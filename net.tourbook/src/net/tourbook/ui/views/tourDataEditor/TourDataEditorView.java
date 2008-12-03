@@ -2919,25 +2919,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void enableControls() {
 
-		final boolean isTourInDb = isTourInDb();
+		final boolean canEdit = fIsEditMode && isTourInDb();
 
-		fTextTitle.setEnabled(fIsEditMode && isTourInDb);
-		fTextDescription.setEnabled(fIsEditMode && isTourInDb);
+		fTextTitle.setEnabled(canEdit);
+		fTextDescription.setEnabled(canEdit);
 
-		fTextStartLocation.setEnabled(fIsEditMode && isTourInDb);
-		fTextEndLocation.setEnabled(fIsEditMode && isTourInDb);
+		fTextStartLocation.setEnabled(canEdit);
+		fTextEndLocation.setEnabled(canEdit);
 
-		fDtTourDate.setEnabled(fIsEditMode && isTourInDb);
-		fDtStartTime.setEnabled(fIsEditMode && isTourInDb);
+		fDtTourDate.setEnabled(canEdit);
+		fDtStartTime.setEnabled(canEdit);
 
-		fDtRecordingTime.setEnabled(fIsEditMode && fIsManualTour);
-		fDtDrivingTime.setEnabled(fIsEditMode && fIsManualTour);
-		fDtPausedTime.setEnabled(fIsEditMode && fIsManualTour);
+		fDtRecordingTime.setEnabled(canEdit && fIsManualTour);
+		fDtDrivingTime.setEnabled(canEdit && fIsManualTour);
+		fDtPausedTime.setEnabled(canEdit && fIsManualTour);
 
-		fTextTourDistance.setEnabled(fIsEditMode && fIsManualTour);
+		fTextTourDistance.setEnabled(canEdit && fIsManualTour);
 
-		fTagLink.setEnabled(fIsEditMode && isTourInDb);
-		fTourTypeLink.setEnabled(fIsEditMode && isTourInDb);
+		fTagLink.setEnabled(canEdit);
+		fTourTypeLink.setEnabled(canEdit);
 
 		fSliceViewer.getTable().setEnabled(fIsManualTour == false);
 		fMarkerViewer.getTable().setEnabled(fIsManualTour == false);

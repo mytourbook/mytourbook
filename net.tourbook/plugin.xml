@@ -25,7 +25,7 @@
          
       <product
             application="net.tourbook.application"
-            name="MyTourbook">
+            name="MyTourbook Testversion">
             
          <property
                name="windowImages"
@@ -38,7 +38,7 @@
                value="icons/application/tourbook-about-250.gif"/>
          <property
                name="appName"
-               value="MyTourbook">
+               value="MyTourbook Testversion">
          </property>
          <property
                name="startupForegroundColor"

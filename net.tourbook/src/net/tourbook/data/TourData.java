@@ -73,11 +73,16 @@ public class TourData {
 	@Transient
 	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";										//$NON-NLS-1$
 
-	@Transient
-	public static final String		DEVICE_NAME_FOR_MANUAL_TOUR		= Messages.tour_data_label_manually_created_tour;
-
 	/**
-	 * persistence unique id which identifies the tour
+	 * Device id for csv files which behave like manually created tours, marker and timeslices are
+	 * disabled because they are not available, tour duration can be edited<br>
+	 * this is the id of the deviceDataReader
+	 */
+	@Transient
+	public static final String		DEVICE_ID_CSV_DATA_READER		= "net.tourbook.device.CSVDataReader";				//$NON-NLS-1$
+	
+	/**
+	 * entity id which identifies the tour
 	 */
 	@Id
 	private Long					tourId;
@@ -2385,8 +2390,8 @@ public class TourData {
 	}
 
 	public String getDeviceName() {
-		if (isManualTour()) {
-			return DEVICE_NAME_FOR_MANUAL_TOUR;
+		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
+			return Messages.tour_data_label_manually_created_tour;
 		} else if (devicePluginName == null || devicePluginName.length() == 0) {
 			return UI.EMPTY_STRING;
 		} else {
@@ -2913,7 +2918,7 @@ public class TourData {
 			return false;
 		}
 
-		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR);
+		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR) || devicePluginId.equals(DEVICE_ID_CSV_DATA_READER);
 	}
 
 	/**
