@@ -449,9 +449,12 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						fTourTimeData.fTourAltitudeValues[valueIndex],
 						UI.UNIT_LABEL_ALTITUDE,
 						//
+						// start time
 						startValue[valueIndex] / 3600,
 						(startValue[valueIndex] % 3600) / 60,
-						endValue[valueIndex] / 3600,
+						//
+						// end time
+						endValue[valueIndex] / 3600 % 24,
 						(endValue[valueIndex] % 3600) / 60,
 						//
 						recordingTime / 3600,

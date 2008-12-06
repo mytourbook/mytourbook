@@ -40,9 +40,9 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -60,30 +60,30 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
 
-	static final String				DISTANCE_DATA	= "distance";									//$NON-NLS-1$
-	static final String				ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
-	static final String				DURATION_DATA	= "duration";									//$NON-NLS-1$
+	static final String			DISTANCE_DATA	= "distance";									//$NON-NLS-1$
+	static final String			ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
+	static final String			DURATION_DATA	= "duration";									//$NON-NLS-1$
 
-	TourTypeFilter					fActiveTourTypeFilter;
-	private TourPerson				fActivePerson;
+	TourTypeFilter				fActiveTourTypeFilter;
+	private TourPerson			fActivePerson;
 
-	Long							fSelectedTourId;
+	Long						fSelectedTourId;
 
-	int								fCurrentYear;
-	int								fCurrentMonth;
-	int								fNumberOfYears;
+	int							fCurrentYear;
+	int							fCurrentMonth;
+	int							fNumberOfYears;
 
-	Calendar						fCalendar		= GregorianCalendar.getInstance();
-	private final DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	Calendar					fCalendar		= GregorianCalendar.getInstance();
+	private final DateFormat	fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
-	IPostSelectionProvider			fPostSelectionProvider;
+	IPostSelectionProvider		fPostSelectionProvider;
 
-	Chart							fChart;
-	BarChartMinMaxKeeper			fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	Chart						fChart;
+	BarChartMinMaxKeeper		fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
-	protected TourDayData			fTourDayData;
+	protected TourDayData		fTourDayData;
 
-	boolean							fIsSynchScaleEnabled;
+	boolean						fIsSynchScaleEnabled;
 	private ITourEventListener	fTourPropertyListener;
 
 	@Override
@@ -94,9 +94,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
@@ -319,7 +317,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				(startValue[valueIndex] % 3600) / 60,
 				//
 				// end time
-				endValue[valueIndex] / 3600,
+				(endValue[valueIndex] / 3600) % 24,
 				(endValue[valueIndex] % 3600) / 60,
 				//
 				recordingTime / 3600,
@@ -435,9 +433,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	@Override
 	public void dispose() {
-		
+
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
-		
+
 		super.dispose();
 	}
 
