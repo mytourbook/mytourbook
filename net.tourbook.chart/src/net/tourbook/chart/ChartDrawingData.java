@@ -209,7 +209,7 @@ public class ChartDrawingData {
 	/**
 	 * @return Returns the top of the chart in graph units
 	 */
-	protected int getGraphYTop() {
+	public int getGraphYTop() {
 		return graphYTop;
 	}
 

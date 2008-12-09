@@ -84,6 +84,7 @@ public class UI {
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final String						SPACE							= " ";
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 

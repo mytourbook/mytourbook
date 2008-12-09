@@ -44,6 +44,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -55,6 +56,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionMergeTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
@@ -92,6 +94,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -137,12 +140,14 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionSaveTourInDatabase		fActionSaveTour;
 	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
+	private ActionAssignMergedTour			fActionAssignMergedTour;
 	private ActionAdjustYear				fActionAdjustImportedYear;
-	private ActionMergeTours				fActionMergeTours;
+	private ActionMergeGPXTours				fActionMergeGPXTours;
 	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
 	private ActionSetTourType				fActionSetTourType;
 	private ActionEditQuick					fActionEditQuick;
 	private ActionEditTour					fActionEditTour;
+	private ActionMergeTour					fActionMergeTour;
 	private ActionSetTourTag				fActionAddTag;
 	private ActionSetTourTag				fActionRemoveTag;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
@@ -151,10 +156,12 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private ImageDescriptor					imageDescDatabase;
 	private ImageDescriptor					imageDescDatabaseOtherPerson;
+	private ImageDescriptor					imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					imageDescDatabasePlaceholder;
 	private ImageDescriptor					imageDescDelete;
 	private Image							imageDatabase;
 	private Image							imageDatabaseOtherPerson;
+	private Image							imageDatabaseAssignMergedTour;
 	private Image							imageDatabasePlaceholder;
 	private Image							imageDelete;
 
@@ -194,6 +201,62 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
+	void actionAssignMergedTour() {
+
+		/*
+		 * when this action is called, the selection contains one saved and one unsaved tour, the
+		 * unsaved tour will be the tour which is merged into the saved tour, the saved tour is not
+		 * deleted
+		 */
+
+		/*
+		 * check if the already saved tour is modified in the tour editor
+		 */
+		if (UI.isTourEditorModified()) {
+			return;
+		}
+
+		/*
+		 * get the saved and unsaved tour
+		 */
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
+		TourData mergeIntoTour = null;
+		TourData mergeFromTour = null;
+
+		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TourData) {
+
+				final TourData tourData = (TourData) treeItem;
+				if (tourData.getTourPerson() == null) {
+					// tour is not yet saved, this is the tour which is merged into the other tour
+					mergeFromTour = tourData;
+				} else {
+					// tour is saved
+					mergeIntoTour = tourData;
+				}
+			}
+		}
+
+		/*
+		 * saved the unsaved tour for the same person, this is the tour which will be merged into
+		 * the already saved tour
+		 */
+		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+		mergeFromTour.setMergeIntoTourId(mergeIntoTour.getTourId());
+		saveTour(mergeFromTour, mergeIntoTour.getTourPerson(), savedTours);
+
+		// set merge tour id
+		mergeIntoTour.setMergeFromTourId(savedTours.get(0).getTourId());
+
+		// resave tour with the new merge tour id
+		mergeIntoTour = TourDatabase.saveTour(mergeIntoTour);
+		savedTours.add(mergeIntoTour);
+
+		// update existing views
+		saveTourPostActions(savedTours);
+	}
+
 	void actionClearView() {
 
 		// remove all tours
@@ -202,10 +265,34 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		reloadViewer();
 
 		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
-		
+
 		// don't throw the selection again
 		fPostSelectionProvider.clearSelection();
 
+	}
+
+	void actionSaveTour(final TourPerson person) {
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
+
+				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+
+				// get selected tours
+				final IStructuredSelection selection = ((IStructuredSelection) fTourViewer.getSelection());
+
+				// loop: all selected tours, selected tours can already be saved
+				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
+					final Object selObject = iter.next();
+					if (selObject instanceof TourData) {
+						saveTour((TourData) selObject, person, savedTours);
+					}
+				}
+
+				saveTourPostActions(savedTours);
+			}
+		});
 	}
 
 	private void addPartListener() {
@@ -391,9 +478,11 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// context menu
 		fActionSaveTour = new ActionSaveTourInDatabase(this, false);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
+		fActionAssignMergedTour = new ActionAssignMergedTour(this);
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
+		fActionMergeTour = new ActionMergeTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
 
@@ -408,7 +497,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// view menu
 		fActionModifyColumns = new ActionModifyColumns(this);
-		fActionMergeTours = new ActionMergeTours(this);
+		fActionMergeGPXTours = new ActionMergeGPXTours(this);
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
 		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 	}
@@ -475,6 +564,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
 		imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
+		imageDescDatabaseAssignMergedTour = TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour);
 		imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__database_placeholder);
 		imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
 
@@ -482,6 +572,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			final Display display = Display.getCurrent();
 			imageDatabase = (Image) imageDescDatabase.createResource(display);
 			imageDatabaseOtherPerson = (Image) imageDescDatabaseOtherPerson.createResource(display);
+			imageDatabaseAssignMergedTour = (Image) imageDescDatabaseAssignMergedTour.createResource(display);
 			imageDatabasePlaceholder = (Image) imageDescDatabasePlaceholder.createResource(display);
 			imageDelete = (Image) imageDescDelete.createResource(display);
 		} catch (final DeviceResourceException e) {
@@ -561,9 +652,13 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 				cell.setImage(tourData.isTourDeleted ? //
 						imageDelete
-						: tourPerson == null ? imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
-								? imageDatabase
-								: imageDatabaseOtherPerson);
+						: tourData.getMergeIntoTourId() != null ? //
+								imageDatabaseAssignMergedTour
+								: tourPerson == null
+										? imageDatabasePlaceholder
+										: tourPerson.getPersonId() == activePersonId
+												? imageDatabase
+												: imageDatabaseOtherPerson);
 			}
 		});
 
@@ -836,6 +931,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		if (imageDatabaseOtherPerson != null) {
 			imageDescDatabaseOtherPerson.destroyResource(imageDatabaseOtherPerson);
 		}
+		if (imageDatabaseAssignMergedTour != null) {
+			imageDescDatabaseAssignMergedTour.destroyResource(imageDatabaseAssignMergedTour);
+		}
 		if (imageDatabasePlaceholder != null) {
 			imageDescDatabasePlaceholder.destroyResource(imageDatabasePlaceholder);
 		}
@@ -859,7 +957,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final int selectedItems = selection.size();
 		int unsavedTours = 0;
 		int savedTours = 0;
-		TourData firstTour = null;
+
+		TourData firstSavedTour = null;
 
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 			final Object treeItem = iter.next();
@@ -867,13 +966,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final TourData tourData = (TourData) treeItem;
 				if (tourData.getTourPerson() == null) {
+
+					// tour is not saved
+
 					if (tourData.isTourDeleted == false) {
+
+						// deleted tours are ignored, tour is not deleted
+
 						unsavedTours++;
 					}
 				} else {
 
 					if (savedTours == 0) {
-						firstTour = tourData;
+						firstSavedTour = tourData;
 					}
 
 					savedTours++;
@@ -881,6 +986,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			}
 		}
 		final boolean isTourSelected = savedTours > 0;
+
+		/*
+		 * check if a tour can be merged
+		 */
+		boolean canAssignMergedTour = savedTours == 1 && unsavedTours == 1;
+		if (canAssignMergedTour) {
+			// check if the saved tour contains a merged tour, a tour can have only one merged tour
+			if (firstSavedTour.getMergeFromTourId() != null) {
+				canAssignMergedTour = false;
+			}
+		}
 
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 		if (person != null) {
@@ -897,6 +1013,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		fActionSaveTour.setEnabled(unsavedTours > 0);
 
+		fActionAssignMergedTour.setEnabled(canAssignMergedTour);
+		fActionMergeTour.setEnabled(selectedItems == 1 && savedTours == 1);
+
 		fActionEditTour.setEnabled(selectedItems == 1 && savedTours == 1);
 		fActionEditQuick.setEnabled(selectedItems == 1 && savedTours == 1);
 		fActionOpenTour.setEnabled(selectedItems == 1 && savedTours == 1);
@@ -909,11 +1028,11 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * enable/disable remove actions
 		 */
-		if (firstTour != null && savedTours == 1) {
+		if (firstSavedTour != null && savedTours == 1) {
 
 			// one tour is selected
 
-			final Set<TourTag> tourTags = firstTour.getTourTags();
+			final Set<TourTag> tourTags = firstSavedTour.getTourTags();
 			if (tourTags != null && tourTags.size() > 0) {
 
 				// at least one tag is within the tour
@@ -944,6 +1063,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			menuMgr.add(fActionSaveTourWithPerson);
 		}
 		menuMgr.add(fActionSaveTour);
+		menuMgr.add(fActionAssignMergedTour);
+		menuMgr.add(fActionMergeTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
@@ -972,6 +1093,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		viewTbm.add(fActionSaveTourWithPerson);
 		viewTbm.add(fActionSaveTour);
+		viewTbm.add(fActionAssignMergedTour);
 		viewTbm.add(new Separator());
 
 		// place for import and transfer actions
@@ -985,7 +1107,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(fActionMergeTours);
+		menuMgr.add(fActionMergeGPXTours);
 		menuMgr.add(fActionDisableChecksumValidation);
 		menuMgr.add(fActionAdjustImportedYear);
 
@@ -1162,20 +1284,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		final RawDataManager rawDataManager = RawDataManager.getInstance();
 
-//		if (memento == null) {
-//
-//			fActionMergeTours.setChecked(true);
-//			rawDataManager.setMergeTracks(true);
-//
-//			// enable checksum validation
-//			fActionDisableChecksumValidation.setChecked(false);
-//			rawDataManager.setIsChecksumValidation(true);
-//
-//		} else {
-
-		// restore: set merge tracks status befor the tours are imported
+		// restore: set merge tracks status before the tours are imported
 		final boolean isMergeTracks = fViewState.getBoolean(MEMENTO_MERGE_TRACKS);
-		fActionMergeTours.setChecked(isMergeTracks);
+		fActionMergeGPXTours.setChecked(isMergeTracks);
 		rawDataManager.setMergeTracks(isMergeTracks);
 
 		// restore: is checksum validation
@@ -1187,8 +1298,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				importFiles();
 			}
 		});
-//		}
-
 	}
 
 	private void saveState() {
@@ -1213,10 +1322,86 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// save selected tour in the viewer
 		fViewState.put(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
 
-		fViewState.put(MEMENTO_MERGE_TRACKS, fActionMergeTours.isChecked());
+		fViewState.put(MEMENTO_MERGE_TRACKS, fActionMergeGPXTours.isChecked());
 		fViewState.put(MEMENTO_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked());
 
 		fColumnManager.saveState(fViewState);
+	}
+
+	/**
+	 * @param tourData
+	 *            {@link TourData} which is not yet saved
+	 * @param person
+	 *            person for which the tour is being saved
+	 * @param savedTours
+	 *            the saved tour is added to this list
+	 */
+	private void saveTour(final TourData tourData, final TourPerson person, final ArrayList<TourData> savedTours) {
+
+		// workaround for hibernate problems
+		if (tourData.isTourDeleted) {
+			return;
+		}
+
+		if (tourData.getTourPerson() != null) {
+			/*
+			 * tour is already saved, resaving cannot be done in the import view it can be done in
+			 * the tour editor
+			 */
+			return;
+		}
+
+		tourData.setTourPerson(person);
+		tourData.setBikerWeight(person.getWeight());
+		tourData.setTourBike(person.getTourBike());
+
+		final TourData savedTour = TourDatabase.saveTour(tourData);
+		if (savedTour != null) {
+			savedTours.add(savedTour);
+		}
+	}
+
+	/**
+	 * After tours are saved, the internal structures and ui viewers must be updated
+	 * 
+	 * @param savedTours
+	 *            contains the saved {@link TourData}
+	 */
+	private void saveTourPostActions(final ArrayList<TourData> savedTours) {
+
+		// update viewer, fire selection event
+		if (savedTours.size() == 0) {
+			return;
+		}
+
+		final ArrayList<Long> savedToursIds = new ArrayList<Long>();
+
+		// update raw data map with the saved tour data 
+		final HashMap<Long, TourData> rawDataMap = RawDataManager.getInstance().getTourDataMap();
+		for (final TourData tourData : savedTours) {
+
+			final Long tourId = tourData.getTourId();
+
+			rawDataMap.put(tourId, tourData);
+			savedToursIds.add(tourId);
+		}
+
+		/*
+		 * the selection provider can contain old tour data which conflicts with the tour data in
+		 * the tour data editor
+		 */
+		fPostSelectionProvider.clearSelection();
+
+		// update import viewer
+		reloadViewer();
+
+		enableActions();
+
+		/*
+		 * notify all views, it is not checked if the tour data editor is dirty because newly saved
+		 * tours can not be modified in the tour data editor
+		 */
+		TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds));
 	}
 
 	/**
@@ -1260,7 +1445,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// update person in save action
 		enableActions();
-		
+
 		// update person in the raw data
 		RawDataManager.getInstance().updateTourDataFromDb();
 

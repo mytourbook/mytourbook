@@ -644,7 +644,9 @@ public class RawDataManager {
 	public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
 
 		for (final TourData tourData : modifiedTours) {
-			fTourDataMap.put(tourData.getTourId(), tourData);
+			if (tourData != null) {
+				fTourDataMap.put(tourData.getTourId(), tourData);
+			}
 		}
 	}
 }

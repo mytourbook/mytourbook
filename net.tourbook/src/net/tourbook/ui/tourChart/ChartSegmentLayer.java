@@ -68,17 +68,11 @@ public class ChartSegmentLayer implements IChartLayer {
 		final int devGraphHeight = drawingData.getDevGraphHeight();
 
 		final int graphYBottom = drawingData.getGraphYBottom();
-
-//		final int yMarkerBar = drawingData.getDevMarginTop()
-//				+ drawingData.getDevXTitelBarHeight()
-//				+ drawingData.getDevMarkerBarHeight();
-
 		final int[] yValues = drawingData.getYData().getHighValues()[0];
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
 		final Color colorLine = new Color(display, getLineColor());
-//		final Point labelExtend;
 		Point lastPoint = null;
 
 		for (final ChartMarker chartMarker : fChartMarkers) {

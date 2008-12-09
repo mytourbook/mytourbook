@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,18 +16,28 @@
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
-import net.tourbook.importdata.RawDataManager;
+import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMergeTours extends Action {
+public class ActionAssignMergedTour extends Action {
 
-	public ActionMergeTours(final RawDataView rawDataView) {
-		super(Messages.import_data_action_merge_tracks, AS_CHECK_BOX);
+	private RawDataView	fRawDataView;
+
+	public ActionAssignMergedTour(final RawDataView rawDataView) {
+
+		fRawDataView = rawDataView;
+
+		setText(Messages.import_data_action_assignMergedTour);
+		setToolTipText(Messages.import_data_action_assignMergedTour_tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour_disabled));
 	}
 
 	@Override
 	public void run() {
-		RawDataManager.getInstance().setMergeTracks(isChecked());
+		fRawDataView.actionAssignMergedTour();
 	}
+
 }

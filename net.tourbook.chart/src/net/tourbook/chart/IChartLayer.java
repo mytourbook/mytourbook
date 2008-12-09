@@ -20,6 +20,6 @@ import org.eclipse.swt.graphics.GC;
 
 public interface IChartLayer {
 
-	public void draw(GC gc, ChartDrawingData config, Chart chart);
+	public void draw(GC gc, ChartDrawingData drawingData, Chart chart);
 
 }

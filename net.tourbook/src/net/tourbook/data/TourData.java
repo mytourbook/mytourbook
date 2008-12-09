@@ -170,7 +170,9 @@ public class TourData {
 
 	private int						deviceWeight;
 
+	@SuppressWarnings("unused")
 	private int						deviceTotalUp;
+	@SuppressWarnings("unused")
 	private int						deviceTotalDown;
 
 	/**
@@ -254,6 +256,28 @@ public class TourData {
 	 * file path for the imported tour
 	 */
 	private String					tourImportFilePath;														// db-version 6
+
+	/**
+	 * when a tour is merged with another tour, {@link #mergeFromTourId} contains the tour id of the
+	 * tour which is merged into this tour
+	 */
+	private Long					mergeFromTourId;															// db-version 7
+
+	/**
+	 * when a tour is merged into another tour, {@link #mergeIntoTourId} contains the tour id of the
+	 * tour into which this tour is merged
+	 */
+	private Long					mergeIntoTourId;															// db-version 7
+
+	/**
+	 * positive or negative time offset in seconds for the merged tour
+	 */
+	private int						mergedTourTimeOffset;														// db-version 7
+
+	/**
+	 * altitude difference for the merged tour
+	 */
+	private int						mergedAltitudeOffset;														// db-version 7
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -2509,6 +2533,22 @@ public class TourData {
 		return maxSpeed;
 	}
 
+	public int getMergedAltitudeOffset() {
+		return mergedAltitudeOffset;
+	}
+
+	public int getMergedTourTimeOffset() {
+		return mergedTourTimeOffset;
+	}
+
+	public Long getMergeFromTourId() {
+		return mergeFromTourId;
+	}
+
+	public Long getMergeIntoTourId() {
+		return mergeIntoTourId;
+	}
+
 	/**
 	 * @return Returns the distance serie from the metric system, the distance serie is
 	 *         <b>always</b> saved in the database with the metric system
@@ -2820,36 +2860,6 @@ public class TourData {
 		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
-	/**
-	 * @return Returns the tags {@link #tourTags} which are defined for this tour
-	 */
-	public Set<TourTag> getTourTags() {
-		return tourTags;
-	}
-
-	/**
-	 * @return the tourTitle
-	 */
-	public String getTourTitle() {
-		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
-	}
-
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
-
-	/**
-	 * @param zoomLevel
-	 * @return Returns the world position for the suplied zoom level and projection id
-	 */
-	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
-		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -2888,6 +2898,41 @@ public class TourData {
 //			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
 //			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
 //		}
+//	}
+
+	/**
+	 * @return Returns the tags {@link #tourTags} which are defined for this tour
+	 */
+	public Set<TourTag> getTourTags() {
+		return tourTags;
+	}
+
+	/**
+	 * @return the tourTitle
+	 */
+	public String getTourTitle() {
+		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
+	}
+
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
+	}
+
+	/**
+	 * @param zoomLevel
+	 * @return Returns the world position for the suplied zoom level and projection id
+	 */
+	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
+		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
+	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
 //	}
 
 	/**
@@ -3109,11 +3154,6 @@ public class TourData {
 		serieData.longitude = longitudeSerie;
 	}
 
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
-
 	/**
 	 * @param avgCadence
 	 *            the avgCadence to set
@@ -3206,6 +3246,22 @@ public class TourData {
 
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
+	}
+
+	public void setMergedAltitudeOffset(final int altitudeDiff) {
+		mergedAltitudeOffset = altitudeDiff;
+	}
+
+	public void setMergedTourTimeOffset(final int mergedTourTimeOffset) {
+		this.mergedTourTimeOffset = mergedTourTimeOffset;
+	}
+
+	public void setMergeFromTourId(final Long mergeTourId) {
+		this.mergeFromTourId = mergeTourId;
+	}
+
+	public void setMergeIntoTourId(final Long mergeIntoTourId) {
+		this.mergeIntoTourId = mergeIntoTourId;
 	}
 
 	public void setStartAltitude(final short startAltitude) {

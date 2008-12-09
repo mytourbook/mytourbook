@@ -13,14 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.ui.views.rawData;
 
-import org.eclipse.jface.viewers.ISelection;
+import net.tourbook.Messages;
+import net.tourbook.importdata.RawDataManager;
 
-public class EmptySelection implements ISelection {
+import org.eclipse.jface.action.Action;
 
-	public boolean isEmpty() {
-		return true;
+public class ActionMergeGPXTours extends Action {
+
+	public ActionMergeGPXTours(final RawDataView rawDataView) {
+		super(Messages.import_data_action_merge_tracks, AS_CHECK_BOX);
 	}
 
+	@Override
+	public void run() {
+		RawDataManager.getInstance().setMergeTracks(isChecked());
+	}
 }

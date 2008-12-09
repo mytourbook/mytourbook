@@ -405,6 +405,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private boolean checkDataValidation(final TourData tourData) {
 
 		if (tourData == null) {
+
 			fPageBook.showPage(fPageNoData);
 
 			fTourData = null;
@@ -412,6 +413,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			return false;
 		}
+
 		if (tourData.altitudeSerie == null
 				|| tourData.altitudeSerie.length == 0
 				|| tourData.getMetricDistanceSerie() == null
@@ -422,11 +424,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return false;
 		}
 
+		fPageBook.showPage(fPageSegmenter);
+
 		return true;
 	}
 
 	private void createActions() {
 
+		fActionShowSegments = new ActionShowSegments();
 		final ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
 
 		/*
@@ -434,18 +439,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(actionModifyColumns);
-	}
 
-	/**
-	 * create view menu
-	 */
-	private void createMenus() {
-
-		fActionShowSegments = new ActionShowSegments();
-
+		/*
+		 * fill view toolbar
+		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 		tbm.add(fActionShowSegments);
-
 	}
 
 	@Override
@@ -471,7 +470,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		createUIHeader(fPageSegmenter);
 		createUIViewer(fPageSegmenter);
 
-		createMenus();
 		createActions();
 
 		addSelectionListener();
@@ -834,7 +832,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		final IWorkbenchPage wbPage = getSite().getPage();
+		wbPage.removePostSelectionListener(fPostSelectionListener);
+		wbPage.removePartListener(fPartListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 		TourManager.getInstance().removePropertyListener(fTourEventListener);

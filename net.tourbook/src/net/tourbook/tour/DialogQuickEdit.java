@@ -16,14 +16,12 @@
 package net.tourbook.tour;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
@@ -33,6 +31,9 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -40,7 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
+public class DialogQuickEdit extends TitleAreaDialog {
 
 	private Text					fTextTitle;
 	private Text					fTextDescription;
@@ -48,16 +49,12 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
 	private TourData				fTourData;
 
 	private final IDialogSettings	fDialogSettings;
+	
+	private Image					fShellImage;
 
-	private static final Calendar	fCalendar			= GregorianCalendar.getInstance();
-	private static final DateFormat	fDateFormatter		= DateFormat.getDateInstance(DateFormat.FULL);
-	private static final DateFormat	fTimeFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT);
-
-	/**
-	 * this width is used as a hint for the width of the description field, this value also
-	 * influences the width of the columns in this editor
-	 */
-	private int						fTextColumnWidth	= 150;
+	private static final Calendar	fCalendar		= GregorianCalendar.getInstance();
+	private static final DateFormat	fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private static final DateFormat	fTimeFormatter	= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	public DialogQuickEdit(final Shell parentShell, final TourData tourData) {
 
@@ -66,8 +63,25 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
+		// set icon for the window 
+		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage();
+		setDefaultImage(fShellImage);
+
 		fTourData = tourData;
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+	}
+
+	@Override
+	protected void configureShell(final Shell shell) {
+
+		super.configureShell(shell);
+
+		shell.setText(Messages.dialog_quick_edit_dialog_title);
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(final DisposeEvent e) {
+				fShellImage.dispose();
+			}
+		});
 	}
 
 	@Override
@@ -75,7 +89,6 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
 
 		super.create();
 
-		getShell().setText(Messages.dialog_quick_edit_dialog_title);
 		setTitle(Messages.dialog_quick_edit_dialog_area_title);
 
 		fCalendar.set(fTourData.getStartYear(),
@@ -97,11 +110,9 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
 
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == fTourData) {
-			okText = Messages.dialog_quick_edit_dialog_update;
-		}
-
-		if (okText == null) {
-			okText = Messages.dialog_quick_edit_dialog_save;
+			okText = Messages.app_action_update;
+		} else {
+			okText = Messages.app_action_save;
 		}
 
 		getButton(IDialogConstants.OK_ID).setText(okText);
@@ -155,14 +166,6 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourProvider {
 
 		// keep window size and position
 		return fDialogSettings;
-	}
-
-	public ArrayList<TourData> getSelectedTours() {
-
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-		selectedTours.add(fTourData);
-
-		return selectedTours;
 	}
 
 	@Override

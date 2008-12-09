@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -76,9 +76,10 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 6;
+	private static final int					TOURBOOK_DB_VERSION							= 7;													// 9.01
 
-//	private static final int					TOURBOOK_DB_VERSION							= 5;	8.11
+//	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
+//	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
 
@@ -116,16 +117,6 @@ public class TourDatabase {
 	 */
 	public static final int						ENTITY_IS_NOT_SAVED							= -1;
 
-//	/**
-//	 * Db property: tour was changed and saved in the database
-//	 */
-//	public static final int						TOUR_IS_CHANGED_AND_PERSISTED				= 1;
-//
-//	/**
-//	 * Db property: tour was changed but not yet saved in the database
-//	 */
-//	public static final int						TOUR_IS_CHANGED								= 2;
-
 	private static TourDatabase					instance;
 
 	private static NetworkServerControl			server;
@@ -153,7 +144,7 @@ public class TourDatabase {
 		// set storage location for the database
 		System.setProperty("derby.system.home", fDatabasePath); //$NON-NLS-1$
 
-		// derby debug properties
+// derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
 //		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
@@ -891,7 +882,7 @@ public class TourDatabase {
 	 * tour
 	 * 
 	 * @param tourData
-	 * @return returns persisted {@link TourData} or <code>null</code> when saving fails
+	 * @return persisted {@link TourData} or <code>null</code> when saving fails
 	 */
 	public static TourData saveTour(final TourData tourData) {
 
@@ -1448,6 +1439,15 @@ public class TourDatabase {
 				+ "tourImportFilePath	VARCHAR(255),		\n" //$NON-NLS-1$
 				//				
 				// version 6 end
+
+				// version 7 start
+				//				
+				+ "mergeFromTourId				BIGINT,				\n" //$NON-NLS-1$
+				+ "mergeIntoTourId				BIGINT,				\n" //$NON-NLS-1$
+				+ "mergedTourTimeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
+				+ "mergedAltitudeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
+				//				
+				// version 7 end
 
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
@@ -2053,6 +2053,11 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 6;
 		}
 
+		if (currentDbVersion == 6) {
+			updateDbDesign_6_7(conn);
+			currentDbVersion = newVersion = 7;
+		}
+
 		/*
 		 * update version number
 		 */
@@ -2064,7 +2069,7 @@ public class TourDatabase {
 		if (isPostUpdate5) {
 
 			/*
-			 * do this post update after the version number is updated because the post update uses
+			 * do the post update after the version number is updated because the post update uses
 			 * connections and this will check the version number
 			 */
 			TourDatabase.computeComputedValuesForAllTours(monitor);
@@ -2245,8 +2250,8 @@ public class TourDatabase {
 
 	private void updateDbDesign_5_6(final Connection conn) {
 
-		System.out.println("Database update: 6");//$NON-NLS-1$
 		System.out.println();
+		System.out.println("Database update: 6");//$NON-NLS-1$
 
 		try {
 			final Statement statement = conn.createStatement();
@@ -2263,6 +2268,45 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+
+		System.out.println("database is updated");//$NON-NLS-1$
+		System.out.println();
+	}
+
+	private void updateDbDesign_6_7(final Connection conn) {
+
+		System.out.println();
+		System.out.println("database update: 7");//$NON-NLS-1$
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeFromTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeIntoTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedTourTimeOffset	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedAltitudeOffset	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+			
+			statement.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		System.out.println("database is updated");//$NON-NLS-1$
+		System.out.println();
 	}
 
 	private void updateVersionNumber(final Connection conn, final int newVersion) {

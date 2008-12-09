@@ -18,6 +18,7 @@ package net.tourbook.ui;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
+	
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";		//$NON-NLS-1$
 
 	public static String		Action_configure_columns;
@@ -35,10 +36,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
-
-	public static String	ColumnFactory_avg_speed_label;
-
-	public static String	ColumnFactory_avg_speed_tooltip;
+	public static String		ColumnFactory_avg_speed_label;
+	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
 	public static String		ColumnFactory_cadence;
@@ -62,8 +61,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_gradient;
 	public static String		ColumnFactory_gradient_label;
 	public static String		ColumnFactory_gradient_tooltip;
-
-	public static String	ColumnFactory_hour;
+	public static String		ColumnFactory_hour;
 	public static String		ColumnFactory_import_filename;
 	public static String		ColumnFactory_import_filename_label;
 	public static String		ColumnFactory_import_filename_tooltip;
@@ -76,10 +74,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_longitude;
 	public static String		ColumnFactory_longitude_label;
 	public static String		ColumnFactory_longitude_tooltip;
-	public static String	ColumnFactory_marker_label;
-
-	public static String	ColumnFactory_marker_label_tooltip;
-
+	public static String		ColumnFactory_marker_label;
+	public static String		ColumnFactory_marker_label_tooltip;
 	public static String		ColumnFactory_max_altitude_label;
 	public static String		ColumnFactory_max_altitude_tooltip;
 	public static String		ColumnFactory_max_pulse;
@@ -89,12 +85,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_pace_label;
 	public static String		ColumnFactory_pace_tooltip;
-	public static String	ColumnFactory_power;
-
-	public static String	ColumnFactory_power_label;
-
-	public static String	ColumnFactory_power_tooltip;
-
+	public static String		ColumnFactory_power;
+	public static String		ColumnFactory_power_label;
+	public static String		ColumnFactory_power_tooltip;
 	public static String		ColumnFactory_profile;
 	public static String		ColumnFactory_profile_label;
 	public static String		ColumnFactory_profile_tooltip;
@@ -126,49 +119,37 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_tag_label;
 	public static String		ColumnFactory_tour_tag_tooltip;
 	public static String		ColumnFactory_tour_time;
-
-	public static String	ColumnFactory_tour_time_hhmmss;
+	public static String		ColumnFactory_tour_time_hhmmss;
 	public static String		ColumnFactory_tour_time_label;
-
-	public static String	ColumnFactory_tour_time_label_hhmmss;
+	public static String		ColumnFactory_tour_time_label_hhmmss;
 	public static String		ColumnFactory_tour_time_tooltip;
-
-	public static String	ColumnFactory_tour_time_tooltip_hhmmss;
+	public static String		ColumnFactory_tour_time_tooltip_hhmmss;
 	public static String		ColumnFactory_tour_title;
 	public static String		ColumnFactory_tour_title_label;
 	public static String		ColumnFactory_tour_title_tooltip;
 	public static String		ColumnFactory_tour_type_label;
 	public static String		ColumnFactory_tour_type_tooltip;
 
-	public static String	ColumnModifyDialog_Button_default;
-
+	public static String		ColumnModifyDialog_Button_default;
 	public static String		ColumnModifyDialog_Button_deselect_all;
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;
 	public static String		ColumnModifyDialog_Button_select_all;
-
-	public static String	ColumnModifyDialog_column_column;
-
-	public static String	ColumnModifyDialog_column_unit;
-
-	public static String	ColumnModifyDialog_column_width;
+	public static String		ColumnModifyDialog_column_column;
+	public static String		ColumnModifyDialog_column_unit;
+	public static String		ColumnModifyDialog_column_width;
 	public static String		ColumnModifyDialog_Dialog_title;
 	public static String		ColumnModifyDialog_Label_hint;
 	public static String		ColumnModifyDialog_Label_info;
 
 	public static String		Image_configure_columns;
 
-	public static String	message_manager_pErrorSummary;
-
-	public static String	message_manager_pMessageSummary;
-
-	public static String	message_manager_pWarningSummary;
-
-	public static String	message_manager_sErrorSummary;
-
-	public static String	message_manager_sMessageSummary;
-
-	public static String	message_manager_sWarningSummary;
+	public static String		message_manager_pErrorSummary;
+	public static String		message_manager_pMessageSummary;
+	public static String		message_manager_pWarningSummary;
+	public static String		message_manager_sErrorSummary;
+	public static String		message_manager_sMessageSummary;
+	public static String		message_manager_sWarningSummary;
 
 	static {
 		// initialize resource bundle

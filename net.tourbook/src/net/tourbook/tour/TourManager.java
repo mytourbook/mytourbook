@@ -374,7 +374,7 @@ public class TourManager {
 
 		final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, canFireNotification);
 
-		if (savedTourData == null) {
+		if (savedTourData == null || savedTourData.size() == 0) {
 			return null;
 		} else {
 			return savedTourData.get(0);

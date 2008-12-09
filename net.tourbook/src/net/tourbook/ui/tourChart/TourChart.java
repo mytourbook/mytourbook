@@ -118,9 +118,11 @@ public class TourChart extends Chart {
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
 
-	private boolean							fIsSegmentLayerVisible;
+	private boolean							fIsSegmentLayerVisible					= false;
+	private boolean							fIsMergeLayerVisible					= false;
 
 	private boolean							fIsTourDirty;
+	private ChartMergeLayer					fMergeLayer;
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
@@ -415,6 +417,23 @@ public class TourChart extends Chart {
 
 			fLabelLayer.addLabel(chartLabel);
 		}
+	}
+
+	private void createMergeLayer() {
+		// TODO Auto-generated method stub
+
+		if (fIsMergeLayerVisible == false || fTourData == null || fTourData.getMergeFromTourId() == null) {
+			fMergeLayer = null;
+			return;
+		}
+
+		final TourData mergeFromTourData = TourManager.getInstance().getTourData(fTourData.getMergeFromTourId());
+		if (mergeFromTourData == null) {
+			fMergeLayer = null;
+			return;
+		}
+
+		fMergeLayer = new ChartMergeLayer(fTourData, mergeFromTourData);
 	}
 
 	/**
@@ -882,10 +901,52 @@ public class TourChart extends Chart {
 		fTCActionHandlerManager.updateUICheckState(commandId);
 	}
 
+	private void setCumtomGraphData(final String customDataKey,
+									final Object segmentDataSerie,
+									final ChartDataYSerie yDataWithLabels) {
+
+		final ChartDataModel dataModel = getChartDataModel();
+		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
+
+		if (yData == null) {
+			return;
+		}
+
+		final ArrayList<IChartLayer> chartLayers = new ArrayList<IChartLayer>();
+
+		// show label layer only for ONE visible graph
+		if (fLabelLayer != null && yData == yDataWithLabels) {
+			chartLayers.add(fLabelLayer);
+		}
+
+		final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+
+		if (yData == yDataAltitude) {
+			if (fSegmentLayer != null) {
+				chartLayers.add(fSegmentLayer);
+			}
+		} else {
+			if (fSegmentValueLayer != null) {
+				chartLayers.add(fSegmentValueLayer);
+			}
+		}
+
+		if (fMergeLayer != null) {
+			chartLayers.add(fMergeLayer);
+		}
+
+		// add the layers as custom data to the y-data
+		yData.setCustomLayers(chartLayers);
+
+		if (segmentDataSerie != null) {
+			yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
+		}
+	}
+
 	/**
-	 * set the graph layers
+	 * set custom data to the graph
 	 */
-	private void setGraphLayers() {
+	private void setCustomGraphData() {
 
 		final ChartDataModel dataModel = getChartDataModel();
 		if (dataModel == null) {
@@ -919,14 +980,14 @@ public class TourChart extends Chart {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
 		}
 
-		setYDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
-		setYDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
+		setCumtomGraphData(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
@@ -992,42 +1053,6 @@ public class TourChart extends Chart {
 
 		if (fTourModifyListener != null) {
 			fTourModifyListener.tourIsModified();
-		}
-	}
-
-	private void setYDataLayers(final String customDataKey,
-								final Object segmentDataSerie,
-								final ChartDataYSerie yDataWithLabels) {
-
-		final ChartDataModel dataModel = getChartDataModel();
-		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
-
-		if (yData != null) {
-
-			final ArrayList<IChartLayer> chartLayers = new ArrayList<IChartLayer>();
-
-			// show label layer only at ONE visible graph
-			if (fLabelLayer != null && yData == yDataWithLabels) {
-				chartLayers.add(fLabelLayer);
-			}
-
-			final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
-
-			if (yData == yDataAltitude) {
-				if (fSegmentLayer != null) {
-					chartLayers.add(fSegmentLayer);
-				}
-			} else {
-				if (fSegmentValueLayer != null) {
-					chartLayers.add(fSegmentValueLayer);
-				}
-			}
-
-			yData.setCustomLayers(chartLayers);
-
-			if (segmentDataSerie != null) {
-				yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
-			}
 		}
 	}
 
@@ -1123,7 +1148,22 @@ public class TourChart extends Chart {
 			fLabelLayer = null;
 		}
 
-		setGraphLayers();
+		setCustomGraphData();
+		updateChartLayers();
+	}
+
+	public void updateMergeLayer(final boolean showLayer) {
+		// TODO Auto-generated method stub
+
+		fIsMergeLayerVisible = showLayer;
+
+		if (fIsMergeLayerVisible) {
+			createMergeLayer();
+		} else {
+			fMergeLayer = null;
+		}
+
+		setCustomGraphData();
 		updateChartLayers();
 	}
 
@@ -1142,11 +1182,11 @@ public class TourChart extends Chart {
 			resetGraphAlpha();
 		}
 
-		setGraphLayers();
+		setCustomGraphData();
 		updateChartLayers();
 
 		/*
-		 * the chart needs to be redrawn because the alpha for filling the chart has changed
+		 * the chart needs to be redrawn because the alpha for filling the chart was modified
 		 */
 		redrawChart();
 	}
@@ -1236,8 +1276,9 @@ public class TourChart extends Chart {
 
 		createSegmentLayer();
 		createLabelLayer();
+		createMergeLayer();
 
-		setGraphLayers();
+		setCustomGraphData();
 
 		updateChart(newChartDataModel);
 

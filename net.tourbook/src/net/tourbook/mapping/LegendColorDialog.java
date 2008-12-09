@@ -106,7 +106,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 	private ColorDefinition			fColorDefinition;
 
-	private boolean					fInizilizeControls;
+	private boolean					fInitializeControls;
 
 	private ColorSelector			fColorSelectorMax;
 	private ColorSelector			fColorSelectorHigh;
@@ -162,11 +162,11 @@ public class LegendColorDialog extends TitleAreaDialog {
 //		} catch (final NumberFormatException e) {
 //			fComboValuePoint.select(0);
 //		}
-		fInizilizeControls = true;
+		fInitializeControls = true;
 		{
 			updateUI();
 		}
-		fInizilizeControls = false;
+		fInitializeControls = false;
 
 		/*
 		 * update color selectors
@@ -184,6 +184,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		fColorSelectorMin.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
 
 		setTitle(Messages.legendcolor_dialog_title);
+		setMessage(NLS.bind(Messages.legendcolor_dialog_title_message, fColorDefinition.getVisibleName()));
 	}
 
 	@Override
@@ -192,10 +193,6 @@ public class LegendColorDialog extends TitleAreaDialog {
 		final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
 
 		createUI(dlgAreaContainer);
-
-		// trick to show the message
-		setMessage(""); //$NON-NLS-1$
-		setMessage(NLS.bind(Messages.legendcolor_dialog_title_message, fColorDefinition.getVisibleName()));
 
 		return dlgAreaContainer;
 	}
@@ -845,7 +842,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 	private void validateFields() {
 
-		if (fInizilizeControls) {
+		if (fInitializeControls) {
 			return;
 		}
 

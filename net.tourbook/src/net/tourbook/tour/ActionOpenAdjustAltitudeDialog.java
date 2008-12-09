@@ -57,14 +57,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		final TourData tourData = selectedTours.get(0);
 
 		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
-		dialog.create();
-		dialog.init();
-
-		if (dialog.open() != Window.OK) {
-
-			dialog.restoreOriginalAltitudeValues();
-
-		} else {
+		if (dialog.open() == Window.OK) {
 
 			if (fIsSaveTour) {
 				TourManager.saveModifiedTours(selectedTours);
@@ -85,6 +78,10 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 				}
 			}
+
+		} else {
+
+			dialog.restoreOriginalAltitudeValues();
 		}
 	}
 }

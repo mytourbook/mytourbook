@@ -29,6 +29,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -40,6 +42,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -82,6 +85,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 			Messages.Dlg_AdjustAltitude_Type_adjust_height,
 			Messages.Dlg_AdjustAltitude_Type_adjust_end		};
 
+	private Image				fShellImage;
+
 	private TourChart			fDialogTourChart;
 	private TourData			fTourData;
 
@@ -121,20 +126,18 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 
 	private boolean				fIsModifiedInternal				= false;
 
-	//	private Image				fWindowIcon;
-
 	public DialogAdjustAltitude(final Shell parentShell, final IStructuredSelection selection) {
 
 		super(parentShell);
 
-		setShell();
+		setShellProperties();
 	}
 
 	public DialogAdjustAltitude(final Shell parentShell, final TourData tourData) {
 
 		super(parentShell);
 
-		setShell();
+		setShellProperties();
 
 		fTourData = tourData;
 
@@ -354,16 +357,52 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 
 		super.configureShell(shell);
 
-		// set window title
 		shell.setText(Messages.Dlg_AdjustAltitude_Title_window);
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(final DisposeEvent e) {
+				fShellImage.dispose();
+			}
+		});
+	}
 
-//		shell.addDisposeListener(new DisposeListener() {
-//			public void widgetDisposed(DisposeEvent e) {
-//				if (fWindowIcon.isDisposed() == false) {
-//					fWindowIcon.dispose();
-//				}
-//			}
-//		});
+	@Override
+	public void create() {
+
+		super.create();
+
+		/*
+		 * initialize dialog by restoring dialog settings
+		 */
+
+		restoreDialogSettings();
+
+		onChangeAdjustType();
+
+		fIsModifiedInternal = true;
+		{
+			fSpinnerNewStartAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, new Integer(fOldStartAlti));
+			fSpinnerNewStartAlti.setSelection((int) (fOldStartAlti / UI.UNIT_VALUE_ALTITUDE));
+		}
+		fIsModifiedInternal = false;
+
+		// set focus to cancel button
+		getButton(IDialogConstants.CANCEL_ID).setFocus();
+
+		/*
+		 * set button width
+		 */
+		final int btnCompareWidth = fBtnCompare.getBounds().width;
+		final int btnResetWidth = fBtnReset.getBounds().width;
+		final int newWidth = Math.max(btnCompareWidth, btnResetWidth);
+
+		GridData gd;
+		gd = (GridData) fBtnCompare.getLayoutData();
+		gd.widthHint = newWidth;
+
+		gd = (GridData) fBtnReset.getLayoutData();
+		gd.widthHint = newWidth;
+
+		fDialogArea.layout(true, true);
 	}
 
 	/**
@@ -669,6 +708,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 				onChangeAltitude(new Integer(ALTI_ID_START));
 			}
 		});
+		/*
+		 * this feature is disabled because it's not working, the reason is that the vertical
+		 * borders are automatically computed since version 1.5.0
+		 */
+		fChkScaleYAxis.setVisible(false);
 
 		/*
 		 * button: reset
@@ -831,40 +875,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
-	/**
-	 * initialize dialog by restoring dialog settings
-	 */
-	public void init() {
-
-		restoreDialogSettings();
-
-		onChangeAdjustType();
-
-		fIsModifiedInternal = true;
-		{
-			fSpinnerNewStartAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, new Integer(fOldStartAlti));
-			fSpinnerNewStartAlti.setSelection((int) (fOldStartAlti / UI.UNIT_VALUE_ALTITUDE));
-		}
-		fIsModifiedInternal = false;
-
-		// set focus to cancel button
-		getButton(IDialogConstants.CANCEL_ID).setFocus();
-
-		// set button width
-		final int btnCompareWidth = fBtnCompare.getBounds().width;
-		final int btnResetWidth = fBtnReset.getBounds().width;
-		final int newWidth = Math.max(btnCompareWidth, btnResetWidth);
-
-		GridData gd;
-		gd = (GridData) fBtnCompare.getLayoutData();
-		gd.widthHint = newWidth;
-
-		gd = (GridData) fBtnReset.getLayoutData();
-		gd.widthHint = newWidth;
-
-		fDialogArea.layout(true, true);
-	}
-
 	private void onChangeAdjustType() {
 
 		if (fTourData.altitudeSerie == null) {
@@ -972,8 +982,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 
 		// force the imperial altitude series to be recomputed
 		fTourData.clearAltitudeSeries();
-
-//		System.arraycopy(fOriginalAltitudes, 0, altitudeSerie, 0, altitudeSerie.length);
 	}
 
 	private void saveDialogSettings() {
@@ -1060,13 +1068,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 		fTourData.clearAltitudeSeries();
 	}
 
-	private void setShell() {
+	private void setShellProperties() {
 
-//		// set icon for this dialog window 
-//		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__adjust_altitude)
-//				.createImage();
-//
-//		setDefaultImage(fWindowIcon);
+		// set icon for the window 
+		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude).createImage();
+		setDefaultImage(fShellImage);
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);

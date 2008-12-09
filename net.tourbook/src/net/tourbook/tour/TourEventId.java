@@ -87,4 +87,9 @@ public enum TourEventId {
 	 */
 	ALL_TOURS_ARE_MODIFIED,
 
+//	/**
+//	 * time offset for the merged tour is modified
+//	 */
+//	TOUR_MERGE_CHANGED,
+
 }

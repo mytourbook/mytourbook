@@ -190,6 +190,19 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 						}
 					}
 
+//				} else if (eventId == TourEventId.TOUR_MERGE_CHANGED) {
+//
+//					if (eventData instanceof TourData && fTourData != null && fTourData == ((TourData) eventData)) {
+//
+//						// display merge layer
+//						fTourChart.updateMergeLayer(true);
+//
+//					} else {
+//
+//						// hide merge layer
+//						fTourChart.updateMergeLayer(false);
+//					}
+
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
 					// check if this tour data editor contains a tour which must be updated

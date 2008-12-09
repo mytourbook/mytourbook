@@ -44,7 +44,8 @@ public class PositionedWizardDialog extends WizardDialog {
 
 	private int					fDefaultWidth;
 	private int					fDefaultHeight;
-	private Image				fWindowIcon;
+
+	private Image				fShellIcon;
 
 	/**
 	 * @param parent
@@ -72,15 +73,53 @@ public class PositionedWizardDialog extends WizardDialog {
 		}
 
 		// set icon for the window 
-		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard).createImage();
-		setDefaultImage(fWindowIcon);
+		fShellIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard).createImage();
+		setDefaultImage(fShellIcon);
+	}
 
-		parent.addDisposeListener(new DisposeListener() {
+	@Override
+	protected void cancelPressed() {
+		saveBounds();
+		super.cancelPressed();
+	}
+
+	@Override
+	protected void configureShell(final Shell shell) {
+
+		super.configureShell(shell);
+
+		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				fWindowIcon.dispose();
+				fShellIcon.dispose();
 			}
 		});
+	}
 
+	@Override
+	protected void finishPressed() {
+		saveBounds();
+		super.finishPressed();
+	}
+
+	@Override
+	protected Point getInitialLocation(final Point initialSize) {
+
+		final Point location = super.getInitialLocation(initialSize);
+
+		final IDialogSettings bounds = fDialogSettings.getSection(fSettingsSection);
+		if (bounds != null) {
+			try {
+				location.x = bounds.getInt(WIZARD_X);
+			} catch (final NumberFormatException e) {
+				// silently ignored
+			}
+			try {
+				location.y = bounds.getInt(WIZARD_Y);
+			} catch (final NumberFormatException e) {
+				// silently ignored
+			}
+		}
+		return location;
 	}
 
 	@Override
@@ -109,33 +148,6 @@ public class PositionedWizardDialog extends WizardDialog {
 
 	}
 
-	@Override
-	protected Point getInitialLocation(final Point initialSize) {
-
-		final Point location = super.getInitialLocation(initialSize);
-
-		final IDialogSettings bounds = fDialogSettings.getSection(fSettingsSection);
-		if (bounds != null) {
-			try {
-				location.x = bounds.getInt(WIZARD_X);
-			} catch (final NumberFormatException e) {
-				// silently ignored
-			}
-			try {
-				location.y = bounds.getInt(WIZARD_Y);
-			} catch (final NumberFormatException e) {
-				// silently ignored
-			}
-		}
-		return location;
-	}
-
-	@Override
-	protected void finishPressed() {
-		saveBounds();
-		super.finishPressed();
-	}
-
 	private void saveBounds() {
 
 		IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
@@ -150,12 +162,6 @@ public class PositionedWizardDialog extends WizardDialog {
 		settings.put(WIZARD_Y, bounds.y);
 		settings.put(WIZARD_WIDTH, bounds.width);
 		settings.put(WIZARD_HEIGHT, bounds.height);
-	}
-
-	@Override
-	protected void cancelPressed() {
-		saveBounds();
-		super.cancelPressed();
 	}
 
 }

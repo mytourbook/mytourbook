@@ -789,13 +789,15 @@
             defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%command_tourChart_tool_graphAnalyzer">
-         
       </command>
+         
       <command
-            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourSegmenter"
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
+            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourSegmenter"
             name="%command_tourChart_tool_tourSegmenter">
       </command>
+      
+      
       <command
             defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourProperties"
             id="net.tourbook.command.tourDataEditor"

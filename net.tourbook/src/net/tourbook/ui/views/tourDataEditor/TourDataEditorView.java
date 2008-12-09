@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -295,6 +295,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								fTextImportFilePath;
 	private Text								fTextPerson;
 	private Text								fTextTourId;
+	private Text								fTextMergeFromTourId;
+	private Text								fTextMergeIntoTourId;
 
 	private MessageManager						fMessageManager;
 
@@ -834,7 +836,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
 
 		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-		
+
 // manual device name is translated in TourData  
 //		tourData.setDeviceName(TourData.DEVICE_NAME_FOR_MANUAL_TOUR);
 
@@ -1339,6 +1341,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// marker is not in the selection
 		return true;
+	}
+
+	public void clearEditorContent() {
+		fTourData = null;
+		setTourClean();
+
+		fPageBook.showPage(fPageNoTour);
 	}
 
 	private boolean confirmUndoChanges() {
@@ -1861,7 +1870,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fDtTourDate.addSelectionListener(fDateTimeListener);
 
 		//////////////////////////////////////
-		createUISeparator(tk, tourDtContainer);
+		createUISeparator(tourDtContainer, tk);
 
 		/*
 		 * start time
@@ -1874,7 +1883,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fDtStartTime.addSelectionListener(fDateTimeListener);
 
 		//////////////////////////////////////
-		createUISeparator(tk, tourDtContainer);
+		createUISeparator(tourDtContainer, tk);
 
 		/*
 		 * tour distance
@@ -1935,7 +1944,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * reference tours
 		 */
-		final Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
+		Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
 		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
 		fTextRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
@@ -1975,12 +1984,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * tour id
 		 */
-		tk.createLabel(section, Messages.tour_editor_label_tour_id);
+		label = tk.createLabel(section, Messages.tour_editor_label_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
 
 		fTextTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextTourId);
 
-		// reset border style
+		/*
+		 * merged from tour id
+		 */
+		label = tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
+
+		fTextMergeFromTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextMergeFromTourId);
+
+		/*
+		 * merged into tour id
+		 */
+		label = tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
+
+		fTextMergeIntoTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextMergeIntoTourId);
+
+		/*
+		 * reset border style
+		 */
 		tk.setBorderStyle(defaultBorderStyle);
 	}
 
@@ -2231,12 +2261,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	}
 
-	private void createUISectionSeparator(final FormToolkit tk, final Composite parent) {
+	private void createUISectionSeparator(final Composite parent, final FormToolkit tk) {
 		final Composite sep = tk.createComposite(parent);
 		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
 	}
 
-	private void createUISeparator(final FormToolkit tk, final Composite parent) {
+	private void createUISeparator(final Composite parent, final FormToolkit tk) {
 		tk.createLabel(parent, UI.EMPTY_STRING);
 	}
 
@@ -2285,31 +2315,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		createMarkerViewer(fMarkerViewerContainer);
 
 		return markerContainer;
-	}
-
-	/**
-	 * @param parent
-	 * @return returns the controls for the tab
-	 */
-	private Control createUITabSlices(final Composite parent) {
-
-		fSliceContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceContainer);
-
-		fSliceViewerContainer = new Composite(fSliceContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceViewerContainer);
-
-		createSliceViewer(fSliceViewerContainer);
-
-		fTimeSliceLabel = new Label(fSliceContainer, SWT.WRAP);
-		fTimeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		fTimeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-		fTimeSliceLabel.setVisible(false);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTimeSliceLabel);
-
-		return fSliceContainer;
 	}
 
 //	private Control createUITabMarkerOLDOLDOLDOLDOLDOLDOLD(final Composite parent) {
@@ -2388,6 +2393,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		return tableLayouter;
 //	}
 
+	/**
+	 * @param parent
+	 * @return returns the controls for the tab
+	 */
+	private Control createUITabSlices(final Composite parent) {
+
+		fSliceContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceContainer);
+
+		fSliceViewerContainer = new Composite(fSliceContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceViewerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceViewerContainer);
+
+		createSliceViewer(fSliceViewerContainer);
+
+		fTimeSliceLabel = new Label(fSliceContainer, SWT.WRAP);
+		fTimeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		fTimeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		fTimeSliceLabel.setVisible(false);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTimeSliceLabel);
+
+		return fSliceContainer;
+	}
+
 	private Composite createUITabTour(final Composite parent, final FormToolkit tk) {
 
 		// scrolled container
@@ -2412,10 +2442,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tk.setBorderStyle(SWT.BORDER);
 
 		createSectionTitle(fTourContainer, tk);
-		createUISectionSeparator(tk, fTourContainer);
+		createUISectionSeparator(fTourContainer, tk);
 
 		createSectionDateTime(fTourContainer, tk);
-		createUISectionSeparator(tk, fTourContainer);
+		createUISectionSeparator(fTourContainer, tk);
 
 		createSectionCharacteristics(fTourContainer, tk);
 
@@ -3027,7 +3057,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tbm.add(new Separator());
 		tbm.add(fActionToggleReadEditMode);
 		tbm.add(fActionToggleRowSelectMode);
-		
+
 		tbm.add(new Separator());
 		tbm.add(fActionCreateTour);
 
@@ -3861,13 +3891,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				displayTour(((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId());
 			}
 		}
-	}
-
-	public void clearEditorContent() {
-		fTourData = null;
-		setTourClean();
-
-		fPageBook.showPage(fPageNoTour);
 	}
 
 	private void onSelectTab() {
@@ -4835,7 +4858,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		/*
-		 * layout container to resize labels
+		 * merge from tour ID
+		 */
+		final Long mergeFromTourId = fTourData.getMergeFromTourId();
+		if (mergeFromTourId == null) {
+			fTextMergeFromTourId.setText(UI.EMPTY_STRING);
+		} else {
+			fTextMergeFromTourId.setText(Long.toString(mergeFromTourId));
+		}
+
+		/*
+		 * merge into tour ID
+		 */
+		final Long mergeIntoTourId = fTourData.getMergeIntoTourId();
+		if (mergeIntoTourId == null) {
+			fTextMergeIntoTourId.setText(UI.EMPTY_STRING);
+		} else {
+			fTextMergeIntoTourId.setText(Long.toString(mergeIntoTourId));
+		}
+
+		/*
+		 * layout container to resize the labels
 		 */
 		fInfoContainer.layout(true);
 	}
@@ -4880,7 +4923,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// title/description
 		fTextTitle.setText(fTourData.getTourTitle());
 		fTextDescription.setText(fTourData.getTourDescription());
-		
+
 		// start/end location
 		fTextStartLocation.setText(fTourData.getTourStartPlace());
 		fTextEndLocation.setText(fTourData.getTourEndPlace());
@@ -4906,7 +4949,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		}
 		fLblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
-		
+
 		// recording time
 		final int recordingTime = fTourData.getTourRecordingTime();
 		fDtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));

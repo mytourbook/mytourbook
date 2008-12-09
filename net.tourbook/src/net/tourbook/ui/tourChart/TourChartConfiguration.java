@@ -65,7 +65,7 @@ public class TourChartConfiguration {
 	/**
 	 * when <code>true</code> the sliders are moved when the chart is zoomed
 	 */
-	public boolean					moveSlidersWhenZoomed		= false;
+	public boolean					moveSlidersWhenZoomed	= false;
 
 	/**
 	 * the graph is automatically zoomed to the slider position when the slider is moved
@@ -119,6 +119,10 @@ public class TourChartConfiguration {
 			}
 			graphIndex++;
 		}
+	}
+
+	public void setIsShowTimeOnXAxis(final boolean isShowTimeOnXAxis) {
+		showTimeOnXAxis = showTimeOnXAxisBackup = isShowTimeOnXAxis;
 	}
 
 	/**

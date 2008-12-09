@@ -16,37 +16,25 @@
 package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourBike;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.EmptySelection;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 public class ActionSaveTourInDatabase extends Action {
 
@@ -155,11 +143,10 @@ public class ActionSaveTourInDatabase extends Action {
 	public void run() {
 
 		final TourPerson person;
-		final TourBike bike;
 
 		// get the person, when not set
 		if (fTourPerson == null) {
-			person = selectPersonDialog();
+			person = selectPersonInDialog();
 			if (person == null) {
 				return;
 			}
@@ -167,86 +154,10 @@ public class ActionSaveTourInDatabase extends Action {
 			person = fTourPerson;
 		}
 
-		bike = person.getTourBike();
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-
-				boolean saveInDatabase = false;
-				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
-				final ArrayList<Long> savedToursIds = new ArrayList<Long>();
-
-				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fRawDataView.getViewer().getSelection());
-
-				// loop: all selected tours
-				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-
-					final Object selObject = iter.next();
-					if (selObject instanceof TourData) {
-
-						final TourData tourData = (TourData) selObject;
-						if (tourData.isTourDeleted == false) {
-
-							if (tourData.getTourPerson() == null) {
-
-								tourData.setTourPerson(person);
-								tourData.setBikerWeight(person.getWeight());
-
-								saveInDatabase = true;
-							}
-
-							if (tourData.getTourBike() == null && tourData.getTourPerson().getTourBike() != null) {
-								tourData.setTourBike(bike);
-
-								saveInDatabase = true;
-							}
-
-							// save the person and or bike when it's not yet set
-							if (saveInDatabase == true) {
-
-								final TourData savedTour = TourDatabase.saveTour(tourData);
-
-								if (savedTour != null) {
-									savedTours.add(savedTour);
-									savedToursIds.add(savedTour.getTourId());
-								}
-							}
-						}
-					}
-				}
-
-				// update viewer, fire selection event
-				if (savedToursIds.size() > 0) {
-
-					// update raw data map with the saved tour data 
-					final HashMap<Long, TourData> rawDataMap = RawDataManager.getInstance().getTourDataMap();
-					for (final TourData tourData : savedTours) {
-						rawDataMap.put(tourData.getTourId(), tourData);
-					}
-
-					/*
-					 * the selection provider can contain old tour data which conflicts with the
-					 * tour data in the tour data editor
-					 */
-					fRawDataView.getSite().getSelectionProvider().setSelection(new EmptySelection());
-
-					// update import viewer
-					fRawDataView.reloadViewer();
-
-					fRawDataView.enableActions();
-
-					/*
-					 * notify all views, it is not checked if the tour data editor is dirty because
-					 * newly saved tours can not be modified in the tour data editor
-					 */
-					TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds));
-				}
-			}
-		});
+		fRawDataView.actionSaveTour(person);
 	}
 
-	private TourPerson selectPersonDialog() {
+	private TourPerson selectPersonInDialog() {
 
 		if (fPeople == null) {
 			// read people list from the db

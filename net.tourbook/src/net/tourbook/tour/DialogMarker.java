@@ -53,12 +53,15 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -133,6 +136,7 @@ public class DialogMarker extends TitleAreaDialog {
 	private HashSet<TourMarker>	fTourMarkersBackup;
 
 	private boolean				fIsOkPressed					= false;
+	private Image				fShellImage;
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -206,6 +210,13 @@ public class DialogMarker extends TitleAreaDialog {
 
 		super(parentShell);
 
+		// make dialog resizable
+		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
+
+		// set icon for the window 
+		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker).createImage();
+		setDefaultImage(fShellImage);
+
 		fTourData = tourData;
 
 		/*
@@ -218,9 +229,6 @@ public class DialogMarker extends TitleAreaDialog {
 		}
 
 		fInitialTourMarker = initialTourMarker;
-
-		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
 	public void addTourMarker(final TourMarker newTourMarker) {
@@ -228,7 +236,7 @@ public class DialogMarker extends TitleAreaDialog {
 		if (newTourMarker == null) {
 			return;
 		}
-		
+
 		// update data model, add new marker to the marker list
 		fTourData.getTourMarkers().add(newTourMarker);
 
@@ -255,7 +263,7 @@ public class DialogMarker extends TitleAreaDialog {
 			restoreVisibleType();
 
 		} else {
-			
+
 			/*
 			 * when OK is not pressed, revert tour markers, this happens when the Cancel button is
 			 * pressed or when the window is closed
@@ -273,19 +281,12 @@ public class DialogMarker extends TitleAreaDialog {
 
 		super.configureShell(shell);
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
-
-		/*
-		 * don't close the dialog when the enter key is pressed, except when the close button has
-		 * the focus
-		 */
-//		shell.addTraverseListener(new TraverseListener() {
-//			public void keyTraversed(final TraverseEvent e) {
-//				if (e.detail == SWT.TRAVERSE_RETURN) {
-//					e.detail = SWT.TRAVERSE_TAB_NEXT;
-//					e.doit = true;
-//				}
-//			}
-//		});
+		
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(final DisposeEvent e) {
+				fShellImage.dispose();
+			}
+		});
 	}
 
 	@Override
