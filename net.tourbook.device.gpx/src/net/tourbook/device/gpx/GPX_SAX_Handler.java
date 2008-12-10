@@ -37,44 +37,54 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
 
-	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";					//$NON-NLS-1$
-	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";					//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";							//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";							//$NON-NLS-1$
+
+	// namespace for extensions used by Garmin
+	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
 
 	private static final int				GPX_VERSION_1_0			= 10;
 	private static final int				GPX_VERSION_1_1			= 11;
 
-	private static final String				TAG_GPX					= "gpx";												//$NON-NLS-1$
+	private static final String				TAG_GPX					= "gpx";														//$NON-NLS-1$
 
-	private static final String				TAG_TRK					= "trk";												//$NON-NLS-1$
-	private static final String				TAG_TRKPT				= "trkpt";												//$NON-NLS-1$
+	private static final String				TAG_TRK					= "trk";														//$NON-NLS-1$
+	private static final String				TAG_TRKPT				= "trkpt";														//$NON-NLS-1$
 //	private static final String				TAG_RTE					= "rte";												//$NON-NLS-1$
 //	private static final String				TAG_RTEPT				= "rtept";												//$NON-NLS-1$
 
-	private static final String				TAG_TIME				= "time";												//$NON-NLS-1$
-	private static final String				TAG_ELE					= "ele";												//$NON-NLS-1$
+	private static final String				TAG_TIME				= "time";														//$NON-NLS-1$
+	private static final String				TAG_ELE					= "ele";														//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat";												//$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE			= "lon";												//$NON-NLS-1$
+	// Extension element for heart rate
+	private static final String				TAG_EXT_HR				= "gpxtpx:hr";													//$NON-NLS-1$
+	// Extension element for temperature
+	private static final String				TAG_EXT_TEMP			= "gpxtpx:atemp";												//$NON-NLS-1$
+
+	private static final String				ATTR_LATITUDE			= "lat";														//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE			= "lon";														//$NON-NLS-1$
 
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
-	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");	//$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");		//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");		//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");				//$NON-NLS-1$
 
 	private int								fGpxVersion				= -1;
-	//	private boolean							fInWpt					= false;
 	private boolean							fInTrk					= false;
-	//	private boolean							fInTrkSeg				= false;
 	private boolean							fInTrkPt				= false;
+	//	private boolean							fInWpt					= false;
+	//	private boolean							fInTrkSeg				= false;
 
 	private boolean							fIsInTime				= false;
 	private boolean							fIsInEle				= false;
 	private boolean							fIsInName				= false;
+	private boolean							fIsInHr					= false;
+	private boolean							fIsInTemp				= false;
+
 	private ArrayList<TimeData>				fTimeDataList;
 
 	private TimeData						fTimeData;
-
 	private TimeData						fPrevTimeData;
 
 	private TourbookDevice					fDeviceDataReader;
@@ -115,7 +125,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-		if (fIsInTime || fIsInEle || fIsInName) {
+		if (fIsInTime || fIsInEle || fIsInName || fIsInHr || fIsInTemp) {
 			fCharacters.append(chars, startIndex, length);
 		}
 	}
@@ -210,10 +220,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
 								final String message = e3.getMessage();
 								MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
 								System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
-//								e2.printStackTrace();
 							}
 						}
 					}
+				} else if (name.equals(TAG_EXT_HR)) {
+					fIsInHr = false;
+					fTimeData.pulse = getIntValue(timeString);
+				} else if (name.equals(TAG_EXT_TEMP)) {
+					fIsInTemp = false;
+					fTimeData.temperature = Math.round(getFloatValue(timeString));
 				}
 			}
 
@@ -324,6 +339,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		} catch (final NumberFormatException e) {
 			return Float.MIN_VALUE;
+		}
+	}
+
+	private int getIntValue(final String textValue) {
+		try {
+			if (textValue != null) {
+				return Integer.parseInt(textValue);
+			} else {
+				return Integer.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Integer.MIN_VALUE;
 		}
 	}
 
@@ -472,6 +500,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					} else if (name.equals(TAG_TIME)) {
 
 						fIsInTime = true;
+						fCharacters.delete(0, fCharacters.length());
+						
+					} else if (name.equals(TAG_EXT_HR)) {
+						
+						fIsInHr = true;
+						fCharacters.delete(0, fCharacters.length());
+						
+					} else if (name.equals(TAG_EXT_TEMP)) {
+						
+						fIsInTemp = true;
 						fCharacters.delete(0, fCharacters.length());
 					}
 
