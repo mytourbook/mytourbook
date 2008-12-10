@@ -92,8 +92,6 @@ public class TourChart extends Chart {
 
 	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE			= "net.tourbook.command.graph.tourCompare";					//$NON-NLS-1$
 
-	static final String						SEGMENT_VALUES							= "segmentValues";												//$NON-NLS-1$
-
 	private TourData						fTourData;
 	private TourChartConfiguration			fTourChartConfig;
 
@@ -435,6 +433,8 @@ public class TourChart extends Chart {
 		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
 		fMergeLayer = new ChartMergeLayer(fTourData, mergeFromTourData, xDataSerie);
+
+		fMergeLayer.setAltiDiffScaling(fTourChartConfig.isRelativeAltiDiffScaling);
 	}
 
 	/**
@@ -902,7 +902,55 @@ public class TourChart extends Chart {
 		fTCActionHandlerManager.updateUICheckState(commandId);
 	}
 
-	private void setCumtomGraphData(final String customDataKey,
+	/**
+	 * set custom data to the graph
+	 */
+	private void setCustomGraphData() {
+
+		final ChartDataModel dataModel = getChartDataModel();
+		if (dataModel == null) {
+			return;
+		}
+
+		/*
+		 * the tour markers are displayed in the altitude graph, when this graph is not available,
+		 * the markers are painted in one of the other graphs
+		 */
+		ChartDataYSerie yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PULSE);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SPEED);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PACE);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_POWER);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GRADIENT);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTIMETER);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
+		}
+
+		setCustomGraphData(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
+	}
+
+	private void setCustomGraphData(final String customDataKey,
 									final Object segmentDataSerie,
 									final ChartDataYSerie yDataWithLabels) {
 
@@ -932,7 +980,10 @@ public class TourChart extends Chart {
 			}
 		}
 
-		if (fMergeLayer != null) {
+		/*
+		 * show the merge layer only in the altitude graph
+		 */
+		if (fMergeLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
 			chartLayers.add(fMergeLayer);
 		}
 
@@ -940,55 +991,8 @@ public class TourChart extends Chart {
 		yData.setCustomLayers(chartLayers);
 
 		if (segmentDataSerie != null) {
-			yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
+			yData.setCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES, segmentDataSerie);
 		}
-	}
-
-	/**
-	 * set custom data to the graph
-	 */
-	private void setCustomGraphData() {
-
-		final ChartDataModel dataModel = getChartDataModel();
-		if (dataModel == null) {
-			return;
-		}
-
-		ChartDataYSerie yDataWithLabels;
-
-		// get y-data which is displayed, this graph will display the tour markers
-		yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
-
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PULSE);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SPEED);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PACE);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_POWER);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GRADIENT);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTIMETER);
-		}
-		if (yDataWithLabels == null) {
-			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
-		}
-
-		setCumtomGraphData(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
-		setCumtomGraphData(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
@@ -1154,7 +1158,6 @@ public class TourChart extends Chart {
 	}
 
 	public void updateMergeLayer(final boolean showLayer) {
-		// TODO Auto-generated method stub
 
 		fIsMergeLayerVisible = showLayer;
 

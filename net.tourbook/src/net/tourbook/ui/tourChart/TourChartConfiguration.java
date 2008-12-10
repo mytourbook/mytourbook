@@ -79,6 +79,11 @@ public class TourChartConfiguration {
 	public boolean					canShowTourCompareGraph	= false;
 
 	/**
+	 * is <code>true</code> when the altitude diff scaling in the merge layer is relative
+	 */
+	public boolean					isRelativeAltiDiffScaling;
+
+	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */

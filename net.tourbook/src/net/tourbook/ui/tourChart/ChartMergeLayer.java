@@ -39,6 +39,7 @@ public class ChartMergeLayer implements IChartLayer {
 //	private TourData	fMergeIntoTourData;
 	private TourData	fMergeFromTourData;
 	private int[]		fXDataSerie;
+	private boolean		fIsRelativeAltiDiffScaling;
 
 	public ChartMergeLayer(final TourData mergeIntoTourData, final TourData mergeFromTourData, final int[] xDataSerie) {
 
@@ -47,6 +48,8 @@ public class ChartMergeLayer implements IChartLayer {
 
 		// x-data serie contains the time or distance distance data serie
 		fXDataSerie = xDataSerie;
+
+//		fAltitudeSerie = altitudeSerie;
 	}
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
@@ -59,8 +62,20 @@ public class ChartMergeLayer implements IChartLayer {
 			return;
 		}
 
+		/*
+		 * convert all altitude diff values into positive values
+		 */
+		int maxAltiDiff = 0;
+		int altiIndex = 0;
+		final int altiDiffValues[] = new int[yAltitudeDiffValues.length];
+		for (int altiDiff : yAltitudeDiffValues) {
+			altiDiffValues[altiIndex++] = altiDiff = (altiDiff < 0) ? -altiDiff : altiDiff;
+			maxAltiDiff = (maxAltiDiff >= altiDiff) ? maxAltiDiff : altiDiff;
+		}
+
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
+		float altiDiffScaling = scaleY;
 
 		// get the horizontal offset for the graph
 		final int graphValueOffset = (int) (Math.max(0, chart.getDevGraphImageXOffset()) / scaleX);
@@ -74,6 +89,11 @@ public class ChartMergeLayer implements IChartLayer {
 		final int devGraphHeight = drawingData.getDevGraphHeight();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - devGraphHeight;
+
+		// get alti diff scaling
+		if (fIsRelativeAltiDiffScaling) {
+			altiDiffScaling = maxAltiDiff == 0 ? scaleY : (float) devGraphHeight / maxAltiDiff;
+		}
 
 		// virtual 0 line for the y-axis of the chart in dev units
 		final float devChartY0Line = devYBottom + (scaleY * graphYBottom);
@@ -91,22 +111,17 @@ public class ChartMergeLayer implements IChartLayer {
 				return;
 			}
 
-			final int xValue = xValues[xValueIndex] - graphValueOffset;// + xMergeOffset;
-			final int yValue = yAltitudeValues[xValueIndex];// + yMergeOffset;
+			final int graphXValue = xValues[xValueIndex] - graphValueOffset;
+			final int graphYValue = yAltitudeValues[xValueIndex];
+			final int graphAltitudeDiff = altiDiffValues[xValueIndex];
 
-			final float devXValue = xValue * scaleX;
-			final float devYValue = yValue * scaleY;
+			final float devXValue = graphXValue * scaleX;
+			final float devYValue = graphYValue * scaleY;
+			final float devAltitudeDiff = graphAltitudeDiff * altiDiffScaling;
 
-			final int graphAltitudeDiff = yAltitudeDiffValues[xValueIndex];
-			final float devAltitudeDiff = ((graphAltitudeDiff < 0) ? -graphAltitudeDiff : graphAltitudeDiff) * scaleY;
-
-			/*
-			 * set first point
-			 */
 			if (xValueIndex == startIndex) {
 
 				// move to the first point
-
 				pathData.moveTo(devXValue, devChartY0Line - devYValue);
 				pathDiff.moveTo(devXValue, devYBottom - devAltitudeDiff);
 			}
@@ -142,5 +157,9 @@ public class ChartMergeLayer implements IChartLayer {
 		// dispose resources
 		pathData.dispose();
 		pathDiff.dispose();
+	}
+
+	void setAltiDiffScaling(final boolean isRelativeAltiDiffScaling) {
+		fIsRelativeAltiDiffScaling = isRelativeAltiDiffScaling;
 	}
 }

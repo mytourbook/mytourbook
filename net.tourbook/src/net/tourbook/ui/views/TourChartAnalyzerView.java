@@ -795,7 +795,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 			final ChartDataSerie serieData = graphInfo.fChartData;
 
-			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.ANALYZER_INFO);
+			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.CUSTOM_DATA_ANALYZER_INFO);
 			if (analyzerInfo == null) {
 				// create default average object
 				analyzerInfo = new TourChartAnalyzerInfo();

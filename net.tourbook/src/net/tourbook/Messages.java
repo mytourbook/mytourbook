@@ -642,7 +642,10 @@ public class Messages extends NLS {
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
 	public static String		tour_merger_dialog_title;
-	public static String		tour_merger_label_adjust_altitude;
+	public static String	tour_merger_label_adjust_altitude_10;
+
+	public static String	tour_merger_label_adjust_altitude_100;
+
 	public static String		tour_merger_label_adjust_hours;
 	public static String		tour_merger_label_adjust_minutes;
 	public static String		tour_merger_label_adjust_seconds;

@@ -24,6 +24,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -66,7 +67,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final ChartDataYSerie yData = drawingData.getYData();
 
 		// get the segment values
-		final Object segmentValuesObject = yData.getCustomData(TourChart.SEGMENT_VALUES);
+		final Object segmentValuesObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
 		if ((segmentValuesObject instanceof float[]) == false) {
 			return;
 		}
