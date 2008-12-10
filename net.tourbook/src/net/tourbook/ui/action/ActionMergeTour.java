@@ -27,7 +27,6 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
@@ -36,14 +35,6 @@ public class ActionMergeTour extends Action {
 	private ITourProvider	fTourProvider;
 
 	private TourData		fIntoTourData;
-	private TourData		fFromTourData;
-
-	private int[]			fBackupFromTimeSerie;
-	private int[]			fBackupFromDistanceSerie;
-	private int[]			fBackupFromAltitudeSerie;
-
-	private int[]			fBackupIntoTemperatureSerie;
-	private int[]			fBackupIntoGradientSerie;
 
 	public ActionMergeTour(final ITourProvider tourProvider) {
 
@@ -51,35 +42,6 @@ public class ActionMergeTour extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__merge_tours));
 
 		fTourProvider = tourProvider;
-	}
-
-	private int[] backupDataSerie(final int[] source) {
-
-		int[] backup = null;
-		if (source != null) {
-			final int serieLength = source.length;
-			backup = new int[serieLength];
-			System.arraycopy(source, 0, backup, 0, serieLength);
-		}
-
-		return backup;
-	}
-
-	private void createDataBackup() {
-
-		/*
-		 * keep a backup of the altitude data because these data will be changed in this dialog
-		 */
-		fBackupFromTimeSerie = backupDataSerie(fFromTourData.timeSerie);
-		fBackupFromDistanceSerie = backupDataSerie(fFromTourData.distanceSerie);
-		fBackupFromAltitudeSerie = backupDataSerie(fFromTourData.altitudeSerie);
-
-		fBackupIntoTemperatureSerie = backupDataSerie(fIntoTourData.temperatureSerie);
-		fBackupIntoGradientSerie = backupDataSerie(fIntoTourData.gradientSerie);
-
-//		fTourData.setMergedTourTimeOffset(timeOffset);
-//		fTourData.setMergedAltitudeOffset(metricAltiDiff);
-
 	}
 
 	/**
@@ -145,48 +107,15 @@ public class ActionMergeTour extends Action {
 		}
 
 		fIntoTourData = intoTourData;
-		fFromTourData = fromTourData;
 
 		return true;
-	}
-
-	/**
-	 * Restore values which have been modified in the dialog
-	 * 
-	 * @param selectedTour
-	 */
-	private void restoreDataBackup() {
-
-		fFromTourData.timeSerie = fBackupFromTimeSerie;
-		fFromTourData.distanceSerie = fBackupFromDistanceSerie;
-		fFromTourData.altitudeSerie = fBackupFromAltitudeSerie;
-
-		fIntoTourData.temperatureSerie = fBackupIntoTemperatureSerie;
-		fIntoTourData.gradientSerie = fBackupIntoGradientSerie;
-
-//			fTourData.setMergedTourTimeOffset(timeOffset);
-//			fTourData.setMergedAltitudeOffset(metricAltiDiff);
-
 	}
 
 	@Override
 	public void run() {
 
-		if (getSelectedTour() == false) {
-			return;
-		}
-
-		createDataBackup();
-
-		if (new DialogMergeTours(Display.getCurrent().getActiveShell(), fIntoTourData).open() == Window.OK) {
-
-			// save merged tour
-			TourManager.saveModifiedTour(fIntoTourData);
-
-		} else {
-
-			// restore data because the tour could be modified
-			restoreDataBackup();
+		if (getSelectedTour()) {
+			new DialogMergeTours(Display.getCurrent().getActiveShell(), fIntoTourData).open();
 		}
 	}
 

@@ -56,8 +56,10 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 	private Image					fShellImage;
 
-	private TourData				fTourData;
+	private TourData				fIntoTourData;
+	private TourData				fFromTourData;
 
+	private TourChart				fTourChart;
 	private Label					fLabelAltitudeDiff;
 	private Scale					fScaleAltitude;
 	private Label					fLabelAdjustSecondsValue;
@@ -66,16 +68,24 @@ public class DialogMergeTours extends TitleAreaDialog {
 	private Scale					fScaleAdjustMinutes;
 	private Label					fLabelAdjustHourValue;
 	private Scale					fScaleAdjustHours;
+	private Button					fBtnReset;
+	private Button					fBtnShowOriginal;
 
 	private boolean					fIsTourDirty		= false;
 	private boolean					fIsDirtyDisabled;
+	private boolean					fIsTourSaved		= false;
 
 	private final IDialogSettings	fDialogSettings;
-	private TourChart				fTourChart;
-	private Button					fBtnReset;
-	private Button					fBtnShowOriginal;
-	private int						backupMergedTourTimeOffset;
-	private int						backupMergedAltitudeOffset;
+
+	private int[]					fBackupFromTimeSerie;
+	private int[]					fBackupFromDistanceSerie;
+	private int[]					fBackupFromAltitudeSerie;
+
+	private int[]					fBackupIntoTemperatureSerie;
+
+	private int						fBackupIntoTimeOffset;
+	private int						fBackupIntoAltitudeOffset;
+
 	private TourChartConfiguration	fTourChartConfig;
 
 	public DialogMergeTours(final Shell parentShell, final TourData tourData) {
@@ -89,7 +99,9 @@ public class DialogMergeTours extends TitleAreaDialog {
 		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__merge_tours).createImage();
 		setDefaultImage(fShellImage);
 
-		fTourData = tourData;
+		fIntoTourData = tourData;
+		fFromTourData = TourManager.getInstance().getTourData(fIntoTourData.getMergeFromTourId());
+
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
@@ -98,10 +110,21 @@ public class DialogMergeTours extends TitleAreaDialog {
 		fScaleAdjustSeconds.setSelection(MAX_ADJUST_SECONDS);
 		fScaleAdjustMinutes.setSelection(MAX_ADJUST_MINUTES);
 		fScaleAdjustHours.setSelection(MAX_ADJUST_HOURS);
-
 		fScaleAltitude.setSelection(MAX_ADJUST_ALTITUDE);
 
 		onModifyAdjustmentSettings();
+	}
+
+	private int[] backupDataSerie(final int[] source) {
+
+		int[] backup = null;
+		if (source != null) {
+			final int serieLength = source.length;
+			backup = new int[serieLength];
+			System.arraycopy(source, 0, backup, 0, serieLength);
+		}
+
+		return backup;
 	}
 
 	@Override
@@ -109,7 +132,107 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		saveState();
 
+		if (fIsTourSaved == false) {
+
+			// tour is not saved, dialog is canceled, restore original values
+			restoreDataBackup();
+		}
+
 		return super.close();
+	}
+
+	private void computeMergedData() {
+
+		final int xMergeOffset = fIntoTourData.getMergedTourTimeOffset();
+		final int yMergeOffset = (int) (fIntoTourData.getMergedAltitudeOffset() * UI.UNIT_VALUE_ALTITUDE);
+
+		final int[] intoTimeSerie = fIntoTourData.timeSerie;
+		final int[] intoDistanceSerie = fIntoTourData.distanceSerie;
+		final int[] intoAltitudeSerie = fIntoTourData.altitudeSerie;
+
+		final int[] fromTimeSerie = fFromTourData.timeSerie;
+		final int[] fromAltitudeSerie = fFromTourData.altitudeSerie;
+		final int[] fromTemperatureSerie = fFromTourData.temperatureSerie;
+
+		final int lastFromIndex = fromTimeSerie.length - 1;
+
+//		boolean isCreateFromDistance = false;
+//		final boolean isCreateIntoTemperature = false;
+//
+//		if ((fromDistaceSerie == null || fromDistaceSerie.length == 0)
+//				&& intoDistanceSerie != null
+//				&& intoDistanceSerie.length > 0) {
+//
+//			// distance is available in destination but not in source
+//
+//			isCreateFromDistance = true;
+//		}
+//
+//		if ((mergeIntoTemperatureSerie == null || mergeIntoTemperatureSerie.length == 0)
+//				&& mergeFromTemperatureSerie != null
+//				&& mergeFromTemperatureSerie.length > 0) {
+//
+//			// temperature is available in source but not in destination
+//
+//			isCreateIntoTemperature = true;
+//			mergeIntoTemperatureSerie = new int[mergeFromTemperatureSerie.length];
+//		}
+
+//		if (isCreateFromDistance) {
+
+		final int serieLength = intoTimeSerie.length;
+
+		final int[] newFromDistanceSerie = new int[serieLength];
+		final int[] newFromTimeSerie = new int[serieLength];
+		final int[] newFromAltitudeSerie = new int[serieLength];
+
+		final int[] newIntoTemperatureSerie = new int[serieLength];
+		final int[] newFromAltiDiffSerie = new int[serieLength];
+
+		int fromIndex = 0;
+		int fromTime = fromTimeSerie[0] + xMergeOffset;
+
+		for (int intoIndex = 0; intoIndex < serieLength; intoIndex++) {
+
+			final int intoTime = intoTimeSerie[intoIndex];
+
+			/*
+			 * time in the merged tour (into...) is the leading time
+			 */
+			while (fromTime < intoTime) {
+
+				fromIndex++;
+
+				// check array bounds
+				fromIndex = (fromIndex <= lastFromIndex) ? fromIndex : lastFromIndex;
+
+				if (fromIndex == lastFromIndex) {
+					//prevent endless loops
+					break;
+				}
+
+				fromTime = fromTimeSerie[fromIndex] + xMergeOffset;
+			}
+
+			final int intoAltitude = intoAltitudeSerie[intoIndex];
+			final int fromAltitude = fromAltitudeSerie[fromIndex] - yMergeOffset;
+
+			newFromDistanceSerie[intoIndex] = intoDistanceSerie[intoIndex];
+			newFromTimeSerie[intoIndex] = intoTime;
+			newFromAltitudeSerie[intoIndex] = fromAltitude;
+
+//			System.out.println(fromAltitude);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+			newFromAltiDiffSerie[intoIndex] = fromAltitude - intoAltitude;
+			newIntoTemperatureSerie[intoIndex] = fromTemperatureSerie[fromIndex];
+		}
+
+		fFromTourData.mergeAltitudeSerie = newFromAltitudeSerie;
+		fFromTourData.mergeAltitudeDiff = newFromAltiDiffSerie;
+
+		fIntoTourData.temperatureSerie = newIntoTemperatureSerie;
+//		}
 	}
 
 	@Override
@@ -118,6 +241,7 @@ public class DialogMergeTours extends TitleAreaDialog {
 		super.configureShell(shell);
 
 		shell.setText(Messages.tour_merger_dialog_title);
+
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				fShellImage.dispose();
@@ -130,24 +254,16 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		super.create();
 
-		setTitle(NLS.bind(Messages.tour_merger_dialog_header_title, TourManager.getTourTitle(fTourData)));
-		setMessage(NLS.bind(Messages.tour_merger_dialog_header_message,
-				TourManager.getTourTitle(TourManager.getInstance().getTourData(fTourData.getMergeFromTourId()))));
+		setTitle(NLS.bind(Messages.tour_merger_dialog_header_title, TourManager.getTourTitle(fIntoTourData)));
+		setMessage(NLS.bind(Messages.tour_merger_dialog_header_message, TourManager.getTourTitle(fFromTourData)));
 
-		createBackupValues();
+		createDataBackup();
+		computeMergedData();
 
-		updateMergedData();
-
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, true);
+		fTourChart.updateTourChart(fIntoTourData, fTourChartConfig, true);
 		updateUIFromTourData();
 
 		enableActions();
-	}
-
-	private void createBackupValues() {
-
-		backupMergedTourTimeOffset = fTourData.getMergedTourTimeOffset();
-		backupMergedAltitudeOffset = fTourData.getMergedAltitudeOffset();
 	}
 
 	@Override
@@ -157,6 +273,21 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		// set text for the OK button
 		getButton(IDialogConstants.OK_ID).setText(Messages.app_action_save);
+	}
+
+	private void createDataBackup() {
+
+		/*
+		 * keep a backup of the altitude data because these data will be changed in this dialog
+		 */
+		fBackupFromTimeSerie = backupDataSerie(fFromTourData.timeSerie);
+		fBackupFromDistanceSerie = backupDataSerie(fFromTourData.distanceSerie);
+		fBackupFromAltitudeSerie = backupDataSerie(fFromTourData.altitudeSerie);
+
+		fBackupIntoTemperatureSerie = backupDataSerie(fIntoTourData.temperatureSerie);
+
+		fBackupIntoTimeOffset = fIntoTourData.getMergedTourTimeOffset();
+		fBackupIntoAltitudeOffset = fIntoTourData.getMergedAltitudeOffset();
 	}
 
 	@Override
@@ -357,7 +488,7 @@ public class DialogMergeTours extends TitleAreaDialog {
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				// set title
-				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fIntoTourData));
 			}
 		});
 	}
@@ -373,6 +504,20 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		// keep window size and position
 		return fDialogSettings;
+	}
+
+	@Override
+	protected void okPressed() {
+
+		if (fIsTourDirty) {
+
+			// save merged tour
+			TourManager.saveModifiedTour(fIntoTourData);
+
+			fIsTourSaved = true;
+		}
+
+		super.okPressed();
 	}
 
 	private void onModifyAdjustmentSettings() {
@@ -391,16 +536,33 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		final int timeOffset = hours * 3600 + minutes * 60 + seconds;
 
-		fTourData.setMergedTourTimeOffset(timeOffset);
-		fTourData.setMergedAltitudeOffset(metricAltiDiff);
+		fIntoTourData.setMergedTourTimeOffset(timeOffset);
+		fIntoTourData.setMergedAltitudeOffset(metricAltiDiff);
 
 		// set dirty flag
 		setTourDirty();
 
-		updateMergedData();
+		computeMergedData();
 
 		// display merge layer
 		fTourChart.updateMergeLayer(true);
+	}
+
+	/**
+	 * Restore values which have been modified in the dialog
+	 * 
+	 * @param selectedTour
+	 */
+	private void restoreDataBackup() {
+
+		fFromTourData.timeSerie = fBackupFromTimeSerie;
+		fFromTourData.distanceSerie = fBackupFromDistanceSerie;
+		fFromTourData.altitudeSerie = fBackupFromAltitudeSerie;
+
+		fIntoTourData.temperatureSerie = fBackupIntoTemperatureSerie;
+
+		fIntoTourData.setMergedTourTimeOffset(fBackupIntoTimeOffset);
+		fIntoTourData.setMergedAltitudeOffset(fBackupIntoAltitudeOffset);
 	}
 
 	private void saveState() {
@@ -418,98 +580,11 @@ public class DialogMergeTours extends TitleAreaDialog {
 			return;
 		}
 
-		if (fTourData != null) {
+		if (fIntoTourData != null) {
 			fIsTourDirty = true;
 		}
 
 		enableActions();
-	}
-
-	private void updateMergedData() {
-
-		final TourData intoTourData = fTourData;
-		final TourData fromTourData = TourManager.getInstance().getTourData(fTourData.getMergeFromTourId());
-
-		final int timeOffset = intoTourData.getMergedTourTimeOffset();
-		final int metricAltiDiff = intoTourData.getMergedAltitudeOffset();
-
-		final int[] intoTimeSerie = intoTourData.timeSerie;
-		final int[] intoDistanceSerie = intoTourData.distanceSerie;
-		final int[] intoAltitudeSerie = intoTourData.altitudeSerie;
-		final int[] intoTemperatureSerie = intoTourData.temperatureSerie;
-
-		final int[] fromTimeSerie = fromTourData.timeSerie;
-		final int[] fromDistaceSerie = fromTourData.distanceSerie;
-		final int[] fromAltitudeSerie = fromTourData.altitudeSerie;
-		final int[] fromTemperatureSerie = fromTourData.temperatureSerie;
-
-		boolean isCreateFromDistance = false;
-		final boolean isCreateIntoTemperature = false;
-
-		if ((fromDistaceSerie == null || fromDistaceSerie.length == 0)
-				&& intoDistanceSerie != null
-				&& intoDistanceSerie.length > 0) {
-
-			// distance is available in destination but not in source
-
-			isCreateFromDistance = true;
-		}
-
-//		if ((mergeIntoTemperatureSerie == null || mergeIntoTemperatureSerie.length == 0)
-//				&& mergeFromTemperatureSerie != null
-//				&& mergeFromTemperatureSerie.length > 0) {
-//
-//			// temperature is available in source but not in destination
-//
-//			isCreateIntoTemperature = true;
-//			mergeIntoTemperatureSerie = new int[mergeFromTemperatureSerie.length];
-//		}
-
-		if (isCreateFromDistance) {
-
-			final int serieLength = intoTimeSerie.length;
-
-			final int[] newFromDistanceSerie = new int[serieLength];
-			final int[] newFromTimeSerie = new int[serieLength];
-			final int[] newFromAltitudeSerie = new int[serieLength];
-
-			final int[] newIntoTemperatureSerie = new int[serieLength];
-			final int[] newIntoAltiDiffSerie = new int[serieLength];
-
-			int fromTimeIndex = 0;
-
-			for (int intoTimeIndex = 0; intoTimeIndex < intoTimeSerie.length; intoTimeIndex++) {
-
-				// check time from array bounds
-				if (fromTimeIndex >= fromTimeSerie.length) {
-					fromTimeIndex = fromTimeSerie.length - 1;
-				}
-
-				final int intoTime = intoTimeSerie[intoTimeIndex];
-				final int intoAltitude = intoAltitudeSerie[intoTimeIndex];
-
-				final int fromTime = fromTimeSerie[fromTimeIndex];
-				final int fromAltitude = fromAltitudeSerie[fromTimeIndex];
-
-				newFromDistanceSerie[intoTimeIndex] = intoDistanceSerie[intoTimeIndex];
-				newFromTimeSerie[intoTimeIndex] = intoTime;
-				newFromAltitudeSerie[intoTimeIndex] = fromAltitude;
-
-				newIntoAltiDiffSerie[intoTimeIndex] = fromAltitude - intoAltitude;
-				newIntoTemperatureSerie[intoTimeIndex] = fromTemperatureSerie[fromTimeIndex];
-
-				if (intoTime > fromTime + timeOffset) {
-					fromTimeIndex++;
-				}
-			}
-
-			fromTourData.timeSerie = newFromTimeSerie;
-			fromTourData.distanceSerie = newFromDistanceSerie;
-			fromTourData.altitudeSerie = newFromAltitudeSerie;
-
-			intoTourData.temperatureSerie = newIntoTemperatureSerie;
-			intoTourData.gradientSerie = newIntoAltiDiffSerie;
-		}
 	}
 
 	/**
@@ -519,8 +594,8 @@ public class DialogMergeTours extends TitleAreaDialog {
 
 		fIsDirtyDisabled = true;
 
-		final int mergedTourTimeOffset = fTourData.getMergedTourTimeOffset();
-		final int mergedAltitudeOffset = fTourData.getMergedAltitudeOffset();
+		final int mergedTourTimeOffset = fIntoTourData.getMergedTourTimeOffset();
+		final int mergedAltitudeOffset = fIntoTourData.getMergedAltitudeOffset();
 
 		final int seconds = mergedTourTimeOffset % 60;
 		final int minutes = mergedTourTimeOffset / 60 % 60;

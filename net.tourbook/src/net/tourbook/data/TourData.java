@@ -547,10 +547,19 @@ public class TourData {
 	@Transient
 	public boolean					isTourDeleted					= false;
 
-	public TourData() {
-		int a = 0;
-		a++;
-	}
+	/**
+	 * altitude difference between this tour and the merge tour
+	 */
+	@Transient
+	public int[]					mergeAltitudeDiff;
+
+	/**
+	 * altitude data serie for the merged tour
+	 */
+	@Transient
+	public int[]					mergeAltitudeSerie;
+
+	public TourData() {}
 
 	/**
 	 * clear imperial altitude series so the next time when it's needed it will be recomputed
@@ -1902,6 +1911,19 @@ public class TourData {
 							? 0
 							: tdCadence;
 				}
+
+				
+				/*
+				 * temperature
+				 */
+				if (isTemperature) {
+					final int tdTemperature = timeData.temperature;
+					if (tdTemperature == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
+				}
+
 
 				/*
 				 * marker

@@ -4534,7 +4534,7 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
-	public void redrawChart() {
+	void redrawChart() {
 
 		if (isDisposed()) {
 			return;
@@ -4547,7 +4547,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * set the slider position when the data model has changed
 	 */
-	public void resetSliders() {
+	void resetSliders() {
 
 		// first get the left/right slider
 		final ChartXSlider leftSlider = getLeftSlider();

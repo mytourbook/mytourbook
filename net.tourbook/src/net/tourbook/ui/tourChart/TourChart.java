@@ -420,7 +420,6 @@ public class TourChart extends Chart {
 	}
 
 	private void createMergeLayer() {
-		// TODO Auto-generated method stub
 
 		if (fIsMergeLayerVisible == false || fTourData == null || fTourData.getMergeFromTourId() == null) {
 			fMergeLayer = null;
@@ -433,7 +432,9 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		fMergeLayer = new ChartMergeLayer(fTourData, mergeFromTourData);
+		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
+
+		fMergeLayer = new ChartMergeLayer(fTourData, mergeFromTourData, xDataSerie);
 	}
 
 	/**
