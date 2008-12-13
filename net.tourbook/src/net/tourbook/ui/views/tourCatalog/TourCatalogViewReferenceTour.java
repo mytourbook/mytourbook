@@ -167,8 +167,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 			final SelectionChartXSliderPosition oldXSliderPosition = fTourChart.getXSliderPosition();
 
 			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
-					oldXSliderPosition.getSlider1ValueIndex(),
-					oldXSliderPosition.getSlider2ValueIndex()));
+					oldXSliderPosition.getLeftSliderValueIndex(),
+					oldXSliderPosition.getRightSliderValueIndex()));
 		}
 
 		fTourChart.addDataModelListener(new IDataModelListener() {

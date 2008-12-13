@@ -168,10 +168,14 @@ public interface ITourbookPreferences {
 	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";						//$NON-NLS-1$
 
 	/*
-	 * merge tour settings
+	 * merge tour dialog
 	 */
 	public static final String	MERGE_TOUR_GRAPH_X_AXIS						= "merge.tour.chart-x-axis";								//$NON-NLS-1$
+
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
+	public static final String	MERGE_TOUR_ADJUST_START_ALTITUDE			= "merge.tour.adjust-start-altitude";						//$NON-NLS-1$
+	public static final String	MERGE_TOUR_MERGE_TEMPERATURE				= "merge.tour.merge-temperature-values";					//$NON-NLS-1$
+
 
 }

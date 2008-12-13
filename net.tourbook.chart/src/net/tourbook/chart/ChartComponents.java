@@ -1238,8 +1238,8 @@ public class ChartComponents extends Composite {
 		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
 		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
 
-		final int slider1ValueIndex = sliderPosition.getSlider1ValueIndex();
-		final int slider2ValueIndex = sliderPosition.getSlider2ValueIndex();
+		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
+		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
 		final int[] xValues = fChartDataModel.getXData().fHighValues[0];
 		final boolean centerSliderPosition = sliderPosition.isCenterSliderPosition();

@@ -21,9 +21,10 @@ import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-	long			fColumnStartDistance;
 	long			fTourId;
 	long			fTourTypeId;
+
+	long			fColumnStartDistance;
 	short			fColumnTimeInterval;
 
 	/**

@@ -155,17 +155,26 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMapAppearance.MAP_TOUR_SYMBOL_DOT);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 4);
-		
+
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 
 		/*
 		 * Tour data editor
 		 */
 		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 3);
-		
+
 		/*
 		 * general appearance
 		 */
 		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
+
+		/*
+		 * merge tour dialog
+		 */
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+		
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_ADJUST_START_ALTITUDE, false);
 	}
 }

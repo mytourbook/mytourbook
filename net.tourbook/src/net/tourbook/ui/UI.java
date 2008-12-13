@@ -85,8 +85,9 @@ public class UI {
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String						SPACE							= " ";
-	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
+	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
@@ -181,6 +182,9 @@ public class UI {
 	public static final DateFormat					DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
 	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");					//$NON-NLS-1$
 	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");				//$NON-NLS-1$
+
+	private static DateFormat						fDateFormatterShort;
+	private static DateFormat						fTimeFormatterShort;
 
 	public static Styler							TAG_STYLER;
 	public static Styler							TAG_CATEGORY_STYLER;
@@ -342,6 +346,136 @@ public class UI {
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
+	}
+
+	/******************************************************************************
+	 * this method is copied from the following source and was adjusted
+	 * 
+	 * <pre>
+	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
+	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
+	 * This program is free software; you can redistribute it and/or modify it    *
+	 * under the terms version 2 of the GNU General Public License as published   *
+	 * by the Free Software Foundation. This program is distributed in the hope   *
+	 * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied *
+	 * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.           *
+	 * See the GNU General Public License for more details.                       *
+	 * You should have received a copy of the GNU General Public License along    *
+	 * with this program; if not, write to the Free Software Foundation, Inc.,    *
+	 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
+	 * For the text or an alternative of this public license, you may reach us    *
+	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
+	 * or via info@compiere.org or http://www.compiere.org/license.html           *
+	 * </pre>
+	 * 
+	 * @return date formatter with leading zeros for month and day and 4-digit year
+	 */
+	public static DateFormat getFormatterDateShort() {
+
+		if (fDateFormatterShort == null) {
+
+			final DateFormat dateInstance = DateFormat.getDateInstance(DateFormat.SHORT);
+			if (dateInstance instanceof SimpleDateFormat) {
+
+				final SimpleDateFormat sdf = (SimpleDateFormat) (fDateFormatterShort = dateInstance);
+
+				String oldPattern = sdf.toPattern();
+
+				//	some short formats have only one M and d (e.g. ths US)
+				if (oldPattern.indexOf("MM") == -1 && oldPattern.indexOf("dd") == -1) {//$NON-NLS-1$ //$NON-NLS-2$
+					String newPattern = UI.EMPTY_STRING;
+					for (int i = 0; i < oldPattern.length(); i++) {
+						if (oldPattern.charAt(i) == 'M') {
+							newPattern += "MM"; //$NON-NLS-1$
+						} else if (oldPattern.charAt(i) == 'd') {
+							newPattern += "dd"; //$NON-NLS-1$
+						} else {
+							newPattern += oldPattern.charAt(i);
+						}
+					}
+					sdf.applyPattern(newPattern);
+				}
+
+				//	Unknown short format => use JDBC
+				if (sdf.toPattern().length() != 8) {
+					sdf.applyPattern("yyyy-MM-dd"); //$NON-NLS-1$
+				}
+
+				//	4 digit year
+				if (sdf.toPattern().indexOf("yyyy") == -1) { //$NON-NLS-1$
+					oldPattern = sdf.toPattern();
+					String newPattern = UI.EMPTY_STRING;
+					for (int i = 0; i < oldPattern.length(); i++) {
+						if (oldPattern.charAt(i) == 'y') { //$NON-NLS-1$
+							newPattern += "yy"; //$NON-NLS-1$
+						} else {
+							newPattern += oldPattern.charAt(i);
+						}
+					}
+					sdf.applyPattern(newPattern);
+				}
+
+				sdf.setLenient(true);
+			}
+		}
+
+		return fDateFormatterShort;
+	}
+
+	/******************************************************************************
+	 * this method is copied from the following source and was adjusted
+	 * 
+	 * <pre>
+	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
+	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
+	 * This program is free software; you can redistribute it and/or modify it    *
+	 * under the terms version 2 of the GNU General Public License as published   *
+	 * by the Free Software Foundation. This program is distributed in the hope   *
+	 * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied *
+	 * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.           *
+	 * See the GNU General Public License for more details.                       *
+	 * You should have received a copy of the GNU General Public License along    *
+	 * with this program; if not, write to the Free Software Foundation, Inc.,    *
+	 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
+	 * For the text or an alternative of this public license, you may reach us    *
+	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
+	 * or via info@compiere.org or http://www.compiere.org/license.html           *
+	 * </pre>
+	 * 
+	 * @return date formatter with leading zeros for month and day and 4-digit year
+	 */
+	public static DateFormat getFormatterTimeShort() {
+
+		if (fTimeFormatterShort == null) {
+
+			final DateFormat timeInstance = DateFormat.getTimeInstance(DateFormat.SHORT);
+			if (timeInstance instanceof SimpleDateFormat) {
+
+				final SimpleDateFormat sdf = (SimpleDateFormat) (fTimeFormatterShort = timeInstance);
+
+				final String oldPattern = sdf.toPattern();
+
+				//	some short formats have only one h (e.g. ths US)
+				if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$ 
+
+					String newPattern = UI.EMPTY_STRING;
+
+					for (int i = 0; i < oldPattern.length(); i++) {
+						if (oldPattern.charAt(i) == 'h') {
+							newPattern += "hh"; //$NON-NLS-1$
+						} else {
+							newPattern += oldPattern.charAt(i);
+						}
+					}
+					
+					sdf.applyPattern(newPattern);
+				}
+
+				sdf.setLenient(true);
+			}
+		}
+
+		return fTimeFormatterShort;
 	}
 
 	public static UI getInstance() {

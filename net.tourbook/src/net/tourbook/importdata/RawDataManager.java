@@ -270,7 +270,7 @@ public class RawDataManager {
 	}
 
 	/**
-	 * @return Returns the tour data which were imported or received, key is tour ID
+	 * @return the tour data which has been imported or received, tour id is the key
 	 */
 	public HashMap<Long, TourData> getTourDataMap() {
 		return fTourDataMap;

@@ -168,6 +168,11 @@ public class Chart extends ViewForm {
 		fFocusListeners.add(listener);
 	}
 
+	/**
+	 * Adds a listener when the vertical slider is moved
+	 * 
+	 * @param listener
+	 */
 	public void addSliderMoveListener(final ISliderMoveListener listener) {
 		fSliderMoveListeners.add(listener);
 	}

@@ -262,7 +262,6 @@ public class Messages extends NLS {
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 
-	public static String		Image__merge_tours;
 	public static String		Image__options;
 
 	public static String		Image__quick_edit;
@@ -302,7 +301,11 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
+	public static String	image__merge_tours;
+
 	public static String		import_data_action_adjust_imported_year;
+
+	public static String	import_data_action_assignment_is_not_available;
 
 	public static String		import_data_action_assignMergedTour;
 
@@ -636,12 +639,41 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_tour_marker;
 	public static String		tour_editor_tour_new_tooltip;
 
+	public static String	tour_merger_btn_reset_adjustment;
+
+	public static String	tour_merger_btn_reset_adjustment_tooltip;
+
 	public static String		tour_merger_btn_reset_values;
-	public static String		tour_merger_btn_show_original_values;
-	public static String		tour_merger_btn_show_original_values_tooltip;
+
+	public static String	tour_merger_btn_reset_values_tooltip;
+	public static String	tour_merger_chk_adjust_start_altitude;
+
+	public static String	tour_merger_chk_adjust_start_altitude_tooltip;
+
+	public static String	tour_merger_chk_alti_diff_scaling;
+
+	public static String	tour_merger_chk_alti_diff_scaling_tooltip;
+
+	public static String	tour_merger_chk_merge_temperature;
+
+	public static String	tour_merger_chk_merge_temperature_tooltip;
+
+	public static String	tour_merger_chk_preview_graphs;
+
+	public static String	tour_merger_chk_preview_graphs_tooltip;
+
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
 	public static String		tour_merger_dialog_title;
+
+	public static String	tour_merger_group_adjust_altitude;
+
+	public static String	tour_merger_group_adjust_time;
+
+	public static String	tour_merger_group_save_actions;
+
+	public static String	tour_merger_group_save_actions_tooltip;
+
 	public static String	tour_merger_label_adjust_altitude_10;
 
 	public static String	tour_merger_label_adjust_altitude_100;

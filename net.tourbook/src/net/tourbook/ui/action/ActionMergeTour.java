@@ -34,12 +34,14 @@ public class ActionMergeTour extends Action {
 
 	private ITourProvider	fTourProvider;
 
-	private TourData		fIntoTourData;
+	private TourData		fMergeIntoTour;
+
+	private TourData		fMergeFromTour;
 
 	public ActionMergeTour(final ITourProvider tourProvider) {
 
 		setText(Messages.app_action_merge_tour);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__merge_tours));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image__merge_tours));
 
 		fTourProvider = tourProvider;
 	}
@@ -61,7 +63,6 @@ public class ActionMergeTour extends Action {
 		}
 
 		final TourData intoTourData = selectedTours.get(0);
-		TourData fromTourData;
 
 		final Long mergeFromTourId = intoTourData.getMergeFromTourId();
 		if (mergeFromTourId == null) {
@@ -74,7 +75,7 @@ public class ActionMergeTour extends Action {
 
 			return false;
 
-		} else if ((fromTourData = TourManager.getInstance().getTourData(mergeFromTourId)) == null) {
+		} else if ((fMergeFromTour = TourManager.getInstance().getTourData(mergeFromTourId)) == null) {
 
 			// check if merge from tour is available
 
@@ -94,10 +95,10 @@ public class ActionMergeTour extends Action {
 				|| intoTourData.altitudeSerie.length == 0
 				|| intoTourData.timeSerie == null
 				|| intoTourData.timeSerie.length == 0
-				|| fromTourData.altitudeSerie == null
-				|| fromTourData.altitudeSerie.length == 0
-				|| fromTourData.timeSerie == null
-				|| fromTourData.timeSerie.length == 0) {
+				|| fMergeFromTour.altitudeSerie == null
+				|| fMergeFromTour.altitudeSerie.length == 0
+				|| fMergeFromTour.timeSerie == null
+				|| fMergeFromTour.timeSerie.length == 0) {
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.merge_tour_dlg_invalid_tour_title,
@@ -106,7 +107,7 @@ public class ActionMergeTour extends Action {
 			return false;
 		}
 
-		fIntoTourData = intoTourData;
+		fMergeIntoTour = intoTourData;
 
 		return true;
 	}
@@ -115,7 +116,7 @@ public class ActionMergeTour extends Action {
 	public void run() {
 
 		if (getSelectedTour()) {
-			new DialogMergeTours(Display.getCurrent().getActiveShell(), fIntoTourData).open();
+			new DialogMergeTours(Display.getCurrent().getActiveShell(), fMergeIntoTour, fMergeFromTour).open();
 		}
 	}
 

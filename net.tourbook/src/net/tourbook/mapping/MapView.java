@@ -1135,8 +1135,8 @@ public class MapView extends ViewPart {
 				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
 				if (tourData != null) {
 
-					final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
-					int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
+					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
 
 					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 							? leftSliderValueIndex

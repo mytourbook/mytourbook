@@ -25,19 +25,19 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public static final int	IGNORE_SLIDER_POSITION			= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
-	private int				fSlider1ValueIndex				= IGNORE_SLIDER_POSITION;
-	private int				fSlider2ValueIndex				= IGNORE_SLIDER_POSITION;
+	private int				fLeftSliderValueIndex			= IGNORE_SLIDER_POSITION;
+	private int				fRightSliderValueIndex			= IGNORE_SLIDER_POSITION;
 
 	private boolean			fCenterSliderPosition			= false;
 
 	private Chart			fChart;
 
-	public SelectionChartXSliderPosition(final Chart chart, final int valueIndex1, final int valueIndex2) {
+	public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
 
 		fChart = chart;
 
-		fSlider1ValueIndex = valueIndex1;
-		fSlider2ValueIndex = valueIndex2;
+		fLeftSliderValueIndex = leftValueIndex;
+		fRightSliderValueIndex = rightValueIndex;
 	}
 
 	public SelectionChartXSliderPosition(	final Chart chart,
@@ -54,12 +54,12 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return fChart;
 	}
 
-	public int getSlider1ValueIndex() {
-		return fSlider1ValueIndex;
+	public int getLeftSliderValueIndex() {
+		return fLeftSliderValueIndex;
 	}
 
-	public int getSlider2ValueIndex() {
-		return fSlider2ValueIndex;
+	public int getRightSliderValueIndex() {
+		return fRightSliderValueIndex;
 	}
 
 	public boolean isCenterSliderPosition() {

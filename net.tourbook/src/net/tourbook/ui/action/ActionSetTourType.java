@@ -48,8 +48,8 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-	 *            {@link TourData} from the tour provider is only modified
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
+	 *            from the tour provider is only modified
 	 */
 	public static void fillMenu(final IMenuManager menuMgr, final ITourProvider tourProvider, final boolean isSaveTour) {
 
@@ -155,12 +155,9 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 			@Override
 			public void menuShown(final MenuEvent e) {
 
-				final Menu menu = (Menu) e.widget;
-
-				// dispose old items
-				final MenuItem[] items = menu.getItems();
-				for (final MenuItem item : items) {
-					item.dispose();
+				// dispose old menu items	
+				for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
+					menuItem.dispose();
 				}
 
 				fillMenu(fMenu);

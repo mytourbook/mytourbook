@@ -4395,8 +4395,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Table table = (Table) fSliceViewer.getControl();
 		final int itemCount = table.getItemCount();
 
-		final int valueIndex1 = sliderPosition.getSlider1ValueIndex();
-		final int valueIndex2 = sliderPosition.getSlider2ValueIndex();
+		final int valueIndex1 = sliderPosition.getLeftSliderValueIndex();
+		final int valueIndex2 = sliderPosition.getRightSliderValueIndex();
 
 		// adjust to array bounds 
 		final int checkedValueIndex1 = Math.max(0, Math.min(valueIndex1, itemCount - 1));

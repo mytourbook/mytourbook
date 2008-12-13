@@ -150,6 +150,22 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
+		
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "deviceName", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_device_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_device);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_device_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TreeColumnFactory DISTANCE = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

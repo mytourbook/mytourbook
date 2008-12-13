@@ -763,8 +763,8 @@ public class TourChartAnalyzerView extends ViewPart {
 		chartInfo.chartDataModel = chart.getChartDataModel();
 		chartInfo.chartDrawingData = chart.getChartDrawingData();
 
-		chartInfo.leftSliderValuesIndex = sliderPosition.getSlider1ValueIndex();
-		chartInfo.rightSliderValuesIndex = sliderPosition.getSlider2ValueIndex();
+		chartInfo.leftSliderValuesIndex = sliderPosition.getLeftSliderValueIndex();
+		chartInfo.rightSliderValuesIndex = sliderPosition.getRightSliderValueIndex();
 
 		updateInfo(chartInfo);
 	}

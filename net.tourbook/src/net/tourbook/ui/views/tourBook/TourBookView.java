@@ -821,6 +821,23 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 			}
 		});
+
+//		/*
+//		 * column: device name
+//		 */
+//		colDef = TreeColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
+//		colDef.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//				final Object element = cell.getElement();
+//				if (element instanceof TVITourBookTour) {
+//
+//					cell.setText(((TVITourBookTour) cell.getElement()).getDeviceName());
+//					setCellColor(cell, element);
+//				}
+//			}
+//		});
+
 	}
 
 	@Override

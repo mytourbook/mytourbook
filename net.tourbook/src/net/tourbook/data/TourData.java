@@ -56,7 +56,7 @@ import org.hibernate.annotations.Cascade;
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
 @Entity
-public class TourData {
+public class TourData implements Comparable<Object> {
 
 	/**
 	 * 
@@ -548,16 +548,22 @@ public class TourData {
 	public boolean					isTourDeleted					= false;
 
 	/**
-	 * altitude difference between this tour and the merge tour
+	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
 	public int[]					mergeAltitudeDiff;
 
 	/**
-	 * altitude data serie for the merged tour
+	 * altitude data serie for the merged tour with metric measurement
 	 */
 	@Transient
 	public int[]					mergeAltitudeSerie;
+
+	/**
+	 * contains the altitude serie which is adjusted at the start
+	 */
+	@Transient
+	public int[]					mergeAdjustedAltitudeSerie;
 
 	public TourData() {}
 
@@ -595,6 +601,36 @@ public class TourData {
 	 */
 	public void clearWorldPositions() {
 		fWorldPosition.clear();
+	}
+
+	public int compareTo(final Object obj) {
+
+		if (obj instanceof TourData) {
+			final TourData otherTourData = (TourData) obj;
+
+			return startYear < otherTourData.startYear ? -1 : (startYear == otherTourData.startYear
+					? startMonth < otherTourData.startMonth ? -1 : (startMonth == otherTourData.startMonth
+							? startDay < otherTourData.startDay ? -1 : (startDay == otherTourData.startDay
+									? startHour < otherTourData.startHour ? -1 : (startHour == otherTourData.startHour
+											? startMinute < otherTourData.startMinute
+													? -1
+													: (startMinute == otherTourData.startMinute ? 0 : 1)
+											: 1)
+									: 1)
+							: 1)
+					: 1);
+
+//			final int month = startMonth < otherTourData.startMonth ? -1 : (startMonth == otherTourData.startMonth
+//					? 0
+//					: 1);
+//			final int day = startDay < otherTourData.startDay ? -1 : (startDay == otherTourData.startDay ? 0 : 1);
+//			final int hour = startHour < otherTourData.startHour ? -1 : (startHour == otherTourData.startHour ? 0 : 1);
+//			final int minure = startMinute < otherTourData.startMinute ? -1 : (startMinute == otherTourData.startMinute
+//					? 0
+//					: 1);
+		}
+
+		return 0;
 	}
 
 	public void computeAltimeterGradientSerie() {
@@ -1912,7 +1948,6 @@ public class TourData {
 							: tdCadence;
 				}
 
-				
 				/*
 				 * temperature
 				 */
@@ -1923,7 +1958,6 @@ public class TourData {
 					}
 					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
-
 
 				/*
 				 * marker
@@ -2376,6 +2410,11 @@ public class TourData {
 		}
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
@@ -2411,11 +2450,6 @@ public class TourData {
 		return ignoreTimeCounter;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * @return the calories
 	 */
@@ -2435,6 +2469,15 @@ public class TourData {
 		return deviceModeName;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
+
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
@@ -2444,15 +2487,6 @@ public class TourData {
 			return devicePluginName;
 		}
 	}
-
-// not used 5.10.2008 
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
@@ -2563,10 +2597,17 @@ public class TourData {
 		return mergedTourTimeOffset;
 	}
 
+	/**
+	 * @return tour id which is merged into this tour
+	 */
 	public Long getMergeFromTourId() {
 		return mergeFromTourId;
 	}
 
+	/**
+	 * @return tour Id into which this tour is merged or <code>null</code> when this tour is not
+	 *         merged into another tour
+	 */
 	public Long getMergeIntoTourId() {
 		return mergeIntoTourId;
 	}
@@ -2875,13 +2916,6 @@ public class TourData {
 		return tourReferences;
 	}
 
-	/**
-	 * @return the tourStartPlace
-	 */
-	public String getTourStartPlace() {
-		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -2923,6 +2957,13 @@ public class TourData {
 //	}
 
 	/**
+	 * @return the tourStartPlace
+	 */
+	public String getTourStartPlace() {
+		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
+	}
+
+	/**
 	 * @return Returns the tags {@link #tourTags} which are defined for this tour
 	 */
 	public Set<TourTag> getTourTags() {
@@ -2944,6 +2985,11 @@ public class TourData {
 		return tourType;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param zoomLevel
 	 * @return Returns the world position for the suplied zoom level and projection id
@@ -2951,11 +2997,6 @@ public class TourData {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
