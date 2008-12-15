@@ -32,9 +32,12 @@ public class ActionMergeInto extends Action {
 
 	private TourData	fFromTourData;
 	private TourData	fIntoTourData;
+
 	private RawDataView	fRawDataView;
 
 	public ActionMergeInto(final TourData mergeFromTour, final TourData mergeIntoTour, final RawDataView rawDataView) {
+
+		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
 		fFromTourData = mergeFromTour;
 		fIntoTourData = mergeIntoTour;
@@ -61,11 +64,17 @@ public class ActionMergeInto extends Action {
 
 		// show database icon
 		setImageDescriptor(ImageDescriptor.createFromImage(fRawDataView.getDbImage(fIntoTourData)));
+
+		// check menu item when the from tour is merge into the into tour
+		final Long mergeIntoTourId = mergeFromTour.getMergeIntoTourId();
+		if (mergeIntoTourId != null && mergeIntoTourId.equals(mergeIntoTour.getTourId())) {
+			setChecked(true);
+		}
 	}
 
 	@Override
 	public void run() {
-		fRawDataView.actionMergedIntoTour(fFromTourData, fIntoTourData);
+		fRawDataView.actionMergeTours(fFromTourData, fIntoTourData);
 	}
 
 }

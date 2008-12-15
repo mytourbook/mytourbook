@@ -219,6 +219,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 	}
 
 	/**
+	 * set button width
+	 */
+	private void adjustButtonWidth() {
+		
+		final int btnCompareWidth = fBtnCompare.getBounds().width;
+		final int btnResetWidth = fBtnReset.getBounds().width;
+		final int newWidth = Math.max(btnCompareWidth, btnResetWidth);
+
+		GridData gd;
+		gd = (GridData) fBtnCompare.getLayoutData();
+		gd.widthHint = newWidth;
+
+		gd = (GridData) fBtnReset.getLayoutData();
+		gd.widthHint = newWidth;
+	}
+
+	/**
 	 * adjust end altitude
 	 * 
 	 * @param altiSrc
@@ -388,19 +405,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 		// set focus to cancel button
 		getButton(IDialogConstants.CANCEL_ID).setFocus();
 
-		/*
-		 * set button width
-		 */
-		final int btnCompareWidth = fBtnCompare.getBounds().width;
-		final int btnResetWidth = fBtnReset.getBounds().width;
-		final int newWidth = Math.max(btnCompareWidth, btnResetWidth);
-
-		GridData gd;
-		gd = (GridData) fBtnCompare.getLayoutData();
-		gd.widthHint = newWidth;
-
-		gd = (GridData) fBtnReset.getLayoutData();
-		gd.widthHint = newWidth;
+		adjustButtonWidth();
 
 		fDialogArea.layout(true, true);
 	}

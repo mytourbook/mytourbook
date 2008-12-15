@@ -654,6 +654,10 @@ public class Messages extends NLS {
 
 	public static String	tour_merger_chk_alti_diff_scaling_tooltip;
 
+	public static String	tour_merger_chk_keep_horiz_vert_adjustments;
+
+	public static String	tour_merger_chk_keep_horiz_vert_adjustments_tooltip;
+
 	public static String	tour_merger_chk_merge_temperature;
 
 	public static String	tour_merger_chk_merge_temperature_tooltip;
@@ -661,6 +665,10 @@ public class Messages extends NLS {
 	public static String	tour_merger_chk_preview_graphs;
 
 	public static String	tour_merger_chk_preview_graphs_tooltip;
+
+	public static String	tour_merger_chk_set_tour_type;
+
+	public static String	tour_merger_chk_set_tour_type_tooltip;
 
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
@@ -673,6 +681,8 @@ public class Messages extends NLS {
 	public static String	tour_merger_group_save_actions;
 
 	public static String	tour_merger_group_save_actions_tooltip;
+
+	public static String	tour_merger_label_adjust_altitude;
 
 	public static String	tour_merger_label_adjust_altitude_10;
 

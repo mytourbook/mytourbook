@@ -40,6 +40,8 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.DialogMergeTours;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
@@ -61,7 +63,7 @@ import net.tourbook.ui.action.ActionMergeTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -142,11 +144,11 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionSaveTourInDatabase		fActionSaveTour;
 	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
-	private ActionAssignMergedTour			fActionMergeIntoTour;
+	private ActionMergeIntoMenu				fActionMergeIntoTour;
 	private ActionAdjustYear				fActionAdjustImportedYear;
 	private ActionMergeGPXTours				fActionMergeGPXTours;
 	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
-	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTypeMenu				fActionSetTourType;
 	private ActionEditQuick					fActionEditQuick;
 	private ActionEditTour					fActionEditTour;
 	private ActionMergeTour					fActionMergeTour;
@@ -155,6 +157,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionRemoveAllTags				fActionRemoveAllTags;
 	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 	private ActionOpenTour					fActionOpenTour;
+	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
 
 	private ImageDescriptor					imageDescDatabase;
 	private ImageDescriptor					imageDescDatabaseOtherPerson;
@@ -216,7 +220,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fPostSelectionProvider.clearSelection();
 	}
 
-	void actionMergedIntoTour(final TourData mergeFromTour, final TourData mergeIntoTour) {
+	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
 
 		// check if the tour editor contains a modified tour
 		if (UI.isTourEditorModified()) {
@@ -226,8 +230,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// backup data
 		final Long backupMergeFromTourId = mergeIntoTour.getMergeFromTourId();
 
-		// assign tour from which is merged
+		// set tour id from which the tour is merged
 		mergeIntoTour.setMergeFromTourId(mergeFromTour.getTourId());
+		mergeIntoTour.setMergeFromTour(mergeFromTour);
 
 		if (new DialogMergeTours(Display.getCurrent().getActiveShell(), mergeIntoTour, mergeFromTour).open() != Window.OK) {
 
@@ -252,12 +257,15 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				// set tour id into which the tour is merged
 				mergeFromTour.setMergeIntoTourId(mergeIntoTour.getTourId());
 
-				saveTour(mergeFromTour, mergeIntoTour.getTourPerson(), savedTours);
+				saveTour(mergeFromTour, mergeIntoTour.getTourPerson(), savedTours, true);
 
 				// update existing views
 				doSaveTourPostActions(savedTours);
 			}
 		}
+
+		// reset temp tour data
+		mergeIntoTour.setMergeFromTour(null);
 	}
 
 	void actionSaveTour(final TourPerson person) {
@@ -275,7 +283,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 					final Object selObject = iter.next();
 					if (selObject instanceof TourData) {
-						saveTour((TourData) selObject, person, savedTours);
+						saveTour((TourData) selObject, person, savedTours, false);
 					}
 				}
 
@@ -470,13 +478,16 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// context menu
 		fActionSaveTour = new ActionSaveTourInDatabase(this, false);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-		fActionMergeIntoTour = new ActionAssignMergedTour(this);
+		fActionMergeIntoTour = new ActionMergeIntoMenu(this);
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionMergeTour = new ActionMergeTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
+
+		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
@@ -698,7 +709,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
-				if (tourType != null) {
+				if (tourType == null) {
+					cell.setImage(null);
+				} else {
 					cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 				}
 			}
@@ -984,6 +997,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		int selectedValidTours = 0;
 
 		TourData firstSavedTour = null;
+		TourData firstValidTour = null;
 
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 			final Object treeItem = iter.next();
@@ -1011,11 +1025,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 					savedTours++;
 					selectedValidTours++;
 				}
+
+				if (selectedValidTours == 1) {
+					firstValidTour = tourData;
+				}
 			}
 		}
 
 		final boolean isTourSelected = savedTours > 0;
 		final boolean isOneSavedAndValidTour = selectedValidTours == 1 && savedTours == 1;
+
+		final boolean canMergeIntoTour = selectedValidTours == 1
+				&& (firstValidTour == null ? true : firstValidTour.getMergeFromTourId() == null);
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
@@ -1034,12 +1055,14 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		fActionSaveTour.setEnabled(unsavedTours > 0);
 
-		fActionMergeIntoTour.setEnabled(selectedValidTours == 1);
+		fActionMergeIntoTour.setEnabled(canMergeIntoTour);
 		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeFromTourId() != null);
 
 		fActionEditTour.setEnabled(isOneSavedAndValidTour);
 		fActionEditQuick.setEnabled(isOneSavedAndValidTour);
 		fActionOpenTour.setEnabled(isOneSavedAndValidTour);
+		fActionOpenMarkerDialog.setEnabled(isOneSavedAndValidTour);
+		fActionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndValidTour);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -1085,11 +1108,13 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		menuMgr.add(fActionSaveTour);
 		menuMgr.add(fActionMergeIntoTour);
-		menuMgr.add(fActionMergeTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenMarkerDialog);
+		menuMgr.add(fActionOpenAdjustAltitudeDialog);
+		menuMgr.add(fActionMergeTour);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
@@ -1417,14 +1442,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	 * @param savedTours
 	 *            the saved tour is added to this list
 	 */
-	private void saveTour(final TourData tourData, final TourPerson person, final ArrayList<TourData> savedTours) {
+	private void saveTour(	final TourData tourData,
+							final TourPerson person,
+							final ArrayList<TourData> savedTours,
+							final boolean isForceSave) {
 
 		// workaround for hibernate problems
 		if (tourData.isTourDeleted) {
 			return;
 		}
 
-		if (tourData.getTourPerson() != null) {
+		if (tourData.getTourPerson() != null && isForceSave == false) {
 			/*
 			 * tour is already saved, resaving cannot be done in the import view it can be done in
 			 * the tour editor

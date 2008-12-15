@@ -174,8 +174,11 @@ public interface ITourbookPreferences {
 
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
+
 	public static final String	MERGE_TOUR_ADJUST_START_ALTITUDE			= "merge.tour.adjust-start-altitude";						//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_TEMPERATURE				= "merge.tour.merge-temperature-values";					//$NON-NLS-1$
 
+	public static final String	MERGE_TOUR_SET_TOUR_TYPE					= "merge.tour.set-tour-type-for-merge-from-tour";			//$NON-NLS-1$
+	public static final String	MERGE_TOUR_SET_TOUR_TYPE_ID					= "merge.tour.set-tour-type-id";							//$NON-NLS-1$
 
 }

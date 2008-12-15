@@ -419,12 +419,24 @@ public class TourChart extends Chart {
 
 	private void createMergeLayer() {
 
-		if (fIsMergeLayerVisible == false || fTourData == null || fTourData.getMergeFromTourId() == null) {
+		if (fTourData == null) {
+			return;
+		}
+
+		final TourData mergeFromTour = fTourData.getMergeFromTour();
+
+		if (fIsMergeLayerVisible == false || (fTourData.getMergeFromTourId() == null && mergeFromTour == null)) {
+
 			fMergeLayer = null;
 			return;
 		}
 
-		final TourData mergeFromTourData = TourManager.getInstance().getTourData(fTourData.getMergeFromTourId());
+		TourData mergeFromTourData;
+		if (mergeFromTour != null) {
+			mergeFromTourData = mergeFromTour;
+		} else {
+			mergeFromTourData = TourManager.getInstance().getTourData(fTourData.getMergeFromTourId());
+		}
 		if (mergeFromTourData == null) {
 			fMergeLayer = null;
 			return;

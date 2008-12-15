@@ -55,7 +55,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -140,7 +140,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
 
-	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTypeMenu				fActionSetTourType;
 	private ActionSetTourTag				fActionAddTag;
 	private ActionSetTourTag				fActionRemoveTag;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
@@ -352,7 +352,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);

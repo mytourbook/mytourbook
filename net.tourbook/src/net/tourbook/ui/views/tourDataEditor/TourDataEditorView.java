@@ -65,7 +65,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -1726,7 +1726,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// set menu items
 
-				ActionSetTourType.fillMenu(menuMgr, TourDataEditorView.this, false);
+				ActionSetTourTypeMenu.fillMenu(menuMgr, TourDataEditorView.this, false);
 
 				menuMgr.add(new Separator());
 				menuMgr.add(fActionOpenTourTypePrefs);
@@ -4467,6 +4467,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		enableActions();
 		enableControls();
 
+		fMessageManager.removeAllMessages();
+		
 		showDefaultTitle();
 
 		/*
@@ -4697,11 +4699,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @param tourData
 	 * @param forceTimeSliceReload
 	 *            <code>true</code> will reload time slices
-	 * @param isModifyEventDisabled
+	 * @param isDirtyDisabled
 	 */
 	private void updateUIFromTourData(	final TourData tourData,
 										final boolean forceTimeSliceReload,
-										final boolean isModifyEventDisabled) {
+										final boolean isDirtyDisabled) {
 
 		if (tourData == null) {
 			fPageBook.showPage(fPageNoTour);
@@ -4739,7 +4741,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				fUIRunnableTourData = tourData;
 				fUIRunnableForceTimeSliceReload = forceTimeSliceReload;
-				fUIRunnableIsDirtyDisabled = isModifyEventDisabled;
+				fUIRunnableIsDirtyDisabled = isDirtyDisabled;
 
 				// force reload
 				fUIRunnableCounter = fUIUpdateCounter - 1;
@@ -4962,7 +4964,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int pausedTime = recordingTime - drivingTime;
 		fDtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
-		UI.updateUITourType(fTourData, fLblTourType);
+		UI.updateUITourType(fTourData.getTourType(), fLblTourType);
 		UI.updateUITags(fTourData, fLblTourTags);
 
 		/*

@@ -17,154 +17,81 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
-public class ActionSetTourType extends Action implements IMenuCreator {
+class ActionSetTourType extends Action {
 
-	private Menu	fMenu;
-
-	ITourProvider	fTourProvider;
-	boolean			fIsSaveTour;
+	private TourType		fTourType;
+	private ITourProvider	fTourProvider;
+	private boolean			fIsSaveTour;
 
 	/**
-	 * Adds all tour types to the menu manager
-	 * 
-	 * @param menuMgr
+	 * @param tourType
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
-	 *            from the tour provider is only modified
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
+	 *            {@link TourData} from the tour provider is only updated
 	 */
-	public static void fillMenu(final IMenuManager menuMgr, final ITourProvider tourProvider, final boolean isSaveTour) {
+	public ActionSetTourType(final TourType tourType, final ITourProvider tourProvider, final boolean isSaveTour) {
 
-		// get tours which tour type should be changed
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-		if (selectedTours == null) {
-			return;
-		}
+		super(tourType.getName(), AS_CHECK_BOX);
 
-		// get tour type which will be checked in the menu
-		TourType checkedTourType = null;
-		if (selectedTours.size() == 1) {
-			checkedTourType = selectedTours.get(0).getTourType();
-		}
+		final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+		setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
-		// add all tour types to the menu
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
-		for (final TourType tourType : tourTypes) {
-
-			boolean isChecked = false;
-
-			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
-				isChecked = true;
-			}
-
-			final ActionTourType actionTourType = new ActionTourType(tourType, tourProvider, isSaveTour);
-			actionTourType.setChecked(isChecked);
-
-			menuMgr.add(actionTourType);
-		}
-	}
-
-	public ActionSetTourType(final ITourProvider tourProvider) {
-		this(tourProvider, true);
-	}
-
-	public ActionSetTourType(final ITourProvider tourProvider, final boolean isSaveTour) {
-
-		super(Messages.App_Action_set_tour_type, AS_DROP_DOWN_MENU);
-		setMenuCreator(this);
-
+		fTourType = tourType;
 		fTourProvider = tourProvider;
 		fIsSaveTour = isSaveTour;
 	}
 
-	private void addActionToMenu(final Action action, final Menu menu) {
+	@Override
+	public void run() {
 
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(menu, -1);
-	}
+		final Runnable runnable = new Runnable() {
 
-	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
-		}
-	}
+			public void run() {
 
-	private void fillMenu(final Menu menu) {
-
-		// get tours which tour type should be changed
-		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-		if (selectedTours == null) {
-			return;
-		}
-
-		// get tour type which will be checked in the menu
-		TourType checkedTourType = null;
-		if (selectedTours.size() == 1) {
-			checkedTourType = selectedTours.get(0).getTourType();
-		}
-
-		// add all tour types to the menu
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
-		for (final TourType tourType : tourTypes) {
-
-			boolean isChecked = false;
-
-			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
-				isChecked = true;
-			}
-
-			final ActionTourType actionTourType = new ActionTourType(tourType, fTourProvider, fIsSaveTour);
-			actionTourType.setChecked(isChecked);
-
-			addActionToMenu(actionTourType, menu);
-		}
-	}
-
-	public Menu getMenu(final Control parent) {
-		return null;
-	}
-
-	public Menu getMenu(final Menu parent) {
-
-		dispose();
-		fMenu = new Menu(parent);
-
-		// Add listener to repopulate the menu each time
-		fMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuShown(final MenuEvent e) {
-
-				// dispose old menu items	
-				for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-					menuItem.dispose();
+				final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+				if (selectedTours == null || selectedTours.size() == 0) {
+					return;
 				}
 
-				fillMenu(fMenu);
-			}
-		});
+				// add the tag in all tours (without tours which are opened in an editor)
+				for (final TourData tourData : selectedTours) {
 
-		return fMenu;
+					// set tour type
+					tourData.setTourType(fTourType);
+				}
+
+				if (fIsSaveTour) {
+
+					// save all tours with the removed tags
+					TourManager.saveModifiedTours(selectedTours);
+
+				} else {
+
+					// tours are not saved but the tour provider must be notified
+
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+							new TourEvent(selectedTours));
+				}
+			}
+		};
+
+		BusyIndicator.showWhile(Display.getCurrent(), runnable);
 	}
 
 }

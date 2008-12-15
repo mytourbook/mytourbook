@@ -53,7 +53,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -132,7 +132,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ActionModifyColumns			fActionModifyColumns;
 	private ActionEditQuick				fActionEditQuick;
 	private ActionEditTour				fActionEditTour;
-	private ActionSetTourType			fActionSetTourType;
+	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
 	private ActionRemoveAllTags			fActionRemoveAllTags;
 	private ActionOpenPrefDialog		fActionOpenTagPrefs;
@@ -455,7 +455,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);

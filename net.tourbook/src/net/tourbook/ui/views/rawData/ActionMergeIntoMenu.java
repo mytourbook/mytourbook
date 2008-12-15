@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class ActionAssignMergedTour extends Action implements IMenuCreator {
+public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 
 	private RawDataView	fRawDataView;
 
@@ -46,7 +46,7 @@ public class ActionAssignMergedTour extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionAssignMergedTour(final RawDataView rawDataView) {
+	public ActionMergeIntoMenu(final RawDataView rawDataView) {
 
 		super(Messages.import_data_action_assignMergedTour, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
@@ -108,7 +108,8 @@ public class ActionAssignMergedTour extends Action implements IMenuCreator {
 					&& mergeFromTour.timeSerie != null
 					&& mergeFromTour.timeSerie.length != 0) {
 
-				addActionToMenu(new ActionMergeInto(mergeFromTour, selectedTour, fRawDataView), menu);
+				final ActionMergeInto actionMerge = new ActionMergeInto(mergeFromTour, selectedTour, fRawDataView);
+				addActionToMenu(actionMerge, menu);
 				menuItems++;
 			}
 		}

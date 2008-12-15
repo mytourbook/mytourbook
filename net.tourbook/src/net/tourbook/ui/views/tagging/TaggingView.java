@@ -60,7 +60,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -146,7 +146,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionRenameTag					fActionRenameTag;
 	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
 	private ActionMenuSetTagStructure		fActionSetTagStructure;
-	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTypeMenu				fActionSetTourType;
 	private ActionOpenTour					fActionOpenTour;
 
 	private ActionModifyColumns				fActionModifyColumns;
@@ -425,7 +425,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);

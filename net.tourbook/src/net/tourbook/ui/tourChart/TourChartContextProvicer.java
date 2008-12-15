@@ -35,7 +35,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
@@ -57,7 +57,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 	private ActionCreateMarker				fActionCreateMarkerLeft;
 	private ActionCreateMarker				fActionCreateMarkerRight;
 
-	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTypeMenu				fActionSetTourType;
 	private ActionSetTourTag				fActionAddTag;
 	private ActionSetTourTag				fActionRemoveTag;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
@@ -101,7 +101,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 		fActionOpenAdjustAltitudeDialog.setEnabled(true);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);

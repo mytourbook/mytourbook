@@ -20,6 +20,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
@@ -30,6 +31,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 public class ChartMergeLayer implements IChartLayer {
@@ -49,8 +51,6 @@ public class ChartMergeLayer implements IChartLayer {
 
 		// x-data serie contains the time or distance distance data serie
 		fXDataSerie = xDataSerie;
-
-//		fAltitudeSerie = altitudeSerie;
 	}
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
@@ -75,6 +75,7 @@ public class ChartMergeLayer implements IChartLayer {
 			maxAltiDiff = (maxAltiDiff >= altiDiff) ? maxAltiDiff : altiDiff;
 		}
 
+		final ChartDataYSerie yData = drawingData.getYData();
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 		float altiDiffScaling = scaleY;
@@ -84,10 +85,15 @@ public class ChartMergeLayer implements IChartLayer {
 
 		final Display display = Display.getCurrent();
 
-		final Path pathData = new Path(display);
-		final Path pathDiff = new Path(display);
-		final Path pathAlti = new Path(display);
+		final Path pathAltitude = new Path(display);
+		final Path pathAltiDiff = new Path(display);
+		final Path pathAdjustAlti = new Path(display);
 
+		final RGB rgbFg = yData.getRgbLine()[0];
+		final RGB rgbBg1 = yData.getRgbDark()[0];
+		final RGB rgbBg2 = yData.getRgbBright()[0];
+
+		final int graphYTop = drawingData.getGraphYTop();
 		final int graphYBottom = drawingData.getGraphYBottom();
 
 		final int devGraphHeight = drawingData.getDevGraphHeight();
@@ -99,15 +105,17 @@ public class ChartMergeLayer implements IChartLayer {
 			altiDiffScaling = maxAltiDiff == 0 ? scaleY : (float) devGraphHeight / maxAltiDiff;
 		}
 
-		// virtual 0 line for the y-axis of the chart in dev units
-		final float devChartY0Line = devYBottom + (scaleY * graphYBottom);
+		// position for the x-axis line in the graph
+		final float devY0 = devYBottom + (scaleY * graphYBottom);
 
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
 
-		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
+		final Rectangle graphRect = new Rectangle(0, devYTop, gc.getClipping().width, devGraphHeight);
 
-		// draw the lines into the path
+		/*
+		 * create paths
+		 */
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
 			// make sure the x-index is not higher than the yValues length
@@ -123,58 +131,66 @@ public class ChartMergeLayer implements IChartLayer {
 			final float devYValue = graphYValue * scaleY;
 			final float devAltitudeDiff = graphAltitudeDiff * altiDiffScaling;
 
+			/*
+			 * draw adjusted altitude graph
+			 */
 			if (yAdjustedAltitude != null) {
+
 				final float devYAdjustedAlti = yAdjustedAltitude[xValueIndex] * scaleY;
+
 				if (xValueIndex == startIndex) {
 
 					// move to the first point
-					pathAlti.moveTo(devXValue, devChartY0Line - devYAdjustedAlti);
+					pathAdjustAlti.moveTo(0, devYBottom);
+					pathAdjustAlti.lineTo(devXValue, devY0 - devYAdjustedAlti);
 				}
 
 				// draw line to the next point
-				pathAlti.lineTo(devXValue, devChartY0Line - devYAdjustedAlti);
+				pathAdjustAlti.lineTo(devXValue, devY0 - devYAdjustedAlti);
+
+				if (xValueIndex == endIndex - 1) {
+
+					/*
+					 * this is the last point, draw the line to the x-axis and the start of the
+					 * chart
+					 */
+					pathAdjustAlti.lineTo(devXValue, devYBottom);
+//					pathAlti.moveTo(0, devYBottom);
+				}
 			}
 
+			/*
+			 * draw altitude and diff value graph
+			 */
 			if (xValueIndex == startIndex) {
 
 				// move to the first point
-				pathData.moveTo(devXValue, devChartY0Line - devYValue);
-				pathDiff.moveTo(devXValue, devYBottom - devAltitudeDiff);
+				pathAltitude.moveTo(devXValue, devY0 - devYValue);
+				pathAltiDiff.moveTo(devXValue, devYBottom - devAltitudeDiff);
 			}
 
 			// draw line to the next point
-			pathData.lineTo(devXValue, devChartY0Line - devYValue);
-			pathDiff.lineTo(devXValue, devYBottom - devAltitudeDiff);
+			pathAltitude.lineTo(devXValue, devY0 - devYValue);
+			pathAltiDiff.lineTo(devXValue, devYBottom - devAltitudeDiff);
+
 		}
 
 		// draw the line of the graph
 		gc.setAntialias(SWT.OFF);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(1);
+		gc.setClipping(graphRect);
 
 		/*
 		 * draw data graph
 		 */
-		RGB rgbGraph;
-		if (yAdjustedAltitude == null) {
-			rgbGraph = new RGB(0x0, 0x0, 0xFF);
-		} else {
-			// draw the graph lighter when the adjusted altitude is displayed
-			rgbGraph = new RGB(0xbb, 0xbb, 0xbb);
-		}
+//		final RGB rgbGraph = new RGB(0x0, 0x0, 0xFF);
+		final RGB rgbGraph = new RGB(0xFF, 0x7C, 0x24);
 		Color colorFg = new Color(display, rgbGraph);
 		gc.setForeground(colorFg);
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		gc.drawPath(pathData);
-		colorFg.dispose();
-
-		/*
-		 * draw altitude diff graph
-		 */
-		colorFg = new Color(display, new RGB(0xff, 0x00, 0x77));
-		gc.setForeground(colorFg);
-
-		gc.drawPath(pathDiff);
+		gc.drawPath(pathAltitude);
 		colorFg.dispose();
 
 		/*
@@ -182,19 +198,46 @@ public class ChartMergeLayer implements IChartLayer {
 		 */
 		if (yAdjustedAltitude != null) {
 
-//			colorFg = new Color(display, new RGB(0xFF, 0x67, 0x00));
-			colorFg = new Color(display, new RGB(0xd8, 0x6a, 0x00));
-//			colorFg = new Color(display, new RGB(0x2C, 0x95, 0x2C));
-			gc.setForeground(colorFg);
 
-			gc.drawPath(pathAlti);
+			colorFg = new Color(display, new RGB(0xFF, 0x7C, 0x24));
+			final Color colorBg1 = new Color(display, rgbBg1);
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.setForeground(colorFg);
+			gc.setBackground(colorBg1);
+			
+			gc.setAlpha(0x80);
+
+			// fill background
+			gc.setClipping(pathAdjustAlti);
+			gc.fillGradientRectangle(0, devYTop, gc.getClipping().width, devGraphHeight, true);
+			gc.setClipping(graphRect);
+
+			// draw graph
+			gc.drawPath(pathAdjustAlti);
+
 			colorFg.dispose();
+			colorBg1.dispose();
+
+			gc.setAlpha(0xff);
 		}
 
+		/*
+		 * draw altitude diff graph
+		 */
+//		colorFg = new Color(display, new RGB(0xFF, 0x24, 0x24));
+//		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
+		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
+		gc.setForeground(colorFg);
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+		gc.drawPath(pathAltiDiff);
+		colorFg.dispose();
+
 		// dispose resources
-		pathData.dispose();
-		pathDiff.dispose();
-		pathAlti.dispose();
+		pathAltitude.dispose();
+		pathAltiDiff.dispose();
+		pathAdjustAlti.dispose();
 	}
 
 	void setAltiDiffScaling(final boolean isRelativeAltiDiffScaling) {

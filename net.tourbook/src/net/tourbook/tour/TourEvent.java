@@ -34,7 +34,7 @@ public class TourEvent {
 	public boolean				isReverted		= false;
 
 	/**
-	 * when <code>true</code>, tour data have been modified in the editor,
+	 * when <code>true</code>, tour data have been modified in the {@link TourDataEditorView},
 	 * {@link TourEvent#modifiedTours} contains the modified {@link TourData}
 	 */
 	public boolean				isTourModified	= false;

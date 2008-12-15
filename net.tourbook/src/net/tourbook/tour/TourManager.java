@@ -188,11 +188,11 @@ public class TourManager {
 		fireEvent(tourProperty, new TourEvent(modifiedTours));
 	}
 
-	public static void fireEvent(final TourEventId tourProperty, final Object propertyData) {
+	public static void fireEvent(final TourEventId tourEventId, final Object tourEvent) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourProperty, propertyData);
+			((ITourEventListener) listener).tourChanged(null, tourEventId, tourEvent);
 		}
 	}
 

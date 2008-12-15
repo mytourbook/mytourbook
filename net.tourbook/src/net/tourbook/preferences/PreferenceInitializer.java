@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StringToArrayConverter;
@@ -172,9 +173,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * merge tour dialog
 		 */
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
-		
+
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, false);
+
+		// save actions
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ADJUST_START_ALTITUDE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_TEMPERATURE, false);
+
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 }

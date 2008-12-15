@@ -767,10 +767,9 @@ public class UI {
 		tourTagLabel.pack(true);
 	}
 
-	public static void updateUITourType(final TourData tourData, final CLabel lblTourType) {
+	public static void updateUITourType(final TourType tourType, final CLabel lblTourType) {
 
 		// tour type
-		final TourType tourType = tourData.getTourType();
 		if (tourType == null) {
 			lblTourType.setText(UI.EMPTY_STRING);
 			lblTourType.setImage(null);
@@ -778,6 +777,7 @@ public class UI {
 			lblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 			lblTourType.setText(tourType.getName());
 		}
+
 		lblTourType.pack(true);
 		lblTourType.redraw(); // display changed tour image
 	}

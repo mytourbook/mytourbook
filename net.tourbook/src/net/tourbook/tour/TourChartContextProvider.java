@@ -30,7 +30,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
@@ -55,7 +55,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionCreateMarker			fActionCreateMarkerLeft;
 	private ActionCreateMarker			fActionCreateMarkerRight;
 
-	private ActionSetTourType			fActionSetTourType;
+	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
 	private ActionSetTourTag			fActionRemoveTag;
 	private ActionRemoveAllTags			fActionRemoveAllTags;
@@ -97,7 +97,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);

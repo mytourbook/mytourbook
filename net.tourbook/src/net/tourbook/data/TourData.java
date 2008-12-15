@@ -565,6 +565,13 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	public int[]					mergeAdjustedAltitudeSerie;
 
+	/**
+	 * when a tour is not saved, tour id is not defined, therefore the tour data are provided from
+	 * the import view when tours are merged
+	 */
+	@Transient
+	private TourData				fMergeFromTour;
+
 	public TourData() {}
 
 	/**
@@ -2597,6 +2604,10 @@ public class TourData implements Comparable<Object> {
 		return mergedTourTimeOffset;
 	}
 
+	public TourData getMergeFromTour() {
+		return fMergeFromTour;
+	}
+
 	/**
 	 * @return tour id which is merged into this tour
 	 */
@@ -2912,10 +2923,6 @@ public class TourData implements Comparable<Object> {
 		return tourRecordingTime;
 	}
 
-	public Collection<TourReference> getTourReferences() {
-		return tourReferences;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -2956,6 +2963,10 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	public Collection<TourReference> getTourReferences() {
+		return tourReferences;
+	}
+
 	/**
 	 * @return the tourStartPlace
 	 */
@@ -2977,6 +2988,11 @@ public class TourData implements Comparable<Object> {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
 	 *         defined
@@ -2984,11 +3000,6 @@ public class TourData implements Comparable<Object> {
 	public TourType getTourType() {
 		return tourType;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @param zoomLevel
@@ -3317,6 +3328,10 @@ public class TourData implements Comparable<Object> {
 
 	public void setMergedTourTimeOffset(final int mergedTourTimeOffset) {
 		this.mergedTourTimeOffset = mergedTourTimeOffset;
+	}
+
+	public void setMergeFromTour(final TourData mergeFromTour) {
+		fMergeFromTour = mergeFromTour;
 	}
 
 	public void setMergeFromTourId(final Long mergeTourId) {

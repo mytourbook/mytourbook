@@ -35,7 +35,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -55,7 +55,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionEditTour		fActionEditTour;
 	private final ActionOpenTour		fActionOpenTour;
 
-	private final ActionSetTourType		fActionSetTourType;
+	private final ActionSetTourTypeMenu		fActionSetTourType;
 	private final ActionSetTourTag		fActionAddTag;
 	private final ActionSetTourTag		fActionRemoveTag;
 
@@ -71,7 +71,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);

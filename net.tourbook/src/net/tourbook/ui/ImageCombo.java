@@ -86,6 +86,13 @@ public final class ImageCombo extends Composite {
 	Color							foreground, background;
 	Font							font;
 
+	static int checkStyle(final int style) {
+		final int mask = gtk
+				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
+				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
+		return style & mask;
+	}
+
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its
 	 * behavior and appearance.
@@ -201,13 +208,6 @@ public final class ImageCombo extends Composite {
 
 		createPopup(-1);
 		initAccessible();
-	}
-
-	static int checkStyle(final int style) {
-		final int mask = gtk
-				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
-				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
-		return style & mask;
 	}
 
 	/**
