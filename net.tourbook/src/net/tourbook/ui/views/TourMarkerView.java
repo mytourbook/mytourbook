@@ -236,7 +236,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
 	}
 
 	/**
@@ -428,7 +428,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	@Override
 	public void dispose() {
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);

@@ -35,8 +35,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-/*
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * This is a copy of CLabel but the indent is smaller
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
 
 /**
@@ -100,6 +101,18 @@ public class ImageComboLabel extends Canvas {
 													| SWT.DRAW_TAB
 													| SWT.DRAW_TRANSPARENT
 													| SWT.DRAW_DELIMITER;
+
+	/**
+	 * Check the style bits to ensure that no invalid styles are applied.
+	 */
+	private static int checkStyle(int style) {
+		if ((style & SWT.BORDER) != 0) {
+			style |= SWT.SHADOW_IN;
+		}
+		final int mask = SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.SHADOW_NONE | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
+		style = style & mask;
+		return style |= SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED;
+	}
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its
@@ -172,18 +185,6 @@ public class ImageComboLabel extends Canvas {
 
 	}
 
-	/**
-	 * Check the style bits to ensure that no invalid styles are applied.
-	 */
-	private static int checkStyle(int style) {
-		if ((style & SWT.BORDER) != 0) {
-			style |= SWT.SHADOW_IN;
-		}
-		final int mask = SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.SHADOW_NONE | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
-		style = style & mask;
-		return style |= SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED;
-	}
-
 //protected void checkSubclass () {
 //	String name = getClass().getName ();
 //	String validName = CLabel.class.getName();
@@ -191,6 +192,32 @@ public class ImageComboLabel extends Canvas {
 //		SWT.error (SWT.ERROR_INVALID_SUBCLASS);
 //	}
 //}
+
+	/*
+	 * Return the lowercase of the first non-'&' character following an '&' character in the given
+	 * string. If there are no '&' characters in the given string, return '\0'.
+	 */
+	char _findMnemonic(final String string) {
+		if (string == null) {
+			return '\0';
+		}
+		int index = 0;
+		final int length = string.length();
+		do {
+			while (index < length && string.charAt(index) != '&') {
+				index++;
+			}
+			if (++index >= length) {
+				return '\0';
+			}
+			if (string.charAt(index) != '&') {
+				return Character.toLowerCase(string.charAt(index));
+			}
+			index++;
+		}
+		while (index < length);
+		return '\0';
+	}
 
 	@Override
 	public Point computeSize(final int wHint, final int hHint, final boolean changed) {
@@ -228,32 +255,6 @@ public class ImageComboLabel extends Canvas {
 		gc.drawLine(x, y, x, y + h - 1);
 	}
 
-	/*
-	 * Return the lowercase of the first non-'&' character following an '&' character in the given
-	 * string. If there are no '&' characters in the given string, return '\0'.
-	 */
-	char _findMnemonic(final String string) {
-		if (string == null) {
-			return '\0';
-		}
-		int index = 0;
-		final int length = string.length();
-		do {
-			while (index < length && string.charAt(index) != '&') {
-				index++;
-			}
-			if (++index >= length) {
-				return '\0';
-			}
-			if (string.charAt(index) != '&') {
-				return Character.toLowerCase(string.charAt(index));
-			}
-			index++;
-		}
-		while (index < length);
-		return '\0';
-	}
-
 	/**
 	 * Returns the alignment. The alignment style (LEFT, CENTER or RIGHT) is returned.
 	 * 
@@ -272,34 +273,6 @@ public class ImageComboLabel extends Canvas {
 	public Image getImage() {
 		//checkWidget();
 		return image;
-	}
-
-	/**
-	 * Compute the minimum size.
-	 */
-	private Point getTotalSize(final Image image, final String text) {
-		final Point size = new Point(0, 0);
-
-		if (image != null) {
-			final Rectangle r = image.getBounds();
-			size.x += r.width;
-			size.y += r.height;
-		}
-
-		final GC gc = new GC(this);
-		if (text != null && text.length() > 0) {
-			final Point e = gc.textExtent(text, DRAW_FLAGS);
-			size.x += e.x;
-			size.y = Math.max(size.y, e.y);
-			if (image != null) {
-				size.x += GAP;
-			}
-		} else {
-			size.y = Math.max(size.y, gc.getFontMetrics().getHeight());
-		}
-		gc.dispose();
-
-		return size;
 	}
 
 	@Override
@@ -335,14 +308,37 @@ public class ImageComboLabel extends Canvas {
 		return appToolTipText;
 	}
 
+	/**
+	 * Compute the minimum size.
+	 */
+	private Point getTotalSize(final Image image, final String text) {
+		final Point size = new Point(0, 0);
+
+		if (image != null) {
+			final Rectangle r = image.getBounds();
+			size.x += r.width;
+			size.y += r.height;
+		}
+
+		final GC gc = new GC(this);
+		if (text != null && text.length() > 0) {
+			final Point e = gc.textExtent(text, DRAW_FLAGS);
+			size.x += e.x;
+			size.y = Math.max(size.y, e.y);
+			if (image != null) {
+				size.x += GAP;
+			}
+		} else {
+			size.y = Math.max(size.y, gc.getFontMetrics().getHeight());
+		}
+		gc.dispose();
+
+		return size;
+	}
+
 	private void initAccessible() {
 		final Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
-			@Override
-			public void getName(final AccessibleEvent e) {
-				e.result = getText();
-			}
-
 			@Override
 			public void getHelp(final AccessibleEvent e) {
 				e.result = getToolTipText();
@@ -355,6 +351,11 @@ public class ImageComboLabel extends Canvas {
 					e.result = "Alt+" + mnemonic; //$NON-NLS-1$
 				}
 			}
+
+			@Override
+			public void getName(final AccessibleEvent e) {
+				e.result = getText();
+			}
 		});
 
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
@@ -364,17 +365,17 @@ public class ImageComboLabel extends Canvas {
 			}
 
 			@Override
+			public void getChildCount(final AccessibleControlEvent e) {
+				e.detail = 0;
+			}
+
+			@Override
 			public void getLocation(final AccessibleControlEvent e) {
 				final Rectangle rect = getDisplay().map(getParent(), null, getBounds());
 				e.x = rect.x;
 				e.y = rect.y;
 				e.width = rect.width;
 				e.height = rect.height;
-			}
-
-			@Override
-			public void getChildCount(final AccessibleControlEvent e) {
-				e.detail = 0;
 			}
 
 			@Override

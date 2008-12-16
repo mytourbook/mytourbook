@@ -116,7 +116,7 @@ public class ActionMergeTour extends Action {
 	public void run() {
 
 		if (getSelectedTour()) {
-			new DialogMergeTours(Display.getCurrent().getActiveShell(), fMergeIntoTour, fMergeFromTour).open();
+			new DialogMergeTours(Display.getCurrent().getActiveShell(), fMergeFromTour, fMergeIntoTour).open();
 		}
 	}
 

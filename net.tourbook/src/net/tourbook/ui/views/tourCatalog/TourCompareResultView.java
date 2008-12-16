@@ -239,7 +239,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fCompareTourPropertyListener);
 	}
 
 	/**
@@ -256,7 +256,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCompareResultView.this) {
+					
 					saveState();
+					
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCompareResultView.this);
 				}
 			}
 
@@ -380,7 +383,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
 	}
 
 	private void createActions() {
@@ -799,9 +802,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getSite().getPage().removePartListener(fPartListener);
-		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fCompareTourPropertyListener);
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 
 		fDbImage.dispose();
 

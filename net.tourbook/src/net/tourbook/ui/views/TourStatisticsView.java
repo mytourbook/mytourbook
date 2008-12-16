@@ -108,7 +108,10 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
+
 					saveState();
+					
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourStatisticsView.this);
 				}
 			}
 
@@ -217,7 +220,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
 	}
 
 	@Override
@@ -261,7 +264,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		getViewSite().getPage().removePartListener(fPartListener);
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

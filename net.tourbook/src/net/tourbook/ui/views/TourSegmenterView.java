@@ -396,7 +396,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	/**
@@ -837,7 +837,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		wbPage.removePartListener(fPartListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		super.dispose();
 	}

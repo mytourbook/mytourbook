@@ -76,16 +76,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 	private final IDialogSettings	fDialogSettings;
 
+	private TourData				fFromTourData;
 	private TourData				fIntoTourData;
 
-	private TourData				fFromTourData;
 	private Composite				fDlgContainer;
 
 	private TourChart				fTourChart;
-
 	private TourChartConfiguration	fTourChartConfig;
-	private Label					fLabelAltitudeDiff1;
 
+	private Label					fLabelAltitudeDiff1;
 	private Label					fLabelAltitudeDiff10;
 	private Scale					fScaleAltitude1;
 	private Scale					fScaleAltitude10;
@@ -99,6 +98,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 	private Button					fBtnResetAdjustment;
 
 	private Button					fBtnResetValues;
+
 	/*
 	 * save actions
 	 */
@@ -116,6 +116,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 	private Link					fTourTypeLink;
 
 	private CLabel					fLblTourType;
+
 	/*
 	 * display actions
 	 */
@@ -126,7 +127,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 	private boolean					fIsTourDirty			= false;
 	private boolean					fIsTourSaved			= false;
-	protected boolean				fIsMergeFromTourModified;
+	private boolean					fIsMergeFromTourModified;
+	private boolean					fIsChartUpdated;
+
 	/*
 	 * backup data
 	 */
@@ -170,12 +173,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 	/**
 	 * @param parentShell
-	 * @param mergeIntoTour
-	 *            {@link TourData} for the tour into which the other tour is merged
 	 * @param mergeFromTour
 	 *            {@link TourData} for the tour which is merge into the other tour
+	 * @param mergeIntoTour
+	 *            {@link TourData} for the tour into which the other tour is merged
 	 */
-	public DialogMergeTours(final Shell parentShell, final TourData mergeIntoTour, final TourData mergeFromTour) {
+	public DialogMergeTours(final Shell parentShell, final TourData mergeFromTour, final TourData mergeIntoTour) {
 
 		super(parentShell);
 
@@ -186,8 +189,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 		fShellImage = TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage();
 		setDefaultImage(fShellImage);
 
-		fIntoTourData = mergeIntoTour;
 		fFromTourData = mergeFromTour;
+		fIntoTourData = mergeIntoTour;
 
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
@@ -215,6 +218,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 							fIsMergeFromTourModified = true;
 
+							setTourDirty();
+
 							// nothing more to do
 							return;
 						}
@@ -223,7 +228,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	/**
@@ -253,7 +258,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 			// tour is not saved, dialog is canceled, restore original values
 
 			restoreDataBackup();
-
 		}
 
 		/**
@@ -358,7 +362,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			final int[] adjustedIntoAltitudeSerie = new int[serieLength];
 
-			final float startAltiDiff = newFromAltiDiffSerie[0];
+			float startAltiDiff = newFromAltiDiffSerie[0];
 			final int endIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
 			final float distanceDiff = intoDistanceSerie[endIndex];
 
@@ -388,8 +392,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			fFromTourData.mergeAdjustedAltitudeSerie = adjustedIntoAltitudeSerie;
 
-			altiDiffTime = startAltiDiff / intoTimeSerie[endIndex];
-			altiDiffDist = startAltiDiff / intoDistanceSerie[endIndex];
+			startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
+
+			// meter/min
+			altiDiffTime = startAltiDiff / (intoTimeSerie[endIndex] / 60);
+			// meter/meter
+			altiDiffDist = ((startAltiDiff * 1000) / intoDistanceSerie[endIndex]) / UI.UNIT_VALUE_DISTANCE;
 
 		} else {
 
@@ -428,12 +436,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 				TourManager.getTourTitle(fFromTourData),
 				fFromTourData.getDeviceName()));
 
+		createDataBackup();
+
 		addTourEventListener();
 		createActions();
 
 		restoreState();
 
-		createDataBackup();
 		computeMergedData();
 
 		// set alti diff scaling
@@ -842,7 +851,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		fLblAdjustAltiValueTime = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
 				.applyTo(fLblAdjustAltiValueTime);
 
 		fLblAdjustAltiValueTimeUnit = new Label(aaContainer, SWT.NONE);
@@ -850,7 +859,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		fLblAdjustAltiValueDistance = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
 				.applyTo(fLblAdjustAltiValueDistance);
 
 		fLblAdjustAltiValueDistanceUnit = new Label(aaContainer, SWT.NONE);
@@ -949,6 +958,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
+
+				if (fIsChartUpdated) {
+					return;
+				}
+
 				fIsDirtyDisabled = true;
 				onModifyProperties();
 				fIsDirtyDisabled = false;
@@ -1016,7 +1030,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		fShellImage.dispose();
 
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 	}
 
 	private void onModifyProperties() {
@@ -1134,16 +1148,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			for (final TourType tourType : tourTypes) {
 				if (tourType.getTypeId() == tourTypeId) {
-					UI.updateUITourType(tourType, fLblTourType);
+
+					fFromTourData.setTourType(tourType);
+
+					fIsMergeFromTourModified = true;
+
 					break;
 				}
 			}
-
-		} else {
-
-			// display saved tour type
-
-			UI.updateUITourType(fFromTourData.getTourType(), fLblTourType);
 		}
 
 	}
@@ -1190,18 +1202,22 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		}
 
-//			if (fChkSetTourType) {
-//
-//			}
+		if (fChkSetTourType.getSelection() == false) {
 
-		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-		modifiedTours.add(fIntoTourData);
+			// restore backup values
 
-		if (fIsMergeFromTourModified) {
-			modifiedTours.add(fFromTourData);
+			fFromTourData.setTourType(fBackupFromTourType);
 		}
 
+		// set tour id into which the tour is merged
+		fFromTourData.setTourPerson(fIntoTourData.getTourPerson());
+		fFromTourData.setMergeIntoTourId(fIntoTourData.getTourId());
+
 		// save modified tours
+		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+		modifiedTours.add(fIntoTourData);
+		modifiedTours.add(fFromTourData);
+
 		TourManager.saveModifiedTours(modifiedTours);
 
 		fIsTourSaved = true;
@@ -1219,7 +1235,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 	}
 
 	private void updateTourChart() {
+		
+		fIsChartUpdated = true;
+		
 		fTourChart.updateTourChart(fIntoTourData, fTourChartConfig, true);
+		
+		fIsChartUpdated = false;
 	}
 
 	private void updateUI(final float altiDiffTime, final float altiDiffDist) {
@@ -1269,7 +1290,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 		fScaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
 		fScaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
 
-//		UI.updateUITourType(fFromTourData.getTourType(), fLblTourType);
+		UI.updateUITourType(fFromTourData.getTourType(), fLblTourType);
 
 		onModifyProperties();
 

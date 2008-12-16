@@ -27,8 +27,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.SelectionTourChart;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvicer;
@@ -186,9 +186,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED,
-						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue),
-						TourCatalogViewReferenceTour.this);
+				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED, new TourPropertyRefTourChanged(fTourChart,
+						refTour.getRefId(),
+						refTourXMarkerValue), TourCatalogViewReferenceTour.this);
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.tourCatalog_view_label_chart_title_reference_tour,
@@ -234,6 +234,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 	public void updateChart() {
 
 		if (fTourData == null) {
+			fActiveRefId = -1;
+			fPageBook.showPage(fPageNoChart);
 			return;
 		}
 

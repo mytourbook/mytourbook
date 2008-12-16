@@ -125,7 +125,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
 	}
 
 	@Override
@@ -434,7 +434,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	@Override
 	public void dispose() {
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 
 		super.dispose();
 	}

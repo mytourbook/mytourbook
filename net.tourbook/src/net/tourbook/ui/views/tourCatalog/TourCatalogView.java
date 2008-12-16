@@ -262,7 +262,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fCompareTourPropertyListener);
 	}
 
 	private void addPartListener() {
@@ -274,7 +274,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCatalogView.this) {
+					
 					saveState();
+					
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogView.this);
 				}
 			}
 
@@ -435,7 +438,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -699,8 +702,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
 
-		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fCompareTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

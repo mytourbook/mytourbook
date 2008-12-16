@@ -74,6 +74,7 @@ public class ChartMergeLayer implements IChartLayer {
 			altiDiffValues[altiIndex++] = altiDiff = (altiDiff < 0) ? -altiDiff : altiDiff;
 			maxAltiDiff = (maxAltiDiff >= altiDiff) ? maxAltiDiff : altiDiff;
 		}
+		maxAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
 
 		final ChartDataYSerie yData = drawingData.getYData();
 		final float scaleX = drawingData.getScaleX();
@@ -125,7 +126,7 @@ public class ChartMergeLayer implements IChartLayer {
 
 			final int graphXValue = xValues[xValueIndex] - graphValueOffset;
 			final int graphYValue = (int) (yAltitudeValues[xValueIndex] / UI.UNIT_VALUE_ALTITUDE);
-			final int graphAltitudeDiff = altiDiffValues[xValueIndex];
+			final int graphAltitudeDiff = (int) (altiDiffValues[xValueIndex] / UI.UNIT_VALUE_ALTITUDE);
 
 			final float devXValue = graphXValue * scaleX;
 			final float devYValue = graphYValue * scaleY;
@@ -136,7 +137,7 @@ public class ChartMergeLayer implements IChartLayer {
 			 */
 			if (yAdjustedAltitude != null) {
 
-				final float devYAdjustedAlti = yAdjustedAltitude[xValueIndex] * scaleY;
+				final float devYAdjustedAlti = yAdjustedAltitude[xValueIndex] * scaleY / UI.UNIT_VALUE_ALTITUDE;
 
 				if (xValueIndex == startIndex) {
 
@@ -198,14 +199,13 @@ public class ChartMergeLayer implements IChartLayer {
 		 */
 		if (yAdjustedAltitude != null) {
 
-
 			colorFg = new Color(display, new RGB(0xFF, 0x7C, 0x24));
 			final Color colorBg1 = new Color(display, rgbBg1);
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 //			gc.setForeground(colorFg);
 			gc.setBackground(colorBg1);
-			
+
 			gc.setAlpha(0x80);
 
 			// fill background

@@ -42,8 +42,8 @@ class ActionSetTourType extends Action {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-	 *            {@link TourData} from the tour provider is only updated
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
+	 *            from the tour provider is only updated
 	 */
 	public ActionSetTourType(final TourType tourType, final ITourProvider tourProvider, final boolean isSaveTour) {
 
@@ -85,8 +85,7 @@ class ActionSetTourType extends Action {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED,
-							new TourEvent(selectedTours));
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
 				}
 			}
 		};

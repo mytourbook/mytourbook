@@ -586,6 +586,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			fSelectedColor.setNewRGB(newValue);
 
 			final ColorDefinition colorDefinition = fSelectedColor.getColorDefinition();
+			
 			/*
 			 * dispose the old color/image from the graph
 			 */
@@ -607,7 +608,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			tourType.setColorDark(colorDefinition.getNewGradientDark());
 			tourType.setColorLine(colorDefinition.getNewLineColor());
 
-			tourTypeColorDefinition.setTourType(TourDatabase.saveEntity(tourType, tourType.getTypeId(), TourType.class));
+			final TourType savedTourType = TourDatabase.saveEntity(tourType, tourType.getTypeId(), TourType.class);
+			
+			tourTypeColorDefinition.setTourType(savedTourType);
 
 			fIsModified = true;
 		}

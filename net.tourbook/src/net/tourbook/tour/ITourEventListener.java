@@ -23,9 +23,9 @@ public interface ITourEventListener {
 	 * @param part
 	 *            part where the property was fired, can be <code>null</code> when the part is not
 	 *            set
-	 * @param tourProperty
-	 * @param propertyData
+	 * @param eventId
+	 * @param eventData
 	 */
-	public void tourChanged(final IWorkbenchPart part, TourEventId tourProperty, Object propertyData);
+	public void tourChanged(final IWorkbenchPart part, TourEventId eventId, Object eventData);
 
 }

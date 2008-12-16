@@ -28,7 +28,7 @@ public class SelectionDeletedTours implements ISelection {
 	public ArrayList<ITourItem>	removedTours	= new ArrayList<ITourItem>();
 
 	public boolean isEmpty() {
-		return removedTours.size() == 0;
+		return false;
 	}
 
 }

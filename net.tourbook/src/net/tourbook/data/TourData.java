@@ -566,8 +566,8 @@ public class TourData implements Comparable<Object> {
 	public int[]					mergeAdjustedAltitudeSerie;
 
 	/**
-	 * when a tour is not saved, tour id is not defined, therefore the tour data are provided from
-	 * the import view when tours are merged
+	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
+	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
 	private TourData				fMergeFromTour;

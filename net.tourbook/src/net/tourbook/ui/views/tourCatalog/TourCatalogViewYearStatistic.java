@@ -154,7 +154,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fCompareTourPropertyListener);
 	}
 
 	private void addPartListener() {
@@ -167,6 +167,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCatalogViewYearStatistic.this) {
 					saveSession();
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogViewYearStatistic.this);
 				}
 			}
 
@@ -359,7 +360,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
-		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fCompareTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

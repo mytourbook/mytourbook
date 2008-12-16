@@ -539,7 +539,7 @@ public class MapView extends ViewPart {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	/**
@@ -837,7 +837,7 @@ public class MapView extends ViewPart {
 		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
 
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
 		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);

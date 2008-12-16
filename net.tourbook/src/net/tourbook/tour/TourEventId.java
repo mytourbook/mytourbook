@@ -87,6 +87,12 @@ public enum TourEventId {
 	 */
 	ALL_TOURS_ARE_MODIFIED,
 
+	/**
+	 * remove the tour which is currently displayed because the tour is removed from a view or a
+	 * view is closed which provided the tour
+	 */
+	CLEAR_DISPLAYED_TOUR,
+
 //	/**
 //	 * time offset for the merged tour is modified
 //	 */

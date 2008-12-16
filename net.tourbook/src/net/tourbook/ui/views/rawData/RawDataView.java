@@ -64,7 +64,6 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -148,7 +147,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionAdjustYear				fActionAdjustImportedYear;
 	private ActionMergeGPXTours				fActionMergeGPXTours;
 	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
-	private ActionSetTourTypeMenu				fActionSetTourType;
+	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionEditQuick					fActionEditQuick;
 	private ActionEditTour					fActionEditTour;
 	private ActionMergeTour					fActionMergeTour;
@@ -230,38 +229,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// backup data
 		final Long backupMergeFromTourId = mergeIntoTour.getMergeFromTourId();
 
-		// set tour id from which the tour is merged
+		// set tour data and tour id from which the tour is merged
 		mergeIntoTour.setMergeFromTourId(mergeFromTour.getTourId());
+		
+		// set temp data, this is required by the dialog because the merge from tour could not be saved
 		mergeIntoTour.setMergeFromTour(mergeFromTour);
 
-		if (new DialogMergeTours(Display.getCurrent().getActiveShell(), mergeIntoTour, mergeFromTour).open() != Window.OK) {
+		if (new DialogMergeTours(Display.getCurrent().getActiveShell(), mergeFromTour, mergeIntoTour).open() != Window.OK) {
 
 			// dialog is canceled, restore modified values
 
 			mergeIntoTour.setMergeFromTourId(backupMergeFromTourId);
-
-		} else {
-
-			// mergeIntoTour is saved, check and save the mergeFromTour
-
-			if (mergeFromTour.getTourPerson() == null
-					|| mergeFromTour.getMergeIntoTourId() == null
-					|| mergeFromTour.getMergeIntoTourId().equals(mergeIntoTour.getMergeFromTourId()) == false) {
-
-				/*
-				 * save merge from tour with the same person as the merge into tour
-				 */
-
-				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
-
-				// set tour id into which the tour is merged
-				mergeFromTour.setMergeIntoTourId(mergeIntoTour.getTourId());
-
-				saveTour(mergeFromTour, mergeIntoTour.getTourPerson(), savedTours, true);
-
-				// update existing views
-				doSaveTourPostActions(savedTours);
-			}
 		}
 
 		// reset temp tour data
@@ -302,18 +280,23 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == RawDataView.this) {
 
-					final TourDataEditorView tourEditor = TourManager.getTourDataEditor();
-					if (tourEditor != null) {
-
-						// hide tours which are originated from this view
-
-						tourEditor.clearEditorContent();
-					}
+//					final TourDataEditorView tourEditor = TourManager.getTourDataEditor();
+//					if (tourEditor != null) {
+//
+//						// hide tours which are originated from this view
+//
+//						tourEditor.clearEditorContent();
+//					}
 
 					saveState();
 
 					// remove all tours
 					RawDataManager.getInstance().removeAllTours();
+
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+//
+//					// don't throw the selection again
+//					fPostSelectionProvider.clearSelection();
 				}
 			}
 
@@ -470,7 +453,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -938,7 +921,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		getViewSite().getPage().removePartListener(fPartListener);
 		getSite().getPage().removeSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

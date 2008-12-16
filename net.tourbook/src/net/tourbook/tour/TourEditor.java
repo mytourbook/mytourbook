@@ -188,7 +188,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -229,7 +229,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		site.getPage().removePartListener(fPartListener);
 		site.getPage().removePostSelectionListener(fPostSelectionListener);
 
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		super.dispose();
 	}
@@ -305,7 +305,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			fTourChart.setXSliderPosition(xSliderPosition);
 
-		} else if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
+		} else if (selection instanceof SelectionDeletedTours) {
 
 			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;

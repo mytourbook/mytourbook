@@ -60,6 +60,7 @@ import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
@@ -132,6 +133,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -139,6 +141,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
@@ -292,7 +295,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								fTextRefTour;
 	private Text								fTextTimeSlicesCount;
 	private Text								fTextDeviceName;
-	private Text								fTextImportFilePath;
+	private ImageComboLabel						fTextImportFilePath;
 	private Text								fTextPerson;
 	private Text								fTextTourId;
 	private Text								fTextMergeFromTourId;
@@ -411,6 +414,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * When <code>true</code> the tour is created with the tour editor
 	 */
 	private boolean								fIsManualTour;
+
+	private ScrolledComposite					fScrolledTabInfo;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -1272,6 +1277,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					updateUIFromTourData(fTourData, false, true);
 
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearEditorContent();
+
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
 					// check if this tour data editor contains a tour which must be updated
@@ -1288,7 +1297,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	private void addTourSaveListener() {
@@ -1344,6 +1353,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	public void clearEditorContent() {
+
 		fTourData = null;
 		setTourClean();
 
@@ -1970,8 +1980,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		tk.createLabel(section, Messages.tour_editor_label_import_file_path);
 
-		fTextImportFilePath = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(fTextImportFilePath);
+//		fTextImportFilePath = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		fTextImportFilePath = new ImageComboLabel(section, SWT.NONE);
+		tk.adapt(fTextImportFilePath);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.FILL).applyTo(fTextImportFilePath);
 
 		/*
 		 * person
@@ -2275,27 +2287,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * scrolled container
 		 */
-		final ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		sc.setExpandVertical(true);
-		sc.setExpandHorizontal(true);
-		sc.addControlListener(new ControlAdapter() {
+		fScrolledTabInfo = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		fScrolledTabInfo.setExpandVertical(true);
+		fScrolledTabInfo.setExpandHorizontal(true);
+		fScrolledTabInfo.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				sc.setMinSize(fInfoContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+				// horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
+				int infoContainerWidth = fScrolledTabInfo.getBounds().width;
+				final ScrollBar vertBar = fScrolledTabInfo.getVerticalBar();
+				if (vertBar != null) {
+					// vertical bar is displayed
+					infoContainerWidth -= vertBar.getSize().x;
+				}
+
+				final Point minSize = fInfoContainer.computeSize(infoContainerWidth, SWT.DEFAULT);
+
+				fScrolledTabInfo.setMinSize(minSize);
 			}
 		});
 
-		fInfoContainer = new Composite(sc, SWT.NONE);
+		fInfoContainer = new Composite(fScrolledTabInfo, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fInfoContainer);
 		tk.adapt(fInfoContainer);
 		GridLayoutFactory.swtDefaults().applyTo(fInfoContainer);
 
 		// set content for scrolled composite
-		sc.setContent(fInfoContainer);
+		fScrolledTabInfo.setContent(fInfoContainer);
 
 		createSectionInfo(fInfoContainer, tk);
 
-		return sc;
+		return fScrolledTabInfo;
 	}
 
 	/**
@@ -2316,82 +2339,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		return markerContainer;
 	}
-
-//	private Control createUITabMarkerOLDOLDOLDOLDOLDOLDOLD(final Composite parent) {
-//
-//		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-//		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
-//		tableLayouter.setLayoutData(gd);
-//
-//		/*
-//		 * create table
-//		 */
-//		final Table table = new Table(tableLayouter, SWT.FULL_SELECTION | /* SWT.BORDER | */SWT.MULTI);
-//
-//		table.setLayout(new TableLayout());
-//		table.setHeaderVisible(true);
-//		table.setLinesVisible(true);
-//
-//		fMarkerViewer = new TableViewer(table);
-//
-//		/*
-//		 * create columns
-//		 */
-//		TableViewerColumn tvc;
-//		final PixelConverter pixelConverter = new PixelConverter(table);
-//
-//		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
-//
-//		// column: time
-//		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-//		tvc.getColumn().setText(Messages.Tour_Marker_Column_time);
-//		tvc.setLabelProvider(labelProvider);
-//		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
-//
-//		// column: distance km/mi
-//		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-//		tvc.getColumn().setText(UI.UNIT_LABEL_DISTANCE);
-//		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
-//		tvc.setLabelProvider(labelProvider);
-//		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
-//
-//		// column: marker
-//		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
-//		tvc.getColumn().setText(Messages.Tour_Marker_Column_remark);
-//		tvc.setLabelProvider(labelProvider);
-//		tableLayouter.addColumnData(new ColumnWeightData(1, true));
-//
-//		/*
-//		 * create table viewer
-//		 */
-//
-//		fMarkerViewer.setContentProvider(new MarkerViewerContentProvicer());
-//		fMarkerViewer.setLabelProvider(labelProvider);
-//		fMarkerViewer.setSorter(new MarkerViewerSorter());
-//
-//		fMarkerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-//			public void selectionChanged(final SelectionChangedEvent event) {
-//				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-//				if (selection != null) {
-//					fireSliderPosition(selection);
-//				}
-//			}
-//		});
-//
-//		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
-//			public void doubleClick(final DoubleClickEvent event) {
-//
-//				// edit selected marker
-//				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
-//				if (selection.size() > 0) {
-//					fActionEditTourMarker.setSelectedMarker((TourMarker) selection.getFirstElement());
-//					fActionEditTourMarker.run();
-//				}
-//			}
-//		});
-//
-//		return tableLayouter;
-//	}
 
 	/**
 	 * @param parent
@@ -2909,7 +2856,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 		TourManager.getInstance().removeTourSaveListener(fTourSaveListener);
 
 		super.dispose();
@@ -4468,7 +4415,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		enableControls();
 
 		fMessageManager.removeAllMessages();
-		
+
 		showDefaultTitle();
 
 		/*
@@ -4826,7 +4773,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// import file path
 		final String tourImportFilePath = fTourData.getTourImportFilePath();
 		fTextImportFilePath.setText(tourImportFilePath == null ? UI.EMPTY_STRING : tourImportFilePath);
-		fTextImportFilePath.pack(true);
+//		fTextImportFilePath.pack(true);
 
 		/*
 		 * reference tours

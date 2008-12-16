@@ -233,7 +233,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBookView.this) {
+					
 					saveState();
+					
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourBookView.this);
 				}
 			}
 
@@ -339,7 +342,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
 	}
 
 	private void createActions() {
@@ -845,7 +848,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

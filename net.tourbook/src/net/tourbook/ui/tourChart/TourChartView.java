@@ -203,6 +203,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 //						fTourChart.updateMergeLayer(false);
 //					}
 
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
+
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
 					// check if this tour data editor contains a tour which must be updated
@@ -217,7 +221,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
+	}
+
+	private void clearView() {
+
+		fTourData = null;
+
+		fPageBook.showPage(fPageNoChart);
 	}
 
 	@Override
@@ -279,7 +290,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		page.removePostSelectionListener(fPostSelectionListener);
 
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -434,9 +445,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		} else if (selection instanceof SelectionDeletedTours) {
 
-			fTourData = null;
-
-			fPageBook.showPage(fPageNoChart);
+			clearView();
 		}
 	}
 

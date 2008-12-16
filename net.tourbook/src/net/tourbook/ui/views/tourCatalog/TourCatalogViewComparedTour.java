@@ -192,7 +192,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fRefTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fRefTourPropertyListener);
 	}
 
 	private void createActions() {
@@ -297,7 +297,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		saveComparedTourDialog();
 
-		TourManager.getInstance().removePropertyListener(fRefTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fRefTourPropertyListener);
 
 		super.dispose();
 	}
@@ -644,6 +644,15 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	protected void updateChart() {
 
 		if (fTourData == null) {
+
+			fRefTourRefId = -1;
+
+			fCTTourId = -1;
+			fCTRefId = -1;
+			fCTCompareId = -1;
+
+			fPageBook.showPage(fPageNoChart);
+
 			return;
 		}
 

@@ -121,7 +121,7 @@ public class TourManager {
 //	
 //	private final TourDataCache			fTourDataCache			= new TourDataCache();
 
-	private static final ListenerList			fPropertyListeners			= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			fTourEventListeners			= new ListenerList(ListenerList.IDENTITY);
 	private static final ListenerList			fTourSaveListeners			= new ListenerList(ListenerList.IDENTITY);
 
 	/**
@@ -180,27 +180,27 @@ public class TourManager {
 		return chartConfig;
 	}
 
-	public static void fireEvent(final TourEventId tourProperty) {
-		fireEvent(tourProperty, null);
+	public static void fireEvent(final TourEventId tourEventId) {
+		fireEvent(tourEventId, null);
 	}
 
-	public static void fireEvent(final TourEventId tourProperty, final ArrayList<TourData> modifiedTours) {
-		fireEvent(tourProperty, new TourEvent(modifiedTours));
+	public static void fireEvent(final TourEventId tourEventId, final ArrayList<TourData> modifiedTours) {
+		fireEvent(tourEventId, new TourEvent(modifiedTours));
 	}
 
-	public static void fireEvent(final TourEventId tourEventId, final Object tourEvent) {
+	public static void fireEvent(final TourEventId tourEventId, final Object eventData) {
 
-		final Object[] allListeners = fPropertyListeners.getListeners();
+		final Object[] allListeners = fTourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourEventId, tourEvent);
+			((ITourEventListener) listener).tourChanged(null, tourEventId, eventData);
 		}
 	}
 
-	public static void fireEvent(final TourEventId tourProperty, final Object propertyData, final IWorkbenchPart part) {
+	public static void fireEvent(final TourEventId tourEventId, final Object eventData, final IWorkbenchPart part) {
 
-		final Object[] allListeners = fPropertyListeners.getListeners();
+		final Object[] allListeners = fTourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourProperty, propertyData);
+			((ITourEventListener) listener).tourChanged(part, tourEventId, eventData);
 		}
 	}
 
@@ -554,8 +554,8 @@ public class TourManager {
 
 	private TourManager() {}
 
-	public void addPropertyListener(final ITourEventListener listener) {
-		fPropertyListeners.add(listener);
+	public void addTourEventListener(final ITourEventListener listener) {
+		fTourEventListeners.add(listener);
 	}
 
 	/**
@@ -1437,9 +1437,9 @@ public class TourManager {
 //		fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTour));
 	}
 
-	public void removePropertyListener(final ITourEventListener listener) {
+	public void removeTourEventListener(final ITourEventListener listener) {
 		if (listener != null) {
-			fPropertyListeners.remove(listener);
+			fTourEventListeners.remove(listener);
 		}
 	}
 

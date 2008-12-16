@@ -291,7 +291,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TaggingView.this) {
+					
 					saveState();
+					
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TaggingView.this);
 				}
 			}
 
@@ -416,7 +419,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -979,7 +982,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removePropertyListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		fImgTag.dispose();
