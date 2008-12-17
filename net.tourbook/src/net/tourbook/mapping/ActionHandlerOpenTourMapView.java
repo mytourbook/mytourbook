@@ -27,7 +27,7 @@ public class ActionHandlerOpenTourMapView extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(MapView.ID,
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourMapView.ID,
 					null,
 					IWorkbenchPage.VIEW_ACTIVATE);
 

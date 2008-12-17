@@ -32,7 +32,7 @@ public class ActionHandlerXAxisDistance extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.onExecuteXAxisDistance(isItemChecked);
+			fTourChart.actionXAxisDistance(isItemChecked);
 		}
 
 		return null;

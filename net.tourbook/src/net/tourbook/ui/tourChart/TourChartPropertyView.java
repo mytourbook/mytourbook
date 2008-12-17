@@ -20,8 +20,8 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -273,6 +273,7 @@ public class TourChartPropertyView extends ViewPart {
 					TourDatabase.computeComputedValuesForAllTours();
 
 					TourManager.getInstance().removeAllToursFromCache();
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
 
 					// fire unique event for all changes
 					TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, null);
@@ -337,6 +338,7 @@ public class TourChartPropertyView extends ViewPart {
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
 
 		TourManager.getInstance().removeAllToursFromCache();
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
 
 		// fire unique event for all changes
 		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);

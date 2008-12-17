@@ -145,6 +145,7 @@ public abstract class TourChartViewPart extends ViewPart {
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					fTourData = null;
+					fPostSelectionProvider.clearSelection();
 
 					updateChart();
 

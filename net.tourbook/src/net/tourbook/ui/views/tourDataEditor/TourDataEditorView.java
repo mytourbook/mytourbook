@@ -40,6 +40,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1355,6 +1356,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public void clearEditorContent() {
 
 		fTourData = null;
+		fPostSelectionProvider.clearSelection();
+
 		setTourClean();
 
 		fPageBook.showPage(fPageNoTour);
@@ -3400,6 +3403,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return fTourData;
 	}
 
+	private TourData getTourData(final Long tourId) {
+
+		TourData tourData = TourManager.getInstance().getTourData(tourId);
+		if (tourData == null) {
+
+			// tour is not in the database, try to get it from the raw data manager
+
+			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getTourDataMap();
+			tourData = rawData.get(tourId);
+		}
+
+		return tourData;
+	}
+
 	/**
 	 * @return Returns the title of the active tour
 	 */
@@ -3555,7 +3572,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
-					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					final TourData tourData = getTourData((Long) tourId);
 					if (tourData != null) {
 
 						fSelectionTourId = tourData.getTourId();
@@ -3584,7 +3601,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
 					if (tourId instanceof Long) {
 
-						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+						final TourData tourData = getTourData((Long) tourId);
 						if (tourData != null) {
 
 							fSelectionTourId = tourData.getTourId();
@@ -3716,7 +3733,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// ensure that the tour manager contains the same tour data
 		if (fTourData != null && fIsTourDirty) {
 			try {
-				UI.checkTourData(fTourData, TourManager.getInstance().getTourData(fTourData.getTourId()));
+				UI.checkTourData(fTourData, getTourData(fTourData.getTourId()));
 			} catch (final MyTourbookException e) {
 				e.printStackTrace();
 			}
@@ -3803,7 +3820,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
-					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					final TourData tourData = getTourData((Long) tourId);
 					if (tourData != null) {
 
 						if (fTourData == null) {

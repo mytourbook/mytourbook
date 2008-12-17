@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionModifyMapProvider extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionModifyMapProvider(final MapView mapView) {
+	public ActionModifyMapProvider(final TourMapView mapView) {
 
 		super(Messages.map_action_modify_map_provider, AS_PUSH_BUTTON);
 

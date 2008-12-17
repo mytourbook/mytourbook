@@ -135,10 +135,10 @@ public class TourMapPropertyView extends ViewPart {
 
 		// radio: tile info
 		final boolean isShowTileInfo = fRadioTileInfoYes.getSelection();
-		store.setValue(MapView.PREF_SHOW_TILE_INFO, isShowTileInfo);
+		store.setValue(TourMapView.PREF_SHOW_TILE_INFO, isShowTileInfo);
 
 		// dim level
-		store.setValue(MapView.PREF_DEBUG_MAP_DIM_LEVEL, fScaleDimMap.getSelection());
+		store.setValue(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL, fScaleDimMap.getSelection());
 
 	}
 
@@ -149,7 +149,7 @@ public class TourMapPropertyView extends ViewPart {
 		// get values from pref store
 
 		// tile info
-		final boolean isShowTileInfo = store.getBoolean(MapView.PREF_SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
 		if (isShowTileInfo) {
 			fRadioTileInfoYes.setSelection(true);
 		} else {
@@ -157,7 +157,7 @@ public class TourMapPropertyView extends ViewPart {
 		}
 
 		// dim map
-		fScaleDimMap.setSelection(store.getInt(MapView.PREF_DEBUG_MAP_DIM_LEVEL));
+		fScaleDimMap.setSelection(store.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL));
 	}
 
 	@Override

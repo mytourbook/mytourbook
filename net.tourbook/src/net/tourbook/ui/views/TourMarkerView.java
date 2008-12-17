@@ -25,11 +25,13 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
@@ -84,9 +86,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -105,17 +109,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private TourData				fTourData;
 
+	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPropertyChangeListener	fPrefChangeListener;
-	private PostSelectionProvider	fPostSelectionProvider;
+	private ITourEventListener		fTourPropertyListener;
+	private IPartListener2			fPartListener;
 
 	private final NumberFormat		fNF						= NumberFormat.getNumberInstance();
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
 	private Composite				fViewerContainer;
-
-	private ITourEventListener		fTourPropertyListener;
 
 	private Chart					fTourChart;
 
@@ -149,6 +153,32 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	public TourMarkerView() {
 		super();
+	}
+
+	private void addPartListener() {
+		fPartListener = new IPartListener2() {
+
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourMarkerView.this) {
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
+				}
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(fPartListener);
 	}
 
 	private void addPrefListener() {
@@ -232,11 +262,26 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 							}
 						}
 					}
+					
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
 				}
 			}
 		};
 
 		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
+	}
+
+	private void clearView() {
+		
+		fTourData = null;
+
+		fMarkerViewer.setInput(new Object[0]);
+
+		fPostSelectionProvider.clearSelection();
+
+		fPageBook.showPage(fPageNoChart);
 	}
 
 	/**
@@ -279,6 +324,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		addSelectionListener();
 		addTourEventListener();
 		addPrefListener();
+		addPartListener();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -430,6 +476,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().removePartListener(fPartListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -518,7 +565,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private void onSelectionChanged(final ISelection selection) {
 
-		long tourId = -1;
+		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
 		if (selection instanceof SelectionTourData) {
 
@@ -527,10 +574,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 			fTourData = tourDataSelection.getTourData();
 
-			if (fTourData != null) {
-				fTourChart = tourDataSelection.getTourChart();
-			} else {
+			if (fTourData == null) {
 				fTourChart = null;
+			} else {
+				fTourChart = tourDataSelection.getTourChart();
+				tourId = fTourData.getTourId();
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -556,6 +604,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				if (tourData != fTourData) {
 					fTourData = tourData;
 					fTourChart = tourChart;
+					tourId = fTourData.getTourId();
 				}
 			}
 
@@ -578,16 +627,21 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 				tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
 		}
 
-		if (tourId >= 0) {
+		if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 			if (tourData != null) {
 				fTourData = tourData;
 			}
 		}
 
-		final boolean isTour = fTourData != null;
+		final boolean isTour = tourId >= 0 && fTourData != null;
 
 		if (isTour) {
 			fPageBook.showPage(fViewerContainer);

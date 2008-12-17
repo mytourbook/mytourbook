@@ -36,7 +36,6 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -109,8 +108,8 @@ public class TourChart extends Chart {
 
 	private final ListenerList				fSelectionListeners						= new ListenerList();
 
-	private ITourModifyListener				fTourModifyListener;
 	private IPropertyChangeListener			fPrefChangeListener;
+
 
 	private ChartLabelLayer					fLabelLayer;
 	private ChartSegmentLayer				fSegmentLayer;
@@ -119,7 +118,6 @@ public class TourChart extends Chart {
 	private boolean							fIsSegmentLayerVisible					= false;
 	private boolean							fIsMergeLayerVisible					= false;
 
-	private boolean							fIsTourDirty;
 	private ChartMergeLayer					fMergeLayer;
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
@@ -155,6 +153,131 @@ public class TourChart extends Chart {
 		});
 	}
 
+	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
+
+		setCanAutoMoveSliders(isItemChecked);
+
+		// apply setting to the chart
+		if (isItemChecked) {
+			onExecuteMoveSlidersToBorder();
+//			onExecuteZoomInWithSlider();
+		}
+
+		updateZoomOptionActionHandlers();
+	}
+
+	public void actionCanAutoZoomToSlider(final Boolean isItemChecked) {
+
+		setCanAutoZoomToSlider(isItemChecked);
+
+		// apply setting to the chart
+//		if (isItemChecked) {
+//			zoomInWithSlider();
+//		} else {
+//			zoomOut(true);
+//		}
+
+		updateZoomOptionActionHandlers();
+	}
+
+//	@Override
+//	public void activateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
+////		net.tourbook.chart.context.isTourChart
+////		fChart.updateChartActionHandlers();
+//	}
+//
+//	@Override
+//	public void deactivateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		contextService.deactivateContext(fContextBarChart);
+//	}
+
+	public void actionCanScrollChart(final Boolean isItemChecked) {
+
+		setCanScrollZoomedChart(isItemChecked);
+
+		// apply setting to the chart
+		if (isItemChecked) {
+			onExecuteZoomInWithSlider();
+		} else {
+			onExecuteZoomOut(true);
+		}
+
+		updateZoomOptionActionHandlers();
+	}
+
+	public void actionShowStartTime(final Boolean isItemChecked) {
+
+		fTourChartConfig.isStartTime = isItemChecked;
+		updateTourChart(true);
+
+		setCommandChecked(COMMAND_ID_SHOW_START_TIME, isItemChecked);
+	}
+
+	/**
+	 * Set the X-axis to distance
+	 * 
+	 * @param isChecked
+	 * @return Returns <code>true</code> when the x-axis was set to the distance
+	 */
+	public boolean actionXAxisDistance(final boolean isChecked) {
+
+		// check if the distance axis button was pressed
+		if (isChecked && !fTourChartConfig.showTimeOnXAxis) {
+			return false;
+		}
+
+		if (isChecked) {
+
+			// show distance on x axis
+
+			fTourChartConfig.showTimeOnXAxis = !fTourChartConfig.showTimeOnXAxis;
+			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
+
+			switchSlidersTo2ndXData();
+			updateTourChart(true);
+		}
+
+		// toggle time and distance buttons
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, !isChecked);
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, isChecked);
+
+		return true;
+	}
+
+	/**
+	 * @param isChecked
+	 * @return Returns <code>true</code> when the check state was changed
+	 */
+	public boolean actionXAxisTime(final boolean isChecked) {
+
+		// check if the time axis button was pressed
+		if (isChecked && fTourChartConfig.showTimeOnXAxis) {
+			return false;
+		}
+
+		if (isChecked) {
+
+			// show time on x axis
+
+			fTourChartConfig.showTimeOnXAxis = !fTourChartConfig.showTimeOnXAxis;
+			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
+
+			switchSlidersTo2ndXData();
+			updateTourChart(true);
+		}
+
+		// toggle time and distance buttons
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, isChecked);
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, !isChecked);
+
+		return true;
+	}
+
 	/**
 	 * Activate all tour chart action handlers, this must be done when the part with a tour chart is
 	 * activated
@@ -181,22 +304,6 @@ public class TourChart extends Chart {
 	public void addDataModelListener(final IDataModelListener dataModelListener) {
 		fChartDataModelListener = dataModelListener;
 	}
-
-//	@Override
-//	public void activateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
-////		net.tourbook.chart.context.isTourChart
-////		fChart.updateChartActionHandlers();
-//	}
-//
-//	@Override
-//	public void deactivateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		contextService.deactivateContext(fContextBarChart);
-//	}
 
 	private void addPrefListeners() {
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
@@ -271,10 +378,6 @@ public class TourChart extends Chart {
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.add(listener);
-	}
-
-	public void addTourModifyListener(final ITourModifyListener listener) {
-		fTourModifyListener = listener;
 	}
 
 	/**
@@ -752,119 +855,6 @@ public class TourChart extends Chart {
 		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setChecked(isMoveSlidersWhenZoomed);
 	}
 
-	public boolean isTourDirty() {
-		return fIsTourDirty;
-	}
-
-	public void onExecuteCanAutoMoveSliders(final boolean isItemChecked) {
-
-		setCanAutoMoveSliders(isItemChecked);
-
-		// apply setting to the chart
-		if (isItemChecked) {
-			onExecuteMoveSlidersToBorder();
-//			onExecuteZoomInWithSlider();
-		}
-
-		updateZoomOptionActionHandlers();
-	}
-
-	public void onExecuteCanAutoZoomToSlider(final Boolean isItemChecked) {
-
-		setCanAutoZoomToSlider(isItemChecked);
-
-		// apply setting to the chart
-//		if (isItemChecked) {
-//			zoomInWithSlider();
-//		} else {
-//			zoomOut(true);
-//		}
-
-		updateZoomOptionActionHandlers();
-	}
-
-	public void onExecuteCanScrollChart(final Boolean isItemChecked) {
-
-		setCanScrollZoomedChart(isItemChecked);
-
-		// apply setting to the chart
-		if (isItemChecked) {
-			onExecuteZoomInWithSlider();
-		} else {
-			onExecuteZoomOut(true);
-		}
-
-		updateZoomOptionActionHandlers();
-	}
-
-	public void onExecuteShowStartTime(final Boolean isItemChecked) {
-
-		fTourChartConfig.isStartTime = isItemChecked;
-		updateTourChart(true);
-
-		setCommandChecked(COMMAND_ID_SHOW_START_TIME, isItemChecked);
-	}
-
-	/**
-	 * Set the X-axis to distance
-	 * 
-	 * @param isChecked
-	 * @return Returns <code>true</code> when the x-axis was set to the distance
-	 */
-	public boolean onExecuteXAxisDistance(final boolean isChecked) {
-
-		// check if the distance axis button was pressed
-		if (isChecked && !fTourChartConfig.showTimeOnXAxis) {
-			return false;
-		}
-
-		if (isChecked) {
-
-			// show distance on x axis
-
-			fTourChartConfig.showTimeOnXAxis = !fTourChartConfig.showTimeOnXAxis;
-			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
-
-			switchSlidersTo2ndXData();
-			updateTourChart(true);
-		}
-
-		// toggle time and distance buttons
-		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, !isChecked);
-		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, isChecked);
-
-		return true;
-	}
-
-	/**
-	 * @param isChecked
-	 * @return Returns <code>true</code> when the check state was changed
-	 */
-	public boolean onExecuteXAxisTime(final boolean isChecked) {
-
-		// check if the time axis button was pressed
-		if (isChecked && fTourChartConfig.showTimeOnXAxis) {
-			return false;
-		}
-
-		if (isChecked) {
-
-			// show time on x axis
-
-			fTourChartConfig.showTimeOnXAxis = !fTourChartConfig.showTimeOnXAxis;
-			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
-
-			switchSlidersTo2ndXData();
-			updateTourChart(true);
-		}
-
-		// toggle time and distance buttons
-		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, isChecked);
-		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, !isChecked);
-
-		return true;
-	}
-
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.remove(listener);
 	}
@@ -1062,18 +1052,6 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * set tour dirty to save the tour when the tour is closed
-	 */
-	public void setTourDirty(final boolean isDirty) {
-
-		fIsTourDirty = isDirty;
-
-		if (fTourModifyListener != null) {
-			fTourModifyListener.tourIsModified();
-		}
-	}
-
-	/**
 	 * set's the chart which is synched with this chart
 	 * 
 	 * @param isSynchEnabled
@@ -1150,6 +1128,17 @@ public class TourChart extends Chart {
 		sb.append(UI.NEW_LINE);
 
 		return sb.toString();
+	}
+
+	@Override
+	public void updateChart(final ChartDataModel chartDataModel) {
+		
+		super.updateChart(chartDataModel);
+
+		if (chartDataModel == null) {
+			fTourData = null;
+			fTourChartConfig = null;
+		}
 	}
 
 	/**

@@ -29,7 +29,7 @@ public class ActionHandlerCanMoveSlidersWhenZoomed extends TCActionHandler {
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fTourChart.onExecuteCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
+		fTourChart.actionCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
 
 		return null;
 	}

@@ -23,6 +23,8 @@ package net.tourbook.data;
 import java.io.Serializable;
 import java.sql.Date;
 
+import net.tourbook.ui.UI;
+
 /**
  * Contains data for one time slice
  */
@@ -108,4 +110,19 @@ public class TimeData implements Serializable {
 
 	public String				markerLabel;
 
+	@Override
+	public String toString() {
+
+		final StringBuilder sb = new StringBuilder()//
+		.append("absoluteTime:") //				//$NON-NLS-1$
+				.append(absoluteTime)
+				.append(UI.DASH_WITH_SPACE)
+				.append("marker:") //		//$NON-NLS-1$
+				.append(marker)
+				.append(UI.DASH_WITH_SPACE)
+				.append("markerLabel:") //		//$NON-NLS-1$
+				.append(markerLabel);
+
+		return sb.toString();
+	}
 }

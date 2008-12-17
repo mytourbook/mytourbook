@@ -32,6 +32,6 @@ class ActionCanScrollZoomedChart extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteCanScrollChart(isChecked());
+		fTourChart.actionCanScrollChart(isChecked());
 	}
 }

@@ -32,7 +32,7 @@ public class ActionHandlerXAxisTime extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.onExecuteXAxisTime(isItemChecked);
+			fTourChart.actionXAxisTime(isItemChecked);
 		}
 
 		return null;

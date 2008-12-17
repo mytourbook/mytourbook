@@ -45,7 +45,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	private static IPreferenceStore						fPrefStore			= TourbookPlugin.getDefault()
 																					.getPreferenceStore();
 
-	private final MapView								fMappingView;
+	private final TourMapView								fMappingView;
 
 	private Menu										fMenu;
 	private final ActionModifyMapProvider				fActionModifyMapProvider;
@@ -95,7 +95,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionSelectMapProvider(final MapView mapView) {
+	public ActionSelectMapProvider(final TourMapView mapView) {
 
 		super(null, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);

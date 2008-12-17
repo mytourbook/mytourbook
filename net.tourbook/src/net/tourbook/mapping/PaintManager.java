@@ -25,7 +25,7 @@ public class PaintManager {
 
 	private static PaintManager	fInstance;
 
-	private ArrayList<TourData>	fTourDataList;
+	private ArrayList<TourData>	fTourDataList	= new ArrayList<TourData>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -106,6 +106,8 @@ public class PaintManager {
 	 * @param tourDataList
 	 */
 	public void setTourData(final ArrayList<TourData> tourDataList) {
+
+		fTourDataList.clear();
 		fTourDataList = tourDataList;
 	}
 
@@ -116,6 +118,9 @@ public class PaintManager {
 	 * @param tourData
 	 */
 	public void setTourData(final TourData tourData) {
+
+		fTourDataList.clear();
+
 		fTourDataList = new ArrayList<TourData>();
 		fTourDataList.add(tourData);
 	}

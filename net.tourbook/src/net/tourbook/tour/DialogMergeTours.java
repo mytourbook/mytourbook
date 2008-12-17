@@ -1200,6 +1200,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			fIntoTourData.altitudeSerie = fFromTourData.mergeAdjustedAltitudeSerie;
 
+			// adjust altitude up/down values
+			fIntoTourData.computeAltitudeUpDown();
 		}
 
 		if (fChkSetTourType.getSelection() == false) {
@@ -1235,11 +1237,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 	}
 
 	private void updateTourChart() {
-		
+
 		fIsChartUpdated = true;
-		
+
 		fTourChart.updateTourChart(fIntoTourData, fTourChartConfig, true);
-		
+
 		fIsChartUpdated = false;
 	}
 

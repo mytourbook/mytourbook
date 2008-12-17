@@ -34,7 +34,7 @@ public class ActionDimMap extends Action implements IMenuCreator {
 
 	private int						fSelectedDimLevel	= 0;
 
-	private MapView				fMapView;
+	private TourMapView				fMapView;
 
 	private ArrayList<ActionDim>	fDimActions;
 
@@ -61,7 +61,7 @@ public class ActionDimMap extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionDimMap(final MapView mapView) {
+	public ActionDimMap(final TourMapView mapView) {
 
 		super(Messages.map_action_dim_map, AS_DROP_DOWN_MENU);
 

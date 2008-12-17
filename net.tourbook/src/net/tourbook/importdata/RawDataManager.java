@@ -55,10 +55,7 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-//	public static final String			TEMP_RAW_DATA_FILE					= "temp-device-data.txt";						//$NON-NLS-1$
-
 	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
-
 	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
 	private static RawDataManager	instance							= null;

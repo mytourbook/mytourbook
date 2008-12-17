@@ -32,7 +32,7 @@ public class ActionHandlerShowStartTime extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.onExecuteShowStartTime(isItemChecked);
+			fTourChart.actionShowStartTime(isItemChecked);
 		}
 
 		return null;

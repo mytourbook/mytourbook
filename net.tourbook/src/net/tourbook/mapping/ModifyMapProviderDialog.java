@@ -53,7 +53,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	private final IDialogSettings	fDialogSettings;
 	private final IPreferenceStore	fPrefStore;
 
-	private MapView				fMappingView;
+	private TourMapView				fMappingView;
 	private ArrayList<MapProvider>	fMapProviders;
 	private Button					fBtnUp;
 	private Button					fBtnDown;
@@ -64,7 +64,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		fPrefStore = TourbookPlugin.getDefault().getPreferenceStore();
 	}
 
-	public ModifyMapProviderDialog(final Shell parentShell, final MapView mappingView) {
+	public ModifyMapProviderDialog(final Shell parentShell, final TourMapView mappingView) {
 
 		super(parentShell);
 

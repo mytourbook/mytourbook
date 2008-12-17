@@ -951,6 +951,54 @@ public class TourData implements Comparable<Object> {
 		gradientSerie = dataSerieGradient;
 	}
 
+	public void computeAltitudeUpDown() {
+
+		if (altitudeSerie == null || timeSerie == null) {
+			return;
+		}
+
+		final int serieLength = timeSerie.length;
+
+		if (serieLength == 0) {
+			return;
+		}
+
+		int lastTime = 0;
+		int currentAltitude = altitudeSerie[0];
+		int lastAltitude = currentAltitude;
+
+		int altitudeUp = 0;
+		int altitudeDown = 0;
+
+		final int minTimeDiff = 10;
+
+		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
+
+			final int currentTime = timeSerie[timeIndex];
+
+			final int timeDiff = currentTime - lastTime;
+
+			currentAltitude = altitudeSerie[timeIndex];
+
+			if (timeDiff >= minTimeDiff) {
+
+				final int altitudeDiff = currentAltitude - lastAltitude;
+
+				if (altitudeDiff >= 0) {
+					altitudeUp += altitudeDiff;
+				} else {
+					altitudeDown += altitudeDiff;
+				}
+
+				lastTime = currentTime;
+				lastAltitude = currentAltitude;
+			}
+		}
+
+		setTourAltUp(altitudeUp);
+		setTourAltDown(-altitudeDown);
+	}
+
 	private void computeAvgCadence() {
 
 		if (cadenceSerie == null) {
@@ -1587,7 +1635,16 @@ public class TourData implements Comparable<Object> {
 			tourMarker.setLabel(timeData.markerLabel);
 		}
 
-		getTourMarkers().add(tourMarker);
+		tourMarkers.add(tourMarker);
+
+		System.out.println("add tourMarker:" + tourMarker);
+		for (final TourMarker marker : tourMarkers) {
+			System.out.println(marker);
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+		System.out.println();
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	/**
@@ -2384,6 +2441,11 @@ public class TourData implements Comparable<Object> {
 		return bikerWeight;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * Computes the time between start index and end index when the speed is <code>0</code>
 	 * 
@@ -2416,11 +2478,6 @@ public class TourData implements Comparable<Object> {
 			return ignoreTimeSlices * deviceTimeInterval;
 		}
 	}
-
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
 
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
@@ -2472,10 +2529,6 @@ public class TourData implements Comparable<Object> {
 		return deviceMode;
 	}
 
-	public String getDeviceModeName() {
-		return deviceModeName;
-	}
-
 // not used 5.10.2008 
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -2484,6 +2537,10 @@ public class TourData implements Comparable<Object> {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	public String getDeviceModeName() {
+		return deviceModeName;
+	}
 
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
@@ -2919,10 +2976,6 @@ public class TourData implements Comparable<Object> {
 		return tourPerson;
 	}
 
-	public int getTourRecordingTime() {
-		return tourRecordingTime;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -2963,6 +3016,10 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	public int getTourRecordingTime() {
+		return tourRecordingTime;
+	}
+
 	public Collection<TourReference> getTourReferences() {
 		return tourReferences;
 	}
@@ -2981,17 +3038,17 @@ public class TourData implements Comparable<Object> {
 		return tourTags;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @return the tourTitle
 	 */
 	public String getTourTitle() {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not

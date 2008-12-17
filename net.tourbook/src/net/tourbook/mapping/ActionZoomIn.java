@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomIn extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionZoomIn(final MapView mapView) {
+	public ActionZoomIn(final TourMapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

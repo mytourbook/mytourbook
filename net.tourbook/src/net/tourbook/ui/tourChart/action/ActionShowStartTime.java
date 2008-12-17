@@ -33,6 +33,6 @@ public class ActionShowStartTime extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteShowStartTime(isChecked());
+		fTourChart.actionShowStartTime(isChecked());
 	}
 }

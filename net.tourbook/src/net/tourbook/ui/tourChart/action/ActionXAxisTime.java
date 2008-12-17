@@ -39,7 +39,7 @@ public class ActionXAxisTime extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteXAxisTime(isChecked());
+		fTourChart.actionXAxisTime(isChecked());
 	}
 
 }

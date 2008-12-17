@@ -30,6 +30,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -91,7 +92,7 @@ import de.byteholder.gpx.ext.PointOfInterest;
  * @author Wolfgang Schramm
  * @since 1.3.0
  */
-public class MapView extends ViewPart {
+public class TourMapView extends ViewPart {
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 
@@ -143,7 +144,7 @@ public class MapView extends ViewPart {
 	/**
 	 * contains the tours which are displayed in the map
 	 */
-	private ArrayList<TourData>						fTourDataList;
+	private ArrayList<TourData>						fTourDataList						= new ArrayList<TourData>();
 	private TourData								fPreviousTourData;
 
 	private ActionDimMap							fActionDimMap;
@@ -207,7 +208,7 @@ public class MapView extends ViewPart {
 	private int										fMapDimLevel						= -1;
 	private RGB										fMapDimColor;
 
-	public MapView() {}
+	public TourMapView() {}
 
 	void actionDimMap(final int dimLevel) {
 
@@ -336,7 +337,7 @@ public class MapView extends ViewPart {
 
 	void actionSynchWithSlider() {
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 			return;
 		}
 
@@ -411,7 +412,7 @@ public class MapView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapView.this) {
+				if (partRef.getPart(false) == TourMapView.this) {
 					saveState();
 				}
 			}
@@ -448,7 +449,7 @@ public class MapView extends ViewPart {
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
-					float prefDimLevel = store.getInt(MapView.PREF_DEBUG_MAP_DIM_LEVEL);
+					float prefDimLevel = store.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL);
 					prefDimLevel *= 2.55;
 					prefDimLevel -= 255;
 
@@ -514,27 +515,33 @@ public class MapView extends ViewPart {
 	private void addTourEventListener() {
 
 		fTourEventListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == MapView.this) {
+				if (part == TourMapView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					resetMap();
 
-				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null && modifiedTours.size() > 0) {
 
-						fTourDataList = modifiedTours;
+						fTourDataList.clear();
+						fTourDataList.addAll(modifiedTours);
+
 						resetMap();
 					}
 
-				} else if (propertyId == TourEventId.SLIDER_POSITION_CHANGED) {
-					onSelectionChanged((ISelection) propertyData);
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
+
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
+					onSelectionChanged((ISelection) eventData);
 				}
 			}
 		};
@@ -575,6 +582,25 @@ public class MapView extends ViewPart {
 
 			fMap.setCenterPosition(geoPosition);
 		}
+	}
+
+	private void clearView() {
+
+		// disable tour data
+		fTourDataList.clear();
+		fPreviousTourData = null;
+
+		PaintManager.getInstance().setTourData(new ArrayList<TourData>());
+
+		showDefaultMap();
+		
+//		final boolean isShowTour = false;
+//		fMap.setShowOverlays(isShowTour);
+//		fMap.setShowLegend(isShowTour);
+//
+//		enableActions();
+//		
+//		fMap.queueRedrawMap();
 	}
 
 	private void createActions() {
@@ -729,20 +755,20 @@ public class MapView extends ViewPart {
 
 	private void createLegendProviders() {
 
-		fLegendProviders.put(MapView.TOUR_COLOR_PULSE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_PULSE));
+		fLegendProviders.put(TourMapView.TOUR_COLOR_PULSE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PULSE));
 
-		fLegendProviders.put(MapView.TOUR_COLOR_ALTITUDE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_ALTITUDE));
+		fLegendProviders.put(TourMapView.TOUR_COLOR_ALTITUDE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_ALTITUDE));
 
-		fLegendProviders.put(MapView.TOUR_COLOR_SPEED, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_SPEED));
+		fLegendProviders.put(TourMapView.TOUR_COLOR_SPEED, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_SPEED));
 
-		fLegendProviders.put(MapView.TOUR_COLOR_PACE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_PACE));
+		fLegendProviders.put(TourMapView.TOUR_COLOR_PACE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PACE));
 
-		fLegendProviders.put(MapView.TOUR_COLOR_GRADIENT, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_GRADIENT));
+		fLegendProviders.put(TourMapView.TOUR_COLOR_GRADIENT, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_GRADIENT));
 
 	}
 
@@ -812,7 +838,7 @@ public class MapView extends ViewPart {
 		// show map from last selection
 //		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 			// a tour is not displayed, find a tour provider which provides a tour
 			showToursFromTourProvider();
 		} else {
@@ -826,6 +852,8 @@ public class MapView extends ViewPart {
 
 	@Override
 	public void dispose() {
+
+		fTourDataList.clear();
 
 		// dispose tilefactory resources
 		for (final TileFactory tileFactory : fTileFactories) {
@@ -846,6 +874,10 @@ public class MapView extends ViewPart {
 		super.dispose();
 	}
 
+	private void enableActions() {
+		enableActions(false);
+	}
+
 	private void enableActions(final boolean isForceTourColor) {
 
 		// update legend action
@@ -861,7 +893,7 @@ public class MapView extends ViewPart {
 			}
 		}
 
-		final boolean isMultipleTours = fTourDataList != null && fTourDataList.size() > 1;
+		final boolean isMultipleTours = fTourDataList.size() > 1;
 		final boolean isOneTour = fIsTour && isMultipleTours == false;
 
 		/*
@@ -879,7 +911,7 @@ public class MapView extends ViewPart {
 		fActionShowSliderInMap.setEnabled(isOneTour);
 		fActionShowSliderInLegend.setEnabled(isOneTour);
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 
 			fActionTourColorAltitude.setEnabled(false);
 			fActionTourColorGradient.setEnabled(false);
@@ -964,6 +996,11 @@ public class MapView extends ViewPart {
 		return rect;
 	}
 
+//	@Override
+//	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
+//		super.init(site, memento);
+//	}
+
 	public List<MapProvider> getTileFactories() {
 		return fTileFactories;
 	}
@@ -1013,11 +1050,6 @@ public class MapView extends ViewPart {
 		return mapPositions;
 	}
 
-//	@Override
-//	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-//		super.init(site, memento);
-//	}
-
 	/**
 	 * Checks if {@link TourData} can be painted
 	 * 
@@ -1052,7 +1084,7 @@ public class MapView extends ViewPart {
 
 			paintOneTour(tourData, selectionTourData.isForceRedraw(), true);
 
-			enableActions(false);
+			enableActions();
 
 		} else if (selection instanceof SelectionTourId) {
 
@@ -1061,7 +1093,7 @@ public class MapView extends ViewPart {
 
 			paintOneTour(tourData, false, true);
 
-			enableActions(false);
+			enableActions();
 
 		} else if (selection instanceof SelectionTourIds) {
 
@@ -1093,7 +1125,7 @@ public class MapView extends ViewPart {
 						chartInfo.rightSliderValuesIndex,
 						chartInfo.selectedSliderValuesIndex);
 
-				enableActions(false);
+				enableActions();
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -1104,7 +1136,15 @@ public class MapView extends ViewPart {
 				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
-					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData == null) {
+
+						// tour is not in the database, try to get it from the raw data manager
+
+						final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getTourDataMap();
+						tourData = rawData.get(tourId);
+					}
+
 					if (tourData != null) {
 
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
@@ -1114,7 +1154,7 @@ public class MapView extends ViewPart {
 								chartInfo.rightSliderValuesIndex,
 								chartInfo.selectedSliderValuesIndex);
 
-						enableActions(false);
+						enableActions();
 					}
 				}
 			}
@@ -1144,7 +1184,7 @@ public class MapView extends ViewPart {
 
 					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
 
-					enableActions(false);
+					enableActions();
 				}
 			}
 
@@ -1161,16 +1201,13 @@ public class MapView extends ViewPart {
 
 			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
 
-			enableActions(false);
+			enableActions();
 
 		} else if (selection instanceof PointOfInterest) {
 
 			fIsTour = false;
 
-			// disable tour data
-			fTourDataList = null;
-			fPreviousTourData = null;
-			PaintManager.getInstance().setTourData(new ArrayList<TourData>());
+			clearView();
 
 			final PointOfInterest poi = (PointOfInterest) selection;
 			fPOIPosition = poi.getPosition();
@@ -1179,7 +1216,7 @@ public class MapView extends ViewPart {
 			fMap.setCenterPosition(fPOIPosition);
 			fMap.queueRedrawMap();
 
-			enableActions(false);
+			enableActions();
 
 		} else if (selection instanceof StructuredSelection) {
 
@@ -1201,7 +1238,7 @@ public class MapView extends ViewPart {
 				paintOneTour(tourData, false, true);
 			}
 
-			enableActions(false);
+			enableActions();
 
 		} else if (selection instanceof SelectionTourCatalogView) {
 
@@ -1215,7 +1252,7 @@ public class MapView extends ViewPart {
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 				paintOneTour(tourData, false, true);
 
-				enableActions(false);
+				enableActions();
 			}
 		}
 
@@ -1223,7 +1260,7 @@ public class MapView extends ViewPart {
 
 	private void paintAllTours() {
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 			return;
 		}
 
@@ -1231,19 +1268,21 @@ public class MapView extends ViewPart {
 		fMap.setShowLegend(fActionShowTourInMap.isChecked());
 
 		if (fTourDataList.size() > 1) {
-			// multiple tours are displayed
-			paintTours();
 
+			// multiple tours are displayed
+
+			paintTours();
 			enableActions(true);
+
 		} else {
 			paintOneTour(fTourDataList.get(0), true, false);
-			enableActions(false);
+			enableActions();
 		}
 	}
 
 	private void paintEntireTour() {
 
-		if (fTourDataList == null || fTourDataList.size() == 0 || isPaintDataValid(fTourDataList.get(0)) == false) {
+		if (fTourDataList.size() == 0 || isPaintDataValid(fTourDataList.get(0)) == false) {
 			showDefaultMap();
 			return;
 		}
@@ -1309,7 +1348,7 @@ public class MapView extends ViewPart {
 		// prevent loading the same tour
 		if (forceRedraw == false) {
 
-			if (fTourDataList != null && fTourDataList.size() == 1 && fTourDataList.get(0) == tourData) {
+			if (fTourDataList.size() == 1 && fTourDataList.get(0) == tourData) {
 				return;
 			}
 		}
@@ -1331,7 +1370,7 @@ public class MapView extends ViewPart {
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
 		 * to figure out if multiple tours are selected
 		 */
-		fTourDataList = new ArrayList<TourData>();
+		fTourDataList.clear();
 		fTourDataList.add(tourData);
 
 		// set the paint context (slider position) for the direct mapping painter
@@ -1445,7 +1484,7 @@ public class MapView extends ViewPart {
 				// force single tour to be repainted
 				fPreviousTourData = null;
 
-				fTourDataList = new ArrayList<TourData>();
+				fTourDataList.clear();
 
 				PaintManager.getInstance().setTourData(fTourDataList);
 
@@ -1509,7 +1548,7 @@ public class MapView extends ViewPart {
 
 	private void resetMap() {
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 			return;
 		}
 
@@ -1560,7 +1599,7 @@ public class MapView extends ViewPart {
 			} else {
 				isShowTour = settings.getBoolean(MEMENTO_SHOW_TOUR_IN_MAP);
 			}
-			
+
 			fActionShowTourInMap.setChecked(isShowTour);
 			fMap.setShowOverlays(isShowTour);
 			fMap.setShowLegend(isShowTour);
@@ -1677,7 +1716,7 @@ public class MapView extends ViewPart {
 		}
 
 		// debug info
-		final boolean isShowTileInfo = store.getBoolean(MapView.PREF_SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
 		fMap.setDrawTileBorders(isShowTileInfo);
 
 		// set dim level/color after the map providers are set
@@ -1868,7 +1907,7 @@ public class MapView extends ViewPart {
 		fIsTour = false;
 
 		// disable tour data
-		fTourDataList = null;
+		fTourDataList.clear();
 		fPreviousTourData = null;
 
 		// update direct painter to draw nothing
@@ -1919,7 +1958,7 @@ public class MapView extends ViewPart {
 				/*
 				 * check if tour is set from a selection provider
 				 */
-				if (fTourDataList != null) {
+				if (fTourDataList.size() > 0) {
 					return;
 				}
 
@@ -1929,7 +1968,8 @@ public class MapView extends ViewPart {
 //					final TourData tourData = TourManager.getInstance().getTourData(tourDataList);
 //					if (tourData != null) {
 
-					fTourDataList = tourDataList;
+					fTourDataList.clear();
+					fTourDataList.addAll(tourDataList);
 
 					paintAllTours();
 
@@ -1944,7 +1984,7 @@ public class MapView extends ViewPart {
 //
 //						paintOneTour(tourData, true, false);
 //
-//						enableActions(false);
+//						enableActions();
 //					}
 				}
 			}
@@ -1961,7 +2001,7 @@ public class MapView extends ViewPart {
 	 */
 	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 
-		if (fTourDataList == null || fTourDataList.size() == 0) {
+		if (fTourDataList.size() == 0) {
 			return false;
 		}
 

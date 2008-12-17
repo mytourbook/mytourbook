@@ -31,14 +31,14 @@ public class LegendProvider implements ILegendProvider {
 
 	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
 
-		final int legendHeight = legendBounds.height - 2 * MapView.LEGEND_MARGIN_TOP_BOTTOM;
+		final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
 		/*
 		 * !!! value range does currently NOT provide negative altitudes
 		 */
 		final int graphRange = graphMaxValue - graphMinValue;
 
-		final int unitCount = legendHeight / MapView.LEGEND_UNIT_DISTANCE;
+		final int unitCount = legendHeight / TourMapView.LEGEND_UNIT_DISTANCE;
 
 		// get altitude range for one unit
 		final int graphUnitValue = graphRange / Math.max(1, unitCount);

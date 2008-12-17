@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionZoomOut(final MapView mapView) {
+	public ActionZoomOut(final TourMapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

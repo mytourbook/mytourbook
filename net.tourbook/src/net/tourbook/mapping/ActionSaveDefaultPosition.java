@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSaveDefaultPosition extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionSaveDefaultPosition(final MapView mapView) {
+	public ActionSaveDefaultPosition(final TourMapView mapView) {
 
 		super(Messages.map_action_save_default_position, AS_PUSH_BUTTON);
 

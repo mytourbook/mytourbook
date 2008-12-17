@@ -467,7 +467,7 @@ public class UI {
 							newPattern += oldPattern.charAt(i);
 						}
 					}
-					
+
 					sdf.applyPattern(newPattern);
 				}
 

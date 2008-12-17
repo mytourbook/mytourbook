@@ -63,6 +63,7 @@ import net.tourbook.ui.action.ActionMergeTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -140,6 +141,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private TableViewer						fTourViewer;
 
 	private ActionClearView					fActionClearView;
+	private ActionRefreshView				fActionRefreshView;
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionSaveTourInDatabase		fActionSaveTour;
 	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
@@ -211,7 +213,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// remove all tours
 		RawDataManager.getInstance().removeAllTours();
 
-		reloadViewer();
+		reloadViewerORIGINAL();
 
 		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
 
@@ -231,7 +233,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// set tour data and tour id from which the tour is merged
 		mergeIntoTour.setMergeFromTourId(mergeFromTour.getTourId());
-		
+
 		// set temp data, this is required by the dialog because the merge from tour could not be saved
 		mergeIntoTour.setMergeFromTour(mergeFromTour);
 
@@ -280,23 +282,12 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == RawDataView.this) {
 
-//					final TourDataEditorView tourEditor = TourManager.getTourDataEditor();
-//					if (tourEditor != null) {
-//
-//						// hide tours which are originated from this view
-//
-//						tourEditor.clearEditorContent();
-//					}
-
 					saveState();
 
 					// remove all tours
 					RawDataManager.getInstance().removeAllTours();
 
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
-//
-//					// don't throw the selection again
-//					fPostSelectionProvider.clearSelection();
 				}
 			}
 
@@ -316,7 +307,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				if (RawDataView.this == partRef.getPart(false)) {
 					fIsPartVisible = true;
 					if (fIsViewerPersonDataDirty || (fNewActivePerson != fActivePerson)) {
-						reloadViewer();
+						reloadViewerORIGINAL();
 						updateViewerPersonData();
 						fNewActivePerson = fActivePerson;
 						fIsViewerPersonDataDirty = false;
@@ -410,7 +401,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 						RawDataManager.getInstance().updateTourDataFromDb();
 
 						// update the table viewer
-						reloadViewer();
+						reloadViewerORIGINAL();
 					} else {
 						fIsViewerPersonDataDirty = true;
 					}
@@ -449,7 +440,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 					RawDataManager.getInstance().updateTourDataFromDb();
 
-					reloadViewer();
+					reloadViewerORIGINAL();
 				}
 			}
 		};
@@ -479,7 +470,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
+		// view toolbar
 		fActionClearView = new ActionClearView(this);
+		fActionRefreshView = new ActionRefreshView(this);
 
 		// view menu
 		fActionModifyColumns = new ActionModifyColumns(this);
@@ -961,7 +954,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fPostSelectionProvider.clearSelection();
 
 		// update import viewer
-		reloadViewer();
+		reloadViewerORIGINAL();
 
 		enableActions();
 
@@ -1119,17 +1112,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * fill view toolbar
 		 */
-		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(fActionSaveTourWithPerson);
-		viewTbm.add(fActionSaveTour);
-		viewTbm.add(new Separator());
+		tbm.add(fActionSaveTourWithPerson);
+		tbm.add(fActionSaveTour);
+		tbm.add(new Separator());
 
 		// place for import and transfer actions
-		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
-		viewTbm.add(new Separator());
+		tbm.add(new GroupMarker("import")); //$NON-NLS-1$
+		tbm.add(new Separator());
 
-		viewTbm.add(fActionClearView);
+		tbm.add(fActionClearView);
+		tbm.add(fActionRefreshView);
 
 		/*
 		 * fill view menu
@@ -1294,7 +1288,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			if (importCounter > 0) {
 
 				rawDataMgr.updateTourDataFromDb();
-				reloadViewer();
+				reloadViewerORIGINAL();
 
 				// restore selected tour
 				try {
@@ -1329,7 +1323,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			fViewerContainer.layout();
 
 			// update the viewer
-			reloadViewer();
+			reloadViewerORIGINAL();
 		}
 		fViewerContainer.setRedraw(true);
 
@@ -1337,6 +1331,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	public void reloadViewer() {
+		
+		// this will reimport files
+
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				importFiles();
+			}
+		});
+	}
+
+	public void reloadViewerORIGINAL() {
 
 		// update tour data viewer
 		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());

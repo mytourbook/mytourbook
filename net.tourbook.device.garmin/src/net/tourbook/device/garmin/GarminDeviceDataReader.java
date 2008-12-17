@@ -103,21 +103,23 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			return false;
 		}
 
-		final GarminSAXHandler handler = new GarminSAXHandler(this, importFilePath, deviceData, tourDataMap);
+		final GarminSAXHandler saxHandler = new GarminSAXHandler(this, importFilePath, deviceData, tourDataMap);
 
 		try {
 
 			final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
-			parser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
+			parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
 		} catch (final Exception e) {
 			System.err.println("Error parsing file: " + importFilePath); //$NON-NLS-1$ 
 			e.printStackTrace();
 			return false;
+		} finally {
+			saxHandler.dispose();
 		}
 
-		return handler.isImported();
+		return saxHandler.isImported();
 	}
 
 	public boolean validateRawData(final String fileName) {

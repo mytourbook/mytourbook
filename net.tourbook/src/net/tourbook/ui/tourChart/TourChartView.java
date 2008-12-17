@@ -55,9 +55,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -73,16 +74,42 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private TourChart				fTourChart;
 	private TourChartConfiguration	fTourChartConfig;
-	TourData						fTourData;
-
-	private ISelectionListener		fPostSelectionListener;
-	private IPropertyChangeListener	fPrefChangeListener;
+	private TourData				fTourData;
 
 	private PostSelectionProvider	fPostSelectionProvider;
+	private ISelectionListener		fPostSelectionListener;
+	private IPropertyChangeListener	fPrefChangeListener;
 	private ITourEventListener		fTourEventListener;
+	private IPartListener2			fPartListener;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
+
+	private void addPartListener() {
+		fPartListener = new IPartListener2() {
+
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartView.this);
+				}
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(fPartListener);
+	}
 
 	private void addPrefListener() {
 
@@ -170,10 +197,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 								 * tour is not set, this can be the case when a manual tour is
 								 * discarded
 								 */
-								fPageBook.showPage(fPageNoChart);
 
-								// removed old tour data from the selection provider
-								fPostSelectionProvider.clearSelection();
+								clearView();
 
 								return;
 							}
@@ -189,19 +214,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 							}
 						}
 					}
-
-//				} else if (eventId == TourEventId.TOUR_MERGE_CHANGED) {
-//
-//					if (eventData instanceof TourData && fTourData != null && fTourData == ((TourData) eventData)) {
-//
-//						// display merge layer
-//						fTourChart.updateMergeLayer(true);
-//
-//					} else {
-//
-//						// hide merge layer
-//						fTourChart.updateMergeLayer(false);
-//					}
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -227,12 +239,35 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void clearView() {
 
 		fTourData = null;
-
+		fTourChart.updateChart(null);
+		
 		fPageBook.showPage(fPageNoChart);
+
+		// removed old tour data from the selection provider
+		fPostSelectionProvider.clearSelection();
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		createUI(parent);
+
+		addSelectionListener();
+		addPrefListener();
+		addTourEventListener();
+		addPartListener();
+
+		// set this view part as selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (fTourData == null) {
+			showTourFromTourProvider();
+		}
+	}
+
+	private void createUI(final Composite parent) {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
 
@@ -268,27 +303,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				fPostSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
-
-		addSelectionListener();
-		addPrefListener();
-		addTourEventListener();
-
-		// set this view part as selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
-
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		if (fTourData == null) {
-			showTourFromTourProvider();
-		}
 	}
 
 	@Override
 	public void dispose() {
 
-		final IWorkbenchPage page = getSite().getPage();
-
-		page.removePostSelectionListener(fPostSelectionListener);
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().removePartListener(fPartListener);
 
 		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
@@ -451,6 +472,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	@Override
 	public void setFocus() {
+		
 		fTourChart.setFocus();
 
 		/*

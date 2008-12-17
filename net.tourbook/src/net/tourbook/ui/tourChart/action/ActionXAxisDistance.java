@@ -40,7 +40,7 @@ public class ActionXAxisDistance extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteXAxisDistance(isChecked());
+		fTourChart.actionXAxisDistance(isChecked());
 	}
 
 }

@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowStartEndInMap extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionShowStartEndInMap(final MapView mapView) {
+	public ActionShowStartEndInMap(final TourMapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

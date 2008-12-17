@@ -53,7 +53,7 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionSynchTourZoomLevel(final MapView osmView) {
+	public ActionSynchTourZoomLevel(final TourMapView osmView) {
 
 		super(Messages.map_action_zoom_level_centered_tour, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);

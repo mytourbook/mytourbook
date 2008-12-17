@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.database.TourDatabase;
 
 @Entity
 public class TourMarker implements Cloneable {
@@ -52,7 +53,7 @@ public class TourMarker implements Cloneable {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					markerId;
+	private long					markerId				= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@ManyToOne(optional = false)
 	private TourData				tourData;
@@ -85,9 +86,9 @@ public class TourMarker implements Cloneable {
 	 */
 	private int						serieIndex;
 
-	private String					label					= "";	//$NON-NLS-1$
+	private String					label					= "";								//$NON-NLS-1$
 
-	private String					category				= "";	//$NON-NLS-1$
+	private String					category				= "";								//$NON-NLS-1$
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */
@@ -358,8 +359,7 @@ public class TourMarker implements Cloneable {
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append(TourMarker.class.getSimpleName())
-				.append(" id:") //$NON-NLS-1$
+		return new StringBuilder().append(TourMarker.class.getSimpleName()).append(" id:") //$NON-NLS-1$
 				.append(markerId)
 				.append(" distance:") //$NON-NLS-1$
 				.append(distance)

@@ -32,7 +32,7 @@ public class ActionHandlerCanAutoZoomToSlider extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.onExecuteCanAutoZoomToSlider(isItemChecked);
+			fTourChart.actionCanAutoZoomToSlider(isItemChecked);
 		}
 
 		return null;

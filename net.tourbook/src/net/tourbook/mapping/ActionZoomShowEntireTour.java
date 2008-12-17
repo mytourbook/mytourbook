@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomShowEntireTour extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionZoomShowEntireTour(final MapView mapView) {
+	public ActionZoomShowEntireTour(final TourMapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

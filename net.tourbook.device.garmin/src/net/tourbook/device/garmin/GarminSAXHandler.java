@@ -75,7 +75,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean					fIsInHeartRate				= false;
 	private boolean					fIsInHeartRateValue			= false;
 
-	private ArrayList<TimeData>		fTimeDataList;
+	private ArrayList<TimeData>		fTimeDataList				= new ArrayList<TimeData>();
 	private TimeData				fTimeData;
 	private TourbookDevice			fDeviceDataReader;
 
@@ -86,7 +86,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private int						fLapCounter;
 	private boolean					fSetLapMarker				= false;
 	private boolean					fSetLapStartTime			= false;
-	private ArrayList<Long>			fLapStart;
+	private ArrayList<Long>			fLapStart					= new ArrayList<Long>();
 
 	private boolean					fIsImported;
 	private long					fCurrentTime;
@@ -121,57 +121,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			fCharacters.append(chars, startIndex, length);
 		}
-	}
-
-	private void computeAltitudeUpDown(final TourData tourData) {
-
-		final int[] timeSerie = tourData.timeSerie;
-		final int[] altitudeSerie = tourData.altitudeSerie;
-
-		if (altitudeSerie == null || timeSerie == null) {
-			return;
-		}
-
-		final int serieLength = timeSerie.length;
-
-		if (serieLength == 0) {
-			return;
-		}
-
-		int lastTime = 0;
-		int currentAltitude = altitudeSerie[0];
-		int lastAltitude = currentAltitude;
-
-		int altitudeUp = 0;
-		int altitudeDown = 0;
-
-		final int minTimeDiff = 10;
-
-		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-
-			final int currentTime = timeSerie[timeIndex];
-
-			final int timeDiff = currentTime - lastTime;
-
-			currentAltitude = altitudeSerie[timeIndex];
-
-			if (timeDiff >= minTimeDiff) {
-
-				final int altitudeDiff = currentAltitude - lastAltitude;
-
-				if (altitudeDiff >= 0) {
-					altitudeUp += altitudeDiff;
-				} else {
-					altitudeDown += altitudeDiff;
-				}
-
-				lastTime = currentTime;
-				lastAltitude = currentAltitude;
-			}
-		}
-
-		tourData.setTourAltUp(altitudeUp);
-		tourData.setTourAltDown(-altitudeDown);
 	}
 
 //	/**
@@ -422,6 +371,11 @@ public class GarminSAXHandler extends DefaultHandler {
 ////		System.out.println("total distance:" + totalDistance);
 //	}
 
+	public void dispose() {
+		fLapStart.clear();
+		fTimeDataList.clear();
+	}
+
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
@@ -645,7 +599,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private void setTourData() {
 
-		if (fTimeDataList == null || fTimeDataList.size() == 0) {
+		if (fTimeDataList.size() == 0) {
 			return;
 		}
 
@@ -653,6 +607,8 @@ public class GarminSAXHandler extends DefaultHandler {
 //		if (fTimeDataList.get(0).absoluteDistance == Float.MIN_VALUE) {
 //		computeDistanceFromLatLon();
 //		}
+
+		validateTimeSeries();
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
@@ -674,7 +630,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setTourImportFilePath(fImportFilePath);
 
 		tourData.createTimeSeries(fTimeDataList, true);
-		computeAltitudeUpDown(tourData);
+		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -749,9 +705,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					fLapCounter = 0;
 					fSetLapMarker = false;
-					fLapStart = new ArrayList<Long>();
+					fLapStart.clear();
 
-					fTimeDataList = new ArrayList<TimeData>();
+					fTimeDataList.clear();
 				}
 
 			} else if (fDataVersion == 2) {
@@ -815,9 +771,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					fLapCounter = 0;
 					fSetLapMarker = false;
-					fLapStart = new ArrayList<Long>();
+					fLapStart.clear();
 
-					fTimeDataList = new ArrayList<TimeData>();
+					fTimeDataList.clear();
 				}
 			}
 
@@ -839,5 +795,29 @@ public class GarminSAXHandler extends DefaultHandler {
 				}
 			}
 		}
+	}
+
+	/**
+	 * There are cases where the lap end time and the next lap start time have the same time value,
+	 * so there are duplicated times which causes problems like markers are not displayed because
+	 * the marker time is twice available.
+	 */
+	private void validateTimeSeries() {
+
+		final ArrayList<TimeData> removeTimeData = new ArrayList<TimeData>();
+		TimeData lastTimeData = null;
+
+		for (final TimeData timeData : fTimeDataList) {
+
+			if (lastTimeData != null) {
+				if (lastTimeData.absoluteTime == timeData.absoluteTime) {
+					removeTimeData.add(lastTimeData);
+				}
+			}
+
+			lastTimeData = timeData;
+		}
+
+		fTimeDataList.removeAll(removeTimeData);
 	}
 }

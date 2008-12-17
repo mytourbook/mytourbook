@@ -117,9 +117,9 @@ public class TourPainter extends MapPainter {
 			// vertical legend
 
 			legendPositionX = legendBounds.x + 1;
-			legendPositionY = legendBounds.y + MapView.LEGEND_MARGIN_TOP_BOTTOM;
+			legendPositionY = legendBounds.y + TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 			legendWidth = 20;
-			legendHeight = legendBounds.height - 2 * MapView.LEGEND_MARGIN_TOP_BOTTOM;
+			legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
 			availableLegendPixels = legendHeight - 1;
 
@@ -983,7 +983,7 @@ public class TourPainter extends MapPainter {
 		fLegendProvider = PaintManager.getInstance().getLegendProvider();
 
 		switch (fLegendProvider.getTourColorId()) {
-		case MapView.TOUR_COLOR_ALTITUDE:
+		case TourMapView.TOUR_COLOR_ALTITUDE:
 
 			final int[] altitudeSerie = tourData.getAltitudeSerie();
 			if (altitudeSerie == null) {
@@ -993,7 +993,7 @@ public class TourPainter extends MapPainter {
 			}
 			break;
 
-		case MapView.TOUR_COLOR_GRADIENT:
+		case TourMapView.TOUR_COLOR_GRADIENT:
 
 			final int[] gradientSerie = tourData.getGradientSerie();
 			if (gradientSerie == null) {
@@ -1003,7 +1003,7 @@ public class TourPainter extends MapPainter {
 			}
 			break;
 
-		case MapView.TOUR_COLOR_PULSE:
+		case TourMapView.TOUR_COLOR_PULSE:
 
 			final int[] pulseSerie = tourData.pulseSerie;
 			if (pulseSerie == null) {
@@ -1013,7 +1013,7 @@ public class TourPainter extends MapPainter {
 			}
 			break;
 
-		case MapView.TOUR_COLOR_SPEED:
+		case TourMapView.TOUR_COLOR_SPEED:
 
 			final int[] speedSerie = tourData.getSpeedSerie();
 			if (speedSerie == null) {
@@ -1023,7 +1023,7 @@ public class TourPainter extends MapPainter {
 			}
 			break;
 
-		case MapView.TOUR_COLOR_PACE:
+		case TourMapView.TOUR_COLOR_PACE:
 
 			final int[] paceSerie = tourData.getPaceSerie();
 			if (paceSerie == null) {
@@ -1080,9 +1080,9 @@ public class TourPainter extends MapPainter {
 			// min < value < max
 
 //			int legendPositionX = legendBounds.x + 1;
-			final int legendPositionY = legendBounds.y + MapView.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendPositionY = legendBounds.y + TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 //			int legendWidth = 20;
-			final int legendHeight = legendBounds.height - 2 * MapView.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
 
 			final int pixelDiff = legendHeight - 1;
 

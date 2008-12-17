@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowSliderInMap extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionShowSliderInMap(final MapView mapView) {
+	public ActionShowSliderInMap(final TourMapView mapView) {
 
 		super(Messages.map_action_show_slider_in_map, AS_CHECK_BOX);
 

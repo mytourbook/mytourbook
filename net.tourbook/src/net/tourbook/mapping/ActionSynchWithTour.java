@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchWithTour extends Action {
 
-	private MapView	fMapView;
+	private TourMapView	fMapView;
 
-	public ActionSynchWithTour(final MapView mapView) {
+	public ActionSynchWithTour(final TourMapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

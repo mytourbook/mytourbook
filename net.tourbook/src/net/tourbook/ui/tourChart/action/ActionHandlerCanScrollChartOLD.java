@@ -31,7 +31,7 @@ public class ActionHandlerCanScrollChartOLD extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.onExecuteCanScrollChart(isItemChecked);
+			fTourChart.actionCanScrollChart(isItemChecked);
 		}
 
 		return null;

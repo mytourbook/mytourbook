@@ -31,6 +31,6 @@ public class ActionCanAutoZoomToSlider extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteCanAutoZoomToSlider(isChecked());
+		fTourChart.actionCanAutoZoomToSlider(isChecked());
 	}
 }
