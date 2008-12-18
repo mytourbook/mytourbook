@@ -100,17 +100,25 @@ public class TourMarker implements Cloneable {
 	 * not persisted
 	 */
 	@Transient
-	private long					createId;
+	private long					createId				= 0;
+
+	/**
+	 * manually created marker or imported marker create a unique id to identify them, saved marker
+	 * are compared with the marker id
+	 */
+	private static int				fCreateCounter			= 0;
 
 	public TourMarker() {}
 
 	public TourMarker(final TourData tourData, final int markerType) {
+
 		this.tourData = tourData;
 		this.type = markerType;
-		this.createId = System.currentTimeMillis();
+
+		this.createId = ++fCreateCounter;
 	}
 
-	public TourMarker(final TourMarker tourMarker) {
+	private TourMarker(final TourMarker tourMarker) {
 
 		category = new String(tourMarker.category);
 		label = new String(tourMarker.label);
@@ -193,12 +201,20 @@ public class TourMarker implements Cloneable {
 			return false;
 		}
 		final TourMarker other = (TourMarker) obj;
-		if (createId != other.createId) {
-			return false;
+		if (createId == 0) {
+
+			// tour is from the database
+			if (markerId != other.markerId) {
+				return false;
+			}
+		} else {
+
+			// tour was create or imported
+			if (createId != other.createId) {
+				return false;
+			}
 		}
-		if (markerId != other.markerId) {
-			return false;
-		}
+
 		return true;
 	}
 
