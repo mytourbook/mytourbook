@@ -178,7 +178,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private IPropertyChangeListener			fPrefChangeListener;
 	private ITourEventListener				fTourEventListener;
 
-	public Calendar							fCalendar						= GregorianCalendar.getInstance();
+	private Calendar						fCalendar						= GregorianCalendar.getInstance();
 	private DateFormat						fDateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
 	private DateFormat						fTimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 	private NumberFormat					fNumberFormatter				= NumberFormat.getNumberInstance();
@@ -213,7 +213,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// remove all tours
 		RawDataManager.getInstance().removeAllTours();
 
-		reloadViewerORIGINAL();
+		reloadViewer();
 
 		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
 
@@ -307,7 +307,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				if (RawDataView.this == partRef.getPart(false)) {
 					fIsPartVisible = true;
 					if (fIsViewerPersonDataDirty || (fNewActivePerson != fActivePerson)) {
-						reloadViewerORIGINAL();
+						reloadViewer();
 						updateViewerPersonData();
 						fNewActivePerson = fActivePerson;
 						fIsViewerPersonDataDirty = false;
@@ -401,7 +401,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 						RawDataManager.getInstance().updateTourDataFromDb();
 
 						// update the table viewer
-						reloadViewerORIGINAL();
+						reloadViewer();
 					} else {
 						fIsViewerPersonDataDirty = true;
 					}
@@ -440,7 +440,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 					RawDataManager.getInstance().updateTourDataFromDb();
 
-					reloadViewerORIGINAL();
+					reloadViewer();
 				}
 			}
 		};
@@ -589,15 +589,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-				final IStructuredSelection selection = (IStructuredSelection) fTourViewer.getSelection();
-
-				final TourData tourData = (TourData) selection.getFirstElement();
-
-				enableActions();
-
-				if (tourData != null) {
-					fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
-				}
+				fireSelectedTour();
 			}
 		});
 
@@ -644,6 +636,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				cell.setText(fDateFormatter.format(fCalendar.getTime()));
 			}
 		});
+
+		// sort column
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -668,6 +662,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				cell.setText(fTimeFormatter.format(fCalendar.getTime()));
 			}
 		});
+
+		// sort column
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -954,7 +950,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fPostSelectionProvider.clearSelection();
 
 		// update import viewer
-		reloadViewerORIGINAL();
+		reloadViewer();
 
 		enableActions();
 
@@ -1138,6 +1134,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		menuMgr.add(fActionModifyColumns);
 	}
 
+	private void fireSelectedTour() {
+		final IStructuredSelection selection = (IStructuredSelection) fTourViewer.getSelection();
+		final TourData tourData = (TourData) selection.getFirstElement();
+
+		enableActions();
+
+		if (tourData != null) {
+			fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
@@ -1288,7 +1295,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			if (importCounter > 0) {
 
 				rawDataMgr.updateTourDataFromDb();
-				reloadViewerORIGINAL();
+				reloadViewer();
 
 				// restore selected tour
 				try {
@@ -1314,6 +1321,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
+//	public void reloadViewer() {
+//		
+//		// this will reimport files
+//
+//		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+//
+//		Display.getCurrent().asyncExec(new Runnable() {
+//			public void run() {
+//				importFiles();
+//			}
+//		});
+//	}
+
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
@@ -1323,7 +1343,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			fViewerContainer.layout();
 
 			// update the viewer
-			reloadViewerORIGINAL();
+			reloadViewer();
 		}
 		fViewerContainer.setRedraw(true);
 
@@ -1331,19 +1351,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	public void reloadViewer() {
-		
-		// this will reimport files
-
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-				importFiles();
-			}
-		});
-	}
-
-	public void reloadViewerORIGINAL() {
 
 		// update tour data viewer
 		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
@@ -1490,7 +1497,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	@Override
 	public void setFocus() {
+
 		fTourViewer.getControl().setFocus();
+
+		if (fPostSelectionProvider.getSelection() == null) {
+
+			// fire a selected tour when the selection provider was cleared sometime before 
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					fireSelectedTour();
+				}
+			});
+		}
 	}
 
 	/**

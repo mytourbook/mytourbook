@@ -92,16 +92,8 @@ public class RawDataManager {
 		return instance;
 	}
 
-//	/**
-//	 * @return Returns the file to the temp data file
-//	 */
-//	public static String getTempDataFileName() {
-//
-//		return TourbookPlugin.getDefault().getStateLocation().append(TEMP_RAW_DATA_FILE).toFile().getAbsolutePath();
-//	}
-
 	/**
-	 * @return Return the temp directory where received data are stored temporarily
+	 * @return temp directory where received data are stored temporarily
 	 */
 	public static String getTempDir() {
 		return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
@@ -621,7 +613,11 @@ public class RawDataManager {
 								 */
 								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
-								fTourDataMap.put(dbTourData.getTourId(), dbTourData);
+								final Long dbTourId = dbTourData.getTourId();
+								if (fTourDataMap.containsKey(dbTourId)) {
+									// replace existing tour do not add new tours
+									fTourDataMap.put(dbTourId, dbTourData);
+								}
 							}
 						} catch (final Exception e) {
 							e.printStackTrace();
@@ -642,7 +638,12 @@ public class RawDataManager {
 
 		for (final TourData tourData : modifiedTours) {
 			if (tourData != null) {
-				fTourDataMap.put(tourData.getTourId(), tourData);
+
+				final Long tourId = tourData.getTourId();
+				if (fTourDataMap.containsKey(tourId)) {
+					// replace existing tour do not add new tours
+					fTourDataMap.put(tourId, tourData);
+				}
 			}
 		}
 	}

@@ -1636,15 +1636,6 @@ public class TourData implements Comparable<Object> {
 		}
 
 		tourMarkers.add(tourMarker);
-
-		System.out.println("add tourMarker:" + tourMarker);
-		for (final TourMarker marker : tourMarkers) {
-			System.out.println(marker);
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-		System.out.println();
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	/**

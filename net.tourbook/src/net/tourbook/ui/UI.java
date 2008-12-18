@@ -186,6 +186,9 @@ public class UI {
 	private static DateFormat						fDateFormatterShort;
 	private static DateFormat						fTimeFormatterShort;
 
+	private static StringBuilder					fFormatterSB					= new StringBuilder();
+	private static Formatter						fFormatter						= new Formatter(fFormatterSB);
+
 	public static Styler							TAG_STYLER;
 	public static Styler							TAG_CATEGORY_STYLER;
 	public static Styler							TAG_SUB_STYLER;
@@ -335,13 +338,25 @@ public class UI {
 		return containedTourId;
 	}
 
-	public static final String formatSeconds(final long value) {
+	public static Formatter format_hh_mm(final long drivingTime) {
 
-		return new Formatter().format(Messages.Format_hhmmss,
+		fFormatterSB.setLength(0);
+
+		return fFormatter.format(//
+		Messages.Format_hhmm,
+				(drivingTime / 3600),
+				((drivingTime % 3600) / 60));
+	}
+
+	public static final String format_hh_mm_ss(final long value) {
+
+		fFormatterSB.setLength(0);
+
+		return fFormatter.format(//
+		Messages.Format_hhmmss,
 				(value / 3600),
 				((value % 3600) / 60),
 				((value % 3600) % 60)).toString();
-
 	}
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {

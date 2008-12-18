@@ -395,7 +395,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(UI.formatSeconds(((TourMarker) cell.getElement()).getTime()));
+				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
 			}
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), false));

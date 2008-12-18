@@ -239,6 +239,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionOpenPrefDialog				fActionOpenTagPrefs;
 	private ActionOpenPrefDialog				fActionOpenTourTypePrefs;
 
+	/*
+	 * ui tabs
+	 */
 	private PageBook							fPageBook;
 
 	private Label								fPageNoTour;
@@ -2416,7 +2419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(UI.formatSeconds(((TourMarker) cell.getElement()).getTime()));
+				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
 			}
 		});
 
@@ -2520,7 +2523,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void update(final ViewerCell cell) {
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				cell.setText(UI.formatSeconds(fSerieTime[serieIndex]));
+				cell.setText(UI.format_hh_mm_ss(fSerieTime[serieIndex]));
 			}
 		});
 
@@ -2791,7 +2794,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void discardModifications() {
 
 		setTourClean();
-
+		fPostSelectionProvider.clearSelection();
 		fMessageManager.removeAllMessages();
 
 		fTourData = reloadTourData();
@@ -2799,6 +2802,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		updateUIFromTourData(fTourData, true, true);
 
 		fireRevertNotification();
+
+		// a manually created tour can not be reloaded, find a tour in the workbench
+		if (fTourData == null) {
+			displaySelectedTour();
+		}
 	}
 
 	/**
@@ -2810,7 +2818,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (fTourData == null) {
-			getAndDisplayTour();
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+
+					/*
+					 * check if tour is set from a selection provider
+					 */
+					if (fTourData != null) {
+						return;
+					}
+
+					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+					if (selectedTours != null && selectedTours.size() > 0) {
+
+						// get first tour, this view shows only one tour
+						displayTour(selectedTours.get(0));
+
+						setTourClean();
+					}
+				}
+			});
 		}
 	}
 
@@ -3043,13 +3071,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void fireRevertNotification() {
 
-		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-		modifiedTour.add(fTourData);
+		final TourEvent tourEvent = new TourEvent(fTourData);
+		tourEvent.isReverted = true;
 
-		final TourEvent tourProperties = new TourEvent(modifiedTour);
-		tourProperties.isReverted = true;
-
-		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourProperties, TourDataEditorView.this);
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
 
 	/**
@@ -3142,33 +3167,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
-
-	/**
-	 * when a tour is not displayed, find a tour provider which provides a tour
-	 */
-	private void getAndDisplayTour() {
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				/*
-				 * check if tour is set from a selection provider
-				 */
-				if (fTourData != null) {
-					return;
-				}
-
-				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-				if (selectedTours != null && selectedTours.size() > 0) {
-
-					// get first tour, this view shows only one tour
-					displayTour(selectedTours.get(0));
-
-					setTourClean();
-				}
-			}
-		});
 	}
 
 	public ColumnManager getColumnManager() {

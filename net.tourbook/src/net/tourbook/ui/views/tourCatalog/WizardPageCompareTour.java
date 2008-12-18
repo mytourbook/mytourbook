@@ -24,13 +24,14 @@ import java.util.ArrayList;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -90,7 +91,7 @@ public class WizardPageCompareTour extends WizardPage {
 	private CheckboxTreeViewer		fTourViewer;
 	private TVIWizardCompareRoot	fRootItem;
 
-	private TourChart				fTourChart;
+	private Chart					fCompTourChart;
 	private ViewerDetailForm		fViewerDetailForm;
 
 	private boolean					fIsTourViewerInitialized	= false;
@@ -309,8 +310,8 @@ public class WizardPageCompareTour extends WizardPage {
 		fPageBook = new PageBook(fChartGroup, SWT.NONE);
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		fTourChart = new TourChart(fPageBook, SWT.NONE, false);
-		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		fCompTourChart = new Chart(fPageBook, SWT.NONE);
+		fCompTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		fPageTourIsNotSelected = new Label(fPageBook, SWT.NONE);
 		fPageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
@@ -421,31 +422,41 @@ public class WizardPageCompareTour extends WizardPage {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-		if (selection != null) {
+		if (selection == null) {
+			return;
+		}
 
-			final Object firstElement = selection.getFirstElement();
-			if (firstElement instanceof TVIWizardCompareTour) {
+		final Object firstElement = selection.getFirstElement();
+		if (firstElement instanceof TVIWizardCompareTour) {
 
-				final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) firstElement;
+			final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) firstElement;
 
-				// get tour data from the database
-				final TourData tourData = TourManager.getInstance().getTourData(tourItem.tourId);
+			// get tour data from the database
+			final TourData tourData = TourManager.getInstance().getTourData(tourItem.tourId);
 
-				// set altitude visible
-				final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
-				chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
+			// set altitude visible
+			final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
+			chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-				fTourChart.updateTourChart(tourData, chartConfig, false);
+//				fTourChart.updateTourChart(tourData, chartConfig, false);
 
-				fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
-						TourManager.getTourDateShort(tourData)));
+			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
 
-				fPageBook.showPage(fTourChart);
+			// set grid size
+//				final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+//				fTourChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+//						prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-			} else {
-				fPageBook.showPage(fPageTourIsNotSelected);
-				fChartGroup.setText(UI.EMPTY_STRING);
-			}
+			fCompTourChart.updateChart(chartDataModel);
+
+			fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
+					TourManager.getTourDateShort(tourData)));
+
+			fPageBook.showPage(fCompTourChart);
+
+		} else {
+			fPageBook.showPage(fPageTourIsNotSelected);
+			fChartGroup.setText(UI.EMPTY_STRING);
 		}
 	}
 

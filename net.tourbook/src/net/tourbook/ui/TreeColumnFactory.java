@@ -357,7 +357,7 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			return colDef;
 		};
 	};
-
+	
 	public static final TreeColumnFactory	TOUR_TAGS	= new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -368,6 +368,24 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnHeader(Messages.ColumnFactory_tour_tag_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_tag_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+			return colDef;
+		};
+	};
+	
+	public static final TreeColumnFactory TOUR_START_TIME = new TreeColumnFactory() {
+		
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourStartTime", SWT.TRAIL); //$NON-NLS-1$
+		
+			colDef.setColumnLabel(Messages.ColumnFactory_time_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_time_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
 
 			return colDef;
 		};

@@ -79,8 +79,8 @@ public class Chart extends ViewForm {
 
 	private Chart						fSynchedChart;
 
-	private boolean						fShowZoomActions;
-	private boolean						fShowMouseMode						= false;
+	private boolean						fIsShowZoomActions;
+	private boolean						fIsShowMouseMode					= false;
 
 	private Color						fBackgroundColor;
 
@@ -134,7 +134,7 @@ public class Chart extends ViewForm {
 		super(parent, style);
 		setBorderVisible(false);
 
-		// setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		final GridLayout gl = new GridLayout(1, false);
 		gl.marginWidth = 0;
@@ -430,16 +430,16 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		if (fUseInternalActionBar && (fShowZoomActions || fShowMouseMode)) {
+		if (fUseInternalActionBar && (fIsShowZoomActions || fIsShowMouseMode)) {
 
 			// add the action to the toolbar
 			final IToolBarManager tbm = getToolBarManager();
 
-			if (fShowZoomActions) {
+			if (fIsShowZoomActions) {
 
 				tbm.add(new Separator());
 
-				if (fShowMouseMode) {
+				if (fIsShowMouseMode) {
 					tbm.add(fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
 				}
 
@@ -629,7 +629,7 @@ public class Chart extends ViewForm {
 
 			// create the toolbar and put it on top of the chart
 			final ToolBar toolBarControl = new ToolBar(this, SWT.FLAT/* | SWT.WRAP */);
-			setTopLeft(toolBarControl);
+			setTopRight(toolBarControl);
 
 			// toolBarControl.addListener(SWT.Resize, new Listener() {
 			// public void handleEvent(Event e) {
@@ -921,7 +921,7 @@ public class Chart extends ViewForm {
 	 * Make the mouse mode button visible
 	 */
 	public void setShowMouseMode() {
-		fShowMouseMode = true;
+		fIsShowMouseMode = true;
 	}
 
 	/**
@@ -932,8 +932,8 @@ public class Chart extends ViewForm {
 		fChartComponents.setSliderVisible(isSliderVisible);
 	}
 
-	public void setShowZoomActions(final boolean showZoomActions) {
-		fShowZoomActions = showZoomActions;
+	public void setShowZoomActions(final boolean isShowZoomActions) {
+		fIsShowZoomActions = isShowZoomActions;
 	}
 
 	/**

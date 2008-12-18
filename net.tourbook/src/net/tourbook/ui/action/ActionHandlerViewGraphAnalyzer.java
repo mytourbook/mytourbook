@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.ui.action;
 
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.ui.views.TourChartAnalyzerView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -24,13 +24,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-public class ActionHandlerViewTourProperties extends AbstractHandler {
+public class ActionHandlerViewGraphAnalyzer extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()//
-					.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourChartAnalyzerView.ID,
+					null,
+					IWorkbenchPage.VIEW_ACTIVATE);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

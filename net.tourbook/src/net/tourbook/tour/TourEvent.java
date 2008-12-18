@@ -25,17 +25,17 @@ public class TourEvent {
 	/**
 	 * contains the tours which have been modified
 	 */
-	private ArrayList<TourData>	modifiedTours;
+	private ArrayList<TourData>	fModifiedTours;
 
 	/**
-	 * when <code>true</code>, tour data have been reverted and {@link TourEvent#modifiedTours}
+	 * when <code>true</code>, tour data have been reverted and {@link TourEvent#fModifiedTours}
 	 * contains the reverted {@link TourData}
 	 */
 	public boolean				isReverted		= false;
 
 	/**
 	 * when <code>true</code>, tour data have been modified in the {@link TourDataEditorView},
-	 * {@link TourEvent#modifiedTours} contains the modified {@link TourData}
+	 * {@link TourEvent#fModifiedTours} contains the modified {@link TourData}
 	 */
 	public boolean				isTourModified	= false;
 
@@ -45,19 +45,23 @@ public class TourEvent {
 	public TourData				tourDataEditorSavedTour;
 
 	public TourEvent(final ArrayList<TourData> modifiedTour) {
-		this.modifiedTours = modifiedTour;
+		fModifiedTours = modifiedTour;
 	}
 
 	public TourEvent(final TourData tourData) {
-		modifiedTours = new ArrayList<TourData>();
-		modifiedTours.add(tourData);
+		
+		fModifiedTours = new ArrayList<TourData>();
+
+		if (tourData != null) {
+			fModifiedTours.add(tourData);
+		}
 	}
 
 	/**
 	 * @return Returns all tours which have been modified
 	 */
 	public ArrayList<TourData> getModifiedTours() {
-		return modifiedTours;
+		return fModifiedTours;
 	}
 
 }

@@ -659,7 +659,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourSegment segment = (TourSegment) cell.getElement();
-				cell.setText(UI.formatSeconds(segment.drivingTime));
+				cell.setText(UI.format_hh_mm_ss(segment.drivingTime));
 			}
 		});
 

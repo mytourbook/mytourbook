@@ -607,6 +607,13 @@
                   mnemonic="%command_tourCompare_wizard_mnemonic"
                   style="push">
             </command>
+            <command
+                  commandId="net.tourbook.command.createNewTour"
+                  icon="icons/tour-new.png"
+                  label="%command_createNewTour"
+                  mnemonic="%command_createNewTour_mnemonic"
+                  style="push">
+            </command>
          
          </toolbar>
       </menuContribution>
@@ -753,7 +760,7 @@
             name="%command_general_preferences">
       </command>
       <command
-            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewSelectedTour"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerViewSelectedTour"
             id="net.tourbook.command.selectedTour"
             name="%command_view_selectedTour">
       </command>
@@ -786,20 +793,20 @@
             name="%command_tourCompare_wizard">
       </command>
       <command
-            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewGraphAnalyzer"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%command_tourChart_tool_graphAnalyzer">
       </command>
          
       <command
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
-            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourSegmenter"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerViewTourSegmenter"
             name="%command_tourChart_tool_tourSegmenter">
       </command>
       
       
       <command
-            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourProperties"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerTourDataEditor"
             id="net.tourbook.command.tourDataEditor"
             name="%command_view_tourEditor">
       </command>
@@ -812,6 +819,10 @@
             defaultHandler="net.tourbook.ui.views.tagging.ActionHandlerOpenTaggingView"
             id="net.tourbook.mapping.command.taggingView"
             name="%command_tagging_name">
+      </command>
+      <command
+            id="net.tourbook.command.createNewTour"
+            name="%command_createNewTour_label">
       </command>
    </extension>
    

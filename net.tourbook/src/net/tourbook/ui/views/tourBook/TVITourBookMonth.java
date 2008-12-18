@@ -50,27 +50,28 @@ public class TVITourBookMonth extends TVITourBookItem {
 		final String sqlString = "" + // //$NON-NLS-1$
 				//
 				"SELECT " //		//$NON-NLS-1$
-				+ "startYear," //			1	//$NON-NLS-1$
-				+ "startMonth," //			2	//$NON-NLS-1$
-				+ "startDay," //			3	//$NON-NLS-1$
-				+ "tourDistance," //		4	//$NON-NLS-1$
-				+ "tourRecordingTime," //	5	//$NON-NLS-1$
-				+ "tourDrivingTime," //		6	//$NON-NLS-1$
-				+ "tourAltUp," //			7	//$NON-NLS-1$
-				+ "tourAltDown," //			8	//$NON-NLS-1$
-				+ "startDistance," //		9	//$NON-NLS-1$
-				+ "tourID," //				10	//$NON-NLS-1$
-				+ "tourType_typeId," //		11	//$NON-NLS-1$
-				+ "tourTitle," //			12	//$NON-NLS-1$
-				+ "deviceTimeInterval," //	13	//$NON-NLS-1$
-				+ "maxSpeed," //			14	//$NON-NLS-1$
-				+ "maxAltitude," //			15	//$NON-NLS-1$
-				+ "maxPulse," //			16	//$NON-NLS-1$
-				+ "avgPulse," //			17	//$NON-NLS-1$
-				+ "avgCadence," //			18	//$NON-NLS-1$
-				+ "avgTemperature," //		19	//$NON-NLS-1$
-
-				+ "jTdataTtag.TourTag_tagId"//	20	//$NON-NLS-1$ 
+				+ "startYear," //				1	//$NON-NLS-1$
+				+ "startMonth," //				2	//$NON-NLS-1$
+				+ "startDay," //				3	//$NON-NLS-1$
+				+ "tourDistance," //			4	//$NON-NLS-1$
+				+ "tourRecordingTime," //		5	//$NON-NLS-1$
+				+ "tourDrivingTime," //			6	//$NON-NLS-1$
+				+ "tourAltUp," //				7	//$NON-NLS-1$
+				+ "tourAltDown," //				8	//$NON-NLS-1$
+				+ "startDistance," //			9	//$NON-NLS-1$
+				+ "tourID," //					10	//$NON-NLS-1$
+				+ "tourType_typeId," //			11	//$NON-NLS-1$
+				+ "tourTitle," //				12	//$NON-NLS-1$
+				+ "deviceTimeInterval," //		13	//$NON-NLS-1$
+				+ "maxSpeed," //				14	//$NON-NLS-1$
+				+ "maxAltitude," //				15	//$NON-NLS-1$
+				+ "maxPulse," //				16	//$NON-NLS-1$
+				+ "avgPulse," //				17	//$NON-NLS-1$
+				+ "avgCadence," //				18	//$NON-NLS-1$
+				+ "avgTemperature," //			19	//$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId,"//	20	//$NON-NLS-1$ 
+				+ "startHour," //				21	//$NON-NLS-1$
+				+ "startMinute" //				22	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -132,9 +133,6 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.fTourMonth = dbMonth;
 					tourItem.fTourDay = dbDay;
 
-					fCalendar.set(dbYear, dbMonth - 1, dbDay);
-					tourItem.fTourDate = fCalendar.getTimeInMillis();
-
 					tourItem.colDistance = result.getLong(4);
 					tourItem.colRecordingTime = result.getLong(5);
 					tourItem.colDrivingTime = result.getLong(6);
@@ -142,25 +140,30 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.colAltitudeDown = result.getLong(8);
 
 					tourItem.fColumnStartDistance = result.getLong(9);
-
 					final Object tourTypeId = result.getObject(11);
-					tourItem.fTourTypeId = (tourTypeId == null ? //
-							TourDatabase.ENTITY_IS_NOT_SAVED
-							: (Long) tourTypeId);
-
 					tourItem.fTourTitle = result.getString(12);
 					tourItem.fColumnTimeInterval = result.getShort(13);
+
 					tourItem.colMaxSpeed = result.getFloat(14);
-
-					if (tourItem.colDrivingTime != 0) {
-						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) tourItem.colDrivingTime * 3.6f;
-					}
-
 					tourItem.colMaxAltitude = result.getLong(15);
 					tourItem.colMaxPulse = result.getLong(16);
 					tourItem.colAvgPulse = result.getLong(17);
 					tourItem.colAvgCadence = result.getLong(18);
 					tourItem.colAvgTemperature = result.getLong(19);
+
+					final int dbHour = result.getInt(21);
+					final int dbMinute = result.getInt(22);
+
+					fCalendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
+					tourItem.fTourDate = fCalendar.getTimeInMillis();
+
+					tourItem.fTourTypeId = (tourTypeId == null ? //
+							TourDatabase.ENTITY_IS_NOT_SAVED
+							: (Long) tourTypeId);
+
+					if (tourItem.colDrivingTime != 0) {
+						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) tourItem.colDrivingTime * 3.6f;
+					}
 
 					if (resultTagId instanceof Long) {
 						tourItem.fTagIds = tagIds = new ArrayList<Long>();

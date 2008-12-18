@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
@@ -126,7 +128,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	TourPerson								fActivePerson;
 	TourTypeFilter							fActiveTourTypeFilter;
 
-	public NumberFormat						fNF											= NumberFormat.getNumberInstance();
+	private NumberFormat					fNF											= NumberFormat.getNumberInstance();
+	private Calendar						fCalendar									= GregorianCalendar.getInstance();
+	private DateFormat						fTimeFormatter								= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private ActionEditQuick					fActionEditQuick;
 
@@ -140,7 +144,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
 
-	private ActionSetTourTypeMenu				fActionSetTourType;
+	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionSetTourTag				fActionAddTag;
 	private ActionSetTourTag				fActionRemoveTag;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
@@ -233,9 +237,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBookView.this) {
-					
+
 					saveState();
-					
+
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourBookView.this);
 				}
 			}
@@ -539,6 +543,28 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 
 		/*
+		 * column: time
+		 */
+		colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					
+					final long tourDate = ((TVITourBookTour) element).fTourDate;
+
+					fCalendar.setTimeInMillis(tourDate);
+
+					cell.setText(fTimeFormatter.format(fCalendar.getTime()));
+
+					setCellColor(cell, element);
+				}
+			}
+		});
+
+		/*
 		 * column: tour type
 		 */
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
@@ -599,9 +625,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
 
-				cell.setText(new Formatter().format(Messages.Format_hhmm,
-						(recordingTime / 3600),
-						((recordingTime % 3600) / 60)).toString());
+				cell.setText(UI.format_hh_mm(recordingTime).toString());
+
+//				cell.setText(new Formatter().format(Messages.Format_hhmm,
+//						(recordingTime / 3600),
+//						((recordingTime % 3600) / 60)).toString());
 
 				setCellColor(cell, element);
 			}
@@ -618,9 +646,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
 
-				cell.setText(new Formatter().format(Messages.Format_hhmm,
-						(drivingTime / 3600),
-						((drivingTime % 3600) / 60)).toString());
+				cell.setText(UI.format_hh_mm(drivingTime).toString());
 
 				setCellColor(cell, element);
 			}
