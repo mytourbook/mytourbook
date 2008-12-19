@@ -15,26 +15,18 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 public class ActionHandlerTourDataEditor extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()//
-					.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+		UI.openTourEditor(true);
 
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
 		return null;
 	}
 

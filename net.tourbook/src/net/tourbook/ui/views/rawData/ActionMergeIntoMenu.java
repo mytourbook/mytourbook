@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -48,7 +49,7 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 
 	public ActionMergeIntoMenu(final RawDataView rawDataView) {
 
-		super(Messages.import_data_action_assignMergedTour, AS_DROP_DOWN_MENU);
+		super(UI.EMPTY_STRING, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fRawDataView = rawDataView;

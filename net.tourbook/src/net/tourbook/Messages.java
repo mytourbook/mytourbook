@@ -309,6 +309,8 @@ public class Messages extends NLS {
 
 	public static String		import_data_action_assignMergedTour;
 
+	public static String	import_data_action_assignMergedTour_default;
+
 	public static String		import_data_action_assignMergedTour_tooltip;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
@@ -575,7 +577,8 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag_category;
 
 	public static String		tour_data_label_device_marker;
-	public static String		tour_data_label_feature_since_version_8_12;
+
+	public static String	tour_data_label_feature_since_version_9_01;
 	public static String		tour_data_label_manually_created_tour;
 
 	public static String		tour_database_version_info_message;
@@ -646,6 +649,10 @@ public class Messages extends NLS {
 	public static String		tour_merger_btn_reset_values;
 
 	public static String	tour_merger_btn_reset_values_tooltip;
+	public static String	tour_merger_chk_adjust_altitude_from_source;
+
+	public static String	tour_merger_chk_adjust_altitude_from_source_tooltip;
+
 	public static String	tour_merger_chk_adjust_start_altitude;
 
 	public static String	tour_merger_chk_adjust_start_altitude_tooltip;

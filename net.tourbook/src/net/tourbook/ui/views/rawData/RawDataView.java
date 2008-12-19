@@ -42,7 +42,6 @@ import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.DialogMergeTours;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -967,6 +966,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		int savedTours = 0;
 		int unsavedTours = 0;
+
+		// contains all tours which are selected and not deleted
 		int selectedValidTours = 0;
 
 		TourData firstSavedTour = null;
@@ -1028,7 +1029,31 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		fActionSaveTour.setEnabled(unsavedTours > 0);
 
+		// action: merge tour ... into ...
+		if (canMergeIntoTour) {
+
+			final Calendar calendar = GregorianCalendar.getInstance();
+			calendar.set(firstValidTour.getStartYear(),
+					firstValidTour.getStartMonth() - 1,
+					firstValidTour.getStartDay(),
+					firstValidTour.getStartHour(),
+					firstValidTour.getStartMinute());
+
+			final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
+					.append(TourManager.getTourDateShort(firstValidTour))
+					.append(UI.DASH_WITH_SPACE)
+					.append(TourManager.getTourTimeShort(firstValidTour))
+					.append(UI.DASH_WITH_SPACE)
+					.append(firstValidTour.getDeviceName());
+
+			fActionMergeIntoTour.setText(NLS.bind(Messages.import_data_action_assignMergedTour, sb.toString()));
+
+		} else {
+			// tour cannot be merged, display default text
+			fActionMergeIntoTour.setText(Messages.import_data_action_assignMergedTour_default);
+		}
 		fActionMergeIntoTour.setEnabled(canMergeIntoTour);
+
 		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeFromTourId() != null);
 
 		fActionEditTour.setEnabled(isOneSavedAndValidTour);
@@ -1321,19 +1346,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
-//	public void reloadViewer() {
-//		
-//		// this will reimport files
-//
-//		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
-//
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//				importFiles();
-//			}
-//		});
-//	}
-
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
@@ -1350,6 +1362,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTourViewer;
 	}
 
+//	public void reloadViewer() {
+//		
+//		// this will reimport files
+//
+////		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+//
+//		Display.getCurrent().asyncExec(new Runnable() {
+//			public void run() {
+//				importFiles();
+//			}
+//		});
+//	}
+	
 	public void reloadViewer() {
 
 		// update tour data viewer

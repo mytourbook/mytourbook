@@ -548,7 +548,8 @@ public class UI {
 
 	/**
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-	 * modified
+	 * modified. A message dialog informs the user about the modified tour and the requested actions
+	 * cannot be done.
 	 * 
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
@@ -589,35 +590,44 @@ public class UI {
 		}
 	}
 
-	public static void openTourEditor(final boolean isActive) {
+	public static TourDataEditorView openTourEditor(final boolean isActive) {
+
+		IViewPart viewPart = null;
+
+		TourDataEditorView tourEditor = null;
 
 		try {
-			final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			final IWorkbenchPage page = wbWindow.getActivePage();
+
+			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 			final String viewId = TourDataEditorView.ID;
+			viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
 
-			final IViewPart viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
+			if (viewPart instanceof TourDataEditorView) {
+				tourEditor = (TourDataEditorView) viewPart;
 
-			if (isActive) {
+				if (isActive) {
 
-				page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+					page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-			} else if (page.isPartVisible(viewPart) == false || isActive) {
+				} else if (page.isPartVisible(viewPart) == false || isActive) {
 
-				page.bringToTop(viewPart);
-			}
-
+					page.bringToTop(viewPart);
+				}
 // this does not restore the part when it's in a fast view
 //
 //			final IWorkbenchPartReference partRef = page.getReference(viewPart);
 //			final int partState = page.getPartState(partRef);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
+				
+			}
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
+
+		return tourEditor;
 	}
 
 	/**

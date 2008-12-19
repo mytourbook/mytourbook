@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.views.rawData;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -27,6 +27,11 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
@@ -103,14 +108,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 	 * save actions
 	 */
 	private Button					fChkKeepHVAdjustments;
-
+	private Button					fChkAdjustAltitudeFromSource;
 	private Button					fChkAdjustStartAltitude;
+	private Button					fChkMergeTemperature;
+
 	private Label					fLblAdjustAltiValueTimeUnit;
 	private Label					fLblAdjustAltiValueDistanceUnit;
-
 	private Label					fLblAdjustAltiValueTime;
 	private Label					fLblAdjustAltiValueDistance;
-	private Button					fChkMergeTemperature;
 
 	private Button					fChkSetTourType;
 	private Link					fTourTypeLink;
@@ -286,70 +291,104 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 		final int xMergeOffset = fIntoTourData.getMergedTourTimeOffset();
 		final int yMergeOffset = fIntoTourData.getMergedAltitudeOffset();
 
-		final int[] intoTimeSerie = fIntoTourData.timeSerie;
-		final int[] intoDistanceSerie = fIntoTourData.distanceSerie;
-		final int[] intoAltitudeSerie = fIntoTourData.altitudeSerie;
+		final int[] targetTimeSerie = fIntoTourData.timeSerie;
+		final int[] targetDistanceSerie = fIntoTourData.distanceSerie;
+		final int[] targetAltitudeSerie = fIntoTourData.altitudeSerie;
 
-		final int[] fromTimeSerie = fFromTourData.timeSerie;
-		final int[] fromAltitudeSerie = fFromTourData.altitudeSerie;
-		final int[] fromTemperatureSerie = fFromTourData.temperatureSerie;
+		final int[] sourceTimeSerie = fFromTourData.timeSerie;
+		final int[] sourceAltitudeSerie = fFromTourData.altitudeSerie;
+		final int[] sourceTemperatureSerie = fFromTourData.temperatureSerie;
 
 		// check if the data series are available
-		final boolean isIntoDistance = intoDistanceSerie != null;
-		final boolean isFromTemperature = fromTemperatureSerie != null;
+		final boolean isIntoDistance = targetDistanceSerie != null;
+		final boolean isFromTemperature = sourceTemperatureSerie != null;
 
-		final int lastFromIndex = fromTimeSerie.length - 1;
-		final int serieLength = intoTimeSerie.length;
+		final int lastFromIndex = sourceTimeSerie.length - 1;
+		final int serieLength = targetTimeSerie.length;
 
-		final int[] newFromTimeSerie = new int[serieLength];
-		final int[] newFromAltitudeSerie = new int[serieLength];
-		final int[] newFromAltiDiffSerie = new int[serieLength];
+		final int[] newSourceTimeSerie = new int[serieLength];
+		final int[] newSourceAltitudeSerie = new int[serieLength];
+		final int[] newSourceAltiDiffSerie = new int[serieLength];
 
 		final int[] newIntoTemperatureSerie = new int[serieLength];
 
-		int fromIndex = 0;
-		int fromTime = fromTimeSerie[0] + xMergeOffset;
+		int sourceIndex = 0;
+
+		int sourceTime = sourceTimeSerie[0] + xMergeOffset;
+		int sourceAltitude = sourceAltitudeSerie[0] + yMergeOffset;
+
+		int prevSourceTime = 0;
+		int prevSourceAlti = sourceAltitude;
+		int newSourceAltitude = sourceAltitude;
+
+		int targetTime = targetTimeSerie[0];
+		int targetAltitude = targetAltitudeSerie[0];
 
 		/*
-		 * create new time/distance serie for the from tour according to the time of the into tour
+		 * create new time/distance serie for the source tour according to the time of the target
+		 * tour
 		 */
-		for (int intoIndex = 0; intoIndex < serieLength; intoIndex++) {
+		for (int targetIndex = 0; targetIndex < serieLength; targetIndex++) {
 
-			final int intoTime = intoTimeSerie[intoIndex];
+			targetTime = targetTimeSerie[targetIndex];
 
 			/*
-			 * time in the merged tour (into...) is the leading time
+			 * target tour is the leading data serie, move time forward for the source time
 			 */
-			while (fromTime < intoTime) {
+			while (sourceTime < targetTime) {
 
-				fromIndex++;
+				sourceIndex++;
 
 				// check array bounds
-				fromIndex = (fromIndex <= lastFromIndex) ? fromIndex : lastFromIndex;
+				sourceIndex = (sourceIndex <= lastFromIndex) ? sourceIndex : lastFromIndex;
 
-				if (fromIndex == lastFromIndex) {
+				if (sourceIndex == lastFromIndex) {
 					//prevent endless loops
 					break;
 				}
 
-				fromTime = fromTimeSerie[fromIndex] + xMergeOffset;
+				prevSourceTime = sourceTime;
+				prevSourceAlti = sourceAltitude;
+
+				sourceTime = sourceTimeSerie[sourceIndex] + xMergeOffset;
+				sourceAltitude = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
 			}
 
-			final int intoAltitude = intoAltitudeSerie[intoIndex];
-			final int fromAltitude = fromAltitudeSerie[fromIndex] + yMergeOffset;
+			targetAltitude = targetAltitudeSerie[targetIndex];
 
-			newFromTimeSerie[intoIndex] = intoTime;
+			/**
+			 * do linear interpolation for the altitude
+			 * <p>
+			 * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
+			 */
+			final int x1 = prevSourceTime;
+			final int x2 = targetTime;
+			final int x3 = sourceTime;
+			final int y1 = prevSourceAlti;
+			final int y3 = sourceAltitude;
 
-			newFromAltitudeSerie[intoIndex] = fromAltitude;
-			newFromAltiDiffSerie[intoIndex] = fromAltitude - intoAltitude;
+			final int xQ1 = x2 - x1;
+			final int xQ2 = x3 - x1;
+			final int yQ1 = y3 - y1;
+
+			if (xQ2 == 0) {
+				newSourceAltitude = prevSourceAlti;
+			} else {
+				newSourceAltitude = xQ1 * yQ1 / xQ2 + y1;
+			}
+
+			newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
+			newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitude;
+
+			newSourceTimeSerie[targetIndex] = targetTime;
 
 			if (isFromTemperature) {
-				newIntoTemperatureSerie[intoIndex] = fromTemperatureSerie[fromIndex];
+				newIntoTemperatureSerie[targetIndex] = sourceTemperatureSerie[sourceIndex];
 			}
 		}
 
-		fFromTourData.mergeAltitudeSerie = newFromAltitudeSerie;
-		fFromTourData.mergeAltitudeDiff = newFromAltiDiffSerie;
+		fFromTourData.mergeAltitudeSerie = newSourceAltitudeSerie;
+		fFromTourData.mergeAltitudeDiff = newSourceAltiDiffSerie;
 
 		if (isFromTemperature) {
 			fIntoTourData.temperatureSerie = newIntoTemperatureSerie;
@@ -362,9 +401,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			final int[] adjustedIntoAltitudeSerie = new int[serieLength];
 
-			float startAltiDiff = newFromAltiDiffSerie[0];
+			float startAltiDiff = newSourceAltiDiffSerie[0];
 			final int endIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
-			final float distanceDiff = intoDistanceSerie[endIndex];
+			final float distanceDiff = targetDistanceSerie[endIndex];
 
 			final int[] altitudeSerie = fIntoTourData.altitudeSerie;
 
@@ -374,13 +413,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 					// add adjusted altitude
 
-					final float intoDistance = intoDistanceSerie[serieIndex];
+					final float intoDistance = targetDistanceSerie[serieIndex];
 					final float distanceScale = 1 - intoDistance / distanceDiff;
 					final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
 					final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
 					adjustedIntoAltitudeSerie[serieIndex] = newAltitude;
-					newFromAltiDiffSerie[serieIndex] = newFromAltitudeSerie[serieIndex] - newAltitude;
+					newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
 
 				} else {
 
@@ -395,9 +434,19 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 			startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
 
 			// meter/min
-			altiDiffTime = startAltiDiff / (intoTimeSerie[endIndex] / 60);
+			altiDiffTime = startAltiDiff / (targetTimeSerie[endIndex] / 60);
 			// meter/meter
-			altiDiffDist = ((startAltiDiff * 1000) / intoDistanceSerie[endIndex]) / UI.UNIT_VALUE_DISTANCE;
+			altiDiffDist = ((startAltiDiff * 1000) / targetDistanceSerie[endIndex]) / UI.UNIT_VALUE_DISTANCE;
+
+		} else if (fChkAdjustAltitudeFromSource.getSelection() && isIntoDistance) {
+
+			final int[] newTargetAltitudeSerie = new int[serieLength];
+
+			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+				newTargetAltitudeSerie[serieIndex] = newSourceAltitudeSerie[serieIndex];
+			}
+
+			fFromTourData.mergeAdjustedAltitudeSerie = newTargetAltitudeSerie;
 
 		} else {
 
@@ -527,9 +576,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		createUISectionDisplayOptions(optionContainer);
 		createUISectionSaveActions(optionContainer);
-
-		// reset buttons
-		createUISectionResetButtons(dlgContainer);
 	}
 
 	/**
@@ -698,6 +744,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 		createUIGroupHorizAdjustment(container);
 		createUIGroupVertAdjustment(container);
+		createUISectionResetButtons(container);
 	}
 
 	private void createUISectionDisplayOptions(final Composite parent) {
@@ -821,6 +868,23 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 		});
 
 		/*
+		 * checkbox: adjust altitude from source
+		 */
+		fChkAdjustAltitudeFromSource = new Button(group, SWT.CHECK);
+		fChkAdjustAltitudeFromSource.setText(Messages.tour_merger_chk_adjust_altitude_from_source);
+		fChkAdjustAltitudeFromSource.setToolTipText(Messages.tour_merger_chk_adjust_altitude_from_source_tooltip);
+		fChkAdjustAltitudeFromSource.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				// only one altitude adjustment can be done
+				fChkAdjustStartAltitude.setSelection(false);
+
+				onModifyProperties();
+			}
+		});
+
+		/*
 		 * checkbox: adjust start altitude
 		 */
 		fChkAdjustStartAltitude = new Button(group, SWT.CHECK);
@@ -829,6 +893,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 		fChkAdjustStartAltitude.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
+
+				// only one altitude adjustment can be done
+				fChkAdjustAltitudeFromSource.setSelection(false);
 
 				final boolean isAdjustAltitude = fChkAdjustStartAltitude.getSelection();
 				if (isAdjustAltitude) {
@@ -855,7 +922,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 				.applyTo(fLblAdjustAltiValueTime);
 
 		fLblAdjustAltiValueTimeUnit = new Label(aaContainer, SWT.NONE);
-		fLblAdjustAltiValueTimeUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/min");
+		fLblAdjustAltiValueTimeUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/min"); //$NON-NLS-1$
 
 		fLblAdjustAltiValueDistance = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory.fillDefaults()
@@ -863,7 +930,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 				.applyTo(fLblAdjustAltiValueDistance);
 
 		fLblAdjustAltiValueDistanceUnit = new Label(aaContainer, SWT.NONE);
-		fLblAdjustAltiValueDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE);
+		fLblAdjustAltiValueDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
 
 		/*
 		 * checkbox: set tour type
@@ -1251,8 +1318,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider {
 
 			// adjusted alti is disabled
 
-			fLblAdjustAltiValueTime.setText("N/A");
-			fLblAdjustAltiValueDistance.setText("N/A");
+			fLblAdjustAltiValueTime.setText("N/A"); //$NON-NLS-1$
+			fLblAdjustAltiValueDistance.setText("N/A"); //$NON-NLS-1$
 
 		} else {
 

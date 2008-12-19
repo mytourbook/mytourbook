@@ -821,8 +821,9 @@
             name="%command_tagging_name">
       </command>
       <command
+            defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
             id="net.tourbook.command.createNewTour"
-            name="%command_createNewTour_label">
+            name="%command_createNewTour">
       </command>
    </extension>
    

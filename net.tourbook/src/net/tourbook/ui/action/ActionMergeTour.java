@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.DialogMergeTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.rawData.DialogMergeTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;

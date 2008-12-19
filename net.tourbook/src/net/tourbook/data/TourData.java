@@ -2948,7 +2948,7 @@ public class TourData implements Comparable<Object> {
 			if (isManualTour()) {
 				return UI.EMPTY_STRING;
 			} else {
-				return Messages.tour_data_label_feature_since_version_8_12;
+				return Messages.tour_data_label_feature_since_version_9_01;
 			}
 		} else {
 			return tourImportFilePath;

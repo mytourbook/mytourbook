@@ -815,7 +815,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Creates a new manually created tour, editor must not be dirty before this action is called
 	 */
-	void actionCreateTour() {
+	public void actionCreateTour() {
 
 		// check if a person is selected
 		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
@@ -2299,18 +2299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fScrolledTabInfo.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-
-				// horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
-				int infoContainerWidth = fScrolledTabInfo.getBounds().width;
-				final ScrollBar vertBar = fScrolledTabInfo.getVerticalBar();
-				if (vertBar != null) {
-					// vertical bar is displayed
-					infoContainerWidth -= vertBar.getSize().x;
-				}
-
-				final Point minSize = fInfoContainer.computeSize(infoContainerWidth, SWT.DEFAULT);
-
-				fScrolledTabInfo.setMinSize(minSize);
+				onResizeTabInfo();
 			}
 		});
 
@@ -3715,6 +3704,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	private void onResizeTabInfo() {
+
+		// horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
+		int infoContainerWidth = fScrolledTabInfo.getBounds().width;
+		final ScrollBar vertBar = fScrolledTabInfo.getVerticalBar();
+		if (vertBar != null) {
+			// vertical bar is displayed
+			infoContainerWidth -= vertBar.getSize().x;
+		}
+
+		final Point minSize = fInfoContainer.computeSize(infoContainerWidth, SWT.DEFAULT);
+
+		fScrolledTabInfo.setMinSize(minSize);
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (fIsSavingInProgress) {
@@ -4485,6 +4489,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+//	/**
+//	 * update each tab separately
+//	 */
+//	private void updateUITab() {
+//
+////		final CTabItem selectedTab = fTabFolder.getSelection();
+////
+////		if (selectedTab == fTabTour) {
+////			updateUITabTour();
+////		} else if (selectedTab == fTabMarker) {
+////			updateUITabMarker();
+////		} else if (selectedTab == fTabSlices) {
+////			updateUITabSlices();
+////		} else if (selectedTab == fTabInfo) {
+////			updateUITabInfo();
+////		}
+//
+//	}
+
 	private void updateRefTourInfo(final Collection<TourReference> refTours) {
 
 		final ArrayList<TourReference> refTourList = new ArrayList<TourReference>(refTours);
@@ -4525,25 +4548,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTextRefTour.setText(sb.toString());
 		fTextRefTour.pack(true);
 	}
-
-//	/**
-//	 * update each tab separately
-//	 */
-//	private void updateUITab() {
-//
-////		final CTabItem selectedTab = fTabFolder.getSelection();
-////
-////		if (selectedTab == fTabTour) {
-////			updateUITabTour();
-////		} else if (selectedTab == fTabMarker) {
-////			updateUITabMarker();
-////		} else if (selectedTab == fTabSlices) {
-////			updateUITabSlices();
-////		} else if (selectedTab == fTabInfo) {
-////			updateUITabInfo();
-////		}
-//
-//	}
 
 	private void updateStatusLine() {
 
@@ -4844,7 +4848,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * layout container to resize the labels
 		 */
-		fInfoContainer.layout(true);
+//		fInfoContainer.layout(true);
+		onResizeTabInfo();
 	}
 
 	private void updateUITabMarker() {
