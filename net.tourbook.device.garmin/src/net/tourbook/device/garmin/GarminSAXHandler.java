@@ -56,6 +56,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String		TAG_TIME					= "Time";														//$NON-NLS-1$
 	private static final String		TAG_VALUE					= "Value";														//$NON-NLS-1$
 
+	private static final String		DEFALULT_UNIQUE_KEY			= "42984";														//$NON-NLS-1$
+
 	private static final Calendar	fCalendar					= GregorianCalendar.getInstance();
 	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
 
@@ -636,9 +638,14 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 		if (distanceSerie == null) {
-			uniqueKey = "42984"; //$NON-NLS-1$
+			uniqueKey = DEFALULT_UNIQUE_KEY;
 		} else {
-			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+			final int lastDistance = distanceSerie[distanceSerie.length - 1];
+			if (lastDistance < 0) {
+				uniqueKey = DEFALULT_UNIQUE_KEY;
+			} else {
+				uniqueKey = Integer.toString(lastDistance);
+			}
 		}
 		final Long tourId = tourData.createTourId(uniqueKey);
 
