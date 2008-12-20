@@ -180,6 +180,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// save actions
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ADJUST_START_ALTITUDE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_TEMPERATURE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_LINEAR_INTERPOLATION, false);
 
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);

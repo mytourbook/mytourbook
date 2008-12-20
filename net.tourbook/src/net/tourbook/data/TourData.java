@@ -2128,7 +2128,7 @@ public class TourData implements Comparable<Object> {
 			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
 			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
-			tourIdKey = Short.toString(getStartYear())
+ 			tourIdKey = Short.toString(getStartYear())
 					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())

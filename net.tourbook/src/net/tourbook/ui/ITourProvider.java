@@ -30,4 +30,5 @@ public interface ITourProvider {
 	 */
 	ArrayList<TourData> getSelectedTours();
 
+
 }

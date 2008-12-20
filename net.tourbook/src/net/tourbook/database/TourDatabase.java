@@ -124,11 +124,11 @@ public class TourDatabase {
 	private static EntityManagerFactory			emFactory;
 
 	private ComboPooledDataSource				fPooledDataSource;
+
 	private static ArrayList<TourType>			fActiveTourTypes;
-
 	private static ArrayList<TourType>			fTourTypes;
+	
 	private static HashMap<Long, TourTag>		fTourTags;
-
 	private static HashMap<Long, TagCollection>	fTagCollections;
 
 	private boolean								fIsTableChecked;
@@ -2298,7 +2298,7 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedAltitudeOffset	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
-			
+
 			statement.close();
 
 		} catch (final SQLException e) {

@@ -653,6 +653,10 @@ public class Messages extends NLS {
 
 	public static String	tour_merger_chk_adjust_altitude_from_source_tooltip;
 
+	public static String	tour_merger_chk_adjust_altitude_linear_interpolition;
+
+	public static String	tour_merger_chk_adjust_altitude_linear_interpolition_tooltip;
+
 	public static String	tour_merger_chk_adjust_start_altitude;
 
 	public static String	tour_merger_chk_adjust_start_altitude_tooltip;

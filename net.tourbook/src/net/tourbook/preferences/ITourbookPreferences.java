@@ -181,4 +181,6 @@ public interface ITourbookPreferences {
 	public static final String	MERGE_TOUR_SET_TOUR_TYPE					= "merge.tour.set-tour-type-for-merge-from-tour";			//$NON-NLS-1$
 	public static final String	MERGE_TOUR_SET_TOUR_TYPE_ID					= "merge.tour.set-tour-type-id";							//$NON-NLS-1$
 
+	public static final String	MERGE_TOUR_LINEAR_INTERPOLATION				= "merge.tour.use-linear-interpolation";					//$NON-NLS-1$
+
 }

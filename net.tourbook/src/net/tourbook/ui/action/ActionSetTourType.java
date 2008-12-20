@@ -23,6 +23,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -35,6 +36,7 @@ class ActionSetTourType extends Action {
 
 	private TourType		fTourType;
 	private ITourProvider	fTourProvider;
+
 	private boolean			fIsSaveTour;
 
 	/**
@@ -85,7 +87,11 @@ class ActionSetTourType extends Action {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+					if (fTourProvider instanceof ITourProvider2) {
+						((ITourProvider2) fTourProvider).toursAreModified(selectedTours);
+					} else {
+						TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+					}
 				}
 			}
 		};

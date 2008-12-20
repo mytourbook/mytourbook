@@ -103,7 +103,7 @@ public class ChartMergeLayer implements IChartLayer {
 
 		// get alti diff scaling
 		if (fIsRelativeAltiDiffScaling) {
-			altiDiffScaling = maxAltiDiff == 0 ? scaleY : (float) devGraphHeight / maxAltiDiff;
+			altiDiffScaling = maxAltiDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxAltiDiff;
 		}
 
 		// position for the x-axis line in the graph
@@ -156,7 +156,6 @@ public class ChartMergeLayer implements IChartLayer {
 					 * chart
 					 */
 					pathAdjustAlti.lineTo(devXValue, devYBottom);
-//					pathAlti.moveTo(0, devYBottom);
 				}
 			}
 
@@ -229,7 +228,7 @@ public class ChartMergeLayer implements IChartLayer {
 //		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
 		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
 		gc.setForeground(colorFg);
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		gc.drawPath(pathAltiDiff);
 		colorFg.dispose();

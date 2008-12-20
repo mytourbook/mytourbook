@@ -620,7 +620,7 @@ public class UI {
 //			final int partState = page.getPartState(partRef);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
 //			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
-				
+
 			}
 
 		} catch (final PartInitException e) {
@@ -928,6 +928,9 @@ public class UI {
 		// keep image in cache
 		fImageCache.put(colorId, transparentImage);
 
+//		System.out.println("createTourTypeImage:" + transparentImage);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		return transparentImage;
 	}
 
@@ -1023,8 +1026,10 @@ public class UI {
 		if (existingImage != null && existingImage.isDisposed() == false) {
 
 			// check if the image is dirty
-
 			if (fDirtyImages.size() == 0 || fDirtyImages.containsKey(keyColorId) == false) {
+
+//				System.out.println("existingImage:" + System.identityHashCode(existingImage));
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				// image is available and not dirty
 				return existingImage;
@@ -1039,7 +1044,7 @@ public class UI {
 
 		} else {
 
-			// old tour type image is available and not disposed but is dirty, update the image
+			// old tour type image is available and not disposed but needs to be updated
 
 			return updateTourTypeImage(existingImage, typeId, keyColorId);
 		}
@@ -1047,7 +1052,8 @@ public class UI {
 	}
 
 	/**
-	 * dispose all tour type images
+	 * set dirty state for all tour type images, images cannot be disposed because they are
+	 * displayed in the UI
 	 */
 	public void setTourTypeImagesDirty() {
 
@@ -1056,13 +1062,7 @@ public class UI {
 			final String imageId = iterator.next();
 
 			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
-
 				fDirtyImages.put(imageId, true);
-
-//				fImageCache.get(imageId).dispose();
-//				iterator.remove();
-
-//				System.out.println("setTourTypeImagesDirty:\t" + imageId);
 			}
 		}
 	}
@@ -1105,8 +1105,8 @@ public class UI {
 
 		fDirtyImages.remove(keyColorId);
 
-//		// keep image in cache
-//		fImageCache.put(keyColorId, transparentImage);
+//		System.out.println("updateTourTypeImage:" + existingImage);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return existingImage;
 	}

@@ -342,7 +342,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 					// update tour type in the raw data
 					RawDataManager.getInstance().updateTourDataFromDb();
 
-					fTourViewer.refresh();
+//					fTourViewer.refresh();x
+					reloadViewer();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -683,7 +684,16 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				if (tourType == null) {
 					cell.setImage(null);
 				} else {
-					cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+//					final byte[] imageData = tourTypeImage.getImageData().data;
+//					final StringBuilder sb = new StringBuilder();
+//					for (final byte b : imageData) {
+//						sb.append(b);
+//					}
+//					System.out.println("raw:" + sb.toString());
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					cell.setImage(tourTypeImage);
 				}
 			}
 		});
@@ -1343,7 +1353,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		if (notImportedFiles.size() > 0) {
 			RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
 		}
-
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
@@ -1362,21 +1371,27 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTourViewer;
 	}
 
-//	public void reloadViewer() {
-//		
-//		// this will reimport files
-//
-////		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
-//
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//				importFiles();
-//			}
-//		});
-//	}
-	
+	public void reimportViewer() {
+		
+		// reimport previous imported files
+
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+		
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				
+				importFiles();
+				
+				// reselect tour vierwer to fire selection
+				fTourViewer.setSelection(fTourViewer.getSelection());
+			}
+		});
+	}
+
 	public void reloadViewer() {
 
+//		fTourViewer.getTable().removeAll();
+		
 		// update tour data viewer
 		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
 	}

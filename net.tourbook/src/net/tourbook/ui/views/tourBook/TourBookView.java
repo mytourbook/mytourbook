@@ -90,6 +90,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -574,7 +575,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setImage(UI.getInstance().getTourTypeImage(((TVITourBookTour) element).getTourTypeId()));
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(((TVITourBookTour) element).getTourTypeId());
+//					final byte[] imageData = tourTypeImage.getImageData().data;
+//					final StringBuilder sb = new StringBuilder();
+//					for (final byte b : imageData) {
+//						sb.append(b);
+//					}
+//					System.out.println("boo:" + sb.toString());
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					cell.setImage(tourTypeImage);
 				}
 			}
 		});
