@@ -833,11 +833,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		fCalendar.setTimeInMillis(System.currentTimeMillis());
 
-		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
+		tourData.setStartSecond((short) fCalendar.get(Calendar.SECOND));
+
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
+		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
+		
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		// create tour id
@@ -1893,7 +1896,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		tk.createLabel(tourDtContainer, Messages.tour_editor_label_start_time);
 
-		fDtStartTime = new DateTime(tourDtContainer, SWT.TIME | SWT.SHORT | SWT.BORDER);
+		fDtStartTime = new DateTime(tourDtContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(fDtStartTime);
 		tk.adapt(fDtStartTime, true, false);
 		fDtStartTime.addSelectionListener(fDateTimeListener);
@@ -4595,6 +4598,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			fTourData.setStartHour((short) fDtStartTime.getHours());
 			fTourData.setStartMinute((short) fDtStartTime.getMinutes());
+			fTourData.setStartSecond((short) fDtStartTime.getSeconds());
 
 			// set week of year
 			fCalendar.set(fTourData.getStartYear(), fTourData.getStartMonth() - 1, fTourData.getStartDay());
@@ -4901,7 +4905,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fDtTourDate.setDate(tourYear, tourMonth, tourDay);
 
 		// start time
-		fDtStartTime.setTime(fTourData.getStartHour(), fTourData.getStartMinute(), 0);
+		fDtStartTime.setTime(fTourData.getStartHour(), fTourData.getStartMinute(), fTourData.getStartSecond());
 
 		// tour distance
 		final int tourDistance = fTourData.getTourDistance();
@@ -4947,7 +4951,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				fDtTourDate.getMonth(),
 				fDtTourDate.getDay(),
 				fDtStartTime.getHours(),
-				fDtStartTime.getMinutes());
+				fDtStartTime.getMinutes(),
+				fDtStartTime.getSeconds());
 	}
 
 	/**
@@ -4958,14 +4963,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @param tourDay
 	 * @param hour
 	 * @param minute
+	 * @param seconds
 	 */
 	private void updateUITitle(	final int tourYear,
 								final int tourMonth,
 								final int tourDay,
 								final int hour,
-								final int minute) {
+								final int minute,
+								final int seconds) {
 
-		fCalendar.set(tourYear, tourMonth, tourDay, hour, minute);
+		fCalendar.set(tourYear, tourMonth, tourDay, hour, minute, seconds);
 
 		updateUITitleAsynch(TourManager.getTourTitle(fCalendar.getTime()));
 	}

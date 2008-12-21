@@ -1446,6 +1446,7 @@ public class TourDatabase {
 				+ "mergeIntoTourId				BIGINT,				\n" //$NON-NLS-1$
 				+ "mergedTourTimeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
 				+ "mergedAltitudeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
+				+ "startSecond	 				SMALLINT DEFAULT 0,	\n" //$NON-NLS-1$
 				//				
 				// version 7 end
 
@@ -2299,6 +2300,10 @@ public class TourDatabase {
 			System.out.println(sql);
 			statement.execute(sql);
 
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startSecond			SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+			
 			statement.close();
 
 		} catch (final SQLException e) {

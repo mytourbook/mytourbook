@@ -399,11 +399,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
-		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
+		tourData.setStartSecond((short) fCalendar.get(Calendar.SECOND));
+
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
+		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
+
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		tourData.setDeviceTimeInterval((short) -1);

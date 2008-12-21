@@ -98,6 +98,11 @@ public class TourData implements Comparable<Object> {
 	private short					startMinute;
 
 	/**
+	 * altitude difference for the merged tour
+	 */
+	private int						startSecond;																// db-version 7
+
+	/**
 	 * year of tour start
 	 */
 	private short					startYear;
@@ -144,7 +149,7 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short					dpTolerance						= 50;
+	private short					dpTolerance					= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -172,6 +177,7 @@ public class TourData implements Comparable<Object> {
 
 	@SuppressWarnings("unused")
 	private int						deviceTotalUp;
+
 	@SuppressWarnings("unused")
 	private int						deviceTotalDown;
 
@@ -180,7 +186,6 @@ public class TourData implements Comparable<Object> {
 	 * distance data serie
 	 */
 	private int						tourDistance;
-
 	/**
 	 * total recording time in seconds
 	 */
@@ -209,75 +214,75 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * Profile used by the device
 	 */
-	private short					deviceMode;																// db-version 3
+	private short					deviceMode;													// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short					deviceTimeInterval;														// db-version 3
+	private short					deviceTimeInterval;											// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
-	private int						maxAltitude;																// db-version 4
+	private int						maxAltitude;													// db-version 4
 
-	private int						maxPulse;																	// db-version 4
+	private int						maxPulse;														// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
-	private float					maxSpeed;																	// db-version 4
+	private float					maxSpeed;														// db-version 4
 
-	private int						avgPulse;																	// db-version 4
-	private int						avgCadence;																// db-version 4
+	private int						avgPulse;														// db-version 4
+
+	private int						avgCadence;													// db-version 4
+
 	private int						avgTemperature;															// db-version 4
-
 	private String					tourTitle;																	// db-version 4
-	private String					tourDescription;															// db-version 4
+	private String					tourDescription;												// db-version 4
 
 	private String					tourStartPlace;															// db-version 4
-	private String					tourEndPlace;																// db-version 4
+	private String					tourEndPlace;													// db-version 4
 
 	private String					calories;																	// db-version 4
-	private float					bikerWeight;																// db-version 4
+	private float					bikerWeight;													// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
 	private String					devicePluginName;															// db-version 4
-
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String					deviceModeName;															// db-version 4
+	private String					deviceModeName;												// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String					tourImportFilePath;														// db-version 6
+	private String					tourImportFilePath;											// db-version 6
 
 	/**
 	 * when a tour is merged with another tour, {@link #mergeFromTourId} contains the tour id of the
 	 * tour which is merged into this tour
 	 */
-	private Long					mergeFromTourId;															// db-version 7
+	private Long					mergeFromTourId;												// db-version 7
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeIntoTourId} contains the tour id of the
 	 * tour into which this tour is merged
 	 */
-	private Long					mergeIntoTourId;															// db-version 7
+	private Long					mergeIntoTourId;												// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int						mergedTourTimeOffset;														// db-version 7
+	private int						mergedTourTimeOffset;											// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int						mergedAltitudeOffset;														// db-version 7
+	private int						mergedAltitudeOffset;											// db-version 7
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -287,15 +292,15 @@ public class TourData implements Comparable<Object> {
 
 	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>			tourMarkers						= new HashSet<TourMarker>();
+	private Set<TourMarker>			tourMarkers					= new HashSet<TourMarker>();
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>		tourReferences					= new HashSet<TourReference>();
+	private Set<TourReference>		tourReferences				= new HashSet<TourReference>();
 
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
-	private Set<TourTag>			tourTags						= new HashSet<TourTag>();
+	private Set<TourTag>			tourTags					= new HashSet<TourTag>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
@@ -397,35 +402,35 @@ public class TourData implements Comparable<Object> {
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isSpeedSerieFromDevice			= false;
+	private boolean					isSpeedSerieFromDevice		= false;
 
 	@Transient
 	private int[]					paceSerie;
 
+	@Transient
+	private int[]					paceSerieImperial;
+
+	@Transient
+	private int[]					powerSerie;
+
 	/*
 	 * computed data series
 	 */
-
-	@Transient
-	private int[]					paceSerieImperial;
-	@Transient
-	private int[]					powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isPowerSerieFromDevice			= false;
-
+	private boolean					isPowerSerieFromDevice		= false;
 	@Transient
 	private int[]					altimeterSerie;
+
 	@Transient
 	private int[]					altimeterSerieImperial;
 
 	@Transient
 	public int[]					gradientSerie;
-
 	@Transient
 	public int[]					tourCompareSerie;
 
@@ -434,6 +439,7 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	public double[]					latitudeSerie;
+
 	@Transient
 	public double[]					longitudeSerie;
 
@@ -442,7 +448,6 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	public Rectangle				gpsBounds;
-
 	/**
 	 * Index of the segmented data in the data series
 	 */
@@ -506,14 +511,14 @@ public class TourData implements Comparable<Object> {
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLatitude		= Double.MIN_VALUE;
+	public double					mapCenterPositionLatitude	= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLongitude		= Double.MIN_VALUE;
+	public double					mapCenterPositionLongitude	= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
@@ -537,7 +542,7 @@ public class TourData implements Comparable<Object> {
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	public Map<Integer, Point[]>	fWorldPosition					= new HashMap<Integer, Point[]>();
+	public Map<Integer, Point[]>	fWorldPosition				= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -545,7 +550,7 @@ public class TourData implements Comparable<Object> {
 	 * tour cannot be saved again, it must be reloaded from the file system
 	 */
 	@Transient
-	public boolean					isTourDeleted					= false;
+	public boolean					isTourDeleted				= false;
 
 	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
@@ -573,6 +578,134 @@ public class TourData implements Comparable<Object> {
 	private TourData				fMergeFromTour;
 
 	public TourData() {}
+
+	/**
+	 * Removed data series when the sum of all values is 0
+	 */
+	private void cleanupDataSeries() {
+
+		int sumAltitude = 0;
+		int sumCadence = 0;
+		int sumDistance = 0;
+		int sumPulse = 0;
+		int sumTemperature = 0;
+		int sumPower = 0;
+		int sumSpeed = 0;
+
+		// get first valid latitude/longitude
+		if (latitudeSerie != null && longitudeSerie != null) {
+
+			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+				if (latitudeSerie[timeIndex] != Double.MIN_VALUE && longitudeSerie[timeIndex] != Double.MIN_VALUE) {
+					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
+					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
+					break;
+				}
+			}
+		}
+		double lastValidLatitude = mapMinLatitude - 90;
+		double lastValidLongitude = mapMinLongitude - 180;
+		boolean isLatitudeValid = false;
+
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+			if (altitudeSerie != null) {
+				sumAltitude += altitudeSerie[serieIndex];
+			}
+
+			if (cadenceSerie != null) {
+				sumCadence += cadenceSerie[serieIndex];
+			}
+			if (distanceSerie != null) {
+				sumDistance += distanceSerie[serieIndex];
+			}
+			if (pulseSerie != null) {
+				sumPulse += pulseSerie[serieIndex];
+			}
+			if (temperatureSerie != null) {
+				final int temp = temperatureSerie[serieIndex];
+				sumTemperature += (temp < 0) ? -temp : temp;
+			}
+			if (powerSerie != null) {
+				sumPower += powerSerie[serieIndex];
+			}
+			if (speedSerie != null) {
+				sumSpeed += speedSerie[serieIndex];
+			}
+
+			if (latitudeSerie != null && longitudeSerie != null) {
+
+				final double latitude = latitudeSerie[serieIndex];
+				final double longitude = longitudeSerie[serieIndex];
+
+				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+					latitudeSerie[serieIndex] = lastValidLatitude;
+					longitudeSerie[serieIndex] = lastValidLongitude;
+				} else {
+					latitudeSerie[serieIndex] = lastValidLatitude = latitude;
+					longitudeSerie[serieIndex] = lastValidLongitude = longitude;
+				}
+
+				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
+				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
+				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
+				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
+
+				/*
+				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
+				 * and longitude has been saved with 0 values
+				 */
+				if (isLatitudeValid == false && lastValidLatitude != 0) {
+					isLatitudeValid = true;
+				}
+			}
+		}
+
+		mapMinLatitude -= 90;
+		mapMaxLatitude -= 90;
+		mapMinLongitude -= 180;
+		mapMaxLongitude -= 180;
+
+		/*
+		 * remove data series when the summary of the values is 0, for temperature this can be a
+		 * problem but for a longer tour the temperature varies
+		 */
+
+		if (sumAltitude == 0) {
+			altitudeSerie = null;
+		}
+		if (sumCadence == 0) {
+			cadenceSerie = null;
+		}
+		if (sumDistance == 0) {
+			distanceSerie = null;
+		}
+		if (sumPulse == 0) {
+			pulseSerie = null;
+		}
+		if (sumTemperature == 0) {
+			temperatureSerie = null;
+		}
+		if (sumPower == 0) {
+			powerSerie = null;
+		}
+		if (sumSpeed == 0) {
+			speedSerie = null;
+		}
+
+		if (powerSerie != null) {
+			isPowerSerieFromDevice = true;
+		}
+
+		if (speedSerie != null) {
+			isSpeedSerieFromDevice = true;
+		}
+
+		if (isLatitudeValid == false) {
+			latitudeSerie = null;
+			longitudeSerie = null;
+		}
+	}
 
 	/**
 	 * clear imperial altitude series so the next time when it's needed it will be recomputed
@@ -1901,7 +2034,7 @@ public class TourData implements Comparable<Object> {
 					} else {
 						distanceDiff = (int) tdDistance;
 					}
-					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
+					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
 
 					/*
 					 * altitude
@@ -1938,7 +2071,7 @@ public class TourData implements Comparable<Object> {
 						 */
 						distanceDiff = (int) tdDistance - distanceAbsolute;
 					}
-					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
+					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff < 0 ? 0 : distanceDiff;
 
 					/*
 					 * altitude
@@ -2008,9 +2141,9 @@ public class TourData implements Comparable<Object> {
 				 */
 				if (isTemperature) {
 					final int tdTemperature = timeData.temperature;
-					if (tdTemperature == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdTemperature == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
@@ -2043,57 +2176,57 @@ public class TourData implements Comparable<Object> {
 
 				if (isDistance) {
 					final int tdDistance = timeData.distance;
-					if (tdDistance == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdDistance == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					distanceSerie[timeIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
 				}
 
 				if (isAltitude) {
 					final int tdAltitude = timeData.altitude;
-					if (tdAltitude == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdAltitude == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					altitudeSerie[timeIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
 				}
 
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					if (tdPulse == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdPulse == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
 				}
 
 				if (isTemperature) {
 					final int tdTemperature = timeData.temperature;
-					if (tdTemperature == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdTemperature == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-					if (tdCadence == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdCadence == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
 				}
 
 				if (isPower) {
 					final int tdPower = timeData.power;
-					if (tdPower == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdPower == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					powerSerie[timeIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
 				}
 
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
-					if (tdSpeed == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-					}
+//					if (tdSpeed == Integer.MIN_VALUE) {
+//						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+//					}
 					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
@@ -2108,6 +2241,7 @@ public class TourData implements Comparable<Object> {
 		tourDistance = distanceAbsolute;
 		tourRecordingTime = recordingTime;
 
+		cleanupDataSeries();
 	}
 
 	/**
@@ -2128,7 +2262,7 @@ public class TourData implements Comparable<Object> {
 			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
 			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
- 			tourIdKey = Short.toString(getStartYear())
+			tourIdKey = Short.toString(getStartYear())
 					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
@@ -2432,11 +2566,6 @@ public class TourData implements Comparable<Object> {
 		return bikerWeight;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * Computes the time between start index and end index when the speed is <code>0</code>
 	 * 
@@ -2469,6 +2598,11 @@ public class TourData implements Comparable<Object> {
 			return ignoreTimeSlices * deviceTimeInterval;
 		}
 	}
+
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
 
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
@@ -2520,6 +2654,10 @@ public class TourData implements Comparable<Object> {
 		return deviceMode;
 	}
 
+	public String getDeviceModeName() {
+		return deviceModeName;
+	}
+
 // not used 5.10.2008 
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -2528,10 +2666,6 @@ public class TourData implements Comparable<Object> {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
-
-	public String getDeviceModeName() {
-		return deviceModeName;
-	}
 
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
@@ -2849,6 +2983,10 @@ public class TourData implements Comparable<Object> {
 		return startPulse;
 	}
 
+	public int getStartSecond() {
+		return startSecond;
+	}
+
 	public short getStartWeek() {
 		return startWeek;
 	}
@@ -3118,128 +3256,7 @@ public class TourData implements Comparable<Object> {
 		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
 		 * data are available
 		 */
-		int sumAltitude = 0;
-		int sumCadence = 0;
-		int sumDistance = 0;
-		int sumPulse = 0;
-		int sumTemperature = 0;
-		int sumPower = 0;
-		int sumSpeed = 0;
-
-		// get first valid latitude/longitude
-		if (latitudeSerie != null && longitudeSerie != null) {
-
-			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
-				if (latitudeSerie[timeIndex] != Double.MIN_VALUE && longitudeSerie[timeIndex] != Double.MIN_VALUE) {
-					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
-					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
-					break;
-				}
-			}
-		}
-		double lastValidLatitude = mapMinLatitude - 90;
-		double lastValidLongitude = mapMinLongitude - 180;
-		boolean isLatitudeValid = false;
-
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			if (altitudeSerie != null) {
-				sumAltitude += altitudeSerie[serieIndex];
-			}
-
-			if (cadenceSerie != null) {
-				sumCadence += cadenceSerie[serieIndex];
-			}
-			if (distanceSerie != null) {
-				sumDistance += distanceSerie[serieIndex];
-			}
-			if (pulseSerie != null) {
-				sumPulse += pulseSerie[serieIndex];
-			}
-			if (temperatureSerie != null) {
-				final int temp = temperatureSerie[serieIndex];
-				sumTemperature += (temp < 0) ? -temp : temp;
-			}
-			if (powerSerie != null) {
-				sumPower += powerSerie[serieIndex];
-			}
-			if (speedSerie != null) {
-				sumSpeed += speedSerie[serieIndex];
-			}
-
-			if (latitudeSerie != null && longitudeSerie != null) {
-
-				final double latitude = latitudeSerie[serieIndex];
-				final double longitude = longitudeSerie[serieIndex];
-
-				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
-					latitudeSerie[serieIndex] = lastValidLatitude;
-					longitudeSerie[serieIndex] = lastValidLongitude;
-				} else {
-					latitudeSerie[serieIndex] = lastValidLatitude = latitude;
-					longitudeSerie[serieIndex] = lastValidLongitude = longitude;
-				}
-
-				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
-				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
-				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
-				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
-
-				/*
-				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
-				 * and longitude has been saved with 0 values
-				 */
-				if (isLatitudeValid == false && lastValidLatitude != 0) {
-					isLatitudeValid = true;
-				}
-			}
-		}
-
-		mapMinLatitude -= 90;
-		mapMaxLatitude -= 90;
-		mapMinLongitude -= 180;
-		mapMaxLongitude -= 180;
-
-		/*
-		 * remove data series when the summary of the values is 0, for temperature this can be a
-		 * problem but for a longer tour the temperature varies
-		 */
-
-		if (sumAltitude == 0) {
-			altitudeSerie = null;
-		}
-		if (sumCadence == 0) {
-			cadenceSerie = null;
-		}
-		if (sumDistance == 0) {
-			distanceSerie = null;
-		}
-		if (sumPulse == 0) {
-			pulseSerie = null;
-		}
-		if (sumTemperature == 0) {
-			temperatureSerie = null;
-		}
-		if (sumPower == 0) {
-			powerSerie = null;
-		}
-		if (sumSpeed == 0) {
-			speedSerie = null;
-		}
-
-		if (powerSerie != null) {
-			isPowerSerieFromDevice = true;
-		}
-
-		if (speedSerie != null) {
-			isSpeedSerieFromDevice = true;
-		}
-
-		if (isLatitudeValid == false) {
-			latitudeSerie = null;
-			longitudeSerie = null;
-		}
-
+		cleanupDataSeries();
 	}
 
 	/**
@@ -3421,6 +3438,10 @@ public class TourData implements Comparable<Object> {
 
 	public void setStartPulse(final short startPulse) {
 		this.startPulse = startPulse;
+	}
+
+	public void setStartSecond(final int startSecond) {
+		this.startSecond = startSecond;
 	}
 
 	public void setStartWeek(final short startWeek) {

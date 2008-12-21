@@ -805,6 +805,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	}
 
 	/**
+	 * Remove duplicated entries
+	 * <p>
 	 * There are cases where the lap end time and the next lap start time have the same time value,
 	 * so there are duplicated times which causes problems like markers are not displayed because
 	 * the marker time is twice available.
