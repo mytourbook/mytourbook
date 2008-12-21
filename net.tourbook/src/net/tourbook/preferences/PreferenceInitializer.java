@@ -173,6 +173,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * merge tour dialog
 		 */
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_SOURCE_GRAPH_ID, TourManager.GRAPH_ALTITUDE);
 
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, false);

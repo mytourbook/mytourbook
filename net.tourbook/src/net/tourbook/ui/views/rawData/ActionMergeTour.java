@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,6 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.rawData.DialogMergeTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -34,9 +33,8 @@ public class ActionMergeTour extends Action {
 
 	private ITourProvider	fTourProvider;
 
-	private TourData		fMergeIntoTour;
-
-	private TourData		fMergeFromTour;
+	private TourData		fMergeTargetTour;
+	private TourData		fMergeSourceTour;
 
 	public ActionMergeTour(final ITourProvider tourProvider) {
 
@@ -62,9 +60,9 @@ public class ActionMergeTour extends Action {
 			return false;
 		}
 
-		final TourData intoTourData = selectedTours.get(0);
+		final TourData targetTour = selectedTours.get(0);
 
-		final Long mergeFromTourId = intoTourData.getMergeFromTourId();
+		final Long mergeFromTourId = targetTour.getMergeSourceTourId();
 		if (mergeFromTourId == null) {
 
 			// check if the tour can be merged
@@ -75,7 +73,7 @@ public class ActionMergeTour extends Action {
 
 			return false;
 
-		} else if ((fMergeFromTour = TourManager.getInstance().getTourData(mergeFromTourId)) == null) {
+		} else if ((fMergeSourceTour = TourManager.getInstance().getTourData(mergeFromTourId)) == null) {
 
 			// check if merge from tour is available
 
@@ -83,22 +81,18 @@ public class ActionMergeTour extends Action {
 					Messages.merge_tour_dlg_invalid_tour_title,
 					NLS.bind(Messages.merge_tour_dlg_invalid_tour_data_message,
 							mergeFromTourId,
-							TourManager.getTourTitle(intoTourData)));
+							TourManager.getTourTitle(targetTour)));
 
 			// remove invalid merge tour id
-			intoTourData.setMergeFromTourId(null);
-			TourManager.saveModifiedTour(intoTourData);
+			targetTour.setMergeSourceTourId(null);
+			TourManager.saveModifiedTour(targetTour);
 
 			return false;
 
-		} else if (intoTourData.altitudeSerie == null
-				|| intoTourData.altitudeSerie.length == 0
-				|| intoTourData.timeSerie == null
-				|| intoTourData.timeSerie.length == 0
-				|| fMergeFromTour.altitudeSerie == null
-				|| fMergeFromTour.altitudeSerie.length == 0
-				|| fMergeFromTour.timeSerie == null
-				|| fMergeFromTour.timeSerie.length == 0) {
+		} else if (targetTour.timeSerie == null
+				|| targetTour.timeSerie.length == 0
+				|| fMergeSourceTour.timeSerie == null
+				|| fMergeSourceTour.timeSerie.length == 0) {
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.merge_tour_dlg_invalid_tour_title,
@@ -107,7 +101,7 @@ public class ActionMergeTour extends Action {
 			return false;
 		}
 
-		fMergeIntoTour = intoTourData;
+		fMergeTargetTour = targetTour;
 
 		return true;
 	}
@@ -116,7 +110,7 @@ public class ActionMergeTour extends Action {
 	public void run() {
 
 		if (getSelectedTour()) {
-			new DialogMergeTours(Display.getCurrent().getActiveShell(), fMergeFromTour, fMergeIntoTour).open();
+			new DialogMergeTours(Display.getCurrent().getActiveShell(), fMergeSourceTour, fMergeTargetTour).open();
 		}
 	}
 

@@ -97,15 +97,11 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 					&& mergeFromTour != selectedTour
 					//
 					// check if the merge tour id is set
-					&& selectedTour.getMergeIntoTourId() == null
+					&& selectedTour.getMergeTargetTourId() == null
 					//
-					// check if altitude and time series are available
-					&& selectedTour.altitudeSerie != null
-					&& selectedTour.altitudeSerie.length != 0
+					// check if time series are available
 					&& selectedTour.timeSerie != null
 					&& selectedTour.timeSerie.length != 0
-					&& mergeFromTour.altitudeSerie != null
-					&& mergeFromTour.altitudeSerie.length != 0
 					&& mergeFromTour.timeSerie != null
 					&& mergeFromTour.timeSerie.length != 0) {
 

@@ -58,7 +58,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionMergeTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
@@ -228,23 +227,23 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 
 		// backup data
-		final Long backupMergeFromTourId = mergeIntoTour.getMergeFromTourId();
+		final Long backupMergeFromTourId = mergeIntoTour.getMergeSourceTourId();
 
 		// set tour data and tour id from which the tour is merged
-		mergeIntoTour.setMergeFromTourId(mergeFromTour.getTourId());
+		mergeIntoTour.setMergeSourceTourId(mergeFromTour.getTourId());
 
 		// set temp data, this is required by the dialog because the merge from tour could not be saved
-		mergeIntoTour.setMergeFromTour(mergeFromTour);
+		mergeIntoTour.setMergeSourceTour(mergeFromTour);
 
 		if (new DialogMergeTours(Display.getCurrent().getActiveShell(), mergeFromTour, mergeIntoTour).open() != Window.OK) {
 
 			// dialog is canceled, restore modified values
 
-			mergeIntoTour.setMergeFromTourId(backupMergeFromTourId);
+			mergeIntoTour.setMergeSourceTourId(backupMergeFromTourId);
 		}
 
 		// reset temp tour data
-		mergeIntoTour.setMergeFromTour(null);
+		mergeIntoTour.setMergeSourceTour(null);
 	}
 
 	void actionSaveTour(final TourPerson person) {
@@ -1020,7 +1019,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final boolean isOneSavedAndValidTour = selectedValidTours == 1 && savedTours == 1;
 
 		final boolean canMergeIntoTour = selectedValidTours == 1
-				&& (firstValidTour == null ? true : firstValidTour.getMergeFromTourId() == null);
+				&& (firstValidTour == null ? true : firstValidTour.getMergeSourceTourId() == null);
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
@@ -1064,7 +1063,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		fActionMergeIntoTour.setEnabled(canMergeIntoTour);
 
-		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeFromTourId() != null);
+		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeSourceTourId() != null);
 
 		fActionEditTour.setEnabled(isOneSavedAndValidTour);
 		fActionEditQuick.setEnabled(isOneSavedAndValidTour);
@@ -1248,7 +1247,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		final Image dbImage = tourData.isTourDeleted ? //
 				imageDelete
-				: tourData.getMergeIntoTourId() != null ? //
+				: tourData.getMergeTargetTourId() != null ? //
 						imageDatabaseAssignMergedTour
 						: tourPerson == null ? imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
 								? imageDatabase

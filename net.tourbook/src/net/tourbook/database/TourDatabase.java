@@ -127,7 +127,7 @@ public class TourDatabase {
 
 	private static ArrayList<TourType>			fActiveTourTypes;
 	private static ArrayList<TourType>			fTourTypes;
-	
+
 	private static HashMap<Long, TourTag>		fTourTags;
 	private static HashMap<Long, TagCollection>	fTagCollections;
 
@@ -1442,8 +1442,8 @@ public class TourDatabase {
 
 				// version 7 start
 				//				
-				+ "mergeFromTourId				BIGINT,				\n" //$NON-NLS-1$
-				+ "mergeIntoTourId				BIGINT,				\n" //$NON-NLS-1$
+				+ "mergeSourceTourId			BIGINT,				\n" //$NON-NLS-1$
+				+ "mergeTargetTourId			BIGINT,				\n" //$NON-NLS-1$
 				+ "mergedTourTimeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
 				+ "mergedAltitudeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
 				+ "startSecond	 				SMALLINT DEFAULT 0,	\n" //$NON-NLS-1$
@@ -2284,11 +2284,11 @@ public class TourDatabase {
 
 			String sql;
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeFromTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeSourceTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeIntoTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeTargetTourId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
 
@@ -2303,7 +2303,7 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startSecond			SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
-			
+
 			statement.close();
 
 		} catch (final SQLException e) {

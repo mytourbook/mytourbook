@@ -4832,7 +4832,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * merge from tour ID
 		 */
-		final Long mergeFromTourId = fTourData.getMergeFromTourId();
+		final Long mergeFromTourId = fTourData.getMergeSourceTourId();
 		if (mergeFromTourId == null) {
 			fTextMergeFromTourId.setText(UI.EMPTY_STRING);
 		} else {
@@ -4842,7 +4842,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * merge into tour ID
 		 */
-		final Long mergeIntoTourId = fTourData.getMergeIntoTourId();
+		final Long mergeIntoTourId = fTourData.getMergeTargetTourId();
 		if (mergeIntoTourId == null) {
 			fTextMergeIntoTourId.setText(UI.EMPTY_STRING);
 		} else {

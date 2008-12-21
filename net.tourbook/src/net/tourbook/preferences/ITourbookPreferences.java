@@ -171,6 +171,7 @@ public interface ITourbookPreferences {
 	 * merge tour dialog
 	 */
 	public static final String	MERGE_TOUR_GRAPH_X_AXIS						= "merge.tour.chart-x-axis";								//$NON-NLS-1$
+	public static final String	MERGE_TOUR_SOURCE_GRAPH_ID					= "merge.tour.source-graph-id";							//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$

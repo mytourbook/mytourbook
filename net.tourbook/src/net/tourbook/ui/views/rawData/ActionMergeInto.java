@@ -66,7 +66,7 @@ public class ActionMergeInto extends Action {
 		setImageDescriptor(ImageDescriptor.createFromImage(fRawDataView.getDbImage(fIntoTourData)));
 
 		// check menu item when the from tour is merge into the into tour
-		final Long mergeIntoTourId = mergeFromTour.getMergeIntoTourId();
+		final Long mergeIntoTourId = mergeFromTour.getMergeTargetTourId();
 		if (mergeIntoTourId != null && mergeIntoTourId.equals(mergeIntoTour.getTourId())) {
 			setChecked(true);
 		}

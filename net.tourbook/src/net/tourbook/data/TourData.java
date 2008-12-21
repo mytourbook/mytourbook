@@ -149,7 +149,7 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short					dpTolerance					= 50;
+	private short					dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -214,39 +214,39 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * Profile used by the device
 	 */
-	private short					deviceMode;													// db-version 3
+	private short					deviceMode;																// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short					deviceTimeInterval;											// db-version 3
+	private short					deviceTimeInterval;														// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
-	private int						maxAltitude;													// db-version 4
+	private int						maxAltitude;																// db-version 4
 
-	private int						maxPulse;														// db-version 4
+	private int						maxPulse;																	// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
-	private float					maxSpeed;														// db-version 4
+	private float					maxSpeed;																	// db-version 4
 
-	private int						avgPulse;														// db-version 4
+	private int						avgPulse;																	// db-version 4
 
-	private int						avgCadence;													// db-version 4
+	private int						avgCadence;																// db-version 4
 
 	private int						avgTemperature;															// db-version 4
 	private String					tourTitle;																	// db-version 4
-	private String					tourDescription;												// db-version 4
+	private String					tourDescription;															// db-version 4
 
 	private String					tourStartPlace;															// db-version 4
-	private String					tourEndPlace;													// db-version 4
+	private String					tourEndPlace;																// db-version 4
 
 	private String					calories;																	// db-version 4
-	private float					bikerWeight;													// db-version 4
+	private float					bikerWeight;																// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
@@ -255,34 +255,34 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String					deviceModeName;												// db-version 4
+	private String					deviceModeName;															// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String					tourImportFilePath;											// db-version 6
+	private String					tourImportFilePath;														// db-version 6
 
 	/**
-	 * when a tour is merged with another tour, {@link #mergeFromTourId} contains the tour id of the
-	 * tour which is merged into this tour
+	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
+	 * the tour which is merged into this tour
 	 */
-	private Long					mergeFromTourId;												// db-version 7
+	private Long					mergeSourceTourId;															// db-version 7
 
 	/**
-	 * when a tour is merged into another tour, {@link #mergeIntoTourId} contains the tour id of the
-	 * tour into which this tour is merged
+	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
+	 * the tour into which this tour is merged
 	 */
-	private Long					mergeIntoTourId;												// db-version 7
+	private Long					mergeTargetTourId;															// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int						mergedTourTimeOffset;											// db-version 7
+	private int						mergedTourTimeOffset;														// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int						mergedAltitudeOffset;											// db-version 7
+	private int						mergedAltitudeOffset;														// db-version 7
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -292,15 +292,15 @@ public class TourData implements Comparable<Object> {
 
 	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>			tourMarkers					= new HashSet<TourMarker>();
+	private Set<TourMarker>			tourMarkers						= new HashSet<TourMarker>();
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>		tourReferences				= new HashSet<TourReference>();
+	private Set<TourReference>		tourReferences					= new HashSet<TourReference>();
 
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
-	private Set<TourTag>			tourTags					= new HashSet<TourTag>();
+	private Set<TourTag>			tourTags						= new HashSet<TourTag>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
@@ -402,7 +402,7 @@ public class TourData implements Comparable<Object> {
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isSpeedSerieFromDevice		= false;
+	private boolean					isSpeedSerieFromDevice			= false;
 
 	@Transient
 	private int[]					paceSerie;
@@ -422,7 +422,7 @@ public class TourData implements Comparable<Object> {
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isPowerSerieFromDevice		= false;
+	private boolean					isPowerSerieFromDevice			= false;
 	@Transient
 	private int[]					altimeterSerie;
 
@@ -511,14 +511,14 @@ public class TourData implements Comparable<Object> {
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLatitude	= Double.MIN_VALUE;
+	public double					mapCenterPositionLatitude		= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLongitude	= Double.MIN_VALUE;
+	public double					mapCenterPositionLongitude		= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
@@ -542,7 +542,7 @@ public class TourData implements Comparable<Object> {
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	public Map<Integer, Point[]>	fWorldPosition				= new HashMap<Integer, Point[]>();
+	public Map<Integer, Point[]>	fWorldPosition					= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -550,32 +550,32 @@ public class TourData implements Comparable<Object> {
 	 * tour cannot be saved again, it must be reloaded from the file system
 	 */
 	@Transient
-	public boolean					isTourDeleted				= false;
+	public boolean					isTourDeleted					= false;
 
 	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]					mergeAltitudeDiff;
+	public int[]					mergeDataDiff;
 
 	/**
 	 * altitude data serie for the merged tour with metric measurement
 	 */
 	@Transient
-	public int[]					mergeAltitudeSerie;
+	public int[]					mergeDataSerie;
 
 	/**
 	 * contains the altitude serie which is adjusted at the start
 	 */
 	@Transient
-	public int[]					mergeAdjustedAltitudeSerie;
+	public int[]					mergeAdjustedDataSerie;
 
 	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
 	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
-	private TourData				fMergeFromTour;
+	private TourData				fMergeSourceTourData;
 
 	public TourData() {}
 
@@ -2786,23 +2786,23 @@ public class TourData implements Comparable<Object> {
 		return mergedTourTimeOffset;
 	}
 
-	public TourData getMergeFromTour() {
-		return fMergeFromTour;
+	public TourData getMergeSourceTourData() {
+		return fMergeSourceTourData;
 	}
 
 	/**
 	 * @return tour id which is merged into this tour
 	 */
-	public Long getMergeFromTourId() {
-		return mergeFromTourId;
+	public Long getMergeSourceTourId() {
+		return mergeSourceTourId;
 	}
 
 	/**
 	 * @return tour Id into which this tour is merged or <code>null</code> when this tour is not
 	 *         merged into another tour
 	 */
-	public Long getMergeIntoTourId() {
-		return mergeIntoTourId;
+	public Long getMergeTargetTourId() {
+		return mergeTargetTourId;
 	}
 
 	/**
@@ -3395,16 +3395,16 @@ public class TourData implements Comparable<Object> {
 		this.mergedTourTimeOffset = mergedTourTimeOffset;
 	}
 
-	public void setMergeFromTour(final TourData mergeFromTour) {
-		fMergeFromTour = mergeFromTour;
+	public void setMergeSourceTour(final TourData mergeSourceTour) {
+		fMergeSourceTourData = mergeSourceTour;
 	}
 
-	public void setMergeFromTourId(final Long mergeTourId) {
-		this.mergeFromTourId = mergeTourId;
+	public void setMergeSourceTourId(final Long mergeSourceTourId) {
+		this.mergeSourceTourId = mergeSourceTourId;
 	}
 
-	public void setMergeIntoTourId(final Long mergeIntoTourId) {
-		this.mergeIntoTourId = mergeIntoTourId;
+	public void setMergeTargetTourId(final Long mergeTargetTourId) {
+		this.mergeTargetTourId = mergeTargetTourId;
 	}
 
 	public void setStartAltitude(final short startAltitude) {

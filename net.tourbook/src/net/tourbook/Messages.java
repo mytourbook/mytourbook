@@ -348,6 +348,14 @@ public class Messages extends NLS {
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
 
+	public static String	merge_tour_source_graph_altitude_tooltip;
+
+	public static String	merge_tour_source_graph_cadence_tooltip;
+
+	public static String	merge_tour_source_graph_heartbeat_tooltip;
+
+	public static String	merge_tour_source_graph_temperature_tooltip;
+
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_Label_title;
@@ -689,6 +697,10 @@ public class Messages extends NLS {
 
 	public static String	tour_merger_group_adjust_time;
 
+	public static String	tour_merger_group_display_options;
+
+	public static String	tour_merger_group_display_options_tooltip;
+
 	public static String	tour_merger_group_save_actions;
 
 	public static String	tour_merger_group_save_actions_tooltip;
@@ -703,6 +715,8 @@ public class Messages extends NLS {
 	public static String		tour_merger_label_adjust_minutes;
 	public static String		tour_merger_label_adjust_seconds;
 	public static String		tour_merger_label_invalid_data;
+
+	public static String	tour_merger_label_source_tour;
 	public static String		tour_merger_reset_settings_tooltip;
 
 	public static String		tour_statistic_label_years;

@@ -81,7 +81,12 @@ public class TourChartConfiguration {
 	/**
 	 * is <code>true</code> when the altitude diff scaling in the merge layer is relative
 	 */
-	public boolean					isRelativeAltiDiffScaling;
+	public boolean					isRelativeValueDiffScaling;
+
+	/**
+	 * measurement system to display data in the merge layer
+	 */
+	public float					measurementSystem;
 
 	/**
 	 * @param keepMinMaxValues

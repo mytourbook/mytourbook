@@ -110,7 +110,6 @@ public class TourChart extends Chart {
 
 	private IPropertyChangeListener			fPrefChangeListener;
 
-
 	private ChartLabelLayer					fLabelLayer;
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
@@ -526,30 +525,30 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final TourData mergeFromTour = fTourData.getMergeFromTour();
+		final TourData mergeSourceTourData = fTourData.getMergeSourceTourData();
 
-		if (fIsMergeLayerVisible == false || (fTourData.getMergeFromTourId() == null && mergeFromTour == null)) {
+		if (fIsMergeLayerVisible == false || (fTourData.getMergeSourceTourId() == null && mergeSourceTourData == null)) {
 
 			fMergeLayer = null;
 			return;
 		}
 
-		TourData mergeFromTourData;
-		if (mergeFromTour != null) {
-			mergeFromTourData = mergeFromTour;
+		TourData layerTourData;
+
+		if (mergeSourceTourData != null) {
+			layerTourData = mergeSourceTourData;
 		} else {
-			mergeFromTourData = TourManager.getInstance().getTourData(fTourData.getMergeFromTourId());
+			layerTourData = TourManager.getInstance().getTourData(fTourData.getMergeSourceTourId());
 		}
-		if (mergeFromTourData == null) {
+		
+		if (layerTourData == null) {
 			fMergeLayer = null;
 			return;
 		}
 
 		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
-		fMergeLayer = new ChartMergeLayer(fTourData, mergeFromTourData, xDataSerie);
-
-		fMergeLayer.setAltiDiffScaling(fTourChartConfig.isRelativeAltiDiffScaling);
+		fMergeLayer = new ChartMergeLayer(layerTourData, xDataSerie, fTourChartConfig);
 	}
 
 	/**
@@ -1132,7 +1131,7 @@ public class TourChart extends Chart {
 
 	@Override
 	public void updateChart(final ChartDataModel chartDataModel) {
-		
+
 		super.updateChart(chartDataModel);
 
 		if (chartDataModel == null) {

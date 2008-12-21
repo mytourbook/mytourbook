@@ -43,6 +43,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -67,6 +68,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 
 public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 {
 
@@ -80,14 +82,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	private final IDialogSettings	fDialogSettings;
 
-	private TourData				fFromTourData;
-	private TourData				fIntoTourData;
+	private TourData				fSourceTour;
+	private TourData				fTargetTour;
 
 	private Composite				fDlgContainer;
 
 	private TourChart				fTourChart;
 	private TourChartConfiguration	fTourChartConfig;
 
+	private Group					fGroupAltitude;
 	private Label					fLabelAltitudeDiff1;
 	private Label					fLabelAltitudeDiff10;
 	private Scale					fScaleAltitude1;
@@ -124,33 +127,40 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	/*
 	 * display actions
 	 */
-	private Button					fChkAltiDiffScaling;
+	private Button					fChkValueDiffScaling;
 
 	private Button					fChkPreviewChart;
 
 	private boolean					fIsTourSaved			= false;
-	private boolean					fIsMergeFromTourModified;
+	private boolean					fIsMergeSourceTourModified;
 	private boolean					fIsChartUpdated;
 
 	/*
 	 * backup data
 	 */
-	private int[]					fBackupFromTimeSerie;
+	private int[]					fBackupSourceTimeSerie;
+	private int[]					fBackupSourceDistanceSerie;
+	private int[]					fBackupSourceAltitudeSerie;
+	
+	private TourType				fBackupSourceTourType;
 
-	private int[]					fBackupFromDistanceSerie;
-	private int[]					fBackupFromAltitudeSerie;
-	private TourType				fBackupFromTourType;
-	private int[]					fBackupIntoTemperatureSerie;
+	private int[]					fBackupTargetPulseSerie;
+	private int[]					fBackupTargetTemperatureSerie;
+	private int[]					fBackupTargetCadenceSerie;
+	
+	private int						fBackupTargetTimeOffset;
+	private int						fBackupTargetAltitudeOffset;
 
-	private int						fBackupIntoTimeOffset;
-	private int						fBackupIntoAltitudeOffset;
 	private ActionOpenPrefDialog	fActionOpenTourTypePrefs;
 
 	private NumberFormat			fNumberFormatter		= NumberFormat.getNumberInstance();
-	{
-		fNumberFormatter.setMinimumFractionDigits(3);
-		fNumberFormatter.setMaximumFractionDigits(3);
-	}
+
+	private ActionSourceTourGraph	fActionSourceTourAltitude;
+	private ActionSourceTourGraph	fActionSourceTourPulse;
+	private ActionSourceTourGraph	fActionSourceTourTemperature;
+	private ActionSourceTourGraph	fActionSourceTourCadence;
+
+	private int						fSelectedSourceGraphId;
 
 	/**
 	 * creates a int array backup
@@ -173,12 +183,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	/**
 	 * @param parentShell
-	 * @param mergeFromTour
+	 * @param mergeSourceTour
 	 *            {@link TourData} for the tour which is merge into the other tour
-	 * @param mergeIntoTour
+	 * @param mergeTargetTour
 	 *            {@link TourData} for the tour into which the other tour is merged
 	 */
-	public DialogMergeTours(final Shell parentShell, final TourData mergeFromTour, final TourData mergeIntoTour) {
+	public DialogMergeTours(final Shell parentShell, final TourData mergeSourceTour, final TourData mergeTargetTour) {
 
 		super(parentShell);
 
@@ -189,10 +199,20 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fShellImage = TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage();
 		setDefaultImage(fShellImage);
 
-		fFromTourData = mergeFromTour;
-		fIntoTourData = mergeIntoTour;
+		fSourceTour = mergeSourceTour;
+		fTargetTour = mergeTargetTour;
+
+		fNumberFormatter.setMinimumFractionDigits(3);
+		fNumberFormatter.setMaximumFractionDigits(3);
 
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+	}
+
+	void actionSetSourceTourGraph(final int graphId) {
+
+		setSelectedSourceGraph(graphId);
+
+		onModifyProperties();
 	}
 
 	/**
@@ -232,11 +252,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		 * when the tour is saved, reverting the tour sets the editor to not dirty, tour data have
 		 * already been saved
 		 */
-		if (fIsMergeFromTourModified) {
+		if (fIsMergeSourceTourModified) {
 
 			// revert modified tour type in the merge from tour
 
-			final TourEvent tourEvent = new TourEvent(fFromTourData);
+			final TourEvent tourEvent = new TourEvent(fSourceTour);
 			tourEvent.isReverted = true;
 
 			TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
@@ -247,40 +267,47 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	private void computeMergedData() {
 
-		final int xMergeOffset = fIntoTourData.getMergedTourTimeOffset();
-		final int yMergeOffset = fIntoTourData.getMergedAltitudeOffset();
+		final int xMergeOffset = fTargetTour.getMergedTourTimeOffset();
+		final int yMergeOffset = fTargetTour.getMergedAltitudeOffset();
 
-		final int[] targetTimeSerie = fIntoTourData.timeSerie;
-		final int[] targetDistanceSerie = fIntoTourData.distanceSerie;
-		final int[] targetAltitudeSerie = fIntoTourData.altitudeSerie;
+		final int[] targetTimeSerie = fTargetTour.timeSerie;
+		final int[] targetDistanceSerie = fTargetTour.distanceSerie;
+		final int[] targetAltitudeSerie = fTargetTour.altitudeSerie;
 
-		final int[] sourceTimeSerie = fFromTourData.timeSerie;
-		final int[] sourceAltitudeSerie = fFromTourData.altitudeSerie;
-		final int[] sourceTemperatureSerie = fFromTourData.temperatureSerie;
+		final int[] sourceTimeSerie = fSourceTour.timeSerie;
+		final int[] sourceAltitudeSerie = fSourceTour.altitudeSerie;
+		final int[] sourceTemperatureSerie = fSourceTour.temperatureSerie;
 
-		// check if the data series are available
-		final boolean isIntoDistance = targetDistanceSerie != null;
-		final boolean isFromTemperature = sourceTemperatureSerie != null;
-
-		final int lastFromIndex = sourceTimeSerie.length - 1;
+		final int lastSourceIndex = sourceTimeSerie.length - 1;
 		final int serieLength = targetTimeSerie.length;
 
 		final int[] newSourceAltitudeSerie = new int[serieLength];
 		final int[] newSourceAltiDiffSerie = new int[serieLength];
-
-		final int[] newIntoTemperatureSerie = new int[serieLength];
+		final int[] newTargetTemperatureSerie = new int[serieLength];
 
 		int sourceIndex = 0;
-
 		int sourceTime = sourceTimeSerie[0] + xMergeOffset;
-		int sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
-
 		int sourceTimePrev = 0;
-		int sourceAltiPrev = sourceAlti;
-		int newSourceAltitude = sourceAlti;
+		int sourceAlti = 0;
+		int sourceAltiPrev = 0;
 
 		int targetTime = targetTimeSerie[0];
-		int targetAltitude = targetAltitudeSerie[0];
+		int targetAltitude;
+		int newSourceAltitude;
+
+		// check if the data series are available
+		final boolean isTargetDistance = targetDistanceSerie != null;
+		final boolean isSourceAltitude = sourceAltitudeSerie != null;
+		final boolean isSourceTemperature = sourceTemperatureSerie != null;
+
+		if (isSourceAltitude) {
+
+			sourceAlti = sourceAltitudeSerie[0] + yMergeOffset;
+			sourceAltiPrev = sourceAlti;
+			newSourceAltitude = sourceAlti;
+
+			targetAltitude = targetAltitudeSerie[0];
+		}
 
 		final boolean isLinearInterpolation = fChkAdjustAltitudeFromSource.getSelection()
 				&& fChkLinearInterpolation.getSelection();
@@ -299,9 +326,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 				sourceIndex++;
 
 				// check array bounds
-				sourceIndex = (sourceIndex <= lastFromIndex) ? sourceIndex : lastFromIndex;
+				sourceIndex = (sourceIndex <= lastSourceIndex) ? sourceIndex : lastSourceIndex;
 
-				if (sourceIndex == lastFromIndex) {
+				if (sourceIndex == lastSourceIndex) {
 					//prevent endless loops
 					break;
 				}
@@ -309,66 +336,79 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 				sourceTimePrev = sourceTime;
 				sourceTime = sourceTimeSerie[sourceIndex] + xMergeOffset;
 
-				sourceAltiPrev = sourceAlti;
-				sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
+				if (isSourceAltitude) {
+					sourceAltiPrev = sourceAlti;
+					sourceAlti = sourceAltitudeSerie[sourceIndex] + yMergeOffset;
+				}
 			}
 
-			targetAltitude = targetAltitudeSerie[targetIndex];
+			if (isSourceAltitude) {
 
-			if (isLinearInterpolation) {
+				targetAltitude = targetAltitudeSerie[targetIndex];
 
-				/**
-				 * do linear interpolation for the altitude
-				 * <p>
-				 * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
-				 */
-				final int x1 = sourceTimePrev;
-				final int x2 = targetTime;
-				final int x3 = sourceTime;
-				final int y1 = sourceAltiPrev;
-				final int y3 = sourceAlti;
+				if (isLinearInterpolation) {
 
-				final int xDiff = x3 - x1;
+					/**
+					 * do linear interpolation for the altitude
+					 * <p>
+					 * y2 = (x2-x1)(y3-y1)/(x3-x1) + y1
+					 */
+					final int x1 = sourceTimePrev;
+					final int x2 = targetTime;
+					final int x3 = sourceTime;
+					final int y1 = sourceAltiPrev;
+					final int y3 = sourceAlti;
 
-				newSourceAltitude = xDiff == 0 ? sourceAltiPrev : (x2 - x1) * (y3 - y1) / xDiff + y1;
+					final int xDiff = x3 - x1;
 
-			} else {
+					newSourceAltitude = xDiff == 0 ? sourceAltiPrev : (x2 - x1) * (y3 - y1) / xDiff + y1;
 
-				/*
-				 * the interpolited altitude is not exact above the none interpolite altitude, it is
-				 * in the middle of the previous and current altitude
-				 */
-//				newSourceAltitude = sourceAlti;
-				newSourceAltitude = sourceAltiPrev;
+				} else {
+
+					/*
+					 * the interpolited altitude is not exact above the none interpolite altitude,
+					 * it is in the middle of the previous and current altitude
+					 */
+					// newSourceAltitude = sourceAlti;
+					newSourceAltitude = sourceAltiPrev;
+				}
+
+				newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
+				newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitude;
 			}
 
-			newSourceAltitudeSerie[targetIndex] = newSourceAltitude;
-			newSourceAltiDiffSerie[targetIndex] = newSourceAltitude - targetAltitude;
-
-			if (isFromTemperature) {
-				newIntoTemperatureSerie[targetIndex] = sourceTemperatureSerie[sourceIndex];
+			if (isSourceTemperature) {
+				newTargetTemperatureSerie[targetIndex] = sourceTemperatureSerie[sourceIndex];
 			}
 		}
 
-		fFromTourData.mergeAltitudeSerie = newSourceAltitudeSerie;
-		fFromTourData.mergeAltitudeDiff = newSourceAltiDiffSerie;
+		fSourceTour.mergeDataSerie = newSourceAltitudeSerie;
+		fSourceTour.mergeDataDiff = newSourceAltiDiffSerie;
 
-		if (isFromTemperature) {
-			fIntoTourData.temperatureSerie = newIntoTemperatureSerie;
+		if (isSourceTemperature) {
+			fTargetTour.temperatureSerie = newTargetTemperatureSerie;
 		}
+
+//		if (isSourcePulse) {
+//			fTargetTour.pulseSerie = newTargetPulseSerie;
+//		}
 
 		float altiDiffTime = 0;
 		float altiDiffDist = 0;
 
-		if (fChkAdjustStartAltitude.getSelection() && isIntoDistance) {
+		if (fChkAdjustStartAltitude.getSelection() && isSourceAltitude && isTargetDistance) {
 
-			final int[] adjustedIntoAltitudeSerie = new int[serieLength];
+			/*
+			 * adjust start altitude until left slider
+			 */
+
+			final int[] adjustedTargetAltitudeSerie = new int[serieLength];
 
 			float startAltiDiff = newSourceAltiDiffSerie[0];
 			final int endIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
 			final float distanceDiff = targetDistanceSerie[endIndex];
 
-			final int[] altitudeSerie = fIntoTourData.altitudeSerie;
+			final int[] altitudeSerie = fTargetTour.altitudeSerie;
 
 			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -376,23 +416,23 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 					// add adjusted altitude
 
-					final float intoDistance = targetDistanceSerie[serieIndex];
-					final float distanceScale = 1 - intoDistance / distanceDiff;
+					final float targetDistance = targetDistanceSerie[serieIndex];
+					final float distanceScale = 1 - targetDistance / distanceDiff;
 					final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
 					final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
-					adjustedIntoAltitudeSerie[serieIndex] = newAltitude;
+					adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
 					newSourceAltiDiffSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
 
 				} else {
 
 					// add altitude which are not adjusted
 
-					adjustedIntoAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
+					adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
 				}
 			}
 
-			fFromTourData.mergeAdjustedAltitudeSerie = adjustedIntoAltitudeSerie;
+			fSourceTour.mergeAdjustedDataSerie = adjustedTargetAltitudeSerie;
 
 			startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
 
@@ -401,20 +441,23 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			// meter/meter
 			altiDiffDist = ((startAltiDiff * 1000) / targetDistanceSerie[endIndex]) / UI.UNIT_VALUE_DISTANCE;
 
-		} else if (fChkAdjustAltitudeFromSource.getSelection() && isIntoDistance) {
+		} else if (fChkAdjustAltitudeFromSource.getSelection() && isSourceAltitude & isTargetDistance) {
 
+			/*
+			 * adjust target altitude from source altitude
+			 */
 			final int[] newTargetAltitudeSerie = new int[serieLength];
 
 			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 				newTargetAltitudeSerie[serieIndex] = newSourceAltitudeSerie[serieIndex];
 			}
 
-			fFromTourData.mergeAdjustedAltitudeSerie = newTargetAltitudeSerie;
+			fSourceTour.mergeAdjustedDataSerie = newTargetAltitudeSerie;
 
 		} else {
 
 			// disable adjusted altitude
-			fFromTourData.mergeAdjustedAltitudeSerie = null;
+			fSourceTour.mergeAdjustedDataSerie = null;
 		}
 
 		updateUI(altiDiffTime, altiDiffDist);
@@ -441,12 +484,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		super.create();
 
 		setTitle(NLS.bind(Messages.tour_merger_dialog_header_title,
-				TourManager.getTourTitle(fIntoTourData),
-				fIntoTourData.getDeviceName()));
+				TourManager.getTourTitle(fTargetTour),
+				fTargetTour.getDeviceName()));
 
 		setMessage(NLS.bind(Messages.tour_merger_dialog_header_message,
-				TourManager.getTourTitle(fFromTourData),
-				fFromTourData.getDeviceName()));
+				TourManager.getTourTitle(fSourceTour),
+				fSourceTour.getDeviceName()));
 
 		createDataBackup();
 
@@ -457,7 +500,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		computeMergedData();
 
 		// set alti diff scaling
-		fTourChartConfig.isRelativeAltiDiffScaling = fChkAltiDiffScaling.getSelection();
+		fTourChartConfig.isRelativeValueDiffScaling = fChkValueDiffScaling.getSelection();
+		fTourChartConfig.measurementSystem = UI.UNIT_VALUE_ALTITUDE;
 		fTourChart.updateMergeLayer(true);
 
 		updateUIFromTourData();
@@ -491,15 +535,17 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		fBackupFromTimeSerie = createDataSerieBackup(fFromTourData.timeSerie);
-		fBackupFromDistanceSerie = createDataSerieBackup(fFromTourData.distanceSerie);
-		fBackupFromAltitudeSerie = createDataSerieBackup(fFromTourData.altitudeSerie);
-		fBackupFromTourType = fFromTourData.getTourType();
+		fBackupSourceTimeSerie = createDataSerieBackup(fSourceTour.timeSerie);
+		fBackupSourceDistanceSerie = createDataSerieBackup(fSourceTour.distanceSerie);
+		fBackupSourceAltitudeSerie = createDataSerieBackup(fSourceTour.altitudeSerie);
+		fBackupSourceTourType = fSourceTour.getTourType();
 
-		fBackupIntoTemperatureSerie = createDataSerieBackup(fIntoTourData.temperatureSerie);
+		fBackupTargetPulseSerie = createDataSerieBackup(fTargetTour.pulseSerie);
+		fBackupTargetTemperatureSerie = createDataSerieBackup(fTargetTour.temperatureSerie);
+		fBackupTargetCadenceSerie = createDataSerieBackup(fTargetTour.cadenceSerie);
 
-		fBackupIntoTimeOffset = fIntoTourData.getMergedTourTimeOffset();
-		fBackupIntoAltitudeOffset = fIntoTourData.getMergedAltitudeOffset();
+		fBackupTargetTimeOffset = fTargetTour.getMergedTourTimeOffset();
+		fBackupTargetAltitudeOffset = fTargetTour.getMergedAltitudeOffset();
 	}
 
 	@Override
@@ -520,24 +566,30 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 		createUITourChart(dlgContainer);
 
-		/*
-		 * column: adjustments
-		 */
+		// column container
 		final Composite columnContainer = new Composite(dlgContainer, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(columnContainer);
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(20, 0).applyTo(columnContainer);
+//		columnContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
-		createUISectionAdjustments(columnContainer);
+		/*
+		 * column: display/adjustments
+		 */
+		final Composite columnDisplay = new Composite(columnContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(columnDisplay);
+		GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(1).applyTo(columnDisplay);
+
+		createUISectionDisplayOptions(columnDisplay);
+		createUISectionAdjustments(columnDisplay);
 
 		/*
 		 * column: options
 		 */
-		final Composite optionContainer = new Composite(columnContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(optionContainer);
-		GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(1).applyTo(optionContainer);
+		final Composite columnOptions = new Composite(columnContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).applyTo(columnOptions);
+		GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(1).applyTo(columnOptions);
 
-		createUISectionSaveActions(optionContainer);
-		createUISectionDisplayOptions(optionContainer);
+		createUISectionSaveActions(columnOptions);
 	}
 
 	/**
@@ -650,22 +702,25 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 		final PixelConverter pc = new PixelConverter(parent);
 
-		final Group groupAltitude = new Group(parent, SWT.NONE);
-		groupAltitude.setText(Messages.tour_merger_group_adjust_altitude);
-		GridDataFactory.swtDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(groupAltitude);
-		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 0).spacing(0, 0).applyTo(groupAltitude);
-//		groupAltitude.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		fGroupAltitude = new Group(parent, SWT.NONE);
+		fGroupAltitude.setText(Messages.tour_merger_group_adjust_altitude);
+		GridDataFactory.swtDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(fGroupAltitude);
+		GridLayoutFactory.fillDefaults()
+				.numColumns(4)
+				.extendedMargins(0, 0, 0, 0)
+				.spacing(0, 0)
+				.applyTo(fGroupAltitude);
 
 		/*
 		 * scale: altitude 20m
 		 */
-		fLabelAltitudeDiff1 = new Label(groupAltitude, SWT.TRAIL);
+		fLabelAltitudeDiff1 = new Label(fGroupAltitude, SWT.TRAIL);
 		GridDataFactory.fillDefaults()
 				.align(SWT.END, SWT.CENTER)
 				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 				.applyTo(fLabelAltitudeDiff1);
 
-		fScaleAltitude1 = new Scale(groupAltitude, SWT.HORIZONTAL);
+		fScaleAltitude1 = new Scale(fGroupAltitude, SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleAltitude1);
 		fScaleAltitude1.setMinimum(0);
 		fScaleAltitude1.setMaximum(MAX_ADJUST_ALTITUDE_1 * 2);
@@ -680,13 +735,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * scale: altitude 100m
 		 */
-		fLabelAltitudeDiff10 = new Label(groupAltitude, SWT.TRAIL);
+		fLabelAltitudeDiff10 = new Label(fGroupAltitude, SWT.TRAIL);
 		GridDataFactory.fillDefaults()
 				.align(SWT.END, SWT.CENTER)
 				.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 				.applyTo(fLabelAltitudeDiff10);
 
-		fScaleAltitude10 = new Scale(groupAltitude, SWT.HORIZONTAL);
+		fScaleAltitude10 = new Scale(fGroupAltitude, SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleAltitude10);
 		fScaleAltitude10.setMinimum(0);
 		fScaleAltitude10.setMaximum(MAX_ADJUST_ALTITUDE_10 * 2);
@@ -701,7 +756,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	private void createUISectionAdjustments(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 
 		createUIGroupHorizAdjustment(container);
@@ -711,20 +768,44 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	private void createUISectionDisplayOptions(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.indent(0, 10)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.tour_merger_group_display_options);
+		group.setToolTipText(Messages.tour_merger_group_display_options_tooltip);
+		GridDataFactory.swtDefaults()//
+				.grab(true, false)
+				.align(SWT.FILL, SWT.FILL)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).spacing(30, 0).applyTo(group);
+
+		/*
+		 * column 1:
+		 */
+		final Composite column1 = new Composite(group, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).applyTo(column1);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(column1);
+
+		/*
+		 * label: source tour
+		 */
+		final Label label = new Label(column1, SWT.NONE);
+		label.setText(Messages.tour_merger_label_source_tour);
+
+		createUISourceGraphActions(column1);
+
+		/*
+		 * column 2:
+		 */
+		final Composite column2 = new Composite(group, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(column2);
+		GridLayoutFactory.fillDefaults().applyTo(column2);
 
 		/*
 		 * checkbox: display relative or absolute scale
 		 */
-		fChkAltiDiffScaling = new Button(container, SWT.CHECK);
-		fChkAltiDiffScaling.setText(Messages.tour_merger_chk_alti_diff_scaling);
-		fChkAltiDiffScaling.setToolTipText(Messages.tour_merger_chk_alti_diff_scaling_tooltip);
-		fChkAltiDiffScaling.addSelectionListener(new SelectionAdapter() {
+		fChkValueDiffScaling = new Button(column2, SWT.CHECK);
+		fChkValueDiffScaling.setText(Messages.tour_merger_chk_alti_diff_scaling);
+		fChkValueDiffScaling.setToolTipText(Messages.tour_merger_chk_alti_diff_scaling_tooltip);
+		fChkValueDiffScaling.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
@@ -734,7 +815,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * checkbox: preview chart
 		 */
-		fChkPreviewChart = new Button(container, SWT.CHECK);
+		fChkPreviewChart = new Button(column2, SWT.CHECK);
 		fChkPreviewChart.setText(Messages.tour_merger_chk_preview_graphs);
 		fChkPreviewChart.setToolTipText(Messages.tour_merger_chk_preview_graphs_tooltip);
 		fChkPreviewChart.addSelectionListener(new SelectionAdapter() {
@@ -862,7 +943,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 				if (isAdjustAltitude) {
 
 					// set relative scaling for altitude diff
-					fChkAltiDiffScaling.setSelection(false);
+					fChkValueDiffScaling.setSelection(false);
 				}
 
 				onModifyProperties();
@@ -951,6 +1032,50 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	}
 
+	private void createUISourceGraphActions(final Composite parent) {
+
+		fActionSourceTourAltitude = new ActionSourceTourGraph(this,
+				TourManager.GRAPH_ALTITUDE,
+				Messages.Graph_Label_Altitude,
+				Messages.merge_tour_source_graph_altitude_tooltip,
+				Messages.Image__graph_altitude,
+				Messages.Image__graph_altitude_disabled);
+
+		fActionSourceTourPulse = new ActionSourceTourGraph(this,
+				TourManager.GRAPH_PULSE,
+				Messages.Graph_Label_Heartbeat,
+				Messages.merge_tour_source_graph_heartbeat_tooltip,
+				Messages.Image__graph_heartbeat,
+				Messages.Image__graph_heartbeat_disabled);
+
+		fActionSourceTourTemperature = new ActionSourceTourGraph(this,
+				TourManager.GRAPH_TEMPERATURE,
+				Messages.Graph_Label_Temperature,
+				Messages.merge_tour_source_graph_temperature_tooltip,
+				Messages.Image__graph_temperature,
+				Messages.Image__graph_temperature_disabled);
+
+		fActionSourceTourCadence = new ActionSourceTourGraph(this,
+				TourManager.GRAPH_CADENCE,
+				Messages.Graph_Label_Cadence,
+				Messages.merge_tour_source_graph_cadence_tooltip,
+				Messages.Image__graph_cadence,
+				Messages.Image__graph_cadence_disabled);
+
+		// create the toolbar 
+		final ToolBar toolBarControl = new ToolBar(parent, SWT.FLAT);
+
+		// create toolbar manager
+		final ToolBarManager tbm = new ToolBarManager(toolBarControl);
+
+		tbm.add(fActionSourceTourAltitude);
+		tbm.add(fActionSourceTourPulse);
+		tbm.add(fActionSourceTourTemperature);
+		tbm.add(fActionSourceTourCadence);
+
+		tbm.update(true);
+	}
+
 	private void createUITourChart(final Composite dlgContainer) {
 
 		fTourChart = new TourChart(dlgContainer, SWT.BORDER, true);
@@ -974,7 +1099,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				// set title
-				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fIntoTourData));
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTargetTour));
 			}
 		});
 
@@ -992,41 +1117,57 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	private void enableActions() {
 
-		if (fFromTourData.temperatureSerie == null) {
-			fChkMergeTemperature.setSelection(false);
-			fChkMergeTemperature.setEnabled(false);
-		}
-
-		if (fIntoTourData.distanceSerie == null) {
-			fChkAdjustStartAltitude.setSelection(false);
-			fChkAdjustStartAltitude.setEnabled(false);
-		}
-
-		final boolean isAdjustAltitude = fChkAdjustStartAltitude.getSelection();
-		fLblAdjustAltiValueDistance.setEnabled(isAdjustAltitude);
-		fLblAdjustAltiValueDistanceUnit.setEnabled(isAdjustAltitude);
-		fLblAdjustAltiValueTime.setEnabled(isAdjustAltitude);
-		fLblAdjustAltiValueTimeUnit.setEnabled(isAdjustAltitude);
+		final boolean isSourceAltitude = fSourceTour.altitudeSerie != null;
+		final boolean isAdjustAltitude = fChkAdjustStartAltitude.getSelection() && isSourceAltitude;
+		final boolean isSetTourType = fChkSetTourType.getSelection();
 
 		// this option can not be modified it's just for information
 		fChkKeepHVAdjustments.setSelection(true);
 		fChkKeepHVAdjustments.setEnabled(false);
 
-		fChkLinearInterpolation.setEnabled(fChkAdjustAltitudeFromSource.getSelection());
+		if (fSourceTour.temperatureSerie == null) {
+			fChkMergeTemperature.setSelection(false);
+			fChkMergeTemperature.setEnabled(false);
+		}
 
-		final boolean isSetTourType = fChkSetTourType.getSelection();
+		// adjust start altitude
+		if (fTargetTour.distanceSerie == null || isSourceAltitude == false) {
+			fChkAdjustStartAltitude.setSelection(false);
+			fChkAdjustStartAltitude.setEnabled(false);
+		}
+		fLblAdjustAltiValueDistance.setEnabled(isAdjustAltitude);
+		fLblAdjustAltiValueDistanceUnit.setEnabled(isAdjustAltitude);
+		fLblAdjustAltiValueTime.setEnabled(isAdjustAltitude);
+		fLblAdjustAltiValueTimeUnit.setEnabled(isAdjustAltitude);
 
+		// adjust from source altitude
+		if (isSourceAltitude == false) {
+			fChkAdjustAltitudeFromSource.setSelection(false);
+			fChkAdjustAltitudeFromSource.setEnabled(false);
+		}
+		fChkLinearInterpolation.setEnabled(isSourceAltitude && fChkAdjustAltitudeFromSource.getSelection());
+
+		// set tour type
 		fTourTypeLink.setEnabled(isSetTourType);
 
 		/*
-		 * CLabel cannot be disabled
+		 * CLabel cannot be disabled, show disabled control with another color
 		 */
 		if (isSetTourType) {
 			fLblTourType.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		} else {
 			fLblTourType.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		}
-		
+
+		/*
+		 * adjustment controls
+		 */
+		fGroupAltitude.setEnabled(isSourceAltitude);
+		fScaleAltitude1.setEnabled(isSourceAltitude);
+		fScaleAltitude10.setEnabled(isSourceAltitude);
+		fLabelAltitudeDiff1.setEnabled(isSourceAltitude);
+		fLabelAltitudeDiff10.setEnabled(isSourceAltitude);
+
 	}
 
 	@Override
@@ -1039,7 +1180,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-		selectedTours.add(fFromTourData);
+		selectedTours.add(fSourceTour);
 
 		return selectedTours;
 	}
@@ -1076,12 +1217,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fLabelAdjustMinuteValue.setText(Integer.toString(minutes));
 		fLabelAdjustHourValue.setText(Integer.toString(hours));
 
-		fIntoTourData.setMergedTourTimeOffset(hours * 3600 + minutes * 60 + seconds);
-		fIntoTourData.setMergedAltitudeOffset(altiDiff1 + altiDiff10);
+		fTargetTour.setMergedTourTimeOffset(hours * 3600 + minutes * 60 + seconds);
+		fTargetTour.setMergedAltitudeOffset(altiDiff1 + altiDiff10);
 
 		computeMergedData();
 
-		fTourChartConfig.isRelativeAltiDiffScaling = fChkAltiDiffScaling.getSelection();
+		fTourChartConfig.isRelativeValueDiffScaling = fChkValueDiffScaling.getSelection();
 
 		if (fChkPreviewChart.getSelection()) {
 			// update chart
@@ -1090,7 +1231,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			// update only the merge layer, this is much faster
 			fTourChart.updateMergeLayer(true);
 		}
-		
+
 		enableActions();
 	}
 
@@ -1110,14 +1251,16 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * get original data from the backuped data
 		 */
-		fFromTourData.timeSerie = createDataSerieBackup(fBackupFromTimeSerie);
-		fFromTourData.distanceSerie = createDataSerieBackup(fBackupFromDistanceSerie);
-		fFromTourData.altitudeSerie = createDataSerieBackup(fBackupFromAltitudeSerie);
+		fSourceTour.timeSerie = createDataSerieBackup(fBackupSourceTimeSerie);
+		fSourceTour.distanceSerie = createDataSerieBackup(fBackupSourceDistanceSerie);
+		fSourceTour.altitudeSerie = createDataSerieBackup(fBackupSourceAltitudeSerie);
 
-		fIntoTourData.temperatureSerie = createDataSerieBackup(fBackupIntoTemperatureSerie);
+		fTargetTour.pulseSerie = createDataSerieBackup(fBackupTargetPulseSerie);
+		fTargetTour.temperatureSerie = createDataSerieBackup(fBackupTargetTemperatureSerie);
+		fTargetTour.cadenceSerie = createDataSerieBackup(fBackupTargetCadenceSerie);
 
-		fIntoTourData.setMergedTourTimeOffset(fBackupIntoTimeOffset);
-		fIntoTourData.setMergedAltitudeOffset(fBackupIntoAltitudeOffset);
+		fTargetTour.setMergedTourTimeOffset(fBackupTargetTimeOffset);
+		fTargetTour.setMergedAltitudeOffset(fBackupTargetAltitudeOffset);
 
 		updateUIFromTourData();
 
@@ -1131,15 +1274,17 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	 */
 	private void restoreDataBackup() {
 
-		fFromTourData.timeSerie = fBackupFromTimeSerie;
-		fFromTourData.distanceSerie = fBackupFromDistanceSerie;
-		fFromTourData.altitudeSerie = fBackupFromAltitudeSerie;
-		fFromTourData.setTourType(fBackupFromTourType);
+		fSourceTour.timeSerie = fBackupSourceTimeSerie;
+		fSourceTour.distanceSerie = fBackupSourceDistanceSerie;
+		fSourceTour.altitudeSerie = fBackupSourceAltitudeSerie;
+		fSourceTour.setTourType(fBackupSourceTourType);
 
-		fIntoTourData.temperatureSerie = fBackupIntoTemperatureSerie;
+		fTargetTour.pulseSerie = fBackupTargetPulseSerie;
+		fTargetTour.temperatureSerie = fBackupTargetTemperatureSerie;
+		fTargetTour.cadenceSerie = fBackupTargetCadenceSerie;
 
-		fIntoTourData.setMergedTourTimeOffset(fBackupIntoTimeOffset);
-		fIntoTourData.setMergedAltitudeOffset(fBackupIntoAltitudeOffset);
+		fTargetTour.setMergedTourTimeOffset(fBackupTargetTimeOffset);
+		fTargetTour.setMergedAltitudeOffset(fBackupTargetAltitudeOffset);
 	}
 
 	private void restoreState() {
@@ -1147,7 +1292,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		fChkPreviewChart.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART));
-		fChkAltiDiffScaling.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING));
+		fChkValueDiffScaling.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING));
 
 		fChkLinearInterpolation.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_LINEAR_INTERPOLATION));
 		fChkMergeTemperature.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_MERGE_TEMPERATURE));
@@ -1159,7 +1304,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		 * set tour type
 		 */
 		fChkSetTourType.setSelection(prefStore.getBoolean(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE));
-		if (fFromTourData.getTourPerson() == null) {
+		if (fSourceTour.getTourPerson() == null) {
 
 			// tour is not saved, used tour type id from pref store
 
@@ -1170,15 +1315,21 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			for (final TourType tourType : tourTypes) {
 				if (tourType.getTypeId() == tourTypeId) {
 
-					fFromTourData.setTourType(tourType);
+					fSourceTour.setTourType(tourType);
 
-					fIsMergeFromTourModified = true;
+					fIsMergeSourceTourModified = true;
 
 					break;
 				}
 			}
 		}
 
+		/*
+		 * source tour graphs
+		 */
+		// selected source graph
+		final int prefSourceGraphId = prefStore.getInt(ITourbookPreferences.MERGE_TOUR_SOURCE_GRAPH_ID);
+		setSelectedSourceGraph(prefSourceGraphId);
 	}
 
 	private void saveState() {
@@ -1190,7 +1341,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 				: TourManager.X_AXIS_DISTANCE);
 
 		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART, fChkPreviewChart.getSelection());
-		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, fChkAltiDiffScaling.getSelection());
+		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, fChkValueDiffScaling.getSelection());
 
 		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_MERGE_TEMPERATURE, fChkMergeTemperature.getSelection());
 		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_LINEAR_INTERPOLATION, fChkLinearInterpolation.getSelection());
@@ -1198,10 +1349,24 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, fChkSetTourType.getSelection());
 
 		// save tour type id
-		final TourType fromTourType = fFromTourData.getTourType();
-		if (fromTourType != null) {
-			prefStore.setValue(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, fromTourType.getTypeId());
+		final TourType sourceTourType = fSourceTour.getTourType();
+		if (sourceTourType != null) {
+			prefStore.setValue(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, sourceTourType.getTypeId());
 		}
+
+		// save source tour graph
+		int sourceGraphId = -1;
+		if (fActionSourceTourAltitude.isChecked()) {
+			sourceGraphId = fActionSourceTourAltitude.getGraphId();
+		} else if (fActionSourceTourPulse.isChecked()) {
+			sourceGraphId = fActionSourceTourPulse.getGraphId();
+		} else if (fActionSourceTourTemperature.isChecked()) {
+			sourceGraphId = fActionSourceTourTemperature.getGraphId();
+		} else if (fActionSourceTourCadence.isChecked()) {
+			sourceGraphId = fActionSourceTourCadence.getGraphId();
+		}
+		prefStore.setValue(ITourbookPreferences.MERGE_TOUR_SOURCE_GRAPH_ID, sourceGraphId);
+
 	}
 
 	private void saveTour() {
@@ -1210,47 +1375,119 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			// temperature is already merged
 		} else {
 			// restore temperature values because temperature should not be saved
-			fIntoTourData.temperatureSerie = fBackupIntoTemperatureSerie;
+			fTargetTour.pulseSerie = fBackupTargetPulseSerie;
+			fTargetTour.temperatureSerie = fBackupTargetTemperatureSerie;
+			fTargetTour.cadenceSerie = fBackupTargetCadenceSerie;
 		}
 
-		if (fChkAdjustStartAltitude.getSelection() && fFromTourData.mergeAdjustedAltitudeSerie != null) {
+		if ((fChkAdjustStartAltitude.getSelection() || fChkAdjustAltitudeFromSource.getSelection())
+				&& fSourceTour.mergeAdjustedDataSerie != null) {
 
-			/*
-			 * put the adjusted altitude into the tour which is merged from the start until the
-			 * first slider
-			 */
-
-			fIntoTourData.altitudeSerie = fFromTourData.mergeAdjustedAltitudeSerie;
+			// update target altitude from adjuste source altitude
+			fTargetTour.altitudeSerie = fSourceTour.mergeAdjustedDataSerie;
 
 			// adjust altitude up/down values
-			fIntoTourData.computeAltitudeUpDown();
+			fTargetTour.computeAltitudeUpDown();
 		}
 
 		if (fChkSetTourType.getSelection() == false) {
 
 			// restore backup values
 
-			fFromTourData.setTourType(fBackupFromTourType);
+			fSourceTour.setTourType(fBackupSourceTourType);
 		}
 
 		// set tour id into which the tour is merged
-		fFromTourData.setTourPerson(fIntoTourData.getTourPerson());
-		fFromTourData.setMergeIntoTourId(fIntoTourData.getTourId());
+		fSourceTour.setTourPerson(fTargetTour.getTourPerson());
+		fSourceTour.setMergeTargetTourId(fTargetTour.getTourId());
 
 		// save modified tours
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-		modifiedTours.add(fIntoTourData);
-		modifiedTours.add(fFromTourData);
+		modifiedTours.add(fTargetTour);
+		modifiedTours.add(fSourceTour);
 
 		TourManager.saveModifiedTours(modifiedTours);
 
 		fIsTourSaved = true;
 	}
 
+	private void setSelectedSourceGraph(final int newSelectedSourceGraphId) {
+
+		fSelectedSourceGraphId = -1;
+
+		final boolean isSourceAltitude = fSourceTour.altitudeSerie != null;
+		fActionSourceTourAltitude.setEnabled(isSourceAltitude);
+
+		final boolean isSourcePulse = fSourceTour.pulseSerie != null;
+		fActionSourceTourPulse.setEnabled(isSourcePulse);
+
+		final boolean isSourceTemperature = fSourceTour.temperatureSerie != null;
+		fActionSourceTourTemperature.setEnabled(isSourceTemperature);
+
+		final boolean isSourceCadence = fSourceTour.cadenceSerie != null;
+		fActionSourceTourCadence.setEnabled(isSourceCadence);
+
+		fActionSourceTourAltitude.setChecked(false);
+		fActionSourceTourPulse.setChecked(false);
+		fActionSourceTourTemperature.setChecked(false);
+		fActionSourceTourCadence.setChecked(false);
+
+		switch (newSelectedSourceGraphId) {
+		case TourManager.GRAPH_ALTITUDE:
+			if (isSourceAltitude) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourAltitude.setChecked(true);
+			}
+			break;
+
+		case TourManager.GRAPH_PULSE:
+			if (isSourcePulse) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourPulse.setChecked(true);
+			}
+			break;
+
+		case TourManager.GRAPH_TEMPERATURE:
+			if (isSourceTemperature) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourTemperature.setChecked(true);
+			}
+			break;
+
+		case TourManager.GRAPH_CADENCE:
+			if (isSourceCadence) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourCadence.setChecked(true);
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		if (fSelectedSourceGraphId == -1) {
+
+			// a graph is not selected, select one
+			if (isSourceAltitude) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourAltitude.setChecked(true);
+			} else if (isSourcePulse) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourPulse.setChecked(true);
+			} else if (isSourceTemperature) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourTemperature.setChecked(true);
+			} else if (isSourceCadence) {
+				fSelectedSourceGraphId = newSelectedSourceGraphId;
+				fActionSourceTourCadence.setChecked(true);
+			}
+		}
+	}
+
 	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
 		// tour type was modified
-		fIsMergeFromTourModified = true;
+		fIsMergeSourceTourModified = true;
 
 		updateUIFromTourData();
 	}
@@ -1259,7 +1496,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 		fIsChartUpdated = true;
 
-		fTourChart.updateTourChart(fIntoTourData, fTourChartConfig, true);
+		fTourChart.updateTourChart(fTargetTour, fTourChartConfig, true);
 
 		fIsChartUpdated = false;
 	}
@@ -1288,8 +1525,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * show time offset
 		 */
-		final int mergedTourTimeOffset = fIntoTourData.getMergedTourTimeOffset();
-		final int mergedMetricAltitudeOffset = fIntoTourData.getMergedAltitudeOffset();
+		final int mergedTourTimeOffset = fTargetTour.getMergedTourTimeOffset();
+		final int mergedMetricAltitudeOffset = fTargetTour.getMergedAltitudeOffset();
 
 		final int seconds = mergedTourTimeOffset % 60;
 		final int minutes = mergedTourTimeOffset / 60 % 60;
@@ -1309,7 +1546,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fScaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
 		fScaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
 
-		UI.updateUITourType(fFromTourData.getTourType(), fLblTourType);
+		UI.updateUITourType(fSourceTour.getTourType(), fLblTourType);
 
 		onModifyProperties();
 	}
