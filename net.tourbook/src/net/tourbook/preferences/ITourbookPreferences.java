@@ -171,17 +171,20 @@ public interface ITourbookPreferences {
 	 * merge tour dialog
 	 */
 	public static final String	MERGE_TOUR_GRAPH_X_AXIS						= "merge.tour.chart-x-axis";								//$NON-NLS-1$
-	public static final String	MERGE_TOUR_SOURCE_GRAPH_ID					= "merge.tour.source-graph-id";							//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_ADJUST_START_ALTITUDE			= "merge.tour.adjust-start-altitude";						//$NON-NLS-1$
-	public static final String	MERGE_TOUR_MERGE_TEMPERATURE				= "merge.tour.merge-temperature-values";					//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_SET_TOUR_TYPE					= "merge.tour.set-tour-type-for-merge-from-tour";			//$NON-NLS-1$
 	public static final String	MERGE_TOUR_SET_TOUR_TYPE_ID					= "merge.tour.set-tour-type-id";							//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_LINEAR_INTERPOLATION				= "merge.tour.use-linear-interpolation";					//$NON-NLS-1$
+
+	public static final String	MERGE_TOUR_MERGE_GRAPH_ALTITUDE				= "merge.tour.merge-graph-altitude";						//$NON-NLS-1$
+	public static final String	MERGE_TOUR_MERGE_GRAPH_PULSE				= "merge.tour.merge-graph-pulse";							//$NON-NLS-1$
+	public static final String	MERGE_TOUR_MERGE_GRAPH_TEMPERATURE			= "merge.tour.merge-graph-temperature";					//$NON-NLS-1$
+	public static final String	MERGE_TOUR_MERGE_GRAPH_CADENCE				= "merge.tour.merge-graph-cadence";						//$NON-NLS-1$
 
 }

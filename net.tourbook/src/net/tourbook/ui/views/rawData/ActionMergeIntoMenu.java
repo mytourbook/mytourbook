@@ -97,7 +97,7 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 					&& mergeFromTour != selectedTour
 					//
 					// check if the merge tour id is set
-					&& selectedTour.getMergeTargetTourId() == null
+//					&& selectedTour.getMergeTargetTourId() == null
 					//
 					// check if time series are available
 					&& selectedTour.timeSerie != null

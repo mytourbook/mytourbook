@@ -56,31 +56,23 @@ public class ChartMergeLayer implements IChartLayer {
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
 		final int xValues[] = fXDataSerie;
-		final int yLayerValues[] = fLayerTourData.mergeDataSerie;
-		final int yLayerDiffValues[] = fLayerTourData.mergeDataDiff;
-		final int[] yAdjustedLayerValues = fLayerTourData.mergeAdjustedDataSerie;
+		final int yValues[] = fLayerTourData.mergeDataSerie;
+
+		final int yDiffValues[] = fLayerTourData.mergeDiffDataSerie;
+		final int[] yAdjustedValues = fLayerTourData.mergeAdjustedDataSerie;
+
+		final boolean isDiffValues = yDiffValues != null;
+		final boolean isAdjustedValues = yAdjustedValues != null;
+
 		final float measurementSystem = fTourChartConfig.measurementSystem;
 
-		if (xValues == null || xValues.length == 0 || yLayerValues == null || yLayerValues.length == 0) {
+		if (xValues == null || xValues.length == 0 || yValues == null || yValues.length == 0) {
 			return;
 		}
-
-		/*
-		 * convert all diff values into positive values
-		 */
-		int maxValueDiff = 0;
-		int valueIndex = 0;
-		final int diffValues[] = new int[yLayerDiffValues.length];
-		for (int valueDiff : yLayerDiffValues) {
-			diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
-			maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
-		}
-		maxValueDiff /= measurementSystem;
 
 		final ChartDataYSerie yData = drawingData.getYData();
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
-		float valueDiffScaling = scaleY;
 
 		// get the horizontal offset for the graph
 		final int graphValueOffset = (int) (Math.max(0, chart.getDevGraphImageXOffset()) / scaleX);
@@ -102,9 +94,27 @@ public class ChartMergeLayer implements IChartLayer {
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - devGraphHeight;
 
-		// get value diff scaling
-		if (fTourChartConfig.isRelativeValueDiffScaling) {
-			valueDiffScaling = maxValueDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxValueDiff;
+		/*
+		 * convert all diff values into positive values
+		 */
+		int diffValues[] = null;
+		float valueDiffScaling = scaleY;
+		if (isDiffValues) {
+
+			int valueIndex = 0;
+			int maxValueDiff = 0;
+
+			diffValues = new int[yDiffValues.length];
+			for (int valueDiff : yDiffValues) {
+				diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
+				maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
+			}
+			maxValueDiff /= measurementSystem;
+
+			// set value diff scaling
+			if (fTourChartConfig.isRelativeValueDiffScaling) {
+				valueDiffScaling = maxValueDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxValueDiff;
+			}
 		}
 
 		// position for the x-axis line in the graph
@@ -121,24 +131,22 @@ public class ChartMergeLayer implements IChartLayer {
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
 			// make sure the x-index is not higher than the yValues length
-			if (xValueIndex >= yLayerValues.length) {
+			if (xValueIndex >= yValues.length) {
 				return;
 			}
 
 			final int graphXValue = xValues[xValueIndex] - graphValueOffset;
-			final int graphYValue = (int) (yLayerValues[xValueIndex] / measurementSystem);
-			final int graphValueDiff = (int) (diffValues[xValueIndex] / measurementSystem);
+			final int graphYValue = (int) (yValues[xValueIndex] / measurementSystem);
 
 			final float devXValue = graphXValue * scaleX;
 			final float devYValue = graphYValue * scaleY;
-			final float devLayerValueDiff = graphValueDiff * valueDiffScaling;
 
 			/*
 			 * draw adjusted value graph
 			 */
-			if (yAdjustedLayerValues != null) {
+			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedLayerValues[xValueIndex] * scaleY / measurementSystem;
+				final float devYAdjustedValue = yAdjustedValues[xValueIndex] * scaleY / measurementSystem;
 
 				if (xValueIndex == startIndex) {
 
@@ -161,19 +169,34 @@ public class ChartMergeLayer implements IChartLayer {
 			}
 
 			/*
-			 * draw value and diff value graph
+			 * draw value graph
 			 */
 			if (xValueIndex == startIndex) {
 
 				// move to the first point
 				pathValue.moveTo(devXValue, devY0 - devYValue);
-				pathValueDiff.moveTo(devXValue, devYBottom - devLayerValueDiff);
 			}
 
 			// draw line to the next point
 			pathValue.lineTo(devXValue, devY0 - devYValue);
-			pathValueDiff.lineTo(devXValue, devYBottom - devLayerValueDiff);
 
+			/*
+			 * draw diff values
+			 */
+			if (isDiffValues) {
+
+				final int graphValueDiff = (int) (diffValues[xValueIndex] / measurementSystem);
+				final float devLayerValueDiff = graphValueDiff * valueDiffScaling;
+
+				if (xValueIndex == startIndex) {
+
+					// move to the first point
+					pathValueDiff.moveTo(devXValue, devYBottom - devLayerValueDiff);
+				}
+
+				// draw line to the next point
+				pathValueDiff.lineTo(devXValue, devYBottom - devLayerValueDiff);
+			}
 		}
 
 		// draw the line of the graph
@@ -183,11 +206,9 @@ public class ChartMergeLayer implements IChartLayer {
 		gc.setClipping(graphRect);
 
 		/*
-		 * draw data graph
+		 * paint data graph
 		 */
-//		final RGB rgbGraph = new RGB(0x0, 0x0, 0xFF);
-		final RGB rgbGraph = new RGB(0xFF, 0x7C, 0x24);
-		Color colorFg = new Color(display, rgbGraph);
+		Color colorFg = new Color(display, new RGB(0xFF, 0x7C, 0x24));
 		gc.setForeground(colorFg);
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
@@ -195,17 +216,14 @@ public class ChartMergeLayer implements IChartLayer {
 		colorFg.dispose();
 
 		/*
-		 * draw adjusted value graph
+		 * paint adjusted value graph
 		 */
-		if (yAdjustedLayerValues != null) {
+		if (isAdjustedValues) {
 
-			colorFg = new Color(display, new RGB(0xFF, 0x7C, 0x24));
-			final Color colorBg1 = new Color(display, rgbBg1);
+			final Color colorBg = new Color(display, rgbBg1);
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//			gc.setForeground(colorFg);
-			gc.setBackground(colorBg1);
-
+			gc.setBackground(colorBg);
 			gc.setAlpha(0x80);
 
 			// fill background
@@ -216,23 +234,23 @@ public class ChartMergeLayer implements IChartLayer {
 			// draw graph
 			gc.drawPath(pathAdjustValue);
 
-			colorFg.dispose();
-			colorBg1.dispose();
+			colorBg.dispose();
 
 			gc.setAlpha(0xff);
 		}
 
 		/*
-		 * draw value diff graph
+		 * paint value diff graph
 		 */
-//		colorFg = new Color(display, new RGB(0xFF, 0x24, 0x24));
-//		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
-		colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
-		gc.setForeground(colorFg);
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+		if (isDiffValues) {
 
-		gc.drawPath(pathValueDiff);
-		colorFg.dispose();
+			colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
+			gc.setForeground(colorFg);
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+
+			gc.drawPath(pathValueDiff);
+			colorFg.dispose();
+		}
 
 		// dispose resources
 		pathValue.dispose();

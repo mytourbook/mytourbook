@@ -173,17 +173,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * merge tour dialog
 		 */
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
-		store.setDefault(ITourbookPreferences.MERGE_TOUR_SOURCE_GRAPH_ID, TourManager.GRAPH_ALTITUDE);
-
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_PREVIEW_CHART, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ALTITUDE_DIFF_SCALING, false);
 
 		// save actions
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, false);
+		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, false);
+
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_ADJUST_START_ALTITUDE, false);
-		store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_TEMPERATURE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_LINEAR_INTERPOLATION, false);
 
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
+
 	}
 }

@@ -227,10 +227,12 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 
 		// backup data
-		final Long backupMergeFromTourId = mergeIntoTour.getMergeSourceTourId();
+		final Long backupMergeSourceTourId = mergeIntoTour.getMergeSourceTourId();
+		final Long backupMergeTargetTourId = mergeIntoTour.getMergeTargetTourId();
 
 		// set tour data and tour id from which the tour is merged
 		mergeIntoTour.setMergeSourceTourId(mergeFromTour.getTourId());
+		mergeIntoTour.setMergeTargetTourId(null);
 
 		// set temp data, this is required by the dialog because the merge from tour could not be saved
 		mergeIntoTour.setMergeSourceTour(mergeFromTour);
@@ -239,7 +241,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 			// dialog is canceled, restore modified values
 
-			mergeIntoTour.setMergeSourceTourId(backupMergeFromTourId);
+			mergeIntoTour.setMergeSourceTourId(backupMergeSourceTourId);
+			mergeIntoTour.setMergeTargetTourId(backupMergeTargetTourId);
 		}
 
 		// reset temp tour data
@@ -1018,8 +1021,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final boolean isTourSelected = savedTours > 0;
 		final boolean isOneSavedAndValidTour = selectedValidTours == 1 && savedTours == 1;
 
-		final boolean canMergeIntoTour = selectedValidTours == 1
-				&& (firstValidTour == null ? true : firstValidTour.getMergeSourceTourId() == null);
+		final boolean canMergeIntoTour = selectedValidTours == 1;
+//				&& (firstValidTour == null ? true : firstValidTour.getMergeSourceTourId() == null);
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();

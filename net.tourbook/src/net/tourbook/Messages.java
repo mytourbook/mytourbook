@@ -717,6 +717,8 @@ public class Messages extends NLS {
 	public static String		tour_merger_label_invalid_data;
 
 	public static String	tour_merger_label_source_tour;
+
+	public static String	tour_merger_label_source_tour_tooltip;
 	public static String		tour_merger_reset_settings_tooltip;
 
 	public static String		tour_statistic_label_years;

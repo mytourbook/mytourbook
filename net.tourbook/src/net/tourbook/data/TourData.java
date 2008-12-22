@@ -556,7 +556,7 @@ public class TourData implements Comparable<Object> {
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]					mergeDataDiff;
+	public int[]					mergeDiffDataSerie;
 
 	/**
 	 * altitude data serie for the merged tour with metric measurement
