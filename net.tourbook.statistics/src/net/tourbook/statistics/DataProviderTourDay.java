@@ -181,7 +181,9 @@ public class DataProviderTourDay extends DataProvider {
 					dbMonths.add(tourMonth);
 					dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
 
-					dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					// round distance
+					final int distance = result.getInt(7);
+					dbDistance.add((int) (distance / UI.UNIT_VALUE_DISTANCE));
 					dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
 
 					dbTourStartTime.add(startTime);

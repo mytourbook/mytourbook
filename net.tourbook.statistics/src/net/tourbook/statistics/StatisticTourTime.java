@@ -409,22 +409,31 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				final Integer drivingTime = fTourTimeData.fTourDrivingTimeValues.get(valueIndex);
 				final int breakTime = recordingTime - drivingTime;
 
+				final float distance = fTourTimeData.fTourDistanceValues[valueIndex];
+				final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
+				final int pace = (int) (distance == 0 ? 0 : (drivingTime * 166.66f / distance));
+
 				final StringBuilder toolTipFormat = new StringBuilder();
 				toolTipFormat.append(Messages.tourtime_info_date_day);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_distance);
+				toolTipFormat.append(Messages.tourtime_info_distance_tour);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_altitude);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_time);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_recording_time);
+				toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
 				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_driving_time);
+				toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
 				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_break_time);
+				toolTipFormat.append(Messages.tourtime_info_break_time_tour);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_avg_speed);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_avg_pace);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_tour_type);
@@ -443,7 +452,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				//
 						beginDate,
 						//
-						fTourTimeData.fTourDistanceValues[valueIndex],
+						distance / 1000,
 						UI.UNIT_LABEL_DISTANCE,
 						//
 						fTourTimeData.fTourAltitudeValues[valueIndex],
@@ -459,12 +468,22 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						//
 						recordingTime / 3600,
 						(recordingTime % 3600) / 60,
+						(recordingTime % 3600) % 60,
 						//
 						drivingTime / 3600,
 						(drivingTime % 3600) / 60,
+						(drivingTime % 3600) % 60,
 						//
 						breakTime / 3600,
 						(breakTime % 3600) / 60,
+						(breakTime % 3600) % 60,
+						//
+						speed,
+						UI.UNIT_LABEL_SPEED,
+						//
+						pace / 60,
+						pace % 60,
+						UI.UNIT_LABEL_PACE,
 						//					
 						tourTypeName,
 						tourTags,

@@ -85,10 +85,10 @@ public class DataProviderTourYear extends DataProvider {
 				+ "tourType_typeId 			\n" //		7 //$NON-NLS-1$
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				
+
 				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
-				
+
 				+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY STARTYEAR"); //$NON-NLS-1$
 
@@ -143,7 +143,7 @@ public class DataProviderTourYear extends DataProvider {
 				}
 
 				dbTourTypeIds[colorIndex][yearIndex] = dbTourTypeIdObject == null ? -1 : dbTourTypeIdObject;
-				dbDistance[colorIndex][yearIndex] = (int) (result.getInt(2) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				dbDistance[colorIndex][yearIndex] = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
 				dbAltitude[colorIndex][yearIndex] = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
 				dbTime[colorIndex][yearIndex] = result.getInt(4);
 

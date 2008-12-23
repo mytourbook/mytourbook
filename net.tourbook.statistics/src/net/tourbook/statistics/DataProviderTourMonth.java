@@ -143,7 +143,7 @@ public class DataProviderTourMonth extends DataProvider {
 				}
 
 				dbTypeIds[colorIndex][monthIndex] = dbTypeIdObject == null ? -1 : dbTypeIdObject;
-				dbDistance[colorIndex][monthIndex] = (int) (result.getInt(3) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				dbDistance[colorIndex][monthIndex] = (int) ((result.getInt(3) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
 				dbAltitude[colorIndex][monthIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
 				dbDurationTime[colorIndex][monthIndex] = result.getInt(5);
 

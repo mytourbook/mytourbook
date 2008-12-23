@@ -123,7 +123,7 @@ public class DataProviderTourTime extends DataProvider {
 
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
-				
+
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
 		try {
@@ -195,7 +195,7 @@ public class DataProviderTourTime extends DataProvider {
 					dbTourStartTime.add(startTime);
 					dbTourEndTime.add((startTime + recordingTime));
 
-					dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					dbDistance.add((int) (result.getInt(7) / UI.UNIT_VALUE_DISTANCE));
 					dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
 
 					dbTourRecordingTime.add(recordingTime);

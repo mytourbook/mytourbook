@@ -43,7 +43,13 @@ public class Messages extends NLS {
 	public static String		NUMBERS_UNIT;
 
 	public static String		tourtime_info_altitude;
+	public static String	tourtime_info_avg_pace;
+
+	public static String	tourtime_info_avg_speed;
+
 	public static String		tourtime_info_break_time;
+
+	public static String	tourtime_info_break_time_tour;
 	public static String		tourtime_info_date_day;
 	public static String		tourtime_info_date_month;
 	public static String		tourtime_info_date_week;
@@ -51,8 +57,14 @@ public class Messages extends NLS {
 	public static String		tourtime_info_description;
 	public static String		tourtime_info_description_text;
 	public static String		tourtime_info_distance;
+
+	public static String	tourtime_info_distance_tour;
 	public static String		tourtime_info_driving_time;
+
+	public static String	tourtime_info_driving_time_tour;
 	public static String		tourtime_info_recording_time;
+
+	public static String	tourtime_info_recording_time_tour;
 	public static String		tourtime_info_tags;
 
 	public static String		tourtime_info_time;
