@@ -161,8 +161,9 @@ public class TVITourBookMonth extends TVITourBookItem {
 							TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);
 
-					if (tourItem.colDrivingTime != 0) {
-						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) tourItem.colDrivingTime * 3.6f;
+					final long drivingTime = tourItem.colDrivingTime;
+					if (drivingTime != 0) {
+						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) drivingTime * 3.6f;
 					}
 
 					if (resultTagId instanceof Long) {
