@@ -840,7 +840,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-		
+
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		// create tour id
@@ -1359,14 +1359,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return true;
 	}
 
-	public void clearEditorContent() {
+	private void clearEditorContent() {
 
-		fTourData = null;
-		fPostSelectionProvider.clearSelection();
+		if (fTourData != null && fIsTourDirty) {
 
-		setTourClean();
+			final TourData savedTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
 
-		fPageBook.showPage(fPageNoTour);
+			if (savedTourData == fTourData) {
+				updateUI(fTourData);
+			} else {
+
+				// TODO check if tour is valid
+
+				fIsSavingInProgress = true;
+
+				updateTourDataFromUI();
+
+				TourDatabase.saveTour(fTourData);
+
+				fIsSavingInProgress = false;
+			}
+
+		} else {
+
+			fTourData = null;
+			fPostSelectionProvider.clearSelection();
+
+			setTourClean();
+
+			fPageBook.showPage(fPageNoTour);
+		}
 	}
 
 	private boolean confirmUndoChanges() {

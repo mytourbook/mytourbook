@@ -338,25 +338,29 @@ public class UI {
 		return containedTourId;
 	}
 
-	public static Formatter format_hh_mm(final long drivingTime) {
+	public static Formatter format_hh_mm(final long time) {
 
 		fFormatterSB.setLength(0);
 
-		return fFormatter.format(//
-		Messages.Format_hhmm,
-				(drivingTime / 3600),
-				((drivingTime % 3600) / 60));
+		return fFormatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
 	}
 
-	public static final String format_hh_mm_ss(final long value) {
+	public static final String format_hh_mm_ss(final long time) {
 
 		fFormatterSB.setLength(0);
 
 		return fFormatter.format(//
 		Messages.Format_hhmmss,
-				(value / 3600),
-				((value % 3600) / 60),
-				((value % 3600) % 60)).toString();
+				(time / 3600),
+				((time % 3600) / 60),
+				((time % 3600) % 60)).toString();
+	}
+
+	public static Formatter format_mm_ss(final long time) {
+
+		fFormatterSB.setLength(0);
+
+		return fFormatter.format(Messages.Format_hhmm, (time / 60), (time % 60));
 	}
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
@@ -989,6 +993,7 @@ public class UI {
 		for (final TourType tourType : tourTypes) {
 			if (tourType.getTypeId() == tourTypeId) {
 				colorTourType = tourType;
+				break;
 			}
 		}
 

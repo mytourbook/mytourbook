@@ -150,6 +150,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private boolean					fIsDirtyDisabled	= false;
 
+	private boolean					fIsClearView;
+
 	private class ActionShowSegments extends Action {
 
 		public ActionShowSegments() {
@@ -392,6 +394,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 					// removed old tour data from the selection provider
 					fPostSelectionProvider.clearSelection();
+
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
 				}
 			}
 		};
@@ -406,10 +412,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (tourData == null) {
 
-			fPageBook.showPage(fPageNoData);
-
-			fTourData = null;
-			fTourChart = null;
+			clearView();
 
 			return false;
 		}
@@ -427,6 +430,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fPageBook.showPage(fPageSegmenter);
 
 		return true;
+	}
+
+	private void clearView() {
+
+		fPageBook.showPage(fPageNoData);
+
+		fTourData = null;
+		fTourChart = null;
+
+		fIsClearView = true;
 	}
 
 	private void createActions() {
@@ -675,8 +688,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				fNf.setMinimumFractionDigits(2);
-				fNf.setMaximumFractionDigits(2);
+				fNf.setMinimumFractionDigits(3);
+				fNf.setMaximumFractionDigits(3);
 
 				cell.setText(fNf.format((segment.distance) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
@@ -718,24 +731,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				if (segment.drivingTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					fNf.setMinimumFractionDigits(1);
-					fNf.setMaximumFractionDigits(1);
-					cell.setText(fNf.format(segment.speed));
-				}
+				fNf.setMinimumFractionDigits(1);
+				fNf.setMaximumFractionDigits(1);
+				cell.setText(fNf.format(segment.speed));
 			}
 		});
 
 		/*
-		 * column: pace
+		 * column: average pace
 		 */
-		colDef = TableColumnFactory.PACE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_PACE);
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
 				fSegmentViewer.refresh();
 			}
 		});
@@ -744,13 +754,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				if (segment.drivingTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					fNf.setMinimumFractionDigits(1);
-					fNf.setMaximumFractionDigits(1);
-					cell.setText(fNf.format(segment.pace));
-				}
+				final float pace = segment.pace * UI.UNIT_VALUE_DISTANCE;
+
+				cell.setText(UI.format_mm_ss((long) pace).toString());
 			}
 		});
 
@@ -958,6 +964,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void onSelectionChanged(final ISelection selection) {
 
+		fIsClearView = false;
+
 		if (fIsSaving) {
 			return;
 		}
@@ -970,7 +978,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 
-				if (fPageBook.isDisposed()) {
+				if (fPageBook.isDisposed() || fIsClearView) {
 					return;
 				}
 

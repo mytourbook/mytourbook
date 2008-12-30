@@ -163,7 +163,9 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(final Composite parent, final IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(	final Composite parent,
+								final IViewSite viewSite,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -359,6 +361,9 @@ public class StatisticTourNumbers extends YearStatistic {
 				String toolTipLabel;
 				final StringBuilder infoText = new StringBuilder();
 
+				final int distance = fStatDistanceSumHigh[serieIndex][valueIndex] / 1000;
+				final int counter = fStatDistanceCounterHigh[serieIndex][valueIndex];
+
 				if (valueIndex == 0) {
 
 					infoText.append(Messages.numbers_info_distance_down);
@@ -368,8 +373,8 @@ public class StatisticTourNumbers extends YearStatistic {
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex],
 							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
+							counter,
+							distance,
 							UI.UNIT_LABEL_DISTANCE).toString();
 
 				} else if (valueIndex == fStatDistanceUnits.length - 1) {
@@ -381,8 +386,8 @@ public class StatisticTourNumbers extends YearStatistic {
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex - 1],
 							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
+							counter,
+							distance,
 							UI.UNIT_LABEL_DISTANCE).toString();
 				} else {
 
@@ -394,8 +399,8 @@ public class StatisticTourNumbers extends YearStatistic {
 							fStatDistanceUnits[valueIndex - 1],
 							fStatDistanceUnits[valueIndex],
 							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
+							counter,
+							distance,
 							UI.UNIT_LABEL_DISTANCE).toString();
 				}
 
@@ -675,6 +680,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * @param statDistanceColorIndex
 	 * @param unit
 	 * @param title
+	 * @param valueDivisor
 	 */
 	private void updateChartDistance(	final Chart statDistanceChart,
 										final BarChartMinMaxKeeper statDistanceMinMaxKeeper,
@@ -682,7 +688,8 @@ public class StatisticTourNumbers extends YearStatistic {
 										final int[][] highValues,
 										final int[][] colorIndex,
 										final String unit,
-										final String title) {
+										final String title,
+										final int valueDivisor) {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
@@ -702,6 +709,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
+		yData.setValueDivisor(valueDivisor);
 		chartDataModel.addYData(yData);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
@@ -730,7 +738,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceCounterHigh,
 				fStatDistanceCounterColorIndex,
 				Messages.NUMBERS_UNIT,
-				Messages.LABEL_GRAPH_DISTANCE);
+				Messages.LABEL_GRAPH_DISTANCE,
+				1);
 
 		updateChartDistance(fChartDistanceSum,
 				fMinMaxKeeperStatDistanceSum,
@@ -738,7 +747,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceSumHigh,
 				fStatDistanceSumColorIndex,
 				UI.UNIT_LABEL_DISTANCE,
-				Messages.LABEL_GRAPH_DISTANCE);
+				Messages.LABEL_GRAPH_DISTANCE,
+				1000);
 
 		updateChartAltitude(fChartAltitudeCounter,
 				fMinMaxKeeperStatAltitudeCounter,

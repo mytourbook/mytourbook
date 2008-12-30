@@ -33,6 +33,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_cadence;
 	public static String		ColumnFactory_avg_cadence_label;
 	public static String		ColumnFactory_avg_cadence_tooltip;
+	public static String	ColumnFactory_avg_pace_label;
+
+	public static String	ColumnFactory_avg_pace_tooltip;
+
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
@@ -85,6 +89,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_pace_label;
 	public static String		ColumnFactory_pace_tooltip;
+	public static String	ColumnFactory_paused_time;
+
+	public static String	ColumnFactory_paused_time_label;
+
+	public static String	ColumnFactory_paused_time_tooltip;
+
 	public static String		ColumnFactory_power;
 	public static String		ColumnFactory_power_label;
 	public static String		ColumnFactory_power_tooltip;

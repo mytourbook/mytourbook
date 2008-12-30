@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTourEditor extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageAppearanceTourEditor extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	private int	fOldDescriptionLines;
 

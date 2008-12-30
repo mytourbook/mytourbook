@@ -29,6 +29,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
@@ -161,6 +162,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private Composite						fViewerContainer;
 
+	private boolean							fIsRecTimeFormat_hhmmss;
+	private boolean							fIsDriveTimeFormat_hhmmss;
+
 	private class ItemComparer implements IElementComparer {
 
 		public boolean equals(final Object a, final Object b) {
@@ -279,6 +283,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					// update tourbook viewer
 					fTourViewer.refresh();
 
+					// redraw must be done to see modified tour type image colors
+					fTourViewer.getTree().redraw();
+
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					// measurement system has changed
@@ -292,6 +299,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					fTourViewer = (TreeViewer) recreateViewer(fTourViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+					readDisplayFormats();
 
 					fTourViewer.getTree()
 							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -424,6 +433,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActivePerson = tourbookPlugin.getActivePerson();
 		fActiveTourTypeFilter = tourbookPlugin.getActiveTourTypeFilter();
 
+		readDisplayFormats();
 		restoreState();
 
 		// update the viewer
@@ -553,13 +563,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					
-					final long tourDate = ((TVITourBookTour) element).fTourDate;
 
+					final long tourDate = ((TVITourBookTour) element).fTourDate;
 					fCalendar.setTimeInMillis(tourDate);
 
 					cell.setText(fTimeFormatter.format(fCalendar.getTime()));
-
 					setCellColor(cell, element);
 				}
 			}
@@ -575,13 +583,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(((TVITourBookTour) element).getTourTypeId());
+					
+					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+
+					/*
+					 * when a tour type image is modified, it will keep the same image resource only
+					 * the content is modified but in the rawDataView the modified image is not
+					 * displayed compared with the tourBookView which displays the correct image
+					 */
 //					final byte[] imageData = tourTypeImage.getImageData().data;
 //					final StringBuilder sb = new StringBuilder();
 //					for (final byte b : imageData) {
 //						sb.append(b);
 //					}
-//					System.out.println("boo:" + sb.toString());
+//					System.out.println("book typeId:" + tourTypeId + " raw:" + sb.toString());
 //					// TODO remove SYSTEM.OUT.PRINTLN
 
 					cell.setImage(tourTypeImage);
@@ -599,8 +615,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(((TVITourBookTour) element).fTourTitle);
 
+					cell.setText(((TVITourBookTour) element).fTourTitle);
 					setCellColor(cell, element);
 				}
 			}
@@ -616,8 +632,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
 
+					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
 					setCellColor(cell, element);
 				}
 			}
@@ -635,11 +651,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
 
-				cell.setText(UI.format_hh_mm(recordingTime).toString());
-
-//				cell.setText(new Formatter().format(Messages.Format_hhmm,
-//						(recordingTime / 3600),
-//						((recordingTime % 3600) / 60)).toString());
+				if (element instanceof TVITourBookTour) {
+					if (fIsRecTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+				}
 
 				setCellColor(cell, element);
 			}
@@ -656,7 +676,45 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
 
-				cell.setText(UI.format_hh_mm(drivingTime).toString());
+				if (element instanceof TVITourBookTour) {
+					if (fIsDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: paused time (h)
+		 */
+		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				/*
+				 * display paused time relative to the recording time
+				 */
+
+				final Object element = cell.getElement();
+				final TVITourBookItem item = (TVITourBookItem) element;
+
+				final long dbPausedTime = item.colPausedTime;
+				final long dbRecordingTime = item.colRecordingTime;
+
+				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
+						/ dbRecordingTime
+						* 100;
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(relativePausedTime));
 
 				setCellColor(cell, element);
 			}
@@ -670,11 +728,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				final float dbDistance = ((TVITourBookItem) element).colDistance;
+
+				if (dbDistance == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					fNF.setMinimumFractionDigits(1);
+					fNF.setMaximumFractionDigits(1);
+					cell.setText(fNF.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+				}
 
 				setCellColor(cell, element);
 			}
@@ -690,8 +755,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				cell.setText(Long.toString((long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+				final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
+
+				if (dbAltitudeUp == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+				}
 
 				setCellColor(cell, element);
 			}
@@ -706,8 +776,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final long dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
 
-				cell.setText(Long.toString((long) (((TVITourBookItem) element).colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+				if (dbAltitudeDown == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -721,8 +797,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
 
-				cell.setText(Long.toString((long) (((TVITourBookItem) element).colMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
+				if (dbMaxAltitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -736,11 +818,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final float dbMaxSpeed = ((TVITourBookItem) element).colMaxSpeed;
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				if (dbMaxSpeed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
 
-				cell.setText(fNF.format(((TVITourBookItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					fNF.setMinimumFractionDigits(1);
+					fNF.setMaximumFractionDigits(1);
+
+					cell.setText(fNF.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -754,8 +843,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final long dbMaxPulse = ((TVITourBookItem) element).colMaxPulse;
 
-				cell.setText(Long.toString(((TVITourBookItem) element).colMaxPulse));
+				if (dbMaxPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbMaxPulse));
+				}
 				setCellColor(cell, element);
 			}
 		});
@@ -770,10 +864,37 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				final Object element = cell.getElement();
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				final float speed = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+				if (speed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					fNF.setMinimumFractionDigits(1);
+					fNF.setMaximumFractionDigits(1);
 
-				cell.setText(fNF.format(((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(fNF.format(speed));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg pace min/km - min/mi
+		 */
+		colDef = TreeColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+				if (pace == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace).toString());
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -787,8 +908,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final long dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
 
-				cell.setText(Long.toString(((TVITourBookItem) element).colAvgPulse));
+				if (dbAvgPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbAvgPulse));
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -802,8 +929,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final long dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
 
-				cell.setText(Long.toString(((TVITourBookItem) element).colAvgCadence));
+				if (dbAvgCadence == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbAvgCadence));
+				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -820,11 +953,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				long temperature = ((TVITourBookItem) element).colAvgTemperature;
 
-				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+				if (temperature == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+					}
+
+					cell.setText(Long.toString(temperature));
 				}
 
-				cell.setText(Long.toString(temperature));
 				setCellColor(cell, element);
 			}
 		});
@@ -839,7 +978,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					cell.setText(Long.toString(((TVITourBookTour) element).getColumnTimeInterval()));
+					final short dbTimeInterval = ((TVITourBookTour) element).getColumnTimeInterval();
+					if (dbTimeInterval == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Long.toString(dbTimeInterval));
+					}
+
 					setCellColor(cell, element);
 				}
 			}
@@ -855,7 +1000,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					cell.setText(Long.toString((long) (((TVITourBookTour) element).getColumnStartDistance() / UI.UNIT_VALUE_DISTANCE)));
+					final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
+
+					if (dbStartDistance == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Long.toString((long) (dbStartDistance / UI.UNIT_VALUE_DISTANCE)));
+					}
+
 					setCellColor(cell, element);
 				}
 			}
@@ -1259,6 +1411,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		enableActions();
+	}
+
+	private void readDisplayFormats() {
+
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
+		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT)
+				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+
+		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT)
+				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

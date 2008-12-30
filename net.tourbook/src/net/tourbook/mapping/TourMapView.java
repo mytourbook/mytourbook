@@ -362,6 +362,10 @@ public class TourMapView extends ViewPart {
 
 	void actionSynchWithTour() {
 
+		if (fTourDataList == null) {
+			return;
+		}
+		
 		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
 
 		if (fIsMapSynchedWithTour) {

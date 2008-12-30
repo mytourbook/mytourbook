@@ -353,14 +353,28 @@ public class TourChart extends Chart {
 
 				isChartModified = setMinDefaultValue(property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+						TourManager.GRAPH_PACE,
+						TourManager.PACE_DIVISOR);
+
+				isChartModified = setMaxDefaultValue(property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+						TourManager.GRAPH_PACE,
+						TourManager.PACE_DIVISOR);
+
+				isChartModified = setMinDefaultValue(property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 						TourManager.GRAPH_ALTIMETER,
 						0);
 
 				isChartModified = setMinDefaultValue(property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 						TourManager.GRAPH_GRADIENT,
 						TourManager.GRADIENT_DIVISOR);
@@ -540,7 +554,7 @@ public class TourChart extends Chart {
 		} else {
 			layerTourData = TourManager.getInstance().getTourData(fTourData.getMergeSourceTourId());
 		}
-		
+
 		if (layerTourData == null) {
 			fMergeLayer = null;
 			return;
@@ -996,6 +1010,49 @@ public class TourChart extends Chart {
 		}
 	}
 
+	private boolean setMaxDefaultValue(	final String property,
+										boolean isChartModified,
+										final String tagIsMaxEnabled,
+										final String tabMaxValue,
+										final int yDataInfoId,
+										final int valueDivisor) {
+
+		if (property.equals(tagIsMaxEnabled) || property.equals(tabMaxValue)) {
+
+			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+			final boolean isMaxEnabled = prefStore.getBoolean(tagIsMaxEnabled);
+
+			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
+
+			// get y-data serie from custom data
+			ChartDataYSerie yData = null;
+			for (final ChartDataYSerie yDataIterator : yDataList) {
+				final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
+				if (yDataInfo == yDataInfoId) {
+					yData = yDataIterator;
+					break;
+				}
+			}
+
+			if (yData != null) {
+
+				if (isMaxEnabled) {
+					// set visible max value from the preferences
+					yData.setVisibleMaxValue(prefStore.getInt(tabMaxValue) * valueDivisor);
+
+				} else {
+					// reset visible max value to the original min value
+					yData.setVisibleMaxValue(yData.getOriginalMinValue());
+				}
+
+				isChartModified = true;
+			}
+		}
+
+		return isChartModified;
+	}
+
 	private boolean setMinDefaultValue(	final String property,
 										boolean isChartModified,
 										final String tagIsMinEnabled,
@@ -1007,22 +1064,23 @@ public class TourChart extends Chart {
 
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-			final boolean isAltMinEnabled = prefStore.getBoolean(tagIsMinEnabled);
+			final boolean isMinEnabled = prefStore.getBoolean(tagIsMinEnabled);
 
 			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
 
-			// get altimeter data from all y-data
+			// get y-data serie from custom data
 			ChartDataYSerie yData = null;
 			for (final ChartDataYSerie yDataIterator : yDataList) {
 				final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
 				if (yDataInfo == yDataInfoId) {
 					yData = yDataIterator;
+					break;
 				}
 			}
 
 			if (yData != null) {
 
-				if (isAltMinEnabled) {
+				if (isMinEnabled) {
 					// set visible min value from the preferences
 					yData.setVisibleMinValue(prefStore.getInt(tabMinValue) * valueDivisor);
 
@@ -1175,6 +1233,10 @@ public class TourChart extends Chart {
 	 * 
 	 */
 	public void updateSegmentLayer(final boolean showLayer) {
+
+		if (fTourData == null) {
+			return;
+		}
 
 		fIsSegmentLayerVisible = showLayer;
 

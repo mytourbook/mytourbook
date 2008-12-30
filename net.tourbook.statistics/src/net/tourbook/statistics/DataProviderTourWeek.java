@@ -156,7 +156,7 @@ public class DataProviderTourWeek extends DataProvider {
 
 				dbTypeIds[colorIndex][weekIndex] = dbTypeId;
 
-				dbDistance[colorIndex][weekIndex] = (int) ((result.getInt(3) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				dbDistance[colorIndex][weekIndex] = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
 				dbAltitude[colorIndex][weekIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
 				dbDurationTime[colorIndex][weekIndex] = result.getInt(5);
 

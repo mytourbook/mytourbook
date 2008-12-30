@@ -183,8 +183,8 @@ public class TourDatabase {
 	}
 
 	/**
-	 * remove all tour types and dispose their images so the next time they have to be loaded from
-	 * the database and the images are recreated
+	 * remove all tour types and set their images dirty that the next time they have to be loaded
+	 * from the database and the images are recreated
 	 */
 	public static void clearTourTypes() {
 

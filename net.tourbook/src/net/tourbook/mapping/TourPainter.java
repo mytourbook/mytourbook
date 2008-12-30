@@ -23,7 +23,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMapAppearance;
+import net.tourbook.preferences.PrefPageAppearanceMap;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -753,8 +753,8 @@ public class TourPainter extends MapPainter {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
-		final boolean isDrawLine = drawSymbol.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_LINE);
-		final boolean isDrawSquare = drawSymbol.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_SQUARE);
+		final boolean isDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
+		final boolean isDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
 
 		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
 		LINE_WIDTH2 = LINE_WIDTH / 2;

@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTourChart extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private static final int		COLUMN_INDENT		= 20;
 
@@ -82,6 +82,9 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 	private Button					fChkZoomToSlider;
 	private Button					fChkMoveSlidersWhenZoomed;
 
+	private BooleanFieldEditor		fEditPaceMinMaxCheckbox;
+	private IntegerFieldEditor		fEditPaceMinEditor;
+	private IntegerFieldEditor		fEditPaceMaxEditor;
 	private BooleanFieldEditor		fEditAltimeterMinCheckbox;
 	private IntegerFieldEditor		fEditAltimeterMinEditor;
 	private BooleanFieldEditor		fEditGradientMinCheckbox;
@@ -115,15 +118,15 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 
 		final TabItem tabVisibleGraphs = new TabItem(tabFolder, SWT.NONE);
 		tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
-		tabVisibleGraphs.setControl(createTabGraphs(tabFolder));
+		tabVisibleGraphs.setControl(createUITabGraphs(tabFolder));
 
 		final TabItem tabMinimumValues = new TabItem(tabFolder, SWT.NONE);
 		tabMinimumValues.setText(Messages.Pref_Graphs_Tab_default_values);
-		tabMinimumValues.setControl(createTabDefaultsValues(tabFolder));
+		tabMinimumValues.setControl(createUITabMinMaxValues(tabFolder));
 
 		final TabItem tabZoom = new TabItem(tabFolder, SWT.NONE);
 		tabZoom.setText(Messages.Pref_Graphs_Tab_zoom_options);
-		tabZoom.setControl(createTabOptions(tabFolder));
+		tabZoom.setControl(createUITabOptions(tabFolder));
 
 		enableActions();
 
@@ -222,39 +225,6 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 			}
 		}
 
-	}
-
-	private Control createTabDefaultsValues(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIMinValue(container);
-
-		return container;
-	}
-
-	private Control createTabGraphs(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIGraphs(container);
-		createUIXAxisUnits(container);
-		createUIGrid(container);
-
-		return container;
-	}
-
-	private Control createTabOptions(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-
-		createUIMouseMode(container);
-		createUIZoomOptions(container);
-
-		return container;
 	}
 
 	private void createUIGraphs(final Composite parent) {
@@ -362,8 +332,9 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 				.applyTo(groupGrid);
 	}
 
-	private void createUIMinValue(final Composite container) {
+	private void createUIMinMaxValue(final Composite container) {
 
+		final IPreferenceStore prefStore = getPreferenceStore();
 		GridData gd;
 
 		// the editor container removes all margins
@@ -372,12 +343,68 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupMinValue);
 
 		/*
+		 * checkbox: pace min/max value
+		 */
+		fEditPaceMinMaxCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
+				Messages.Pref_Graphs_Check_force_minmax_for_pace,
+				groupMinValue);
+		fEditPaceMinMaxCheckbox.setPreferenceStore(prefStore);
+		fEditPaceMinMaxCheckbox.setPage(this);
+		fEditPaceMinMaxCheckbox.load();
+		fEditPaceMinMaxCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
+				fEditPaceMinEditor.setEnabled(isChecked, groupMinValue);
+				fEditPaceMaxEditor.setEnabled(isChecked, groupMinValue);
+			}
+		});
+
+		// paceholder
+		new Label(groupMinValue, SWT.NONE);
+
+		/*
+		 * editor: pace min value
+		 */
+		fEditPaceMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+				Messages.Pref_Graphs_Text_min_value,
+				groupMinValue);
+		fEditPaceMinEditor.setPreferenceStore(prefStore);
+		fEditPaceMinEditor.setPage(this);
+		fEditPaceMinEditor.setTextLimit(4);
+		fEditPaceMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		fEditPaceMinEditor.load();
+		UI.setFieldWidth(groupMinValue, fEditPaceMinEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		fEditPaceMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+
+		fEditPaceMinEditor.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
+
+		/*
+		 * editor: pace max value
+		 */
+		fEditPaceMaxEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+				Messages.Pref_Graphs_Text_max_value,
+				groupMinValue);
+		fEditPaceMaxEditor.setPreferenceStore(prefStore);
+		fEditPaceMaxEditor.setPage(this);
+		fEditPaceMaxEditor.setTextLimit(4);
+		fEditPaceMaxEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		fEditPaceMaxEditor.load();
+		UI.setFieldWidth(groupMinValue, fEditPaceMaxEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		fEditPaceMaxEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+
+		fEditPaceMaxEditor.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
+
+		/*
 		 * checkbox: altimeter min value
 		 */
-		fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+		fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
 				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
 				groupMinValue);
-		fEditAltimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
+		fEditAltimeterMinCheckbox.setPreferenceStore(prefStore);
 		fEditAltimeterMinCheckbox.setPage(this);
 		fEditAltimeterMinCheckbox.load();
 		fEditAltimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
@@ -387,9 +414,8 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 			}
 		});
 
-		// add placeholder
-		Label label = new Label(groupMinValue, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
+		// paceholder
+		new Label(groupMinValue, SWT.NONE);
 
 		/*
 		 * editor: altimeter min value
@@ -397,7 +423,7 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		fEditAltimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 				Messages.Pref_Graphs_Text_min_value,
 				groupMinValue);
-		fEditAltimeterMinEditor.setPreferenceStore(getPreferenceStore());
+		fEditAltimeterMinEditor.setPreferenceStore(prefStore);
 		fEditAltimeterMinEditor.setPage(this);
 		fEditAltimeterMinEditor.setTextLimit(4);
 		fEditAltimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
@@ -412,10 +438,10 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * checkbox: gradient min value
 		 */
-		fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+		fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
 				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
 				groupMinValue);
-		fEditGradientMinCheckbox.setPreferenceStore(getPreferenceStore());
+		fEditGradientMinCheckbox.setPreferenceStore(prefStore);
 		fEditGradientMinCheckbox.setPage(this);
 		fEditGradientMinCheckbox.load();
 		fEditGradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
@@ -426,8 +452,7 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		});
 
 		// add placeholder
-		label = new Label(groupMinValue, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
+		new Label(groupMinValue, SWT.NONE);
 
 		/*
 		 * editor: gradient min value
@@ -435,7 +460,7 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		fEditGradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 				Messages.Pref_Graphs_Text_min_value,
 				groupMinValue);
-		fEditGradientMinEditor.setPreferenceStore(getPreferenceStore());
+		fEditGradientMinEditor.setPreferenceStore(prefStore);
 		fEditGradientMinEditor.setPage(this);
 		fEditGradientMinEditor.setTextLimit(4);
 		fEditGradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
@@ -476,6 +501,39 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		} else {
 			fRdoZoomFeatures.setSelection(true);
 		}
+	}
+
+	private Control createUITabGraphs(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUIGraphs(container);
+		createUIXAxisUnits(container);
+		createUIGrid(container);
+
+		return container;
+	}
+
+	private Control createUITabMinMaxValues(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUIMinMaxValue(container);
+
+		return container;
+	}
+
+	private Control createUITabOptions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUIMouseMode(container);
+		createUIZoomOptions(container);
+
+		return container;
 	}
 
 	private void createUIXAxisUnits(final Composite container) {
@@ -697,6 +755,9 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
 				fChkMoveSlidersWhenZoomed.getSelection());
 
+		fEditPaceMinMaxCheckbox.store();
+		fEditPaceMinEditor.store();
+		fEditPaceMaxEditor.store();
 		fEditAltimeterMinCheckbox.store();
 		fEditAltimeterMinEditor.store();
 		fEditGradientMinCheckbox.store();

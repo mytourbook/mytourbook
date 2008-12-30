@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tagging;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,6 +28,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ActionRemoveAllTags;
@@ -146,7 +146,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionRenameTag					fActionRenameTag;
 	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
 	private ActionMenuSetTagStructure		fActionSetTagStructure;
-	private ActionSetTourTypeMenu				fActionSetTourType;
+	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionOpenTour					fActionOpenTour;
 
 	private ActionModifyColumns				fActionModifyColumns;
@@ -161,6 +161,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 																					.createImage();
 
 	private IPartListener2					fPartListener;
+
+	private boolean							fIsRecTimeFormat_hhmmss;
+	private boolean							fIsDriveTimeFormat_hhmmss;
+	private boolean							fIsPauseTimeFormat_hhmmss;
 
 	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
@@ -291,9 +295,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TaggingView.this) {
-					
+
 					saveState();
-					
+
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TaggingView.this);
 				}
 			}
@@ -343,6 +347,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					fTagViewer = (TreeViewer) recreateViewer(fTagViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+					readDisplayFormats();
 
 					fTagViewer.getTree()
 							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -498,6 +504,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		enableActions();
 
 		restoreState();
+		readDisplayFormats();
+
 		reloadViewer();
 	}
 
@@ -700,6 +708,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		 * column: recording time (h)
 		 */
 		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -710,14 +719,18 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 
 				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
-				if (recordingTime != 0) {
 
-					cell.setText(new Formatter().format(Messages.Format_hhmm,
-							(recordingTime / 3600),
-							((recordingTime % 3600) / 60)).toString());
-
-					setCellColor(cell, element);
+				if (element instanceof TVITagViewTour) {
+					if (fIsRecTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
 				}
+
+				setCellColor(cell, element);
 			}
 		});
 
@@ -735,13 +748,53 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 
 				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
-				if (drivingTime != 0) {
 
-					cell.setText(new Formatter().format(Messages.Format_hhmm,
-							(drivingTime / 3600),
-							((drivingTime % 3600) / 60)).toString());
-					setCellColor(cell, element);
+				if (element instanceof TVITagViewTour) {
+					if (fIsDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: paused time (h)
+		 */
+		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				/*
+				 * display paused time relative to the recording time
+				 */
+
+				final TVITagViewItem item = (TVITagViewItem) element;
+
+				final long dbPausedTime = item.colPausedTime;
+				final long dbRecordingTime = item.colRecordingTime;
+
+				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
+						/ dbRecordingTime
+						* 100;
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(relativePausedTime));
+
+				setCellColor(cell, element);
+
 			}
 		});
 
@@ -905,6 +958,27 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					cell.setText(fNF.format(colAvgSpeed));
 					setCellColor(cell, element);
 				}
+			}
+		});
+
+		/*
+		 * column: avg pace min/km - min/mi
+		 */
+		colDef = TreeColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+				if (pace == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace).toString());
+				}
+
+				setCellColor(cell, element);
 			}
 		});
 
@@ -1203,6 +1277,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	public ColumnViewer getViewer() {
 		return fTagViewer;
+	}
+
+	private void readDisplayFormats() {
+
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
+		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT)
+				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+
+		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT)
+				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

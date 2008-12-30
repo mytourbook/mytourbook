@@ -58,16 +58,23 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long					fTourDate;
 	String					fTourTitle;
 
+	long					colCounter;
+
 	long					colDistance;
+
 	long					colRecordingTime;
 	long					colDrivingTime;
+	long					colPausedTime;
+
 	long					colAltitudeUp;
 	long					colAltitudeDown;
-	long					colCounter;
+
 	float					colMaxSpeed;
-	float					colAvgSpeed;
 	long					colMaxAltitude;
 	long					colMaxPulse;
+
+	float					colAvgSpeed;
+	float					colAvgPace;
 	long					colAvgPulse;
 	long					colAvgCadence;
 	long					colAvgTemperature;
@@ -90,10 +97,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 		colMaxSpeed = result.getFloat(startIndex + 6);
 
-		// compute average speed, prevent divide by 0
+		// compute average speed/pace, prevent divide by 0
 		final long dbDistance = result.getLong(startIndex + 7);
 		final long dbDrivingTime = result.getLong(startIndex + 8);
-		colAvgSpeed = (float) (dbDrivingTime == 0 ? 0 : 3.6 * dbDistance / dbDrivingTime);
+
+		colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
+		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 166.66f / dbDistance;
 
 		colMaxAltitude = result.getLong(startIndex + 9);
 		colMaxPulse = result.getLong(startIndex + 10);
@@ -101,6 +110,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colAvgPulse = result.getLong(startIndex + 11);
 		colAvgCadence = result.getLong(startIndex + 12);
 		colAvgTemperature = result.getLong(startIndex + 13);
+
+		colPausedTime = colRecordingTime - colDrivingTime;
 	}
 
 	public Long getTourId() {

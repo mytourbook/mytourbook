@@ -5637,16 +5637,13 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			/*
-			 * set visible min/max value, adjust the value to prevent it to be displayed at the
-			 * border of the chart
-			 */
-			if (yData.isForceMinValue() == false) {
-				if (minValue != 0) {
-					yData.setVisibleMinValue(minValue - 1);
-				}
+			if (yData.isForceMinValue() == false && minValue != 0) {
+				yData.setVisibleMinValue(minValue - 1);
 			}
-			yData.setVisibleMaxValue(maxValue + 1);
+			
+			if (yData.isForceMaxValue() == false && maxValue != 0) {
+				yData.setVisibleMaxValue(maxValue + 1);
+			}
 		}
 	}
 

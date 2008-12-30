@@ -133,9 +133,9 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.fTourMonth = dbMonth;
 					tourItem.fTourDay = dbDay;
 
-					tourItem.colDistance = result.getLong(4);
+					final long dbDistance = tourItem.colDistance = result.getLong(4);
 					tourItem.colRecordingTime = result.getLong(5);
-					tourItem.colDrivingTime = result.getLong(6);
+					final long dbDrivingTime = tourItem.colDrivingTime = result.getLong(6);
 					tourItem.colAltitudeUp = result.getLong(7);
 					tourItem.colAltitudeDown = result.getLong(8);
 
@@ -161,10 +161,11 @@ public class TVITourBookMonth extends TVITourBookItem {
 							TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);
 
-					final long drivingTime = tourItem.colDrivingTime;
-					if (drivingTime != 0) {
-						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) drivingTime * 3.6f;
-					}
+					// compute average speed/pace, prevent divide by 0
+					tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
+					tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 166.66f / dbDistance;
+
+					tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
 
 					if (resultTagId instanceof Long) {
 						tourItem.fTagIds = tagIds = new ArrayList<Long>();

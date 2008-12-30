@@ -20,7 +20,6 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
@@ -70,7 +69,7 @@ public class ChartMergeLayer implements IChartLayer {
 			return;
 		}
 
-		final ChartDataYSerie yData = drawingData.getYData();
+//		final ChartDataYSerie yData = drawingData.getYData();
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
@@ -83,11 +82,11 @@ public class ChartMergeLayer implements IChartLayer {
 		final Path pathValueDiff = new Path(display);
 		final Path pathAdjustValue = new Path(display);
 
-		final RGB rgbFg = yData.getRgbLine()[0];
-		final RGB rgbBg1 = yData.getRgbDark()[0];
-		final RGB rgbBg2 = yData.getRgbBright()[0];
-
-		final int graphYTop = drawingData.getGraphYTop();
+//		final RGB rgbFg = yData.getRgbLine()[0];
+//		final RGB rgbBg1 = yData.getRgbDark()[0];
+//		final RGB rgbBg2 = yData.getRgbBright()[0];
+//
+//		final int graphYTop = drawingData.getGraphYTop();
 		final int graphYBottom = drawingData.getGraphYBottom();
 
 		final int devGraphHeight = drawingData.getDevGraphHeight();
@@ -206,24 +205,13 @@ public class ChartMergeLayer implements IChartLayer {
 		gc.setClipping(graphRect);
 
 		/*
-		 * paint data graph
-		 */
-		Color colorFg = new Color(display, new RGB(0xFF, 0x7C, 0x24));
-		gc.setForeground(colorFg);
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
-		gc.drawPath(pathValue);
-		colorFg.dispose();
-
-		/*
 		 * paint adjusted value graph
 		 */
 		if (isAdjustedValues) {
 
-			final Color colorBg = new Color(display, rgbBg1);
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			gc.setBackground(colorBg);
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			gc.setAlpha(0x80);
 
 			// fill background
@@ -234,8 +222,6 @@ public class ChartMergeLayer implements IChartLayer {
 			// draw graph
 			gc.drawPath(pathAdjustValue);
 
-			colorBg.dispose();
-
 			gc.setAlpha(0xff);
 		}
 
@@ -244,14 +230,20 @@ public class ChartMergeLayer implements IChartLayer {
 		 */
 		if (isDiffValues) {
 
-			colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
+			final Color colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
 			gc.setForeground(colorFg);
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 
 			gc.drawPath(pathValueDiff);
 			colorFg.dispose();
 		}
 
+		/*
+		 * paint data graph
+		 */
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		gc.drawPath(pathValue);
+		
 		// dispose resources
 		pathValue.dispose();
 		pathValueDiff.dispose();

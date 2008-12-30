@@ -63,9 +63,12 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 
-	public static final String	GRAPH_ALTIMETER_MIN_ENABLED					= "graphs.altimeter.is-min-enabled";						//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED					= "graph.pace.is-min-enabled";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MAX_VALUE						= "graph.pace.max-value";									//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MIN_IS_ENABLED				= "graphs.altimeter.is-min-enabled";						//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MIN_VALUE					= "graphs.altimeter.min-value";							//$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_ENABLED					= "graphs.gradient.is-min-enabled";						//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MIN_IS_ENABLED				= "graphs.gradient.is-min-enabled";						//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MIN_VALUE					= "graphs.gradient.min-value";								//$NON-NLS-1$
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
@@ -143,6 +146,9 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_LAYOUT_COLOR_SUB_SUB					= "view.layout.color.sub-sub";								//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_TOUR						= "view.layout.color.tour";								//$NON-NLS-1$
 
+	public static final String	VIEW_LAYOUT_RECORDING_TIME_FORMAT			= "view.layout.recording-time-format";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_DRIVING_TIME_FORMAT				= "view.layout.driving-time-format";						//$NON-NLS-1$
+
 	/*
 	 * layout for maps
 	 */
@@ -175,6 +181,7 @@ public interface ITourbookPreferences {
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
 
+	public static final String	MERGE_TOUR_SYNC_START_TIME					= "merge.tour.synch-start-time";							//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ADJUST_START_ALTITUDE			= "merge.tour.adjust-start-altitude";						//$NON-NLS-1$
 
 	public static final String	MERGE_TOUR_SET_TOUR_TYPE					= "merge.tour.set-tour-type-for-merge-from-tour";			//$NON-NLS-1$
@@ -186,5 +193,6 @@ public interface ITourbookPreferences {
 	public static final String	MERGE_TOUR_MERGE_GRAPH_PULSE				= "merge.tour.merge-graph-pulse";							//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_GRAPH_TEMPERATURE			= "merge.tour.merge-graph-temperature";					//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_GRAPH_CADENCE				= "merge.tour.merge-graph-cadence";						//$NON-NLS-1$
+
 
 }

@@ -31,6 +31,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -56,6 +57,7 @@ import org.eclipse.ui.WorkbenchException;
 public class RawDataManager {
 
 	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+
 	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
 	private static RawDataManager	instance							= null;
@@ -596,6 +598,8 @@ public class RawDataManager {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
+				boolean isReplaced = false;
+
 				for (final TourData mapTourData : fTourDataMap.values()) {
 
 					if (mapTourData.isTourDeleted == false) {
@@ -614,9 +618,13 @@ public class RawDataManager {
 								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
 								final Long dbTourId = dbTourData.getTourId();
+
+								// replace existing tour, do not add new tours
 								if (fTourDataMap.containsKey(dbTourId)) {
-									// replace existing tour do not add new tours
+
 									fTourDataMap.put(dbTourId, dbTourData);
+
+									isReplaced = true;
 								}
 							}
 						} catch (final Exception e) {
@@ -625,6 +633,10 @@ public class RawDataManager {
 					}
 				}
 
+				if (isReplaced) {
+					// prevent async error
+					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+				}
 			}
 		});
 	}
@@ -640,8 +652,9 @@ public class RawDataManager {
 			if (tourData != null) {
 
 				final Long tourId = tourData.getTourId();
+
+				// replace existing tour do not add new tours
 				if (fTourDataMap.containsKey(tourId)) {
-					// replace existing tour do not add new tours
 					fTourDataMap.put(tourId, tourData);
 				}
 			}

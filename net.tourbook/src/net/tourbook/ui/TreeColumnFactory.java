@@ -87,6 +87,23 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory AVG_PACE = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "avgPace", SWT.TRAIL); //$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_PACE;
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_pace_label);
+			colDef.setColumnHeader(unitLabel); 
+			colDef.setColumnUnit(unitLabel); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+
 	public static final TreeColumnFactory AVG_SPEED = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -198,7 +215,6 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 
-
 	public static final TreeColumnFactory MAX_ALTITUDE = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -250,6 +266,22 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 	
+	public static final TreeColumnFactory PAUSED_TIME = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "pausedTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_paused_time_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_paused_time);
+			colDef.setColumnUnit(Messages.ColumnFactory_paused_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_paused_time_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+
 	public static final TreeColumnFactory RECORDING_TIME = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

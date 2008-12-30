@@ -25,7 +25,7 @@
          
       <product
             application="net.tourbook.application"
-            name="MyTourbook Testversion">
+            name="MyTourbook">
             
          <property
                name="windowImages"
@@ -38,7 +38,7 @@
                value="icons/application/tourbook-about-250.gif"/>
          <property
                name="appName"
-               value="MyTourbook Testversion">
+               value="MyTourbook">
          </property>
          <property
                name="startupForegroundColor"
@@ -103,6 +103,12 @@
             class="net.tourbook.preferences.PrefPageStatistic"
             id="net.tourbook.preferences.prefPageStatistic"
             name="%preference_page_statistics"/>
+            
+      <page
+            class="net.tourbook.preferences.PrefPageAppearance"
+            id="net.tourbook.preferences.PrefPageAppearance"
+            name="%preference_page_appearance">
+      </page>
 
       <page
             category="net.tourbook.preferences.prefPageStatistic"
@@ -111,12 +117,14 @@
             name="%preference_page_statistics_tourFrequency"/>
 
       <page
-            class="net.tourbook.preferences.PrefPageTourChart"
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceTourChart"
             id="net.tourbook.preferences.PrefPageChartGraphs"
             name="%preference_page_Graphs"/>
             
       <page
-            class="net.tourbook.preferences.PrefPageTourEditor"
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
             id="net.tourbook.preferences.PrefPageTourEditor"
             name="%preference_page_tourEditor"/>
 
@@ -134,30 +142,24 @@
             class="net.tourbook.preferences.PrefPageTags"
             id="net.tourbook.preferences.PrefPageTags"
             name="%preference_page_tags"/>
-            
-      <page
-            class="net.tourbook.preferences.PrefPageAppearance"
-            id="net.tourbook.preferences.PrefPageAppearance"
-            name="%preference_page_appearance">
-      </page>
       
       <page
             category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageGraphColors"
+            class="net.tourbook.preferences.PrefPageAppearanceColors"
             id="net.tourbook.preferences.PrefPageChartColors"
             name="%preference_page_Chart_Colors">
       </page>
       
       <page
             category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageViewColors"
+            class="net.tourbook.preferences.PrefPageAppearanceView"
             id="net.tourbook.preferences.PrefPageViewColors"
             name="%preference_page_view_colors">
       </page>
       
       <page
             category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageMapAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceMap"
             id="net.tourbook.preferences.PrefPageMapAppearance"
             name="%preference_page_map_appearance">
       </page>

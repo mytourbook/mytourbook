@@ -98,6 +98,8 @@ public class TourManager {
 			GRAPH_PACE,
 			GRAPH_TOUR_COMPARE												};
 
+	private static final int					SPEED_DIVISOR				= 10;
+	public static final int						PACE_DIVISOR				= 10;
 	public static final int						GRADIENT_DIVISOR			= 10;
 
 	private static TourManager					instance;
@@ -1074,7 +1076,7 @@ public class TourManager {
 
 			yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
-			yDataSpeed.setValueDivisor(10);
+			yDataSpeed.setValueDivisor(SPEED_DIVISOR);
 			yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true,
@@ -1098,7 +1100,7 @@ public class TourManager {
 
 			yDataPace.setYTitle(Messages.Graph_Label_Pace);
 			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
-			yDataPace.setValueDivisor(10);
+			yDataPace.setValueDivisor(PACE_DIVISOR);
 			yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computePaceAvg, 1));
@@ -1106,6 +1108,17 @@ public class TourManager {
 
 			setGraphColor(prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
+
+			// adjust pace when it's defined in the pref store
+			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
+				
+				yDataPace.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * PACE_DIVISOR,
+						true);
+				
+				// set max value after min value
+				yDataPace.setVisibleMaxValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * PACE_DIVISOR,
+						true);
+			}
 		}
 
 		/*
@@ -1151,7 +1164,7 @@ public class TourManager {
 			chartDataModel.addXyData(yDataAltimeter);
 
 			// adjust min altitude when it's defined in the pref store
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED)) {
+			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED)) {
 				yDataAltimeter.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
 						true);
 			}
@@ -1180,7 +1193,7 @@ public class TourManager {
 			chartDataModel.addXyData(yDataGradient);
 
 			// adjust min value when defined in the pref store
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED)) {
+			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
 				yDataGradient.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
 						* GRADIENT_DIVISOR, true);
 			}

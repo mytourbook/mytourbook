@@ -25,6 +25,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,9 +34,12 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageViewColors extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageAppearanceView extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private final IPreferenceStore	fPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	public static final String		VIEW_TIME_LAYOUT_HH_MM		= "hh_mm";											//$NON-NLS-1$
+	public static final String		VIEW_TIME_LAYOUT_HH_MM_SS	= "hh_mm_ss";										//$NON-NLS-1$
+
+	private final IPreferenceStore	fPrefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 	private boolean					fIsModified;
 
 	@Override
@@ -70,10 +74,50 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 				Messages.pref_view_layout_label_sub_sub,
 				colorGroup));
 
-		final GridLayout gl = (GridLayout) colorGroup.getLayout();
+		GridLayout gl = (GridLayout) colorGroup.getLayout();
 		gl.marginHeight = 5;
 		gl.marginWidth = 5;
 
+		/*
+		 * container: column time format
+		 */
+		final Group formatGroup = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(formatGroup);
+		formatGroup.setText(Messages.pref_view_layout_group_display_format);
+
+		/*
+		 * recording time format: hh:mm
+		 */
+		addField(new RadioGroupFieldEditor(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
+				Messages.pref_view_layout_label_recording_time_format,
+				2,
+				new String[][] {
+						{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
+						{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
+				formatGroup,
+				false));
+
+		/*
+		 * driving time format: hh:mm
+		 */
+		addField(new RadioGroupFieldEditor(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
+				Messages.pref_view_layout_label_driving_time_format,
+				2,
+				new String[][] {
+						{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
+						{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
+				formatGroup,
+				false));
+
+		// set group margin after the fields are created
+		gl = (GridLayout) formatGroup.getLayout();
+		gl.marginHeight = 5;
+		gl.marginWidth = 5;
+		gl.numColumns = 2;
+
+		/*
+		 * container: other
+		 */
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(container);
 

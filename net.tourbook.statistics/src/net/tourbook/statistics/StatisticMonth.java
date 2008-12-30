@@ -184,7 +184,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		 * tool tip: label
 		 */
 		final StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append(Messages.tourtime_info_distance);
+		toolTipFormat.append(Messages.tourtime_info_distance_tour);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
 		toolTipFormat.append(NEW_LINE);
@@ -197,7 +197,7 @@ public abstract class StatisticMonth extends YearStatistic {
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
-				fTourMonthData.fDistanceHigh[serieIndex][valueIndex],
+				(float) fTourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
 				//
 				fTourMonthData.fAltitudeHigh[serieIndex][valueIndex],
@@ -261,6 +261,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setValueDivisor(1000);
 		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, fTourMonthData.fTypeIds, fActiveTourTypeFilter);

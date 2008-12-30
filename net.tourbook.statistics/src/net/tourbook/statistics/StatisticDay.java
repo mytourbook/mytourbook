@@ -417,6 +417,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
+		yData.setValueDivisor(1000);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		yData.setColorIndex(new int[][] { fTourDayData.fTypeColorIndex });
 

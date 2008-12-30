@@ -100,6 +100,7 @@ public abstract class ChartDataSerie {
 	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
 	 */
 	private boolean					fIsForceMinValue				= false;
+	private boolean					fIsForceMaxValue				= false;
 
 	public int getAxisUnit() {
 		return axisUnit;
@@ -196,6 +197,10 @@ public abstract class ChartDataSerie {
 		return fVisibleMinValue;
 	}
 
+	public boolean isForceMaxValue() {
+		return fIsForceMaxValue;
+	}
+
 	public boolean isForceMinValue() {
 		return fIsForceMinValue;
 	}
@@ -268,7 +273,7 @@ public abstract class ChartDataSerie {
 
 	public void setRgbDark(final RGB[] rgbDark) {
 		fRgbDark = rgbDark;
-	} 
+	}
 
 	public void setRgbLine(final RGB[] rgbLine) {
 		fRgbLine = rgbLine;
@@ -290,13 +295,18 @@ public abstract class ChartDataSerie {
 		fVisibleMaxValue = maxValue;
 	}
 
+	public void setVisibleMaxValue(final int maxValue, final boolean forceValue) {
+		fVisibleMaxValue = maxValue > fVisibleMinValue ? maxValue : fVisibleMinValue + 1 * valueDivisor;
+		fIsForceMaxValue = forceValue;
+	}
+
 	public void setVisibleMinValue(final int minValue) {
 		fVisibleMinValue = minValue;
 	}
 
-	public void setVisibleMinValue(final int minValue, final boolean forceMinValue) {
+	public void setVisibleMinValue(final int minValue, final boolean forceValue) {
 		fVisibleMinValue = minValue;
-		fIsForceMinValue = forceMinValue;
+		fIsForceMinValue = forceValue;
 	}
 
 }

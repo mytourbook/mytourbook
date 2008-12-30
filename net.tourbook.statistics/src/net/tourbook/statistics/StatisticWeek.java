@@ -168,7 +168,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		toolTipFormat.append(Messages.tourtime_info_date_week);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(Messages.tourtime_info_distance);
+		toolTipFormat.append(Messages.tourtime_info_distance_tour);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
 		toolTipFormat.append(NEW_LINE);
@@ -184,7 +184,7 @@ public abstract class StatisticWeek extends YearStatistic {
 				beginDate,
 				endDate,
 				//
-				fTourWeekData.fDistanceHigh[serieIndex][valueIndex],
+				(float) fTourWeekData.fDistanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
 				//
 				fTourWeekData.fAltitudeHigh[serieIndex][valueIndex],
@@ -323,6 +323,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
+		yData.setValueDivisor(1000);
 		yData.setVisibleMinValue(0);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, fTourWeekData.fTypeIds, fActiveTourTypeFilter);

@@ -77,18 +77,14 @@ public class Messages extends NLS {
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
 	public static String		app_action_expand_type_year_month_day;
-
 	public static String		app_action_merge_tour;
-
 	public static String		app_action_open_tour;
 	public static String		app_action_quick_edit;
 	public static String		app_action_read_edit_tooltip;
 	public static String		app_action_save;
-
 	public static String		app_action_save_tour_tooltip;
 	public static String		app_action_undo_modifications;
 	public static String		app_action_undo_modifications_tooltip;
-
 	public static String		app_action_update;
 
 	public static String		App_Action_set_tour_type;
@@ -216,9 +212,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_time;
 
 	public static String		Image__assignMergedTour;
-
 	public static String		Image__assignMergedTour_disabled;
-
 	public static String		Image__chart_analyzer;
 	public static String		Image__collapse_all;
 	public static String		Image__database;
@@ -226,9 +220,7 @@ public class Messages extends NLS {
 	public static String		Image__database_placeholder;
 	public static String		Image__delete;
 	public static String		Image__delete_disabled;
-
 	public static String		Image__edit_adjust_altitude;
-
 	public static String		Image__edit_adjust_altitude_disabled;
 	public static String		Image__edit_row;
 	public static String		Image__edit_tour;
@@ -261,15 +253,13 @@ public class Messages extends NLS {
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
+	public static String		Image__open_folder_add;
 
 	public static String		Image__options;
-
 	public static String		Image__quick_edit;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
 	public static String		Image__remove_all_disabled;
-
-	public static String		Image__reset;
 	public static String		Image__save;
 	public static String		Image__save_disabled;
 	public static String		Image__save_tour;
@@ -286,14 +276,10 @@ public class Messages extends NLS {
 	public static String		Image__tag_category;
 	public static String		Image__tag_root;
 	public static String		Image__tour_map_ref_tour_new;
-
 	public static String		Image__tour_new;
-
 	public static String		Image__tour_new_disabled;
-
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
-
 	public static String		Image__tour_viewer;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
@@ -301,21 +287,17 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
-	public static String	image__merge_tours;
+	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;
-
-	public static String	import_data_action_assignment_is_not_available;
-
+	public static String		import_data_action_assignment_is_not_available;
 	public static String		import_data_action_assignMergedTour;
-
-	public static String	import_data_action_assignMergedTour_default;
-
-	public static String		import_data_action_assignMergedTour_tooltip;
+	public static String		import_data_action_assignMergedTour_default;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
+	public static String		import_data_action_reimport_tour;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
@@ -342,23 +324,18 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Monitor_wait_for_data;
 	public static String		Import_Wizard_Thread_name_read_device_data;
 
-	public static String	merge_tour_dlg_invalid_serie_data_message;
-
+	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
 
-	public static String	merge_tour_source_graph_altitude_tooltip;
-
-	public static String	merge_tour_source_graph_cadence_tooltip;
-
-	public static String	merge_tour_source_graph_heartbeat_tooltip;
-
-	public static String	merge_tour_source_graph_temperature_tooltip;
+	public static String		merge_tour_source_graph_altitude_tooltip;
+	public static String		merge_tour_source_graph_cadence_tooltip;
+	public static String		merge_tour_source_graph_heartbeat_tooltip;
+	public static String		merge_tour_source_graph_temperature_tooltip;
 
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
-	public static String		Pref_ChartColors_Label_title;
 	public static String		Pref_ChartColors_unit_high;
 	public static String		Pref_ChartColors_unit_low;
 	public static String		Pref_ChartColors_unit_max;
@@ -382,6 +359,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_autozoom;
 	public static String		Pref_Graphs_Check_force_minimum_for_altimeter;
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
+
+	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
@@ -402,6 +381,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
 	public static String		Pref_Graphs_Tab_zoom_options;
+	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
 	public static String		Pref_People_Action_add_person;
@@ -474,8 +454,13 @@ public class Messages extends NLS {
 	public static String		pref_tourtag_viewer_title;
 
 	public static String		pref_view_layout_display_lines;
+	public static String		pref_view_layout_group_display_format;
 	public static String		pref_view_layout_label_category;
 	public static String		pref_view_layout_label_color_group;
+	public static String		pref_view_layout_label_driving_time_format;
+	public static String		pref_view_layout_label_format_hh_mm;
+	public static String		pref_view_layout_label_format_hh_mm_ss;
+	public static String		pref_view_layout_label_recording_time_format;
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
@@ -585,8 +570,7 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag_category;
 
 	public static String		tour_data_label_device_marker;
-
-	public static String	tour_data_label_feature_since_version_9_01;
+	public static String		tour_data_label_feature_since_version_9_01;
 	public static String		tour_data_label_manually_created_tour;
 
 	public static String		tour_database_version_info_message;
@@ -650,76 +634,42 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_tour_marker;
 	public static String		tour_editor_tour_new_tooltip;
 
-	public static String	tour_merger_btn_reset_adjustment;
-
-	public static String	tour_merger_btn_reset_adjustment_tooltip;
-
+	public static String		tour_merger_btn_reset_adjustment;
+	public static String		tour_merger_btn_reset_adjustment_tooltip;
 	public static String		tour_merger_btn_reset_values;
+	public static String		tour_merger_btn_reset_values_tooltip;
+	public static String		tour_merger_chk_adjust_altitude_from_source;
+	public static String		tour_merger_chk_adjust_altitude_from_source_tooltip;
+	public static String		tour_merger_chk_adjust_altitude_linear_interpolition;
+	public static String		tour_merger_chk_adjust_altitude_linear_interpolition_tooltip;
+	public static String		tour_merger_chk_adjust_start_altitude;
+	public static String		tour_merger_chk_adjust_start_altitude_tooltip;
+	public static String		tour_merger_chk_alti_diff_scaling;
+	public static String		tour_merger_chk_alti_diff_scaling_tooltip;
+	public static String		tour_merger_chk_keep_horiz_vert_adjustments;
+	public static String		tour_merger_chk_keep_horiz_vert_adjustments_tooltip;
+	public static String		tour_merger_chk_preview_graphs;
+	public static String		tour_merger_chk_preview_graphs_tooltip;
+	public static String		tour_merger_chk_set_tour_type;
+	public static String		tour_merger_chk_set_tour_type_tooltip;
 
-	public static String	tour_merger_btn_reset_values_tooltip;
-	public static String	tour_merger_chk_adjust_altitude_from_source;
+	public static String	tour_merger_chk_use_synced_start_time;
 
-	public static String	tour_merger_chk_adjust_altitude_from_source_tooltip;
-
-	public static String	tour_merger_chk_adjust_altitude_linear_interpolition;
-
-	public static String	tour_merger_chk_adjust_altitude_linear_interpolition_tooltip;
-
-	public static String	tour_merger_chk_adjust_start_altitude;
-
-	public static String	tour_merger_chk_adjust_start_altitude_tooltip;
-
-	public static String	tour_merger_chk_alti_diff_scaling;
-
-	public static String	tour_merger_chk_alti_diff_scaling_tooltip;
-
-	public static String	tour_merger_chk_keep_horiz_vert_adjustments;
-
-	public static String	tour_merger_chk_keep_horiz_vert_adjustments_tooltip;
-
-	public static String	tour_merger_chk_merge_temperature;
-
-	public static String	tour_merger_chk_merge_temperature_tooltip;
-
-	public static String	tour_merger_chk_preview_graphs;
-
-	public static String	tour_merger_chk_preview_graphs_tooltip;
-
-	public static String	tour_merger_chk_set_tour_type;
-
-	public static String	tour_merger_chk_set_tour_type_tooltip;
-
+	public static String	tour_merger_chk_use_synced_start_time_tooltip;
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
 	public static String		tour_merger_dialog_title;
-
-	public static String	tour_merger_group_adjust_altitude;
-
-	public static String	tour_merger_group_adjust_time;
-
-	public static String	tour_merger_group_display_options;
-
-	public static String	tour_merger_group_display_options_tooltip;
-
-	public static String	tour_merger_group_save_actions;
-
-	public static String	tour_merger_group_save_actions_tooltip;
-
-	public static String	tour_merger_label_adjust_altitude;
-
-	public static String	tour_merger_label_adjust_altitude_10;
-
-	public static String	tour_merger_label_adjust_altitude_100;
-
+	public static String		tour_merger_group_adjust_altitude;
+	public static String		tour_merger_group_adjust_time;
+	public static String		tour_merger_group_save_actions;
+	public static String		tour_merger_group_save_actions_tooltip;
 	public static String		tour_merger_label_adjust_hours;
 	public static String		tour_merger_label_adjust_minutes;
 	public static String		tour_merger_label_adjust_seconds;
-	public static String		tour_merger_label_invalid_data;
+	public static String		tour_merger_label_source_tour;
+	public static String		tour_merger_label_source_tour_tooltip;
 
-	public static String	tour_merger_label_source_tour;
-
-	public static String	tour_merger_label_source_tour_tooltip;
-	public static String		tour_merger_reset_settings_tooltip;
+	public static String		tour_merger_save_target_tour;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

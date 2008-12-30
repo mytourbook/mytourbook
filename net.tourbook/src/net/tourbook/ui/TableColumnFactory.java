@@ -118,6 +118,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory AVG_PACE = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgPace", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_pace_label);
+			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
+			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory AVG_SPEED = new TableColumnFactory() {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

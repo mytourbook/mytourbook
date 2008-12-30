@@ -62,13 +62,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
+public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	private static final List<Integer>	fUnitValues		= Arrays.asList(10, 50, 100, 150, 190);
 	private static final List<String>	fUnitLabels		= Arrays.asList(Messages.Pref_ChartColors_unit_min,
@@ -131,7 +130,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			if (inputElement instanceof PrefPageGraphColors) {
+			if (inputElement instanceof PrefPageAppearanceColors) {
 				return GraphColorProvider.getInstance().getGraphColorDefinitions();
 			}
 			return null;
@@ -354,8 +353,13 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 					if (fExpandedItem != null) {
 						fColorViewer.collapseToLevel(fExpandedItem, 1);
 					}
-					fColorViewer.expandToLevel(treeItem, 1);
-					fExpandedItem = treeItem;
+					
+					Display.getCurrent().asyncExec(new Runnable() {
+						public void run() {
+							fColorViewer.expandToLevel(treeItem, 1);
+							fExpandedItem = treeItem;
+						}
+					});
 				}
 			}
 		});
@@ -372,12 +376,6 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		container.setLayout(gridLayout);
-
-		final Label label = new Label(container, SWT.WRAP);
-		label.setText(Messages.Pref_ChartColors_Label_title);
-		final GridData gd = new GridData();
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
 
 		createColorViewer(container);
 		createColorControl(container);

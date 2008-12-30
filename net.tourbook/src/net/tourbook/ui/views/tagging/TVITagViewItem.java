@@ -65,6 +65,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 	long				colRecordingTime;
 	long				colDrivingTime;
+	long				colPausedTime;
 
 	long				colAltitudeUp;
 	long				colAltitudeDown;
@@ -74,6 +75,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	long				colMaxAltitude;
 
 	float				colAvgSpeed;
+	float				colAvgPace;
+
 	long				colAvgPulse;
 	long				colAvgCadence;
 	long				colAvgTemperature;
@@ -118,7 +121,6 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 			conn.close();
 
-			
 			if (tagItem.colItemCounter == 0) {
 
 				/*
@@ -127,7 +129,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 				 */
 				tagItem.setChildren(new ArrayList<TreeViewerItem>());
 			}
-			
+
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
@@ -139,6 +141,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 		colRecordingTime = result.getLong(startIndex + 1);
 		colDrivingTime = result.getLong(startIndex + 2);
+		colPausedTime = colRecordingTime - colDrivingTime;
 
 		colAltitudeUp = result.getLong(startIndex + 3);
 		colAltitudeDown = result.getLong(startIndex + 4);
@@ -153,7 +156,9 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 		// prevent divide by 0
 		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
-		colAvgSpeed = (float) (colDrivingTime == 0 ? 0 : 3.6 * colDistance / colDrivingTime);
+		colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
+		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 166.66f / colDistance;
+
 	}
 
 	public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
