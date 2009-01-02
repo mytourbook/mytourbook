@@ -217,7 +217,6 @@ public class Messages extends NLS {
 	public static String		Image__collapse_all;
 	public static String		Image__database;
 	public static String		Image__database_other_person;
-	public static String		Image__database_placeholder;
 	public static String		Image__delete;
 	public static String		Image__delete_disabled;
 	public static String		Image__edit_adjust_altitude;
@@ -250,6 +249,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
+
+	public static String	Image__icon_placeholder;
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
@@ -329,9 +330,17 @@ public class Messages extends NLS {
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
 
+	public static String	merge_tour_source_graph_altitude;
+
 	public static String		merge_tour_source_graph_altitude_tooltip;
+	public static String	merge_tour_source_graph_cadence;
+
 	public static String		merge_tour_source_graph_cadence_tooltip;
+	public static String	merge_tour_source_graph_heartbeat;
+
 	public static String		merge_tour_source_graph_heartbeat_tooltip;
+	public static String	merge_tour_source_graph_temperature;
+
 	public static String		merge_tour_source_graph_temperature_tooltip;
 
 	public static String		Pref_ChartColors_btn_legend;
@@ -652,8 +661,7 @@ public class Messages extends NLS {
 	public static String		tour_merger_chk_preview_graphs_tooltip;
 	public static String		tour_merger_chk_set_tour_type;
 	public static String		tour_merger_chk_set_tour_type_tooltip;
-
-	public static String	tour_merger_chk_use_synced_start_time;
+	public static String		tour_merger_chk_use_synced_start_time;
 
 	public static String	tour_merger_chk_use_synced_start_time_tooltip;
 	public static String		tour_merger_dialog_header_message;
@@ -668,7 +676,6 @@ public class Messages extends NLS {
 	public static String		tour_merger_label_adjust_seconds;
 	public static String		tour_merger_label_source_tour;
 	public static String		tour_merger_label_source_tour_tooltip;
-
 	public static String		tour_merger_save_target_tour;
 
 	public static String		tour_statistic_label_years;

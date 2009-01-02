@@ -632,7 +632,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
 		imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
 		imageDescDatabaseAssignMergedTour = TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour);
-		imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__database_placeholder);
+		imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder);
 		imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
 
 		try {

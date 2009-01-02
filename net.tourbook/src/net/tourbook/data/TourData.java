@@ -1202,8 +1202,6 @@ public class TourData implements Comparable<Object> {
 		int breakTime = 0;
 		int currentBreakTime = 0;
 
-//		cadenceSerie = new int[timeSerie.length];
-
 		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
 
 			final int currentDistance = distanceSerie[serieIndex];
@@ -1212,17 +1210,15 @@ public class TourData implements Comparable<Object> {
 			final int timeDiff = currentTime - lastMovingTime;
 			final int distDiff = currentDistance - lastMovingDistance;
 
-			if (distDiff == 0 || timeDiff > 20 && distDiff < 10) {
+			if (distDiff == 0 || (timeDiff > minStopTime && distDiff < 10)) {
 
 				// distance has not changed, check if a longer stop is done
-
-				// speed must be greater than 1.8 km/h
+				// speed must be greater than 1.8 km/h (10m in 20 sec)
 
 				final int breakDiff = currentTime - currentBreakTime;
 
 				breakTime += breakDiff;
 
-//				int breakValue = 0;
 				if (timeDiff > minStopTime) {
 
 					// person has stopped for a break
@@ -1230,21 +1226,7 @@ public class TourData implements Comparable<Object> {
 
 					breakTime = 0;
 					currentBreakTime = currentTime;
-
-//					breakValue = -500 - breakTime;
-
-				} else {
-
-//					breakValue = 20;
 				}
-
-//				if (distDiff == 0) {
-//					cadenceSerie[serieIndex] = 100 + breakValue;
-//				} else if (timeDiff > 20) {
-//					cadenceSerie[serieIndex] = 200 + breakValue;
-//				} else if (distDiff < 5) {
-//					cadenceSerie[serieIndex] = 300 + breakValue;
-//				}
 
 			} else {
 
@@ -1254,8 +1236,6 @@ public class TourData implements Comparable<Object> {
 
 				breakTime = 0;
 				currentBreakTime = currentTime;
-
-//				cadenceSerie[serieIndex] = 0;
 			}
 		}
 
@@ -2385,7 +2365,7 @@ public class TourData implements Comparable<Object> {
 			segmentSerieAltitudeDown[segmentIndex] = segment.altitudeDown = altitudeDown;
 
 			final int segmentDistance = segment.distance;
-			
+
 			segmentSerieSpeed[segmentIndex] = segment.speed //
 			= drivingTime == 0 ? 0 : (float) ((float) segmentDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
 

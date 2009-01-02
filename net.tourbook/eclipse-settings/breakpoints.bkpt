@@ -3,7 +3,7 @@
 <breakpoint enabled="true" persistant="true" registered="true">
 <resource path="/" type="8"/>
 <marker type="org.eclipse.jdt.debug.javaExceptionBreakpointMarker">
-<attrib name="message" value="Breakpoint:ArrayIndexOutOfBoundsException [scoped]: uncaught"/>
+<attrib name="message" value="Breakpoint:ArrayIndexOutOfBoundsException [scoped]: caught and uncaught"/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.jdt.debug"/>
 <attrib name="org.eclipse.jdt.debug.core.checked" value="false"/>
 <attrib name="org.eclipse.jdt.debug.ui.JAVA_ELEMENT_HANDLE_ID" value="=net.tourbook/C:\/Program Files\/Java\/jre1.6.0_05\/lib\/rt.jar&lt;java.lang(ArrayIndexOutOfBoundsException.class[ArrayIndexOutOfBoundsException"/>
@@ -12,7 +12,7 @@
 <attrib name="org.eclipse.jdt.internal.core.JavaModelManager.handleId" value="=net.tourbook/C:\/Program Files\/Java\/jre1.6.0_05\/lib\/rt.jar&lt;java.lang(ArrayIndexOutOfBoundsException.class"/>
 <attrib name="org.eclipse.jdt.debug.core.installCount" value="1"/>
 <attrib name="org.eclipse.jdt.debug.core.inclusion_filters" value="net.tourbook.*,de.byteholder.*"/>
-<attrib name="org.eclipse.jdt.debug.core.caught" value="false"/>
+<attrib name="org.eclipse.jdt.debug.core.caught" value="true"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.jdt.debug.core.typeName" value="java.lang.ArrayIndexOutOfBoundsException"/>
 </marker>
@@ -27,18 +27,18 @@
 <attrib name="org.eclipse.jdt.internal.core.JavaModelManager.handleId" value="=de.byteholder.geoclipse/C:\/Program Files\/Java\/jre1.6.0_05\/lib\/rt.jar&lt;java.lang(ClassNotFoundException.class"/>
 <attrib name="org.eclipse.jdt.debug.core.installCount" value="1"/>
 <attrib name="org.eclipse.debug.core.registered" value="true"/>
-<attrib name="message" value="Breakpoint:ClassNotFoundException [scoped]: uncaught"/>
+<attrib name="message" value="Breakpoint:ClassNotFoundException [scoped]: caught and uncaught"/>
 <attrib name="org.eclipse.jdt.debug.core.uncaught" value="true"/>
 <attrib name="org.eclipse.jdt.debug.core.inclusion_filters" value="de.byteholder.*,net.tourbook.*"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
-<attrib name="org.eclipse.jdt.debug.core.caught" value="false"/>
+<attrib name="org.eclipse.jdt.debug.core.caught" value="true"/>
 <attrib name="org.eclipse.jdt.debug.core.typeName" value="java.lang.ClassNotFoundException"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
 <resource path="/" type="8"/>
 <marker type="org.eclipse.jdt.debug.javaExceptionBreakpointMarker">
-<attrib name="message" value="Breakpoint:NullPointerException [scoped]: uncaught"/>
+<attrib name="message" value="Breakpoint:NullPointerException [scoped]: caught and uncaught"/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.jdt.debug"/>
 <attrib name="org.eclipse.jdt.debug.core.checked" value="false"/>
 <attrib name="org.eclipse.jdt.debug.ui.JAVA_ELEMENT_HANDLE_ID" value="=net.tourbook/C:\/Program Files\/Java\/jre1.6.0_05\/lib\/rt.jar&lt;java.lang(NullPointerException.class[NullPointerException"/>
@@ -47,7 +47,7 @@
 <attrib name="org.eclipse.jdt.internal.core.JavaModelManager.handleId" value="=net.tourbook/C:\/Program Files\/Java\/jre1.6.0_05\/lib\/rt.jar&lt;java.lang(NullPointerException.class"/>
 <attrib name="org.eclipse.jdt.debug.core.installCount" value="1"/>
 <attrib name="org.eclipse.jdt.debug.core.inclusion_filters" value="net.tourbook.*,de.byteholder.*"/>
-<attrib name="org.eclipse.jdt.debug.core.caught" value="false"/>
+<attrib name="org.eclipse.jdt.debug.core.caught" value="true"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.jdt.debug.core.typeName" value="java.lang.NullPointerException"/>
 </marker>
@@ -66,9 +66,25 @@
 <attrib name="message" value="Breakpoint:SQLException [scoped]: caught and uncaught"/>
 <attrib name="org.eclipse.jdt.debug.core.uncaught" value="true"/>
 <attrib name="org.eclipse.jdt.debug.core.inclusion_filters" value="net.tourbook.*"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="org.eclipse.jdt.debug.core.caught" value="true"/>
+<attrib name="org.eclipse.jdt.debug.core.typeName" value="java.sql.SQLException"/>
+</marker>
+</breakpoint>
+<breakpoint enabled="true" persistant="true" registered="true">
+<resource path="/" type="8"/>
+<marker type="org.eclipse.jdt.debug.javaExceptionBreakpointMarker">
+<attrib name="message" value="Breakpoint:SWTException: caught and uncaught"/>
+<attrib name="org.eclipse.debug.core.id" value="org.eclipse.jdt.debug"/>
+<attrib name="org.eclipse.jdt.debug.core.checked" value="false"/>
+<attrib name="org.eclipse.jdt.debug.ui.JAVA_ELEMENT_HANDLE_ID" value="=com.dawidweiss.tilefactory.yahoo/L:\/Eclipse 3.4\/eclipse\/plugins\/org.eclipse.swt.win32.win32.x86_3.4.0.v3448f.jar&lt;org.eclipse.swt(SWTException.class[SWTException"/>
+<attrib name="org.eclipse.jdt.debug.core.suspendPolicy" value="2"/>
+<attrib name="org.eclipse.jdt.debug.core.uncaught" value="true"/>
+<attrib name="org.eclipse.jdt.internal.core.JavaModelManager.handleId" value="=com.dawidweiss.tilefactory.yahoo/L:\/Eclipse 3.4\/eclipse\/plugins\/org.eclipse.swt.win32.win32.x86_3.4.0.v3448f.jar&lt;org.eclipse.swt(SWTException.class"/>
+<attrib name="org.eclipse.jdt.debug.core.installCount" value="0"/>
 <attrib name="org.eclipse.jdt.debug.core.caught" value="true"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
-<attrib name="org.eclipse.jdt.debug.core.typeName" value="java.sql.SQLException"/>
+<attrib name="org.eclipse.jdt.debug.core.typeName" value="org.eclipse.swt.SWTException"/>
 </marker>
 </breakpoint>
 </breakpoints>
