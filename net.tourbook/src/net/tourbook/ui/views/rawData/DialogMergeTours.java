@@ -42,6 +42,8 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -185,6 +187,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 	private boolean					fIsAdjustAltiFromSourceBackup;
 	private boolean					fIsAdjustAltiFromStartBackup;
+	private IPropertyChangeListener	fPrefChangeListener;
 
 	/**
 	 * creates a int array backup
@@ -252,6 +255,32 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fNumberFormatter.setMaximumFractionDigits(3);
 
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+	}
+
+	private void addPrefListener() {
+
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+					/*
+					 * tour data cache is cleared, reload tour data from the database
+					 */
+
+					fSourceTour = TourManager.getInstance().getTourData(fSourceTour.getTourId());
+					fTargetTour = TourManager.getInstance().getTourData(fTargetTour.getTourId());
+
+					onModifyProperties();
+				}
+			}
+		};
+
+		prefStore.addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -573,6 +602,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	public void create() {
 
 		createDataBackup();
+		addPrefListener();
 
 		// create UI widgets
 		super.create();
@@ -601,6 +631,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fTourChart.updateMergeLayer(true);
 
 		updateUIFromTourData();
+		
 		if (fChkSynchStartTime.getSelection()) {
 			fTourTimeOffsetBackup = fTargetTour.getMergedTourTimeOffset();
 			updateUITourTimeOffset(fTourStartTimeSynchOffset);
@@ -1478,6 +1509,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		for (final Image image : fGraphImages.values()) {
 			image.dispose();
 		}
+
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void onModifyProperties() {

@@ -207,7 +207,7 @@ public class TourData implements Comparable<Object> {
 	private int						tourAltDown;
 
 	/**
-	 * plugin id for the device which was used for this tour
+	 * plugin id for the device which was used to create this tour
 	 */
 	private String					devicePluginId;
 
@@ -3538,15 +3538,15 @@ public class TourData implements Comparable<Object> {
 	@Override
 	public String toString() {
 
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append("[TourData] ");//$NON-NLS-1$ 
-		sb.append("tourId:");//$NON-NLS-1$
-		sb.append(tourId);
-		sb.append("\t" + super.toString());//$NON-NLS-1$
-		sb.append("\t" + System.identityHashCode(this));//$NON-NLS-1$
-
-		return sb.toString();
+		return new StringBuilder()//
+		.append("[TourData]") //$NON-NLS-1$ 
+				.append(" tourId:") //$NON-NLS-1$
+				.append(tourId)
+				.append(" object:") //$NON-NLS-1$
+				.append(super.toString())
+				.append(" identityHashCode:") //$NON-NLS-1$
+				.append(System.identityHashCode(this))
+				.toString();
 	}
 
 	public String toStringWithHash() {

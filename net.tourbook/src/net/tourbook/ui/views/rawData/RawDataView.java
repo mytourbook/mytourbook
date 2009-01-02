@@ -61,7 +61,6 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -139,7 +138,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private TableViewer						fTourViewer;
 
 	private ActionClearView					fActionClearView;
-	private ActionRefreshView				fActionRefreshView;
+//	private ActionRefreshView				fActionRefreshView;
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionSaveTourInDatabase		fActionSaveTour;
 	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
@@ -306,11 +305,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 					final TourData savedTourData = TourManager.saveModifiedTour(mapTourData);
 
 					// replace tour in map
-//					if (savedTourData == null) {
-//						System.err.println("reimported tour was not found in map");//$NON-NLS-1$
-//					} else {
 					tourDataMap.put(savedTourData.getTourId(), savedTourData);
-//					}
 				}
 			}
 
@@ -430,7 +425,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 					RawDataManager.getInstance().updateTourDataFromDb();
 
 					fTourViewer.refresh();
-//					reloadViewer();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -560,7 +554,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// view toolbar
 		fActionClearView = new ActionClearView(this);
-		fActionRefreshView = new ActionRefreshView(this);
+//		fActionRefreshView = new ActionRefreshView(this);
 
 		// view menu
 		fActionModifyColumns = new ActionModifyColumns(this);

@@ -64,6 +64,9 @@ public class ChartMergeLayer implements IChartLayer {
 		final boolean isAdjustedValues = yAdjustedValues != null;
 
 		final float measurementSystem = fTourChartConfig.measurementSystem;
+		
+		System.out.println(fLayerTourData + " " + yValues);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (xValues == null || xValues.length == 0 || yValues == null || yValues.length == 0) {
 			return;

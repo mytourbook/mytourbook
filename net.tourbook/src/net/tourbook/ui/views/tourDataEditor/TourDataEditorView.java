@@ -1363,22 +1363,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (fTourData != null && fIsTourDirty) {
 
-			final TourData savedTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
-
-			if (savedTourData == fTourData) {
-				updateUI(fTourData);
-			} else {
-
-				// TODO check if tour is valid
-
-				fIsSavingInProgress = true;
-
-				updateTourDataFromUI();
-
-				TourDatabase.saveTour(fTourData);
-
-				fIsSavingInProgress = false;
-			}
+			/*
+			 * in this case, nothing is done because the method which fires the event
+			 * TourEventId.CLEAR_DISPLAYED_TOUR is reponsible to use the correct TourData
+			 */
 
 		} else {
 
@@ -1415,20 +1403,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			return dialog.getReturnCode() == Window.OK;
 		}
-	}
-
-	private void contentIsModified() {
-
-		if (fTourData == null) {
-			return;
-		}
-
-		// update modified data
-		updateTourDataFromUI();
-
-		enableActions();
-
-		fireModifyNotification();
 	}
 
 	private void createActions() {
@@ -1476,7 +1450,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fKeyListener = new KeyAdapter() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
-				contentIsModified();
+				onModifyContent();
 			}
 		};
 
@@ -1495,7 +1469,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				updateUITitle();
 
-				contentIsModified();
+				onModifyContent();
 			}
 		};
 
@@ -3727,6 +3701,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		}
+	}
+
+	private void onModifyContent() {
+
+		if (fTourData == null) {
+			return;
+		}
+
+		// update modified data
+		updateTourDataFromUI();
+
+		enableActions();
+
+		fireModifyNotification();
 	}
 
 	private void onResizeTabInfo() {

@@ -351,11 +351,12 @@ public class TourManager {
 
 	/**
 	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourManager#TOUR_CHANGED} event.<br>
-	 * <br>
+	 * {@link TourEventId#TOUR_CHANGED} event.
+	 * <p>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
-	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
-	 * fired.
+	 * tour is not dirty, if the tour is dirty, saving is not done.
+	 * <p>
+	 * Event {@link TourEventId#TOUR_CHANGED} is always fired.
 	 * 
 	 * @param tourData
 	 *            modified tour
@@ -584,11 +585,25 @@ public class TourManager {
 	}
 
 	/**
-	 * Remove all {@link TourData} from the cache so they need to be reloaded the next time in
-	 * {@link #getTourData} the database
+	 * Remove all {@link TourData} from the cache so they need to be reloaded the next time with
+	 * {@link #getTourData} from the database.
+	 * <p>
+	 * When this method is called and a tour is modified in the tour editor, the calling method is
+	 * responsible to update the tour in the tour editor:
 	 */
 	public void clearTourDataCache() {
+
 		fTourDataCache.clear();
+
+		/*
+		 * keep modified tour in cache
+		 */
+		final TourDataEditorView tourEditor = getTourDataEditor();
+		if (tourEditor != null && tourEditor.isDirty()) {
+
+			final TourData tourData = tourEditor.getTourData();
+			fTourDataCache.put(tourData.getTourId(), tourData);
+		}
 	}
 
 	/**
@@ -1111,10 +1126,10 @@ public class TourManager {
 
 			// adjust pace when it's defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
-				
+
 				yDataPace.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * PACE_DIVISOR,
 						true);
-				
+
 				// set max value after min value
 				yDataPace.setVisibleMaxValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * PACE_DIVISOR,
 						true);

@@ -30,8 +30,8 @@ import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeViewerItem;
@@ -544,7 +544,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		if (fIsModified) {
 			fIsModified = false;
 
-			// remove old tags from internal list
+			// remove old tags from cached tours
 			TourDatabase.clearTourTags();
 
 			TagManager.updateTagNames();

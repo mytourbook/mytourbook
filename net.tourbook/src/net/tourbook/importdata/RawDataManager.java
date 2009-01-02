@@ -34,6 +34,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -68,14 +69,14 @@ public class RawDataManager {
 	private DeviceData				fDeviceData							= new DeviceData();
 
 	/**
-	 * contains the tour data which were imported or received
+	 * contains tours which were imported or received
 	 */
-	private HashMap<Long, TourData>	fTourDataMap						= new HashMap<Long, TourData>();
+	private HashMap<Long, TourData>	fImportedTourData					= new HashMap<Long, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>			fImportedFiles						= new HashSet<String>();
+	private HashSet<String>			fImportedFileNames					= new HashSet<String>();
 
 	private boolean					fIsImported;
 
@@ -250,7 +251,7 @@ public class RawDataManager {
 	}
 
 	public HashSet<String> getImportedFiles() {
-		return fImportedFiles;
+		return fImportedFileNames;
 	}
 
 	/**
@@ -264,12 +265,12 @@ public class RawDataManager {
 	 * @return the tour data which has been imported or received, tour id is the key
 	 */
 	public HashMap<Long, TourData> getTourDataMap() {
-		return fTourDataMap;
+		return fImportedTourData;
 	}
 
 	/**
 	 * Import the raw data from a file and save the imported data in the fields
-	 * <code>fDeviceData</code> and <code>fTourData</code>
+	 * {@link #fImportedTourData}
 	 * 
 	 * @param importFile
 	 *            the file to be imported
@@ -287,7 +288,7 @@ public class RawDataManager {
 									final boolean buildNewFileNames,
 									final FileCollisionBehavior fileCollision) {
 
-		final String fileName = importFile.getAbsolutePath();
+		final String filePathName = importFile.getAbsolutePath();
 
 		// check if importFile exist
 		if (importFile.exists() == false) {
@@ -299,7 +300,7 @@ public class RawDataManager {
 				final MessageBox msgBox = new MessageBox(activeShell, SWT.ICON_ERROR | SWT.OK);
 
 				msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
-				msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, fileName));
+				msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, filePathName));
 
 				msgBox.open();
 			}
@@ -308,11 +309,11 @@ public class RawDataManager {
 		}
 
 		// find the file extension in the filename
-		final int dotPos = fileName.lastIndexOf("."); //$NON-NLS-1$
+		final int dotPos = filePathName.lastIndexOf("."); //$NON-NLS-1$
 		if (dotPos == -1) {
 			return false;
 		}
-		final String fileExtension = fileName.substring(dotPos + 1);
+		final String fileExtension = filePathName.substring(dotPos + 1);
 
 		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 		fIsImported = false;
@@ -332,7 +333,7 @@ public class RawDataManager {
 
 						// device file extension was found in the filename extension
 
-						if (importWithDevice(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
+						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
 							break;
@@ -350,7 +351,7 @@ public class RawDataManager {
 					 * the file extension
 					 */
 					for (final TourbookDevice device : deviceList) {
-						if (importWithDevice(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
+						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
 							break;
@@ -359,7 +360,7 @@ public class RawDataManager {
 				}
 
 				if (isDataImported) {
-					fImportedFiles.add(fLastImportedFile);
+					fImportedFileNames.add(fLastImportedFile);
 				}
 			}
 		});
@@ -538,7 +539,7 @@ public class RawDataManager {
 
 			fLastImportedFile = sourceFileName;
 
-			return device.processDeviceData(sourceFileName, fDeviceData, fTourDataMap);
+			return device.processDeviceData(sourceFileName, fDeviceData, fImportedTourData);
 		}
 
 		return false;
@@ -546,8 +547,8 @@ public class RawDataManager {
 	}
 
 	public void removeAllTours() {
-		fTourDataMap.clear();
-		fImportedFiles.clear();
+		fImportedTourData.clear();
+		fImportedFileNames.clear();
 	}
 
 	public void setImportCanceled(final boolean importCanceled) {
@@ -600,36 +601,55 @@ public class RawDataManager {
 
 				boolean isReplaced = false;
 
-				for (final TourData mapTourData : fTourDataMap.values()) {
+				long editorTourId = -1;
 
-					if (mapTourData.isTourDeleted == false) {
+				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+				if (tourDataEditor != null) {
+					final TourData tourData = tourDataEditor.getTourData();
+					if (tourData != null) {
+						editorTourId = tourData.getTourId();
+					}
+				}
 
-						final Long tourId = mapTourData.getTourId();
+				for (final TourData mapTourData : fImportedTourData.values()) {
 
-						try {
+					if (mapTourData.isTourDeleted) {
+						continue;
+					}
 
-							final TourData dbTourData = TourManager.getInstance().getTourData(tourId);
-							if (dbTourData != null) {
+					final Long tourId = mapTourData.getTourId();
+
+					try {
+
+						final TourData dbTourData = TourManager.getInstance().getTourData(tourId);
+						if (dbTourData != null) {
+
+							/*
+							 * tour is saved in the database, set rawdata file name to display the
+							 * filepath
+							 */
+							dbTourData.importRawDataFile = mapTourData.importRawDataFile;
+
+							final Long dbTourId = dbTourData.getTourId();
+
+							// replace existing tours but do not add new tours
+							if (fImportedTourData.containsKey(dbTourId)) {
 
 								/*
-								 * tour is saved in the database, set rawdata file name to display
-								 * the filepath
+								 * check if the tour editor contains this tour, this should not be
+								 * necessary, just make sure the correct tour is used !!!
 								 */
-								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
-
-								final Long dbTourId = dbTourData.getTourId();
-
-								// replace existing tour, do not add new tours
-								if (fTourDataMap.containsKey(dbTourId)) {
-
-									fTourDataMap.put(dbTourId, dbTourData);
-
-									isReplaced = true;
+								if (editorTourId == dbTourId) {
+									fImportedTourData.put(dbTourId, tourDataEditor.getTourData());
+								} else {
+									fImportedTourData.put(dbTourId, dbTourData);
 								}
+
+								isReplaced = true;
 							}
-						} catch (final Exception e) {
-							e.printStackTrace();
 						}
+					} catch (final Exception e) {
+						e.printStackTrace();
 					}
 				}
 
@@ -654,8 +674,8 @@ public class RawDataManager {
 				final Long tourId = tourData.getTourId();
 
 				// replace existing tour do not add new tours
-				if (fTourDataMap.containsKey(tourId)) {
-					fTourDataMap.put(tourId, tourData);
+				if (fImportedTourData.containsKey(tourId)) {
+					fImportedTourData.put(tourId, tourData);
 				}
 			}
 		}

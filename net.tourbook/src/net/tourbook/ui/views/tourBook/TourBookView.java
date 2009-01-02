@@ -59,6 +59,7 @@ import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -145,6 +146,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionOpenTour					fActionOpenTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
+	private ActionMergeTour					fActionMergeTour;
 
 	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionSetTourTag				fActionAddTag;
@@ -368,6 +370,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
+		fActionMergeTour = new ActionMergeTour(this);
 
 		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -583,7 +586,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					
+
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
 					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
 
@@ -599,7 +602,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 //					}
 //					System.out.println("book typeId:" + tourTypeId + " raw:" + sb.toString());
 //					// TODO remove SYSTEM.OUT.PRINTLN
-
 					cell.setImage(tourTypeImage);
 				}
 			}
@@ -1076,10 +1078,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+		TourData firstSavedTour = null;
+
 		if (isOneTour) {
-			final TourData firstTourData = TourManager.getInstance().getTourData(firstTour.getTourId());
-			isDeviceTour = firstTourData.isManualTour() == false;
+			firstSavedTour = TourManager.getInstance().getTourData(firstTour.getTourId());
+			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
+
 		/*
 		 * enable actions
 		 */
@@ -1088,6 +1093,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditQuick.setEnabled(isOneTour);
 		fActionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+		fActionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -1172,6 +1178,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
+		menuMgr.add(fActionMergeTour);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());

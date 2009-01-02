@@ -248,6 +248,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			}
 		});
 
+// 2009-01-02 disabled because the tour data cache was cleared		
 		// button: delete
 		fButtonDelete = new Button(container, SWT.NONE);
 		fButtonDelete.setText(Messages.Pref_TourTypes_Button_delete);
@@ -484,7 +485,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			fIsModified = false;
 
-//			TourDatabase.clearTourTypes();
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
