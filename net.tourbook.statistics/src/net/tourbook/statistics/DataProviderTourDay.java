@@ -241,62 +241,29 @@ public class DataProviderTourDay extends DataProvider {
 			final int[] distanceLow = new int[serieLength];
 			final int[] altitudeLow = new int[serieLength];
 
-			int lastDOY = -1;
-			int lastTime = 0;
-			int lastDistance = 0;
-			int lastAltitude = 0;
-
 			/*
-			 * set the low/high values when different tours have the same day
+			 * adjust low/high values when a day has multiple tours
 			 */
-			int tourIndex = 0;
-			for (; tourIndex < tourAllYearsDOY.length; tourIndex++) {
+			int prevTourDOY = -1;
+			for (int tourIndex = 0; tourIndex < tourAllYearsDOY.length; tourIndex++) {
 
-				if (lastDOY == tourAllYearsDOY[tourIndex]) {
+				final int tourDOY = tourAllYearsDOY[tourIndex];
+
+				if (prevTourDOY == tourDOY) {
 
 					// current tour is at the same day as the tour before
 
-					timeLow[tourIndex] = lastTime;
-					distanceLow[tourIndex] = lastDistance;
-					altitudeLow[tourIndex] = lastAltitude;
-
-					lastTime = timeHigh[tourIndex - 1] += lastTime;
-					lastDistance = distanceHigh[tourIndex - 1] += lastDistance;
-					lastAltitude = altitudeHigh[tourIndex - 1] += lastAltitude;
+					timeHigh[tourIndex] += timeLow[tourIndex] = timeHigh[tourIndex - 1];
+					distanceHigh[tourIndex] += distanceLow[tourIndex] = distanceHigh[tourIndex - 1];
+					altitudeHigh[tourIndex] += altitudeLow[tourIndex] = altitudeHigh[tourIndex - 1];
 
 				} else {
 
 					// current tour is on another day as the tour before
 
-					updateLastTour(tourIndex,
-							lastTime,
-							lastDistance,
-							lastAltitude,
-							timeLow,
-							distanceLow,
-							altitudeLow,
-							timeHigh,
-							distanceHigh,
-							altitudeHigh);
-
-					lastTime = 0;
-					lastDistance = 0;
-					lastAltitude = 0;
-
-					lastDOY = tourAllYearsDOY[tourIndex];
+					prevTourDOY = tourDOY;
 				}
 			}
-
-			updateLastTour(tourIndex,
-					lastTime,
-					lastDistance,
-					lastAltitude,
-					timeLow,
-					distanceLow,
-					altitudeLow,
-					timeHigh,
-					distanceHigh,
-					altitudeHigh);
 
 			// get number of days for all years
 			int yearDays = 0;
@@ -320,11 +287,12 @@ public class DataProviderTourDay extends DataProvider {
 			fTourDayData.fTagIds = dbTagIds;
 
 			fTourDayData.fTimeLow = timeLow;
-			fTourDayData.fDistanceLow = distanceLow;
-			fTourDayData.fAltitudeLow = altitudeLow;
-
 			fTourDayData.fTimeHigh = timeHigh;
+
+			fTourDayData.fDistanceLow = distanceLow;
 			fTourDayData.fDistanceHigh = distanceHigh;
+
+			fTourDayData.fAltitudeLow = altitudeLow;
 			fTourDayData.fAltitudeHigh = altitudeHigh;
 
 			fTourDayData.fTourStartValues = ArrayListToArray.toInt(dbTourStartTime);
@@ -346,27 +314,4 @@ public class DataProviderTourDay extends DataProvider {
 		return fTourDayData;
 	}
 
-	private final void updateLastTour(	final int tourIndex,
-										final int lastTime,
-										final int lastDistance,
-										final int lastAltitude,
-										final int[] timeLow,
-										final int[] distanceLow,
-										final int[] altitudeLow,
-										final int[] timeHigh,
-										final int[] distanceHigh,
-										final int[] altitudeHigh) {
-		if (lastTime > 0) {
-
-			// update last time
-			final int lastTourIndex = tourIndex - 1;
-			timeLow[lastTourIndex] = lastTime;
-			distanceLow[lastTourIndex] = lastDistance;
-			altitudeLow[lastTourIndex] = lastAltitude;
-
-			timeHigh[lastTourIndex] += lastTime;
-			distanceHigh[lastTourIndex] += lastDistance;
-			altitudeHigh[lastTourIndex] += lastAltitude;
-		}
-	}
 }

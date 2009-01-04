@@ -249,7 +249,11 @@ public class StatisticTourNumbers extends YearStatistic {
 			final int typeColorIndex = tourDayData.fTypeColorIndex[tourIndex];
 			int unitIndex;
 
-			unitIndex = createTourStatData(tourDayData.fDistanceHigh[tourIndex] - tourDayData.fDistanceLow[tourIndex],
+			final int diffDistance = (tourDayData.fDistanceHigh[tourIndex] - tourDayData.fDistanceLow[tourIndex] + 500) / 1000;
+			final int diffAltitude = tourDayData.fAltitudeHigh[tourIndex] - tourDayData.fAltitudeLow[tourIndex];
+			final int diffTime = tourDayData.fTimeHigh[tourIndex] - tourDayData.fTimeLow[tourIndex];
+
+			unitIndex = createTourStatData(diffDistance,
 					fStatDistanceUnits,
 					fStatDistanceCounterHigh[typeColorIndex],
 					fStatDistanceSumHigh[typeColorIndex]);
@@ -257,7 +261,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			fStatDistanceCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 			fStatDistanceSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 
-			unitIndex = createTourStatData(tourDayData.fAltitudeHigh[tourIndex] - tourDayData.fAltitudeLow[tourIndex],
+			unitIndex = createTourStatData(diffAltitude,
 					fStatAltitudeUnits,
 					fStatAltitudeCounterHigh[typeColorIndex],
 					fStatAltitudeSumHigh[typeColorIndex]);
@@ -265,7 +269,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			fStatAltitudeCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 			fStatAltitudeSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 
-			unitIndex = createTourStatData(tourDayData.fTimeHigh[tourIndex] - tourDayData.fTimeLow[tourIndex],
+			unitIndex = createTourStatData(diffTime,
 					fStatTimeUnits,
 					fStatTimeCounterHigh[typeColorIndex],
 					fStatTimeSumHigh[typeColorIndex]);
@@ -359,18 +363,18 @@ public class StatisticTourNumbers extends YearStatistic {
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
-				final StringBuilder infoText = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 
-				final int distance = fStatDistanceSumHigh[serieIndex][valueIndex] / 1000;
+				final int distance = fStatDistanceSumHigh[serieIndex][valueIndex];
 				final int counter = fStatDistanceCounterHigh[serieIndex][valueIndex];
 
 				if (valueIndex == 0) {
 
-					infoText.append(Messages.numbers_info_distance_down);
-					infoText.append(NEW_LINE);
-					infoText.append(Messages.numbers_info_distance_total);
+					sb.append(Messages.numbers_info_distance_down);
+					sb.append(NEW_LINE);
+					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(infoText.toString(),
+					toolTipLabel = new Formatter().format(sb.toString(),
 							fStatDistanceUnits[valueIndex],
 							UI.UNIT_LABEL_DISTANCE,
 							counter,
@@ -379,11 +383,11 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				} else if (valueIndex == fStatDistanceUnits.length - 1) {
 
-					infoText.append(Messages.numbers_info_distance_up);
-					infoText.append(NEW_LINE);
-					infoText.append(Messages.numbers_info_distance_total);
+					sb.append(Messages.numbers_info_distance_up);
+					sb.append(NEW_LINE);
+					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(infoText.toString(),
+					toolTipLabel = new Formatter().format(sb.toString(),
 							fStatDistanceUnits[valueIndex - 1],
 							UI.UNIT_LABEL_DISTANCE,
 							counter,
@@ -391,11 +395,11 @@ public class StatisticTourNumbers extends YearStatistic {
 							UI.UNIT_LABEL_DISTANCE).toString();
 				} else {
 
-					infoText.append(Messages.numbers_info_distance_between);
-					infoText.append(NEW_LINE);
-					infoText.append(Messages.numbers_info_distance_total);
+					sb.append(Messages.numbers_info_distance_between);
+					sb.append(NEW_LINE);
+					sb.append(Messages.numbers_info_distance_total);
 
-					toolTipLabel = new Formatter().format(infoText.toString(),
+					toolTipLabel = new Formatter().format(sb.toString(),
 							fStatDistanceUnits[valueIndex - 1],
 							fStatDistanceUnits[valueIndex],
 							UI.UNIT_LABEL_DISTANCE,
@@ -748,7 +752,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceSumColorIndex,
 				UI.UNIT_LABEL_DISTANCE,
 				Messages.LABEL_GRAPH_DISTANCE,
-				1000);
+				1);
 
 		updateChartAltitude(fChartAltitudeCounter,
 				fMinMaxKeeperStatAltitudeCounter,
