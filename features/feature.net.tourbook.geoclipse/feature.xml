@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.geoclipse.feature"
+      id="feature.net.tourbook.geoclipse"
       label="Geoclipse Feature"
       version="0.1.4.v2009-01-07"
       provider-name="Geoclipse">

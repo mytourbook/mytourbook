@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.feature"
+      id="feature.net.tourbook"
       label="%Feature_Name"
       version="8.11.0.v2008-11-22"
       provider-name="MyTourbook"
@@ -340,13 +340,6 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.rxtx"
          download-size="0"
          install-size="0"
@@ -390,5 +383,11 @@ POSSIBILITY OF SUCH DAMAGES.
          version="0.0.0"
          fragment="true"
          unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.jars"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

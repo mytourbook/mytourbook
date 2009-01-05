@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.ext.eclipse.feature"
+      id="feature.net.tourbook.ext.eclipse"
       label="Additional Eclipse Plugins"
       version="8.11.0.v2008-11-22">
 

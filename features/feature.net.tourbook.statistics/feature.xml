@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.statistics.feature"
+      id="feature.net.tourbook.statistics"
       label="%Feature_Name"
       version="8.11.0.v2008-11-22"
       provider-name="MyTourbook"
@@ -365,7 +365,7 @@ Public License instead of this License.
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="net.tourbook" version="1.6" match="greaterOrEqual"/>
       <import plugin="net.tourbook.chart"/>
-      <import plugin="net.tourbook.ext"/>
+      <import plugin="net.tourbook.ext.jars"/>
    </requires>
 
    <plugin

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.ext.ejb3.feature"
+      id="feature.net.tourbook.ext.ejb3"
       label="Ejb3 Service"
       version="3.3.0"
       provider-name="MyTourbook"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.ext.derby.feature"
+      id="feature.net.tourbook.ext.derby"
       label="Derby Database"
       version="10.3.2.1"
       plugin="net.tourbook.branding">
