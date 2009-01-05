@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.geoclipse.feature"
       label="Geoclipse Feature"
-      version="0.1.3.v2008-11-22"
+      version="0.1.4.v2009-01-07"
       provider-name="Geoclipse">
 
    <copyright>
@@ -303,63 +303,63 @@ POSSIBILITY OF SUCH DAMAGES.
          id="de.byteholder.geoclipse"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.libraries"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.poi"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.tilefactory.osm"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.tilefactory.wms"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.gpx"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.tilefactory.empty"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.tilefactory.osm.cycle"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.tilefactory.osm.tile.at.home"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.4.v2009-01-07"
          unpack="false"/>
 
 </feature>
