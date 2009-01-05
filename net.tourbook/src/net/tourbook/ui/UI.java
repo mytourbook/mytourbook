@@ -84,7 +84,7 @@ public class UI {
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
-	public static final String						SPACE							= " ";
+	public static final String						SPACE							= " "; //$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
@@ -932,9 +932,6 @@ public class UI {
 		// keep image in cache
 		fImageCache.put(colorId, transparentImage);
 
-//		System.out.println("createTourTypeImage:" + transparentImage);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		return transparentImage;
 	}
 
@@ -1033,9 +1030,6 @@ public class UI {
 			// check if the image is dirty
 			if (fDirtyImages.size() == 0 || fDirtyImages.containsKey(keyColorId) == false) {
 
-//				System.out.println("existingImage:" + System.identityHashCode(existingImage));
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 				// image is available and not dirty
 				return existingImage;
 			}
@@ -1109,9 +1103,6 @@ public class UI {
 		transparentImage.dispose();
 
 		fDirtyImages.remove(keyColorId);
-
-//		System.out.println("updateTourTypeImage:" + existingImage);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return existingImage;
 	}

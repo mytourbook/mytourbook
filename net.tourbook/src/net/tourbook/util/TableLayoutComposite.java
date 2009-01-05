@@ -110,7 +110,7 @@ public class TableLayoutComposite extends Composite {
 	}
 
 	private void layoutTable(final Table table, final int width, final Rectangle area, final boolean increase) {
-		// XXX: Layout is being called with an invalid value the first time
+		// Layout is being called with an invalid value the first time
 		// it is being called on Linux. This method resets the
 		// Layout to null so we make sure we run it only when
 		// the value is OK.

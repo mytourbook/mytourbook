@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * The MessageRegion is the optional area to show messages in the page.
  * <p>
- * XXX: Copied from org.eclipse.jface.preference.PreferencePage.MessageRegion see:
+ * Copied from org.eclipse.jface.preference.PreferencePage.MessageRegion see:
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=84061
  * </p>
  * 
@@ -56,6 +56,14 @@ class MessageRegion {
 	 */
 	public MessageRegion() {
 	//No initial behavior
+	}
+
+	/**
+	 * Clear the error message. Restore the previously displayed message if there is one, if not
+	 * restore the title label.
+	 */
+	public void clearErrorMessage() {
+		updateText(lastMessageText, lastMessageType);
 	}
 
 	/**
@@ -102,6 +110,27 @@ class MessageRegion {
 	}
 
 	/**
+	 * Hide the message region and clear out the caches.
+	 */
+	private void hideRegion() {
+		messageComposite.setVisible(false);
+		lastMessageText = null;
+		lastMessageType = IMessageProvider.NONE;
+	}
+
+	/**
+	 * Set the colors of the message area.
+	 * 
+	 * @param color
+	 *            The color to be use in the message area.
+	 */
+	private void setMessageColors(final Color color) {
+		messageText.setBackground(color);
+		messageComposite.setBackground(color);
+		messageImageLabel.setBackground(color);
+	}
+
+	/**
 	 * Set the layoutData for the messageArea. In most cases this will be a copy of the layoutData
 	 * used in setTitleLayoutData.
 	 * 
@@ -110,6 +139,13 @@ class MessageRegion {
 	 */
 	public void setMessageLayoutData(final Object layoutData) {
 		messageComposite.setLayoutData(layoutData);
+	}
+
+	/**
+	 * Show and enable the widgets in the message region
+	 */
+	private void showRegion() {
+		messageComposite.setVisible(true);
 	}
 
 	/**
@@ -160,41 +196,5 @@ class MessageRegion {
 			setMessageColors(JFaceColors.getBannerBackground(messageComposite.getDisplay()));
 		}
 
-	}
-
-	/**
-	 * Show and enable the widgets in the message region
-	 */
-	private void showRegion() {
-		messageComposite.setVisible(true);
-	}
-
-	/**
-	 * Hide the message region and clear out the caches.
-	 */
-	private void hideRegion() {
-		messageComposite.setVisible(false);
-		lastMessageText = null;
-		lastMessageType = IMessageProvider.NONE;
-	}
-
-	/**
-	 * Set the colors of the message area.
-	 * 
-	 * @param color
-	 *            The color to be use in the message area.
-	 */
-	private void setMessageColors(final Color color) {
-		messageText.setBackground(color);
-		messageComposite.setBackground(color);
-		messageImageLabel.setBackground(color);
-	}
-
-	/**
-	 * Clear the error message. Restore the previously displayed message if there is one, if not
-	 * restore the title label.
-	 */
-	public void clearErrorMessage() {
-		updateText(lastMessageText, lastMessageType);
 	}
 }

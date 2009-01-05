@@ -45,7 +45,6 @@ public class CRPDataReader extends TourbookDevice {
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

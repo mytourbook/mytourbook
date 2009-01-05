@@ -780,8 +780,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 //					for (final byte b : imageData) {
 //						sb.append(b);
 //					}
-//					System.out.println("raw  typeId:" + tourTypeId + " raw:" + sb.toString());
-//					// TODO remove SYSTEM.OUT.PRINTLN
+
 					cell.setImage(tourTypeImage);
 				}
 			}

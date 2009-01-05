@@ -600,8 +600,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 //					for (final byte b : imageData) {
 //						sb.append(b);
 //					}
-//					System.out.println("book typeId:" + tourTypeId + " raw:" + sb.toString());
-//					// TODO remove SYSTEM.OUT.PRINTLN
+
 					cell.setImage(tourTypeImage);
 				}
 			}

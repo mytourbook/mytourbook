@@ -26,6 +26,7 @@ public class Messages extends NLS {
 
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Menu_file;
@@ -197,7 +198,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Heartbeat_unit;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
-
 	public static String		Graph_Label_Power_unit;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
@@ -249,13 +249,11 @@ public class Messages extends NLS {
 	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
-
-	public static String	Image__icon_placeholder;
+	public static String		Image__icon_placeholder;
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 	public static String		Image__open_folder_add;
-
 	public static String		Image__options;
 	public static String		Image__quick_edit;
 	public static String		Image__refresh;
@@ -329,18 +327,13 @@ public class Messages extends NLS {
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
-
-	public static String	merge_tour_source_graph_altitude;
-
+	public static String		merge_tour_source_graph_altitude;
 	public static String		merge_tour_source_graph_altitude_tooltip;
-	public static String	merge_tour_source_graph_cadence;
-
+	public static String		merge_tour_source_graph_cadence;
 	public static String		merge_tour_source_graph_cadence_tooltip;
-	public static String	merge_tour_source_graph_heartbeat;
-
+	public static String		merge_tour_source_graph_heartbeat;
 	public static String		merge_tour_source_graph_heartbeat_tooltip;
-	public static String	merge_tour_source_graph_temperature;
-
+	public static String		merge_tour_source_graph_temperature;
 	public static String		merge_tour_source_graph_temperature_tooltip;
 
 	public static String		Pref_ChartColors_btn_legend;
@@ -514,7 +507,6 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
-
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
 	public static String		Tour_Action_graph_altimeter_tooltip;
@@ -662,8 +654,7 @@ public class Messages extends NLS {
 	public static String		tour_merger_chk_set_tour_type;
 	public static String		tour_merger_chk_set_tour_type_tooltip;
 	public static String		tour_merger_chk_use_synced_start_time;
-
-	public static String	tour_merger_chk_use_synced_start_time_tooltip;
+	public static String		tour_merger_chk_use_synced_start_time_tooltip;
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
 	public static String		tour_merger_dialog_title;
@@ -671,11 +662,8 @@ public class Messages extends NLS {
 	public static String		tour_merger_group_adjust_time;
 	public static String		tour_merger_group_save_actions;
 	public static String		tour_merger_group_save_actions_tooltip;
-	public static String		tour_merger_label_adjust_hours;
 	public static String		tour_merger_label_adjust_minutes;
 	public static String		tour_merger_label_adjust_seconds;
-	public static String		tour_merger_label_source_tour;
-	public static String		tour_merger_label_source_tour_tooltip;
 	public static String		tour_merger_save_target_tour;
 
 	public static String		tour_statistic_label_years;

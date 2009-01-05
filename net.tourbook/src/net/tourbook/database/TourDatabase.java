@@ -527,7 +527,7 @@ public class TourDatabase {
 				tagList.add(tag.getTagName());
 			} else {
 				try {
-					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-1$
+					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 				} catch (final MyTourbookException e) {
 					e.printStackTrace();
 				}
