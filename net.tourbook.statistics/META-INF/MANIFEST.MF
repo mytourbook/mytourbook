@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.tourbook.statistics;singleton:=true
-Bundle-Version: 8.11.0.v2008-11-22
+Bundle-Version: 9.01.0.v2009-01-07
 Bundle-Activator: net.tourbook.statistics.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.chart,
- net.tourbook.ext
+ net.tourbook.ext.jars
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

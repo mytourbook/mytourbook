@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse"
       label="Additional Eclipse Plugins"
-      version="8.11.0.v2008-11-22">
+      version="9.01.0.v2009-01-07">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

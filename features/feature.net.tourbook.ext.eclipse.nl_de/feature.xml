@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse.nl_de"
       label="Eclipse German Translation"
-      version="8.11.0.v2008-11-22"
+      version="9.01.0.v2009-01-07"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">

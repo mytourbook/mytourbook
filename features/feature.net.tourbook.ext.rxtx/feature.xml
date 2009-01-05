@@ -306,34 +306,45 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook.rxtx"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="net.tourbook.rxtx.linux"
+         os="linux"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"/>
+         fragment="true"
+         unpack="false"/>
 
    <plugin
          id="net.tourbook.rxtx.linux64"
+         os="linux"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"/>
+         fragment="true"
+         unpack="false"/>
 
    <plugin
          id="net.tourbook.rxtx.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"/>
+         fragment="true"
+         unpack="false"/>
 
    <plugin
          id="net.tourbook.rxtx.win32"
+         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"/>
+         fragment="true"
+         unpack="false"/>
 
 </feature>

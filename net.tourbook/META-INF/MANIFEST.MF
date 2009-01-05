@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 8.11.0.v2008-11-22
+Bundle-Version: 9.01.0.v2009-01-07
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.update.ui,
  org.eclipse.core.expressions,
  org.apache.derby.core,
- net.tourbook.ext,
+ net.tourbook.ext.jars,
  net.tourbook.chart,
  net.tourbook.ext.ejb3,
  net.tourbook.rxtx,

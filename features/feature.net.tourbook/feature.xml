@@ -2,16 +2,17 @@
 <feature
       id="feature.net.tourbook"
       label="%Feature_Name"
-      version="8.11.0.v2008-11-22"
+      version="9.01.0.v2009-01-07"
       provider-name="MyTourbook"
-      plugin="net.tourbook.branding">
+      plugin="net.tourbook.branding"
+      >
 
    <description>
       MyTourbook Application
    </description>
 
    <copyright>
-      (c) Copyright Wolfgang Schramm and Contributors 2005, 2008. 
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2009. 
 All rights reserved.
    </copyright>
 
@@ -303,19 +304,24 @@ POSSIBILITY OF SUCH DAMAGES.
    </url>
 
    <includes
-         id="net.tourbook.geoclipse.feature"
+         id="feature.net.tourbook.geoclipse"
          version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.ui" version="3.4" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.forms" version="3.3.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.update.ui"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.apache.derby.core"/>
+      <import plugin="net.tourbook.ext.jars"/>
       <import plugin="net.tourbook.ext.ejb3"/>
+      <import plugin="net.tourbook.rxtx" version="2.1.8" match="greaterOrEqual"/>
       <import plugin="de.byteholder.geoclipse"/>
       <import plugin="de.byteholder.gpx"/>
-      <import plugin="net.tourbook.rxtx" version="2.1.8" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.databinding" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="com.ibm.icu" version="3.8.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface"/>
    </requires>
 
    <plugin
@@ -340,54 +346,94 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx"
+         id="net.tourbook.device"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.linux"
-         os="linux"
-         arch="x86"
+         id="net.tourbook.device.ciclotour.text"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.linux64"
-         os="linux"
-         arch="x86_64"
+         id="net.tourbook.device.cm4xxm"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.macosx"
-         os="macosx"
+         id="net.tourbook.device.crp"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.win32"
-         os="win32"
+         id="net.tourbook.device.csv.tours"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext.jars"
+         id="net.tourbook.device.daum_ergobike"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.garmin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.gpx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.hac4"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.hac4pro"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.hac5"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.tur"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.statistics"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
