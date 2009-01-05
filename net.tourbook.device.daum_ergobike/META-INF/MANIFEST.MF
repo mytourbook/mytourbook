@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Import tours from .CSV files
-Bundle-SymbolicName: net.tourbook.device.csv.tours;singleton:=true
-Bundle-Version: 8.12.0.v2008-12-06
-Bundle-Activator: net.tourbook.device.csv.tours.Activator
+Bundle-Name: Import Daum Ergometer .CSV files
+Bundle-SymbolicName: net.tourbook.device.daum_ergobike;singleton:=true
+Bundle-Version: 9.01.0.v2009-01-07
+Bundle-Activator: net.tourbook.device.daum.ergobike.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook
