@@ -272,7 +272,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 					 * tour data cache is cleared, reload tour data from the database
 					 */
 
-					fSourceTour = TourManager.getInstance().getTourData(fSourceTour.getTourId());
+					if (fSourceTour.getTourPerson() != null) {
+						fSourceTour = TourManager.getInstance().getTourData(fSourceTour.getTourId());
+					}
+
 					fTargetTour = TourManager.getInstance().getTourData(fTargetTour.getTourId());
 
 					onModifyProperties();
@@ -631,7 +634,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fTourChart.updateMergeLayer(true);
 
 		updateUIFromTourData();
-		
+
 		if (fChkSynchStartTime.getSelection()) {
 			fTourTimeOffsetBackup = fTargetTour.getMergedTourTimeOffset();
 			updateUITourTimeOffset(fTourStartTimeSynchOffset);
@@ -1388,16 +1391,18 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		}
 
 		/*
-		 * adjustment controls
+		 * altitude adjustment controls
 		 */
-		fScaleAltitude1.setEnabled(isMergeAltitude);
-		fScaleAltitude10.setEnabled(isMergeAltitude);
-		fLabelAltitudeDiff1.setEnabled(isMergeAltitude);
-		fLabelAltitudeDiff10.setEnabled(isMergeAltitude);
+		fScaleAltitude1.setEnabled(isAltitudeAvailable);
+		fScaleAltitude10.setEnabled(isAltitudeAvailable);
+		fLabelAltitudeDiff1.setEnabled(isAltitudeAvailable);
+		fLabelAltitudeDiff10.setEnabled(isAltitudeAvailable);
 
 		fChkValueDiffScaling.setEnabled(isAltitudeAvailable);
 
-//		fChkSynchStartTime.setEnabled(isMergeActionSelected || isAltitudeAvailable);
+		/*
+		 * time adjustment controls
+		 */
 		fChkSynchStartTime.setEnabled(true);
 
 		fScaleAdjustMinutes.setEnabled(isAdjustTime);
@@ -1408,6 +1413,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		fLabelAdjustSecondsValue.setEnabled(isAdjustTime);
 		fLabelAdjustSecondsUnit.setEnabled(isAdjustTime);
 
+		/*
+		 * reset buttons
+		 */
 		fBtnResetAdjustment.setEnabled(true);
 		fBtnResetValues.setEnabled(true);
 	}
@@ -1547,6 +1555,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	private void onSelectMergeGraph(final SelectionEvent event) {
 
 		if (event.widget == fChkMergeAltitude) {
+
+			// merge altitude is modified
 
 			if (fChkMergeAltitude.getSelection()) {
 
