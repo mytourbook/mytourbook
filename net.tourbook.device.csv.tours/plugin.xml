@@ -7,7 +7,7 @@
             class="net.tourbook.device.csv.tours.CSVTourDataReader"
             fileextension="csv"
             id="net.tourbook.device.CSVTourDataReader"
-            name="Imported CSV Tour"/>
+            name="CSV Tour Import"/>
    </extension>
 
 </plugin>

@@ -4,10 +4,10 @@
    <extension
          point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.csv.tours.CSVTourDataReader"
+            class="net.tourbook.device.daum.ergobike.DaumErgoBikeDataReader"
             fileextension="csv"
-            id="net.tourbook.device.CSVDataReader"
-            name="Imported CSV Tour"/>
+            id="net.tourbook.device.CSVDaumErgoBikeDataReader"
+            name="Daum Ergometer"/>
    </extension>
 
 </plugin>
