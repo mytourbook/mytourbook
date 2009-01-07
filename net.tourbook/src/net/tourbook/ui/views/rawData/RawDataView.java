@@ -76,6 +76,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -266,12 +267,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			importFilePathName = tourData.getTourImportFilePath();
 
 			if (importFilePathName == null) {
+				MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+						Messages.import_data_dlg_reimport_title,
+						Messages.import_data_dlg_reimport_message);
 				return;
 			}
 		}
 
 		final File file = new File(importFilePathName);
 		if (file.exists() == false) {
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					NLS.bind(Messages.import_data_dlg_reimport_invalid_file_message, importFilePathName));
 			return;
 		}
 

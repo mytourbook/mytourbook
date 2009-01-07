@@ -300,6 +300,12 @@ public class Messages extends NLS {
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
+	public static String	import_data_dlg_reimport_invalid_file_message;
+
+	public static String	import_data_dlg_reimport_message;
+
+	public static String	import_data_dlg_reimport_title;
+
 	public static String		import_data_dlg_save_tour_msg;
 	public static String		import_data_dlg_save_tour_title;
 	public static String		import_data_label_unknown_device;
