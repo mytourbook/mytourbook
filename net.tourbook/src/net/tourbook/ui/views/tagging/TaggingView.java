@@ -298,7 +298,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					saveState();
 
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TaggingView.this);
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TaggingView.this);
 				}
 			}
 

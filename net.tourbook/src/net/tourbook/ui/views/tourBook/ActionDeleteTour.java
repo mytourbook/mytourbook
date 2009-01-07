@@ -25,6 +25,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.ui.TreeViewerItem;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -140,6 +141,10 @@ public class ActionDeleteTour extends Action {
 
 	@Override
 	public void run() {
+
+		if (UI.isTourEditorModified()) {
+			return;
+		}
 
 		// confirm deletion
 		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),

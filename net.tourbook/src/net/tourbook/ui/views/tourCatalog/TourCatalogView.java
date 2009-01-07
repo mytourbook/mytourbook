@@ -276,8 +276,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				if (partRef.getPart(false) == TourCatalogView.this) {
 					
 					saveState();
-					
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogView.this);
+
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogView.this);
 				}
 			}
 

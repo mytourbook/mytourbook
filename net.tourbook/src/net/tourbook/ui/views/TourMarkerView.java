@@ -164,7 +164,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMarkerView.this) {
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
 				}
 			}
 

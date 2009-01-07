@@ -94,7 +94,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartView.this);
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartView.this);
 				}
 			}
 

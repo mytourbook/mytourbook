@@ -167,7 +167,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCatalogViewYearStatistic.this) {
 					saveSession();
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogViewYearStatistic.this);
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCatalogViewYearStatistic.this);
 				}
 			}
 

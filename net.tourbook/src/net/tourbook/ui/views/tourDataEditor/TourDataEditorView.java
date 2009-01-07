@@ -3424,9 +3424,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * @return Returns <code>true</code> when the data have been modified and not saved
+	 * @return Returns <code>true</code> when the data have been modified and not saved, returns
+	 *         <code>false</code> when tour is not modified or {@link TourData} is <code>null</code>
 	 */
 	public boolean isDirty() {
+
+		if (fTourData == null) {
+			return false;
+		}
+
 		return fIsTourDirty;
 	}
 
@@ -4298,6 +4304,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateTourDataFromUI();
 
+		/*
+		 * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
+		 * flag can be set before to prevent an out of synch error
+		 */
+		fIsTourDirty = false;
+
 		fTourData = TourDatabase.saveTour(fTourData);
 		updateMarkerMap();
 
@@ -4458,6 +4470,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
+	 * Set {@link TourData} for the editor, when the editor is dirty, nothing is done, the calling
+	 * method must check if the tour editor is dirty
+	 * 
+	 * @param tourDataForEditor
+	 */
+	public void setTourData(final TourData tourDataForEditor) {
+
+		if (fIsTourDirty) {
+			return;
+		}
+
+		fTourChart = null;
+		updateUIFromTourData(tourDataForEditor, false, true);
+	}
+
+	/**
 	 * sets the tour editor dirty, updates the save/undo actions and updates the part name
 	 */
 	private void setTourDirty() {
@@ -4488,20 +4516,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fIsInfoInTitle = false;
 	}
 
-	/**
-	 * converts the {@link TourMarker} from {@link TourData} into the map {@link #fMarkerMap}
-	 */
-	void updateMarkerMap() {
-
-		fMarkerMap.clear();
-
-		final Set<TourMarker> tourMarkers = fTourData.getTourMarkers();
-
-		for (final TourMarker tourMarker : tourMarkers) {
-			fMarkerMap.put(tourMarker.getSerieIndex(), tourMarker);
-		}
-	}
-
 //	/**
 //	 * update each tab separately
 //	 */
@@ -4520,6 +4534,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 ////		}
 //
 //	}
+
+	/**
+	 * converts the {@link TourMarker} from {@link TourData} into the map {@link #fMarkerMap}
+	 */
+	void updateMarkerMap() {
+
+		fMarkerMap.clear();
+
+		final Set<TourMarker> tourMarkers = fTourData.getTourMarkers();
+
+		for (final TourMarker tourMarker : tourMarkers) {
+			fMarkerMap.put(tourMarker.getSerieIndex(), tourMarker);
+		}
+	}
 
 	private void updateRefTourInfo(final Collection<TourReference> refTours) {
 

@@ -42,9 +42,11 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -595,14 +597,14 @@ public class TourManager {
 
 		fTourDataCache.clear();
 
-		/*
-		 * keep modified tour in cache
-		 */
-		final TourDataEditorView tourEditor = getTourDataEditor();
-		if (tourEditor != null && tourEditor.isDirty()) {
+		if (fTourDataEditorInstance != null && fTourDataEditorInstance.isDirty()) {
 
-			final TourData tourData = tourEditor.getTourData();
-			fTourDataCache.put(tourData.getTourId(), tourData);
+			final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+			if (tourDataInEditor != null) {
+
+				// keep modified tour in cache
+				fTourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
+			}
 		}
 	}
 
@@ -1399,33 +1401,58 @@ public class TourManager {
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
 	 * creates always a new instance
 	 * 
-	 * @param tourId
+	 * @param requestedTourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
 	 */
-	public TourData getTourData(final Long tourId) {
+	public TourData getTourData(final Long requestedTourId) {
 
-		if (tourId == null) {
+		if (requestedTourId == null) {
 			return null;
 		}
 
-		final TourData tourDataInCache = fTourDataCache.get(tourId);
+		/*
+		 * get tour from tour editor when it contains the requested tour
+		 */
+		if (fTourDataEditorInstance != null) {
+
+			final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+			if (tourDataInEditor != null && tourDataInEditor.getTourId() == requestedTourId) {
+
+				// cache tour data
+				fTourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
+
+				return tourDataInEditor;
+			}
+		}
+
+		/*
+		 * get tour from cache or database
+		 */
+		TourData availableTourData = null;
+
+		final TourData tourDataInCache = fTourDataCache.get(requestedTourId);
 		if (tourDataInCache != null) {
-//			System.out.println("tourDataInCache:" + tourDataInCache);
-			return tourDataInCache;
+			availableTourData = tourDataInCache;
+		} else {
+
+			final TourData tourDataFromDb = TourDatabase.getTourFromDb(requestedTourId);
+
+			if (tourDataFromDb == null) {
+				return null;
+			}
+
+			// cache tour data
+			fTourDataCache.put(tourDataFromDb.getTourId(), tourDataFromDb);
+
+			availableTourData = tourDataFromDb;
 		}
 
-		final TourData tourDataFromDb = TourDatabase.getTourFromDb(tourId);
-
-		if (tourDataFromDb == null) {
-			return null;
+		if (availableTourData != null) {
+			replaceTourInTourEditor(availableTourData);
 		}
-//		System.out.println("tourDataFromDb:" + tourDataFromDb);
 
-		// keep the tour data
-		updateTourInCache(tourDataFromDb);
-
-		return tourDataFromDb;
+		return availableTourData;
 	}
 
 	/**
@@ -1490,6 +1517,81 @@ public class TourManager {
 	}
 
 	/**
+	 * Check tour in tour editor, when the tour is modified and it contains a wrong tourData
+	 * instance, show an error, otherwise replace (silently) the tour data in the editor
+	 */
+	private void replaceTourInTourEditor(final TourData tourDataForEditor) {
+
+		if (tourDataForEditor == null || fTourDataEditorInstance == null) {
+			return;
+		}
+
+		final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+		if (tourDataInEditor == null) {
+			return;
+		}
+
+		final long tourIdInEditor = tourDataInEditor.getTourId().longValue();
+		final long tourIdForEditor = tourDataForEditor.getTourId().longValue();
+		if (tourIdInEditor != tourIdForEditor) {
+			// tour editor contains another tour
+			return;
+		}
+
+		/*
+		 * tour editor contains the same tour
+		 */
+
+		if (fTourDataEditorInstance.isDirty()) {
+
+			if (tourDataInEditor == tourDataForEditor) {
+
+				/*
+				 * tour editor contains the correct tour, there is nothing to do more
+				 */
+
+			} else {
+
+				/*
+				 * tour editor contains the wrong tour data instance
+				 */
+
+				final StringBuilder sb = new StringBuilder()//
+				.append("ERROR: ") //$NON-NLS-1$
+						.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
+						.append(UI.NEW_LINE2)
+						.append("You can solve the problem by:") //$NON-NLS-1$
+						.append(UI.NEW_LINE2)
+						.append("Save or revert the tour in the tour editor and select another tour") //$NON-NLS-1$
+						.append(UI.NEW_LINE2)
+						.append(UI.NEW_LINE)
+						.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
+						.append(UI.NEW_LINE2)
+						.append("Tour in Editor:") //$NON-NLS-1$
+						.append(tourDataForEditor.toStringWithHash())
+						.append(UI.NEW_LINE)
+						.append("Selected Tour:") //$NON-NLS-1$
+						.append(tourDataInEditor.toStringWithHash())
+						.append(UI.NEW_LINE2)
+						.append(UI.NEW_LINE)
+						.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
+						.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+						.append(UI.NEW_LINE2)
+						.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
+
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
+			}
+
+		} else {
+
+			/*
+			 * silently replace tour data in editor
+			 */
+			fTourDataEditorInstance.setTourData(tourDataForEditor);
+		}
+	}
+
+	/**
 	 * Before the application is shut down, the tour save listeners are called to save unsaved data.
 	 * 
 	 * @return Returns <code>true</code> when the tours have been saved or false when it was
@@ -1512,7 +1614,14 @@ public class TourManager {
 	}
 
 	public void updateTourInCache(final TourData tourData) {
+
+		if (tourData == null) {
+			return;
+		}
+
 		fTourDataCache.put(tourData.getTourId(), tourData);
+
+		replaceTourInTourEditor(tourData);
 	}
 
 }

@@ -110,8 +110,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
 
 					saveState();
-					
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourStatisticsView.this);
+
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourStatisticsView.this);
 				}
 			}
 
