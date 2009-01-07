@@ -4,8 +4,7 @@
       label="Feature for various jars"
       version="9.01.0.v2009-01-07"
       provider-name="MyTourbook"
-      plugin="net.tourbook.branding"
-      >
+      plugin="net.tourbook.branding">
 
    <description>
       MyTourbook Application
@@ -307,6 +306,7 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook.ext.jars"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
