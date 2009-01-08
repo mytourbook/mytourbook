@@ -865,11 +865,32 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				if (drivingTime != 0) {
 					fNumberFormatter.setMinimumFractionDigits(1);
 					fNumberFormatter.setMaximumFractionDigits(1);
+					
 					cell.setText(fNumberFormatter.format(((float) tourDistance)
 							/ drivingTime
 							* 3.6
 							/ UI.UNIT_VALUE_DISTANCE));
 				}
+			}
+		});
+
+		/*
+		 * column: average pace
+		 */
+		colDef = TableColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				final int tourDistance = tourData.getTourDistance();
+				final int drivingTime = tourData.getTourDrivingTime();
+
+				final int pace = (int) (tourDistance == 0 ? 0 : (drivingTime * 1000 / tourDistance)
+						* UI.UNIT_VALUE_DISTANCE);
+
+				cell.setText(UI.format_mm_ss(pace).toString());
 			}
 		});
 

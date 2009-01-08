@@ -102,7 +102,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		final long dbDrivingTime = result.getLong(startIndex + 8);
 
 		colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 166.66f / dbDistance;
+		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
 		colMaxAltitude = result.getLong(startIndex + 9);
 		colMaxPulse = result.getLong(startIndex + 10);

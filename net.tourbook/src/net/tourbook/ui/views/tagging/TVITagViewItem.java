@@ -157,7 +157,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		// prevent divide by 0
 		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
 		colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
-		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 166.66f / colDistance;
+		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000 / colDistance;
+		
 
 	}
 

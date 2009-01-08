@@ -272,7 +272,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		final float distance = fTourDayData.fTourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 166.66f / distance));
+		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_date_day);

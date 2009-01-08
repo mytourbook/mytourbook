@@ -163,7 +163,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					// compute average speed/pace, prevent divide by 0
 					tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-					tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 166.66f / dbDistance;
+					tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
 					tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
 
