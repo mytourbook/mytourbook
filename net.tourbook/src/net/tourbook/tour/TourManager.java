@@ -1456,6 +1456,30 @@ public class TourManager {
 	}
 
 	/**
+	 * Get a tour from the database and keep it in the cache
+	 * 
+	 * @param tourId
+	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
+	 *         the database
+	 */
+	public TourData getTourDataFromDb(final Long tourId) {
+
+		if (tourId == null) {
+			return null;
+		}
+
+		final TourData tourDataFromDb = TourDatabase.getTourFromDb(tourId);
+		if (tourDataFromDb == null) {
+			return null;
+		}
+
+		// keep the tour data
+		updateTourInCache(tourDataFromDb);
+
+		return tourDataFromDb;
+	}
+
+	/**
 	 * Opens the tour for the given tour id
 	 * 
 	 * @param tourId
@@ -1542,45 +1566,39 @@ public class TourManager {
 		 * tour editor contains the same tour
 		 */
 
+		if (tourDataInEditor == tourDataForEditor) {
+			return;
+		}
+
+		/*
+		 * tour editor contains the wrong tour data instance
+		 */
 		if (fTourDataEditorInstance.isDirty()) {
 
-			if (tourDataInEditor == tourDataForEditor) {
+			final StringBuilder sb = new StringBuilder()//
+			.append("ERROR: ") //$NON-NLS-1$
+					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("You can solve the problem by:") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("Save or revert the tour in the tour editor and select another tour") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("Tour in Editor:") //$NON-NLS-1$
+					.append(tourDataForEditor.toStringWithHash())
+					.append(UI.NEW_LINE)
+					.append("Selected Tour:") //$NON-NLS-1$
+					.append(tourDataInEditor.toStringWithHash())
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
+					.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
 
-				/*
-				 * tour editor contains the correct tour, there is nothing to do more
-				 */
-
-			} else {
-
-				/*
-				 * tour editor contains the wrong tour data instance
-				 */
-
-				final StringBuilder sb = new StringBuilder()//
-				.append("ERROR: ") //$NON-NLS-1$
-						.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
-						.append(UI.NEW_LINE2)
-						.append("You can solve the problem by:") //$NON-NLS-1$
-						.append(UI.NEW_LINE2)
-						.append("Save or revert the tour in the tour editor and select another tour") //$NON-NLS-1$
-						.append(UI.NEW_LINE2)
-						.append(UI.NEW_LINE)
-						.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
-						.append(UI.NEW_LINE2)
-						.append("Tour in Editor:") //$NON-NLS-1$
-						.append(tourDataForEditor.toStringWithHash())
-						.append(UI.NEW_LINE)
-						.append("Selected Tour:") //$NON-NLS-1$
-						.append(tourDataInEditor.toStringWithHash())
-						.append(UI.NEW_LINE2)
-						.append(UI.NEW_LINE)
-						.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-						.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
-						.append(UI.NEW_LINE2)
-						.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
-
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
-			}
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
 
 		} else {
 

@@ -4045,7 +4045,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		tourManager.removeTourFromCache(tourId);
 
-		return tourManager.getTourData(tourId);
+		return tourManager.getTourDataFromDb(tourId);
 	}
 
 	/**
@@ -4731,7 +4731,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateMarkerMap();
 
-		Display.getCurrent().asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 
 			final int	fRunnableCounter	= fUIUpdateCounter;
 
