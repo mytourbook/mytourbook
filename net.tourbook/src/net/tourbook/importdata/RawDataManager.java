@@ -599,7 +599,7 @@ public class RawDataManager {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
-				boolean isReplaced = false;
+//				boolean isReplaced = false;
 
 				long editorTourId = -1;
 
@@ -621,7 +621,7 @@ public class RawDataManager {
 
 					try {
 
-						final TourData dbTourData = TourManager.getInstance().getTourData(tourId);
+						final TourData dbTourData = TourManager.getInstance().getTourDataFromDb(tourId);
 						if (dbTourData != null) {
 
 							/*
@@ -645,7 +645,7 @@ public class RawDataManager {
 									fImportedTourData.put(dbTourId, dbTourData);
 								}
 
-								isReplaced = true;
+//								isReplaced = true;
 							}
 						}
 					} catch (final Exception e) {
@@ -653,10 +653,10 @@ public class RawDataManager {
 					}
 				}
 
-				if (isReplaced) {
-					// prevent async error
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
-				}
+//				if (isReplaced) {
+				// prevent async error
+				TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+//				}
 			}
 		});
 	}

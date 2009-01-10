@@ -627,7 +627,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-		
+
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		tourData.setDeviceTimeInterval((short) -1);
@@ -817,17 +817,46 @@ public class GarminSAXHandler extends DefaultHandler {
 	private void validateTimeSeries() {
 
 		final ArrayList<TimeData> removeTimeData = new ArrayList<TimeData>();
-		TimeData lastTimeData = null;
+
+		TimeData previousTimeData = null;
+		TimeData firstMarkerTimeData = null;
 
 		for (final TimeData timeData : fTimeDataList) {
 
-			if (lastTimeData != null) {
-				if (lastTimeData.absoluteTime == timeData.absoluteTime) {
-					removeTimeData.add(lastTimeData);
+			if (previousTimeData != null) {
+
+				if (previousTimeData.absoluteTime == timeData.absoluteTime) {
+
+					// current slice has the same time as the previous slice
+
+					if (firstMarkerTimeData == null) {
+
+						// initialize first item
+
+						firstMarkerTimeData = previousTimeData;
+					}
+
+					// copy marker into the first time data
+
+					if (firstMarkerTimeData.markerLabel == null && timeData.markerLabel != null) {
+
+						firstMarkerTimeData.marker = timeData.marker;
+						firstMarkerTimeData.markerLabel = timeData.markerLabel;
+					}
+
+					// remove obsolete time data
+					removeTimeData.add(timeData);
+
+				} else {
+
+					/*
+					 * current slice time is different than the previous
+					 */
+					firstMarkerTimeData = null;
 				}
 			}
 
-			lastTimeData = timeData;
+			previousTimeData = timeData;
 		}
 
 		fTimeDataList.removeAll(removeTimeData);
