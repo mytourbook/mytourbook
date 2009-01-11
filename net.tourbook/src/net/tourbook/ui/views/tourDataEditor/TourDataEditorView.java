@@ -65,6 +65,7 @@ import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionAdjustAltitudeSRTM;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -229,6 +230,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionToggleReadEditMode			fActionToggleReadEditMode;
 	private ActionOpenMarkerDialog				fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog		fActionOpenAdjustAltitudeDialog;
+	private ActionAdjustAltitudeSRTM			fActionAdjustAltitudeSRTM;
 	private ActionDeleteTimeSlicesKeepTime		fActionDeleteTimeSlicesKeepTime;
 	private ActionDeleteTimeSlicesRemoveTime	fActionDeleteTimeSlicesRemoveTime;
 	private ActionCreateTourMarker				fActionCreateTourMarker;
@@ -1414,6 +1416,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionToggleReadEditMode = new ActionToggleReadEditMode(this);
 
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, false);
+		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM(this);
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
 
 		fActionDeleteTimeSlicesKeepTime = new ActionDeleteTimeSlicesKeepTime(this);
@@ -2895,6 +2898,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final CTabItem selectedTab = fTabFolder.getSelection();
 		final boolean isTableViewerTab = selectedTab == fTabSlices || selectedTab == fTabMarker;
+		final boolean canUseTool = fIsEditMode && isTourValid && fIsManualTour == false;
 
 		/*
 		 * tour can only be saved when it's already saved in the database,except manual tours
@@ -2904,8 +2908,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionCreateTour.setEnabled(!fIsTourDirty);
 		fActionUndoChanges.setEnabled(fIsTourDirty);
 
-		fActionOpenAdjustAltitudeDialog.setEnabled(fIsEditMode && isTourValid && fIsManualTour == false);
-		fActionOpenMarkerDialog.setEnabled(fIsEditMode && isTourValid && fIsManualTour == false);
+		fActionOpenAdjustAltitudeDialog.setEnabled(canUseTool);
+		fActionAdjustAltitudeSRTM.setEnabled(canUseTool);
+		fActionOpenMarkerDialog.setEnabled(canUseTool);
 
 		fActionToggleRowSelectMode.setEnabled(isTableViewerTab && isTourValid && fIsManualTour == false);
 		fActionToggleReadEditMode.setEnabled(isTourInDb);
@@ -3019,6 +3024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tbm.add(new Separator());
 		tbm.add(fActionOpenMarkerDialog);
 		tbm.add(fActionOpenAdjustAltitudeDialog);
+		tbm.add(fActionAdjustAltitudeSRTM);
 
 		tbm.add(new Separator());
 		tbm.add(fActionToggleReadEditMode);

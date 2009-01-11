@@ -67,6 +67,18 @@ public class Messages extends NLS {
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
+	public static String	adjust_alti_srtm_dialog_header_message;
+
+	public static String		adjust_alti_srtm_dialog_header_title;
+
+	public static String		adjust_alti_srtm_dialog_invalid_data;
+
+	public static String		adjust_alti_srtm_dialog_title;
+
+	public static String		adjust_alti_srtm_save_tour;
+
+	public static String		app_action_adjust_altitude_srtm;
+
 	public static String		app_action_button_down;
 	public static String		app_action_button_up;
 	public static String		app_action_collapse_all_tooltip;
@@ -285,6 +297,10 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter;
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
+
+	public static String		image__adjust_altitude_srtm;
+
+	public static String		image__adjust_altitude_srtm_disabled;
 
 	public static String		image__merge_tours;
 
@@ -663,6 +679,7 @@ public class Messages extends NLS {
 	public static String		tour_merger_chk_use_synced_start_time_tooltip;
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
+
 	public static String		tour_merger_dialog_title;
 	public static String		tour_merger_group_adjust_altitude;
 	public static String		tour_merger_group_adjust_time;

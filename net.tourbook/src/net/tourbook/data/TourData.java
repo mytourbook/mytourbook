@@ -577,6 +577,12 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	private TourData				fMergeSourceTourData;
 
+	/**
+	 * SRTM altitude values
+	 */
+	@Transient
+	public int[]					srtmDataSerie;
+
 	public TourData() {}
 
 	/**
