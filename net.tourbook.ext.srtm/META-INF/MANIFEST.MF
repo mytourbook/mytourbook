@@ -1,17 +1,19 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SRTM Plug-in
-Bundle-SymbolicName: net.tourbook.ext.srtm
-Bundle-Version: 9.02.0.v2009-04-xx
+Bundle-Name: %bundle_name
+Bundle-SymbolicName: net.tourbook.ext.srtm;singleton:=true
+Bundle-Version: 9.04.0.v2009-04-xx
 Bundle-Activator: net.tourbook.ext.srtm.Activator
-Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.enterprisedt,
- com.enterprisedt.net.ftp;uses:="com.enterprisedt.net.ftp.internal",
- com.enterprisedt.net.ftp.internal;uses:="com.enterprisedt.net.ftp",
- com.enterprisedt.net.ftp.test;uses:="junit.framework,com.enterprisedt.net.ftp,com.enterprisedt.util.debug",
+ com.enterprisedt.net.ftp,
+ com.enterprisedt.net.ftp.internal,
+ com.enterprisedt.net.ftp.test,
  com.enterprisedt.util.debug,
- net.tourbook.ext.srtm;uses:="org.eclipse.core.runtime,org.osgi.framework"
-Bundle-ClassPath: edtftpj.jar,
- .
+ net.tourbook.ext.srtm
+Bundle-ClassPath: .,
+ edtftpj.jar
+Bundle-Localization: plugin
