@@ -49,7 +49,7 @@ import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionAdjustAltitudeSRTM;
+import net.tourbook.ui.action.ActionAdjustAltitudeSRTM_OLD;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -147,7 +147,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionOpenTour					fActionOpenTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionAdjustAltitudeSRTM		fActionAdjustAltitudeSRTM;
+	private ActionAdjustAltitudeSRTM_OLD	fActionAdjustAltitudeSRTM;
 	private ActionMergeTour					fActionMergeTour;
 
 	private ActionSetTourTypeMenu			fActionSetTourType;
@@ -372,7 +372,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
-		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM(this);
+		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM_OLD(this);
 		fActionMergeTour = new ActionMergeTour(this);
 
 		fActionSetTourType = new ActionSetTourTypeMenu(this);
@@ -1180,7 +1180,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
-		menuMgr.add(fActionAdjustAltitudeSRTM);
+//		menuMgr.add(fActionAdjustAltitudeSRTM);
 		menuMgr.add(fActionMergeTour);
 		menuMgr.add(fActionOpenTour);
 

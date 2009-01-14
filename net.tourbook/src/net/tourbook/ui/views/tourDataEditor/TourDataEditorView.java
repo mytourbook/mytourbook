@@ -65,7 +65,7 @@ import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionAdjustAltitudeSRTM;
+import net.tourbook.ui.action.ActionAdjustAltitudeSRTM_OLD;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -230,7 +230,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionToggleReadEditMode			fActionToggleReadEditMode;
 	private ActionOpenMarkerDialog				fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog		fActionOpenAdjustAltitudeDialog;
-	private ActionAdjustAltitudeSRTM			fActionAdjustAltitudeSRTM;
+	private ActionAdjustAltitudeSRTM_OLD		fActionAdjustAltitudeSRTM;
 	private ActionDeleteTimeSlicesKeepTime		fActionDeleteTimeSlicesKeepTime;
 	private ActionDeleteTimeSlicesRemoveTime	fActionDeleteTimeSlicesRemoveTime;
 	private ActionCreateTourMarker				fActionCreateTourMarker;
@@ -1416,7 +1416,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionToggleReadEditMode = new ActionToggleReadEditMode(this);
 
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, false);
-		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM(this);
+		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM_OLD(this);
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
 
 		fActionDeleteTimeSlicesKeepTime = new ActionDeleteTimeSlicesKeepTime(this);
@@ -3024,7 +3024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tbm.add(new Separator());
 		tbm.add(fActionOpenMarkerDialog);
 		tbm.add(fActionOpenAdjustAltitudeDialog);
-		tbm.add(fActionAdjustAltitudeSRTM);
+//		tbm.add(fActionAdjustAltitudeSRTM);
 
 		tbm.add(new Separator());
 		tbm.add(fActionToggleReadEditMode);

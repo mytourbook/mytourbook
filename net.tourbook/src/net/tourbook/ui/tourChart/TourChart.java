@@ -122,8 +122,8 @@ public class TourChart extends Chart {
 	/*
 	 * SRTM data
 	 */
-	private boolean							fIsSRTMLayerVisible;
-	private ChartSRTMLayer					fSRTMLayer;
+//	private boolean							fIsSRTMLayerVisible;
+//	private ChartSRTMLayer					fSRTMLayer;
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
@@ -617,22 +617,22 @@ public class TourChart extends Chart {
 		setGraphAlpha(0x60);
 	}
 
-	private void createSRTMLayer() {
-
-		if (fTourData == null) {
-			return;
-		}
-
-		if (fIsSRTMLayerVisible == false || fTourData.srtmDataSerie == null) {
-
-			fSRTMLayer = null;
-			return;
-		}
-
-		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
-
-		fSRTMLayer = new ChartSRTMLayer(fTourData, xDataSerie);
-	}
+//	private void createSRTMLayer() {
+//
+//		if (fTourData == null) {
+//			return;
+//		}
+//
+//		if (fIsSRTMLayerVisible == false || fTourData.srtmDataSerie == null) {
+//
+//			fSRTMLayer = null;
+//			return;
+//		}
+//
+//		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
+//
+//		fSRTMLayer = new ChartSRTMLayer(fTourData, xDataSerie);
+//	}
 
 	/**
 	 * Create the action proxies for all tour actions
@@ -1028,9 +1028,9 @@ public class TourChart extends Chart {
 		/*
 		 * show the SRTM layer only in the altitude graph
 		 */
-		if (fSRTMLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
-			chartLayers.add(fSRTMLayer);
-		}
+//		if (fSRTMLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
+//			chartLayers.add(fSRTMLayer);
+//		}
 
 		// add the layers as custom data to the y-data
 		yData.setCustomLayers(chartLayers);
@@ -1287,19 +1287,19 @@ public class TourChart extends Chart {
 		redrawChart();
 	}
 
-	public void updateSRTMLayer() {
-
-		fIsSRTMLayerVisible = true;
-
-		if (fIsSRTMLayerVisible) {
-			createSRTMLayer();
-		} else {
-			fSRTMLayer = null;
-		}
-
-		setCustomGraphData();
-		updateChartLayers();
-	}
+//	public void updateSRTMLayer() {
+//
+//		fIsSRTMLayerVisible = true;
+//
+//		if (fIsSRTMLayerVisible) {
+//			createSRTMLayer();
+//		} else {
+//			fSRTMLayer = null;
+//		}
+//
+//		setCustomGraphData();
+//		updateChartLayers();
+//	}
 
 	/**
 	 * Update the tour chart with the previous data and configuration
@@ -1387,7 +1387,7 @@ public class TourChart extends Chart {
 		createSegmentLayer();
 		createLabelLayer();
 		createMergeLayer();
-		createSRTMLayer();
+//		createSRTMLayer();
 
 		setCustomGraphData();
 

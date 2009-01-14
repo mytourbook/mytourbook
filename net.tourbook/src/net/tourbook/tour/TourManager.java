@@ -1044,11 +1044,17 @@ public class TourManager {
 		/*
 		 * altitude
 		 */
-		final int[] altitudeSerie = tourData.getAltitudeSerie();
 		ChartDataYSerie yDataAltitude = null;
+
+		final int[] altitudeSerie = tourData.getAltitudeSerie();
 		if (altitudeSerie != null) {
 
-			yDataAltitude = getChartData(altitudeSerie, chartType);
+			final int[] srtmDataSerie = tourData.getSRTMSerie();
+			if (srtmDataSerie == null) {
+				yDataAltitude = getChartData(altitudeSerie, chartType);
+			} else {
+				yDataAltitude = getChartData(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
+			}
 
 			yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
 			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -1065,8 +1071,9 @@ public class TourManager {
 		/*
 		 * heartbeat
 		 */
-		final int[] pulseSerie = tourData.pulseSerie;
 		ChartDataYSerie yDataPulse = null;
+
+		final int[] pulseSerie = tourData.pulseSerie;
 		if (pulseSerie != null) {
 
 			yDataPulse = getChartData(pulseSerie, chartType);
@@ -1385,6 +1392,19 @@ public class TourManager {
 	}
 
 	private ChartDataYSerie getChartData(final int[] dataSerie, final int chartType) {
+
+		ChartDataYSerie chartDataSerie;
+
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+
+		} else {
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+		}
+		return chartDataSerie;
+	}
+
+	private ChartDataYSerie getChartData(final int[][] dataSerie, final int chartType) {
 
 		ChartDataYSerie chartDataSerie;
 

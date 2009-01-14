@@ -43,13 +43,19 @@ import javax.persistence.Transient;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.ext.srtm.ElevationSRTM3;
+import net.tourbook.ext.srtm.GeoLat;
+import net.tourbook.ext.srtm.GeoLon;
+import net.tourbook.ext.srtm.NumberForm;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -62,16 +68,16 @@ public class TourData implements Comparable<Object> {
 	 * 
 	 */
 	@Transient
-	public static final int			MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 
 	@Transient
-	public static final float		MAX_BIKE_SPEED					= 120f;
+	public static final float			MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Device Id for manually created tours
 	 */
 	@Transient
-	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";								//$NON-NLS-1$
+	public static final String			DEVICE_ID_FOR_MANUAL_TOUR		= "manual";								//$NON-NLS-1$
 
 	/**
 	 * Device id for csv files which behave like manually created tours, marker and timeslices are
@@ -79,54 +85,61 @@ public class TourData implements Comparable<Object> {
 	 * this is the id of the deviceDataReader
 	 */
 	@Transient
-	public static final String		DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
+	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
+
+	// initialize SRTM 
+	@SuppressWarnings("unused")//$NON-NLS-1$
+	@Transient
+	private static final NumberForm		srtmNumberForm					= new NumberForm();
+	@Transient
+	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
 
 	/**
 	 * entity id which identifies the tour
 	 */
 	@Id
-	private Long					tourId;
+	private Long						tourId;
 
 	/**
 	 * HH (d) hour of tour
 	 */
-	private short					startHour;
+	private short						startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
-	private short					startMinute;
+	private short						startMinute;
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int						startSecond;																// db-version 7
+	private int							startSecond;																// db-version 7
 
 	/**
 	 * year of tour start
 	 */
-	private short					startYear;
+	private short						startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
-	private short					startMonth;
+	private short						startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
-	private short					startDay;
+	private short						startDay;
 
 	/**
 	 * week of the tour, 0 is the first week
 	 */
-	private short					startWeek;
+	private short						startWeek;
 
 	/**
 	 * total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
 	 * the field tourDistance
 	 */
-	private int						startDistance;
+	private int							startDistance;
 
 	/**
 	 * ssss distance msw
@@ -134,22 +147,22 @@ public class TourData implements Comparable<Object> {
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
 	@SuppressWarnings("unused")//$NON-NLS-1$
-	private int						distance;
+	private int							distance;
 
 	/**
 	 * aaaa (h) initial altitude (m)
 	 */
-	private short					startAltitude;
+	private short						startAltitude;
 
 	/**
 	 * pppp (h) initial pulse (bpm)
 	 */
-	private short					startPulse;
+	private short						startPulse;
 
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short					dpTolerance						= 50;
+	private short						dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -161,165 +174,165 @@ public class TourData implements Comparable<Object> {
 	 * "B1" ski-bike
 	 */
 	@Column(length = 2)
-	private String					deviceTourType;
+	private String						deviceTourType;
 
 	/*
 	 * data from the device
 	 */
-	private long					deviceTravelTime;
+	private long						deviceTravelTime;
 
 	@SuppressWarnings("unused")
-	private int						deviceDistance;
+	private int							deviceDistance;
 
-	private int						deviceWheel;
+	private int							deviceWheel;
 
-	private int						deviceWeight;
-
-	@SuppressWarnings("unused")
-	private int						deviceTotalUp;
+	private int							deviceWeight;
 
 	@SuppressWarnings("unused")
-	private int						deviceTotalDown;
+	private int							deviceTotalUp;
+
+	@SuppressWarnings("unused")
+	private int							deviceTotalDown;
 
 	/**
 	 * total distance of the tour in meters (metric system), this value is computed from the
 	 * distance data serie
 	 */
-	private int						tourDistance;
+	private int							tourDistance;
 	/**
 	 * total recording time in seconds
 	 */
-	private int						tourRecordingTime;
+	private int							tourRecordingTime;
 
 	/**
 	 * total driving time in seconds
 	 */
-	private int						tourDrivingTime;
+	private int							tourDrivingTime;
 
 	/**
 	 * altitude up (m)
 	 */
-	private int						tourAltUp;
+	private int							tourAltUp;
 
 	/**
 	 * altitude down (m)
 	 */
-	private int						tourAltDown;
+	private int							tourAltDown;
 
 	/**
 	 * plugin id for the device which was used to create this tour
 	 */
-	private String					devicePluginId;
+	private String						devicePluginId;
 
 	/**
 	 * Profile used by the device
 	 */
-	private short					deviceMode;																// db-version 3
+	private short						deviceMode;																// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short					deviceTimeInterval;														// db-version 3
+	private short						deviceTimeInterval;														// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
-	private int						maxAltitude;																// db-version 4
+	private int							maxAltitude;																// db-version 4
 
-	private int						maxPulse;																	// db-version 4
+	private int							maxPulse;																	// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
-	private float					maxSpeed;																	// db-version 4
+	private float						maxSpeed;																	// db-version 4
 
-	private int						avgPulse;																	// db-version 4
+	private int							avgPulse;																	// db-version 4
 
-	private int						avgCadence;																// db-version 4
+	private int							avgCadence;																// db-version 4
 
-	private int						avgTemperature;															// db-version 4
-	private String					tourTitle;																	// db-version 4
-	private String					tourDescription;															// db-version 4
+	private int							avgTemperature;															// db-version 4
+	private String						tourTitle;																	// db-version 4
+	private String						tourDescription;															// db-version 4
 
-	private String					tourStartPlace;															// db-version 4
-	private String					tourEndPlace;																// db-version 4
+	private String						tourStartPlace;															// db-version 4
+	private String						tourEndPlace;																// db-version 4
 
-	private String					calories;																	// db-version 4
-	private float					bikerWeight;																// db-version 4
+	private String						calories;																	// db-version 4
+	private float						bikerWeight;																// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String					devicePluginName;															// db-version 4
+	private String						devicePluginName;															// db-version 4
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String					deviceModeName;															// db-version 4
+	private String						deviceModeName;															// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String					tourImportFilePath;														// db-version 6
+	private String						tourImportFilePath;														// db-version 6
 
 	/**
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
-	private Long					mergeSourceTourId;															// db-version 7
+	private Long						mergeSourceTourId;															// db-version 7
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
 	 * the tour into which this tour is merged
 	 */
-	private Long					mergeTargetTourId;															// db-version 7
+	private Long						mergeTargetTourId;															// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int						mergedTourTimeOffset;														// db-version 7
+	private int							mergedTourTimeOffset;														// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int						mergedAltitudeOffset;														// db-version 7
+	private int							mergedAltitudeOffset;														// db-version 7
 
 	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
-	private SerieData				serieData;
+	private SerieData					serieData;
 
 	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>			tourMarkers						= new HashSet<TourMarker>();
+	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>		tourReferences					= new HashSet<TourReference>();
+	private Set<TourReference>			tourReferences					= new HashSet<TourReference>();
 
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
-	private Set<TourTag>			tourTags						= new HashSet<TourTag>();
+	private Set<TourTag>				tourTags						= new HashSet<TourTag>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
 	 */
 	@ManyToOne
-	private TourType				tourType;
+	private TourType					tourType;
 
 	/**
 	 * Person which created this tour or <code>null</code> when the tour is not saved in the
 	 * database
 	 */
 	@ManyToOne
-	private TourPerson				tourPerson;
+	private TourPerson					tourPerson;
 
 	/**
 	 * plugin id for the device which was used for this tour Bike used for this tour
 	 */
 	@ManyToOne
-	private TourBike				tourBike;
+	private TourBike					tourBike;
 
 	/*
 	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
@@ -337,81 +350,90 @@ public class TourData implements Comparable<Object> {
 	//
 	//
 	/**
-	 * contains the relative time in seconds, {@link #startHour} and {@link #startMinute} contains
-	 * the absolute time when a tour is started
+	 * contains the relative time in seconds, {@link #startHour}, {@link #startMinute} and
+	 * {@link #startSecond} contains the absolute time when a tour is started
 	 * <p>
 	 * {@link #timeSerie} is null for a manually created tour
 	 */
 	@Transient
-	public int[]					timeSerie;
+	public int[]						timeSerie;
 
 	/**
 	 * contains the absolute distance in m (metric system)
 	 */
 	@Transient
-	public int[]					distanceSerie;
+	public int[]						distanceSerie;
 
 	/**
 	 * contains the absolute distance in miles/1000 (imperial system)
 	 */
 	@Transient
-	private int[]					distanceSerieImperial;
+	private int[]						distanceSerieImperial;
 
 	/**
 	 * contains the absolute altitude in m (metric system)
 	 */
 	@Transient
-	public int[]					altitudeSerie;
+	public int[]						altitudeSerie;
 
 	/**
 	 * contains the absolute altitude in feet (imperial system)
 	 */
 	@Transient
-	private int[]					altitudeSerieImperial;
+	private int[]						altitudeSerieImperial;
+
+	/**
+	 * SRTM altitude values
+	 */
+	@Transient
+	private int[]						srtmSerie;
 
 	@Transient
-	public int[]					cadenceSerie;
+	private int[]						srtmSerieImperial;
 
 	@Transient
-	public int[]					pulseSerie;
+	public int[]						cadenceSerie;
+
+	@Transient
+	public int[]						pulseSerie;
 
 	/**
 	 * contains the temperature in the metric measurement system
 	 */
 	@Transient
-	public int[]					temperatureSerie;
+	public int[]						temperatureSerie;
 
 	/**
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private int[]					temperatureSerieImperial;
+	private int[]						temperatureSerieImperial;
 
 	/**
 	 * the metric speed serie is required form computing the power even if the current measurement
 	 * system is imperial
 	 */
 	@Transient
-	private int[]					speedSerie;
+	private int[]						speedSerie;
 
 	@Transient
-	private int[]					speedSerieImperial;
+	private int[]						speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isSpeedSerieFromDevice			= false;
+	private boolean						isSpeedSerieFromDevice			= false;
 
 	@Transient
-	private int[]					paceSerie;
+	private int[]						paceSerie;
 
 	@Transient
-	private int[]					paceSerieImperial;
+	private int[]						paceSerieImperial;
 
 	@Transient
-	private int[]					powerSerie;
+	private int[]						powerSerie;
 
 	/*
 	 * computed data series
@@ -422,127 +444,127 @@ public class TourData implements Comparable<Object> {
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean					isPowerSerieFromDevice			= false;
+	private boolean						isPowerSerieFromDevice			= false;
 	@Transient
-	private int[]					altimeterSerie;
+	private int[]						altimeterSerie;
 
 	@Transient
-	private int[]					altimeterSerieImperial;
+	private int[]						altimeterSerieImperial;
 
 	@Transient
-	public int[]					gradientSerie;
+	public int[]						gradientSerie;
 	@Transient
-	public int[]					tourCompareSerie;
+	public int[]						tourCompareSerie;
 
 	/*
 	 * GPS data
 	 */
 	@Transient
-	public double[]					latitudeSerie;
+	public double[]						latitudeSerie;
 
 	@Transient
-	public double[]					longitudeSerie;
+	public double[]						longitudeSerie;
 
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
 	@Transient
-	public Rectangle				gpsBounds;
+	public Rectangle					gpsBounds;
 	/**
 	 * Index of the segmented data in the data series
 	 */
 	@Transient
-	public int[]					segmentSerieIndex;
+	public int[]						segmentSerieIndex;
 
 	/**
 	 * oooo (o) DD-record // offset
 	 */
 	@Transient
-	public int						offsetDDRecord;
+	public int							offsetDDRecord;
 
 	/*
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]					segmentSerieAltitude;
+	public int[]						segmentSerieAltitude;
 
 	@Transient
-	public int[]					segmentSerieDistance;
+	public int[]						segmentSerieDistance;
 
 	@Transient
-	public int[]					segmentSerieTime;
+	public int[]						segmentSerieTime;
 
 	@Transient
-	public int[]					segmentSerieDrivingTime;
+	public int[]						segmentSerieDrivingTime;
 
 	@Transient
-	public float[]					segmentSerieAltimeter;
+	public float[]						segmentSerieAltimeter;
 
 	@Transient
-	public int[]					segmentSerieAltitudeDown;
+	public int[]						segmentSerieAltitudeDown;
 
 	@Transient
-	public float[]					segmentSerieSpeed;
+	public float[]						segmentSerieSpeed;
 
 	@Transient
-	public float[]					segmentSeriePace;
+	public float[]						segmentSeriePace;
 
 	@Transient
-	public float[]					segmentSeriePower;
+	public float[]						segmentSeriePower;
 
 	@Transient
-	public float[]					segmentSerieGradient;
+	public float[]						segmentSerieGradient;
 
 	@Transient
-	public float[]					segmentSeriePulse;
+	public float[]						segmentSeriePulse;
 
 	@Transient
-	public float[]					segmentSerieCadence;
+	public float[]						segmentSerieCadence;
 
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data are not imported they are from the database
 	 */
 	@Transient
-	public String					importRawDataFile;
+	public String						importRawDataFile;
 
 	/**
 	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLatitude		= Double.MIN_VALUE;
+	public double						mapCenterPositionLatitude		= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double					mapCenterPositionLongitude		= Double.MIN_VALUE;
+	public double						mapCenterPositionLongitude		= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
 	 */
 	@Transient
-	public int						mapZoomLevel;
+	public int							mapZoomLevel;
 
 	@Transient
-	public double					mapMinLatitude;
+	public double						mapMinLatitude;
 
 	@Transient
-	public double					mapMaxLatitude;
+	public double						mapMaxLatitude;
 
 	@Transient
-	public double					mapMinLongitude;
+	public double						mapMinLongitude;
 
 	@Transient
-	public double					mapMaxLongitude;
+	public double						mapMaxLongitude;
 
 	/**
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	public Map<Integer, Point[]>	fWorldPosition					= new HashMap<Integer, Point[]>();
+	public Map<Integer, Point[]>		fWorldPosition					= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -550,38 +572,32 @@ public class TourData implements Comparable<Object> {
 	 * tour cannot be saved again, it must be reloaded from the file system
 	 */
 	@Transient
-	public boolean					isTourDeleted					= false;
+	public boolean						isTourDeleted					= false;
 
 	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]					mergeDiffDataSerie;
+	public int[]						mergeDiffDataSerie;
 
 	/**
 	 * altitude data serie for the merged tour with metric measurement
 	 */
 	@Transient
-	public int[]					mergeDataSerie;
+	public int[]						mergeDataSerie;
 
 	/**
 	 * contains the altitude serie which is adjusted at the start
 	 */
 	@Transient
-	public int[]					mergeAdjustedDataSerie;
+	public int[]						mergeAdjustedDataSerie;
 
 	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
 	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
-	private TourData				fMergeSourceTourData;
-
-	/**
-	 * SRTM altitude values
-	 */
-	@Transient
-	public int[]					srtmDataSerie;
+	private TourData					fMergeSourceTourData;
 
 	public TourData() {}
 
@@ -717,7 +733,11 @@ public class TourData implements Comparable<Object> {
 	 * clear imperial altitude series so the next time when it's needed it will be recomputed
 	 */
 	public void clearAltitudeSeries() {
+
 		altitudeSerieImperial = null;
+
+		srtmSerie = null;
+		srtmSerieImperial = null;
 	}
 
 	/**
@@ -740,6 +760,9 @@ public class TourData implements Comparable<Object> {
 		paceSerieImperial = null;
 		altimeterSerieImperial = null;
 		altitudeSerieImperial = null;
+
+		srtmSerie = null;
+		srtmSerieImperial = null;
 	}
 
 	/**
@@ -1757,6 +1780,61 @@ public class TourData implements Comparable<Object> {
 		tourMarkers.add(tourMarker);
 	}
 
+	private void createSRTMDataSerie() {
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+
+			public void run() {
+
+				int serieIndex = 0;
+				short lastValidSRTM = 0;
+				boolean isSRTMValid = false;
+
+				final int serieLength = timeSerie.length;
+
+				final int[] newSRTMSerie = new int[serieLength];
+				final int[] newSRTMSerieImperial = new int[serieLength];
+
+				for (final double latitude : latitudeSerie) {
+
+					short srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude),
+							new GeoLon(longitudeSerie[serieIndex]));
+
+					/*
+					 * set invalid values to the previous valid value
+					 */
+					if (srtmValue == Short.MIN_VALUE) {
+						// invalid data
+						srtmValue = lastValidSRTM;
+					} else {
+						// valid data are available
+						isSRTMValid = true;
+						lastValidSRTM = srtmValue;
+					}
+
+					// adjust wrong values
+					if (srtmValue < -1000) {
+						srtmValue = 0;
+					} else if (srtmValue > 10000) {
+						srtmValue = 10000;
+					}
+
+					newSRTMSerie[serieIndex] = srtmValue;
+					newSRTMSerieImperial[serieIndex] = (int) (srtmValue / UI.UNIT_VALUE_ALTITUDE);
+
+					serieIndex++;
+				}
+
+				if (isSRTMValid) {
+					srtmSerie = newSRTMSerie;
+					srtmSerieImperial = newSRTMSerieImperial;
+				} else {
+					srtmSerie = new int[0];
+				}
+			}
+		});
+	}
+
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
 	 * transfered
@@ -2588,11 +2666,6 @@ public class TourData implements Comparable<Object> {
 		}
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
@@ -2628,6 +2701,11 @@ public class TourData implements Comparable<Object> {
 		return ignoreTimeCounter;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * @return the calories
 	 */
@@ -2647,15 +2725,6 @@ public class TourData implements Comparable<Object> {
 		return deviceModeName;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
-
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
@@ -2665,6 +2734,15 @@ public class TourData implements Comparable<Object> {
 			return devicePluginName;
 		}
 	}
+
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
@@ -2938,6 +3016,37 @@ public class TourData implements Comparable<Object> {
 			// use imperial system
 
 			return speedSerieImperial;
+		}
+	}
+
+	/**
+	 * @return Returns SRTM metric or imperial data serie depending on the active measurement or
+	 *         <code>null</code> when SRTM data serie is not available
+	 */
+	public int[] getSRTMSerie() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (srtmSerie == null) {
+			createSRTMDataSerie();
+		}
+
+		if (srtmSerie.length == 0) {
+			// SRTM data are invalid
+			return null;
+		}
+
+		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+			// imperial system is used
+
+			return srtmSerieImperial;
+
+		} else {
+
+			return srtmSerie;
 		}
 	}
 

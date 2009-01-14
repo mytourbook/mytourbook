@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
+public class DialogAdjustAltitudeSRTM_OLD extends TitleAreaDialog {
 
 	private Image					fShellImage;
 	private final IDialogSettings	fDialogSettings;
@@ -89,7 +89,7 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 	 * @param tourData
 	 *            {@link TourData} for the tour which altitude should be adjusted
 	 */
-	public DialogAdjustAltitudeSRTM(final Shell parentShell, final TourData tourData) {
+	public DialogAdjustAltitudeSRTM_OLD(final Shell parentShell, final TourData tourData) {
 
 		super(parentShell);
 
@@ -146,7 +146,7 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 		createSRTMData();
 		createChartConfiguration();
 
-		fTourChart.updateSRTMLayer();
+//		fTourChart.updateSRTMLayer();
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, true);
 	}
 
@@ -278,7 +278,7 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 			if (altitudeSerie == null) {
 				fTourData.altitudeSerie = srtmDataSerie;
 			} else {
-				fTourData.srtmDataSerie = srtmDataSerie;
+//				fTourData.srtmDataSerie = srtmDataSerie;
 			}
 		}
 	}

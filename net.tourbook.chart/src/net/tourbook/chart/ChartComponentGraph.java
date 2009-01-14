@@ -2107,21 +2107,30 @@ public class ChartComponentGraph extends Canvas {
 										final int alphaValue,
 										final int graphValueOffset) {
 
-		final Display display = getDisplay();
-		final Path path = new Path(display);
-
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 		final int graphFillMethod = yData.getGraphFillMethod();
 
+		final int[][] highValues = yData.getHighValues();
+
 		final int xValues[] = xData.getHighValues()[0];
-		final int yValues[] = yData.getHighValues()[0];
+		final int yValues[] = highValues[0];
+
+		final boolean isPath2 = highValues.length > 1;
+		int[] yValues2 = null;
+		if (isPath2) {
+			yValues2 = highValues[1];
+		}
 
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final int graphYTop = drawingData.getGraphYTop();
 
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
+
+		final Display display = getDisplay();
+		final Path path = new Path(display);
+		final Path path2 = isPath2 ? new Path(display) : null;
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
@@ -2146,6 +2155,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			int yValue = yValues[xValueIndex];
+			int yValue2 = 0;
 
 			// force the bottom and top value not to drawn over the border
 			if (yValue < graphYBottom) {
@@ -2153,6 +2163,19 @@ public class ChartComponentGraph extends Canvas {
 			}
 			if (yValue > graphYTop) {
 				yValue = graphYTop;
+			}
+
+			if (isPath2) {
+
+				yValue2 = yValues2[xValueIndex];
+
+				// force the bottom and top value not to drawn over the border
+				if (yValue2 < graphYBottom) {
+					yValue2 = graphYBottom;
+				}
+				if (yValue2 > graphYTop) {
+					yValue2 = graphYTop;
+				}
 			}
 
 			final float devXValue = xValue * scaleX;
@@ -2171,14 +2194,22 @@ public class ChartComponentGraph extends Canvas {
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
-					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 					// start from the x-axis
+					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 					path.moveTo(devXValue, devY0 - (graphXAxisLine * scaleY));
+				}
+
+				if (isPath2) {
+					path2.moveTo(devXValue, devY0 - (yValue2 * scaleY));
 				}
 			}
 
 			// draw line to the next point
 			path.lineTo(devXValue, devY0 - (yValue * scaleY));
+
+			if (isPath2) {
+				path2.lineTo(devXValue, devY0 - (yValue2 * scaleY));
+			}
 
 			/*
 			 * set last point
@@ -2203,6 +2234,11 @@ public class ChartComponentGraph extends Canvas {
 
 				path.lineTo(devXValue, devY0 - (graphXAxisLine * scaleY));
 				path.moveTo(devXValue, devY0 - (graphXAxisLine * scaleY));
+
+				if (isPath2) {
+					path.lineTo(devXValue, devY0 - (yValue2 * scaleY));
+					path.moveTo(devXValue, devY0 - (yValue2 * scaleY));
+				}
 			}
 		}
 
@@ -2267,11 +2303,21 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorBg2);
 			gc.setBackground(colorBg1);
 
-			gc.fillGradientRectangle(0, devYBottom, devChartWidth, (int) -Math.min(devGraphHeight, devYBottom
-					- devY0),
+			gc.fillGradientRectangle(0,
+					devYBottom,
+					devChartWidth,
+					(int) -Math.min(devGraphHeight, devYBottom - devY0),
 					true);
 
 			gc.setClipping(chartRectangle);
+		}
+
+		if (isPath2) {
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.drawPath(path2);
+
+			path2.dispose();
 		}
 
 		// draw the line of the graph
@@ -5640,7 +5686,7 @@ public class ChartComponentGraph extends Canvas {
 			if (yData.isForceMinValue() == false && minValue != 0) {
 				yData.setVisibleMinValue(minValue - 1);
 			}
-			
+
 			if (yData.isForceMaxValue() == false && maxValue != 0) {
 				yData.setVisibleMaxValue(maxValue + 1);
 			}

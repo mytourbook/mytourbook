@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.DialogAdjustAltitudeSRTM;
+import net.tourbook.tour.DialogAdjustAltitudeSRTM_OLD;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
@@ -28,11 +28,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionAdjustAltitudeSRTM extends Action {
+public class ActionAdjustAltitudeSRTM_OLD extends Action {
 
 	private ITourProvider	fTourProvider;
 
-	public ActionAdjustAltitudeSRTM(final ITourProvider tourProvider) {
+	public ActionAdjustAltitudeSRTM_OLD(final ITourProvider tourProvider) {
 
 		setText(Messages.app_action_adjust_altitude_srtm);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image__adjust_altitude_srtm));
@@ -68,7 +68,7 @@ public class ActionAdjustAltitudeSRTM extends Action {
 			return;
 		}
 		
-		new DialogAdjustAltitudeSRTM(Display.getCurrent().getActiveShell(), tourData).open();
+		new DialogAdjustAltitudeSRTM_OLD(Display.getCurrent().getActiveShell(), tourData).open();
 	}
 
 }

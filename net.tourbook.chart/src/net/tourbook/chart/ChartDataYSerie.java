@@ -93,6 +93,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
 
+	public ChartDataYSerie(final int chartType, final int[][] valueSeries) {
+		fChartType = chartType;
+		setMinMaxValues(valueSeries);
+	}
+
 	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
 		fChartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
@@ -247,7 +252,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			// set initial min/max value
 			fVisibleMaxValue = fVisibleMinValue = valueSeries[0][0];
 
-			if (fChartType == ChartDataModel.CHART_TYPE_LINE) {
+			if (fChartType == ChartDataModel.CHART_TYPE_LINE || //
+					fChartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
 
 				super.setMinMaxValues(valueSeries);
 
@@ -294,10 +300,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					break;
 				}
-
-			} else if (fChartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
-
-				super.setMinMaxValues(valueSeries);
 			}
 
 			fOriginalMinValue = fVisibleMinValue;
