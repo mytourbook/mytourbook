@@ -362,7 +362,7 @@ public class TourMapView extends ViewPart {
 
 	void actionSynchWithTour() {
 
-		if (fTourDataList == null) {
+		if (fTourDataList.size() == 0) {
 			return;
 		}
 		
@@ -1292,7 +1292,9 @@ public class TourMapView extends ViewPart {
 		}
 
 		final PaintManager paintManager = PaintManager.getInstance();
+		
 		paintManager.setTourData(fTourDataList);
+		
 		final TourData firstTourData = fTourDataList.get(0);
 
 		// set slider position

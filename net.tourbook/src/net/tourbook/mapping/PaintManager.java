@@ -108,7 +108,7 @@ public class PaintManager {
 	public void setTourData(final ArrayList<TourData> tourDataList) {
 
 		fTourDataList.clear();
-		fTourDataList = tourDataList;
+		fTourDataList.addAll(tourDataList);
 	}
 
 	/**
@@ -120,8 +120,6 @@ public class PaintManager {
 	public void setTourData(final TourData tourData) {
 
 		fTourDataList.clear();
-
-		fTourDataList = new ArrayList<TourData>();
 		fTourDataList.add(tourData);
 	}
 }
