@@ -3,8 +3,6 @@ package net.tourbook.ext.srtm;
 import java.io.File;
 import java.util.HashMap;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 public final class ElevationSRTM3 extends Elevation {
 
 	static private SRTM3I							srtm3I;
@@ -16,8 +14,8 @@ public final class ElevationSRTM3 extends Elevation {
 
 		private SRTM3I(final GeoLat b, final GeoLon l) {
 
-			final String homeDir = getSRTMDataPath();
-			final String srtm3Dir = homeDir + File.separator + "srtm3"; // Lokale Lage der SRTM3-Files!!!
+			final String srtmDataPath = getSRTMDataPath();
+			final String srtm3Dir = srtmDataPath + File.separator + "srtm3"; // Lokale Lage der SRTM3-Files!!!
 			final String srtm3Suffix = ".hgt";
 
 			String fileName = new String();
@@ -36,25 +34,29 @@ public final class ElevationSRTM3 extends Elevation {
 			}
 		}
 
-		public short getElevation(final GeoLat b, final GeoLon l) {
-			return fileShort.get(offset(b, l));
+		public short getElevation(final GeoLat lat, final GeoLon lon) {
+			return fileShort.get(srtmFileOffset(lat, lon));
 		}
 
 		private String getSRTMDataPath() {
 
-			final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
-			final String dataPath = prefStore.getString(IPreferences.SRTM_DATA_FILEPATH);
+			String srtmDataPath;
 
-			if (dataPath.length() == 0 || new File(dataPath).exists() == false) {
+			final String prefDataPath = Activator.getDefault()
+					.getPreferenceStore()
+					.getString(IPreferences.SRTM_DATA_FILEPATH);
 
+			if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
+				srtmDataPath = (String) System.getProperties().get("user.home");
+			} else {
+				srtmDataPath = prefDataPath;
 			}
 
-			final Object userHomeDir = System.getProperties().get("user.home");
-			return (String) userHomeDir;
+			return srtmDataPath;
 		}
 
 		//    Offset im SRTM3-File
-		public int offset(final GeoLat b, final GeoLon l) {
+		public int srtmFileOffset(final GeoLat b, final GeoLon l) {
 
 			if (b.isSueden()) {
 				if (l.isOsten()) {

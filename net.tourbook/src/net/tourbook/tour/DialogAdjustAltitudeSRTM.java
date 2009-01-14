@@ -63,6 +63,8 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 	private int						fAltiMinValue;
 	private int						fAltiMaxValue;
 
+	boolean							isSRTMValid	= false;
+
 	/**
 	 * creates a int array backup
 	 * 
@@ -212,10 +214,10 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 	private void createSRTMData() {
 
 		final int[] srtmDataSerie = new int[fTourData.timeSerie.length];
-
 		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+
 			public void run() {
 
 				// initialize SRTM
@@ -226,13 +228,24 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 				final double[] longitude = fTourData.longitudeSerie;
 
 				int serieIndex = 0;
+				short lastValidSRTM = 0;
 
 				for (final double latitude : latitudeSerie) {
 
 					short srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude),
 							new GeoLon(longitude[serieIndex]));
 
-					// ignore wrong values
+					/*
+					 * set invalid values to the previous valid value
+					 */
+					if (srtmValue == Short.MIN_VALUE) {
+						srtmValue = lastValidSRTM;
+					} else {
+						isSRTMValid = true;
+						lastValidSRTM = srtmValue;
+					}
+
+					// adjust wrong values
 					if (srtmValue < -1000) {
 						srtmValue = 0;
 					} else if (srtmValue > 10000) {
@@ -257,13 +270,16 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 						fAltiMaxValue = altitude > fAltiMaxValue ? altitude : fAltiMaxValue;
 					}
 				}
+
 			}
 		});
 
-		if (altitudeSerie == null) {
-			fTourData.altitudeSerie = srtmDataSerie;
-		} else {
-			fTourData.srtmDataSerie = srtmDataSerie;
+		if (isSRTMValid) {
+			if (altitudeSerie == null) {
+				fTourData.altitudeSerie = srtmDataSerie;
+			} else {
+				fTourData.srtmDataSerie = srtmDataSerie;
+			}
 		}
 	}
 
@@ -304,18 +320,21 @@ public class DialogAdjustAltitudeSRTM extends TitleAreaDialog {
 		changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 
 		// adjust min/max values for the altitude to the SRTM min/max values
-		for (final ChartDataSerie chartData : changedChartDataModel.getYData()) {
-			if (chartData instanceof ChartDataYSerie) {
-				final ChartDataYSerie yData = (ChartDataYSerie) chartData;
+		if (isSRTMValid) {
 
-				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
-				if (graphId == TourManager.GRAPH_ALTITUDE) {
+			for (final ChartDataSerie chartData : changedChartDataModel.getYData()) {
+				if (chartData instanceof ChartDataYSerie) {
+					final ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
-					yData.setVisibleMinValue(fAltiMinValue, true);
-					yData.setVisibleMaxValue(fAltiMaxValue, true);
+					final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+					if (graphId == TourManager.GRAPH_ALTITUDE) {
 
-					// nothing more to to
-					break;
+						yData.setVisibleMinValue(fAltiMinValue, true);
+						yData.setVisibleMaxValue(fAltiMaxValue, true);
+
+						// nothing more to to
+						break;
+					}
 				}
 			}
 		}

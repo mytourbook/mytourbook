@@ -1,5 +1,6 @@
 package net.tourbook.ext.srtm;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -14,7 +15,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
 		store.setDefault(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH, true);
-		store.setDefault(IPreferences.SRTM_DATA_FILEPATH, "");//$NON-NLS-1$
+		
+		// set srtm default data path to the working directory
+		store.setDefault(IPreferences.SRTM_DATA_FILEPATH, Platform.getInstanceLocation().getURL().getPath());
 
 	}
 }
