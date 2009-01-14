@@ -96,20 +96,21 @@ public class DataProviderTourMonth extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		final int tourTypeSerieLength = colorOffset + tourTypes.length;
+		int serieLength = colorOffset + tourTypes.length;
+		serieLength = serieLength == 0 ? 1 : serieLength;
 		final int valueLength = 12 * numberOfYears;
 
 		try {
 
-			final int[][] dbDistance = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbAltitude = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbDurationTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbDistance = new int[serieLength][valueLength];
+			final int[][] dbAltitude = new int[serieLength][valueLength];
+			final int[][] dbDurationTime = new int[serieLength][valueLength];
 
-			final int[][] dbRecordingTime = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbDrivingTime = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbBreakTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbRecordingTime = new int[serieLength][valueLength];
+			final int[][] dbDrivingTime = new int[serieLength][valueLength];
+			final int[][] dbBreakTime = new int[serieLength][valueLength];
 
-			final long[][] dbTypeIds = new long[tourTypeSerieLength][valueLength];
+			final long[][] dbTypeIds = new long[serieLength][valueLength];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
@@ -159,9 +160,9 @@ public class DataProviderTourMonth extends DataProvider {
 
 			fTourMonthData.fTypeIds = dbTypeIds;
 
-			fTourMonthData.fDistanceLow = new int[tourTypeSerieLength][valueLength];
-			fTourMonthData.fAltitudeLow = new int[tourTypeSerieLength][valueLength];
-			fTourMonthData.fTimeLow = new int[tourTypeSerieLength][valueLength];
+			fTourMonthData.fDistanceLow = new int[serieLength][valueLength];
+			fTourMonthData.fAltitudeLow = new int[serieLength][valueLength];
+			fTourMonthData.fTimeLow = new int[serieLength][valueLength];
 
 			fTourMonthData.fDistanceHigh = dbDistance;
 			fTourMonthData.fAltitudeHigh = dbAltitude;

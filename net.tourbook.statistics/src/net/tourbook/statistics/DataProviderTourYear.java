@@ -97,20 +97,21 @@ public class DataProviderTourYear extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		final int tourTypeSerieLength = colorOffset + allTourTypes.length;
+		int serieLength = colorOffset + allTourTypes.length;
+		serieLength = serieLength == 0 ? 1 : serieLength;
 		final int valueLength = numberOfYears;
 
 		try {
 
-			final int[][] dbDistance = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbAltitude = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbDistance = new int[serieLength][valueLength];
+			final int[][] dbAltitude = new int[serieLength][valueLength];
+			final int[][] dbTime = new int[serieLength][valueLength];
 
-			final int[][] dbRecordingTime = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbDrivingTime = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbBreakTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbRecordingTime = new int[serieLength][valueLength];
+			final int[][] dbDrivingTime = new int[serieLength][valueLength];
+			final int[][] dbBreakTime = new int[serieLength][valueLength];
 
-			final long[][] dbTourTypeIds = new long[tourTypeSerieLength][valueLength];
+			final long[][] dbTourTypeIds = new long[serieLength][valueLength];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
@@ -167,9 +168,9 @@ public class DataProviderTourYear extends DataProvider {
 			fTourDataYear.fTypeIds = dbTourTypeIds;
 			fTourDataYear.years = years;
 
-			fTourDataYear.fDistanceLow = new int[tourTypeSerieLength][valueLength];
-			fTourDataYear.fAltitudeLow = new int[tourTypeSerieLength][valueLength];
-			fTourDataYear.fTimeLow = new int[tourTypeSerieLength][valueLength];
+			fTourDataYear.fDistanceLow = new int[serieLength][valueLength];
+			fTourDataYear.fAltitudeLow = new int[serieLength][valueLength];
+			fTourDataYear.fTimeLow = new int[serieLength][valueLength];
 
 			fTourDataYear.fDistanceHigh = dbDistance;
 			fTourDataYear.fAltitudeHigh = dbAltitude;

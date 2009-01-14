@@ -82,7 +82,9 @@ public class DataProviderTourWeek extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		final int serieLength = colorOffset + tourTypes.length;
+		int serieLength = colorOffset + tourTypes.length;
+		serieLength = serieLength == 0 ? 1 : serieLength;
+		
 		final int valueLength = weekCounter;
 		final SQLFilter sqlFilter = new SQLFilter();
 
