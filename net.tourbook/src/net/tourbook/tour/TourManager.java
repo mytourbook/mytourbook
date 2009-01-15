@@ -176,8 +176,8 @@ public class TourManager {
 		}
 		chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
-		// set the starttime from the prefs
 		chartConfig.isStartTime = prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		chartConfig.isSRTMDataVisible = prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
 		updateZoomOptionsInChartConfig(chartConfig, prefStore);
 
@@ -1049,11 +1049,26 @@ public class TourManager {
 		final int[] altitudeSerie = tourData.getAltitudeSerie();
 		if (altitudeSerie != null) {
 
-			final int[] srtmDataSerie = tourData.getSRTMSerie();
-			if (srtmDataSerie == null) {
-				yDataAltitude = getChartData(altitudeSerie, chartType);
+			if (tourData.isSRTMAvailable()) {
+
+				chartConfig.canShowSRTMData = true;
+
+				if (chartConfig.isSRTMDataVisible) {
+
+					final int[] srtmDataSerie = tourData.getSRTMSerie();
+					if (srtmDataSerie != null) {
+						yDataAltitude = getChartData(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
+					}
+				}
+
 			} else {
-				yDataAltitude = getChartData(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
+
+				// SRTM data are not available
+				chartConfig.canShowSRTMData = false;
+			}
+
+			if (yDataAltitude == null) {
+				yDataAltitude = getChartData(altitudeSerie, chartType);
 			}
 
 			yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);

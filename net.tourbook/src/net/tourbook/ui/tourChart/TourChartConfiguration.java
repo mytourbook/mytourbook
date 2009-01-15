@@ -89,6 +89,16 @@ public class TourChartConfiguration {
 	public float					measurementSystem;
 
 	/**
+	 * when <code>true</code> the SRTM data are visible in the altitude graph
+	 */
+	public boolean					isSRTMDataVisible		= false;
+
+	/**
+	 * when <code>true</code> the SRTM data are visible in the altitude graph
+	 */
+	public boolean					canShowSRTMData;
+
+	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */

@@ -592,6 +592,8 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
 
+	public static String	tour_action_show_srtm_data;
+
 	public static String		tour_data_label_device_marker;
 	public static String		tour_data_label_feature_since_version_9_01;
 	public static String		tour_data_label_manually_created_tour;

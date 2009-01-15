@@ -128,7 +128,7 @@ public class UI {
 	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
 
 	public static final float						UNIT_MILE						= 1.609344f;
-	private static final float						UNIT_FOOT						= 0.3048f;
+	public static final float						UNIT_FOOT						= 0.3048f;
 
 	/**
 	 * contains the system of measurement value for distances relative to the metric system, the

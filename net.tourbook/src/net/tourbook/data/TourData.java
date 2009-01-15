@@ -1820,7 +1820,7 @@ public class TourData implements Comparable<Object> {
 					}
 
 					newSRTMSerie[serieIndex] = srtmValue;
-					newSRTMSerieImperial[serieIndex] = (int) (srtmValue / UI.UNIT_VALUE_ALTITUDE);
+					newSRTMSerieImperial[serieIndex] = (int) (srtmValue / UI.UNIT_FOOT);
 
 					serieIndex++;
 				}
@@ -3323,6 +3323,29 @@ public class TourData implements Comparable<Object> {
 
 		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)
 				|| devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
+	}
+
+	/**
+	 * @return Returns <code>true</code> when SRTM data are available or when they can be available
+	 *         but not yet computed.
+	 */
+	public boolean isSRTMAvailable() {
+
+		if (latitudeSerie == null) {
+			return false;
+		}
+
+		if (srtmSerie == null) {
+			// srtm data can be available but are not yet computed 
+			return true;
+		}
+
+		if (srtmSerie.length == 0) {
+			// SRTM data are invalid
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**

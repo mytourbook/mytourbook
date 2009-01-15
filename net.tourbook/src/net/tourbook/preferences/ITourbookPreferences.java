@@ -60,10 +60,11 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
+	public static final String	GRAPH_IS_SRTM_VISIBLE						= "graphs.is-srtm-visible";								//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 
-	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED					= "graph.pace.is-min-enabled";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED				= "graph.pace.is-min-enabled";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MAX_VALUE						= "graph.pace.max-value";									//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MIN_IS_ENABLED				= "graphs.altimeter.is-min-enabled";						//$NON-NLS-1$
@@ -193,6 +194,5 @@ public interface ITourbookPreferences {
 	public static final String	MERGE_TOUR_MERGE_GRAPH_PULSE				= "merge.tour.merge-graph-pulse";							//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_GRAPH_TEMPERATURE			= "merge.tour.merge-graph-temperature";					//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_GRAPH_CADENCE				= "merge.tour.merge-graph-cadence";						//$NON-NLS-1$
-
 
 }

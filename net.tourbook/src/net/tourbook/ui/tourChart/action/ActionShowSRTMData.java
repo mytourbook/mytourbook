@@ -15,23 +15,22 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.ui.HandlerUtil;
+import net.tourbook.Messages;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerCanMoveSlidersWhenZoomed extends TCActionHandler {
+public class ActionShowSRTMData extends Action {
 
-	public ActionHandlerCanMoveSlidersWhenZoomed() {
-		fCommandId = TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED;
+	private TourChart	fTourChart;
+
+	public ActionShowSRTMData(final TourChart tourChart) {
+		super(Messages.tour_action_show_srtm_data, AS_CHECK_BOX);
+		fTourChart = tourChart;
 	}
 
-	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-		fTourChart.actionCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
-
-		return null;
+	@Override
+	public void run() {
+		fTourChart.actionShowSRTMData(isChecked());
 	}
-
 }

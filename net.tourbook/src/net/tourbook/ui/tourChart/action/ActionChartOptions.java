@@ -71,10 +71,11 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		fMenu = new Menu(parent);
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_SRTM_DATA).getAction());
 		(new Separator()).fill(fMenu, -1);
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
 
 		return fMenu;
 	}

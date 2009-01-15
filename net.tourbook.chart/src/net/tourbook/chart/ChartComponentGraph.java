@@ -5659,7 +5659,8 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final int yValues[] = yData.getHighValues()[0];
+			final int[][] yValueSeries = yData.getHighValues();
+			final int yValues[] = yValueSeries[0];
 
 			// ensure array bounds
 			final int maxYValueIndex = yValues.length - 1;
@@ -5671,15 +5672,17 @@ public class ChartComponentGraph extends Canvas {
 			int minValue = yValues[valueIndexLeft];
 			int maxValue = yValues[valueIndexLeft];
 
-			for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
+			for (final int[] yValueSerie : yValueSeries) {
+				for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
 
-				final int yValue = yValues[valueIndex];
+					final int yValue = yValueSerie[valueIndex];
 
-				if (yValue < minValue) {
-					minValue = yValue;
-				}
-				if (yValue > maxValue) {
-					maxValue = yValue;
+					if (yValue < minValue) {
+						minValue = yValue;
+					}
+					if (yValue > maxValue) {
+						maxValue = yValue;
+					}
 				}
 			}
 

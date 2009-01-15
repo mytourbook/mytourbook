@@ -21,17 +21,20 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerCanMoveSlidersWhenZoomed extends TCActionHandler {
+public class ActionHandlerShowSRTMData extends TCActionHandler {
 
-	public ActionHandlerCanMoveSlidersWhenZoomed() {
-		fCommandId = TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED;
+	public ActionHandlerShowSRTMData() {
+		fCommandId = TourChart.COMMAND_ID_SHOW_SRTM_DATA;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fTourChart.actionCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+
+		if (isItemChecked != null) {
+			fTourChart.actionShowSRTMData(isItemChecked);
+		}
 
 		return null;
 	}
-
 }

@@ -43,6 +43,7 @@ import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionChartOptions;
 import net.tourbook.ui.tourChart.action.ActionGraph;
+import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
 import net.tourbook.ui.tourChart.action.ActionShowStartTime;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
@@ -74,7 +75,8 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_CHART_OPTIONS				= "net.tourbook.command.tourChart.options";					//$NON-NLS-1$
 	public static final String				COMMAND_ID_SHOW_START_TIME				= "net.tourbook.command.tourChart.showStartTime";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "net.tourbook.command.tourChart.canAutoZoomToSlider";		//$NON-NLS-1$
-	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
+	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
+	public static final String				COMMAND_ID_SHOW_SRTM_DATA				= "net.tourbook.command.option.showSRTMData";					//$NON-NLS-1$
 
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
@@ -124,7 +126,6 @@ public class TourChart extends Chart {
 	 */
 //	private boolean							fIsSRTMLayerVisible;
 //	private ChartSRTMLayer					fSRTMLayer;
-
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
@@ -213,6 +214,17 @@ public class TourChart extends Chart {
 		}
 
 		updateZoomOptionActionHandlers();
+	}
+
+	public void actionShowSRTMData(final boolean isItemChecked) {
+
+		TourbookPlugin.getDefault().getPreferenceStore().setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE,
+				isItemChecked);
+
+		fTourChartConfig.isSRTMDataVisible = isItemChecked;
+		updateTourChart(true);
+
+		setCommandChecked(COMMAND_ID_SHOW_SRTM_DATA, isItemChecked);
 	}
 
 	public void actionShowStartTime(final Boolean isItemChecked) {
@@ -571,6 +583,23 @@ public class TourChart extends Chart {
 		fMergeLayer = new ChartMergeLayer(layerTourData, xDataSerie, fTourChartConfig);
 	}
 
+//	private void createSRTMLayer() {
+//
+//		if (fTourData == null) {
+//			return;
+//		}
+//
+//		if (fIsSRTMLayerVisible == false || fTourData.srtmDataSerie == null) {
+//
+//			fSRTMLayer = null;
+//			return;
+//		}
+//
+//		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
+//
+//		fSRTMLayer = new ChartSRTMLayer(fTourData, xDataSerie);
+//	}
+
 	/**
 	 * Creates the layers from the segmented tour data
 	 */
@@ -616,23 +645,6 @@ public class TourChart extends Chart {
 		// draw the graph lighter so the segments are more visible
 		setGraphAlpha(0x60);
 	}
-
-//	private void createSRTMLayer() {
-//
-//		if (fTourData == null) {
-//			return;
-//		}
-//
-//		if (fIsSRTMLayerVisible == false || fTourData.srtmDataSerie == null) {
-//
-//			fSRTMLayer = null;
-//			return;
-//		}
-//
-//		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
-//
-//		fSRTMLayer = new ChartSRTMLayer(fTourData, xDataSerie);
-//	}
 
 	/**
 	 * Create the action proxies for all tour actions
@@ -693,9 +705,16 @@ public class TourChart extends Chart {
 		/*
 		 * Action: move sliders when zoomed
 		 */
-		actionProxy = new TCActionProxy(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED, //
+		actionProxy = new TCActionProxy(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, //
 				useInternalActionBar ? new ActionCanMoveSlidersWhenZoomed(this) : null);
-		fActionProxies.put(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED, actionProxy);
+		fActionProxies.put(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, actionProxy);
+
+		/*
+		 * Action: show SRTM data
+		 */
+		actionProxy = new TCActionProxy(COMMAND_ID_SHOW_SRTM_DATA, //
+				useInternalActionBar ? new ActionShowSRTMData(this) : null);
+		fActionProxies.put(COMMAND_ID_SHOW_SRTM_DATA, actionProxy);
 
 	}
 
@@ -727,6 +746,70 @@ public class TourChart extends Chart {
 
 	}
 
+	/**
+	 * Enable/disable the graph action buttons, the visible state of a graph is defined in the chart
+	 * config
+	 */
+	public void enableTourActions() {
+
+		final int[] allGraphIds = TourManager.allGraphIDs;
+		final ArrayList<Integer> checkedGraphIds = fTourChartConfig.getVisibleGraphs();
+		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
+
+		// get all graph ids which can be displayed
+		for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
+
+			if (xyDataIterator instanceof ChartDataYSerie) {
+				final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+				enabledGraphIds.add(graphId);
+			}
+		}
+
+		for (final int graphId : allGraphIds) {
+
+			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(graphId));
+
+			actionProxy.setChecked(checkedGraphIds.contains(graphId));
+			actionProxy.setEnabled(enabledGraphIds.contains(graphId));
+		}
+
+		// update start time option
+		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setEnabled(fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
+
+		final boolean canShowSRTMData = fTourChartConfig.canShowSRTMData;
+		fActionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setEnabled(canShowSRTMData);
+		fActionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setChecked(canShowSRTMData
+				? fTourChartConfig.isSRTMDataVisible
+				: false);
+
+		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setEnabled(!fTourChartConfig.isForceTimeOnXAxis);
+
+		// get options check status from the configuration
+		final boolean isMoveSlidersWhenZoomed = fTourChartConfig.moveSlidersWhenZoomed;
+		final boolean isAutoZoomToSlider = fTourChartConfig.autoZoomToSlider;
+		final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
+
+		// update tour chart actions
+		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(isAutoZoomToSlider);
+
+		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).setEnabled(canAutoZoom);
+		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).setChecked(isMoveSlidersWhenZoomed);
+
+		// update the chart actions
+		setCanAutoMoveSliders(isMoveSlidersWhenZoomed);
+		setCanAutoZoomToSlider(isAutoZoomToSlider);
+
+		// update UI state for the action handlers
+		if (useActionHandlers()) {
+			fTCActionHandlerManager.updateUIState();
+		}
+	}
+
 	private void enableZoomOptions() {
 
 		if (fActionProxies == null) {
@@ -735,7 +818,7 @@ public class TourChart extends Chart {
 
 		final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
 
-		final TCActionProxy actionProxy = fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED);
+		final TCActionProxy actionProxy = fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED);
 		if (actionProxy != null) {
 			actionProxy.setEnabled(canAutoZoom);
 		}
@@ -823,72 +906,6 @@ public class TourChart extends Chart {
 
 	public TourData getTourData() {
 		return fTourData;
-	}
-
-	/**
-	 * Enable/disable the graph action buttons, the visible state of a graph is defined in the chart
-	 * config
-	 */
-	public void initializeTourActions() {
-
-		final int[] allGraphIds = TourManager.allGraphIDs;
-		final ArrayList<Integer> checkedGraphIds = fTourChartConfig.getVisibleGraphs();
-		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
-
-		// get all graph ids which can be displayed
-		for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
-
-			if (xyDataIterator instanceof ChartDataYSerie) {
-				final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
-				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
-				enabledGraphIds.add(graphId);
-			}
-		}
-
-		for (final int graphId : allGraphIds) {
-
-			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(graphId));
-
-			actionProxy.setChecked(checkedGraphIds.contains(graphId));
-			actionProxy.setEnabled(enabledGraphIds.contains(graphId));
-		}
-
-		// update start time option
-		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setEnabled(fTourChartConfig.showTimeOnXAxis);
-		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
-
-		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
-		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
-		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setEnabled(!fTourChartConfig.isForceTimeOnXAxis);
-
-		initializeZoomOptions();
-
-		// update UI state for the action handlers
-		if (useActionHandlers()) {
-			fTCActionHandlerManager.updateUIState();
-		}
-	}
-
-	/**
-	 * enable/disable and check/uncheck the zoom options from the chart configuration
-	 */
-	private void initializeZoomOptions() {
-
-		// get options check status from the configuration
-		final boolean isMoveSlidersWhenZoomed = fTourChartConfig.moveSlidersWhenZoomed;
-		final boolean isAutoZoomToSlider = fTourChartConfig.autoZoomToSlider;
-		final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
-
-		// update the chart
-		setCanAutoMoveSliders(isMoveSlidersWhenZoomed);
-		setCanAutoZoomToSlider(isAutoZoomToSlider);
-
-		// update actions
-		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(isAutoZoomToSlider);
-
-		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setEnabled(canAutoZoom);
-		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setChecked(isMoveSlidersWhenZoomed);
 	}
 
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
@@ -1031,7 +1048,6 @@ public class TourChart extends Chart {
 //		if (fSRTMLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
 //			chartLayers.add(fSRTMLayer);
 //		}
-
 		// add the layers as custom data to the y-data
 		yData.setCustomLayers(chartLayers);
 
@@ -1259,6 +1275,20 @@ public class TourChart extends Chart {
 		updateChartLayers();
 	}
 
+//	public void updateSRTMLayer() {
+//
+//		fIsSRTMLayerVisible = true;
+//
+//		if (fIsSRTMLayerVisible) {
+//			createSRTMLayer();
+//		} else {
+//			fSRTMLayer = null;
+//		}
+//
+//		setCustomGraphData();
+//		updateChartLayers();
+//	}
+
 	/**
 	 * 
 	 */
@@ -1286,20 +1316,6 @@ public class TourChart extends Chart {
 		 */
 		redrawChart();
 	}
-
-//	public void updateSRTMLayer() {
-//
-//		fIsSRTMLayerVisible = true;
-//
-//		if (fIsSRTMLayerVisible) {
-//			createSRTMLayer();
-//		} else {
-//			fSRTMLayer = null;
-//		}
-//
-//		setCustomGraphData();
-//		updateChartLayers();
-//	}
 
 	/**
 	 * Update the tour chart with the previous data and configuration
@@ -1371,7 +1387,7 @@ public class TourChart extends Chart {
 		if (fShowActions) {
 			createTourActionProxies();
 			fillToolbar();
-			initializeTourActions();
+			enableTourActions();
 		}
 
 		// restore min/max values from the chart config
@@ -1408,7 +1424,7 @@ public class TourChart extends Chart {
 	void updateZoomOptionActionHandlers() {
 
 		setCommandChecked(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, getCanAutoZoomToSlider());
-		setCommandChecked(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED, getCanAutoMoveSliders());
+		setCommandChecked(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, getCanAutoMoveSliders());
 	}
 
 	/**
@@ -1418,7 +1434,7 @@ public class TourChart extends Chart {
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
-		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setEnabled(isEnabled);
+		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).setEnabled(isEnabled);
 	}
 
 }
