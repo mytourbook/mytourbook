@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Spinner;
  * Dialog to adjust the altitude, this dialog can be opened from within a tour chart or from the
  * tree viewer
  */
-public class DialogAdjustAltitude extends TitleAreaDialog {
+public class DialogAdjustAltitudeOLD extends TitleAreaDialog {
 
 	private static final String	WIDGET_DATA_ALTI_ID				= "altiId";		//$NON-NLS-1$
 
@@ -126,14 +126,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 
 	private boolean				fIsModifiedInternal				= false;
 
-	public DialogAdjustAltitude(final Shell parentShell, final IStructuredSelection selection) {
+	public DialogAdjustAltitudeOLD(final Shell parentShell, final IStructuredSelection selection) {
 
 		super(parentShell);
 
 		setShellProperties();
 	}
 
-	public DialogAdjustAltitude(final Shell parentShell, final TourData tourData) {
+	public DialogAdjustAltitudeOLD(final Shell parentShell, final TourData tourData) {
 
 		super(parentShell);
 
