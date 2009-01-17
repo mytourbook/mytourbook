@@ -21,8 +21,12 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 
 public class ActionOpenAdjustAltitudeDialog extends Action {
 
@@ -52,33 +56,41 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		}
 
 		final TourData tourData = selectedTours.get(0);
+		final int[] altitudeSerie = tourData.altitudeSerie;
 
-//		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
-//		if (dialog.open() == Window.OK) {
-//
-//			if (fIsSaveTour) {
-//				TourManager.saveModifiedTours(selectedTours);
-//			} else {
-//
-//				/*
-//				 * don't save the tour, just update the tour data editor
-//				 */
-//				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-//				if (tourDataEditor != null) {
-//
-//					tourDataEditor.updateUI(tourData, true);
-//
-//					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-//					modifiedTours.add(tourData);
-//					final TourEvent propertyData = new TourEvent(modifiedTours);
-//
-//					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
-//				}
-//			}
-//
-//		} else {
-//
-//			dialog.restoreOriginalAltitudeValues();
-//		}
+		if (altitudeSerie == null || altitudeSerie.length == 0) {
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					Messages.adjust_altitude_invalid_data_title,
+					Messages.adjust_altitude_invalid_data_message);
+			return;
+		}
+
+		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
+		if (dialog.open() == Window.OK) {
+
+			if (fIsSaveTour) {
+				TourManager.saveModifiedTours(selectedTours);
+			} else {
+
+				/*
+				 * don't save the tour, just update the tour data editor
+				 */
+				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+				if (tourDataEditor != null) {
+
+					tourDataEditor.updateUI(tourData, true);
+
+					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+					modifiedTours.add(tourData);
+					final TourEvent propertyData = new TourEvent(modifiedTours);
+
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
+				}
+			}
+
+		} else {
+
+			dialog.restoreOriginalAltitudeValues();
+		}
 	}
 }

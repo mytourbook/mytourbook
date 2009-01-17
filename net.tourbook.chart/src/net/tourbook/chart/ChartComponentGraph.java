@@ -4496,7 +4496,7 @@ public class ChartComponentGraph extends Canvas {
 			// image is smaller than client area, the image is drawn in the top
 			// left corner and the free are is painted with background color
 
-			if (fIsXSliderVisible) {
+			if (fIsXSliderVisible && fLayerImage != null) {
 				hBar.setVisible(false);
 				fillImagePadding(gc, fLayerImage.getBounds());
 			} else {

@@ -79,7 +79,7 @@ public class Chart extends ViewForm {
 
 	private Chart						fSynchedChart;
 
-	private boolean						fIsShowZoomActions;
+	private boolean						fIsShowZoomActions					= false;
 	private boolean						fIsShowMouseMode					= false;
 
 	private Color						fBackgroundColor;

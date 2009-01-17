@@ -78,12 +78,12 @@ public class DialogAdjustAltitudeOLD extends TitleAreaDialog {
 	static final int			ADJUST_ALTITUDE_MAX_HEIGHT		= 3;
 	static final int			ADJUST_ALTITUDE_END				= 4;
 
-	static final String[]		adjustTypes						= new String[] {
-			Messages.Dlg_AdjustAltitude_Type_Show_original,
-			Messages.Dlg_AdjustAltitude_Type_adjust_whole_tour,
-			Messages.Dlg_AdjustAltitude_Type_start_and_end,
-			Messages.Dlg_AdjustAltitude_Type_adjust_height,
-			Messages.Dlg_AdjustAltitude_Type_adjust_end		};
+	static final String[]		adjustTypes						= null;			//		= new String[] {
+//			Messages.Dlg_AdjustAltitude_Type_Show_original,
+//			Messages.Dlg_AdjustAltitude_Type_adjust_whole_tour,
+//			Messages.Dlg_AdjustAltitude_Type_start_and_end,
+//			Messages.Dlg_AdjustAltitude_Type_adjust_height,
+//			Messages.Dlg_AdjustAltitude_Type_adjust_end		};
 
 	private Image				fShellImage;
 
@@ -549,7 +549,7 @@ public class DialogAdjustAltitudeOLD extends TitleAreaDialog {
 		typeContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
 		label = new Label(typeContainer, SWT.NONE);
-		label.setText(Messages.Dlg_AdjustAltitude_Label_adjustment_type);
+//		label.setText(Messages.Dlg_AdjustAltitude_Label_adjustment_type);
 
 		fComboAdjustType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboAdjustType.setVisibleItemCount(20);

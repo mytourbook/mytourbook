@@ -50,6 +50,7 @@ import net.tourbook.ext.srtm.NumberForm;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -575,22 +576,23 @@ public class TourData implements Comparable<Object> {
 	public boolean						isTourDeleted					= false;
 
 	/**
+	 * 2nd data serie, this is used in the {@link ChartLayer2ndAltiSerie} to display the merged tour
+	 * or to adjust the altitude
+	 */
+	@Transient
+	public int[]						dataSerie2ndAlti;
+
+	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]						mergeDiffDataSerie;
-
-	/**
-	 * altitude data serie for the merged tour with metric measurement
-	 */
-	@Transient
-	public int[]						mergeDataSerie;
+	public int[]						dataSerieDiffTo2ndAlti;
 
 	/**
 	 * contains the altitude serie which is adjusted at the start
 	 */
 	@Transient
-	public int[]						mergeAdjustedDataSerie;
+	public int[]						dataSerieAdjustedAlti;
 
 	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
@@ -3048,6 +3050,28 @@ public class TourData implements Comparable<Object> {
 
 			return srtmSerie;
 		}
+	}
+
+	/**
+	 * @return Returns SRTM metric data serie or <code>null</code> when SRTM data serie is not
+	 *         available
+	 */
+	public int[] getSRTMSerieMetric() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (srtmSerie == null) {
+			createSRTMDataSerie();
+		}
+
+		if (srtmSerie.length == 0) {
+			// SRTM data are invalid
+			return null;
+		}
+
+		return srtmSerie;
 	}
 
 	public short getStartAltitude() {

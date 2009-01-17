@@ -84,11 +84,6 @@ public class TourChartConfiguration {
 	public boolean					isRelativeValueDiffScaling;
 
 	/**
-	 * measurement system to display data in the merge layer
-	 */
-	public float					measurementSystem;
-
-	/**
 	 * when <code>true</code> the SRTM data are visible in the altitude graph
 	 */
 	public boolean					isSRTMDataVisible		= false;

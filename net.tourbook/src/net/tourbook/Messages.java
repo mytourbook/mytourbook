@@ -77,6 +77,30 @@ public class Messages extends NLS {
 
 	public static String		adjust_alti_srtm_save_tour;
 
+	public static String	adjust_altitude_dlg_dialog_message;
+
+	public static String	adjust_altitude_dlg_dialog_title;
+
+	public static String	adjust_altitude_dlg_shell_title;
+
+	public static String	adjust_altitude_invalid_data_message;
+
+	public static String	adjust_altitude_invalid_data_title;
+
+	public static String	adjust_altitude_label_adjustment_type;
+
+	public static String	adjust_altitude_type_adjust_end;
+
+	public static String	adjust_altitude_type_adjust_height;
+
+	public static String	adjust_altitude_type_adjust_whole_tour;
+
+	public static String	adjust_altitude_type_show_original;
+
+	public static String	adjust_altitude_type_start_and_end;
+
+	public static String	adjust_altitude_type_until_left_slider;
+
 	public static String		app_action_adjust_altitude_srtm;
 
 	public static String		app_action_button_down;
@@ -155,7 +179,6 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis;
 	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis_tooltip;
 	public static String		Dlg_AdjustAltitude_Group_options;
-	public static String		Dlg_AdjustAltitude_Label_adjustment_type;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;
 	public static String		Dlg_AdjustAltitude_Label_max_altitude;
@@ -174,12 +197,6 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
 	public static String		Dlg_AdjustAltitude_Title_dlg;
 	public static String		Dlg_AdjustAltitude_Title_window;
-	public static String		Dlg_AdjustAltitude_Type_adjust_end;
-	public static String		Dlg_AdjustAltitude_Type_adjust_height;
-	public static String		Dlg_AdjustAltitude_Type_adjust_whole_tour;
-	public static String		Dlg_AdjustAltitude_Type_Show_original;
-	public static String		Dlg_AdjustAltitude_Type_start_and_end;
-
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;

@@ -195,4 +195,9 @@ public interface ITourbookPreferences {
 	public static final String	MERGE_TOUR_MERGE_GRAPH_TEMPERATURE			= "merge.tour.merge-graph-temperature";					//$NON-NLS-1$
 	public static final String	MERGE_TOUR_MERGE_GRAPH_CADENCE				= "merge.tour.merge-graph-cadence";						//$NON-NLS-1$
 
+	/*
+	 * dialog: adjust altitude
+	 */
+	public static final String	ADJUST_ALTITUDE_CHART_X_AXIS_UNIT			= "adjust.altitude.x-axis-unit";							//$NON-NLS-1$
+
 }

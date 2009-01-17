@@ -38,9 +38,12 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.PixelConverter;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -76,7 +79,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
-public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 {
+public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2, I2ndAltiLayer {
 
 	private static final int		MAX_ADJUST_SECONDS		= 120;
 	private static final int		MAX_ADJUST_MINUTES		= 120;								// x 60
@@ -188,25 +191,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 	private boolean					fIsAdjustAltiFromSourceBackup;
 	private boolean					fIsAdjustAltiFromStartBackup;
 	private IPropertyChangeListener	fPrefChangeListener;
-
-	/**
-	 * creates a int array backup
-	 * 
-	 * @param source
-	 * @return the backup array or <code>null</code> when the source is <code>null</code>
-	 */
-	private static int[] createDataSerieBackup(final int[] source) {
-
-		int[] backup = null;
-
-		if (source != null) {
-			final int serieLength = source.length;
-			backup = new int[serieLength];
-			System.arraycopy(source, 0, backup, 0, serieLength);
-		}
-
-		return backup;
-	}
 
 	/**
 	 * @param parentShell
@@ -475,18 +459,18 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			}
 		}
 
-		fSourceTour.mergeAdjustedDataSerie = null;
+		fSourceTour.dataSerieAdjustedAlti = null;
 
 		if (isSourceAltitude) {
-			fSourceTour.mergeDataSerie = newSourceAltitudeSerie;
+			fSourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
 		} else {
-			fSourceTour.mergeDataSerie = null;
+			fSourceTour.dataSerie2ndAlti = null;
 		}
 
 		if (isSourceAltitude && isTargetAltitude) {
-			fSourceTour.mergeDiffDataSerie = newSourceAltiDiffSerie;
+			fSourceTour.dataSerieDiffTo2ndAlti = newSourceAltiDiffSerie;
 		} else {
-			fSourceTour.mergeDiffDataSerie = null;
+			fSourceTour.dataSerieDiffTo2ndAlti = null;
 		}
 
 		if (fChkMergePulse.getSelection()) {
@@ -538,6 +522,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 						final float targetDistance = targetDistanceSerie[serieIndex];
 						final float distanceScale = 1 - targetDistance / distanceDiff;
+						
 						final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
 						final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
@@ -552,7 +537,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 					}
 				}
 
-				fSourceTour.mergeAdjustedDataSerie = adjustedTargetAltitudeSerie;
+				fSourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
 
 				startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
 
@@ -580,7 +565,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 					newTargetAltitudeSerie[serieIndex] = newSourceAltitudeSerie[serieIndex];
 				}
 
-				fSourceTour.mergeAdjustedDataSerie = newTargetAltitudeSerie;
+				fSourceTour.dataSerieAdjustedAlti = newTargetAltitudeSerie;
 			}
 		}
 
@@ -630,8 +615,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 		// set alti diff scaling
 		fTourChartConfig.isRelativeValueDiffScaling = fChkValueDiffScaling.getSelection();
-		fTourChartConfig.measurementSystem = UI.UNIT_VALUE_ALTITUDE;
-		fTourChart.updateMergeLayer(true);
+		fTourChart.update2ndAltiLayer(this, true);
 
 		updateUIFromTourData();
 
@@ -645,6 +629,37 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 
 		enableActions();
 
+	}
+
+	public ChartLayer2ndAltiSerie create2ndAltiLayer() {
+
+		if (fTargetTour == null) {
+			return null;
+		}
+
+		final TourData mergeSourceTourData = fTargetTour.getMergeSourceTourData();
+
+		if (fTargetTour.getMergeSourceTourId() == null && mergeSourceTourData == null) {
+			return null;
+		}
+
+		TourData layerTourData;
+
+		if (mergeSourceTourData != null) {
+			layerTourData = mergeSourceTourData;
+		} else {
+			layerTourData = TourManager.getInstance().getTourData(fTargetTour.getMergeSourceTourId());
+		}
+
+		if (layerTourData == null) {
+			return null;
+		}
+
+		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis
+				? fTargetTour.timeSerie
+				: fTargetTour.getDistanceSerie();
+
+		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, fTourChartConfig);
 	}
 
 	private void createActions() {
@@ -670,14 +685,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		fBackupSourceTimeSerie = createDataSerieBackup(fSourceTour.timeSerie);
-		fBackupSourceDistanceSerie = createDataSerieBackup(fSourceTour.distanceSerie);
-		fBackupSourceAltitudeSerie = createDataSerieBackup(fSourceTour.altitudeSerie);
+		fBackupSourceTimeSerie = Util.createDataSerieBackup(fSourceTour.timeSerie);
+		fBackupSourceDistanceSerie = Util.createDataSerieBackup(fSourceTour.distanceSerie);
+		fBackupSourceAltitudeSerie = Util.createDataSerieBackup(fSourceTour.altitudeSerie);
 		fBackupSourceTourType = fSourceTour.getTourType();
 
-		fBackupTargetPulseSerie = createDataSerieBackup(fTargetTour.pulseSerie);
-		fBackupTargetTemperatureSerie = createDataSerieBackup(fTargetTour.temperatureSerie);
-		fBackupTargetCadenceSerie = createDataSerieBackup(fTargetTour.cadenceSerie);
+		fBackupTargetPulseSerie = Util.createDataSerieBackup(fTargetTour.pulseSerie);
+		fBackupTargetTemperatureSerie = Util.createDataSerieBackup(fTargetTour.temperatureSerie);
+		fBackupTargetCadenceSerie = Util.createDataSerieBackup(fTargetTour.cadenceSerie);
 
 		fBackupTargetTimeOffset = fTargetTour.getMergedTourTimeOffset();
 		fBackupTargetAltitudeOffset = fTargetTour.getMergedAltitudeOffset();
@@ -1536,7 +1551,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			updateTourChart();
 		} else {
 			// update only the merge layer, this is much faster
-			fTourChart.updateMergeLayer(true);
+			fTourChart.update2ndAltiLayer(this, true);
 		}
 
 		enableActions();
@@ -1608,13 +1623,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 		/*
 		 * get original data from the backuped data
 		 */
-		fSourceTour.timeSerie = createDataSerieBackup(fBackupSourceTimeSerie);
-		fSourceTour.distanceSerie = createDataSerieBackup(fBackupSourceDistanceSerie);
-		fSourceTour.altitudeSerie = createDataSerieBackup(fBackupSourceAltitudeSerie);
+		fSourceTour.timeSerie = Util.createDataSerieBackup(fBackupSourceTimeSerie);
+		fSourceTour.distanceSerie = Util.createDataSerieBackup(fBackupSourceDistanceSerie);
+		fSourceTour.altitudeSerie = Util.createDataSerieBackup(fBackupSourceAltitudeSerie);
 
-		fTargetTour.pulseSerie = createDataSerieBackup(fBackupTargetPulseSerie);
-		fTargetTour.temperatureSerie = createDataSerieBackup(fBackupTargetTemperatureSerie);
-		fTargetTour.cadenceSerie = createDataSerieBackup(fBackupTargetCadenceSerie);
+		fTargetTour.pulseSerie = Util.createDataSerieBackup(fBackupTargetPulseSerie);
+		fTargetTour.temperatureSerie = Util.createDataSerieBackup(fBackupTargetTemperatureSerie);
+		fTargetTour.cadenceSerie = Util.createDataSerieBackup(fBackupTargetCadenceSerie);
 
 		fTargetTour.setMergedTourTimeOffset(fBackupTargetTimeOffset);
 		fTargetTour.setMergedAltitudeOffset(fBackupTargetAltitudeOffset);
@@ -1722,10 +1737,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2 
 			// set target altitude values
 
 			if ((fChkAdjustAltiFromStart.getSelection() || fChkAdjustAltiFromSource.getSelection())
-					&& fSourceTour.mergeAdjustedDataSerie != null) {
+					&& fSourceTour.dataSerieAdjustedAlti != null) {
 
 				// update target altitude from adjuste source altitude
-				fTargetTour.altitudeSerie = fSourceTour.mergeAdjustedDataSerie;
+				fTargetTour.altitudeSerie = fSourceTour.dataSerieAdjustedAlti;
 
 				// adjust altitude up/down values
 				fTargetTour.computeAltitudeUpDown();

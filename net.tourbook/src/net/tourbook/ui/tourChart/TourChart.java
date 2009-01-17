@@ -115,17 +115,12 @@ public class TourChart extends Chart {
 	private ChartLabelLayer					fLabelLayer;
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
+	private ChartLayer2ndAltiSerie			fLayer2ndAltiSerie;
 
 	private boolean							fIsSegmentLayerVisible					= false;
-	private boolean							fIsMergeLayerVisible					= false;
+	private boolean							fIs2ndAltiLayerVisible					= false;
+	private I2ndAltiLayer					f2ndAltiLayerProvider;
 
-	private ChartMergeLayer					fMergeLayer;
-
-	/*
-	 * SRTM data
-	 */
-//	private boolean							fIsSRTMLayerVisible;
-//	private ChartSRTMLayer					fSRTMLayer;
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
@@ -411,6 +406,15 @@ public class TourChart extends Chart {
 		fSelectionListeners.add(listener);
 	}
 
+	private void create2ndAltiLayer() {
+
+		if (fIs2ndAltiLayerVisible && f2ndAltiLayerProvider != null) {
+			fLayer2ndAltiSerie = f2ndAltiLayerProvider.create2ndAltiLayer();
+		} else {
+			fLayer2ndAltiSerie = null;
+		}
+	}
+
 	/**
 	 * Create action proxies for all chart graphs
 	 */
@@ -550,55 +554,6 @@ public class TourChart extends Chart {
 			fLabelLayer.addLabel(chartLabel);
 		}
 	}
-
-	private void createMergeLayer() {
-
-		if (fTourData == null) {
-			return;
-		}
-
-		final TourData mergeSourceTourData = fTourData.getMergeSourceTourData();
-
-		if (fIsMergeLayerVisible == false || (fTourData.getMergeSourceTourId() == null && mergeSourceTourData == null)) {
-
-			fMergeLayer = null;
-			return;
-		}
-
-		TourData layerTourData;
-
-		if (mergeSourceTourData != null) {
-			layerTourData = mergeSourceTourData;
-		} else {
-			layerTourData = TourManager.getInstance().getTourData(fTourData.getMergeSourceTourId());
-		}
-
-		if (layerTourData == null) {
-			fMergeLayer = null;
-			return;
-		}
-
-		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
-
-		fMergeLayer = new ChartMergeLayer(layerTourData, xDataSerie, fTourChartConfig);
-	}
-
-//	private void createSRTMLayer() {
-//
-//		if (fTourData == null) {
-//			return;
-//		}
-//
-//		if (fIsSRTMLayerVisible == false || fTourData.srtmDataSerie == null) {
-//
-//			fSRTMLayer = null;
-//			return;
-//		}
-//
-//		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
-//
-//		fSRTMLayer = new ChartSRTMLayer(fTourData, xDataSerie);
-//	}
 
 	/**
 	 * Creates the layers from the segmented tour data
@@ -1016,40 +971,33 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final ArrayList<IChartLayer> chartLayers = new ArrayList<IChartLayer>();
+		final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<IChartLayer>();
 
 		// show label layer only for ONE visible graph
 		if (fLabelLayer != null && yData == yDataWithLabels) {
-			chartLayers.add(fLabelLayer);
+			chartCustomLayers.add(fLabelLayer);
 		}
 
 		final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
 
 		if (yData == yDataAltitude) {
 			if (fSegmentLayer != null) {
-				chartLayers.add(fSegmentLayer);
+				chartCustomLayers.add(fSegmentLayer);
 			}
 		} else {
 			if (fSegmentValueLayer != null) {
-				chartLayers.add(fSegmentValueLayer);
+				chartCustomLayers.add(fSegmentValueLayer);
 			}
 		}
 
 		/*
-		 * show the merge layer only in the altitude graph
+		 * show merge layer only together with the altitude graph
 		 */
-		if (fMergeLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
-			chartLayers.add(fMergeLayer);
+		if (fLayer2ndAltiSerie != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
+			chartCustomLayers.add(fLayer2ndAltiSerie);
 		}
 
-		/*
-		 * show the SRTM layer only in the altitude graph
-		 */
-//		if (fSRTMLayer != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
-//			chartLayers.add(fSRTMLayer);
-//		}
-		// add the layers as custom data to the y-data
-		yData.setCustomLayers(chartLayers);
+		yData.setCustomLayers(chartCustomLayers);
 
 		if (segmentDataSerie != null) {
 			yData.setCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES, segmentDataSerie);
@@ -1233,6 +1181,17 @@ public class TourChart extends Chart {
 		return sb.toString();
 	}
 
+	public void update2ndAltiLayer(final I2ndAltiLayer alti2ndLayerProvider, final boolean isLayerVisible) {
+
+		fIs2ndAltiLayerVisible = isLayerVisible;
+		f2ndAltiLayerProvider = alti2ndLayerProvider;
+
+		create2ndAltiLayer();
+
+		setCustomGraphData();
+		updateChartLayers();
+	}
+
 	@Override
 	public void updateChart(final ChartDataModel chartDataModel) {
 
@@ -1247,11 +1206,11 @@ public class TourChart extends Chart {
 	/**
 	 * Updates the marker layer in the chart
 	 * 
-	 * @param showLayer
+	 * @param isLayerVisible
 	 */
-	public void updateMarkerLayer(final boolean showLayer) {
+	public void updateMarkerLayer(final boolean isLayerVisible) {
 
-		if (showLayer) {
+		if (isLayerVisible) {
 			createLabelLayer();
 		} else {
 			fLabelLayer = null;
@@ -1261,44 +1220,16 @@ public class TourChart extends Chart {
 		updateChartLayers();
 	}
 
-	public void updateMergeLayer(final boolean showLayer) {
-
-		fIsMergeLayerVisible = showLayer;
-
-		if (fIsMergeLayerVisible) {
-			createMergeLayer();
-		} else {
-			fMergeLayer = null;
-		}
-
-		setCustomGraphData();
-		updateChartLayers();
-	}
-
-//	public void updateSRTMLayer() {
-//
-//		fIsSRTMLayerVisible = true;
-//
-//		if (fIsSRTMLayerVisible) {
-//			createSRTMLayer();
-//		} else {
-//			fSRTMLayer = null;
-//		}
-//
-//		setCustomGraphData();
-//		updateChartLayers();
-//	}
-
 	/**
 	 * 
 	 */
-	public void updateSegmentLayer(final boolean showLayer) {
+	public void updateSegmentLayer(final boolean isLayerVisible) {
 
 		if (fTourData == null) {
 			return;
 		}
 
-		fIsSegmentLayerVisible = showLayer;
+		fIsSegmentLayerVisible = isLayerVisible;
 
 		if (fIsSegmentLayerVisible) {
 			createSegmentLayer();
@@ -1359,10 +1290,19 @@ public class TourChart extends Chart {
 		updateTourChartInternal(tourData, chartConfig, keepMinMaxValues, false);
 	}
 
-	private void updateTourChartInternal(	final TourData newTourData,
-											final TourChartConfiguration newChartConfig,
-											final boolean keepMinMaxValues,
-											final boolean isPropertyChanged) {
+	/**
+	 * This method is synchronized because when SRTM data are retrieved and the import view is
+	 * openened, the error occured that the chart config was deleted with {@link #updateChart(null)}
+	 * 
+	 * @param newTourData
+	 * @param newChartConfig
+	 * @param keepMinMaxValues
+	 * @param isPropertyChanged
+	 */
+	private synchronized void updateTourChartInternal(	final TourData newTourData,
+														final TourChartConfiguration newChartConfig,
+														final boolean keepMinMaxValues,
+														final boolean isPropertyChanged) {
 
 		if (newTourData == null || newChartConfig == null) {
 			return;
@@ -1402,8 +1342,7 @@ public class TourChart extends Chart {
 
 		createSegmentLayer();
 		createLabelLayer();
-		createMergeLayer();
-//		createSRTMLayer();
+		create2ndAltiLayer();
 
 		setCustomGraphData();
 

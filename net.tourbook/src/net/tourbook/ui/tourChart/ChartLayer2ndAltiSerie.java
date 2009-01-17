@@ -16,36 +16,34 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
+import net.tourbook.ui.UI;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartMergeLayer implements IChartLayer {
+public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	/**
-	 * this is {@link TourData} which is displayed in the chart
+	 * contains tour which is displayed in the chart
 	 */
-	private TourData				fLayerTourData;
+	private TourData				fTourData;
 	private int[]					fXDataSerie;
 	private TourChartConfiguration	fTourChartConfig;
 
-	public ChartMergeLayer(	final TourData layerTourData,
-							final int[] xDataSerie,
-							final TourChartConfiguration tourChartConfig) {
+	public ChartLayer2ndAltiSerie(	final TourData tourData,
+								final int[] xDataSerie,
+								final TourChartConfiguration tourChartConfig) {
 
-		fLayerTourData = layerTourData;
+		fTourData = tourData;
 		fTourChartConfig = tourChartConfig;
 
 		// x-data serie contains the time or distance distance data serie
@@ -54,20 +52,20 @@ public class ChartMergeLayer implements IChartLayer {
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
-		final int xValues[] = fXDataSerie;
-		final int yValues[] = fLayerTourData.mergeDataSerie;
+		final int[] xValues = fXDataSerie;
 
-		final int yDiffValues[] = fLayerTourData.mergeDiffDataSerie;
-		final int[] yAdjustedValues = fLayerTourData.mergeAdjustedDataSerie;
+		final int[] yValues2ndSerie = fTourData.dataSerie2ndAlti;
+		final int[] yDiffTo2ndSerie = fTourData.dataSerieDiffTo2ndAlti;
+		final int[] yAdjustedSerie = fTourData.dataSerieAdjustedAlti;
 
-		final boolean isDiffValues = yDiffValues != null;
-		final boolean isAdjustedValues = yAdjustedValues != null;
+		final boolean isDiffValues = yDiffTo2ndSerie != null;
+		final boolean isAdjustedValues = yAdjustedSerie != null;
 
-		final float measurementSystem = fTourChartConfig.measurementSystem;
-
-		if (xValues == null || xValues.length == 0 || yValues == null || yValues.length == 0) {
+		if (xValues == null || xValues.length == 0 || yValues2ndSerie == null || yValues2ndSerie.length == 0) {
 			return;
 		}
+		
+		final float measurementSystem = UI.UNIT_VALUE_ALTITUDE;
 
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
@@ -77,7 +75,7 @@ public class ChartMergeLayer implements IChartLayer {
 
 		final Display display = Display.getCurrent();
 
-		final Path pathValue = new Path(display);
+		final Path path2ndSerie = new Path(display);
 		final Path pathValueDiff = new Path(display);
 		final Path pathAdjustValue = new Path(display);
 
@@ -102,8 +100,8 @@ public class ChartMergeLayer implements IChartLayer {
 			int valueIndex = 0;
 			int maxValueDiff = 0;
 
-			diffValues = new int[yDiffValues.length];
-			for (int valueDiff : yDiffValues) {
+			diffValues = new int[yDiffTo2ndSerie.length];
+			for (int valueDiff : yDiffTo2ndSerie) {
 				diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
 				maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
 			}
@@ -129,22 +127,22 @@ public class ChartMergeLayer implements IChartLayer {
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
 			// make sure the x-index is not higher than the yValues length
-			if (xValueIndex >= yValues.length) {
+			if (xValueIndex >= yValues2ndSerie.length) {
 				return;
 			}
 
 			final int graphXValue = xValues[xValueIndex] - graphValueOffset;
-			final int graphYValue = (int) (yValues[xValueIndex] / measurementSystem);
+			final int graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
 
 			final float devXValue = graphXValue * scaleX;
-			final float devYValue = graphYValue * scaleY;
+			final float devYValue2nd = graphYValue2nd * scaleY;
 
 			/*
 			 * draw adjusted value graph
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedValues[xValueIndex] * scaleY / measurementSystem;
+				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * scaleY / measurementSystem;
 
 				if (xValueIndex == startIndex) {
 
@@ -172,11 +170,11 @@ public class ChartMergeLayer implements IChartLayer {
 			if (xValueIndex == startIndex) {
 
 				// move to the first point
-				pathValue.moveTo(devXValue, devY0 - devYValue);
+				path2ndSerie.moveTo(devXValue, devY0 - devYValue2nd);
 			}
 
 			// draw line to the next point
-			pathValue.lineTo(devXValue, devY0 - devYValue);
+			path2ndSerie.lineTo(devXValue, devY0 - devYValue2nd);
 
 			/*
 			 * draw diff values
@@ -208,7 +206,6 @@ public class ChartMergeLayer implements IChartLayer {
 		 */
 		if (isAdjustedValues) {
 
-
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			gc.setAlpha(0x80);
@@ -229,22 +226,18 @@ public class ChartMergeLayer implements IChartLayer {
 		 */
 		if (isDiffValues) {
 
-			final Color colorFg = new Color(display, new RGB(0x00, 0xA2, 0x8B));
-			gc.setForeground(colorFg);
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-
 			gc.drawPath(pathValueDiff);
-			colorFg.dispose();
 		}
 
 		/*
 		 * paint data graph
 		 */
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		gc.drawPath(pathValue);
-		
+		gc.drawPath(path2ndSerie);
+
 		// dispose resources
-		pathValue.dispose();
+		path2ndSerie.dispose();
 		pathValueDiff.dispose();
 		pathAdjustValue.dispose();
 	}
