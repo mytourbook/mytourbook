@@ -47,7 +47,7 @@ public final class FileSRTM3FTP {
 		try {
 			remoteDirName[0] = getDir(remoteName);
 			final String localDirName = localName.substring(0, localName.lastIndexOf(File.separator));
-			System.out.println("remoteDir " + remoteDirName); //$NON-NLS-1$
+			System.out.println("remoteDir " + remoteDirName[0]); //$NON-NLS-1$
 			System.out.println("localDir " + localDirName); //$NON-NLS-1$
 
 			final File localDir = new File(localDirName);
@@ -94,7 +94,7 @@ public final class FileSRTM3FTP {
 					System.out.println("set type binary"); //$NON-NLS-1$
 					ftp.setType(FTPTransferType.BINARY);
 
-					System.out.println("chdir " + remoteDirName); //$NON-NLS-1$
+					System.out.println("chdir " + remoteDirName[0]); //$NON-NLS-1$
 					ftp.chdir(remoteDirName[0]);
 
 					monitor.worked(1);
