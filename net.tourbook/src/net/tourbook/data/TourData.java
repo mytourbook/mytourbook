@@ -589,6 +589,12 @@ public class TourData implements Comparable<Object> {
 	public int[]						dataSerieDiffTo2ndAlti;
 
 	/**
+	 * contains special points which are displayed in the alti diff graph
+	 */
+	@Transient
+	public int[][]						altiDiffSpecialPoints;
+
+	/**
 	 * contains the altitude serie which is adjusted at the start
 	 */
 	@Transient

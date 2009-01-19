@@ -380,6 +380,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean						fIsGraphVisible			= false;
 
+	private boolean						fIsMouseDown;
+
 	/**
 	 * is <code>true</code> when the chart is panned
 	 */
@@ -3935,11 +3937,13 @@ public class ChartComponentGraph extends Canvas {
 			// check if a y-slider was hit
 			ySliderDragged = isYSliderHit(devXGraph, devYMouse);
 
-			if (ySliderDragged != null)
+			if (ySliderDragged != null) {
+
 				// y-slider was hit
+
 				ySliderDragged.setDevYClickOffset(devYMouse - ySliderDragged.getHitRectangle().y);
 
-			else if (fHoveredBarSerieIndex != -1) {
+			} else if (fHoveredBarSerieIndex != -1) {
 
 				actionSelectBars();
 
@@ -3990,6 +3994,10 @@ public class ChartComponentGraph extends Canvas {
 				fDraggedChartDraggedPos = fDraggedChartStartPos;
 
 				setCursor(fCursorDragged);
+
+			} else {
+
+				fIsMouseDown = true;
 			}
 		}
 	}
@@ -4204,10 +4212,18 @@ public class ChartComponentGraph extends Canvas {
 				setDefaultCursor();
 
 			} else if (hBar.isVisible()) {
+				
 				// horizontal bar is visible, show the scroll cursor
+				
 				setupScrollCursor(devXMouse, devYMouse);
+				
 			} else {
+				
 				setDefaultCursor();
+				
+				if (fIsMouseDown) {
+//					fChart.fireMouseMoveEvent(event);
+				}
 			}
 		}
 
@@ -4305,6 +4321,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
+		fIsMouseDown = false;
 	}
 
 	private void onMouseWheel(final Event event) {

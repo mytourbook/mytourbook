@@ -40,8 +40,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private TourChartConfiguration	fTourChartConfig;
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
-								final int[] xDataSerie,
-								final TourChartConfiguration tourChartConfig) {
+									final int[] xDataSerie,
+									final TourChartConfiguration tourChartConfig) {
 
 		fTourData = tourData;
 		fTourChartConfig = tourChartConfig;
@@ -57,14 +57,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int[] yValues2ndSerie = fTourData.dataSerie2ndAlti;
 		final int[] yDiffTo2ndSerie = fTourData.dataSerieDiffTo2ndAlti;
 		final int[] yAdjustedSerie = fTourData.dataSerieAdjustedAlti;
+		final int[][] specialPoints = fTourData.altiDiffSpecialPoints;
 
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
+		final boolean isSpecialPoints = specialPoints != null;
 
 		if (xValues == null || xValues.length == 0 || yValues2ndSerie == null || yValues2ndSerie.length == 0) {
 			return;
 		}
-		
+
 		final float measurementSystem = UI.UNIT_VALUE_ALTITUDE;
 
 		final float scaleX = drawingData.getScaleX();
@@ -94,7 +96,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		 * convert all diff values into positive values
 		 */
 		int diffValues[] = null;
-		float valueDiffScaling = scaleY;
+		float scaleValueDiff = scaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
@@ -109,7 +111,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			// set value diff scaling
 			if (fTourChartConfig.isRelativeValueDiffScaling) {
-				valueDiffScaling = maxValueDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxValueDiff;
+				scaleValueDiff = maxValueDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxValueDiff;
 			}
 		}
 
@@ -182,7 +184,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (isDiffValues) {
 
 				final int graphValueDiff = (int) (diffValues[xValueIndex] / measurementSystem);
-				final float devLayerValueDiff = graphValueDiff * valueDiffScaling;
+				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
 
 				if (xValueIndex == startIndex) {
 
@@ -228,6 +230,26 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 			gc.drawPath(pathValueDiff);
+		}
+
+		/*
+		 * paint special points on the diff graph
+		 */
+		if (isSpecialPoints) {
+
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+			for (int pointIndex = 0; pointIndex < specialPoints[0].length; pointIndex++) {
+
+				final float graphSpX = specialPoints[0][pointIndex];
+				final float graphSpY = specialPoints[1][pointIndex] / measurementSystem;
+
+				final int devLayerSpX = (int) (graphSpX * scaleX);
+				final int devLayerSpY = (int) (graphSpY * scaleValueDiff);
+
+				gc.fillRectangle(devLayerSpX - 1, devYBottom - devLayerSpY - 1, 4, 4);
+			}
+
 		}
 
 		/*

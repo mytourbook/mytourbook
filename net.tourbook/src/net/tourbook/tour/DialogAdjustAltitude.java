@@ -16,6 +16,7 @@
 
 package net.tourbook.tour;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -23,6 +24,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
+import net.tourbook.math.CubicSpline;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -38,8 +40,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -65,6 +66,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private final IPreferenceStore		fPrefStore						= TourbookPlugin.getDefault()
 																				.getPreferenceStore();
+	private final NumberFormat			fNF								= NumberFormat.getNumberInstance();
 
 	private Image						fShellImage;
 
@@ -85,7 +87,31 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static AdjustmentType[]		fAllAdjustmentTypes;
 	private ArrayList<AdjustmentType>	fAvailableAdjustTypes			= new ArrayList<AdjustmentType>();
 
+	private Scale						fScaleSrmtMathVarX1;
+	private Scale						fScaleSrmtMathVarY1;
+	private Scale						fScaleSrmtMathVarX2;
+	private Scale						fScaleSrmtMathVarY2;
+	private Scale						fScaleSrmtMathVarXBorder;
+	private Scale						fScaleSrmtMathVarYBorder;
+
+	private Label						fLabelMathVarX1;
+	private Label						fLabelMathVarY1;
+	private Label						fLabelMathVarX2;
+	private Label						fLabelMathVarY2;
+	private Label						fLabelMathVarXBorder;
+	private Label						fLabelMathVarYBorder;
+
+	private float						fMathVarX1;
+	private float						fMathVarY1;
+	private float						fMathVarX2;
+	private float						fMathVarY2;
+	private float						fMathVarXBorder;
+	private float						fMathVarYBorder;
+
 	{
+		fNF.setMinimumFractionDigits(3);
+		fNF.setMaximumFractionDigits(3);
+
 		fAllAdjustmentTypes = new AdjustmentType[] {
 			new AdjustmentType(ADJUST_TYPE_UNTIL_LEFT_SLIDER, Messages.adjust_altitude_type_until_left_slider),
 			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, Messages.adjust_altitude_type_adjust_whole_tour),
@@ -136,17 +162,106 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return super.close();
 	}
 
+	/**
+	 * adjust start altitude until left slider
+	 */
+	private void computeAdjustTypeUntilLeftSlider() {
+
+		// srtm values must be available, otherwise this option is not available in the combo box
+
+		final int[] srtm2ndAlti = fTourData.dataSerie2ndAlti = fTourData.getSRTMSerieMetric();
+
+		final int serieLength = fTourData.timeSerie.length;
+
+		final int[] adjustedAlti = new int[serieLength];
+		final int[] diffTo2ndAlti = new int[serieLength];
+		final int sliderIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
+
+		final int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] distanceSerie = fTourData.distanceSerie;
+		final float sliderDistance = distanceSerie[sliderIndex];
+
+		// get altitude diff serie
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+			diffTo2ndAlti[serieIndex] = altitudeSerie[serieIndex] - srtm2ndAlti[serieIndex];
+		}
+		final float startAltiDiff = -diffTo2ndAlti[0];
+
+		/*
+		 * create spline values
+		 */
+		final int spPointLength = 6;
+		final double[] splineDistance = new double[spPointLength];
+		final double[] splineAltitude = new double[spPointLength];
+
+		final double xBorder = fMathVarXBorder / 1;
+		final double yBorder = fMathVarYBorder * 10;
+
+		splineDistance[0] = -1 - xBorder * sliderDistance / 2;
+		splineDistance[1] = 0;
+		splineDistance[2] = fMathVarY1 * sliderDistance;
+		splineDistance[3] = fMathVarY2 * sliderDistance;
+		splineDistance[4] = sliderDistance;
+		splineDistance[5] = 0.001 + sliderDistance + xBorder * sliderDistance / 2;
+
+		splineAltitude[0] = yBorder * startAltiDiff / 2;
+		splineAltitude[1] = 0;
+		splineAltitude[2] = fMathVarX1 * startAltiDiff;
+		splineAltitude[3] = fMathVarX2 * startAltiDiff;
+		splineAltitude[4] = 0;
+		splineAltitude[5] = yBorder * startAltiDiff / 2;
+
+		final int[][] splinePoints = fTourData.altiDiffSpecialPoints = new int[2][spPointLength];
+		for (int pointIndex = 0; pointIndex < spPointLength; pointIndex++) {
+			splinePoints[0][pointIndex] = (int) splineDistance[pointIndex]; // X-axis
+			splinePoints[1][pointIndex] = (int) splineAltitude[pointIndex]; // Y-axis
+
+			System.out.println("x:" + splinePoints[0][pointIndex] + "\ty:" + splinePoints[1][pointIndex]);
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+		System.out.println();
+// TODO remove SYSTEM.OUT.PRINTLN
+
+		final CubicSpline cubicSpline = new CubicSpline(splineDistance, splineAltitude);
+
+		// get adjusted altitude serie
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			if (serieIndex < sliderIndex) {
+
+				// add adjusted altitude
+
+				final float distance = distanceSerie[serieIndex];
+				final float distanceScale = 1 - distance / sliderDistance;
+
+				final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
+				final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
+
+//				final int splineAlti = (int) cubicSpline.interpolate(distance);
+				final int splineAlti = (int) cubicSpline.interpolate(distance);
+
+				adjustedAlti[serieIndex] = newAltitude - splineAlti;
+//				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - newAltitude + splineAlti;
+				diffTo2ndAlti[serieIndex] = splineAlti;
+
+			} else {
+
+				// set altitude which is not adjusted
+
+				adjustedAlti[serieIndex] = altitudeSerie[serieIndex];
+			}
+		}
+
+		fTourData.dataSerieAdjustedAlti = adjustedAlti;
+		fTourData.dataSerieDiffTo2ndAlti = diffTo2ndAlti;
+	}
+
 	@Override
 	protected void configureShell(final Shell shell) {
 
 		super.configureShell(shell);
 
 		shell.setText(Messages.adjust_altitude_dlg_shell_title);
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-//				fShellImage.dispose();
-			}
-		});
 	}
 
 	@Override
@@ -198,7 +313,110 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		createUIAdjustmentType(parent);
 		createUITourChart(parent);
+		createUIAdjustments(parent);
+	}
 
+	private void createUIAdjustments(final Composite parent) {
+
+		final Composite scaleContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(scaleContainer);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(scaleContainer);
+
+		/*
+		 * scale: math var X1
+		 */
+		fScaleSrmtMathVarX1 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarX1);
+		fScaleSrmtMathVarX1.setMaximum(100);
+		fScaleSrmtMathVarX1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarX1 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarX1);
+
+		/*
+		 * scale: math var Y1
+		 */
+		fScaleSrmtMathVarY1 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarY1);
+		fScaleSrmtMathVarY1.setMaximum(100);
+		fScaleSrmtMathVarY1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarY1 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarY1);
+
+		/*
+		 * scale: math var X2
+		 */
+		fScaleSrmtMathVarX2 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarX2);
+		fScaleSrmtMathVarX2.setMaximum(100);
+		fScaleSrmtMathVarX2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarX2 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarX2);
+
+		/*
+		 * scale: math var Y2
+		 */
+		fScaleSrmtMathVarY2 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarY2);
+		fScaleSrmtMathVarY2.setMaximum(100);
+		fScaleSrmtMathVarY2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarY2 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarY2);
+
+		/*
+		 * scale: math var X border
+		 */
+		fScaleSrmtMathVarXBorder = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarXBorder);
+		fScaleSrmtMathVarXBorder.setMaximum(100);
+		fScaleSrmtMathVarXBorder.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarXBorder = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarXBorder);
+
+		/*
+		 * scale: math var Y border
+		 */
+		fScaleSrmtMathVarYBorder = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarYBorder);
+		fScaleSrmtMathVarYBorder.setMaximum(100);
+		fScaleSrmtMathVarYBorder.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelMathVarYBorder = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarYBorder);
 	}
 
 	private void createUIAdjustmentType(final Composite parent) {
@@ -238,12 +456,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void createUITourChart(final Composite parent) {
 
-		fTourChart = new TourChart(parent, SWT.BORDER, false);
+		fTourChart = new TourChart(parent, SWT.BORDER, true);
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(fTourChart);
 
 		// hide the toolbar
-		fTourChart.setToolBarManager(null, false);
+//		fTourChart.setToolBarManager(null, false);
 
+		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 
 		// set altitude visible
@@ -281,6 +500,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
+	private void getValuesFromUI() {
+
+		fMathVarX1 = (float) fScaleSrmtMathVarX1.getSelection() / 100;
+		fMathVarY1 = (float) fScaleSrmtMathVarY1.getSelection() / 100;
+		fMathVarX2 = (float) fScaleSrmtMathVarX2.getSelection() / 100;
+		fMathVarY2 = (float) fScaleSrmtMathVarY2.getSelection() / 100;
+
+		fMathVarXBorder = (float) fScaleSrmtMathVarXBorder.getSelection() / 10;
+		fMathVarYBorder = (float) (fScaleSrmtMathVarYBorder.getSelection() - 50) / 10;
+	}
+
 	@Override
 	protected void okPressed() {
 
@@ -290,6 +520,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	}
 
 	private void onModifyProperties() {
+
+		getValuesFromUI();
 
 		// hide 2nd alti diff & adjustment
 		fTourData.dataSerieAdjustedAlti = null;
@@ -306,12 +538,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		switch (selectedAdjustType.id) {
 		case ADJUST_TYPE_UNTIL_LEFT_SLIDER:
-			setAdjustTypeUntilLeftSlider();
+			computeAdjustTypeUntilLeftSlider();
 			break;
 
 		default:
 			break;
 		}
+
+		updateUI();
 
 		fTourChart.update2ndAltiLayer(this, true);
 	}
@@ -378,59 +612,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fIsTourSaved = true;
 	}
 
-	/**
-	 * adjust start altitude until left slider
-	 */
-	private void setAdjustTypeUntilLeftSlider() {
-
-		// srtm values must be available, otherwise this option is not available in the combo box
-
-		final int[] srtm2ndAlti = fTourData.dataSerie2ndAlti = fTourData.getSRTMSerieMetric();
-
-		final int serieLength = fTourData.timeSerie.length;
-
-		final int[] adjustedAlti = new int[serieLength];
-		final int[] diffTo2ndAlti = new int[serieLength];
-		final int endIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
-
-		final int[] altitudeSerie = fTourData.altitudeSerie;
-		final int[] distanceSerie = fTourData.distanceSerie;
-		final float distanceDiff = distanceSerie[endIndex];
-
-		// get altitude diff serie
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-			diffTo2ndAlti[serieIndex] = altitudeSerie[serieIndex] - srtm2ndAlti[serieIndex];
-		}
-		final float startAltiDiff = -diffTo2ndAlti[0];
-
-		// get adjusted altitude serie
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			if (serieIndex < endIndex) {
-
-				// add adjusted altitude
-
-				final float targetDistance = distanceSerie[serieIndex];
-				final float distanceScale = 1 - targetDistance / distanceDiff;
-
-				final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
-				final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
-
-				adjustedAlti[serieIndex] = newAltitude;
-				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - newAltitude;
-
-			} else {
-
-				// set altitude which is not adjusted
-
-				adjustedAlti[serieIndex] = altitudeSerie[serieIndex];
-			}
-		}
-
-		fTourData.dataSerieAdjustedAlti = adjustedAlti;
-		fTourData.dataSerieDiffTo2ndAlti = diffTo2ndAlti;
-	}
-
 	private void updateTourChart() {
 
 		fIsChartUpdated = true;
@@ -438,6 +619,26 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, true);
 
 		fIsChartUpdated = false;
+	}
+
+	private void updateUI() {
+
+		fLabelMathVarX1.setText(fNF.format(fMathVarX1));
+		fLabelMathVarX1.pack(true);
+
+		fLabelMathVarY1.setText(fNF.format(fMathVarY1));
+		fLabelMathVarY1.pack(true);
+
+		fLabelMathVarX2.setText(fNF.format(fMathVarX2));
+		fLabelMathVarX2.pack(true);
+
+		fLabelMathVarY2.setText(fNF.format(fMathVarY2));
+		fLabelMathVarY2.pack(true);
+
+		fLabelMathVarXBorder.setText(fNF.format(fMathVarXBorder));
+		fLabelMathVarXBorder.pack(true);
+		fLabelMathVarYBorder.setText(fNF.format(fMathVarYBorder));
+		fLabelMathVarYBorder.pack(true);
 	}
 
 }

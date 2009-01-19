@@ -801,7 +801,7 @@ public class Chart extends ViewForm {
 		fChartContextProvider = chartContextProvider;
 	}
 
-	public void setDataModel(final ChartDataModel chartDataModel) {
+	protected void setDataModel(final ChartDataModel chartDataModel) {
 		fChartDataModel = chartDataModel;
 	}
 
