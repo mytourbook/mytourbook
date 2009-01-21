@@ -1,9 +1,15 @@
 package net.tourbook.tilefactory.srtm;
 
+import net.tourbook.colors.ColorDefinition;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.ext.srtm.ElevationSRTM3;
 import net.tourbook.ext.srtm.GeoLat;
 import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
+import net.tourbook.mapping.LegendColor;
+import net.tourbook.mapping.LegendConfig;
+import net.tourbook.mapping.LegendProvider;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -12,6 +18,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.map.DefaultTileFactory;
@@ -96,6 +103,13 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public ImageData[] paintTile(final Tile tile) {
 
+			final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+			final ColorDefinition colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_MAP_SRTM);
+			final LegendColor legendColor = colorDefinition.getNewLegendColor();
+
+			final LegendProvider legendProvider = new LegendProvider(new LegendConfig(), legendColor, -1);
+			legendProvider.setLegendColorValues(new Rectangle(0, 0, 20, 20), 300, 1800, UI.EMPTY_STRING);
+
 			final Display display = Display.getDefault();
 			final ImageData[] paintedImageData = new ImageData[1];
 
@@ -112,7 +126,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					final Image paintedImage = new Image(display, tileSize, tileSize);
 					final GC gc = new GC(paintedImage);
 
-					if (tileZoom >= 10) {
+					if (tileZoom >= 6) {
 
 						System.out.println(">>> Start painting tile (" + tileX + ", " + tileY + ", " + tileZoom + ")");
 
@@ -161,12 +175,16 @@ public class SRTMTileFactory extends DefaultTileFactory {
 									double elev = elevStart;
 									for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-										int elevInt = (int) (elev / 2) % 256;
+////										int elevInt = (int) (elev / 2) % 256;
+//										int elevInt = (int) (elev / 2000 * 256);
+//
+//										// range check
+//										elevInt = (elevInt < 0) ? -elevInt : elevInt;
+//										elevInt = elevInt > 0xff ? 0xff : elevInt;
+//
+////										final Color color = new Color(display, elevInt, elevInt, elevInt);
 
-										// range check
-										elevInt = (elevInt < 0) ? -elevInt : elevInt;
-
-										final Color color = new Color(display, elevInt, elevInt, elevInt);
+										final Color color = legendProvider.getValueColor((int) elev);
 
 										gc.setForeground(color);
 										gc.drawPoint(drawX, drawY);
