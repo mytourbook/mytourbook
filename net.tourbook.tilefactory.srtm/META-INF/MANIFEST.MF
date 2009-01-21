@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %PLUGIN_NAME
+Bundle-SymbolicName: net.tourbook.tilefactory.srtm;singleton:=true
+Bundle-Version: 9.02.0.v2009-0x-xx
+Bundle-Vendor: %PLUGIN_PROVIDER
+Bundle-Localization: plugin
+Require-Bundle: de.byteholder.geoclipse,
+ de.byteholder.gpx,
+ org.eclipse.core.runtime,
+ org.eclipse.swt,
+ net.tourbook.ext.srtm;bundle-version="9.4.0"
+Export-Package: net.tourbook.tilefactory.srtm
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
