@@ -46,9 +46,12 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Dialog to adjust the altitude, this dialog can be opened from within a tour chart or from the
@@ -87,29 +90,35 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static AdjustmentType[]		fAllAdjustmentTypes;
 	private ArrayList<AdjustmentType>	fAvailableAdjustTypes			= new ArrayList<AdjustmentType>();
 
-	private Scale						fScaleSrmtMathVarX1;
-	private Scale						fScaleSrmtMathVarY1;
-	private Scale						fScaleSrmtMathVarX2;
-	private Scale						fScaleSrmtMathVarY2;
-	private Scale						fScaleSrmtMathVarXBorder;
-	private Scale						fScaleSrmtMathVarYBorder;
+	private Scale						fScaleSrmtVarX1;
+	private Scale						fScaleSrmtVarY1;
+	private Scale						fScaleSrmtVarX1Border;
+	private Scale						fScaleSrmtVarY1Border;
+	private Scale						fScaleSrmtVarX2Border;
+	private Scale						fScaleSrmtVarY2Border;
 
-	private Label						fLabelMathVarX1;
-	private Label						fLabelMathVarY1;
-	private Label						fLabelMathVarX2;
-	private Label						fLabelMathVarY2;
-	private Label						fLabelMathVarXBorder;
-	private Label						fLabelMathVarYBorder;
+	private Label						fLabelVarX1;
+	private Label						fLabelVarY1;
+	private Label						fLabelVarX1Border;
+	private Label						fLabelVarY1Border;
+	private Label						fLabelVarX2Border;
+	private Label						fLabelVarY2Border;
 
-	private float						fMathVarX1;
-	private float						fMathVarY1;
-	private float						fMathVarX2;
-	private float						fMathVarY2;
-	private float						fMathVarXBorder;
-	private float						fMathVarYBorder;
+	private float						fVarX1;
+	private float						fVarY1;
+	private float						fVarX1Border;
+	private float						fVarY1Border;
+	private float						fVarX2Border;
+	private float						fVarY2Border;
+	private float						fUIVarX1;
+	private float						fUIVarY1;
+	private float						fUIVarX2Border;
+	private float						fUIVarY2Border;
+	private float						fUIVarX1Border;
+	private float						fUIVarY1Border;
 
 	{
-		fNF.setMinimumFractionDigits(3);
+		fNF.setMinimumFractionDigits(0);
 		fNF.setMaximumFractionDigits(3);
 
 		fAllAdjustmentTypes = new AdjustmentType[] {
@@ -194,22 +203,26 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final double[] splineDistance = new double[spPointLength];
 		final double[] splineAltitude = new double[spPointLength];
 
-		final double xBorder = fMathVarXBorder / 1;
-		final double yBorder = fMathVarYBorder * 10;
+		fUIVarX1 = fVarX1 * sliderDistance;
+		fUIVarY1 = fVarY1 * startAltiDiff;
 
-		splineDistance[0] = -1 - xBorder * sliderDistance / 2;
+		fUIVarX1Border = -0.1f - fVarX1Border * sliderDistance;
+		fUIVarX2Border = 0.1f + fVarX2Border * sliderDistance;
+
+		fUIVarY1Border = -0.1f - fVarY1Border * startAltiDiff * 2;
+		fUIVarY2Border = 0.1f + fVarY2Border * startAltiDiff * 2;
+
+		splineDistance[0] = fUIVarX1Border;
 		splineDistance[1] = 0;
-		splineDistance[2] = fMathVarY1 * sliderDistance;
-		splineDistance[3] = fMathVarY2 * sliderDistance;
+		splineDistance[2] = fUIVarX1;
 		splineDistance[4] = sliderDistance;
-		splineDistance[5] = 0.001 + sliderDistance + xBorder * sliderDistance / 2;
+		splineDistance[5] = sliderDistance + fUIVarX2Border;
 
-		splineAltitude[0] = yBorder * startAltiDiff / 2;
+		splineAltitude[0] = fUIVarY1Border;
 		splineAltitude[1] = 0;
-		splineAltitude[2] = fMathVarX1 * startAltiDiff;
-		splineAltitude[3] = fMathVarX2 * startAltiDiff;
+		splineAltitude[2] = fUIVarY1;
 		splineAltitude[4] = 0;
-		splineAltitude[5] = yBorder * startAltiDiff / 2;
+		splineAltitude[5] = fUIVarY2Border;
 
 		final int[][] splinePoints = fTourData.altiDiffSpecialPoints = new int[2][spPointLength];
 		for (int pointIndex = 0; pointIndex < spPointLength; pointIndex++) {
@@ -323,100 +336,112 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(scaleContainer);
 
 		/*
-		 * scale: math var X1
+		 * scale: math var X1 border
 		 */
-		fScaleSrmtMathVarX1 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarX1);
-		fScaleSrmtMathVarX1.setMaximum(100);
-		fScaleSrmtMathVarX1.addSelectionListener(new SelectionAdapter() {
+		fScaleSrmtVarX1Border = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarX1Border);
+		fScaleSrmtVarX1Border.setMaximum(100);
+		fScaleSrmtVarX1Border.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
 			}
 		});
 
-		fLabelMathVarX1 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarX1);
+		fLabelVarX1Border = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarX1Border);
+
+		/*
+		 * scale: math var Y1 border
+		 */
+		fScaleSrmtVarY1Border = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarY1Border);
+		fScaleSrmtVarY1Border.setMaximum(100);
+		fScaleSrmtVarY1Border.setSelection(50);
+		fScaleSrmtVarY1Border.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+		fScaleSrmtVarY1Border.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
+			}
+		});
+
+		fLabelVarY1Border = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarY1Border);
+
+		/*
+		 * scale: math var X1
+		 */
+		fScaleSrmtVarX1 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarX1);
+		fScaleSrmtVarX1.setMaximum(100);
+		fScaleSrmtVarX1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModifyProperties();
+			}
+		});
+
+		fLabelVarX1 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarX1);
 
 		/*
 		 * scale: math var Y1
 		 */
-		fScaleSrmtMathVarY1 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarY1);
-		fScaleSrmtMathVarY1.setMaximum(100);
-		fScaleSrmtMathVarY1.addSelectionListener(new SelectionAdapter() {
+		fScaleSrmtVarY1 = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarY1);
+		fScaleSrmtVarY1.setMaximum(100);
+		fScaleSrmtVarY1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
 			}
 		});
 
-		fLabelMathVarY1 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarY1);
+		fLabelVarY1 = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarY1);
 
 		/*
-		 * scale: math var X2
+		 * scale: math var X2 border
 		 */
-		fScaleSrmtMathVarX2 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarX2);
-		fScaleSrmtMathVarX2.setMaximum(100);
-		fScaleSrmtMathVarX2.addSelectionListener(new SelectionAdapter() {
+		fScaleSrmtVarX2Border = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarX2Border);
+		fScaleSrmtVarX2Border.setMaximum(100);
+		fScaleSrmtVarX2Border.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
 			}
 		});
 
-		fLabelMathVarX2 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarX2);
+		fLabelVarX2Border = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarX2Border);
 
 		/*
-		 * scale: math var Y2
+		 * scale: math var Y2 border
 		 */
-		fScaleSrmtMathVarY2 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarY2);
-		fScaleSrmtMathVarY2.setMaximum(100);
-		fScaleSrmtMathVarY2.addSelectionListener(new SelectionAdapter() {
+		fScaleSrmtVarY2Border = new Scale(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarY2Border);
+		fScaleSrmtVarY2Border.setMaximum(100);
+		fScaleSrmtVarY2Border.setSelection(50);
+		fScaleSrmtVarY2Border.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
 			}
 		});
-
-		fLabelMathVarY2 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarY2);
-
-		/*
-		 * scale: math var X border
-		 */
-		fScaleSrmtMathVarXBorder = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarXBorder);
-		fScaleSrmtMathVarXBorder.setMaximum(100);
-		fScaleSrmtMathVarXBorder.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
+		fScaleSrmtVarY2Border.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
 			}
 		});
 
-		fLabelMathVarXBorder = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarXBorder);
-
-		/*
-		 * scale: math var Y border
-		 */
-		fScaleSrmtMathVarYBorder = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtMathVarYBorder);
-		fScaleSrmtMathVarYBorder.setMaximum(100);
-		fScaleSrmtMathVarYBorder.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-
-		fLabelMathVarYBorder = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelMathVarYBorder);
+		fLabelVarY2Border = new Label(scaleContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarY2Border);
 	}
 
 	private void createUIAdjustmentType(final Composite parent) {
@@ -502,13 +527,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void getValuesFromUI() {
 
-		fMathVarX1 = (float) fScaleSrmtMathVarX1.getSelection() / 100;
-		fMathVarY1 = (float) fScaleSrmtMathVarY1.getSelection() / 100;
-		fMathVarX2 = (float) fScaleSrmtMathVarX2.getSelection() / 100;
-		fMathVarY2 = (float) fScaleSrmtMathVarY2.getSelection() / 100;
+		fVarX1 = (float) fScaleSrmtVarX1.getSelection() / 100;
+		fVarY1 = (float) fScaleSrmtVarY1.getSelection() / 100;
 
-		fMathVarXBorder = (float) fScaleSrmtMathVarXBorder.getSelection() / 10;
-		fMathVarYBorder = (float) (fScaleSrmtMathVarYBorder.getSelection() - 50) / 10;
+		fVarX1Border = (float) fScaleSrmtVarX1Border.getSelection() / 100;
+		fVarY1Border = (float) (fScaleSrmtVarY1Border.getSelection() - 50) / 10;
+		fVarX2Border = (float) fScaleSrmtVarX2Border.getSelection() / 100;
+		fVarY2Border = (float) (fScaleSrmtVarY2Border.getSelection() - 50) / 10;
 	}
 
 	@Override
@@ -548,6 +573,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateUI();
 
 		fTourChart.update2ndAltiLayer(this, true);
+	}
+
+	private void onScaleDoubleClick(final Widget widget) {
+
+		final Scale scale = (Scale) widget;
+		final int max = scale.getMaximum();
+
+		scale.setSelection(max / 2);
+
+		onModifyProperties();
 	}
 
 	/**
@@ -623,22 +658,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void updateUI() {
 
-		fLabelMathVarX1.setText(fNF.format(fMathVarX1));
-		fLabelMathVarX1.pack(true);
+		fLabelVarX1.setText(Integer.toString((int) fUIVarX1));
+		fLabelVarX1.pack(true);
+		fLabelVarY1.setText(Integer.toString((int) fUIVarY1));
+		fLabelVarY1.pack(true);
 
-		fLabelMathVarY1.setText(fNF.format(fMathVarY1));
-		fLabelMathVarY1.pack(true);
+		fLabelVarX1Border.setText(Integer.toString((int) fUIVarX1Border));
+		fLabelVarX1Border.pack(true);
+		fLabelVarY1Border.setText(Integer.toString((int) fUIVarY1Border));
+		fLabelVarY1Border.pack(true);
 
-		fLabelMathVarX2.setText(fNF.format(fMathVarX2));
-		fLabelMathVarX2.pack(true);
-
-		fLabelMathVarY2.setText(fNF.format(fMathVarY2));
-		fLabelMathVarY2.pack(true);
-
-		fLabelMathVarXBorder.setText(fNF.format(fMathVarXBorder));
-		fLabelMathVarXBorder.pack(true);
-		fLabelMathVarYBorder.setText(fNF.format(fMathVarYBorder));
-		fLabelMathVarYBorder.pack(true);
+		fLabelVarX2Border.setText(Integer.toString((int) fUIVarX2Border));
+		fLabelVarX2Border.pack(true);
+		fLabelVarY2Border.setText(Integer.toString((int) fUIVarY2Border));
+		fLabelVarY2Border.pack(true);
 	}
 
 }
