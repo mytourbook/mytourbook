@@ -59,7 +59,6 @@ public class GraphColorProvider {
 	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
 	public static final String				PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_MAP_SRTM			= "srtm";				//$NON-NLS-1$
 
 	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
 	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$ 
@@ -144,7 +143,9 @@ public class GraphColorProvider {
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				8);
+																				8)
+
+																		;
 
 	private static final LegendColor		LEGEND_COLOR_SPEED			= new LegendColor(new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
@@ -156,17 +157,6 @@ public class GraphColorProvider {
 																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				8);
-
-	private static final LegendColor		LEGEND_COLOR_SRTM			= new LegendColor(new ValueColor[] {
-			new ValueColor(10, 161, 85, 0),
-			new ValueColor(50, 232, 169, 0),
-			new ValueColor(100, 0, 241, 0),
-			new ValueColor(150, 0, 154, 255),
-			new ValueColor(190, 144, 219, 255)							},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				10,
-																				LegendColor.BRIGHTNESS_LIGHTNING,
-																				10);
 
 	/**
 	 * 
@@ -249,62 +239,24 @@ public class GraphColorProvider {
 					new RGB(239, 167, 16),
 					new RGB(203, 141, 14),
 					null),
-
 			new ColorDefinition(PREF_GRAPH_TIME,//
 					Messages.Graph_Pref_color_statistic_time,
 					new RGB(255, 255, 255),
 					new RGB(187, 187, 140),
 					new RGB(170, 170, 127),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_MAP_SRTM, //
-					Messages.Graph_Label_Tour_SRTM,
-					new RGB(255, 255, 255),
-					new RGB(255, 255, 255),
-					new RGB(255, 255, 255),
-					LEGEND_COLOR_SRTM)
-																		//
-																		};
+					null)												};
 
 	private static GraphColorProvider		instance;
 
 	private ColorDefinition[]				fGraphColorDefinitions;
+
+	public GraphColorProvider() {}
 
 	public static GraphColorProvider getInstance() {
 		if (instance == null) {
 			instance = new GraphColorProvider();
 		}
 		return instance;
-	}
-
-	private static void getLegendColorXML(	final LegendColor legendColor,
-											final IMemento xmlMemento,
-											final String prefName) {
-
-		final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
-		mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, prefName);
-
-		for (final ValueColor valueColor : legendColor.valueColors) {
-
-			final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
-
-			mementoValueColor.putInteger(TAG_VALUE_COLOR_VALUE, valueColor.value);
-			mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
-			mementoValueColor.putInteger(TAG_VALUE_COLOR_GREEN, valueColor.green);
-			mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
-		}
-
-		final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
-		mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, legendColor.minBrightness);
-		mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, legendColor.minBrightnessFactor);
-		mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, legendColor.maxBrightness);
-		mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, legendColor.maxBrightnessFactor);
-
-		final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
-		mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, legendColor.isMinValueOverwrite ? 1 : 0);
-		mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, legendColor.overwriteMinValue);
-		mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, legendColor.isMaxValueOverwrite ? 1 : 0);
-		mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, legendColor.overwriteMaxValue);
 	}
 
 	private static XMLMemento getXMLMementoRoot() {
@@ -347,7 +299,30 @@ public class GraphColorProvider {
 					continue;
 				}
 
-				getLegendColorXML(legendColor, xmlMemento, graphDefinition.getPrefName());
+				final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
+				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getPrefName());
+
+				for (final ValueColor valueColor : legendColor.valueColors) {
+
+					final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
+
+					mementoValueColor.putInteger(TAG_VALUE_COLOR_VALUE, valueColor.value);
+					mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
+					mementoValueColor.putInteger(TAG_VALUE_COLOR_GREEN, valueColor.green);
+					mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
+				}
+
+				final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, legendColor.minBrightness);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, legendColor.minBrightnessFactor);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, legendColor.maxBrightness);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, legendColor.maxBrightnessFactor);
+
+				final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
+				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, legendColor.isMinValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, legendColor.overwriteMinValue);
+				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, legendColor.isMaxValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, legendColor.overwriteMaxValue);
 			}
 
 			xmlMemento.save(writer);
@@ -364,8 +339,6 @@ public class GraphColorProvider {
 			}
 		}
 	}
-
-	public GraphColorProvider() {}
 
 	/**
 	 * @param preferenceName
@@ -445,7 +418,79 @@ public class GraphColorProvider {
 					continue;
 				}
 
-				final LegendColor legendColor = readLegendColorXML(mementoLegendColor, mementoValueColors);
+				final LegendColor legendColor = new LegendColor();
+
+				/*
+				 * value colors
+				 */
+				final ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
+
+				// loop: all value colors
+				for (final IMemento mementoValueColor : mementoValueColors) {
+
+					final Integer value = mementoValueColor.getInteger(TAG_VALUE_COLOR_VALUE);
+					final Integer red = mementoValueColor.getInteger(TAG_VALUE_COLOR_RED);
+					final Integer green = mementoValueColor.getInteger(TAG_VALUE_COLOR_GREEN);
+					final Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);
+
+					if (value != null && red != null && green != null && blue != null) {
+						valueColors.add(new ValueColor(value, red, green, blue));
+					}
+				}
+				legendColor.valueColors = valueColors.toArray(new ValueColor[valueColors.size()]);
+
+				/*
+				 * min/max brightness
+				 */
+				final IMemento[] mementoBrightness = mementoLegendColor.getChildren(MEMENTO_CHILD_BRIGHTNESS);
+				if (mementoBrightness.length > 0) {
+
+					final IMemento mementoBrightness0 = mementoBrightness[0];
+
+					final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
+					if (minBrightness != null) {
+						legendColor.minBrightness = minBrightness;
+					}
+					final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
+					if (minBrightness != null) {
+						legendColor.minBrightnessFactor = minBrightnessFactor;
+					}
+					final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
+					if (maxBrightness != null) {
+						legendColor.maxBrightness = maxBrightness;
+					}
+					final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
+					if (minBrightness != null) {
+						legendColor.maxBrightnessFactor = maxBrightnessFactor;
+					}
+				}
+
+				/*
+				 * min/max overwrite
+				 */
+				final IMemento[] mementoMinMaxValue = mementoLegendColor.getChildren(MEMENTO_CHILD_MIN_MAX_VALUE);
+				if (mementoMinMaxValue.length > 0) {
+
+					final IMemento mementoMinMaxValue0 = mementoMinMaxValue[0];
+
+					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
+					if (isMinOverwrite != null) {
+						legendColor.isMinValueOverwrite = isMinOverwrite == 1;
+					}
+					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
+					if (minValue != null) {
+						legendColor.overwriteMinValue = minValue;
+					}
+
+					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
+					if (isMaxOverwrite != null) {
+						legendColor.isMaxValueOverwrite = isMaxOverwrite == 1;
+					}
+					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
+					if (maxValue != null) {
+						legendColor.overwriteMaxValue = maxValue;
+					}
+				}
 
 				/*
 				 * update color definition with the read data
@@ -479,85 +524,6 @@ public class GraphColorProvider {
 				}
 			}
 		}
-	}
-
-	private LegendColor readLegendColorXML(final IMemento mementoLegendColor, final IMemento[] mementoValueColors) {
-
-		final LegendColor legendColor = new LegendColor();
-
-		/*
-		 * value colors
-		 */
-		final ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
-
-		// loop: all value colors
-		for (final IMemento mementoValueColor : mementoValueColors) {
-
-			final Integer value = mementoValueColor.getInteger(TAG_VALUE_COLOR_VALUE);
-			final Integer red = mementoValueColor.getInteger(TAG_VALUE_COLOR_RED);
-			final Integer green = mementoValueColor.getInteger(TAG_VALUE_COLOR_GREEN);
-			final Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);
-
-			if (value != null && red != null && green != null && blue != null) {
-				valueColors.add(new ValueColor(value, red, green, blue));
-			}
-		}
-		legendColor.valueColors = valueColors.toArray(new ValueColor[valueColors.size()]);
-
-		/*
-		 * min/max brightness
-		 */
-		final IMemento[] mementoBrightness = mementoLegendColor.getChildren(MEMENTO_CHILD_BRIGHTNESS);
-		if (mementoBrightness.length > 0) {
-
-			final IMemento mementoBrightness0 = mementoBrightness[0];
-
-			final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
-			if (minBrightness != null) {
-				legendColor.minBrightness = minBrightness;
-			}
-			final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
-			if (minBrightness != null) {
-				legendColor.minBrightnessFactor = minBrightnessFactor;
-			}
-			final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
-			if (maxBrightness != null) {
-				legendColor.maxBrightness = maxBrightness;
-			}
-			final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
-			if (minBrightness != null) {
-				legendColor.maxBrightnessFactor = maxBrightnessFactor;
-			}
-		}
-
-		/*
-		 * min/max overwrite
-		 */
-		final IMemento[] mementoMinMaxValue = mementoLegendColor.getChildren(MEMENTO_CHILD_MIN_MAX_VALUE);
-		if (mementoMinMaxValue.length > 0) {
-
-			final IMemento mementoMinMaxValue0 = mementoMinMaxValue[0];
-
-			final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
-			if (isMinOverwrite != null) {
-				legendColor.isMinValueOverwrite = isMinOverwrite == 1;
-			}
-			final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
-			if (minValue != null) {
-				legendColor.overwriteMinValue = minValue;
-			}
-
-			final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
-			if (isMaxOverwrite != null) {
-				legendColor.isMaxValueOverwrite = isMaxOverwrite == 1;
-			}
-			final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
-			if (maxValue != null) {
-				legendColor.overwriteMaxValue = maxValue;
-			}
-		}
-
-		return legendColor;
 	}
 
 	/**
