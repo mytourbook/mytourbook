@@ -233,15 +233,15 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint special points on the diff graph
 		 */
-		final int[][] specialPoints = fTourData.altiDiffSpecialPoints;
+		final double[][] specialPoints = fTourData.altiDiffSpecialPoints;
 		if (specialPoints != null) {
 
 			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 			for (int pointIndex = 0; pointIndex < specialPoints[0].length; pointIndex++) {
 
-				final float graphSpX = specialPoints[0][pointIndex] - graphXValueOffset;
-				final float graphSpY = specialPoints[1][pointIndex] / measurementSystem;
+				final double graphSpX = specialPoints[0][pointIndex] - graphXValueOffset;
+				final double graphSpY = specialPoints[1][pointIndex] / measurementSystem;
 
 				final int devLayerSpX = (int) (graphSpX * scaleX);
 				final int devLayerSpY = (int) (graphSpY * scaleValueDiff);
@@ -268,11 +268,11 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				final float graphY = ySplineSerie[xIndex] / measurementSystem;
 
 				final int devX = (int) (graphX * scaleX);
-				int devY = (int) (graphY * scaleY);
+				final int devY = (int) (graphY * scaleY);
 
-				if (devY < 0) {
-					devY = -devY;
-				}
+//				if (devY < 0) {
+//					devY = -devY;
+//				}
 
 				if (!(devX == devPrevX && devY == devPrevY)) {
 					gc.drawLine(devPrevX, devYBottom - devPrevY, devX, devYBottom - devY);

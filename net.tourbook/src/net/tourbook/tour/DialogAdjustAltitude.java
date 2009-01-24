@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.SplineGraph;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.TourChart;
@@ -116,6 +117,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private float						fUIVarY2Border;
 	private float						fUIVarX1Border;
 	private float						fUIVarY1Border;
+	private SplineGraph					fSpline;
 
 	{
 		fNF.setMinimumFractionDigits(0);
@@ -182,7 +184,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final int serieLength = fTourData.timeSerie.length;
 
-		final int[] adjustedAlti = new int[serieLength];
+		final int[] adjustedAltiSerie = new int[serieLength];
 		final int[] diffTo2ndAlti = new int[serieLength];
 		final int[] spline = new int[serieLength];
 		final int sliderIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
@@ -210,8 +212,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fUIVarX1Border = -0.1f - fVarX1Border * sliderDistance;
 		fUIVarX2Border = 0.1f + fVarX2Border * sliderDistance;
 
-		fUIVarY1Border = 0.1f + fVarY1Border * startAltiDiff * 1;
-		fUIVarY2Border = 0.1f + fVarY2Border * startAltiDiff * 1;
+		fUIVarY1Border = 0.0f + fVarY1Border * startAltiDiff * 1;
+		fUIVarY2Border = 0.0f + fVarY2Border * startAltiDiff * 1;
 
 		splineDistance[0] = fUIVarX1Border;
 		splineDistance[1] = 0;
@@ -219,16 +221,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		splineDistance[3] = sliderDistance;
 		splineDistance[4] = sliderDistance + fUIVarX2Border;
 
-		splineAltitude[0] = fUIVarY1Border;
+		splineAltitude[0] = -fUIVarY1Border;
 		splineAltitude[1] = 0;
-		splineAltitude[2] = fUIVarY1;
+		splineAltitude[2] = -fUIVarY1;
 		splineAltitude[3] = 0;
-		splineAltitude[4] = fUIVarY2Border;
+		splineAltitude[4] = -fUIVarY2Border;
 
-		final int[][] splinePoints = fTourData.altiDiffSpecialPoints = new int[2][spPointLength];
+		final double[][] splinePoints = fTourData.altiDiffSpecialPoints = new double[2][spPointLength];
 		for (int pointIndex = 0; pointIndex < spPointLength; pointIndex++) {
-			splinePoints[0][pointIndex] = (int) splineDistance[pointIndex]; // X-axis
-			splinePoints[1][pointIndex] = (int) splineAltitude[pointIndex]; // Y-axis
+			splinePoints[0][pointIndex] = splineDistance[pointIndex]; // X-axis
+			splinePoints[1][pointIndex] = splineAltitude[pointIndex]; // Y-axis
 
 			System.out.println("x:" + splinePoints[0][pointIndex] + "\ty:" + splinePoints[1][pointIndex]);
 			// TODO remove SYSTEM.OUT.PRINTLN
@@ -253,19 +255,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 				final int splineAlti = (int) cubicSpline.interpolate(distance);
 
-				adjustedAlti[serieIndex] = newAltitude - splineAlti;
-				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - newAltitude + splineAlti;
+				final int adjustedAlti = newAltitude + splineAlti;
+				adjustedAltiSerie[serieIndex] = adjustedAlti;
+				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - adjustedAlti;
 				spline[serieIndex] = splineAlti;
 
 			} else {
 
 				// set altitude which is not adjusted
 
-				adjustedAlti[serieIndex] = altitudeSerie[serieIndex];
+				adjustedAltiSerie[serieIndex] = altitudeSerie[serieIndex];
 			}
 		}
 
-		fTourData.dataSerieAdjustedAlti = adjustedAlti;
+		fTourData.dataSerieAdjustedAlti = adjustedAltiSerie;
 		fTourData.dataSerieDiffTo2ndAlti = diffTo2ndAlti;
 		fTourData.dataSerieSpline = spline;
 	}
@@ -334,7 +337,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		createUIAdjustmentType(parent);
 		createUITourChart(parent);
-		createUIAdjustments(parent);
+
+		final Composite splineContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(splineContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(splineContainer);
+
+		createUISpline(splineContainer);
+		createUIAdjustments(splineContainer);
 	}
 
 	private void createUIAdjustments(final Composite parent) {
@@ -508,6 +517,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
+	private void createUISpline(final Composite parent) {
+
+		fSpline = new SplineGraph(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.hint(300, 200)
+				.applyTo(fSpline);
+	}
+
 	private void createUITourChart(final Composite parent) {
 
 		fTourChart = new TourChart(parent, SWT.BORDER, true);
@@ -557,13 +575,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private void getValuesFromUI() {
 
 		fVarX1Border = (float) fScaleSrmtVarX1Border.getSelection() / 100;
-		fVarY1Border = -(float) (fScaleSrmtVarY1Border.getSelection() - 50) / 10;
+		fVarY1Border = (float) (fScaleSrmtVarY1Border.getSelection() - 50) / 10;
 
 		fVarX1 = (float) fScaleSrmtVarX1.getSelection() / 100;
-		fVarY1 = -(float) (fScaleSrmtVarY1.getSelection() - 50) / 100;
+		fVarY1 = (float) (fScaleSrmtVarY1.getSelection() - 50) / 100;
 
 		fVarX2Border = (float) fScaleSrmtVarX2Border.getSelection() / 100;
-		fVarY2Border = -(float) (fScaleSrmtVarY2Border.getSelection() - 50) / 10;
+		fVarY2Border = (float) (fScaleSrmtVarY2Border.getSelection() - 50) / 10;
 	}
 
 	@Override
@@ -603,6 +621,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateUI();
 
 		fTourChart.update2ndAltiLayer(this, true);
+		fSpline.updateValues(fTourData.altiDiffSpecialPoints);
 	}
 
 	private void onScaleDoubleClick(final Widget widget) {
@@ -690,17 +709,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		fLabelVarX1.setText(Integer.toString((int) fUIVarX1));
 		fLabelVarX1.pack(true);
-		fLabelVarY1.setText(Integer.toString((int) fUIVarY1));
+		fLabelVarY1.setText(Integer.toString((int) -fUIVarY1));
 		fLabelVarY1.pack(true);
 
 		fLabelVarX1Border.setText(Integer.toString((int) fUIVarX1Border));
 		fLabelVarX1Border.pack(true);
-		fLabelVarY1Border.setText(Integer.toString((int) fUIVarY1Border));
+		fLabelVarY1Border.setText(Integer.toString((int) -fUIVarY1Border));
 		fLabelVarY1Border.pack(true);
 
 		fLabelVarX2Border.setText(Integer.toString((int) fUIVarX2Border));
 		fLabelVarX2Border.pack(true);
-		fLabelVarY2Border.setText(Integer.toString((int) fUIVarY2Border));
+		fLabelVarY2Border.setText(Integer.toString((int) -fUIVarY2Border));
 		fLabelVarY2Border.pack(true);
 	}
 
