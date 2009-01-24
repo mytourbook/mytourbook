@@ -184,6 +184,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final int[] adjustedAlti = new int[serieLength];
 		final int[] diffTo2ndAlti = new int[serieLength];
+		final int[] spline = new int[serieLength];
 		final int sliderIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
 
 		final int[] altitudeSerie = fTourData.altitudeSerie;
@@ -199,30 +200,30 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		/*
 		 * create spline values
 		 */
-		final int spPointLength = 6;
+		final int spPointLength = 5;
 		final double[] splineDistance = new double[spPointLength];
 		final double[] splineAltitude = new double[spPointLength];
 
 		fUIVarX1 = fVarX1 * sliderDistance;
-		fUIVarY1 = fVarY1 * startAltiDiff;
+		fUIVarY1 = fVarY1 * startAltiDiff * 1;
 
 		fUIVarX1Border = -0.1f - fVarX1Border * sliderDistance;
 		fUIVarX2Border = 0.1f + fVarX2Border * sliderDistance;
 
-		fUIVarY1Border = -0.1f - fVarY1Border * startAltiDiff * 2;
-		fUIVarY2Border = 0.1f + fVarY2Border * startAltiDiff * 2;
+		fUIVarY1Border = 0.1f + fVarY1Border * startAltiDiff * 1;
+		fUIVarY2Border = 0.1f + fVarY2Border * startAltiDiff * 1;
 
 		splineDistance[0] = fUIVarX1Border;
 		splineDistance[1] = 0;
 		splineDistance[2] = fUIVarX1;
-		splineDistance[4] = sliderDistance;
-		splineDistance[5] = sliderDistance + fUIVarX2Border;
+		splineDistance[3] = sliderDistance;
+		splineDistance[4] = sliderDistance + fUIVarX2Border;
 
 		splineAltitude[0] = fUIVarY1Border;
 		splineAltitude[1] = 0;
 		splineAltitude[2] = fUIVarY1;
-		splineAltitude[4] = 0;
-		splineAltitude[5] = fUIVarY2Border;
+		splineAltitude[3] = 0;
+		splineAltitude[4] = fUIVarY2Border;
 
 		final int[][] splinePoints = fTourData.altiDiffSpecialPoints = new int[2][spPointLength];
 		for (int pointIndex = 0; pointIndex < spPointLength; pointIndex++) {
@@ -250,12 +251,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
 				final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
-//				final int splineAlti = (int) cubicSpline.interpolate(distance);
 				final int splineAlti = (int) cubicSpline.interpolate(distance);
 
 				adjustedAlti[serieIndex] = newAltitude - splineAlti;
-//				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - newAltitude + splineAlti;
-				diffTo2ndAlti[serieIndex] = splineAlti;
+				diffTo2ndAlti[serieIndex] = srtm2ndAlti[serieIndex] - newAltitude + splineAlti;
+				spline[serieIndex] = splineAlti;
 
 			} else {
 
@@ -267,6 +267,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		fTourData.dataSerieAdjustedAlti = adjustedAlti;
 		fTourData.dataSerieDiffTo2ndAlti = diffTo2ndAlti;
+		fTourData.dataSerieSpline = spline;
 	}
 
 	@Override
@@ -319,6 +320,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		createUI(container);
 
+		// initialize scale, remove it from the same position as the next spline position
+		fScaleSrmtVarX1Border.setSelection(50);
+		fScaleSrmtVarX2Border.setSelection(50);
+
+		fScaleSrmtVarX1.setSelection(50);
+		fScaleSrmtVarY1.setSelection(50);
+
 		return fDialogContainer;
 	}
 
@@ -345,6 +353,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
+			}
+		});
+		fScaleSrmtVarX1Border.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
 			}
 		});
 
@@ -385,6 +398,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				onModifyProperties();
 			}
 		});
+		fScaleSrmtVarX1.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
+			}
+		});
 
 		fLabelVarX1 = new Label(scaleContainer, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelVarX1);
@@ -395,10 +413,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fScaleSrmtVarY1 = new Scale(scaleContainer, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleSrmtVarY1);
 		fScaleSrmtVarY1.setMaximum(100);
+		fScaleSrmtVarY1.setSelection(50);
 		fScaleSrmtVarY1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
+			}
+		});
+		fScaleSrmtVarY1.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
 			}
 		});
 
@@ -415,6 +439,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onModifyProperties();
+			}
+		});
+		fScaleSrmtVarX2Border.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(final Event event) {
+				onScaleDoubleClick(event.widget);
 			}
 		});
 
@@ -527,13 +556,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void getValuesFromUI() {
 
-		fVarX1 = (float) fScaleSrmtVarX1.getSelection() / 100;
-		fVarY1 = (float) fScaleSrmtVarY1.getSelection() / 100;
-
 		fVarX1Border = (float) fScaleSrmtVarX1Border.getSelection() / 100;
-		fVarY1Border = (float) (fScaleSrmtVarY1Border.getSelection() - 50) / 10;
+		fVarY1Border = -(float) (fScaleSrmtVarY1Border.getSelection() - 50) / 10;
+
+		fVarX1 = (float) fScaleSrmtVarX1.getSelection() / 100;
+		fVarY1 = -(float) (fScaleSrmtVarY1.getSelection() - 50) / 100;
+
 		fVarX2Border = (float) fScaleSrmtVarX2Border.getSelection() / 100;
-		fVarY2Border = (float) (fScaleSrmtVarY2Border.getSelection() - 50) / 10;
+		fVarY2Border = -(float) (fScaleSrmtVarY2Border.getSelection() - 50) / 10;
 	}
 
 	@Override

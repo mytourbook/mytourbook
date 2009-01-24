@@ -57,11 +57,9 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int[] yValues2ndSerie = fTourData.dataSerie2ndAlti;
 		final int[] yDiffTo2ndSerie = fTourData.dataSerieDiffTo2ndAlti;
 		final int[] yAdjustedSerie = fTourData.dataSerieAdjustedAlti;
-		final int[][] specialPoints = fTourData.altiDiffSpecialPoints;
 
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
-		final boolean isSpecialPoints = specialPoints != null;
 
 		if (xValues == null || xValues.length == 0 || yValues2ndSerie == null || yValues2ndSerie.length == 0) {
 			return;
@@ -73,7 +71,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final float scaleY = drawingData.getScaleY();
 
 		// get the horizontal offset for the graph
-		final int graphValueOffset = (int) (Math.max(0, chart.getDevGraphImageXOffset()) / scaleX);
+		final int graphXValueOffset = (int) (Math.max(0, chart.getDevGraphImageXOffset()) / scaleX);
 
 		final Display display = Display.getCurrent();
 
@@ -133,7 +131,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				return;
 			}
 
-			final int graphXValue = xValues[xValueIndex] - graphValueOffset;
+			final int graphXValue = xValues[xValueIndex] - graphXValueOffset;
 			final int graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
 
 			final float devXValue = graphXValue * scaleX;
@@ -235,19 +233,53 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint special points on the diff graph
 		 */
-		if (isSpecialPoints) {
+		final int[][] specialPoints = fTourData.altiDiffSpecialPoints;
+		if (specialPoints != null) {
 
 			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 			for (int pointIndex = 0; pointIndex < specialPoints[0].length; pointIndex++) {
 
-				final float graphSpX = specialPoints[0][pointIndex];
+				final float graphSpX = specialPoints[0][pointIndex] - graphXValueOffset;
 				final float graphSpY = specialPoints[1][pointIndex] / measurementSystem;
 
 				final int devLayerSpX = (int) (graphSpX * scaleX);
 				final int devLayerSpY = (int) (graphSpY * scaleValueDiff);
 
 				gc.fillRectangle(devLayerSpX - 1, devYBottom - devLayerSpY - 1, 4, 4);
+			}
+
+		}
+
+		/*
+		 * paint splines
+		 */
+		final int[] ySplineSerie = fTourData.dataSerieSpline;
+		if (ySplineSerie != null) {
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+			int devPrevX = (int) ((xValues[0] - graphXValueOffset) * scaleX);
+			int devPrevY = (int) (ySplineSerie[0] / measurementSystem * scaleY);
+
+			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
+
+				final float graphX = xValues[xIndex];
+				final float graphY = ySplineSerie[xIndex] / measurementSystem;
+
+				final int devX = (int) (graphX * scaleX);
+				int devY = (int) (graphY * scaleY);
+
+				if (devY < 0) {
+					devY = -devY;
+				}
+
+				if (!(devX == devPrevX && devY == devPrevY)) {
+					gc.drawLine(devPrevX, devYBottom - devPrevY, devX, devYBottom - devY);
+				}
+
+				devPrevX = devX;
+				devPrevY = devY;
 			}
 
 		}

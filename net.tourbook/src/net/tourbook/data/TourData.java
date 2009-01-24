@@ -601,11 +601,18 @@ public class TourData implements Comparable<Object> {
 	public int[]						dataSerieAdjustedAlti;
 
 	/**
+	 * Contains a spline data serie
+	 */
+	@Transient
+	public int[]						dataSerieSpline;
+
+	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
 	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
 	private TourData					fMergeSourceTourData;
+
 
 	public TourData() {}
 
