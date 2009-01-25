@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.plugin.TourbookPlugin;
@@ -200,12 +201,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float startAltiDiff = -diffTo2ndAlti[0];
 
 		/*
-		 * create spline values
+		 * create UI scale data
 		 */
-		final int spPointLength = 5;
-		final double[] splineDistance = new double[spPointLength];
-		final double[] splineAltitude = new double[spPointLength];
-
 		fUIVarX1 = fVarX1 * sliderDistance;
 		fUIVarY1 = fVarY1 * startAltiDiff * 1;
 
@@ -215,30 +212,61 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fUIVarY1Border = 0.0f + fVarY1Border * startAltiDiff * 1;
 		fUIVarY2Border = 0.0f + fVarY2Border * startAltiDiff * 1;
 
-		splineDistance[0] = fUIVarX1Border;
-		splineDistance[1] = 0;
-		splineDistance[2] = fUIVarX1;
-		splineDistance[3] = sliderDistance;
-		splineDistance[4] = sliderDistance + fUIVarX2Border;
+		/*
+		 * create spline values
+		 */
+		final int spPointLength = 5;
+		final double[] splineX = new double[spPointLength];
+		final double[] splineY = new double[spPointLength];
+		final boolean[] isMovable = new boolean[spPointLength];
+		final double[] splineMinX = new double[spPointLength];
+		final double[] splineMaxX = new double[spPointLength];
 
-		splineAltitude[0] = -fUIVarY1Border;
-		splineAltitude[1] = 0;
-		splineAltitude[2] = -fUIVarY1;
-		splineAltitude[3] = 0;
-		splineAltitude[4] = -fUIVarY2Border;
+		final SplineData splineData = new SplineData();
+		splineData.xValues = splineX;
+		splineData.yValues = splineY;
+		splineData.isPointMovable = isMovable;
+		splineData.xMinValues = splineMinX;
+		splineData.xMaxValues = splineMaxX;
+		fTourData.splineDataPoints = splineData;
 
-		final double[][] splinePoints = fTourData.altiDiffSpecialPoints = new double[2][spPointLength];
-		for (int pointIndex = 0; pointIndex < spPointLength; pointIndex++) {
-			splinePoints[0][pointIndex] = splineDistance[pointIndex]; // X-axis
-			splinePoints[1][pointIndex] = splineAltitude[pointIndex]; // Y-axis
+		splineX[0] = fUIVarX1Border;
+		splineY[0] = -fUIVarY1Border;
+		
+		splineX[1] = 0;
+		splineY[1] = 0;
+		
+		splineX[2] = fUIVarX1;
+		splineY[2] = -fUIVarY1;
+		
+		splineX[3] = sliderDistance;
+		splineY[3] = 0;
 
-			System.out.println("x:" + splinePoints[0][pointIndex] + "\ty:" + splinePoints[1][pointIndex]);
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-		System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
+		splineX[4] = sliderDistance + fUIVarX2Border;
+		splineY[4] = -fUIVarY2Border;
 
-		final CubicSpline cubicSpline = new CubicSpline(splineDistance, splineAltitude);
+		isMovable[0] = true;
+		isMovable[1] = false;
+		isMovable[2] = true;
+		isMovable[3] = false;
+		isMovable[4] = true;
+
+		splineMinX[0] = Double.NaN;
+		splineMaxX[0] = 0;
+
+		splineMinX[1] = Double.NaN;
+		splineMaxX[1] = Double.NaN;
+
+		splineMinX[2] = 0;
+		splineMaxX[2] = sliderDistance;
+
+		splineMinX[3] = Double.NaN;
+		splineMaxX[3] = Double.NaN;
+
+		splineMinX[4] = sliderDistance;
+		splineMaxX[4] = Double.NaN;
+
+		final CubicSpline cubicSpline = new CubicSpline(splineX, splineY);
 
 		// get adjusted altitude serie
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -338,12 +366,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		createUIAdjustmentType(parent);
 		createUITourChart(parent);
 
-		final Composite splineContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(splineContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(splineContainer);
+//		final Composite splineContainer = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(splineContainer);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(splineContainer);
 
-		createUISpline(splineContainer);
-		createUIAdjustments(splineContainer);
+		createUISpline(parent);
+		createUIAdjustments(parent);
 	}
 
 	private void createUIAdjustments(final Composite parent) {
@@ -621,7 +649,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateUI();
 
 		fTourChart.update2ndAltiLayer(this, true);
-		fSpline.updateValues(fTourData.altiDiffSpecialPoints);
+		fSpline.updateValues(fTourData.splineDataPoints);
 	}
 
 	private void onScaleDoubleClick(final Widget widget) {

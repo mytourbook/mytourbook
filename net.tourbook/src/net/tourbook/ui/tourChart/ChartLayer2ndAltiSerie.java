@@ -21,6 +21,7 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.UI;
 
@@ -233,20 +234,23 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint special points on the diff graph
 		 */
-		final double[][] specialPoints = fTourData.altiDiffSpecialPoints;
-		if (specialPoints != null) {
+		final SplineData splineData = fTourData.splineDataPoints;
+		if (splineData != null) {
+
+			final double[] xSplineValues = splineData.xValues;
+			final double[] ySplineValues = splineData.yValues;
 
 			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-			for (int pointIndex = 0; pointIndex < specialPoints[0].length; pointIndex++) {
+			for (int pointIndex = 0; pointIndex < xSplineValues.length; pointIndex++) {
 
-				final double graphSpX = specialPoints[0][pointIndex] - graphXValueOffset;
-				final double graphSpY = specialPoints[1][pointIndex] / measurementSystem;
+				final double graphSpX = xSplineValues[pointIndex] - graphXValueOffset;
+				final double graphSpY = ySplineValues[pointIndex] / measurementSystem;
 
 				final int devLayerSpX = (int) (graphSpX * scaleX);
 				final int devLayerSpY = (int) (graphSpY * scaleValueDiff);
 
-				gc.fillRectangle(devLayerSpX - 1, devYBottom - devLayerSpY - 1, 4, 4);
+				gc.fillRectangle(devLayerSpX - 1, devYBottom - devLayerSpY - 1, 3, 3);
 			}
 
 		}

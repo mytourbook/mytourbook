@@ -13,35 +13,15 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.util;
+package net.tourbook.data;
 
-import org.eclipse.swt.graphics.Resource;
+public class SplineData {
 
-public class Util {
+	public double[]		xValues;
+	public double[]		yValues;
 
-	/**
-	 * creates a int array backup
-	 * 
-	 * @param original
-	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
-	 */
-	public static int[] createDataSerieBackup(final int[] original) {
+	public double[]		xMinValues;
+	public double[]		xMaxValues;
 
-		int[] backup = null;
-
-		if (original != null) {
-			final int serieLength = original.length;
-			backup = new int[serieLength];
-			System.arraycopy(original, 0, backup, 0, serieLength);
-		}
-
-		return backup;
-	}
-
-	public static Resource disposeResource(final Resource resource) {
-		if (resource != null && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
+	public boolean[]	isPointMovable;
 }
