@@ -67,42 +67,29 @@ public class Messages extends NLS {
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
-	public static String	adjust_alti_srtm_dialog_header_message;
-
+	public static String		adjust_alti_srtm_dialog_header_message;
 	public static String		adjust_alti_srtm_dialog_header_title;
-
 	public static String		adjust_alti_srtm_dialog_invalid_data;
-
 	public static String		adjust_alti_srtm_dialog_title;
-
 	public static String		adjust_alti_srtm_save_tour;
+	public static String		adjust_altitude_dlg_dialog_message;
+	public static String		adjust_altitude_dlg_dialog_title;
+	public static String		adjust_altitude_dlg_shell_title;
+	public static String		adjust_altitude_invalid_data_message;
+	public static String		adjust_altitude_invalid_data_title;
+	public static String		adjust_altitude_label_adjustment_type;
+	public static String	adjust_altitude_synch_min_max_immediately_tooltip;
 
-	public static String	adjust_altitude_dlg_dialog_message;
+	public static String	adjust_altitude_synch_min_max_tooltip;
 
-	public static String	adjust_altitude_dlg_dialog_title;
-
-	public static String	adjust_altitude_dlg_shell_title;
-
-	public static String	adjust_altitude_invalid_data_message;
-
-	public static String	adjust_altitude_invalid_data_title;
-
-	public static String	adjust_altitude_label_adjustment_type;
-
-	public static String	adjust_altitude_type_adjust_end;
-
-	public static String	adjust_altitude_type_adjust_height;
-
-	public static String	adjust_altitude_type_adjust_whole_tour;
-
-	public static String	adjust_altitude_type_show_original;
-
-	public static String	adjust_altitude_type_start_and_end;
-
-	public static String	adjust_altitude_type_until_left_slider;
+	public static String		adjust_altitude_type_adjust_end;
+	public static String		adjust_altitude_type_adjust_height;
+	public static String		adjust_altitude_type_adjust_whole_tour;
+	public static String		adjust_altitude_type_show_original;
+	public static String		adjust_altitude_type_start_and_end;
+	public static String		adjust_altitude_type_until_left_slider;
 
 	public static String		app_action_adjust_altitude_srtm;
-
 	public static String		app_action_button_down;
 	public static String		app_action_button_up;
 	public static String		app_action_collapse_all_tooltip;
@@ -233,7 +220,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
-	public static String	Graph_Label_Tour_SRTM;
+	public static String		Graph_Label_Tour_SRTM;
 
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;
@@ -317,10 +304,14 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
+	public static String	image__action_zoom_show_all;
+
+	public static String	image__action_zoom_show_all_immediatly;
+
+	public static String	image__action_zoom_show_all_immediatly_disabled;
+
 	public static String		image__adjust_altitude_srtm;
-
 	public static String		image__adjust_altitude_srtm_disabled;
-
 	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;
@@ -335,12 +326,9 @@ public class Messages extends NLS {
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
-	public static String	import_data_dlg_reimport_invalid_file_message;
-
-	public static String	import_data_dlg_reimport_message;
-
-	public static String	import_data_dlg_reimport_title;
-
+	public static String		import_data_dlg_reimport_invalid_file_message;
+	public static String		import_data_dlg_reimport_message;
+	public static String		import_data_dlg_reimport_title;
 	public static String		import_data_dlg_save_tour_msg;
 	public static String		import_data_dlg_save_tour_title;
 	public static String		import_data_label_unknown_device;
@@ -611,7 +599,7 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
 
-	public static String	tour_action_show_srtm_data;
+	public static String		tour_action_show_srtm_data;
 
 	public static String		tour_data_label_device_marker;
 	public static String		tour_data_label_feature_since_version_9_01;

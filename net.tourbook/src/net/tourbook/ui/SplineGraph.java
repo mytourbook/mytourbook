@@ -60,6 +60,16 @@ public class SplineGraph extends Canvas {
 
 	private double		fGraphStartX;
 
+	private boolean		fIsSynchMinMax;
+
+	private float		fXMinComputed;
+	private float		fXMaxComputed;
+	private float		fYMinComputed;
+	private float		fYMaxComputed;
+	private boolean		fIsMinMaxComputed;
+
+	private int			fDevXStartOffset;
+
 	public SplineGraph(final Composite parent, final int style) {
 
 		super(parent, style | SWT.DOUBLE_BUFFERED);
@@ -212,7 +222,10 @@ public class SplineGraph extends Canvas {
 
 			fIsPointMoved = false;
 
-			fIsComputeGraph = true;
+			if (fIsSynchMinMax) {
+				fIsComputeGraph = true;
+			}
+
 			redraw();
 		}
 	}
@@ -234,32 +247,45 @@ public class SplineGraph extends Canvas {
 			return;
 		}
 
-		float graphXMax;
-		float graphXMin = graphXMax = (float) graphPointsX[0];
-		float graphYMax;
-		float graphYMin = graphYMax = (float) graphPointsY[0];
+		float graphXMin = fXMinComputed;
+		float graphXMax = fXMaxComputed;
+		float graphYMin = fYMinComputed;
+		float graphYMax = fYMaxComputed;
 
-		// get x/y min/max values
-		for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
+		if (fIsSynchMinMax || fIsMinMaxComputed == false) {
 
-			final float graphX = (float) graphPointsX[valueIndex];
-			final float graphY = (float) graphPointsY[valueIndex];
+			fIsMinMaxComputed = true;
 
-			graphXMin = graphX < graphXMin ? graphX : graphXMin;
-			graphXMax = graphX > graphXMax ? graphX : graphXMax;
+			graphXMin = graphXMax = (float) graphPointsX[0];
+			graphYMin = graphYMax = (float) graphPointsY[0];
 
-			graphYMin = graphY < graphYMin ? graphY : graphYMin;
-			graphYMax = graphY > graphYMax ? graphY : graphYMax;
-		}
+			// get x/y min/max values
+			for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
 
-		// enforce minimum size
-		if (graphXMin == graphXMax) {
-			graphXMin--;
-			graphXMax++;
-		}
-		if (graphYMin == graphYMax) {
-			graphYMin--;
-			graphYMax++;
+				final float graphX = (float) graphPointsX[valueIndex];
+				final float graphY = (float) graphPointsY[valueIndex];
+
+				graphXMin = graphX < graphXMin ? graphX : graphXMin;
+				graphXMax = graphX > graphXMax ? graphX : graphXMax;
+
+				graphYMin = graphY < graphYMin ? graphY : graphYMin;
+				graphYMax = graphY > graphYMax ? graphY : graphYMax;
+			}
+
+			// enforce minimum size
+			if (graphXMin == graphXMax) {
+				graphXMin--;
+				graphXMax++;
+			}
+			if (graphYMin == graphYMax) {
+				graphYMin--;
+				graphYMax++;
+			}
+
+			fXMinComputed = graphXMin;
+			fXMaxComputed = graphXMax;
+			fYMinComputed = graphYMin;
+			fYMaxComputed = graphYMax;
 		}
 
 		if (fIsPointMoved) {
@@ -269,12 +295,16 @@ public class SplineGraph extends Canvas {
 			graphYMin = fMovedYMin;
 			graphYMax = fMovedYMax;
 		} else {
+
+			// keep none moved min/max
 			fMovedXMin = graphXMin;
 			fMovedXMax = graphXMax;
 			fMovedYMin = graphYMin;
 			fMovedYMax = graphYMax;
 
-			fGraphStartX = graphPointsX[0];
+			if (fDevXStartOffset == 0) {
+				fGraphStartX = graphPointsX[0];
+			}
 		}
 
 		final Display display = Display.getCurrent();
@@ -307,10 +337,10 @@ public class SplineGraph extends Canvas {
 		fMovedDevX0 = devX0;
 		fMovedDevY0 = devY0;
 
-		int devXStartOffset = 0;
-
 		// compute splines
 		if (fIsComputeGraph || fDevYSplineValues == null) {
+
+			fIsComputeGraph = false;
 
 			final double graphXStart = graphPointsX[0];
 			final double graphXEnd = graphPointsX[pointLength - 1];
@@ -322,11 +352,6 @@ public class SplineGraph extends Canvas {
 
 				// get spline width
 				devSplineWidth = (int) (graphWidth * fMovedScaleX);
-
-				// get fist point offset
-				if (fPointHitIndex == 0) {
-					devXStartOffset = (int) ((graphXStart - fGraphStartX) * fMovedScaleX);
-				}
 
 			} else {
 				devSplineWidth = devGraphWidth;
@@ -353,8 +378,21 @@ public class SplineGraph extends Canvas {
 			} catch (final IllegalArgumentException e2) {
 				// ignore
 			}
+		}
 
-			fIsComputeGraph = false;
+		// get fist point offset
+		if (fIsSynchMinMax) {
+
+			if (fPointHitIndex == 0 && fIsPointMoved) {
+				fDevXStartOffset = (int) ((graphPointsX[0] - fGraphStartX) * fMovedScaleX);
+			} else {
+				fDevXStartOffset = 0;
+			}
+
+		} else {
+			if (fPointHitIndex == 0 && fIsPointMoved) {
+				fDevXStartOffset = (int) ((graphPointsX[0] - fGraphStartX) * fMovedScaleX);
+			}
 		}
 
 		/*
@@ -385,9 +423,9 @@ public class SplineGraph extends Canvas {
 
 			final int devY = fDevYSplineValues[devXIndex];
 
-			gc.drawLine(devXStartOffset + devXIndex - 1 + devMargin2,//
+			gc.drawLine(fDevXStartOffset + devXIndex - 1 + devMargin2,//
 					devY0 - devYPrev,
-					devXStartOffset + devXIndex + devMargin2,
+					fDevXStartOffset + devXIndex + devMargin2,
 					devY0 - devY);
 
 			devYPrev = devY;
@@ -427,13 +465,24 @@ public class SplineGraph extends Canvas {
 
 	}
 
-	public void updateValues(final SplineData splineData) {
+	public void updateValues(final SplineData splineData, final boolean isSynchMinMax, final boolean keepSynchMinMax) {
+
+		final boolean backupIsSynchMinMax = fIsSynchMinMax;
 
 		fSplineData = splineData;
+		fIsSynchMinMax = isSynchMinMax;
 
 		fIsComputeGraph = true;
 
+		// recompute min/max values
+//		fIsMinMaxComputed = false;
+
 		redraw();
+
+		if (keepSynchMinMax == false) {
+			// restore synch min/max state
+			fIsSynchMinMax = backupIsSynchMinMax;
+		}
 	}
 
 }
