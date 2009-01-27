@@ -4160,7 +4160,11 @@ public class ChartComponentGraph extends Canvas {
 
 			ChartXSlider xSlider;
 
-			if (fIsXSliderVisible && (xSlider = isXSliderHit(devYMouse, devXGraph)) != null) {
+			if (fChart.isMouseMoveDone(devXMouse, devYMouse, devXGraph)) {
+
+				setCursor(fCursorDragged);
+
+			} else if (fIsXSliderVisible && (xSlider = isXSliderHit(devYMouse, devXGraph)) != null) {
 
 				// mouse is over an x-slider
 
@@ -4212,15 +4216,15 @@ public class ChartComponentGraph extends Canvas {
 				setDefaultCursor();
 
 			} else if (hBar.isVisible()) {
-				
+
 				// horizontal bar is visible, show the scroll cursor
-				
+
 				setupScrollCursor(devXMouse, devYMouse);
-				
+
 			} else {
-				
+
 				setDefaultCursor();
-				
+
 				if (fIsMouseDown) {
 //					fChart.fireMouseMoveEvent(event);
 				}

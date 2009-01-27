@@ -93,7 +93,6 @@ public class SplineGraph extends Canvas {
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
-
 			public void mouseMove(final MouseEvent e) {
 				onMouseMove(e);
 			}

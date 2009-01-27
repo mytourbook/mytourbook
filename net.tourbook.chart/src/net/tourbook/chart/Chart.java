@@ -71,6 +71,7 @@ public class Chart extends ViewForm {
 	private final ListenerList			fSliderMoveListeners				= new ListenerList();
 	private final ListenerList			fBarDoubleClickListeners			= new ListenerList();
 	private final ListenerList			fDoubleClickListeners				= new ListenerList();
+	private final ListenerList			fMouseListener						= new ListenerList();
 
 	ChartComponents						fChartComponents;
 	private ChartDataModel				fChartDataModel;
@@ -166,6 +167,10 @@ public class Chart extends ViewForm {
 
 	public void addFocusListener(final Listener listener) {
 		fFocusListeners.add(listener);
+	}
+
+	public void addMouseMoveListener(final IMouseMoveListener mouseMoveListener) {
+		fMouseListener.add(mouseMoveListener);
 	}
 
 	/**
@@ -489,6 +494,22 @@ public class Chart extends ViewForm {
 		}
 	}
 
+	private void fireChartEvent(final ChartEvent chartEvent) {
+
+		final Object[] listeners = fMouseListener.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+
+			switch (chartEvent.type) {
+			case SWT.MouseMove:
+				((IMouseMoveListener) listeners[i]).mouseMove(chartEvent);
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
 	void fireDoubleClick() {
 
 		final Object[] listeners = fDoubleClickListeners.getListeners();
@@ -518,7 +539,7 @@ public class Chart extends ViewForm {
 	public void fireSliderMoveEvent() {
 
 		final SelectionChartInfo chartInfo = createChartInfo();
-//		System.out.println("fireSliderMove... " + this);
+
 		final Object[] listeners = fSliderMoveListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISliderMoveListener listener = (ISliderMoveListener) listeners[i];
@@ -663,6 +684,19 @@ public class Chart extends ViewForm {
 				chartGraph.getRightSlider().getValuesIndex());
 	}
 
+	boolean isMouseMoveDone(final int devXMouse, final int devYMouse, final int devXGraph) {
+
+		final ChartEvent event = new ChartEvent(SWT.MouseMove);
+		
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+		event.devMouseXInGraph = devXGraph;
+
+		fireChartEvent(event);
+
+		return event.isWorked;
+	}
+
 	/**
 	 * @return Returns <code>true</code> when the x-sliders are visible
 	 */
@@ -801,6 +835,16 @@ public class Chart extends ViewForm {
 		fChartContextProvider = chartContextProvider;
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 * 
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	protected void setDataModel(final ChartDataModel chartDataModel) {
 		fChartDataModel = chartDataModel;
 	}
@@ -813,16 +857,6 @@ public class Chart extends ViewForm {
 	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
 		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 * 
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	@Override
 	public boolean setFocus() {
@@ -876,6 +910,10 @@ public class Chart extends ViewForm {
 		}
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * Select (highlight) the bar in the bar chart
 	 * 
@@ -912,10 +950,6 @@ public class Chart extends ViewForm {
 	public void setShowMarker(final boolean isMarkerVisible) {
 		fChartComponents.setMarkerVisible(isMarkerVisible);
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	/**
 	 * Make the mouse mode button visible
