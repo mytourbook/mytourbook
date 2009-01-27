@@ -9,9 +9,9 @@ public class GeoLon extends GeoCoord {
       super();
    }
 
-   public GeoLon(GeoLon l) {
+   public GeoLon(GeoLon lon) {
       super();
-      set(l);
+      set(lon);
    }
 
    public GeoLon(String s) {
@@ -32,34 +32,34 @@ public class GeoLon extends GeoCoord {
       return (!this.isOsten());
    }
 
-   public void add(GeoLon l) {
+   public void add(GeoLon lon) {
 
-      dezimal += l.getDezimal();
+      dezimal += lon.getDezimal();
       if (dezimal > 180*faktg) dezimal -= 360*faktg;
 
       updateGrad();
    }
 
-   public void add(GeoLon l, GeoLon a) {
-      dezimal = l.getDezimal();
+   public void add(GeoLon lon, GeoLon a) {
+      dezimal = lon.getDezimal();
       this.add(a);
    }
    
-   public void sub(GeoLon l) {
+   public void sub(GeoLon lon) {
 
-      dezimal -= l.getDezimal();
+      dezimal -= lon.getDezimal();
       if (dezimal < -180*faktg) dezimal += 360*faktg;
 
       updateGrad();
    }
 
-   public void sub(GeoLon l, GeoLon s) {
-      dezimal = l.getDezimal();
+   public void sub(GeoLon lon, GeoLon s) {
+      dezimal = lon.getDezimal();
       this.sub(s);
    }
       
-   public void set(GeoLon l) {
-      super.set((GeoCoord)l);
+   public void set(GeoLon lon) {
+      super.set((GeoCoord)lon);
    }
 
    public static void main(String[] args) {

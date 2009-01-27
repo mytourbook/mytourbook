@@ -3,93 +3,76 @@ package net.tourbook.ext.srtm;
 import java.io.File;
 import java.util.HashMap;
 
-public final class ElevationSRTM3 extends Elevation {
+public final class ElevationSRTM3 extends ElevationBase {
 
 	static private SRTM3I							srtm3I;
 	static final private HashMap<Integer, SRTM3I>	hm	= new HashMap<Integer, SRTM3I>();	// default initial 16 Files
 
 	private class SRTM3I {
 
-		FileShort	fileShort;
+		ElevationFile	elevationFile;
 
-		private SRTM3I(final GeoLat b, final GeoLon l) {
+		private SRTM3I(final GeoLat lat, final GeoLon lon) {
 
-			final String srtmDataPath = getSRTMDataPath();
-			final String srtm3Dir = srtmDataPath + File.separator + "srtm3"; // Lokale Lage der SRTM3-Files!!!
+			final String elevationDataPath = getElevationDataPath();
+			final String srtm3Dir = elevationDataPath + File.separator + "srtm3"; // Lokale Lage der SRTM3-Files!!!
 			final String srtm3Suffix = ".hgt";
 
 			String fileName = new String();
 			fileName = srtm3Dir
 					+ File.separator
-					+ b.getRichtung()
-					+ NumberForm.n2(b.isNorden() ? b.getGrad() : b.getGrad() + 1)
-					+ l.getRichtung()
-					+ NumberForm.n3(l.isOsten() ? l.getGrad() : l.getGrad() + 1)
+					+ lat.getRichtung()
+					+ NumberForm.n2(lat.isNorden() ? lat.getGrad() : lat.getGrad() + 1)
+					+ lon.getRichtung()
+					+ NumberForm.n3(lon.isOsten() ? lon.getGrad() : lon.getGrad() + 1)
 					+ srtm3Suffix;
 
 			try {
-				fileShort = new FileShort(fileName, true); // ggf. unzip und/oder FTP
+				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_SRTM3);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
 
 		public short getElevation(final GeoLat lat, final GeoLon lon) {
-			return fileShort.get(srtmFileOffset(lat, lon));
-		}
-
-		private String getSRTMDataPath() {
-
-			String srtmDataPath;
-
-			final String prefDataPath = Activator.getDefault()
-					.getPreferenceStore()
-					.getString(IPreferences.SRTM_DATA_FILEPATH);
-
-			if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
-				srtmDataPath = (String) System.getProperties().get("user.home");
-			} else {
-				srtmDataPath = prefDataPath;
-			}
-
-			return srtmDataPath;
+			return elevationFile.get(srtmFileOffset(lat, lon));
 		}
 
 		//    Offset im SRTM3-File
-		public int srtmFileOffset(final GeoLat b, final GeoLon l) {
+		public int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
 
-			if (b.isSueden()) {
-				if (l.isOsten()) {
+			if (lat.isSueden()) {
+				if (lon.isOsten()) {
 					return 1201
-							* (b.getMinuten() * 20 + b.getSekunden() / 3)
-							+ l.getMinuten()
+							* (lat.getMinuten() * 20 + lat.getSekunden() / 3)
+							+ lon.getMinuten()
 							* 20
-							+ l.getSekunden()
+							+ lon.getSekunden()
 							/ 3;
 				} else {
 					return 1201
-							* (b.getMinuten() * 20 + b.getSekunden() / 3)
+							* (lat.getMinuten() * 20 + lat.getSekunden() / 3)
 							+ 1199
-							- l.getMinuten()
+							- lon.getMinuten()
 							* 20
-							- l.getSekunden()
+							- lon.getSekunden()
 							/ 3;
 				}
 			} else {
-				if (l.isOsten()) {
+				if (lon.isOsten()) {
 					return 1201
-							* (1199 - b.getMinuten() * 20 - b.getSekunden() / 3)
-							+ l.getMinuten()
+							* (1199 - lat.getMinuten() * 20 - lat.getSekunden() / 3)
+							+ lon.getMinuten()
 							* 20
-							+ l.getSekunden()
+							+ lon.getSekunden()
 							/ 3;
 				} else {
 					return 1201
-							* (1199 - b.getMinuten() * 20 - b.getSekunden() / 3)
+							* (1199 - lat.getMinuten() * 20 - lat.getSekunden() / 3)
 							+ 1199
-							- l.getMinuten()
+							- lon.getMinuten()
 							* 20
-							- l.getSekunden()
+							- lon.getSekunden()
 							/ 3;
 				}
 			}
@@ -107,23 +90,23 @@ public final class ElevationSRTM3 extends Elevation {
 	}
 
 	@Override
-	public short getElevation(final GeoLat b, final GeoLon l) {
+	public short getElevation(final GeoLat lat, final GeoLon lon) {
 
-		if (b.getTertia() != 0)
-			return getElevationGrid(b, l);
-		if (l.getTertia() != 0)
-			return getElevationGrid(b, l);
-		if (b.getSekunden() % 3 != 0)
-			return getElevationGrid(b, l);
-		if (l.getSekunden() % 3 != 0)
-			return getElevationGrid(b, l);
+		if (lat.getTertia() != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.getTertia() != 0)
+			return getElevationGrid(lat, lon);
+		if (lat.getSekunden() % 3 != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.getSekunden() % 3 != 0)
+			return getElevationGrid(lat, lon);
 
-		int i = l.getGrad();
-		if (l.isWesten())
+		int i = lon.getGrad();
+		if (lon.isWesten())
 			i += 256;
 		i *= 1024;
-		i += b.getGrad();
-		if (b.isSueden())
+		i += lat.getGrad();
+		if (lat.isSueden())
 			i += 256;
 		final Integer ii = new Integer(i);
 		srtm3I = hm.get(ii);
@@ -131,33 +114,33 @@ public final class ElevationSRTM3 extends Elevation {
 		if (srtm3I == null) {
 			// nur beim jeweils ersten Mal
 			// FileLog.println(this, "Index ElevationSRTM3 " + ii);
-			srtm3I = new SRTM3I(b, l);
+			srtm3I = new SRTM3I(lat, lon);
 			hm.put(ii, srtm3I);
 		}
 
-		return srtm3I.getElevation(b, l);
+		return srtm3I.getElevation(lat, lon);
 
 	}
 
 	@Override
-	public double getElevationDouble(final GeoLat b, final GeoLon l) {
+	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
 
-		if (b.getDezimal() == 0 && l.getDezimal() == 0)
+		if (lat.getDezimal() == 0 && lon.getDezimal() == 0)
 			return 0.;
-		if (b.getTertia() != 0)
-			return getElevationGridDouble(b, l);
-		if (l.getTertia() != 0)
-			return getElevationGridDouble(b, l);
-		if (b.getSekunden() % 3 != 0)
-			return getElevationGridDouble(b, l);
-		if (l.getSekunden() % 3 != 0)
-			return getElevationGridDouble(b, l);
-		return getElevation(b, l);
+		if (lat.getTertia() != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.getTertia() != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lat.getSekunden() % 3 != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.getSekunden() % 3 != 0)
+			return getElevationGridDouble(lat, lon);
+		return getElevation(lat, lon);
 	}
 
 	@Override
 	public String getName() {
-		return "ElevationSRTM3";
+		return "SRTM3";
 	}
 
 	@Override

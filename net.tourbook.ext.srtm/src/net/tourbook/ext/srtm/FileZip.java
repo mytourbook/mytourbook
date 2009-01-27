@@ -1,9 +1,4 @@
 package net.tourbook.ext.srtm;
-/*
- * 
- * ZIP-Tools
- * 
- */
 
 import java.io.*;
 import java.util.zip.*;
@@ -18,9 +13,10 @@ public final class FileZip {
       try {
          // Open the ZIP file
          ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipName));
-         // Get the firstStrecke entry
+         // Get the first entry
          ZipEntry zipEntry = zipInputStream.getNextEntry();
          zipEntryName = zipEntry.getName();
+         System.out.println("zipEntryName " + zipEntryName);
                   
          if (zipEntryName.indexOf(File.separator) != -1) 
             // Delimiter im Namen (z.B. bei selbsterzeugten kmz-Files)
@@ -28,6 +24,8 @@ public final class FileZip {
          
          outFileName = zipName.substring(0, zipName.lastIndexOf(File.separator))
                      + File.separator + zipEntryName;
+         
+         System.out.println("outFileName " + outFileName);
          
          OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
@@ -44,10 +42,53 @@ public final class FileZip {
          return zipEntryName;
          
       } catch (IOException e) {
+         System.out.println("unzip: Fehler: " + e.getMessage());
          throw(e); // Exception weitergeben
       }
    }
 
+
+   public final static String gunzip(String gzipName) throws Exception {
+      
+      String outFileName = null;
+      String gzipEntryName = null;
+      try {
+         // Open the GZIP file
+         GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipName));
+         
+         gzipEntryName = gzipName;
+         if (gzipEntryName.indexOf(File.separator) != -1) // Delimiter im Namen
+            gzipEntryName = gzipEntryName.substring(gzipEntryName.lastIndexOf(File.separator)+1);
+         if (gzipEntryName.indexOf('.') != -1)
+            gzipEntryName = gzipEntryName.substring(0, gzipEntryName.lastIndexOf('.'));
+
+         outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator))
+                     + File.separator + gzipEntryName;
+         
+         System.out.println("outFileName " + outFileName);
+         
+         OutputStream fileOutputStream = new FileOutputStream(outFileName);
+
+         // Transfer bytes from the GZIP file to the output file
+         byte[] buf = new byte[1024];
+         int len;
+         while ((len = gzipInputStream.read(buf)) > 0) {
+            fileOutputStream.write(buf, 0, len);
+         }
+
+         fileOutputStream.close();
+         gzipInputStream.close();
+         
+         return gzipEntryName;
+         
+      } catch (IOException e) {
+         System.out.println("gunzip: Fehler: " + e.getMessage());
+         throw(e); // Exception weitergeben
+      }
+   }
+
+   
+   
    
    public final static void zip(String fileName, String zipName) throws Exception {
       try {
@@ -79,6 +120,7 @@ public final class FileZip {
          zipOutputStream.close();
          
       } catch (IOException e) {
+         System.out.println("zip: Fehler: " + e.getMessage());
          throw(e); // Exception weitergeben
       }
    }

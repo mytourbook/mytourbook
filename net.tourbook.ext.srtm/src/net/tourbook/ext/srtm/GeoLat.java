@@ -9,9 +9,9 @@ public class GeoLat extends GeoCoord {
       super();
    }
 
-   public GeoLat(GeoLat b) {
+   public GeoLat(GeoLat lat) {
       super();
-      set(b);
+      set(lat);
    }
 
    public GeoLat(String s) {
@@ -32,34 +32,34 @@ public class GeoLat extends GeoCoord {
       return (!this.isNorden());
    }
 
-   public void add(GeoLat b) {
+   public void add(GeoLat lat) {
 
-      dezimal += b.getDezimal();
+      dezimal += lat.getDezimal();
        if (dezimal > 90 *faktg) dezimal = 180*faktg - dezimal;
 
       updateGrad();
    }
 
-   public void add(GeoLat b, GeoLat a) {
-      dezimal = b.getDezimal();
+   public void add(GeoLat lat, GeoLat a) {
+      dezimal = lat.getDezimal();
       this.add(a);
    }
    
-   public void sub(GeoLat b) {
+   public void sub(GeoLat lat) {
 
-      dezimal -= b.getDezimal();
+      dezimal -= lat.getDezimal();
       if (dezimal < -90 *faktg) dezimal = -180*faktg - dezimal;
 
       updateGrad();
    }
 
-   public void sub(GeoLat b, GeoLat s) {
-      dezimal = b.getDezimal();
+   public void sub(GeoLat lat, GeoLat s) {
+      dezimal = lat.getDezimal();
       this.sub(s);
    }
 
-   public void set(GeoLat b) {
-      super.set((GeoCoord)b);
+   public void set(GeoLat lat) {
+      super.set((GeoCoord)lat);
    }
 
    public static void main(String[] args) {
