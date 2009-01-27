@@ -1,15 +1,15 @@
 package net.tourbook.tilefactory.srtm;
 
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ext.srtm.ElevationSRTM3;
+//import net.tourbook.colors.ColorDefinition;
+//import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.ext.srtm.ElevationLayer;
 import net.tourbook.ext.srtm.GeoLat;
 import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
-import net.tourbook.mapping.LegendColor;
-import net.tourbook.mapping.LegendConfig;
-import net.tourbook.mapping.LegendProvider;
-import net.tourbook.ui.UI;
+//import net.tourbook.mapping.LegendColor;
+//import net.tourbook.mapping.LegendConfig;
+//import net.tourbook.mapping.LegendProvider;
+//import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
+//import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.map.DefaultTileFactory;
@@ -55,7 +55,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		// initialize SRTM loading
 		public final NumberForm			numberForm		= new NumberForm();
-		private final ElevationSRTM3	elevationSRTM3	= new ElevationSRTM3();
+		private final ElevationLayer	elevationLayer	= new ElevationLayer();
 
 		public SRTMTileFactoryInfo() {
 
@@ -103,12 +103,12 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public ImageData[] paintTile(final Tile tile) {
 
-			final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
-			final ColorDefinition colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_MAP_SRTM);
-			final LegendColor legendColor = colorDefinition.getNewLegendColor();
-
-			final LegendProvider legendProvider = new LegendProvider(new LegendConfig(), legendColor, -1);
-			legendProvider.setLegendColorValues(new Rectangle(0, 0, 20, 20), 300, 1800, UI.EMPTY_STRING);
+//			final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+//			final ColorDefinition colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_MAP_SRTM);
+//			final LegendColor legendColor = colorDefinition.getNewLegendColor();
+//
+//			final LegendProvider legendProvider = new LegendProvider(new LegendConfig(), legendColor, -1);
+//			legendProvider.setLegendColorValues(new Rectangle(0, 0, 20, 20), 300, 1800, UI.EMPTY_STRING);
 
 			final Display display = Display.getDefault();
 			final ImageData[] paintedImageData = new ImageData[1];
@@ -126,78 +126,78 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					final Image paintedImage = new Image(display, tileSize, tileSize);
 					final GC gc = new GC(paintedImage);
 
-					if (tileZoom >= 6) {
+					elevationLayer.setZoom(tileZoom);
 
-						System.out.println(">>> Start painting tile (" + tileX + ", " + tileY + ", " + tileZoom + ")");
+					System.out.println(">>> Start painting tile " + elevationLayer.getName() + "(" + tileX + ", " + tileY + ", " + tileZoom + ")");
 
-						// elevation is used at every grid-th pixel in both directions; 
-						// the other values are interpolated
-						// i.e. it gives the resolution of the image!
-						final int grid = 4;
-						final int gridQuot = grid - 1;
-						double lon = 0.;
-						double lonOld = 0.;
-						double lat = 0.;
-						double latOld = 0.;
+					// elevation is used at every grid-th pixel in both directions; 
+					// the other values are interpolated
+					// i.e. it gives the resolution of the image!
+					final int grid = 4;
+					final int gridQuot = grid - 1;
+					double lon = 0.;
+					double lonOld = 0.;
+					double lat = 0.;
+					double latOld = 0.;
 
-						for (int pixelY = 0, mapY = tileY * tileSize; pixelY <= tileSize; pixelY += grid, mapY += grid, latOld = lat) {
+					for (int pixelY = 0, mapY = tileY * tileSize; pixelY <= tileSize; pixelY += grid, mapY += grid, latOld = lat) {
 
-							// TODO how to do that using Mercator class method yToLong??  
-							lat = 360.
-									* Math.atan(Math.exp(2 * Math.PI * (0.5 - (double) mapY / mapPower)))
-									/ Math.PI
-									- 90.; // Mercator
+						// TODO how to do that using Mercator class method yToLong??  
+						lat = 360.
+						* Math.atan(Math.exp(2 * Math.PI * (0.5 - (double) mapY / mapPower)))
+						/ Math.PI
+						- 90.; // Mercator
 
-							for (int pixelX = 0, mapX = tileX * tileSize; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
+						for (int pixelX = 0, mapX = tileX * tileSize; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
 
-								// lon = 2. * Math.PI * (Mercator.xToLat(mapX, mapPower) + 180.) - 180.; Using Mercator class is not simpler either!  
-								lon = 360. * mapX / mapPower - 180.; // Mercator
-								if (pixelX == 0 || pixelY == 0)
-									continue;
+							// lon = 2. * Math.PI * (Mercator.xToLat(mapX, mapPower) + 180.) - 180.; Using Mercator class is not simpler either!  
+							lon = 360. * mapX / mapPower - 180.; // Mercator
+							if (pixelX == 0 || pixelY == 0)
+								continue;
 
-								final double elev00 = elevationSRTM3.getElevation(new GeoLat(latOld),
-										new GeoLon(lonOld));
-								final double elev01 = elevationSRTM3.getElevation(new GeoLat(latOld), new GeoLon(lon));
-								final double elev10 = elevationSRTM3.getElevation(new GeoLat(lat), new GeoLon(lonOld));
-								final double elev11 = elevationSRTM3.getElevation(new GeoLat(lat), new GeoLon(lon));
+							final double elev00 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lonOld));
+							final double elev01 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lon));
+							final double elev10 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lonOld));
+							final double elev11 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
 
-								// interpolate elevation over this quad
-								final double elevGridX0 = (elev01 - elev00) / gridQuot;
-								final double elevGridX1 = (elev11 - elev10) / gridQuot;
-								final double elevGridY0 = (elev10 - elev00) / gridQuot;
-								// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
-								final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
-								double elevStart = elev00;
-								double elevGridXAdd = elevGridX0;
+							// interpolate elevation over this quad
+							final double elevGridX0 = (elev01 - elev00) / gridQuot;
+							final double elevGridX1 = (elev11 - elev10) / gridQuot;
+							final double elevGridY0 = (elev10 - elev00) / gridQuot;
+							// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
+							final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
+							double elevStart = elev00;
+							double elevGridXAdd = elevGridX0;
 
-								for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
+							for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
 
-									double elev = elevStart;
-									for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
+								double elev = elevStart;
+								for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-////										int elevInt = (int) (elev / 2) % 256;
-//										int elevInt = (int) (elev / 2000 * 256);
-//
-//										// range check
-//										elevInt = (elevInt < 0) ? -elevInt : elevInt;
-//										elevInt = elevInt > 0xff ? 0xff : elevInt;
-//
-////										final Color color = new Color(display, elevInt, elevInt, elevInt);
+//										int elevInt = (int) (elev / 2) % 256;
+									int elevInt = (int) (elev / 1000 * 256);
 
-										final Color color = legendProvider.getValueColor((int) elev);
+									// range check
+									// elevInt = (elevInt < 0) ? -elevInt : elevInt;
+									elevInt = elevInt > 0xff ? 0xff : elevInt;
+									int elevRed = elevInt <= 0 ? 0 : elevInt;
+									int elevGreen = elevInt <= 0 ? 0 : elevInt;
+									int elevBlue = elevInt <= 0 ? 255 : elevInt;
+									
+									final Color color = new Color(display, elevRed, elevGreen, elevBlue);
 
-										gc.setForeground(color);
-										gc.drawPoint(drawX, drawY);
+//										final Color color = legendProvider.getValueColor((int) elev);
 
-										color.dispose();
-									}
+									gc.setForeground(color);
+									gc.drawPoint(drawX, drawY);
+
+									color.dispose();
 								}
 							}
 						}
-
-						System.out.println(">>> Finish painting tile (" + tileX + ", " + tileY + ", " + tileZoom + ")");
-
 					}
+
+					System.out.println(">>> Finish painting tile");
 
 					gc.dispose();
 
