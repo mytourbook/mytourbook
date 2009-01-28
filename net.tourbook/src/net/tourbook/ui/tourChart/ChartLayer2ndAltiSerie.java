@@ -39,7 +39,14 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private TourData				fTourData;
 	private int[]					fXDataSerie;
 	private TourChartConfiguration	fTourChartConfig;
+
 	private Rectangle[]				fSpPointRects;
+
+	private int						fGraphXValueOffset;
+	private int						fDevGraphValueXOffset;
+	private int						fDevY0Spline;
+	private float					fScaleX;
+	private float					fScaleY;
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
 									final int[] xDataSerie,
@@ -69,11 +76,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 		final float measurementSystem = UI.UNIT_VALUE_ALTITUDE;
 
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
+		fScaleX = drawingData.getScaleX();
+		fScaleY = drawingData.getScaleY();
 
 		// get the horizontal offset for the graph
-		final int graphXValueOffset = (int) (Math.max(0, chart.getDevGraphImageXOffset()) / scaleX);
+		fDevGraphValueXOffset = chart.getDevGraphImageXOffset();
+		fGraphXValueOffset = (int) (Math.max(0, fDevGraphValueXOffset) / fScaleX);
 
 		final Display display = Display.getCurrent();
 
@@ -91,15 +99,15 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int devGraphHeight = drawingData.getDevGraphHeight();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - devGraphHeight;
-		
+
 		// write spline into the middle of the chart 
-		final int devY0Spline = devYBottom - devGraphHeight / 2;
+		fDevY0Spline = devYBottom - devGraphHeight / 2;
 
 		/*
 		 * convert all diff values into positive values
 		 */
 		int diffValues[] = null;
-		float scaleValueDiff = scaleY;
+		float scaleValueDiff = fScaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
@@ -114,12 +122,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			// set value diff scaling
 			if (fTourChartConfig.isRelativeValueDiffScaling) {
-				scaleValueDiff = maxValueDiff == 0 ? scaleY : (float) devGraphHeight / 2 / maxValueDiff;
+				scaleValueDiff = maxValueDiff == 0 ? fScaleY : (float) devGraphHeight / 2 / maxValueDiff;
 			}
 		}
 
 		// position for the x-axis line in the graph
-		final float devY0 = devYBottom + (scaleY * graphYBottom);
+		final float devY0 = devYBottom + (fScaleY * graphYBottom);
 
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
@@ -136,18 +144,18 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				return;
 			}
 
-			final int graphXValue = xValues[xValueIndex] - graphXValueOffset;
+			final int graphXValue = xValues[xValueIndex] - fGraphXValueOffset;
 			final int graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
 
-			final float devXValue = graphXValue * scaleX;
-			final float devYValue2nd = graphYValue2nd * scaleY;
+			final float devXValue = graphXValue * fScaleX;
+			final float devYValue2nd = graphYValue2nd * fScaleY;
 
 			/*
 			 * draw adjusted value graph
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * scaleY / measurementSystem;
+				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * fScaleY / measurementSystem;
 
 				if (xValueIndex == startIndex) {
 
@@ -238,25 +246,24 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint splines
 		 */
-		final int[] ySplineSerie = fTourData.dataSerieSpline;
+		final float[] ySplineSerie = fTourData.dataSerieSpline;
 		if (ySplineSerie != null) {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
-			int devPrevX = (int) ((xValues[0] - graphXValueOffset) * scaleX);
-			int devPrevY = (int) (ySplineSerie[0] / measurementSystem * scaleY);
-
+			int devPrevX = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
+			int devPrevY = (int) (ySplineSerie[0] / measurementSystem * fScaleY);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
 				final float graphX = xValues[xIndex];
 				final float graphY = ySplineSerie[xIndex] / measurementSystem;
 
-				final int devX = (int) (graphX * scaleX);
-				final int devY = (int) (graphY * scaleY);
+				final int devX = (int) (graphX * fScaleX);
+				final int devY = (int) (graphY * fScaleY);
 
 				if (!(devX == devPrevX && devY == devPrevY)) {
-					gc.drawLine(devPrevX, devY0Spline - devPrevY, devX, devY0Spline - devY);
+					gc.drawLine(devPrevX, fDevY0Spline - devPrevY, devX, fDevY0Spline - devY);
 				}
 
 				devPrevX = devX;
@@ -279,7 +286,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			final double[] xSplineValues = splineData.xValues;
 			final double[] ySplineValues = splineData.yValues;
 			final boolean[] isPointMovable = splineData.isPointMovable;
-			
+
 			final int splinePointLength = xSplineValues.length;
 
 			fSpPointRects = new Rectangle[splinePointLength];
@@ -289,31 +296,58 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			final int hitSize = 10;
 			final int hitSize2 = hitSize / 2;
 
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
+			/*
+			 * paint static points
+			 */
 			for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
 
-				final double graphSpX = xSplineValues[pointIndex] - graphXValueOffset;
+				if (isPointMovable[pointIndex]) {
+					continue;
+				}
+
+				final double graphSpX = xSplineValues[pointIndex] - fGraphXValueOffset;
 				final double graphSpY = ySplineValues[pointIndex] / measurementSystem;
 
-				final int devPointX = (int) (graphSpX * scaleX);
+				final int devPointX = (int) (graphSpX * fScaleX);
 				final int devPointY = (int) (graphSpY * scaleValueDiff);
 
 				final int devX = devPointX - pointSize2;
-				final int devY = devY0Spline - devPointY - pointSize2;
+				final int devY = fDevY0Spline - devPointY - pointSize2;
 
-				// draw movable points with different colors
-				if (isPointMovable[pointIndex]) {
-					gc.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
-				} else {
-					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-				}
-				
+				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				gc.fillOval(devX, devY, pointSize, pointSize);
 
 				// keep point position
 				fSpPointRects[pointIndex] = new Rectangle(devPointX - hitSize2,
-						devY0Spline - devPointY - hitSize2,
+						fDevY0Spline - devPointY - hitSize2,
+						hitSize,
+						hitSize);
+			}
+
+			/*
+			 * paint movable points
+			 */
+			for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
+
+				if (isPointMovable[pointIndex] == false) {
+					continue;
+				}
+
+				final double graphSpX = xSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphSpY = ySplineValues[pointIndex] / measurementSystem;
+
+				final int devPointX = (int) (graphSpX * fScaleX);
+				final int devPointY = (int) (graphSpY * scaleValueDiff);
+
+				final int devX = devPointX - pointSize2;
+				final int devY = fDevY0Spline - devPointY - pointSize2;
+
+				gc.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
+				gc.fillOval(devX, devY, pointSize, pointSize);
+
+				// keep point position
+				fSpPointRects[pointIndex] = new Rectangle(devPointX - hitSize2,
+						fDevY0Spline - devPointY - hitSize2,
 						hitSize,
 						hitSize);
 			}
@@ -323,6 +357,20 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		path2ndSerie.dispose();
 		pathValueDiff.dispose();
 		pathAdjustValue.dispose();
+	}
+
+	public SplineDrawingData getDrawingData() {
+
+		// create drawing data
+		final SplineDrawingData drawingData = new SplineDrawingData();
+
+		drawingData.graphXValueOffset = fGraphXValueOffset;
+		drawingData.devY0Spline = fDevY0Spline;
+		drawingData.scaleX = fScaleX;
+		drawingData.scaleY = fScaleY;
+		drawingData.devGraphValueXOffset = fDevGraphValueXOffset;
+
+		return drawingData;
 	}
 
 	public Rectangle[] getPointHitRectangels() {

@@ -242,7 +242,7 @@ public class DialogAdjustAltitudeSRTM_OLD2 extends TitleAreaDialog implements I2
 
 		final int[] adjustedAltiSerie = new int[serieLength];
 		final int[] diffTo2ndAlti = new int[serieLength];
-		final int[] spline = new int[serieLength];
+		final float[] spline = new float[serieLength];
 		final int sliderIndex = fTourChart.getXSliderPosition().getLeftSliderValueIndex();
 
 		final int[] altitudeSerie = fTourData.altitudeSerie;

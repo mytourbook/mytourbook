@@ -604,7 +604,7 @@ public class TourData implements Comparable<Object> {
 	 * Contains a spline data serie
 	 */
 	@Transient
-	public int[]						dataSerieSpline;
+	public float[]						dataSerieSpline;
 
 	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided

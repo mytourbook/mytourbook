@@ -380,8 +380,6 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean						fIsGraphVisible			= false;
 
-	private boolean						fIsMouseDown;
-
 	/**
 	 * is <code>true</code> when the chart is panned
 	 */
@@ -3899,6 +3897,7 @@ public class ChartComponentGraph extends Canvas {
 		fMouseDownPositionX = event.x;
 //		fMouseDownPositionY = event.y;
 
+		// show context menu
 		if (event.button != 1) {
 			if (event.button == 3) {
 				computeSliderForContextMenu(devXMouse, devYMouse, devXGraph);
@@ -3906,6 +3905,10 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
+		if (fChart.isMouseDownExternal(devXMouse, devYMouse, devXGraph)) {
+			return;
+		} 
+		
 		// check if a x-slider was hit
 		xSliderDragged = null;
 		if (xSliderA.getHitRectangle().contains(devXGraph, devYMouse)) {
@@ -3932,7 +3935,7 @@ public class ChartComponentGraph extends Canvas {
 
 		} else {
 
-			// a x-slider wasn't dragged
+			// a x-slider isn't dragged
 
 			// check if a y-slider was hit
 			ySliderDragged = isYSliderHit(devXGraph, devYMouse);
@@ -3995,9 +3998,6 @@ public class ChartComponentGraph extends Canvas {
 
 				setCursor(fCursorDragged);
 
-			} else {
-
-				fIsMouseDown = true;
 			}
 		}
 	}
@@ -4160,7 +4160,7 @@ public class ChartComponentGraph extends Canvas {
 
 			ChartXSlider xSlider;
 
-			if (fChart.isMouseMoveDone(devXMouse, devYMouse, devXGraph)) {
+			if (fChart.isMouseMoveExternal(devXMouse, devYMouse, devXGraph)) {
 
 				setCursor(fCursorDragged);
 
@@ -4174,15 +4174,15 @@ public class ChartComponentGraph extends Canvas {
 
 					fMouseOverXSlider = xSlider;
 
-					// set cursor
-					setCursor(fCursorResizeLeftRight);
-
 					// hide the y-slider
 					hitYSlider = null;
 
 					fIsSliderDirty = true;
 					isChartDirty = true;
 				}
+				
+				// set cursor
+				setCursor(fCursorResizeLeftRight);
 
 			} else if (fMouseOverXSlider != null) {
 
@@ -4224,10 +4224,6 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				setDefaultCursor();
-
-				if (fIsMouseDown) {
-//					fChart.fireMouseMoveEvent(event);
-				}
 			}
 		}
 
@@ -4259,13 +4255,17 @@ public class ChartComponentGraph extends Canvas {
 		final ScrollBar hBar = getHorizontalBar();
 		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
 
-		final int devX = event.x;
-		final int devY = event.y;
-		final int graphX = hBarOffset + devX;
+		final int devXMouse = event.x;
+		final int devYMouse = event.y;
+		final int devXGraph = hBarOffset + devXMouse;
 
 		if (isGraphScrolled) {
 			isGraphScrolled = false;
 		} else {
+
+			if (fChart.isMouseUpExternal(devXMouse, devYMouse, devXGraph)) {
+				return;
+			} 
 
 			if (xSliderDragged != null) {
 
@@ -4318,14 +4318,13 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// show scroll cursor if mouse up was not over the slider
-			if (xSliderA.getHitRectangle().contains(graphX, devY) || xSliderB.getHitRectangle().contains(graphX, devY)) {
+			if (xSliderA.getHitRectangle().contains(devXGraph, devYMouse)
+					|| xSliderB.getHitRectangle().contains(devXGraph, devYMouse)) {
 				if (getHorizontalBar().isVisible()) {
-					setupScrollCursor(devX, devY);
+					setupScrollCursor(devXMouse, devYMouse);
 				}
 			}
 		}
-
-		fIsMouseDown = false;
 	}
 
 	private void onMouseWheel(final Event event) {

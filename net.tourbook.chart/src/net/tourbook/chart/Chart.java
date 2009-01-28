@@ -169,8 +169,8 @@ public class Chart extends ViewForm {
 		fFocusListeners.add(listener);
 	}
 
-	public void addMouseMoveListener(final IMouseMoveListener mouseMoveListener) {
-		fMouseListener.add(mouseMoveListener);
+	public void addMouseListener(final IMouseListener mouseListener) {
+		fMouseListener.add(mouseListener);
 	}
 
 	/**
@@ -494,14 +494,28 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	private void fireChartEvent(final ChartEvent chartEvent) {
+	private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
 
 		final Object[] listeners = fMouseListener.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 
-			switch (chartEvent.type) {
+			final Object listener = listeners[i];
+			
+			switch (mouseEvent.type) {
 			case SWT.MouseMove:
-				((IMouseMoveListener) listeners[i]).mouseMove(chartEvent);
+				((IMouseListener) listener).mouseMove(mouseEvent);
+				break;
+
+			case SWT.MouseDown:
+				((IMouseListener) listener).mouseDown(mouseEvent);
+				break;
+
+			case SWT.MouseUp:
+				((IMouseListener) listener).mouseUp(mouseEvent);
+				break;
+
+			case SWT.MouseDoubleClick:
+				((IMouseListener) listener).mouseDoubleClick(mouseEvent);
 				break;
 
 			default:
@@ -684,16 +698,42 @@ public class Chart extends ViewForm {
 				chartGraph.getRightSlider().getValuesIndex());
 	}
 
-	boolean isMouseMoveDone(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseDownExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
 
-		final ChartEvent event = new ChartEvent(SWT.MouseMove);
-		
+		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseDown);
+
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
 		event.devMouseXInGraph = devXGraph;
 
-		fireChartEvent(event);
+		fireChartMouseEvent(event);
 
+		return event.isWorked;
+	}
+	
+	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseMove);
+
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+		event.devMouseXInGraph = devXGraph;
+
+		fireChartMouseEvent(event);
+
+		return event.isWorked;
+	}
+
+	boolean isMouseUpExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+		
+		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseUp);
+		
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+		event.devMouseXInGraph = devXGraph;
+		
+		fireChartMouseEvent(event);
+		
 		return event.isWorked;
 	}
 
@@ -831,10 +871,6 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	public void setContextProvider(final IChartContextProvider chartContextProvider) {
-		fChartContextProvider = chartContextProvider;
-	}
-
 //	/**
 //	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
 //	 * when the workbench action should be used.
@@ -844,6 +880,10 @@ public class Chart extends ViewForm {
 //	public void setUseInternalActionBar(boolean useInternalActionBar) {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
+
+	public void setContextProvider(final IChartContextProvider chartContextProvider) {
+		fChartContextProvider = chartContextProvider;
+	}
 
 	protected void setDataModel(final ChartDataModel chartDataModel) {
 		fChartDataModel = chartDataModel;
@@ -900,6 +940,10 @@ public class Chart extends ViewForm {
 
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	public void setMouseMode(final Object newMouseMode) {
 
 		if (newMouseMode instanceof String) {
@@ -909,10 +953,6 @@ public class Chart extends ViewForm {
 			updateMouseModeUIState();
 		}
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	/**
 	 * Select (highlight) the bar in the bar chart

@@ -15,21 +15,10 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-public class ChartEvent {
+public interface IMouseListener {
 
-	int				type;
-
-	/**
-	 * When <code>true</code> the event is done by the receiver, when <code>false</code> the
-	 * receiver has done nothing.
-	 */
-	public boolean	isWorked	= false;
-
-	public int		devYMouse;
-	public int		devXMouse;
-	public int		devMouseXInGraph;
-
-	public ChartEvent(final int eventType) {
-		type = eventType;
-	}
+	void mouseDoubleClick(ChartMouseEvent event);
+	void mouseDown(ChartMouseEvent event);
+	void mouseMove(ChartMouseEvent event);
+	void mouseUp(ChartMouseEvent event);
 }

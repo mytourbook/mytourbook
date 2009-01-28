@@ -13,10 +13,15 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
 
-public interface IMouseMoveListener {
+public class SplineDrawingData {
 
-	void mouseMove(ChartEvent chartEvent);
+	public int		graphXValueOffset;
 
+	public int		devGraphValueXOffset;
+	public int		devY0Spline;
+
+	public float	scaleX;
+	public float	scaleY;
 }
