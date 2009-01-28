@@ -2,211 +2,212 @@ package net.tourbook.ext.srtm;
 
 import java.io.File;
 
-// Minimal-/Maximalwerte
+// Minimum/Maximum values
 // 
 //           | W179:59:30 | W089:59:30 | E000:00:00 | E090:00:00 |
 //           | W090:00:00 | W000:00:00 | E089:59:30 | E179:59:30 |
 // ----------+------------+------------+------------+------------+
-// N89:59:30 | a          | lat          | c          | d          |
+// N89:59:30 | a          | b          | c          | d          |
 // N50:00:00 |            |            |            |            |
 // ----------+------------+------------+------------+------------+
 // N49:59:30 | e          | f          | g          | h          |
 // N00:00:00 |            |            |            |            |
 // ----------+------------+------------+------------+------------+
-// S00:00:00 | i          | j          | k          | lon          |
+// S00:00:00 | i          | j          | k          | l          |
 // S49:59:30 |            |            |            |            |
 // ----------+------------+------------+------------+------------+
 // S50:00:00 | m          | n          | o          | p          |
 // S89:59:30 |            |            |            |            |
 // ----------+------------+------------+------------+------------+
 
-public final class ElevationGlobe extends ElevationBase { 
+public final class ElevationGlobe extends ElevationBase {
 
-   final static private GlobeI fGlobei[] = new GlobeI[16];
-   final static private boolean initialized[] = new boolean[16]; ///[fGlobei.length];
-   
-   ;
-   public ElevationGlobe() {
-      // FileLog.println(this, "ElevationGlobe Konstructor!");
-      
-      
-      for (int i = 0; i < 16; i++) {initialized[i] = false;} 
-      bGrid.setGradMinutenSekundenRichtung(0, 0, 30, 'N');
-      lGrid.setGradMinutenSekundenRichtung(0, 0, 30, 'E');
-   }
+	final static private GlobeI		fGlobei[]		= new GlobeI[16];
+	final static private boolean	initialized[]	= new boolean[16];
 
-   public short getElevation(GeoLat lat, GeoLon lon) {
-      int i = 0;
-      
-      if (lat.getTertia() != 0) return getElevationGrid(lat, lon);
-      if (lon.getTertia() != 0) return getElevationGrid(lat, lon);
-      if (lat.getSekunden() % 30 != 0) return getElevationGrid(lat, lon);
-      if (lon.getSekunden() % 30 != 0) return getElevationGrid(lat, lon);
-      
-      // globe-Fileindex bestimmen (a-p ~ 0-15)
-      if (lat.isSueden()) {
-         i += 8;
-         if (lat.getGrad() >= 50)
-            i += 4;
-      } else if (lat.getGrad() < 50)
-         i += 4;
-      if (lon.isOsten()) {
-         i += 2;
-         if (lon.getGrad() >= 90)
-            i++;
-      } else if (lon.getGrad() < 90)
-         i++;
+	public ElevationGlobe() {
+		for (int i = 0; i < 16; i++)
+			initialized[i] = false;
+		gridLat.setGradeMinutesSecondsDirection(0, 0, 30, 'N');
+		gridLon.setGradeMinutesSecondsDirection(0, 0, 30, 'E');
+	}
 
-      if (initialized[i] == false) {
-         initialized[i] = true;
-         // FileLog.println(this, "Index ElevationGlobe " + i);
-         fGlobei[i] = new GlobeI(i); // nur beim jeweils ersten Mal !!
-      }
+	public short getElevation(GeoLat lat, GeoLon lon) {
+		int i = 0;
 
-      return fGlobei[i].getElevation(lat, lon);
-   }
+		if (lat.getTertia() != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.getTertia() != 0)
+			return getElevationGrid(lat, lon);
+		if (lat.getSeconds() % 30 != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.getSeconds() % 30 != 0)
+			return getElevationGrid(lat, lon);
 
-   public double getElevationDouble(GeoLat lat, GeoLon lon) {
+		// calculate globe fileindex (a-p ~ 0-15)
+		if (lat.isSouth()) {
+			i += 8;
+			if (lat.getGrade() >= 50)
+				i += 4;
+		} else if (lat.getGrade() < 50)
+			i += 4;
+		if (lon.isEast()) {
+			i += 2;
+			if (lon.getGrade() >= 90)
+				i++;
+		} else if (lon.getGrade() < 90)
+			i++;
 
-      if (lat.getDezimal() == 0 && lon.getDezimal() == 0) return 0.;
-      if (lat.getTertia() != 0) return getElevationGridDouble(lat, lon);
-      if (lon.getTertia() != 0) return getElevationGridDouble(lat, lon);
-      if (lat.getSekunden() % 30 != 0) return getElevationGridDouble(lat, lon);
-      if (lon.getSekunden() % 30 != 0) return getElevationGridDouble(lat, lon);
-      return (double) getElevation(lat, lon);
-   }
+		if (initialized[i] == false) {
+			initialized[i] = true;
+			fGlobei[i] = new GlobeI(i); // first time only !!
+		}
 
-   public short getSekDiff() {
-   	// Anzahl Gradsekunden zwischen zwei Datenpunkten
-   	return 30;
-   }
-   
-   public String getName() {
-   	return "GLOBE";
-   }
+		return fGlobei[i].getElevation(lat, lon);
+	}
 
-   private class GlobeI {
-      private GeoLat minLat = new GeoLat();
-      private GeoLon minLon = new GeoLon();
-      ElevationFile elevationFile;
-      GeoLat bo = new GeoLat();
-      GeoLon lo = new GeoLon();
-      
+	public double getElevationDouble(GeoLat lat, GeoLon lon) {
 
-      private GlobeI(int i) {
+		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
+			return 0.;
+		if (lat.getTertia() != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.getTertia() != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lat.getSeconds() % 30 != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.getSeconds() % 30 != 0)
+			return getElevationGridDouble(lat, lon);
+		return (double) getElevation(lat, lon);
+	}
 
-         final String elevationDataPath = getElevationDataPath();
-         final String globeDir = elevationDataPath + File.separator + "globe"; // Lokale Lage der GLOBE-Files!!!
-         final String globeSuffix = "10g";
+	public short getSecDiff() {
+		// number of grade seconds between two data points
+		return 30;
+	}
 
-         char c = (char) ('a' + i);
-         String fileName = new String();
-         fileName =globeDir
-         + File.separator
-         + c 
-         + globeSuffix;
-         
-         try {
-            elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_GLOBE);
-         } catch (Exception e) {
-            System.out.println("GlobeI: Fehler: " + e.getMessage()); // NICHT File not found
-            // Exception nicht weitergeben
-         }
-         
-         switch (i) {
-            case 0 :
-            case 4 :
-            case 8 :
-            case 12 :
-               minLon.setGradMinutenSekundenRichtung(179, 59, 30, 'W');
-               break;
-            case 1 :
-            case 5 :
-            case 9 :
-            case 13 :
-               minLon.setGradMinutenSekundenRichtung(89, 59, 30, 'W');
-               break;
-            case 2 :
-            case 6 :
-            case 10 :
-            case 14 :
-               minLon.setGradMinutenSekundenRichtung(0, 0, 0, 'E');
-               break;
-            case 3 :
-            case 7 :
-            case 11 :
-            case 15 :
-               minLon.setGradMinutenSekundenRichtung(90, 0, 0, 'E');
-               break;
-            default :
-               break;
-         }
-         switch (i) {
-            case 0 :
-            case 1 :
-            case 2 :
-            case 3 :
-               minLat.setGradMinutenSekundenRichtung(89, 59, 30, 'N');
-               break;
-            case 4 :
-            case 5 :
-            case 6 :
-            case 7 :
-               minLat.setGradMinutenSekundenRichtung(49, 59, 30, 'N');
-               break;
-            case 8 :
-            case 9 :
-            case 10 :
-            case 11 :
-               minLat.setGradMinutenSekundenRichtung(0, 0, 0, 'S');
-               break;
-            case 12 :
-            case 13 :
-            case 14 :
-            case 15 :
-               minLat.setGradMinutenSekundenRichtung(50, 0, 0, 'S');
-               break;
-            default :
-               break;
-         }
-      }
-      
-      /**
-       * Byte swap a single short value.
-       * 
-       * @param value  Value to byte swap.
-       * @return       Byte swapped representation.
-       */
-      private short swap(short value)
-      {
-        int lat1 = value & 0xff;
-        int lat2 = (value >> 8) & 0xff;
+	public String getName() {
+		return "GLOBE";
+	}
 
-        return (short) (lat1 << 8 | lat2 << 0);
-      }
+	private class GlobeI {
+		private GeoLat	minLat	= new GeoLat();
+		private GeoLon	minLon	= new GeoLon();
+		GeoLat			offLat	= new GeoLat();
+		GeoLon			offLon	= new GeoLon();
+		ElevationFile	elevationFile;
 
-      public short getElevation(GeoLat lat, GeoLon lon) {
-         
-         short elev = elevationFile.get(offset(lat, lon));
-         return swap(elev);
-         // return elev;
-      }
+		private GlobeI(int i) {
 
-      //    Offset im Globe-File
-      public int offset(GeoLat lat, GeoLon lon) {
+			final String globeDataPath = getElevationDataPath("globe");
+			final String globeSuffix = "10g";
+			char c = (char) ('a' + i);
+			String fileName = new String(globeDataPath + File.separator + c + globeSuffix);
 
-         bo.sub(minLat, lat);
-         lo.sub(minLon, lon);
-         return bo.getGrad() * 1296000  // 360*60*60
-            + bo.getMinuten() * 21600   // 360*60
-            + bo.getSekunden() * 360
-            + lo.getGrad() * 120
-            + lo.getMinuten() * 2
-            + lo.getSekunden() / 30;
-      }
+			try {
+				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_GLOBE);
+			} catch (Exception e) {
+				System.out.println("GlobeI: Error: " + e.getMessage()); // NOT File not found
+				// dont return exception
+			}
 
-   }
+			switch (i) {
+			case 0:
+			case 4:
+			case 8:
+			case 12:
+				minLon.setGradeMinutesSecondsDirection(179, 59, 30, 'W');
+				break;
+			case 1:
+			case 5:
+			case 9:
+			case 13:
+				minLon.setGradeMinutesSecondsDirection(89, 59, 30, 'W');
+				break;
+			case 2:
+			case 6:
+			case 10:
+			case 14:
+				minLon.setGradeMinutesSecondsDirection(0, 0, 0, 'E');
+				break;
+			case 3:
+			case 7:
+			case 11:
+			case 15:
+				minLon.setGradeMinutesSecondsDirection(90, 0, 0, 'E');
+				break;
+			default:
+				break;
+			}
+			switch (i) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				minLat.setGradeMinutesSecondsDirection(89, 59, 30, 'N');
+				break;
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				minLat.setGradeMinutesSecondsDirection(49, 59, 30, 'N');
+				break;
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				minLat.setGradeMinutesSecondsDirection(0, 0, 0, 'S');
+				break;
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+				minLat.setGradeMinutesSecondsDirection(50, 0, 0, 'S');
+				break;
+			default:
+				break;
+			}
+		}
 
-   public static void main(String[] args) {
-   }
+		/**
+		 * Byte swap a single short value.
+		 * 
+		 * @param value
+		 *            Value to byte swap.
+		 * @return Byte swapped representation.
+		 */
+		private short swap(short value) {
+			int lat1 = value & 0xff;
+			int lat2 = (value >> 8) & 0xff;
+
+			return (short) (lat1 << 8 | lat2 << 0);
+		}
+
+		public short getElevation(GeoLat lat, GeoLon lon) {
+
+			short elev = elevationFile.get(offset(lat, lon));
+			return swap(elev);
+		}
+
+		//    Offset in the Globe-File
+		public int offset(GeoLat lat, GeoLon lon) {
+
+			offLat.sub(minLat, lat);
+			offLon.sub(minLon, lon);
+			return offLat.getGrade() * 1296000 // 360*60*60
+					+ offLat.getMinutes()
+					* 21600 // 360*60
+					+ offLat.getSeconds()
+					* 360
+					+ offLon.getGrade()
+					* 120
+					+ offLon.getMinutes()
+					* 2
+					+ offLon.getSeconds()
+					/ 30;
+		}
+
+	}
+
+	public static void main(String[] args) {}
 }

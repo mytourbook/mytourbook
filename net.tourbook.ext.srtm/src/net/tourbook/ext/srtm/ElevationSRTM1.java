@@ -10,13 +10,11 @@ public class ElevationSRTM1 extends ElevationBase {
    static private HashMap<Integer,SRTM1I> hm;
 
    public ElevationSRTM1() {
-      // FileLog.println(this, "ElevationSRTM1 Konstructor!");
-      
-      // Map mit benutzten Files anlegen
-      // um den File zu finden, wird eine Schluesselzahl berechnet und gemerkt
+      // create map with used Files
+      // to find file, calculate and remember key value
       hm = new HashMap<Integer,SRTM1I>(); // default initial 16 Files
-      bGrid.setGradMinutenSekundenRichtung(0, 0, 1, 'N');
-      lGrid.setGradMinutenSekundenRichtung(0, 0, 1, 'E');
+      gridLat.setGradeMinutesSecondsDirection(0, 0, 1, 'N');
+      gridLon.setGradeMinutesSecondsDirection(0, 0, 1, 'E');
    }
 
    public short getElevation(GeoLat lat, GeoLon lon) {
@@ -24,19 +22,18 @@ public class ElevationSRTM1 extends ElevationBase {
       if (lat.getTertia() != 0) return getElevationGrid(lat, lon);
       if (lon.getTertia() != 0) return getElevationGrid(lat, lon);
       
-      int i = lon.getGrad();
-      if (lon.isWesten())
+      int i = lon.getGrade();
+      if (lon.isWest())
          i += 256;
       i *= 1024;
-      i += lat.getGrad();
-      if (lat.isSueden())
+      i += lat.getGrade();
+      if (lat.isSouth())
          i += 256;
       Integer ii = new Integer(i);
       fSRTMi = (SRTM1I)hm.get(ii);
 
       if (fSRTMi == null) {
-         // nur beim jeweils ersten Mal
-         // FileLog.println(this, "Index ElevationSRTM1 " + ii);
+         // first time only
          fSRTMi = new SRTM1I(lat, lon);
          hm.put(ii, fSRTMi);
       }
@@ -47,15 +44,15 @@ public class ElevationSRTM1 extends ElevationBase {
 
    public double getElevationDouble(GeoLat lat, GeoLon lon) {
 
-      if (lat.getDezimal() == 0 && lon.getDezimal() == 0) return 0.;
+      if (lat.getDecimal() == 0 && lon.getDecimal() == 0) return 0.;
       if (lat.getTertia() != 0) return getElevationGridDouble(lat, lon);
       if (lon.getTertia() != 0) return getElevationGridDouble(lat, lon);
       return (double) getElevation(lat, lon);
    }
    
-   public short getSekDiff() {
-   	// Anzahl Gradsekunden zwischen zwei Datenpunkten
-   	return 1;
+   public short getSecDiff() {
+	   // number of grade seconds between two data points
+	   return 1;
    }
    
    public String getName() {
@@ -68,24 +65,22 @@ public class ElevationSRTM1 extends ElevationBase {
 
       private SRTM1I(GeoLat lat, GeoLon lon) {
 
-    	  final String elevationDataPath = getElevationDataPath();
-    	  final String srtm1Dir = elevationDataPath + File.separator + "srtm1"; // Lokale Lage der SRTM1-Files!!!
-    	  final String srtm1Suffix = ".hgt";
+			final String srtm1DataPath = getElevationDataPath("srtm1");
+			final String srtm1Suffix = ".hgt";
 
-    	  String fileName = new String();
-    	  fileName =srtm1Dir
-    	       + File.separator
-               + lat.getRichtung()
-               + NumberForm.n2(lat.isNorden() ? lat.getGrad() : lat.getGrad() + 1)
-               + lon.getRichtung()
-               + NumberForm.n3(lon.isOsten() ? lon.getGrad() : lon.getGrad() + 1)
-  			   + srtm1Suffix;
+			String fileName = new String(srtm1DataPath
+					+ File.separator
+					+ lat.getDirection()
+					+ NumberForm.n2(lat.isNorth() ? lat.getGrade() : lat.getGrade() + 1)
+					+ lon.getDirection()
+					+ NumberForm.n3(lon.isEast() ? lon.getGrade() : lon.getGrade() + 1)
+					+ srtm1Suffix);
 
          try {
             elevationFile = new ElevationFile(fileName,  Constants.ELEVATION_TYPE_SRTM1);
          } catch (Exception e) {
-            System.out.println("SRTM1I: Fehler: " + e.getMessage()); // NICHT File not found
-            // Exception nicht weitergeben
+            System.out.println("SRTM1I: Error: " + e.getMessage()); // NOT File not found
+            // dont return exception
          }
        }
       
@@ -93,24 +88,24 @@ public class ElevationSRTM1 extends ElevationBase {
       	return elevationFile.get(offset(lat, lon));
       }
 
-      //    Offset im SRTM1-File
+      //    Offset in the SRTM1-File
       public int offset(GeoLat lat, GeoLon lon) {
 
-      	if (lat.isSueden()) {
-      		if (lon.isOsten())
-      			return 3601 * (lat.getMinuten() * 60 + lat.getSekunden())
-            		+ lon.getMinuten() * 60 + lon.getSekunden();
+      	if (lat.isSouth()) {
+      		if (lon.isEast())
+      			return 3601 * (lat.getMinutes() * 60 + lat.getSeconds())
+            		+ lon.getMinutes() * 60 + lon.getSeconds();
       		else
-      			return 3601 * (lat.getMinuten() * 60 + lat.getSekunden())
-					+ 3599 - lon.getMinuten() * 60 - lon.getSekunden();
+      			return 3601 * (lat.getMinutes() * 60 + lat.getSeconds())
+					+ 3599 - lon.getMinutes() * 60 - lon.getSeconds();
       	}
       	else {
-      		if (lon.isOsten())
-      			return 3601 * (3599 - lat.getMinuten() * 60 - lat.getSekunden())
-            		+ lon.getMinuten() * 60 + lon.getSekunden();
+      		if (lon.isEast())
+      			return 3601 * (3599 - lat.getMinutes() * 60 - lat.getSeconds())
+            		+ lon.getMinutes() * 60 + lon.getSeconds();
       		else
-      			return 3601 * (3599 - lat.getMinuten() * 60 - lat.getSekunden())
-					+ 3599 - lon.getMinuten() * 60 - lon.getSekunden();
+      			return 3601 * (3599 - lat.getMinutes() * 60 - lat.getSeconds())
+					+ 3599 - lon.getMinutes() * 60 - lon.getSeconds();
       	}
       }
 
