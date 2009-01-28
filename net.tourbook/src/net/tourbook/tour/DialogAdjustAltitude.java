@@ -51,12 +51,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Widget;
 
 /**
  * Dialog to adjust the altitude, this dialog can be opened from within a tour chart or from the
@@ -71,7 +67,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static final int			ADJUST_TYPE_END					= 1004;
 
 	private static final String			PREF_ADJUST_TYPE				= "adjust.altitude.adjust_type";	//$NON-NLS-1$
-//	private static final String				PREF_SYNCH_MIN_MAX_IS_CHECKED	= "adjust.altitude.synch-min-max.is-checked";	//$NON-NLS-1$
 
 	private final IPreferenceStore		fPrefStore						= TourbookPlugin.getDefault()
 																				.getPreferenceStore();
@@ -96,40 +91,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static AdjustmentType[]		fAllAdjustmentTypes;
 	private ArrayList<AdjustmentType>	fAvailableAdjustTypes			= new ArrayList<AdjustmentType>();
 
-	private Scale						fUIScaleX1;
-	private Scale						fUIScaleY1;
-	private Scale						fUIScaleX1Border;
-	private Scale						fUIScaleY1Border;
-	private Scale						fUIScaleX2Border;
-	private Scale						fUIScaleY2Border;
-
-	private float						fUIScaleValueX1;
-	private float						fUIScaleValueY1;
-	private float						fUIScaleValueX1Border;
-	private float						fUIScaleValueY1Border;
-	private float						fUIScaleValueX2Border;
-	private float						fUIScaleValueY2Border;
-
-	private float						fUIValueX1;
-	private float						fUIValueY1;
-	private float						fUIValueX2Border;
-	private float						fUIValueY2Border;
-	private float						fUIValueX1Border;
-	private float						fUIValueY1Border;
-
-	private Label						fLabelX1;
-	private Label						fLabelY1;
-	private Label						fLabelX1Border;
-	private Label						fLabelY1Border;
-	private Label						fLabelX2Border;
-	private Label						fLabelY2Border;
-
 	private ChartLayer2ndAltiSerie		fChartLayer2ndAltiSerie;
 
 	private int							fPointHitIndex					= -1;
-
-	private float						fSliderDistance;
-	private float						fStartAltiDiff;
+	private SplineData					fSplineData;
+	private int							fAltiDiff;
+	private int							fSliderDistance;
 
 	{
 		fNF.setMinimumFractionDigits(0);
@@ -190,7 +157,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	 */
 	private void computeAltitudeUntilLeftSlider() {
 
-		// srtm values must be available, otherwise this option is not available in the combo box
+		// srtm values are available, otherwise this option is not available in the combo box
 
 		final int[] srtm2ndAlti = fTourData.dataSerie2ndAlti = fTourData.getSRTMSerieMetric();
 
@@ -210,9 +177,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 			diffTo2ndAlti[serieIndex] = altitudeSerie[serieIndex] - srtm2ndAlti[serieIndex];
 		}
-		fStartAltiDiff = -diffTo2ndAlti[0];
+		fAltiDiff = -diffTo2ndAlti[0];
 
-		final CubicSpline cubicSpline = createSplineData();
+		final CubicSpline cubicSpline = updateSplineData(fSliderDistance, fAltiDiff);
 
 		// get adjusted altitude serie
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -224,10 +191,24 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				final float distance = distanceSerie[serieIndex];
 				final float distanceScale = 1 - (distance / fSliderDistance);
 
-				final int adjustedAltiDiff = (int) (fStartAltiDiff * distanceScale);
+				final int adjustedAltiDiff = (int) (fAltiDiff * distanceScale);
 				final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
-				final float splineAlti = (float) cubicSpline.interpolate(distance);
+				float splineAlti = 0;
+				try {
+
+					splineAlti = (float) cubicSpline.interpolate(distance);
+
+				} catch (final IllegalArgumentException e) {
+					final double[] xValues = fTourData.splineDataPoints.xValues;
+					System.out.println((xValues[0] + " ")
+							+ (xValues[1] + " ")
+							+ (xValues[2] + " ")
+							+ (xValues[3] + " ")
+							+ xValues[4]);
+					e.printStackTrace();
+					return;
+				}
 				splineDataSerie[serieIndex] = splineAlti;
 
 				final int adjustedAlti = newAltitude + (int) splineAlti;
@@ -241,15 +222,54 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				adjustedAltiSerie[serieIndex] = altitudeSerie[serieIndex];
 			}
 		}
+
 	}
 
 	private void computePointMoveValues(final ChartMouseEvent mouseEvent) {
 
+		if (fPointHitIndex == -1) {
+			return;
+		}
+
 		final SplineDrawingData drawingData = fChartLayer2ndAltiSerie.getDrawingData();
+		final float scaleX = drawingData.scaleX;
+		final float scaleY = drawingData.scaleY;
+		
 
-		final int devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
-		final int devY = drawingData.devY0Spline - mouseEvent.devYMouse;
+		float devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
+		final float devY = drawingData.devY0Spline - mouseEvent.devYMouse;
 
+		final float[] posX = fSplineData.relativePositionX;
+		final float[] posY = fSplineData.relativePositionY;
+		
+		final double graphXMin = fSplineData.xMinValues[fPointHitIndex];
+		final double graphXMax = fSplineData.xMaxValues[fPointHitIndex];
+
+		float graphX = devX / scaleX;
+		
+		if (graphXMin != Double.NaN) {
+			if (graphX < graphXMin) {
+				graphX = (float) graphXMin;
+			}
+		}
+		if (graphXMax != Double.NaN) {
+			if (graphX > graphXMax) {
+				graphX = (float) graphXMax;
+			}
+		}
+		devX = graphX * scaleX;
+		
+		final int graph1X = fSliderDistance;
+		final int graph1Y = fAltiDiff;
+
+		final float dev1X = graph1X * scaleX;
+		final float dev1Y = graph1Y * scaleY;
+
+		final float devNewPosX = devX / dev1X;
+		final float devNewPosY = devY / dev1Y;
+
+		posX[fPointHitIndex] = devNewPosX;
+		posY[fPointHitIndex] = devNewPosY;
 	}
 
 	@Override
@@ -304,55 +324,44 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		createUI(container);
 
-		// initialize scale, remove it from the same position as the next spline position
-		fUIScaleX1Border.setSelection(0);
-		fUIScaleX1.setSelection(50);
-		fUIScaleX2Border.setSelection(100);
-
-		fUIScaleY1Border.setSelection(50);
-		fUIScaleY1.setSelection(50);
-		fUIScaleY2Border.setSelection(50);
+		createSplineData();
 
 		return fDialogContainer;
 	}
 
 	/**
 	 * create spline values
+	 * 
+	 * @param altiDiff
+	 * @param sliderDistance
+	 * @return
 	 */
-	private CubicSpline createSplineData() {
+	private void createSplineData() {
 
-		/*
-		 * create UI scale data
-		 */
-		fUIValueX1Border = 0.1f + fUIScaleValueX1Border * fSliderDistance;
-		fUIValueY1Border = 0.0f + fUIScaleValueY1Border * fStartAltiDiff;
+		fSplineData = fTourData.splineDataPoints = new SplineData();
 
-		fUIValueX1 = fUIScaleValueX1 * fSliderDistance;
-		fUIValueY1 = fUIScaleValueY1 * fStartAltiDiff;
+		final int pointLength = 5;
 
-		fUIValueX2Border = 0.1f + fUIScaleValueX2Border * fSliderDistance;
-		fUIValueY2Border = 0.0f + fUIScaleValueY2Border * fStartAltiDiff;
+		fSplineData.xValues = new double[pointLength];
+		fSplineData.yValues = new double[pointLength];
 
-		final int spPointLength = 5;
+		final boolean[] isMovable = fSplineData.isPointMovable = new boolean[pointLength];
+		final double[] splineMinX = fSplineData.xMinValues = new double[pointLength];
+		final double[] splineMaxX = fSplineData.xMaxValues = new double[pointLength];
 
-		final SplineData splineData = fTourData.splineDataPoints = new SplineData();
+		final float[] posX = fSplineData.relativePositionX = new float[pointLength];
+		final float[] posY = fSplineData.relativePositionY = new float[pointLength];
 
-		final double[] splineX = splineData.xValues = new double[spPointLength];
-		final double[] splineY = splineData.yValues = new double[spPointLength];
-		final boolean[] isMovable = splineData.isPointMovable = new boolean[spPointLength];
-		final double[] splineMinX = splineData.xMinValues = new double[spPointLength];
-		final double[] splineMaxX = splineData.xMaxValues = new double[spPointLength];
-
-		splineX[0] = 0;
-		splineY[0] = 0;
-		splineX[1] = fUIValueX1Border;
-		splineY[1] = -fUIValueY1Border;
-		splineX[2] = fUIValueX1;
-		splineY[2] = -fUIValueY1;
-		splineX[3] = fUIValueX2Border;
-		splineY[3] = -fUIValueY2Border;
-		splineX[4] = fSliderDistance;
-		splineY[4] = 0;
+		posX[0] = -0.1f;
+		posY[0] = 0;
+		posX[1] = 0;
+		posY[1] = 0;
+		posX[2] = 0.5f;
+		posY[2] = 0;
+		posX[3] = 1f;
+		posY[3] = 0;
+		posX[4] = 1.1f;
+		posY[4] = 0;
 
 		isMovable[0] = false;
 		isMovable[1] = true;
@@ -362,16 +371,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		splineMinX[0] = Double.NaN;
 		splineMaxX[0] = Double.NaN;
-		splineMinX[1] = Double.NaN;
+		splineMinX[1] = 0;
 		splineMaxX[1] = 0;
 		splineMinX[2] = 0;
-		splineMaxX[2] = fSliderDistance;
-		splineMinX[3] = fSliderDistance;
-		splineMaxX[3] = Double.NaN;
+		splineMaxX[2] = 0;
+		splineMinX[3] = 0;
+		splineMaxX[3] = 0;
 		splineMinX[4] = Double.NaN;
 		splineMaxX[4] = Double.NaN;
-
-		return new CubicSpline(splineX, splineY);
 	}
 
 	private void createUI(final Composite parent) {
@@ -386,140 +393,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //		createUISpline(splineContainer);
 //		createUISplineActions(splineContainer);
 
-		createUIAdjustments(parent);
-	}
-
-	private void createUIAdjustments(final Composite parent) {
-
-		final Composite scaleContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(scaleContainer);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(scaleContainer);
-
-		/*
-		 * scale: math var X1 border
-		 */
-		fUIScaleX1Border = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleX1Border);
-		fUIScaleX1Border.setMaximum(100);
-		fUIScaleX1Border.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleX1Border.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelX1Border = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelX1Border);
-
-		/*
-		 * scale: math var Y1 border
-		 */
-		fUIScaleY1Border = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleY1Border);
-		fUIScaleY1Border.setMaximum(100);
-		fUIScaleY1Border.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleY1Border.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelY1Border = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelY1Border);
-
-		/*
-		 * scale: math var X1
-		 */
-		fUIScaleX1 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleX1);
-		fUIScaleX1.setMaximum(100);
-		fUIScaleX1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleX1.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelX1 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelX1);
-
-		/*
-		 * scale: math var Y1
-		 */
-		fUIScaleY1 = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleY1);
-		fUIScaleY1.setMaximum(100);
-		fUIScaleY1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleY1.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelY1 = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelY1);
-
-		/*
-		 * scale: math var X2 border
-		 */
-		fUIScaleX2Border = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleX2Border);
-		fUIScaleX2Border.setMaximum(100);
-		fUIScaleX2Border.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleX2Border.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelX2Border = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelX2Border);
-
-		/*
-		 * scale: math var Y2 border
-		 */
-		fUIScaleY2Border = new Scale(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fUIScaleY2Border);
-		fUIScaleY2Border.setMaximum(100);
-		fUIScaleY2Border.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyProperties();
-			}
-		});
-		fUIScaleY2Border.addListener(SWT.MouseDoubleClick, new Listener() {
-			public void handleEvent(final Event event) {
-				onScaleDoubleClick(event.widget);
-			}
-		});
-
-		fLabelY2Border = new Label(scaleContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(40, SWT.DEFAULT).applyTo(fLabelY2Border);
+//		createUIAdjustments(parent);
 	}
 
 	private void createUIAdjustmentType(final Composite parent) {
@@ -620,18 +494,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
-	private void getValuesFromUI() {
-
-		fUIScaleValueX1Border = (float) fUIScaleX1Border.getSelection() / 100;
-		fUIScaleValueY1Border = (float) (fUIScaleY1Border.getSelection() - 50) / 100;
-
-		fUIScaleValueX1 = (float) fUIScaleX1.getSelection() / 100;
-		fUIScaleValueY1 = (float) (fUIScaleY1.getSelection() - 50) / 100;
-
-		fUIScaleValueX2Border = (float) fUIScaleX2Border.getSelection() / 100;
-		fUIScaleValueY2Border = (float) (fUIScaleY2Border.getSelection() - 50) / 100;
-	}
-
 	@Override
 	protected void okPressed() {
 
@@ -641,8 +503,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	}
 
 	private void onModifyProperties() {
-
-		getValuesFromUI();
 
 		// hide 2nd alti diff & adjustment
 		fTourData.dataSerieAdjustedAlti = null;
@@ -666,8 +526,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			break;
 		}
 
-		updateUI();
-
 		fTourChart.update2ndAltiLayer(this, true);
 	}
 
@@ -683,9 +541,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 
 		fPointHitIndex = -1;
+		final boolean[] isPointMovable = fSplineData.isPointMovable;
 
 		// check if the mouse hits a spline point
 		for (int pointIndex = 0; pointIndex < pointHitRectangles.length; pointIndex++) {
+
+			if (isPointMovable[pointIndex] == false) {
+				// ignore none movable points
+				continue;
+			}
 
 			if (pointHitRectangles[pointIndex].contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
@@ -713,17 +577,24 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			// point is moved
 
 			computePointMoveValues(mouseEvent);
-			computeAltitudeUntilLeftSlider();
 
-			updateUI();
-			fTourChart.update2ndAltiLayer(this, true);
+			onModifyProperties();
+
+			mouseEvent.isWorked = true;
 
 		} else {
 
 			// point is not moved, check if the mouse hits a spline point
 
-			for (final Rectangle pointRect : pointHitRectangles) {
-				if (pointRect.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
+			final boolean[] isPointMovable = fSplineData.isPointMovable;
+			for (int pointIndex = 0; pointIndex < pointHitRectangles.length; pointIndex++) {
+
+				if (isPointMovable[pointIndex] == false) {
+					// ignore none movable points
+					continue;
+				}
+
+				if (pointHitRectangles[pointIndex].contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 					mouseEvent.isWorked = true;
 					break;
 				}
@@ -739,16 +610,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		mouseEvent.isWorked = true;
 		fPointHitIndex = -1;
-	}
-
-	private void onScaleDoubleClick(final Widget widget) {
-
-		final Scale scale = (Scale) widget;
-		final int max = scale.getMaximum();
-
-		scale.setSelection(max / 2);
-
-		onModifyProperties();
 	}
 
 	/**
@@ -811,6 +672,47 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fIsTourSaved = true;
 	}
 
+	private CubicSpline updateSplineData(final int sliderDistance, final int altiDiff) {
+
+		final double[] splineX = fSplineData.xValues;
+		final double[] splineY = fSplineData.yValues;
+
+		final double[] splineMinX = fSplineData.xMinValues;
+		final double[] splineMaxX = fSplineData.xMaxValues;
+
+		final float[] posX = fSplineData.relativePositionX;
+		final float[] posY = fSplineData.relativePositionY;
+
+		splineX[0] = -0.1f;
+		splineX[1] = posX[1] * sliderDistance;
+		splineX[2] = posX[2] * sliderDistance;
+		splineX[3] = posX[3] * sliderDistance;
+		splineX[4] = sliderDistance + 0.1f;
+
+		splineY[0] = 0;
+		splineY[1] = posY[1] * altiDiff;
+		splineY[2] = posY[2] * altiDiff;
+		splineY[3] = posY[3] * altiDiff;
+		splineY[4] = 0;
+
+		splineMinX[0] = Double.NaN;
+		splineMaxX[0] = Double.NaN;
+
+		splineMinX[1] = 0;
+		splineMaxX[1] = sliderDistance;
+
+		splineMinX[2] = 0;
+		splineMaxX[2] = sliderDistance;
+
+		splineMinX[3] = 0;
+		splineMaxX[3] = sliderDistance;
+
+		splineMinX[4] = Double.NaN;
+		splineMaxX[4] = Double.NaN;
+
+		return new CubicSpline(splineX, splineY);
+	}
+
 	private void updateTourChart() {
 
 		fIsChartUpdated = true;
@@ -818,24 +720,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, true);
 
 		fIsChartUpdated = false;
-	}
-
-	private void updateUI() {
-
-		fLabelX1.setText(Integer.toString((int) fUIValueX1));
-		fLabelX1.pack(true);
-		fLabelY1.setText(Integer.toString((int) -fUIValueY1));
-		fLabelY1.pack(true);
-
-		fLabelX1Border.setText(Integer.toString((int) fUIValueX1Border));
-		fLabelX1Border.pack(true);
-		fLabelY1Border.setText(Integer.toString((int) -fUIValueY1Border));
-		fLabelY1Border.pack(true);
-
-		fLabelX2Border.setText(Integer.toString((int) fUIValueX2Border));
-		fLabelX2Border.pack(true);
-		fLabelY2Border.setText(Integer.toString((int) -fUIValueY2Border));
-		fLabelY2Border.pack(true);
 	}
 
 }

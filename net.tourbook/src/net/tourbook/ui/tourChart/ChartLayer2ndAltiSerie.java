@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.ui.UI;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Rectangle;
@@ -246,17 +247,18 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint splines
 		 */
+		final Color splineColor = new Color(display, 0x00, 0xb4, 0xff);
 		final float[] ySplineSerie = fTourData.dataSerieSpline;
 		if (ySplineSerie != null) {
 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+			gc.setForeground(splineColor);
 
 			int devPrevX = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
 			int devPrevY = (int) (ySplineSerie[0] / measurementSystem * fScaleY);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
-				final float graphX = xValues[xIndex];
+				final float graphX = xValues[xIndex] - fGraphXValueOffset;
 				final float graphY = ySplineSerie[xIndex] / measurementSystem;
 
 				final int devX = (int) (graphX * fScaleX);
@@ -299,22 +301,22 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			/*
 			 * paint static points
 			 */
+			gc.setBackground(splineColor);
 			for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
 
 				if (isPointMovable[pointIndex]) {
 					continue;
 				}
 
-				final double graphSpX = xSplineValues[pointIndex] - fGraphXValueOffset;
-				final double graphSpY = ySplineValues[pointIndex] / measurementSystem;
+				final double graphX = xSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphY = ySplineValues[pointIndex] / measurementSystem;
 
-				final int devPointX = (int) (graphSpX * fScaleX);
-				final int devPointY = (int) (graphSpY * scaleValueDiff);
+				final int devPointX = (int) (graphX * fScaleX);
+				final int devPointY = (int) (graphY * scaleValueDiff);
 
 				final int devX = devPointX - pointSize2;
 				final int devY = fDevY0Spline - devPointY - pointSize2;
 
-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				gc.fillOval(devX, devY, pointSize, pointSize);
 
 				// keep point position
@@ -327,6 +329,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			/*
 			 * paint movable points
 			 */
+			gc.setBackground(display.getSystemColor(SWT.COLOR_RED));
 			for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
 
 				if (isPointMovable[pointIndex] == false) {
@@ -342,7 +345,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				final int devX = devPointX - pointSize2;
 				final int devY = fDevY0Spline - devPointY - pointSize2;
 
-				gc.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
 				gc.fillOval(devX, devY, pointSize, pointSize);
 
 				// keep point position
@@ -354,6 +356,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		}
 
 		// dispose resources
+		splineColor.dispose();
 		path2ndSerie.dispose();
 		pathValueDiff.dispose();
 		pathAdjustValue.dispose();

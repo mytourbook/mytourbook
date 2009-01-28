@@ -17,6 +17,9 @@ package net.tourbook.data;
 
 public class SplineData {
 
+	public float[]		relativePositionX;
+	public float[]		relativePositionY;
+
 	public double[]		xValues;
 	public double[]		yValues;
 
@@ -24,4 +27,6 @@ public class SplineData {
 	public double[]		xMaxValues;
 
 	public boolean[]	isPointMovable;
+	
+	public SplineData() {}
 }
