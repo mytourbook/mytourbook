@@ -8,28 +8,28 @@ public class GeoCoord {
    public static final int fakts = 60;
    
    // dummies; siehe GeoLon / GeoLat
-   public char richtungPlus() {return '!';}
-   public char richtungMinus() {return '?';}
+   public char directionPlus() {return '!';}
+   public char directionMinus() {return '?';}
    
    final static private int PATTERN_ANZ = 10;
    final static private String  patternString[] = new String[PATTERN_ANZ];
    final static private Pattern pattern[] = new Pattern[PATTERN_ANZ];
    static private Matcher matcher = null;
    
-   public char richtung;
-   private int grad;                            // 1 Grad in NS-Richtung = 110.946 km
-   private int minuten;                         // 1 Min. in NS-Richtung = 1.852 km
-   private int sekunden;                        // 1 Sek. in NS-Richtung = 30.68 m
-   private int tertia; // sechzigstel Sekunden  // 1 Trz. in NS-Richtung =  0.51 m
-   protected int dezimal; // nur Subklassen (GeoLat, GeoLon) kennen die Variable
+   public char direction;
+   private int grade;                            // 1 Grade in NS-Direction = 110.946 km
+   private int minutes;                         // 1 Min. in NS-Direction = 1.852 km
+   private int seconds;                        // 1 Sek. in NS-Direction = 30.68 m
+   private int tertia; // sechzigstel Seconds  // 1 Trz. in NS-Direction =  0.51 m
+   protected int decimal; // nur Subklassen (GeoLat, GeoLon) kennen die Variable
    
-   // Variable doppel wird ausschliesslich für GPS-Dateifiles verwendet
+   // Variable doubleValue wird ausschliesslich für GPS-Dateifiles verwendet
    // (dort, damit keine Rundungsfehler beim Splitten eines großen HST-Files in
    // viele kleine entstehen)
    // Variable muss mit set(double) gesetzt und mit toStringDouble*() gelesen werden
-   // _kein_ Update in updateDezimal und updateGrad,
+   // _kein_ Update in updateDecimal und updateGrade,
    // d.h. add etc. fkt. nicht!
-   private double doppel = 0.; 
+   private double doubleValue = 0.; 
    
 
    /***********************************************************************************
@@ -74,13 +74,13 @@ public class GeoCoord {
    
    
    public GeoCoord() {
-      grad = 0;
-      minuten = 0;
-      sekunden = 0;
-      dezimal = 0;
+      grade = 0;
+      minutes = 0;
+      seconds = 0;
+      decimal = 0;
       tertia = 0;
       
-      richtung = richtungPlus();
+      direction = directionPlus();
       
       // Kommentar s. o.
       patternString[0] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2})");
@@ -123,7 +123,7 @@ public class GeoCoord {
       //  °           -> :  
       //  '           -> :  
       s = s.replace(',', '.')
-//            .replace('°', ':')
+           .replace('\u00B0', ':') // degree sign
            .replace('\'', ':');
       
       //  : hinten    -> (nichts)
@@ -144,63 +144,63 @@ public class GeoCoord {
       }
       
       if (pat == PATTERN_ANZ) {
-         grad = minuten = sekunden = tertia = 0;
-         updateDezimal();
+         grade = minutes = seconds = tertia = 0;
+         updateDecimal();
          return;
       }
       
       switch (pat) {
       
       case 0: case 1: // -ggg:mm oder -gggMM   
-         grad =     new Integer(matcher.group(2)).intValue();
-         minuten =  new Integer(matcher.group(3)).intValue();
-         sekunden = 0;
+         grade =     new Integer(matcher.group(2)).intValue();
+         minutes =  new Integer(matcher.group(3)).intValue();
+         seconds = 0;
          tertia = 0;
          break;
          
       case 2: case 3: // -ggg:mm:ss (z.B. von toString) oder -gggMMSS
          
-         grad =     new Integer(matcher.group(2)).intValue();
-         minuten =  new Integer(matcher.group(3)).intValue();
-         sekunden = new Integer(matcher.group(4)).intValue();
+         grade =     new Integer(matcher.group(2)).intValue();
+         minutes =  new Integer(matcher.group(3)).intValue();
+         seconds = new Integer(matcher.group(4)).intValue();
          tertia = 0;
          break;
          
       case 4: // -ggg:mm:ss:tt z.B. von toStringFine (mit Tertia, d. h. um Faktor 60 genauer)      
          
-         grad =     new Integer(matcher.group(2)).intValue();
-         minuten =  new Integer(matcher.group(3)).intValue();
-         sekunden = new Integer(matcher.group(4)).intValue();
+         grade =     new Integer(matcher.group(2)).intValue();
+         minutes =  new Integer(matcher.group(3)).intValue();
+         seconds = new Integer(matcher.group(4)).intValue();
          tertia =   new Integer(matcher.group(5)).intValue();
          break;
          
       case 5: // -ggg.ggggg        
          
          double dg = new Double(matcher.group(2)).doubleValue();
-         grad = (int)dg;
-         double dgg = Math.abs(dg - grad);
-         minuten =  (int)(dgg*fakts); 
-         sekunden = (int)(dgg*faktm - minuten*fakts); 
-         tertia =   (int)(dgg*faktg - minuten*faktm - sekunden*fakts + 0.5);
+         grade = (int)dg;
+         double dgg = Math.abs(dg - grade);
+         minutes =  (int)(dgg*fakts); 
+         seconds = (int)(dgg*faktm - minutes*fakts); 
+         tertia =   (int)(dgg*faktg - minutes*faktm - seconds*fakts + 0.5);
          break;
          
       case 6: case 7: // -ggg:mm.mmmmm oder -gggMM.mmmmm
          
-         grad =      new Integer(matcher.group(2)).intValue();
+         grade =      new Integer(matcher.group(2)).intValue();
          double dm = new Double(matcher.group(3)).doubleValue();
-         minuten = (int)dm;
-         double dmm = Math.abs(dm - minuten);
-         sekunden = (int)(dmm*fakts); 
-         tertia =   (int)(dmm*faktm - sekunden*fakts + 0.5); 
+         minutes = (int)dm;
+         double dmm = Math.abs(dm - minutes);
+         seconds = (int)(dmm*fakts); 
+         tertia =   (int)(dmm*faktm - seconds*fakts + 0.5); 
          break;
          
       case 8: case 9: // -ggg:mm:ss.sssss oder -gggMMSS.sssss
          
-         grad =      new Integer(matcher.group(2)).intValue();
-         minuten =   new Integer(matcher.group(3)).intValue();
+         grade =      new Integer(matcher.group(2)).intValue();
+         minutes =   new Integer(matcher.group(3)).intValue();
          double ds = new Double(matcher.group(4)).doubleValue();
-         sekunden = (int)ds;
-         double dss = Math.abs(ds - sekunden);
+         seconds = (int)ds;
+         double dss = Math.abs(ds - seconds);
          tertia =   (int)(dss*fakts + 0.5);
          break;
          
@@ -209,331 +209,331 @@ public class GeoCoord {
       }
             
       if (matcher.group(1).equals("-"))
-         richtung = richtungMinus();
+         direction = directionMinus();
       else
-         richtung = richtungPlus();
-      updateDezimal();
+         direction = directionPlus();
+      updateDecimal();
    }
 
 
-   public int getDezimal() {
-      return dezimal;
+   public int getDecimal() {
+      return decimal;
    }
    
 //   public int getHashkey() {
 //       // tertia-genau
-//      if (dezimal >= 0)
-//         return dezimal;
-//      return dezimal + 134217728; // = 2^27  > 77760000 = 360 * 60 * 60 * 60
+//      if (decimal >= 0)
+//         return decimal;
+//      return decimal + 134217728; // = 2^27  > 77760000 = 360 * 60 * 60 * 60
 //      }
 
    public int getHashkeyDist() {
-      // Minuten-genau; Wert < 21600; 21600^2 < 2^30
+      // Minutes-genau; Wert < 21600; 21600^2 < 2^30
       // absichtlich grob, damit "benachbarte" Punkte in gleiche "Toepfe" fallen
-      if (richtung == 'N') return 60*( 89-grad) + minuten;
-      if (richtung == 'S') return 60*( 90+grad) + minuten;
-      if (richtung == 'W') return 60*(179-grad) + minuten;
-      return 60*(180+grad) + minuten;
+      if (direction == 'N') return 60*( 89-grade) + minutes;
+      if (direction == 'S') return 60*( 90+grade) + minutes;
+      if (direction == 'W') return 60*(179-grade) + minutes;
+      return 60*(180+grade) + minutes;
       
       }
 
-   public int getGrad() {
-      return grad;
+   public int getGrade() {
+      return grade;
    }
 
-   public int getMinuten() {
-      return minuten;
+   public int getMinutes() {
+      return minutes;
    }
 
-   public int getSekunden() {
-      return sekunden;
+   public int getSeconds() {
+      return seconds;
    }
    
    public int getTertia() {
       return tertia;
    }
    
-   public char getRichtung() {
-      return richtung;
+   public char getDirection() {
+      return direction;
    }
    
    public double toRadians() {
-      return Math.toRadians((double)dezimal/faktg);
+      return Math.toRadians((double)decimal/faktg);
    }
    
    public double toDegrees() {
-      return ((double)dezimal/faktg);
+      return ((double)decimal/faktg);
    }
-   public void setDezimal(int d) {
-      dezimal = d;
-      updateGrad();
-   }
-
-   public void setGrad(int g) {
-      grad = g;
-      updateDezimal();
+   public void setDecimal(int d) {
+      decimal = d;
+      updateGrade();
    }
 
-   public void setMinuten(int m) {
-      minuten = m;
-      updateDezimal();
+   public void setGrade(int g) {
+      grade = g;
+      updateDecimal();
    }
 
-   public void setSekunden(int s) {
-      sekunden = s;
-      updateDezimal();
+   public void setMinutes(int m) {
+      minutes = m;
+      updateDecimal();
+   }
+
+   public void setSeconds(int s) {
+      seconds = s;
+      updateDecimal();
    }
 
    public void setTertia(int t) {
        tertia = t;
-       updateDezimal();
+       updateDecimal();
     }
 
-   public void setGradMinutenSekundenRichtung(int g, int m, int s, char r) {
-      grad = g;
-      minuten = m;
-      sekunden = s;
-      richtung = r;
-      updateDezimal();
+   public void setGradeMinutesSecondsDirection(int g, int m, int s, char r) {
+      grade = g;
+      minutes = m;
+      seconds = s;
+      direction = r;
+      updateDecimal();
    }
 
    public void set(GeoCoord lb) {
       
-      dezimal = lb.getDezimal();
-      doppel = lb.getDoppel();  
+      decimal = lb.getDecimal();
+      doubleValue = lb.getDoubleValue();  
 
-      updateGrad();
+      updateGrade();
    }
 
-   public void setRichtung(char r) {
-      richtung = r;
-      if (richtung == 'O') richtung = 'E';
-      updateDezimal();
+   public void setDirection(char r) {
+      direction = r;
+      if (direction == 'O') direction = 'E';
+      updateDecimal();
    }
 
    public void add(GeoCoord a) {
-      dezimal += a.getDezimal();
+      decimal += a.getDecimal();
 
-      updateGrad();
+      updateGrade();
    }
    
    public void add(GeoCoord lb, GeoCoord a) {
-      dezimal = lb.getDezimal();
+      decimal = lb.getDecimal();
       this.add(a);
    }
       
    public void add(double d) {
-      dezimal += d;
+      decimal += d;
 
-      updateGrad();
+      updateGrade();
    }
 
-   public void addSekunde(int n) {
+   public void addSecond(int n) {
       this.add(n*fakts);
    }
 
    public void sub(GeoCoord gc) {
-      dezimal -= gc.getDezimal();
+      decimal -= gc.getDecimal();
 
-      updateGrad();
+      updateGrade();
    }
    
    public void sub(GeoCoord lb, GeoCoord s) {
-      dezimal = lb.getDezimal();
+      decimal = lb.getDecimal();
       this.sub(s);
    }
    
    public void sub(double d) {
-      dezimal -= d;
+      decimal -= d;
 
-      updateGrad();
+      updateGrade();
    }
    
-   public void subSekunde(int n) {
+   public void subSecond(int n) {
       this.sub(n*fakts);
    }
    
    public void mult(double faktor) {
-      dezimal *= faktor;
+      decimal *= faktor;
 
-      updateGrad();
+      updateGrade();
    }
 
    public void div(double faktor) {
-      dezimal /= faktor;
+      decimal /= faktor;
 
-      updateGrad();
+      updateGrade();
    }
 
    public void toLeft(GeoCoord r) {
       // auf Rasterrand zur Linken shiften
-      int raster = r.getDezimal();
-      if (dezimal < 0) dezimal -= raster;
-      dezimal /= raster;
-      dezimal *= raster;
+      int raster = r.getDecimal();
+      if (decimal < 0) decimal -= raster;
+      decimal /= raster;
+      decimal *= raster;
 
-      updateGrad();
+      updateGrade();
    }
    public void toLeft(GeoCoord lb, GeoCoord r) {
       // lb auf Rasterrand zur Linken shiften
-      dezimal = lb.getDezimal();
+      decimal = lb.getDecimal();
       this.toLeft(r);
    }
    
    public void toRight(GeoCoord r) {
       // auf Rasterrand zur Rechten shiften
-      int raster = r.getDezimal();
-      dezimal /= raster;
-      dezimal *= raster;
-      if (dezimal >= 0) dezimal += raster;
-      updateGrad();
+      int raster = r.getDecimal();
+      decimal /= raster;
+      decimal *= raster;
+      if (decimal >= 0) decimal += raster;
+      updateGrade();
    }
    
    public void toRight(GeoCoord lb, GeoCoord r) {
       // lb auf Rasterrand zur Rechten shiften
-      dezimal = lb.getDezimal();
+      decimal = lb.getDecimal();
       this.toRight(r);
    }
    
-   public boolean kleiner(GeoCoord lb) {
+   public boolean lessThen(GeoCoord lb) {
 
-      return (dezimal < lb.getDezimal());
+      return (decimal < lb.getDecimal());
    }
 
-   public boolean kleinergleich(GeoCoord lb) {
+   public boolean lessOrEqual(GeoCoord lb) {
 
-      return (dezimal <= lb.getDezimal());
+      return (decimal <= lb.getDecimal());
    }
 
-   public boolean groesser(GeoCoord lb) {
+   public boolean greaterThen(GeoCoord lb) {
 
-      return (dezimal > lb.getDezimal());
+      return (decimal > lb.getDecimal());
    }
 
-   public boolean groessergleich(GeoCoord lb) {
+   public boolean greaterOrEqual(GeoCoord lb) {
 
-      return (dezimal >= lb.getDezimal());
+      return (decimal >= lb.getDecimal());
    }
 
-   public boolean gleich(GeoCoord lb) {
+   public boolean equalTo(GeoCoord lb) {
 
-      return (dezimal == lb.getDezimal());
+      return (decimal == lb.getDecimal());
    }
 
-   public boolean ungleich(GeoCoord lb) {
+   public boolean notEqualTo(GeoCoord lb) {
 
-      return (dezimal != lb.getDezimal());
+      return (decimal != lb.getDecimal());
    }
 
-   public String toString() {  // = toStringGradMinutenSekundenRichtung()
+   public String toString() {  // = toStringGradeMinutesSecondsDirection()
 
       return ""
-         + NumberForm.n2(grad)
+         + NumberForm.n2(grade)
          + ":"
-         + NumberForm.n2(minuten)
+         + NumberForm.n2(minutes)
          + ":"
-         + NumberForm.n2(sekunden)
+         + NumberForm.n2(seconds)
          + " "
-         + richtung;
+         + direction;
    }
 
-   public String toStringFine() { // = toStringGradMinutenSekundenTertiaRichtung()
+   public String toStringFine() { // = toStringGradeMinutesSecondsTertiaDirection()
 
       return ""
-         + NumberForm.n2(grad)
+         + NumberForm.n2(grade)
          + ":"
-         + NumberForm.n2(minuten)
+         + NumberForm.n2(minutes)
          + ":"
-         + NumberForm.n2(sekunden)
+         + NumberForm.n2(seconds)
          + ":"
          + NumberForm.n2(tertia)
          + " "
-         + richtung;
+         + direction;
    }
 
    public String toStringDouble() {  // nur für GPS-Datenfiles
       
-      return NumberForm.f6(doppel);
+      return NumberForm.f6(doubleValue);
    }
 
-   public String toStringGrad() {
+   public String toStringGrade() {
       
-      double g = dezimal;
+      double g = decimal;
       g /= faktg;
       
       return NumberForm.f6(g);
    }
 
-   public String toStringGradRichtung() {
+   public String toStringGradeDirection() {
       
-      double g = dezimal;
+      double g = decimal;
       g /= faktg;
       if (g < 0) g = -g;
       
       return "" 
          + NumberForm.f5(g)
          + " "
-         + richtung;
+         + direction;
       
    }
 
-   public String toStringGradMinutenRichtung() {
+   public String toStringGradeMinutesDirection() {
       
-      double m = dezimal;
+      double m = decimal;
       if (m < 0) m = -m;
-      m -= grad * faktg;
+      m -= grade * faktg;
       m /= faktm;
       return ""
-         + NumberForm.n2(grad)
+         + NumberForm.n2(grade)
          + ":"
          + NumberForm.n2f3(m)
          + " "
-         + richtung;
+         + direction;
    }
    
-   public void updateDezimal() {
-      dezimal = grad * faktg;
-      dezimal += minuten * faktm;
-      dezimal += sekunden * fakts;
-      dezimal += tertia;
+   public void updateDecimal() {
+      decimal = grade * faktg;
+      decimal += minutes * faktm;
+      decimal += seconds * fakts;
+      decimal += tertia;
 
-      doppel = dezimal;
-      doppel /= faktg;
+      doubleValue = decimal;
+      doubleValue /= faktg;
       
-      if (richtung == richtungMinus()) {
-         dezimal = -dezimal;
-         doppel = -doppel;
+      if (direction == directionMinus()) {
+         decimal = -decimal;
+         doubleValue = -doubleValue;
       }
    }
    
    
-   public void updateGrad() {
+   public void updateGrade() {
 
-      int dez = Math.abs(dezimal);
+      int dec = Math.abs(decimal);
 
-      grad = dez / faktg;
-      dez -= grad * faktg;
-      minuten = dez / faktm;
-      dez -= minuten * faktm;
-      sekunden = dez / fakts;
-      dez -= sekunden * fakts;
-      tertia = dez;
-      richtung = dezimal < 0 ? richtungMinus() : richtungPlus();
+      grade = dec / faktg;
+      dec -= grade * faktg;
+      minutes = dec / faktm;
+      dec -= minutes * faktm;
+      seconds = dec / fakts;
+      dec -= seconds * fakts;
+      tertia = dec;
+      direction = decimal < 0 ? directionMinus() : directionPlus();
       
-      doppel = dezimal; 
-      doppel /= faktg;
+      doubleValue = decimal; 
+      doubleValue /= faktg;
    }
    
    public void set(double d) {
-      doppel = d;
-      dezimal = (int)(d * faktg);
-      updateGrad();
+      doubleValue = d;
+      decimal = (int)(d * faktg);
+      updateGrade();
    }
-   public double getDoppel() {
-      return doppel;
+   public double getDoubleValue() {
+      return doubleValue;
    }
-   public void setDoppel(double doppel) {
-      this.doppel = doppel;
+   public void setDoubleValue(double doppel) {
+      this.doubleValue = doppel;
    }
 
    public double sin() {

@@ -25,7 +25,7 @@ public class ElevationFile {
          open(fileName);        
       } catch (FileNotFoundException e1) {
          try {
-            // File downloaden
+            // download file
             String localName = fileName; 
             String remoteName = localName.substring(localName.lastIndexOf(File.separator)+1);
             DownloadETOPO.get(remoteName, localName);
@@ -34,7 +34,7 @@ public class ElevationFile {
          } catch (Exception e2) {
             handleError(fileName, e2);            
          }
-      } catch (Exception e1) { // sonstige Fehler
+      } catch (Exception e1) { // other Error
          handleError(fileName, e1);
       }
    }
@@ -45,7 +45,7 @@ public class ElevationFile {
          open(fileName);        
       } catch (FileNotFoundException e1) {
          try {
-            // gzip-File <fileName>.gz downloaden und entgzippen
+            // download gzip-File <fileName>.gz and unzip
             String localName = fileName+".gz"; 
             String remoteName = localName.substring(localName.lastIndexOf(File.separator)+1);
             DownloadGLOBE.get(remoteName, localName);
@@ -55,7 +55,7 @@ public class ElevationFile {
          } catch (Exception e2) {
             handleError(fileName, e2);            
          }
-      } catch (Exception e1) { // sonstige Fehler
+      } catch (Exception e1) { // other Error
          handleError(fileName, e1);
       }
    }
@@ -66,7 +66,7 @@ public class ElevationFile {
          open(fileName);        
       } catch (FileNotFoundException e1) {
          try {
-            // zip-File <fileName>.zip per FTP downloaden und entzippen
+            //  download zip-File <fileName>.zip and unzip
             String localName = fileName+".zip"; 
             String remoteName = localName.substring(localName.lastIndexOf(File.separator)+1);
             DownloadSRTM3.get(remoteName, localName);
@@ -76,13 +76,14 @@ public class ElevationFile {
          } catch (Exception e2) {
             handleError(fileName, e2);            
          }
-      } catch (Exception e1) { // sonstige Fehler
+      } catch (Exception e1) { // other Error
          handleError(fileName, e1);
       }
    }
    
    private void initSRTM1(String fileName) throws Exception {
       
+	   // currently no automatically download realized
       try {
          open(fileName);        
       } catch (Exception e) {
@@ -115,11 +116,11 @@ public class ElevationFile {
 //      fileChannel.close();
 //   }
 
-   private void handleError(String fileName, Exception e) { // throws Exception{
+   private void handleError(String fileName, Exception e) { 
       System.out.println("handleError: " + fileName + ": "+ e.getMessage());
       // e.printStackTrace();
       exists = false;
-      // keine Exception weitergeben      
+      // dont return exception      
    }
    
    public static void main(String[] args) throws Exception {

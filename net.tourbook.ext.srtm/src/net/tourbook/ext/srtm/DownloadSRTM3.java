@@ -35,7 +35,7 @@ public final class DownloadSRTM3 {
 			"/srtm/version2/SRTM3/South_America", // 2 //$NON-NLS-1$
 			"/srtm/version2/SRTM3/Africa", // 3 //$NON-NLS-1$
 			"/srtm/version2/SRTM3/Australia", // 4 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/Islands"	};							// 5 //$NON-NLS-1$
+			"/srtm/version2/SRTM3/Islands"}; // 5 //$NON-NLS-1$
 
 	public final static void get(final String remoteName, final String localName) {
 
@@ -56,9 +56,7 @@ public final class DownloadSRTM3 {
 				localDir.mkdir();
 			}
 
-			/*
-			 * get connection to the host before the progress monitor is started
-			 */
+			// get connection to the host before the progress monitor is started
 			ftp.setRemoteHost(host);
 			ftp.setMessageListener(listener);
 
@@ -69,7 +67,7 @@ public final class DownloadSRTM3 {
 					NLS.bind(Messages.srtm_transfer_error_message, host));
 
 			return;
-			
+
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -117,9 +115,6 @@ public final class DownloadSRTM3 {
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 		} catch (final InvocationTargetException e) {
-
-//			final Throwable cause = e.getCause();
-
 			e.printStackTrace();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
@@ -129,18 +124,18 @@ public final class DownloadSRTM3 {
 	private static String getDir(final String pathName) throws Exception {
 
 		final String fileName = pathName.substring(pathName.lastIndexOf(File.separator) + 1);
-		final String latString = fileName.substring(0, 3) + ":00"; // z.B. N50 //$NON-NLS-1$
-		final String lonString = fileName.substring(3, 7) + ":00"; // z.B. E006 //$NON-NLS-1$
+		final String latString = fileName.substring(0, 3) + ":00"; // e.g. N50 //$NON-NLS-1$
+		final String lonString = fileName.substring(3, 7) + ":00"; // e.g. E006 //$NON-NLS-1$
 		final GeoLat lat = new GeoLat(latString);
 		final GeoLon lon = new GeoLon(lonString);
 
-		if (lat.groesser(new GeoLat("N60:00"))) //$NON-NLS-1$
+		if (lat.greaterThen(new GeoLat("N60:00"))) //$NON-NLS-1$
 			throw (new FileNotFoundException());
-		if (lat.kleiner(new GeoLat("S56:00"))) //$NON-NLS-1$
+		if (lat.lessThen(new GeoLat("S56:00"))) //$NON-NLS-1$
 			throw (new FileNotFoundException());
 
-		// Reihenfolge wichtig!
-		// vgl. Grafik ftp://e0srp01u.ecs.nasa.gov/srtm/version2/Documentation/Continent_def.gif
+		// order important!
+		// compare map ftp://e0srp01u.ecs.nasa.gov/srtm/version2/Documentation/Continent_def.gif
 		if (isIn(lat, lon, "S56", "S28", "E165", "E179")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return dirs[DirIslands];
 		if (isIn(lat, lon, "S56", "S55", "E158", "E159")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -186,13 +181,13 @@ public final class DownloadSRTM3 {
 								final String lonMin,
 								final String lonMax) {
 
-		if (lat.kleiner(new GeoLat(latMin + ":00"))) //$NON-NLS-1$
+		if (lat.lessThen(new GeoLat(latMin + ":00"))) //$NON-NLS-1$
 			return false;
-		if (lat.groesser(new GeoLat(latMax + ":00"))) //$NON-NLS-1$
+		if (lat.greaterThen(new GeoLat(latMax + ":00"))) //$NON-NLS-1$
 			return false;
-		if (lon.kleiner(new GeoLon(lonMin + ":00"))) //$NON-NLS-1$
+		if (lon.lessThen(new GeoLon(lonMin + ":00"))) //$NON-NLS-1$
 			return false;
-		if (lon.groesser(new GeoLon(lonMax + ":00"))) //$NON-NLS-1$
+		if (lon.greaterThen(new GeoLon(lonMax + ":00"))) //$NON-NLS-1$
 			return false;
 		return true;
 	}

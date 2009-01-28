@@ -2,8 +2,8 @@ package net.tourbook.ext.srtm;
 
 public class GeoLon extends GeoCoord {
 
-   public char richtungPlus() {return 'E';}
-   public char richtungMinus() {return 'W';}
+   public char directionPlus() {return 'E';}
+   public char directionMinus() {return 'W';}
 
    public GeoLon() {
       super();
@@ -24,37 +24,37 @@ public class GeoLon extends GeoCoord {
       set(d);
    }
    
-   public boolean isOsten() {
-      return (richtung == richtungPlus());
+   public boolean isEast() {
+      return (direction == directionPlus());
    }
 
-   public boolean isWesten() {
-      return (!this.isOsten());
+   public boolean isWest() {
+      return (!this.isEast());
    }
 
    public void add(GeoLon lon) {
 
-      dezimal += lon.getDezimal();
-      if (dezimal > 180*faktg) dezimal -= 360*faktg;
+      decimal += lon.getDecimal();
+      if (decimal > 180*faktg) decimal -= 360*faktg;
 
-      updateGrad();
+      updateGrade();
    }
 
    public void add(GeoLon lon, GeoLon a) {
-      dezimal = lon.getDezimal();
+      decimal = lon.getDecimal();
       this.add(a);
    }
    
    public void sub(GeoLon lon) {
 
-      dezimal -= lon.getDezimal();
-      if (dezimal < -180*faktg) dezimal += 360*faktg;
+      decimal -= lon.getDecimal();
+      if (decimal < -180*faktg) decimal += 360*faktg;
 
-      updateGrad();
+      updateGrade();
    }
 
    public void sub(GeoLon lon, GeoLon s) {
-      dezimal = lon.getDezimal();
+      decimal = lon.getDecimal();
       this.sub(s);
    }
       

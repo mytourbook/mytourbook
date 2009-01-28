@@ -4,22 +4,22 @@ import java.io.File;
 
 public class ElevationBase {
 
-	final public GeoLat	bGrid;
-	final public GeoLon	lGrid;
-	final public GeoLat	bFirst;
-	final public GeoLat	bLast;
-	final public GeoLon	lFirst;
-	final public GeoLon	lLast;
+	final public GeoLat	gridLat;
+	final public GeoLon	gridLon;
+	final public GeoLat	firstLat;
+	final public GeoLat	lastLat;
+	final public GeoLon	firstLon;
+	final public GeoLon	lastLon;
 
 	public static void main(final String[] args) {}
 
 	public ElevationBase() {
-		bGrid = new GeoLat();
-		lGrid = new GeoLon();
-		bFirst = new GeoLat();
-		bLast = new GeoLat();
-		lFirst = new GeoLon();
-		lLast = new GeoLon();
+		gridLat = new GeoLat();
+		gridLon = new GeoLon();
+		firstLat = new GeoLat();
+		lastLat = new GeoLat();
+		firstLon = new GeoLon();
+		lastLon = new GeoLon();
 	}
 
 	// dummy
@@ -45,101 +45,100 @@ public class ElevationBase {
 	 */
 	public double getElevationGridDouble(final GeoLat lat, final GeoLon lon) {
 
-		short h1, h2, h3, h4;
+		short elev1, elev2, elev3, elev4;
 		double p, q;
 		short ok = 0;
-		double hm;
+		double elevMid;
 
-		bFirst.toLeft(lat, bGrid);
-		bLast.toRight(lat, bGrid);
-		lFirst.toLeft(lon, lGrid);
-		lLast.toRight(lon, lGrid);
+		firstLat.toLeft(lat, gridLat);
+		lastLat.toRight(lat, gridLat);
+		firstLon.toLeft(lon, gridLon);
+		lastLon.toRight(lon, gridLon);
 
-		h1 = this.getElevation(bLast, lFirst);
-		h2 = this.getElevation(bLast, lLast);
-		h3 = this.getElevation(bFirst, lFirst);
-		h4 = this.getElevation(bFirst, lLast);
+		elev1 = this.getElevation(lastLat, firstLon);
+		elev2 = this.getElevation(lastLat, lastLon);
+		elev3 = this.getElevation(firstLat, firstLon);
+		elev4 = this.getElevation(firstLat, lastLon);
 
-		// ungueltige Werte ausgleichen
-		final boolean is_valid_h1 = is_valid(h1);
-		final boolean is_valid_h2 = is_valid(h2);
-		final boolean is_valid_h3 = is_valid(h3);
-		final boolean is_valid_h4 = is_valid(h4);
+		// adjust invalid values
+		final boolean isValidElev1 = isValid(elev1);
+		final boolean isValidElev2 = isValid(elev2);
+		final boolean isValidElev3 = isValid(elev3);
+		final boolean isValidElev4 = isValid(elev4);
 
 		ok = 0;
-		if (is_valid_h1)
+		if (isValidElev1)
 			ok++;
-		if (is_valid_h2)
+		if (isValidElev2)
 			ok++;
-		if (is_valid_h3)
+		if (isValidElev3)
 			ok++;
-		if (is_valid_h4)
+		if (isValidElev4)
 			ok++;
 		if (ok != 4) {
 
-			//FileLog.println(this, "ElevationBase: " + ok + " " + h1 + " " + h2 + " " + h3 + " " + h4 + " " + ec++);
-
 			if (ok == 0) {
-				hm = (h1 + h2 + h3 + h4) / 4;
-//            return hm; 
+				elevMid = (elev1 + elev2 + elev3 + elev4) / 4;
 				return Short.MIN_VALUE;
 			}
-			hm = 0;
-			if (is_valid_h1)
-				hm += h1;
-			if (is_valid_h2)
-				hm += h2;
-			if (is_valid_h3)
-				hm += h3;
-			if (is_valid_h4)
-				hm += h4;
-			hm /= ok;
-			if (!is_valid_h1)
-				h1 = (short) hm;
-			if (!is_valid_h2)
-				h2 = (short) hm;
-			if (!is_valid_h3)
-				h3 = (short) hm;
-			if (!is_valid_h4)
-				h4 = (short) hm;
+			elevMid = 0;
+			if (isValidElev1)
+				elevMid += elev1;
+			if (isValidElev2)
+				elevMid += elev2;
+			if (isValidElev3)
+				elevMid += elev3;
+			if (isValidElev4)
+				elevMid += elev4;
+			elevMid /= ok;
+			if (!isValidElev1)
+				elev1 = (short) elevMid;
+			if (!isValidElev2)
+				elev2 = (short) elevMid;
+			if (!isValidElev3)
+				elev3 = (short) elevMid;
+			if (!isValidElev4)
+				elev4 = (short) elevMid;
 		}
 
-		p = lat.getDezimal() - bFirst.getDezimal();
-		p /= bLast.getDezimal() - bFirst.getDezimal();
-		q = lon.getDezimal() - lFirst.getDezimal();
-		q /= lLast.getDezimal() - lFirst.getDezimal();
+		p = lat.getDecimal() - firstLat.getDecimal();
+		p /= lastLat.getDecimal() - firstLat.getDecimal();
+		q = lon.getDecimal() - firstLon.getDecimal();
+		q /= lastLon.getDecimal() - firstLon.getDecimal();
 
-		return ((1 - q) * p * h1 + q * p * h2 + (1 - q) * (1 - p) * h3 + q * (1 - p) * h4 + 0.5);
+		return ((1 - q) * p * elev1 + q * p * elev2 + (1 - q) * (1 - p) * elev3 + q * (1 - p) * elev4 + 0.5);
 	}
 
 	// dummy
 	public String getName() {
-		return "FILETYP-DUMMY";
+		return "FILETYPE-DUMMY";
 	}
 
 	// dummy
-	public short getSekDiff() {
-		// Anzahl Gradsekunden zwischen zwei Datenpunkten
+	public short getSecDiff() {
+		// number of grade seconds between two data points
 		return 42;
 	}
 
-	public boolean is_valid(final double elev) {
-		return is_valid((short) elev);
+	public boolean isValid(final double elev) {
+		return isValid((short) elev);
 	}
 
-	public boolean is_valid(final short elev) {
+	public boolean isValid(final short elev) {
 		if (elev >= -11000 && elev < 8850)
 			return true;
 		return false;
 	}
-	
-	public String getElevationDataPath() {
+
+	public String getElevationDataPath(String layerSubdir) {
+
+		// Create directory for local placement of the elevation files and return its path
 
 		String elevationDataPath;
 
 		final String prefDataPath = Activator.getDefault()
 				.getPreferenceStore()
-				.getString(IPreferences.SRTM_DATA_FILEPATH); // TODO umbenennen
+				.getString(IPreferences.SRTM_DATA_FILEPATH); // TODO rename
 
 		if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
 			elevationDataPath = (String) System.getProperties().get("user.home");
@@ -147,7 +146,16 @@ public class ElevationBase {
 			elevationDataPath = prefDataPath;
 		}
 
+		elevationDataPath = elevationDataPath.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+		if (!elevationDataPath.endsWith(File.separator))
+			elevationDataPath = elevationDataPath + File.separator;
+		elevationDataPath = elevationDataPath + layerSubdir;
+		File elevationDataDir = new File(elevationDataPath);
+		if (elevationDataDir.exists() == false) {
+			if (elevationDataDir.mkdirs() == false)
+				return null;
+		}
 		return elevationDataPath;
 	}
-	
+
 }
