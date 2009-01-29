@@ -7,15 +7,15 @@ public final class ElevationEtopo extends ElevationBase {
 	static private EtopoI	fEtopoi	= null;
 
 	public ElevationEtopo() {
-		gridLat.setGradeMinutesSecondsDirection(0, 5, 0, 'N');
-		gridLon.setGradeMinutesSecondsDirection(0, 5, 0, 'E');
+		gridLat.setDegreesMinutesSecondsDirection(0, 5, 0, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 5, 0, 'E');
 	}
 
 	public short getElevation(GeoLat lat, GeoLon lon) {
 
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGrid(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGrid(lat, lon);
 		if (lat.getSeconds() != 0)
 			return getElevationGrid(lat, lon);
@@ -37,9 +37,9 @@ public final class ElevationEtopo extends ElevationBase {
 
 		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
 			return 0.;
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
 		if (lat.getSeconds() != 0)
 			return getElevationGridDouble(lat, lon);
@@ -53,7 +53,7 @@ public final class ElevationEtopo extends ElevationBase {
 	}
 
 	public short getSecDiff() {
-		// number of grade seconds between two data points
+		// number of degrees seconds between two data points
 		return 300;
 	}
 
@@ -82,8 +82,8 @@ public final class ElevationEtopo extends ElevationBase {
 				// dont return exception
 			}
 
-			minLon.setGradeMinutesSecondsDirection(360, 0, 0, 'W');
-			minLat.setGradeMinutesSecondsDirection(89, 55, 0, 'N');
+			minLon.setDegreesMinutesSecondsDirection(360, 0, 0, 'W');
+			minLat.setDegreesMinutesSecondsDirection(89, 55, 0, 'N');
 		}
 
 		public short getElevation(GeoLat lat, GeoLon lon) {
@@ -96,10 +96,10 @@ public final class ElevationEtopo extends ElevationBase {
 
 			offLat.sub(minLat, lat);
 			offLon.sub(lon, minLon);
-			return offLat.getGrade() * 51840 // 360*12*12       
+			return offLat.getDegrees() * 51840 // 360*12*12       
 					+ offLat.getMinutes()
 					* 864 // 360*12/5      
-					+ offLon.getGrade()
+					+ offLon.getDegrees()
 					* 12
 					+ offLon.getMinutes()
 					/ 5;

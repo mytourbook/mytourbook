@@ -37,7 +37,7 @@ public class GeoLon extends GeoCoord {
       decimal += lon.getDecimal();
       if (decimal > 180*faktg) decimal -= 360*faktg;
 
-      updateGrade();
+      updateDegrees();
    }
 
    public void add(GeoLon lon, GeoLon a) {
@@ -50,7 +50,7 @@ public class GeoLon extends GeoCoord {
       decimal -= lon.getDecimal();
       if (decimal < -180*faktg) decimal += 360*faktg;
 
-      updateGrade();
+      updateDegrees();
    }
 
    public void sub(GeoLon lon, GeoLon s) {

@@ -37,7 +37,7 @@ public class GeoLat extends GeoCoord {
       decimal += lat.getDecimal();
        if (decimal > 90 *faktg) decimal = 180*faktg - decimal;
 
-      updateGrade();
+      updateDegrees();
    }
 
    public void add(GeoLat lat, GeoLat a) {
@@ -50,7 +50,7 @@ public class GeoLat extends GeoCoord {
       decimal -= lat.getDecimal();
       if (decimal < -90 *faktg) decimal = -180*faktg - decimal;
 
-      updateGrade();
+      updateDegrees();
    }
 
    public void sub(GeoLat lat, GeoLat s) {

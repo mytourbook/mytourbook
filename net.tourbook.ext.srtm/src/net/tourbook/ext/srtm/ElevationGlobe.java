@@ -28,16 +28,16 @@ public final class ElevationGlobe extends ElevationBase {
 	public ElevationGlobe() {
 		for (int i = 0; i < 16; i++)
 			initialized[i] = false;
-		gridLat.setGradeMinutesSecondsDirection(0, 0, 30, 'N');
-		gridLon.setGradeMinutesSecondsDirection(0, 0, 30, 'E');
+		gridLat.setDegreesMinutesSecondsDirection(0, 0, 30, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 0, 30, 'E');
 	}
 
 	public short getElevation(GeoLat lat, GeoLon lon) {
 		int i = 0;
 
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGrid(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGrid(lat, lon);
 		if (lat.getSeconds() % 30 != 0)
 			return getElevationGrid(lat, lon);
@@ -47,15 +47,15 @@ public final class ElevationGlobe extends ElevationBase {
 		// calculate globe fileindex (a-p ~ 0-15)
 		if (lat.isSouth()) {
 			i += 8;
-			if (lat.getGrade() >= 50)
+			if (lat.getDegrees() >= 50)
 				i += 4;
-		} else if (lat.getGrade() < 50)
+		} else if (lat.getDegrees() < 50)
 			i += 4;
 		if (lon.isEast()) {
 			i += 2;
-			if (lon.getGrade() >= 90)
+			if (lon.getDegrees() >= 90)
 				i++;
-		} else if (lon.getGrade() < 90)
+		} else if (lon.getDegrees() < 90)
 			i++;
 
 		if (initialized[i] == false) {
@@ -70,9 +70,9 @@ public final class ElevationGlobe extends ElevationBase {
 
 		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
 			return 0.;
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
 		if (lat.getSeconds() % 30 != 0)
 			return getElevationGridDouble(lat, lon);
@@ -82,7 +82,7 @@ public final class ElevationGlobe extends ElevationBase {
 	}
 
 	public short getSecDiff() {
-		// number of grade seconds between two data points
+		// number of degrees seconds between two data points
 		return 30;
 	}
 
@@ -116,25 +116,25 @@ public final class ElevationGlobe extends ElevationBase {
 			case 4:
 			case 8:
 			case 12:
-				minLon.setGradeMinutesSecondsDirection(179, 59, 30, 'W');
+				minLon.setDegreesMinutesSecondsDirection(179, 59, 30, 'W');
 				break;
 			case 1:
 			case 5:
 			case 9:
 			case 13:
-				minLon.setGradeMinutesSecondsDirection(89, 59, 30, 'W');
+				minLon.setDegreesMinutesSecondsDirection(89, 59, 30, 'W');
 				break;
 			case 2:
 			case 6:
 			case 10:
 			case 14:
-				minLon.setGradeMinutesSecondsDirection(0, 0, 0, 'E');
+				minLon.setDegreesMinutesSecondsDirection(0, 0, 0, 'E');
 				break;
 			case 3:
 			case 7:
 			case 11:
 			case 15:
-				minLon.setGradeMinutesSecondsDirection(90, 0, 0, 'E');
+				minLon.setDegreesMinutesSecondsDirection(90, 0, 0, 'E');
 				break;
 			default:
 				break;
@@ -144,25 +144,25 @@ public final class ElevationGlobe extends ElevationBase {
 			case 1:
 			case 2:
 			case 3:
-				minLat.setGradeMinutesSecondsDirection(89, 59, 30, 'N');
+				minLat.setDegreesMinutesSecondsDirection(89, 59, 30, 'N');
 				break;
 			case 4:
 			case 5:
 			case 6:
 			case 7:
-				minLat.setGradeMinutesSecondsDirection(49, 59, 30, 'N');
+				minLat.setDegreesMinutesSecondsDirection(49, 59, 30, 'N');
 				break;
 			case 8:
 			case 9:
 			case 10:
 			case 11:
-				minLat.setGradeMinutesSecondsDirection(0, 0, 0, 'S');
+				minLat.setDegreesMinutesSecondsDirection(0, 0, 0, 'S');
 				break;
 			case 12:
 			case 13:
 			case 14:
 			case 15:
-				minLat.setGradeMinutesSecondsDirection(50, 0, 0, 'S');
+				minLat.setDegreesMinutesSecondsDirection(50, 0, 0, 'S');
 				break;
 			default:
 				break;
@@ -194,12 +194,12 @@ public final class ElevationGlobe extends ElevationBase {
 
 			offLat.sub(minLat, lat);
 			offLon.sub(minLon, lon);
-			return offLat.getGrade() * 1296000 // 360*60*60
+			return offLat.getDegrees() * 1296000 // 360*60*60
 					+ offLat.getMinutes()
 					* 21600 // 360*60
 					+ offLat.getSeconds()
 					* 360
-					+ offLon.getGrade()
+					+ offLon.getDegrees()
 					* 120
 					+ offLon.getMinutes()
 					* 2

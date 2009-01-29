@@ -20,9 +20,9 @@ public final class ElevationSRTM3 extends ElevationBase {
 			String fileName = new String(srtm3DataPath
 					+ File.separator
 					+ lat.getDirection()
-					+ NumberForm.n2(lat.isNorth() ? lat.getGrade() : lat.getGrade() + 1)
+					+ NumberForm.n2(lat.isNorth() ? lat.getDegrees() : lat.getDegrees() + 1)
 					+ lon.getDirection()
-					+ NumberForm.n3(lon.isEast() ? lon.getGrade() : lon.getGrade() + 1)
+					+ NumberForm.n3(lon.isEast() ? lon.getDegrees() : lon.getDegrees() + 1)
 					+ srtm3Suffix);
 
 			try {
@@ -78,27 +78,27 @@ public final class ElevationSRTM3 extends ElevationBase {
 	}
 
 	public ElevationSRTM3() {
-		gridLat.setGradeMinutesSecondsDirection(0, 0, 3, 'N');
-		gridLon.setGradeMinutesSecondsDirection(0, 0, 3, 'E');
+		gridLat.setDegreesMinutesSecondsDirection(0, 0, 3, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 0, 3, 'E');
 	}
 
 	@Override
 	public short getElevation(final GeoLat lat, final GeoLon lon) {
 
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGrid(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGrid(lat, lon);
 		if (lat.getSeconds() % 3 != 0)
 			return getElevationGrid(lat, lon);
 		if (lon.getSeconds() % 3 != 0)
 			return getElevationGrid(lat, lon);
 
-		int i = lon.getGrade();
+		int i = lon.getDegrees();
 		if (lon.isWest())
 			i += 256;
 		i *= 1024;
-		i += lat.getGrade();
+		i += lat.getDegrees();
 		if (lat.isSouth())
 			i += 256;
 		final Integer ii = new Integer(i);
@@ -119,9 +119,9 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
 			return 0.;
-		if (lat.getTertia() != 0)
+		if (lat.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
-		if (lon.getTertia() != 0)
+		if (lon.getTertias() != 0)
 			return getElevationGridDouble(lat, lon);
 		if (lat.getSeconds() % 3 != 0)
 			return getElevationGridDouble(lat, lon);
@@ -137,7 +137,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 	@Override
 	public short getSecDiff() {
-		// number of grade seconds between two data points
+		// number of degrees seconds between two data points
 		return 3;
 	}
 }

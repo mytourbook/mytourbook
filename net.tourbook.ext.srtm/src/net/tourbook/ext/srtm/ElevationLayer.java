@@ -68,7 +68,7 @@ public class ElevationLayer {
 	}
 
 	public short getSekDiff() {
-		// Anzahl Gradeseconds zwischen zwei Datenpunkten
+		// Anzahl Degreesseconds zwischen zwei Datenpunkten
 		return fLayer[getElevationType()].getSecDiff();
 	}
 

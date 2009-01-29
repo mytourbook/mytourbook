@@ -116,7 +116,7 @@ public class ElevationBase {
 
 	// dummy
 	public short getSecDiff() {
-		// number of grade seconds between two data points
+		// number of degrees seconds between two data points
 		return 42;
 	}
 
