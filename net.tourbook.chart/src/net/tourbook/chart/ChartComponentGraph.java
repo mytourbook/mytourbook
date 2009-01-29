@@ -3905,10 +3905,10 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		if (fChart.isMouseDownExternal(devXMouse, devYMouse, devXGraph)) {
+		if (fChart.isMouseDownExternalPre(devXMouse, devYMouse, devXGraph)) {
 			return;
-		} 
-		
+		}
+
 		// check if a x-slider was hit
 		xSliderDragged = null;
 		if (xSliderA.getHitRectangle().contains(devXGraph, devYMouse)) {
@@ -3998,6 +3998,11 @@ public class ChartComponentGraph extends Canvas {
 
 				setCursor(fCursorDragged);
 
+			} else {
+
+				// do post processing when no other ations are done
+				
+				fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph);
 			}
 		}
 	}
@@ -4180,7 +4185,7 @@ public class ChartComponentGraph extends Canvas {
 					fIsSliderDirty = true;
 					isChartDirty = true;
 				}
-				
+
 				// set cursor
 				setCursor(fCursorResizeLeftRight);
 
@@ -4265,7 +4270,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (fChart.isMouseUpExternal(devXMouse, devYMouse, devXGraph)) {
 				return;
-			} 
+			}
 
 			if (xSliderDragged != null) {
 

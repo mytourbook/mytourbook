@@ -66,6 +66,12 @@ public class Chart extends ViewForm {
 	public static final String			MOUSE_MODE_SLIDER					= "slider";										//$NON-NLS-1$
 	public static final String			MOUSE_MODE_ZOOM						= "zoom";											//$NON-NLS-1$
 
+	private static final int			MouseMove							= 10;
+	private static final int			MouseDownPre						= 20;
+	private static final int			MouseDownPost						= 21;
+	private static final int			MouseUp								= 30;
+	private static final int			MouseDoubleClick					= 40;
+
 	private final ListenerList			fFocusListeners						= new ListenerList();
 	private final ListenerList			fBarSelectionListeners				= new ListenerList();
 	private final ListenerList			fSliderMoveListeners				= new ListenerList();
@@ -500,21 +506,25 @@ public class Chart extends ViewForm {
 		for (int i = 0; i < listeners.length; ++i) {
 
 			final Object listener = listeners[i];
-			
+
 			switch (mouseEvent.type) {
-			case SWT.MouseMove:
+			case Chart.MouseMove:
 				((IMouseListener) listener).mouseMove(mouseEvent);
 				break;
 
-			case SWT.MouseDown:
-				((IMouseListener) listener).mouseDown(mouseEvent);
+			case Chart.MouseDownPre:
+				((IMouseListener) listener).mouseDownPre(mouseEvent);
 				break;
 
-			case SWT.MouseUp:
+			case Chart.MouseDownPost:
+				((IMouseListener) listener).mouseDownPost(mouseEvent);
+				break;
+				
+			case Chart.MouseUp:
 				((IMouseListener) listener).mouseUp(mouseEvent);
 				break;
 
-			case SWT.MouseDoubleClick:
+			case Chart.MouseDoubleClick:
 				((IMouseListener) listener).mouseDoubleClick(mouseEvent);
 				break;
 
@@ -698,9 +708,21 @@ public class Chart extends ViewForm {
 				chartGraph.getRightSlider().getValuesIndex());
 	}
 
-	boolean isMouseDownExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
+	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
+		
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
+		
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+		event.devMouseXInGraph = devXGraph;
+		
+		fireChartMouseEvent(event);
+		
+		return event.isWorked;
+	}
+	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseDown);
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
@@ -710,10 +732,10 @@ public class Chart extends ViewForm {
 
 		return event.isWorked;
 	}
-	
+
 	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseMove);
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove);
 
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
@@ -725,15 +747,15 @@ public class Chart extends ViewForm {
 	}
 
 	boolean isMouseUpExternal(final int devXMouse, final int devYMouse, final int devXGraph) {
-		
-		final ChartMouseEvent event = new ChartMouseEvent(SWT.MouseUp);
-		
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp);
+
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
 		event.devMouseXInGraph = devXGraph;
-		
+
 		fireChartMouseEvent(event);
-		
+
 		return event.isWorked;
 	}
 

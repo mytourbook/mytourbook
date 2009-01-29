@@ -18,7 +18,10 @@ package net.tourbook.chart;
 public interface IMouseListener {
 
 	void mouseDoubleClick(ChartMouseEvent event);
-	void mouseDown(ChartMouseEvent event);
+	
+	void mouseDownPost(ChartMouseEvent event);
+	void mouseDownPre(ChartMouseEvent event);
+
 	void mouseMove(ChartMouseEvent event);
 	void mouseUp(ChartMouseEvent event);
 }
