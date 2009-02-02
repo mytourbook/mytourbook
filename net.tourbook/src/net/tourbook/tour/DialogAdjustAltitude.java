@@ -48,11 +48,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.part.PageBook;
 
 /**
  * Dialog to adjust the altitude, this dialog can be opened from within a tour chart or from the
@@ -86,6 +88,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private Composite					fDialogContainer;
 
+	private PageBook					fPageBookOptions;
+	private Label						fPageEmpty;
+	private Composite					fPageOptionSRTM;
+
+	private Button						fBtnRemoveAllPoints;
 	private Combo						fComboAdjustType;
 
 	private static AdjustmentType[]		fAllAdjustmentTypes;
@@ -97,6 +104,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private SplineData					fSplineData;
 	private int							fAltiDiff;
 	private int							fSliderDistance;
+
+	private boolean						fCanDeletePoint;
 
 	{
 		fNF.setMinimumFractionDigits(0);
@@ -201,9 +210,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 				} catch (final IllegalArgumentException e) {
 					final double[] xValues = fTourData.splineDataPoints.xValues;
-					System.out.println((xValues[0] + " ") //
-							+ (xValues[1] + " ")
-							+ (xValues[2] + " "));
+					System.out.println((xValues[0] + " ") // //$NON-NLS-1$
+							+ (xValues[1] + " ") //$NON-NLS-1$
+							+ (xValues[2] + " ")); //$NON-NLS-1$
 					e.printStackTrace();
 					return;
 				}
@@ -221,6 +230,99 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 		}
 
+	}
+
+	private void computeDeletedPoint() {
+
+		if (fSplineData.isPointMovable.length <= 3) {
+			// prevent deleting less than 3 points
+			return;
+		}
+
+		final boolean[] oldIsPointMovable = fSplineData.isPointMovable;
+		final float[] oldPosX = fSplineData.relativePositionX;
+		final float[] oldPosY = fSplineData.relativePositionY;
+		final double[] oldXValues = fSplineData.xValues;
+		final double[] oldYValues = fSplineData.yValues;
+		final double[] oldXMinValues = fSplineData.xMinValues;
+		final double[] oldXMaxValues = fSplineData.xMaxValues;
+
+		final int newLength = oldIsPointMovable.length - 1;
+
+		final boolean[] newIsPointMovable = fSplineData.isPointMovable = new boolean[newLength];
+		final float[] newPosX = fSplineData.relativePositionX = new float[newLength];
+		final float[] newPosY = fSplineData.relativePositionY = new float[newLength];
+		final double[] newXValues = fSplineData.xValues = new double[newLength];
+		final double[] newYValues = fSplineData.yValues = new double[newLength];
+		final double[] newXMinValues = fSplineData.xMinValues = new double[newLength];
+		final double[] newXMaxValues = fSplineData.xMaxValues = new double[newLength];
+
+		int srcPos, destPos, length;
+
+		if (fPointHitIndex == 0) {
+
+			// remove first point
+
+			srcPos = 1;
+			destPos = 0;
+			length = newLength;
+
+			System.arraycopy(oldIsPointMovable, srcPos, newIsPointMovable, destPos, length);
+			System.arraycopy(oldPosX, srcPos, newPosX, destPos, length);
+			System.arraycopy(oldPosY, srcPos, newPosY, destPos, length);
+
+			System.arraycopy(oldXValues, srcPos, newXValues, destPos, length);
+			System.arraycopy(oldYValues, srcPos, newYValues, destPos, length);
+			System.arraycopy(oldXMinValues, srcPos, newXMinValues, destPos, length);
+			System.arraycopy(oldXMaxValues, srcPos, newXMaxValues, destPos, length);
+
+		} else if (fPointHitIndex == newLength) {
+
+			// remove last point
+
+			srcPos = 0;
+			destPos = 0;
+			length = newLength;
+
+			System.arraycopy(oldIsPointMovable, srcPos, newIsPointMovable, destPos, length);
+			System.arraycopy(oldPosX, srcPos, newPosX, destPos, length);
+			System.arraycopy(oldPosY, srcPos, newPosY, destPos, length);
+
+			System.arraycopy(oldXValues, srcPos, newXValues, destPos, length);
+			System.arraycopy(oldYValues, srcPos, newYValues, destPos, length);
+			System.arraycopy(oldXMinValues, srcPos, newXMinValues, destPos, length);
+			System.arraycopy(oldXMaxValues, srcPos, newXMaxValues, destPos, length);
+
+		} else {
+
+			// remove points in the middle
+
+			srcPos = 0;
+			destPos = 0;
+			length = fPointHitIndex;
+
+			System.arraycopy(oldIsPointMovable, srcPos, newIsPointMovable, destPos, length);
+			System.arraycopy(oldPosX, srcPos, newPosX, destPos, length);
+			System.arraycopy(oldPosY, srcPos, newPosY, destPos, length);
+
+			System.arraycopy(oldXValues, srcPos, newXValues, destPos, length);
+			System.arraycopy(oldYValues, srcPos, newYValues, destPos, length);
+			System.arraycopy(oldXMinValues, srcPos, newXMinValues, destPos, length);
+			System.arraycopy(oldXMaxValues, srcPos, newXMaxValues, destPos, length);
+
+			srcPos = fPointHitIndex + 1;
+			destPos = fPointHitIndex;
+			length = newLength - fPointHitIndex;
+
+			System.arraycopy(oldIsPointMovable, srcPos, newIsPointMovable, destPos, length);
+			System.arraycopy(oldPosX, srcPos, newPosX, destPos, length);
+			System.arraycopy(oldPosY, srcPos, newPosY, destPos, length);
+
+			System.arraycopy(oldXValues, srcPos, newXValues, destPos, length);
+			System.arraycopy(oldYValues, srcPos, newYValues, destPos, length);
+			System.arraycopy(oldXMinValues, srcPos, newXMinValues, destPos, length);
+			System.arraycopy(oldXMaxValues, srcPos, newXMaxValues, destPos, length);
+		}
 	}
 
 	private boolean computeNewPoint(final ChartMouseEvent mouseEvent) {
@@ -296,7 +398,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// make the point immediately movable
 		fPointHitIndex = lastIndex;
-		
+
 		return true;
 	}
 
@@ -321,18 +423,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		float graphX = devX / scaleX;
 
+		fCanDeletePoint = false;
+
 		// check min value
 		if (graphXMin != Double.NaN) {
 			if (graphX < graphXMin) {
 				graphX = (float) graphXMin;
+				fCanDeletePoint = true;
 			}
 		}
 		// check max value
 		if (graphXMax != Double.NaN) {
 			if (graphX > graphXMax) {
 				graphX = (float) graphXMax;
+				fCanDeletePoint = true;
 			}
 		}
+
 		devX = graphX * scaleX;
 
 		final int graph1X = fSliderDistance;
@@ -407,14 +514,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		createUIAdjustmentType(parent);
 		createUITourChart(parent);
 
-//		final Composite splineContainer = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(splineContainer);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(splineContainer);
-//
-//		createUISpline(splineContainer);
-//		createUISplineActions(splineContainer);
+		/*
+		 * create options for each adjustment type in a pagebook
+		 */
+		fPageBookOptions = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fPageBookOptions);
 
-//		createUIAdjustments(parent);
+		fPageEmpty = new Label(fPageBookOptions, SWT.NONE);
+		fPageOptionSRTM = createUIOptionSRTM(fPageBookOptions);
 	}
 
 	private void createUIAdjustmentType(final Composite parent) {
@@ -450,6 +557,25 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			fComboAdjustType.add(adjustType.visibleName);
 		}
+	}
+
+	private Composite createUIOptionSRTM(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+
+		fBtnRemoveAllPoints = new Button(container, SWT.NONE);
+		fBtnRemoveAllPoints.setText(Messages.adjust_altitude_btn_srtm_remove_all_points);
+		fBtnRemoveAllPoints.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				initializeSplineData();
+				onModifyProperties();
+			}
+		});
+
+		return container;
 	}
 
 	private void createUITourChart(final Composite parent) {
@@ -510,6 +636,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 
 		});
+	}
+
+	private void enableActions() {
+
+		/*
+		 * srtm options
+		 */
+		if (fSplineData != null && fSplineData.isPointMovable != null) {
+			fBtnRemoveAllPoints.setEnabled(fSplineData.isPointMovable.length > 3);
+		}
 	}
 
 	@Override
@@ -583,11 +719,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		switch (selectedAdjustType.id) {
 		case ADJUST_TYPE_UNTIL_LEFT_SLIDER:
 			computeAltitudeUntilLeftSlider();
+			fPageBookOptions.showPage(fPageOptionSRTM);
 			break;
 
 		default:
+			fPageBookOptions.showPage(fPageEmpty);
 			break;
 		}
+
+		enableActions();
 
 		fTourChart.update2ndAltiLayer(this, true);
 	}
@@ -681,6 +821,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			return;
 		}
 
+		if (fCanDeletePoint) {
+
+			fCanDeletePoint = false;
+
+			computeDeletedPoint();
+
+			// redraw layer to update the hit rectangles
+			onModifyProperties();
+		}
+
 		mouseEvent.isWorked = true;
 		fPointHitIndex = -1;
 	}
@@ -766,29 +916,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			splineMinX[pointIndex] = 0;
 			splineMaxX[pointIndex] = fSliderDistance;
 		}
-
-//		splineX[0] = -0.1f;
-//		splineY[0] = 0;
-//
-//		splineX[2] = posX[2] * sliderDistance;
-//		splineY[2] = posY[2] * altiDiff;
-//		splineX[3] = posX[3] * sliderDistance;
-//		splineY[3] = posY[3] * altiDiff;
-//
-//		splineX[4] = sliderDistance + 0.1f;
-//		splineY[4] = 0;
-//
-//		splineMinX[0] = Double.NaN;
-//		splineMaxX[0] = Double.NaN;
-//
-//		splineMinX[4] = Double.NaN;
-//		splineMaxX[4] = Double.NaN;
-//
-//		splineMinX[2] = 0;
-//		splineMaxX[2] = sliderDistance;
-//
-//		splineMinX[3] = 0;
-//		splineMaxX[3] = sliderDistance;
 
 		return new CubicSpline(splineX, splineY);
 	}

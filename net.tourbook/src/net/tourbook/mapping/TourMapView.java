@@ -365,7 +365,7 @@ public class TourMapView extends ViewPart {
 		if (fTourDataList.size() == 0) {
 			return;
 		}
-		
+
 		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
 
 		if (fIsMapSynchedWithTour) {
@@ -597,14 +597,6 @@ public class TourMapView extends ViewPart {
 		PaintManager.getInstance().setTourData(new ArrayList<TourData>());
 
 		showDefaultMap();
-		
-//		final boolean isShowTour = false;
-//		fMap.setShowOverlays(isShowTour);
-//		fMap.setShowLegend(isShowTour);
-//
-//		enableActions();
-//		
-//		fMap.queueRedrawMap();
 	}
 
 	private void createActions() {
@@ -950,30 +942,6 @@ public class TourMapView extends ViewPart {
 		}
 	}
 
-	/**
-	 * Converts the tour id's into {@link TourData}
-	 * 
-	 * @param tourIdList
-	 * @return unique overlay key
-	 */
-	private long fillTourDataList(final ArrayList<Long> tourIdList) {
-
-		// create a unique overlay key for the selected tours
-		long overlayKey = 0;
-
-		// get tour data for each tour id
-		for (final Long tourId : tourIdList) {
-
-			final TourData tourData = TourManager.getInstance().getTourData(tourId);
-			if (isPaintDataValid(tourData)) {
-				fTourDataList.add(tourData);
-				overlayKey += tourData.getTourId();
-			}
-		}
-
-		return overlayKey;
-	}
-
 	private ILegendProvider getLegendProvider(final int colorId) {
 		return fLegendProviders.get(colorId);
 	}
@@ -1292,9 +1260,9 @@ public class TourMapView extends ViewPart {
 		}
 
 		final PaintManager paintManager = PaintManager.getInstance();
-		
+
 		paintManager.setTourData(fTourDataList);
-		
+
 		final TourData firstTourData = fTourDataList.get(0);
 
 		// set slider position
@@ -1315,23 +1283,6 @@ public class TourMapView extends ViewPart {
 
 		fMap.queueRedrawMap();
 	}
-
-//	/**
-//	 * Paint tours with already defined tour data in <code>fTourDataList</code>
-//	 */
-//	private void paintMultipleTours() {
-//
-//		fIsTour = true;
-//
-//		// force single tour to be repainted
-//		fPreviousTourData = null;
-//
-//		final boolean isShowTour = fActionShowTourInMap.isChecked();
-//		fMap.setShowOverlays(isShowTour);
-//		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
-//
-//		fMap.queueRedrawMap();
-//	}
 
 	/**
 	 * Paint the currently selected tour in the map
@@ -1476,7 +1427,6 @@ public class TourMapView extends ViewPart {
 		}
 
 		createLegendImage(PaintManager.getInstance().getLegendProvider());
-
 		fMap.queueRedrawMap();
 	}
 
@@ -1490,9 +1440,6 @@ public class TourMapView extends ViewPart {
 				// force single tour to be repainted
 				fPreviousTourData = null;
 
-				fTourDataList.clear();
-
-				PaintManager.getInstance().setTourData(fTourDataList);
 
 				fDirectMappingPainter.disablePaintContext();
 
@@ -1500,7 +1447,21 @@ public class TourMapView extends ViewPart {
 				fMap.setShowOverlays(isShowTour);
 				fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
 
-				final long newOverlayKey = fillTourDataList(tourIdList);
+				/*
+				 * create a unique overlay key for the selected tours
+				 */
+				long newOverlayKey = 0;
+				fTourDataList.clear();
+				for (final Long tourId : tourIdList) {
+
+					final TourData tourData = TourManager.getInstance().getTourData(tourId);
+					if (isPaintDataValid(tourData)) {
+						// keep tour data for each tour id
+						fTourDataList.add(tourData);
+						newOverlayKey += tourData.getTourId();
+					}
+				}
+				PaintManager.getInstance().setTourData(fTourDataList);
 
 				if (fPreviousOverlayKey != newOverlayKey) {
 
@@ -1511,10 +1472,9 @@ public class TourMapView extends ViewPart {
 				}
 
 				createLegendImage(PaintManager.getInstance().getLegendProvider());
+				fMap.queueRedrawMap();
 			}
 		});
-
-		fMap.queueRedrawMap();
 	}
 
 	private void paintTourSliders(	final TourData tourData,
