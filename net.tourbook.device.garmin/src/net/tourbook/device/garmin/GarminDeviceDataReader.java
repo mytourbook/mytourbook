@@ -32,6 +32,7 @@ import net.tourbook.importdata.TourbookDevice;
 public class GarminDeviceDataReader extends TourbookDevice {
 
 	private static final String	XML_START_ID	= "<?xml";	//$NON-NLS-1$
+	private static final String	XML_GARMIN_TAG	= "<TrainingCenterDatabase";	//$NON-NLS-1$
 
 	// plugin constructor
 	public GarminDeviceDataReader() {}
@@ -74,10 +75,13 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		try {
 			fileReader = new BufferedReader(new FileReader(importFilePath));
 			final String fileHeader = fileReader.readLine();
-			if (fileHeader == null || fileHeader.startsWith(XML_START_ID) == false) {
+			if (fileHeader == null
+					|| (fileHeader.startsWith(XML_START_ID) || fileHeader.startsWith(XML_GARMIN_TAG)) == false) {
+				
 				fileReader.close();
 				return false;
 			}
+
 		} catch (final FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (final IOException e) {
