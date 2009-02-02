@@ -6,5 +6,8 @@
    <feature url="features/patch6.jar" id="patch.net.tourbook.feature.9.01.0.v2009-01-07-patch6" version="9.01.0.v2009-01-07-patch6" patch="true">
       <category name="MyTourbook 9.01"/>
    </feature>
+   <feature url="features/patch7.jar" id="net.tourbook.patch" version="9.01.0.v2009-02-02-patch7" patch="true">
+      <category name="MyTourbook 9.01"/>
+   </feature>
    <category-def name="MyTourbook 9.01" label="MyTourbook 9.01"/>
 </site>
