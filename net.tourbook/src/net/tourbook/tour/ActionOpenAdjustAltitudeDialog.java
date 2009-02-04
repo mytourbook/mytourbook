@@ -88,9 +88,9 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 				}
 			}
 
-		} else {
-
-			dialog.restoreOriginalAltitudeValues();
+//		} else {
+//
+//			dialog.restoreOriginalAltitudeValues();
 		}
 	}
 }

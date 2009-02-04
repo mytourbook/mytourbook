@@ -109,7 +109,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {}
 
-	public void fillContextMenu(final IMenuManager menuMgr) {
+	public void fillContextMenu(final IMenuManager menuMgr,
+								final int mouseDownDevPositionX,
+								final int mouseDownDevPositionY) {
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionQuickEdit);

@@ -67,7 +67,9 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {}
 
-	public void fillContextMenu(final IMenuManager menuMgr) {}
+	public void fillContextMenu(final IMenuManager menuMgr,
+								final int mouseDownDevPositionX,
+								final int mouseDownDevPositionY) {}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,

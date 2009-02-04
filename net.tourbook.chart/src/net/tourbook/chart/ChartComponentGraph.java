@@ -371,7 +371,8 @@ public class ChartComponentGraph extends Canvas {
 	/*
 	 * position of the mouse in the mouse down event
 	 */
-	private int							fMouseDownPositionX;
+	private int							fMouseDownDevPositionX;
+	private int							fMouseDownDevPositionY;
 
 	private boolean						fIsPaintDraggedImage	= false;
 
@@ -971,7 +972,9 @@ public class ChartComponentGraph extends Canvas {
 						contextLeftSlider,
 						contextRightSlider,
 						fHoveredBarSerieIndex,
-						fHoveredBarValueIndex);
+						fHoveredBarValueIndex,
+						fMouseDownDevPositionX,
+						fMouseDownDevPositionY);
 			}
 		});
 
@@ -2138,6 +2141,8 @@ public class ChartComponentGraph extends Canvas {
 		// virtual 0 line for the y-axis of the chart in dev units
 		final float devY0 = devYBottom + (scaleY * graphYBottom);
 
+		float devXPrev = xValues[startIndex] * scaleX;
+
 		final Rectangle chartRectangle = gc.getClipping();
 
 		// draw the lines into the path
@@ -2148,10 +2153,10 @@ public class ChartComponentGraph extends Canvas {
 				return;
 			}
 
-			int xValue = xValues[xValueIndex];
+			int graphX = xValues[xValueIndex];
 
 			if (canScrollZoomedChart == false) {
-				xValue -= graphValueOffset;
+				graphX -= graphValueOffset;
 			}
 
 			int yValue = yValues[xValueIndex];
@@ -2178,10 +2183,10 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			final float devXValue = xValue * scaleX;
+			final float devX = graphX * scaleX;
 
 			/*
-			 * set first point
+			 * draw first point
 			 */
 			if (xValueIndex == startIndex) {
 
@@ -2190,29 +2195,33 @@ public class ChartComponentGraph extends Canvas {
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 					// start from the bottom of the chart
-					path.moveTo(devXValue, devY0 - (graphYBottom * scaleY));
+					path.moveTo(devX, devY0 - (graphYBottom * scaleY));
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					// start from the x-axis
 					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
-					path.moveTo(devXValue, devY0 - (graphXAxisLine * scaleY));
+					path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
 				}
 
 				if (isPath2) {
-					path2.moveTo(devXValue, devY0 - (yValue2 * scaleY));
+					path2.moveTo(devX, devY0 - (yValue2 * scaleY));
 				}
 			}
 
-			// draw line to the next point
-			path.lineTo(devXValue, devY0 - (yValue * scaleY));
+			// optimize to draw only one line starting at the current x-position
+			if (devX != devXPrev) {
 
-			if (isPath2) {
-				path2.lineTo(devXValue, devY0 - (yValue2 * scaleY));
+				// draw line to the next point
+				path.lineTo(devX, devY0 - (yValue * scaleY));
+
+				if (isPath2) {
+					path2.lineTo(devX, devY0 - (yValue2 * scaleY));
+				}
 			}
 
 			/*
-			 * set last point
+			 * draw last point
 			 */
 			if ((xValueIndex == endIndex - 1 && //
 			(graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM || //
@@ -2232,14 +2241,16 @@ public class ChartComponentGraph extends Canvas {
 					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 				}
 
-				path.lineTo(devXValue, devY0 - (graphXAxisLine * scaleY));
-				path.moveTo(devXValue, devY0 - (graphXAxisLine * scaleY));
+				path.lineTo(devX, devY0 - (graphXAxisLine * scaleY));
+				path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
 
 				if (isPath2) {
-					path.lineTo(devXValue, devY0 - (yValue2 * scaleY));
-					path.moveTo(devXValue, devY0 - (yValue2 * scaleY));
+					path.lineTo(devX, devY0 - (yValue2 * scaleY));
+					path.moveTo(devX, devY0 - (yValue2 * scaleY));
 				}
 			}
+
+			devXPrev = devX;
 		}
 
 		final Color colorFg = new Color(display, rgbFg);
@@ -3595,7 +3606,7 @@ public class ChartComponentGraph extends Canvas {
 	void moveLeftSliderHere() {
 
 		final ChartXSlider leftSlider = getLeftSlider();
-		final int devLeftPosition = fDevGraphImageXOffset + fMouseDownPositionX;
+		final int devLeftPosition = fDevGraphImageXOffset + fMouseDownDevPositionX;
 
 		computeXSliderValue(leftSlider, devLeftPosition);
 		leftSlider.moveToDevPosition(devLeftPosition, true, true);
@@ -3612,7 +3623,7 @@ public class ChartComponentGraph extends Canvas {
 	void moveRightSliderHere() {
 
 		final ChartXSlider rightSlider = getRightSlider();
-		final int devRightPosition = fDevGraphImageXOffset + fMouseDownPositionX;
+		final int devRightPosition = fDevGraphImageXOffset + fMouseDownDevPositionX;
 
 		computeXSliderValue(rightSlider, devRightPosition);
 		rightSlider.moveToDevPosition(devRightPosition, true, true);
@@ -3894,8 +3905,8 @@ public class ChartComponentGraph extends Canvas {
 		final int devYMouse = event.y;
 		final int devXGraph = hBarOffset + devXMouse;
 
-		fMouseDownPositionX = event.x;
-//		fMouseDownPositionY = event.y;
+		fMouseDownDevPositionX = event.x;
+		fMouseDownDevPositionY = event.y;
 
 		// show context menu
 		if (event.button != 1) {
@@ -3979,30 +3990,36 @@ public class ChartComponentGraph extends Canvas {
 					redraw();
 				}
 
-			} else if (fGraphZoomRatio > 1) {
-
-				// start moving the chart
-
-				/*
-				 * to prevent flickering with the double click event, dragged started is used
-				 */
-				fIsChartDraggedStarted = true;
-
-				fDraggedChartStartPos = new Point(event.x, event.y);
-
-				/*
-				 * set also the move position because when changing the data model, the old position
-				 * will be used and the chart is painted on the wrong position on mouse down
-				 */
-				fDraggedChartDraggedPos = fDraggedChartStartPos;
-
-				setCursor(fCursorDragged);
-
 			} else {
 
 				// do post processing when no other ations are done
-				
-				fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph);
+
+				if (fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph)) {
+					return;
+				}
+				;
+
+				if (fGraphZoomRatio > 1) {
+
+					// start moving the chart
+
+					/*
+					 * to prevent flickering with the double click event, dragged started is used
+					 */
+					fIsChartDraggedStarted = true;
+
+					fDraggedChartStartPos = new Point(event.x, event.y);
+
+					/*
+					 * set also the move position because when changing the data model, the old
+					 * position will be used and the chart is painted on the wrong position on mouse
+					 * down
+					 */
+					fDraggedChartDraggedPos = fDraggedChartStartPos;
+
+					setCursor(fCursorDragged);
+
+				}
 			}
 		}
 	}
@@ -5698,6 +5715,11 @@ public class ChartComponentGraph extends Canvas {
 			int maxValue = yValues[valueIndexLeft];
 
 			for (final int[] yValueSerie : yValueSeries) {
+				
+				if (yValueSerie == null) {
+					continue;
+				}
+				
 				for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
 
 					final int yValue = yValueSerie[valueIndex];

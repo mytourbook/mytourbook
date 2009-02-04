@@ -37,8 +37,10 @@ public interface IChartContextProvider {
 	 * Fills the context menu for the chart
 	 * 
 	 * @param menuMgr
+	 * @param mouseDownDevPositionY
+	 * @param mouseDownDevPositionX
 	 */
-	public void fillContextMenu(IMenuManager menuMgr);
+	public void fillContextMenu(IMenuManager menuMgr, int mouseDownDevPositionX, int mouseDownDevPositionY);
 
 	/**
 	 * Fills the context menu for the chart slider

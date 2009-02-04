@@ -72,6 +72,8 @@ public class Messages extends NLS {
 	public static String		adjust_alti_srtm_dialog_invalid_data;
 	public static String		adjust_alti_srtm_dialog_title;
 	public static String		adjust_alti_srtm_save_tour;
+	public static String	adjust_altitude_action_create_spline_point;
+
 	public static String	adjust_altitude_btn_srtm_remove_all_points;
 
 	public static String		adjust_altitude_dlg_dialog_message;
@@ -286,6 +288,8 @@ public class Messages extends NLS {
 	public static String		Image__show_distance_on_x_axis;
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
+
+	public static String	Image__spline_point;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;
 	public static String		Image__synch_graph_bySize;

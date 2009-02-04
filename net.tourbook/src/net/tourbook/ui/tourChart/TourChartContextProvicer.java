@@ -118,7 +118,9 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {}
 
-	public void fillContextMenu(final IMenuManager menuMgr) {
+	public void fillContextMenu(final IMenuManager menuMgr,
+								final int mouseDownDevPositionX,
+								final int mouseDownDevPositionY) {
 
 		final TourData tourData = fTourChartViewer.getTourChart().getTourData();
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;

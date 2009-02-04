@@ -123,7 +123,9 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		enableActions(hoveredBarSerieIndex != -1);
 	}
 
-	public void fillContextMenu(final IMenuManager menuMgr) {}
+	public void fillContextMenu(final IMenuManager menuMgr,
+								final int mouseDownDevPositionX,
+								final int mouseDownDevPositionY) {}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,

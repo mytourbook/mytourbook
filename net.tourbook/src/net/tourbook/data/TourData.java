@@ -577,7 +577,7 @@ public class TourData implements Comparable<Object> {
 
 	/**
 	 * 2nd data serie, this is used in the {@link ChartLayer2ndAltiSerie} to display the merged tour
-	 * or to adjust the altitude
+	 * or the adjusted altitude
 	 */
 	@Transient
 	public int[]						dataSerie2ndAlti;

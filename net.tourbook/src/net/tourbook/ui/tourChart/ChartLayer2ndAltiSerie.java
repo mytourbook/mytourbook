@@ -68,10 +68,14 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int[] yDiffTo2ndSerie = fTourData.dataSerieDiffTo2ndAlti;
 		final int[] yAdjustedSerie = fTourData.dataSerieAdjustedAlti;
 
+		final boolean is2ndYValues = yValues2ndSerie != null;
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
 
-		if (xValues == null || xValues.length == 0 || yValues2ndSerie == null || yValues2ndSerie.length == 0) {
+		if (xValues == null || xValues.length == 0 /*
+													 * || yValues2ndSerie == null ||
+													 * yValues2ndSerie.length == 0
+													 */) {
 			return;
 		}
 
@@ -89,10 +93,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final Path path2ndSerie = new Path(display);
 		final Path pathValueDiff = new Path(display);
 		final Path pathAdjustValue = new Path(display);
-
-//		final RGB rgbFg = yData.getRgbLine()[0];
-//		final RGB rgbBg1 = yData.getRgbDark()[0];
-//		final RGB rgbBg2 = yData.getRgbBright()[0];
 //
 //		final int graphYTop = drawingData.getGraphYTop();
 		final int graphYBottom = drawingData.getGraphYBottom();
@@ -135,21 +135,28 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 		final Rectangle graphRect = new Rectangle(0, devYTop, gc.getClipping().width, devGraphHeight);
 
+		// get initial dev X
+		int graphXValue = xValues[startIndex] - fGraphXValueOffset;
+		int devPrevXInt = (int) (graphXValue * fScaleX);
+
+		int graphYValue2nd;
+		if (is2ndYValues) {
+			graphYValue2nd = (int) (yValues2ndSerie[startIndex] / measurementSystem);
+		}
+
 		/*
 		 * create paths
 		 */
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
 			// make sure the x-index is not higher than the yValues length
-			if (xValueIndex >= yValues2ndSerie.length) {
-				return;
-			}
+//			if (xValueIndex >= yValues2ndSerie.length) {
+//				return;
+//			}
 
-			final int graphXValue = xValues[xValueIndex] - fGraphXValueOffset;
-			final int graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
-
-			final float devXValue = graphXValue * fScaleX;
-			final float devYValue2nd = graphYValue2nd * fScaleY;
+			graphXValue = xValues[xValueIndex] - fGraphXValueOffset;
+			final float devX = graphXValue * fScaleX;
+			final int devXInt = (int) devX;
 
 			/*
 			 * draw adjusted value graph
@@ -157,16 +164,19 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (isAdjustedValues) {
 
 				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * fScaleY / measurementSystem;
+				final float devYAdjusted = devY0 - devYAdjustedValue;
 
 				if (xValueIndex == startIndex) {
 
 					// move to the first point
 					pathAdjustValue.moveTo(0, devYBottom);
-					pathAdjustValue.lineTo(devXValue, devY0 - devYAdjustedValue);
+					pathAdjustValue.lineTo(devX, devYAdjusted);
 				}
 
 				// draw line to the next point
-				pathAdjustValue.lineTo(devXValue, devY0 - devYAdjustedValue);
+				if (devXInt != devPrevXInt) {
+					pathAdjustValue.lineTo(devX, devYAdjusted);
+				}
 
 				if (xValueIndex == endIndex - 1) {
 
@@ -174,21 +184,31 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 					 * this is the last point, draw the line to the x-axis and the start of the
 					 * chart
 					 */
-					pathAdjustValue.lineTo(devXValue, devYBottom);
+					pathAdjustValue.lineTo(devX, devYBottom);
 				}
 			}
 
 			/*
 			 * draw value graph
 			 */
-			if (xValueIndex == startIndex) {
+			if (is2ndYValues) {
 
-				// move to the first point
-				path2ndSerie.moveTo(devXValue, devY0 - devYValue2nd);
+				graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
+				final float devYValue2nd = graphYValue2nd * fScaleY;
+
+				final float devY2nd = devY0 - devYValue2nd;
+
+				if (xValueIndex == startIndex) {
+
+					// move to the first point
+					path2ndSerie.moveTo(devX, devY2nd);
+				}
+
+				// draw line to the next point
+				if (devXInt != devPrevXInt) {
+					path2ndSerie.lineTo(devX, devY2nd);
+				}
 			}
-
-			// draw line to the next point
-			path2ndSerie.lineTo(devXValue, devY0 - devYValue2nd);
 
 			/*
 			 * draw diff values
@@ -197,16 +217,21 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 				final int graphValueDiff = (int) (diffValues[xValueIndex] / measurementSystem);
 				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
+				final float devYDiff = devYBottom - devLayerValueDiff;
 
 				if (xValueIndex == startIndex) {
 
 					// move to the first point
-					pathValueDiff.moveTo(devXValue, devYBottom - devLayerValueDiff);
+					pathValueDiff.moveTo(devX, devYDiff);
 				}
 
 				// draw line to the next point
-				pathValueDiff.lineTo(devXValue, devYBottom - devLayerValueDiff);
+				if (devXInt != devPrevXInt) {
+					pathValueDiff.lineTo(devX, devYDiff);
+				}
 			}
+
+			devPrevXInt = devXInt;
 		}
 
 		// draw the line of the graph
@@ -216,7 +241,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		gc.setClipping(graphRect);
 
 		/*
-		 * paint adjusted value graph
+		 * paint and fill adjusted value graph
 		 */
 		if (isAdjustedValues) {
 
@@ -253,8 +278,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			gc.setForeground(splineColor);
 
-			int devPrevX = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
-			int devPrevY = (int) (ySplineSerie[0] / measurementSystem * fScaleY);
+			int devXPrev = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
+			int devYPrev = (int) (ySplineSerie[0] / measurementSystem * fScaleY);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
@@ -264,20 +289,22 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				final int devX = (int) (graphX * fScaleX);
 				final int devY = (int) (graphY * fScaleY);
 
-				if (!(devX == devPrevX && devY == devPrevY)) {
-					gc.drawLine(devPrevX, fDevY0Spline - devPrevY, devX, fDevY0Spline - devY);
+				if (!(devX == devXPrev && devY == devYPrev)) {
+					gc.drawLine(devXPrev, fDevY0Spline - devYPrev, devX, fDevY0Spline - devY);
 				}
 
-				devPrevX = devX;
-				devPrevY = devY;
+				devXPrev = devX;
+				devYPrev = devY;
 			}
 		}
 
 		/*
 		 * paint data graph
 		 */
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		gc.drawPath(path2ndSerie);
+		if (is2ndYValues) {
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.drawPath(path2ndSerie);
+		}
 
 		/*
 		 * paint special points on the diff graph

@@ -132,6 +132,7 @@ public class Chart extends ViewForm {
 	 * <br>{@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
 	private String						fMouseMode							= MOUSE_MODE_SLIDER;
+	private boolean						fIsFirstContextMenu;
 
 	/**
 	 * Chart widget
@@ -372,21 +373,20 @@ public class Chart extends ViewForm {
 
 	}
 
-	void fillContextMenu(final IMenuManager menuMgr) {
-
-		if (fChartContextProvider != null) {
-			fChartContextProvider.fillContextMenu(menuMgr);
-		}
-	}
-
 	void fillContextMenu(	final IMenuManager menuMgr,
 							final ChartXSlider leftSlider,
 							final ChartXSlider rightSlider,
 							final int hoveredBarSerieIndex,
-							final int hoveredBarValueIndex) {
+							final int hoveredBarValueIndex,
+							final int mouseDownDevPositionX,
+							final int mouseDownDevPositionY) {
 
 		if (fChartActionProxies == null) {
 			return;
+		}
+
+		if (fIsFirstContextMenu && fChartContextProvider != null) {
+			fChartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
@@ -412,6 +412,7 @@ public class Chart extends ViewForm {
 				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
 			}
 
+			menuMgr.add(new Separator());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
 			menuMgr.add(actionMouseMode);
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
@@ -425,8 +426,8 @@ public class Chart extends ViewForm {
 			}
 		}
 
-		if (fChartContextProvider != null) {
-			fChartContextProvider.fillContextMenu(menuMgr);
+		if (fIsFirstContextMenu == false && fChartContextProvider != null) {
+			fChartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 	}
 
@@ -519,7 +520,7 @@ public class Chart extends ViewForm {
 			case Chart.MouseDownPost:
 				((IMouseListener) listener).mouseDownPost(mouseEvent);
 				break;
-				
+
 			case Chart.MouseUp:
 				((IMouseListener) listener).mouseUp(mouseEvent);
 				break;
@@ -709,17 +710,18 @@ public class Chart extends ViewForm {
 	}
 
 	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-		
+
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-		
+
 		event.devXMouse = devXMouse;
 		event.devYMouse = devYMouse;
 		event.devMouseXInGraph = devXGraph;
-		
+
 		fireChartMouseEvent(event);
-		
+
 		return event.isWorked;
 	}
+
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
@@ -905,6 +907,18 @@ public class Chart extends ViewForm {
 
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		fChartContextProvider = chartContextProvider;
+	}
+
+	/**
+	 * @param chartContextProvider
+	 * @param isFirstContextMenu
+	 *            when <code>true</code> the context menu will be positioned before the chart menu
+	 *            items
+	 */
+	public void setContextProvider(final IChartContextProvider chartContextProvider, final boolean isFirstContextMenu) {
+
+		fChartContextProvider = chartContextProvider;
+		fIsFirstContextMenu = isFirstContextMenu;
 	}
 
 	protected void setDataModel(final ChartDataModel chartDataModel) {

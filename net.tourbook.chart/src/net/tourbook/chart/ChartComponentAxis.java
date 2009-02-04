@@ -18,9 +18,6 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -56,57 +53,57 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private boolean						fIsLeft;
 
-	ChartComponentAxis(Chart chart, Composite parent, int style) {
+	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
 		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
 		fChart = chart;
 
 		addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent event) {
+			public void paintControl(final PaintEvent event) {
 				onPaint(event.gc);
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				axisImage = (Image) ChartUtil.disposeResource(axisImage);
+			public void widgetDisposed(final DisposeEvent e) {
+				axisImage = ChartUtil.disposeResource(axisImage);
 			}
 		});
 
 		addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseDown(MouseEvent e) {
-				fChart.fChartComponents.getChartComponentGraph().setFocus();
-			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
+			public void mouseDoubleClick(final MouseEvent e) {
 				fChart.fChartComponents.getChartComponentGraph().onMouseDoubleClick(e);
 			}
 
-		});
-
-		createContextMenu();
-	}
-
-	/**
-	 * create the context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-				fChart.fillContextMenu(menuMgr);
+			@Override
+			public void mouseDown(final MouseEvent e) {
+				fChart.fChartComponents.getChartComponentGraph().setFocus();
 			}
+
 		});
 
-		setMenu(menuMgr.createContextMenu(this));
+//		createContextMenu();
 	}
+
+//	/**
+//	 * create the context menu
+//	 */
+//	private void createContextMenu() {
+//
+//		final MenuManager menuMgr = new MenuManager();
+//
+//		menuMgr.setRemoveAllWhenShown(true);
+//
+//		menuMgr.addMenuListener(new IMenuListener() {
+//			public void menuAboutToShow(final IMenuManager menuMgr) {
+//				fChart.fillContextMenu(menuMgr);
+//			}
+//		});
+//
+//		setMenu(menuMgr.createContextMenu(this));
+//	}
 
 	/**
 	 * draw the chart on the axisImage
@@ -123,7 +120,7 @@ public class ChartComponentAxis extends Canvas {
 		// it is dirty
 		if (!isAxisDirty && axisImage != null) {
 
-			Rectangle oldBounds = axisImage.getBounds();
+			final Rectangle oldBounds = axisImage.getBounds();
 
 			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
 				return;
@@ -135,7 +132,7 @@ public class ChartComponentAxis extends Canvas {
 		}
 
 		// draw into the image
-		GC gc = new GC(axisImage);
+		final GC gc = new GC(axisImage);
 
 		gc.setBackground(fChart.getBackgroundColor());
 		gc.fillRectangle(axisImage.getBounds());
@@ -154,20 +151,20 @@ public class ChartComponentAxis extends Canvas {
 	 * @param gc
 	 * @param graphRect
 	 */
-	private void drawYUnits(GC gc, Rectangle axisRect) {
+	private void drawYUnits(final GC gc, final Rectangle axisRect) {
 
 		if (chartDrawingData == null) {
 			return;
 		}
 
-		Display display = getDisplay();
+		final Display display = getDisplay();
 
-		int devX = fIsLeft ? axisRect.width - 1 : 0;
+		final int devX = fIsLeft ? axisRect.width - 1 : 0;
 
 		// loop: all graphs
-		for (ChartDrawingData drawingData : chartDrawingData) {
+		for (final ChartDrawingData drawingData : chartDrawingData) {
 
-			ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
+			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 
 			final float scaleY = drawingData.getScaleY();
 			final ChartDataYSerie yData = drawingData.getYData();
@@ -180,18 +177,18 @@ public class ChartComponentAxis extends Canvas {
 			final int devYTop = devYBottom - devGraphHeight;
 			final String unitText = yData.getUnitLabel();
 
-			String title = yData.getYTitle();
+			final String title = yData.getYTitle();
 
 			if (fIsLeft && title != null) {
 
-				Color colorLine = new Color(Display.getCurrent(), yData.getDefaultRGB());
+				final Color colorLine = new Color(Display.getCurrent(), yData.getDefaultRGB());
 				gc.setForeground(colorLine);
 
 				String yTitle = title + (unitText.equals("") ? "" : " - " + unitText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				Point labelExtend = gc.textExtent(yTitle);
 
-				int devChartHeight = devYBottom - devYTop;
+				final int devChartHeight = devYBottom - devYTop;
 
 				// draw only the unit text and not the title when there is not
 				// enough space
@@ -200,10 +197,10 @@ public class ChartComponentAxis extends Canvas {
 					labelExtend = gc.textExtent(yTitle);
 				}
 
-				int xPos = labelExtend.y / 2;
-				int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+				final int xPos = labelExtend.y / 2;
+				final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
-				Transform tr = new Transform(display);
+				final Transform tr = new Transform(display);
 				tr.translate(xPos, yPos);
 				tr.rotate(-90f);
 
@@ -222,12 +219,12 @@ public class ChartComponentAxis extends Canvas {
 
 			// loop: all units
 			int unitCount = 0;
-			for (ChartUnit yUnit : yUnits) {
+			for (final ChartUnit yUnit : yUnits) {
 
 				if (yAxisDirection) {
-					devY = devYBottom - (int) ((float) (yUnit.value - graphYBottom) * scaleY);
+					devY = devYBottom - (int) ((yUnit.value - graphYBottom) * scaleY);
 				} else {
-					devY = devYTop + (int) ((float) (yUnit.value - graphYBottom) * scaleY);
+					devY = devYTop + (int) ((yUnit.value - graphYBottom) * scaleY);
 				}
 
 				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
@@ -250,7 +247,7 @@ public class ChartComponentAxis extends Canvas {
 				}
 
 				final Point unitExtend = gc.textExtent(valueLabel);
-				int devYUnit = devY - unitExtend.y / 2;
+				final int devYUnit = devY - unitExtend.y / 2;
 
 				// draw the unit label centered at the unit tick
 				if (fIsLeft) {
@@ -269,7 +266,7 @@ public class ChartComponentAxis extends Canvas {
 		}
 	}
 
-	private void onPaint(GC gc) {
+	private void onPaint(final GC gc) {
 
 		drawAxisImage();
 
@@ -288,7 +285,7 @@ public class ChartComponentAxis extends Canvas {
 	 * @param isLeft
 	 *        true if the axis is on the left side
 	 */
-	protected void setDrawingData(ArrayList<ChartDrawingData> list, boolean isLeft) {
+	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
 		chartDrawingData = list;
 		fIsLeft = isLeft;
 

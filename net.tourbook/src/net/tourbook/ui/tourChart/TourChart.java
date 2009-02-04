@@ -109,6 +109,7 @@ public class TourChart extends Chart {
 	private IDataModelListener				fChartDataModelListener;
 
 	private final ListenerList				fSelectionListeners						= new ListenerList();
+	private final ListenerList				fXAxisSelectionListener					= new ListenerList();
 
 	private IPropertyChangeListener			fPrefChangeListener;
 
@@ -181,22 +182,6 @@ public class TourChart extends Chart {
 		updateZoomOptionActionHandlers();
 	}
 
-//	@Override
-//	public void activateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
-////		net.tourbook.chart.context.isTourChart
-////		fChart.updateChartActionHandlers();
-//	}
-//
-//	@Override
-//	public void deactivateActions(IWorkbenchPartSite partSite) {
-//
-////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-////		contextService.deactivateContext(fContextBarChart);
-//	}
-
 	public void actionCanScrollChart(final Boolean isItemChecked) {
 
 		setCanScrollZoomedChart(isItemChecked);
@@ -221,6 +206,22 @@ public class TourChart extends Chart {
 
 		setCommandChecked(COMMAND_ID_SHOW_SRTM_DATA, isItemChecked);
 	}
+
+//	@Override
+//	public void activateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
+////		net.tourbook.chart.context.isTourChart
+////		fChart.updateChartActionHandlers();
+//	}
+//
+//	@Override
+//	public void deactivateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		contextService.deactivateContext(fContextBarChart);
+//	}
 
 	public void actionShowStartTime(final Boolean isItemChecked) {
 
@@ -286,6 +287,8 @@ public class TourChart extends Chart {
 		// toggle time and distance buttons
 		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, isChecked);
 		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, !isChecked);
+
+		fireXAxisSelection(fTourChartConfig.showTimeOnXAxis);
 
 		return true;
 	}
@@ -404,6 +407,10 @@ public class TourChart extends Chart {
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.add(listener);
+	}
+
+	public void addXAxisSelectionListener(final IXAxisSelectionListener listener) {
+		fXAxisSelectionListener.add(listener);
 	}
 
 	private void create2ndAltiLayer() {
@@ -841,6 +848,20 @@ public class TourChart extends Chart {
 		}
 	}
 
+	/**
+	 * Fires an event when the x-axis values were changed by the user
+	 * 
+	 * @param showTimeOnXAxis
+	 */
+	private void fireXAxisSelection(final boolean showTimeOnXAxis) {
+
+		final Object[] listeners = fXAxisSelectionListener.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IXAxisSelectionListener listener = (IXAxisSelectionListener) listeners[i];
+			listener.selectionChanged(showTimeOnXAxis);
+		}
+	}
+
 	public Map<String, TCActionProxy> getActionProxies() {
 		return fActionProxies;
 	}
@@ -865,6 +886,10 @@ public class TourChart extends Chart {
 
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.remove(listener);
+	}
+
+	public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {
+		fXAxisSelectionListener.remove(listener);
 	}
 
 	/**

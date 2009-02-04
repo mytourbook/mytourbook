@@ -61,7 +61,6 @@ import org.eclipse.swt.widgets.Spinner;
 public class DialogAdjustAltitudeOLD extends TitleAreaDialog {
 
 	private static final String	WIDGET_DATA_ALTI_ID				= "altiId";		//$NON-NLS-1$
-
 	private static final String	WIDGET_DATA_METRIC_ALTITUDE		= "metricAltitude"; //$NON-NLS-1$
 
 	private static final String	DIALOG_SETTINGS_ADJUST_TYPE		= "adjust_type";	//$NON-NLS-1$

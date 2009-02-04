@@ -241,6 +241,11 @@ public abstract class ChartDataSerie {
 
 			// calculate min/max highValues
 			for (final int[] valueSerie : valueSeries) {
+				
+				if (valueSerie == null) {
+					continue;
+				}
+				
 				for (final int value : valueSerie) {
 					fVisibleMaxValue = (fVisibleMaxValue >= value) ? fVisibleMaxValue : value;
 					fVisibleMinValue = (fVisibleMinValue <= value) ? fVisibleMinValue : value;

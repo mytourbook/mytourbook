@@ -1057,7 +1057,9 @@ public class TourManager {
 
 					final int[] srtmDataSerie = tourData.getSRTMSerie();
 					if (srtmDataSerie != null) {
-						yDataAltitude = getChartData(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
+
+						// create altitude dataserie and adjust min/max values with with the srtm values
+						yDataAltitude = createChartDataSerie(new int[][] { altitudeSerie, srtmDataSerie }, chartType);
 					}
 				}
 
@@ -1068,7 +1070,7 @@ public class TourManager {
 			}
 
 			if (yDataAltitude == null) {
-				yDataAltitude = getChartData(altitudeSerie, chartType);
+				yDataAltitude = createChartDataSerie(altitudeSerie, chartType);
 			}
 
 			yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
@@ -1091,7 +1093,7 @@ public class TourManager {
 		final int[] pulseSerie = tourData.pulseSerie;
 		if (pulseSerie != null) {
 
-			yDataPulse = getChartData(pulseSerie, chartType);
+			yDataPulse = createChartDataSerie(pulseSerie, chartType);
 
 			yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 			yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
@@ -1111,7 +1113,7 @@ public class TourManager {
 		ChartDataYSerie yDataSpeed = null;
 		if (speedSerie != null) {
 
-			yDataSpeed = getChartData(speedSerie, chartType);
+			yDataSpeed = createChartDataSerie(speedSerie, chartType);
 
 			yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -1135,7 +1137,7 @@ public class TourManager {
 		ChartDataYSerie yDataPace = null;
 		if (paceSerie != null) {
 
-			yDataPace = getChartData(paceSerie, chartType);
+			yDataPace = createChartDataSerie(paceSerie, chartType);
 
 			yDataPace.setYTitle(Messages.Graph_Label_Pace);
 			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -1167,7 +1169,7 @@ public class TourManager {
 		ChartDataYSerie yDataPower = null;
 		if (powerSerie != null) {
 
-			yDataPower = getChartData(powerSerie, chartType);
+			yDataPower = createChartDataSerie(powerSerie, chartType);
 
 			yDataPower.setYTitle(Messages.Graph_Label_Power);
 			yDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
@@ -1190,7 +1192,7 @@ public class TourManager {
 		ChartDataYSerie yDataAltimeter = null;
 		if (altimeterSerie != null) {
 
-			yDataAltimeter = getChartData(altimeterSerie, chartType);
+			yDataAltimeter = createChartDataSerie(altimeterSerie, chartType);
 
 			yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
@@ -1216,7 +1218,7 @@ public class TourManager {
 		ChartDataYSerie yDataGradient = null;
 		if (gradientSerie != null) {
 
-			yDataGradient = getChartData(gradientSerie, chartType);
+			yDataGradient = createChartDataSerie(gradientSerie, chartType);
 
 			yDataGradient.setYTitle(Messages.Graph_Label_Gradient);
 			yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
@@ -1245,7 +1247,7 @@ public class TourManager {
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
 
-			yDataCadence = getChartData(cadenceSerie, chartType);
+			yDataCadence = createChartDataSerie(cadenceSerie, chartType);
 
 			yDataCadence.setYTitle(Messages.Graph_Label_Cadence);
 			yDataCadence.setUnitLabel(Messages.Graph_Label_Cadence_unit);
@@ -1264,7 +1266,7 @@ public class TourManager {
 		ChartDataYSerie yDataTemperature = null;
 		if (temperatureSerie != null) {
 
-			yDataTemperature = getChartData(temperatureSerie, chartType);
+			yDataTemperature = createChartDataSerie(temperatureSerie, chartType);
 
 			yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
@@ -1284,7 +1286,7 @@ public class TourManager {
 		ChartDataYSerie yDataTourCompare = null;
 		if (tourCompareSerie != null && tourCompareSerie.length > 0) {
 
-			yDataTourCompare = getChartData(tourCompareSerie, chartType);
+			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
 			yDataTourCompare.setYTitle(Messages.Graph_Label_Tour_Compare);
 			yDataTourCompare.setUnitLabel(Messages.Graph_Label_Tour_Compare_unit);
@@ -1383,6 +1385,25 @@ public class TourManager {
 		return chartDataModel;
 	}
 
+	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
+
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+
+		} else {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+		}
+	}
+
+	private ChartDataYSerie createChartDataSerie(final int[][] dataSerie, final int chartType) {
+
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+		} else {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+		}
+	}
+
 	/**
 	 * @param tourData
 	 * @param useNormalizedData
@@ -1404,32 +1425,6 @@ public class TourManager {
 
 	public TourChart getActiveTourChart() {
 		return fActiveTourChart;
-	}
-
-	private ChartDataYSerie getChartData(final int[] dataSerie, final int chartType) {
-
-		ChartDataYSerie chartDataSerie;
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-
-		} else {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-		}
-		return chartDataSerie;
-	}
-
-	private ChartDataYSerie getChartData(final int[][] dataSerie, final int chartType) {
-
-		ChartDataYSerie chartDataSerie;
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-
-		} else {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-		}
-		return chartDataSerie;
 	}
 
 	/**
