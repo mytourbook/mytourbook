@@ -685,14 +685,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		fBackupSourceTimeSerie = Util.createDataSerieBackup(fSourceTour.timeSerie);
-		fBackupSourceDistanceSerie = Util.createDataSerieBackup(fSourceTour.distanceSerie);
-		fBackupSourceAltitudeSerie = Util.createDataSerieBackup(fSourceTour.altitudeSerie);
+		fBackupSourceTimeSerie = Util.createDataSerieCopy(fSourceTour.timeSerie);
+		fBackupSourceDistanceSerie = Util.createDataSerieCopy(fSourceTour.distanceSerie);
+		fBackupSourceAltitudeSerie = Util.createDataSerieCopy(fSourceTour.altitudeSerie);
 		fBackupSourceTourType = fSourceTour.getTourType();
 
-		fBackupTargetPulseSerie = Util.createDataSerieBackup(fTargetTour.pulseSerie);
-		fBackupTargetTemperatureSerie = Util.createDataSerieBackup(fTargetTour.temperatureSerie);
-		fBackupTargetCadenceSerie = Util.createDataSerieBackup(fTargetTour.cadenceSerie);
+		fBackupTargetPulseSerie = Util.createDataSerieCopy(fTargetTour.pulseSerie);
+		fBackupTargetTemperatureSerie = Util.createDataSerieCopy(fTargetTour.temperatureSerie);
+		fBackupTargetCadenceSerie = Util.createDataSerieCopy(fTargetTour.cadenceSerie);
 
 		fBackupTargetTimeOffset = fTargetTour.getMergedTourTimeOffset();
 		fBackupTargetAltitudeOffset = fTargetTour.getMergedAltitudeOffset();
@@ -1623,13 +1623,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * get original data from the backuped data
 		 */
-		fSourceTour.timeSerie = Util.createDataSerieBackup(fBackupSourceTimeSerie);
-		fSourceTour.distanceSerie = Util.createDataSerieBackup(fBackupSourceDistanceSerie);
-		fSourceTour.altitudeSerie = Util.createDataSerieBackup(fBackupSourceAltitudeSerie);
+		fSourceTour.timeSerie = Util.createDataSerieCopy(fBackupSourceTimeSerie);
+		fSourceTour.distanceSerie = Util.createDataSerieCopy(fBackupSourceDistanceSerie);
+		fSourceTour.altitudeSerie = Util.createDataSerieCopy(fBackupSourceAltitudeSerie);
 
-		fTargetTour.pulseSerie = Util.createDataSerieBackup(fBackupTargetPulseSerie);
-		fTargetTour.temperatureSerie = Util.createDataSerieBackup(fBackupTargetTemperatureSerie);
-		fTargetTour.cadenceSerie = Util.createDataSerieBackup(fBackupTargetCadenceSerie);
+		fTargetTour.pulseSerie = Util.createDataSerieCopy(fBackupTargetPulseSerie);
+		fTargetTour.temperatureSerie = Util.createDataSerieCopy(fBackupTargetTemperatureSerie);
+		fTargetTour.cadenceSerie = Util.createDataSerieCopy(fBackupTargetCadenceSerie);
 
 		fTargetTour.setMergedTourTimeOffset(fBackupTargetTimeOffset);
 		fTargetTour.setMergedAltitudeOffset(fBackupTargetAltitudeOffset);

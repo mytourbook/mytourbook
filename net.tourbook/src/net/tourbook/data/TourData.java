@@ -589,7 +589,7 @@ public class TourData implements Comparable<Object> {
 	public int[]						dataSerieDiffTo2ndAlti;
 
 	/**
-	 * contains the altitude serie which is adjusted at the start
+	 * contains the altitude serie which is adjusted
 	 */
 	@Transient
 	public int[]						dataSerieAdjustedAlti;

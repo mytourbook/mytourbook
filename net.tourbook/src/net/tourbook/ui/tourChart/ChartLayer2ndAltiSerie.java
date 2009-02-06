@@ -247,7 +247,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			gc.setAlpha(0x80);
+			gc.setAlpha(0x40);
 
 			// fill background
 			gc.setClipping(pathAdjustValue);

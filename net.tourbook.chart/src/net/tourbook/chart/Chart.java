@@ -68,7 +68,7 @@ public class Chart extends ViewForm {
 
 	private static final int			MouseMove							= 10;
 	private static final int			MouseDownPre						= 20;
-	private static final int			MouseDownPost						= 21;
+//	private static final int			MouseDownPost						= 21;
 	private static final int			MouseUp								= 30;
 	private static final int			MouseDoubleClick					= 40;
 
@@ -514,12 +514,12 @@ public class Chart extends ViewForm {
 				break;
 
 			case Chart.MouseDownPre:
-				((IMouseListener) listener).mouseDownPre(mouseEvent);
+				((IMouseListener) listener).mouseDown(mouseEvent);
 				break;
 
-			case Chart.MouseDownPost:
-				((IMouseListener) listener).mouseDownPost(mouseEvent);
-				break;
+//			case Chart.MouseDownPost:
+//				((IMouseListener) listener).mouseDownPost(mouseEvent);
+//				break;
 
 			case Chart.MouseUp:
 				((IMouseListener) listener).mouseUp(mouseEvent);
@@ -709,18 +709,18 @@ public class Chart extends ViewForm {
 				chartGraph.getRightSlider().getValuesIndex());
 	}
 
-	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
-
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
-
-		event.devXMouse = devXMouse;
-		event.devYMouse = devYMouse;
-		event.devMouseXInGraph = devXGraph;
-
-		fireChartMouseEvent(event);
-
-		return event.isWorked;
-	}
+//	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
+//
+//		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
+//
+//		event.devXMouse = devXMouse;
+//		event.devYMouse = devYMouse;
+//		event.devMouseXInGraph = devXGraph;
+//
+//		fireChartMouseEvent(event);
+//
+//		return event.isWorked;
+//	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
 

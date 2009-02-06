@@ -395,7 +395,7 @@ public class DialogAdjustAltitudeSRTM_OLD2 extends TitleAreaDialog implements I2
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		fBackupAltitudeSerie = Util.createDataSerieBackup(fTourData.altitudeSerie);
+		fBackupAltitudeSerie = Util.createDataSerieCopy(fTourData.altitudeSerie);
 	}
 
 	@Override

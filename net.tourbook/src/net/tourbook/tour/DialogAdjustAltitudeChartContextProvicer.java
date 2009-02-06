@@ -45,7 +45,7 @@ public class DialogAdjustAltitudeChartContextProvicer implements IChartContextPr
 		fActionNewSplinePoint.fMouseDownDevPositionX = mouseDownDevPositionX;
 		fActionNewSplinePoint.fMouseDownDevPositionY = mouseDownDevPositionY;
 
-		fActionNewSplinePoint.setEnabled(fDialogAdjustAltitude.isActionCreateSplinePointEnabled(mouseDownDevPositionX,
+		fActionNewSplinePoint.setEnabled(fDialogAdjustAltitude.isActionEnabledCreateSplinePoint(mouseDownDevPositionX,
 				mouseDownDevPositionY));
 		
 		menuMgr.add(fActionNewSplinePoint);

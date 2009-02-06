@@ -74,7 +74,19 @@ public class Messages extends NLS {
 	public static String		adjust_alti_srtm_save_tour;
 	public static String	adjust_altitude_action_create_spline_point;
 
+	public static String	adjust_altitude_btn_reset_adjustments;
+
+	public static String	adjust_altitude_btn_reset_adjustments_tooltip;
+
+	public static String	adjust_altitude_btn_reset_altitude;
+
+	public static String	adjust_altitude_btn_reset_altitude_tooltip;
+
 	public static String	adjust_altitude_btn_srtm_remove_all_points;
+
+	public static String	adjust_altitude_btn_update_altitude;
+
+	public static String	adjust_altitude_btn_update_altitude_tooltip;
 
 	public static String		adjust_altitude_dlg_dialog_message;
 	public static String		adjust_altitude_dlg_dialog_title;

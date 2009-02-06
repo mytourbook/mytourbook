@@ -3994,10 +3994,9 @@ public class ChartComponentGraph extends Canvas {
 
 				// do post processing when no other ations are done
 
-				if (fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph)) {
-					return;
-				}
-				;
+//				if (fChart.isMouseDownExternalPost(devXMouse, devYMouse, devXGraph)) {
+//					return;
+//				}
 
 				if (fGraphZoomRatio > 1) {
 

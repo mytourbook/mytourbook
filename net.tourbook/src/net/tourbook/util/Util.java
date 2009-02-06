@@ -25,7 +25,7 @@ public class Util {
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
-	public static int[] createDataSerieBackup(final int[] original) {
+	public static int[] createDataSerieCopy(final int[] original) {
 
 		int[] backup = null;
 
