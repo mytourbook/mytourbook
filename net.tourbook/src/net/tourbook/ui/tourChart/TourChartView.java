@@ -240,7 +240,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		fTourData = null;
 		fTourChart.updateChart(null);
-		
+
 		fPageBook.showPage(fPageNoChart);
 
 		// removed old tour data from the selection provider
@@ -400,7 +400,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
 			final Chart chart = xSliderPosition.getChart();
-			if (chart != fTourChart) {
+			if (chart != null && chart != fTourChart) {
 
 				// it's not the same chart, check if it's the same tour
 
@@ -472,7 +472,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	@Override
 	public void setFocus() {
-		
+
 		fTourChart.setFocus();
 
 		/*

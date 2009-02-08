@@ -87,10 +87,6 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 				}
 			}
-
-//		} else {
-//
-//			dialog.restoreOriginalAltitudeValues();
 		}
 	}
 }

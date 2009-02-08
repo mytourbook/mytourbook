@@ -26,12 +26,15 @@ public class DialogAdjustAltitudeChartContextProvicer implements IChartContextPr
 	private DialogAdjustAltitude	fDialogAdjustAltitude;
 
 	private ActionCreateSplinePoint	fActionNewSplinePoint;
+	private ActionCreateSplinePoint3	fActionNewSplinePoint3;
+
 
 	public DialogAdjustAltitudeChartContextProvicer(final DialogAdjustAltitude dialogAdjustAltitude) {
 
 		fDialogAdjustAltitude = dialogAdjustAltitude;
 		
 		fActionNewSplinePoint = new ActionCreateSplinePoint(dialogAdjustAltitude);
+		fActionNewSplinePoint3 = new ActionCreateSplinePoint3(dialogAdjustAltitude);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -44,12 +47,18 @@ public class DialogAdjustAltitudeChartContextProvicer implements IChartContextPr
 
 		fActionNewSplinePoint.fMouseDownDevPositionX = mouseDownDevPositionX;
 		fActionNewSplinePoint.fMouseDownDevPositionY = mouseDownDevPositionY;
+		fActionNewSplinePoint3.fMouseDownDevPositionX = mouseDownDevPositionX;
+		fActionNewSplinePoint3.fMouseDownDevPositionY = mouseDownDevPositionY;
 
-		fActionNewSplinePoint.setEnabled(fDialogAdjustAltitude.isActionEnabledCreateSplinePoint(mouseDownDevPositionX,
-				mouseDownDevPositionY));
+		final boolean canCreatePoint = fDialogAdjustAltitude.isActionEnabledCreateSplinePoint(mouseDownDevPositionX,
+				mouseDownDevPositionY);
+
+		fActionNewSplinePoint.setEnabled(canCreatePoint);
+		fActionNewSplinePoint3.setEnabled(canCreatePoint);
 		
 		menuMgr.add(fActionNewSplinePoint);
-
+// disabled, it works but is not easy to use
+//		menuMgr.add(fActionNewSplinePoint3);
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,

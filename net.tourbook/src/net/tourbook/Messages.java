@@ -74,15 +74,29 @@ public class Messages extends NLS {
 	public static String		adjust_alti_srtm_save_tour;
 	public static String	adjust_altitude_action_create_spline_point;
 
+	public static String	adjust_altitude_action_create_spline_point_3;
+
 	public static String	adjust_altitude_btn_reset_adjustments;
 
 	public static String	adjust_altitude_btn_reset_adjustments_tooltip;
 
 	public static String	adjust_altitude_btn_reset_altitude;
 
+	public static String	adjust_altitude_btn_reset_altitude_and_points;
+
+	public static String	adjust_altitude_btn_reset_altitude_and_points_tooltip;
+
 	public static String	adjust_altitude_btn_reset_altitude_tooltip;
 
+	public static String	adjust_altitude_btn_save_modified_tour;
+
 	public static String	adjust_altitude_btn_srtm_remove_all_points;
+
+	public static String	adjust_altitude_btn_srtm_remove_all_points_tooltip;
+
+	public static String	adjust_altitude_btn_srtm_reset_all_points;
+
+	public static String	adjust_altitude_btn_srtm_reset_all_points_tooltip;
 
 	public static String	adjust_altitude_btn_update_altitude;
 
@@ -102,9 +116,11 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
 	public static String		adjust_altitude_type_show_original;
-	public static String		adjust_altitude_type_start_and_end;
-	public static String		adjust_altitude_type_until_left_slider;
+	public static String	adjust_altitude_type_srtm;
 
+	public static String	adjust_altitude_type_srtm_spline;
+
+	public static String		adjust_altitude_type_start_and_end;
 	public static String		app_action_adjust_altitude_srtm;
 	public static String		app_action_button_down;
 	public static String		app_action_button_up;

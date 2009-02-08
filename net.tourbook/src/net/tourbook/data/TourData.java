@@ -749,9 +749,9 @@ public class TourData implements Comparable<Object> {
 	public void clearAltitudeSeries() {
 
 		altitudeSerieImperial = null;
-
-		srtmSerie = null;
-		srtmSerieImperial = null;
+//
+//		srtmSerie = null;
+//		srtmSerieImperial = null;
 	}
 
 	/**

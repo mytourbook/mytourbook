@@ -23,12 +23,12 @@ import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
-import net.tourbook.ui.UI;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -78,9 +78,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 													 */) {
 			return;
 		}
-
-		final float measurementSystem = UI.UNIT_VALUE_ALTITUDE;
-
+		
 		fScaleX = drawingData.getScaleX();
 		fScaleY = drawingData.getScaleY();
 
@@ -119,7 +117,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
 				maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
 			}
-			maxValueDiff /= measurementSystem;
 
 			// set value diff scaling
 			if (fTourChartConfig.isRelativeValueDiffScaling) {
@@ -141,7 +138,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 		int graphYValue2nd;
 		if (is2ndYValues) {
-			graphYValue2nd = (int) (yValues2ndSerie[startIndex] / measurementSystem);
+			graphYValue2nd = yValues2ndSerie[startIndex];
 		}
 
 		/*
@@ -163,7 +160,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * fScaleY / measurementSystem;
+				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * fScaleY;
 				final float devYAdjusted = devY0 - devYAdjustedValue;
 
 				if (xValueIndex == startIndex) {
@@ -193,7 +190,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (is2ndYValues) {
 
-				graphYValue2nd = (int) (yValues2ndSerie[xValueIndex] / measurementSystem);
+				graphYValue2nd = (yValues2ndSerie[xValueIndex]);
 				final float devYValue2nd = graphYValue2nd * fScaleY;
 
 				final float devY2nd = devY0 - devYValue2nd;
@@ -215,7 +212,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isDiffValues) {
 
-				final int graphValueDiff = (int) (diffValues[xValueIndex] / measurementSystem);
+				final int graphValueDiff = (diffValues[xValueIndex]);
 				final float devLayerValueDiff = graphValueDiff * scaleValueDiff;
 				final float devYDiff = devYBottom - devLayerValueDiff;
 
@@ -245,9 +242,13 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		 */
 		if (isAdjustedValues) {
 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			gc.setAlpha(0x40);
+			final Color color1 = new Color(display, new RGB(0xFF, 0x3E, 0x00));
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+			gc.setForeground(color1);
+			gc.setBackground(color1);
+			gc.setAlpha(0x80);
 
 			// fill background
 			gc.setClipping(pathAdjustValue);
@@ -258,6 +259,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			gc.drawPath(pathAdjustValue);
 
 			gc.setAlpha(0xff);
+			color1.dispose();
 		}
 
 		/*
@@ -279,12 +281,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			gc.setForeground(splineColor);
 
 			int devXPrev = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
-			int devYPrev = (int) (ySplineSerie[0] / measurementSystem * fScaleY);
+			int devYPrev = (int) (ySplineSerie[0] * fScaleY);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
 				final float graphX = xValues[xIndex] - fGraphXValueOffset;
-				final float graphY = ySplineSerie[xIndex] / measurementSystem;
+				final float graphY = ySplineSerie[xIndex];
 
 				final int devX = (int) (graphX * fScaleX);
 				final int devY = (int) (graphY * fScaleY);
@@ -336,7 +338,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				}
 
 				final double graphX = xSplineValues[pointIndex] - fGraphXValueOffset;
-				final double graphY = ySplineValues[pointIndex] / measurementSystem;
+				final double graphY = ySplineValues[pointIndex];
 
 				final int devPointX = (int) (graphX * fScaleX);
 				final int devPointY = (int) (graphY * scaleValueDiff);
@@ -364,7 +366,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 				}
 
 				final double graphSpX = xSplineValues[pointIndex] - fGraphXValueOffset;
-				final double graphSpY = ySplineValues[pointIndex] / measurementSystem;
+				final double graphSpY = ySplineValues[pointIndex];
 
 				final int devPointX = (int) (graphSpX * fScaleX);
 				final int devPointY = (int) (graphSpY * scaleValueDiff);
