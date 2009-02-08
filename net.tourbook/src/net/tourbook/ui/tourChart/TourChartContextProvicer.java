@@ -31,7 +31,6 @@ import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.action.ActionAdjustAltitudeSRTM_OLD;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
@@ -51,7 +50,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 	private ActionEditTour					fActionEditTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionAdjustAltitudeSRTM_OLD	fActionAdjustAltitudeSRTM;
 	private ActionOpenTour					fActionOpenTour;
 
 	private ActionCreateRefTour				fActionCreateRefTour;
@@ -103,9 +101,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 		fActionOpenAdjustAltitudeDialog.setEnabled(true);
 
-		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM_OLD(this);
-		fActionAdjustAltitudeSRTM.setEnabled(true);
-		
 		fActionSetTourType = new ActionSetTourTypeMenu(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
@@ -130,7 +125,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
-//		menuMgr.add(fActionAdjustAltitudeSRTM);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());

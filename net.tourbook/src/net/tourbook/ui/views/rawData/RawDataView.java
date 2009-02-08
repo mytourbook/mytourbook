@@ -56,7 +56,6 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionAdjustAltitudeSRTM_OLD;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionModifyColumns;
@@ -160,7 +159,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionOpenTour					fActionOpenTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionAdjustAltitudeSRTM_OLD	fActionAdjustAltitudeSRTM;
 
 	private ImageDescriptor					imageDescDatabase;
 	private ImageDescriptor					imageDescDatabaseOtherPerson;
@@ -553,7 +551,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
-		fActionAdjustAltitudeSRTM = new ActionAdjustAltitudeSRTM_OLD(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
@@ -1193,7 +1190,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionOpenTour.setEnabled(isOneSavedAndValidTour);
 		fActionOpenMarkerDialog.setEnabled(isOneSavedAndValidTour);
 		fActionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndValidTour);
-		fActionAdjustAltitudeSRTM.setEnabled(isOneSavedAndValidTour);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
