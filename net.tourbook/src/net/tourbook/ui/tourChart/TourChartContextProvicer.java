@@ -98,7 +98,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenMarkerDialog.setEnabled(true);
 
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		fActionOpenAdjustAltitudeDialog.setEnabled(true);
 
 		fActionSetTourType = new ActionSetTourTypeMenu(this);

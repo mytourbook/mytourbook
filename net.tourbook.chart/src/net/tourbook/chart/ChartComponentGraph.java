@@ -2170,7 +2170,7 @@ public class ChartComponentGraph extends Canvas {
 				yValue = graphYTop;
 			}
 
-			if (isPath2) {
+			if (path2 != null) {
 
 				yValue2 = yValues2[xValueIndex];
 
@@ -2204,7 +2204,7 @@ public class ChartComponentGraph extends Canvas {
 					path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
 				}
 
-				if (isPath2) {
+				if (path2 != null) {
 					path2.moveTo(devX, devY0 - (yValue2 * scaleY));
 				}
 			}
@@ -2215,7 +2215,7 @@ public class ChartComponentGraph extends Canvas {
 				// draw line to the next point
 				path.lineTo(devX, devY0 - (yValue * scaleY));
 
-				if (isPath2) {
+				if (path2 != null) {
 					path2.lineTo(devX, devY0 - (yValue2 * scaleY));
 				}
 			}
@@ -2244,7 +2244,7 @@ public class ChartComponentGraph extends Canvas {
 				path.lineTo(devX, devY0 - (graphXAxisLine * scaleY));
 				path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
 
-				if (isPath2) {
+				if (path2 != null) {
 					path.lineTo(devX, devY0 - (yValue2 * scaleY));
 					path.moveTo(devX, devY0 - (yValue2 * scaleY));
 				}
@@ -2323,14 +2323,6 @@ public class ChartComponentGraph extends Canvas {
 			gc.setClipping(chartRectangle);
 		}
 
-		if (isPath2) {
-
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gc.drawPath(path2);
-
-			path2.dispose();
-		}
-
 		// draw the line of the graph
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(1);
@@ -2344,6 +2336,17 @@ public class ChartComponentGraph extends Canvas {
 		colorBg2.dispose();
 
 		path.dispose();
+
+		/*
+		 * draw path2 above the other graph
+		 */
+		if (path2 != null) {
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.drawPath(path2);
+
+			path2.dispose();
+		}
 
 		gc.setAlpha(0xFF);
 	}
@@ -5714,11 +5717,11 @@ public class ChartComponentGraph extends Canvas {
 			int maxValue = yValues[valueIndexLeft];
 
 			for (final int[] yValueSerie : yValueSeries) {
-				
+
 				if (yValueSerie == null) {
 					continue;
 				}
-				
+
 				for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
 
 					final int yValue = yValueSerie[valueIndex];

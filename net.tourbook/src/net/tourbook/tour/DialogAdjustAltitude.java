@@ -133,6 +133,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	 */
 	private boolean						fIsDisableSliderEvent;
 	private boolean						fIsTourSaved				= false;
+	private boolean						fIsSaveTour;
 
 	private TourData					fTourData;
 	private SplineData					fSplineData;
@@ -186,12 +187,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	public DialogAdjustAltitude(final Shell parentShell, final TourData tourData) {
+	public DialogAdjustAltitude(final Shell parentShell, final TourData tourData, final boolean isSaveTour) {
 
 		super(parentShell);
 
 		fTourData = tourData;
 		fSRTMValues = fTourData.getSRTMSerie();
+		fIsSaveTour = isSaveTour;
 
 		// set icon for the window 
 		final Image shellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude).createImage();
@@ -871,7 +873,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// rename OK button
 		final Button buttonOK = getButton(IDialogConstants.OK_ID);
-		buttonOK.setText(Messages.adjust_altitude_btn_save_modified_tour);
+		
+		if (fIsSaveTour) {
+			buttonOK.setText(Messages.adjust_altitude_btn_save_modified_tour);
+		} else {
+			buttonOK.setText(Messages.adjust_altitude_btn_update_modified_tour);
+		}
 
 		setButtonLayoutData(buttonOK);
 	}
@@ -1798,7 +1805,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		switch (getSelectedAdjustmentType().id) {
 		case ADJUST_TYPE_SRTM:
 		case ADJUST_TYPE_SRTM_SPLINE:
-			fTourData.altitudeSerie = fTourData.dataSerieAdjustedAlti;
+
+			final int[] dataSerieAdjustedAlti = fTourData.dataSerieAdjustedAlti;
+			final int[] altitudeSerie = new int[dataSerieAdjustedAlti.length];
+
+			for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
+				altitudeSerie[serieIndex] = (int) (dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE);
+			}
+			fTourData.altitudeSerie = altitudeSerie;
 			break;
 
 		case ADJUST_TYPE_WHOLE_TOUR:
@@ -1814,6 +1828,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// force the imperial altitude series to be recomputed
 		fTourData.clearAltitudeSeries();
+		
+		// adjust altitude up/down values
+		fTourData.computeAltitudeUpDown();
 	}
 
 	private CubicSpline updateSplineData() {

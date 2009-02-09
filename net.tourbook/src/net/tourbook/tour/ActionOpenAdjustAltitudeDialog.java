@@ -31,12 +31,10 @@ import org.eclipse.swt.widgets.Display;
 public class ActionOpenAdjustAltitudeDialog extends Action {
 
 	private ITourProvider	fTourProvider;
-	private boolean			fIsSaveTour;
 
-	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
+	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider) {
 
 		fTourProvider = tourProvider;
-		fIsSaveTour = isSaveTour;
 
 		setText(Messages.app_action_edit_adjust_altitude);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude));
@@ -65,26 +63,30 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 			return;
 		}
 
-		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
-		if (dialog.open() == Window.OK) {
+		/*
+		 * don't save when the tour is opened in the editor, just update the tour, saving is done in
+		 * the editor ALWAYS
+		 */
+		boolean isSave = true;
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if (tourDataEditor != null && tourDataEditor.getTourData() == tourData) {
+			isSave = false;
+		}
 
-			if (fIsSaveTour) {
+		if (new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData, isSave).open() == Window.OK) {
+
+			if (isSave) {
 				TourManager.saveModifiedTours(selectedTours);
 			} else {
 
 				/*
 				 * don't save the tour, just update the tour data editor
 				 */
-				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 				if (tourDataEditor != null) {
 
 					tourDataEditor.updateUI(tourData, true);
 
-					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-					modifiedTours.add(tourData);
-					final TourEvent propertyData = new TourEvent(modifiedTours);
-
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
 				}
 			}
 		}

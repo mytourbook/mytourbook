@@ -1413,7 +1413,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
 		fActionToggleReadEditMode = new ActionToggleReadEditMode(this);
 
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, false);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
 
 		fActionDeleteTimeSlicesKeepTime = new ActionDeleteTimeSlicesKeepTime(this);

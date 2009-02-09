@@ -102,6 +102,8 @@ public class Messages extends NLS {
 
 	public static String	adjust_altitude_btn_update_altitude_tooltip;
 
+	public static String	adjust_altitude_btn_update_modified_tour;
+
 	public static String		adjust_altitude_dlg_dialog_message;
 	public static String		adjust_altitude_dlg_dialog_title;
 	public static String		adjust_altitude_dlg_shell_title;

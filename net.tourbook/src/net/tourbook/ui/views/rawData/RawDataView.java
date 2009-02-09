@@ -550,7 +550,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionSetTourType = new ActionSetTourTypeMenu(this);
 
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);

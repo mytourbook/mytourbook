@@ -369,7 +369,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionDeleteTour = new ActionDeleteTour(this);
 
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		fActionMergeTour = new ActionMergeTour(this);
 
 		fActionSetTourType = new ActionSetTourTypeMenu(this);
