@@ -56,7 +56,7 @@ public class SplineORIGINAL extends Applet {
 		offscreenG = offscreenImg.getGraphics();
 
 		// put "Polygon" button on screen
-		polygon = new Button("Polygon");
+		polygon = new Button("Polygon"); //$NON-NLS-1$
 		add(polygon);
 	}
 

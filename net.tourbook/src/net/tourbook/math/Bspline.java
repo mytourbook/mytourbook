@@ -23,7 +23,7 @@ public class Bspline extends Frame {
 	}
 
 	Bspline() {
-		super("Define points; press any key after the final one");
+		super("Define points; press any key after the final one"); //$NON-NLS-1$
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent e) {
@@ -31,7 +31,7 @@ public class Bspline extends Frame {
 			}
 		});
 		setSize(500, 300);
-		add("Center", new CvBspline());
+		add("Center", new CvBspline()); //$NON-NLS-1$
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		show();
 	}

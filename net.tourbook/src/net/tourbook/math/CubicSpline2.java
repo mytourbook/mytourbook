@@ -46,7 +46,7 @@ public class CubicSpline2{
     	//  after the derivatives (deriv) have been calculated independently of and calcDeriv().
     	public static double interpolate(final double xx, final double[] x, final double[] y, final double[] deriv){
         	if(((x.length != y.length) || (x.length != deriv.length)) || (y.length != deriv.length)){
-            		throw new IllegalArgumentException("array lengths are not all equal");
+            		throw new IllegalArgumentException("array lengths are not all equal"); //$NON-NLS-1$
         	}
 	    	final int n = x.length;
         	double  h=0.0D, b=0.0D, a=0.0D, yy = 0.0D;
@@ -66,7 +66,7 @@ public class CubicSpline2{
         	h=x[khi]-x[klo];
 
 	    	if (h == 0.0){
-	        	throw new IllegalArgumentException("Two values of x are identical");
+	        	throw new IllegalArgumentException("Two values of x are identical"); //$NON-NLS-1$
 	    	}
 	    	else{
 	        	a=(x[khi]-xx)/h;
@@ -97,7 +97,7 @@ public class CubicSpline2{
     	// Constructor with data arrays initialised to arrays x and y
     	public CubicSpline2(final double[] x, final double[] y){
         	this.npoints=x.length;
-        	if(this.npoints!=y.length)throw new IllegalArgumentException("Arrays x and y are of different length");
+        	if(this.npoints!=y.length)throw new IllegalArgumentException("Arrays x and y are of different length"); //$NON-NLS-1$
         	this.x = new double[npoints];
         	this.y = new double[npoints];
         	this.y2 = new double[npoints];
@@ -169,7 +169,7 @@ public class CubicSpline2{
 	    	double h=0.0D,b=0.0D,a=0.0D, yy=0.0D;
 
         	if (xx<this.x[0] || xx>this.x[this.npoints-1]){
-	        	throw new IllegalArgumentException("x is outside the range of data points");
+	        	throw new IllegalArgumentException("x is outside the range of data points"); //$NON-NLS-1$
 	    	}
 
 	    	int k=0;
@@ -187,7 +187,7 @@ public class CubicSpline2{
 	    	h=this.x[khi]-this.x[klo];
 
 	    	if (h == 0.0){
-	        	throw new IllegalArgumentException("Two values of x are identical: point "+klo+ " ("+this.x[klo]+") and point "+khi+ " ("+this.x[khi]+")" );
+	        	throw new IllegalArgumentException("Two values of x are identical: point "+klo+ " ("+this.x[klo]+") and point "+khi+ " ("+this.x[khi]+")" ); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	    	}
 	    	else{
 	        	a=(this.x[khi]-xx)/h;
@@ -200,8 +200,8 @@ public class CubicSpline2{
     	//  METHODS
     	// Resets the x y data arrays - primarily for use in BiCubicSpline
     	public void resetData(final double[] x, final double[] y){
-        	if(x.length!=y.length)throw new IllegalArgumentException("Arrays x and y are of different length");
-        	if(this.npoints!=x.length)throw new IllegalArgumentException("Original array length not matched by new array length");
+        	if(x.length!=y.length)throw new IllegalArgumentException("Arrays x and y are of different length"); //$NON-NLS-1$
+        	if(this.npoints!=x.length)throw new IllegalArgumentException("Original array length not matched by new array length"); //$NON-NLS-1$
         	for(int i=0; i<this.npoints; i++){
             		this.x[i]=x[i];
             		this.y[i]=y[i];

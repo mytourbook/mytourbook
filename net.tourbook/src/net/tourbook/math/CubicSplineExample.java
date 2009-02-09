@@ -31,12 +31,12 @@ public class CubicSplineExample {
 		//   also calculates the required derivatives
 		x1 = 2.5e-7;
 		y1 = cs.interpolate(x1);
-		System.out.println("The refractive index of fused quartz at " + x1 * 1.0e9 + " nm is " + y1);
+		System.out.println("The refractive index of fused quartz at " + x1 * 1.0e9 + " nm is " + y1); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Second interpolation at a wavelength of 590 nm
 		//  uses the derivatives calculated in the first call
 		x1 = 5.9e-7;
 		y1 = cs.interpolate(x1);
-		System.out.println("The refractive index of fused quartz at " + x1 * 1.0e9 + " nm is " + y1);
+		System.out.println("The refractive index of fused quartz at " + x1 * 1.0e9 + " nm is " + y1); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

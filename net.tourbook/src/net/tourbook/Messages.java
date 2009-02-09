@@ -67,63 +67,32 @@ public class Messages extends NLS {
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
-	public static String		adjust_alti_srtm_dialog_header_message;
-	public static String		adjust_alti_srtm_dialog_header_title;
-	public static String		adjust_alti_srtm_dialog_invalid_data;
-	public static String		adjust_alti_srtm_dialog_title;
-	public static String		adjust_alti_srtm_save_tour;
-	public static String	adjust_altitude_action_create_spline_point;
-
-	public static String	adjust_altitude_action_create_spline_point_3;
-
-	public static String	adjust_altitude_btn_reset_adjustments;
-
-	public static String	adjust_altitude_btn_reset_adjustments_tooltip;
-
-	public static String	adjust_altitude_btn_reset_altitude;
-
-	public static String	adjust_altitude_btn_reset_altitude_and_points;
-
-	public static String	adjust_altitude_btn_reset_altitude_and_points_tooltip;
-
-	public static String	adjust_altitude_btn_reset_altitude_tooltip;
-
-	public static String	adjust_altitude_btn_save_modified_tour;
-
-	public static String	adjust_altitude_btn_srtm_remove_all_points;
-
-	public static String	adjust_altitude_btn_srtm_remove_all_points_tooltip;
-
-	public static String	adjust_altitude_btn_srtm_reset_all_points;
-
-	public static String	adjust_altitude_btn_srtm_reset_all_points_tooltip;
-
-	public static String	adjust_altitude_btn_update_altitude;
-
-	public static String	adjust_altitude_btn_update_altitude_tooltip;
-
-	public static String	adjust_altitude_btn_update_modified_tour;
-
+	public static String		adjust_altitude_action_create_spline_point;
+	public static String		adjust_altitude_btn_reset_adjustments;
+	public static String		adjust_altitude_btn_reset_adjustments_tooltip;
+	public static String		adjust_altitude_btn_reset_altitude;
+	public static String		adjust_altitude_btn_reset_altitude_and_points;
+	public static String		adjust_altitude_btn_reset_altitude_and_points_tooltip;
+	public static String		adjust_altitude_btn_reset_altitude_tooltip;
+	public static String		adjust_altitude_btn_save_modified_tour;
+	public static String		adjust_altitude_btn_srtm_remove_all_points;
+	public static String		adjust_altitude_btn_srtm_remove_all_points_tooltip;
+	public static String		adjust_altitude_btn_update_altitude;
+	public static String		adjust_altitude_btn_update_altitude_tooltip;
+	public static String		adjust_altitude_btn_update_modified_tour;
 	public static String		adjust_altitude_dlg_dialog_message;
 	public static String		adjust_altitude_dlg_dialog_title;
 	public static String		adjust_altitude_dlg_shell_title;
 	public static String		adjust_altitude_invalid_data_message;
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
-	public static String	adjust_altitude_synch_min_max_immediately_tooltip;
-
-	public static String	adjust_altitude_synch_min_max_tooltip;
-
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
-	public static String		adjust_altitude_type_show_original;
-	public static String	adjust_altitude_type_srtm;
-
-	public static String	adjust_altitude_type_srtm_spline;
-
+	public static String		adjust_altitude_type_srtm;
+	public static String		adjust_altitude_type_srtm_spline;
 	public static String		adjust_altitude_type_start_and_end;
-	public static String		app_action_adjust_altitude_srtm;
+	
 	public static String		app_action_button_down;
 	public static String		app_action_button_up;
 	public static String		app_action_collapse_all_tooltip;
@@ -193,12 +162,6 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
-	public static String		Dlg_AdjustAltitude_Button_reset_altitudes;
-	public static String		Dlg_AdjustAltitude_Button_reset_altitudes_tooltip;
-	public static String		Dlg_AdjustAltitude_Button_show_original_values;
-	public static String		Dlg_AdjustAltitude_Button_show_original_values_tooltip;
-	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis;
-	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis_tooltip;
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;
@@ -211,13 +174,11 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Message_adjust_max;
 	public static String		Dlg_AdjustAltitude_Message_adjust_start_and_end;
 	public static String		Dlg_AdjustAltitude_Message_adjust_whole_tour;
-	public static String		Dlg_AdjustAltitude_Message_select_type;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
-	public static String		Dlg_AdjustAltitude_Title_dlg;
-	public static String		Dlg_AdjustAltitude_Title_window;
+
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;
@@ -253,8 +214,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
-
-	public static String		Graph_Label_Tour_SRTM;
 
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;
@@ -319,7 +278,7 @@ public class Messages extends NLS {
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
 
-	public static String	Image__spline_point;
+	public static String		Image__spline_point;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;
 	public static String		Image__synch_graph_bySize;
@@ -340,14 +299,6 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
-	public static String	image__action_zoom_show_all;
-
-	public static String	image__action_zoom_show_all_immediatly;
-
-	public static String	image__action_zoom_show_all_immediatly_disabled;
-
-	public static String		image__adjust_altitude_srtm;
-	public static String		image__adjust_altitude_srtm_disabled;
 	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;

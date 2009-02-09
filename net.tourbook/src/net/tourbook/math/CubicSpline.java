@@ -62,7 +62,7 @@ public class CubicSpline {
 	private double			ypn							= Double.NaN;	// first derivative at point n
 	// default value = NaN (natural spline)
 	private boolean			derivCalculated				= false;		// = true when the derivatives have been calculated
-	private String			subMatrixIndices			= " ";			// String of indices of the submatrices that have called CubicSpline from higher order interpolation
+	private String			subMatrixIndices			= " ";			// String of indices of the submatrices that have called CubicSpline from higher order interpolation //$NON-NLS-1$
 
 	private boolean			checkPoints					= false;		// = true when points checked for identical values
 	private boolean			averageIdenticalAbscissae	= false;		// if true: the the ordinate values for identical abscissae are averaged
@@ -75,7 +75,7 @@ public class CubicSpline {
 	public static double interpolate(final double xx, final double[] x, final double[] y, final double[] deriv) {
 
 		if (((x.length != y.length) || (x.length != deriv.length)) || (y.length != deriv.length)) {
-			throw new IllegalArgumentException("array lengths are not all equal");
+			throw new IllegalArgumentException("array lengths are not all equal"); //$NON-NLS-1$
 		}
 		final int n = x.length;
 		double h = 0.0D, b = 0.0D, a = 0.0D, yy = 0.0D;
@@ -94,7 +94,7 @@ public class CubicSpline {
 		h = x[khi] - x[klo];
 
 		if (h == 0.0) {
-			throw new IllegalArgumentException("Two values of x are identical");
+			throw new IllegalArgumentException("Two values of x are identical"); //$NON-NLS-1$
 		} else {
 			a = (x[khi] - xx) / h;
 			b = (xx - x[klo]) / h;
@@ -121,7 +121,7 @@ public class CubicSpline {
 	// Primarily for use in BiCubicSpline
 	public static CubicSpline[] oneDarray(final int n, final int m) {
 		if (m < 3)
-			throw new IllegalArgumentException("A minimum of three data points is needed");
+			throw new IllegalArgumentException("A minimum of three data points is needed"); //$NON-NLS-1$
 		final CubicSpline[] a = new CubicSpline[n];
 		for (int i = 0; i < n; i++) {
 			a[i] = CubicSpline.zero(m);
@@ -141,7 +141,7 @@ public class CubicSpline {
 	// Primarily for use in BiCubicSpline
 	public static CubicSpline zero(final int n) {
 		if (n < 3)
-			throw new IllegalArgumentException("A minimum of three data points is needed");
+			throw new IllegalArgumentException("A minimum of three data points is needed"); //$NON-NLS-1$
 		final CubicSpline aa = new CubicSpline(n);
 		return aa;
 	}
@@ -152,12 +152,12 @@ public class CubicSpline {
 		this.nPoints = x.length;
 		this.nPointsOriginal = this.nPoints;
 		if (this.nPoints != y.length)
-			throw new IllegalArgumentException("Arrays x and y are of different length "
+			throw new IllegalArgumentException("Arrays x and y are of different length " //$NON-NLS-1$
 					+ this.nPoints
-					+ " "
+					+ " " //$NON-NLS-1$
 					+ y.length);
 		if (this.nPoints < 3)
-			throw new IllegalArgumentException("A minimum of three data points is needed");
+			throw new IllegalArgumentException("A minimum of three data points is needed"); //$NON-NLS-1$
 		this.x = new double[nPoints];
 		this.y = new double[nPoints];
 		this.d2ydx2 = new double[nPoints];
@@ -174,7 +174,7 @@ public class CubicSpline {
 		this.nPoints = nPoints;
 		this.nPointsOriginal = this.nPoints;
 		if (this.nPoints < 3)
-			throw new IllegalArgumentException("A minimum of three data points is needed");
+			throw new IllegalArgumentException("A minimum of three data points is needed"); //$NON-NLS-1$
 		this.x = new double[nPoints];
 		this.y = new double[nPoints];
 		this.d2ydx2 = new double[nPoints];
@@ -241,15 +241,15 @@ public class CubicSpline {
 				if (this.x[ii] == this.x[jj]) {
 					if (this.y[ii] == this.y[jj]) {
 						System.out.print(subMatrixIndices
-								+ "CubicSpline: Two identical points, "
+								+ "CubicSpline: Two identical points, " //$NON-NLS-1$
 								+ this.x[ii]
-								+ ", "
+								+ ", " //$NON-NLS-1$
 								+ this.y[ii]);
-						System.out.println(", in data array at indices "
+						System.out.println(", in data array at indices " //$NON-NLS-1$
 								+ this.newAndOldIndices[ii]
-								+ " and "
+								+ " and " //$NON-NLS-1$
 								+ this.newAndOldIndices[jj]
-								+ ", latter point removed");
+								+ ", latter point removed"); //$NON-NLS-1$
 
 						for (int i = jj; i < nP - 1; i++) {
 							this.x[i] = this.x[i + 1];
@@ -265,13 +265,13 @@ public class CubicSpline {
 					} else {
 						if (this.averageIdenticalAbscissae == true) {
 							System.out.print(subMatrixIndices
-									+ "CubicSpline: Two identical points on the absicca (x-axis) with different ordinate (y-axis) values, "
+									+ "CubicSpline: Two identical points on the absicca (x-axis) with different ordinate (y-axis) values, " //$NON-NLS-1$
 									+ x[ii]
-									+ ": "
+									+ ": " //$NON-NLS-1$
 									+ y[ii]
-									+ ", "
+									+ ", " //$NON-NLS-1$
 									+ y[jj]);
-							System.out.println(", average of the ordinates taken");
+							System.out.println(", average of the ordinates taken"); //$NON-NLS-1$
 							this.y[ii] = (this.y[ii] + this.y[jj]) / 2.0D;
 							for (int i = jj; i < nP - 1; i++) {
 								this.x[i] = this.x[i + 1];
@@ -287,11 +287,11 @@ public class CubicSpline {
 						} else {
 							double sepn = range * 0.0005D;
 							System.out.print(subMatrixIndices
-									+ "CubicSpline: Two identical points on the absicca (x-axis) with different ordinate (y-axis) values, "
+									+ "CubicSpline: Two identical points on the absicca (x-axis) with different ordinate (y-axis) values, " //$NON-NLS-1$
 									+ x[ii]
-									+ ": "
+									+ ": " //$NON-NLS-1$
 									+ y[ii]
-									+ ", "
+									+ ", " //$NON-NLS-1$
 									+ y[jj]);
 							boolean check = false;
 							if (ii == 0) {
@@ -371,7 +371,7 @@ public class CubicSpline {
 							if (check == false) {
 								check = stay(ii, jj, sepn);
 							}
-							System.out.println(", the two abscissae have been separated by a distance " + sepn);
+							System.out.println(", the two abscissae have been separated by a distance " + sepn); //$NON-NLS-1$
 							jj++;
 						}
 					}
@@ -389,14 +389,14 @@ public class CubicSpline {
 		}
 		this.nPoints = nP;
 		if (this.nPoints < 3)
-			throw new IllegalArgumentException("Removal of duplicate points has reduced the number of points to less than the required minimum of three data points");
+			throw new IllegalArgumentException("Removal of duplicate points has reduced the number of points to less than the required minimum of three data points"); //$NON-NLS-1$
 
 		this.checkPoints = true;
 	}
 
 	// print to screen the limis of x
 	public void displayLimits() {
-		System.out.println("\nThe limits of the abscissae (x-values) are " + this.xMin + " and " + this.xMax + "\n");
+		System.out.println("\nThe limits of the abscissae (x-values) are " + this.xMin + " and " + this.xMax + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	// Returns the internal array of second derivatives
@@ -439,13 +439,13 @@ public class CubicSpline {
 							* CubicSpline.potentialRoundingError) {
 				xx = x[0];
 			} else {
-				throw new IllegalArgumentException("x ("
+				throw new IllegalArgumentException("x (" //$NON-NLS-1$
 						+ xx
-						+ ") is outside the range of data points ("
+						+ ") is outside the range of data points (" //$NON-NLS-1$
 						+ x[0]
-						+ " to "
+						+ " to " //$NON-NLS-1$
 						+ x[this.nPoints - 1]
-						+ ")");
+						+ ")"); //$NON-NLS-1$
 			}
 		}
 		if (xx > this.x[this.nPoints - 1]) {
@@ -455,13 +455,13 @@ public class CubicSpline {
 							* CubicSpline.potentialRoundingError) {
 				xx = this.x[this.nPoints - 1];
 			} else {
-				throw new IllegalArgumentException("x ("
+				throw new IllegalArgumentException("x (" //$NON-NLS-1$
 						+ xx
-						+ ") is outside the range of data points ("
+						+ ") is outside the range of data points (" //$NON-NLS-1$
 						+ x[0]
-						+ " to "
+						+ " to " //$NON-NLS-1$
 						+ x[this.nPoints - 1]
-						+ ")");
+						+ ")"); //$NON-NLS-1$
 			}
 		}
 
@@ -483,15 +483,15 @@ public class CubicSpline {
 		h = this.x[khi] - this.x[klo];
 
 		if (h == 0.0) {
-			throw new IllegalArgumentException("Two values of x are identical: point "
+			throw new IllegalArgumentException("Two values of x are identical: point " //$NON-NLS-1$
 					+ klo
-					+ " ("
+					+ " (" //$NON-NLS-1$
 					+ this.x[klo]
-					+ ") and point "
+					+ ") and point " //$NON-NLS-1$
 					+ khi
-					+ " ("
+					+ " (" //$NON-NLS-1$
 					+ this.x[khi]
-					+ ")");
+					+ ")"); //$NON-NLS-1$
 		} else {
 			a = (this.x[khi] - xx) / h;
 			b = (xx - this.x[klo]) / h;
@@ -525,9 +525,9 @@ public class CubicSpline {
 	public void resetData(final double[] x, final double[] y) {
 		this.nPoints = this.nPointsOriginal;
 		if (x.length != y.length)
-			throw new IllegalArgumentException("Arrays x and y are of different length");
+			throw new IllegalArgumentException("Arrays x and y are of different length"); //$NON-NLS-1$
 		if (this.nPoints != x.length)
-			throw new IllegalArgumentException("Original array length not matched by new array length");
+			throw new IllegalArgumentException("Original array length not matched by new array length"); //$NON-NLS-1$
 
 		for (int i = 0; i < this.nPoints; i++) {
 			this.x[i] = x[i];

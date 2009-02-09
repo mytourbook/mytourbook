@@ -200,8 +200,8 @@ public class Fmath{
         // argument and return are integer, therefore limited to 0<=n<=12
         // see below for long and double arguments
         public static int factorial(int n){
-            if(n<0)throw new IllegalArgumentException("n must be a positive integer");
-            if(n>12)throw new IllegalArgumentException("n must less than 13 to avoid integer overflow\nTry long or double argument");
+            if(n<0)throw new IllegalArgumentException("n must be a positive integer"); //$NON-NLS-1$
+            if(n>12)throw new IllegalArgumentException("n must less than 13 to avoid integer overflow\nTry long or double argument"); //$NON-NLS-1$
             int f = 1;
             for(int i=2; i<=n; i++)f*=i;
             return f;
@@ -211,8 +211,8 @@ public class Fmath{
         // argument and return are long, therefore limited to 0<=n<=20
         // see below for double argument
         public static long factorial(long n){
-            if(n<0)throw new IllegalArgumentException("n must be a positive integer");
-            if(n>20)throw new IllegalArgumentException("n must less than 21 to avoid long integer overflow\nTry double argument");
+            if(n<0)throw new IllegalArgumentException("n must be a positive integer"); //$NON-NLS-1$
+            if(n>20)throw new IllegalArgumentException("n must less than 21 to avoid long integer overflow\nTry double argument"); //$NON-NLS-1$
             long f = 1;
             long iCount = 2L;
             while(iCount<=n){
@@ -225,10 +225,10 @@ public class Fmath{
         // factorial of n
         // Argument is of type BigInteger
         public static BigInteger factorial(BigInteger n){
-            if(n.compareTo(BigInteger.ZERO)==-1)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n.compareTo(BigInteger.ZERO)==-1)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             BigInteger one = BigInteger.ONE;
             BigInteger f = one;
-            BigInteger iCount = new BigInteger("2");
+            BigInteger iCount = new BigInteger("2"); //$NON-NLS-1$
             while(iCount.compareTo(n)!=1){
                 f = f.multiply(iCount);
                 iCount = iCount.add(one);
@@ -243,7 +243,7 @@ public class Fmath{
         // factorial returned as double but is, numerically, should be an integer
         // numerical rounding may makes this an approximation after n = 21
         public static double factorial(double n){
-            if(n<0.0 || (n-Math.floor(n))!=0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n<0.0 || (n-Math.floor(n))!=0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             double f = 1.0D;
             double iCount = 2.0D;
             while(iCount<=n){
@@ -256,7 +256,7 @@ public class Fmath{
         // factorial of n
         // Argument is of type BigDecimal but must be, numerically, an integer
         public static BigDecimal factorial(BigDecimal n){
-            if(n.compareTo(BigDecimal.ZERO)==-1 || !Fmath.isInteger(n))throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n.compareTo(BigDecimal.ZERO)==-1 || !Fmath.isInteger(n))throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             BigDecimal one = BigDecimal.ONE;
             BigDecimal f = one;
             BigDecimal iCount = new BigDecimal(2.0D);
@@ -275,7 +275,7 @@ public class Fmath{
         // log[e](factorial) returned as double
         // numerical rounding may makes this an approximation
         public static double logFactorial(int n){
-            if(n<0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n<0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             double f = 0.0D;
             for(int i=2; i<=n; i++)f+=Math.log(i);
             return f;
@@ -286,7 +286,7 @@ public class Fmath{
         // log[e](factorial) returned as double
         // numerical rounding may makes this an approximation
         public static double logFactorial(long n){
-            if(n<0L)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n<0L)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             double f = 0.0D;
             long iCount = 2L;
             while(iCount<=n){
@@ -301,7 +301,7 @@ public class Fmath{
         // log[e](factorial) returned as double
         // numerical rounding may makes this an approximation
         public static double logFactorial(double n){
-            if(n<0 || (n-Math.floor(n))!=0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?");
+            if(n<0 || (n-Math.floor(n))!=0)throw new IllegalArgumentException("\nn must be a positive integer\nIs a Gamma funtion [Fmath.gamma(x)] more appropriate?"); //$NON-NLS-1$
             double f = 0.0D;
             double iCount = 2.0D;
             while(iCount<=n){
@@ -431,7 +431,7 @@ public class Fmath{
         // Inverse sine
         // Fmath.asin Checks limits - Java Math.asin returns NaN if without limits
         public static double asin(double a){
-            if(a<-1.0D && a>1.0D) throw new IllegalArgumentException("Fmath.asin argument (" + a + ") must be >= -1.0 and <= 1.0");
+            if(a<-1.0D && a>1.0D) throw new IllegalArgumentException("Fmath.asin argument (" + a + ") must be >= -1.0 and <= 1.0"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.asin(a);
         }
 
@@ -458,7 +458,7 @@ public class Fmath{
         // Inverse cosine
         // Fmath.asin Checks limits - Java Math.asin returns NaN if without limits
         public static double acos(double a){
-            if(a<-1.0D || a>1.0D) throw new IllegalArgumentException("Fmath.acos argument (" + a + ") must be >= -1.0 and <= 1.0");
+            if(a<-1.0D || a>1.0D) throw new IllegalArgumentException("Fmath.acos argument (" + a + ") must be >= -1.0 and <= 1.0"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.acos(a);
         }
 
@@ -515,7 +515,7 @@ public class Fmath{
 
         // Inverse secant
         public static double asec(double a){
-            if(a<1.0D && a>-1.0D) throw new IllegalArgumentException("asec argument (" + a + ") must be >= 1 or <= -1");
+            if(a<1.0D && a>-1.0D) throw new IllegalArgumentException("asec argument (" + a + ") must be >= 1 or <= -1"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.acos(1.0/a);
         }
 
@@ -526,7 +526,7 @@ public class Fmath{
 
         // Inverse cosecant
         public static double acsc(double a){
-            if(a<1.0D && a>-1.0D) throw new IllegalArgumentException("acsc argument (" + a + ") must be >= 1 or <= -1");
+            if(a<1.0D && a>-1.0D) throw new IllegalArgumentException("acsc argument (" + a + ") must be >= 1 or <= -1"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.asin(1.0/a);
         }
 
@@ -537,7 +537,7 @@ public class Fmath{
 
         // Inverse exsecant
         public static double aexsec(double a){
-            if(a<0.0D && a>-2.0D) throw new IllegalArgumentException("aexsec argument (" + a + ") must be >= 0.0 and <= -2");
+            if(a<0.0D && a>-2.0D) throw new IllegalArgumentException("aexsec argument (" + a + ") must be >= 0.0 and <= -2"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.asin(1.0D/(1.0D + a));
         }
 
@@ -548,7 +548,7 @@ public class Fmath{
 
         // Inverse  versine
         public static double avers(double a){
-            if(a<0.0D && a>2.0D) throw new IllegalArgumentException("avers argument (" + a + ") must be <= 2 and >= 0");
+            if(a<0.0D && a>2.0D) throw new IllegalArgumentException("avers argument (" + a + ") must be <= 2 and >= 0"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.acos(1.0D - a);
         }
 
@@ -559,7 +559,7 @@ public class Fmath{
 
         // Inverse coversine
         public static double acovers(double a){
-            if(a<0.0D && a>2.0D) throw new IllegalArgumentException("acovers argument (" + a + ") must be <= 2 and >= 0");
+            if(a<0.0D && a>2.0D) throw new IllegalArgumentException("acovers argument (" + a + ") must be <= 2 and >= 0"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.asin(1.0D - a);
         }
 
@@ -570,7 +570,7 @@ public class Fmath{
 
         // Inverse haversine
         public static double ahav(double a){
-            if(a<0.0D && a>1.0D) throw new IllegalArgumentException("ahav argument (" + a + ") must be >= 0 and <= 1");
+            if(a<0.0D && a>1.0D) throw new IllegalArgumentException("ahav argument (" + a + ") must be >= 0 and <= 1"); //$NON-NLS-1$ //$NON-NLS-2$
             return Fmath.acos(1.0D - 2.0D*a);
         }
 
@@ -616,7 +616,7 @@ public class Fmath{
 
         // Inverse hyperbolic cosine of a double number
         public static double acosh(double a){
-            if(a<1.0D) throw new IllegalArgumentException("acosh real number argument (" + a + ") must be >= 1");
+            if(a<1.0D) throw new IllegalArgumentException("acosh real number argument (" + a + ") must be >= 1"); //$NON-NLS-1$ //$NON-NLS-2$
             return Math.log(a+Math.sqrt(a*a-1.0D));
         }
 
@@ -632,7 +632,7 @@ public class Fmath{
                 sgn = -1.0D;
                 a = -a;
             }
-            if(a>1.0D) throw new IllegalArgumentException("atanh real number argument (" + sgn*a + ") must be >= -1 and <= 1");
+            if(a>1.0D) throw new IllegalArgumentException("atanh real number argument (" + sgn*a + ") must be >= -1 and <= 1"); //$NON-NLS-1$ //$NON-NLS-2$
             return 0.5D*sgn*(Math.log(1.0D + a)-Math.log(1.0D - a));
         }
 
@@ -648,7 +648,7 @@ public class Fmath{
                 sgn = -1.0D;
                 a = -a;
             }
-            if(a<1.0D) throw new IllegalArgumentException("acoth real number argument (" + sgn*a + ") must be <= -1 or >= 1");
+            if(a<1.0D) throw new IllegalArgumentException("acoth real number argument (" + sgn*a + ") must be <= -1 or >= 1"); //$NON-NLS-1$ //$NON-NLS-2$
             return 0.5D*sgn*(Math.log(1.0D + a)-Math.log(a - 1.0D));
         }
 
@@ -659,7 +659,7 @@ public class Fmath{
 
         // Inverse hyperbolic secant of a double number
         public static double asech(double a){
-            if(a>1.0D || a<0.0D) throw new IllegalArgumentException("asech real number argument (" + a + ") must be >= 0 and <= 1");
+            if(a>1.0D || a<0.0D) throw new IllegalArgumentException("asech real number argument (" + a + ") must be >= 0 and <= 1"); //$NON-NLS-1$ //$NON-NLS-2$
             return 0.5D*(Math.log(1.0D/a + Math.sqrt(1.0D/(a*a) - 1.0D)));
         }
 
@@ -716,8 +716,8 @@ public class Fmath{
 
         String xTruncated = xValue;
         String xWorking = xValue;
-        String exponent = " ";
-        String first = "+";
+        String exponent = " "; //$NON-NLS-1$
+        String first = "+"; //$NON-NLS-1$
         int expPos = xValue.indexOf('E');
         int dotPos = xValue.indexOf('.');
         int minPos = xValue.indexOf('-');
@@ -725,7 +725,7 @@ public class Fmath{
         if(minPos!=-1){
             if(minPos==0){
                 xWorking = xWorking.substring(1);
-                first = "-";
+                first = "-"; //$NON-NLS-1$
                 dotPos--;
                 expPos--;
             }
@@ -735,7 +735,7 @@ public class Fmath{
             xWorking = xWorking.substring(0,expPos);
         }
         String xPreDot = null;
-        String xPostDot = "0";
+        String xPostDot = "0"; //$NON-NLS-1$
         String xDiscarded = null;
         String tempString = null;
         double tempDouble = 0.0D;
@@ -745,12 +745,12 @@ public class Fmath{
             int xLength = xPostDot.length();
             if(trunc<xLength){
                 xDiscarded = xPostDot.substring(trunc);
-                tempString = xDiscarded.substring(0,1) + ".";
+                tempString = xDiscarded.substring(0,1) + "."; //$NON-NLS-1$
                 if(xDiscarded.length()>1){
                     tempString += xDiscarded.substring(1);
                 }
                 else{
-                    tempString += "0";
+                    tempString += "0"; //$NON-NLS-1$
                 }
                 tempDouble = Math.round(Double.parseDouble(tempString));
 
@@ -781,7 +781,7 @@ public class Fmath{
                         int preInt = Integer.parseInt(xPreDot);
                         preInt += xArray[0];
                         xPreDot = (new Integer(preInt)).toString();
-                        tempString = "";
+                        tempString = ""; //$NON-NLS-1$
                         for(int i=1; i<=trunc; i++){
                             tempString += (new Integer(xArray[i])).toString();
                         }
@@ -797,10 +797,10 @@ public class Fmath{
                         preInt++;
                         xPreDot = (new Integer(preInt)).toString();
                     }
-                    xPostDot = "0";
+                    xPostDot = "0"; //$NON-NLS-1$
                 }
             }
-            xTruncated = first + xPreDot.trim() + "." + xPostDot.trim() + exponent;
+            xTruncated = first + xPreDot.trim() + "." + xPostDot.trim() + exponent; //$NON-NLS-1$
         }
         return xTruncated.trim();
     }
@@ -1053,7 +1053,7 @@ public class Fmath{
         // x and y are BigDecimal
         public static boolean isEqualWithinPerCent(BigDecimal x, BigDecimal y, BigDecimal perCent){
             boolean test=false;
-            BigDecimal limit = (x.add(y)).multiply(perCent).multiply(new BigDecimal("0.005"));
+            BigDecimal limit = (x.add(y)).multiply(perCent).multiply(new BigDecimal("0.005")); //$NON-NLS-1$
             if(((x.subtract(y)).abs()).compareTo(limit.abs())<=0)test = true;
             limit = null;
             return test;
@@ -1065,7 +1065,7 @@ public class Fmath{
             boolean test=false;
             BigDecimal xx = new BigDecimal(x);
             BigDecimal yy = new BigDecimal(y);
-            BigDecimal limit = (xx.add(yy)).multiply(perCent).multiply(new BigDecimal("0.005"));
+            BigDecimal limit = (xx.add(yy)).multiply(perCent).multiply(new BigDecimal("0.005")); //$NON-NLS-1$
             if(((xx.subtract(yy)).abs()).compareTo(limit.abs())<=0)test = true;
             limit = null;
             xx = null;
@@ -1080,7 +1080,7 @@ public class Fmath{
             BigDecimal xx = new BigDecimal(x);
             BigDecimal yy = new BigDecimal(y);
             BigDecimal pc = new BigDecimal(perCent);
-            BigDecimal limit = (xx.add(yy)).multiply(pc).multiply(new BigDecimal("0.005"));
+            BigDecimal limit = (xx.add(yy)).multiply(pc).multiply(new BigDecimal("0.005")); //$NON-NLS-1$
             if(((xx.subtract(yy)).abs()).compareTo(limit.abs())<=0)test = true;
             limit = null;
             xx = null;
@@ -1267,7 +1267,7 @@ public class Fmath{
         // x is float but must hold an integer value
         public static boolean isEven(float x){
             double y=Math.floor(x);
-            if(((double)x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer");
+            if(((double)x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer"); //$NON-NLS-1$
             boolean test=false;
             y=Math.floor(x/2.0F);
             if(((double)(x/2.0F)-y) == 0.0D)test=true;
@@ -1278,7 +1278,7 @@ public class Fmath{
         // x is double but must hold an integer value
         public static boolean isEven(double x){
             double y=Math.floor(x);
-            if((x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer");
+            if((x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer"); //$NON-NLS-1$
             boolean test=false;
             y=Math.floor(x/2.0F);
             if((x/2.0D-y) == 0.0D)test=true;
@@ -1298,7 +1298,7 @@ public class Fmath{
         // x is float but must hold an integer value
         public static boolean isOdd(float x){
             double y=Math.floor(x);
-            if(((double)x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer");
+            if(((double)x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer"); //$NON-NLS-1$
             boolean test=true;
             y=Math.floor(x/2.0F);
             if(((double)(x/2.0F)-y) == 0.0D)test=false;
@@ -1309,7 +1309,7 @@ public class Fmath{
         // x is double but must hold an integer value
         public static boolean isOdd(double x){
             double y=Math.floor(x);
-            if((x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer");
+            if((x - y)!= 0.0D)throw new IllegalArgumentException("the argument is not an integer"); //$NON-NLS-1$
             boolean test=true;
             y=Math.floor(x/2.0F);
             if((x/2.0D-y) == 0.0D)test=false;
@@ -2847,7 +2847,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(double[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2856,7 +2856,7 @@ public class Fmath{
         // with line returns
         public static void println(double[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2864,7 +2864,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(float[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2873,7 +2873,7 @@ public class Fmath{
         // with line returns
         public static void println(float[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2881,7 +2881,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(int[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2890,7 +2890,7 @@ public class Fmath{
         // with line returns
         public static void println(int[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2898,7 +2898,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(long[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2907,7 +2907,7 @@ public class Fmath{
         // with line returns
         public static void println(long[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2915,7 +2915,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(char[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2924,7 +2924,7 @@ public class Fmath{
         // with line returns
         public static void println(char[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2932,7 +2932,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(String[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2941,7 +2941,7 @@ public class Fmath{
         // with line returns
         public static void println(String[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2949,7 +2949,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(short[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2958,7 +2958,7 @@ public class Fmath{
         // with line returns
         public static void println(short[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -2966,7 +2966,7 @@ public class Fmath{
         // No line returns except at the end
         public static void print(byte[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.print(aa[i]+"   ");
+                System.out.print(aa[i]+"   "); //$NON-NLS-1$
             }
             System.out.println();
         }
@@ -2975,7 +2975,7 @@ public class Fmath{
         // with line returns
         public static void println(byte[] aa){
             for(int i=0; i<aa.length; i++){
-                System.out.println(aa[i]+"   ");
+                System.out.println(aa[i]+"   "); //$NON-NLS-1$
             }
         }
 
@@ -3194,11 +3194,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             double holdx = 0.0D;
             double holdy = 0.0D;
@@ -3236,11 +3236,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             float holdx = 0.0F;
             float holdy = 0.0F;
@@ -3278,11 +3278,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             long holdx = 0L;
             long holdy = 0L;
@@ -3320,11 +3320,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             int holdx = 0;
             int holdy = 0;
@@ -3362,11 +3362,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             double holdx = 0.0D;
             long holdy = 0L;
@@ -3404,11 +3404,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             long holdx = 0L;
             double holdy = 0.0D;
@@ -3446,11 +3446,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             double holdx = 0.0D;
             int holdy = 0;
@@ -3488,11 +3488,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             int holdx = 0;
             double holdy = 0.0D;
@@ -3530,11 +3530,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             long holdx = 0L;
             int holdy = 0;
@@ -3572,11 +3572,11 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length");
+            if(n!=m)throw new IllegalArgumentException("First argument array, aa, (length = " + n + ") and the second argument array, bb, (length = " + m + ") should be the same length"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int nn = cc.length;
-            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(nn<n)throw new IllegalArgumentException("The third argument array, cc, (length = " + nn + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int mm = dd.length;
-            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")");
+            if(mm<m)throw new IllegalArgumentException("The fourth argument array, dd, (length = " + mm + ") should be at least as long as the second argument array, bb, (length = " + m + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             int holdx = 0;
             long holdy = 0L;
@@ -3615,9 +3615,9 @@ public class Fmath{
             int lastIndex = -1;
             int n = aa.length;
             int m = bb.length;
-            if(m<n)throw new IllegalArgumentException("The second argument array, bb, (length = " + m + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(m<n)throw new IllegalArgumentException("The second argument array, bb, (length = " + m + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             int k = indices.length;
-            if(m<n)throw new IllegalArgumentException("The third argument array, indices, (length = " + k + ") should be at least as long as the first argument array, aa, (length = " + n + ")");
+            if(m<n)throw new IllegalArgumentException("The third argument array, indices, (length = " + k + ") should be at least as long as the first argument array, aa, (length = " + n + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             double holdb = 0.0D;
             int holdi = 0;

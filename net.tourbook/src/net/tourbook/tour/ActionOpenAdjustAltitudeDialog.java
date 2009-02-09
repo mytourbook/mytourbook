@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Display;
 public class ActionOpenAdjustAltitudeDialog extends Action {
 
 	private ITourProvider	fTourProvider;
+	private boolean			fIsFromEditor;
 
 	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider) {
 
@@ -41,6 +42,11 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude_disabled));
 
 		setEnabled(false);
+	}
+
+	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider, final boolean isFromEditor) {
+		this(tourProvider);
+		fIsFromEditor = isFromEditor;
 	}
 
 	@Override
@@ -69,7 +75,8 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		 */
 		boolean isSave = true;
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-		if (tourDataEditor != null && tourDataEditor.getTourData() == tourData) {
+		if (fIsFromEditor
+				|| (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == tourData)) {
 			isSave = false;
 		}
 

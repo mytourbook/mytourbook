@@ -128,11 +128,11 @@ public class Bspline2nd extends java.applet.Applet implements MouseMotionListene
 
 	@Override
 	public void init() {
-		w = Integer.parseInt(getParameter("width"));
-		h = Integer.parseInt(getParameter("height"));
+		w = Integer.parseInt(getParameter("width")); //$NON-NLS-1$
+		h = Integer.parseInt(getParameter("height")); //$NON-NLS-1$
 		h1 = h - 1;
 		w2 = w / 2;
-		String s = getParameter("N");
+		String s = getParameter("N"); //$NON-NLS-1$
 		if (s != null) {
 			final StringTokenizer st = new StringTokenizer(s);
 			n = Integer.parseInt(st.nextToken());
@@ -145,7 +145,7 @@ public class Bspline2nd extends java.applet.Applet implements MouseMotionListene
 		ti = new double[nt + k];
 		col = new Color[w2];
 		N = new double[nt + 1][w2];
-		s = getParameter("pts");
+		s = getParameter("pts"); //$NON-NLS-1$
 		if (s != null) {
 			final StringTokenizer st = new StringTokenizer(s);
 			for (int i = 0; i < n1; i++) {
@@ -158,7 +158,7 @@ public class Bspline2nd extends java.applet.Applet implements MouseMotionListene
 			Py[0] = .8 * h1;
 			Py[1] = .2 * h1;
 		}
-		s = getParameter("knots");
+		s = getParameter("knots"); //$NON-NLS-1$
 		if (s != null) {
 			final StringTokenizer st = new StringTokenizer(s);
 			for (int i = 0; i < nt; i++)
