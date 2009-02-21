@@ -1,15 +1,25 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package net.tourbook.tilefactory.srtm;
 
-//import net.tourbook.colors.ColorDefinition;
-//import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.ext.srtm.ElevationColor;
 import net.tourbook.ext.srtm.ElevationLayer;
 import net.tourbook.ext.srtm.GeoLat;
 import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
-//import net.tourbook.mapping.LegendColor;
-//import net.tourbook.mapping.LegendConfig;
-//import net.tourbook.mapping.LegendProvider;
-//import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -18,7 +28,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-//import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.map.DefaultTileFactory;
@@ -32,26 +42,27 @@ import de.byteholder.geoclipse.map.TileFactoryInfo;
  */
 public class SRTMTileFactory extends DefaultTileFactory {
 
-	private static SRTMTileFactoryInfo	info	= new SRTMTileFactoryInfo();
+	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
 	/**
 	 * cache for tile images
 	 */
+	final static ElevationColor			elevationColor	= new ElevationColor();
 
 	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
 
-		private static final String		FACTORY_ID		= "srtm";
-		private static final String		FACTORY_NAME	= "SRTM";
-		private static final String		FACTORY_OS_NAME	= "srtm";
+		private static final String		FACTORY_ID		= "srtm"; //$NON-NLS-1$
+		private static final String		FACTORY_NAME	= "SRTM"; //$NON-NLS-1$
+		private static final String		FACTORY_OS_NAME	= "srtm"; //$NON-NLS-1$
 
-		private static final String		SEPARATOR		= "/";
+		private static final String		SEPARATOR		= "/"; //$NON-NLS-1$
 
 		private static final int		MIN_ZOOM		= 0;
 		private static final int		MAX_ZOOM		= 17;
 		private static final int		TOTAL_ZOOM		= 17;
 
-		private static final String		BASE_URL		= "file://dummy";
-		private static final String		FILE_EXT		= "png";
+		private static final String		BASE_URL		= "file://dummy"; //$NON-NLS-1$
+		private static final String		FILE_EXT		= "png"; //$NON-NLS-1$
 
 		// initialize SRTM loading
 		public final NumberForm			numberForm		= new NumberForm();
@@ -59,7 +70,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public SRTMTileFactoryInfo() {
 
-			super(MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z");
+			super(MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		@Override
@@ -103,13 +114,6 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public ImageData[] paintTile(final Tile tile) {
 
-//			final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
-//			final ColorDefinition colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_MAP_SRTM);
-//			final LegendColor legendColor = colorDefinition.getNewLegendColor();
-//
-//			final LegendProvider legendProvider = new LegendProvider(new LegendConfig(), legendColor, -1);
-//			legendProvider.setLegendColorValues(new Rectangle(0, 0, 20, 20), 300, 1800, UI.EMPTY_STRING);
-
 			final Display display = Display.getDefault();
 			final ImageData[] paintedImageData = new ImageData[1];
 
@@ -128,7 +132,15 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 					elevationLayer.setZoom(tileZoom);
 
-					System.out.println(">>> Start painting tile " + elevationLayer.getName() + "(" + tileX + ", " + tileY + ", " + tileZoom + ")");
+					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
+							+ elevationLayer.getName()
+							+ "(" //$NON-NLS-1$
+							+ tileX
+							+ ", " //$NON-NLS-1$
+							+ tileY
+							+ ", " //$NON-NLS-1$
+							+ tileZoom
+							+ ")"); //$NON-NLS-1$
 
 					// elevation is used at every grid-th pixel in both directions; 
 					// the other values are interpolated
@@ -144,9 +156,9 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 						// TODO how to do that using Mercator class method yToLong??  
 						lat = 360.
-						* Math.atan(Math.exp(2 * Math.PI * (0.5 - (double) mapY / mapPower)))
-						/ Math.PI
-						- 90.; // Mercator
+								* Math.atan(Math.exp(2 * Math.PI * (0.5 - (double) mapY / mapPower)))
+								/ Math.PI
+								- 90.; // Mercator
 
 						for (int pixelX = 0, mapX = tileX * tileSize; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
 
@@ -174,19 +186,8 @@ public class SRTMTileFactory extends DefaultTileFactory {
 								double elev = elevStart;
 								for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-//										int elevInt = (int) (elev / 2) % 256;
-									int elevInt = (int) (elev / 1000 * 256);
-
-									// range check
-									// elevInt = (elevInt < 0) ? -elevInt : elevInt;
-									elevInt = elevInt > 0xff ? 0xff : elevInt;
-									int elevRed = elevInt <= 0 ? 0 : elevInt;
-									int elevGreen = elevInt <= 0 ? 0 : elevInt;
-									int elevBlue = elevInt <= 0 ? 255 : elevInt;
-									
-									final Color color = new Color(display, elevRed, elevGreen, elevBlue);
-
-//										final Color color = legendProvider.getValueColor((int) elev);
+									RGB rgb = elevationColor.getRGB((int) elev);
+									final Color color = new Color(display, rgb);
 
 									gc.setForeground(color);
 									gc.drawPoint(drawX, drawY);
@@ -196,8 +197,6 @@ public class SRTMTileFactory extends DefaultTileFactory {
 							}
 						}
 					}
-
-					System.out.println(">>> Finish painting tile");
 
 					gc.dispose();
 
