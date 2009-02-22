@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
+/**
+ * @author Alfred Barten
+ */
 package net.tourbook.ext.srtm;
 
 import java.io.File;
@@ -7,7 +25,7 @@ import java.io.File;
 //           | W179:59:30 | W089:59:30 | E000:00:00 | E090:00:00 |
 //           | W090:00:00 | W000:00:00 | E089:59:30 | E179:59:30 |
 // ----------+------------+------------+------------+------------+
-// N89:59:30 | a          | b          | c          | d          |
+// N89:59:30 | a          | c          | c          | d          |
 // N50:00:00 |            |            |            |            |
 // ----------+------------+------------+------------+------------+
 // N49:59:30 | e          | f          | g          | h          |

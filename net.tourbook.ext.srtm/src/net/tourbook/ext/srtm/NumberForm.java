@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
+/**
+ * @author Alfred Barten
+ */
 package net.tourbook.ext.srtm;
 
 import java.util.Locale;
@@ -90,36 +108,36 @@ public final class NumberForm {
    // speziell für GeoCoord nn.fff
    static public String n2f3(double number) { return ln2f3.format(number); }
       
-   public static void main(String[] args) {
-
-      NumberForm numberForm = new NumberForm();
-      double test = Math.PI;
-      int test2 = 42;
-      
-      System.out.println(NumberForm.n1(test2));
-      System.out.println(NumberForm.n2(test2));
-      System.out.println(NumberForm.n3(test2));
-      System.out.println(NumberForm.n4(test2));
-      System.out.println(NumberForm.n5(test2));
-      System.out.println(NumberForm.n6(test2));
-      System.out.println(NumberForm.n7(test2));
-      
-      System.out.println(NumberForm.n1(test));
-      System.out.println(NumberForm.n2(test));
-      System.out.println(NumberForm.n3(test));
-      System.out.println(NumberForm.n4(test));
-      System.out.println(NumberForm.n5(test));
-      System.out.println(NumberForm.n6(test));
-      System.out.println(NumberForm.n7(test));
-      
-      System.out.println(NumberForm.f0(test));
-      System.out.println(NumberForm.f1(test));
-      System.out.println(NumberForm.f2(test));
-      System.out.println(NumberForm.f3(test));
-      System.out.println(NumberForm.f4(test));
-      System.out.println(NumberForm.f5(test));
-      System.out.println(NumberForm.f6(test));
-      System.out.println(NumberForm.f7(test));
-   }
+//   public static void main(String[] args) {
+//
+//      NumberForm numberForm = new NumberForm();
+//      double test = Math.PI;
+//      int test2 = 42;
+//      
+//      System.out.println(NumberForm.n1(test2));
+//      System.out.println(NumberForm.n2(test2));
+//      System.out.println(NumberForm.n3(test2));
+//      System.out.println(NumberForm.n4(test2));
+//      System.out.println(NumberForm.n5(test2));
+//      System.out.println(NumberForm.n6(test2));
+//      System.out.println(NumberForm.n7(test2));
+//      
+//      System.out.println(NumberForm.n1(test));
+//      System.out.println(NumberForm.n2(test));
+//      System.out.println(NumberForm.n3(test));
+//      System.out.println(NumberForm.n4(test));
+//      System.out.println(NumberForm.n5(test));
+//      System.out.println(NumberForm.n6(test));
+//      System.out.println(NumberForm.n7(test));
+//      
+//      System.out.println(NumberForm.f0(test));
+//      System.out.println(NumberForm.f1(test));
+//      System.out.println(NumberForm.f2(test));
+//      System.out.println(NumberForm.f3(test));
+//      System.out.println(NumberForm.f4(test));
+//      System.out.println(NumberForm.f5(test));
+//      System.out.println(NumberForm.f6(test));
+//      System.out.println(NumberForm.f7(test));
+//   }
 
 }
