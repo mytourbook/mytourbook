@@ -219,17 +219,17 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 		compositeColorButtons.pack(); // necessary if # of fields doesn't change!
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(compositeColorButtons);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(compositeColorButtons);
+		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
 		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
 			elevFields[ix] = new Text(compositeColorButtons, SWT.SINGLE);
 			elevFields[ix].setText("" + ((RGBVertex) rgbVertexList.get(ix)).getElevation()); //$NON-NLS-1$
-			// elevFields[ix].setSize(100, 50);TODO 
 			elevFields[ix].setEditable(true);
-			elevFields[ix].setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+			elevFields[ix].setLayoutData(gridData);
 
 			colorButtons[ix] = new Button(compositeColorButtons, SWT.PUSH);
 			colorButtons[ix].setBackground(new Color(compositeColorButtons.getDisplay(),
 					((RGBVertex) rgbVertexList.get(ix)).getRGB()));
-			colorButtons[ix].setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+			colorButtons[ix].setLayoutData(gridData);
 			setButtonLayoutData(colorButtons[ix]);
 			colorButtons[ix].setToolTipText(""
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().red
@@ -260,7 +260,7 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 			});
 
 			checkButtons[ix] = new Button(compositeColorButtons, SWT.CHECK);
-			checkButtons[ix].setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+			checkButtons[ix].setLayoutData(gridData);
 		}
 		compositeColorButtons.pack();
 	}
