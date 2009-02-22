@@ -9,6 +9,11 @@
             id="net.tourbook.ext.srtm.PrefPageSRTMFilePath"
             name="%pref_page_srtm_files">
       </page>
+      <page
+            class="net.tourbook.ext.srtm.PrefPageSRTMColors"
+            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
+            name="%pref_page_srtm_colors">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
