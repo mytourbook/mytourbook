@@ -28,6 +28,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -42,6 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -50,16 +54,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private Composite						fPrefContainer		= null;
-	private Composite						fColorContainer		= null;
-	private final static IPreferenceStore	fPrefStore			= Activator.getDefault().getPreferenceStore();
+	private Composite						mainComposite		= null;
+	private Composite						colorComposite		= null;
+	private final static IPreferenceStore	iPreferenceStore	= Activator.getDefault().getPreferenceStore();
 	private static final int				maxProfiles			= 100;
 	private static RGBVertexList[]			rgbVertexList		= new RGBVertexList[maxProfiles];
 	private Table							table				= null;
 	private static TableItem[]				tableItem			= new TableItem[maxProfiles];
 	private static int						noProfiles			= 0;
 	private static int						actualProfile		= 0;
-	private int								imageWidth			= 500;
+	private int								imageWidth			= 600;
 	private int								imageHeight			= 40;
 	private static String					profiles			= null;
 	private Button							addProfileButton	= null;
@@ -70,41 +74,73 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		createUI(parent);
 
-		return fPrefContainer;
+		return mainComposite;
 	}
 
 	private void createUI(final Composite parent) {
 
-		fPrefContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.swtDefaults().grab(true, false).applyTo(fPrefContainer);
-		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(SWT.DEFAULT, 0).numColumns(3).applyTo(fPrefContainer);
-		GridDataFactory.swtDefaults().applyTo(fPrefContainer);
+		mainComposite = new Composite(parent, SWT.NONE);
+		GridDataFactory.swtDefaults().grab(false, false).applyTo(mainComposite);
+		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(SWT.DEFAULT, 0).numColumns(1).applyTo(mainComposite);
 
-		createTableSettings(fPrefContainer);
-		createButtons(fPrefContainer);
+		createResolutionOptions(mainComposite);
+		createTableSettings(mainComposite);
+		createButtons(mainComposite);
+	}
+	
+	private void createResolutionOptions(final Composite parent) {
+
+//		final Group resolutionGroup = new Group(parent, SWT.NONE);
+//		resolutionGroup.setText("Resolution");
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(resolutionGroup);
+
+		final RadioGroupFieldEditor radioGroupFieldEditor = new RadioGroupFieldEditor(IPreferences.SRTM_RESOLUTION,
+				Messages.prefPage_srtm_resolution_title,
+				4,
+				new String[][] {
+				     new String[] {Messages.prefPage_srtm_resolution_very_fine, IPreferences.SRTM_RESOLUTION_VERY_FINE},
+				     new String[] {Messages.prefPage_srtm_resolution_fine, IPreferences.SRTM_RESOLUTION_FINE},
+				     new String[] {Messages.prefPage_srtm_resolution_rough, IPreferences.SRTM_RESOLUTION_ROUGH}, 
+				     new String[] {Messages.prefPage_srtm_resolution_very_rough, IPreferences.SRTM_RESOLUTION_VERY_ROUGH}, 
+					 		   },
+				parent, // resolutionGroup,
+				true);
+		
+		radioGroupFieldEditor.setPreferenceStore(iPreferenceStore);
+		radioGroupFieldEditor.load();
+		radioGroupFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent e) {
+				iPreferenceStore.setValue(IPreferences.SRTM_RESOLUTION, ""+e.getNewValue()); //$NON-NLS-1$
+			}
+		});
+		
+		// set margins after the editors are added
+//		final GridLayout groupLayout = (GridLayout) resolutionGroup.getLayout();
+//		groupLayout.marginWidth = 5;
+//		groupLayout.marginHeight = 5;
 	}
 
 	private void createButtons(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(5, 0).applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
+		final Composite buttonComposite = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(5, 0).applyTo(buttonComposite);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(buttonComposite);
 
-		addProfileButton = new Button(container, SWT.NONE);
-		addProfileButton.setText(Messages.prefPage_srtm_add_profile);
+		addProfileButton = new Button(buttonComposite, SWT.NONE);
+		addProfileButton.setText(Messages.prefPage_srtm_profile_add);
 		setButtonLayoutData(addProfileButton);
 		addProfileButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
-				addTableRow(fColorContainer);
+				addTableRow(colorComposite);
 			}
 		});
 
-		removeProfileButton = new Button(container, SWT.NONE);
-		removeProfileButton.setText(Messages.prefPage_srtm_remove_profile);
+		removeProfileButton = new Button(buttonComposite, SWT.NONE);
+		removeProfileButton.setText(Messages.prefPage_srtm_profile_remove);
 		setButtonLayoutData(removeProfileButton);
 		removeProfileButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
-				removeTableRow(fColorContainer);
+				removeTableRow(colorComposite);
 			}
 		});
 		removeProfileButton.setEnabled(false);
@@ -112,16 +148,16 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void createTableSettings(final Composite parent) {
 
-		fColorContainer = new Composite(parent, SWT.NONE);
-		fColorContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		Label label = new Label(parent, SWT.LEFT);
+		label.setText(Messages.prefPage_srtm_profile_title);
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 
-		GridDataFactory.fillDefaults().grab(false, false)
-		//.hint(200, 100)
-				.span(2, 1)
-				.applyTo(fColorContainer);
+		colorComposite = new Composite(parent, SWT.NONE);
+		colorComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		GridDataFactory.fillDefaults().grab(false, false).span(2, 1).applyTo(colorComposite);
 
 		initVertexLists();
-		createTable(fColorContainer);
+		createTable(colorComposite);
 
 		table.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
 
@@ -137,11 +173,11 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 						dialog.setRGBVertexList(rgbVertexListEdit);
 						if (dialog.open() == Window.OK) {
 							rgbVertexList[selectedIndex] = dialog.getRgbVertexList();
-							Image image = rgbVertexList[selectedIndex].getImage(fColorContainer.getDisplay(),
+							Image image = rgbVertexList[selectedIndex].getImage(colorComposite.getDisplay(),
 									imageWidth,
 									imageHeight);
 							tableItem[selectedIndex].setImage(image);
-						} // else CANCEL			
+						} 		
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -173,12 +209,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		});
 
 		// !!! set layout after the editor was created because the editor sets the parents layout
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fColorContainer);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(colorComposite);
 	}
 
 	public static void initVertexLists() {
-		profiles = fPrefStore.getString(IPreferences.SRTM_COLORS_PROFILES);
-		actualProfile = fPrefStore.getInt(IPreferences.SRTM_COLORS_ACTUAL_PROFILE);
+		profiles = iPreferenceStore.getString(IPreferences.SRTM_COLORS_PROFILES);
+		actualProfile = iPreferenceStore.getInt(IPreferences.SRTM_COLORS_ACTUAL_PROFILE);
 		noProfiles = 0;
 		Pattern pattern = Pattern.compile("^([-,;0-9]*)X(.*)$"); //$NON-NLS-1$
 
@@ -214,7 +250,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				tableItem[ix].setChecked(false);
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -274,10 +309,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	@Override
 	protected void performDefaults() {
 
-		profiles = fPrefStore.getDefaultString(IPreferences.SRTM_COLORS_PROFILES);
-		actualProfile = fPrefStore.getDefaultInt(IPreferences.SRTM_COLORS_ACTUAL_PROFILE);
+		profiles = iPreferenceStore.getDefaultString(IPreferences.SRTM_COLORS_PROFILES);
+		actualProfile = iPreferenceStore.getDefaultInt(IPreferences.SRTM_COLORS_ACTUAL_PROFILE);
 
-		createTable(fColorContainer);
+		createTable(colorComposite);
 
 		super.performDefaults();
 	}
@@ -287,10 +322,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		profiles = ""; //$NON-NLS-1$
 		for (int ix = 0; ix < noProfiles; ix++)
 			profiles += rgbVertexList[ix].toString() + 'X';
-		fPrefStore.setValue(IPreferences.SRTM_COLORS_PROFILES, profiles);
-		fPrefStore.setValue(IPreferences.SRTM_COLORS_ACTUAL_PROFILE, actualProfile);
-
-		createTable(fColorContainer);
+		iPreferenceStore.setValue(IPreferences.SRTM_COLORS_PROFILES, profiles);
+		iPreferenceStore.setValue(IPreferences.SRTM_COLORS_ACTUAL_PROFILE, actualProfile);
+		createTable(colorComposite);
 
 		return super.performOk();
 	}

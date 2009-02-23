@@ -77,6 +77,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		// set srtm actual color profile index
 		store.setDefault(IPreferences.SRTM_COLORS_ACTUAL_PROFILE, 0);
-                
+
+		// set srtm default resolution 
+		store.setDefault(IPreferences.SRTM_RESOLUTION, IPreferences.SRTM_RESOLUTION_FINE);                
 	}
 }

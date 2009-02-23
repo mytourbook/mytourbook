@@ -21,4 +21,9 @@ public interface IPreferences {
 	String	SRTM_DATA_FILEPATH				= "srtm.data.filepath";			//$NON-NLS-1$
 	String  SRTM_COLORS_PROFILES            = "srtm.colors.profiles";			//$NON-NLS-1$
 	String  SRTM_COLORS_ACTUAL_PROFILE      = "srtm.colors.actual.profile";			//$NON-NLS-1$
+	String  SRTM_RESOLUTION                 = "srtm.resolution";			//$NON-NLS-1$
+	String  SRTM_RESOLUTION_VERY_FINE       = "srtm.resolution.very-fine";			//$NON-NLS-1$
+	String  SRTM_RESOLUTION_FINE            = "srtm.resolution.fine";			//$NON-NLS-1$
+	String  SRTM_RESOLUTION_ROUGH           = "srtm.resolution.rough";			//$NON-NLS-1$
+	String  SRTM_RESOLUTION_VERY_ROUGH      = "srtm.resolution.very-rough";			//$NON-NLS-1$
 }

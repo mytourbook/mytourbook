@@ -26,8 +26,16 @@ public class Messages extends NLS {
 	public static String	prefPage_srtm_group_label_data_location;
 	public static String	prefPage_srtm_group_label_colors;
 	public static String	prefPage_srtm_msg_invalid_data_path;
-	public static String	prefPage_srtm_add_profile;
-	public static String	prefPage_srtm_remove_profile;
+
+	public static String	prefPage_srtm_profile_title;
+	public static String	prefPage_srtm_profile_add;
+	public static String	prefPage_srtm_profile_remove;
+	
+	public static String	prefPage_srtm_resolution_title;
+	public static String	prefPage_srtm_resolution_very_fine;
+	public static String	prefPage_srtm_resolution_fine;
+	public static String	prefPage_srtm_resolution_rough;
+	public static String	prefPage_srtm_resolution_very_rough;
 	
 	public static String	srtm_transfer_error_message;
 	public static String	srtm_transfer_error_title;
