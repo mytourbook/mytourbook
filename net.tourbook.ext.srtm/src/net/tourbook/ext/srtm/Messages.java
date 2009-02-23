@@ -28,6 +28,7 @@ public class Messages extends NLS {
 	public static String	prefPage_srtm_msg_invalid_data_path;
 	public static String	prefPage_srtm_add_profile;
 	public static String	prefPage_srtm_remove_profile;
+	
 	public static String	srtm_transfer_error_message;
 	public static String	srtm_transfer_error_title;
 	public static String	srtm_transfer_initialize;
@@ -35,10 +36,9 @@ public class Messages extends NLS {
 	public static String	srtm_transfer_task;
 	
 	public static String    Image__adjust_srtm_colors;
+	
 	public static String	dialog_adjust_srtm_colors_button_add;
-
 	public static String	dialog_adjust_srtm_colors_button_remove;
-
 	public static String	dialog_adjust_srtm_colors_button_sort;
 
 	public static String    dialog_adjust_srtm_colors_dialog_title;
@@ -49,6 +49,15 @@ public class Messages extends NLS {
 	public static String    app_action_save;
 
 	public static String	color_chooser_choosed_color;
+	public static String	color_chooser_hexagon;
+	public static String	color_chooser_rgb;
+	public static String	color_chooser_hsb;
+	public static String	color_chooser_red;
+	public static String	color_chooser_green;
+	public static String	color_chooser_blue;
+	public static String	color_chooser_hue;
+	public static String	color_chooser_saturation;
+	public static String	color_chooser_brightness;
 
 	public static String	rgv_vertex_class_cast_exception;
 	
