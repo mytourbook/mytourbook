@@ -132,67 +132,99 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 					elevationLayer.setZoom(tileZoom);
 
-					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
-							+ elevationLayer.getName()
-							+ "(" //$NON-NLS-1$
-							+ tileX
-							+ ", " //$NON-NLS-1$
-							+ tileY
-							+ ", " //$NON-NLS-1$
-							+ tileZoom
-							+ ")"); //$NON-NLS-1$
-
 					// elevation is used at every grid-th pixel in both directions; 
 					// the other values are interpolated
 					// i.e. it gives the resolution of the image!
-					final int grid = 4;
-					final int gridQuot = grid - 1;
+					final int grid = elevationColor.getGrid();
+					
+					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
+							+ "(L=" //$NON-NLS-1$
+							+ elevationLayer.getName()
+							+ ", G=" //$NON-NLS-1$
+							+ grid
+							+ ", X=" //$NON-NLS-1$
+							+ tileX
+							+ ", Y=" //$NON-NLS-1$
+							+ tileY
+							+ ", Z=" //$NON-NLS-1$
+							+ tileZoom
+							+ ")"); //$NON-NLS-1$
+					
 					double lon = 0.;
-					double lonOld = 0.;
 					double lat = 0.;
-					double latOld = 0.;
+					final double pi = Math.PI;
+					final double twoPi = 2 * pi;
+					final double constMx1 = 360. / pi;
+					final double constMx2 = twoPi / mapPower;
+					final double constMy = 360. / mapPower;
+					final int mapStartX = tileX * tileSize;
+					final int mapStartY = tileY * tileSize;
+					
+					if (grid == 1) {
+						
+						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
-					for (int pixelY = 0, mapY = tileY * tileSize; pixelY <= tileSize; pixelY += grid, mapY += grid, latOld = lat) {
+							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 
-						// TODO how to do that using Mercator class method yToLong??  
-						lat = 360.
-								* Math.atan(Math.exp(2 * Math.PI * (0.5 - (double) mapY / mapPower)))
-								/ Math.PI
-								- 90.; // Mercator
+							for (int drawX = 0, mapX = mapStartX; drawX < tileSize; drawX++, mapX++) {
 
-						for (int pixelX = 0, mapX = tileX * tileSize; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
+								lon = constMy * mapX - 180.; // Mercator
 
-							// lon = 2. * Math.PI * (Mercator.xToLat(mapX, mapPower) + 180.) - 180.; Using Mercator class is not simpler either!  
-							lon = 360. * mapX / mapPower - 180.; // Mercator
-							if (pixelX == 0 || pixelY == 0)
-								continue;
+								final double elev = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
 
-							final double elev00 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lonOld));
-							final double elev01 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lon));
-							final double elev10 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lonOld));
-							final double elev11 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
+								RGB rgb = elevationColor.getRGB((int) elev);
+								final Color color = new Color(display, rgb);
 
-							// interpolate elevation over this quad
-							final double elevGridX0 = (elev01 - elev00) / gridQuot;
-							final double elevGridX1 = (elev11 - elev10) / gridQuot;
-							final double elevGridY0 = (elev10 - elev00) / gridQuot;
-							// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
-							final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
-							double elevStart = elev00;
-							double elevGridXAdd = elevGridX0;
+								gc.setForeground(color);
+								gc.drawPoint(drawX, drawY);
 
-							for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
+								color.dispose();
+							}
+						}
+						
+					} else { // grid > 1
+						
+						final int gridQuot = grid - 1;
+						double lonOld = 0.;
+						double latOld = 0.;
 
-								double elev = elevStart;
-								for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
+						for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, latOld = lat) {
 
-									RGB rgb = elevationColor.getRGB((int) elev);
-									final Color color = new Color(display, rgb);
+							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 
-									gc.setForeground(color);
-									gc.drawPoint(drawX, drawY);
+							for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
 
-									color.dispose();
+								lon = constMy * mapX - 180.; // Mercator
+								if (pixelX == 0 || pixelY == 0)
+									continue;
+
+								final double elev00 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lonOld));
+								final double elev01 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lon));
+								final double elev10 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lonOld));
+								final double elev11 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
+
+								// interpolate elevation over this quad
+								final double elevGridX0 = (elev01 - elev00) / gridQuot;
+								final double elevGridX1 = (elev11 - elev10) / gridQuot;
+								final double elevGridY0 = (elev10 - elev00) / gridQuot;
+								// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
+								final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
+								double elevStart = elev00;
+								double elevGridXAdd = elevGridX0;
+
+								for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
+
+									double elev = elevStart;
+									for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
+
+										RGB rgb = elevationColor.getRGB((int) elev);
+										final Color color = new Color(display, rgb);
+
+										gc.setForeground(color);
+										gc.drawPoint(drawX, drawY);
+
+										color.dispose();
+									}
 								}
 							}
 						}
