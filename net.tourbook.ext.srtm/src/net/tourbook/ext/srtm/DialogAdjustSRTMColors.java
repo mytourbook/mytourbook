@@ -221,11 +221,12 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(compositeColorButtons);
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
 		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
-			elevFields[ix] = new Text(compositeColorButtons, SWT.SINGLE);
+			elevFields[ix] = new Text(compositeColorButtons, SWT.SINGLE | SWT.TRAIL);
 			elevFields[ix].setText("" + ((RGBVertex) rgbVertexList.get(ix)).getElevation()); //$NON-NLS-1$
 			elevFields[ix].setEditable(true);
-			elevFields[ix].setLayoutData(gridData);
-
+			//elevFields[ix].setLayoutData(gridData);
+			GridDataFactory.fillDefaults().hint(50, SWT.DEFAULT).grab(true, false).applyTo(elevFields[ix]);
+			
 			colorButtons[ix] = new Button(compositeColorButtons, SWT.PUSH);
 			colorButtons[ix].setBackground(new Color(compositeColorButtons.getDisplay(),
 					((RGBVertex) rgbVertexList.get(ix)).getRGB()));
