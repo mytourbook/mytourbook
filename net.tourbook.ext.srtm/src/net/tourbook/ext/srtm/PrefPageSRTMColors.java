@@ -265,10 +265,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void addTableRow(final Composite parent) {
 		rgbVertexList[noProfiles] = new RGBVertexList();
+		rgbVertexList[noProfiles].init(); // a few default settings 
 		Image image = rgbVertexList[noProfiles].getImage(parent.getDisplay(), imageWidth, imageHeight);
 		tableItem[noProfiles] = new TableItem(table, 0);
 		tableItem[noProfiles].setImage(image);
 		tableItem[noProfiles].setChecked(false);
+		table.setSelection(noProfiles);
 		noProfiles++;
 	}
 
