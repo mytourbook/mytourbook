@@ -217,14 +217,13 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 
 	private void setFields() {
 		compositeColorButtons.pack(); // necessary if # of fields doesn't change!
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(compositeColorButtons);
+		GridDataFactory.fillDefaults().grab(false, false).align(SWT.CENTER, SWT.TOP).applyTo(compositeColorButtons);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(compositeColorButtons);
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
 		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
 			elevFields[ix] = new Text(compositeColorButtons, SWT.SINGLE | SWT.TRAIL);
 			elevFields[ix].setText("" + ((RGBVertex) rgbVertexList.get(ix)).getElevation()); //$NON-NLS-1$
 			elevFields[ix].setEditable(true);
-			//elevFields[ix].setLayoutData(gridData);
 			GridDataFactory.fillDefaults().hint(50, SWT.DEFAULT).grab(true, false).applyTo(elevFields[ix]);
 			
 			colorButtons[ix] = new Button(compositeColorButtons, SWT.PUSH);
@@ -242,12 +241,6 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 				public void handleEvent(Event e) {
 					switch (e.type) {
 					case SWT.Selection:
-//    					RGB rgb = new ColorDialog(compositeColorButtons.getShell()).open();
-//    					if(rgb != null) {
-//    						Color buttonColor = new Color(compositeColorButtons.getDisplay(), rgb); 
-//    						((Button)(e.widget)).setBackground(buttonColor);
-//    						sortColors();
-//    					}
 						Color buttonColor = new Color(compositeColorButtons.getDisplay(), colorChooser.getRGB());
 						((Button) (e.widget)).setBackground(buttonColor);
 						sortColors();

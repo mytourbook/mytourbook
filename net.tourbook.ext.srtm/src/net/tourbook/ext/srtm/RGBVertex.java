@@ -18,6 +18,7 @@
  */
 package net.tourbook.ext.srtm;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 
@@ -29,9 +30,19 @@ public class RGBVertex implements Comparable{
    
    public RGBVertex() {
       elev = 0;
-      rgb = new RGB(255, 255, 255); // WHITE;
+      rgb = new RGB(255, 255, 255); // WHITE
    }
    
+   public RGBVertex(int red, int green, int blue, long elev) {
+	   if ((red > 255) || (red < 0) ||
+		   (green > 255) || (green < 0) ||
+		   (blue > 255) || (blue < 0))
+		   SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+	   
+	   this.elev = elev;
+	   rgb = new RGB(red, green, blue);
+   }
+
    public RGB getRGB() {
       return rgb;
    }

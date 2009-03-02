@@ -125,6 +125,14 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		return image;
 	}
 
+	public void init() {
+		if (size() > 0)
+			return;
+		add(0, new RGBVertex(0, 0, 255, 0));
+		add(1, new RGBVertex(0, 255, 0, 1000));
+		add(2, new RGBVertex(255, 0, 0, 2000));
+	}
+	
 	public static void main(String[] args) {
 		return;
 	}
