@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -83,12 +84,13 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		GridDataFactory.swtDefaults().grab(false, false).applyTo(mainComposite);
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(SWT.DEFAULT, 0).numColumns(1).applyTo(mainComposite);
 
-		createResolutionOptions(mainComposite);
+		createResolutionOption(mainComposite);
+		createShadowOption(mainComposite);
 		createTableSettings(mainComposite);
 		createButtons(mainComposite);
 	}
 	
-	private void createResolutionOptions(final Composite parent) {
+	private void createResolutionOption(final Composite parent) {
 
 //		final Group resolutionGroup = new Group(parent, SWT.NONE);
 //		resolutionGroup.setText("Resolution");
@@ -119,6 +121,23 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 //		groupLayout.marginWidth = 5;
 //		groupLayout.marginHeight = 5;
 	}
+	
+	private void createShadowOption(final Composite parent) {
+
+		final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(IPreferences.SRTM_SHADOW,
+				Messages.PrefPage_srtm_shadow_text,
+				parent);
+		
+		booleanFieldEditor.setPreferenceStore(iPreferenceStore);
+		booleanFieldEditor.load();
+		booleanFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent e) {
+				iPreferenceStore.setValue(IPreferences.SRTM_SHADOW, ""+e.getNewValue()); //$NON-NLS-1$
+			}
+		});
+		
+	}
+
 
 	private void createButtons(final Composite parent) {
 
@@ -335,6 +354,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		if (noProfiles == 0)
 			initVertexLists();
 		return rgbVertexList[actualProfile].getRGB(elev);
+	}
+	
+	public static boolean isShadowState() {
+		return iPreferenceStore.getBoolean(IPreferences.SRTM_SHADOW);
 	}
 
 }

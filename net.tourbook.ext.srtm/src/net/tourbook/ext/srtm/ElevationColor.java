@@ -25,12 +25,22 @@ public class ElevationColor {
 	
 	private final static IPreferenceStore iPreferenceStore = Activator.getDefault().getPreferenceStore();
 	
+	private final static double dimFactor = 0.7; // like in standard java Color.darker() 
+	
 	public ElevationColor() {
 		PrefPageSRTMColors.initVertexLists();
 	}
 	
 	public RGB getRGB(int elev) {
 		return PrefPageSRTMColors.getRGB(elev);
+	}
+
+	public RGB getDarkerRGB(int elev) {
+		RGB rgb = getRGB(elev);
+		rgb.red   *= dimFactor;
+		rgb.green *= dimFactor;
+		rgb.blue  *= dimFactor;
+		return rgb;
 	}
 
 	public int getGrid() {
@@ -48,4 +58,9 @@ public class ElevationColor {
 			return 1;		
 		return 4;
 	}
+	
+	public boolean isShadowState() {
+		return PrefPageSRTMColors.isShadowState();
+	}
+
 }

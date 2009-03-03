@@ -159,22 +159,35 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					final double constMy = 360. / mapPower;
 					final int mapStartX = tileX * tileSize;
 					final int mapStartY = tileY * tileSize;
+					RGB rgb;
 					
 					if (grid == 1) {
+
+						double elevOld = 0;
+						boolean isShadowState = elevationColor.isShadowState();
+						int drawXStart = isShadowState ? -1 : 0;
 						
 						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 
-							for (int drawX = 0, mapX = mapStartX; drawX < tileSize; drawX++, mapX++) {
-
-								lon = constMy * mapX - 180.; // Mercator
+							lon = constMy * (mapStartX - 1)  - 180.; // Mercator
+							for (int drawX = drawXStart; drawX < tileSize; drawX++, lon += constMy) {
 
 								final double elev = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
+								
+								if (drawX == -1) { 
+									elevOld = elev;
+									continue;
+								}
+									
+								if (isShadowState && elev < elevOld)
+									rgb = elevationColor.getDarkerRGB((int) elev);
+								else
+									rgb = elevationColor.getRGB((int) elev);
+								elevOld = elev;
 
-								RGB rgb = elevationColor.getRGB((int) elev);
-								final Color color = new Color(display, rgb);
-
+								final Color color = new Color(display, rgb);                                    
 								gc.setForeground(color);
 								gc.drawPoint(drawX, drawY);
 
@@ -217,7 +230,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 									double elev = elevStart;
 									for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-										RGB rgb = elevationColor.getRGB((int) elev);
+										rgb = elevationColor.getRGB((int) elev);
 										final Color color = new Color(display, rgb);
 
 										gc.setForeground(color);

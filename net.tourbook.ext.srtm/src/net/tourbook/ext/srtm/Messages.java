@@ -36,6 +36,8 @@ public class Messages extends NLS {
 	public static String	prefPage_srtm_resolution_fine;
 	public static String	prefPage_srtm_resolution_rough;
 	public static String	prefPage_srtm_resolution_very_rough;
+
+	public static String	PrefPage_srtm_shadow_text;
 	
 	public static String	srtm_transfer_error_message;
 	public static String	srtm_transfer_error_title;

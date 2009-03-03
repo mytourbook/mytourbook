@@ -26,4 +26,5 @@ public interface IPreferences {
 	String  SRTM_RESOLUTION_FINE            = "srtm.resolution.fine";			//$NON-NLS-1$
 	String  SRTM_RESOLUTION_ROUGH           = "srtm.resolution.rough";			//$NON-NLS-1$
 	String  SRTM_RESOLUTION_VERY_ROUGH      = "srtm.resolution.very-rough";			//$NON-NLS-1$
+	String  SRTM_SHADOW                     = "srtm.shadow";		//$NON-NLS-1$
 }
