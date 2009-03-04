@@ -157,7 +157,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					final double constMx1 = 360. / pi;
 					final double constMx2 = twoPi / mapPower;
 					final double constMy = 360. / mapPower;
-					final int mapStartX = tileX * tileSize;
+					int mapStartX = tileX * tileSize;
 					final int mapStartY = tileY * tileSize;
 					RGB rgb;
 					
@@ -165,14 +165,16 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 						double elevOld = 0;
 						boolean isShadowState = elevationColor.isShadowState();
-						int drawXStart = isShadowState ? -1 : 0;
+						int drawStartX = isShadowState ? -1 : 0;
+						mapStartX += drawStartX;
+						double lonStart = constMy * mapStartX  - 180.; // Mercator
 						
 						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
-
-							lon = constMy * (mapStartX - 1)  - 180.; // Mercator
-							for (int drawX = drawXStart; drawX < tileSize; drawX++, lon += constMy) {
+							lon = lonStart;
+							
+							for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
 
 								final double elev = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
 								
