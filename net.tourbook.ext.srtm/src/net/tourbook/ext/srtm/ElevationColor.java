@@ -18,12 +18,9 @@
  */
 package net.tourbook.ext.srtm;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.RGB;
 
 public class ElevationColor {
-	
-	private final static IPreferenceStore iPreferenceStore = Activator.getDefault().getPreferenceStore();
 	
 	private final static double dimFactor = 0.7; // like in standard java Color.darker() 
 	
@@ -44,23 +41,17 @@ public class ElevationColor {
 	}
 
 	public int getGrid() {
-		// elevation is used at every grid-th pixel in both directions; 
-		// the other values are interpolated
-		// i.e. it gives the resolution of the image!
-		String srtmResolution = iPreferenceStore.getString(IPreferences.SRTM_RESOLUTION);
-		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH))
-			return 64;
-		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH))
-			return 16;
-		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_FINE))
-			return 4;
-		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE))
-			return 1;		
-		return 4;
+		return PrefPageSRTMColors.getGrid();
 	}
 	
 	public boolean isShadowState() {
 		return PrefPageSRTMColors.isShadowState();
+	}
+	
+	public int hashCode() {
+        // Type of map is changed IFF one of colors, shadow state or grid is changed.
+		String s = PrefPageSRTMColors.getRGBVertexListString() + isShadowState() + getGrid();
+		return s.hashCode();
 	}
 
 }

@@ -355,9 +355,28 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			initVertexLists();
 		return rgbVertexList[actualProfile].getRGB(elev);
 	}
+
+	public static int getGrid() {
+		// elevation is used at every grid-th pixel in both directions; 
+		// the other values are interpolated
+		// i.e. it gives the resolution of the image!
+		String srtmResolution = iPreferenceStore.getString(IPreferences.SRTM_RESOLUTION);
+		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH))
+			return 64;
+		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH))
+			return 16;
+		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_FINE))
+			return 4;
+		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE))
+			return 1;		
+		return 4;
+	}
 	
 	public static boolean isShadowState() {
 		return iPreferenceStore.getBoolean(IPreferences.SRTM_SHADOW);
 	}
-
+	
+	public static String getRGBVertexListString() {
+		return rgbVertexList[actualProfile].toString();
+	}
 }

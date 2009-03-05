@@ -98,6 +98,12 @@ public class SRTMTileFactory extends DefaultTileFactory {
 			return this;
 		}
 
+		// TODO
+		@Override
+		public int hashCode() {
+			return elevationColor.hashCode();
+		}
+
 		@Override
 		public String getTileUrl(final int x, final int y, final int zoom) {
 			final StringBuilder url = new StringBuilder(this.getBaseURL()).append(SEPARATOR)

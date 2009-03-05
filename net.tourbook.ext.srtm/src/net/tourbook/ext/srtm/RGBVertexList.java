@@ -133,6 +133,10 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		add(2, new RGBVertex(255, 0, 0, 2000));
 	}
 	
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
 	public static void main(String[] args) {
 		return;
 	}
