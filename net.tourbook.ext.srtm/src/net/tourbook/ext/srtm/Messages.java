@@ -61,6 +61,7 @@ public class Messages extends NLS {
 
 	public static String	color_chooser_choosed_color;
 	public static String	color_chooser_hexagon;
+	public static String	color_chooser_hexagon_move;
 	public static String	color_chooser_rgb;
 	public static String	color_chooser_hsb;
 	public static String	color_chooser_red;

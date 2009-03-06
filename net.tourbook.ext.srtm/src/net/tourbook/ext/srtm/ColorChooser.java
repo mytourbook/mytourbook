@@ -23,6 +23,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -70,6 +71,8 @@ public class ColorChooser {
 	private int                 scaleValueHue   = 0;
 	private int                 scaleValueSaturation = 0;
 	private int                 scaleValueBrightness = 0;	
+	private boolean             hexagonChangeState = false;
+
 	
 	public ColorChooser(Composite composite) {
 		this.composite = composite;
@@ -130,8 +133,11 @@ public class ColorChooser {
 		gridData.widthHint = chooserSize - 50;
 		
 		// choosed Color Button
+		GridData gridDataCCB = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
+		gridDataCCB.widthHint = chooserSize;
+		gridDataCCB.heightHint = chooserSize/4;
 		choosedColorButton = new Button(composite, SWT.PUSH);
-		choosedColorButton.setLayoutData(gridData);
+		choosedColorButton.setLayoutData(gridDataCCB);
 		choosedColorButton.setToolTipText(Messages.color_chooser_choosed_color);
 		choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
 		updateChoosedColorButton(composite.getDisplay());
@@ -154,13 +160,25 @@ public class ColorChooser {
 		gc = new GC(hexagonImage);
 
 		setHexagon();
-
+		
 		hexagonLabel = new Label(hexagonComposite, SWT.CENTER);
 		hexagonLabel.setImage(hexagonImage);
+		hexagonLabel.setToolTipText(Messages.color_chooser_hexagon_move);
 		hexagonLabel.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {}
 
 			public void mouseDown(MouseEvent e) {
+				hexagonChangeState = true;
+			}
+
+			public void mouseUp(MouseEvent e) {
+				hexagonChangeState = false;
+			}
+		});
+		hexagonLabel.addMouseMoveListener(new MouseMoveListener() {
+			public void mouseMove(MouseEvent e) {
+				if (!hexagonChangeState)
+					return;
 				int x = e.x - chooserRadius;
 				int y = e.y - chooserRadius;
 				choosedRGB = getRGBFromHexagon(x, y);
@@ -170,7 +188,6 @@ public class ColorChooser {
 				updateScaleValuesHSB();
 			}
 
-			public void mouseUp(MouseEvent e) {}
 		});
 
 		final Slider hexagonSlider = new Slider(hexagonComposite, SWT.HORIZONTAL);
