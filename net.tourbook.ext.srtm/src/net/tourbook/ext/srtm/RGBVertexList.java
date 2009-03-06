@@ -26,6 +26,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 public class RGBVertexList extends ArrayList<RGBVertex> {
@@ -37,12 +38,12 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		if (size() < 2)
 			return new RGB(255, 255, 255);
 
-		for (int i = size() - 2; i >= 0; i--) {
-			if (elev > get(i).getElevation()) {
-				RGB rgb1 = get(i).getRGB();
-				RGB rgb2 = get(i + 1).getRGB();
-				long elev1 = get(i).getElevation();
-				long elev2 = get(i + 1).getElevation();
+		for (int ix = size() - 2; ix >= 0; ix--) {
+			if (elev > get(ix).getElevation()) {
+				RGB rgb1 = get(ix).getRGB();
+				RGB rgb2 = get(ix + 1).getRGB();
+				long elev1 = get(ix).getElevation();
+				long elev2 = get(ix + 1).getElevation();
 				long dElevG = elev2 - elev1;
 				long dElev1 = elev - elev1;
 				long dElev2 = elev2 - elev;
@@ -120,8 +121,26 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 			RGB rgb = getRGB(elev);
 			Color color = new Color(display, rgb);
 			gc.setForeground(color);
-			gc.drawLine(x, 0, x, height);
+			gc.drawLine(width - x, 0, width - x, height);
 		}
+		Transform transform = new Transform(display);
+		for (int ix = 0; ix < size(); ix++) {
+			long elev = get(ix).getElevation();
+			if (elev < 0) continue;
+			int x = (int) (elev * width / elevMax);
+			x = Math.max(x, 13);
+			RGB rgb = getRGB(elev);
+			rgb.red = 255 - rgb.red;
+			rgb.green = 255 - rgb.green;
+			rgb.blue = 255 - rgb.blue;
+			Color color = new Color(display, rgb);
+			gc.setForeground(color);
+			transform.setElements(0, -1, 1, 0, width - x - 1, height - 3); // Rotate by -90 degrees	
+			gc.setTransform(transform);
+			gc.drawText(""+elev, 0, 0, true);
+		}
+		transform.dispose();
+		
 		return image;
 	}
 
