@@ -64,7 +64,7 @@ public class ElevationFile {
       } catch (FileNotFoundException e1) {
          try {
             // download gzip-File <fileName>.gz and unzip
-            String localName = fileName+".gz"; 
+            String localName = fileName+".gz";  //$NON-NLS-1$
             String remoteName = localName.substring(localName.lastIndexOf(File.separator)+1);
             DownloadGLOBE.get(remoteName, localName);
             FileZip.gunzip(localName);
@@ -85,7 +85,7 @@ public class ElevationFile {
       } catch (FileNotFoundException e1) {
          try {
             //  download zip-File <fileName>.zip and unzip
-            String localName = fileName+".zip"; 
+            String localName = fileName+".zip";  //$NON-NLS-1$
             String remoteName = localName.substring(localName.lastIndexOf(File.separator)+1);
             DownloadSRTM3.get(remoteName, localName);
             FileZip.unzip(localName);
@@ -119,7 +119,7 @@ public class ElevationFile {
          System.out.println(e.getMessage()); 
          throw(e);
       }
-      System.out.println("open " + fileName);
+      System.out.println("open " + fileName); //$NON-NLS-1$
       exists = true;
    }
    
@@ -135,7 +135,7 @@ public class ElevationFile {
 //   }
 
    private void handleError(String fileName, Exception e) { 
-      System.out.println("handleError: " + fileName + ": "+ e.getMessage());
+      System.out.println("handleError: " + fileName + ": "+ e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
       // e.printStackTrace();
       exists = false;
       // dont return exception      

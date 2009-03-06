@@ -44,13 +44,13 @@ public final class NumberForm {
    
    public NumberForm() {
       
-      ln1 = new DecimalFormat("0");
-      ln2 = new DecimalFormat("00");
-      ln3 = new DecimalFormat("000");
-      ln4 = new DecimalFormat("0000");
-      ln5 = new DecimalFormat("00000");
-      ln6 = new DecimalFormat("000000");
-      ln7 = new DecimalFormat("0000000");
+      ln1 = new DecimalFormat("0"); //$NON-NLS-1$
+      ln2 = new DecimalFormat("00"); //$NON-NLS-1$
+      ln3 = new DecimalFormat("000"); //$NON-NLS-1$
+      ln4 = new DecimalFormat("0000"); //$NON-NLS-1$
+      ln5 = new DecimalFormat("00000"); //$NON-NLS-1$
+      ln6 = new DecimalFormat("000000"); //$NON-NLS-1$
+      ln7 = new DecimalFormat("0000000"); //$NON-NLS-1$
 
       // NumberFormat lf0 = new DecimalFormat("0.000000"); => Komma, weil current Locale GERMAN ist
       // Damit es Punkte und keine Kommas werden:

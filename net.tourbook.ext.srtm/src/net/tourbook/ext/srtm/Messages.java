@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	
 	public static String	prefPage_srtm_chk_use_default_location;
 	public static String	prefPage_srtm_editor_data_filepath;
-	public static String	prefPage_srtm_editor_colors_filepath;
 	public static String	prefPage_srtm_group_label_data_location;
 	public static String	prefPage_srtm_group_label_colors;
 	public static String	prefPage_srtm_msg_invalid_data_path;
@@ -36,6 +35,8 @@ public class Messages extends NLS {
 	public static String	prefPage_srtm_resolution_fine;
 	public static String	prefPage_srtm_resolution_rough;
 	public static String	prefPage_srtm_resolution_very_rough;
+
+	public static String	PrefPage_srtm_colors_table_ttt;
 
 	public static String	PrefPage_srtm_shadow_text;
 	

@@ -24,13 +24,13 @@ import java.net.URLConnection;
 
 public final class DownloadETOPO {
 
-   final static String addressPraefix = "http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO5/TOPO/ETOPO5/";
+   final static String addressPraefix = "http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO5/TOPO/ETOPO5/"; //$NON-NLS-1$
    
    public final static void get(String remoteName, String localName) throws Exception {
     
       try {
          String address = addressPraefix + remoteName;
-         System.out.println("load " + address);
+         System.out.println("load " + address); //$NON-NLS-1$
          OutputStream outputStream = null;
          InputStream inputStream = null;
          try {
@@ -46,7 +46,7 @@ public final class DownloadETOPO {
              outputStream.write(buffer, 0, numRead);
              numWritten += numRead;
              }
-             System.out.println("# Bytes localName = " + numWritten);
+             System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
          } catch (Exception e) {
              e.printStackTrace();
          } finally {
@@ -62,7 +62,7 @@ public final class DownloadETOPO {
              }
          }
 
-         System.out.println("get " + remoteName + " -> " + localName + " ...");
+         System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       } catch (Exception e) {
          System.out.println(e.getMessage());

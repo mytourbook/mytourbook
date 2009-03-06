@@ -137,7 +137,7 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 			gc.setForeground(color);
 			transform.setElements(0, -1, 1, 0, width - x - 1, height - 3); // Rotate by -90 degrees	
 			gc.setTransform(transform);
-			gc.drawText(""+elev, 0, 0, true);
+			gc.drawText(""+elev, 0, 0, true); //$NON-NLS-1$
 		}
 		transform.dispose();
 		

@@ -105,7 +105,7 @@ public final class ElevationGlobe extends ElevationBase {
 	}
 
 	public String getName() {
-		return "GLOBE";
+		return "GLOBE"; //$NON-NLS-1$
 	}
 
 	private class GlobeI {
@@ -117,15 +117,15 @@ public final class ElevationGlobe extends ElevationBase {
 
 		private GlobeI(int i) {
 
-			final String globeDataPath = getElevationDataPath("globe");
-			final String globeSuffix = "10g";
+			final String globeDataPath = getElevationDataPath("globe"); //$NON-NLS-1$
+			final String globeSuffix = "10g"; //$NON-NLS-1$
 			char c = (char) ('a' + i);
 			String fileName = new String(globeDataPath + File.separator + c + globeSuffix);
 
 			try {
 				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_GLOBE);
 			} catch (Exception e) {
-				System.out.println("GlobeI: Error: " + e.getMessage()); // NOT File not found
+				System.out.println("GlobeI: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
 				// dont return exception
 			}
 

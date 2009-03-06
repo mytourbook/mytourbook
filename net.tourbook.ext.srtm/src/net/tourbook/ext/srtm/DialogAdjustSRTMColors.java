@@ -232,7 +232,7 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 					((RGBVertex) rgbVertexList.get(ix)).getRGB()));
 			colorButtons[ix].setLayoutData(gridData);
 			setButtonLayoutData(colorButtons[ix]);
-			colorButtons[ix].setToolTipText(""
+			colorButtons[ix].setToolTipText("" //$NON-NLS-1$
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().red
 					+ "/" //$NON-NLS-1$
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().green

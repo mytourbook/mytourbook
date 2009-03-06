@@ -179,7 +179,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		createTable(colorComposite);
 
 		table.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
-
+		table.setToolTipText(Messages.PrefPage_srtm_colors_table_ttt);
 		table.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
 				try {

@@ -81,16 +81,16 @@ public class GeoCoord {
 		direction = directionPlus();
 
 		// Kommentar s. o.
-		patternString[0] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2})");
-		patternString[1] = new String("([-+]?)([0-9]{1,3})([0-9]{2})");
-		patternString[2] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2})");
-		patternString[3] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2})");
-		patternString[4] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})");
-		patternString[5] = new String("([-+]?)([0-9]{1,3}\\.[0-9]+)");
-		patternString[6] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)");
-		patternString[7] = new String("([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+)");
-		patternString[8] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)");
-		patternString[9] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)");
+		patternString[0] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2})"); //$NON-NLS-1$
+		patternString[1] = new String("([-+]?)([0-9]{1,3})([0-9]{2})"); //$NON-NLS-1$
+		patternString[2] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2})"); //$NON-NLS-1$
+		patternString[3] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2})"); //$NON-NLS-1$
+		patternString[4] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})"); //$NON-NLS-1$
+		patternString[5] = new String("([-+]?)([0-9]{1,3}\\.[0-9]+)"); //$NON-NLS-1$
+		patternString[6] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)"); //$NON-NLS-1$
+		patternString[7] = new String("([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+)"); //$NON-NLS-1$
+		patternString[8] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)"); //$NON-NLS-1$
+		patternString[9] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)"); //$NON-NLS-1$
 
 		for (int i = 0; i < PATTERN_ANZ; i++)
 			pattern[i] = Pattern.compile(patternString[i]);
@@ -104,18 +104,18 @@ public class GeoCoord {
 		//    blank       -> (nichts) 
 		//    "           -> (nichts) 
 		//    [NEO]       -> (nichts) 
-		s = s.replace(" ", "").replace("\"", "").replace("N", "").replace("E", "").replace("O", "");
+		s = s.replace(" ", "").replace("\"", "").replace("N", "").replace("E", "").replace("O", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 
 		//  [SW] vorne  -> - vorne
 		//  [SW] hinten -> - vorne
-		if (s.startsWith("S"))
-			s = "-" + s.substring(1);
-		else if (s.startsWith("W"))
-			s = "-" + s.substring(1);
-		else if (s.endsWith("S"))
-			s = "-" + s.substring(0, s.length() - 1);
-		else if (s.endsWith("W"))
-			s = "-" + s.substring(0, s.length() - 1);
+		if (s.startsWith("S")) //$NON-NLS-1$
+			s = "-" + s.substring(1); //$NON-NLS-1$
+		else if (s.startsWith("W")) //$NON-NLS-1$
+			s = "-" + s.substring(1); //$NON-NLS-1$
+		else if (s.endsWith("S")) //$NON-NLS-1$
+			s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
+		else if (s.endsWith("W")) //$NON-NLS-1$
+			s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
 
 		//  ,           -> .  
 		//  °           -> :  
@@ -124,7 +124,7 @@ public class GeoCoord {
 				.replace('\'', ':');
 
 		//  : hinten    -> (nichts)
-		if (s.endsWith(":"))
+		if (s.endsWith(":")) //$NON-NLS-1$
 			s = s.substring(0, s.length() - 1);
 
 		return s;
@@ -210,7 +210,7 @@ public class GeoCoord {
 			break;
 		}
 
-		if (matcher.group(1).equals("-"))
+		if (matcher.group(1).equals("-")) //$NON-NLS-1$
 			direction = directionMinus();
 		else
 			direction = directionPlus();
@@ -436,27 +436,27 @@ public class GeoCoord {
 
 	public String toString() { // = toStringDegreesMinutesSecondsDirection()
 
-		return ""
+		return "" //$NON-NLS-1$
 				+ NumberForm.n2(degrees)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ NumberForm.n2(minutes)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ NumberForm.n2(seconds)
-				+ " "
+				+ " " //$NON-NLS-1$
 				+ direction;
 	}
 
 	public String toStringFine() { // = toStringDegreesMinutesSecondsTertiasDirection()
 
-		return ""
+		return "" //$NON-NLS-1$
 				+ NumberForm.n2(degrees)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ NumberForm.n2(minutes)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ NumberForm.n2(seconds)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ NumberForm.n2(tertias)
-				+ " "
+				+ " " //$NON-NLS-1$
 				+ direction;
 	}
 
@@ -480,7 +480,7 @@ public class GeoCoord {
 		if (d < 0)
 			d = -d;
 
-		return "" + NumberForm.f5(d) + " " + direction;
+		return "" + NumberForm.f5(d) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
@@ -491,7 +491,7 @@ public class GeoCoord {
 			m = -m;
 		m -= degrees * faktg;
 		m /= faktm;
-		return "" + NumberForm.n2(degrees) + ":" + NumberForm.n2f3(m) + " " + direction;
+		return "" + NumberForm.n2(degrees) + ":" + NumberForm.n2f3(m) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void updateDecimal() {

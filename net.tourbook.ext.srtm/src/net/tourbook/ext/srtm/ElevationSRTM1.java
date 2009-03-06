@@ -74,7 +74,7 @@ public class ElevationSRTM1 extends ElevationBase {
    }
    
    public String getName() {
-   	return "SRTM1";
+   	return "SRTM1"; //$NON-NLS-1$
    }
 
    private class SRTM1I {
@@ -83,8 +83,8 @@ public class ElevationSRTM1 extends ElevationBase {
 
       private SRTM1I(GeoLat lat, GeoLon lon) {
 
-			final String srtm1DataPath = getElevationDataPath("srtm1");
-			final String srtm1Suffix = ".hgt";
+			final String srtm1DataPath = getElevationDataPath("srtm1"); //$NON-NLS-1$
+			final String srtm1Suffix = ".hgt"; //$NON-NLS-1$
 
 			String fileName = new String(srtm1DataPath
 					+ File.separator
@@ -97,7 +97,7 @@ public class ElevationSRTM1 extends ElevationBase {
          try {
             elevationFile = new ElevationFile(fileName,  Constants.ELEVATION_TYPE_SRTM1);
          } catch (Exception e) {
-            System.out.println("SRTM1I: Error: " + e.getMessage()); // NOT File not found
+            System.out.println("SRTM1I: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
             // dont return exception
          }
        }

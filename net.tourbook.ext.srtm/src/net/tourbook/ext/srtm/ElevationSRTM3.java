@@ -32,8 +32,8 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 		private SRTM3I(final GeoLat lat, final GeoLon lon) {
 
-			final String srtm3DataPath = getElevationDataPath("srtm3");
-			final String srtm3Suffix = ".hgt";
+			final String srtm3DataPath = getElevationDataPath("srtm3"); //$NON-NLS-1$
+			final String srtm3Suffix = ".hgt"; //$NON-NLS-1$
 
 			String fileName = new String(srtm3DataPath
 					+ File.separator
@@ -150,7 +150,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 	@Override
 	public String getName() {
-		return "SRTM3";
+		return "SRTM3"; //$NON-NLS-1$
 	}
 
 	@Override

@@ -129,7 +129,7 @@ public class ElevationBase {
 
 	// dummy
 	public String getName() {
-		return "FILETYPE-DUMMY";
+		return "FILETYPE-DUMMY"; //$NON-NLS-1$
 	}
 
 	// dummy
@@ -159,7 +159,7 @@ public class ElevationBase {
 				.getString(IPreferences.SRTM_DATA_FILEPATH); // TODO rename
 
 		if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
-			elevationDataPath = (String) System.getProperties().get("user.home");
+			elevationDataPath = (String) System.getProperties().get("user.home"); //$NON-NLS-1$
 		} else {
 			elevationDataPath = prefDataPath;
 		}

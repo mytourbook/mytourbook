@@ -76,7 +76,7 @@ public final class ElevationEtopo extends ElevationBase {
 	}
 
 	public String getName() {
-		return "ETOPO";
+		return "ETOPO"; //$NON-NLS-1$
 	}
 
 	private final class EtopoI {
@@ -89,14 +89,14 @@ public final class ElevationEtopo extends ElevationBase {
 
 		private EtopoI() {
 
-			final String etopoDataPath = getElevationDataPath("etopo");
-			final String etopoFilename = "ETOPO5.DAT";
+			final String etopoDataPath = getElevationDataPath("etopo"); //$NON-NLS-1$
+			final String etopoFilename = "ETOPO5.DAT"; //$NON-NLS-1$
 			String fileName = new String(etopoDataPath + File.separator + etopoFilename);
 
 			try {
 				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_ETOPO);
 			} catch (Exception e) {
-				System.out.println("EtopoI: Error: " + e.getMessage()); // NOT File not found
+				System.out.println("EtopoI: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
 				// dont return exception
 			}
 

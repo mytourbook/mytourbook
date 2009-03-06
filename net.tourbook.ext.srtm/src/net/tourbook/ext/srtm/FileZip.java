@@ -34,7 +34,7 @@ public final class FileZip {
 			// Get the first entry
 			ZipEntry zipEntry = zipInputStream.getNextEntry();
 			zipEntryName = zipEntry.getName();
-			System.out.println("zipEntryName " + zipEntryName);
+			System.out.println("zipEntryName " + zipEntryName); //$NON-NLS-1$
 
 			if (zipEntryName.indexOf(File.separator) != -1)
 				// delimiter in name (e.g. in self created kmz files)
@@ -42,7 +42,7 @@ public final class FileZip {
 
 			outFileName = zipName.substring(0, zipName.lastIndexOf(File.separator)) + File.separator + zipEntryName;
 
-			System.out.println("outFileName " + outFileName);
+			System.out.println("outFileName " + outFileName); //$NON-NLS-1$
 
 			OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
@@ -59,7 +59,7 @@ public final class FileZip {
 			return zipEntryName;
 
 		} catch (IOException e) {
-			System.out.println("unzip: Error: " + e.getMessage());
+			System.out.println("unzip: Error: " + e.getMessage()); //$NON-NLS-1$
 			throw(e); // return exception 
 		}
 	}
@@ -80,7 +80,7 @@ public final class FileZip {
 
 			outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator)) + File.separator + gzipEntryName;
 
-			System.out.println("outFileName " + outFileName);
+			System.out.println("outFileName " + outFileName); //$NON-NLS-1$
 
 			OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
@@ -97,7 +97,7 @@ public final class FileZip {
 			return gzipEntryName;
 
 		} catch (IOException e) {
-			System.out.println("gunzip: Error: " + e.getMessage());
+			System.out.println("gunzip: Error: " + e.getMessage()); //$NON-NLS-1$
 			throw (e); // return exception
 		}
 	}
@@ -132,7 +132,7 @@ public final class FileZip {
 			zipOutputStream.close();
 
 		} catch (IOException e) {
-			System.out.println("zip: Error: " + e.getMessage());
+			System.out.println("zip: Error: " + e.getMessage()); //$NON-NLS-1$
 			throw (e); // return exception
 		}
 	}
