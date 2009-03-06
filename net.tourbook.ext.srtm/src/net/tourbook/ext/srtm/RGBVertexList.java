@@ -35,8 +35,10 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 	public RGB getRGB(long elev) {
 
-		if (size() < 2)
+		if (size() == 0)
 			return new RGB(255, 255, 255);
+		if (size() == 1)
+			return get(0).getRGB();
 
 		for (int ix = size() - 2; ix >= 0; ix--) {
 			if (elev > get(ix).getElevation()) {
@@ -127,7 +129,7 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		for (int ix = 0; ix < size(); ix++) {
 			long elev = get(ix).getElevation();
 			if (elev < 0) continue;
-			int x = (int) (elev * width / elevMax);
+			int x = elevMax == 0 ? 0 : (int) (elev * width / elevMax);
 			x = Math.max(x, 13);
 			RGB rgb = getRGB(elev);
 			rgb.red = 255 - rgb.red;

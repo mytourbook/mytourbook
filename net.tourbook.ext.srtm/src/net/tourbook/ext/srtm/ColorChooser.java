@@ -169,6 +169,7 @@ public class ColorChooser {
 
 			public void mouseDown(MouseEvent e) {
 				hexagonChangeState = true;
+				chooseRGBFromHexagon(e);
 			}
 
 			public void mouseUp(MouseEvent e) {
@@ -179,15 +180,8 @@ public class ColorChooser {
 			public void mouseMove(MouseEvent e) {
 				if (!hexagonChangeState)
 					return;
-				int x = e.x - chooserRadius;
-				int y = e.y - chooserRadius;
-				choosedRGB = getRGBFromHexagon(x, y);
-				updateChoosedColorButton(e.display);
-				updateScales();
-				updateScaleValuesRGB();
-				updateScaleValuesHSB();
+				chooseRGBFromHexagon(e);
 			}
-
 		});
 
 		final Slider hexagonSlider = new Slider(hexagonComposite, SWT.HORIZONTAL);
@@ -196,10 +190,6 @@ public class ColorChooser {
 		hexagonSlider.setIncrement(8);
 		hexagonSlider.setLayoutData(gridData);
 
-//		slider.addSelectionListener(new SelectionAdapter() {
-//			public void widgetSelected(SelectionEvent e) {
-//			}
-//		});
 		hexagonSlider.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				col3 = new Integer(hexagonSlider.getSelection()).intValue();
@@ -323,6 +313,16 @@ public class ColorChooser {
 
 		tabFolder.pack();
 		
+	}
+	
+	public void chooseRGBFromHexagon(MouseEvent e) {
+		int x = e.x - chooserRadius;
+		int y = e.y - chooserRadius;
+		choosedRGB = getRGBFromHexagon(x, y);
+		updateChoosedColorButton(e.display);
+		updateScales();
+		updateScaleValuesRGB();
+		updateScaleValuesHSB();
 	}
 
 	private void updateScales() {
