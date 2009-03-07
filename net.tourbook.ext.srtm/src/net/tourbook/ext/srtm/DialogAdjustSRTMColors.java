@@ -29,12 +29,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -48,7 +51,7 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 	// private ScrolledComposite compositeColorButtons;
 	private Composite				compositeColorButtons;
 	private Composite				compositeChooser;
-	private static Button[]			colorButtons	= new Button[maxColor];
+	private static Label[]			colorLabel	= new Label[maxColor];
 	private static Text[]			elevFields		= new Text[maxColor];
 	private static Button[]			checkButtons	= new Button[maxColor];
 	private RGBVertexList			rgbVertexList;
@@ -93,6 +96,7 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 					int rgbVertexListSize = rgbVertexList.size();
 					disposeFields(rgbVertexListSize);
 					RGBVertex rgbVertex = new RGBVertex();
+					rgbVertex.setRGB(colorChooser.getRGB());
 					rgbVertexList.add(rgbVertexListSize, rgbVertex);
 					setFields();
 					break;
@@ -206,7 +210,7 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 			Long elev = new Long(elevFields[ix].getText());
 			RGBVertex rgbVertex = new RGBVertex();
 			rgbVertex.setElev(elev.longValue());
-			rgbVertex.setRGB(colorButtons[ix].getBackground().getRGB());
+			rgbVertex.setRGB(colorLabel[ix].getBackground().getRGB());
 			rgbVertexList.add(ixn, rgbVertex);
 			ixn++;
 		}
@@ -226,43 +230,64 @@ public class DialogAdjustSRTMColors extends TitleAreaDialog {
 			elevFields[ix].setText("" + ((RGBVertex) rgbVertexList.get(ix)).getElevation()); //$NON-NLS-1$
 			elevFields[ix].setEditable(true);
 			GridDataFactory.fillDefaults().hint(50, SWT.DEFAULT).grab(true, false).applyTo(elevFields[ix]);
-			
-			colorButtons[ix] = new Button(compositeColorButtons, SWT.PUSH);
-			colorButtons[ix].setBackground(new Color(compositeColorButtons.getDisplay(),
+			colorLabel[ix] = new Label(compositeColorButtons, SWT.CENTER);
+			colorLabel[ix].setBackground(new Color(compositeColorButtons.getDisplay(),
 					((RGBVertex) rgbVertexList.get(ix)).getRGB()));
-			colorButtons[ix].setLayoutData(gridData);
-			setButtonLayoutData(colorButtons[ix]);
-			colorButtons[ix].setToolTipText("" //$NON-NLS-1$
+			GridData gridDataCL = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
+			gridDataCL.widthHint = 70;
+			gridDataCL.heightHint = 20;
+			colorLabel[ix].setLayoutData(gridDataCL);
+			colorLabel[ix].setToolTipText("" //$NON-NLS-1$
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().red
 					+ "/" //$NON-NLS-1$
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().green
 					+ "/" //$NON-NLS-1$
 					+ ((RGBVertex) rgbVertexList.get(ix)).getRGB().blue);
-			colorButtons[ix].addListener(SWT.Selection | SWT.Dispose, new Listener() {
-				public void handleEvent(Event e) {
-					switch (e.type) {
-					case SWT.Selection:
-						Color buttonColor = new Color(compositeColorButtons.getDisplay(), colorChooser.getRGB());
-						((Button) (e.widget)).setBackground(buttonColor);
-						sortColors();
-
-						break;
-					case SWT.Dispose:
-						// xxx.dispose();
-						break;
-					}
+			colorLabel[ix].addMouseListener(new MouseListener() {
+				public void mouseDown(MouseEvent e) {
+					Color labelColor = new Color(compositeColorButtons.getDisplay(), colorChooser.getRGB());
+					((Label) (e.widget)).setBackground(labelColor);
+					sortColors();
 				}
+				public void mouseUp(MouseEvent e) {}
+				public void mouseDoubleClick(MouseEvent e) {}
 			});
 
 			checkButtons[ix] = new Button(compositeColorButtons, SWT.CHECK);
 			checkButtons[ix].setLayoutData(gridData);
-		}
+			checkButtons[ix].setToolTipText(Messages.dialog_adjust_srtm_colors_checkbutton_ttt);
+			checkButtons[ix].addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					switch (e.type) {
+					case SWT.Selection:
+						int checked = 0;
+				    	for (int ix = 0; ix < rgbVertexList.size(); ix++)
+							if (checkButtons[ix].getSelection())
+								checked++;
+						if (checked == rgbVertexList.size() - 2) {
+					    	for (int ix = 0; ix < rgbVertexList.size(); ix++)
+								if (!checkButtons[ix].getSelection())
+									checkButtons[ix].setEnabled(false);
+						} else {
+					    	for (int ix = 0; ix < rgbVertexList.size(); ix++)
+					    		checkButtons[ix].setEnabled(true);							
+						}				    	
+						break;
+					}
+				}
+			});
+		} // end for
+    	
+		if (rgbVertexList.size() <= 2)
+	    	for (int ix = 0; ix < rgbVertexList.size(); ix++)
+	    		checkButtons[ix].setEnabled(false);
+    	
 		compositeColorButtons.pack();
 	}
 
 	private void disposeFields(int length) {
 		for (int ix = 0; ix < length; ix++) {
-			colorButtons[ix].dispose();
+			colorLabel[ix].dispose();
 			elevFields[ix].dispose();
 			checkButtons[ix].dispose();
 		}

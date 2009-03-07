@@ -29,7 +29,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -58,7 +57,7 @@ public class ColorChooser {
 	private Display				chooserDisplay;
 	private Label				hexagonLabel;
 	private RGB					choosedRGB;
-	private Button				choosedColorButton;
+	private Label				choosedColorLabel;
 	private Scale               redScale;
 	private Scale               greenScale;
 	private Scale               blueScale;
@@ -132,13 +131,15 @@ public class ColorChooser {
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
 		gridData.widthHint = chooserSize - 50;
 		
-		// choosed Color Button
-		GridData gridDataCCB = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
-		gridDataCCB.widthHint = chooserSize;
-		gridDataCCB.heightHint = chooserSize/4;
-		choosedColorButton = new Button(composite, SWT.PUSH);
-		choosedColorButton.setLayoutData(gridDataCCB);
-		choosedColorButton.setToolTipText(Messages.color_chooser_choosed_color);
+		// choosed Color Label
+		GridData gridDataCCL = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
+		gridDataCCL.widthHint = chooserSize;
+		gridDataCCL.heightHint = chooserSize/4;
+		
+		choosedColorLabel = new Label(composite, SWT.CENTER);
+		choosedColorLabel.setLayoutData(gridDataCCL);
+		choosedColorLabel.setToolTipText(Messages.color_chooser_choosed_color);
+		
 		choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
 		updateChoosedColorButton(composite.getDisplay());
 
@@ -337,8 +338,8 @@ public class ColorChooser {
 	
 	private void updateChoosedColorButton(Display display) {
 		Color color = new Color(display, choosedRGB);
-		choosedColorButton.setBackground(color);		
-		choosedColorButton.setForeground(color);
+		choosedColorLabel.setBackground(color);		
+		choosedColorLabel.setForeground(color);
 	}
 	
 	private void updateScaleValuesRGB() {

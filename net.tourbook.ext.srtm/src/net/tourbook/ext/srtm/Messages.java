@@ -52,6 +52,7 @@ public class Messages extends NLS {
 	public static String	dialog_adjust_srtm_colors_button_remove;
 	public static String	dialog_adjust_srtm_colors_button_sort;
 
+	public static String	dialog_adjust_srtm_colors_checkbutton_ttt;
 	public static String    dialog_adjust_srtm_colors_dialog_title;
 	public static String    dialog_adjust_srtm_colors_dialog_area_title;
 	public static String    dialog_adjust_srtm_colors_delete_profile_title;
