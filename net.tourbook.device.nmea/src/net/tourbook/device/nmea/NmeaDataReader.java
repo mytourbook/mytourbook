@@ -101,8 +101,7 @@ public class NmeaDataReader extends TourbookDevice {
 		timeData.latitude = latitude == 90.0 ? Double.MIN_VALUE : latitude;
 		timeData.longitude = longitude == 180.0 ? Double.MIN_VALUE : longitude;
 
-		final long absoluteTime = nmea.getFixtime();
-		timeData.absoluteTime = absoluteTime * 1000;
+		timeData.absoluteTime = nmea.getFixtime() * 1000;
 		timeData.absoluteAltitude = (int) nmea.getAltitudeMeters();
 
 		// calculate distance
