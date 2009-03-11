@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Import NMEA files
+Bundle-SymbolicName: net.tourbook.device.nmea;singleton:=true
+Bundle-Version: 9.04.0.v2009-04
+Bundle-Activator: net.tourbook.device.nmea.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: MyTourbook
