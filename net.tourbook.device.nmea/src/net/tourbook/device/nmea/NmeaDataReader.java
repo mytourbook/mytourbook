@@ -1,24 +1,52 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package net.tourbook.device.nmea;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.StringTokenizer;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.opengts.util.Nmea0183;
+
 public class NmeaDataReader extends TourbookDevice {
-	private static final String	FILE_HEADER	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:"; //$NON-NLS-1$
+
+	private static final String		FILE_HEADER		= "$GP";							//$NON-NLS-1$
+
+	private static final Calendar	fCalendar		= GregorianCalendar.getInstance();
+
+	private ArrayList<TimeData>		fTimeDataList	= new ArrayList<TimeData>();
+	private TimeData				fPrevTimeData;
+
+	private float					fAbsoluteDistance;
+
+	private String					fImportFilePath;
+
+	private HashMap<Long, TourData>	fTourDataMap;
 
 	public NmeaDataReader() {
 		canReadFromDevice = false;
@@ -35,59 +63,6 @@ public class NmeaDataReader extends TourbookDevice {
 		return false;
 	}
 
-	/**
-	 * Derives a date from a filename, if possible. The name of the file must start with
-	 * <code>ddmmyy</code>, with <code>dd</code> being the day of year, <code>mm</code> the month,
-	 * and <code>yy</code> the year.
-	 * <p>
-	 * As a default, todays date is returned.
-	 * 
-	 * @param file
-	 *            The file from which the name should be derived.
-	 * @return A Date object that has its calendar information set correctly, but not its time
-	 *         information.
-	 */
-	private Calendar deriveDateFromFile(final File file) {
-
-		final Calendar cal = Calendar.getInstance();
-
-		// only get the last part of the filename
-		final String filename = file.getName();
-
-		// standard format is ddmmyy.txt, but the user can actually modify it,
-		// so be
-		// careful.
-		try {
-			if (filename.length() > 6) {
-				final String dayDenom = filename.substring(0, 2);
-				final String monthDenom = filename.substring(2, 4);
-				final String yearDenom = filename.substring(4, 6);
-
-				final int day = Integer.parseInt(dayDenom);
-				final int month = Integer.parseInt(monthDenom);
-				int year = Integer.parseInt(yearDenom);
-				
-				// we assume that a two-digit date smaller 90 is in the 21st century,
-				// and dates larger 90 in the 20st century, covering a timespan of
-				// 1900 to 2089, which should be ample.
-				if (year < 90) {
-					year += 2000;
-				}
-				else {
-					year += 1900;
-				}
-
-				cal.set(Calendar.DAY_OF_MONTH, day);
-				cal.set(Calendar.MONTH, month - 1);
-				cal.set(Calendar.YEAR, year);
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-
-		return cal;
-	}
-
 	public String getDeviceModeName(final int modeId) {
 		return null;
 	}
@@ -95,19 +70,6 @@ public class NmeaDataReader extends TourbookDevice {
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 		return null;
-	}
-
-	/**
-	 * Computes the equivalent of the time section of the parameter in seconds. The date section is
-	 * ignored.
-	 * 
-	 * @param cal
-	 *            A Calendar object
-	 * @return The equivalent of the time in seconds
-	 */
-	private int getSeconds(final Calendar cal) {
-		return (cal.get(Calendar.HOUR_OF_DAY) * 3600) + (cal.get(Calendar.MINUTE) * 60) + (cal.get(Calendar.SECOND));
-
 	}
 
 	@Override
@@ -119,6 +81,52 @@ public class NmeaDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	private void parseNMEAStrings(final ArrayList<String> nmeaStrings) {
+
+		final Nmea0183 nmea = new Nmea0183();
+
+		// parse all nmea lines
+		for (final String nmeaLine : nmeaStrings) {
+			nmea.parse(nmeaLine);
+		}
+
+		// create new time item
+		final TimeData timeData = new TimeData();
+		fTimeDataList.add(timeData);
+
+		// get attributes
+		final double latitude = nmea.getLatitude();
+		final double longitude = nmea.getLongitude();
+
+		timeData.latitude = latitude == 90.0 ? Double.MIN_VALUE : latitude;
+		timeData.longitude = longitude == 180.0 ? Double.MIN_VALUE : longitude;
+
+		final long absoluteTime = nmea.getFixtime();
+		timeData.absoluteTime = absoluteTime * 1000;
+		timeData.absoluteAltitude = (int) nmea.getAltitudeMeters();
+
+		// calculate distance
+		if (fPrevTimeData == null) {
+			// first time data
+			timeData.absoluteDistance = 0;
+		} else {
+			fAbsoluteDistance += DeviceReaderTools.computeDistance(fPrevTimeData.latitude,
+					fPrevTimeData.longitude,
+					latitude,
+					longitude);
+
+			timeData.absoluteDistance = fAbsoluteDistance;
+		}
+
+		// set virtual time if time is not available
+		if (timeData.absoluteTime == Long.MIN_VALUE) {
+			fCalendar.set(2000, 0, 1, 0, 0, 0);
+			timeData.absoluteTime = fCalendar.getTimeInMillis();
+		}
+		
+		fPrevTimeData = timeData;
+	}
+
 	public boolean processDeviceData(	final String fileName,
 										final DeviceData deviceData,
 										final HashMap<Long, TourData> tourDataMap) {
@@ -128,130 +136,138 @@ public class NmeaDataReader extends TourbookDevice {
 			return false;
 		}
 
-		final TourData tourData = new TourData();
-
-		// if we are this far, we can assume that the file actually exists,
-		// because
-		// the validateRawData call must check for it.
+		fImportFilePath = fileName;
+		fTourDataMap = tourDataMap;
+		
+		// if we are so far, we can assume that the file actually exists,
+		// because the validateRawData call must check for it.
 		final File file = new File(fileName);
 
-		// The text file export does not record any time or date information,
-		// but if we are really lucky, the user did not change the filename
-		// format,
-		// and we at least get the correct date. Time info is lost.
-		final Calendar cal = this.deriveDateFromFile(file);
+		String nmeaLine;
+		final ArrayList<String> nmeaStrings = new ArrayList<String>();
 
-		tourData.setStartDay((short) cal.get(Calendar.DATE));
-		tourData.setStartMonth((short) cal.get(Calendar.MONTH));
-		tourData.setStartYear((short) cal.get(Calendar.YEAR));
-
-		StringTokenizer tokenizer = null;
-
-		String tokenLine;
-
-		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
-		TimeData timeData;
-
-		int previousTime = 0;
-		int time = 0;
-		int timeDelta = 0;
-
-		float distance = 0;
-		float previousDistance = 0;
-		float distanceDelta = 0;
-
-		int alt = 0;
-		int previousAlt = 0;
-		int altDelta = 0;
+		long nmeaTypes = Nmea0183.TYPE_NONE;
+		boolean startParsing = false;
 
 		try {
 			final BufferedReader reader = new BufferedReader(new FileReader(file));
 
-			// skip the header line
-			reader.readLine();
+			while ((nmeaLine = reader.readLine()) != null) {
 
-			while ((tokenLine = reader.readLine()) != null) {
+				if (nmeaLine.startsWith("$GPRMC")) {//$NON-NLS-1$
 
-				if (tokenLine.length() == 0) {
-					continue;
+					if ((nmeaTypes & Nmea0183.TYPE_GPRMC) != 0) {
+						nmeaTypes = Nmea0183.TYPE_GPRMC;
+						startParsing = true;
+					} else {
+						nmeaTypes |= Nmea0183.TYPE_GPRMC;
+					}
+
+				} else if (nmeaLine.startsWith("$GPGGA")) {//$NON-NLS-1$
+
+					if ((nmeaTypes & Nmea0183.TYPE_GPGGA) != 0) {
+						nmeaTypes = Nmea0183.TYPE_GPGGA;
+						startParsing = true;
+					} else {
+						nmeaTypes |= Nmea0183.TYPE_GPGGA;
+					}
+
+				} else if (nmeaLine.startsWith("$GPVTG")) {//$NON-NLS-1$
+
+					if ((nmeaTypes & Nmea0183.TYPE_GPVTG) != 0) {
+						nmeaTypes = Nmea0183.TYPE_GPVTG;
+						startParsing = true;
+					} else {
+						nmeaTypes |= Nmea0183.TYPE_GPVTG;
+					}
+
+				} else if (nmeaLine.startsWith("$GPZDA")) {//$NON-NLS-1$
+
+					if ((nmeaTypes & Nmea0183.TYPE_GPZDA) != 0) {
+						nmeaTypes = Nmea0183.TYPE_GPZDA;
+						startParsing = true;
+					} else {
+						nmeaTypes |= Nmea0183.TYPE_GPZDA;
+					}
 				}
 
-				// file format is Tabbed Seperated Values
-				tokenizer = new StringTokenizer(tokenLine, "\t"); //$NON-NLS-1$
-				final String recTime = tokenizer.nextToken();
-				distance = Float.parseFloat(tokenizer.nextToken());
-				alt = Integer.parseInt(tokenizer.nextToken());
-				// not recorded, but read for the fun of it.
-				final float speed = Float.parseFloat(tokenizer.nextToken());
-				final int heartrate = Integer.parseInt(tokenizer.nextToken());
-				final float temperature = Float.parseFloat(tokenizer.nextToken());
-				// same as with speed ...
-				final float gradient = Float.parseFloat(tokenizer.nextToken());
-				final int cadence = Integer.parseInt(tokenizer.nextToken());
+				if (startParsing) {
 
-				final DateFormat df = DateFormat.getTimeInstance(DateFormat.MEDIUM, Locale.GERMAN);
+					startParsing = false;
 
-				final Calendar dataCal = Calendar.getInstance();
+					parseNMEAStrings(nmeaStrings);
 
-				dataCal.setTime(df.parse(recTime));
-				time = this.getSeconds(dataCal);
+					// reset nmea strings and types
+					nmeaStrings.clear();
+				}
 
-				// values are recorded absolutely, but we need to get the difference
-				// between the current and the previous data point. Let's compute
-				// the delta
-				distanceDelta = distance - previousDistance;
-				timeDelta = time - previousTime;
-				altDelta = alt - previousAlt;
-
-				timeDataList.add(timeData = new TimeData());
-
-				timeData.altitude = altDelta;
-				timeData.cadence = cadence;
-				timeData.pulse = heartrate;
-				timeData.temperature = Math.round(temperature);
-				timeData.time = timeDelta;
-				// distance is stored in kilometers, but we need meters.
-				timeData.distance = Math.round(distanceDelta * 1000);
-
-				previousTime = time;
-				previousDistance = distance;
-				previousAlt = alt;
-
-			}
-
-			tourData.setStartDistance(Math.round(distance));
-			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
-
-			// check if the tour is in the tour map
-			if (tourDataMap.containsKey(tourId) == false) {
-
-				// add new tour to the map
-				tourDataMap.put(tourId, tourData);
-
-				// create additional data
-				tourData.createTimeSeries(timeDataList, false);
-				tourData.computeTourDrivingTime();
-				tourData.computeComputedValues();
-
-				tourData.setDeviceId(deviceId);
-				tourData.setDeviceName(visibleName);
-
+				nmeaStrings.add(nmeaLine);
 			}
 
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
-		return true;
+		return setTourData();
 	}
 
-	/**
-	 * Checks the presence of the header information written by the CicloTour text export function.
-	 * 
-	 * @see net.tourbook.importdata.IRawDataReader#validateRawData(java.lang.String)
-	 * @return <code>true</code> if the file appears to be a valid CicloTour Text file, otherwise
-	 *         <code>false</code>.
-	 */
+	private boolean setTourData() {
+
+		if (fTimeDataList == null || fTimeDataList.size() == 0) {
+			return false;
+		}
+
+		// create data object for each tour
+		final TourData tourData = new TourData();
+
+		/*
+		 * set tour start date/time
+		 */
+		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
+
+		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
+		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
+		tourData.setStartSecond((short) fCalendar.get(Calendar.SECOND));
+
+		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
+		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
+
+		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+
+		tourData.setDeviceTimeInterval((short) -1);
+		tourData.importRawDataFile = fImportFilePath;
+		tourData.setTourImportFilePath(fImportFilePath);
+
+		tourData.createTimeSeries(fTimeDataList, true);
+		tourData.computeAltitudeUpDown();
+
+		// after all data are added, the tour id can be created
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		String uniqueKey;
+		if (distanceSerie == null) {
+			uniqueKey = "32481"; //$NON-NLS-1$
+		} else {
+			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+		}
+		final Long tourId = tourData.createTourId(uniqueKey);
+
+		// check if the tour is already imported
+		if (fTourDataMap.containsKey(tourId) == false) {
+
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
+
+			tourData.setDeviceId(deviceId);
+			tourData.setDeviceName(visibleName);
+
+			// add new tour to other tours
+			fTourDataMap.put(tourId, tourData);
+		}
+
+		return true;
+	}
+	
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader reader = null;
@@ -262,6 +278,7 @@ public class NmeaDataReader extends TourbookDevice {
 			final String header = reader.readLine();
 
 			return header.startsWith(FILE_HEADER);
+
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
