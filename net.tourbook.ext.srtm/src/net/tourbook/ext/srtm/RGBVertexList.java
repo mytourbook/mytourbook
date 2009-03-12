@@ -18,7 +18,8 @@
  */
 package net.tourbook.ext.srtm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +32,54 @@ import org.eclipse.swt.widgets.Display;
 
 public class RGBVertexList extends ArrayList<RGBVertex> {
 
+	private static final int	IMAGE_MIN_WIDTH		= 10;
+	private static final int	IMAGE_MIN_HEIGHT	= 10;
+
 	private static final long	serialVersionUID	= 1L;
 
-	public RGB getRGB(long elev) {
+	public static void main(final String[] args) {
+		return;
+	}
+
+	public Image getImage(final Display display, int width, int height) {
+
+		// ensure min image size
+		width = width < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : width;
+		height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
+
+		final Image image = new Image(display, width, height);
+		final GC gc = new GC(image);
+		final long elevMax = size() == 0 ? 8850 : get(size() - 1).getElevation();
+		for (int x = 0; x < width; x++) {
+			final long elev = elevMax * x / width;
+			final RGB rgb = getRGB(elev);
+			final Color color = new Color(display, rgb);
+			gc.setForeground(color);
+			gc.drawLine(width - x, 0, width - x, height);
+		}
+		final Transform transform = new Transform(display);
+		for (int ix = 0; ix < size(); ix++) {
+			final long elev = get(ix).getElevation();
+			if (elev < 0)
+				continue;
+			int x = elevMax == 0 ? 0 : (int) (elev * width / elevMax);
+			x = Math.max(x, 13);
+			final RGB rgb = getRGB(elev);
+			rgb.red = 255 - rgb.red;
+			rgb.green = 255 - rgb.green;
+			rgb.blue = 255 - rgb.blue;
+			final Color color = new Color(display, rgb);
+			gc.setForeground(color);
+			transform.setElements(0, -1, 1, 0, width - x - 1, height - 3); // Rotate by -90 degrees	
+			gc.setTransform(transform);
+			gc.drawText("" + elev, 0, 0, true); //$NON-NLS-1$
+		}
+		transform.dispose();
+
+		return image;
+	}
+
+	public RGB getRGB(final long elev) {
 
 		if (size() == 0)
 			return new RGB(255, 255, 255);
@@ -42,13 +88,13 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 		for (int ix = size() - 2; ix >= 0; ix--) {
 			if (elev > get(ix).getElevation()) {
-				RGB rgb1 = get(ix).getRGB();
-				RGB rgb2 = get(ix + 1).getRGB();
-				long elev1 = get(ix).getElevation();
-				long elev2 = get(ix + 1).getElevation();
-				long dElevG = elev2 - elev1;
-				long dElev1 = elev - elev1;
-				long dElev2 = elev2 - elev;
+				final RGB rgb1 = get(ix).getRGB();
+				final RGB rgb2 = get(ix + 1).getRGB();
+				final long elev1 = get(ix).getElevation();
+				final long elev2 = get(ix + 1).getElevation();
+				final long dElevG = elev2 - elev1;
+				final long dElev1 = elev - elev1;
+				final long dElev2 = elev2 - elev;
 				int red = (int) ((double) (rgb2.red * dElev1 + rgb1.red * dElev2) / dElevG);
 				int green = (int) ((double) (rgb2.green * dElev1 + rgb1.green * dElev2) / dElevG);
 				int blue = (int) ((double) (rgb2.blue * dElev1 + rgb1.blue * dElev2) / dElevG);
@@ -70,32 +116,39 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		return new RGB(255, 255, 255);
 	}
 
-	public String toString() {
-		String s;
-		s = ""; //$NON-NLS-1$
-		for (int i = 0; i < size(); i++) {
-			s += get(i);
-		}
-		return s;
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
 	}
 
-	@SuppressWarnings("unchecked")
-	public void sort() {
-		Collections.sort(this);
+	public void init() {
+		if (size() > 0)
+			return;
+		add(0, new RGBVertex(0, 0, 255, 0));
+		add(1, new RGBVertex(0, 255, 0, 1000));
+		add(2, new RGBVertex(255, 0, 0, 2000));
+	}
+
+	public void set(final RGBVertexList rgbVertexList) {
+		clear();
+		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
+			final RGBVertex rgbVertex = rgbVertexList.get(ix);
+			add(ix, rgbVertex);
+		}
 	}
 
 	public void set(String s) {
-		Pattern pattern = Pattern.compile("^([-]*[0-9]*),([0-9]*),([0-9]*),([0-9]*);(.*)$"); //$NON-NLS-1$
+		final Pattern pattern = Pattern.compile("^([-]*[0-9]*),([0-9]*),([0-9]*),([0-9]*);(.*)$"); //$NON-NLS-1$
 		clear();
 		int ix = 0;
 		while (s.length() > 0) {
-			Matcher matcher = pattern.matcher(s);
+			final Matcher matcher = pattern.matcher(s);
 			if (matcher.matches()) {
-				Long elev = new Long(matcher.group(1));
-				Integer red = new Integer(matcher.group(2));
-				Integer green = new Integer(matcher.group(3));
-				Integer blue = new Integer(matcher.group(4));
-				RGBVertex rgbVertex = new RGBVertex();
+				final Long elev = new Long(matcher.group(1));
+				final Integer red = new Integer(matcher.group(2));
+				final Integer green = new Integer(matcher.group(3));
+				final Integer blue = new Integer(matcher.group(4));
+				final RGBVertex rgbVertex = new RGBVertex();
 				rgbVertex.setElev(elev.longValue());
 				rgbVertex.setRGB(new RGB(red.intValue(), green.intValue(), blue.intValue()));
 				add(ix, rgbVertex);
@@ -106,59 +159,18 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		sort();
 	}
 
-	public void set(RGBVertexList rgbVertexList) {
-		clear();
-		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
-			RGBVertex rgbVertex = rgbVertexList.get(ix);
-			add(ix, rgbVertex);
-		}
+	@SuppressWarnings("unchecked")
+	public void sort() {
+		Collections.sort(this);
 	}
 
-	public Image getImage(Display display, int width, int height) {
-		final Image image = new Image(display, width, height);
-		GC gc = new GC(image);
-		long elevMax = size() == 0 ? 8850 : get(size() - 1).getElevation();
-		for (int x = 0; x < width; x++) {
-			long elev = elevMax * x / width;
-			RGB rgb = getRGB(elev);
-			Color color = new Color(display, rgb);
-			gc.setForeground(color);
-			gc.drawLine(width - x, 0, width - x, height);
+	@Override
+	public String toString() {
+		String s;
+		s = ""; //$NON-NLS-1$
+		for (int i = 0; i < size(); i++) {
+			s += get(i);
 		}
-		Transform transform = new Transform(display);
-		for (int ix = 0; ix < size(); ix++) {
-			long elev = get(ix).getElevation();
-			if (elev < 0) continue;
-			int x = elevMax == 0 ? 0 : (int) (elev * width / elevMax);
-			x = Math.max(x, 13);
-			RGB rgb = getRGB(elev);
-			rgb.red = 255 - rgb.red;
-			rgb.green = 255 - rgb.green;
-			rgb.blue = 255 - rgb.blue;
-			Color color = new Color(display, rgb);
-			gc.setForeground(color);
-			transform.setElements(0, -1, 1, 0, width - x - 1, height - 3); // Rotate by -90 degrees	
-			gc.setTransform(transform);
-			gc.drawText(""+elev, 0, 0, true); //$NON-NLS-1$
-		}
-		transform.dispose();
-		
-		return image;
-	}
-
-	public void init() {
-		if (size() > 0)
-			return;
-		add(0, new RGBVertex(0, 0, 255, 0));
-		add(1, new RGBVertex(0, 255, 0, 1000));
-		add(2, new RGBVertex(255, 0, 0, 2000));
-	}
-	
-	public int hashCode() {
-		return toString().hashCode();
-	}
-	
-	public static void main(String[] args) {
-		return;
+		return s;
 	}
 }
