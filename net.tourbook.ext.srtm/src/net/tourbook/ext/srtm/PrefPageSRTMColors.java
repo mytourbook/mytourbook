@@ -168,7 +168,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		Table table;
 		if (fTable == null) {
-			table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);// | SWT.CHECK);
+			table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
 			selectedIndex = actualProfile;
 		} else {
 			table = fTable;
