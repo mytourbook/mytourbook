@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.export.ActionExport;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceView;
@@ -158,6 +159,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionRefreshView				fActionRefreshView;
 
+	private ActionExport					fActionExportTour;
+
 	private int								fTourViewerSelectedYear						= -1;
 	private int								fTourViewerSelectedMonth					= -1;
 	private Long							fActiveTourId;
@@ -166,6 +169,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private boolean							fIsRecTimeFormat_hhmmss;
 	private boolean							fIsDriveTimeFormat_hhmmss;
+
 
 	private class ItemComparer implements IElementComparer {
 
@@ -388,6 +392,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
+		fActionExportTour = new ActionExport(this);
+		
 		fillActions();
 	}
 
@@ -1100,6 +1106,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fActionDeleteTour.setEnabled(false);
 		}
 
+		fActionExportTour.setEnabled(isTourSelected);
+		
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -1178,6 +1186,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
 		menuMgr.add(fActionMergeTour);
 		menuMgr.add(fActionOpenTour);
+		menuMgr.add(fActionExportTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTourType);

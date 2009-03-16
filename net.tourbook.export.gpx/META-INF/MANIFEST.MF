@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: GPX Export
+Bundle-SymbolicName: net.tourbook.export.gpx;singleton:=true
+Bundle-Version: 9.04
+Bundle-Activator: net.tourbook.export.gpx.Activator
+Bundle-Vendor: MyTourbook
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.tourbook;bundle-version="9.1.0",
+ net.tourbook.ext.jars.importExport;bundle-version="9.4.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy

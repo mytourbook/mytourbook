@@ -37,6 +37,7 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.swt.widgets,
    javax.persistence,
    org.eclipse.jface.dialogs",
+ net.tourbook.export,
  net.tourbook.importdata;
   uses:="org.eclipse.jface.wizard,
    org.eclipse.jface.operation,

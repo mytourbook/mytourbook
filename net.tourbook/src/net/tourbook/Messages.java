@@ -21,6 +21,22 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String	dialog_export_btn_selectDirectory;
+
+	public static String	dialog_export_dialog_message;
+
+	public static String	dialog_export_dialog_title;
+
+	public static String	dialog_export_dir_dialog_message;
+
+	public static String	dialog_export_dir_dialog_text;
+
+	public static String	dialog_export_invalid_path;
+
+	public static String	dialog_export_label_destination;
+
+	public static String	dialog_export_shell_text;
+
 	public static String		dialog_is_tour_editor_modified_message;
 	public static String		dialog_is_tour_editor_modified_title;
 
@@ -38,6 +54,8 @@ public class Messages extends NLS {
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
+
+	public static String	action_export_tour;
 
 	public static String		action_tag_add;
 	public static String		action_tag_dlg_rename_message;

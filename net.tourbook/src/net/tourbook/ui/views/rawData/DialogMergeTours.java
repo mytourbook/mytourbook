@@ -181,7 +181,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	private NumberFormat			fNumberFormatter		= NumberFormat.getNumberInstance();
 	private static final Calendar	fCalendar				= GregorianCalendar.getInstance();
 
-	private Image					fShellImage;
 	private Image					fIconPlaceholder;
 	private HashMap<Integer, Image>	fGraphImages			= new HashMap<Integer, Image>();
 
@@ -207,9 +206,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
 		// set icon for the window 
-		fShellImage = TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage();
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage());
+		
 		fIconPlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder).createImage();
-		setDefaultImage(fShellImage);
 
 		fSourceTour = mergeSourceTour;
 		fTargetTour = mergeTargetTour;
@@ -1526,7 +1525,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private void onDispose() {
 
-		fShellImage.dispose();
 		fIconPlaceholder.dispose();
 
 		for (final Image image : fGraphImages.values()) {

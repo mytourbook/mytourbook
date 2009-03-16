@@ -53,15 +53,12 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -136,7 +133,6 @@ public class DialogMarker extends TitleAreaDialog {
 	private HashSet<TourMarker>	fTourMarkersBackup;
 
 	private boolean				fIsOkPressed					= false;
-	private Image				fShellImage;
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -214,8 +210,7 @@ public class DialogMarker extends TitleAreaDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
 		// set icon for the window 
-		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker).createImage();
-		setDefaultImage(fShellImage);
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker).createImage());
 
 		fTourData = tourData;
 
@@ -281,12 +276,6 @@ public class DialogMarker extends TitleAreaDialog {
 
 		super.configureShell(shell);
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
-		
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				fShellImage.dispose();
-			}
-		});
 	}
 
 	@Override

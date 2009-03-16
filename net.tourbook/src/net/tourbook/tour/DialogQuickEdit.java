@@ -31,9 +31,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -50,8 +47,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private final IDialogSettings	fDialogSettings;
 	
-	private Image					fShellImage;
-
 	private static final Calendar	fCalendar		= GregorianCalendar.getInstance();
 	private static final DateFormat	fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat	fTimeFormatter	= DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -63,9 +58,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		// set icon for the window 
-		fShellImage = TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage();
-		setDefaultImage(fShellImage);
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage());
 
 		fTourData = tourData;
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
@@ -77,11 +70,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		super.configureShell(shell);
 
 		shell.setText(Messages.dialog_quick_edit_dialog_title);
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				fShellImage.dispose();
-			}
-		});
 	}
 
 	@Override

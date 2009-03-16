@@ -4,6 +4,7 @@
    <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
    <extension-point id="externalDeviceDataReader" name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
+   <extension-point id="exportTour" name="Export Tours" schema="schema/exportTour.exsd"/>
 
    <extension
          id="application"

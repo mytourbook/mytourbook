@@ -22,9 +22,6 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -44,8 +41,6 @@ public class PositionedWizardDialog extends WizardDialog {
 
 	private int					fDefaultWidth;
 	private int					fDefaultHeight;
-
-	private Image				fShellIcon;
 
 	/**
 	 * @param parent
@@ -73,8 +68,7 @@ public class PositionedWizardDialog extends WizardDialog {
 		}
 
 		// set icon for the window 
-		fShellIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard).createImage();
-		setDefaultImage(fShellIcon);
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard).createImage());
 	}
 
 	@Override
@@ -87,12 +81,6 @@ public class PositionedWizardDialog extends WizardDialog {
 	protected void configureShell(final Shell shell) {
 
 		super.configureShell(shell);
-
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				fShellIcon.dispose();
-			}
-		});
 	}
 
 	@Override
