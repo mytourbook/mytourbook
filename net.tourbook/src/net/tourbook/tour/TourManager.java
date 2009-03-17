@@ -274,7 +274,7 @@ public class TourManager {
 				tourData.getStartDay(),
 				tourData.getStartHour(),
 				tourData.getStartMinute(),
-				0,
+				tourData.getStartSecond(),
 				0);
 	}
 

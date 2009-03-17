@@ -8,6 +8,6 @@
 	<classpathentry exported="true" kind="lib" path="dinopolis-util-0.5.4mt.jar" sourcepath="net.tourbook.ext.jars.importExportsrc.zip"/>
 	<classpathentry exported="true" kind="lib" path="gpsinput-0.5.4mt.jar" sourcepath="/gpstool"/>
 	<classpathentry exported="true" kind="lib" path="log4j-1.2.14.jar" sourcepath="net.tourbook.ext.jars.importExportsrc.zip"/>
-	<classpathentry exported="true" kind="lib" path="velocity-1.5.jar" sourcepath="net.tourbook.ext.jars.importExportsrc.zip"/>
+	<classpathentry exported="true" kind="lib" path="velocity-1.5.jar" sourcepath="L:/java-resources/velocity/velocity-1.5/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
