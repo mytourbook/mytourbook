@@ -65,6 +65,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -84,7 +85,7 @@ public class UI {
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
-	public static final String						SPACE							= " "; //$NON-NLS-1$
+	public static final String						SPACE							= " ";											//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
@@ -336,6 +337,23 @@ public class UI {
 		}
 
 		return containedTourId;
+	}
+
+	/**
+	 * Disables all controls and their children<br>
+	 * <br>
+	 * !!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!
+	 */
+	public static void disableAllControls(final Composite container) {
+
+		for (final Control child : container.getChildren()) {
+
+			if (child instanceof Composite) {
+				disableAllControls((Composite) child);
+			}
+			
+			child.setEnabled(false);
+		}
 	}
 
 	public static Formatter format_hh_mm(final long time) {
@@ -883,6 +901,39 @@ public class UI {
 
 			UNIT_VALUE_TEMPERATURE = 1;
 			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_C;
+		}
+	}
+
+	public static void verifyIntegerInput(final Event e, final boolean canBeNegative) {
+
+		// check backspace and del key
+		if (e.character == SWT.BS || e.character == SWT.DEL) {
+			return;
+		}
+
+		// check '-' key
+		if (canBeNegative && e.character == '-') {
+			return;
+		}
+
+		try {
+			Integer.parseInt(e.text);
+		} catch (final NumberFormatException ex) {
+			e.doit = false;
+		}
+	}
+
+	public static boolean verifyIntegerValue(final String valueString) {
+
+		if (valueString.trim().length() == 0) {
+			return false;
+		}
+
+		try {
+			Integer.parseInt(valueString);
+			return true;
+		} catch (final NumberFormatException ex) {
+			return false;
 		}
 	}
 

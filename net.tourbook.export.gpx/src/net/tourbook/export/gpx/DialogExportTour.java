@@ -37,6 +37,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.export.ExportTourExtension;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -49,7 +50,9 @@ import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
 import org.dinopolis.util.text.OneArgumentMessageFormat;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -59,33 +62,74 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.joda.time.DateTime;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String		SETTINGS_EXPORT_PATH	= "ExportPath";
+	private static final int				VERTICAL_SECTION_MARGIN			= 10;
 
-	private static final int		SIZING_TEXT_FIELD_WIDTH	= 250;
-	private static final int		COMBO_HISTORY_LENGTH	= 20;
+	private static final int				SIZING_TEXT_FIELD_WIDTH			= 250;
+	private static final int				COMBO_HISTORY_LENGTH			= 20;
 
-	private ExportTourExtension		fExportExtensionPoint;
-	private ArrayList<TourData>		fTourDataList;
+	private static final String				SETTINGS_EXPORT_PATH			= "ExportPath";										//$NON-NLS-1$
+	private static final String				SETTINGS_IS_CAMOUFLAGE_SPEED	= "IsCamouflageSpeed";									//$NON-NLS-1$
+	private static final String				SETTINGS_CAMOUFLAGE_SPEED		= "CamouflageSpeedValue";								//$NON-NLS-1$
 
-	private final IDialogSettings	fDialogSettings;
+	final static DecimalFormat				fIntFormatter					= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	final static DecimalFormat				fDouble2Formatter				= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	final static DecimalFormat				fDouble6Formatter				= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	final static OneArgumentMessageFormat	fStringFormatter				= new OneArgumentMessageFormat("{0}", Locale.US);		//$NON-NLS-1$
+	final static SimpleDateFormat			fDateFormat						= new SimpleDateFormat();
 
-	private Combo					fComboPath;
-	private Button					fBtnSelectDirectory;
+	static {
+		fIntFormatter.applyPattern("000000"); //$NON-NLS-1$
+		fDouble2Formatter.applyPattern("0.00"); //$NON-NLS-1$
+		fDouble6Formatter.applyPattern("0.0000000"); //$NON-NLS-1$
+		fDateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+	}
 
-	private Composite				fDlgContainer;
+	private ExportTourExtension				fExportExtensionPoint;
+	private ArrayList<TourData>				fTourDataList;
+
+	private final IDialogSettings			fDialogSettings;
+
+	private Composite						fDlgContainer;
+
+	private Label							fLblFilePath;
+	private Combo							fComboPath;
+	private Button							fBtnSelectDirectory;
+
+	private Button							fChkCamouflageSpeed;
+	private Text							fTxtCamouflageSpeed;
+	private Label							fLblCoumouflageSpeedUnit;
+
+	private ProgressIndicator				fProgressIndicator;
+
+	private boolean							fInitializeControls;
+	private Composite						fInputContainer;
+	private Button							fChkMergeAllTours;
+
+	private Text							fTxtFileName;
+
+	private Button							fRdoFileNameFromTour;
+
+	private Button							fRdoFileNameManual;
+
+	private Label							fLblFileNameFromTour;
+
+	private Text							fTxtFilePath;
 
 	public DialogExportTour(final Shell parentShell,
 							final ExportTourExtension exportExtensionPoint,
@@ -110,24 +154,13 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * @param context
 	 *            the velocity context holding all the data
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	private void addValuesToContext(final VelocityContext context) {
-		
-		final DecimalFormat double6formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		double6formatter.applyPattern("0.0000000"); //$NON-NLS-1$
-		final DecimalFormat int_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		int_formatter.applyPattern("000000"); //$NON-NLS-1$
-		final DecimalFormat double2formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		double2formatter.applyPattern("0.00"); //$NON-NLS-1$
-		final OneArgumentMessageFormat string_formatter = new OneArgumentMessageFormat("{0}", Locale.US); //$NON-NLS-1$
-		final SimpleDateFormat dateFormat = new SimpleDateFormat();
-		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-		
-		context.put("dateformatter", dateFormat); //$NON-NLS-1$
-		context.put("double6formatter", double6formatter); //$NON-NLS-1$
-		context.put("intformatter", int_formatter); //$NON-NLS-1$
-		context.put("stringformatter", string_formatter); //$NON-NLS-1$
-		context.put("double2formatter", double2formatter); //$NON-NLS-1$
+
+		context.put("dateformatter", fDateFormat); //$NON-NLS-1$
+		context.put("intformatter", fIntFormatter); //$NON-NLS-1$
+		context.put("double6formatter", fDouble6Formatter); //$NON-NLS-1$
+		context.put("double2formatter", fDouble2Formatter); //$NON-NLS-1$
+		context.put("stringformatter", fStringFormatter); //$NON-NLS-1$
 
 		// current time, date
 		final Calendar now = Calendar.getInstance();
@@ -288,7 +321,13 @@ public class DialogExportTour extends TitleAreaDialog {
 		setTitle(Messages.dialog_export_dialog_title);
 		setMessage(NLS.bind(Messages.dialog_export_dialog_message, fExportExtensionPoint.getVisibleName()));
 
-		restoreState();
+		fInitializeControls = true;
+		{
+			restoreState();
+		}
+		fInitializeControls = false;
+
+		validateFields();
 	}
 
 	@Override
@@ -297,16 +336,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		super.createButtonsForButtonBar(parent);
 
 		// set text for the OK button
-//		String okText = null;
-//
-//		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-//		if (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == fTourDataList) {
-//			okText = Messages.app_action_update;
-//		} else {
-//			okText = Messages.app_action_save;
-//		}
-//
-//		getButton(IDialogConstants.OK_ID).setText(okText);
+		getButton(IDialogConstants.OK_ID).setText(Messages.dialog_export_btn_export);
 	}
 
 	@Override
@@ -321,84 +351,256 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void createUI(final Composite parent) {
 
-//		final Label label;
-//
-//		final PixelConverter pixelConverter = new PixelConverter(parent);
+		fInputContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fInputContainer);
+		GridLayoutFactory.swtDefaults().applyTo(fInputContainer);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().applyTo(container);
+		createUIOptions(fInputContainer);
+		createUIDestination(fInputContainer);
 
-		createUIDestination(container);
+		createUIProgress(parent);
 	}
 
-	/**
-	 * Create the export destination specification widgets
-	 * 
-	 * @param parent
-	 *            org.eclipse.swt.widgets.Composite
-	 */
 	private void createUIDestination(final Composite parent) {
 
-		final Font font = parent.getFont();
+		// group: filename
+		final Group filenameGroup = new Group(parent, SWT.NONE);
+		filenameGroup.setText(Messages.dialog_export_group_exportFileName);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(filenameGroup);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(filenameGroup);
+		{
+			/*
+			 * radio: use tour date/time
+			 */
+			fRdoFileNameFromTour = new Button(filenameGroup, SWT.RADIO);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fRdoFileNameFromTour);
+			fRdoFileNameFromTour.setText(Messages.dialog_export_rdo_filenameFromTour);
+			fRdoFileNameFromTour.setToolTipText(Messages.dialog_export_rdo_filenameFromTour_tooltip);
+			fRdoFileNameFromTour.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					enableFields();
+				}
+			});
+
+			/*
+			 * label: path
+			 */
+			fLblFileNameFromTour = new Label(filenameGroup, SWT.NONE);
+
+			/*
+			 * radio: manual filename
+			 */
+			fRdoFileNameManual = new Button(filenameGroup, SWT.RADIO);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fRdoFileNameManual);
+			fRdoFileNameManual.setText(Messages.dialog_export_rdo_filenameManual);
+			fRdoFileNameManual.setToolTipText(Messages.dialog_export_rdo_filenameManual_tooltip);
+			fRdoFileNameManual.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					validateFields();
+				}
+			});
+
+			/*
+			 * text: filename
+			 */
+			fTxtFileName = new Text(filenameGroup, SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtFileName);
+		}
+
+		// container: path
+		final Composite containerPath = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(containerPath);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerPath);
+		{
+			/*
+			 * label: path
+			 */
+			fLblFilePath = new Label(containerPath, SWT.NONE);
+			fLblFilePath.setText(Messages.dialog_export_label_exportFilePath);
+
+			/*
+			 * combo: path
+			 */
+			fComboPath = new Combo(containerPath, SWT.SINGLE | SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fComboPath);
+			final GridData layoutData = (GridData) fComboPath.getLayoutData();
+			layoutData.widthHint = SIZING_TEXT_FIELD_WIDTH;
+			fComboPath.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					validateFields();
+				}
+			});
+			fComboPath.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					validateFields();
+				}
+			});
+
+			/*
+			 * button: browse
+			 */
+			fBtnSelectDirectory = new Button(containerPath, SWT.PUSH);
+			fBtnSelectDirectory.setText(Messages.dialog_export_btn_selectDirectory);
+			fBtnSelectDirectory.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectBrowseDirectory();
+				}
+			});
+			setButtonLayoutData(fBtnSelectDirectory);
+		}
+		
+		/*
+		 * text: file path+name
+		 */
+		fTxtFilePath = new Text(parent, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtFilePath);
+
+	}
+
+	private void createUIOptions(final Composite parent) {
+
+		// container
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.dialog_export_group_options);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		{
+			/*
+			 * checkbox: merge all tours
+			 */
+			fChkMergeAllTours = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(3, 0).applyTo(fChkMergeAllTours);
+			fChkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
+			fChkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
+			fChkMergeAllTours.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+//					validateFields();
+//					enableFields();
+				}
+			});
+
+			/*
+			 * checkbox: camouflage speed
+			 */
+			fChkCamouflageSpeed = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkCamouflageSpeed);
+			fChkCamouflageSpeed.setText(Messages.dialog_export_chk_camouflageSpeed);
+			fChkCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeed_tooltip);
+			fChkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					validateFields();
+					enableFields();
+
+					if (fChkCamouflageSpeed.getSelection()) {
+						fTxtCamouflageSpeed.setFocus();
+					}
+				}
+			});
+
+			// text: speed
+			fTxtCamouflageSpeed = new Text(group, SWT.BORDER | SWT.TRAIL);
+			fTxtCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeedInput_tooltip);
+			fTxtCamouflageSpeed.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					validateFields();
+				}
+			});
+			fTxtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
+				public void handleEvent(final Event e) {
+					UI.verifyIntegerInput(e, false);
+				}
+			});
+
+			// label: unit
+			fLblCoumouflageSpeedUnit = new Label(group, SWT.NONE);
+			fLblCoumouflageSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+			GridDataFactory.fillDefaults()
+					.grab(true, false)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(fLblCoumouflageSpeedUnit);
+		}
+	}
+
+	private void createUIProgress(final Composite parent) {
+
+		final int selectedTours = fTourDataList.size();
+
+		// hide progress bar when only one tour is exported
+		if (selectedTours < 2) {
+			return;
+		}
 
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		container.setFont(font);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+			fProgressIndicator = new ProgressIndicator(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fProgressIndicator);
 
-		/*
-		 * label
-		 */
-		final Label label = new Label(container, SWT.NONE);
-		label.setText(Messages.dialog_export_label_destination);
-		label.setFont(font);
-
-		/*
-		 * combo: path
-		 */
-		fComboPath = new Combo(container, SWT.SINGLE | SWT.BORDER);
-		fComboPath.setFont(font);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fComboPath);
-		final GridData layoutData = (GridData) fComboPath.getLayoutData();
-		layoutData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-		fComboPath.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				validatePath();
-			}
-		});
-		fComboPath.addModifyListener(new ModifyListener() {
-			public void modifyText(final ModifyEvent e) {
-				validatePath();
-			}
-		});
-
-		/*
-		 * button: browse
-		 */
-		// destination browse button
-		fBtnSelectDirectory = new Button(container, SWT.PUSH);
-		fBtnSelectDirectory.setText(Messages.dialog_export_btn_selectDirectory);
-		fBtnSelectDirectory.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectBrowseDirectory();
-			}
-		});
-		fBtnSelectDirectory.setFont(font);
-		setButtonLayoutData(fBtnSelectDirectory);
+			fProgressIndicator.beginTask(selectedTours);
+			fProgressIndicator.worked(1);
+		}
 	}
 
 	private void doExport() throws IOException {
+
+		if (fTourDataList.size() < 2) {
+
+			final String exportFileName = "export"; //$NON-NLS-1$
+
+			exportTour(fTourDataList.get(0), exportFileName);
+
+		} else {
+
+//			if (fChkMergeAllTours.getSelection()) {
+//
+//				// merge all tours into one
+//
+//				exportTour();
+//
+//			} else {
+//
+//				// export each tour separately
+//
+//				exportTour();
+//			}
+		}
+	}
+
+	private void enableExportButton(final boolean isEnabled) {
+		final Button okButton = getButton(IDialogConstants.OK_ID);
+		if (okButton != null) {
+			okButton.setEnabled(isEnabled);
+		}
+	}
+
+	private void enableFields() {
+
+		fChkMergeAllTours.setEnabled(fTourDataList.size() > 1);
+
+		final boolean isCamouflageTime = fChkCamouflageSpeed.getSelection();
+		fTxtCamouflageSpeed.setEnabled(isCamouflageTime);
+		fLblCoumouflageSpeedUnit.setEnabled(isCamouflageTime);
+	}
+
+	private void exportTour(final TourData tourData, final String exportFileName) throws IOException {
 
 		// create context
 		final VelocityContext context = new VelocityContext();
 
 		// prepare context
 		final ArrayList<GarminTrack> tList = new ArrayList<GarminTrack>();
-		tList.add(getTracks(fTourDataList.get(0)));
+		tList.add(getTracks(tourData));
 
 		context.put("tracks", tList); //$NON-NLS-1$
 		context.put("printtracks", new Boolean(true)); //$NON-NLS-1$
@@ -408,7 +610,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final Reader templateReader = new InputStreamReader(this.getClass()
 				.getResourceAsStream("/format-templates/gpx-1.0.vm")); //$NON-NLS-1$
 
-		final File exportFile = new File(fComboPath.getText() + File.separator + "export" + ".gpx"); //$NON-NLS-1$
+		final File exportFile = new File(fComboPath.getText() + File.separator + exportFileName + ".gpx"); //$NON-NLS-1$ //$NON-NLS-2$
 		final Writer exportWriter = new FileWriter(exportFile);
 
 		addValuesToContext(context);
@@ -422,6 +624,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		// keep window size and position
 		return fDialogSettings;
 	}
+
 	private GarminTrack getTracks(final TourData tourData) {
 
 		final GarminTrack track = new GarminTrack();
@@ -457,9 +660,8 @@ public class DialogExportTour extends TitleAreaDialog {
 	@Override
 	protected void okPressed() {
 
-		/*
-		 * do export
-		 */
+		UI.disableAllControls(fInputContainer);
+
 		try {
 			doExport();
 		} catch (final IOException e) {
@@ -488,8 +690,13 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void restoreState() {
 
-		final String[] pathItems = fDialogSettings.getArray(SETTINGS_EXPORT_PATH);
+		// camouflage speed
+		fChkCamouflageSpeed.setSelection(fDialogSettings.getBoolean(SETTINGS_IS_CAMOUFLAGE_SPEED));
+		final String camouflageSpeed = fDialogSettings.get(SETTINGS_CAMOUFLAGE_SPEED);
+		fTxtCamouflageSpeed.setText(camouflageSpeed == null ? "10" : camouflageSpeed);//$NON-NLS-1$
 
+		// export path
+		final String[] pathItems = fDialogSettings.getArray(SETTINGS_EXPORT_PATH);
 		if (pathItems != null && pathItems.length > 0) {
 			for (final String pathItem : pathItems) {
 				fComboPath.add(pathItem);
@@ -502,16 +709,13 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void saveState() {
 
+		/*
+		 * add current path to the path history
+		 */
 		String[] pathItems = fComboPath.getItems();
-
 		if (isPathValid()) {
 
-			/*
-			 * add current path to the path history
-			 */
-
 			final String currentPath = fComboPath.getText();
-
 			final ArrayList<String> pathList = new ArrayList<String>();
 
 			pathList.add(currentPath);
@@ -530,19 +734,54 @@ public class DialogExportTour extends TitleAreaDialog {
 			pathItems = pathList.toArray(new String[pathList.size()]);
 		}
 
+		// export path
 		if (pathItems.length > 0) {
 			fDialogSettings.put(SETTINGS_EXPORT_PATH, pathItems);
 		}
+
+		// camouflage speed
+		fDialogSettings.put(SETTINGS_IS_CAMOUFLAGE_SPEED, fChkCamouflageSpeed.getSelection());
+		fDialogSettings.put(SETTINGS_CAMOUFLAGE_SPEED, fTxtCamouflageSpeed.getText());
+
 	}
 
-	private void validatePath() {
+	private void setError(final String message) {
+		setErrorMessage(message);
+		enableExportButton(false);
+	}
 
-		if (isPathValid()) {
-			setErrorMessage(null);
-		} else {
-			setErrorMessage(Messages.dialog_export_invalid_path);
+	private void validateFields() {
+
+		if (fInitializeControls) {
+			return;
 		}
 
+		/*
+		 * validate fields
+		 */
+
+		// speed value
+		final boolean isEqualizeTimeEnabled = fChkCamouflageSpeed.getSelection();
+		if (isEqualizeTimeEnabled) {
+
+			if (UI.verifyIntegerValue(fTxtCamouflageSpeed.getText()) == false) {
+				setError(Messages.dialog_export_error_camouflageSpeedIsInvalid);
+				fTxtCamouflageSpeed.setFocus();
+				return;
+			}
+		}
+
+		// export path
+		if (isPathValid() == false) {
+			setError(Messages.dialog_export_invalid_path);
+			fComboPath.setFocus();
+			return;
+		}
+
+		setErrorMessage(null);
+		enableExportButton(true);
+
+		enableFields();
 	}
 
 }

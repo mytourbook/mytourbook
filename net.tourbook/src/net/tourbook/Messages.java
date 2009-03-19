@@ -21,7 +21,19 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String	dialog_export_btn_export;
+
 	public static String	dialog_export_btn_selectDirectory;
+
+	public static String	dialog_export_chk_camouflageSpeed;
+
+	public static String	dialog_export_chk_camouflageSpeed_tooltip;
+
+	public static String	dialog_export_chk_camouflageSpeedInput_tooltip;
+
+	public static String	dialog_export_chk_mergeAllTours;
+
+	public static String	dialog_export_chk_mergeAllTours_tooltip;
 
 	public static String	dialog_export_dialog_message;
 
@@ -31,9 +43,27 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_dir_dialog_text;
 
+	public static String	dialog_export_error_camouflageSpeedIsInvalid;
+
+	public static String	dialog_export_group_exportFileName;
+
+	public static String	dialog_export_group_options;
+
 	public static String	dialog_export_invalid_path;
 
-	public static String	dialog_export_label_destination;
+	public static String	dialog_export_label_exportFileName;
+
+	public static String	dialog_export_label_exportFilePath;
+
+	public static String	dialog_export_label_timeUnitSeconds;
+
+	public static String	dialog_export_rdo_filenameFromTour;
+
+	public static String	dialog_export_rdo_filenameFromTour_tooltip;
+
+	public static String	dialog_export_rdo_filenameManual;
+
+	public static String	dialog_export_rdo_filenameManual_tooltip;
 
 	public static String	dialog_export_shell_text;
 
