@@ -45,7 +45,6 @@ public class NmeaDataReader extends TourbookDevice {
 	private float					fAbsoluteDistance;
 
 	private String					fImportFilePath;
-
 	private HashMap<Long, TourData>	fTourDataMap;
 
 	public NmeaDataReader() {
@@ -122,7 +121,7 @@ public class NmeaDataReader extends TourbookDevice {
 			fCalendar.set(2000, 0, 1, 0, 0, 0);
 			timeData.absoluteTime = fCalendar.getTimeInMillis();
 		}
-		
+
 		fPrevTimeData = timeData;
 	}
 
@@ -137,7 +136,12 @@ public class NmeaDataReader extends TourbookDevice {
 
 		fImportFilePath = fileName;
 		fTourDataMap = tourDataMap;
-		
+
+		// initialize new tour
+		fAbsoluteDistance = 0;
+		fPrevTimeData = null;
+		fTimeDataList.clear();
+
 		// if we are so far, we can assume that the file actually exists,
 		// because the validateRawData call must check for it.
 		final File file = new File(fileName);
@@ -188,6 +192,10 @@ public class NmeaDataReader extends TourbookDevice {
 					} else {
 						nmeaTypes |= Nmea0183.TYPE_GPZDA;
 					}
+				} else {
+
+					// ignore invalid lines
+					continue;
 				}
 
 				if (startParsing) {
@@ -266,17 +274,20 @@ public class NmeaDataReader extends TourbookDevice {
 
 		return true;
 	}
-	
+
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader reader = null;
 
 		try {
 			reader = new BufferedReader(new FileReader(fileName));
+			String nmeaLine;
 
-			final String header = reader.readLine();
-
-			return header.startsWith(FILE_HEADER);
+			while ((nmeaLine = reader.readLine()) != null) {
+				if (nmeaLine.startsWith(FILE_HEADER)) {
+					return true;
+				}
+			}
 
 		} catch (final Exception e) {
 			e.printStackTrace();
