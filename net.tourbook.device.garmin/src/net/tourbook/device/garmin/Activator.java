@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -28,35 +28,12 @@ import org.osgi.framework.Version;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String	PLUGIN_ID	= "net.tourbook.device.garmin305";	//$NON-NLS-1$
+	public static final String	PLUGIN_ID	= "net.tourbook.device.garmin"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator	plugin;
 
 	private Version				version;
-
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-		plugin = this;
-	}
-
-	@Override
-	public void start(BundleContext context) throws Exception {
-		Bundle bundle = context.getBundle();
-		if (bundle instanceof AbstractBundle) {
-			AbstractBundle abstractBundle = (AbstractBundle) bundle;
-			version = abstractBundle.getVersion();
-		}
-		super.start(context);
-	}
-
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
 
 	/**
 	 * Returns the shared instance
@@ -67,7 +44,30 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	/**
+	 * The constructor
+	 */
+	public Activator() {
+		plugin = this;
+	}
+
 	public Version getVersion() {
 		return version;
+	}
+
+	@Override
+	public void start(final BundleContext context) throws Exception {
+		final Bundle bundle = context.getBundle();
+		if (bundle instanceof AbstractBundle) {
+			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
+			version = abstractBundle.getVersion();
+		}
+		super.start(context);
+	}
+
+	@Override
+	public void stop(final BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
 	}
 }
