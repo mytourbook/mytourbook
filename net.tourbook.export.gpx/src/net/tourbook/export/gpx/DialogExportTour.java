@@ -49,19 +49,24 @@ import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
 import org.dinopolis.util.text.OneArgumentMessageFormat;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -107,7 +112,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private Composite						fDlgContainer;
 
-	private Label							fLblFilePath;
 	private Combo							fComboPath;
 	private Button							fBtnSelectDirectory;
 
@@ -121,15 +125,9 @@ public class DialogExportTour extends TitleAreaDialog {
 	private Composite						fInputContainer;
 	private Button							fChkMergeAllTours;
 
-	private Text							fTxtFileName;
-
-	private Button							fRdoFileNameFromTour;
-
-	private Button							fRdoFileNameManual;
-
-	private Label							fLblFileNameFromTour;
-
 	private Text							fTxtFilePath;
+
+	private Text							fTxtFileName;
 
 	public DialogExportTour(final Shell parentShell,
 							final ExportTourExtension exportExtensionPoint,
@@ -311,6 +309,18 @@ public class DialogExportTour extends TitleAreaDialog {
 		super.configureShell(shell);
 
 		shell.setText(Messages.dialog_export_shell_text);
+
+		shell.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+
+				// allow resizing the width but not the height
+
+				final Point computedSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				computedSize.x = shell.getSize().x;
+				shell.setSize(computedSize);
+			}
+		});
 	}
 
 	@Override
@@ -321,6 +331,9 @@ public class DialogExportTour extends TitleAreaDialog {
 		setTitle(Messages.dialog_export_dialog_title);
 		setMessage(NLS.bind(Messages.dialog_export_dialog_message, fExportExtensionPoint.getVisibleName()));
 
+		setFileName();
+		validateFilePath();
+
 		fInitializeControls = true;
 		{
 			restoreState();
@@ -328,6 +341,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		fInitializeControls = false;
 
 		validateFields();
+		enableFields();
 	}
 
 	@Override
@@ -364,101 +378,93 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void createUIDestination(final Composite parent) {
 
-		// group: filename
-		final Group filenameGroup = new Group(parent, SWT.NONE);
-		filenameGroup.setText(Messages.dialog_export_group_exportFileName);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(filenameGroup);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(filenameGroup);
+		Label label;
+
+		final ModifyListener filePathModifyListener = new ModifyListener() {
+			public void modifyText(final ModifyEvent e) {
+				validateFilePath();
+			}
+		};
+
+		/*
+		 * group: filename
+		 */
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.dialog_export_group_exportFileName);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		{
 			/*
-			 * radio: use tour date/time
+			 * label: filename
 			 */
-			fRdoFileNameFromTour = new Button(filenameGroup, SWT.RADIO);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fRdoFileNameFromTour);
-			fRdoFileNameFromTour.setText(Messages.dialog_export_rdo_filenameFromTour);
-			fRdoFileNameFromTour.setToolTipText(Messages.dialog_export_rdo_filenameFromTour_tooltip);
-			fRdoFileNameFromTour.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableFields();
-				}
-			});
-
-			/*
-			 * label: path
-			 */
-			fLblFileNameFromTour = new Label(filenameGroup, SWT.NONE);
-
-			/*
-			 * radio: manual filename
-			 */
-			fRdoFileNameManual = new Button(filenameGroup, SWT.RADIO);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fRdoFileNameManual);
-			fRdoFileNameManual.setText(Messages.dialog_export_rdo_filenameManual);
-			fRdoFileNameManual.setToolTipText(Messages.dialog_export_rdo_filenameManual_tooltip);
-			fRdoFileNameManual.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
+			label = new Label(group, SWT.NONE);
+			label.setText(Messages.dialog_export_label_fileName);
 
 			/*
 			 * text: filename
 			 */
-			fTxtFileName = new Text(filenameGroup, SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtFileName);
-		}
+			fTxtFileName = new Text(group, SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).span(1, 1).applyTo(fTxtFileName);
+			fTxtFileName.addModifyListener(filePathModifyListener);
+			fTxtFileName.addListener(SWT.Verify, new Listener() {
+				public void handleEvent(final Event e) {
+//					UI.verifyFilenameInput(e, false);
+				}
+			});
+			// spacer
+			new Label(group, SWT.NONE);
 
-		// container: path
-		final Composite containerPath = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(containerPath);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerPath);
-		{
+			// -----------------------------------------------------------------------------
+
 			/*
 			 * label: path
 			 */
-			fLblFilePath = new Label(containerPath, SWT.NONE);
-			fLblFilePath.setText(Messages.dialog_export_label_exportFilePath);
+			label = new Label(group, SWT.NONE);
+			label.setText(Messages.dialog_export_label_exportFilePath);
 
 			/*
 			 * combo: path
 			 */
-			fComboPath = new Combo(containerPath, SWT.SINGLE | SWT.BORDER);
+			fComboPath = new Combo(group, SWT.SINGLE | SWT.BORDER);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fComboPath);
 			final GridData layoutData = (GridData) fComboPath.getLayoutData();
 			layoutData.widthHint = SIZING_TEXT_FIELD_WIDTH;
+			fComboPath.addModifyListener(filePathModifyListener);
 			fComboPath.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
-			fComboPath.addModifyListener(new ModifyListener() {
-				public void modifyText(final ModifyEvent e) {
-					validateFields();
+					validateFilePath();
 				}
 			});
 
 			/*
 			 * button: browse
 			 */
-			fBtnSelectDirectory = new Button(containerPath, SWT.PUSH);
+			fBtnSelectDirectory = new Button(group, SWT.PUSH);
 			fBtnSelectDirectory.setText(Messages.dialog_export_btn_selectDirectory);
 			fBtnSelectDirectory.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectBrowseDirectory();
+					validateFilePath();
 				}
 			});
 			setButtonLayoutData(fBtnSelectDirectory);
+
+			// -----------------------------------------------------------------------------
+
+			/*
+			 * label: file path
+			 */
+			label = new Label(group, SWT.NONE);
+			label.setText(Messages.dialog_export_label_filePath);
+
+			/*
+			 * text: filename
+			 */
+			fTxtFilePath = new Text(group, SWT.BORDER | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fTxtFilePath);
 		}
-		
-		/*
-		 * text: file path+name
-		 */
-		fTxtFilePath = new Text(parent, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtFilePath);
 
 	}
 
@@ -512,6 +518,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			fTxtCamouflageSpeed.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
 					validateFields();
+					enableFields();
 				}
 			});
 			fTxtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
@@ -650,13 +657,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		return track;
 	}
 
-	/**
-	 * @return <code>true</code> when the path is valid in the destination field
-	 */
-	private boolean isPathValid() {
-		return new Path(fComboPath.getText()).toFile().exists();
-	}
-
 	@Override
 	protected void okPressed() {
 
@@ -670,6 +670,37 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		super.okPressed();
 	}
+
+//	/**
+//	 * @return <code>true</code> when the path is valid in the destination field
+//	 */
+//	private boolean isPathValid() {
+//		return new Path(fComboPath.getText()).toFile().exists();
+//	}
+
+//	private boolean isValidFileName(final String filePath) {
+//
+//		final File newFile = new File(filePath);
+//
+//		// if file already exists, it may be file name is correct
+//		if (!newFile.exists()) {
+//			try {
+//				final boolean isFileCreated = newFile.createNewFile();
+//				// if isFileCreated is true, name is correct
+//				if (isFileCreated) {
+//					// because the file is created for checking validity
+//					newFile.delete();
+//				}
+//
+//				return isFileCreated;
+//			} catch (final IOException ioe) {
+//				return false;
+//			}
+//		}
+//
+//		// if the new file's parent and the given parent is differ then the file name is wrong
+//		return newFile.getParent().equals(parent.getPath());
+//	}
 
 	private void onSelectBrowseDirectory() {
 
@@ -713,7 +744,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		 * add current path to the path history
 		 */
 		String[] pathItems = fComboPath.getItems();
-		if (isPathValid()) {
+		if (validateFilePath()) {
 
 			final String currentPath = fComboPath.getText();
 			final ArrayList<String> pathList = new ArrayList<String>();
@@ -750,6 +781,29 @@ public class DialogExportTour extends TitleAreaDialog {
 		enableExportButton(false);
 	}
 
+	private void setFileName() {
+
+		// search for the first tour
+		TourData minTourData = null;
+		final long minTourMillis = 0;
+
+		for (final TourData tourData : fTourDataList) {
+			final DateTime checkingTourDate = TourManager.getTourDate(tourData);
+
+			if (minTourData == null) {
+				minTourData = tourData;
+			} else {
+
+				final long tourMillis = checkingTourDate.getMillis();
+				if (tourMillis < minTourMillis) {
+					minTourData = tourData;
+				}
+			}
+		}
+
+		fTxtFileName.setText(UI.format_yyyymmdd_hhmmss(minTourData));
+	}
+
 	private void validateFields() {
 
 		if (fInitializeControls) {
@@ -771,17 +825,48 @@ public class DialogExportTour extends TitleAreaDialog {
 			}
 		}
 
-		// export path
-		if (isPathValid() == false) {
-			setError(Messages.dialog_export_invalid_path);
-			fComboPath.setFocus();
-			return;
-		}
-
 		setErrorMessage(null);
 		enableExportButton(true);
+	}
 
-		enableFields();
+	private boolean validateFilePath() {
+
+		boolean returnValue = false;
+
+		final IPath filePath = new Path(fComboPath.getText()).addTrailingSeparator()
+				.append(fTxtFileName.getText())
+				.addFileExtension(fExportExtensionPoint.getFileExtension());
+
+		final File newFile = new File(filePath.toOSString());
+
+		if (newFile.isDirectory()) {
+			setError("Filename is invalid");
+		} else if (newFile.exists()) {
+			setError(null);
+			setMessage("File already exists", IMessageProvider.WARNING);
+		} else {
+			setMessage(null);
+			try {
+				final boolean isFileCreated = newFile.createNewFile();
+
+				// name is correct
+
+				if (isFileCreated) {
+					// delete file because the file is created for checking validity
+					newFile.delete();
+				}
+				setError(null);
+				returnValue = true;
+
+			} catch (final IOException ioe) {
+				setError("Filename is invalid");
+			}
+
+		}
+
+		fTxtFilePath.setText(filePath.toOSString());
+
+		return returnValue;
 	}
 
 }

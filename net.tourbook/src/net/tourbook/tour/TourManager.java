@@ -318,7 +318,8 @@ public class TourManager {
 				tourData.getStartMonth() - 1,
 				tourData.getStartDay(),
 				tourData.getStartHour(),
-				tourData.getStartMinute());
+				tourData.getStartMinute(),
+				tourData.getStartSecond());
 
 		return UI.TimeFormatterShort.format(calendar.getTime());
 	}

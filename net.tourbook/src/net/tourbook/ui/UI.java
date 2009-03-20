@@ -86,9 +86,10 @@ public class UI {
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String						SPACE							= " ";											//$NON-NLS-1$
-	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+	public static final String						UNDERSCORE						= "_";											//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
+	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
@@ -351,7 +352,7 @@ public class UI {
 			if (child instanceof Composite) {
 				disableAllControls((Composite) child);
 			}
-			
+
 			child.setEnabled(false);
 		}
 	}
@@ -363,7 +364,7 @@ public class UI {
 		return fFormatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
 	}
 
-	public static final String format_hh_mm_ss(final long time) {
+	public static String format_hh_mm_ss(final long time) {
 
 		fFormatterSB.setLength(0);
 
@@ -379,6 +380,25 @@ public class UI {
 		fFormatterSB.setLength(0);
 
 		return fFormatter.format(Messages.Format_hhmm, (time / 60), (time % 60));
+	}
+
+	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
+
+		if (tourData == null) {
+			return UI.EMPTY_STRING;
+		}
+
+		fFormatterSB.setLength(0);
+
+		return fFormatter.format(//
+		Messages.Format_yyyymmdd_hhmmss,
+				tourData.getStartYear(),
+				tourData.getStartMonth() - 1,
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute(),
+				tourData.getStartSecond())//
+				.toString();
 	}
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
@@ -901,6 +921,15 @@ public class UI {
 
 			UNIT_VALUE_TEMPERATURE = 1;
 			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_C;
+		}
+	}
+
+	public static void verifyFilenameInput(final Event e) {
+
+		// check / or \\
+		if (e.character == '/' || e.character == '\\') {
+			e.doit = false;
+			return;
 		}
 	}
 

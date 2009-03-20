@@ -55,6 +55,10 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_label_exportFilePath;
 
+	public static String	dialog_export_label_fileName;
+
+	public static String	dialog_export_label_filePath;
+
 	public static String	dialog_export_label_timeUnitSeconds;
 
 	public static String	dialog_export_rdo_filenameFromTour;
@@ -246,6 +250,8 @@ public class Messages extends NLS {
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
+
+	public static String	Format_yyyymmdd_hhmmss;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
