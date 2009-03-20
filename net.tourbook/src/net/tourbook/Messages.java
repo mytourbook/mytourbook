@@ -35,6 +35,10 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_chk_mergeAllTours_tooltip;
 
+	public static String	dialog_export_chk_overwriteFiles;
+
+	public static String	dialog_export_chk_overwriteFiles_tooltip;
+
 	public static String	dialog_export_dialog_message;
 
 	public static String	dialog_export_dialog_title;
@@ -61,6 +65,10 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_label_timeUnitSeconds;
 
+	public static String	dialog_export_msg_fileAlreadyExists;
+
+	public static String	dialog_export_msg_fileNameIsInvalid;
+
 	public static String	dialog_export_rdo_filenameFromTour;
 
 	public static String	dialog_export_rdo_filenameFromTour_tooltip;
@@ -70,6 +78,10 @@ public class Messages extends NLS {
 	public static String	dialog_export_rdo_filenameManual_tooltip;
 
 	public static String	dialog_export_shell_text;
+
+	public static String	dialog_export_txt_fileName_tooltip;
+
+	public static String	dialog_export_txt_filePath_tooltip;
 
 	public static String		dialog_is_tour_editor_modified_message;
 	public static String		dialog_is_tour_editor_modified_title;

@@ -98,6 +98,8 @@ public class DialogExportTour extends TitleAreaDialog {
 	final static OneArgumentMessageFormat	fStringFormatter				= new OneArgumentMessageFormat("{0}", Locale.US);		//$NON-NLS-1$
 	final static SimpleDateFormat			fDateFormat						= new SimpleDateFormat();
 
+	private static String					fDlgDefaultMessage;
+
 	static {
 		fIntFormatter.applyPattern("000000"); //$NON-NLS-1$
 		fDouble2Formatter.applyPattern("0.00"); //$NON-NLS-1$
@@ -129,6 +131,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private Text							fTxtFileName;
 
+	private Button							fChkOverwriteFiles;
+
 	public DialogExportTour(final Shell parentShell,
 							final ExportTourExtension exportExtensionPoint,
 							final ArrayList<TourData> tourDataList) {
@@ -138,10 +142,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-//		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage());
-
 		fTourDataList = tourDataList;
 		fExportExtensionPoint = exportExtensionPoint;
+
+		fDlgDefaultMessage = NLS.bind(Messages.dialog_export_dialog_message, fExportExtensionPoint.getVisibleName());
 
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
@@ -329,10 +333,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		super.create();
 
 		setTitle(Messages.dialog_export_dialog_title);
-		setMessage(NLS.bind(Messages.dialog_export_dialog_message, fExportExtensionPoint.getVisibleName()));
+		setMessage(fDlgDefaultMessage);
 
+		// set filename from tour date/time
 		setFileName();
-		validateFilePath();
 
 		fInitializeControls = true;
 		{
@@ -382,7 +386,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		final ModifyListener filePathModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				validateFilePath();
+				validateFields();
 			}
 		};
 
@@ -403,12 +407,18 @@ public class DialogExportTour extends TitleAreaDialog {
 			/*
 			 * text: filename
 			 */
-			fTxtFileName = new Text(group, SWT.BORDER);
+			int style = SWT.BORDER;
+			if (fTourDataList.size() > 1) {
+				// for multiple files the filename will be created from the tour date/time
+				style |= SWT.READ_ONLY;
+			}
+			fTxtFileName = new Text(group, style);
 			GridDataFactory.fillDefaults().grab(true, false).span(1, 1).applyTo(fTxtFileName);
+			fTxtFileName.setToolTipText(Messages.dialog_export_txt_fileName_tooltip);
 			fTxtFileName.addModifyListener(filePathModifyListener);
 			fTxtFileName.addListener(SWT.Verify, new Listener() {
 				public void handleEvent(final Event e) {
-//					UI.verifyFilenameInput(e, false);
+					UI.verifyFilenameInput(e);
 				}
 			});
 			// spacer
@@ -433,7 +443,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			fComboPath.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					validateFilePath();
+					validateFields();
 				}
 			});
 
@@ -446,7 +456,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectBrowseDirectory();
-					validateFilePath();
+					validateFields();
 				}
 			});
 			setButtonLayoutData(fBtnSelectDirectory);
@@ -463,7 +473,21 @@ public class DialogExportTour extends TitleAreaDialog {
 			 * text: filename
 			 */
 			fTxtFilePath = new Text(group, SWT.BORDER | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fTxtFilePath);
+			GridDataFactory.fillDefaults().grab(true, false).span(1, 1).applyTo(fTxtFilePath);
+			fTxtFilePath.setToolTipText(Messages.dialog_export_txt_filePath_tooltip);
+
+			// spacer
+			new Label(group, SWT.NONE);
+
+			// -----------------------------------------------------------------------------
+
+			/*
+			 * checkbox: overwrite files
+			 */
+			fChkOverwriteFiles = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(2, 1).applyTo(fChkOverwriteFiles);
+			fChkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
+			fChkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
 		}
 
 	}
@@ -725,6 +749,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		fChkCamouflageSpeed.setSelection(fDialogSettings.getBoolean(SETTINGS_IS_CAMOUFLAGE_SPEED));
 		final String camouflageSpeed = fDialogSettings.get(SETTINGS_CAMOUFLAGE_SPEED);
 		fTxtCamouflageSpeed.setText(camouflageSpeed == null ? "10" : camouflageSpeed);//$NON-NLS-1$
+		fTxtCamouflageSpeed.selectAll();
 
 		// export path
 		final String[] pathItems = fDialogSettings.getArray(SETTINGS_EXPORT_PATH);
@@ -802,6 +827,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		fTxtFileName.setText(UI.format_yyyymmdd_hhmmss(minTourData));
+		fTxtFileName.selectAll();
 	}
 
 	private void validateFields() {
@@ -813,6 +839,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		/*
 		 * validate fields
 		 */
+
+		if (validateFilePath() == false) {
+			return;
+		}
 
 		// speed value
 		final boolean isEqualizeTimeEnabled = fChkCamouflageSpeed.getSelection();
@@ -833,19 +863,20 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		boolean returnValue = false;
 
+		final String fileName = fTxtFileName.getText().trim();
 		final IPath filePath = new Path(fComboPath.getText()).addTrailingSeparator()
-				.append(fTxtFileName.getText())
+				.append(fileName)
 				.addFileExtension(fExportExtensionPoint.getFileExtension());
 
 		final File newFile = new File(filePath.toOSString());
 
-		if (newFile.isDirectory()) {
-			setError("Filename is invalid");
+		if (fileName.length() == 0 || newFile.isDirectory()) {
+			setError(Messages.dialog_export_msg_fileNameIsInvalid);
 		} else if (newFile.exists()) {
-			setError(null);
-			setMessage("File already exists", IMessageProvider.WARNING);
+			setMessage(Messages.dialog_export_msg_fileAlreadyExists, IMessageProvider.WARNING);
+			returnValue = true;
 		} else {
-			setMessage(null);
+			setMessage(fDlgDefaultMessage);
 			try {
 				final boolean isFileCreated = newFile.createNewFile();
 
@@ -855,11 +886,10 @@ public class DialogExportTour extends TitleAreaDialog {
 					// delete file because the file is created for checking validity
 					newFile.delete();
 				}
-				setError(null);
 				returnValue = true;
 
 			} catch (final IOException ioe) {
-				setError("Filename is invalid");
+				setError(Messages.dialog_export_msg_fileNameIsInvalid);
 			}
 
 		}

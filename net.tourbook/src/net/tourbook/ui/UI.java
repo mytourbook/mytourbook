@@ -195,6 +195,17 @@ public class UI {
 	public static Styler							TAG_CATEGORY_STYLER;
 	public static Styler							TAG_SUB_STYLER;
 
+	private static final char[]						INVALID_FILENAME_CHARS			= new char[] {
+			'\\',
+			'/',
+			':',
+			'*',
+			'?',
+			'"',
+			'<',
+			'>',
+			'|',																	};
+
 	private final static HashMap<String, Image>		fImageCache						= new HashMap<String, Image>();
 	private final static HashMap<String, Boolean>	fDirtyImages					= new HashMap<String, Boolean>();
 
@@ -926,10 +937,12 @@ public class UI {
 
 	public static void verifyFilenameInput(final Event e) {
 
-		// check / or \\
-		if (e.character == '/' || e.character == '\\') {
-			e.doit = false;
-			return;
+		// check invalid chars
+		for (final char invalidChar : INVALID_FILENAME_CHARS) {
+			if (invalidChar == e.character) {
+				e.doit = false;
+				return;
+			}
 		}
 	}
 
