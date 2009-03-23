@@ -93,10 +93,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
@@ -108,14 +110,16 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID											= "net.tourbook.views.tourListView";			//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tourListView";				//$NON-NLS-1$
 
-	final IDialogSettings					fViewState									= TourbookPlugin.getDefault()
-																								.getDialogSettingsSection(ID);
+	private final IDialogSettings			fState							= TourbookPlugin.getDefault()
+																					.getDialogSettingsSection("ViewTourBook");	//$NON-NLS-1$
 
-	private static final String				MEMENTO_TOURVIEWER_SELECTED_YEAR			= "tourbook.view.tourviewer.selected-year";	//$NON-NLS-1$
-	private static final String				MEMENTO_TOURVIEWER_SELECTED_MONTH			= "tourbook.view.tourviewer.selected-month";	//$NON-NLS-1$
-	private static final String				MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS	= "tourbook.view.select-year-month-tours";		//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR				= "selectedYear";									//$NON-NLS-1$
+	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";									//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOURS			= "selectedTours";									//$NON-NLS-1$
+
+	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";						//$NON-NLS-1$
 
 	private TreeViewer						fTourViewer;
 
@@ -132,9 +136,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	TourPerson								fActivePerson;
 	TourTypeFilter							fActiveTourTypeFilter;
 
-	private NumberFormat					fNF											= NumberFormat.getNumberInstance();
-	private Calendar						fCalendar									= GregorianCalendar.getInstance();
-	private DateFormat						fTimeFormatter								= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private NumberFormat					fNF								= NumberFormat.getNumberInstance();
+	private Calendar						fCalendar						= GregorianCalendar.getInstance();
+	private DateFormat						fTimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private ActionEditQuick					fActionEditQuick;
 
@@ -155,21 +159,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionRemoveAllTags				fActionRemoveAllTags;
 	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 
-	private ActionSelectYearMonthTours		fActionSelectYearMonthTours;
+	private ActionSelectAllTours			fActionSelectAllTours;
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionRefreshView				fActionRefreshView;
 
 	private ActionExport					fActionExportTour;
 
-	private int								fTourViewerSelectedYear						= -1;
-	private int								fTourViewerSelectedMonth					= -1;
-	private Long							fActiveTourId;
+	private int								fSelectedYear					= -1;
+	private int								fSelectedMonth					= -1;
+//	private long							fSelectedTourId;
+	private ArrayList<Long>					fSelectedTourIds				= new ArrayList<Long>();							;
 
 	private Composite						fViewerContainer;
 
 	private boolean							fIsRecTimeFormat_hhmmss;
 	private boolean							fIsDriveTimeFormat_hhmmss;
-
 
 	private class ItemComparer implements IElementComparer {
 
@@ -233,7 +237,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	void actionSelectYearMonthTours() {
 
-		if (fActionSelectYearMonthTours.isChecked()) {
+		if (fActionSelectAllTours.isChecked()) {
 			// reselect selection
 			fTourViewer.setSelection(fTourViewer.getSelection());
 		}
@@ -298,7 +302,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fViewState);
+					fColumnManager.saveState(fState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -382,7 +386,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
-		fActionSelectYearMonthTours = new ActionSelectYearMonthTours(this);
+		fActionSelectAllTours = new ActionSelectAllTours(this);
 		fActionRefreshView = new ActionRefreshView(this);
 
 		fActionExpandSelection = new ActionExpandSelection(this);
@@ -393,7 +397,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fActionExportTour = new ActionExport(this);
-		
+
 		fillActions();
 	}
 
@@ -420,7 +424,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	public void createPartControl(final Composite parent) {
 
 		// define all columns for the viewer
-		fColumnManager = new ColumnManager(this, fViewState);
+		fColumnManager = new ColumnManager(this, fState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -1107,7 +1111,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		fActionExportTour.setEnabled(isTourSelected);
-		
+
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -1157,7 +1161,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(fActionSelectYearMonthTours);
+		menuMgr.add(fActionSelectAllTours);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(fActionModifyColumns);
@@ -1206,9 +1210,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	Long getActiveTourId() {
-		return fActiveTourId;
-	}
+//	Long getActiveTourId() {
+//		return fSelectedTourId;
+//	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -1246,30 +1250,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return fPostSelectionProvider;
 	}
 
+	private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final ArrayList<Long> tourIds) {
+		for (final Long tourId : tourIds) {
+			selectedTourData.add(TourManager.getInstance().getTourData(tourId));
+		}
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
+
 		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
-
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-
-//		// loop: all selected tours
-//		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-//
-//			final Object treeItem = iter.next();
-//
-//			if (treeItem instanceof TVITourBookTour) {
-//
-//				final TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
-//
-//				if (tourData != null) {
-//					selectedTourData.add(tourData);
-//				}
-//			}
-//		}
-
 		final ArrayList<Long> tourIds = new ArrayList<Long>();
 
 		if (selectedTours.size() < 2) {
@@ -1281,7 +1273,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one year is selected
 
-				if (fActionSelectYearMonthTours.isChecked()) {
+				if (fActionSelectAllTours.isChecked()) {
 
 					// loop: all months
 					for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
@@ -1295,7 +1287,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one month is selected
 
-				if (fActionSelectYearMonthTours.isChecked()) {
+				if (fActionSelectAllTours.isChecked()) {
 					getMonthTourIds((TVITourBookMonth) selectedItem, tourIds);
 				}
 
@@ -1320,8 +1312,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		}
 
-		for (final Long tourId : tourIds) {
-			selectedTourData.add(TourManager.getInstance().getTourData(tourId));
+		/*
+		 * show busyindicator when multiple tours needs to be retrieved from the database
+		 */
+		if (tourIds.size() > 1) {
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				public void run() {
+					getSelectedTourData(selectedTourData, tourIds);
+				}
+			});
+		} else {
+			getSelectedTourData(selectedTourData, tourIds);
 		}
 
 		return selectedTourData;
@@ -1332,6 +1333,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
+
+		fSelectedTourIds.clear();
 
 		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 		if (selectedTours.size() < 2) {
@@ -1344,9 +1347,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				// year is selected
 
 				final TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
-				fTourViewerSelectedYear = yearItem.fTourYear;
+				fSelectedYear = yearItem.fTourYear;
 
-				if (fActionSelectYearMonthTours.isChecked()) {
+				if (fActionSelectAllTours.isChecked()) {
 
 					// get all tours for the selected year
 					final ArrayList<Long> tourIds = new ArrayList<Long>();
@@ -1367,10 +1370,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				// month is selected
 
 				final TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
-				fTourViewerSelectedYear = monthItem.fTourYear;
-				fTourViewerSelectedMonth = monthItem.fTourMonth;
+				fSelectedYear = monthItem.fTourYear;
+				fSelectedMonth = monthItem.fTourMonth;
 
-				if (fActionSelectYearMonthTours.isChecked()) {
+				if (fActionSelectAllTours.isChecked()) {
 
 					// get all tours for the selected month
 					final ArrayList<Long> tourIds = new ArrayList<Long>();
@@ -1387,18 +1390,19 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				final TVITourBookTour tourItem = (TVITourBookTour) selectedItem;
 
-				fTourViewerSelectedYear = tourItem.fTourYear;
-				fTourViewerSelectedMonth = tourItem.fTourMonth;
-				fActiveTourId = tourItem.getTourId();
+				fSelectedYear = tourItem.fTourYear;
+				fSelectedMonth = tourItem.fTourMonth;
 
-				fPostSelectionProvider.setSelection(new SelectionTourId(fActiveTourId));
+				final Long tourId = tourItem.getTourId();
+				fSelectedTourIds.add(tourId);
+
+				fPostSelectionProvider.setSelection(new SelectionTourId(tourId));
 			}
 
 		} else {
 
 			// multiple items are selected
 
-			final ArrayList<Long> tourIds = new ArrayList<Long>();
 			boolean isFirstTour = true;
 
 			// get all selected tours
@@ -1408,20 +1412,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (viewItem instanceof TVITourBookTour) {
 
 					final TVITourBookTour tourItem = (TVITourBookTour) viewItem;
-					tourIds.add(tourItem.getTourId());
+					fSelectedTourIds.add(tourItem.getTourId());
 
 					if (isFirstTour) {
-
 						isFirstTour = false;
 
-						fTourViewerSelectedYear = tourItem.fTourYear;
-						fTourViewerSelectedMonth = tourItem.fTourMonth;
-						fActiveTourId = tourItem.getTourId();
+						fSelectedYear = tourItem.fTourYear;
+						fSelectedMonth = tourItem.fTourMonth;
 					}
 				}
 			}
 
-			fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+			fPostSelectionProvider.setSelection(new SelectionTourIds(fSelectedTourIds));
 		}
 
 		enableActions();
@@ -1479,23 +1481,42 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void reselectTourViewer() {
 
 		// find the old selected year/month in the new tour items
-		TreeViewerItem newYearItem = null;
-		TreeViewerItem newMonthItem = null;
-		final ArrayList<TreeViewerItem> yearItems = fRootItem.getChildren();
+		TreeViewerItem reselectYearItem = null;
+		TreeViewerItem reselectMonthItem = null;
+		final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<TreeViewerItem>();
 
 		/*
-		 * get the year and month item in the data model
+		 * get the year/month/tour item in the data model
 		 */
+		final ArrayList<TreeViewerItem> yearItems = fRootItem.getChildren();
 		for (final TreeViewerItem yearItem : yearItems) {
+
 			final TVITourBookYear tourBookYear = ((TVITourBookYear) yearItem);
-			if (tourBookYear.fTourYear == fTourViewerSelectedYear) {
-				newYearItem = yearItem;
+			if (tourBookYear.fTourYear == fSelectedYear) {
+
+				reselectYearItem = yearItem;
 
 				final Object[] monthItems = tourBookYear.getFetchedChildrenAsArray();
 				for (final Object monthItem : monthItems) {
+
 					final TVITourBookMonth tourBookMonth = ((TVITourBookMonth) monthItem);
-					if (tourBookMonth.fTourMonth == fTourViewerSelectedMonth) {
-						newMonthItem = tourBookMonth;
+					if (tourBookMonth.fTourMonth == fSelectedMonth) {
+
+						reselectMonthItem = tourBookMonth;
+
+						final Object[] tourItems = tourBookMonth.getFetchedChildrenAsArray();
+						for (final Object tourItem : tourItems) {
+
+							final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
+							final long treeTourId = tourBookTour.fTourId;
+
+							for (final Long tourId : fSelectedTourIds) {
+								if (treeTourId == tourId) {
+									reselectTourItems.add(tourBookTour);
+									break;
+								}
+							}
+						}
 						break;
 					}
 				}
@@ -1503,14 +1524,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		}
 
-		// select year/month in the viewer
-		if (newMonthItem != null) {
+		// select year/month/tour in the viewer
+		if (reselectTourItems.size() > 0) {
 
-			fTourViewer.setSelection(new StructuredSelection(newMonthItem) {}, false);
+			fTourViewer.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
-		} else if (newYearItem != null) {
+		} else if (reselectMonthItem != null) {
 
-			fTourViewer.setSelection(new StructuredSelection(newYearItem) {}, false);
+			fTourViewer.setSelection(new StructuredSelection(reselectMonthItem) {}, false);
+
+		} else if (reselectYearItem != null) {
+
+			fTourViewer.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
 		} else if (yearItems.size() > 0) {
 
@@ -1532,35 +1557,55 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// set tour viewer reselection data
 		try {
-			fTourViewerSelectedYear = fViewState.getInt(MEMENTO_TOURVIEWER_SELECTED_YEAR);
+			fSelectedYear = fState.getInt(STATE_SELECTED_YEAR);
 		} catch (final NumberFormatException e) {
-			fTourViewerSelectedYear = -1;
+			fSelectedYear = -1;
 		}
 
 		try {
-			fTourViewerSelectedMonth = fViewState.getInt(MEMENTO_TOURVIEWER_SELECTED_MONTH);
+			fSelectedMonth = fState.getInt(STATE_SELECTED_MONTH);
 		} catch (final NumberFormatException e) {
-			fTourViewerSelectedMonth = -1;
+			fSelectedMonth = -1;
 		}
 
-		fActionSelectYearMonthTours.setChecked(fViewState.getBoolean(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS));
+		final String[] selectedTourIds = fState.getArray(STATE_SELECTED_TOURS);
+		fSelectedTourIds.clear();
+
+		if (selectedTourIds != null) {
+			for (final String tourId : selectedTourIds) {
+				try {
+					fSelectedTourIds.add(Long.parseLong(tourId));
+				} catch (final NumberFormatException e) {
+					// ignore
+				}
+			}
+		}
+
+		fActionSelectAllTours.setChecked(fState.getBoolean(STATE_SELECT_YEAR_MONTH_TOURS));
 
 	}
 
 	private void saveState() {
 
 		// save selection in the tour viewer
-		fViewState.put(MEMENTO_TOURVIEWER_SELECTED_YEAR, fTourViewerSelectedYear);
-		fViewState.put(MEMENTO_TOURVIEWER_SELECTED_MONTH, fTourViewerSelectedMonth);
+		fState.put(STATE_SELECTED_YEAR, fSelectedYear);
+		fState.put(STATE_SELECTED_MONTH, fSelectedMonth);
+
+		// convert tour id's into string
+		final ArrayList<String> selectedTourIds = new ArrayList<String>();
+		for (final Long tourId : fSelectedTourIds) {
+			selectedTourIds.add(tourId.toString());
+		}
+		fState.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
 		// action: select tours for year/month
-		fViewState.put(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS, fActionSelectYearMonthTours.isChecked());
+		fState.put(STATE_SELECT_YEAR_MONTH_TOURS, fActionSelectAllTours.isChecked());
 
-		fColumnManager.saveState(fViewState);
+		fColumnManager.saveState(fState);
 	}
 
 	public void setActiveYear(final int activeYear) {
-		fTourViewerSelectedYear = activeYear;
+		fSelectedYear = activeYear;
 	}
 
 	private void setCellColor(final ViewerCell cell, final Object element) {

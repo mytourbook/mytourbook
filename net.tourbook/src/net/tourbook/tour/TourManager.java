@@ -265,9 +265,9 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the date of the tour
+	 * @return returns the date/time of the tour
 	 */
-	public static DateTime getTourDate(final TourData tourData) {
+	public static DateTime getTourDateTime(final TourData tourData) {
 
 		return new DateTime(tourData.getStartYear(),
 				tourData.getStartMonth(),
@@ -334,7 +334,7 @@ public class TourManager {
 	 * @return returns the title of this tour
 	 */
 	public static String getTourTitle(final TourData tourData) {
-		return getTourDateLong(getTourDate(tourData).toDate())//
+		return getTourDateLong(getTourDateTime(tourData).toDate())//
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData);
 	}

@@ -20,11 +20,11 @@ import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSelectYearMonthTours extends Action {
+public class ActionSelectAllTours extends Action {
 
 	private TourBookView	fTourViewer;
 
-	public ActionSelectYearMonthTours(final TourBookView tourViewer) {
+	public ActionSelectAllTours(final TourBookView tourViewer) {
 
 		super(null, AS_CHECK_BOX);
 

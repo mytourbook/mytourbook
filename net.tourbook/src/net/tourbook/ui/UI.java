@@ -62,6 +62,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -681,6 +682,20 @@ public class UI {
 		}
 
 		return tourEditor;
+	}
+
+	public static void restoreCombo(final Combo combo, final String[] comboItems) {
+
+		if (comboItems == null || comboItems.length == 0) {
+			return;
+		}
+
+		for (final String pathItem : comboItems) {
+			combo.add(pathItem);
+		}
+
+		// restore last used path
+		combo.setText(comboItems[0]);
 	}
 
 	/**

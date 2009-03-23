@@ -61,7 +61,11 @@ public class ActionExport extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			fExportTourExtension.exportTours(fTourProvider.getSelectedTours());
+			final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+			if (selectedTours == null || selectedTours.size() == 0) {
+				return;
+			}
+			fExportTourExtension.exportTours(selectedTours);
 		}
 
 	}

@@ -23,8 +23,6 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_btn_export;
 
-	public static String	dialog_export_btn_selectDirectory;
-
 	public static String	dialog_export_chk_camouflageSpeed;
 
 	public static String	dialog_export_chk_camouflageSpeed_tooltip;
@@ -49,6 +47,8 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_error_camouflageSpeedIsInvalid;
 
+	public static String	dialog_export_file_dialog_text;
+
 	public static String	dialog_export_group_exportFileName;
 
 	public static String	dialog_export_group_options;
@@ -65,9 +65,13 @@ public class Messages extends NLS {
 
 	public static String	dialog_export_label_timeUnitSeconds;
 
+	public static String	dialog_export_lbl_exportFilePath;
+
 	public static String	dialog_export_msg_fileAlreadyExists;
 
 	public static String	dialog_export_msg_fileNameIsInvalid;
+
+	public static String	dialog_export_msg_pathIsNotAvailable;
 
 	public static String	dialog_export_rdo_filenameFromTour;
 
@@ -177,6 +181,8 @@ public class Messages extends NLS {
 	public static String		app_action_undo_modifications;
 	public static String		app_action_undo_modifications_tooltip;
 	public static String		app_action_update;
+
+	public static String	app_btn_browse;
 
 	public static String		App_Action_set_tour_type;
 
