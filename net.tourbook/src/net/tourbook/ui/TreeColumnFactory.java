@@ -405,6 +405,21 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 	
+	public static final TreeColumnFactory	TOUR_MARKERS	= new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourMarkers", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_tour_marker_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_tour_marker_header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_marker_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TreeColumnFactory TOUR_START_TIME = new TreeColumnFactory() {
 		
 		@Override

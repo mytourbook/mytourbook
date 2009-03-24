@@ -123,6 +123,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_time_interval_tooltip;
 	public static String		ColumnFactory_time_label;
 	public static String		ColumnFactory_time_tooltip;
+	public static String	ColumnFactory_tour_marker_header;
+
+	public static String	ColumnFactory_tour_marker_label;
+
+	public static String	ColumnFactory_tour_marker_tooltip;
+
 	public static String		ColumnFactory_tour_numbers;
 	public static String		ColumnFactory_tour_numbers_lable;
 	public static String		ColumnFactory_tour_numbers_tooltip;

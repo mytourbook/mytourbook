@@ -643,7 +643,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
+					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).getTagIds()));
+					setCellColor(cell, element);
+				}
+			}
+		});
+
+		/*
+		 * column: markers
+		 */
+		colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+
+					final ArrayList<Long> markerIds = ((TVITourBookTour) element).getMarkerIds();
+					if (markerIds == null) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Integer.toString(markerIds.size()));
+					}
+
 					setCellColor(cell, element);
 				}
 			}
@@ -1123,7 +1146,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			// one tour is selected
 
-			final ArrayList<Long> tagIds = firstTour.fTagIds;
+			final ArrayList<Long> tagIds = firstTour.getTagIds();
 			if (tagIds != null && tagIds.size() > 0) {
 
 				// at least one tag is within the tour

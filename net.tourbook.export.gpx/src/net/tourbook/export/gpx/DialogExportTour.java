@@ -30,10 +30,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.export.ExportTourExtension;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
@@ -45,11 +47,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.dinopolis.gpstool.gpsinput.GPSRoute;
 import org.dinopolis.gpstool.gpsinput.GPSTrack;
-import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.GPSWaypoint;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
+import org.dinopolis.gpstool.gpsinput.garmin.GarminWaypoint;
+import org.dinopolis.gpstool.gpsinput.garmin.GarminWaypointBase;
 import org.dinopolis.util.text.OneArgumentMessageFormat;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -89,6 +92,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.joda.time.DateTime;
+import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
@@ -183,16 +187,27 @@ public class DialogExportTour extends TitleAreaDialog {
 		final Date creationDate = now.getTime();
 		context.put("creation_date", creationDate); //$NON-NLS-1$
 
-//		// author
-//		context.put("author", System.getProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, "MyTourbook")); //$NON-NLS-1$ //$NON-NLS-2$
-//
+		// creator
+		final Version version = Activator.getDefault().getVersion();
+		context.put("creator", new StringBuilder().append("MyTourbook")//$NON-NLS-1$
+				.append(" ")//$NON-NLS-1$
+				.append(version.getMajor())
+				.append(".")
+				.append(version.getMinor())
+				.append(".")
+				.append(version.getMicro())
+				.append(".")
+				.append(version.getQualifier())
+				.append(" - http://mytourbook.sourceforge.net")//$NON-NLS-1$
+				.toString());
+
 //		// device infos
 //		final String productName = productInfo.getProductName();
 //		context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
 //		context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
 //		context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
 //		context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
-//
+////
 //		// Version
 //		String pluginmajorversion = "0"; //$NON-NLS-1$
 //		String pluginminorversion = "0"; //$NON-NLS-1$
@@ -222,17 +237,6 @@ public class DialogExportTour extends TitleAreaDialog {
 			}
 		}
 
-		final List<?> tracks = (List<?>) context.get("tracks"); //$NON-NLS-1$
-		if (tracks != null) {
-			final Iterator<?> track_iterator = tracks.iterator();
-			while (track_iterator.hasNext()) {
-				final GPSTrack track = (GPSTrack) track_iterator.next();
-				min_longitude = Math.min(min_longitude, track.getMinLongitude());
-				max_longitude = Math.max(max_longitude, track.getMaxLongitude());
-				min_latitude = Math.min(min_latitude, track.getMinLatitude());
-				max_latitude = Math.max(max_latitude, track.getMaxLatitude());
-			}
-		}
 		final List<?> waypoints = (List<?>) context.get("waypoints"); //$NON-NLS-1$
 		if (waypoints != null) {
 			final Iterator<?> waypoint_iterator = waypoints.iterator();
@@ -244,73 +248,88 @@ public class DialogExportTour extends TitleAreaDialog {
 				max_latitude = Math.max(max_latitude, waypoint.getLatitude());
 			}
 		}
+
+		final List<?> tracks = (List<?>) context.get("tracks"); //$NON-NLS-1$
+		if (tracks != null) {
+			final Iterator<?> track_iterator = tracks.iterator();
+			while (track_iterator.hasNext()) {
+				final GPSTrack track = (GPSTrack) track_iterator.next();
+				min_longitude = Math.min(min_longitude, track.getMinLongitude());
+				max_longitude = Math.max(max_longitude, track.getMaxLongitude());
+				min_latitude = Math.min(min_latitude, track.getMinLatitude());
+				max_latitude = Math.max(max_latitude, track.getMaxLatitude());
+			}
+		}
 		context.put("min_latitude", new Double(min_latitude)); //$NON-NLS-1$
 		context.put("min_longitude", new Double(min_longitude)); //$NON-NLS-1$
 		context.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
 		context.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
 
-		Date starttime = null;
-		Date endtime = null;
-		int heartNum = 0;
-		long heartSum = 0;
-		int cadNum = 0;
-		long cadSum = 0;
-		short maximumheartrate = 0;
-		double totaldistance = 0;
-
-		for (final Iterator<?> trackIter = tracks.iterator(); trackIter.hasNext();) {
-			final GPSTrack track = (GPSTrack) trackIter.next();
-			for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
-				final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
-
-				// starttime, totaltime
-				if (wp.getDate() != null) {
-					if (starttime == null)
-						starttime = wp.getDate();
-					endtime = wp.getDate();
-				}
-				if (wp instanceof GarminTrackpointAdapter) {
-					final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
-
-					// averageheartrate, maximumheartrate
-					if (gta.hasValidHeartrate()) {
-						heartSum += gta.getHeartrate();
-						heartNum++;
-						if (gta.getHeartrate() > maximumheartrate)
-							maximumheartrate = gta.getHeartrate();
-					}
-
-					// averagecadence
-					if (gta.hasValidCadence()) {
-						cadSum += gta.getCadence();
-						cadNum++;
-					}
-
-					// totaldistance
-					if (gta.hasValidDistance())
-						totaldistance = gta.getDistance();
-				}
-			}
-		}
-
-		if (starttime != null)
-			context.put("starttime", starttime); //$NON-NLS-1$
-		else
-			context.put("starttime", creationDate); //$NON-NLS-1$
-
-		if (starttime != null && endtime != null)
-			context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
-		else
-			context.put("totaltime", (double) 0); //$NON-NLS-1$
-
-		context.put("totaldistance", totaldistance); //$NON-NLS-1$
-
-		if (maximumheartrate != 0)
-			context.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
-		if (heartNum != 0)
-			context.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
-		if (cadNum != 0)
-			context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
+//		Date starttime = null;
+//		Date endtime = null;
+//		int heartNum = 0;
+//		long heartSum = 0;
+//		int cadNum = 0;
+//		long cadSum = 0;
+//		short maximumheartrate = 0;
+//		double totaldistance = 0;
+//
+//		for (final Iterator<?> trackIter = tracks.iterator(); trackIter.hasNext();) {
+//			final GPSTrack track = (GPSTrack) trackIter.next();
+//			for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+//				final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+//
+//				// starttime, totaltime
+//				if (wp.getDate() != null) {
+//					if (starttime == null)
+//						starttime = wp.getDate();
+//					endtime = wp.getDate();
+//				}
+//				if (wp instanceof GarminTrackpointAdapter) {
+//					final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+//
+//					// averageheartrate, maximumheartrate
+//					if (gta.hasValidHeartrate()) {
+//						heartSum += gta.getHeartrate();
+//						heartNum++;
+//						if (gta.getHeartrate() > maximumheartrate)
+//							maximumheartrate = gta.getHeartrate();
+//					}
+//
+//					// averagecadence
+//					if (gta.hasValidCadence()) {
+//						cadSum += gta.getCadence();
+//						cadNum++;
+//					}
+//
+//					// totaldistance
+//					if (gta.hasValidDistance())
+//						totaldistance = gta.getDistance();
+//				}
+//			}
+//		}
+//
+//		if (starttime != null) {
+//			context.put("starttime", starttime); //$NON-NLS-1$
+//		} else
+//			context.put("starttime", creationDate); //$NON-NLS-1$
+//
+//		if (starttime != null && endtime != null) {
+//			context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
+//		} else
+//			context.put("totaltime", (double) 0); //$NON-NLS-1$
+//
+//		context.put("totaldistance", totaldistance); //$NON-NLS-1$
+//
+//		if (maximumheartrate != 0) {
+//			context.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
+//		}
+//		if (heartNum != 0) {
+//			context.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
+//		}
+//		if (cadNum != 0) {
+//			context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
+//		}
 	}
 
 	@Override
@@ -645,7 +664,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 		camouflageSpeed[0] *= UI.UNIT_VALUE_DISTANCE / 3.6f;
 
-		final ArrayList<GarminTrack> tList = new ArrayList<GarminTrack>();
+		final ArrayList<GarminTrack> trackList = new ArrayList<GarminTrack>();
+		final ArrayList<GarminWaypoint> wayPointList = new ArrayList<GarminWaypoint>();
 
 		final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
 
@@ -658,12 +678,14 @@ public class DialogExportTour extends TitleAreaDialog {
 					TourManager.getTourDateTime(tourData),
 					isCamouflageSpeed,
 					camouflageSpeed[0]);
+
 			if (track != null) {
-
-				tList.add(track);
-
-				doExportTour(tList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
+				trackList.add(track);
 			}
+
+			getWaypoints(wayPointList, tourData);
+
+			doExportTour(trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
 
 		} else {
 
@@ -691,11 +713,11 @@ public class DialogExportTour extends TitleAreaDialog {
 
 					final GarminTrack track = getTrack(tourData, trackDateTime, isCamouflageSpeed, camouflageSpeed[0]);
 					if (track != null) {
-						tList.add(track);
+						trackList.add(track);
 					}
 				}
 
-				doExportTour(tList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
+				doExportTour(trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
 
 			} else {
 
@@ -720,14 +742,14 @@ public class DialogExportTour extends TitleAreaDialog {
 									.addFileExtension(fExportExtensionPoint.getFileExtension());
 
 							// create tracklist
-							tList.clear();
+							trackList.clear();
 							final GarminTrack track = getTrack(tourData,
 									TourManager.getTourDateTime(tourData),
 									isCamouflageSpeed,
 									camouflageSpeed[0]);
 
 							if (track != null) {
-								tList.add(track);
+								trackList.add(track);
 
 								/*
 								 * update dialog progress monitor
@@ -747,7 +769,11 @@ public class DialogExportTour extends TitleAreaDialog {
 								});
 
 								try {
-									doExportTour(tList, filePath.toOSString(), fileCollisionBehaviour, isOverwriteFiles);
+									doExportTour(trackList,
+											wayPointList,
+											filePath.toOSString(),
+											fileCollisionBehaviour,
+											isOverwriteFiles);
 								} catch (final IOException e) {
 									e.printStackTrace();
 								}
@@ -758,7 +784,7 @@ public class DialogExportTour extends TitleAreaDialog {
 								break;
 							}
 						}
-						
+
 						return Status.OK_STATUS;
 					}
 				};
@@ -774,6 +800,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	}
 
 	private void doExportTour(	final ArrayList<GarminTrack> tList,
+								final ArrayList<GarminWaypoint> wayPointList,
 								final String exportFileName,
 								final FileCollisionBehavior fileCollisionBehaviour,
 								final boolean isOverwriteFiles) throws IOException {
@@ -784,7 +811,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		// prepare context
 		context.put("tracks", tList); //$NON-NLS-1$
 		context.put("printtracks", new Boolean(true)); //$NON-NLS-1$
-		context.put("printwaypoints", new Boolean(false)); //$NON-NLS-1$
+
+		context.put("waypoints", wayPointList); //$NON-NLS-1$
+		context.put("printwaypoints", new Boolean(wayPointList.size() > 0)); //$NON-NLS-1$
+
 		context.put("printroutes", new Boolean(false)); //$NON-NLS-1$
 
 		final Reader templateReader = new InputStreamReader(this.getClass()
@@ -852,18 +882,17 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
+		final int[] distanceSerie = tourData.distanceSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
-		final int[] distanceSerie = tourData.distanceSerie;
 
 		// check if all dataseries are available
-		if (timeSerie == null
-				|| altitudeSerie == null
-				|| latitudeSerie == null
-				|| longitudeSerie == null
-				|| distanceSerie == null) {
+		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
 			return null;
 		}
+
+		final boolean isAltitude = altitudeSerie != null && altitudeSerie.length > 0;
+		final boolean isDistance = distanceSerie != null && distanceSerie.length > 0;
 
 		int prevTime = -1;
 		DateTime lastTrackDateTime = null;
@@ -875,14 +904,16 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			final GarminTrackpointAdapter trackPoint = new GarminTrackpointAdapter(new GarminTrackpointD304());
 
-			trackPoint.setAltitude(altitudeSerie[serieIndex]);
+			if (isAltitude) {
+				trackPoint.setAltitude(altitudeSerie[serieIndex]);
+			}
 
 			trackPoint.setLongitude(longitudeSerie[serieIndex]);
 			trackPoint.setLatitude(latitudeSerie[serieIndex]);
 
 			int currentTime;
 
-			if (isCamouflageSpeed) {
+			if (isCamouflageSpeed && isDistance) {
 
 				// camouflage speed
 
@@ -934,6 +965,39 @@ public class DialogExportTour extends TitleAreaDialog {
 		return pathList.toArray(new String[pathList.size()]);
 	}
 
+	private void getWaypoints(final ArrayList<GarminWaypoint> wayPointList, final TourData tourData) {
+
+		final int[] timeSerie = tourData.timeSerie;
+		final int[] altitudeSerie = tourData.altitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+
+		// check if all dataseries are available
+		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null || tourMarkers == null) {
+			return;
+		}
+
+		for (final TourMarker tourMarker : tourMarkers) {
+
+			final int serieIndex = tourMarker.getSerieIndex();
+
+			final GarminWaypointBase wayPoint = new GarminWaypointBase();
+			wayPointList.add(wayPoint);
+
+			wayPoint.setLatitude(latitudeSerie[serieIndex]);
+			wayPoint.setLongitude(longitudeSerie[serieIndex]);
+
+			// <name>...<name>
+			wayPoint.setIdentification(tourMarker.getLabel());
+
+			// <ele>...</ele>
+			if (altitudeSerie != null) {
+				wayPoint.setAltitude(altitudeSerie[serieIndex]);
+			}
+		}
+	}
+
 	@Override
 	protected void okPressed() {
 
@@ -941,11 +1005,11 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
-		try {
-			doExport();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
+				try {
+					doExport();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 

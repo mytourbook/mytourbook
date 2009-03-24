@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GPX Export
 Bundle-SymbolicName: net.tourbook.export.gpx;singleton:=true
-Bundle-Version: 9.04
+Bundle-Version: 9.04.0.v2009-04-xx
 Bundle-Activator: net.tourbook.export.gpx.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,

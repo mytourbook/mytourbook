@@ -16,21 +16,30 @@
 package net.tourbook.ui.views.tourBook;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-	long			fTourId;
-	long			fTourTypeId;
+	long					fTourId;
+	long					fTourTypeId;
 
-	long			fColumnStartDistance;
-	short			fColumnTimeInterval;
+	long					fColumnStartDistance;
+	short					fColumnTimeInterval;
+
+	HashSet<Long>			fSQLTagIds;
+	HashSet<Long>			fSQLMarkerIds;
 
 	/**
 	 * id's for the tags or <code>null</code> when tags are not available
 	 */
-	ArrayList<Long>	fTagIds;
+	private ArrayList<Long>	fTagIds;
+
+	/**
+	 * id's for the markers or <code>null</code> when markers are not available
+	 */
+	private ArrayList<Long>	fMarkerIds;
 
 	public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
@@ -48,6 +57,20 @@ public class TVITourBookTour extends TVITourBookItem {
 
 	public short getColumnTimeInterval() {
 		return fColumnTimeInterval;
+	}
+
+	public ArrayList<Long> getMarkerIds() {
+		if (fSQLMarkerIds != null && fMarkerIds == null) {
+			fMarkerIds = new ArrayList<Long>(fSQLMarkerIds);
+		}
+		return fMarkerIds;
+	}
+
+	public ArrayList<Long> getTagIds() {
+		if (fSQLTagIds != null && fTagIds == null) {
+			fTagIds = new ArrayList<Long>(fSQLTagIds);
+		}
+		return fTagIds;
 	}
 
 	@Override
@@ -69,5 +92,13 @@ public class TVITourBookTour extends TVITourBookItem {
 
 	@Override
 	protected void remove() {}
+
+	public void setMarkerIds(final HashSet<Long> markerIds) {
+		fSQLMarkerIds = markerIds;
+	}
+
+	public void setTagIds(final HashSet<Long> tagIds) {
+		fSQLTagIds = tagIds;
+	}
 
 }

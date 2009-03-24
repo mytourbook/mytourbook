@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $double6formatter.applyPattern("0.000000") $double2formatter.applyPattern("0.00") $intformatter.applyPattern("0")
 <gpx  version="1.0"
-  creator="$author"
+  creator=	"$creator"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://www.topografix.com/GPX/1/0"
   xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
