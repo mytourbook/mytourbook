@@ -599,7 +599,7 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	public SplineData					splineDataPoints;
-	
+
 	/**
 	 * Contains a spline data serie
 	 */
@@ -1876,7 +1876,7 @@ public class TourData implements Comparable<Object> {
 		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
 		/*
-		 * time and distance serie is always available
+		 * time serie is always available
 		 */
 		timeSerie = new int[serieLength];
 
@@ -2345,6 +2345,7 @@ public class TourData implements Comparable<Object> {
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
+					//
 					+ uniqueKey;
 
 			tourId = Long.parseLong(tourIdKey);
@@ -2360,6 +2361,7 @@ public class TourData implements Comparable<Object> {
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
+					//
 					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
 
 			tourId = Long.parseLong(tourIdKey);

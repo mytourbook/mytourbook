@@ -57,34 +57,35 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String		RAW_DATA_LAST_SELECTED_PATH						= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
-	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
+	private static final String		TEMP_IMPORTED_FILE								= "received-device-data.txt";					//$NON-NLS-1$
 
-	private static RawDataManager	instance							= null;
+	private static RawDataManager	instance										= null;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData				fDeviceData							= new DeviceData();
+	private DeviceData				fDeviceData										= new DeviceData();
 
 	/**
 	 * contains tours which were imported or received
 	 */
-	private HashMap<Long, TourData>	fImportedTourData					= new HashMap<Long, TourData>();
+	private HashMap<Long, TourData>	fImportedTourData								= new HashMap<Long, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>			fImportedFileNames					= new HashSet<String>();
+	private HashSet<String>			fImportedFileNames								= new HashSet<String>();
 
 	private boolean					fIsImported;
 
 	private boolean					fImportCanceled;
 
-	private int						fImportSettingsImportYear			= -1;
+	private int						fImportSettingsImportYear						= -1;
 	private boolean					fImportSettingsIsMergeTracks;
-	private boolean					fImportSettingsIsChecksumValidation	= true;
+	private boolean					fImportSettingsIsChecksumValidation				= true;
+	private boolean					fImportSettingsCreateTourIdWithTime	= false;
 
 	private String					fLastImportedFile;
 
@@ -405,6 +406,7 @@ public class RawDataManager {
 			}
 
 			device.setMergeTracks(fImportSettingsIsMergeTracks);
+			device.setCreateTourIdWithTime(fImportSettingsCreateTourIdWithTime);
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
@@ -549,6 +551,10 @@ public class RawDataManager {
 	public void removeAllTours() {
 		fImportedTourData.clear();
 		fImportedFileNames.clear();
+	}
+
+	public void setCreateTourIdWithTime(final boolean isActionChecked) {
+		fImportSettingsCreateTourIdWithTime = isActionChecked;
 	}
 
 	public void setImportCanceled(final boolean importCanceled) {

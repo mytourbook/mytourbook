@@ -41,7 +41,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";							//$NON-NLS-1$
 
 	// namespace for extensions used by Garmin
-	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
+//	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
 
 	private static final int				GPX_VERSION_1_0			= 10;
 	private static final int				GPX_VERSION_1_1			= 11;
@@ -419,11 +419,37 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
-		if (distanceSerie == null) {
-			uniqueKey = "42984"; //$NON-NLS-1$
+
+		if (fDeviceDataReader.isCreateTourIdWithTime) {
+
+			/*
+			 * 23.3.2009: added recording time to the tour distance for the unique key because tour
+			 * export and import found a wrong tour when exporting was done with camouflage speed ->
+			 * this will result in a NEW tour
+			 */
+			final int tourRecordingTime = tourData.getTourRecordingTime();
+
+			if (distanceSerie == null) {
+				uniqueKey = Integer.toString(tourRecordingTime);
+			} else {
+
+				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+
+				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+			}
+
 		} else {
-			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+
+			/*
+			 * original version to create tour id
+			 */
+			if (distanceSerie == null) {
+				uniqueKey = "42984"; //$NON-NLS-1$
+			} else {
+				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+			}
 		}
+
 		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
@@ -504,14 +530,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 						fIsInTime = true;
 						fCharacters.delete(0, fCharacters.length());
-						
+
 					} else if (name.equals(TAG_EXT_HR)) {
-						
+
 						fIsInHr = true;
 						fCharacters.delete(0, fCharacters.length());
-						
+
 					} else if (name.equals(TAG_EXT_TEMP)) {
-						
+
 						fIsInTemp = true;
 						fCharacters.delete(0, fCharacters.length());
 					}

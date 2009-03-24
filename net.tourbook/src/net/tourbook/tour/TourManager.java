@@ -264,20 +264,6 @@ public class TourManager {
 		return fTourDataEditorInstance;
 	}
 
-	/**
-	 * @return returns the date/time of the tour
-	 */
-	public static DateTime getTourDateTime(final TourData tourData) {
-
-		return new DateTime(tourData.getStartYear(),
-				tourData.getStartMonth(),
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond(),
-				0);
-	}
-
 	public static String getTourDateFull(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
@@ -301,6 +287,20 @@ public class TourManager {
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
 		return UI.DateFormatterShort.format(calendar.getTime());
+	}
+
+	/**
+	 * @return returns the date/time of the tour
+	 */
+	public static DateTime getTourDateTime(final TourData tourData) {
+
+		return new DateTime(tourData.getStartYear(),
+				tourData.getStartMonth(),
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute(),
+				tourData.getStartSecond(),
+				0);
 	}
 
 	private static String getTourTimeShort(final Date date) {

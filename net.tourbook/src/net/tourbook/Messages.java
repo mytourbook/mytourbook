@@ -184,6 +184,10 @@ public class Messages extends NLS {
 
 	public static String	app_btn_browse;
 
+	public static String	app_dlg_confirmFileOverwrite_message;
+
+	public static String	app_dlg_confirmFileOverwrite_title;
+
 	public static String		App_Action_set_tour_type;
 
 	public static String		App_measurement_imperial;
@@ -379,6 +383,8 @@ public class Messages extends NLS {
 	public static String		import_data_action_assignMergedTour_default;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
+
+	public static String	import_data_action_createTourIdWithTime;
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_reimport_tour;

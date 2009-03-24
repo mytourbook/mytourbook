@@ -66,6 +66,11 @@ public class ActionGraph extends Action {
 	public void run() {
 
 		final TourChartConfiguration chartConfig = fTourChart.getTourChartConfig();
+		
+		if (chartConfig == null) {
+			return;
+		}
+		
 		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
 		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);

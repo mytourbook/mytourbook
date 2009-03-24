@@ -60,6 +60,11 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 */
 	public boolean	isChecksumValidation					= true;
 
+	/**
+	 * when <code>true</code> the tour id will be created with the recording time
+	 */
+	public boolean	isCreateTourIdWithTime;
+
 	public TourbookDevice() {}
 
 	public TourbookDevice(final String deviceName) {
@@ -94,6 +99,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * @return
 	 */
 	public abstract int getStartSequenceSize();
+
+	public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
+		this.isCreateTourIdWithTime = isCreateTourIdWithTime;
+	}
 
 	public void setImportYear(final int importYear) {
 		this.importYear = importYear;

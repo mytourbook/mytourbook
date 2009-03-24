@@ -64,7 +64,6 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
@@ -117,29 +116,26 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProvider, ITourViewer {
 
-	private static final String				FILESTRING_SEPARATOR			= "|";											//$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 
-	public static final String				ID								= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
+	final IDialogSettings					fState								= TourbookPlugin.getDefault()
+																						.getDialogSettingsSection(ID);
 
-	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
-																					.getDialogSettingsSection(ID);
+	public static final int					COLUMN_DATE							= 0;
+	public static final int					COLUMN_TITLE						= 1;
+	public static final int					COLUMN_DATA_FORMAT					= 2;
+	public static final int					COLUMN_FILE_NAME					= 3;
 
-	public static final int					COLUMN_DATE						= 0;
-	public static final int					COLUMN_TITLE					= 1;
-	public static final int					COLUMN_DATA_FORMAT				= 2;
-	public static final int					COLUMN_FILE_NAME				= 3;
+	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDEX			= "selectedTourIndex";							//$NON-NLS-1$
 
-	private static final String				MEMENTO_SASH_CONTAINER			= "importview.sash.container.";				//$NON-NLS-1$
-	private static final String				MEMENTO_IMPORT_FILENAME			= "importview.raw-data.filename";				//$NON-NLS-1$
-	private static final String				MEMENTO_SELECTED_TOUR_INDEX		= "importview.selected-tour-index";			//$NON-NLS-1$
-
-	private static final String				MEMENTO_MERGE_TRACKS			= "importview.action.merge-tracks";			//$NON-NLS-1$
-	private static final String				MEMENTO_IS_CHECKSUM_VALIDATION	= "importview.action.is-checksum-validation";	//$NON-NLS-1$
+	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";								//$NON-NLS-1$
+	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";						//$NON-NLS-1$
+	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";					//$NON-NLS-1$
 
 	private TableViewer						fTourViewer;
 
 	private ActionClearView					fActionClearView;
-//	private ActionRefreshView				fActionRefreshView;
 	private ActionModifyColumns				fActionModifyColumns;
 	private ActionSaveTourInDatabase		fActionSaveTour;
 	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
@@ -147,6 +143,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionReimportTour				fActionReimportTour;
 	private ActionAdjustYear				fActionAdjustImportedYear;
 	private ActionMergeGPXTours				fActionMergeGPXTours;
+	private ActionCreateTourIdWithTime		fActionCreateTourIdWithTime;
 	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
 	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionEditQuick					fActionEditQuick;
@@ -165,6 +162,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ImageDescriptor					imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					imageDescDatabasePlaceholder;
 	private ImageDescriptor					imageDescDelete;
+	
 	private Image							imageDatabase;
 	private Image							imageDatabaseOtherPerson;
 	private Image							imageDatabaseAssignMergedTour;
@@ -177,18 +175,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private IPropertyChangeListener			fPrefChangeListener;
 	private ITourEventListener				fTourEventListener;
 
-	private Calendar						fCalendar						= GregorianCalendar.getInstance();
-	private DateFormat						fDateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
-	private DateFormat						fTimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private NumberFormat					fNumberFormatter				= NumberFormat.getNumberInstance();
-	private DateFormat						fDurationFormatter				= DateFormat.getTimeInstance(DateFormat.SHORT,
-																					Locale.GERMAN);
+	private Calendar						fCalendar							= GregorianCalendar.getInstance();
+	private DateFormat						fDateFormatter						= DateFormat.getDateInstance(DateFormat.SHORT);
+	private DateFormat						fTimeFormatter						= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private NumberFormat					fNumberFormatter					= NumberFormat.getNumberInstance();
+	private DateFormat						fDurationFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT,
+																						Locale.GERMAN);
 
 	protected TourPerson					fActivePerson;
 	protected TourPerson					fNewActivePerson;
 
-	protected boolean						fIsPartVisible					= false;
-	protected boolean						fIsViewerPersonDataDirty		= false;
+	protected boolean						fIsPartVisible						= false;
+	protected boolean						fIsViewerPersonDataDirty			= false;
 
 	private ColumnManager					fColumnManager;
 
@@ -439,7 +437,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fViewState);
+					fColumnManager.saveState(fState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -566,6 +564,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		// view menu
 		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionMergeGPXTours = new ActionMergeGPXTours(this);
+		fActionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
 		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 	}
@@ -604,7 +603,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		createResources();
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fViewState);
+		fColumnManager = new ColumnManager(this, fState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -1283,6 +1282,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(fActionMergeGPXTours);
+		menuMgr.add(fActionCreateTourIdWithTime);
 		menuMgr.add(fActionDisableChecksumValidation);
 		menuMgr.add(fActionAdjustImportedYear);
 
@@ -1420,24 +1420,39 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTourViewer;
 	}
 
-	private void importFiles() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		// restore imported tours
-		final String mementoImportedFiles = fViewState.get(MEMENTO_IMPORT_FILENAME);
+		fViewerContainer.setRedraw(false);
+		{
+			fTourViewer.getTable().dispose();
+			createTourViewer(fViewerContainer);
+			fViewerContainer.layout();
+
+			// update the viewer
+			reloadViewer();
+		}
+		fViewerContainer.setRedraw(true);
+
+		return fTourViewer;
+	}
+
+	/**
+	 * reimport previous imported tours
+	 */
+	private void reimportFiles() {
+
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
-		if (mementoImportedFiles != null) {
+		final String[] prevImportedFiles = fState.getArray(STATE_IMPORTED_FILENAMES);
+		if (prevImportedFiles != null) {
 
 			final RawDataManager rawDataMgr = RawDataManager.getInstance();
 
 			rawDataMgr.getTourDataMap().clear();
-
-			final String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles,
-					FILESTRING_SEPARATOR);
 			int importCounter = 0;
 
 			// loop: import all files
-			for (final String fileName : files) {
+			for (final String fileName : prevImportedFiles) {
 
 				final File file = new File(fileName);
 				if (file.exists()) {
@@ -1456,8 +1471,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 				// restore selected tour
 				try {
-					final Integer selectedTourIndex = fViewState.getInt(MEMENTO_SELECTED_TOUR_INDEX);
-
+					final Integer selectedTourIndex = fState.getInt(STATE_SELECTED_TOUR_INDEX);
 					final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
 
 					Display.getDefault().asyncExec(new Runnable() {
@@ -1477,42 +1491,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 	}
 
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-
-		fViewerContainer.setRedraw(false);
-		{
-			fTourViewer.getTable().dispose();
-			createTourViewer(fViewerContainer);
-			fViewerContainer.layout();
-
-			// update the viewer
-			reloadViewer();
-		}
-		fViewerContainer.setRedraw(true);
-
-		return fTourViewer;
-	}
-
-	public void reimportViewer() {
-
-		// reimport previous imported files
-
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				importFiles();
-
-				// reselect tour vierwer to fire selection
-				fTourViewer.setSelection(fTourViewer.getSelection());
-			}
-		});
-	}
-
 	public void reloadViewer() {
-
-//		fTourViewer.getTable().removeAll();
 
 		// update tour data viewer
 		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
@@ -1551,17 +1530,22 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final RawDataManager rawDataManager = RawDataManager.getInstance();
 
 		// restore: set merge tracks status before the tours are imported
-		final boolean isMergeTracks = fViewState.getBoolean(MEMENTO_MERGE_TRACKS);
+		final boolean isMergeTracks = fState.getBoolean(STATE_IS_MERGE_TRACKS);
 		fActionMergeGPXTours.setChecked(isMergeTracks);
 		rawDataManager.setMergeTracks(isMergeTracks);
 
+		// restore: set merge tracks status before the tours are imported
+		final boolean isCreateTourIdWithTime = fState.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
+		fActionCreateTourIdWithTime.setChecked(isCreateTourIdWithTime);
+		rawDataManager.setCreateTourIdWithTime(isCreateTourIdWithTime);
+
 		// restore: is checksum validation
-		fActionDisableChecksumValidation.setChecked(fViewState.getBoolean(MEMENTO_IS_CHECKSUM_VALIDATION));
+		fActionDisableChecksumValidation.setChecked(fState.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
 		rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
 
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				importFiles();
+				reimportFiles();
 			}
 		});
 	}
@@ -1570,28 +1554,26 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// save sash weights
 		final Table table = fTourViewer.getTable();
-
 		if (table.isDisposed()) {
 			return;
 		}
 
-		fViewState.put(MEMENTO_SASH_CONTAINER, table.getSize().x);
-
-		final RawDataManager rawDataMgr = RawDataManager.getInstance();
-
 		// save imported file names
-		final HashSet<String> importedFiles = rawDataMgr.getImportedFiles();
-		fViewState.put(MEMENTO_IMPORT_FILENAME,
-				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
-						FILESTRING_SEPARATOR));
+		final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
+		fState.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+
+//		fViewState.put(STATE_IMPORTED_FILENAMES,
+//				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
+//						FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
-		fViewState.put(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
+		fState.put(STATE_SELECTED_TOUR_INDEX, table.getSelectionIndex());
 
-		fViewState.put(MEMENTO_MERGE_TRACKS, fActionMergeGPXTours.isChecked());
-		fViewState.put(MEMENTO_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked());
+		fState.put(STATE_IS_MERGE_TRACKS, fActionMergeGPXTours.isChecked());
+		fState.put(STATE_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked());
+		fState.put(STATE_IS_CREATE_TOUR_ID_WITH_TIME, fActionCreateTourIdWithTime.isChecked());
 
-		fColumnManager.saveState(fViewState);
+		fColumnManager.saveState(fState);
 	}
 
 	/**

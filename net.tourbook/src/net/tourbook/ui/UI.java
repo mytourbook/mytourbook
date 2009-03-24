@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -49,6 +51,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
@@ -320,6 +323,74 @@ public class UI {
 		return true;
 	}
 
+	public static boolean confirmOverwrite(final FileCollisionBehavior fileCollision, final File file) {
+
+		final boolean[] isOverwrite = { false };
+
+		final int fileCollisionValue = fileCollision.value;
+
+		if (fileCollisionValue == FileCollisionBehavior.REPLACE_ALL) {
+
+			// overwrite is already confirmed
+			isOverwrite[0] = true;
+
+		} else if (fileCollisionValue == FileCollisionBehavior.ASK
+				|| fileCollisionValue == FileCollisionBehavior.REPLACE
+				|| fileCollisionValue == FileCollisionBehavior.KEEP) {
+
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+
+					final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+					final MessageDialog dialog = new MessageDialog(shell,
+							Messages.app_dlg_confirmFileOverwrite_title,
+							null,
+							NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
+							MessageDialog.QUESTION,
+							new String[] {
+									IDialogConstants.YES_LABEL,
+									IDialogConstants.YES_TO_ALL_LABEL,
+									IDialogConstants.NO_LABEL,
+									IDialogConstants.NO_TO_ALL_LABEL },
+							0);
+					dialog.open();
+
+					final int returnCode = dialog.getReturnCode();
+					switch (returnCode) {
+
+					case -1: // dialog was canceled
+						fileCollision.value = FileCollisionBehavior.DIALOG_IS_CANCELED;
+						break;
+
+					case 0: // YES
+						fileCollision.value = FileCollisionBehavior.REPLACE;
+						isOverwrite[0] = true;
+						break;
+
+					case 1: // YES_TO_ALL
+						fileCollision.value = FileCollisionBehavior.REPLACE_ALL;
+						isOverwrite[0] = true;
+						break;
+
+					case 2: // NO
+						fileCollision.value = FileCollisionBehavior.KEEP;
+						break;
+
+					case 3: // NO_TO_ALL
+						fileCollision.value = FileCollisionBehavior.KEEP_ALL;
+						break;
+
+					default:
+						break;
+					}
+				}
+			});
+
+		}
+
+		return isOverwrite[0];
+	}
+
 	/**
 	 * Checks if tour id is contained in the property data
 	 * 
@@ -353,16 +424,25 @@ public class UI {
 	}
 
 	/**
-	 * Disables all controls and their children<br>
-	 * <br>
-	 * !!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!
+	 * Disables all controls and their children
 	 */
 	public static void disableAllControls(final Composite container) {
+
+		disableAllControlsInternal(container);
+
+		// !!! force controls (text,combo...) to be updated !!!
+		container.update();
+	}
+
+	/**
+	 * !!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!
+	 */
+	private static void disableAllControlsInternal(final Composite container) {
 
 		for (final Control child : container.getChildren()) {
 
 			if (child instanceof Composite) {
-				disableAllControls((Composite) child);
+				disableAllControlsInternal((Composite) child);
 			}
 
 			child.setEnabled(false);
@@ -405,7 +485,7 @@ public class UI {
 		return fFormatter.format(//
 		Messages.Format_yyyymmdd_hhmmss,
 				tourData.getStartYear(),
-				tourData.getStartMonth() - 1,
+				tourData.getStartMonth(),
 				tourData.getStartDay(),
 				tourData.getStartHour(),
 				tourData.getStartMinute(),
