@@ -31,6 +31,9 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.opengts.util.Nmea0183;
 
 public class NmeaDataReader extends TourbookDevice {
@@ -45,7 +48,10 @@ public class NmeaDataReader extends TourbookDevice {
 	private float					fAbsoluteDistance;
 
 	private String					fImportFilePath;
+
 	private HashMap<Long, TourData>	fTourDataMap;
+
+	private boolean					fNullCoordinates;
 
 	public NmeaDataReader() {
 		canReadFromDevice = false;
@@ -89,13 +95,21 @@ public class NmeaDataReader extends TourbookDevice {
 			nmea.parse(nmeaLine);
 		}
 
-		// create new time item
-		final TimeData timeData = new TimeData();
-		fTimeDataList.add(timeData);
-
 		// get attributes
 		final double latitude = nmea.getLatitude();
 		final double longitude = nmea.getLongitude();
+
+		// ignore 0 coordinates, it's very unlikely that they are valid 
+//	Begin of O. Budischewski, 2008.03.19
+		if (latitude == 0 || longitude == 0) {
+			fNullCoordinates = true;
+			return;
+		}
+//	End	  of O. Budischewski, 2008.03.19		
+
+		// create new time item
+		final TimeData timeData = new TimeData();
+		fTimeDataList.add(timeData);
 
 		timeData.latitude = latitude == 90.0 ? Double.MIN_VALUE : latitude;
 		timeData.longitude = longitude == 180.0 ? Double.MIN_VALUE : longitude;
@@ -128,19 +142,20 @@ public class NmeaDataReader extends TourbookDevice {
 	public boolean processDeviceData(	final String fileName,
 										final DeviceData deviceData,
 										final HashMap<Long, TourData> tourDataMap) {
-
 		// immediately bail out if the file format is not correct.
 		if (!validateRawData(fileName)) {
 			return false;
 		}
 
+//	Begin of O. Budischewski, 2008.03.19
+//		Initialize new tour
+		fAbsoluteDistance = 0;
 		fImportFilePath = fileName;
 		fTourDataMap = tourDataMap;
-
-		// initialize new tour
-		fAbsoluteDistance = 0;
 		fPrevTimeData = null;
+		fNullCoordinates = false;
 		fTimeDataList.clear();
+//	End	  of O. Budischewski, 2008.03.19		
 
 		// if we are so far, we can assume that the file actually exists,
 		// because the validateRawData call must check for it.
@@ -215,6 +230,14 @@ public class NmeaDataReader extends TourbookDevice {
 			e.printStackTrace();
 		}
 
+//	Begin of O. Budischewski, 2008.03.20		
+		if (fNullCoordinates == true) {
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					Messages.NMEA_Null_Coords_title,
+					NLS.bind(Messages.NMEA_Null_Coords_message, fImportFilePath));
+		}
+//	End	  of O. Budischewski, 2008.03.20		
+
 		return setTourData();
 	}
 
@@ -262,14 +285,14 @@ public class NmeaDataReader extends TourbookDevice {
 		// check if the tour is already imported
 		if (fTourDataMap.containsKey(tourId) == false) {
 
+			// add new tour to other tours
+			fTourDataMap.put(tourId, tourData);
+
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
 
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(visibleName);
-
-			// add new tour to other tours
-			fTourDataMap.put(tourId, tourData);
 		}
 
 		return true;
