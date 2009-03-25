@@ -1011,7 +1011,6 @@ public class TourManager {
 			// time is displayed on the X axis
 
 			chartDataModel.setXData(xDataTime);
-
 			chartDataModel.addXyData(xDataTime);
 
 			if (xDataDistance != null) {

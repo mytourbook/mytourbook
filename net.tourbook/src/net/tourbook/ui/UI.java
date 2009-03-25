@@ -113,6 +113,8 @@ public class UI {
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
+	public static final String						UTF_8							= "UTF-8";
+
 	/*
 	 * labels for the different measurement systems
 	 */
@@ -1236,6 +1238,17 @@ public class UI {
 			return updateTourTypeImage(existingImage, typeId, keyColorId);
 		}
 
+	}
+
+	public String getTourTypeLabel(final long tourTypeId) {
+
+		for (final TourType tourType : TourDatabase.getAllTourTypes()) {
+			if (tourType.getTypeId() == tourTypeId) {
+				return tourType.getName();
+			}
+		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	/**

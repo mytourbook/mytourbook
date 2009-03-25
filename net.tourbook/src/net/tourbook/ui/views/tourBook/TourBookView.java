@@ -600,6 +600,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
 					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
 
+					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only
 					 * the content is modified but in the rawDataView the modified image is not

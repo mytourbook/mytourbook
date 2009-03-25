@@ -442,7 +442,7 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourType", SWT.TRAIL); //$NON-NLS-1$
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourType", SWT.LEAD); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_type_tooltip);
