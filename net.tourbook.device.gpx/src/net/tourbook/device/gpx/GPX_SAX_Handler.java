@@ -50,8 +50,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				TAG_TRK					= "trk";														//$NON-NLS-1$
 	private static final String				TAG_TRKPT				= "trkpt";														//$NON-NLS-1$
-//	private static final String				TAG_RTE					= "rte";												//$NON-NLS-1$
-//	private static final String				TAG_RTEPT				= "rtept";												//$NON-NLS-1$
 
 	private static final String				TAG_TIME				= "time";														//$NON-NLS-1$
 	private static final String				TAG_ELE					= "ele";														//$NON-NLS-1$
@@ -73,8 +71,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private int								fGpxVersion				= -1;
 	private boolean							fInTrk					= false;
 	private boolean							fInTrkPt				= false;
-	//	private boolean							fInWpt					= false;
-	//	private boolean							fInTrkSeg				= false;
 
 	private boolean							fIsInTime				= false;
 	private boolean							fIsInEle				= false;
@@ -83,7 +79,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							fIsInTemp				= false;
 
 	private ArrayList<TimeData>				fTimeDataList;
-
 	private TimeData						fTimeData;
 	private TimeData						fPrevTimeData;
 
@@ -184,6 +179,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
+		System.out.println("</" + name + ">");
+
 		if (fIsError) {
 			return;
 		}
@@ -196,12 +193,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				if (name.equals(TAG_ELE)) {
 
+					// </ele>
+					
 					fIsInEle = false;
 
 					fTimeData.absoluteAltitude = getFloatValue(timeString);
 
 				} else if (name.equals(TAG_TIME)) {
 
+					// </time>
+					
 					fIsInTime = false;
 
 					try {
@@ -223,16 +224,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							}
 						}
 					}
+					
 				} else if (name.equals(TAG_EXT_HR)) {
+					
+					// </gpxtpx:hr>
+					
 					fIsInHr = false;
 					fTimeData.pulse = getIntValue(timeString);
+					
 				} else if (name.equals(TAG_EXT_TEMP)) {
+					
+					// </gpxtpx:atemp>
+					
 					fIsInTemp = false;
 					fTimeData.temperature = Math.round(getFloatValue(timeString));
 				}
 			}
 
-			if (name.equals(TAG_TRKPT) /* || name.equals(TAG_RTEPT) */) {
+			if (name.equals(TAG_TRKPT)) {
 
 				/*
 				 * trackpoint ends
@@ -242,7 +251,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				finalizeTrackpoint();
 
-			} else if (name.equals(TAG_TRK) /* || name.equals(TAG_RTE) */) {
+			} else if (name.equals(TAG_TRK)) {
 
 				/*
 				 * track ends
@@ -471,6 +480,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
+
+		System.out.print("<" + name + ">");
 
 		if (fIsError) {
 			return;

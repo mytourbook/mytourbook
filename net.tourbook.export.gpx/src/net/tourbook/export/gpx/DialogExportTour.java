@@ -15,10 +15,12 @@
  *******************************************************************************/
 package net.tourbook.export.gpx;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.DecimalFormat;
@@ -95,6 +97,7 @@ import org.joda.time.DateTime;
 import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
+
 
 	private static final int				VERTICAL_SECTION_MARGIN		= 10;
 
@@ -832,7 +835,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		if (isOverwrite) {
 
-			final Writer exportWriter = new FileWriter(exportFile);
+			final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile),
+					UI.UTF_8));
+
+//			final Writer exportWriter = new FileWriter(exportFile);
 			addValuesToContext(context);
 
 			Velocity.evaluate(context, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
@@ -903,6 +909,11 @@ public class DialogExportTour extends TitleAreaDialog {
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			final GarminTrackpointAdapter trackPoint = new GarminTrackpointAdapter(new GarminTrackpointD304());
+
+			// mark as a new track to create the <trkseg>...</trkseg> tags
+			if (serieIndex == 0) {
+				trackPoint.setNewTrack(true);
+			}
 
 			if (isAltitude) {
 				trackPoint.setAltitude(altitudeSerie[serieIndex]);
