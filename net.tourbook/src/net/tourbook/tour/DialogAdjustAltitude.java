@@ -680,15 +680,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			return;
 		}
 
+		final boolean isPointMovable = fSplineData.isPointMovable[fPointHitIndex];
+
 		final SplineDrawingData drawingData = fChartLayer2ndAltiSerie.getDrawingData();
 		final float scaleX = drawingData.scaleX;
 		final float scaleY = drawingData.scaleY;
 
 		float devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
 		final float devY = drawingData.devY0Spline - mouseEvent.devYMouse;
-
-		final float[] posX = fSplineData.relativePositionX;
-		final float[] posY = fSplineData.relativePositionY;
 
 		final double graphXMin = fSplineData.xMinValues[fPointHitIndex];
 		final double graphXMax = fSplineData.xMaxValues[fPointHitIndex];
@@ -697,18 +696,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		fCanDeletePoint = false;
 
-		// check min value
-		if (graphXMin != Double.NaN) {
-			if (graphX < graphXMin) {
-				graphX = (float) graphXMin;
-				fCanDeletePoint = true;
+		if (isPointMovable) {
+
+			// point can be moved horizontal and vertical
+
+			// check min value
+			if (graphXMin != Double.NaN) {
+				if (graphX < graphXMin) {
+					graphX = (float) graphXMin;
+					fCanDeletePoint = true;
+				}
 			}
-		}
-		// check max value
-		if (graphXMax != Double.NaN) {
-			if (graphX > graphXMax) {
-				graphX = (float) graphXMax;
-				fCanDeletePoint = true;
+			// check max value
+			if (graphXMax != Double.NaN) {
+				if (graphX > graphXMax) {
+					graphX = (float) graphXMax;
+					fCanDeletePoint = true;
+				}
 			}
 		}
 
@@ -720,8 +724,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float dev1X = graph1X * scaleX;
 		final float dev1Y = graph1Y * scaleY;
 
-		posX[fPointHitIndex] = devX / dev1X;
-		posY[fPointHitIndex] = devY / dev1Y;
+		if (isPointMovable) {
+			// point can be moved horizontal
+			fSplineData.relativePositionX[fPointHitIndex] = devX / dev1X;
+		}
+		fSplineData.relativePositionY[fPointHitIndex] = devY / dev1Y;
 	}
 
 	@Override
@@ -873,7 +880,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// rename OK button
 		final Button buttonOK = getButton(IDialogConstants.OK_ID);
-		
+
 		if (fIsSaveTour) {
 			buttonOK.setText(Messages.adjust_altitude_btn_save_modified_tour);
 		} else {
@@ -1443,12 +1450,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final double[] splineMinX = fSplineData.xMinValues = new double[pointLength];
 		final double[] splineMaxX = fSplineData.xMaxValues = new double[pointLength];
-		splineMinX[0] = Double.NaN;
-		splineMaxX[0] = Double.NaN;
+		splineMinX[0] = -0.00001f;
+		splineMaxX[0] = -0.00001f;
 		splineMinX[1] = 0;
 		splineMaxX[1] = 0;
-		splineMinX[2] = Double.NaN;
-		splineMaxX[2] = Double.NaN;
+		splineMinX[2] = 1.00001f;
+		splineMaxX[2] = 1.00001f;
 
 		fSplineData.xValues = new double[pointLength];
 		fSplineData.yValues = new double[pointLength];
@@ -1556,15 +1563,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 
 		fPointHitIndex = -1;
-		final boolean[] isPointMovable = fSplineData.isPointMovable;
+//		final boolean[] isPointMovable = fSplineData.isPointMovable;
 
 		// check if the mouse hits a spline point
 		for (int pointIndex = 0; pointIndex < pointHitRectangles.length; pointIndex++) {
 
-			if (isPointMovable[pointIndex] == false) {
-				// ignore none movable points
-				continue;
-			}
+//			if (isPointMovable[pointIndex] == false) {
+//				// ignore none movable points
+//				continue;
+//			}
 
 			if (pointHitRectangles[pointIndex].contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
@@ -1601,13 +1608,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			// point is not moved, check if the mouse hits a spline point
 
-			final boolean[] isPointMovable = fSplineData.isPointMovable;
+//			final boolean[] isPointMovable = fSplineData.isPointMovable;
 			for (int pointIndex = 0; pointIndex < pointHitRectangles.length; pointIndex++) {
 
-				if (isPointMovable[pointIndex] == false) {
-					// ignore none movable points
-					continue;
-				}
+//				if (isPointMovable[pointIndex] == false) {
+//					// ignore none movable points
+//					continue;
+//				}
 
 				if (pointHitRectangles[pointIndex].contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 					mouseEvent.isWorked = true;
@@ -1694,11 +1701,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * set all points to y=0
 		 */
 		final float[] posY = fSplineData.relativePositionY;
-		final boolean[] isPointMovable = fSplineData.isPointMovable;
+//		final boolean[] isPointMovable = fSplineData.isPointMovable;
 		for (int pointIndex = 0; pointIndex < posY.length; pointIndex++) {
-			if (isPointMovable[pointIndex]) {
-				posY[pointIndex] = 0;
-			}
+//			if (isPointMovable[pointIndex]) {
+			posY[pointIndex] = 0;
+//			}
 		}
 
 		computeAltitudeSRTMSpline();
@@ -1747,11 +1754,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * set all points to y=0
 		 */
 		final float[] posY = fSplineData.relativePositionY;
-		final boolean[] isPointMovable = fSplineData.isPointMovable;
+//		final boolean[] isPointMovable = fSplineData.isPointMovable;
 		for (int pointIndex = 0; pointIndex < posY.length; pointIndex++) {
-			if (isPointMovable[pointIndex]) {
-				posY[pointIndex] = 0;
-			}
+//			if (isPointMovable[pointIndex]) {
+			posY[pointIndex] = 0;
+//			}
 		}
 
 		computeAltitudeSRTMSpline();
@@ -1828,7 +1835,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// force the imperial altitude series to be recomputed
 		fTourData.clearAltitudeSeries();
-		
+
 		// adjust altitude up/down values
 		fTourData.computeAltitudeUpDown();
 	}
@@ -1844,9 +1851,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float[] posX = fSplineData.relativePositionX;
 		final float[] posY = fSplineData.relativePositionY;
 
-		final boolean[] isMovable = fSplineData.isPointMovable;
+		final int serieLength = fSplineData.isPointMovable.length;
 
-		for (int pointIndex = 0; pointIndex < isMovable.length; pointIndex++) {
+		for (int pointIndex = 0; pointIndex < serieLength; pointIndex++) {
 
 			splineX[pointIndex] = posX[pointIndex] * fSliderXAxisValue;
 			splineY[pointIndex] = posY[pointIndex] * fAltiDiff;

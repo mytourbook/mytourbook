@@ -165,7 +165,7 @@ public class SplineGraph extends Canvas {
 			final double graphPointY = (double) devY / fMovedScaleY;
 
 			/*
-			 * limit movement to min/max when it's set
+			 * limit horizontal movement to min/max when it's set
 			 */
 			final double graphXMin = fSplineData.xMinValues[fPointHitIndex];
 			final double graphXMax = fSplineData.xMaxValues[fPointHitIndex];
