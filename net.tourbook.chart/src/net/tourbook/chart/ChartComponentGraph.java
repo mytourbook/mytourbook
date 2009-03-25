@@ -2458,7 +2458,8 @@ public class ChartComponentGraph extends Canvas {
 
 				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidth, devBarHeight);
 
-				final int colorIndex = colorsIndex[serieIndex][valueIndex];
+				final int colorSerieIndex = colorsIndex.length >= serieIndex ? colorsIndex.length - 1 : serieIndex;
+				final int colorIndex = colorsIndex[colorSerieIndex][valueIndex];
 
 				final RGB rgbBrightDef = rgbBright[colorIndex];
 				final RGB rgbDarkDef = rgbDark[colorIndex];
