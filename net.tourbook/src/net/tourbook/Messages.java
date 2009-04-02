@@ -154,6 +154,8 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_invalid_data_message;
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
+
+	public static String	adjust_altitude_lbl_altitude;
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;

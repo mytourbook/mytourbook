@@ -207,7 +207,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		// set icon for the window 
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage());
-		
+
 		fIconPlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder).createImage();
 
 		fSourceTour = mergeSourceTour;
@@ -521,7 +521,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 						final float targetDistance = targetDistanceSerie[serieIndex];
 						final float distanceScale = 1 - targetDistance / distanceDiff;
-						
+
 						final int adjustedAltiDiff = (int) (startAltiDiff * distanceScale);
 						final int newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
 
@@ -658,7 +658,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				? fTargetTour.timeSerie
 				: fTargetTour.getDistanceSerie();
 
-		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, fTourChartConfig);
+		return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, fTourChartConfig, null);
 	}
 
 	private void createActions() {

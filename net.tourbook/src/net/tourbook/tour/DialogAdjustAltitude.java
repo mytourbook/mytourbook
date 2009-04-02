@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -160,6 +161,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private int							fPrevAltiMax;
 	private int							fPrevAltiStart;
+	private Text						fTxtAltitudeValue;
 
 	{
 		fNF.setMinimumFractionDigits(0);
@@ -397,26 +399,29 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		fSliderXAxisValue = xDataSerie[sliderIndex];
 		fAltiDiff = fSRTMValues[0] - yDataSerie[0];
+
 		// ensure that a point can be moved with the mouse
 		fAltiDiff = fAltiDiff == 0 ? 1 : fAltiDiff;
 
 		final CubicSpline cubicSpline = updateSplineData();
 
-		// get adjusted altitude serie
+		/*
+		 * get adjusted altitude serie
+		 */
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final int yValue = yDataSerie[serieIndex];
 			final int srtmValue = fSRTMValues[serieIndex];
 
-			if (serieIndex < sliderIndex) {
+			if (serieIndex <= sliderIndex && sliderIndex != 0) {
 
 				// add adjusted altitude
 
 				final float distance = xDataSerie[serieIndex];
 				final float distanceScale = 1 - (distance / fSliderXAxisValue);
 
-				final int adjustedAltiDiff = (int) (fAltiDiff * distanceScale);
-				final int newAltitude = yValue + adjustedAltiDiff;
+				final float linearAdjustedAltiDiff = fAltiDiff * distanceScale;
+				final float newAltitude = yValue + linearAdjustedAltiDiff;
 
 				float splineAlti = 0;
 				try {
@@ -424,16 +429,21 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 					splineAlti = (float) cubicSpline.interpolate(distance);
 
 				} catch (final IllegalArgumentException e) {
-					final double[] xValues = fTourData.splineDataPoints.xValues;
-					System.out.println((xValues[0] + " ") // //$NON-NLS-1$
-							+ (xValues[1] + " ") //$NON-NLS-1$
-							+ (xValues[2] + " ")); //$NON-NLS-1$
-					e.printStackTrace();
-					return;
-				}
-				splineDataSerie[serieIndex] = splineAlti;
 
-				final int adjustedAlti = newAltitude + (int) splineAlti;
+					System.out.println(e.getMessage());
+
+//					final double[] xValues = fTourData.splineDataPoints.xValues;
+//					System.out.println((xValues[0] + " ") // //$NON-NLS-1$
+//							+ (xValues[1] + " ") //$NON-NLS-1$
+//							+ (xValues[2] + " ")); //$NON-NLS-1$
+//
+//					e.printStackTrace();
+//					return;
+				}
+
+				final int adjustedAlti = (int) (newAltitude + splineAlti);
+
+				splineDataSerie[serieIndex] = splineAlti;
 				adjustedAltiSerie[serieIndex] = adjustedAlti;
 				diffTo2ndAlti[serieIndex] = srtmValue - adjustedAlti;
 
@@ -443,6 +453,28 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 				adjustedAltiSerie[serieIndex] = yValue;
 				diffTo2ndAlti[serieIndex] = srtmValue - yValue;
+			}
+		}
+
+		/*
+		 * compute position of the spline points within the graph
+		 */
+		final int graph1X = fSliderXAxisValue;
+		final float[] spRelativePositionX = fSplineData.relativePositionX;
+		final int pointLength = spRelativePositionX.length;
+		fSplineData.serieIndex = new int[pointLength];
+
+		for (int pointIndex = 0; pointIndex < pointLength; pointIndex++) {
+
+			final int pointAbsolutePosX = (int) (spRelativePositionX[pointIndex] * graph1X);
+
+			for (int serieIndex = 0; serieIndex < xDataSerie.length; serieIndex++) {
+				final int graphX = xDataSerie[serieIndex];
+
+				if (graphX >= pointAbsolutePosX) {
+					fSplineData.serieIndex[pointIndex] = serieIndex;
+					break;
+				}
 			}
 		}
 	}
@@ -489,20 +521,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final boolean[] oldIsPointMovable = fSplineData.isPointMovable;
 		final float[] oldPosX = fSplineData.relativePositionX;
 		final float[] oldPosY = fSplineData.relativePositionY;
-		final double[] oldXValues = fSplineData.xValues;
-		final double[] oldYValues = fSplineData.yValues;
-		final double[] oldXMinValues = fSplineData.xMinValues;
-		final double[] oldXMaxValues = fSplineData.xMaxValues;
+		final double[] oldXValues = fSplineData.graphXValues;
+		final double[] oldYValues = fSplineData.graphYValues;
+		final double[] oldXMinValues = fSplineData.graphXMinValues;
+		final double[] oldXMaxValues = fSplineData.graphXMaxValues;
 
 		final int newLength = oldIsPointMovable.length - 1;
 
 		final boolean[] newIsPointMovable = fSplineData.isPointMovable = new boolean[newLength];
 		final float[] newPosX = fSplineData.relativePositionX = new float[newLength];
 		final float[] newPosY = fSplineData.relativePositionY = new float[newLength];
-		final double[] newXValues = fSplineData.xValues = new double[newLength];
-		final double[] newYValues = fSplineData.yValues = new double[newLength];
-		final double[] newXMinValues = fSplineData.xMinValues = new double[newLength];
-		final double[] newXMaxValues = fSplineData.xMaxValues = new double[newLength];
+		final double[] newXValues = fSplineData.graphXValues = new double[newLength];
+		final double[] newYValues = fSplineData.graphYValues = new double[newLength];
+		final double[] newXMinValues = fSplineData.graphXMinValues = new double[newLength];
+		final double[] newXMaxValues = fSplineData.graphXMaxValues = new double[newLength];
 
 		int srcPos, destPos, length;
 
@@ -601,19 +633,19 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final boolean[] oldIsPointMovable = fSplineData.isPointMovable;
 		final float[] oldPosX = fSplineData.relativePositionX;
 		final float[] oldPosY = fSplineData.relativePositionY;
-		final double[] oldXValues = fSplineData.xValues;
-		final double[] oldYValues = fSplineData.yValues;
-		final double[] oldXMinValues = fSplineData.xMinValues;
-		final double[] oldXMaxValues = fSplineData.xMaxValues;
+		final double[] oldXValues = fSplineData.graphXValues;
+		final double[] oldYValues = fSplineData.graphYValues;
+		final double[] oldXMinValues = fSplineData.graphXMinValues;
+		final double[] oldXMaxValues = fSplineData.graphXMaxValues;
 
 		final int newLength = oldXValues.length + numberOfPoints;
 		final boolean[] newIsPointMovable = fSplineData.isPointMovable = new boolean[newLength];
 		final float[] newPosX = fSplineData.relativePositionX = new float[newLength];
 		final float[] newPosY = fSplineData.relativePositionY = new float[newLength];
-		final double[] newXValues = fSplineData.xValues = new double[newLength];
-		final double[] newYValues = fSplineData.yValues = new double[newLength];
-		final double[] newXMinValues = fSplineData.xMinValues = new double[newLength];
-		final double[] newXMaxValues = fSplineData.xMaxValues = new double[newLength];
+		final double[] newXValues = fSplineData.graphXValues = new double[newLength];
+		final double[] newYValues = fSplineData.graphYValues = new double[newLength];
+		final double[] newXMinValues = fSplineData.graphXMinValues = new double[newLength];
+		final double[] newXMaxValues = fSplineData.graphXMaxValues = new double[newLength];
 
 		final int oldLength = oldXValues.length;
 
@@ -674,6 +706,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return true;
 	}
 
+	/**
+	 * Compute relative position of the moved point
+	 * 
+	 * @param mouseEvent
+	 */
 	private void computePointMoveValues(final ChartMouseEvent mouseEvent) {
 
 		if (fPointHitIndex == -1) {
@@ -689,8 +726,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		float devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
 		final float devY = drawingData.devY0Spline - mouseEvent.devYMouse;
 
-		final double graphXMin = fSplineData.xMinValues[fPointHitIndex];
-		final double graphXMax = fSplineData.xMaxValues[fPointHitIndex];
+		final double graphXMin = fSplineData.graphXMinValues[fPointHitIndex];
+		final double graphXMax = fSplineData.graphXMaxValues[fPointHitIndex];
 
 		float graphX = devX / scaleX;
 
@@ -716,6 +753,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 		}
 
+		/*
+		 * set new relative position
+		 */
 		devX = graphX * scaleX;
 
 		final int graph1X = fSliderXAxisValue;
@@ -725,9 +765,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float dev1Y = graph1Y * scaleY;
 
 		if (isPointMovable) {
-			// point can be moved horizontal
+			// horizontal move is allowed 
 			fSplineData.relativePositionX[fPointHitIndex] = devX / dev1X;
 		}
+		// set vertical position 
 		fSplineData.relativePositionY[fPointHitIndex] = devY / dev1Y;
 	}
 
@@ -759,7 +800,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
-		fChartLayer2ndAltiSerie = new ChartLayer2ndAltiSerie(fTourData, xDataSerie, fTourChartConfig);
+		fChartLayer2ndAltiSerie = new ChartLayer2ndAltiSerie(fTourData, xDataSerie, fTourChartConfig, fSplineData);
 
 		return fChartLayer2ndAltiSerie;
 	}
@@ -1161,6 +1202,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(5).equalWidth(false).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
 			 * button: update altitude
@@ -1205,6 +1247,37 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				}
 			});
 			setButtonLayoutData(fBtnSRTMRemoveAllPoints);
+
+			// spacer
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+
+			/*
+			 * container: altitude positions
+			 */
+//			final Composite xyContainer = new Composite(container, SWT.NONE);
+//			GridDataFactory.fillDefaults().applyTo(xyContainer);
+//			GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).applyTo(xyContainer);
+//			xyContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			{
+//				/*
+//				 * label: altitude
+//				 */
+//				label = new Label(xyContainer, SWT.NONE);
+//				label.setText(Messages.adjust_altitude_lbl_altitude);
+//
+//				/*
+//				 * text: altitude value
+//				 */
+//				fTxtAltitudeValue = new Text(xyContainer, SWT.NONE);
+//				GridDataFactory.fillDefaults().applyTo(fTxtAltitudeValue);
+//
+//				/*
+//				 * label: unit
+//				 */
+//				label = new Label(xyContainer, SWT.NONE);
+//				label.setText(UI.UNIT_LABEL_ALTITUDE);
+//			}
 		}
 
 		return container;
@@ -1292,7 +1365,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			fRadioKeepStart.setEnabled(true);
 			fRadioKeepBottom.setEnabled(true);
 
-			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_start_and_end);
 			break;
 
 		case ADJUST_TYPE_WHOLE_TOUR:
@@ -1303,7 +1375,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			fRadioKeepStart.setEnabled(false);
 			fRadioKeepBottom.setEnabled(false);
 
-			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_whole_tour);
 			break;
 
 		case ADJUST_TYPE_END:
@@ -1314,7 +1385,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			fRadioKeepStart.setEnabled(false);
 			fRadioKeepBottom.setEnabled(false);
 
-			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_end);
 			break;
 
 		case ADJUST_TYPE_MAX_HEIGHT:
@@ -1325,7 +1395,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			fRadioKeepStart.setEnabled(true);
 			fRadioKeepBottom.setEnabled(true);
 
-			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_max);
 			break;
 
 		default:
@@ -1422,7 +1491,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	}
 
 	/**
-	 * create spline values
+	 * create spline values, these are 3 points at start/middle/end
 	 * 
 	 * @param altiDiff
 	 * @param sliderDistance
@@ -1442,14 +1511,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final float[] posX = fSplineData.relativePositionX = new float[pointLength];
 		final float[] posY = fSplineData.relativePositionY = new float[pointLength];
 		posX[0] = -0.00001f;
-		posY[0] = 0;
 		posX[1] = 0.5f;
-		posY[1] = 0;
 		posX[2] = 1.00001f;
+		posY[0] = 0;
+		posY[1] = 0;
 		posY[2] = 0;
 
-		final double[] splineMinX = fSplineData.xMinValues = new double[pointLength];
-		final double[] splineMaxX = fSplineData.xMaxValues = new double[pointLength];
+		final double[] splineMinX = fSplineData.graphXMinValues = new double[pointLength];
+		final double[] splineMaxX = fSplineData.graphXMaxValues = new double[pointLength];
 		splineMinX[0] = -0.00001f;
 		splineMaxX[0] = -0.00001f;
 		splineMinX[1] = 0;
@@ -1457,8 +1526,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		splineMinX[2] = 1.00001f;
 		splineMaxX[2] = 1.00001f;
 
-		fSplineData.xValues = new double[pointLength];
-		fSplineData.yValues = new double[pointLength];
+		fSplineData.graphXValues = new double[pointLength];
+		fSplineData.graphYValues = new double[pointLength];
 	}
 
 	boolean isActionEnabledCreateSplinePoint(final int mouseDownDevPositionX, final int mouseDownDevPositionY) {
@@ -1499,6 +1568,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// hide splines
 		fTourData.splineDataPoints = null;
+		fSplineData.serieIndex = null;
 
 		switch (getSelectedAdjustmentType().id) {
 		case ADJUST_TYPE_SRTM:
@@ -1608,13 +1678,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			// point is not moved, check if the mouse hits a spline point
 
-//			final boolean[] isPointMovable = fSplineData.isPointMovable;
 			for (int pointIndex = 0; pointIndex < pointHitRectangles.length; pointIndex++) {
-
-//				if (isPointMovable[pointIndex] == false) {
-//					// ignore none movable points
-//					continue;
-//				}
 
 				if (pointHitRectangles[pointIndex].contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 					mouseEvent.isWorked = true;
@@ -1701,11 +1765,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * set all points to y=0
 		 */
 		final float[] posY = fSplineData.relativePositionY;
-//		final boolean[] isPointMovable = fSplineData.isPointMovable;
 		for (int pointIndex = 0; pointIndex < posY.length; pointIndex++) {
-//			if (isPointMovable[pointIndex]) {
 			posY[pointIndex] = 0;
-//			}
 		}
 
 		computeAltitudeSRTMSpline();
@@ -1754,11 +1815,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * set all points to y=0
 		 */
 		final float[] posY = fSplineData.relativePositionY;
-//		final boolean[] isPointMovable = fSplineData.isPointMovable;
 		for (int pointIndex = 0; pointIndex < posY.length; pointIndex++) {
-//			if (isPointMovable[pointIndex]) {
 			posY[pointIndex] = 0;
-//			}
 		}
 
 		computeAltitudeSRTMSpline();
@@ -1842,21 +1900,21 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private CubicSpline updateSplineData() {
 
-		final double[] splineX = fSplineData.xValues;
-		final double[] splineY = fSplineData.yValues;
+		final double[] splineX = fSplineData.graphXValues;
+		final double[] splineY = fSplineData.graphYValues;
 
-		final double[] splineMinX = fSplineData.xMinValues;
-		final double[] splineMaxX = fSplineData.xMaxValues;
+		final double[] splineMinX = fSplineData.graphXMinValues;
+		final double[] splineMaxX = fSplineData.graphXMaxValues;
 
-		final float[] posX = fSplineData.relativePositionX;
-		final float[] posY = fSplineData.relativePositionY;
+		final float[] relativPosX = fSplineData.relativePositionX;
+		final float[] relativePosY = fSplineData.relativePositionY;
 
 		final int serieLength = fSplineData.isPointMovable.length;
 
 		for (int pointIndex = 0; pointIndex < serieLength; pointIndex++) {
 
-			splineX[pointIndex] = posX[pointIndex] * fSliderXAxisValue;
-			splineY[pointIndex] = posY[pointIndex] * fAltiDiff;
+			splineX[pointIndex] = relativPosX[pointIndex] * fSliderXAxisValue;
+			splineY[pointIndex] = relativePosY[pointIndex] * fAltiDiff;
 
 			splineMinX[pointIndex] = 0;
 			splineMaxX[pointIndex] = fSliderXAxisValue;

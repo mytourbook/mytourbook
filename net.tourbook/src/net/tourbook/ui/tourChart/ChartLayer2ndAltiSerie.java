@@ -28,6 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -40,6 +41,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	private TourData				fTourData;
 	private int[]					fXDataSerie;
 	private TourChartConfiguration	fTourChartConfig;
+	private SplineData				fSplineData;
 
 	private Rectangle[]				fSpPointRects;
 
@@ -51,10 +53,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
 									final int[] xDataSerie,
-									final TourChartConfiguration tourChartConfig) {
+									final TourChartConfiguration tourChartConfig,
+									final SplineData splineData) {
 
 		fTourData = tourData;
 		fTourChartConfig = tourChartConfig;
+		fSplineData = splineData;
 
 		// x-data serie contains the time or distance distance data serie
 		fXDataSerie = xDataSerie;
@@ -71,6 +75,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final boolean is2ndYValues = yValues2ndSerie != null;
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
+		final boolean isPointInGraph = fSplineData != null && fSplineData.serieIndex != null;
 
 		if (xValues == null || xValues.length == 0 /*
 													 * || yValues2ndSerie == null ||
@@ -78,7 +83,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 													 */) {
 			return;
 		}
-		
+
 		fScaleX = drawingData.getScaleX();
 		fScaleY = drawingData.getScaleY();
 
@@ -130,7 +135,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
 
-		final Rectangle graphRect = new Rectangle(0, devYTop, gc.getClipping().width, devGraphHeight);
+		final int graphClippingWidth = gc.getClipping().width;
+		final Rectangle graphRect = new Rectangle(0, devYTop, graphClippingWidth, devGraphHeight);
 
 		// get initial dev X
 		int graphXValue = xValues[startIndex] - fGraphXValueOffset;
@@ -190,7 +196,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (is2ndYValues) {
 
-				graphYValue2nd = (yValues2ndSerie[xValueIndex]);
+				graphYValue2nd = yValues2ndSerie[xValueIndex];
 				final float devYValue2nd = graphYValue2nd * fScaleY;
 
 				final float devY2nd = devY0 - devYValue2nd;
@@ -252,7 +258,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			// fill background
 			gc.setClipping(pathAdjustValue);
-			gc.fillGradientRectangle(0, devYTop, gc.getClipping().width, devGraphHeight, true);
+			gc.fillGradientRectangle(0, devYTop, graphClippingWidth, devGraphHeight, true);
 			gc.setClipping(graphRect);
 
 			// draw graph
@@ -309,16 +315,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		}
 
 		/*
-		 * paint special points on the diff graph
+		 * paint spline points
 		 */
 		final SplineData splineData = fTourData.splineDataPoints;
 		if (splineData != null) {
 
-			final double[] xSplineValues = splineData.xValues;
-			final double[] ySplineValues = splineData.yValues;
+			final double[] graphXSplineValues = splineData.graphXValues;
+			final double[] graphYSplineValues = splineData.graphYValues;
 			final boolean[] isPointMovable = splineData.isPointMovable;
 
-			final int splinePointLength = xSplineValues.length;
+			final int splinePointLength = graphXSplineValues.length;
 
 			fSpPointRects = new Rectangle[splinePointLength];
 
@@ -337,8 +343,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 					continue;
 				}
 
-				final double graphX = xSplineValues[pointIndex] - fGraphXValueOffset;
-				final double graphY = ySplineValues[pointIndex];
+				final double graphX = graphXSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphY = graphYSplineValues[pointIndex];
 
 				final int devPointX = (int) (graphX * fScaleX);
 				final int devPointY = (int) (graphY * scaleValueDiff);
@@ -365,8 +371,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 					continue;
 				}
 
-				final double graphSpX = xSplineValues[pointIndex] - fGraphXValueOffset;
-				final double graphSpY = ySplineValues[pointIndex];
+				final double graphSpX = graphXSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphSpY = graphYSplineValues[pointIndex];
 
 				final int devPointX = (int) (graphSpX * fScaleX);
 				final int devPointY = (int) (graphSpY * scaleValueDiff);
@@ -381,6 +387,45 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 						fDevY0Spline - devPointY - hitSize2,
 						hitSize,
 						hitSize);
+			}
+		}
+
+		/*
+		 * paint spline points in the graph
+		 */
+		if (isPointInGraph && isAdjustedValues) {
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			final int[] graphSerieIndex = fSplineData.serieIndex;
+
+			for (final int serieIndex : graphSerieIndex) {
+
+				final int graphX = xValues[serieIndex] - fGraphXValueOffset;
+				final int graphY = yAdjustedSerie[serieIndex];
+
+				final int devX = (int) (graphX * fScaleX);
+				final int devY = (int) (devY0 - (graphY * fScaleY));
+
+				gc.fillOval(devX - 2, devY - 2, 5, 5);
+
+				/*
+				 * draw altitude
+				 */
+				final String altiText = Integer.toString(graphY);
+				final Point textExtent = gc.textExtent(altiText);
+				final int textWidth = textExtent.x;
+
+				int devXText = devX - 2 - textWidth / 2;
+				final int devYText = devY - 5 - textExtent.y;
+
+				// ensure the text is visible
+				if (devXText < 0) {
+					devXText = 2;
+				} else if (devXText + textWidth > graphClippingWidth) {
+					devXText = graphClippingWidth - textWidth - 2;
+				}
+
+				gc.drawText(altiText, devXText, devYText, true);
 			}
 		}
 

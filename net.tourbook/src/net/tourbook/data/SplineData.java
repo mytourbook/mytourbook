@@ -20,13 +20,18 @@ public class SplineData {
 	public float[]		relativePositionX;
 	public float[]		relativePositionY;
 
-	public double[]		xValues;
-	public double[]		yValues;
+	public double[]		graphXValues;
+	public double[]		graphYValues;
 
-	public double[]		xMinValues;
-	public double[]		xMaxValues;
+	public double[]		graphXMinValues;
+	public double[]		graphXMaxValues;
+
+	/**
+	 * serie index for the spline point in the data serie (distance or time)
+	 */
+	public int[]		serieIndex;
 
 	public boolean[]	isPointMovable;
-	
+
 	public SplineData() {}
 }
