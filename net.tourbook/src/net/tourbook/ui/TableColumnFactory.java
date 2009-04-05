@@ -18,7 +18,10 @@ package net.tourbook.ui;
 import java.io.File;
 
 import net.tourbook.data.TourData;
+import net.tourbook.util.ColumnDefinition;
+import net.tourbook.util.ColumnManager;
 import net.tourbook.util.PixelConverter;
+import net.tourbook.util.TableColumnDefinition;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;

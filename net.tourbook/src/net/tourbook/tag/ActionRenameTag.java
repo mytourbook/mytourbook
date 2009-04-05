@@ -22,12 +22,12 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
-import net.tourbook.ui.ITourViewer;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tagging.TVITagViewTag;
 import net.tourbook.ui.views.tagging.TVITagViewTagCategory;
+import net.tourbook.util.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;

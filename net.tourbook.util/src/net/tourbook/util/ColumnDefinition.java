@@ -13,12 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.util;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 
 public class ColumnDefinition implements Cloneable {
@@ -47,23 +48,24 @@ public class ColumnDefinition implements Cloneable {
 	protected int				fStyle;
 
 	private CellLabelProvider	fCellLabelProvider;
+	private ControlListener		fColumnControlListener;
 
 	private String				fColumnText;
+
 	private String				fColumnToolTipText;
 	private int					fColumnWidth;
 	private String				fColumnUnit;
-	private boolean				fIsColumnResizable		= true;
+	private boolean				fIsColumnResizable	= true;
+	private boolean				fIsColumnMoveable	= true;
 
-	private boolean				fIsColumnMoveable		= true;
 	private SelectionAdapter	fColumnSelectionListener;
-
 	private int					fCreateIndex;
 
 	/**
 	 * when <code>true</code> this column will be checked in the modify dialog when the default
 	 * button is selected
 	 */
-	private boolean				fIsDefaultColumn		= false;
+	private boolean				fIsDefaultColumn	= false;
 
 	private int					fDefaultColumnWidth;
 
@@ -71,11 +73,15 @@ public class ColumnDefinition implements Cloneable {
 	 * column will have the width 0 to be hidden, this is necessary that the first visible column
 	 * can be right aligned
 	 */
-	private boolean				fIsColumnHidden			= false;
+	private boolean				fIsColumnHidden		= false;
 
 	private EditingSupport		fEditingSupport;
 
 	private ColumnLayoutData	fColumnLayoutData;
+
+	public void addControlListener(final ControlListener controlListener) {
+		fColumnControlListener = controlListener;
+	}
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
@@ -139,6 +145,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public CellLabelProvider getCellLabelProvider() {
 		return fCellLabelProvider;
+	}
+
+	public ControlListener getColumnControlListener() {
+		return fColumnControlListener;
 	}
 
 	public String getColumnId() {

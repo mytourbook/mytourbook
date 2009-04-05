@@ -20,7 +20,36 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages"; //$NON-NLS-1$
 	
+	
+	public static String	profileViewer_column_label_color;
+
+
+	public static String	profileViewer_column_label_color_header;
+
+
+	public static String	profileViewer_column_label_color_tooltip;
+
+
+	public static String	profileViewer_column_label_imagePath;
+
+
+	public static String	profileViewer_column_label_imagePath_header;
+
+
+	public static String	profileViewer_column_label_imagePath_tooltip;
+
+
+	public static String		profileViewer_column_label_name;
+	public static String		profileViewer_column_label_name_header;
+	public static String		profileViewer_column_label_name_tooltip;
+	
 	public static String	prefPage_srtm_chk_use_default_location;
+	public static String	prefPage_srtm_confirm_defaults_message;
+
+
+	public static String	prefPage_srtm_confirm_defaults_title;
+
+
 	public static String	prefPage_srtm_editor_data_filepath;
 	public static String	prefPage_srtm_group_label_data_location;
 	public static String	prefPage_srtm_group_label_colors;

@@ -13,12 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.util;
 
 import java.util.ArrayList;
-
-import net.tourbook.database.MyTourbookException;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.AbstractColumnLayout;
@@ -31,6 +28,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
@@ -179,8 +177,8 @@ public class ColumnManager {
 
 			if (columnLayoutData == null) {
 				try {
-					throw new MyTourbookException("ColumnWeightData is not set for the column: " + colDef); //$NON-NLS-1$
-				} catch (final MyTourbookException e) {
+					throw new Exception("ColumnWeightData is not set for the column: " + colDef); //$NON-NLS-1$
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -206,6 +204,11 @@ public class ColumnManager {
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
 		if (columnSelectionListener != null) {
 			tc.addSelectionListener(columnSelectionListener);
+		}
+
+		final ControlListener columnControlListener = colDef.getColumnControlListener();
+		if (columnControlListener != null) {
+			tc.addControlListener(columnControlListener);
 		}
 	}
 

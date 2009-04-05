@@ -13,12 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.util;
 
 import java.util.ArrayList;
-
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -55,6 +52,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
 
 public class ColumnModifyDialog extends TrayDialog {
 
@@ -399,7 +397,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+		return Activator.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**

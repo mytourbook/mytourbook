@@ -22,9 +22,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.util.ITourViewer;
 
 public class TVICatalogRootItem extends TVICatalogItem {
 

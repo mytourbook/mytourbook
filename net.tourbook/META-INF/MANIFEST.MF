@@ -24,7 +24,8 @@ Require-Bundle: org.eclipse.ui,
  de.byteholder.gpx,
  org.eclipse.core.databinding;bundle-version="1.1.0",
  com.ibm.icu;bundle-version="3.8.1",
- net.tourbook.ext.srtm;bundle-version="9.2.0"
+ net.tourbook.ext.srtm;bundle-version="9.2.0",
+ net.tourbook.util
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
  net.tourbook.colors;uses:="net.tourbook.mapping,org.eclipse.swt.graphics",
@@ -125,11 +126,5 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.ui.dialogs,
    org.eclipse.swt.widgets,
    org.eclipse.jface.dialogs",
- net.tourbook.ui.action,
- net.tourbook.util;
-  uses:="org.eclipse.jface.wizard,
-   org.eclipse.core.runtime,
-   org.eclipse.swt.graphics,
-   org.eclipse.jface.viewers,
-   org.eclipse.swt.widgets"
+ net.tourbook.ui.action
 

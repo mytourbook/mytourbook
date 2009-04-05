@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.ui.UI;
-import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

@@ -18,12 +18,12 @@ package net.tourbook.tag;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.views.tagging.TVITagViewMonth;
 import net.tourbook.ui.views.tagging.TVITagViewTag;
 import net.tourbook.ui.views.tagging.TVITagViewTour;
 import net.tourbook.ui.views.tagging.TVITagViewYear;
+import net.tourbook.util.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

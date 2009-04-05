@@ -35,14 +35,14 @@ import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ColumnDefinition;
-import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.util.ColumnDefinition;
+import net.tourbook.util.ColumnManager;
+import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 

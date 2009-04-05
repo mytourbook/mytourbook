@@ -32,12 +32,12 @@ import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.util.ColumnManager;
+import net.tourbook.util.ITourViewer;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;

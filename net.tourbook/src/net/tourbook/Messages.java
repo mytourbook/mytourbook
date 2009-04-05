@@ -21,71 +21,39 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
-	public static String	dialog_export_btn_export;
-
-	public static String	dialog_export_chk_camouflageSpeed;
-
-	public static String	dialog_export_chk_camouflageSpeed_tooltip;
-
-	public static String	dialog_export_chk_camouflageSpeedInput_tooltip;
-
-	public static String	dialog_export_chk_mergeAllTours;
-
-	public static String	dialog_export_chk_mergeAllTours_tooltip;
-
-	public static String	dialog_export_chk_overwriteFiles;
-
-	public static String	dialog_export_chk_overwriteFiles_tooltip;
-
-	public static String	dialog_export_dialog_message;
-
-	public static String	dialog_export_dialog_title;
-
-	public static String	dialog_export_dir_dialog_message;
-
-	public static String	dialog_export_dir_dialog_text;
-
-	public static String	dialog_export_error_camouflageSpeedIsInvalid;
-
-	public static String	dialog_export_file_dialog_text;
-
-	public static String	dialog_export_group_exportFileName;
-
-	public static String	dialog_export_group_options;
-
-	public static String	dialog_export_invalid_path;
-
-	public static String	dialog_export_label_exportFileName;
-
-	public static String	dialog_export_label_exportFilePath;
-
-	public static String	dialog_export_label_fileName;
-
-	public static String	dialog_export_label_filePath;
-
-	public static String	dialog_export_label_timeUnitSeconds;
-
-	public static String	dialog_export_lbl_exportFilePath;
-
-	public static String	dialog_export_msg_fileAlreadyExists;
-
-	public static String	dialog_export_msg_fileNameIsInvalid;
-
-	public static String	dialog_export_msg_pathIsNotAvailable;
-
-	public static String	dialog_export_rdo_filenameFromTour;
-
-	public static String	dialog_export_rdo_filenameFromTour_tooltip;
-
-	public static String	dialog_export_rdo_filenameManual;
-
-	public static String	dialog_export_rdo_filenameManual_tooltip;
-
-	public static String	dialog_export_shell_text;
-
-	public static String	dialog_export_txt_fileName_tooltip;
-
-	public static String	dialog_export_txt_filePath_tooltip;
+	public static String		dialog_export_btn_export;
+	public static String		dialog_export_chk_camouflageSpeed;
+	public static String		dialog_export_chk_camouflageSpeed_tooltip;
+	public static String		dialog_export_chk_camouflageSpeedInput_tooltip;
+	public static String		dialog_export_chk_mergeAllTours;
+	public static String		dialog_export_chk_mergeAllTours_tooltip;
+	public static String		dialog_export_chk_overwriteFiles;
+	public static String		dialog_export_chk_overwriteFiles_tooltip;
+	public static String		dialog_export_dialog_message;
+	public static String		dialog_export_dialog_title;
+	public static String		dialog_export_dir_dialog_message;
+	public static String		dialog_export_dir_dialog_text;
+	public static String		dialog_export_error_camouflageSpeedIsInvalid;
+	public static String		dialog_export_file_dialog_text;
+	public static String		dialog_export_group_exportFileName;
+	public static String		dialog_export_group_options;
+	public static String		dialog_export_invalid_path;
+	public static String		dialog_export_label_exportFileName;
+	public static String		dialog_export_label_exportFilePath;
+	public static String		dialog_export_label_fileName;
+	public static String		dialog_export_label_filePath;
+	public static String		dialog_export_label_timeUnitSeconds;
+	public static String		dialog_export_lbl_exportFilePath;
+	public static String		dialog_export_msg_fileAlreadyExists;
+	public static String		dialog_export_msg_fileNameIsInvalid;
+	public static String		dialog_export_msg_pathIsNotAvailable;
+	public static String		dialog_export_rdo_filenameFromTour;
+	public static String		dialog_export_rdo_filenameFromTour_tooltip;
+	public static String		dialog_export_rdo_filenameManual;
+	public static String		dialog_export_rdo_filenameManual_tooltip;
+	public static String		dialog_export_shell_text;
+	public static String		dialog_export_txt_fileName_tooltip;
+	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		dialog_is_tour_editor_modified_message;
 	public static String		dialog_is_tour_editor_modified_title;
@@ -105,7 +73,7 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
-	public static String	action_export_tour;
+	public static String		action_export_tour;
 
 	public static String		action_tag_add;
 	public static String		action_tag_dlg_rename_message;
@@ -132,7 +100,9 @@ public class Messages extends NLS {
 	public static String		action_tour_editor_delete_tour_marker;
 
 	public static String		action_tourbook_select_year_month_tours;
+
 	public static String		action_tourCatalog_open_compare_wizard;
+
 	public static String		action_tourType_modify_tourTypes;
 
 	public static String		adjust_altitude_action_create_spline_point;
@@ -155,14 +125,14 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
 
-	public static String	adjust_altitude_lbl_altitude;
+	public static String		adjust_altitude_lbl_altitude;
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
 	public static String		adjust_altitude_type_srtm;
 	public static String		adjust_altitude_type_srtm_spline;
 	public static String		adjust_altitude_type_start_and_end;
-	
+
 	public static String		app_action_button_down;
 	public static String		app_action_button_up;
 	public static String		app_action_collapse_all_tooltip;
@@ -184,11 +154,10 @@ public class Messages extends NLS {
 	public static String		app_action_undo_modifications_tooltip;
 	public static String		app_action_update;
 
-	public static String	app_btn_browse;
+	public static String		app_btn_browse;
 
-	public static String	app_dlg_confirmFileOverwrite_message;
-
-	public static String	app_dlg_confirmFileOverwrite_title;
+	public static String		app_dlg_confirmFileOverwrite_message;
+	public static String		app_dlg_confirmFileOverwrite_title;
 
 	public static String		App_Action_set_tour_type;
 
@@ -275,7 +244,7 @@ public class Messages extends NLS {
 	public static String		Format_hhmmss;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 
-	public static String	Format_yyyymmdd_hhmmss;
+	public static String		Format_yyyymmdd_hhmmss;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
@@ -386,7 +355,7 @@ public class Messages extends NLS {
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
 
-	public static String	import_data_action_createTourIdWithTime;
+	public static String		import_data_action_createTourIdWithTime;
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_reimport_tour;

@@ -19,7 +19,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.IReferenceTourProvider;
-import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;

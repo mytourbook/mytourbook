@@ -13,26 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.util;
 
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * A ColumnDefinition contains the data for creating a column in a TableViewer
  */
-public class TableColumnDefinition extends ColumnDefinition {
+public class TreeColumnDefinition extends ColumnDefinition {
 
-	private TableColumn	fTableColumn;
+	private TreeColumn	fTreeColumn;
 
 	/**
-	 * @param columnManager
-	 *            manager which managed the columns
 	 * @param columnId
-	 *            column id which must be unique within the table
+	 *            column id which must be unique within the tree
 	 * @param style
 	 *            ui style
 	 */
-	public TableColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
+	public TreeColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
 
 		fColumnId = columnId;
 		fStyle = style;
@@ -40,17 +38,12 @@ public class TableColumnDefinition extends ColumnDefinition {
 		columnManager.addColumn(this);
 	}
 
-	public TableColumn getTableColumn() {
-		return fTableColumn;
+	public TreeColumn getTreeColumn() {
+		return fTreeColumn;
 	}
 
-	public void setTableColumn(final TableColumn tableColumn) {
-		fTableColumn = tableColumn;
-	}
-
-	@Override
-	public String toString() {
-		return fColumnId;
+	public void setTreeColumn(final TreeColumn tableColumn) {
+		fTreeColumn = tableColumn;
 	}
 
 }

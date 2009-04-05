@@ -18,7 +18,7 @@ package net.tourbook.ui;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	
+
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";		//$NON-NLS-1$
 
 	public static String		Action_configure_columns;
@@ -33,10 +33,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_cadence;
 	public static String		ColumnFactory_avg_cadence_label;
 	public static String		ColumnFactory_avg_cadence_tooltip;
-	public static String	ColumnFactory_avg_pace_label;
-
-	public static String	ColumnFactory_avg_pace_tooltip;
-
+	public static String		ColumnFactory_avg_pace_label;
+	public static String		ColumnFactory_avg_pace_tooltip;
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
@@ -89,12 +87,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_pace_label;
 	public static String		ColumnFactory_pace_tooltip;
-	public static String	ColumnFactory_paused_time;
-
-	public static String	ColumnFactory_paused_time_label;
-
-	public static String	ColumnFactory_paused_time_tooltip;
-
+	public static String		ColumnFactory_paused_time;
+	public static String		ColumnFactory_paused_time_label;
+	public static String		ColumnFactory_paused_time_tooltip;
 	public static String		ColumnFactory_power;
 	public static String		ColumnFactory_power_label;
 	public static String		ColumnFactory_power_tooltip;
@@ -123,12 +118,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_time_interval_tooltip;
 	public static String		ColumnFactory_time_label;
 	public static String		ColumnFactory_time_tooltip;
-	public static String	ColumnFactory_tour_marker_header;
-
-	public static String	ColumnFactory_tour_marker_label;
-
-	public static String	ColumnFactory_tour_marker_tooltip;
-
+	public static String		ColumnFactory_tour_marker_header;
+	public static String		ColumnFactory_tour_marker_label;
+	public static String		ColumnFactory_tour_marker_tooltip;
 	public static String		ColumnFactory_tour_numbers;
 	public static String		ColumnFactory_tour_numbers_lable;
 	public static String		ColumnFactory_tour_numbers_tooltip;
@@ -145,18 +137,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_title_tooltip;
 	public static String		ColumnFactory_tour_type_label;
 	public static String		ColumnFactory_tour_type_tooltip;
-
-	public static String		ColumnModifyDialog_Button_default;
-	public static String		ColumnModifyDialog_Button_deselect_all;
-	public static String		ColumnModifyDialog_Button_move_down;
-	public static String		ColumnModifyDialog_Button_move_up;
-	public static String		ColumnModifyDialog_Button_select_all;
-	public static String		ColumnModifyDialog_column_column;
-	public static String		ColumnModifyDialog_column_unit;
-	public static String		ColumnModifyDialog_column_width;
-	public static String		ColumnModifyDialog_Dialog_title;
-	public static String		ColumnModifyDialog_Label_hint;
-	public static String		ColumnModifyDialog_Label_info;
 
 	public static String		Image_configure_columns;
 

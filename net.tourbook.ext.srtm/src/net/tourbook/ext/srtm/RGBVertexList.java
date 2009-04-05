@@ -37,18 +37,34 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 	private static final long	serialVersionUID	= 1L;
 
+	private Image				fProfileImage;
+
+	private int					fProfileId;
+	private String				fProfileName;
+	private String				fProfilePath;
+
 	public static void main(final String[] args) {
 		return;
 	}
 
-	public Image getImage(final Display display, int width, int height) {
+	/**
+	 * Creates or recreates the vertex image
+	 * 
+	 * @param display
+	 * @param width
+	 * @param height
+	 */
+	public void createImage(final Display display, int width, int height) {
+
+		// dispose previous image
+		disposeImage();
 
 		// ensure min image size
 		width = width < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : width;
 		height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
 
-		final Image image = new Image(display, width, height);
-		final GC gc = new GC(image);
+		fProfileImage = new Image(display, width, height);
+		final GC gc = new GC(fProfileImage);
 		final long elevMax = size() == 0 ? 8850 : get(size() - 1).getElevation();
 		for (int x = 0; x < width; x++) {
 			final long elev = elevMax * x / width;
@@ -75,8 +91,28 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 			gc.drawText("" + elev, 0, 0, true); //$NON-NLS-1$
 		}
 		transform.dispose();
+	}
 
-		return image;
+	public void disposeImage() {
+		if (fProfileImage != null && fProfileImage.isDisposed() == false) {
+			fProfileImage.dispose();
+		}
+	}
+
+	public Image getImage() {
+		return fProfileImage;
+	}
+
+	public int getProfileId() {
+		return fProfileId;
+	}
+
+	public String getProfileName() {
+		return fProfileName;
+	}
+
+	public String getProfilePath() {
+		return fProfilePath;
 	}
 
 	public RGB getRGB(final long elev) {
@@ -129,7 +165,7 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		add(2, new RGBVertex(255, 0, 0, 2000));
 	}
 
-	public void set(final RGBVertexList rgbVertexList) {
+	public void replaceVertexes(final RGBVertexList rgbVertexList) {
 		clear();
 		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
 			final RGBVertex rgbVertex = rgbVertexList.get(ix);
@@ -157,6 +193,25 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 			}
 		}
 		sort();
+	}
+
+	public void setProfileId(final int fProfileId) {
+		this.fProfileId = fProfileId;
+	}
+
+	public void setProfileName(final String fProfileName) {
+		this.fProfileName = fProfileName;
+	}
+
+	public void setProfilePath(final String fProfilePath) {
+		this.fProfilePath = fProfilePath;
+	}
+
+	public void setVertexList(final ArrayList<RGBVertex> vertexList) {
+		clear();
+		for (final RGBVertex vertex : vertexList) {
+			add(vertex);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
