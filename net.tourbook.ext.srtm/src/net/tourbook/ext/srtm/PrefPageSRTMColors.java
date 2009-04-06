@@ -95,44 +95,35 @@ import org.w3c.dom.Element;
 
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	private final static IPreferenceStore	fPrefStore					= Activator.getDefault().getPreferenceStore();
+	private final static IPreferenceStore	fPrefStore				= Activator.getDefault().getPreferenceStore();
 
-	private static final String				PROFILE_FILE_NAME			= "srtmprofiles.xml";								//$NON-NLS-1$
+	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";								//$NON-NLS-1$
 
-	private static final String				PROFILE_XML_ROOT			= "srtmprofiles";									//$NON-NLS-1$
-	private static final String				MEMENTO_CHILD_STATE			= "state";											//$NON-NLS-1$
+	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";									//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_PROFILE	= "profile";										//$NON-NLS-1$
 
-	private static final String				ATTR_LAST_USED_PROFILE_ID	= "lastUsedProfileId";								//$NON-NLS-1$
-	private static final String				MEMENTO_CHILD_PROFILE		= "profile";										//$NON-NLS-1$
+	private static final String				TAG_PROFILE_ID			= "profileId";										//$NON-NLS-1$
+	private static final String				TAG_NAME				= "name";											//$NON-NLS-1$
+	private static final String				TAG_IMAGE_PATH			= "imagePath";										//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";										//$NON-NLS-1$
 
-	private static final String				TAG_PROFILE_ID				= "profileId";										//$NON-NLS-1$
-	private static final String				TAG_NAME					= "name";											//$NON-NLS-1$
-	private static final String				TAG_IMAGE_PATH				= "imagePath";										//$NON-NLS-1$
-	private static final String				MEMENTO_CHILD_VERTEX		= "vertex";										//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE			= "altitude";										//$NON-NLS-1$
+	private static final String				TAG_RED					= "red";											//$NON-NLS-1$
+	private static final String				TAG_GREEN				= "green";											//$NON-NLS-1$
+	private static final String				TAG_BLUE				= "blue";											//$NON-NLS-1$
+	private final IDialogSettings			fState					= Activator.getDefault()
+																			.getDialogSettingsSection("SRTMColors");	//$NON-NLS-1$
 
-	private static final String				TAG_ALTITUDE				= "altitude";										//$NON-NLS-1$
-	private static final String				TAG_RED						= "red";											//$NON-NLS-1$
-	private static final String				TAG_GREEN					= "green";											//$NON-NLS-1$
-	private static final String				TAG_BLUE					= "blue";											//$NON-NLS-1$
-	private final IDialogSettings			fState						= Activator.getDefault()
-																				.getDialogSettingsSection("SRTMColors");	//$NON-NLS-1$
+	private static ArrayList<RGBVertexList>	fProfileList			= new ArrayList<RGBVertexList>();
+	private static RGBVertexList			fSelectedProfile		= null;
 
-	private static ArrayList<RGBVertexList>	fProfileList				= new ArrayList<RGBVertexList>();
+	private Button							fBtnAddProfile			= null;
 
-	private static RGBVertexList			fSelectedProfile			= null;
-	private Composite						fTableContainer				= null;
+	private Button							fBtnRemoveProfile		= null;
+	private int								fDefaultImageWidth		= 300;
+	private int								fImageHeight			= 40;
 
-//	private static final int				fMaxProfiles			= 100;
-//	private static int						fNumberOfProfiles			= 0;
-//	private static String					fPrefProfiles				= null;
-
-	private Button							fBtnAddProfile				= null;
-
-	private Button							fBtnRemoveProfile			= null;
-	private int								fDefaultImageWidth			= 300;
-	private int								fImageHeight				= 40;
-
-	private int								fOldImageWidth				= -1;
+	private int								fOldImageWidth			= -1;
 	private Composite						fProfileContainer;
 
 	private CheckboxTableViewer				fProfileViewer;
@@ -147,9 +138,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 * index of the profile image, this can be changed when the columns are reordered with the mouse
 	 * or the column manager
 	 */
-	private int								fProfileImageColumn			= 0;
+	private int								fProfileImageColumn		= 0;
 
-	private static int						fLastUsedProfileId			= 0;
+	private static int						fMaxProfileId;
 
 	private class ProfileContentProvider implements IStructuredContentProvider {
 
@@ -244,8 +235,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 250, 35, 161, 48);
 			createXmlVertex(profile, 300, 54, 134, 255);
 			createXmlVertex(profile, 350, 130, 255, 255);
-
-			xmlRoot.createChild(MEMENTO_CHILD_STATE).putInteger(ATTR_LAST_USED_PROFILE_ID, profileId);
 
 			xmlRoot.save(writer);
 
@@ -387,20 +376,21 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			reader = new InputStreamReader(new FileInputStream(profileFile), "UTF-8"); //$NON-NLS-1$
 			final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
-			/*
-			 * read last used profile id
-			 */
-			final IMemento[] xmlState = xmlRoot.getChildren(MEMENTO_CHILD_STATE);
-			if (xmlState.length == 0) {
-				final Integer profileId = xmlState[0].getInteger(ATTR_LAST_USED_PROFILE_ID);
-				if (profileId == null) {
-					fLastUsedProfileId = 0;
-				} else {
-					fLastUsedProfileId = profileId;
-				}
-			}
+//			/*
+//			 * read last used profile id
+//			 */
+//			final IMemento[] xmlState = xmlRoot.getChildren(MEMENTO_CHILD_STATE);
+//			if (xmlState.length == 0) {
+//				final Integer profileId = xmlState[0].getInteger(ATTR_LAST_USED_PROFILE_ID);
+//				if (profileId == null) {
+//					fLastUsedProfileId = 0;
+//				} else {
+//					fLastUsedProfileId = profileId;
+//				}
+//			}
 
 			final ArrayList<RGBVertex> vertexList = new ArrayList<RGBVertex>();
+			fMaxProfileId = -1;
 
 			/*
 			 * read all profiles
@@ -463,6 +453,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				profile.setProfileName(profileName);
 				profile.setProfilePath(profilePath);
 				profile.setVertexList(vertexList);
+
+				// get max profile id 
+				fMaxProfileId = Math.max(fMaxProfileId, profileId);
 			}
 
 		} catch (final UnsupportedEncodingException e) {
@@ -516,7 +509,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		fProfileList.add(profile = new RGBVertexList());
 
 		profile.init();
-		profile.setProfileId(++fLastUsedProfileId);
+		profile.setProfileId(++fMaxProfileId);
 		profile.setProfileName(Messages.prefPage_srtm_default_profile_name);
 		profile.setProfilePath(Messages.prefPage_srtm_default_profile_path);
 
@@ -530,13 +523,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		fProfileViewer.setAllChecked(false);
 		fProfileViewer.setChecked(fSelectedProfile, true);
 
-		/*
-		 * select new profile and make it visible, encapsulate into a list otherwise the vertexes
-		 * will be used but will fails
-		 */
-		final ArrayList<RGBVertexList> selection = new ArrayList<RGBVertexList>();
-		selection.add(profile);
-		fProfileViewer.setSelection(new StructuredSelection(selection), true);
+		selectProfile(profile);
 
 //		fRgbVertexList[fNumberOfProfiles] = new RGBVertexList();
 //		fRgbVertexList[fNumberOfProfiles].init(); // a few default settings 
@@ -552,6 +539,24 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 //		fTable.setSelection(fNumberOfProfiles);
 //
 //		fNumberOfProfiles++;
+	}
+
+	@Override
+	protected Control createContents(final Composite parent) {
+
+		initVertexLists();
+
+		final Composite container = createUI(parent);
+
+		reloadViewer();
+
+		// restore check state and select it
+		fProfileViewer.setChecked(fSelectedProfile, true);
+		selectProfile(fSelectedProfile);
+
+		enableActions();
+
+		return container;
 	}
 
 //	private Table createTableItems(final Composite parent) {
@@ -597,23 +602,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 //
 //		return table;
 //	}
-
-	@Override
-	protected Control createContents(final Composite parent) {
-
-		initVertexLists();
-
-		final Composite container = createUI(parent);
-
-		reloadViewer();
-
-		// restore check state
-		fProfileViewer.setChecked(fSelectedProfile, true);
-
-		enableActions();
-
-		return container;
-	}
 
 	private void createProfileViewer(final Composite parent) {
 
@@ -811,7 +799,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					removeProfile();
 				}
 			});
-			fBtnRemoveProfile.setEnabled(false);
 			setButtonLayoutData(fBtnRemoveProfile);
 
 			/*
@@ -841,6 +828,41 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		createProfileViewer(fProfileContainer);
 		createVertexImages();
+	}
+
+	private void createUIResolutionOption(final Composite parent) {
+
+//		final Group resolutionGroup = new Group(parent, SWT.NONE);
+//		resolutionGroup.setText("Resolution");
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(resolutionGroup);
+
+		final RadioGroupFieldEditor radioGroupFieldEditor = new RadioGroupFieldEditor(IPreferences.SRTM_RESOLUTION,
+				Messages.prefPage_srtm_resolution_title,
+				4,
+				new String[][] {
+						new String[] {
+								Messages.prefPage_srtm_resolution_very_fine,
+								IPreferences.SRTM_RESOLUTION_VERY_FINE },
+						new String[] { Messages.prefPage_srtm_resolution_fine, IPreferences.SRTM_RESOLUTION_FINE },
+						new String[] { Messages.prefPage_srtm_resolution_rough, IPreferences.SRTM_RESOLUTION_ROUGH },
+						new String[] {
+								Messages.prefPage_srtm_resolution_very_rough,
+								IPreferences.SRTM_RESOLUTION_VERY_ROUGH }, },
+				parent, // resolutionGroup,
+				true);
+
+		radioGroupFieldEditor.setPreferenceStore(fPrefStore);
+		radioGroupFieldEditor.load();
+		radioGroupFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent e) {
+				fPrefStore.setValue(IPreferences.SRTM_RESOLUTION, "" + e.getNewValue()); //$NON-NLS-1$
+			}
+		});
+
+		// set margins after the editors are added
+//		final GridLayout groupLayout = (GridLayout) resolutionGroup.getLayout();
+//		groupLayout.marginWidth = 5;
+//		groupLayout.marginHeight = 5;
 	}
 
 //	private void createUIProfileTableOLD(final Composite parent) {
@@ -929,41 +951,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 //
 //	}
 
-	private void createUIResolutionOption(final Composite parent) {
-
-//		final Group resolutionGroup = new Group(parent, SWT.NONE);
-//		resolutionGroup.setText("Resolution");
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(resolutionGroup);
-
-		final RadioGroupFieldEditor radioGroupFieldEditor = new RadioGroupFieldEditor(IPreferences.SRTM_RESOLUTION,
-				Messages.prefPage_srtm_resolution_title,
-				4,
-				new String[][] {
-						new String[] {
-								Messages.prefPage_srtm_resolution_very_fine,
-								IPreferences.SRTM_RESOLUTION_VERY_FINE },
-						new String[] { Messages.prefPage_srtm_resolution_fine, IPreferences.SRTM_RESOLUTION_FINE },
-						new String[] { Messages.prefPage_srtm_resolution_rough, IPreferences.SRTM_RESOLUTION_ROUGH },
-						new String[] {
-								Messages.prefPage_srtm_resolution_very_rough,
-								IPreferences.SRTM_RESOLUTION_VERY_ROUGH }, },
-				parent, // resolutionGroup,
-				true);
-
-		radioGroupFieldEditor.setPreferenceStore(fPrefStore);
-		radioGroupFieldEditor.load();
-		radioGroupFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent e) {
-				fPrefStore.setValue(IPreferences.SRTM_RESOLUTION, "" + e.getNewValue()); //$NON-NLS-1$
-			}
-		});
-
-		// set margins after the editors are added
-//		final GridLayout groupLayout = (GridLayout) resolutionGroup.getLayout();
-//		groupLayout.marginWidth = 5;
-//		groupLayout.marginHeight = 5;
-	}
-
 	private void createUIShadowOption(final Composite parent) {
 
 		final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(IPreferences.SRTM_SHADOW,
@@ -998,7 +985,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
 		/*
-		 * column: profile name
+		 * column: checkbox
 		 */
 		colDef = new TableColumnDefinition(fColumnManager, "checkboxColumn", SWT.LEAD); //$NON-NLS-1$
 
@@ -1075,7 +1062,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		colDef.setColumnToolTipText(Messages.profileViewer_column_label_imagePath_tooltip);
 		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
-		colDef.setCanModifyVisibility(true);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1101,7 +1087,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		final StructuredSelection selection = (StructuredSelection) fProfileViewer.getSelection();
 
-		fBtnRemoveProfile.setEnabled(selection.size() > 0);
+		fBtnRemoveProfile.setEnabled(selection.size() > 1);
 	}
 
 	public ColumnManager getColumnManager() {
@@ -1178,7 +1164,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	public boolean performOk() {
 
 		saveState();
-//		createTableItems(fTableContainer);
 
 		return super.performOk();
 	}
@@ -1233,14 +1218,48 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	}
 
-	private void saveProfiles() {
-	// TODO Auto-generated method stub
+	private void saveProfileXML() {
 
+		BufferedWriter writer = null;
+
+		try {
+
+			final File file = getProfileFile();
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+
+			final XMLMemento xmlRoot = getXMLRoot();
+
+			for (final RGBVertexList profile : fProfileList) {
+
+				final IMemento xmlProfile = createXmlProfile(xmlRoot,
+						profile.getProfileId(),
+						profile.getProfileName(),
+						profile.getProfilePath());
+
+				for (final RGBVertex vertex : profile) {
+					final RGB rgb = vertex.getRGB();
+					createXmlVertex(xmlProfile, (int) vertex.getElevation(), rgb.red, rgb.green, rgb.blue);
+				}
+			}
+
+			xmlRoot.save(writer);
+
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private void saveState() {
 
-		saveProfiles();
+		saveProfileXML();
 
 		// save selected profile
 		if (fSelectedProfile != null) {
@@ -1254,5 +1273,18 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		// viewer state
 		fColumnManager.saveState(fState);
+	}
+
+	/**
+	 * select profile and make it visible, encapsulate into a list otherwise the vertexes will be
+	 * used and will fail
+	 */
+	private void selectProfile(final RGBVertexList profile) {
+		
+		fProfileViewer.getTable().setFocus();
+		
+		final ArrayList<RGBVertexList> selection = new ArrayList<RGBVertexList>();
+		selection.add(profile);
+		fProfileViewer.setSelection(new StructuredSelection(selection), true);
 	}
 }
