@@ -148,6 +148,7 @@ public class ColumnManager {
 
 		tvc.setEditingSupport(colDef.getEditingSupport());
 
+		// get column widget
 		tc = tvc.getColumn();
 
 		final String columnText = colDef.getColumnText();
@@ -199,13 +200,21 @@ public class ColumnManager {
 
 		// keep reference to the column definition
 		tc.setData(colDef);
+
+		// keep tc ref
 		colDef.setTableColumn(tc);
 
+		// keep create index
+		final int tcIndex = tableViewer.getTable().getColumnCount();
+		colDef.setTableColumnIndex(tcIndex);
+
+		// add selection listener
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
 		if (columnSelectionListener != null) {
 			tc.addSelectionListener(columnSelectionListener);
 		}
 
+		// add resize/move listener
 		final ControlListener columnControlListener = colDef.getColumnControlListener();
 		if (columnControlListener != null) {
 			tc.addControlListener(columnControlListener);

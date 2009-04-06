@@ -21,6 +21,9 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages"; //$NON-NLS-1$
 	
 	
+	public static String	profileViewer_column_label_checkbox;
+
+
 	public static String	profileViewer_column_label_color;
 
 
@@ -43,11 +46,20 @@ public class Messages extends NLS {
 	public static String		profileViewer_column_label_name_header;
 	public static String		profileViewer_column_label_name_tooltip;
 	
+	public static String	prefPage_srtm_btn_adjust_columns;
+
+
 	public static String	prefPage_srtm_chk_use_default_location;
 	public static String	prefPage_srtm_confirm_defaults_message;
 
 
 	public static String	prefPage_srtm_confirm_defaults_title;
+
+
+	public static String	prefPage_srtm_default_profile_name;
+
+
+	public static String	prefPage_srtm_default_profile_path;
 
 
 	public static String	prefPage_srtm_editor_data_filepath;

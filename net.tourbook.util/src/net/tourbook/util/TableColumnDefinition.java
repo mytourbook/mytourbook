@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.TableColumn;
 public class TableColumnDefinition extends ColumnDefinition {
 
 	private TableColumn	fTableColumn;
+	private int			fColumnIndex;
 
 	/**
 	 * @param columnManager
@@ -44,8 +45,16 @@ public class TableColumnDefinition extends ColumnDefinition {
 		return fTableColumn;
 	}
 
+	public int getTableColumnIndex() {
+		return fColumnIndex;
+	}
+
 	public void setTableColumn(final TableColumn tableColumn) {
 		fTableColumn = tableColumn;
+	}
+
+	public void setTableColumnIndex(final int tcIndex) {
+		fColumnIndex = tcIndex;
 	}
 
 	@Override

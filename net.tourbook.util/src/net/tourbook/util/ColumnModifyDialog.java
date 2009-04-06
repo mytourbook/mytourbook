@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-
 public class ColumnModifyDialog extends TrayDialog {
 
 	private ColumnManager				fColumnManager;
@@ -150,7 +149,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			}
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), true));
-		
+
 		// column: width
 		tvc = new TableViewerColumn(fColumnViewer, SWT.TRAIL);
 		tvcColumn = tvc.getColumn();
@@ -389,6 +388,18 @@ public class ColumnModifyDialog extends TrayDialog {
 
 			isUpEnabled = indices[0] != 0;
 			isDownEnabled = indices[indices.length - 1] < max - 1;
+		}
+
+		// disable movable when a column is not allowed to be moved
+		for (final TableItem tableItem : items) {
+			final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
+
+			if (colDef.isColumnMoveable() == false) {
+				isUpEnabled = false;
+				isDownEnabled = false;
+
+				break;
+			}
 		}
 
 		fBtnMoveUp.setEnabled(isUpEnabled);

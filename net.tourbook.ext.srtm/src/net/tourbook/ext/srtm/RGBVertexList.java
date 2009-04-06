@@ -99,6 +99,24 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		}
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof RGBVertexList)) {
+			return false;
+		}
+		final RGBVertexList other = (RGBVertexList) obj;
+		if (fProfileId != other.fProfileId) {
+			return false;
+		}
+		return true;
+	}
+
 	public Image getImage() {
 		return fProfileImage;
 	}
@@ -154,7 +172,10 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 	@Override
 	public int hashCode() {
-		return toString().hashCode();
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + fProfileId;
+		return result;
 	}
 
 	public void init() {
