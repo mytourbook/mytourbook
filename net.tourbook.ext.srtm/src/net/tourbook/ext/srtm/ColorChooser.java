@@ -123,7 +123,7 @@ public class ColorChooser {
 		}
 	}
 
-	public void setChooser() {
+	public void createUI() {
 		
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(composite);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(composite);

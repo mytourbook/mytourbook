@@ -30,22 +30,23 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
-public class RGBVertexList extends ArrayList<RGBVertex> {
+public class SRTMProfile {
 
-	private static final int	IMAGE_MIN_WIDTH		= 10;
-	private static final int	IMAGE_MIN_HEIGHT	= 10;
+	private static final int		IMAGE_MIN_WIDTH		= 10;
+	private static final int		IMAGE_MIN_HEIGHT	= 10;
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long		serialVersionUID	= 1L;
 
-	private Image				fProfileImage;
+	private Image					fProfileImage;
 
-	private int					fProfileId;
-	private String				fProfileName;
-	private String				fProfilePath;
+	private int						fProfileId;
+	private String					fProfileName;
+	private String					fProfilePath;
 
-	public static void main(final String[] args) {
-		return;
-	}
+	/**
+	 * list with all vertexes
+	 */
+	private ArrayList<RGBVertex>	fVertexList			= new ArrayList<RGBVertex>();
 
 	/**
 	 * Creates or recreates the vertex image
@@ -65,7 +66,7 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 		fProfileImage = new Image(display, width, height);
 		final GC gc = new GC(fProfileImage);
-		final long elevMax = size() == 0 ? 8850 : get(size() - 1).getElevation();
+		final long elevMax = fVertexList.size() == 0 ? 8850 : fVertexList.get(fVertexList.size() - 1).getElevation();
 		for (int x = 0; x < width; x++) {
 			final long elev = elevMax * x / width;
 			final RGB rgb = getRGB(elev);
@@ -74,8 +75,8 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 			gc.drawLine(width - x, 0, width - x, height);
 		}
 		final Transform transform = new Transform(display);
-		for (int ix = 0; ix < size(); ix++) {
-			final long elev = get(ix).getElevation();
+		for (int ix = 0; ix < fVertexList.size(); ix++) {
+			final long elev = fVertexList.get(ix).getElevation();
 			if (elev < 0)
 				continue;
 			int x = elevMax == 0 ? 0 : (int) (elev * width / elevMax);
@@ -107,10 +108,10 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		if (!super.equals(obj)) {
 			return false;
 		}
-		if (!(obj instanceof RGBVertexList)) {
+		if (!(obj instanceof SRTMProfile)) {
 			return false;
 		}
-		final RGBVertexList other = (RGBVertexList) obj;
+		final SRTMProfile other = (SRTMProfile) obj;
 		if (fProfileId != other.fProfileId) {
 			return false;
 		}
@@ -135,17 +136,17 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 
 	public RGB getRGB(final long elev) {
 
-		if (size() == 0)
+		if (fVertexList.size() == 0)
 			return new RGB(255, 255, 255);
-		if (size() == 1)
-			return get(0).getRGB();
+		if (fVertexList.size() == 1)
+			return fVertexList.get(0).getRGB();
 
-		for (int ix = size() - 2; ix >= 0; ix--) {
-			if (elev > get(ix).getElevation()) {
-				final RGB rgb1 = get(ix).getRGB();
-				final RGB rgb2 = get(ix + 1).getRGB();
-				final long elev1 = get(ix).getElevation();
-				final long elev2 = get(ix + 1).getElevation();
+		for (int ix = fVertexList.size() - 2; ix >= 0; ix--) {
+			if (elev > fVertexList.get(ix).getElevation()) {
+				final RGB rgb1 = fVertexList.get(ix).getRGB();
+				final RGB rgb2 = fVertexList.get(ix + 1).getRGB();
+				final long elev1 = fVertexList.get(ix).getElevation();
+				final long elev2 = fVertexList.get(ix + 1).getElevation();
 				final long dElevG = elev2 - elev1;
 				final long dElev1 = elev - elev1;
 				final long dElev2 = elev2 - elev;
@@ -170,6 +171,10 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 		return new RGB(255, 255, 255);
 	}
 
+	public ArrayList<RGBVertex> getVertexList() {
+		return fVertexList;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -179,24 +184,36 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 	}
 
 	public void init() {
-		if (size() > 0)
+		if (fVertexList.size() > 0)
 			return;
-		add(0, new RGBVertex(0, 0, 255, 0));
-		add(1, new RGBVertex(0, 255, 0, 1000));
-		add(2, new RGBVertex(255, 0, 0, 2000));
+		fVertexList.add(0, new RGBVertex(0, 0, 255, 0));
+		fVertexList.add(1, new RGBVertex(0, 255, 0, 1000));
+		fVertexList.add(2, new RGBVertex(255, 0, 0, 2000));
 	}
 
-	public void replaceVertexes(final RGBVertexList rgbVertexList) {
-		clear();
-		for (int ix = 0; ix < rgbVertexList.size(); ix++) {
-			final RGBVertex rgbVertex = rgbVertexList.get(ix);
-			add(ix, rgbVertex);
+	/**
+	 * update profile from another profile
+	 * 
+	 * @param newProfile
+	 */
+	public void replaceVertexes(final SRTMProfile newProfile) {
+
+		fVertexList.clear();
+		final ArrayList<RGBVertex> newVertexList = newProfile.getVertexList();
+
+		for (int ix = 0; ix < newVertexList.size(); ix++) {
+			final RGBVertex rgbVertex = newVertexList.get(ix);
+			fVertexList.add(ix, rgbVertex);
 		}
+
+		fProfileId = newProfile.getProfileId();
+		fProfileName = new String(newProfile.getProfileName());
+		fProfilePath = new String(newProfile.getProfilePath());
 	}
 
 	public void set(String s) {
 		final Pattern pattern = Pattern.compile("^([-]*[0-9]*),([0-9]*),([0-9]*),([0-9]*);(.*)$"); //$NON-NLS-1$
-		clear();
+		fVertexList.clear();
 		int ix = 0;
 		while (s.length() > 0) {
 			final Matcher matcher = pattern.matcher(s);
@@ -208,7 +225,7 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 				final RGBVertex rgbVertex = new RGBVertex();
 				rgbVertex.setElev(elev.longValue());
 				rgbVertex.setRGB(new RGB(red.intValue(), green.intValue(), blue.intValue()));
-				add(ix, rgbVertex);
+				fVertexList.add(ix, rgbVertex);
 				ix++;
 				s = matcher.group(5); // rest
 			}
@@ -229,23 +246,23 @@ public class RGBVertexList extends ArrayList<RGBVertex> {
 	}
 
 	public void setVertexList(final ArrayList<RGBVertex> vertexList) {
-		clear();
+		fVertexList.clear();
 		for (final RGBVertex vertex : vertexList) {
-			add(vertex);
+			fVertexList.add(vertex);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public void sort() {
-		Collections.sort(this);
+		Collections.sort(fVertexList);
 	}
 
 	@Override
 	public String toString() {
 		String s;
 		s = ""; //$NON-NLS-1$
-		for (int i = 0; i < size(); i++) {
-			s += get(i);
+		for (int i = 0; i < fVertexList.size(); i++) {
+			s += fVertexList.get(i);
 		}
 		return s;
 	}
