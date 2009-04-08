@@ -635,7 +635,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 						if (dialog.open() == Window.OK) {
 
-							final SRTMProfile modifiedProfile = dialog.getRgbVertexList();
+							final SRTMProfile modifiedProfile = dialog.getSRTMProfile();
 
 							selectedProfile.replaceVertexes(modifiedProfile);
 							selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);

@@ -48,6 +48,8 @@ public class SRTMProfile {
 	 */
 	private ArrayList<RGBVertex>	fVertexList			= new ArrayList<RGBVertex>();
 
+	private boolean					fIsHorizontal		= true;
+
 	/**
 	 * Creates or recreates the vertex image
 	 * 
@@ -65,31 +67,83 @@ public class SRTMProfile {
 		height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
 
 		fProfileImage = new Image(display, width, height);
+
+		/*
+		 * draw colors
+		 */
 		final GC gc = new GC(fProfileImage);
 		final long elevMax = fVertexList.size() == 0 ? 8850 : fVertexList.get(fVertexList.size() - 1).getElevation();
-		for (int x = 0; x < width; x++) {
-			final long elev = elevMax * x / width;
+
+		final int horizontal = fIsHorizontal ? width : height;
+		final int vertical = fIsHorizontal ? height : width;
+
+		for (int x = 0; x < horizontal; x++) {
+
+			final long elev = elevMax * x / horizontal;
+
 			final RGB rgb = getRGB(elev);
 			final Color color = new Color(display, rgb);
 			gc.setForeground(color);
-			gc.drawLine(width - x, 0, width - x, height);
+
+			if (fIsHorizontal) {
+
+				final int x1 = horizontal - x;
+				final int x2 = horizontal - x;
+
+				final int y1 = 0;
+				final int y2 = vertical;
+
+				gc.drawLine(x1, y1, x2, y2);
+
+			} else {
+
+				final int x1 = 0;
+				final int x2 = vertical;
+
+				final int y1 = horizontal - x;
+				final int y2 = horizontal - x;
+
+				gc.drawLine(x1, y1, x2, y2);
+			}
 		}
+
+		/*
+		 * draw text
+		 */
 		final Transform transform = new Transform(display);
 		for (int ix = 0; ix < fVertexList.size(); ix++) {
+
 			final long elev = fVertexList.get(ix).getElevation();
-			if (elev < 0)
+
+			if (elev < 0) {
 				continue;
-			int x = elevMax == 0 ? 0 : (int) (elev * width / elevMax);
-			x = Math.max(x, 13);
+			}
+
 			final RGB rgb = getRGB(elev);
 			rgb.red = 255 - rgb.red;
 			rgb.green = 255 - rgb.green;
 			rgb.blue = 255 - rgb.blue;
 			final Color color = new Color(display, rgb);
 			gc.setForeground(color);
-			transform.setElements(0, -1, 1, 0, width - x - 1, height - 3); // Rotate by -90 degrees	
+
+			int x = elevMax == 0 ? 0 : (int) (elev * horizontal / elevMax);
+			x = Math.max(x, 13);
+
+			// Rotate by -90 degrees	
+			
+			if (fIsHorizontal) {
+				final int dx = horizontal - x - 1;
+				final int dy = vertical - 3;
+				transform.setElements(0, -1, 1, 0, dx, dy);
+			} else {
+				final int dx = 3;
+				final int dy = horizontal - x - 1;
+				transform.setElements(1, 0, 0, 1, dx, dy);
+			}
+
 			gc.setTransform(transform);
-			gc.drawText("" + elev, 0, 0, true); //$NON-NLS-1$
+
+			gc.drawText(UI.EMPTY_STRING + elev, 0, 0, true);
 		}
 		transform.dispose();
 	}
@@ -136,23 +190,30 @@ public class SRTMProfile {
 
 	public RGB getRGB(final long elev) {
 
-		if (fVertexList.size() == 0)
+		if (fVertexList.size() == 0) {
 			return new RGB(255, 255, 255);
-		if (fVertexList.size() == 1)
+		}
+
+		if (fVertexList.size() == 1) {
 			return fVertexList.get(0).getRGB();
+		}
 
 		for (int ix = fVertexList.size() - 2; ix >= 0; ix--) {
 			if (elev > fVertexList.get(ix).getElevation()) {
+
 				final RGB rgb1 = fVertexList.get(ix).getRGB();
 				final RGB rgb2 = fVertexList.get(ix + 1).getRGB();
 				final long elev1 = fVertexList.get(ix).getElevation();
 				final long elev2 = fVertexList.get(ix + 1).getElevation();
+
 				final long dElevG = elev2 - elev1;
 				final long dElev1 = elev - elev1;
 				final long dElev2 = elev2 - elev;
+
 				int red = (int) ((double) (rgb2.red * dElev1 + rgb1.red * dElev2) / dElevG);
 				int green = (int) ((double) (rgb2.green * dElev1 + rgb1.green * dElev2) / dElevG);
 				int blue = (int) ((double) (rgb2.blue * dElev1 + rgb1.blue * dElev2) / dElevG);
+
 				if (red > 0xFF)
 					red = 0xFF;
 				if (green > 0xFF)
@@ -165,6 +226,7 @@ public class SRTMProfile {
 					green = 0;
 				if (blue < 0)
 					blue = 0;
+
 				return new RGB(red, green, blue);
 			}
 		}
@@ -250,6 +312,13 @@ public class SRTMProfile {
 		for (final RGBVertex vertex : vertexList) {
 			fVertexList.add(vertex);
 		}
+	}
+
+	/**
+	 * paint the profile image vertical, default is horizontal
+	 */
+	public void setVertical() {
+		fIsHorizontal = false;
 	}
 
 	@SuppressWarnings("unchecked")
