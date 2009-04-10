@@ -28,13 +28,20 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -48,24 +55,30 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogSelectSRTMColors extends Dialog {
 
-	private static final int		maxColor		= 100;
-
 	private final IDialogSettings	fDialogSettings;
 
 	private Text					fTxtProfileName;
 	private Text					fTxtTilePath;
 
 	private ImageCanvas				fProfileImageCanvas;
+	private Composite				fColorContainer;
 	private ColorChooser			fColorChooser;
-	private Composite				fContainerVertexFields;
-	private Button					fBtnRemove;
+	private Composite				fVertexOuterContainer;
+	private ScrolledComposite		fVertexScrolledContainer;
 
-	private static Label[]			colorLabel		= new Label[maxColor];
-	private static Text[]			elevFields		= new Text[maxColor];
-	private static Button[]			checkButtons	= new Button[maxColor];
+	private Text[]					elevFields;
+	private Label[]					colorLabel;
+	private Button[]				checkButtons;
+
+	private Button					fBtnRemove;
 
 	private SRTMProfile				fProfile;
 	private ArrayList<RGBVertex>	fVertexList;
+
+	/**
+	 * keep colors which must be disposed when the dialog gets disposed
+	 */
+	private ArrayList<Color>		fColorList	= new ArrayList<Color>();
 
 	public DialogSelectSRTMColors(final Shell parentShell, final SRTMProfile profile) {
 
@@ -76,7 +89,7 @@ public class DialogSelectSRTMColors extends Dialog {
 		fVertexList = profile.getVertexList();
 
 		// make dialog resizable
-		setShellStyle(getShellStyle() /* | SWT.RESIZE */);
+		setShellStyle(getShellStyle() | SWT.RESIZE);
 
 		fDialogSettings = Activator.getDefault().getDialogSettingsSection(getClass().getName());
 	}
@@ -87,8 +100,27 @@ public class DialogSelectSRTMColors extends Dialog {
 		super.configureShell(shell);
 
 		shell.setText(Messages.dialog_adjust_srtm_colors_dialog_title);
+
 		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {}
+			public void widgetDisposed(final DisposeEvent e) {
+				disposeColors();
+			}
+		});
+
+		shell.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+
+				// allow resizing the height but not the width
+
+				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				final Point shellSize = shell.getSize();
+
+//				defaultSize.y = shellSize.y < defaultSize.y ? defaultSize.y : shellSize.y;
+				defaultSize.y = shellSize.y;
+
+				shell.setSize(defaultSize);
+			}
 		});
 	}
 
@@ -115,18 +147,23 @@ public class DialogSelectSRTMColors extends Dialog {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				final int rgbVertexListSize = fVertexList.size();
+				// ensure the field list is updated and not unsorted
+				updateProfile();
 
-				final RGBVertex rgbVertex = new RGBVertex();
-				rgbVertex.setRGB(fColorChooser.getRGB());
-				fVertexList.add(rgbVertexListSize, rgbVertex);
+				// create new vertex at the end of the list
+				fVertexList.add(new RGBVertex(fColorChooser.getRGB()));
 
-				disposeVertexFields(rgbVertexListSize);
-				createUIVertexFieds();
+				createUIVertexFieds(fVertexOuterContainer);
 
-				paintProfileImage();
-				
+				// set focus to the new vertex
+				elevFields[elevFields.length - 1].setFocus();
+
 				enableActions();
+
+				/*
+				 * !!! the fields are not sorted here because this leads to confusion when the field
+				 * is moved to another position
+				 */
 			}
 
 		});
@@ -147,11 +184,8 @@ public class DialogSelectSRTMColors extends Dialog {
 					}
 				}
 
-				disposeVertexFields(rgbVertexListSize);
-				createUIVertexFieds();
-
+				createUIVertexFieds(fVertexOuterContainer);
 				paintProfileImage();
-				
 				enableActions();
 			}
 		});
@@ -163,7 +197,7 @@ public class DialogSelectSRTMColors extends Dialog {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				sortColors();
+				updateProfile();
 			}
 		});
 
@@ -215,44 +249,75 @@ public class DialogSelectSRTMColors extends Dialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtTilePath);
 		}
 
-		final Composite colorContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(0, 10).applyTo(colorContainer);
-		GridLayoutFactory.fillDefaults().numColumns(3).spacing(20, 0).applyTo(colorContainer);
+		fColorContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).indent(0, 10).applyTo(fColorContainer);
+		GridLayoutFactory.fillDefaults().numColumns(3).spacing(10, 0).applyTo(fColorContainer);
 		{
 			/*
 			 * profile image
 			 */
-			fProfileImageCanvas = new ImageCanvas(colorContainer, SWT.NO_BACKGROUND);
+			fProfileImageCanvas = new ImageCanvas(fColorContainer, SWT.NO_BACKGROUND);
 			GridDataFactory.fillDefaults().grab(false, true).hint(100, SWT.DEFAULT).applyTo(fProfileImageCanvas);
+			fProfileImageCanvas.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(final ControlEvent e) {
+					paintProfileImage();
+				}
+			});
 
 			/*
 			 * vertex fields
 			 */
-			fContainerVertexFields = new Composite(colorContainer, SWT.NONE);
-			createUIVertexFieds();
+			fVertexOuterContainer = new Composite(fColorContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(false, true).applyTo(fVertexOuterContainer);
+			GridLayoutFactory.fillDefaults().applyTo(fVertexOuterContainer);
+
+			createUIVertexFieds(fVertexOuterContainer);
 
 			/*
 			 * color chooser
 			 */
-			fColorChooser = new ColorChooser(new Composite(colorContainer, SWT.NONE));
+			fColorChooser = new ColorChooser(new Composite(fColorContainer, SWT.NONE));
 			fColorChooser.createUI();
+
 		}
 	}
 
-	private void createUIVertexFieds() {
-
-		fContainerVertexFields.pack(); // necessary if # of fields doesn't change!
-
-		GridDataFactory.fillDefaults()/* .indent(50, 0) */.align(SWT.CENTER, SWT.TOP).applyTo(fContainerVertexFields);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(fContainerVertexFields);
+	private void createUIVertexFieds(final Composite parent) {
 
 		final int vertexSize = fVertexList.size();
 		if (vertexSize == 0) {
 			return;
 		}
 
-		final GridData gdCheckbox = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
+		final Display display = parent.getDisplay();
 
+		// dispose previous content
+		if (fVertexScrolledContainer != null) {
+			fVertexScrolledContainer.dispose();
+		}
+
+		// scrolled container
+		fVertexScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(fVertexScrolledContainer);
+		fVertexScrolledContainer.setExpandVertical(true);
+		fVertexScrolledContainer.setExpandHorizontal(true);
+
+		// vertex container
+		final Composite vertexContainer = new Composite(fVertexScrolledContainer, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(vertexContainer);
+
+		fVertexScrolledContainer.setContent(vertexContainer);
+		fVertexScrolledContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				fVertexScrolledContainer.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
+		});
+
+		/*
+		 * field listener
+		 */
 		final SelectionAdapter checkboxListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -279,49 +344,108 @@ public class DialogSelectSRTMColors extends Dialog {
 			}
 		};
 
-		final Display display = fContainerVertexFields.getDisplay();
+		final ModifyListener eleModifyListener = new ModifyListener() {
+			public void modifyText(final ModifyEvent event) {
+
+				final Text widget = (Text) event.widget;
+				final String vertexText = widget.getText();
+
+				if (vertexText.trim().length() == 0) {
+					widget.setText(UI.STRING_0);//$NON-NLS-1$
+					return;
+				}
+
+				final RGBVertex vertex = (RGBVertex) widget.getData();
+
+				try {
+					vertex.elev = Long.parseLong(vertexText);
+				} catch (final NumberFormatException e) {
+					widget.setText(UI.STRING_0);//$NON-NLS-1$
+				}
+			}
+		};
+
+		final MouseAdapter colorMouseListener = new MouseAdapter() {
+			@Override
+			public void mouseDown(final MouseEvent e) {
+
+				final RGB rgb = fColorChooser.getRGB();
+				final Color labelColor = new Color(display, rgb);
+				fColorList.add(labelColor);
+
+				final Label label = (Label) (e.widget);
+				label.setBackground(labelColor);
+
+				final RGBVertex vertex = (RGBVertex) label.getData();
+				vertex.setRGB(rgb);
+
+				updateProfile();
+			}
+		};
+
+		final VerifyListener eleVerifyListener = UI.verifyListenerInteger(true);
+
+		/*
+		 * grid data
+		 */
+		final GridData gdEle = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		gdEle.widthHint = 50;
+
+		final GridData gdColor = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		gdColor.widthHint = 70;
+		gdColor.heightHint = 20;
+
+		final GridData gdCheckbox = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+
+		/*
+		 * fields
+		 */
+		colorLabel = new Label[vertexSize];
+		elevFields = new Text[vertexSize];
+		checkButtons = new Button[vertexSize];
 
 		for (int vertexIndex = vertexSize - 1; vertexIndex >= 0; vertexIndex--) {
 
 			final RGBVertex vertex = fVertexList.get(vertexIndex);
+			final RGB vertexRGB = vertex.getRGB();
 
 			/*
 			 * text: elevation
 			 */
-			final Text txtElevation = elevFields[vertexIndex] = new Text(fContainerVertexFields, SWT.SINGLE | SWT.TRAIL);
-			GridDataFactory.fillDefaults().hint(50, SWT.DEFAULT).grab(true, false).applyTo(txtElevation);
+			final Text txtElevation = elevFields[vertexIndex] = new Text(vertexContainer, SWT.SINGLE
+					| SWT.TRAIL
+					| SWT.BORDER);
+			txtElevation.setLayoutData(gdEle);
 			txtElevation.setText(UI.EMPTY_STRING + vertex.getElevation());
-			txtElevation.setEditable(true);
+			txtElevation.addModifyListener(eleModifyListener);
+			txtElevation.addVerifyListener(eleVerifyListener);
+			txtElevation.setData(vertex);
 
 			/*
 			 * color label
 			 */
-			final Label lblColor = colorLabel[vertexIndex] = new Label(fContainerVertexFields, SWT.CENTER);
-
-			final GridData gd = new GridData(SWT.CENTER, SWT.CENTER, true, true);
-			gd.widthHint = 70;
-			gd.heightHint = 20;
-			lblColor.setLayoutData(gd);
-
-			final RGB vertexRGB = vertex.getRGB();
-			lblColor.setToolTipText("" + vertexRGB.red + "/" + vertexRGB.green + "/" + vertexRGB.blue);
-			lblColor.setBackground(new Color(display, vertexRGB));
-			lblColor.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseDown(final MouseEvent e) {
-					final Color labelColor = new Color(display, fColorChooser.getRGB());
-					((Label) (e.widget)).setBackground(labelColor);
-					sortColors();
-				}
-			});
+			final Label lblColor = colorLabel[vertexIndex] = new Label(vertexContainer, SWT.CENTER);
+			lblColor.setLayoutData(gdColor);
+			lblColor.setToolTipText(UI.EMPTY_STRING + vertexRGB.red + "/" + vertexRGB.green + "/" + vertexRGB.blue); //$NON-NLS-1$ //$NON-NLS-2$
+			final Color bgColor = new Color(display, vertexRGB);
+			fColorList.add(bgColor);
+			lblColor.setBackground(bgColor);
+			lblColor.addMouseListener(colorMouseListener);
+			lblColor.setData(vertex);
 
 			/*
 			 * checkbox
 			 */
-			final Button checkbox = checkButtons[vertexIndex] = new Button(fContainerVertexFields, SWT.CHECK);
+			final Button checkbox = checkButtons[vertexIndex] = new Button(vertexContainer, SWT.CHECK);
 			checkbox.setLayoutData(gdCheckbox);
 			checkbox.setToolTipText(Messages.dialog_adjust_srtm_colors_checkbutton_ttt);
 			checkbox.addSelectionListener(checkboxListener);
+
+			/*
+			 * spacer
+			 */
+			final Label label = new Label(vertexContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().minSize(10, 1).applyTo(label);
 		}
 
 		/*
@@ -333,14 +457,12 @@ public class DialogSelectSRTMColors extends Dialog {
 			}
 		}
 
-		fContainerVertexFields.pack();
+		fVertexOuterContainer.layout(true);
 	}
 
-	private void disposeVertexFields(final int length) {
-		for (int ix = 0; ix < length; ix++) {
-			colorLabel[ix].dispose();
-			elevFields[ix].dispose();
-			checkButtons[ix].dispose();
+	private void disposeColors() {
+		for (final Color color : fColorList) {
+			color.dispose();
 		}
 	}
 
@@ -350,8 +472,11 @@ public class DialogSelectSRTMColors extends Dialog {
 
 		int checked = 0;
 		for (int ix = 0; ix < vertexSize; ix++) {
-			if (checkButtons[ix].getSelection()) {
-				checked++;
+			final Button button = checkButtons[ix];
+			if (button != null) {
+				if (button.getSelection()) {
+					checked++;
+				}
 			}
 		}
 
@@ -365,10 +490,10 @@ public class DialogSelectSRTMColors extends Dialog {
 		return fDialogSettings;
 	}
 
-	@Override
-	protected int getDialogBoundsStrategy() {
-		return DIALOG_PERSISTLOCATION;
-	}
+//	@Override
+//	protected int getDialogBoundsStrategy() {
+//		return DIALOG_PERSISTLOCATION;
+//	}
 
 	public SRTMProfile getSRTMProfile() {
 		return fProfile;
@@ -377,7 +502,7 @@ public class DialogSelectSRTMColors extends Dialog {
 	@Override
 	protected void okPressed() {
 
-		sortColors();
+		updateProfile();
 
 		fProfile.setProfileName(fTxtProfileName.getText());
 		fProfile.setProfilePath(fTxtTilePath.getText());
@@ -391,29 +516,31 @@ public class DialogSelectSRTMColors extends Dialog {
 		fProfileImageCanvas.paintImage(fProfile.getImage());
 	}
 
-	@SuppressWarnings("unchecked")
-	private void sortColors() {
+	/**
+	 * sort's the vertexes, updates fields and profile image
+	 */
+	private void updateProfile() {
 
 		final int rgbVertexListSize = fVertexList.size();
 		fVertexList.clear();
 
-		for (int ix = 0, ixn = 0; ix < rgbVertexListSize; ix++) {
-			if (elevFields[ix].getText().equals(UI.EMPTY_STRING)) {
+		for (int ix = 0; ix < rgbVertexListSize; ix++) {
+
+			final String elevation = elevFields[ix].getText();
+			if (elevation.equals(UI.EMPTY_STRING)) {
 				continue; // remove empty fields
 			}
 
-			final Long elev = new Long(elevFields[ix].getText());
+			final Long elev = new Long(elevation);
 			final RGBVertex rgbVertex = new RGBVertex();
 			rgbVertex.setElev(elev.longValue());
 			rgbVertex.setRGB(colorLabel[ix].getBackground().getRGB());
-			fVertexList.add(ixn, rgbVertex);
-			ixn++;
+
+			fVertexList.add(rgbVertex);
 		}
 		Collections.sort(fVertexList);
 
-		disposeVertexFields(rgbVertexListSize);
-		createUIVertexFieds();
-		
+		createUIVertexFieds(fVertexOuterContainer);
 		paintProfileImage();
 	}
 

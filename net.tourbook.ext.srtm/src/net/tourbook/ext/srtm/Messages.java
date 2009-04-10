@@ -45,6 +45,8 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_msg_invalid_data_path;
 	public static String		prefPage_srtm_profile_title;
 	public static String		prefPage_srtm_profile_add;
+
+	public static String	prefPage_srtm_profile_edit;
 	public static String		prefPage_srtm_profile_remove;
 	public static String		prefPage_srtm_resolution_title;
 	public static String		prefPage_srtm_resolution_very_fine;

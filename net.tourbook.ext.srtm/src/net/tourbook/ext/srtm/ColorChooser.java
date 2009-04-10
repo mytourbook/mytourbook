@@ -90,7 +90,7 @@ public class ColorChooser {
 
 	public void createUI() {
 
-		final GridData gdCCL = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
+		final GridData gdCCL = new GridData(SWT.CENTER, SWT.TOP, true, false);
 
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(composite);
 		GridLayoutFactory.fillDefaults().applyTo(composite);
@@ -122,8 +122,8 @@ public class ColorChooser {
 		hexagonTab.setText(Messages.color_chooser_hexagon);
 		final TabItem rgbTab = new TabItem(fTabFolder, SWT.NONE);
 		rgbTab.setText(Messages.color_chooser_rgb);
-		final TabItem hsbTab = new TabItem(fTabFolder, SWT.NONE);
-		hsbTab.setText(Messages.color_chooser_hsb);
+//		final TabItem hsbTab = new TabItem(fTabFolder, SWT.NONE);
+//		hsbTab.setText(Messages.color_chooser_hsb);
 
 		// Hexagon-Tab
 		final Composite hexagonComposite = new Composite(fTabFolder, SWT.NONE);
@@ -186,7 +186,7 @@ public class ColorChooser {
 			redScale = new Scale(rgbComposite, SWT.BORDER);
 			redScale.setMinimum(0);
 			redScale.setMaximum(255);
-			redScale.setBackground(new Color(rgbComposite.getDisplay(), 255, 0, 0));
+			redScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			redScale.setLayoutData(gridData);
 			redScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
@@ -202,7 +202,7 @@ public class ColorChooser {
 			greenScale = new Scale(rgbComposite, SWT.BORDER);
 			greenScale.setMinimum(0);
 			greenScale.setMaximum(255);
-			greenScale.setBackground(new Color(rgbComposite.getDisplay(), 0, 255, 0));
+			greenScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			greenScale.setLayoutData(gridData);
 			greenScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
@@ -218,7 +218,7 @@ public class ColorChooser {
 			blueScale = new Scale(rgbComposite, SWT.BORDER);
 			blueScale.setMinimum(0);
 			blueScale.setMaximum(255);
-			blueScale.setBackground(new Color(rgbComposite.getDisplay(), 0, 0, 255));
+			blueScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			blueScale.setLayoutData(gridData);
 			blueScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
@@ -236,14 +236,14 @@ public class ColorChooser {
 //	    hue        - the hue        value for the HSB color (from 0 to 360)
 //	    saturation - the saturation value for the HSB color (from 0 to 1)
 //	    brightness - the brightness value for the HSB color (from 0 to 1) 
-		final Composite hsbComposite = new Composite(fTabFolder, SWT.NONE);
-
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(hsbComposite);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(hsbComposite);
+//		final Composite hsbComposite = new Composite(fTabFolder, SWT.NONE);
+//
+//		GridDataFactory.fillDefaults().grab(false, false).applyTo(hsbComposite);
+//		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(hsbComposite);
 		{
-			final Label hueLabel = new Label(hsbComposite, SWT.NONE);
+			final Label hueLabel = new Label(rgbComposite, SWT.NONE);
 			hueLabel.setText(Messages.color_chooser_hue);
-			hueScale = new Scale(hsbComposite, SWT.BORDER);
+			hueScale = new Scale(rgbComposite, SWT.BORDER);
 			hueScale.setMinimum(0);
 			hueScale.setMaximum(360);
 			hueScale.setLayoutData(gridData);
@@ -258,9 +258,9 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
-			final Label saturationLabel = new Label(hsbComposite, SWT.NONE);
+			final Label saturationLabel = new Label(rgbComposite, SWT.NONE);
 			saturationLabel.setText(Messages.color_chooser_saturation);
-			saturationScale = new Scale(hsbComposite, SWT.BORDER);
+			saturationScale = new Scale(rgbComposite, SWT.BORDER);
 			saturationScale.setMinimum(0);
 			saturationScale.setMaximum(100);
 			saturationScale.setLayoutData(gridData);
@@ -275,9 +275,9 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
-			final Label brightnessLabel = new Label(hsbComposite, SWT.NONE);
+			final Label brightnessLabel = new Label(rgbComposite, SWT.NONE);
 			brightnessLabel.setText(Messages.color_chooser_brightness);
-			brightnessScale = new Scale(hsbComposite, SWT.BORDER);
+			brightnessScale = new Scale(rgbComposite, SWT.BORDER);
 			brightnessScale.setMinimum(0);
 			brightnessScale.setMaximum(100);
 			brightnessScale.setLayoutData(gridData);
@@ -292,7 +292,7 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
-			hsbTab.setControl(hsbComposite);
+//			hsbTab.setControl(rgbComposite);
 		}
 
 		fTabFolder.pack();
@@ -341,8 +341,12 @@ public class ColorChooser {
 	private void setHexagon() {
 		for (int x = -chooserRadius; x < chooserRadius; x++) {
 			for (int y = -chooserRadius; y < chooserRadius; y++) {
-				gc.setForeground(new Color(chooserDisplay, getRGBFromHexagon(x, y)));
-				gc.drawPoint(x + chooserRadius, y + chooserRadius);
+				final Color fgColor = new Color(chooserDisplay, getRGBFromHexagon(x, y));
+				{
+					gc.setForeground(fgColor);
+					gc.drawPoint(x + chooserRadius, y + chooserRadius);
+				}
+				fgColor.dispose();
 			}
 		}
 	}
@@ -355,8 +359,11 @@ public class ColorChooser {
 
 	private void updateChoosedColorButton(final Display display) {
 		final Color color = new Color(display, choosedRGB);
-		choosedColorLabel.setBackground(color);
-		choosedColorLabel.setForeground(color);
+		{
+			choosedColorLabel.setBackground(color);
+			choosedColorLabel.setForeground(color);
+		}
+		color.dispose();
 	}
 
 	private void updateScales() {

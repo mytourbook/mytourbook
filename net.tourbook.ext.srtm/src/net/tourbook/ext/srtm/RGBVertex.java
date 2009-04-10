@@ -21,58 +21,61 @@ package net.tourbook.ext.srtm;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+public class RGBVertex implements Comparable<Object> {
 
-@SuppressWarnings("unchecked")
-public class RGBVertex implements Comparable{
+	RGB		rgb;
+	long	elev;
 
-   RGB rgb;
-   long elev;
-   
-   public RGBVertex() {
-      elev = 0;
-      rgb = new RGB(255, 255, 255); // WHITE
-   }
-   
-   public RGBVertex(int red, int green, int blue, long elev) {
-	   if ((red > 255) || (red < 0) ||
-		   (green > 255) || (green < 0) ||
-		   (blue > 255) || (blue < 0))
-		   SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	   
-	   this.elev = elev;
-	   rgb = new RGB(red, green, blue);
-   }
+	public static void main(final String[] args) {}
 
-   public RGB getRGB() {
-      return rgb;
-   }
+	public RGBVertex() {
+		elev = 0;
+		rgb = new RGB(255, 255, 255); // WHITE
+	}
 
-   public long getElevation() {
-      return elev;
-   }
+	public RGBVertex(final int red, final int green, final int blue, final long elev) {
+		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0))
+			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 
-   public void setRGB(RGB rgb) {
-      this.rgb = rgb;
-   }
+		this.elev = elev;
+		rgb = new RGB(red, green, blue);
+	}
 
-   public void setElev(long l) {
-      elev = l;
-   }
-   
-   public int compareTo(Object anotherRGBVertex) throws ClassCastException {
-       if (!(anotherRGBVertex instanceof RGBVertex))
-         throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
-       long anotherElev = ((RGBVertex) anotherRGBVertex).getElevation();
-         
-       if (this.elev < anotherElev) return (-1);
-       if (this.elev > anotherElev) return 1;
-       return 0;    
-   }
-   
-   public String toString() {
-	   return ""+elev+","+rgb.red+","+rgb.green+","+rgb.blue+";"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-   }
+	public RGBVertex(final RGB rgb) {
+		elev = 0;
+		this.rgb = rgb;
+	}
 
-   public static void main(String[] args) {
-   }
+	public int compareTo(final Object anotherRGBVertex) throws ClassCastException {
+		if (!(anotherRGBVertex instanceof RGBVertex))
+			throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
+		final long anotherElev = ((RGBVertex) anotherRGBVertex).getElevation();
+
+		if (this.elev < anotherElev)
+			return (-1);
+		if (this.elev > anotherElev)
+			return 1;
+		return 0;
+	}
+
+	public long getElevation() {
+		return elev;
+	}
+
+	public RGB getRGB() {
+		return rgb;
+	}
+
+	public void setElev(final long l) {
+		elev = l;
+	}
+
+	public void setRGB(final RGB rgb) {
+		this.rgb = rgb;
+	}
+
+	@Override
+	public String toString() {
+		return UI.EMPTY_STRING + elev + "," + rgb.red + "," + rgb.green + "," + rgb.blue + ";"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	}
 }

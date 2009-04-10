@@ -117,9 +117,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private static ArrayList<SRTMProfile>	fProfileList			= new ArrayList<SRTMProfile>();
 	private static SRTMProfile				fSelectedProfile		= null;
 
+	private Button							fBtnEditProfile;
 	private Button							fBtnAddProfile			= null;
-
 	private Button							fBtnRemoveProfile		= null;
+
 	private int								fDefaultImageWidth		= 300;
 	private int								fImageHeight			= 40;
 
@@ -619,36 +620,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		fProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-
-				final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
-				if (firstElement instanceof SRTMProfile) {
-
-					final SRTMProfile selectedProfile = (SRTMProfile) firstElement;
-					try {
-						// open color dialog
-
-						final SRTMProfile rgbVertexListEdit = new SRTMProfile();
-						rgbVertexListEdit.replaceVertexes(selectedProfile);
-
-						final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent()
-								.getActiveShell(), rgbVertexListEdit);
-
-						if (dialog.open() == Window.OK) {
-
-							final SRTMProfile modifiedProfile = dialog.getSRTMProfile();
-
-							selectedProfile.replaceVertexes(modifiedProfile);
-							selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
-
-							// update viewer
-							fProfileViewer.update(selectedProfile, null);
-
-							fProfileViewer.getTable().redraw();
-						}
-					} catch (final Exception e) {
-						e.printStackTrace();
-					}
-				}
+				onEditProfile();
 			}
 		});
 
@@ -662,8 +634,14 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		createUIResolutionOption(container);
 		createUIShadowOption(container);
-		createUIProfileList(container);
-		createUIButtons(container);
+
+		final Composite profileContainer = new Composite(container, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(profileContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 10).applyTo(profileContainer);
+		{
+			createUIProfileList(profileContainer);
+			createUIButtons(profileContainer);
+		}
 
 		return container;
 	}
@@ -672,8 +650,21 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults()/* .numColumns(5) */.applyTo(container);
 		{
+			/*
+			 * button: edit profile
+			 */
+			fBtnEditProfile = new Button(container, SWT.NONE);
+			fBtnEditProfile.setText(Messages.prefPage_srtm_profile_edit);
+			fBtnEditProfile.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onEditProfile();
+				}
+			});
+			setButtonLayoutData(fBtnEditProfile);
+
 			/*
 			 * button: add profile
 			 */
@@ -787,25 +778,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		TableColumnDefinition colDef;
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-
-		/*
-		 * column: checkbox
-		 */
-		colDef = new TableColumnDefinition(fColumnManager, "checkboxColumn", SWT.LEAD); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.profileViewer_column_label_checkbox);
-		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setIsColumnMoveable(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			/*
-			 * !!! set dummy label provider, otherwise an error occures !!!
-			 */
-			@Override
-			public void update(final ViewerCell cell) {}
-		});
 
 		/*
 		 * column: profile name
@@ -946,6 +918,39 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		// select new profile
 		fProfileViewer.setAllChecked(false);
 		selectProfile(profile);
+	}
+
+	private void onEditProfile() {
+
+		final Object firstElement = ((StructuredSelection) fProfileViewer.getSelection()).getFirstElement();
+		if (firstElement instanceof SRTMProfile) {
+
+			final SRTMProfile selectedProfile = (SRTMProfile) firstElement;
+			try {
+				// open color dialog
+
+				final SRTMProfile rgbVertexListEdit = new SRTMProfile();
+				rgbVertexListEdit.replaceVertexes(selectedProfile);
+
+				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent().getActiveShell(),
+						rgbVertexListEdit);
+
+				if (dialog.open() == Window.OK) {
+
+					final SRTMProfile modifiedProfile = dialog.getSRTMProfile();
+
+					selectedProfile.replaceVertexes(modifiedProfile);
+					selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+
+					// update viewer
+					fProfileViewer.update(selectedProfile, null);
+
+					fProfileViewer.getTable().redraw();
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void onRemoveProfile() {

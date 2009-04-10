@@ -74,7 +74,7 @@ public class SRTMProfile {
 		final GC gc = new GC(fProfileImage);
 		final long elevMax = fVertexList.size() == 0 ? 8850 : fVertexList.get(fVertexList.size() - 1).getElevation();
 
-		final int horizontal = fIsHorizontal ? width : height;
+		final int horizontal = fIsHorizontal ? width : height + 1;
 		final int vertical = fIsHorizontal ? height : width;
 
 		for (int x = 0; x < horizontal; x++) {
@@ -87,8 +87,8 @@ public class SRTMProfile {
 
 			if (fIsHorizontal) {
 
-				final int x1 = horizontal - x;
-				final int x2 = horizontal - x;
+				final int x1 = horizontal - x - 1;
+				final int x2 = horizontal - x - 1;
 
 				final int y1 = 0;
 				final int y2 = vertical;
@@ -100,8 +100,8 @@ public class SRTMProfile {
 				final int x1 = 0;
 				final int x2 = vertical;
 
-				final int y1 = horizontal - x;
-				final int y2 = horizontal - x;
+				final int y1 = horizontal - x - 1;
+				final int y2 = horizontal - x - 1;
 
 				gc.drawLine(x1, y1, x2, y2);
 			}
@@ -130,7 +130,7 @@ public class SRTMProfile {
 			x = Math.max(x, 13);
 
 			// Rotate by -90 degrees	
-			
+
 			if (fIsHorizontal) {
 				final int dx = horizontal - x - 1;
 				final int dy = vertical - 3;
@@ -321,7 +321,6 @@ public class SRTMProfile {
 		fIsHorizontal = false;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void sort() {
 		Collections.sort(fVertexList);
 	}
