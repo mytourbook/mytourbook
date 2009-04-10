@@ -22,6 +22,8 @@ package net.tourbook.ext.srtm;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.tourbook.util.UI;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -41,6 +43,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -116,7 +119,6 @@ public class DialogSelectSRTMColors extends Dialog {
 				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				final Point shellSize = shell.getSize();
 
-//				defaultSize.y = shellSize.y < defaultSize.y ? defaultSize.y : shellSize.y;
 				defaultSize.y = shellSize.y;
 
 				shell.setSize(defaultSize);
@@ -148,7 +150,7 @@ public class DialogSelectSRTMColors extends Dialog {
 			public void widgetSelected(final SelectionEvent e) {
 
 				// ensure the field list is updated and not unsorted
-				updateProfile();
+				sortVertexsUpdateProfile();
 
 				// create new vertex at the end of the list
 				fVertexList.add(new RGBVertex(fColorChooser.getRGB()));
@@ -197,7 +199,7 @@ public class DialogSelectSRTMColors extends Dialog {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				updateProfile();
+				sortVertexsUpdateProfile();
 			}
 		});
 
@@ -247,6 +249,7 @@ public class DialogSelectSRTMColors extends Dialog {
 			 */
 			fTxtTilePath = new Text(propertyContainer, SWT.BORDER);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtTilePath);
+			fTxtTilePath.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
 		}
 
 		fColorContainer = new Composite(parent, SWT.NONE);
@@ -256,8 +259,13 @@ public class DialogSelectSRTMColors extends Dialog {
 			/*
 			 * profile image
 			 */
-			fProfileImageCanvas = new ImageCanvas(fColorContainer, SWT.NO_BACKGROUND);
+			fProfileImageCanvas = new ImageCanvas(fColorContainer, SWT.NO_BACKGROUND
+//					| SWT.BORDER
+//					| SWT.SHADOW_NONE
+//					| SWT.FLAT
+			);
 			GridDataFactory.fillDefaults().grab(false, true).hint(100, SWT.DEFAULT).applyTo(fProfileImageCanvas);
+//			fProfileImageCanvas.setIsAdaptSize(true);
 			fProfileImageCanvas.addControlListener(new ControlAdapter() {
 				@Override
 				public void controlResized(final ControlEvent e) {
@@ -291,9 +299,14 @@ public class DialogSelectSRTMColors extends Dialog {
 		}
 
 		final Display display = parent.getDisplay();
+		Point scrollOrigin = null;
 
 		// dispose previous content
 		if (fVertexScrolledContainer != null) {
+
+			// get current scroll position
+			scrollOrigin = fVertexScrolledContainer.getOrigin();
+
 			fVertexScrolledContainer.dispose();
 		}
 
@@ -379,7 +392,7 @@ public class DialogSelectSRTMColors extends Dialog {
 				final RGBVertex vertex = (RGBVertex) label.getData();
 				vertex.setRGB(rgb);
 
-				updateProfile();
+				sortVertexsUpdateProfile();
 			}
 		};
 
@@ -424,7 +437,9 @@ public class DialogSelectSRTMColors extends Dialog {
 			/*
 			 * color label
 			 */
-			final Label lblColor = colorLabel[vertexIndex] = new Label(vertexContainer, SWT.CENTER);
+			final Label lblColor = colorLabel[vertexIndex] = new Label(vertexContainer, SWT.CENTER
+					| SWT.BORDER
+					| SWT.SHADOW_NONE);
 			lblColor.setLayoutData(gdColor);
 			lblColor.setToolTipText(UI.EMPTY_STRING + vertexRGB.red + "/" + vertexRGB.green + "/" + vertexRGB.blue); //$NON-NLS-1$ //$NON-NLS-2$
 			final Color bgColor = new Color(display, vertexRGB);
@@ -458,6 +473,12 @@ public class DialogSelectSRTMColors extends Dialog {
 		}
 
 		fVertexOuterContainer.layout(true);
+
+		// set scroll position to previous position
+		if (scrollOrigin != null) {
+			fVertexScrolledContainer.setOrigin(scrollOrigin);
+		}
+
 	}
 
 	private void disposeColors() {
@@ -490,11 +511,6 @@ public class DialogSelectSRTMColors extends Dialog {
 		return fDialogSettings;
 	}
 
-//	@Override
-//	protected int getDialogBoundsStrategy() {
-//		return DIALOG_PERSISTLOCATION;
-//	}
-
 	public SRTMProfile getSRTMProfile() {
 		return fProfile;
 	}
@@ -502,7 +518,7 @@ public class DialogSelectSRTMColors extends Dialog {
 	@Override
 	protected void okPressed() {
 
-		updateProfile();
+		sortVertexsUpdateProfile();
 
 		fProfile.setProfileName(fTxtProfileName.getText());
 		fProfile.setProfilePath(fTxtTilePath.getText());
@@ -512,14 +528,14 @@ public class DialogSelectSRTMColors extends Dialog {
 
 	private void paintProfileImage() {
 		final Rectangle imageBounds = fProfileImageCanvas.getBounds();
-		fProfile.createImage(Display.getCurrent(), imageBounds.width, imageBounds.height);
-		fProfileImageCanvas.paintImage(fProfile.getImage());
+		final Image image = fProfile.createImage(Display.getCurrent(), imageBounds.width, imageBounds.height);
+		fProfileImageCanvas.setImage(image);
 	}
 
 	/**
 	 * sort's the vertexes, updates fields and profile image
 	 */
-	private void updateProfile() {
+	private void sortVertexsUpdateProfile() {
 
 		final int rgbVertexListSize = fVertexList.size();
 		fVertexList.clear();

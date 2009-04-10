@@ -44,6 +44,7 @@ public class ColorChooser {
 	private int					chooserSize				= 0;
 	private int					chooserRadius			= 0;
 	private int					hexagonRadius			= 0;
+
 	private static final double	a120					= 2 * Math.PI / 3;
 	private static final double	sqrt3					= Math.sqrt(3);
 	private static final double	twodivsqrt3				= 2. / sqrt3;
@@ -51,11 +52,13 @@ public class ColorChooser {
 	private static final double	cos120					= Math.cos(a120);
 	private static final double	sin240					= -sin120;
 	private static final double	cos240					= cos120;
+
 	private int					col3					= 0;
+
 	private Composite			composite;
-	private GC					gc;
+	private TabFolder			fTabFolder;
 	private Display				chooserDisplay;
-	private Label				hexagonLabel;
+	private ImageCanvas			fHexagonCanvas;
 	private RGB					choosedRGB;
 	private Label				choosedColorLabel;
 	private Scale				redScale;
@@ -64,14 +67,15 @@ public class ColorChooser {
 	private Scale				hueScale;
 	private Scale				saturationScale;
 	private Scale				brightnessScale;
+
 	private int					scaleValueRed			= 0;
 	private int					scaleValueGreen			= 0;
 	private int					scaleValueBlue			= 0;
 	private int					scaleValueHue			= 0;
 	private int					scaleValueSaturation	= 0;
 	private int					scaleValueBrightness	= 0;
+
 	private boolean				hexagonChangeState		= false;
-	private TabFolder			fTabFolder;
 
 	public ColorChooser(final Composite composite) {
 		this.composite = composite;
@@ -96,7 +100,7 @@ public class ColorChooser {
 		GridLayoutFactory.fillDefaults().applyTo(composite);
 		{
 			// choosed Color Label
-			choosedColorLabel = new Label(composite, SWT.CENTER);
+			choosedColorLabel = new Label(composite, SWT.CENTER | SWT.BORDER | SWT.SHADOW_NONE);
 			choosedColorLabel.setLayoutData(gdCCL);
 			choosedColorLabel.setToolTipText(Messages.color_chooser_choosed_color);
 
@@ -106,40 +110,42 @@ public class ColorChooser {
 			createUITabs();
 		}
 
-//		gdCCL.widthHint = chooserSize;
 		gdCCL.widthHint = fTabFolder.getBounds().width;
 		gdCCL.heightHint = chooserSize / 4;
-
 	}
 
 	private void createUITabs() {
 
-		final GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1);
-		gridData.widthHint = chooserSize - 50;
+		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 
+		/*
+		 * tabfolder
+		 */
 		fTabFolder = new TabFolder(composite, SWT.NONE);
+		
 		final TabItem hexagonTab = new TabItem(fTabFolder, SWT.NONE);
 		hexagonTab.setText(Messages.color_chooser_hexagon);
+		
 		final TabItem rgbTab = new TabItem(fTabFolder, SWT.NONE);
 		rgbTab.setText(Messages.color_chooser_rgb);
-//		final TabItem hsbTab = new TabItem(fTabFolder, SWT.NONE);
-//		hsbTab.setText(Messages.color_chooser_hsb);
 
-		// Hexagon-Tab
-		final Composite hexagonComposite = new Composite(fTabFolder, SWT.NONE);
+		/*
+		 * Hexagon-Tab
+		 */
+		final Composite hexagonContainer = new Composite(fTabFolder, SWT.NONE);
 
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(hexagonComposite);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(hexagonComposite);
+		GridDataFactory.fillDefaults().grab(false, false).applyTo(hexagonContainer);
+		GridLayoutFactory.swtDefaults().applyTo(hexagonContainer);
 		{
-			final Image hexagonImage = new Image(hexagonComposite.getDisplay(), chooserSize, chooserSize);
-			gc = new GC(hexagonImage);
+			final Image hexagonImage = new Image(hexagonContainer.getDisplay(), chooserSize, chooserSize);
+			paintHexagon(hexagonImage);
 
-			setHexagon();
+			fHexagonCanvas = new ImageCanvas(hexagonContainer, SWT.NO_BACKGROUND);
+			GridDataFactory.fillDefaults().hint(chooserSize, chooserSize).applyTo(fHexagonCanvas);
 
-			hexagonLabel = new Label(hexagonComposite, SWT.CENTER);
-			hexagonLabel.setImage(hexagonImage);
-			hexagonLabel.setToolTipText(Messages.color_chooser_hexagon_move);
-			hexagonLabel.addMouseListener(new MouseListener() {
+			fHexagonCanvas.setImage(hexagonImage);
+			fHexagonCanvas.setToolTipText(Messages.color_chooser_hexagon_move);
+			fHexagonCanvas.addMouseListener(new MouseListener() {
 				public void mouseDoubleClick(final MouseEvent e) {}
 
 				public void mouseDown(final MouseEvent e) {
@@ -151,36 +157,42 @@ public class ColorChooser {
 					hexagonChangeState = false;
 				}
 			});
-			hexagonLabel.addMouseMoveListener(new MouseMoveListener() {
+			fHexagonCanvas.addMouseMoveListener(new MouseMoveListener() {
 				public void mouseMove(final MouseEvent e) {
-					if (!hexagonChangeState)
+					if (!hexagonChangeState) {
 						return;
+					}
 					chooseRGBFromHexagon(e);
 				}
 			});
 
-			final Slider hexagonSlider = new Slider(hexagonComposite, SWT.HORIZONTAL);
+			final Slider hexagonSlider = new Slider(hexagonContainer, SWT.HORIZONTAL);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(hexagonSlider);
 			hexagonSlider.setMinimum(0);
 			hexagonSlider.setMaximum(255);
 			hexagonSlider.setIncrement(8);
-			hexagonSlider.setLayoutData(gridData);
 
 			hexagonSlider.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event event) {
 					col3 = new Integer(hexagonSlider.getSelection()).intValue();
-					setHexagon();
-					hexagonLabel.setImage(hexagonImage);
+					paintHexagon(hexagonImage);
+					fHexagonCanvas.redraw();
 				}
 			});
-			hexagonTab.setControl(hexagonComposite);
+			hexagonTab.setControl(hexagonContainer);
 		}
 
-		// RGB-Tab
+		/*
+		 * RGB/HSB-Tab
+		 */
 		final Composite rgbComposite = new Composite(fTabFolder, SWT.NONE);
 
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(rgbComposite);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(rgbComposite);
 		{
+			/*
+			 * red
+			 */
 			final Label redLabel = new Label(rgbComposite, SWT.NONE);
 			redLabel.setText(Messages.color_chooser_red);
 			redScale = new Scale(rgbComposite, SWT.BORDER);
@@ -197,6 +209,10 @@ public class ColorChooser {
 					updateScaleValuesHSB();
 				}
 			});
+
+			/*
+			 * green
+			 */
 			final Label greenLabel = new Label(rgbComposite, SWT.NONE);
 			greenLabel.setText(Messages.color_chooser_green);
 			greenScale = new Scale(rgbComposite, SWT.BORDER);
@@ -213,6 +229,10 @@ public class ColorChooser {
 					updateScaleValuesHSB();
 				}
 			});
+
+			/*
+			 * blue
+			 */
 			final Label blueLabel = new Label(rgbComposite, SWT.NONE);
 			blueLabel.setText(Messages.color_chooser_blue);
 			blueScale = new Scale(rgbComposite, SWT.BORDER);
@@ -230,17 +250,14 @@ public class ColorChooser {
 				}
 			});
 			rgbTab.setControl(rgbComposite);
-		}
 
-		// HSB-Tab
-//	    hue        - the hue        value for the HSB color (from 0 to 360)
-//	    saturation - the saturation value for the HSB color (from 0 to 1)
-//	    brightness - the brightness value for the HSB color (from 0 to 1) 
-//		final Composite hsbComposite = new Composite(fTabFolder, SWT.NONE);
-//
-//		GridDataFactory.fillDefaults().grab(false, false).applyTo(hsbComposite);
-//		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(hsbComposite);
-		{
+			// hue        - the hue        value for the HSB color (from 0 to 360)
+			// saturation - the saturation value for the HSB color (from 0 to 1)
+			// brightness - the brightness value for the HSB color (from 0 to 1)
+
+			/*
+			 * HUE
+			 */
 			final Label hueLabel = new Label(rgbComposite, SWT.NONE);
 			hueLabel.setText(Messages.color_chooser_hue);
 			hueScale = new Scale(rgbComposite, SWT.BORDER);
@@ -258,6 +275,10 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
+
+			/*
+			 * saturation
+			 */
 			final Label saturationLabel = new Label(rgbComposite, SWT.NONE);
 			saturationLabel.setText(Messages.color_chooser_saturation);
 			saturationScale = new Scale(rgbComposite, SWT.BORDER);
@@ -275,6 +296,10 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
+
+			/*
+			 * brightness
+			 */
 			final Label brightnessLabel = new Label(rgbComposite, SWT.NONE);
 			brightnessLabel.setText(Messages.color_chooser_brightness);
 			brightnessScale = new Scale(rgbComposite, SWT.BORDER);
@@ -292,7 +317,6 @@ public class ColorChooser {
 					updateScaleValuesRGB();
 				}
 			});
-//			hsbTab.setControl(rgbComposite);
 		}
 
 		fTabFolder.pack();
@@ -335,20 +359,28 @@ public class ColorChooser {
 				return new RGB(col2, col1, col3);
 			}
 		}
-		return new RGB(0, 0, 0);
+
+		// return widget background color
+		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
 	}
 
-	private void setHexagon() {
-		for (int x = -chooserRadius; x < chooserRadius; x++) {
-			for (int y = -chooserRadius; y < chooserRadius; y++) {
-				final Color fgColor = new Color(chooserDisplay, getRGBFromHexagon(x, y));
-				{
-					gc.setForeground(fgColor);
-					gc.drawPoint(x + chooserRadius, y + chooserRadius);
+	private void paintHexagon(final Image hexagonImage) {
+
+		final GC gc = new GC(hexagonImage);
+		{
+			for (int x = -chooserRadius; x < chooserRadius; x++) {
+				for (int y = -chooserRadius; y < chooserRadius; y++) {
+
+					final Color fgColor = new Color(chooserDisplay, getRGBFromHexagon(x, y));
+					{
+						gc.setForeground(fgColor);
+						gc.drawPoint(x + chooserRadius, y + chooserRadius);
+					}
+					fgColor.dispose();
 				}
-				fgColor.dispose();
 			}
 		}
+		gc.dispose();
 	}
 
 	public void setSize(final int size) {
@@ -367,9 +399,11 @@ public class ColorChooser {
 	}
 
 	private void updateScales() {
+
 		redScale.setSelection(choosedRGB.red);
 		greenScale.setSelection(choosedRGB.green);
 		blueScale.setSelection(choosedRGB.blue);
+
 		final float hsb[] = choosedRGB.getHSB();
 		hueScale.setSelection((int) hsb[0]);
 		saturationScale.setSelection((int) (hsb[1] * 100));

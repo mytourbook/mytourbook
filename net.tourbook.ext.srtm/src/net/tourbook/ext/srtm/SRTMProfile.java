@@ -56,8 +56,9 @@ public class SRTMProfile {
 	 * @param display
 	 * @param width
 	 * @param height
+	 * @return new image
 	 */
-	public void createImage(final Display display, int width, int height) {
+	public Image createImage(final Display display, int width, int height) {
 
 		// dispose previous image
 		disposeImage();
@@ -143,9 +144,11 @@ public class SRTMProfile {
 
 			gc.setTransform(transform);
 
-			gc.drawText(UI.EMPTY_STRING + elev, 0, 0, true);
+			gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
 		}
 		transform.dispose();
+		
+		return fProfileImage;
 	}
 
 	public void disposeImage() {

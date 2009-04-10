@@ -31,6 +31,8 @@ public class ImageCanvas extends Canvas {
 
 	private Image	fImage;
 
+	private boolean	fIsAdaptSize	= false;
+
 	/**
 	 * @param parent
 	 * @param style
@@ -41,20 +43,32 @@ public class ImageCanvas extends Canvas {
 
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent e) {
-				if (fImage != null) {
+				if (fImage != null && fImage.isDisposed() == false) {
 
-					final Rectangle canvasBounds = getBounds();
 					final Rectangle imageBounds = fImage.getBounds();
 
-					e.gc.drawImage(fImage,
-							0,
-							0,
-							imageBounds.width,
-							imageBounds.height,
-							0,
-							0,
-							canvasBounds.width,
-							canvasBounds.height);
+					if (fIsAdaptSize) {
+						final Rectangle canvasBounds = getBounds();
+						e.gc.drawImage(fImage,
+								0,
+								0,
+								imageBounds.width,
+								imageBounds.height,
+								0,
+								0,
+								canvasBounds.width,
+								canvasBounds.height);
+					} else {
+						e.gc.drawImage(fImage,
+								0,
+								0,
+								imageBounds.width,
+								imageBounds.height,
+								0,
+								0,
+								imageBounds.width,
+								imageBounds.height);
+					}
 				}
 			}
 		});
@@ -66,8 +80,27 @@ public class ImageCanvas extends Canvas {
 		fImage.dispose();
 	}
 
-	public void paintImage(final Image image) {
+	/**
+	 * Sets and draws the image, dispose previous image
+	 * 
+	 * @param image
+	 */
+	public void setImage(final Image image) {
+
+		if (fImage != null) {
+			fImage.dispose();
+		}
+
 		fImage = image;
 		redraw();
+	}
+
+	/**
+	 * When <code>true</code> it adapts the size of the image to the available client area
+	 * 
+	 * @param isAdaptSize
+	 */
+	public void setIsAdaptSize(final boolean isAdaptSize) {
+		fIsAdaptSize = isAdaptSize;
 	}
 }

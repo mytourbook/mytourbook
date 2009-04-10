@@ -178,7 +178,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			final XMLMemento xmlRoot = getXMLRoot();
 
-			IMemento profile = createXmlProfile(xmlRoot, ++profileId, "Default 1", "default-1"); //$NON-NLS-1$ //$NON-NLS-2$
+			IMemento profile = createXmlProfile(xmlRoot, ++profileId, "Default 1", "profile-default-1"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 100, 198, 235, 197);
 			createXmlVertex(profile, 200, 0, 102, 0);
@@ -189,7 +189,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 1500, 92, 67, 64);
 			createXmlVertex(profile, 2000, 204, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 2", "default-2"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, ++profileId, "Default 2", "profile-default-2"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 100, 179, 244, 129);
 			createXmlVertex(profile, 200, 144, 239, 129);
@@ -202,7 +202,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 900, 255, 204, 204);
 			createXmlVertex(profile, 1000, 204, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 3", "default-3"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, ++profileId, "Default 3", "profile-default-3"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 500, 166, 219, 156);
 			createXmlVertex(profile, 1000, 51, 153, 0);
@@ -211,13 +211,13 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 4000, 204, 255, 255);
 			createXmlVertex(profile, 8850, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 4", "default-4"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, ++profileId, "Default 4", "profile-default-4"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 1000, 178, 81, 0);
 			createXmlVertex(profile, 2000, 100, 0, 59);
 			createXmlVertex(profile, 3000, 0, 102, 127);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 5", "default-5"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, ++profileId, "Default 5", "profile-default-5"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 0, 0, 255);
 			createXmlVertex(profile, 1000, 127, 0, 215);
 			createXmlVertex(profile, 2000, 255, 0, 0);
@@ -228,7 +228,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 7000, 105, 231, 202);
 			createXmlVertex(profile, 8000, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 6", "default-6"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, ++profileId, "Default 6", "profile-default-6"); //$NON-NLS-1$ //$NON-NLS-2$
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 100, 92, 43, 0);
 			createXmlVertex(profile, 150, 166, 77, 0);
@@ -317,6 +317,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	public static String getRGBVertexListString() {
 		return fSelectedProfile.toString();
+	}
+
+	public static SRTMProfile getSelectedProfile() {
+		return fSelectedProfile;
 	}
 
 	private static XMLMemento getXMLRoot() {
@@ -943,9 +947,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
 
 					// update viewer
-					fProfileViewer.update(selectedProfile, null);
-
-					fProfileViewer.getTable().redraw();
+					fProfileViewer.refresh();
+					fProfileViewer.setSelection(new StructuredSelection(selectedProfile), true);
 				}
 			} catch (final Exception e) {
 				e.printStackTrace();

@@ -20,6 +20,7 @@ import net.tourbook.ext.srtm.ElevationLayer;
 import net.tourbook.ext.srtm.GeoLat;
 import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
+import net.tourbook.ext.srtm.PrefPageSRTMColors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -51,18 +52,18 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
 
-		private static final String		FACTORY_ID		= "srtm"; //$NON-NLS-1$
-		private static final String		FACTORY_NAME	= "SRTM"; //$NON-NLS-1$
-		private static final String		FACTORY_OS_NAME	= "srtm"; //$NON-NLS-1$
+		private static final String		FACTORY_ID		= "srtm";				//$NON-NLS-1$
+		private static final String		FACTORY_NAME	= "SRTM";				//$NON-NLS-1$
+		private static final String		FACTORY_OS_NAME	= "srtm";				//$NON-NLS-1$
 
-		private static final String		SEPARATOR		= "/"; //$NON-NLS-1$
+		private static final String		SEPARATOR		= "/";					//$NON-NLS-1$
 
 		private static final int		MIN_ZOOM		= 0;
 		private static final int		MAX_ZOOM		= 17;
 		private static final int		TOTAL_ZOOM		= 17;
 
-		private static final String		BASE_URL		= "file://dummy"; //$NON-NLS-1$
-		private static final String		FILE_EXT		= "png"; //$NON-NLS-1$
+		private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
+		private static final String		FILE_EXT		= "png";				//$NON-NLS-1$
 
 		// initialize SRTM loading
 		public final NumberForm			numberForm		= new NumberForm();
@@ -87,6 +88,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel) {
 
 			return new Path(fullPath).append(FACTORY_OS_NAME)
+					.append(PrefPageSRTMColors.getSelectedProfile().getProfilePath())
 					.append(Integer.toString(zoomLevel))
 					.append(Integer.toString(x))
 					.append(Integer.toString(y))
@@ -96,12 +98,6 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		@Override
 		public ITilePainter getTilePainter() {
 			return this;
-		}
-
-		// TODO
-		@Override
-		public int hashCode() {
-			return elevationColor.hashCode();
 		}
 
 		@Override
@@ -116,6 +112,12 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					.append(FILE_EXT);
 
 			return url.toString();
+		}
+
+		// TODO
+		@Override
+		public int hashCode() {
+			return elevationColor.hashCode();
 		}
 
 		public ImageData[] paintTile(final Tile tile) {
@@ -142,7 +144,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					// the other values are interpolated
 					// i.e. it gives the resolution of the image!
 					final int grid = elevationColor.getGrid();
-					
+
 					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
 							+ "(L=" //$NON-NLS-1$
 							+ elevationLayer.getName()
@@ -155,7 +157,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 							+ ", Z=" //$NON-NLS-1$
 							+ tileZoom
 							+ ")"); //$NON-NLS-1$
-					
+
 					double lon = 0.;
 					double lat = 0.;
 					final double pi = Math.PI;
@@ -166,45 +168,45 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					int mapStartX = tileX * tileSize;
 					final int mapStartY = tileY * tileSize;
 					RGB rgb;
-					
+
 					if (grid == 1) {
 
 						double elevOld = 0;
-						boolean isShadowState = elevationColor.isShadowState();
-						int drawStartX = isShadowState ? -1 : 0;
+						final boolean isShadowState = elevationColor.isShadowState();
+						final int drawStartX = isShadowState ? -1 : 0;
 						mapStartX += drawStartX;
-						double lonStart = constMy * mapStartX  - 180.; // Mercator
-						
+						final double lonStart = constMy * mapStartX - 180.; // Mercator
+
 						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 							lon = lonStart;
-							
+
 							for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
 
 								final double elev = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
-								
-								if (drawX == -1) { 
+
+								if (drawX == -1) {
 									elevOld = elev;
 									continue;
 								}
-									
+
 								if (isShadowState && elev < elevOld)
 									rgb = elevationColor.getDarkerRGB((int) elev);
 								else
 									rgb = elevationColor.getRGB((int) elev);
 								elevOld = elev;
 
-								final Color color = new Color(display, rgb);                                    
+								final Color color = new Color(display, rgb);
 								gc.setForeground(color);
 								gc.drawPoint(drawX, drawY);
 
 								color.dispose();
 							}
 						}
-						
+
 					} else { // grid > 1
-						
+
 						final int gridQuot = grid - 1;
 						double lonOld = 0.;
 						double latOld = 0.;
@@ -219,7 +221,8 @@ public class SRTMTileFactory extends DefaultTileFactory {
 								if (pixelX == 0 || pixelY == 0)
 									continue;
 
-								final double elev00 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lonOld));
+								final double elev00 = elevationLayer.getElevation(new GeoLat(latOld),
+										new GeoLon(lonOld));
 								final double elev01 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lon));
 								final double elev10 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lonOld));
 								final double elev11 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));

@@ -18,6 +18,8 @@
  */
 package net.tourbook.ext.srtm;
 
+import net.tourbook.util.UI;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 

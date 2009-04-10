@@ -98,7 +98,6 @@ import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-
 	private static final int				VERTICAL_SECTION_MARGIN		= 10;
 
 	private static final int				SIZING_TEXT_FIELD_WIDTH		= 250;
@@ -448,16 +447,12 @@ public class DialogExportTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fComboFile);
 			((GridData) fComboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
 			fComboFile.setVisibleItemCount(20);
+			fComboFile.addVerifyListener(net.tourbook.util.UI.verifyFilenameInput());
 			fComboFile.addModifyListener(filePathModifyListener);
 			fComboFile.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					validateFields();
-				}
-			});
-			fComboFile.addListener(SWT.Verify, new Listener() {
-				public void handleEvent(final Event e) {
-					UI.verifyFilenameInput(e);
 				}
 			});
 
@@ -606,7 +601,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			});
 			fTxtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
 				public void handleEvent(final Event e) {
-					UI.verifyIntegerInput(e, false);
+					net.tourbook.util.UI.verifyIntegerInput(e, false);
 				}
 			});
 
@@ -1149,7 +1144,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final boolean isEqualizeTimeEnabled = fChkCamouflageSpeed.getSelection();
 		if (isEqualizeTimeEnabled) {
 
-			if (UI.verifyIntegerValue(fTxtCamouflageSpeed.getText()) == false) {
+			if (net.tourbook.util.UI.verifyIntegerValue(fTxtCamouflageSpeed.getText()) == false) {
 				setError(Messages.dialog_export_error_camouflageSpeedIsInvalid);
 				fTxtCamouflageSpeed.setFocus();
 				return;
