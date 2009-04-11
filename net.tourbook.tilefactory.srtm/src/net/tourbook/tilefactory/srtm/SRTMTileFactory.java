@@ -114,7 +114,6 @@ public class SRTMTileFactory extends DefaultTileFactory {
 			return url.toString();
 		}
 
-		// TODO
 		@Override
 		public int hashCode() {
 			return elevationColor.hashCode();
@@ -175,18 +174,21 @@ public class SRTMTileFactory extends DefaultTileFactory {
 						final boolean isShadowState = elevationColor.isShadowState();
 						final int drawStartX = isShadowState ? -1 : 0;
 						mapStartX += drawStartX;
-						final double lonStart = constMy * mapStartX - 180.; // Mercator
-
+						double lonStart = constMy * mapStartX  - 180.; // Mercator
+                        GeoLat geoLat = new GeoLat();
+                        GeoLon geoLon = new GeoLon();
+						
 						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
+							geoLat.set(lat);
 							lon = lonStart;
-
-							for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
-
-								final double elev = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
-
-								if (drawX == -1) {
+							
+   						    for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
+   						    	geoLon.set(lon);
+								final double elev = elevationLayer.getElevation(geoLat, geoLon);
+								
+								if (drawX == -1) { 
 									elevOld = elev;
 									continue;
 								}
@@ -208,24 +210,27 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					} else { // grid > 1
 
 						final int gridQuot = grid - 1;
-						double lonOld = 0.;
-						double latOld = 0.;
 
-						for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, latOld = lat) {
+						GeoLat geoLat = new GeoLat();
+                        GeoLat geoLatOld = new GeoLat();
+                        GeoLon geoLon = new GeoLon();
+                        GeoLon geoLonOld = new GeoLon();
+						for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld.set(lat)) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
+							geoLat.set(lat);
 
-							for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, lonOld = lon) {
+							for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, geoLonOld.set(lon)) {
 
 								lon = constMy * mapX - 180.; // Mercator
+								geoLon.set(lon);
 								if (pixelX == 0 || pixelY == 0)
 									continue;
 
-								final double elev00 = elevationLayer.getElevation(new GeoLat(latOld),
-										new GeoLon(lonOld));
-								final double elev01 = elevationLayer.getElevation(new GeoLat(latOld), new GeoLon(lon));
-								final double elev10 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lonOld));
-								final double elev11 = elevationLayer.getElevation(new GeoLat(lat), new GeoLon(lon));
+								final double elev00 = elevationLayer.getElevation(geoLatOld, geoLonOld);
+								final double elev01 = elevationLayer.getElevation(geoLatOld, geoLon);
+								final double elev10 = elevationLayer.getElevation(geoLat, geoLonOld);
+								final double elev11 = elevationLayer.getElevation(geoLat, geoLon);
 
 								// interpolate elevation over this quad
 								final double elevGridX0 = (elev01 - elev00) / gridQuot;
