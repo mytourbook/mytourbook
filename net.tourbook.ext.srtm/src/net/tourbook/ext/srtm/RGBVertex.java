@@ -22,7 +22,7 @@ import net.tourbook.util.UI;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
-
+ 
 public class RGBVertex implements Comparable<Object> {
 
 	RGB		rgb;
@@ -46,6 +46,17 @@ public class RGBVertex implements Comparable<Object> {
 	public RGBVertex(final RGB rgb) {
 		elev = 0;
 		this.rgb = rgb;
+	}
+
+	/**
+	 * Make a close of the vertexSource
+	 * 
+	 * @param vertexSource
+	 */
+	public RGBVertex(final RGBVertex vertexSource) {
+		final RGB sourceRGB = vertexSource.getRGB();
+		rgb = new RGB(sourceRGB.red, sourceRGB.green, sourceRGB.blue);
+		elev = vertexSource.elev;
 	}
 
 	public int compareTo(final Object anotherRGBVertex) throws ClassCastException {

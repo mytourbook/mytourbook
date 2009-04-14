@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-public class ColorChooser {
+public class ColorChooser extends Composite {
 
 	private int					chooserSize				= 0;
 	private int					chooserRadius			= 0;
@@ -55,9 +55,7 @@ public class ColorChooser {
 
 	private int					col3					= 0;
 
-	private Composite			composite;
 	private TabFolder			fTabFolder;
-	private Display				chooserDisplay;
 	private ImageCanvas			fHexagonCanvas;
 	private RGB					choosedRGB;
 	private Label				choosedColorLabel;
@@ -68,7 +66,7 @@ public class ColorChooser {
 	private Scale				saturationScale;
 	private Scale				brightnessScale;
 
-	private int					scaleValueRed			= 0;
+ 	private int					scaleValueRed			= 0;
 	private int					scaleValueGreen			= 0;
 	private int					scaleValueBlue			= 0;
 	private int					scaleValueHue			= 0;
@@ -77,55 +75,48 @@ public class ColorChooser {
 
 	private boolean				hexagonChangeState		= false;
 
-	public ColorChooser(final Composite composite) {
-		this.composite = composite;
+	public ColorChooser(final Composite parent, final int style) {
+		super(parent, style);
 		setSize(330);
+		createUI(parent);
 	}
 
 	public void chooseRGBFromHexagon(final MouseEvent e) {
 		final int x = e.x - chooserRadius;
 		final int y = e.y - chooserRadius;
 		choosedRGB = getRGBFromHexagon(x, y);
-		updateChoosedColorButton(e.display);
-		updateScales();
-		updateScaleValuesRGB();
-		updateScaleValuesHSB();
+		updateUI();
 	}
 
-	public void createUI() {
+	private void createUI(final Composite parent) {
 
-		final GridData gdCCL = new GridData(SWT.CENTER, SWT.TOP, true, false);
-
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(composite);
-		GridLayoutFactory.fillDefaults().applyTo(composite);
+		GridLayoutFactory.fillDefaults().applyTo(this);
 		{
 			// choosed Color Label
-			choosedColorLabel = new Label(composite, SWT.CENTER | SWT.BORDER | SWT.SHADOW_NONE);
-			choosedColorLabel.setLayoutData(gdCCL);
+			choosedColorLabel = new Label(this, SWT.BORDER | SWT.SHADOW_NONE);
+			GridDataFactory.fillDefaults().hint(SWT.DEFAULT, chooserSize / 4).applyTo(choosedColorLabel);
 			choosedColorLabel.setToolTipText(Messages.color_chooser_choosed_color);
 
-			choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
-			updateChoosedColorButton(composite.getDisplay());
-
-			createUITabs();
+			createUITabs(this);
 		}
 
-		gdCCL.widthHint = fTabFolder.getBounds().width;
-		gdCCL.heightHint = chooserSize / 4;
+		// set selected color
+		choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
+		updateChoosedColorButton();
 	}
 
-	private void createUITabs() {
+	private void createUITabs(final Composite parent) {
 
-		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 
 		/*
 		 * tabfolder
 		 */
-		fTabFolder = new TabFolder(composite, SWT.NONE);
-		
+		fTabFolder = new TabFolder(parent, SWT.NONE);
+
 		final TabItem hexagonTab = new TabItem(fTabFolder, SWT.NONE);
 		hexagonTab.setText(Messages.color_chooser_hexagon);
-		
+
 		final TabItem rgbTab = new TabItem(fTabFolder, SWT.NONE);
 		rgbTab.setText(Messages.color_chooser_rgb);
 
@@ -199,12 +190,12 @@ public class ColorChooser {
 			redScale.setMinimum(0);
 			redScale.setMaximum(255);
 			redScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			redScale.setLayoutData(gridData);
+			redScale.setLayoutData(gd);
 			redScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueRed = new Integer(redScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesHSB();
 				}
@@ -219,12 +210,12 @@ public class ColorChooser {
 			greenScale.setMinimum(0);
 			greenScale.setMaximum(255);
 			greenScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-			greenScale.setLayoutData(gridData);
+			greenScale.setLayoutData(gd);
 			greenScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueGreen = new Integer(greenScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesHSB();
 				}
@@ -239,12 +230,12 @@ public class ColorChooser {
 			blueScale.setMinimum(0);
 			blueScale.setMaximum(255);
 			blueScale.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			blueScale.setLayoutData(gridData);
+			blueScale.setLayoutData(gd);
 			blueScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueBlue = new Integer(blueScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueRed, scaleValueGreen, scaleValueBlue);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesHSB();
 				}
@@ -263,14 +254,14 @@ public class ColorChooser {
 			hueScale = new Scale(rgbComposite, SWT.BORDER);
 			hueScale.setMinimum(0);
 			hueScale.setMaximum(360);
-			hueScale.setLayoutData(gridData);
+			hueScale.setLayoutData(gd);
 			hueScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueHue = new Integer(hueScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueHue,
 							(float) scaleValueSaturation / 100,
 							(float) scaleValueBrightness / 100);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesRGB();
 				}
@@ -284,14 +275,14 @@ public class ColorChooser {
 			saturationScale = new Scale(rgbComposite, SWT.BORDER);
 			saturationScale.setMinimum(0);
 			saturationScale.setMaximum(100);
-			saturationScale.setLayoutData(gridData);
+			saturationScale.setLayoutData(gd);
 			saturationScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueSaturation = new Integer(saturationScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueHue,
 							(float) scaleValueSaturation / 100,
 							(float) scaleValueBrightness / 100);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesRGB();
 				}
@@ -305,14 +296,14 @@ public class ColorChooser {
 			brightnessScale = new Scale(rgbComposite, SWT.BORDER);
 			brightnessScale.setMinimum(0);
 			brightnessScale.setMaximum(100);
-			brightnessScale.setLayoutData(gridData);
+			brightnessScale.setLayoutData(gd);
 			brightnessScale.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event e) {
 					scaleValueBrightness = new Integer(brightnessScale.getSelection()).intValue();
 					choosedRGB = new RGB(scaleValueHue,
 							(float) scaleValueSaturation / 100,
 							(float) scaleValueBrightness / 100);
-					updateChoosedColorButton(e.display);
+					updateChoosedColorButton();
 					updateScales();
 					updateScaleValuesRGB();
 				}
@@ -371,7 +362,7 @@ public class ColorChooser {
 			for (int x = -chooserRadius; x < chooserRadius; x++) {
 				for (int y = -chooserRadius; y < chooserRadius; y++) {
 
-					final Color fgColor = new Color(chooserDisplay, getRGBFromHexagon(x, y));
+					final Color fgColor = new Color(this.getDisplay(), getRGBFromHexagon(x, y));
 					{
 						gc.setForeground(fgColor);
 						gc.drawPoint(x + chooserRadius, y + chooserRadius);
@@ -383,14 +374,24 @@ public class ColorChooser {
 		gc.dispose();
 	}
 
-	public void setSize(final int size) {
-		this.chooserSize = size;
+	/**
+	 * Set RGB for the color chooser
+	 * 
+	 * @param rgb
+	 */
+	public void setRGB(final RGB rgb) {
+		choosedRGB = rgb;
+		updateUI();
+	}
+
+	private void setSize(final int size) {
+		chooserSize = size;
 		chooserRadius = chooserSize / 2;
 		hexagonRadius = (int) (chooserSize / 2.2);
 	}
 
-	private void updateChoosedColorButton(final Display display) {
-		final Color color = new Color(display, choosedRGB);
+	private void updateChoosedColorButton() {
+		final Color color = new Color(Display.getCurrent(), choosedRGB);
 		{
 			choosedColorLabel.setBackground(color);
 			choosedColorLabel.setForeground(color);
@@ -421,6 +422,13 @@ public class ColorChooser {
 		scaleValueRed = choosedRGB.red;
 		scaleValueGreen = choosedRGB.green;
 		scaleValueBlue = choosedRGB.blue;
+	}
+
+	private void updateUI() {
+		updateChoosedColorButton();
+		updateScales();
+		updateScaleValuesRGB();
+		updateScaleValuesHSB();
 	}
 
 }

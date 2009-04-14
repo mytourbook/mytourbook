@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package net.tourbook.tilefactory.srtm;
-
+ 
 import net.tourbook.ext.srtm.ElevationColor;
 import net.tourbook.ext.srtm.ElevationLayer;
 import net.tourbook.ext.srtm.GeoLat;
@@ -48,7 +48,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 	/**
 	 * cache for tile images
 	 */
-	final static ElevationColor			elevationColor	= new ElevationColor();
+	final static ElevationColor			elevationColor	= new ElevationColor(info);
 
 	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
 
@@ -88,11 +88,16 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel) {
 
 			return new Path(fullPath).append(FACTORY_OS_NAME)
-					.append(PrefPageSRTMColors.getSelectedProfile().getProfilePath())
+					.append(PrefPageSRTMColors.getSelectedProfile().getTilePath())
 					.append(Integer.toString(zoomLevel))
 					.append(Integer.toString(x))
 					.append(Integer.toString(y))
 					.addFileExtension(FILE_EXT);
+		}
+
+		@Override
+		public IPath getTileOSPathFolder(final String fullPath) {
+			return new Path(fullPath).append(FACTORY_OS_NAME);
 		}
 
 		@Override
@@ -142,7 +147,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 					// elevation is used at every grid-th pixel in both directions; 
 					// the other values are interpolated
 					// i.e. it gives the resolution of the image!
-					final int grid = elevationColor.getGrid();
+					final int grid = elevationColor.getResolution();
 
 					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
 							+ "(L=" //$NON-NLS-1$
@@ -174,21 +179,21 @@ public class SRTMTileFactory extends DefaultTileFactory {
 						final boolean isShadowState = elevationColor.isShadowState();
 						final int drawStartX = isShadowState ? -1 : 0;
 						mapStartX += drawStartX;
-						double lonStart = constMy * mapStartX  - 180.; // Mercator
-                        GeoLat geoLat = new GeoLat();
-                        GeoLon geoLon = new GeoLon();
-						
+						final double lonStart = constMy * mapStartX - 180.; // Mercator
+						final GeoLat geoLat = new GeoLat();
+						final GeoLon geoLon = new GeoLon();
+
 						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 							geoLat.set(lat);
 							lon = lonStart;
-							
-   						    for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
-   						    	geoLon.set(lon);
+
+							for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
+								geoLon.set(lon);
 								final double elev = elevationLayer.getElevation(geoLat, geoLon);
-								
-								if (drawX == -1) { 
+
+								if (drawX == -1) {
 									elevOld = elev;
 									continue;
 								}
@@ -211,10 +216,10 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 						final int gridQuot = grid - 1;
 
-						GeoLat geoLat = new GeoLat();
-                        GeoLat geoLatOld = new GeoLat();
-                        GeoLon geoLon = new GeoLon();
-                        GeoLon geoLonOld = new GeoLon();
+						final GeoLat geoLat = new GeoLat();
+						final GeoLat geoLatOld = new GeoLat();
+						final GeoLon geoLon = new GeoLon();
+						final GeoLon geoLonOld = new GeoLon();
 						for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld.set(lat)) {
 
 							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator

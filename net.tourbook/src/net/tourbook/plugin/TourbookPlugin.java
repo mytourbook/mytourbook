@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package net.tourbook.plugin;
-
+ 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -55,6 +55,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private TourTypeFilter			fActiveTourTypeFilter;
 
 	private MyTourbookSplashHandler	fSplashHandler;
+
+	private BundleContext			fContext;
 
 	/**
 	 * Returns the shared instance.
@@ -105,6 +107,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fActiveTourTypeFilter;
 	}
 
+	public BundleContext getBundleContext() {
+		return fContext;
+	}
+
 	/**
 	 * @param sectionName
 	 * @return Returns the dialog setting section for the sectionName, a section is always returned
@@ -149,10 +155,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
 	}
 
-	public void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
-		fSplashHandler = splashHandler;
-	}
-
 //	/**
 //	 * This method is called upon plug-in activation
 //	 */
@@ -176,6 +178,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 //		// server.shutdown();
 //	}
 
+	public void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
+		fSplashHandler = splashHandler;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -184,6 +190,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		fContext = context;
 	}
 
 	/*

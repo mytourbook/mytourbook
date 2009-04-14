@@ -18,20 +18,44 @@ package net.tourbook.ext.srtm;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages"; //$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages";	//$NON-NLS-1$
+
+	public static String		app_ui_N;
+	public static String		app_ui_Y;
+
+	public static String	profileViewer_column_content_resolution_fine;
+	public static String	profileViewer_column_content_resolution_rough;
+
+	public static String	profileViewer_column_content_resolution_veryFine;
+
+	public static String	profileViewer_column_content_resolution_veryRough;
 
 	public static String		profileViewer_column_label_checkbox;
 	public static String		profileViewer_column_label_color;
 	public static String		profileViewer_column_label_color_header;
 	public static String		profileViewer_column_label_color_tooltip;
+	public static String		profileViewer_column_label_id;
+	public static String		profileViewer_column_label_id_header;
+	public static String		profileViewer_column_label_id_tooltip;
 	public static String		profileViewer_column_label_imagePath;
 	public static String		profileViewer_column_label_imagePath_header;
 	public static String		profileViewer_column_label_imagePath_tooltip;
+	public static String		profileViewer_column_label_isShadow;
+	public static String		profileViewer_column_label_isShadow_header;
+	public static String		profileViewer_column_label_isShadow_tooltip;
 	public static String		profileViewer_column_label_name;
 	public static String		profileViewer_column_label_name_header;
 	public static String		profileViewer_column_label_name_tooltip;
 
+	public static String	profileViewer_column_label_resolution;
+
+	public static String	profileViewer_column_label_resolution_header;
+
+	public static String	profileViewer_column_label_resolution_tooltip;
+
 	public static String		prefPage_srtm_btn_adjust_columns;
+	public static String		prefPage_srtm_chk_apply_when_selected;
+	public static String		prefPage_srtm_chk_apply_when_selected_tooltip;
 	public static String		prefPage_srtm_chk_use_default_location;
 	public static String		prefPage_srtm_confirm_defaults_message;
 	public static String		prefPage_srtm_confirm_defaults_title;
@@ -46,7 +70,8 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_profile_title;
 	public static String		prefPage_srtm_profile_add;
 
-	public static String	prefPage_srtm_profile_edit;
+	public static String	prefPage_srtm_profile_duplicate;
+	public static String		prefPage_srtm_profile_edit;
 	public static String		prefPage_srtm_profile_remove;
 	public static String		prefPage_srtm_resolution_title;
 	public static String		prefPage_srtm_resolution_very_fine;
@@ -64,16 +89,19 @@ public class Messages extends NLS {
 	public static String		Image__adjust_srtm_colors;
 
 	public static String		dialog_adjust_srtm_colors_button_add;
+
+	public static String	dialog_adjust_srtm_colors_button_apply;
 	public static String		dialog_adjust_srtm_colors_button_remove;
 	public static String		dialog_adjust_srtm_colors_button_sort;
 	public static String		dialog_adjust_srtm_colors_button_update;
 	public static String		dialog_adjust_srtm_colors_checkbutton_ttt;
+	public static String		dialog_adjust_srtm_colors_color_tooltip;
 	public static String		dialog_adjust_srtm_colors_dialog_title;
 	public static String		dialog_adjust_srtm_colors_dialog_area_title;
-
-	public static String	dialog_adjust_srtm_colors_label_profile_name;
-
-	public static String	dialog_adjust_srtm_colors_label_tile_path;
+	public static String		dialog_adjust_srtm_colors_dialog_message;
+	public static String		dialog_adjust_srtm_colors_error_invalid_tile_path;
+	public static String		dialog_adjust_srtm_colors_label_profile_name;
+	public static String		dialog_adjust_srtm_colors_label_tile_path;
 
 	public static String		color_chooser_choosed_color;
 	public static String		color_chooser_hexagon;

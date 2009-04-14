@@ -19,7 +19,7 @@
  */
 
 package net.tourbook.ext.srtm;
-
+ 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +38,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableColumnDefinition;
+import net.tourbook.util.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -45,12 +46,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -76,6 +73,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -93,6 +91,9 @@ import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.byteholder.geoclipse.map.MapImageCache;
+import de.byteholder.geoclipse.map.TileFactoryInfo;
+
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
 	private final static IPreferenceStore	fPrefStore				= Activator.getDefault().getPreferenceStore();
@@ -100,17 +101,20 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";								//$NON-NLS-1$
 
 	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";									//$NON-NLS-1$
-	private static final String				MEMENTO_CHILD_PROFILE	= "profile";										//$NON-NLS-1$
 
+	private static final String				MEMENTO_CHILD_PROFILE	= "profile";										//$NON-NLS-1$
 	private static final String				TAG_PROFILE_ID			= "profileId";										//$NON-NLS-1$
 	private static final String				TAG_NAME				= "name";											//$NON-NLS-1$
 	private static final String				TAG_IMAGE_PATH			= "imagePath";										//$NON-NLS-1$
-	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";										//$NON-NLS-1$
+	private static final String				TAG_IS_SHADOW			= "isShadow";										//$NON-NLS-1$
+	private static final String				TAG_RESOLUTION			= "resolution";									//$NON-NLS-1$
 
+	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";										//$NON-NLS-1$
 	private static final String				TAG_ALTITUDE			= "altitude";										//$NON-NLS-1$
 	private static final String				TAG_RED					= "red";											//$NON-NLS-1$
 	private static final String				TAG_GREEN				= "green";											//$NON-NLS-1$
 	private static final String				TAG_BLUE				= "blue";											//$NON-NLS-1$
+
 	private final IDialogSettings			fState					= Activator.getDefault()
 																			.getDialogSettingsSection("SRTMColors");	//$NON-NLS-1$
 
@@ -120,6 +124,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private Button							fBtnEditProfile;
 	private Button							fBtnAddProfile			= null;
 	private Button							fBtnRemoveProfile		= null;
+	private Button							fBtnDuplicateProfile;
 
 	private int								fDefaultImageWidth		= 300;
 	private int								fImageHeight			= 40;
@@ -129,12 +134,14 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private CheckboxTableViewer				fProfileViewer;
 	private ColumnManager					fColumnManager;
+
 	/**
 	 * contains the table column widget for the profile color
 	 */
 	private TableColumn						fTcProfileImage;
 
 	private TableColumnDefinition			fColDefImage;
+
 	/**
 	 * index of the profile image, this can be changed when the columns are reordered with the mouse
 	 * or the column manager
@@ -142,6 +149,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private int								fProfileImageColumn		= 0;
 
 	private static int						fMaxProfileId;
+
+	private static boolean					fIsCreateDefault;
 
 	private class ProfileContentProvider implements IStructuredContentProvider {
 
@@ -178,7 +187,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			final XMLMemento xmlRoot = getXMLRoot();
 
-			IMemento profile = createXmlProfile(xmlRoot, ++profileId, "Default 1", "profile-default-1"); //$NON-NLS-1$ //$NON-NLS-2$
+			IMemento profile = createXmlProfile(xmlRoot,//
+					++profileId,
+					"Default 1", //$NON-NLS-1$ 
+					"profile-default-1", //$NON-NLS-1$
+					false,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 100, 198, 235, 197);
 			createXmlVertex(profile, 200, 0, 102, 0);
@@ -189,7 +203,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 1500, 92, 67, 64);
 			createXmlVertex(profile, 2000, 204, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 2", "profile-default-2"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, //
+					++profileId,
+					"Default 2", //$NON-NLS-1$ 
+					"profile-default-2", //$NON-NLS-1$
+					false,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 100, 179, 244, 129);
 			createXmlVertex(profile, 200, 144, 239, 129);
@@ -202,7 +221,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 900, 255, 204, 204);
 			createXmlVertex(profile, 1000, 204, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 3", "profile-default-3"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, //
+					++profileId,
+					"Default 3", //$NON-NLS-1$ 
+					"profile-default-3", //$NON-NLS-1$
+					false,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 500, 166, 219, 156);
 			createXmlVertex(profile, 1000, 51, 153, 0);
@@ -211,13 +235,23 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 4000, 204, 255, 255);
 			createXmlVertex(profile, 8850, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 4", "profile-default-4"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot,//
+					++profileId,
+					"Default 4", //$NON-NLS-1$ 
+					"profile-default-4", //$NON-NLS-1$
+					true,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 1000, 178, 81, 0);
 			createXmlVertex(profile, 2000, 100, 0, 59);
 			createXmlVertex(profile, 3000, 0, 102, 127);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 5", "profile-default-5"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot,//
+					++profileId,
+					"Default 5", //$NON-NLS-1$ 
+					"profile-default-5", //$NON-NLS-1$
+					true,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 0, 0, 255);
 			createXmlVertex(profile, 1000, 127, 0, 215);
 			createXmlVertex(profile, 2000, 255, 0, 0);
@@ -228,7 +262,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 7000, 105, 231, 202);
 			createXmlVertex(profile, 8000, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, ++profileId, "Default 6", "profile-default-6"); //$NON-NLS-1$ //$NON-NLS-2$
+			profile = createXmlProfile(xmlRoot, //
+					++profileId,
+					"Default 6", //$NON-NLS-1$ 
+					"profile-default-6", //$NON-NLS-1$
+					true,
+					IPreferences.SRTM_RESOLUTION_VERY_FINE);
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 100, 92, 43, 0);
 			createXmlVertex(profile, 150, 166, 77, 0);
@@ -255,12 +294,16 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private static IMemento createXmlProfile(	final XMLMemento xmlMemento,
 												final int profileId,
 												final String name,
-												final String profileImagePath) {
+												final String profileImagePath,
+												final boolean isShadow,
+												final String resolution) {
 
 		final IMemento xmlProfile = xmlMemento.createChild(MEMENTO_CHILD_PROFILE);
 		xmlProfile.putInteger(TAG_PROFILE_ID, profileId);
-		xmlProfile.putString(TAG_NAME, name);//$NON-NLS-1$
-		xmlProfile.putString(TAG_IMAGE_PATH, profileImagePath);//$NON-NLS-1$
+		xmlProfile.putString(TAG_NAME, name);
+		xmlProfile.putString(TAG_IMAGE_PATH, profileImagePath);
+		xmlProfile.putBoolean(TAG_IS_SHADOW, isShadow);
+		xmlProfile.putString(TAG_RESOLUTION, resolution);
 
 		return xmlProfile;
 	}
@@ -286,37 +329,36 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 	}
 
-	public static int getGrid() {
-		/*
-		 * elevation is used at every grid-th pixel in both directions; the other values are
-		 * interpolated i.e. it gives the resolution of the image!
-		 */
-		final String srtmResolution = fPrefStore.getString(IPreferences.SRTM_RESOLUTION);
-		if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH)) {
-			return 64;
-		} else if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH)) {
-			return 16;
-		} else if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_FINE)) {
-			return 4;
-		} else if (srtmResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE)) {
-			return 1;
-		} else {
-			return 4;
-		}
-	}
-
 	private static File getProfileFile() {
 		final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 		final File file = stateLocation.append(PROFILE_FILE_NAME).toFile();
 		return file;
 	}
 
-	public static RGB getRGB(final int elev) {
-		return fSelectedProfile.getRGB(elev);
+	/**
+	 * Type of map is changed IFF one of colors, shadow state or grid is changed.
+	 * 
+	 * @return Unique key for the current profile settings
+	 */
+	public static String getProfileKey() {
+		return fSelectedProfile.getProfileKey();
 	}
 
-	public static String getRGBVertexListString() {
-		return fSelectedProfile.toString();
+	/**
+	 * Type of map is changed IFF one of colors, shadow state or grid is changed.
+	 * 
+	 * @return Hashcode for the unique key for the current profile settings
+	 */
+	public static int getProfileKeyHashCode() {
+		return getProfileKey().hashCode();
+	}
+
+	public static int getResolutionValue() {
+		return fSelectedProfile.getResolutionValue();
+	}
+
+	public static RGB getRGB(final int elev) {
+		return fSelectedProfile.getRGB(elev);
 	}
 
 	public static SRTMProfile getSelectedProfile() {
@@ -342,14 +384,18 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	}
 
 	public static void initVertexLists() {
+
 		loadProfiles();
 		restoreSelectedProfile();
 	}
 
 	public static boolean isShadowState() {
-		return fPrefStore.getBoolean(IPreferences.SRTM_SHADOW);
+		return fSelectedProfile.isShadowState();
 	}
 
+	/**
+	 * load profiles from profile file
+	 */
 	private static void loadProfiles() {
 
 		// cleanup existing profiles
@@ -408,6 +454,16 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					continue;
 				}
 
+				final Boolean profileShadowState = xmlProfile.getBoolean(TAG_IS_SHADOW);
+				if (profileShadowState == null) {
+					continue;
+				}
+
+				final String profileResolution = xmlProfile.getString(TAG_RESOLUTION);
+				if (profileResolution == null) {
+					continue;
+				}
+
 				/*
 				 * read all vertexes
 				 */
@@ -443,7 +499,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 				profile.setProfileId(profileId);
 				profile.setProfileName(profileName);
-				profile.setProfilePath(profilePath);
+				profile.setTilePath(profilePath);
+				profile.setShadowState(profileShadowState);
+				profile.setResolution(profileResolution);
+
 				profile.setVertexList(vertexList);
 
 				// get max profile id 
@@ -459,6 +518,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		} catch (final NumberFormatException e) {
 			e.printStackTrace();
 		} finally {
+
 			if (reader != null) {
 				try {
 					reader.close();
@@ -468,8 +528,28 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			}
 
 			if (fProfileList.size() == 0) {
+
 				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Read Profiles", //$NON-NLS-1$
 						"Profiles could not be created"); //$NON-NLS-1$
+
+				// prevent endless loops
+				if (fIsCreateDefault) {
+					fIsCreateDefault = false;
+				} else {
+
+					// create default profile
+					createXmlDefaultProfiles();
+
+					fIsCreateDefault = true;
+					loadProfiles();
+				}
+
+			} else {
+
+				// create profile key for the saved profile
+				for (final SRTMProfile profile : fProfileList) {
+					profile.createSavedProfileKey();
+				}
 			}
 		}
 	}
@@ -479,7 +559,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		/*
 		 * get selected profile
 		 */
-		final int prefProfileId = fPrefStore.getInt(IPreferences.SRTM_COLORS_ACTUAL_PROFILE);
+		final int prefProfileId = fPrefStore.getInt(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID);
 		for (final SRTMProfile profile : fProfileList) {
 			if (profile.getProfileId() == prefProfileId) {
 				fSelectedProfile = profile;
@@ -501,12 +581,37 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		reloadViewer();
 
+		restoreState();
+
 		// reselected profile
 		selectProfile(fSelectedProfile);
 
 		enableActions();
 
 		return container;
+	}
+
+	/**
+	 * Creates a new profile which is not yet attached to the model
+	 * 
+	 * @return
+	 */
+	private SRTMProfile createNewProfile() {
+
+		final SRTMProfile profile = new SRTMProfile();
+
+		final int newProfileId = ++fMaxProfileId;
+
+		profile.setProfileId(newProfileId);
+		profile.setProfileName(Messages.prefPage_srtm_default_profile_name);
+
+		// make a unique tile path
+		profile.setTilePath(Messages.prefPage_srtm_default_profile_path + "-" + newProfileId);//$NON-NLS-1$
+		profile.setDefaultVertexes();
+
+//		profile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+
+		return profile;
 	}
 
 	private void createProfileViewer(final Composite parent) {
@@ -599,25 +704,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 				final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
 				if (firstElement instanceof SRTMProfile) {
-
-					final SRTMProfile selectedProfile = (SRTMProfile) firstElement;
-
-					// ignore same profile
-					if (fSelectedProfile != null && fSelectedProfile == selectedProfile) {
-						enableActions();
-						return;
-					}
-
-					// uncheck previous profile
-					if (fSelectedProfile != null) {
-						fProfileViewer.setChecked(fSelectedProfile, false);
-					}
-
-					// check selected profile
-					fSelectedProfile = selectedProfile;
-					fProfileViewer.setChecked(fSelectedProfile, true);
-
-					enableActions();
+					onSelectProfile((SRTMProfile) firstElement);
 				}
 			}
 		});
@@ -633,15 +720,14 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.swtDefaults().grab(false, false).applyTo(container);
+		GridDataFactory.swtDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().applyTo(container);
-
-		createUIResolutionOption(container);
-		createUIShadowOption(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		final Composite profileContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(profileContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 10).applyTo(profileContainer);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(profileContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 0).applyTo(profileContainer);
+//		profileContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUIProfileList(profileContainer);
 			createUIButtons(profileContainer);
@@ -654,7 +740,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults()/* .numColumns(5) */.applyTo(container);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			/*
 			 * button: edit profile
@@ -696,6 +783,19 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			setButtonLayoutData(fBtnRemoveProfile);
 
 			/*
+			 * button: duplicate profile
+			 */
+			fBtnDuplicateProfile = new Button(container, SWT.NONE);
+			fBtnDuplicateProfile.setText(Messages.prefPage_srtm_profile_duplicate);
+			fBtnDuplicateProfile.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onDuplicateProfile();
+				}
+			});
+			setButtonLayoutData(fBtnDuplicateProfile);
+
+			/*
 			 * button: adjust columns
 			 */
 			final Button btnAdjustColumns = new Button(container, SWT.NONE);
@@ -707,6 +807,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				}
 			});
 			setButtonLayoutData(btnAdjustColumns);
+			final GridData gd = (GridData) btnAdjustColumns.getLayoutData();
+			gd.verticalIndent = 20;
 		}
 	}
 
@@ -719,51 +821,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		fProfileContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fProfileContainer);
 		GridLayoutFactory.fillDefaults().applyTo(fProfileContainer);
-
+//		fProfileContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		createProfileViewer(fProfileContainer);
 		createVertexImages();
-	}
-
-	private void createUIResolutionOption(final Composite parent) {
-
-		final RadioGroupFieldEditor radioGroupFieldEditor = new RadioGroupFieldEditor(IPreferences.SRTM_RESOLUTION,
-				Messages.prefPage_srtm_resolution_title,
-				4,
-				new String[][] {
-						new String[] {
-								Messages.prefPage_srtm_resolution_very_fine,
-								IPreferences.SRTM_RESOLUTION_VERY_FINE },
-						new String[] { Messages.prefPage_srtm_resolution_fine, IPreferences.SRTM_RESOLUTION_FINE },
-						new String[] { Messages.prefPage_srtm_resolution_rough, IPreferences.SRTM_RESOLUTION_ROUGH },
-						new String[] {
-								Messages.prefPage_srtm_resolution_very_rough,
-								IPreferences.SRTM_RESOLUTION_VERY_ROUGH }, },
-				parent, // resolutionGroup,
-				true);
-
-		radioGroupFieldEditor.setPreferenceStore(fPrefStore);
-		radioGroupFieldEditor.load();
-		radioGroupFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent e) {
-				fPrefStore.setValue(IPreferences.SRTM_RESOLUTION, "" + e.getNewValue()); //$NON-NLS-1$
-			}
-		});
-	}
-
-	private void createUIShadowOption(final Composite parent) {
-
-		final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(IPreferences.SRTM_SHADOW,
-				Messages.prefPage_srtm_shadow_text,
-				parent);
-
-		booleanFieldEditor.setPreferenceStore(fPrefStore);
-		booleanFieldEditor.load();
-		booleanFieldEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent e) {
-				fPrefStore.setValue(IPreferences.SRTM_SHADOW, "" + e.getNewValue()); //$NON-NLS-1$
-			}
-		});
-
 	}
 
 	private void createVertexImages() {
@@ -792,15 +852,51 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		colDef.setColumnHeader(Messages.profileViewer_column_label_name_header);
 		colDef.setColumnToolTipText(Messages.profileViewer_column_label_name_tooltip);
 		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
-
 		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(true);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final SRTMProfile vertexList = (SRTMProfile) cell.getElement();
 				cell.setText(vertexList.getProfileName());
+			}
+		});
+
+		/*
+		 * column: shadow
+		 */
+		colDef = new TableColumnDefinition(fColumnManager, "shadowState", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.profileViewer_column_label_isShadow);
+		colDef.setColumnHeader(Messages.profileViewer_column_label_isShadow_header);
+		colDef.setColumnToolTipText(Messages.profileViewer_column_label_isShadow_tooltip);
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final SRTMProfile profile = (SRTMProfile) cell.getElement();
+				cell.setText(profile.isShadowState() ? Messages.app_ui_Y : Messages.app_ui_N);
+			}
+		});
+
+		/*
+		 * column: resolution
+		 */
+		colDef = new TableColumnDefinition(fColumnManager, "resolution", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.profileViewer_column_label_resolution);
+		colDef.setColumnHeader(Messages.profileViewer_column_label_resolution_header);
+		colDef.setColumnToolTipText(Messages.profileViewer_column_label_resolution_tooltip);
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final SRTMProfile profile = (SRTMProfile) cell.getElement();
+				cell.setText(getResolutionUI(profile));
 			}
 		});
 
@@ -814,7 +910,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		colDef.setColumnHeader(Messages.profileViewer_column_label_color_header);
 		colDef.setColumnToolTipText(Messages.profileViewer_column_label_color_tooltip);
 		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(50));
-
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -835,21 +930,159 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		/*
 		 * column: image path
 		 */
-		colDef = new TableColumnDefinition(fColumnManager, "imagePath", SWT.LEAD); //$NON-NLS-1$
-
+		colDef = new TableColumnDefinition(fColumnManager, "tileImagePath", SWT.LEAD); //$NON-NLS-1$
 		colDef.setColumnLabel(Messages.profileViewer_column_label_imagePath);
 		colDef.setColumnHeader(Messages.profileViewer_column_label_imagePath_header);
 		colDef.setColumnToolTipText(Messages.profileViewer_column_label_imagePath_tooltip);
 		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
-
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final SRTMProfile vertexList = (SRTMProfile) cell.getElement();
-				cell.setText(vertexList.getProfilePath());
+				cell.setText(vertexList.getTilePath());
 			}
 		});
+
+		/*
+		 * column: id
+		 */
+		colDef = new TableColumnDefinition(fColumnManager, "profileId", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.profileViewer_column_label_id);
+		colDef.setColumnHeader(Messages.profileViewer_column_label_id_header);
+		colDef.setColumnToolTipText(Messages.profileViewer_column_label_id_tooltip);
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final SRTMProfile vertexList = (SRTMProfile) cell.getElement();
+				cell.setText(Integer.toString(vertexList.getProfileId()));
+			}
+		});
+	}
+
+	private void deleteAllOfflineImages() {
+
+		for (final SRTMProfile profile : fProfileList) {
+			deleteOfflineImages(profile);
+		}
+	}
+
+	/**
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+	 * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
+	 * delete and returns false. <br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * 
+	 * @param directory
+	 * @return Returns <code>true</code> if all deletions were successful
+	 */
+	private boolean deleteDir(final File directory) {
+
+		if (directory.isDirectory()) {
+
+			final String[] children = directory.list();
+
+			for (int i = 0; i < children.length; i++) {
+				final boolean success = deleteDir(new File(directory, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+
+		// The directory is now empty so delete it
+		final boolean isDeleted = directory.delete();
+
+		return isDeleted;
+	}
+
+	/**
+	 * Delete tile images for the given profile
+	 * 
+	 * @param profile
+	 */
+	private void deleteOfflineImages(final SRTMProfile profile) {
+
+		try {
+
+			final TileFactoryInfo srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+
+			final String tileCacheOSPath = MapImageCache.getTileCacheOSPath();
+			IPath tileCacheOSPathFolder = null;
+			if (tileCacheOSPath != null) {
+				tileCacheOSPathFolder = srtmFactoryInfo.getTileOSPathFolder(tileCacheOSPath);
+			}
+			if (tileCacheOSPathFolder == null) {
+				return;
+			}
+
+			// get profile folder
+			final File profileFolder = tileCacheOSPathFolder.append(profile.getTilePath()).toFile();
+			if (profileFolder.exists() == false) {
+				return;
+			}
+
+			// check if the folder contains files/folders
+			final String[] fileList = profileFolder.list();
+			if (fileList == null || fileList.length == 0) {
+				return;
+			}
+
+			deleteDir(profileFolder);
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * delete all tile images which profile key has changed
+	 */
+	private void deleteOfflineImagesWhenModified() {
+
+		try {
+
+			final TileFactoryInfo srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+
+			final String tileCacheOSPath = MapImageCache.getTileCacheOSPath();
+			IPath tileCacheOSPathFolder = null;
+			if (tileCacheOSPath != null) {
+				tileCacheOSPathFolder = srtmFactoryInfo.getTileOSPathFolder(tileCacheOSPath);
+			}
+
+			if (tileCacheOSPathFolder == null) {
+				return;
+			}
+
+			// loop: all profiles
+			for (final SRTMProfile profile : fProfileList) {
+				if (profile.getProfileKeyHashCode() != profile.getSavedProfileKeyHashCode()) {
+
+					// profile key has changed
+
+					// get profile folder
+					final File profileFolder = tileCacheOSPathFolder.append(profile.getTilePath()).toFile();
+					if (profileFolder.exists() == false) {
+						continue;
+					}
+
+					// check if the folder contains files/folders
+					final String[] fileList = profileFolder.list();
+					if (fileList == null || fileList.length == 0) {
+						continue;
+					}
+
+					deleteDir(profileFolder);
+				}
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -861,6 +1094,28 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	@Override
 	protected IPreferenceStore doGetPreferenceStore() {
 		return Activator.getDefault().getPreferenceStore();
+	}
+
+	private void editNewProfile(final SRTMProfile newProfile) {
+
+		try {
+
+			// open color chooser dialog
+
+			final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent().getActiveShell(),
+					newProfile,
+					fProfileList,
+					this,
+					true,
+					null);
+
+			if (dialog.open() == Window.OK) {
+				saveNewProfile(newProfile);
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void enableActions() {
@@ -886,6 +1141,23 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return width;
 	}
 
+	private String getResolutionUI(final SRTMProfile profile) {
+
+		final String resolution = profile.getResolution();
+
+		if (IPreferences.SRTM_RESOLUTION_VERY_FINE.equals(resolution)) {
+			return Messages.profileViewer_column_content_resolution_veryFine;
+		} else if (IPreferences.SRTM_RESOLUTION_FINE.equals(resolution)) {
+			return Messages.profileViewer_column_content_resolution_fine;
+		} else if (IPreferences.SRTM_RESOLUTION_ROUGH.equals(resolution)) {
+			return Messages.profileViewer_column_content_resolution_rough;
+		} else if (IPreferences.SRTM_RESOLUTION_VERY_ROUGH.equals(resolution)) {
+			return Messages.profileViewer_column_content_resolution_veryRough;
+		}
+
+		return UI.EMPTY_STRING;
+	}
+
 	public ColumnViewer getViewer() {
 		return fProfileViewer;
 	}
@@ -905,23 +1177,24 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 */
 	private void onAddProfile() {
 
-		SRTMProfile profile;
-		fProfileList.add(profile = new SRTMProfile());
+		final SRTMProfile newProfile = createNewProfile();
 
-		profile.init();
-		profile.setProfileId(++fMaxProfileId);
-		profile.setProfileName(Messages.prefPage_srtm_default_profile_name);
-		profile.setProfilePath(Messages.prefPage_srtm_default_profile_path);
+		editNewProfile(newProfile);
+	}
 
-		profile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+	private void onDuplicateProfile() {
 
-		fSelectedProfile = profile;
+		final SRTMProfile newProfile = new SRTMProfile(fSelectedProfile);
 
-		fProfileViewer.add(profile);
+		final int newProfileId = ++fMaxProfileId;
 
-		// select new profile
-		fProfileViewer.setAllChecked(false);
-		selectProfile(profile);
+		newProfile.setProfileId(newProfileId);
+
+		// make a unique tile path
+//		newProfile.setTilePath(Messages.prefPage_srtm_default_profile_path + "-" + newProfileId);//$NON-NLS-1$
+
+//		newProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+		editNewProfile(newProfile);
 	}
 
 	private void onEditProfile() {
@@ -930,26 +1203,24 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		if (firstElement instanceof SRTMProfile) {
 
 			final SRTMProfile selectedProfile = (SRTMProfile) firstElement;
-			try {
-				// open color dialog
 
-				final SRTMProfile rgbVertexListEdit = new SRTMProfile();
-				rgbVertexListEdit.replaceVertexes(selectedProfile);
+			try {
+
+				// open color chooser dialog
+
+				final SRTMProfile profileClone = new SRTMProfile(selectedProfile);
 
 				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent().getActiveShell(),
-						rgbVertexListEdit);
+						profileClone,
+						fProfileList,
+						this,
+						false,
+						selectedProfile);
 
 				if (dialog.open() == Window.OK) {
-
-					final SRTMProfile modifiedProfile = dialog.getSRTMProfile();
-
-					selectedProfile.replaceVertexes(modifiedProfile);
-					selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
-
-					// update viewer
-					fProfileViewer.refresh();
-					fProfileViewer.setSelection(new StructuredSelection(selectedProfile), true);
+					saveEditedProfile(selectedProfile, dialog);
 				}
+
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
@@ -965,23 +1236,28 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			return;
 		}
 
-		final Table table = fProfileViewer.getTable();
+		int selectedIndex = fProfileViewer.getTable().getSelectionIndex();
 
-		int selectedIndex = table.getSelectionIndex();
-
+		// update model
 		fProfileList.remove(fSelectedProfile);
 
 		// update viewer
 		fProfileViewer.remove(fSelectedProfile);
 
+		// remove images
+		deleteOfflineImages(fSelectedProfile);
+		fSelectedProfile.disposeImage();
+
 		/*
-		 * select profile at the same position
+		 * select a new profile from the same position
 		 */
 		final int profileSize = fProfileList.size();
 		selectedIndex = selectedIndex >= profileSize ? profileSize - 1 : selectedIndex;
 		fSelectedProfile = (SRTMProfile) fProfileViewer.getElementAt(selectedIndex);
 
 		selectProfile(fSelectedProfile);
+
+		saveAllProfiles();
 	}
 
 	private void onResizeImageColumn() {
@@ -995,6 +1271,28 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		disposeImages();
 		createVertexImages();
+	}
+
+	private void onSelectProfile(final SRTMProfile selectedProfile) {
+
+		// ignore same profile
+		if (fSelectedProfile != null && fSelectedProfile == selectedProfile) {
+			enableActions();
+			return;
+		}
+
+		// uncheck previous profile
+		if (fSelectedProfile != null) {
+			fProfileViewer.setChecked(fSelectedProfile, false);
+		}
+
+		// check selected profile
+		fSelectedProfile = selectedProfile;
+		fProfileViewer.setChecked(fSelectedProfile, true);
+
+		enableActions();
+
+		saveSelectedProfile();
 	}
 
 	@Override
@@ -1012,6 +1310,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				Messages.prefPage_srtm_confirm_defaults_title,
 				Messages.prefPage_srtm_confirm_defaults_message)) {
 
+			deleteAllOfflineImages();
+
 			createXmlDefaultProfiles();
 
 			initVertexLists();
@@ -1022,6 +1322,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			fSelectedProfile = fProfileList.get(0);
 			selectProfile(fSelectedProfile);
+
+			saveState();
 		}
 
 		super.performDefaults();
@@ -1056,7 +1358,87 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		fProfileViewer.setInput(new Object[0]);
 	}
 
-	private void saveProfileXML() {
+	private void restoreState() {
+
+//		fChkApplyWhenSelected.setSelection(fPrefStore.getBoolean(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED));
+
+	}
+
+	private void saveAllProfiles() {
+
+		deleteOfflineImagesWhenModified();
+
+		saveProfileXMLFile();
+
+		saveState();
+	}
+
+	/**
+	 * Save profile which was edited
+	 * 
+	 * @param selectedProfile
+	 * @param dialog
+	 */
+	private void saveEditedProfile(final SRTMProfile selectedProfile, final DialogSelectSRTMColors dialog) {
+
+		final SRTMProfile modifiedProfile = dialog.getSRTMProfile();
+
+		// delete tile images when tile path has changed
+		if (selectedProfile.getTilePath().equalsIgnoreCase(modifiedProfile.getTilePath()) == false) {
+			deleteOfflineImages(selectedProfile);
+		}
+
+		selectedProfile.cloneProfile(modifiedProfile);
+		selectedProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+
+		// update viewer
+		fProfileViewer.refresh();
+		fProfileViewer.setSelection(new StructuredSelection(selectedProfile), true);
+
+		saveAllProfiles();
+
+		selectedProfile.createSavedProfileKey();
+	}
+
+	/**
+	 * Save profile which was newly created
+	 * 
+	 * @param newProfile
+	 */
+	private void saveNewProfile(final SRTMProfile newProfile) {
+
+		newProfile.createSavedProfileKey();
+
+		// update model
+		fProfileList.add(newProfile);
+
+		// rotate image
+		newProfile.setHorizontal();
+		newProfile.createImage(Display.getCurrent(), getImageWidth(), fImageHeight);
+
+		// update viewer
+		fProfileViewer.add(newProfile);
+
+		// select new profile
+		fProfileViewer.setAllChecked(false);
+		selectProfile(newProfile);
+
+		saveAllProfiles();
+	}
+
+	void saveProfile(	final SRTMProfile modifiedProfile,
+						final boolean isNewProfile,
+						final SRTMProfile selectedProfile,
+						final DialogSelectSRTMColors dialogSelectSRTMColors) {
+
+		if (isNewProfile) {
+			saveNewProfile(modifiedProfile);
+		} else {
+			saveEditedProfile(selectedProfile, dialogSelectSRTMColors);
+		}
+	}
+
+	private void saveProfileXMLFile() {
 
 		BufferedWriter writer = null;
 
@@ -1072,7 +1454,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				final IMemento xmlProfile = createXmlProfile(xmlRoot,
 						profile.getProfileId(),
 						profile.getProfileName(),
-						profile.getProfilePath());
+						profile.getTilePath(),
+						profile.isShadowState(),
+						profile.getResolution());
 
 				for (final RGBVertex vertex : profile.getVertexList()) {
 					final RGB rgb = vertex.getRGB();
@@ -1095,15 +1479,21 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 	}
 
-	private void saveState() {
-
-		saveProfileXML();
-
-		// save selected profile
+	/**
+	 * save selected profile, this will fire an event to update existing maps
+	 */
+	private void saveSelectedProfile() {
 		if (fSelectedProfile != null) {
-			fPrefStore.setValue(IPreferences.SRTM_COLORS_ACTUAL_PROFILE, fSelectedProfile.getProfileId());
+			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID, fSelectedProfile.getProfileId());
+			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY, getProfileKeyHashCode());
 		}
+	}
 
+	/**
+	 * save state of the pref page
+	 */
+	private void saveState() {
+		saveSelectedProfile();
 		saveViewerState();
 	}
 
@@ -1114,8 +1504,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	}
 
 	/**
-	 * select profile and make it visible, encapsulate into a list otherwise the vertexes will be
-	 * used and will fail
+	 * select profile and make it visible,
 	 */
 	private void selectProfile(final SRTMProfile profile) {
 
@@ -1123,8 +1512,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		fProfileViewer.getTable().setFocus();
 
-		final ArrayList<SRTMProfile> selection = new ArrayList<SRTMProfile>();
-		selection.add(profile);
-		fProfileViewer.setSelection(new StructuredSelection(selection), true);
+		fProfileViewer.setSelection(new StructuredSelection(profile), true);
 	}
 }

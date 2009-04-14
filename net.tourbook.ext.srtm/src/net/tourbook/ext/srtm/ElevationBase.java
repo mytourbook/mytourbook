@@ -29,6 +29,34 @@ public class ElevationBase {
 	final public GeoLon	firstLon;
 	final public GeoLon	lastLon;
 
+	public static String getElevationDataPath(final String layerSubdir) {
+
+		// Create directory for local placement of the elevation files and return its path
+
+		String elevationDataPath;
+
+		final String prefDataPath = Activator.getDefault()
+				.getPreferenceStore()
+				.getString(IPreferences.SRTM_DATA_FILEPATH); // TODO rename
+
+		if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
+			elevationDataPath = (String) System.getProperties().get("user.home"); //$NON-NLS-1$
+		} else {
+			elevationDataPath = prefDataPath;
+		}
+ 
+		elevationDataPath = elevationDataPath.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+		if (!elevationDataPath.endsWith(File.separator))
+			elevationDataPath = elevationDataPath + File.separator;
+		elevationDataPath = elevationDataPath + layerSubdir;
+		final File elevationDataDir = new File(elevationDataPath);
+		if (elevationDataDir.exists() == false) {
+			if (elevationDataDir.mkdirs() == false)
+				return null;
+		}
+		return elevationDataPath;
+	}
+
 	public static void main(final String[] args) {}
 
 	public ElevationBase() {
@@ -146,34 +174,6 @@ public class ElevationBase {
 		if (elev >= -11000 && elev < 8850)
 			return true;
 		return false;
-	}
-
-	public String getElevationDataPath(String layerSubdir) {
-
-		// Create directory for local placement of the elevation files and return its path
-
-		String elevationDataPath;
-
-		final String prefDataPath = Activator.getDefault()
-				.getPreferenceStore()
-				.getString(IPreferences.SRTM_DATA_FILEPATH); // TODO rename
-
-		if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
-			elevationDataPath = (String) System.getProperties().get("user.home"); //$NON-NLS-1$
-		} else {
-			elevationDataPath = prefDataPath;
-		}
-
-		elevationDataPath = elevationDataPath.replace('/', File.separatorChar).replace('\\', File.separatorChar);
-		if (!elevationDataPath.endsWith(File.separator))
-			elevationDataPath = elevationDataPath + File.separator;
-		elevationDataPath = elevationDataPath + layerSubdir;
-		File elevationDataDir = new File(elevationDataPath);
-		if (elevationDataDir.exists() == false) {
-			if (elevationDataDir.mkdirs() == false)
-				return null;
-		}
-		return elevationDataPath;
 	}
 
 }

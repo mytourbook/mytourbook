@@ -30,6 +30,8 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.ext.srtm.Activator;
+import net.tourbook.ext.srtm.IPreferences;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -52,6 +54,7 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -83,6 +86,8 @@ import org.eclipse.ui.part.ViewPart;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.event.ITileListener;
+import de.byteholder.geoclipse.map.event.TileEvent;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
@@ -138,6 +143,7 @@ public class TourMapView extends ViewPart {
 	private ISelectionListener						fPostSelectionListener;
 	private IPropertyChangeListener					fPrefChangeListener;
 	private IPropertyChangeListener					fTourbookPrefChangeListener;
+	private IPropertyChangeListener					fMapPrefChangeListener;
 	private IPartListener2							fPartListener;
 	private ITourEventListener						fTourEventListener;
 
@@ -207,6 +213,10 @@ public class TourMapView extends ViewPart {
 
 	private int										fMapDimLevel						= -1;
 	private RGB										fMapDimColor;
+
+	private TileMonitor								fTileMonitor;
+
+	protected int									fSelectedProfileKey					= 0;
 
 	public TourMapView() {}
 
@@ -408,6 +418,49 @@ public class TourMapView extends ViewPart {
 		paintEntireTour();
 	}
 
+	private void addMapListener() {
+
+		fMap.addTileListener(new ITileListener() {
+
+			public void tileEvent(final TileEvent tileEventId, final String tileKey) {
+				System.out.println(tileEventId + "\t" + tileKey);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+			}
+		});
+	}
+
+	/**
+	 * observe map preferences
+	 */
+	private void addMapPrefListener() {
+		fMapPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+				if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
+
+					final String newValue = event.getNewValue().toString();
+					final Integer prefProfileKey = Integer.parseInt(newValue);
+
+					if (prefProfileKey != fSelectedProfileKey) {
+
+						fSelectedProfileKey = prefProfileKey;
+
+						fMap.disposeCachedImages();
+						fMap.queueRedrawMap();
+					}
+				}
+//				else if (property.equals(IPreferences.SRTM_COLORS_UPDATE_MAP)) {
+//
+//					fMap.disposeCachedImages();
+//					fMap.queueRedrawMap();
+//				}
+			}
+		};
+		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(fMapPrefChangeListener);
+	}
+
 	private void addPartListener() {
 
 		fPartListener = new IPartListener2() {
@@ -441,6 +494,7 @@ public class TourMapView extends ViewPart {
 
 				final String property = event.getProperty();
 				final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+//				final IPreferenceStore mapPrefStore = net.tourbook.ext.srtm.Activator.getDefault().getPreferenceStore();
 
 				if (property.equals(PREF_SHOW_TILE_INFO)) {
 
@@ -477,6 +531,7 @@ public class TourMapView extends ViewPart {
 			}
 		};
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+
 	}
 
 	/**
@@ -693,6 +748,14 @@ public class TourMapView extends ViewPart {
 		menuMgr.add(fActionSynchTourZoomLevel);
 		menuMgr.add(fActionReloadFailedMapImages);
 //		menuMgr.add(fActionResetTileOverlays);
+
+		/*
+		 * fill statusbar
+		 */
+		fTileMonitor = new TileMonitor();
+
+		final IStatusLineManager slMgr = getViewSite().getActionBars().getStatusLineManager();
+		slMgr.add(fTileMonitor);
 	}
 
 	/**
@@ -828,6 +891,8 @@ public class TourMapView extends ViewPart {
 		addSelectionListener();
 		addTourEventListener();
 		addTourbookPrefListener();
+		addMapListener();
+		addMapPrefListener();
 
 		restoreState();
 
@@ -1439,7 +1504,6 @@ public class TourMapView extends ViewPart {
 
 				// force single tour to be repainted
 				fPreviousTourData = null;
-
 
 				fDirectMappingPainter.disablePaintContext();
 

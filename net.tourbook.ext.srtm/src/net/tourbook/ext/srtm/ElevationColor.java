@@ -20,38 +20,47 @@ package net.tourbook.ext.srtm;
 
 import org.eclipse.swt.graphics.RGB;
 
+import de.byteholder.geoclipse.map.TileFactoryInfo;
+
 public class ElevationColor {
-	
-	private final static double dimFactor = 0.7; // like in standard java Color.darker() 
-	
-	public ElevationColor() {
-		PrefPageSRTMColors.initVertexLists();
+
+	private final static double		dimFactor	= 0.7;	// like in standard java Color.darker() 
+
+	private static TileFactoryInfo	fTileFactoryInfo;
+
+	public static TileFactoryInfo getTileFactoryInfo() {
+		return fTileFactoryInfo;
 	}
-	
-	public RGB getRGB(int elev) {
+
+	public ElevationColor(final TileFactoryInfo tileFactoryInfo) {
+		PrefPageSRTMColors.initVertexLists();
+		fTileFactoryInfo = tileFactoryInfo;
+	}
+
+	public RGB getDarkerRGB(final int elev) {
+		final RGB rgb = getRGB(elev);
+		rgb.red *= dimFactor;
+		rgb.green *= dimFactor;
+		rgb.blue *= dimFactor;
+		return rgb;
+	}
+ 
+	public int getResolution() {
+		return PrefPageSRTMColors.getResolutionValue();
+	}
+
+	public RGB getRGB(final int elev) {
 		return PrefPageSRTMColors.getRGB(elev);
 	}
 
-	public RGB getDarkerRGB(int elev) {
-		RGB rgb = getRGB(elev);
-		rgb.red   *= dimFactor;
-		rgb.green *= dimFactor;
-		rgb.blue  *= dimFactor;
-		return rgb;
+	@Override
+	public int hashCode() {
+		// Type of map is changed IFF one of colors, shadow state or grid is changed.
+		return PrefPageSRTMColors.getProfileKeyHashCode();
 	}
 
-	public int getGrid() {
-		return PrefPageSRTMColors.getGrid();
-	}
-	
 	public boolean isShadowState() {
 		return PrefPageSRTMColors.isShadowState();
-	}
-	
-	public int hashCode() {
-        // Type of map is changed IFF one of colors, shadow state or grid is changed.
-		String s = PrefPageSRTMColors.getRGBVertexListString() + isShadowState() + getGrid();
-		return s.hashCode();
 	}
 
 }

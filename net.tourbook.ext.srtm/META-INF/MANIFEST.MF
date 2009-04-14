@@ -7,7 +7,8 @@ Bundle-Activator: net.tourbook.ext.srtm.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- net.tourbook.util
+ net.tourbook.util,
+ de.byteholder.geoclipse;bundle-version="0.1.4"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,

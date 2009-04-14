@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
-
+ 
 public class SRTMProfile {
 
 	private static final int		IMAGE_MIN_WIDTH		= 10;
@@ -37,11 +37,21 @@ public class SRTMProfile {
 
 	private static final long		serialVersionUID	= 1L;
 
-	private Image					fProfileImage;
-
+	/*
+	 * saved profile fields in xml file
+	 */
 	private int						fProfileId;
 	private String					fProfileName;
-	private String					fProfilePath;
+	private String					fTilePath;
+	private boolean					fIsShadow			= false;
+	private String					fResolution			= IPreferences.SRTM_RESOLUTION_VERY_FINE;
+
+	/*
+	 * not saved fields
+	 */
+	private int						fSavedProfileKeyHashCode;
+
+	private Image					fProfileImage;
 
 	/**
 	 * list with all vertexes
@@ -49,6 +59,41 @@ public class SRTMProfile {
 	private ArrayList<RGBVertex>	fVertexList			= new ArrayList<RGBVertex>();
 
 	private boolean					fIsHorizontal		= true;
+
+	public SRTMProfile() {}
+
+	/**
+	 * Creates a clone from another profile
+	 * 
+	 * @param otherProfile
+	 *            profile which gets cloned
+	 */
+	public SRTMProfile(final SRTMProfile otherProfile) {
+		cloneProfile(otherProfile);
+	}
+
+	/**
+	 * clone a profile from another profile
+	 * 
+	 * @param newProfile
+	 */
+	public void cloneProfile(final SRTMProfile newProfile) {
+
+		// ensure old list is empty
+		fVertexList.clear();
+
+		// copy vertex list and it's content
+		final ArrayList<RGBVertex> newVertexList = newProfile.getVertexList();
+		for (int ix = 0; ix < newVertexList.size(); ix++) {
+			fVertexList.add(ix, new RGBVertex(newVertexList.get(ix)));
+		}
+
+		fProfileId = newProfile.getProfileId();
+		fProfileName = new String(newProfile.getProfileName());
+		fTilePath = new String(newProfile.getTilePath());
+		fIsShadow = newProfile.isShadowState();
+		fResolution = new String(newProfile.getResolution());
+	}
 
 	/**
 	 * Creates or recreates the vertex image
@@ -147,8 +192,15 @@ public class SRTMProfile {
 			gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
 		}
 		transform.dispose();
-		
+
 		return fProfileImage;
+	}
+
+	/**
+	 * creates the profile key for all profile properties which are saved in the xml file
+	 */
+	public void createSavedProfileKey() {
+		fSavedProfileKeyHashCode = getProfileKeyHashCode();
 	}
 
 	public void disposeImage() {
@@ -183,12 +235,38 @@ public class SRTMProfile {
 		return fProfileId;
 	}
 
+	public String getProfileKey() {
+		return getVertexKey() + isShadowState() + getResolutionValue() + fTilePath;
+	}
+
+	public int getProfileKeyHashCode() {
+		return getProfileKey().hashCode();
+	}
+
 	public String getProfileName() {
 		return fProfileName;
 	}
 
-	public String getProfilePath() {
-		return fProfilePath;
+	public String getResolution() {
+		return fResolution;
+	}
+
+	/**
+	 * elevation is used at every grid-th pixel in both directions; the other values are
+	 * interpolated i.e. it gives the resolution of the image!
+	 */
+	public int getResolutionValue() {
+		if (fResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH)) {
+			return 64;
+		} else if (fResolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH)) {
+			return 16;
+		} else if (fResolution.equals(IPreferences.SRTM_RESOLUTION_FINE)) {
+			return 4;
+		} else if (fResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE)) {
+			return 1;
+		} else {
+			return 4;
+		}
 	}
 
 	public RGB getRGB(final long elev) {
@@ -236,6 +314,22 @@ public class SRTMProfile {
 		return new RGB(255, 255, 255);
 	}
 
+	public int getSavedProfileKeyHashCode() {
+		return fSavedProfileKeyHashCode;
+	}
+
+	public String getTilePath() {
+		return fTilePath;
+	}
+
+	private String getVertexKey() {
+		final StringBuilder sb = new StringBuilder();
+		for (final RGBVertex vertex : fVertexList) {
+			sb.append(vertex.toString());
+		}
+		return sb.toString();
+	}
+
 	public ArrayList<RGBVertex> getVertexList() {
 		return fVertexList;
 	}
@@ -248,32 +342,8 @@ public class SRTMProfile {
 		return result;
 	}
 
-	public void init() {
-		if (fVertexList.size() > 0)
-			return;
-		fVertexList.add(0, new RGBVertex(0, 0, 255, 0));
-		fVertexList.add(1, new RGBVertex(0, 255, 0, 1000));
-		fVertexList.add(2, new RGBVertex(255, 0, 0, 2000));
-	}
-
-	/**
-	 * update profile from another profile
-	 * 
-	 * @param newProfile
-	 */
-	public void replaceVertexes(final SRTMProfile newProfile) {
-
-		fVertexList.clear();
-		final ArrayList<RGBVertex> newVertexList = newProfile.getVertexList();
-
-		for (int ix = 0; ix < newVertexList.size(); ix++) {
-			final RGBVertex rgbVertex = newVertexList.get(ix);
-			fVertexList.add(ix, rgbVertex);
-		}
-
-		fProfileId = newProfile.getProfileId();
-		fProfileName = new String(newProfile.getProfileName());
-		fProfilePath = new String(newProfile.getProfilePath());
+	public boolean isShadowState() {
+		return fIsShadow;
 	}
 
 	public void set(String s) {
@@ -298,16 +368,45 @@ public class SRTMProfile {
 		sort();
 	}
 
-	public void setProfileId(final int fProfileId) {
-		this.fProfileId = fProfileId;
+	/**
+	 * set default vertex list
+	 */
+	public void setDefaultVertexes() {
+		if (fVertexList.size() > 0) {
+			return;
+		}
+		fVertexList.add(0, new RGBVertex(0, 0, 255, 0));
+		fVertexList.add(1, new RGBVertex(0, 255, 0, 1000));
+		fVertexList.add(2, new RGBVertex(255, 0, 0, 2000));
 	}
 
-	public void setProfileName(final String fProfileName) {
-		this.fProfileName = fProfileName;
+	public void setHorizontal() {
+		fIsHorizontal = true;
 	}
 
-	public void setProfilePath(final String fProfilePath) {
-		this.fProfilePath = fProfilePath;
+	/**
+	 * Set unique id for each profile
+	 * 
+	 * @param profileId
+	 */
+	public void setProfileId(final int profileId) {
+		fProfileId = profileId;
+	}
+
+	public void setProfileName(final String profileName) {
+		fProfileName = profileName;
+	}
+
+	public void setResolution(final String resolution) {
+		fResolution = resolution;
+	}
+
+	public void setShadowState(final Boolean isShadow) {
+		fIsShadow = isShadow;
+	}
+
+	public void setTilePath(final String tilePath) {
+		fTilePath = tilePath;
 	}
 
 	public void setVertexList(final ArrayList<RGBVertex> vertexList) {
@@ -328,13 +427,4 @@ public class SRTMProfile {
 		Collections.sort(fVertexList);
 	}
 
-	@Override
-	public String toString() {
-		String s;
-		s = ""; //$NON-NLS-1$
-		for (int i = 0; i < fVertexList.size(); i++) {
-			s += fVertexList.get(i);
-		}
-		return s;
-	}
 }
