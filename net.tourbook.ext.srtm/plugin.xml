@@ -4,17 +4,28 @@
 
      <extension
          point="org.eclipse.ui.preferencePages">
+
       <page
+            class="net.tourbook.ext.srtm.PrefPageSRTM"
+            id="net.tourbook.ext.srtm.PrefPageSRTM"
+            name="%pref_page_srtm">
+      </page>
+               
+      <page
+            category="net.tourbook.ext.srtm.PrefPageSRTM"
             class="net.tourbook.ext.srtm.PrefPageSRTMFilePath"
             id="net.tourbook.ext.srtm.PrefPageSRTMFilePath"
             name="%pref_page_srtm_files">
       </page>
       <page
+            category="net.tourbook.ext.srtm.PrefPageSRTM"
             class="net.tourbook.ext.srtm.PrefPageSRTMColors"
             id="net.tourbook.ext.srtm.PrefPageSRTMColors"
             name="%pref_page_srtm_colors">
       </page>
+      
    </extension>
+   
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
