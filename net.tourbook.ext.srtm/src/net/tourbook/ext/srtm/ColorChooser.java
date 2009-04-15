@@ -351,8 +351,9 @@ public class ColorChooser extends Composite {
 			}
 		}
 
-		// return widget background color
-		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+		// return grey
+		return new RGB(127, 127, 127);
+
 	}
 
 	private void paintHexagon(final Image hexagonImage) {
