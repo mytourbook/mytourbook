@@ -19,7 +19,7 @@
  */
 
 package net.tourbook.ext.srtm;
- 
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,8 +46,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -147,6 +150,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 * or the column manager
 	 */
 	private int								fProfileImageColumn		= 0;
+
+	private BooleanFieldEditor				fBooleanEditorApplyOption;
 
 	private static int						fMaxProfileId;
 
@@ -383,6 +388,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 	}
 
+	/**
+	 * load profiles and set profile to the previous profile
+	 */
 	public static void initVertexLists() {
 
 		loadProfiles();
@@ -614,109 +622,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return profile;
 	}
 
-	private void createProfileViewer(final Composite parent) {
-
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-		table.setLayout(new TableLayout());
-		table.setHeaderVisible(true);
-//		table.setLinesVisible(true);
-//		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-		/*
-		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
-		 * critical for performance that these methods be as efficient as possible.
-		 */
-		final Listener paintListener = new Listener() {
-			public void handleEvent(final Event event) {
-
-				if (event.index == fProfileImageColumn) {
-
-					final TableItem item = (TableItem) event.item;
-					final SRTMProfile vertexList = (SRTMProfile) item.getData();
-					final Image image = vertexList.getImage();
-
-					if (image != null) {
-
-						final Rectangle rect = image.getBounds();
-
-						switch (event.type) {
-						case SWT.MeasureItem:
-
-							event.width += rect.width;
-							event.height = Math.max(event.height, rect.height + 2);
-
-							break;
-
-						case SWT.PaintItem:
-
-							final int x = event.x + event.width;
-							final int offset = Math.max(0, (event.height - rect.height) / 2);
-							event.gc.drawImage(image, x, event.y + offset);
-
-							break;
-						}
-					}
-				}
-			}
-		};
-		table.addListener(SWT.MeasureItem, paintListener);
-		table.addListener(SWT.PaintItem, paintListener);
-
-		/*
-		 * create viewer
-		 */
-		fProfileViewer = new CheckboxTableViewer(table);
-
-		fColumnManager.createColumns(fProfileViewer);
-		fTcProfileImage = fColDefImage.getTableColumn();
-		fProfileImageColumn = fColDefImage.getCreateIndex();
-
-		fProfileViewer.setContentProvider(new ProfileContentProvider());
-		fProfileViewer.setSorter(new ProfileSorter());
-
-		fProfileViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-
-				final SRTMProfile checkedProfile = (SRTMProfile) event.getElement();
-
-				// ignore the same profile
-				if (fSelectedProfile != null && checkedProfile == fSelectedProfile) {
-					if (event.getChecked() == false) {
-						// reverse uncheck state
-						event.getCheckable().setChecked(checkedProfile, true);
-					}
-					return;
-				}
-
-				// uncheck previous profile
-				if (fSelectedProfile != null && fSelectedProfile != checkedProfile) {
-					fProfileViewer.setChecked(fSelectedProfile, false);
-				}
-
-				fSelectedProfile = checkedProfile;
-			}
-		});
-
-		fProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
-
-				final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
-				if (firstElement instanceof SRTMProfile) {
-					onSelectProfile((SRTMProfile) firstElement);
-				}
-			}
-		});
-
-		fProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(final DoubleClickEvent event) {
-				onEditProfile();
-			}
-		});
-
-	}
-
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -733,7 +638,32 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createUIButtons(profileContainer);
 		}
 
+		createUIApplyOption(parent);
+
 		return container;
+	}
+
+	private void createUIApplyOption(final Composite parent) {
+
+		/*
+		 * checkbox: pace min/max value
+		 */
+		fBooleanEditorApplyOption = new BooleanFieldEditor(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED,
+				Messages.prefPage_srtm_profile_option_apply_when_selected,
+				parent);
+		fBooleanEditorApplyOption.setPreferenceStore(fPrefStore);
+		fBooleanEditorApplyOption.setPage(this);
+		fBooleanEditorApplyOption.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				if (((Boolean) event.getNewValue())) {
+					// apply profile
+					final Object firstElement = ((StructuredSelection) fProfileViewer.getSelection()).getFirstElement();
+					if (firstElement instanceof SRTMProfile) {
+						onSelectProfile((SRTMProfile) firstElement, true);
+					}
+				}
+			}
+		});
 	}
 
 	private void createUIButtons(final Composite parent) {
@@ -822,8 +752,108 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fProfileContainer);
 		GridLayoutFactory.fillDefaults().applyTo(fProfileContainer);
 //		fProfileContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		createProfileViewer(fProfileContainer);
+
+		createUIProfileViewer(fProfileContainer);
 		createVertexImages();
+	}
+
+	private void createUIProfileViewer(final Composite parent) {
+
+		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+		table.setLayout(new TableLayout());
+		table.setHeaderVisible(true);
+//		table.setLinesVisible(true);
+//		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+		/*
+		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+		 * critical for performance that these methods be as efficient as possible.
+		 */
+		final Listener paintListener = new Listener() {
+			public void handleEvent(final Event event) {
+
+				if (event.index == fProfileImageColumn) {
+
+					final TableItem item = (TableItem) event.item;
+					final SRTMProfile vertexList = (SRTMProfile) item.getData();
+					final Image image = vertexList.getImage();
+
+					if (image != null) {
+
+						final Rectangle rect = image.getBounds();
+
+						switch (event.type) {
+						case SWT.MeasureItem:
+
+							event.width += rect.width;
+							event.height = Math.max(event.height, rect.height + 2);
+
+							break;
+
+						case SWT.PaintItem:
+
+							final int x = event.x + event.width;
+							final int offset = Math.max(0, (event.height - rect.height) / 2);
+							event.gc.drawImage(image, x, event.y + offset);
+
+							break;
+						}
+					}
+				}
+			}
+		};
+		table.addListener(SWT.MeasureItem, paintListener);
+		table.addListener(SWT.PaintItem, paintListener);
+
+		/*
+		 * create viewer
+		 */
+		fProfileViewer = new CheckboxTableViewer(table);
+
+		fColumnManager.createColumns(fProfileViewer);
+		fTcProfileImage = fColDefImage.getTableColumn();
+		fProfileImageColumn = fColDefImage.getCreateIndex();
+
+		fProfileViewer.setContentProvider(new ProfileContentProvider());
+		fProfileViewer.setSorter(new ProfileSorter());
+
+		fProfileViewer.addCheckStateListener(new ICheckStateListener() {
+			public void checkStateChanged(final CheckStateChangedEvent event) {
+
+				final SRTMProfile checkedProfile = (SRTMProfile) event.getElement();
+
+				// ignore the same profile
+				if (fSelectedProfile != null && checkedProfile == fSelectedProfile) {
+					
+					// prevent unchecking selected profile
+					event.getCheckable().setChecked(checkedProfile, true);
+
+					return;
+				}
+
+				// select checked profile
+				selectProfile(checkedProfile);
+			}
+		});
+
+		fProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+
+				final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
+				if (firstElement instanceof SRTMProfile) {
+					onSelectProfile((SRTMProfile) firstElement, false);
+				}
+			}
+		});
+
+		fProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+				onEditProfile();
+			}
+		});
+
 	}
 
 	private void createVertexImages() {
@@ -1273,10 +1303,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		createVertexImages();
 	}
 
-	private void onSelectProfile(final SRTMProfile selectedProfile) {
+	private void onSelectProfile(final SRTMProfile selectedProfile, final boolean isForceSelection) {
 
 		// ignore same profile
-		if (fSelectedProfile != null && fSelectedProfile == selectedProfile) {
+		if (isForceSelection == false && fSelectedProfile != null && fSelectedProfile == selectedProfile) {
 			enableActions();
 			return;
 		}
@@ -1292,7 +1322,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		enableActions();
 
-		saveSelectedProfile();
+		if (fBooleanEditorApplyOption.getBooleanValue()) {
+
+			// apply profile
+			
+			saveSelectedProfile();
+		}
 	}
 
 	@Override
@@ -1323,6 +1358,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			fSelectedProfile = fProfileList.get(0);
 			selectProfile(fSelectedProfile);
 
+			fBooleanEditorApplyOption.loadDefault();
+
 			saveState();
 		}
 
@@ -1343,7 +1380,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		{
 			fProfileViewer.getTable().dispose();
 
-			createProfileViewer(fProfileContainer);
+			createUIProfileViewer(fProfileContainer);
 			fProfileContainer.layout();
 
 			// update the viewer
@@ -1360,8 +1397,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void restoreState() {
 
-//		fChkApplyWhenSelected.setSelection(fPrefStore.getBoolean(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED));
-
+		fBooleanEditorApplyOption.load();
 	}
 
 	private void saveAllProfiles() {
@@ -1493,6 +1529,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 * save state of the pref page
 	 */
 	private void saveState() {
+		fBooleanEditorApplyOption.store();
 		saveSelectedProfile();
 		saveViewerState();
 	}

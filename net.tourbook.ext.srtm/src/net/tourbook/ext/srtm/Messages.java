@@ -72,6 +72,8 @@ public class Messages extends NLS {
 
 	public static String	prefPage_srtm_profile_duplicate;
 	public static String		prefPage_srtm_profile_edit;
+
+	public static String	prefPage_srtm_profile_option_apply_when_selected;
 	public static String		prefPage_srtm_profile_remove;
 	public static String		prefPage_srtm_resolution_title;
 	public static String		prefPage_srtm_resolution_very_fine;
