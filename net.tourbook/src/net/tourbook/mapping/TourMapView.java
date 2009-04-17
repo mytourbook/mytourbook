@@ -54,7 +54,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -86,8 +85,6 @@ import org.eclipse.ui.part.ViewPart;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
-import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.TileEvent;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
@@ -214,9 +211,7 @@ public class TourMapView extends ViewPart {
 	private int										fMapDimLevel						= -1;
 	private RGB										fMapDimColor;
 
-	private TileMonitor								fTileMonitor;
-
-	protected int									fSelectedProfileKey					= 0;
+	private int										fSelectedProfileKey					= 0;
 
 	public TourMapView() {}
 
@@ -418,17 +413,6 @@ public class TourMapView extends ViewPart {
 		paintEntireTour();
 	}
 
-	private void addMapListener() {
-
-		fMap.addTileListener(new ITileListener() {
-
-			public void tileEvent(final TileEvent tileEventId, final String tileKey) {
-				System.out.println(tileEventId + "\t" + tileKey);
-// TODO remove SYSTEM.OUT.PRINTLN
-
-			}
-		});
-	}
 
 	/**
 	 * observe map preferences
@@ -749,13 +733,6 @@ public class TourMapView extends ViewPart {
 		menuMgr.add(fActionReloadFailedMapImages);
 //		menuMgr.add(fActionResetTileOverlays);
 
-		/*
-		 * fill statusbar
-		 */
-		fTileMonitor = new TileMonitor();
-
-		final IStatusLineManager slMgr = getViewSite().getActionBars().getStatusLineManager();
-		slMgr.add(fTileMonitor);
 	}
 
 	/**
@@ -891,7 +868,6 @@ public class TourMapView extends ViewPart {
 		addSelectionListener();
 		addTourEventListener();
 		addTourbookPrefListener();
-		addMapListener();
 		addMapPrefListener();
 
 		restoreState();
