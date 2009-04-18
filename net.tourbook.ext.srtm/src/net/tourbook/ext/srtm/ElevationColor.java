@@ -24,8 +24,6 @@ import de.byteholder.geoclipse.map.TileFactoryInfo;
 
 public class ElevationColor {
 
-	private final static double		dimFactor	= 0.7;	// like in standard java Color.darker() 
-
 	private static TileFactoryInfo	fTileFactoryInfo;
 
 	public static TileFactoryInfo getTileFactoryInfo() {
@@ -38,13 +36,9 @@ public class ElevationColor {
 	}
 
 	public RGB getDarkerRGB(final int elev) {
-		final RGB rgb = getRGB(elev);
-		rgb.red *= dimFactor;
-		rgb.green *= dimFactor;
-		rgb.blue *= dimFactor;
-		return rgb;
+		return PrefPageSRTMColors.getShadowRGB(elev);
 	}
- 
+
 	public int getResolution() {
 		return PrefPageSRTMColors.getResolutionValue();
 	}

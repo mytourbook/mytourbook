@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
- 
+
 public class SRTMProfile {
 
 	private static final int		IMAGE_MIN_WIDTH		= 10;
@@ -59,6 +59,7 @@ public class SRTMProfile {
 	private ArrayList<RGBVertex>	fVertexList			= new ArrayList<RGBVertex>();
 
 	private boolean					fIsHorizontal		= true;
+	private float					fShadowValue;
 
 	public SRTMProfile() {}
 
@@ -92,6 +93,7 @@ public class SRTMProfile {
 		fProfileName = new String(newProfile.getProfileName());
 		fTilePath = new String(newProfile.getTilePath());
 		fIsShadow = newProfile.isShadowState();
+		fShadowValue = newProfile.getShadowValue();
 		fResolution = new String(newProfile.getResolution());
 	}
 
@@ -236,7 +238,7 @@ public class SRTMProfile {
 	}
 
 	public String getProfileKey() {
-		return getVertexKey() + isShadowState() + getResolutionValue() + fTilePath;
+		return getVertexKey() + isShadowState() + getResolutionValue() + fTilePath + Float.toString(fShadowValue);
 	}
 
 	public int getProfileKeyHashCode() {
@@ -316,6 +318,10 @@ public class SRTMProfile {
 
 	public int getSavedProfileKeyHashCode() {
 		return fSavedProfileKeyHashCode;
+	}
+
+	public float getShadowValue() {
+		return fShadowValue;
 	}
 
 	public String getTilePath() {
@@ -403,6 +409,10 @@ public class SRTMProfile {
 
 	public void setShadowState(final Boolean isShadow) {
 		fIsShadow = isShadow;
+	}
+
+	public void setShadowValue(final float value) {
+		fShadowValue = value;
 	}
 
 	public void setTilePath(final String tilePath) {

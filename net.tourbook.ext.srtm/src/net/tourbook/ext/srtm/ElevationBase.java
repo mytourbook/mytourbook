@@ -29,7 +29,7 @@ public class ElevationBase {
 	final public GeoLon	firstLon;
 	final public GeoLon	lastLon;
 
-	public static String getElevationDataPath(final String layerSubdir) {
+	public synchronized static String getElevationDataPath(final String layerSubdir) {
 
 		// Create directory for local placement of the elevation files and return its path
 
@@ -69,16 +69,16 @@ public class ElevationBase {
 	}
 
 	// dummy
-	public short getElevation(final GeoLat lat, final GeoLon lon) {
+	public synchronized short getElevation(final GeoLat lat, final GeoLon lon) {
 		return 0;
 	}
 
 	// dummy
-	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
+	public synchronized double getElevationDouble(final GeoLat lat, final GeoLon lon) {
 		return 0.;
 	}
 
-	public short getElevationGrid(final GeoLat lat, final GeoLon lon) {
+	public synchronized short getElevationGrid(final GeoLat lat, final GeoLon lon) {
 		return (short) getElevationGridDouble(lat, lon);
 	}
 
@@ -89,7 +89,7 @@ public class ElevationBase {
 	 *         the altitude cannot be read from a file or the file cannot be retrieved from the SRTM
 	 *         host.
 	 */
-	public double getElevationGridDouble(final GeoLat lat, final GeoLon lon) {
+	public synchronized double getElevationGridDouble(final GeoLat lat, final GeoLon lon) {
 
 		short elev1, elev2, elev3, elev4;
 		double p, q;

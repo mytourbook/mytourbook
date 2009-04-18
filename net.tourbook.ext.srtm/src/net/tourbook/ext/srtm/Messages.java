@@ -53,6 +53,12 @@ public class Messages extends NLS {
 
 	public static String	profileViewer_column_label_resolution_tooltip;
 
+	public static String	profileViewer_column_label_shadowValue;
+
+	public static String	profileViewer_column_label_shadowValue_header;
+
+	public static String	profileViewer_column_label_shadowValue_tooltip;
+
 	public static String		prefPage_srtm_btn_adjust_columns;
 	public static String		prefPage_srtm_chk_apply_when_selected;
 	public static String		prefPage_srtm_chk_apply_when_selected_tooltip;
@@ -82,6 +88,8 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_resolution_very_rough;
 	public static String		prefPage_srtm_shadow_text;
 
+	public static String	prefPage_srtm_shadow_value_text;
+
 	public static String		srtm_transfer_error_message;
 	public static String		srtm_transfer_error_title;
 	public static String		srtm_transfer_initialize;
@@ -101,6 +109,8 @@ public class Messages extends NLS {
 	public static String		dialog_adjust_srtm_colors_dialog_title;
 	public static String		dialog_adjust_srtm_colors_dialog_area_title;
 	public static String		dialog_adjust_srtm_colors_dialog_message;
+	public static String	dialog_adjust_srtm_colors_error_invalid_shadow_value;
+
 	public static String		dialog_adjust_srtm_colors_error_invalid_tile_path;
 	public static String		dialog_adjust_srtm_colors_label_profile_name;
 	public static String		dialog_adjust_srtm_colors_label_tile_path;

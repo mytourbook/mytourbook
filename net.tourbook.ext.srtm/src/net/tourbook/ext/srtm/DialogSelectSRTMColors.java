@@ -70,10 +70,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 	private Composite				fVertexOuterContainer;
 	private ScrolledComposite		fVertexScrolledContainer;
 
+	// vertex fields
 	private Text[]					elevFields;
 	private Label[]					colorLabel;
 	private Button[]				checkButtons;
 
+	private Button					fBtnApply;
 	private Button					fBtnOK;
 	private Button					fBtnRemove;
 
@@ -85,21 +87,20 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 	 * keep colors which must be disposed when the dialog gets disposed
 	 */
 	private ArrayList<Color>		fColorList	= new ArrayList<Color>();
- 
+
 	private Button					fRdoResolutionVeryFine;
 	private Button					fRdoResolutionFine;
 	private Button					fRdoResolutionRough;
 	private Button					fRdoResolutionVeryRough;
 
 	private Button					fChkShadow;
+	private Text					fTxtShadowValue;
 
 	private Shell					fShell;
 
 	private PrefPageSRTMColors		fPrefPageSRTMColors;
 	private boolean					fIsNewProfile;
 	private SRTMProfile				fSelectedProfile;
-
-
 
 	public DialogSelectSRTMColors(	final Shell parentShell,
 									final SRTMProfile profile,
@@ -114,7 +115,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		fProfile.setVertical();
 		fVertexList = profile.getVertexList();
 		fProfileList = profileList;
-		
+
 		fPrefPageSRTMColors = prefPageSRTMColors;
 		fIsNewProfile = isNewProfile;
 		fSelectedProfile = selectedProfile;
@@ -241,8 +242,8 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		/*
 		 * button: apply
 		 */
-		button = createButton(parent, 45, Messages.dialog_adjust_srtm_colors_button_apply, false);
-		button.addSelectionListener(new SelectionAdapter() {
+		fBtnApply = createButton(parent, 45, Messages.dialog_adjust_srtm_colors_button_apply, false);
+		fBtnApply.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onApply();
@@ -373,32 +374,21 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			GridLayoutFactory.swtDefaults().numColumns(4).applyTo(groupResolution);
 			groupResolution.setText(Messages.prefPage_srtm_resolution_title);
 			{
-//				final SelectionAdapter resolutionListener = new SelectionAdapter() {
-//					@Override
-//					public void widgetSelected(final SelectionEvent event) {
-//						onChangeResolution();
-//					}
-//				};
-
 				// radio: very fine
 				fRdoResolutionVeryFine = new Button(groupResolution, SWT.RADIO);
 				fRdoResolutionVeryFine.setText(Messages.prefPage_srtm_resolution_very_fine);
-//				fRdoResolutionVeryFine.addSelectionListener(resolutionListener);
 
 				// radio: fine
 				fRdoResolutionFine = new Button(groupResolution, SWT.RADIO);
 				fRdoResolutionFine.setText(Messages.prefPage_srtm_resolution_fine);
-//				fRdoResolutionFine.addSelectionListener(resolutionListener);
 
 				// radio: rough
 				fRdoResolutionRough = new Button(groupResolution, SWT.RADIO);
 				fRdoResolutionRough.setText(Messages.prefPage_srtm_resolution_rough);
-//				fRdoResolutionRough.addSelectionListener(resolutionListener);
 
 				// radio: very rough
 				fRdoResolutionVeryRough = new Button(groupResolution, SWT.RADIO);
 				fRdoResolutionVeryRough.setText(Messages.prefPage_srtm_resolution_very_rough);
-//				fRdoResolutionVeryRough.addSelectionListener(resolutionListener);
 			}
 
 			/*
@@ -409,9 +399,31 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			fChkShadow.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-
+					enableActions();
 				}
 			});
+
+			final Composite shadowContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(shadowContainer);
+			GridLayoutFactory.fillDefaults().applyTo(shadowContainer);
+			{
+				/*
+				 * input: shadow value
+				 */
+				fTxtShadowValue = new Text(shadowContainer, SWT.BORDER);
+				GridDataFactory.swtDefaults().indent(20, 0).applyTo(fTxtShadowValue);
+				fTxtShadowValue.addModifyListener(new ModifyListener() {
+					public void modifyText(final ModifyEvent e) {
+						validateFields();
+					}
+				});
+
+				/*
+				 * lable: shadow info
+				 */
+				final Label label = new Label(shadowContainer, SWT.NONE);
+				label.setText(Messages.prefPage_srtm_shadow_value_text);
+			}
 		}
 	}
 
@@ -632,8 +644,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			return;
 		}
 
-		final int vertexSize = fVertexList.size();
+		// shadow value
+		final boolean isShadow = fChkShadow.getSelection();
+		fTxtShadowValue.setEnabled(isShadow);
 
+		// remove button
+		final int vertexSize = fVertexList.size();
 		int checked = 0;
 		for (int ix = 0; ix < vertexSize; ix++) {
 			final Button button = checkButtons[ix];
@@ -643,7 +659,6 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				}
 			}
 		}
-
 		fBtnRemove.setEnabled(checked > 0 && vertexSize > 2);
 	}
 
@@ -706,10 +721,6 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		fProfileImageCanvas.setImage(image);
 	}
 
-//	private void onChangeResolution() {
-//
-//	}
-
 	private void setResolutionIntoUI(final String resolution) {
 
 		final boolean isVeryFine = IPreferences.SRTM_RESOLUTION_VERY_FINE.equals(resolution);
@@ -757,12 +768,14 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 	}
 
 	private void updateProfileFromUI() {
+
 		sortVertexsAndUpdateProfile();
 
 		fProfile.setProfileName(fTxtProfileName.getText());
 		fProfile.setTilePath(fTxtTilePath.getText());
 		fProfile.setShadowState(fChkShadow.getSelection());
 		fProfile.setResolution(getResolutionFromUI());
+		fProfile.setShadowValue(Float.parseFloat(fTxtShadowValue.getText()));
 	}
 
 	private void updateUI() {
@@ -771,13 +784,16 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		fTxtTilePath.setText(fProfile.getTilePath());
 		fChkShadow.setSelection(fProfile.isShadowState());
 		setResolutionIntoUI(fProfile.getResolution());
+		fTxtShadowValue.setText(Float.toString(fProfile.getShadowValue()));
 	}
 
 	private boolean validateFields() {
 
 		boolean isValid = true;
 
-		// check if the tile path is already used
+		/*
+		 * check if the tile path is already used
+		 */
 		final int dialogProfileId = fProfile.getProfileId();
 		final String dialogTilePath = fTxtTilePath.getText().trim();
 
@@ -798,7 +814,22 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			}
 		}
 
+		/*
+		 * check shadow value
+		 */
+		try {
+			final float shadowValue = Float.parseFloat(fTxtShadowValue.getText());
+			if (shadowValue > 1 || shadowValue < 0) {
+				isValid = false;
+				setErrorMessage(Messages.dialog_adjust_srtm_colors_error_invalid_shadow_value);
+			}
+		} catch (final NumberFormatException e) {
+			isValid = false;
+			setErrorMessage(Messages.dialog_adjust_srtm_colors_error_invalid_shadow_value);
+		}
+
 		fBtnOK.setEnabled(isValid);
+		fBtnApply.setEnabled(isValid);
 
 		if (isValid) {
 			setErrorMessage(null);
