@@ -221,7 +221,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		});
 
 		/*
-		 * button: add vertex multiple
+		 * button: add multiple vertexes
 		 */
 		button = createButton(parent,
 				IDialogConstants.CLIENT_ID + 2,
@@ -235,24 +235,44 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 				// ensure the field list is updated and not unsorted
 				sortVertexsAndUpdateProfile();
 
-				final DialogGetMultipleVertexParameter dialog = new DialogGetMultipleVertexParameter(Display.getCurrent()
+				final DialogCreateMultipleVertexes dialog = new DialogCreateMultipleVertexes(Display.getCurrent()
 						.getActiveShell());
 				if (dialog.open() == Window.OK) {
 
-					// create new vertex at the end of the list
-					fVertexList.add(new RGBVertex(fColorChooser.getRGB()));
+					final int startEle = dialog.getStartElevation();
+					final int endEle = dialog.getEndElevation();
+					final int eleDiff = dialog.getElevationDifference();
+
+					for (int elevation = startEle; elevation <= endEle; elevation += eleDiff) {
+
+						boolean isNewEle = true;
+
+						/*
+						 * check if elevation is already available, they will be ignored
+						 */
+						for (final RGBVertex vertex : fVertexList) {
+							if (vertex.elev == elevation) {
+								isNewEle = false;
+								break;
+							}
+						}
+
+						if (isNewEle) {
+							// create new vertex
+							final RGBVertex vertex = new RGBVertex(fColorChooser.getRGB());
+							fVertexList.add(vertex);
+							vertex.elev = elevation;
+						}
+					}
 
 					createUIVertexFieds(fVertexOuterContainer);
 
 					// set focus to the new vertex
-					elevFields[elevFields.length - 1].setFocus();
+//					elevFields[elevFields.length - 1].setFocus();
 
 					enableActions();
-
-					/*
-					 * !!! the fields are not sorted here because this leads to confusion when the
-					 * field is moved to another position
-					 */
+					
+					sortVertexsAndUpdateProfile();
 				}
 			}
 		});

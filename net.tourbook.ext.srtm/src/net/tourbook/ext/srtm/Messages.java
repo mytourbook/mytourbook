@@ -117,6 +117,14 @@ public class Messages extends NLS {
 	public static String		dialog_adjust_srtm_colors_label_profile_name;
 	public static String		dialog_adjust_srtm_colors_label_tile_path;
 
+	public static String	dialog_multipleVertexes_label_eleDiff;
+
+	public static String	dialog_multipleVertexes_label_endElevation;
+
+	public static String	dialog_multipleVertexes_label_startElevation;
+
+	public static String	dialog_multipleVertexes_title;
+
 	public static String		color_chooser_choosed_color;
 	public static String		color_chooser_hexagon;
 	public static String		color_chooser_hexagon_move;
