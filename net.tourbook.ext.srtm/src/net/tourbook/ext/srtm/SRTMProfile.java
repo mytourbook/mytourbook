@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -32,10 +33,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class SRTMProfile {
 
-	private static final int		IMAGE_MIN_WIDTH		= 10;
-	private static final int		IMAGE_MIN_HEIGHT	= 10;
+	static final String				DEFAULT_SRTM_RESOLUTION	= IPreferences.SRTM_RESOLUTION_VERY_FINE;
+	static final boolean			DEFAULT_IS_SHADOW		= false;
+	static final float				DEFAULT_SHADOW_VALUE	= 0.8f;
 
-	private static final long		serialVersionUID	= 1L;
+	private static final int		IMAGE_MIN_WIDTH			= 10;
+	private static final int		IMAGE_MIN_HEIGHT		= 10;
+
+	private static final long		serialVersionUID		= 1L;
 
 	/*
 	 * saved profile fields in xml file
@@ -43,8 +48,9 @@ public class SRTMProfile {
 	private int						fProfileId;
 	private String					fProfileName;
 	private String					fTilePath;
-	private boolean					fIsShadow			= false;
-	private String					fResolution			= IPreferences.SRTM_RESOLUTION_VERY_FINE;
+	private boolean					fIsShadow				= DEFAULT_IS_SHADOW;
+	private String					fResolution				= DEFAULT_SRTM_RESOLUTION;
+	private float					fShadowValue			= DEFAULT_SHADOW_VALUE;
 
 	/*
 	 * not saved fields
@@ -56,10 +62,11 @@ public class SRTMProfile {
 	/**
 	 * list with all vertexes
 	 */
-	private ArrayList<RGBVertex>	fVertexList			= new ArrayList<RGBVertex>();
+	private ArrayList<RGBVertex>	fVertexList				= new ArrayList<RGBVertex>();
 
-	private boolean					fIsHorizontal		= true;
-	private float					fShadowValue;
+	private boolean					fIsHorizontal			= true;
+	private int						fImageWidth;
+	private int						fImageHeight;
 
 	public SRTMProfile() {}
 
@@ -97,33 +104,23 @@ public class SRTMProfile {
 		fResolution = new String(newProfile.getResolution());
 	}
 
-	/**
-	 * Creates or recreates the vertex image
-	 * 
-	 * @param display
-	 * @param width
-	 * @param height
-	 * @return new image
-	 */
-	public Image createImage(final Display display, int width, int height) {
-
-		// dispose previous image
-		disposeImage();
+	public Image createImage(int width, int height, final boolean isHorizontal) {
 
 		// ensure min image size
 		width = width < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : width;
 		height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
 
-		fProfileImage = new Image(display, width, height);
+		final Device display = Display.getCurrent();
+		final Image profileImage = new Image(display, width, height);
 
 		/*
 		 * draw colors
 		 */
-		final GC gc = new GC(fProfileImage);
+		final GC gc = new GC(profileImage);
 		final long elevMax = fVertexList.size() == 0 ? 8850 : fVertexList.get(fVertexList.size() - 1).getElevation();
 
-		final int horizontal = fIsHorizontal ? width : height + 1;
-		final int vertical = fIsHorizontal ? height : width;
+		final int horizontal = isHorizontal ? width : height + 1;
+		final int vertical = isHorizontal ? height : width;
 
 		for (int x = 0; x < horizontal; x++) {
 
@@ -133,7 +130,7 @@ public class SRTMProfile {
 			final Color color = new Color(display, rgb);
 			gc.setForeground(color);
 
-			if (fIsHorizontal) {
+			if (isHorizontal) {
 
 				final int x1 = horizontal - x - 1;
 				final int x2 = horizontal - x - 1;
@@ -179,7 +176,7 @@ public class SRTMProfile {
 
 			// Rotate by -90 degrees	
 
-			if (fIsHorizontal) {
+			if (isHorizontal) {
 				final int dx = horizontal - x - 1;
 				final int dy = vertical - 3;
 				transform.setElements(0, -1, 1, 0, dx, dy);
@@ -194,8 +191,23 @@ public class SRTMProfile {
 			gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
 		}
 		transform.dispose();
+		return profileImage;
+	}
 
-		return fProfileImage;
+	/**
+	 * Recreates the profile image
+	 * 
+	 * @param width
+	 * @param height
+	 * @param isHorizontal
+	 * @return profile image
+	 */
+	private Image createImageInternal(final int width, final int height, final boolean isHorizontal) {
+
+		// dispose previous image
+		disposeImage();
+
+		return createImage(width, height, isHorizontal);
 	}
 
 	/**
@@ -229,7 +241,36 @@ public class SRTMProfile {
 		return true;
 	}
 
-	public Image getImage() {
+	public Image getImage(final int width, final int height, final boolean isHorizontal) {
+
+		/*
+		 * create image when the requested image size/orientation is different than the previous
+		 * created image
+		 */
+		if (fProfileImage == null
+				|| fProfileImage.isDisposed()
+				|| fIsHorizontal != isHorizontal
+				|| fImageWidth != width
+				|| fImageHeight != height) {
+
+			fIsHorizontal = isHorizontal;
+			fImageWidth = width;
+			fImageHeight = height;
+
+			fProfileImage = createImageInternal(width, height, isHorizontal);
+		}
+
+		return fProfileImage;
+	}
+
+	public Image getImage(final int width, final int height, final boolean isHorizontal, final boolean forceRedraw) {
+
+		if (forceRedraw) {
+			fProfileImage = createImageInternal(width, height, isHorizontal);
+		} else {
+			getImage(width, height, isHorizontal);
+		}
+
 		return fProfileImage;
 	}
 
@@ -352,6 +393,10 @@ public class SRTMProfile {
 		return fIsShadow;
 	}
 
+//	public void setHorizontal() {
+//		fIsHorizontal = true;
+//	}
+
 	public void set(String s) {
 		final Pattern pattern = Pattern.compile("^([-]*[0-9]*),([0-9]*),([0-9]*),([0-9]*);(.*)$"); //$NON-NLS-1$
 		fVertexList.clear();
@@ -384,10 +429,6 @@ public class SRTMProfile {
 		fVertexList.add(0, new RGBVertex(0, 0, 255, 0));
 		fVertexList.add(1, new RGBVertex(0, 255, 0, 1000));
 		fVertexList.add(2, new RGBVertex(255, 0, 0, 2000));
-	}
-
-	public void setHorizontal() {
-		fIsHorizontal = true;
 	}
 
 	/**
@@ -429,10 +470,9 @@ public class SRTMProfile {
 	/**
 	 * paint the profile image vertical, default is horizontal
 	 */
-	public void setVertical() {
-		fIsHorizontal = false;
-	}
-
+//	public void setVertical() {
+//		fIsHorizontal = false;
+//	}
 	public void sort() {
 		Collections.sort(fVertexList);
 	}

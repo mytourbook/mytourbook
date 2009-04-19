@@ -100,6 +100,8 @@ public class Messages extends NLS {
 
 	public static String		dialog_adjust_srtm_colors_button_add;
 
+	public static String	dialog_adjust_srtm_colors_button_add_multiple;
+
 	public static String	dialog_adjust_srtm_colors_button_apply;
 	public static String		dialog_adjust_srtm_colors_button_remove;
 	public static String		dialog_adjust_srtm_colors_button_sort;
