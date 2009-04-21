@@ -17,23 +17,27 @@
  * @author Alfred Barten
  */
 package net.tourbook.ext.srtm;
-
+ 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPMessageCollector;
+import com.enterprisedt.net.ftp.FTPProgressMonitor;
 import com.enterprisedt.net.ftp.FTPTransferType;
+
+import de.byteholder.geoclipse.map.event.TileEvent;
+import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 public final class DownloadSRTM3 {
 
@@ -53,7 +57,7 @@ public final class DownloadSRTM3 {
 			"/srtm/version2/SRTM3/South_America", // 2 //$NON-NLS-1$
 			"/srtm/version2/SRTM3/Africa", // 3 //$NON-NLS-1$
 			"/srtm/version2/SRTM3/Australia", // 4 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/Islands"}; // 5 //$NON-NLS-1$
+			"/srtm/version2/SRTM3/Islands"	};							// 5 //$NON-NLS-1$
 
 	public final static void get(final String remoteName, final String localName) {
 
@@ -90,13 +94,14 @@ public final class DownloadSRTM3 {
 			e.printStackTrace();
 		}
 
-		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		final TileInfoManager tileInfoMgr = TileInfoManager.getInstance();
 
+		final Job downloadJob = new Job("downloadJob") { //$NON-NLS-1$
+			@Override
+			protected IStatus run(final IProgressMonitor monitor) {
 				try {
 
-					monitor.beginTask(Messages.srtm_transfer_task, 2);
-					monitor.subTask(NLS.bind(Messages.srtm_transfer_initialize, host));
+					TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteName, 0);
 
 					System.out.println("connect " + host); //$NON-NLS-1$
 					ftp.connect();
@@ -113,27 +118,33 @@ public final class DownloadSRTM3 {
 					System.out.println("chdir " + remoteDirName[0]); //$NON-NLS-1$
 					ftp.chdir(remoteDirName[0]);
 
-					monitor.worked(1);
-					monitor.subTask(NLS.bind(Messages.srtm_transfer_retrieve_file, remoteName));
+					ftp.setProgressMonitor(new FTPProgressMonitor() {
+						public void bytesTransferred(final long count) {
+							tileInfoMgr.updateSRTMTileInfo(TileEvent.LOADING_SRTM_DATA_MONITOR, remoteName, count);
+						}
+					});
 
 					System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					ftp.get(localName, remoteName);
 
-					monitor.worked(1);
+					ftp.get(localName, remoteName);
 
 					System.out.println("quit"); //$NON-NLS-1$
 					ftp.quit();
 
 				} catch (final Exception e) {
-					throw new InvocationTargetException(e);
+					e.printStackTrace();
+				} finally {
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteName, 0);
 				}
+
+				return Status.OK_STATUS;
 			}
 		};
+		downloadJob.schedule();
 
+		// wait until the job is finished
 		try {
-			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
+			downloadJob.join();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

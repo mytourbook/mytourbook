@@ -17,61 +17,56 @@
  * @author Alfred Barten
  */
 package net.tourbook.ext.srtm;
+ 
+public final class DownloadETOPO extends DownloadResource {
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+	final static String	addressPraefix	= "http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO5/TOPO/ETOPO5/"; //$NON-NLS-1$
 
-public final class DownloadETOPO {
+	public static void get(final String remoteName, final String localName) throws Exception {
+		get(addressPraefix, remoteName, localName);
+	}
 
-   final static String addressPraefix = "http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO5/TOPO/ETOPO5/"; //$NON-NLS-1$
-   
-   public final static void get(String remoteName, String localName) throws Exception {
-    
-      try {
-         String address = addressPraefix + remoteName;
-         System.out.println("load " + address); //$NON-NLS-1$
-         OutputStream outputStream = null;
-         InputStream inputStream = null;
-         try {
-             URL url = new URL(address);
-             outputStream = new BufferedOutputStream(
-                                new FileOutputStream(localName));
-             URLConnection urlConnection = url.openConnection();
-             inputStream = urlConnection.getInputStream();
-             byte[] buffer = new byte[1024];
-             int numRead;
-             long numWritten = 0;
-             while ((numRead = inputStream.read(buffer)) != -1) {
-             outputStream.write(buffer, 0, numRead);
-             numWritten += numRead;
-             }
-             System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
-         } catch (Exception e) {
-             e.printStackTrace();
-         } finally {
-             try {
-             if (inputStream != null) {
-                 inputStream.close();
-             }
-             if (outputStream != null) {
-                 outputStream.close();
-             }
-             } catch (IOException ioe) {
-             ioe.printStackTrace();
-             }
-         }
-
-         System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-      } catch (Exception e) {
-         System.out.println(e.getMessage());
-         throw(e);
-      }
-   }   
-
-   
-   public static void main(String[] args) {
-
-   }
-} 
+//   public final static void get(String remoteName, String localName) throws Exception {
+//    
+//      try {
+//         String address = addressPraefix + remoteName;
+//         System.out.println("load " + address); //$NON-NLS-1$
+//         OutputStream outputStream = null;
+//         InputStream inputStream = null;
+//         try {
+//             URL url = new URL(address);
+//             outputStream = new BufferedOutputStream(
+//                                new FileOutputStream(localName));
+//             URLConnection urlConnection = url.openConnection();
+//             inputStream = urlConnection.getInputStream();
+//             byte[] buffer = new byte[1024];
+//             int numRead;
+//             long numWritten = 0;
+//             while ((numRead = inputStream.read(buffer)) != -1) {
+//             outputStream.write(buffer, 0, numRead);
+//             numWritten += numRead;
+//             }
+//             System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//         } finally {
+//             try {
+//             if (inputStream != null) {
+//                 inputStream.close();
+//             }
+//             if (outputStream != null) {
+//                 outputStream.close();
+//             }
+//             } catch (IOException ioe) {
+//             ioe.printStackTrace();
+//             }
+//         }
+//
+//         System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//
+//      } catch (Exception e) {
+//         System.out.println(e.getMessage());
+//         throw(e);
+//      }
+//   }   
+}
