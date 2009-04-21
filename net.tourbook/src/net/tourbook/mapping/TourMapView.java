@@ -413,7 +413,6 @@ public class TourMapView extends ViewPart {
 		paintEntireTour();
 	}
 
-
 	/**
 	 * observe map preferences
 	 */
@@ -707,11 +706,11 @@ public class TourMapView extends ViewPart {
 		viewTbm.add(fActionSynchWithTour);
 		viewTbm.add(fActionSynchWithSlider);
 		viewTbm.add(new Separator());
+		viewTbm.add(fActionSelectMapProvider);
+		viewTbm.add(new Separator());
 		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
-		viewTbm.add(new Separator());
-		viewTbm.add(fActionSelectMapProvider);
 		viewTbm.add(fActionZoomShowAll);
 
 		/*
