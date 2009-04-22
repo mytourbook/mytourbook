@@ -104,7 +104,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void createMapProviderList() {
 
-		final List<MapProvider> mapProviders = fMappingView.getTileFactories();
+		final List<MapProvider> mapProviders = fMappingView.getMapProviders();
 
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
 		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
@@ -116,7 +116,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 			// find the stored map provider in the available map providers
 			for (final MapProvider mapProvider : mapProviders) {
-				if (mapProvider.getInfo().getFactoryID().equals(storeMapProvider)) {
+				if (mapProvider.getTileFactory().getInfo().getFactoryID().equals(storeMapProvider)) {
 					fMapProviders.add(mapProvider);
 					break;
 				}
@@ -209,7 +209,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			@Override
 			public String getText(final Object element) {
 				final MapProvider tileFactory = (MapProvider) element;
-				return tileFactory.getInfo().getFactoryName();
+				return tileFactory.getTileFactory().getInfo().getFactoryName();
 			}
 		});
 
@@ -246,7 +246,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final ArrayList<MapProvider> checkedProviders = new ArrayList<MapProvider>();
 
 		for (final MapProvider mapProvider : fMapProviders) {
-			final String factoryId = mapProvider.getInfo().getFactoryID();
+			final String factoryId = mapProvider.getTileFactory().getInfo().getFactoryID();
 			for (final String storedProviderId : storeProviderIds) {
 				if (factoryId.equals(storedProviderId)) {
 					mapProvider.setCanBeToggled(true);
@@ -360,7 +360,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		for (int graphIndex = 0; graphIndex < mapProviders.length; graphIndex++) {
 			final MapProvider mapTileFactory = (MapProvider) mapProviders[graphIndex];
-			prefGraphsChecked[graphIndex] = mapTileFactory.getInfo().getFactoryID();
+			prefGraphsChecked[graphIndex] = mapTileFactory.getTileFactory().getInfo().getFactoryID();
 		}
 
 		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST,
@@ -373,7 +373,9 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final String[] mapProviderIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			mapProviderIds[itemIndex] = ((MapProvider) items[itemIndex].getData()).getInfo().getFactoryID();
+			mapProviderIds[itemIndex] = ((MapProvider) items[itemIndex].getData()).getTileFactory()
+					.getInfo()
+					.getFactoryID();
 		}
 
 		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER,

@@ -179,7 +179,7 @@ public class TourMapView extends ViewPart {
 	private boolean									fIsMapSynchedWithSlider;
 	private boolean									fIsPositionCentered;
 
-	private List<MapProvider>						fTileFactories;
+	private List<MapProvider>						fMapProvider;
 
 	private int										fDefaultZoom;
 	private GeoPosition								fDefaultPosition					= null;
@@ -851,12 +851,12 @@ public class TourMapView extends ViewPart {
 		});
 
 		// create list with all map factories
-		fTileFactories = new ArrayList<MapProvider>();
+		fMapProvider = new ArrayList<MapProvider>();
 		final List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
 		for (final TileFactory tileFactory : tileFactories) {
 
 			final MapProvider mapProvider = new MapProvider(tileFactory, tileFactory.getProjection());
-			fTileFactories.add(mapProvider);
+			fMapProvider.add(mapProvider);
 		}
 
 		createActions();
@@ -892,8 +892,8 @@ public class TourMapView extends ViewPart {
 		fTourDataList.clear();
 
 		// dispose tilefactory resources
-		for (final TileFactory tileFactory : fTileFactories) {
-			tileFactory.dispose();
+		for (final MapProvider mapProvider : fMapProvider) {
+			mapProvider.getTileFactory().dispose();
 		}
 
 		fMap.disposeOverlayImageCache();
@@ -1013,8 +1013,8 @@ public class TourMapView extends ViewPart {
 //		super.init(site, memento);
 //	}
 
-	public List<MapProvider> getTileFactories() {
-		return fTileFactories;
+	public List<MapProvider> getMapProviders() {
+		return fMapProvider;
 	}
 
 	/**

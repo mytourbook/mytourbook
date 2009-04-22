@@ -14,13 +14,15 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package net.tourbook.tilefactory.srtm;
- 
+
 import net.tourbook.ext.srtm.ElevationColor;
 import net.tourbook.ext.srtm.ElevationLayer;
 import net.tourbook.ext.srtm.GeoLat;
 import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
 import net.tourbook.ext.srtm.PrefPageSRTMColors;
+import net.tourbook.ext.srtm.SRTMProfile;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -226,10 +228,16 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		}
 
 		@Override
-		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel) {
+		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
 
-			return new Path(fullPath).append(FACTORY_OS_NAME)
-					.append(PrefPageSRTMColors.getSelectedProfile().getTilePath())
+			String tilePath = tile.getTilePath();
+			if (tilePath == null) {
+				tilePath = UI.EMPTY_STRING;
+			}
+
+			return new Path(fullPath)//
+			.append(FACTORY_OS_NAME)
+					.append(tilePath)
 					.append(Integer.toString(zoomLevel))
 					.append(Integer.toString(x))
 					.append(Integer.toString(y))
@@ -265,160 +273,173 @@ public class SRTMTileFactory extends DefaultTileFactory {
 			return elevationColor.hashCode();
 		}
 
-//		private ImageData[] paintTileInUIThread(final Tile tile) {
-//
-//			final Display display = Display.getDefault();
-//			final ImageData[] paintedImageData = new ImageData[1];
-//
-//			BusyIndicator.showWhile(display, new Runnable() {
-//				public void run() {
-//
-//					final int tileSize = getTileSize();
-//					final int tileX = tile.getX();
-//					final int tileY = tile.getY();
-//					final int tileZoom = tile.getZoom();
-//					final int zoomPower = (int) Math.pow(2., tileZoom);
-//					final int mapPower = zoomPower * tileSize;
-//
-//					final Image paintedImage = new Image(display, tileSize, tileSize);
-//					final GC gc = new GC(paintedImage);
-//
-//					elevationLayer.setZoom(tileZoom);
-//
-//					// elevation is used at every grid-th pixel in both directions; 
-//					// the other values are interpolated
-//					// i.e. it gives the resolution of the image!
-//					final int grid = elevationColor.getResolution();
-//
-//					System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
-//							+ "(L=" //$NON-NLS-1$
-//							+ elevationLayer.getName()
-//							+ ", G=" //$NON-NLS-1$
-//							+ grid
-//							+ ", X=" //$NON-NLS-1$
-//							+ tileX
-//							+ ", Y=" //$NON-NLS-1$
-//							+ tileY
-//							+ ", Z=" //$NON-NLS-1$
-//							+ tileZoom
-//							+ ")"); //$NON-NLS-1$
-//
-//					double lon = 0.;
-//					double lat = 0.;
-//					final double pi = Math.PI;
-//					final double twoPi = 2 * pi;
-//					final double constMx1 = 360. / pi;
-//					final double constMx2 = twoPi / mapPower;
-//					final double constMy = 360. / mapPower;
-//					int mapStartX = tileX * tileSize;
-//					final int mapStartY = tileY * tileSize;
-//					RGB rgb;
-//
-//					if (grid == 1) {
-//
-//						double elevOld = 0;
-//						final boolean isShadowState = elevationColor.isShadowState();
-//						final int drawStartX = isShadowState ? -1 : 0;
-//						mapStartX += drawStartX;
-//						final double lonStart = constMy * mapStartX - 180.; // Mercator
-//						final GeoLat geoLat = new GeoLat();
-//						final GeoLon geoLon = new GeoLon();
-//
-//						for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
-//
-//							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
-//							geoLat.set(lat);
-//							lon = lonStart;
-//
-//							for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
-//								geoLon.set(lon);
-//								final double elev = elevationLayer.getElevation(geoLat, geoLon);
-//
-//								if (drawX == -1) {
-//									elevOld = elev;
-//									continue;
-//								}
-//
-//								if (isShadowState && elev < elevOld) {
-//									rgb = elevationColor.getDarkerRGB((int) elev);
-//								} else {
-//									rgb = elevationColor.getRGB((int) elev);
-//								}
-//								elevOld = elev;
-//
-//								final Color color = new Color(display, rgb);
-//								gc.setForeground(color);
-//								gc.drawPoint(drawX, drawY);
-//
-//								color.dispose();
-//							}
-//						}
-//
-//					} else { // grid > 1
-//
-//						final int gridQuot = grid - 1;
-//
-//						final GeoLat geoLat = new GeoLat();
-//						final GeoLat geoLatOld = new GeoLat();
-//						final GeoLon geoLon = new GeoLon();
-//						final GeoLon geoLonOld = new GeoLon();
-//						for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld.set(lat)) {
-//
-//							lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
-//							geoLat.set(lat);
-//
-//							for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, geoLonOld.set(lon)) {
-//
-//								lon = constMy * mapX - 180.; // Mercator
-//								geoLon.set(lon);
-//								if (pixelX == 0 || pixelY == 0)
-//									continue;
-//
-//								final double elev00 = elevationLayer.getElevation(geoLatOld, geoLonOld);
-//								final double elev01 = elevationLayer.getElevation(geoLatOld, geoLon);
-//								final double elev10 = elevationLayer.getElevation(geoLat, geoLonOld);
-//								final double elev11 = elevationLayer.getElevation(geoLat, geoLon);
-//
-//								// interpolate elevation over this quad
-//								final double elevGridX0 = (elev01 - elev00) / gridQuot;
-//								final double elevGridX1 = (elev11 - elev10) / gridQuot;
-//								final double elevGridY0 = (elev10 - elev00) / gridQuot;
-//								// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
-//								final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
-//								double elevStart = elev00;
-//								double elevGridXAdd = elevGridX0;
-//
-//								for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
-//
-//									double elev = elevStart;
-//									for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
-//
-//										rgb = elevationColor.getRGB((int) elev);
-//										final Color color = new Color(display, rgb);
-//
-//										gc.setForeground(color);
-//										gc.drawPoint(drawX, drawY);
-//
-//										color.dispose();
-//									}
-//								}
-//							}
-//						}
-//					}
-//
-//					gc.dispose();
-//
-//					paintedImageData[0] = paintedImage.getImageData();
-//					paintedImage.dispose();
-//
-//				}
-//			});
-//
-//			return paintedImageData;
-//		}
 	}
 
 	public SRTMTileFactory() {
 		super(info);
 	}
+
+	@Override
+	public void doPostCreation(final Tile tile) {
+
+		super.doPostCreation(tile);
+		
+		/*
+		 * set tile path, each profile has a different tile path
+		 */
+		final SRTMProfile currentlySelectedProfile = PrefPageSRTMColors.getSelectedProfile();
+		tile.setTilePath(currentlySelectedProfile.getTilePath());
+	}
+
+//	private ImageData[] paintTileInUIThread(final Tile tile) {
+//
+//		final Display display = Display.getDefault();
+//		final ImageData[] paintedImageData = new ImageData[1];
+//
+//		BusyIndicator.showWhile(display, new Runnable() {
+//			public void run() {
+//
+//				final int tileSize = getTileSize();
+//				final int tileX = tile.getX();
+//				final int tileY = tile.getY();
+//				final int tileZoom = tile.getZoom();
+//				final int zoomPower = (int) Math.pow(2., tileZoom);
+//				final int mapPower = zoomPower * tileSize;
+//
+//				final Image paintedImage = new Image(display, tileSize, tileSize);
+//				final GC gc = new GC(paintedImage);
+//
+//				elevationLayer.setZoom(tileZoom);
+//
+//				// elevation is used at every grid-th pixel in both directions; 
+//				// the other values are interpolated
+//				// i.e. it gives the resolution of the image!
+//				final int grid = elevationColor.getResolution();
+//
+//				System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
+//						+ "(L=" //$NON-NLS-1$
+//						+ elevationLayer.getName()
+//						+ ", G=" //$NON-NLS-1$
+//						+ grid
+//						+ ", X=" //$NON-NLS-1$
+//						+ tileX
+//						+ ", Y=" //$NON-NLS-1$
+//						+ tileY
+//						+ ", Z=" //$NON-NLS-1$
+//						+ tileZoom
+//						+ ")"); //$NON-NLS-1$
+//
+//				double lon = 0.;
+//				double lat = 0.;
+//				final double pi = Math.PI;
+//				final double twoPi = 2 * pi;
+//				final double constMx1 = 360. / pi;
+//				final double constMx2 = twoPi / mapPower;
+//				final double constMy = 360. / mapPower;
+//				int mapStartX = tileX * tileSize;
+//				final int mapStartY = tileY * tileSize;
+//				RGB rgb;
+//
+//				if (grid == 1) {
+//
+//					double elevOld = 0;
+//					final boolean isShadowState = elevationColor.isShadowState();
+//					final int drawStartX = isShadowState ? -1 : 0;
+//					mapStartX += drawStartX;
+//					final double lonStart = constMy * mapStartX - 180.; // Mercator
+//					final GeoLat geoLat = new GeoLat();
+//					final GeoLon geoLon = new GeoLon();
+//
+//					for (int drawY = 0, mapY = mapStartY; drawY < tileSize; drawY++, mapY++) {
+//
+//						lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
+//						geoLat.set(lat);
+//						lon = lonStart;
+//
+//						for (int drawX = drawStartX; drawX < tileSize; drawX++, lon += constMy) {
+//							geoLon.set(lon);
+//							final double elev = elevationLayer.getElevation(geoLat, geoLon);
+//
+//							if (drawX == -1) {
+//								elevOld = elev;
+//								continue;
+//							}
+//
+//							if (isShadowState && elev < elevOld) {
+//								rgb = elevationColor.getDarkerRGB((int) elev);
+//							} else {
+//								rgb = elevationColor.getRGB((int) elev);
+//							}
+//							elevOld = elev;
+//
+//							final Color color = new Color(display, rgb);
+//							gc.setForeground(color);
+//							gc.drawPoint(drawX, drawY);
+//
+//							color.dispose();
+//						}
+//					}
+//
+//				} else { // grid > 1
+//
+//					final int gridQuot = grid - 1;
+//
+//					final GeoLat geoLat = new GeoLat();
+//					final GeoLat geoLatOld = new GeoLat();
+//					final GeoLon geoLon = new GeoLon();
+//					final GeoLon geoLonOld = new GeoLon();
+//					for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld.set(lat)) {
+//
+//						lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
+//						geoLat.set(lat);
+//
+//						for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, geoLonOld.set(lon)) {
+//
+//							lon = constMy * mapX - 180.; // Mercator
+//							geoLon.set(lon);
+//							if (pixelX == 0 || pixelY == 0)
+//								continue;
+//
+//							final double elev00 = elevationLayer.getElevation(geoLatOld, geoLonOld);
+//							final double elev01 = elevationLayer.getElevation(geoLatOld, geoLon);
+//							final double elev10 = elevationLayer.getElevation(geoLat, geoLonOld);
+//							final double elev11 = elevationLayer.getElevation(geoLat, geoLon);
+//
+//							// interpolate elevation over this quad
+//							final double elevGridX0 = (elev01 - elev00) / gridQuot;
+//							final double elevGridX1 = (elev11 - elev10) / gridQuot;
+//							final double elevGridY0 = (elev10 - elev00) / gridQuot;
+//							// double elevGridY1 = (elev11 - elev01)/gridQuot; last elev in double for-loop gives this value
+//							final double elevGridX = (elevGridX1 - elevGridX0) / gridQuot;
+//							double elevStart = elev00;
+//							double elevGridXAdd = elevGridX0;
+//
+//							for (int drawY = pixelY - grid; drawY < pixelY; drawY++, elevStart += elevGridY0, elevGridXAdd += elevGridX) {
+//
+//								double elev = elevStart;
+//								for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
+//
+//									rgb = elevationColor.getRGB((int) elev);
+//									final Color color = new Color(display, rgb);
+//
+//									gc.setForeground(color);
+//									gc.drawPoint(drawX, drawY);
+//
+//									color.dispose();
+//								}
+//							}
+//						}
+//					}
+//				}
+//
+//				gc.dispose();
+//
+//				paintedImageData[0] = paintedImage.getImageData();
+//				paintedImage.dispose();
+//
+//			}
+//		});
+//
+//		return paintedImageData;
+//	}
 }

@@ -16,24 +16,31 @@
 
 package net.tourbook.mapping;
 
-import de.byteholder.geoclipse.map.DefaultTileFactory;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.util.Projection;
 
-public class MapProvider extends DefaultTileFactory {
+public class MapProvider /* extends DefaultTileFactory */{
 
 	/**
 	 * status if this map provider can be toggled with in the map provider button
 	 */
-	private boolean	fCanBeToggled	= false;
+	private boolean		fCanBeToggled	= false;
+
+	private TileFactory	fTileFactory;
+	private Projection	fProjection;
 
 	public MapProvider(final TileFactory tileFactory, final Projection projection) {
-		super(tileFactory.getInfo());
-		this.projection = projection;
+//		super(tileFactory.getInfo());
+		fTileFactory = tileFactory;
+		fProjection = projection;
 	}
 
 	boolean canBeToggled() {
 		return fCanBeToggled;
+	}
+
+	public TileFactory getTileFactory() {
+		return fTileFactory;
 	}
 
 	void setCanBeToggled(final boolean canBeToggled) {
