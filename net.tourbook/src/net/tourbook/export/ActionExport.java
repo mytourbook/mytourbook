@@ -22,6 +22,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.CoreException;
@@ -61,10 +62,17 @@ public class ActionExport extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+			final ArrayList<TourData> selectedTours;
+			if (fTourProvider instanceof ITourProviderAll) {
+				selectedTours = ((ITourProviderAll) fTourProvider).getAllSelectedTours();
+			} else {
+				selectedTours = fTourProvider.getSelectedTours();
+			}
+
 			if (selectedTours == null || selectedTours.size() == 0) {
 				return;
 			}
+			
 			fExportTourExtension.exportTours(selectedTours);
 		}
 

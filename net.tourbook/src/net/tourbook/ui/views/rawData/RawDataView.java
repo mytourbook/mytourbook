@@ -34,6 +34,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -50,7 +51,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -114,7 +115,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * 
  */
-public class RawDataView extends ViewPart implements ITourProvider, ITourViewer {
+public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer {
 
 	public static final String				ID									= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 
@@ -156,13 +157,14 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionOpenTour					fActionOpenTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
+	private ActionExport					fActionExportTour;
 
 	private ImageDescriptor					imageDescDatabase;
 	private ImageDescriptor					imageDescDatabaseOtherPerson;
 	private ImageDescriptor					imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					imageDescDatabasePlaceholder;
 	private ImageDescriptor					imageDescDelete;
-	
+
 	private Image							imageDatabase;
 	private Image							imageDatabaseOtherPerson;
 	private Image							imageDatabaseAssignMergedTour;
@@ -540,6 +542,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
 		fActionMergeIntoTour = new ActionMergeIntoMenu(this);
 		fActionReimportTour = new ActionReimportTour(this);
+		fActionExportTour = new ActionExport(this);
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
@@ -1137,7 +1140,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		final boolean isOneSavedAndValidTour = selectedValidTours == 1 && savedTours == 1;
 
 		final boolean canMergeIntoTour = selectedValidTours == 1;
-//				&& (firstValidTour == null ? true : firstValidTour.getMergeSourceTourId() == null);
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
@@ -1183,6 +1185,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeSourceTourId() != null);
 		fActionReimportTour.setEnabled(selectedTours == 1);
+		fActionExportTour.setEnabled(selectedValidTours > 0);
 
 		fActionEditTour.setEnabled(isOneSavedAndValidTour);
 		fActionEditQuick.setEnabled(isOneSavedAndValidTour);
@@ -1241,9 +1244,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
-//		menuMgr.add(fActionAdjustAltitudeSRTM);
 		menuMgr.add(fActionMergeTour);
 		menuMgr.add(fActionOpenTour);
+		menuMgr.add(fActionExportTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTourType);
@@ -1313,10 +1316,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
-	/**
-	 * @return all selected tour this includes tours which are not saved
-	 */
-	ArrayList<TourData> getAllSelectedTours() {
+	public ArrayList<TourData> getAllSelectedTours() {
 
 		final TourManager tourManager = TourManager.getInstance();
 

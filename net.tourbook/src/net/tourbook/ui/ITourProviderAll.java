@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui;
 
 import java.util.ArrayList;
@@ -21,15 +20,17 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 
 /**
- * This interface provides tours which are selected in a view
+ * This interface provides tours which are selected in a view but must not be saved, deleted tours
+ * are excluded
  */
-public interface ITourProvider {
+public interface ITourProviderAll extends ITourProvider {
 
 	/**
-	 * Returns the tours which are selected and saved or <code>null</code> when a tour is not
-	 * selected or not saved
+	 * Returns the tours which are selected and must not be saved or <code>null</code> when a tour
+	 * is not selected
+	 * 
+	 * @return all selected tour this includes tours which are not saved
 	 */
-	ArrayList<TourData> getSelectedTours();
-
+	ArrayList<TourData> getAllSelectedTours();
 
 }
