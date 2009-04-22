@@ -42,7 +42,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
 	/**
-	 * !!! this is NOT unused but annotaded win "unused" to remove the warning !!!!
+	 * !!! this is NOT unused but annotaded with "unused" to remove the warning !!!!
 	 */
 	@SuppressWarnings("unused")
 	private static final ElevationColor	elevationColor	= new ElevationColor(info);
