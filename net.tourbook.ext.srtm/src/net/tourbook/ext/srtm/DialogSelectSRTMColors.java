@@ -784,10 +784,6 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 		}
 	}
 
-//	public SRTMProfile getSRTMProfile() {
-//		return fProfile;
-//	}
-
 	@Override
 	protected void okPressed() {
 

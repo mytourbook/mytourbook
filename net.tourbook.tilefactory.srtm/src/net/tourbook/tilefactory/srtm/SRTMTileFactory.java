@@ -42,9 +42,10 @@ public class SRTMTileFactory extends DefaultTileFactory {
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
 	/**
-	 * cache for tile images
+	 * !!! this is NOT unused but annotaded win "unused" to remove the warning !!!!
 	 */
-	final static ElevationColor			elevationColor	= new ElevationColor(info);
+	@SuppressWarnings("unused")
+	private static final ElevationColor	elevationColor	= new ElevationColor(info);
 
 	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
 
@@ -53,13 +54,12 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		private static final String		FACTORY_OS_NAME	= "srtm";				//$NON-NLS-1$
 
 		private static final String		SEPARATOR		= "/";					//$NON-NLS-1$
+		private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
+		private static final String		FILE_EXT		= "png";				//$NON-NLS-1$
 
 		private static final int		MIN_ZOOM		= 0;
 		private static final int		MAX_ZOOM		= 17;
 		private static final int		TOTAL_ZOOM		= 17;
-
-		private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
-		private static final String		FILE_EXT		= "png";				//$NON-NLS-1$
 
 		// initialize SRTM loading
 		public final NumberForm			numberForm		= new NumberForm();
@@ -72,23 +72,24 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public RGB[][] drawTile(final Tile tile) {
 
+			final SRTMProfile srtmProfile = (SRTMProfile) tile.getData();
+
 			final int tileSize = getTileSize();
 			final int tileX = tile.getX();
 			final int tileY = tile.getY();
 			final int tileZoom = tile.getZoom();
+
 			final int zoomPower = (int) Math.pow(2., tileZoom);
 			final int mapPower = zoomPower * tileSize;
 
 			final RGB[][] rgbData = new RGB[tileSize][tileSize];
-//			final Image paintedImage = new Image(display, tileSize, tileSize);
-//			final GC gc = new GC(paintedImage);
 
 			elevationLayer.setZoom(tileZoom);
 
 			// elevation is used at every grid-th pixel in both directions; 
 			// the other values are interpolated
 			// i.e. it gives the resolution of the image!
-			final int grid = elevationColor.getResolution();
+			final int grid = srtmProfile.getResolutionValue();
 
 			System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
 					+ "(L=" //$NON-NLS-1$
@@ -117,7 +118,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 			if (grid == 1) {
 
 				double elevOld = 0;
-				final boolean isShadowState = elevationColor.isShadowState();
+				final boolean isShadowState = srtmProfile.isShadowState();
 				final int drawStartX = isShadowState ? -1 : 0;
 				mapStartX += drawStartX;
 				final double lonStart = constMy * mapStartX - 180.; // Mercator
@@ -140,18 +141,13 @@ public class SRTMTileFactory extends DefaultTileFactory {
 						}
 
 						if (isShadowState && elev < elevOld) {
-							rgb = elevationColor.getDarkerRGB((int) elev);
+							rgb = srtmProfile.getShadowRGB((int) elev);
 						} else {
-							rgb = elevationColor.getRGB((int) elev);
+							rgb = srtmProfile.getRGB((int) elev);
 						}
-						elevOld = elev;
-
-//						final Color color = new Color(display, rgb);
-//						gc.setForeground(color);
-//						gc.drawPoint(drawX, drawY);
-//						color.dispose();
-
 						rgbData[drawX][drawY] = rgb;
+
+						elevOld = elev;
 					}
 				}
 
@@ -194,25 +190,13 @@ public class SRTMTileFactory extends DefaultTileFactory {
 							double elev = elevStart;
 							for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-								rgb = elevationColor.getRGB((int) elev);
+								rgb = srtmProfile.getRGB((int) elev);
 								rgbData[drawX][drawY] = rgb;
-
-//								final Color color = new Color(display, rgb);
-//
-//								gc.setForeground(color);
-//								gc.drawPoint(drawX, drawY);
-//
-//								color.dispose();
 							}
 						}
 					}
 				}
 			}
-
-//			gc.dispose();
-//
-//			paintedImageData[0] = paintedImage.getImageData();
-//			paintedImage.dispose();
 
 			return rgbData;
 		}
@@ -230,7 +214,8 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		@Override
 		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
 
-			String tilePath = tile.getTilePath();
+			// get profile specific tile path
+			String tilePath = ((SRTMProfile) tile.getData()).getTilePath();
 			if (tilePath == null) {
 				tilePath = UI.EMPTY_STRING;
 			}
@@ -268,10 +253,10 @@ public class SRTMTileFactory extends DefaultTileFactory {
 			return url.toString();
 		}
 
-		@Override
-		public int hashCode() {
-			return elevationColor.hashCode();
-		}
+//		@Override
+//		public int hashCode() {
+//			return elevationColor.hashCode();
+//		}
 
 	}
 
@@ -282,16 +267,15 @@ public class SRTMTileFactory extends DefaultTileFactory {
 	@Override
 	public void doPostCreation(final Tile tile) {
 
-		super.doPostCreation(tile);
-		
 		/*
-		 * set tile path, each profile has a different tile path
+		 * add profile as custom data to the tile
 		 */
-		final SRTMProfile currentlySelectedProfile = PrefPageSRTMColors.getSelectedProfile();
-		tile.setTilePath(currentlySelectedProfile.getTilePath());
+		final SRTMProfile selectedProfile = PrefPageSRTMColors.getSelectedProfile();
+		tile.setData(selectedProfile);
 	}
+}
 
-//	private ImageData[] paintTileInUIThread(final Tile tile) {
+//	private ImageData[] paintTileOLD(final Tile tile) {
 //
 //		final Display display = Display.getDefault();
 //		final ImageData[] paintedImageData = new ImageData[1];
@@ -442,4 +426,4 @@ public class SRTMTileFactory extends DefaultTileFactory {
 //
 //		return paintedImageData;
 //	}
-}
+

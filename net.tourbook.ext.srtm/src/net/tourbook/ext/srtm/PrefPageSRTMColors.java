@@ -349,46 +349,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return file;
 	}
 
-	/**
-	 * Type of map is changed IFF one of colors, shadow state or grid is changed.
-	 * 
-	 * @return Unique key for the current profile settings
-	 */
-	public static String getProfileKey() {
-		return fSelectedProfile.getProfileKey();
-	}
-
-	/**
-	 * Type of map is changed IFF one of colors, shadow state or grid is changed.
-	 * 
-	 * @return Hashcode for the unique key for the current profile settings
-	 */
-	public static int getProfileKeyHashCode() {
-		return getProfileKey().hashCode();
-	}
-
-	public static int getResolutionValue() {
-		return fSelectedProfile.getResolutionValue();
-	}
-
-	public static RGB getRGB(final int elev) {
-		return fSelectedProfile.getRGB(elev);
-	}
-
 	public static SRTMProfile getSelectedProfile() {
 		return fSelectedProfile;
-	}
-
-	public static RGB getShadowRGB(final int elev) {
-
-		final float dimFactor = fSelectedProfile.getShadowValue();
-		final RGB rgb = getRGB(elev);
-
-		rgb.red *= dimFactor;
-		rgb.green *= dimFactor;
-		rgb.blue *= dimFactor;
-
-		return rgb;
 	}
 
 	private static XMLMemento getXMLRoot() {
@@ -413,13 +375,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 * load profiles and set profile to the previous profile
 	 */
 	public static void initVertexLists() {
-
 		loadProfiles();
 		restoreSelectedProfile();
-	}
-
-	public static boolean isShadowState() {
-		return fSelectedProfile.isShadowState();
 	}
 
 	/**
@@ -790,8 +747,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
-//		table.setLinesVisible(true);
-//		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		/*
 		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
@@ -1207,6 +1162,15 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return width;
 	}
 
+	/**
+	 * Type of map is changed IFF one of colors, shadow state or grid is changed.
+	 * 
+	 * @return Hashcode for the unique key for the current profile settings
+	 */
+	private int getProfileKeyHashCode() {
+		return fSelectedProfile.getProfileKey().hashCode();
+	}
+
 	private String getResolutionUI(final SRTMProfile profile) {
 
 		final String resolution = profile.getResolution();
@@ -1255,9 +1219,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final int newProfileId = ++fMaxProfileId;
 
 		newProfile.setProfileId(newProfileId);
-
-		// make a unique tile path
-//		newProfile.setTilePath(Messages.prefPage_srtm_default_profile_path + "-" + newProfileId);//$NON-NLS-1$
 
 		editNewProfile(newProfile);
 	}
@@ -1576,7 +1537,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 */
 	private void saveSelectedProfile() {
 		if (fSelectedProfile != null) {
+			
 			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID, fSelectedProfile.getProfileId());
+			
+			// this will fire a profile change event
 			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY, getProfileKeyHashCode());
 		}
 	}

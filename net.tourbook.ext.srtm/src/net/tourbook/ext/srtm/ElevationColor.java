@@ -18,8 +18,6 @@
  */
 package net.tourbook.ext.srtm;
 
-import org.eclipse.swt.graphics.RGB;
-
 import de.byteholder.geoclipse.map.TileFactoryInfo;
 
 public class ElevationColor {
@@ -33,28 +31,6 @@ public class ElevationColor {
 	public ElevationColor(final TileFactoryInfo tileFactoryInfo) {
 		PrefPageSRTMColors.initVertexLists();
 		fTileFactoryInfo = tileFactoryInfo;
-	}
-
-	public RGB getDarkerRGB(final int elev) {
-		return PrefPageSRTMColors.getShadowRGB(elev);
-	}
-
-	public int getResolution() {
-		return PrefPageSRTMColors.getResolutionValue();
-	}
-
-	public RGB getRGB(final int elev) {
-		return PrefPageSRTMColors.getRGB(elev);
-	}
-
-	@Override
-	public int hashCode() {
-		// Type of map is changed IFF one of colors, shadow state or grid is changed.
-		return PrefPageSRTMColors.getProfileKeyHashCode();
-	}
-
-	public boolean isShadowState() {
-		return PrefPageSRTMColors.isShadowState();
 	}
 
 }

@@ -356,9 +356,21 @@ public class SRTMProfile {
 		}
 		return new RGB(255, 255, 255);
 	}
-
+	
 	public int getSavedProfileKeyHashCode() {
 		return fSavedProfileKeyHashCode;
+	}
+
+	public  RGB getShadowRGB(final int elev) {
+
+		final float dimFactor = fShadowValue;
+		final RGB rgb = getRGB(elev);
+
+		rgb.red *= dimFactor;
+		rgb.green *= dimFactor;
+		rgb.blue *= dimFactor;
+
+		return rgb;
 	}
 
 	public float getShadowValue() {
