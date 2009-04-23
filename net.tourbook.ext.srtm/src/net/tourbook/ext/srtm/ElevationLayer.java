@@ -100,9 +100,9 @@ public class ElevationLayer {
 			return Constants.ELEVATION_TYPE_ETOPO;
 		if (zoom <= 8)
 			return Constants.ELEVATION_TYPE_GLOBE;
-		if (zoom <= 14)
+		// if (zoom <= 14)
 			return Constants.ELEVATION_TYPE_SRTM3;
-		return Constants.ELEVATION_TYPE_SRTM1;
+		// return Constants.ELEVATION_TYPE_SRTM1;
 	}
 
 	public void setZoom(int z) {
