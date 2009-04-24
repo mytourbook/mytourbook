@@ -179,7 +179,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-		System.out.println("</" + name + ">");
+//		System.out.println("</" + name + ">");
 
 		if (fIsError) {
 			return;
@@ -481,7 +481,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
 
-		System.out.print("<" + name + ">");
+//		System.out.print("<" + name + ">");
 
 		if (fIsError) {
 			return;
