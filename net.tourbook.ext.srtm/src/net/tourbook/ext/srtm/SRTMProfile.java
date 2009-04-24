@@ -63,6 +63,7 @@ public class SRTMProfile {
 	 * list with all vertexes
 	 */
 	private ArrayList<RGBVertex>	fVertexList				= new ArrayList<RGBVertex>();
+	private RGBVertex[]				fVertexArray;
 
 	private boolean					fIsHorizontal			= true;
 	private int						fImageWidth;
@@ -95,6 +96,7 @@ public class SRTMProfile {
 		for (int ix = 0; ix < newVertexList.size(); ix++) {
 			fVertexList.add(ix, new RGBVertex(newVertexList.get(ix)));
 		}
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
 
 		fProfileId = newProfile.getProfileId();
 		fProfileName = new String(newProfile.getProfileName());
@@ -314,21 +316,28 @@ public class SRTMProfile {
 
 	public RGB getRGB(final long elev) {
 
-		if (fVertexList.size() == 0) {
+		final int vertexSize = fVertexArray.length;
+
+		if (vertexSize == 0) {
 			return new RGB(255, 255, 255);
 		}
 
-		if (fVertexList.size() == 1) {
-			return fVertexList.get(0).getRGB();
+		if (vertexSize == 1) {
+			return fVertexArray[0].getRGB();
 		}
 
-		for (int ix = fVertexList.size() - 2; ix >= 0; ix--) {
-			if (elev > fVertexList.get(ix).getElevation()) {
+		for (int ix = vertexSize - 2; ix >= 0; ix--) {
 
-				final RGB rgb1 = fVertexList.get(ix).getRGB();
-				final RGB rgb2 = fVertexList.get(ix + 1).getRGB();
-				final long elev1 = fVertexList.get(ix).getElevation();
-				final long elev2 = fVertexList.get(ix + 1).getElevation();
+			final RGBVertex vertex = fVertexArray[ix];
+			if (elev > vertex.getElevation()) {
+
+				final RGBVertex vertex2 = fVertexArray[ix + 1];
+
+				final RGB rgb1 = vertex.getRGB();
+				final RGB rgb2 = vertex2.getRGB();
+
+				final long elev1 = vertex.getElevation();
+				final long elev2 = vertex2.getElevation();
 
 				final long dElevG = elev2 - elev1;
 				final long dElev1 = elev - elev1;
@@ -356,12 +365,12 @@ public class SRTMProfile {
 		}
 		return new RGB(255, 255, 255);
 	}
-	
+
 	public int getSavedProfileKeyHashCode() {
 		return fSavedProfileKeyHashCode;
 	}
 
-	public  RGB getShadowRGB(final int elev) {
+	public RGB getShadowRGB(final int elev) {
 
 		final float dimFactor = fShadowValue;
 		final RGB rgb = getRGB(elev);
@@ -429,6 +438,8 @@ public class SRTMProfile {
 			}
 		}
 		sort();
+
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
 	}
 
 	/**
@@ -441,6 +452,8 @@ public class SRTMProfile {
 		fVertexList.add(0, new RGBVertex(0, 0, 255, 0));
 		fVertexList.add(1, new RGBVertex(0, 255, 0, 1000));
 		fVertexList.add(2, new RGBVertex(255, 0, 0, 2000));
+
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
 	}
 
 	/**
@@ -477,6 +490,8 @@ public class SRTMProfile {
 		for (final RGBVertex vertex : vertexList) {
 			fVertexList.add(vertex);
 		}
+
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
 	}
 
 	/**
@@ -487,6 +502,7 @@ public class SRTMProfile {
 //	}
 	public void sort() {
 		Collections.sort(fVertexList);
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
 	}
 
 }

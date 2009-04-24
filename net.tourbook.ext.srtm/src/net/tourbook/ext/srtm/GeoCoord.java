@@ -27,7 +27,7 @@ public class GeoCoord {
 	public static final int	fakts	= 60;
 
 	// dummies; siehe GeoLon / GeoLat
-	public char directionPlus() {
+	public char directionPlus() { 
 		return '!';
 	}
 
@@ -511,7 +511,7 @@ public class GeoCoord {
 
 	public void updateDegrees() {
 
-		int dec = Math.abs(decimal);
+		int dec = ((decimal < 0) ? -decimal : decimal);
 
 		degrees = dec / faktg;
 		dec -= degrees * faktg;
@@ -520,6 +520,7 @@ public class GeoCoord {
 		seconds = dec / fakts;
 		dec -= seconds * fakts;
 		tertias = dec;
+		
 		direction = decimal < 0 ? directionMinus() : directionPlus();
 
 		doubleValue = decimal;
