@@ -848,9 +848,11 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			}
 
 			final Long elev = new Long(elevation);
+			final RGB rgb = colorLabel[ix].getBackground().getRGB();
+			
 			final RGBVertex rgbVertex = new RGBVertex();
 			rgbVertex.setElev(elev.longValue());
-			rgbVertex.setRGB(colorLabel[ix].getBackground().getRGB());
+			rgbVertex.setRGB(rgb);
 
 			fVertexList.add(rgbVertex);
 		}

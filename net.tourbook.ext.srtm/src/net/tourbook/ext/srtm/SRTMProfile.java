@@ -108,6 +108,9 @@ public class SRTMProfile {
 
 	public Image createImage(int width, int height, final boolean isHorizontal) {
 
+		// ensure vertex list and array are in synch
+		fVertexArray = fVertexList.toArray(new RGBVertex[fVertexList.size()]);
+
 		// ensure min image size
 		width = width < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : width;
 		height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
@@ -130,28 +133,33 @@ public class SRTMProfile {
 
 			final RGB rgb = getRGB(elev);
 			final Color color = new Color(display, rgb);
-			gc.setForeground(color);
+			{
+				gc.setForeground(color);
 
-			if (isHorizontal) {
+				if (isHorizontal) {
 
-				final int x1 = horizontal - x - 1;
-				final int x2 = horizontal - x - 1;
+					final int x1 = horizontal - x - 1;
+					final int x2 = horizontal - x - 1;
 
-				final int y1 = 0;
-				final int y2 = vertical;
+					final int y1 = 0;
+					final int y2 = vertical;
 
-				gc.drawLine(x1, y1, x2, y2);
+					gc.drawLine(x1, y1, x2, y2);
 
-			} else {
+				} else {
 
-				final int x1 = 0;
-				final int x2 = vertical;
+					final int x1 = 0;
+					final int x2 = vertical;
 
-				final int y1 = horizontal - x - 1;
-				final int y2 = horizontal - x - 1;
+					final int y1 = horizontal - x - 1;
+					final int y2 = horizontal - x - 1;
 
-				gc.drawLine(x1, y1, x2, y2);
+					gc.drawLine(x1, y1, x2, y2);
+				}
 			}
+			color.dispose();
+			
+
 		}
 
 		/*
@@ -170,8 +178,6 @@ public class SRTMProfile {
 			rgb.red = 255 - rgb.red;
 			rgb.green = 255 - rgb.green;
 			rgb.blue = 255 - rgb.blue;
-			final Color color = new Color(display, rgb);
-			gc.setForeground(color);
 
 			int x = elevMax == 0 ? 0 : (int) (elev * horizontal / elevMax);
 			x = Math.max(x, 13);
@@ -188,11 +194,18 @@ public class SRTMProfile {
 				transform.setElements(1, 0, 0, 1, dx, dy);
 			}
 
-			gc.setTransform(transform);
-
-			gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
+			final Color color = new Color(display, rgb);
+			{
+				gc.setTransform(transform);
+				gc.setForeground(color);
+				gc.drawText(net.tourbook.util.UI.EMPTY_STRING + elev, 0, 0, true);
+			}
+			color.dispose();
 		}
 		transform.dispose();
+
+		gc.dispose();
+
 		return profileImage;
 	}
 
