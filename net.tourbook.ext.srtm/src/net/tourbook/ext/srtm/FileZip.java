@@ -82,7 +82,7 @@ public final class FileZip {
 			// Get the first entry
 			final ZipEntry zipEntry = zipInputStream.getNextEntry();
 			if (zipEntry == null) {
-				throw new Exception("zipEntry is null");
+				throw new Exception("zipEntry is null"); //$NON-NLS-1$
 			}
 			
 			zipEntryName = zipEntry.getName();

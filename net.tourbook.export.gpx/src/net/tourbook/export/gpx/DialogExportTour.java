@@ -191,14 +191,14 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		// creator
 		final Version version = Activator.getDefault().getVersion();
-		context.put("creator", new StringBuilder().append("MyTourbook")//$NON-NLS-1$
+		context.put("creator", new StringBuilder().append("MyTourbook")//$NON-NLS-1$ //$NON-NLS-2$
 				.append(" ")//$NON-NLS-1$
 				.append(version.getMajor())
-				.append(".")
+				.append(".") //$NON-NLS-1$
 				.append(version.getMinor())
-				.append(".")
+				.append(".") //$NON-NLS-1$
 				.append(version.getMicro())
-				.append(".")
+				.append(".") //$NON-NLS-1$
 				.append(version.getQualifier())
 				.append(" - http://mytourbook.sourceforge.net")//$NON-NLS-1$
 				.toString());
@@ -726,7 +726,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				final String exportPathName = getExportPathName();
 				fProgressIndicator.beginTask(fTourDataList.size());
 
-				final Job exportJob = new Job("export files") {
+				final Job exportJob = new Job("export files") { //$NON-NLS-1$
 					@Override
 					public IStatus run(final IProgressMonitor monitor) {
 

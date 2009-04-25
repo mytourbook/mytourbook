@@ -41,7 +41,7 @@ public class DownloadResource {
 		final TileInfoManager tileInfoMgr = TileInfoManager.getInstance();
 		final long[] numWritten = new long[1];
 
-		final Job monitorJob = new Job("downloadMonitor") {
+		final Job monitorJob = new Job("downloadMonitor") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 

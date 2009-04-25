@@ -13,7 +13,7 @@ import org.osgi.framework.Version;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "net.tourbook.export.gpx";
+	public static final String PLUGIN_ID = "net.tourbook.export.gpx"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
