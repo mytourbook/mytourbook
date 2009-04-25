@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="dinopolis-util-0.5.4mt.jar"/>
+	<classpathentry exported="true" kind="lib" path="gpsinput-0.5.4mt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="commons-collections-3.2.jar" sourcepath="/net.tourbook.ext.jars.importExport/net.tourbook.ext.jars.importExportsrc.zip"/>
-	<classpathentry exported="true" kind="lib" path="log4j-1.2.14.jar" sourcepath="/net.tourbook.ext.jars.importExport/net.tourbook.ext.jars.importExportsrc.zip"/>
-	<classpathentry exported="true" kind="lib" path="commons-lang-2.4.jar" sourcepath="/net.tourbook.ext.jars.importExport/net.tourbook.ext.jars.importExportsrc.zip"/>
-	<classpathentry exported="true" kind="lib" path="dinopolis-util-0.5.4mt.jar" sourcepath="/net.tourbook.ext.jars.importExport/net.tourbook.ext.jars.importExportsrc.zip"/>
-	<classpathentry exported="true" kind="lib" path="velocity-1.5.jar" sourcepath="L:/java-resources/velocity/velocity-1.5/src"/>
-	<classpathentry exported="true" kind="lib" path="gpsinput-0.5.4mt.jar" sourcepath="/gpstool"/>
+	<classpathentry exported="true" kind="lib" path="log4j-1.2.14.jar" sourcepath="net.tourbook.device.garminsrc.zip"/>
+	<classpathentry exported="true" kind="lib" path="velocity-1.5.jar" sourcepath="net.tourbook.device.garminsrc.zip"/>
+	<classpathentry exported="true" kind="lib" path="commons-collections-3.2.jar" sourcepath="net.tourbook.device.garminsrc.zip"/>
+	<classpathentry exported="true" kind="lib" path="commons-lang-2.4.jar" sourcepath="net.tourbook.device.garminsrc.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
