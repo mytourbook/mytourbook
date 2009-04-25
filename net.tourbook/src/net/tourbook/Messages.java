@@ -37,22 +37,22 @@ public class Messages extends NLS {
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
-	public static String		dialog_export_invalid_path;
-	public static String		dialog_export_label_exportFileName;
+//	public static String		dialog_export_invalid_path;
+//	public static String		dialog_export_label_exportFileName;
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
-	public static String		dialog_export_label_timeUnitSeconds;
+//	public static String		dialog_export_label_timeUnitSeconds;
 	public static String		dialog_export_lbl_exportFilePath;
 	public static String		dialog_export_msg_fileAlreadyExists;
 	public static String		dialog_export_msg_fileNameIsInvalid;
 	public static String		dialog_export_msg_pathIsNotAvailable;
-	public static String		dialog_export_rdo_filenameFromTour;
-	public static String		dialog_export_rdo_filenameFromTour_tooltip;
-	public static String		dialog_export_rdo_filenameManual;
-	public static String		dialog_export_rdo_filenameManual_tooltip;
+//	public static String		dialog_export_rdo_filenameFromTour;
+//	public static String		dialog_export_rdo_filenameFromTour_tooltip;
+//	public static String		dialog_export_rdo_filenameManual;
+//	public static String		dialog_export_rdo_filenameManual_tooltip;
 	public static String		dialog_export_shell_text;
-	public static String		dialog_export_txt_fileName_tooltip;
+//	public static String		dialog_export_txt_fileName_tooltip;
 	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		dialog_is_tour_editor_modified_message;
@@ -125,7 +125,7 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
 
-	public static String		adjust_altitude_lbl_altitude;
+//	public static String		adjust_altitude_lbl_altitude;
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
@@ -215,10 +215,10 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Label_original_values;
 	public static String		Dlg_AdjustAltitude_Label_start_altitude;
 	public static String		Dlg_AdjustAltitude_Label_start_altitude_tooltip;
-	public static String		Dlg_AdjustAltitude_Message_adjust_end;
-	public static String		Dlg_AdjustAltitude_Message_adjust_max;
-	public static String		Dlg_AdjustAltitude_Message_adjust_start_and_end;
-	public static String		Dlg_AdjustAltitude_Message_adjust_whole_tour;
+//	public static String		Dlg_AdjustAltitude_Message_adjust_end;
+//	public static String		Dlg_AdjustAltitude_Message_adjust_max;
+//	public static String		Dlg_AdjustAltitude_Message_adjust_start_and_end;
+//	public static String		Dlg_AdjustAltitude_Message_adjust_whole_tour;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;

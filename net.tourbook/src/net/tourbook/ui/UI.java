@@ -110,7 +110,7 @@ public class UI {
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
-	public static final String						UTF_8							= "UTF-8";
+	public static final String						UTF_8							= "UTF-8"; //$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
