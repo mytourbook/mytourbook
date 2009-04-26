@@ -35,8 +35,11 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	public static final String	APP_BUILD_ID_VERSION	= "9.0x";									//$NON-NLS-1$
-	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-0x-xx";	//$NON-NLS-1$
+	public static final String	APP_BUILD_ID_VERSION	= "9.05";									//$NON-NLS-1$
+	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-05-09";	//$NON-NLS-1$
+
+//	public static final String	APP_BUILD_ID_VERSION	= "9.05";									//$NON-NLS-1$
+//	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-05-09";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID_VERSION	= "9.01";									//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-01-07";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID_VERSION	= "8.11";									//$NON-NLS-1$
