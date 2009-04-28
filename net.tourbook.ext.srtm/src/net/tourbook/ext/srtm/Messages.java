@@ -59,6 +59,7 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_dlg_delete_profile_title;
 	public static String		prefPage_srtm_editor_data_filepath;
 	public static String		prefPage_srtm_group_label_data_location;
+	public static String		prefPage_srtm_link_srtmProfiles;
 	public static String		prefPage_srtm_msg_invalid_data_path;
 	public static String		prefPage_srtm_profile_add;
 	public static String		prefPage_srtm_profile_duplicate;

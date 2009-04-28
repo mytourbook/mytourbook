@@ -28,14 +28,20 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreferencePage {
+
+	private static final String		PREF_PAGE_SRTM_COLORS	= "net.tourbook.ext.srtm.PrefPageSRTMColors";			//$NON-NLS-1$
 
 	final static NumberFormat		nf						= NumberFormat.getNumberInstance();
 
@@ -73,6 +79,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 //		fPrefContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		createUICacheSettings(fPrefContainer);
+		createUISRTMPageLink(fPrefContainer);
 	}
 
 	private void createUICacheSettings(final Composite parent) {
@@ -109,15 +116,34 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			fDataPathEditor.setPreferenceStore(prefStore);
 			fDataPathEditor.setEmptyStringAllowed(false);
 			fDataPathEditor.load();
-			fDataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent event) {
-					updateDataInfo();
-				}
-			});
+//			fDataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+//				public void propertyChange(final PropertyChangeEvent event) {
+//					updateDataInfo();
+//				}
+//			});
 		}
 
 		// !!! set layout after the editor was created because the editor sets the parents layout
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(fLocationContainer);
+	}
+
+	private void createUISRTMPageLink(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(0, 20).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			final Link link = new Link(container, SWT.NONE);
+			link.setText(Messages.prefPage_srtm_link_srtmProfiles);
+			link.setEnabled(true);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					PreferencesUtil.createPreferenceDialogOn(getShell(), PREF_PAGE_SRTM_COLORS, null, null);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -172,10 +198,6 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		return super.performOk();
 	}
 
-	private void updateDataInfo() {
-	// TODO Auto-generated method stub
-
-	}
 
 	private boolean validateData() {
 

@@ -12,7 +12,7 @@
             name="%pref_page_srtm">
       </page>
       <page
-            category="net.tourbook.ext.srtm.PrefPageSRTM"
+            category="net.tourbook.preferences.PrefPageAppearance"
             class="net.tourbook.ext.srtm.PrefPageSRTMColors"
             id="net.tourbook.ext.srtm.PrefPageSRTMColors"
             name="%pref_page_srtm_colors">
