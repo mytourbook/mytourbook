@@ -11,12 +11,12 @@
    </aboutInfo>
 
    <configIni use="default">
-      <linux>/net.tourbook/install-settings/config.ini</linux>
-      <macosx>/net.tourbook/install-settings/config.ini</macosx>
-      <solaris>/net.tourbook/install-settings/config.ini</solaris>
-      <win32>/net.tourbook/install-settings/config.ini</win32>
+      <linux>/net.tourbook/install-settings/config-linux.ini</linux>
+      <macosx>/net.tourbook/install-settings/config-osx.ini</macosx>
+      <solaris>/net.tourbook/install-settings/config-linux.ini</solaris>
+      <win32>/net.tourbook/install-settings/config-win.ini</win32>
    </configIni>
-
+ 
    <launcherArgs>
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
 #-consolelog 
