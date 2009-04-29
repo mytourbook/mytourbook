@@ -104,6 +104,8 @@ public class DownloadResource {
 
 					System.out.println(e.getMessage());
 
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.ERROR_LOADING_SRTM_DATA, remoteName, 0);
+
 					return new Status(IStatus.ERROR, //
 							Activator.PLUGIN_ID,
 							IStatus.ERROR,
@@ -117,7 +119,7 @@ public class DownloadResource {
 				return Status.OK_STATUS;
 			}
 		};
-		
+
 		monitorJob.schedule();
 		downloadJob.schedule();
 
@@ -142,52 +144,6 @@ public class DownloadResource {
 			throw (e);
 		}
 
-	}
-
-	protected static final void getOLD(final String addressPraefix, final String remoteName, final String localName)
-			throws Exception {
-
-		try {
-
-			final String address = addressPraefix + remoteName;
-
-			System.out.println("load " + address); //$NON-NLS-1$
-			OutputStream outputStream = null;
-			InputStream inputStream = null;
-			try {
-				final URL url = new URL(address);
-				outputStream = new BufferedOutputStream(new FileOutputStream(localName));
-				final URLConnection urlConnection = url.openConnection();
-				inputStream = urlConnection.getInputStream();
-				final byte[] buffer = new byte[1024];
-				int numRead;
-				long numWritten = 0;
-				while ((numRead = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, numRead);
-					numWritten += numRead;
-				}
-				System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
-			} catch (final Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (inputStream != null) {
-						inputStream.close();
-					}
-					if (outputStream != null) {
-						outputStream.close();
-					}
-				} catch (final IOException ioe) {
-					ioe.printStackTrace();
-				}
-			}
-
-			System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-		} catch (final Exception e) {
-			System.out.println(e.getMessage());
-			throw (e);
-		}
 	}
 
 	public DownloadResource() {

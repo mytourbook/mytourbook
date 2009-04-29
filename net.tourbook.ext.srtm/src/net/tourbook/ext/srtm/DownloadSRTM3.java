@@ -17,7 +17,7 @@
  * @author Alfred Barten
  */
 package net.tourbook.ext.srtm;
- 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
@@ -69,12 +69,13 @@ public final class DownloadSRTM3 {
 		try {
 			remoteDirName[0] = getDir(remoteName);
 			final String localDirName = localName.substring(0, localName.lastIndexOf(File.separator));
-			System.out.println("remoteDir " + remoteDirName[0]); //$NON-NLS-1$
-			System.out.println("localDir " + localDirName); //$NON-NLS-1$
+			System.out.println("ftp:"); //$NON-NLS-1$
+			System.out.println("   remoteDir " + remoteDirName[0]); //$NON-NLS-1$
+			System.out.println("   localDir " + localDirName); //$NON-NLS-1$
 
 			final File localDir = new File(localDirName);
 			if (!localDir.exists()) {
-				System.out.println("create Dir " + localDirName); //$NON-NLS-1$
+				System.out.println("   create Dir " + localDirName); //$NON-NLS-1$
 				localDir.mkdir();
 			}
 
@@ -84,9 +85,7 @@ public final class DownloadSRTM3 {
 
 		} catch (final UnknownHostException e) {
 
-			MessageDialog.openError(Display.getDefault().getActiveShell(),
-					Messages.srtm_transfer_error_title,
-					NLS.bind(Messages.srtm_transfer_error_message, host));
+			showConnectError();
 
 			return;
 
@@ -101,21 +100,22 @@ public final class DownloadSRTM3 {
 			protected IStatus run(final IProgressMonitor monitor) {
 				try {
 
-					TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteName, 0);
-
-					System.out.println("connect " + host); //$NON-NLS-1$
+					showTileInfo(remoteName, -1);
+					System.out.println("   connect " + host); //$NON-NLS-1$
 					ftp.connect();
 
-					System.out.println("login " + user + " " + password); //$NON-NLS-1$ //$NON-NLS-2$
+					showTileInfo(remoteName, -2);
+					System.out.println("   login " + user + " " + password); //$NON-NLS-1$ //$NON-NLS-2$
 					ftp.login(user, password);
 
-					System.out.println("set passive mode"); //$NON-NLS-1$
+					System.out.println("   set passive mode"); //$NON-NLS-1$
 					ftp.setConnectMode(FTPConnectMode.PASV);
 
-					System.out.println("set type binary"); //$NON-NLS-1$
+					System.out.println("   set type binary"); //$NON-NLS-1$
 					ftp.setType(FTPTransferType.BINARY);
 
-					System.out.println("chdir " + remoteDirName[0]); //$NON-NLS-1$
+					showTileInfo(remoteName, -3);
+					System.out.println("   chdir " + remoteDirName[0]); //$NON-NLS-1$
 					ftp.chdir(remoteDirName[0]);
 
 					ftp.setProgressMonitor(new FTPProgressMonitor() {
@@ -124,15 +124,20 @@ public final class DownloadSRTM3 {
 						}
 					});
 
-					System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+					showTileInfo(remoteName, -4);
+					System.out.println("   get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					ftp.get(localName, remoteName);
 
-					System.out.println("quit"); //$NON-NLS-1$
+					System.out.println("   quit"); //$NON-NLS-1$
 					ftp.quit();
 
 				} catch (final Exception e) {
+					
+					// ignore this error because the data can not be available
+					
 					e.printStackTrace();
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.ERROR_LOADING_SRTM_DATA, remoteName, 0);
+
 				} finally {
 					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteName, 0);
 				}
@@ -221,7 +226,17 @@ public final class DownloadSRTM3 {
 		return true;
 	}
 
-	public static void main(final String[] args) {
+	private static void showConnectError() {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openError(Display.getDefault().getActiveShell(),
+						Messages.srtm_transfer_error_title,
+						NLS.bind(Messages.srtm_transfer_error_message, host));
+			}
+		});
+	}
 
+	private static void showTileInfo(final String remoteName, final int status) {
+		TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteName, status);
 	}
 }
