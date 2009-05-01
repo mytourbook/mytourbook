@@ -385,21 +385,28 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		if (fIsFirstContextMenu && fChartContextProvider != null) {
+		// check if this is slider context
+		final boolean isSliderContext = leftSlider != null || rightSlider != null;
+		final boolean showOnlySliderContext = isSliderContext && fChartContextProvider.showOnlySliderContextMenu();
+
+		if (fChartContextProvider != null && showOnlySliderContext == false && fIsFirstContextMenu) {
 			fChartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
-		}
+ 		}
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
+
+			// create menu for bar charts
 
 			// get the context provider from the data model
 			final IChartContextProvider barChartContextProvider = (IChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
-			// create the menu for bar charts
 			if (barChartContextProvider != null) {
 				barChartContextProvider.fillBarChartContextMenu(menuMgr, hoveredBarSerieIndex, hoveredBarValueIndex);
 			}
 
 		} else {
+
+			// create menu for line charts
 
 			// set text for mouse wheel mode
 			final Action actionMouseMode = fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction();
@@ -412,21 +419,22 @@ public class Chart extends ViewForm {
 				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
 			}
 
+			// fill slider context menu
+			if (fChartContextProvider != null) {
+				menuMgr.add(new Separator());
+				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
+			}
+
 			menuMgr.add(new Separator());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
 			menuMgr.add(actionMouseMode);
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-			menuMgr.add(new Separator());
-
-			// create the menu for line charts
-			if (fChartContextProvider != null) {
-				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
-			}
 		}
 
-		if (fIsFirstContextMenu == false && fChartContextProvider != null) {
+		if (fChartContextProvider != null && showOnlySliderContext == false && fIsFirstContextMenu == false) {
+			menuMgr.add(new Separator());
 			fChartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 	}
@@ -624,6 +632,9 @@ public class Chart extends ViewForm {
 		return fChartComponents.getChartComponentGraph().getDevGraphImageXOffset();
 	}
 
+	/**
+	 * @return Returns the left slider
+	 */
 	public ChartXSlider getLeftSlider() {
 		return fChartComponents.getChartComponentGraph().getLeftSlider();
 	}
@@ -632,6 +643,9 @@ public class Chart extends ViewForm {
 		return fMouseMode;
 	}
 
+	/**
+	 * @return Return the right slider
+	 */
 	public ChartXSlider getRightSlider() {
 		return fChartComponents.getChartComponentGraph().getRightSlider();
 	}

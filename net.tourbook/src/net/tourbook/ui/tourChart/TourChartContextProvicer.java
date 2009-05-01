@@ -23,6 +23,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
@@ -56,6 +57,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 	private ActionCreateMarker				fActionCreateMarker;
 	private ActionCreateMarker				fActionCreateMarkerLeft;
 	private ActionCreateMarker				fActionCreateMarkerRight;
+	private ActionExport					fActionExportTour;
 
 	private ActionSetTourTypeMenu			fActionSetTourType;
 	private ActionSetTourTag				fActionAddTag;
@@ -95,6 +97,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
+		fActionExportTour = new ActionExport(this);
+
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		fActionOpenMarkerDialog.setEnabled(true);
 
@@ -117,7 +121,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 								final int mouseDownDevPositionX,
 								final int mouseDownDevPositionY) {
 
-		final TourData tourData = fTourChartViewer.getTourChart().getTourData();
+		final TourChart tourChart = fTourChartViewer.getTourChart();
+		final TourData tourData = tourChart.getTourData();
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 
 		menuMgr.add(new Separator());
@@ -126,6 +131,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionOpenAdjustAltitudeDialog);
 		menuMgr.add(fActionOpenTour);
+		menuMgr.add(fActionExportTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTourType);
@@ -147,6 +153,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionOpenMarkerDialog.setEnabled(isTourSaved);
 		fActionOpenAdjustAltitudeDialog.setEnabled(isTourSaved);
 		fActionOpenTour.setEnabled(isTourSaved);
+		fActionExportTour.setEnabled(true);
 
 		fActionSetTourType.setEnabled(isTourSaved);
 		fActionAddTag.setEnabled(isTourSaved);
@@ -156,6 +163,9 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		// enable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSaved);
 
+		// set slider position in export action
+		fActionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
+				tourChart.getRightSlider().getValuesIndex());
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
@@ -176,7 +186,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 			}
 
 			menuMgr.add(fActionCreateRefTour);
-			menuMgr.add(new Separator());
 
 			/*
 			 * enable actions
@@ -194,7 +203,6 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 
 			fActionCreateRefTour.setEnabled(canCreateRefTours);
 		}
-
 	}
 
 	public Chart getChart() {
@@ -215,5 +223,9 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		tourList.add(fTourChartViewer.getTourChart().getTourData());
 
 		return tourList;
+	}
+
+	public boolean showOnlySliderContextMenu() {
+		return true;
 	}
 }

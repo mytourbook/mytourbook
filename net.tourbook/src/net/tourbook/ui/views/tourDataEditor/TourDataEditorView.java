@@ -40,6 +40,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.plugin.TourbookPlugin;
@@ -232,6 +233,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionDeleteTimeSlicesKeepTime		fActionDeleteTimeSlicesKeepTime;
 	private ActionDeleteTimeSlicesRemoveTime	fActionDeleteTimeSlicesRemoveTime;
 	private ActionCreateTourMarker				fActionCreateTourMarker;
+	private ActionExport						fActionExportTour;
 
 	private ActionSetTourTag					fActionAddTag;
 	private ActionSetTourTag					fActionRemoveTag;
@@ -1421,6 +1423,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fActionCreateTourMarker = new ActionCreateTourMarker(this);
 		fActionDeleteTourMarker = new ActionDeleteTourMarker(this);
+		fActionExportTour = new ActionExport(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true, false);
 		fActionRemoveTag = new ActionSetTourTag(this, false, false);
@@ -2973,6 +2976,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(fActionDeleteTimeSlicesRemoveTime);
 		menuMgr.add(fActionDeleteTimeSlicesKeepTime);
 
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionExportTour);
+
 		/*
 		 * enable actions
 		 */
@@ -3006,6 +3012,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fActionDeleteTimeSlicesRemoveTime.setEnabled(fIsEditMode && isTourInDb && isSliceSelected);
 		fActionDeleteTimeSlicesKeepTime.setEnabled(fIsEditMode && isTourInDb && isSliceSelected);
+
+		fActionExportTour.setEnabled(true);
+
+		// set start/end position in export action
+		if (isSliceSelected) {
+
+			final Object[] sliceArray = sliceSelection.toArray();
+			final TimeSlice firstTimeSlice = (TimeSlice) sliceArray[0];
+			final TimeSlice lastTimeSlice = (TimeSlice) sliceArray[sliceArray.length - 1];
+
+			fActionExportTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
+		}
 	}
 
 	private void fillToolbar() {

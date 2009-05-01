@@ -69,5 +69,9 @@ public class DialogAdjustAltitudeChartContextProvicer implements IChartContextPr
 	public ChartXSlider getRightSlider() {
 		return null;
 	}
+ 
+	public boolean showOnlySliderContextMenu() {
+		return false;
+	}
 
 }

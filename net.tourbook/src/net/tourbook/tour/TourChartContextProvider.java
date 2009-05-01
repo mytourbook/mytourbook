@@ -187,4 +187,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		return tourList;
 	}
 
+	public boolean showOnlySliderContextMenu() {
+		return false;
+	}
+ 
 }

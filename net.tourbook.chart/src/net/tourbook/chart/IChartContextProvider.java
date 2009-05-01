@@ -67,4 +67,11 @@ public interface IChartContextProvider {
 	 */
 	public ChartXSlider getRightSlider();
 
+	/**
+	 * @return Returns <code>true</code> when the context menu for a slider is displayed, the
+	 *         default context menu is hidden
+	 */
+	public boolean showOnlySliderContextMenu();
+
 }
+ 

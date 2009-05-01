@@ -25,7 +25,16 @@ public abstract class ExportTourExtension {
 	private String	fVisibleName;
 	private String	fFileExtension;
 
-	public abstract void exportTours(ArrayList<TourData> tourDataList);
+ 	/**
+	 * Exports the tour in the {@link TourData} list. If only one tour is exported, the values of
+	 * tourStartIndex and tourEndIndex is the range which points are exported, when the index is -1,
+	 * the whole tour is exported.
+	 * 
+	 * @param tourDataList
+	 * @param tourStartIndex
+	 * @param tourEndIndex
+	 */
+	public abstract void exportTours(ArrayList<TourData> tourDataList, int tourStartIndex, int tourEndIndex);
 
 	public String getExportId() {
 		return fExportId;

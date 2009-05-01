@@ -32,9 +32,13 @@ public class ExportTourGPX extends ExportTourExtension {
 	 */
 	public ExportTourGPX() {}
 
-	@Override
-	public void exportTours(final ArrayList<TourData> tourDataList) {
-		new DialogExportTour(Display.getCurrent().getActiveShell(), this, tourDataList).open();
+ 	@Override
+	public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+		new DialogExportTour(Display.getCurrent().getActiveShell(),//
+				this,
+				tourDataList,
+				tourStartIndex,
+				tourEndIndex).open();
 	}
 
 }

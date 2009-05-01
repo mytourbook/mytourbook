@@ -160,4 +160,8 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 		return null;
 	}
+ 
+	public boolean showOnlySliderContextMenu() {
+		return false;
+	}
 }

@@ -29,6 +29,12 @@ public class Messages extends NLS {
 	public static String		dialog_export_chk_mergeAllTours_tooltip;
 	public static String		dialog_export_chk_overwriteFiles;
 	public static String		dialog_export_chk_overwriteFiles_tooltip;
+
+	public static String	dialog_export_chk_tourRangeDisabled;
+
+	public static String	dialog_export_chk_tourRangeWithDistance;
+
+	public static String	dialog_export_chk_tourRangeWithoutDistance;
 	public static String		dialog_export_dialog_message;
 	public static String		dialog_export_dialog_title;
 	public static String		dialog_export_dir_dialog_message;

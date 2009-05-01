@@ -110,7 +110,7 @@ public class UI {
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
-	public static final String						UTF_8							= "UTF-8"; //$NON-NLS-1$
+	public static final String						UTF_8							= "UTF-8";										//$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
@@ -462,7 +462,22 @@ public class UI {
 		return fFormatter.format(Messages.Format_hhmm, (time / 60), (time % 60));
 	}
 
-	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
+	public static String format_yyyymmdd_hhmmss(final int year, final int month, final int day, final int hour, final int minute, final int second) {
+
+		fFormatterSB.setLength(0);
+
+		return fFormatter.format(//
+		Messages.Format_yyyymmdd_hhmmss,
+				year,
+				month,
+				day,
+				hour,
+				minute,
+				second)//
+				.toString();
+	}
+
+ 	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
 
 		if (tourData == null) {
 			return UI.EMPTY_STRING;

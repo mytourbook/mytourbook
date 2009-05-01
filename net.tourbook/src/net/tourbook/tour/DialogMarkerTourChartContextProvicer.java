@@ -102,4 +102,8 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		return fRightSlider;
 	}
 
+ 	public boolean showOnlySliderContextMenu() {
+		return false;
+	}
+
 }

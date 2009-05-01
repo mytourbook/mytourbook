@@ -42,11 +42,14 @@ import org.eclipse.swt.widgets.Menu;
 public class ActionExport extends Action implements IMenuCreator {
 
 	private static ArrayList<ExportTourExtension>	fExportExtensionPoints;
-	private static ArrayList<ActionExportTour>		fExportTourActions;
-
+ 
 	private Menu									fMenu;
+	private ArrayList<ActionExportTour>				fExportTourActions;
 
 	private ITourProvider							fTourProvider;
+
+	private int										fTourStartIndex	= -1;
+	private int										fTourEndIndex	= -1;
 
 	private class ActionExportTour extends Action {
 
@@ -72,8 +75,8 @@ public class ActionExport extends Action implements IMenuCreator {
 			if (selectedTours == null || selectedTours.size() == 0) {
 				return;
 			}
-			
-			fExportTourExtension.exportTours(selectedTours);
+
+			fExportTourExtension.exportTours(selectedTours, fTourStartIndex, fTourEndIndex);
 		}
 
 	}
@@ -182,6 +185,11 @@ public class ActionExport extends Action implements IMenuCreator {
 		}
 
 		return fMenu;
+	}
+
+	public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
+		fTourStartIndex = tourStartIndex;
+		fTourEndIndex = tourEndIndex;
 	}
 
 }
