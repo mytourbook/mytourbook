@@ -99,6 +99,8 @@ import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
+	private static final String						UI_AVERAGE_SYMBOL			= "Ø ";
+
 	private static final int						VERTICAL_SECTION_MARGIN		= 10;
 
 	private static final int						SIZING_TEXT_FIELD_WIDTH		= 250;
@@ -108,9 +110,12 @@ public class DialogExportTour extends TitleAreaDialog {
 																						.getDialogSettingsSection("DialogExportTour");	//$NON-NLS-1$
 
 	private static final String						STATE_IS_MERGE_ALL_TOURS	= "isMergeAllTours";									//$NON-NLS-1$
-	private static final String						STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";									//$NON-NLS-1$
 	private static final String						STATE_IS_EXPORT_TOUR_RANGE	= "isExportTourRange";									//$NON-NLS-1$
+	private static final String						STATE_IS_EXPORT_MARKERS		= "isExportMarkers";									//$NON-NLS-1$
+
+	private static final String						STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";									//$NON-NLS-1$
 	private static final String						STATE_CAMOUFLAGE_SPEED		= "camouflageSpeedValue";								//$NON-NLS-1$
+
 	private static final String						STATE_EXPORT_PATH_NAME		= "exportPathName";									//$NON-NLS-1$
 	private static final String						STATE_EXPORT_FILE_NAME		= "exportFileName";									//$NON-NLS-1$
 	private static final String						STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";									//$NON-NLS-1$
@@ -142,13 +147,15 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private Composite								fDlgContainer;
 
-	private Button									fChkCamouflageSpeed;
 	private Button									fChkExportTourRange;
+	private Button									fChkMergeAllTours;
+	private Button									fChkExportMarkers;
+
+	private Button									fChkCamouflageSpeed;
 	private Text									fTxtCamouflageSpeed;
 	private Label									fLblCoumouflageSpeedUnit;
 
 	private Composite								fInputContainer;
-	private Button									fChkMergeAllTours;
 
 	private Combo									fComboFile;
 	private Combo									fComboPath;
@@ -347,6 +354,20 @@ public class DialogExportTour extends TitleAreaDialog {
 //		if (cadNum != 0) {
 //			context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
 //		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when a part of a tour can be exported
+	 */
+	private boolean canExportTourPart() {
+		return fTourDataList.size() == 1 && fTourStartIndex >= 0 && fTourEndIndex > 0;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when tours can be merged
+	 */
+	private boolean canMergeTours() {
+		return fTourDataList.size() > 1;
 	}
 
 	@Override
@@ -560,21 +581,9 @@ public class DialogExportTour extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 		{
-			/*
-			 * checkbox: merge all tours
-			 */
-			fChkMergeAllTours = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkMergeAllTours);
-			fChkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
-			fChkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
-			fChkMergeAllTours.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableFields();
-				}
-			});
-
 			createUIOptionCamouflageSpeed(group);
+			createUIOptionExportMarkers(group);
+			createUIOptionMergeTours(group);
 			createUIOptionTourPart(group);
 		}
 	}
@@ -622,7 +631,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// label: unit
 			fLblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-			fLblCoumouflageSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+			fLblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
 			GridDataFactory.fillDefaults()
 					.grab(true, false)
 					.align(SWT.BEGINNING, SWT.CENTER)
@@ -630,7 +639,35 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 	}
 
-	private void createUIOptionTourPart(final Group parent) {
+	private void createUIOptionExportMarkers(final Composite parent) {
+
+		/*
+		 * checkbox: export markers
+		 */
+		fChkExportMarkers = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkExportMarkers);
+		fChkExportMarkers.setText(Messages.dialog_export_chk_exportMarkers);
+		fChkExportMarkers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
+	}
+
+	private void createUIOptionMergeTours(final Composite parent) {
+
+		/*
+		 * checkbox: merge all tours
+		 */
+		fChkMergeAllTours = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkMergeAllTours);
+		fChkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
+		fChkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
+		fChkMergeAllTours.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableFields();
+			}
+		});
+	}
+
+	private void createUIOptionTourPart(final Composite parent) {
 
 		/*
 		 * checkbox: tour range
@@ -749,7 +786,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		try {
 			camouflageSpeed[0] = Float.parseFloat(fTxtCamouflageSpeed.getText());
 		} catch (final NumberFormatException e) {
-
 			camouflageSpeed[0] = 0.1F;
 		}
 		camouflageSpeed[0] *= UI.UNIT_VALUE_DISTANCE / 3.6f;
@@ -774,7 +810,10 @@ public class DialogExportTour extends TitleAreaDialog {
 				trackList.add(track);
 			}
 
-			getWaypoints(wayPointList, tourData);
+			if (fChkExportMarkers.getSelection()) {
+				// get markers when this option is checked
+				getWaypoints(wayPointList, tourData);
+			}
 
 			doExportTour(trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
 
@@ -941,16 +980,23 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void enableFields() {
 
-		final boolean isOneTour = fTourDataList.size() == 1;
+		fChkMergeAllTours.setEnabled(canMergeTours());
+		// when disabled, uncheck it
+		if (fChkMergeAllTours.isEnabled() == false) {
+			fChkMergeAllTours.setSelection(false);
+		}
 
-		fChkMergeAllTours.setEnabled(isOneTour == false);
-		fComboFile.setEnabled(fChkMergeAllTours.getSelection() || isOneTour);
+		fComboFile.setEnabled(true);
 
 		final boolean isCamouflageTime = fChkCamouflageSpeed.getSelection();
 		fTxtCamouflageSpeed.setEnabled(isCamouflageTime);
 		fLblCoumouflageSpeedUnit.setEnabled(isCamouflageTime);
 
-		fChkExportTourRange.setEnabled(isOneTour && fTourStartIndex >= 0 && fTourEndIndex > 0);
+		fChkExportTourRange.setEnabled(canExportTourPart());
+		// when disabled, uncheck it
+		if (fChkExportTourRange.isEnabled() == false) {
+			fChkExportTourRange.setSelection(false);
+		}
 	}
 
 	@Override
@@ -1126,6 +1172,9 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 	}
 
+	/**
+	 * @return Return <code>true</code> when a part of a tour can be exported
+	 */
 	private boolean isExportTourPart() {
 		return fChkExportTourRange.getSelection()
 				&& fTourDataList.size() == 1
@@ -1189,8 +1238,8 @@ public class DialogExportTour extends TitleAreaDialog {
 	private void restoreState() {
 
 		fChkMergeAllTours.setSelection(fState.getBoolean(STATE_IS_MERGE_ALL_TOURS));
-		fChkOverwriteFiles.setSelection(fState.getBoolean(STATE_IS_OVERWRITE_FILES));
 		fChkExportTourRange.setSelection(fState.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
+		fChkExportMarkers.setSelection(fState.getBoolean(STATE_IS_EXPORT_MARKERS));
 
 		// camouflage speed
 		fChkCamouflageSpeed.setSelection(fState.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
@@ -1201,6 +1250,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		// export file/path
 		UI.restoreCombo(fComboFile, fState.getArray(STATE_EXPORT_FILE_NAME));
 		UI.restoreCombo(fComboPath, fState.getArray(STATE_EXPORT_PATH_NAME));
+		fChkOverwriteFiles.setSelection(fState.getBoolean(STATE_IS_OVERWRITE_FILES));
 	}
 
 	private void saveState() {
@@ -1212,14 +1262,21 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		// merge all tours
-		fState.put(STATE_IS_MERGE_ALL_TOURS, fChkMergeAllTours.getSelection());
+		if (canMergeTours()) {
+			fState.put(STATE_IS_MERGE_ALL_TOURS, fChkMergeAllTours.getSelection());
+		}
+
+		// export tour part
+		if (canExportTourPart()) {
+			fState.put(STATE_IS_EXPORT_TOUR_RANGE, fChkExportTourRange.getSelection());
+		}
 
 		// camouflage speed
 		fState.put(STATE_IS_CAMOUFLAGE_SPEED, fChkCamouflageSpeed.getSelection());
 		fState.put(STATE_CAMOUFLAGE_SPEED, fTxtCamouflageSpeed.getText());
 
-		fState.put(STATE_IS_EXPORT_TOUR_RANGE, fChkExportTourRange.getSelection());
 		fState.put(STATE_IS_OVERWRITE_FILES, fChkOverwriteFiles.getSelection());
+		fState.put(STATE_IS_EXPORT_MARKERS, fChkExportMarkers.getSelection());
 	}
 
 	private void setError(final String message) {
