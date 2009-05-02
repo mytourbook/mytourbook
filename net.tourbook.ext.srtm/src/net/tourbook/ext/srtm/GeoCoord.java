@@ -18,7 +18,8 @@
  */
 package net.tourbook.ext.srtm;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GeoCoord {
 
@@ -26,27 +27,19 @@ public class GeoCoord {
 	public static final int	faktm	= 60 * 60;
 	public static final int	fakts	= 60;
 
-	// dummies; siehe GeoLon / GeoLat
-	public char directionPlus() { 
-		return '!';
-	}
-
-	public char directionMinus() {
-		return '?';
-	}
-
 	final static private int		PATTERN_ANZ		= 10;
+
 	final static private String		patternString[]	= new String[PATTERN_ANZ];
+
 	final static private Pattern	pattern[]		= new Pattern[PATTERN_ANZ];
 	static private Matcher			matcher			= null;
-
 	public char						direction;
-	private int						degrees;									// 1 Degrees in NS-Direction = 110.946 km
-	private int						minutes;									// 1 Min. in NS-Direction = 1.852 km
-	private int						seconds;									// 1 Sek. in NS-Direction = 30.68 m
-	private int						tertias;									// sechzigstel Seconds  // 1 Trz. in NS-Direction =  0.51 m
-	protected int					decimal;									// nur Subklassen (GeoLat, GeoLon) kennen die Variable
+	int								degrees;									// 1 Degrees in NS-Direction = 110.946 km
 
+	int								minutes;									// 1 Min. in NS-Direction = 1.852 km
+	int								seconds;									// 1 Sek. in NS-Direction = 30.68 m
+	int								tertias;									// sechzigstel Seconds  // 1 Trz. in NS-Direction =  0.51 m
+	protected int					decimal;									// nur Subklassen (GeoLat, GeoLon) kennen die Variable
 	// Variable doubleValue wird ausschliesslich für GPS-Dateifiles verwendet
 	// (dort, damit keine Rundungsfehler beim Splitten eines großen HST-Files in
 	// viele kleine entstehen)
@@ -54,7 +47,6 @@ public class GeoCoord {
 	// _kein_ Update in updateDecimal und updateDegrees,
 	// d.h. add etc. fkt. nicht!
 	private double					doubleValue		= 0.;
-
 	/***********************************************************************************
 	 * Zur Erkennung von Strings: zunächst werden Ersetzungen vorgenommen: blank -> (nichts) " ->
 	 * (nichts) [SW] vorne -> - vorne [SW] hinten -> - vorne [NEO] -> (nichts) , -> . ° -> : ' -> :
@@ -97,6 +89,137 @@ public class GeoCoord {
 
 	}
 
+	public double acos() {
+		return Math.acos(this.toRadians());
+	}
+
+	public void add(final double d) {
+		decimal += d;
+
+		updateDegrees();
+	}
+
+	public void add(final GeoCoord a) {
+		decimal += a.decimal;
+
+		updateDegrees();
+	}
+
+	public void add(final GeoCoord c, final GeoCoord a) {
+		decimal = c.decimal;
+		this.add(a);
+	}
+
+	public void addSecond(final int n) {
+		this.add(n * fakts);
+	}
+
+//   public int getHashkey() {
+//       // tertias-genau
+//      if (decimal >= 0)
+//         return decimal;
+//      return decimal + 134217728; // = 2^27  > 77760000 = 360 * 60 * 60 * 60
+//      }
+
+	public double asin() {
+		return Math.asin(this.toRadians());
+	}
+
+	public double atan() {
+		return Math.atan(this.toRadians());
+	}
+
+	public double cos() {
+		return Math.cos(this.toRadians());
+	}
+
+	public char directionMinus() {
+		return '?';
+	}
+
+	// dummies; siehe GeoLon / GeoLat
+	public char directionPlus() { 
+		return '!';
+	}
+
+	public void div(final double faktor) {
+		decimal /= faktor;
+
+		updateDegrees();
+	}
+
+	public boolean equalTo(final GeoCoord c) {
+
+		return (decimal == c.decimal);
+	}
+
+//	public int getDecimal() {
+//		return decimal;
+//	}
+//
+//	public int getDegrees() {
+//		return degrees;
+//	}
+//
+//	public char getDirection() {
+//		return direction;
+//	}
+//
+//	public double getDoubleValue() {
+//		return doubleValue;
+//	}
+
+	public int getHashkeyDist() {
+		// Minutes-genau; Wert < 21600; 21600^2 < 2^30
+		// absichtlich grob, damit "benachbarte" Punkte in gleiche "Toepfe" fallen
+		if (direction == 'N')
+			return 60 * (89 - degrees) + minutes;
+		if (direction == 'S')
+			return 60 * (90 + degrees) + minutes;
+		if (direction == 'W')
+			return 60 * (179 - degrees) + minutes;
+		return 60 * (180 + degrees) + minutes;
+
+	}
+
+//	public int getMinutes() {
+//		return minutes;
+//	}
+//
+//	public int getSeconds() {
+//		return seconds;
+//	}
+//
+//	public int getTertias() {
+//		return tertias;
+//	}
+
+	public boolean greaterOrEqual(final GeoCoord c) {
+
+		return (decimal >= c.decimal);
+	}
+
+	public boolean greaterThen(final GeoCoord c) {
+
+		return (decimal > c.decimal);
+	}
+
+	public boolean lessOrEqual(final GeoCoord c) {
+
+		return (decimal <= c.decimal);
+	}
+
+	public boolean lessThen(final GeoCoord c) {
+
+		return (decimal < c.decimal);
+	}
+
+	public void mult(final double faktor) {
+		decimal *= faktor;
+
+		updateDegrees();
+	}
+
 	private String normalize(String s) {
 
 		// Kommentar s. o.
@@ -128,6 +251,25 @@ public class GeoCoord {
 			s = s.substring(0, s.length() - 1);
 
 		return s;
+	}
+
+	public boolean notEqualTo(final GeoCoord c) {
+
+		return (decimal != c.decimal);
+	}
+
+	public void set(final double d) {
+		doubleValue = d;
+		decimal = (int) (d * faktg);
+		updateDegrees();
+	}
+
+	public void set(final GeoCoord c) {
+
+		decimal = c.decimal;
+		doubleValue = c.doubleValue;
+
+		updateDegrees();
 	}
 
 	public void set(String s) {
@@ -176,9 +318,9 @@ public class GeoCoord {
 
 		case 5: // -ggg.ggggg        
 
-			double dg = new Double(matcher.group(2)).doubleValue();
+			final double dg = new Double(matcher.group(2)).doubleValue();
 			degrees = (int) dg;
-			double dgg = Math.abs(dg - degrees);
+			final double dgg = Math.abs(dg - degrees);
 			minutes = (int) (dgg * fakts);
 			seconds = (int) (dgg * faktm - minutes * fakts);
 			tertias = (int) (dgg * faktg - minutes * faktm - seconds * fakts + 0.5);
@@ -188,9 +330,9 @@ public class GeoCoord {
 		case 7: // -ggg:mm.mmmmm oder -gggMM.mmmmm
 
 			degrees = new Integer(matcher.group(2)).intValue();
-			double dm = new Double(matcher.group(3)).doubleValue();
+			final double dm = new Double(matcher.group(3)).doubleValue();
 			minutes = (int) dm;
-			double dmm = Math.abs(dm - minutes);
+			final double dmm = Math.abs(dm - minutes);
 			seconds = (int) (dmm * fakts);
 			tertias = (int) (dmm * faktm - seconds * fakts + 0.5);
 			break;
@@ -200,9 +342,9 @@ public class GeoCoord {
 
 			degrees = new Integer(matcher.group(2)).intValue();
 			minutes = new Integer(matcher.group(3)).intValue();
-			double ds = new Double(matcher.group(4)).doubleValue();
+			final double ds = new Double(matcher.group(4)).doubleValue();
 			seconds = (int) ds;
-			double dss = Math.abs(ds - seconds);
+			final double dss = Math.abs(ds - seconds);
 			tertias = (int) (dss * fakts + 0.5);
 			break;
 
@@ -217,84 +359,17 @@ public class GeoCoord {
 		updateDecimal();
 	}
 
-	public int getDecimal() {
-		return decimal;
-	}
-
-//   public int getHashkey() {
-//       // tertias-genau
-//      if (decimal >= 0)
-//         return decimal;
-//      return decimal + 134217728; // = 2^27  > 77760000 = 360 * 60 * 60 * 60
-//      }
-
-	public int getHashkeyDist() {
-		// Minutes-genau; Wert < 21600; 21600^2 < 2^30
-		// absichtlich grob, damit "benachbarte" Punkte in gleiche "Toepfe" fallen
-		if (direction == 'N')
-			return 60 * (89 - degrees) + minutes;
-		if (direction == 'S')
-			return 60 * (90 + degrees) + minutes;
-		if (direction == 'W')
-			return 60 * (179 - degrees) + minutes;
-		return 60 * (180 + degrees) + minutes;
-
-	}
-
-	public int getDegrees() {
-		return degrees;
-	}
-
-	public int getMinutes() {
-		return minutes;
-	}
-
-	public int getSeconds() {
-		return seconds;
-	}
-
-	public int getTertias() {
-		return tertias;
-	}
-
-	public char getDirection() {
-		return direction;
-	}
-
-	public double toRadians() {
-		return Math.toRadians((double) decimal / faktg);
-	}
-
-	public double toDegrees() {
-		return ((double) decimal / faktg);
-	}
-
-	public void setDecimal(int d) {
+	public void setDecimal(final int d) {
 		decimal = d;
 		updateDegrees();
 	}
 
-	public void setDegrees(int d) {
+	public void setDegrees(final int d) {
 		degrees = d;
 		updateDecimal();
 	}
 
-	public void setMinutes(int m) {
-		minutes = m;
-		updateDecimal();
-	}
-
-	public void setSeconds(int s) {
-		seconds = s;
-		updateDecimal();
-	}
-
-	public void setTertias(int t) {
-		tertias = t;
-		updateDecimal();
-	}
-
-	public void setDegreesMinutesSecondsDirection(int d, int m, int s, char r) {
+	public void setDegreesMinutesSecondsDirection(final int d, final int m, final int s, final char r) {
 		degrees = d;
 		minutes = m;
 		seconds = s;
@@ -302,78 +377,78 @@ public class GeoCoord {
 		updateDecimal();
 	}
 
-	public void set(GeoCoord c) {
-
-		decimal = c.getDecimal();
-		doubleValue = c.getDoubleValue();
-
-		updateDegrees();
-	}
-
-	public void setDirection(char r) {
+	public void setDirection(final char r) {
 		direction = r;
 		if (direction == 'O')
 			direction = 'E';
 		updateDecimal();
 	}
 
-	public void add(GeoCoord a) {
-		decimal += a.getDecimal();
-
-		updateDegrees();
+	public void setDoubleValue(final double doppel) {
+		this.doubleValue = doppel;
 	}
 
-	public void add(GeoCoord c, GeoCoord a) {
-		decimal = c.getDecimal();
-		this.add(a);
+	public void setMean(final GeoCoord k1, final GeoCoord k2) {
+		// auf Mittelwert von k1 und k2 setzen (1-dimensional!) 
+		set(k1);
+		div(2.);
+		final GeoCoord kHelp = new GeoCoord();
+		kHelp.set(k2);
+		kHelp.div(2.);
+		add(kHelp);
 	}
 
-	public void add(double d) {
-		decimal += d;
-
-		updateDegrees();
+	public void setMinutes(final int m) {
+		minutes = m;
+		updateDecimal();
 	}
 
-	public void addSecond(int n) {
-		this.add(n * fakts);
+	public void setSeconds(final int s) {
+		seconds = s;
+		updateDecimal();
 	}
 
-	public void sub(GeoCoord c) {
-		decimal -= c.getDecimal();
-
-		updateDegrees();
+	public void setTertias(final int t) {
+		tertias = t;
+		updateDecimal();
 	}
 
-	public void sub(GeoCoord c, GeoCoord s) {
-		decimal = c.getDecimal();
-		this.sub(s);
+	public double sin() {
+		return Math.sin(this.toRadians());
 	}
 
-	public void sub(double d) {
+	public void sub(final double d) {
 		decimal -= d;
 
 		updateDegrees();
 	}
 
-	public void subSecond(int n) {
+	public void sub(final GeoCoord c) {
+		decimal -= c.decimal;
+
+		updateDegrees();
+	}
+
+	public void sub(final GeoCoord c, final GeoCoord s) {
+		decimal = c.decimal;
+		this.sub(s);
+	}
+
+	public void subSecond(final int n) {
 		this.sub(n * fakts);
 	}
 
-	public void mult(double faktor) {
-		decimal *= faktor;
-
-		updateDegrees();
+	public double tan() {
+		return Math.tan(this.toRadians());
 	}
 
-	public void div(double faktor) {
-		decimal /= faktor;
-
-		updateDegrees();
+	public double toDegrees() {
+		return ((double) decimal / faktg);
 	}
 
-	public void toLeft(GeoCoord r) {
+	public void toLeft(final GeoCoord r) {
 		// auf Rasterrand zur Linken shiften
-		int raster = r.getDecimal();
+		final int raster = r.decimal;
 		if (decimal < 0)
 			decimal -= raster;
 		decimal /= raster;
@@ -382,15 +457,19 @@ public class GeoCoord {
 		updateDegrees();
 	}
 
-	public void toLeft(GeoCoord c, GeoCoord r) {
+	public void toLeft(final GeoCoord c, final GeoCoord r) {
 		// c auf Rasterrand zur Linken shiften
-		decimal = c.getDecimal();
+		decimal = c.decimal;
 		this.toLeft(r);
 	}
 
-	public void toRight(GeoCoord r) {
+	public double toRadians() {
+		return Math.toRadians((double) decimal / faktg);
+	}
+
+	public void toRight(final GeoCoord r) {
 		// auf Rasterrand zur Rechten shiften
-		int raster = r.getDecimal();
+		final int raster = r.decimal;
 		decimal /= raster;
 		decimal *= raster;
 		if (decimal >= 0)
@@ -398,42 +477,13 @@ public class GeoCoord {
 		updateDegrees();
 	}
 
-	public void toRight(GeoCoord c, GeoCoord r) {
+	public void toRight(final GeoCoord c, final GeoCoord r) {
 		// c auf Rasterrand zur Rechten shiften
-		decimal = c.getDecimal();
+		decimal = c.decimal;
 		this.toRight(r);
 	}
 
-	public boolean lessThen(GeoCoord c) {
-
-		return (decimal < c.getDecimal());
-	}
-
-	public boolean lessOrEqual(GeoCoord c) {
-
-		return (decimal <= c.getDecimal());
-	}
-
-	public boolean greaterThen(GeoCoord c) {
-
-		return (decimal > c.getDecimal());
-	}
-
-	public boolean greaterOrEqual(GeoCoord c) {
-
-		return (decimal >= c.getDecimal());
-	}
-
-	public boolean equalTo(GeoCoord c) {
-
-		return (decimal == c.getDecimal());
-	}
-
-	public boolean notEqualTo(GeoCoord c) {
-
-		return (decimal != c.getDecimal());
-	}
-
+	@Override
 	public String toString() { // = toStringDegreesMinutesSecondsDirection()
 
 		return "" //$NON-NLS-1$
@@ -444,25 +494,6 @@ public class GeoCoord {
 				+ NumberForm.n2(seconds)
 				+ " " //$NON-NLS-1$
 				+ direction;
-	}
-
-	public String toStringFine() { // = toStringDegreesMinutesSecondsTertiasDirection()
-
-		return "" //$NON-NLS-1$
-				+ NumberForm.n2(degrees)
-				+ ":" //$NON-NLS-1$
-				+ NumberForm.n2(minutes)
-				+ ":" //$NON-NLS-1$
-				+ NumberForm.n2(seconds)
-				+ ":" //$NON-NLS-1$
-				+ NumberForm.n2(tertias)
-				+ " " //$NON-NLS-1$
-				+ direction;
-	}
-
-	public String toStringDouble() { // nur für GPS-Datenfiles
-
-		return NumberForm.f6(doubleValue);
 	}
 
 	public String toStringDegrees() {
@@ -494,6 +525,25 @@ public class GeoCoord {
 		return "" + NumberForm.n2(degrees) + ":" + NumberForm.n2f3(m) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public String toStringDouble() { // nur für GPS-Datenfiles
+
+		return NumberForm.f6(doubleValue);
+	}
+
+	public String toStringFine() { // = toStringDegreesMinutesSecondsTertiasDirection()
+
+		return "" //$NON-NLS-1$
+				+ NumberForm.n2(degrees)
+				+ ":" //$NON-NLS-1$
+				+ NumberForm.n2(minutes)
+				+ ":" //$NON-NLS-1$
+				+ NumberForm.n2(seconds)
+				+ ":" //$NON-NLS-1$
+				+ NumberForm.n2(tertias)
+				+ " " //$NON-NLS-1$
+				+ direction;
+	}
+
 	public void updateDecimal() {
 		decimal = degrees * faktg;
 		decimal += minutes * faktm;
@@ -512,12 +562,14 @@ public class GeoCoord {
 	public void updateDegrees() {
 
 		int dec = ((decimal < 0) ? -decimal : decimal);
-
 		degrees = dec / faktg;
+		
 		dec -= degrees * faktg;
 		minutes = dec / faktm;
+		
 		dec -= minutes * faktm;
 		seconds = dec / fakts;
+		
 		dec -= seconds * fakts;
 		tertias = dec;
 		
@@ -525,54 +577,6 @@ public class GeoCoord {
 
 		doubleValue = decimal;
 		doubleValue /= faktg;
-	}
-
-	public void set(double d) {
-		doubleValue = d;
-		decimal = (int) (d * faktg);
-		updateDegrees();
-	}
-
-	public double getDoubleValue() {
-		return doubleValue;
-	}
-
-	public void setDoubleValue(double doppel) {
-		this.doubleValue = doppel;
-	}
-
-	public double sin() {
-		return Math.sin(this.toRadians());
-	}
-
-	public double cos() {
-		return Math.cos(this.toRadians());
-	}
-
-	public double tan() {
-		return Math.tan(this.toRadians());
-	}
-
-	public double asin() {
-		return Math.asin(this.toRadians());
-	}
-
-	public double acos() {
-		return Math.acos(this.toRadians());
-	}
-
-	public double atan() {
-		return Math.atan(this.toRadians());
-	}
-
-	public void setMean(GeoCoord k1, GeoCoord k2) {
-		// auf Mittelwert von k1 und k2 setzen (1-dimensional!) 
-		set(k1);
-		div(2.);
-		GeoCoord kHelp = new GeoCoord();
-		kHelp.set(k2);
-		kHelp.div(2.);
-		add(kHelp);
 	}
 
 }

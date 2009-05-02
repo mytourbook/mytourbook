@@ -20,7 +20,7 @@ package net.tourbook.ext.srtm;
 
 import java.io.File;
 
-public class ElevationBase {
+public abstract class ElevationBase {
 
 	final public GeoLat	gridLat;
 	final public GeoLon	gridLon;
@@ -44,7 +44,7 @@ public class ElevationBase {
 		} else {
 			elevationDataPath = prefDataPath;
 		}
- 
+
 		elevationDataPath = elevationDataPath.replace('/', File.separatorChar).replace('\\', File.separatorChar);
 		if (!elevationDataPath.endsWith(File.separator))
 			elevationDataPath = elevationDataPath + File.separator;
@@ -68,14 +68,22 @@ public class ElevationBase {
 		lastLon = new GeoLon();
 	}
 
-	// dummy
+	/**
+	 * @param lat
+	 * @param lon
+	 * @return
+	 */
 	public synchronized short getElevation(final GeoLat lat, final GeoLon lon) {
 		return 0;
 	}
 
-	// dummy
+	/**
+	 * @param lat
+	 * @param lon
+	 * @return
+	 */
 	public synchronized double getElevationDouble(final GeoLat lat, final GeoLon lon) {
-		return 0.;
+		return 0;
 	}
 
 	public synchronized short getElevationGrid(final GeoLat lat, final GeoLon lon) {
@@ -101,10 +109,10 @@ public class ElevationBase {
 		firstLon.toLeft(lon, gridLon);
 		lastLon.toRight(lon, gridLon);
 
-		elev1 = this.getElevation(lastLat, firstLon);
-		elev2 = this.getElevation(lastLat, lastLon);
-		elev3 = this.getElevation(firstLat, firstLon);
-		elev4 = this.getElevation(firstLat, lastLon);
+		elev1 = getElevation(lastLat, firstLon);
+		elev2 = getElevation(lastLat, lastLon);
+		elev3 = getElevation(firstLat, firstLon);
+		elev4 = getElevation(firstLat, lastLon);
 
 		// adjust invalid values
 		final boolean isValidElev1 = isValid(elev1);
@@ -147,10 +155,10 @@ public class ElevationBase {
 				elev4 = (short) elevMid;
 		}
 
-		p = lat.getDecimal() - firstLat.getDecimal();
-		p /= lastLat.getDecimal() - firstLat.getDecimal();
-		q = lon.getDecimal() - firstLon.getDecimal();
-		q /= lastLon.getDecimal() - firstLon.getDecimal();
+		p = lat.decimal - firstLat.decimal;
+		p /= lastLat.decimal - firstLat.decimal;
+		q = lon.decimal - firstLon.decimal;
+		q /= lastLon.decimal - firstLon.decimal;
 
 		return ((1 - q) * p * elev1 + q * p * elev2 + (1 - q) * (1 - p) * elev3 + q * (1 - p) * elev4 + 0.5);
 	}

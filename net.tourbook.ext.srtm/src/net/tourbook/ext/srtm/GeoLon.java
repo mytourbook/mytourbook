@@ -20,66 +20,69 @@ package net.tourbook.ext.srtm;
 
 public class GeoLon extends GeoCoord {
 
-   public char directionPlus() {return 'E';}
-   public char directionMinus() {return 'W';}
+	static final char	DIRECTION_WEST	= 'W';
+	static final char	DIRECTION_EAST	= 'E';
 
-   public GeoLon() {
-      super();
-   }
+	public static void main(final String[] args) {}
 
-   public GeoLon(GeoLon lon) {
-      super();
-      set(lon);
-   }
+	public GeoLon() {
+		super();
+	}
 
-   public GeoLon(String s) {
-      super();
-      set(s);
-   }
-   
-   public GeoLon(double d) {
-      super();
-      set(d);
-   }
-   
-   public boolean isEast() {
-      return (direction == directionPlus());
-   }
+	public GeoLon(final double d) {
+		super();
+		set(d);
+	}
 
-   public boolean isWest() {
-      return (!this.isEast());
-   }
+	public GeoLon(final GeoLon lon) {
+		super();
+		set(lon);
+	}
 
-   public void add(GeoLon lon) {
+	public GeoLon(final String s) {
+		super();
+		set(s);
+	}
 
-      decimal += lon.getDecimal();
-      if (decimal > 180*faktg) decimal -= 360*faktg;
+	public void add(final GeoLon lon) {
 
-      updateDegrees();
-   }
+		decimal += lon.decimal;
+		if (decimal > 180 * faktg)
+			decimal -= 360 * faktg;
 
-   public void add(GeoLon lon, GeoLon a) {
-      decimal = lon.getDecimal();
-      this.add(a);
-   }
-   
-   public void sub(GeoLon lon) {
+		updateDegrees();
+	}
 
-      decimal -= lon.getDecimal();
-      if (decimal < -180*faktg) decimal += 360*faktg;
+	public void add(final GeoLon lon, final GeoLon a) {
+		decimal = lon.decimal;
+		this.add(a);
+	}
 
-      updateDegrees();
-   }
+	@Override
+	public char directionMinus() {
+		return DIRECTION_WEST;
+	}
 
-   public void sub(GeoLon lon, GeoLon s) {
-      decimal = lon.getDecimal();
-      this.sub(s);
-   }
-      
-   public void set(GeoLon lon) {
-      super.set((GeoCoord)lon);
-   }
+	@Override
+	public char directionPlus() {
+		return DIRECTION_EAST;
+	}
 
-   public static void main(String[] args) {
-   }
+	public void set(final GeoLon lon) {
+		super.set(lon);
+	}
+
+	public void sub(final GeoLon lon) {
+
+		decimal -= lon.decimal;
+		if (decimal < -180 * faktg)
+			decimal += 360 * faktg;
+
+		updateDegrees();
+	}
+
+	public void sub(final GeoLon lon, final GeoLon s) {
+		decimal = lon.decimal;
+		this.sub(s);
+	}
 }

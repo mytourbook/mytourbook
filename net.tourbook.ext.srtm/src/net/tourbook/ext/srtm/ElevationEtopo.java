@@ -24,61 +24,6 @@ public final class ElevationEtopo extends ElevationBase {
 
 	static private EtopoI	fEtopoi	= null;
 
-	public ElevationEtopo() {
-		gridLat.setDegreesMinutesSecondsDirection(0, 5, 0, 'N');
-		gridLon.setDegreesMinutesSecondsDirection(0, 5, 0, 'E');
-	}
-
-	public short getElevation(GeoLat lat, GeoLon lon) {
-
-		if (lat.getTertias() != 0)
-			return getElevationGrid(lat, lon);
-		if (lon.getTertias() != 0)
-			return getElevationGrid(lat, lon);
-		if (lat.getSeconds() != 0)
-			return getElevationGrid(lat, lon);
-		if (lon.getSeconds() != 0)
-			return getElevationGrid(lat, lon);
-		if (lat.getMinutes() % 5 != 0)
-			return getElevationGrid(lat, lon);
-		if (lon.getMinutes() % 5 != 0)
-			return getElevationGrid(lat, lon);
-
-		if (fEtopoi == null)
-			fEtopoi = new EtopoI(); // first time only !!
-
-		return fEtopoi.getElevation(lat, lon);
-
-	}
-
-	public double getElevationDouble(GeoLat lat, GeoLon lon) {
-
-		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
-			return 0.;
-		if (lat.getTertias() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lon.getTertias() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lat.getSeconds() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lon.getSeconds() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lat.getMinutes() % 5 != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lon.getMinutes() % 5 != 0)
-			return getElevationGridDouble(lat, lon);
-		return (double) getElevation(lat, lon);
-	}
-
-	public short getSecDiff() {
-		// number of degrees seconds between two data points
-		return 300;
-	}
-
-	public String getName() {
-		return "ETOPO"; //$NON-NLS-1$
-	}
-
 	private final class EtopoI {
 
 		private GeoLat	minLat	= new GeoLat();
@@ -91,11 +36,11 @@ public final class ElevationEtopo extends ElevationBase {
 
 			final String etopoDataPath = getElevationDataPath("etopo"); //$NON-NLS-1$
 			final String etopoFilename = "ETOPO5.DAT"; //$NON-NLS-1$
-			String fileName = new String(etopoDataPath + File.separator + etopoFilename);
+			final String fileName = new String(etopoDataPath + File.separator + etopoFilename);
 
 			try {
 				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_ETOPO);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				System.out.println("EtopoI: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
 				// dont return exception
 			}
@@ -104,25 +49,84 @@ public final class ElevationEtopo extends ElevationBase {
 			minLat.setDegreesMinutesSecondsDirection(89, 55, 0, 'N');
 		}
 
-		public short getElevation(GeoLat lat, GeoLon lon) {
+		public short getElevation(final GeoLat lat, final GeoLon lon) {
 
 			return elevationFile.get(offset(lat, lon));
 		}
 
 		// Offset in the Etopo-File
-		public int offset(GeoLat lat, GeoLon lon) {
+		public int offset(final GeoLat lat, final GeoLon lon) {
 
 			offLat.sub(minLat, lat);
 			offLon.sub(lon, minLon);
-			return offLat.getDegrees() * 51840 // 360*12*12       
-					+ offLat.getMinutes()
+			return offLat.degrees * 51840 // 360*12*12       
+					+ offLat.minutes
 					* 864 // 360*12/5      
-					+ offLon.getDegrees()
+					+ offLon.degrees
 					* 12
-					+ offLon.getMinutes()
+					+ offLon.minutes
 					/ 5;
 		}
 	}
 
-	public static void main(String[] args) {}
+	public static void main(final String[] args) {}
+
+	public ElevationEtopo() {
+		gridLat.setDegreesMinutesSecondsDirection(0, 5, 0, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 5, 0, 'E');
+	}
+
+	@Override
+	public short getElevation(final GeoLat lat, final GeoLon lon) {
+
+		if (lat.tertias != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.tertias != 0)
+			return getElevationGrid(lat, lon);
+		if (lat.seconds != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.seconds != 0)
+			return getElevationGrid(lat, lon);
+		if (lat.minutes % 5 != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.minutes % 5 != 0)
+			return getElevationGrid(lat, lon);
+
+		if (fEtopoi == null)
+			fEtopoi = new EtopoI(); // first time only !!
+
+		return fEtopoi.getElevation(lat, lon);
+
+	}
+
+	@Override
+	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
+
+		if (lat.decimal == 0 && lon.decimal == 0)
+			return 0.;
+		if (lat.tertias != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.tertias != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lat.seconds != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.seconds != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lat.minutes % 5 != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.minutes % 5 != 0)
+			return getElevationGridDouble(lat, lon);
+		return getElevation(lat, lon);
+	}
+
+	@Override
+	public String getName() {
+		return "ETOPO"; //$NON-NLS-1$
+	}
+
+	@Override
+	public short getSecDiff() {
+		// number of degrees seconds between two data points
+		return 300;
+	}
 }

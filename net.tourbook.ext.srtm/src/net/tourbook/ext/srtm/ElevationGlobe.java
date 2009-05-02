@@ -43,71 +43,6 @@ public final class ElevationGlobe extends ElevationBase {
 	final static private GlobeI		fGlobei[]		= new GlobeI[16];
 	final static private boolean	initialized[]	= new boolean[16];
 
-	public ElevationGlobe() {
-		for (int i = 0; i < 16; i++)
-			initialized[i] = false;
-		gridLat.setDegreesMinutesSecondsDirection(0, 0, 30, 'N');
-		gridLon.setDegreesMinutesSecondsDirection(0, 0, 30, 'E');
-	}
-
-	public short getElevation(GeoLat lat, GeoLon lon) {
-		int i = 0;
-
-		if (lat.getTertias() != 0)
-			return getElevationGrid(lat, lon);
-		if (lon.getTertias() != 0)
-			return getElevationGrid(lat, lon);
-		if (lat.getSeconds() % 30 != 0)
-			return getElevationGrid(lat, lon);
-		if (lon.getSeconds() % 30 != 0)
-			return getElevationGrid(lat, lon);
-
-		// calculate globe fileindex (a-p ~ 0-15)
-		if (lat.isSouth()) {
-			i += 8;
-			if (lat.getDegrees() >= 50)
-				i += 4;
-		} else if (lat.getDegrees() < 50)
-			i += 4;
-		if (lon.isEast()) {
-			i += 2;
-			if (lon.getDegrees() >= 90)
-				i++;
-		} else if (lon.getDegrees() < 90)
-			i++;
-
-		if (initialized[i] == false) {
-			initialized[i] = true;
-			fGlobei[i] = new GlobeI(i); // first time only !!
-		}
-
-		return fGlobei[i].getElevation(lat, lon);
-	}
-
-	public double getElevationDouble(GeoLat lat, GeoLon lon) {
-
-		if (lat.getDecimal() == 0 && lon.getDecimal() == 0)
-			return 0.;
-		if (lat.getTertias() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lon.getTertias() != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lat.getSeconds() % 30 != 0)
-			return getElevationGridDouble(lat, lon);
-		if (lon.getSeconds() % 30 != 0)
-			return getElevationGridDouble(lat, lon);
-		return (double) getElevation(lat, lon);
-	}
-
-	public short getSecDiff() {
-		// number of degrees seconds between two data points
-		return 30;
-	}
-
-	public String getName() {
-		return "GLOBE"; //$NON-NLS-1$
-	}
-
 	private class GlobeI {
 		private GeoLat	minLat	= new GeoLat();
 		private GeoLon	minLon	= new GeoLon();
@@ -115,16 +50,16 @@ public final class ElevationGlobe extends ElevationBase {
 		GeoLon			offLon	= new GeoLon();
 		ElevationFile	elevationFile;
 
-		private GlobeI(int i) {
+		private GlobeI(final int i) {
 
 			final String globeDataPath = getElevationDataPath("globe"); //$NON-NLS-1$
 			final String globeSuffix = "10g"; //$NON-NLS-1$
-			char c = (char) ('a' + i);
-			String fileName = new String(globeDataPath + File.separator + c + globeSuffix);
+			final char c = (char) ('a' + i);
+			final String fileName = new String(globeDataPath + File.separator + c + globeSuffix);
 
 			try {
 				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_GLOBE);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				System.out.println("GlobeI: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
 				// dont return exception
 			}
@@ -187,6 +122,30 @@ public final class ElevationGlobe extends ElevationBase {
 			}
 		}
 
+		public short getElevation(final GeoLat lat, final GeoLon lon) {
+
+			final short elev = elevationFile.get(offset(lat, lon));
+			return swap(elev);
+		}
+
+		//    Offset in the Globe-File
+		public int offset(final GeoLat lat, final GeoLon lon) {
+
+			offLat.sub(minLat, lat);
+			offLon.sub(minLon, lon);
+			return offLat.degrees * 1296000 // 360*60*60
+					+ offLat.minutes
+					* 21600 // 360*60
+					+ offLat.seconds
+					* 360
+					+ offLon.degrees
+					* 120
+					+ offLon.minutes
+					* 2
+					+ offLon.seconds
+					/ 30;
+		}
+
 		/**
 		 * Byte swap a single short value.
 		 * 
@@ -194,38 +153,84 @@ public final class ElevationGlobe extends ElevationBase {
 		 *            Value to byte swap.
 		 * @return Byte swapped representation.
 		 */
-		private short swap(short value) {
-			int lat1 = value & 0xff;
-			int lat2 = (value >> 8) & 0xff;
+		private short swap(final short value) {
+			final int lat1 = value & 0xff;
+			final int lat2 = (value >> 8) & 0xff;
 
 			return (short) (lat1 << 8 | lat2 << 0);
 		}
 
-		public short getElevation(GeoLat lat, GeoLon lon) {
-
-			short elev = elevationFile.get(offset(lat, lon));
-			return swap(elev);
-		}
-
-		//    Offset in the Globe-File
-		public int offset(GeoLat lat, GeoLon lon) {
-
-			offLat.sub(minLat, lat);
-			offLon.sub(minLon, lon);
-			return offLat.getDegrees() * 1296000 // 360*60*60
-					+ offLat.getMinutes()
-					* 21600 // 360*60
-					+ offLat.getSeconds()
-					* 360
-					+ offLon.getDegrees()
-					* 120
-					+ offLon.getMinutes()
-					* 2
-					+ offLon.getSeconds()
-					/ 30;
-		}
-
 	}
 
-	public static void main(String[] args) {}
+	public static void main(final String[] args) {}
+
+	public ElevationGlobe() {
+		for (int i = 0; i < 16; i++)
+			initialized[i] = false;
+		gridLat.setDegreesMinutesSecondsDirection(0, 0, 30, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 0, 30, 'E');
+	}
+
+	@Override
+	public short getElevation(final GeoLat lat, final GeoLon lon) {
+		int i = 0;
+
+		if (lat.tertias != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.tertias != 0)
+			return getElevationGrid(lat, lon);
+		if (lat.seconds % 30 != 0)
+			return getElevationGrid(lat, lon);
+		if (lon.seconds % 30 != 0)
+			return getElevationGrid(lat, lon);
+
+		// calculate globe fileindex (a-p ~ 0-15)
+		if (lat.direction == GeoLat.DIRECTION_SOUTH) {
+			i += 8;
+			if (lat.degrees >= 50)
+				i += 4;
+		} else if (lat.degrees < 50)
+			i += 4;
+		if (lon.direction == GeoLon.DIRECTION_EAST) {
+			i += 2;
+			if (lon.degrees >= 90)
+				i++;
+		} else if (lon.degrees < 90)
+			i++;
+
+		if (initialized[i] == false) {
+			initialized[i] = true;
+			fGlobei[i] = new GlobeI(i); // first time only !!
+		}
+
+		return fGlobei[i].getElevation(lat, lon);
+	}
+
+	@Override
+	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
+
+		if (lat.decimal == 0 && lon.decimal == 0)
+			return 0.;
+		if (lat.tertias != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.tertias != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lat.seconds % 30 != 0)
+			return getElevationGridDouble(lat, lon);
+		if (lon.seconds % 30 != 0)
+			return getElevationGridDouble(lat, lon);
+		
+		return getElevation(lat, lon);
+	}
+
+	@Override
+	public String getName() {
+		return "GLOBE"; //$NON-NLS-1$
+	}
+
+	@Override
+	public short getSecDiff() {
+		// number of degrees seconds between two data points
+		return 30;
+	}
 }

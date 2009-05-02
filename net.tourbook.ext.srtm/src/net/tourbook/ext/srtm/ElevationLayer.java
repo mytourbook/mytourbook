@@ -21,6 +21,7 @@ package net.tourbook.ext.srtm;
 public class ElevationLayer {
 
 	static private ElevationBase[]	fLayer	= new ElevationBase[4];
+	
 	static private ElevationEtopo	fEtopo	= new ElevationEtopo();
 	static private ElevationGlobe	fGlobe	= new ElevationGlobe();
 	static private ElevationSRTM3	fSrtm3	= new ElevationSRTM3();
@@ -36,48 +37,26 @@ public class ElevationLayer {
 		fLayer[1] = fGlobe;
 		fLayer[2] = fSrtm3;
 		fLayer[3] = fSrtm1;
+		
 		zoom = 0;
 	}
 
-	private void setFileTypIndexStart() {
-		fileTypIndexStart = getElevationType();
-	}
-
-	public short getElevation(GeoLat lat, GeoLon lon) {
+	public short getElevation(final GeoLat lat, final GeoLon lon) {
 		return getElevationPrivate(lat, lon, fileTypIndexStart);
 	}
 
-	private short getElevationPrivate(GeoLat lat, GeoLon lon, int layerIndexStart) {
-
-		layerIndex = layerIndexStart;
-		while (layerIndex >= 0) {
-			try {
-				short hoehe = fLayer[layerIndex].getElevation(lat, lon);
-
-				if (fLayer[layerIndex].isValid(hoehe))
-					return hoehe;
-				else
-					layerIndex--;
-			} catch (Exception e) {
-				layerIndex--;
-			}
-		}
-		layerIndex = 0;
-		return -500;
-	}
-
-	public double getElevationDouble(GeoLat lat, GeoLon lon) {
+	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
 
 		layerIndex = Constants.ELEVATION_TYPE_SRTM1;
 		while (layerIndex >= 0) {
 			try {
-				double hoehe = fLayer[layerIndex].getElevationDouble(lat, lon);
+				final double hoehe = fLayer[layerIndex].getElevationDouble(lat, lon);
 
 				if (fLayer[layerIndex].isValid(hoehe))
 					return hoehe;
 				else
 					layerIndex--;
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				layerIndex--;
 			}
 		}
@@ -85,14 +64,24 @@ public class ElevationLayer {
 		return -500;
 	}
 
-	public short getSekDiff() {
-		// Anzahl Degreesseconds zwischen zwei Datenpunkten
-		return fLayer[getElevationType()].getSecDiff();
-	}
+	private short getElevationPrivate(final GeoLat lat, final GeoLon lon, final int layerIndexStart) {
 
-	public String getName() {
-		// ETOPO, GLOBE, SRTM3, SRTM1
-		return fLayer[getElevationType()].getName();
+		layerIndex = layerIndexStart;
+		while (layerIndex >= 0) {
+			try {
+				final short hoehe = fLayer[layerIndex].getElevation(lat, lon);
+
+				if (fLayer[layerIndex].isValid(hoehe)) {
+					return hoehe;
+				} else {
+					layerIndex--;
+				}
+			} catch (final Exception e) {
+				layerIndex--;
+			}
+		}
+		layerIndex = 0;
+		return -500;
 	}
 
 	private int getElevationType() {
@@ -105,7 +94,21 @@ public class ElevationLayer {
 		// return Constants.ELEVATION_TYPE_SRTM1;
 	}
 
-	public void setZoom(int z) {
+	public String getName() {
+		// ETOPO, GLOBE, SRTM3, SRTM1
+		return fLayer[getElevationType()].getName();
+	}
+
+	public short getSekDiff() {
+		// Anzahl Degreesseconds zwischen zwei Datenpunkten
+		return fLayer[getElevationType()].getSecDiff();
+	}
+
+	private void setFileTypIndexStart() {
+		fileTypIndexStart = getElevationType();
+	}
+
+	public void setZoom(final int z) {
 		zoom = z;
 		setFileTypIndexStart();
 	}

@@ -20,69 +20,72 @@ package net.tourbook.ext.srtm;
 
 public class GeoLat extends GeoCoord {
 
-   public char directionPlus() {return 'N';}
-   public char directionMinus() {return 'S';}
+	static final char	DIRECTION_NORTH	= 'N';
+	static final char	DIRECTION_SOUTH	= 'S';
 
-   public GeoLat() {
-      super();
-   }
+	public static void main(final String[] args) {
 
-   public GeoLat(GeoLat lat) {
-      super();
-      set(lat);
-   }
+	}
 
-   public GeoLat(String s) {
-      super();
-      set(s);
-   }
+	public GeoLat() {
+		super();
+	}
 
-   public GeoLat(double d) {
-      super();
-      set(d);
-   }
+	public GeoLat(final double d) {
+		super();
+		set(d);
+	}
 
-   public boolean isNorth() {
-      return (direction == directionPlus());
-   }
+	public GeoLat(final GeoLat lat) {
+		super();
+		set(lat);
+	}
 
-   public boolean isSouth() {
-      return (!this.isNorth());
-   }
+	public GeoLat(final String s) {
+		super();
+		set(s);
+	}
 
-   public void add(GeoLat lat) {
+	public void add(final GeoLat lat) {
 
-      decimal += lat.getDecimal();
-       if (decimal > 90 *faktg) decimal = 180*faktg - decimal;
+		decimal += lat.decimal;
+		if (decimal > 90 * faktg)
+			decimal = 180 * faktg - decimal;
 
-      updateDegrees();
-   }
+		updateDegrees();
+	}
 
-   public void add(GeoLat lat, GeoLat a) {
-      decimal = lat.getDecimal();
-      this.add(a);
-   }
-   
-   public void sub(GeoLat lat) {
+	public void add(final GeoLat lat, final GeoLat a) {
+		decimal = lat.decimal;
+		this.add(a);
+	}
 
-      decimal -= lat.getDecimal();
-      if (decimal < -90 *faktg) decimal = -180*faktg - decimal;
+	@Override
+	public char directionMinus() {
+		return 'S';
+	}
 
-      updateDegrees();
-   }
+	@Override
+	public char directionPlus() {
+		return 'N';
+	}
 
-   public void sub(GeoLat lat, GeoLat s) {
-      decimal = lat.getDecimal();
-      this.sub(s);
-   }
+	public void set(final GeoLat lat) {
+		super.set(lat);
+	}
 
-   public void set(GeoLat lat) {
-      super.set((GeoCoord)lat);
-   }
+	public void sub(final GeoLat lat) {
 
-   public static void main(String[] args) {
+		decimal -= lat.decimal;
+		if (decimal < -90 * faktg)
+			decimal = -180 * faktg - decimal;
 
-   }
-   
+		updateDegrees();
+	}
+
+	public void sub(final GeoLat lat, final GeoLat s) {
+		decimal = lat.decimal;
+		this.sub(s);
+	}
 
 }
