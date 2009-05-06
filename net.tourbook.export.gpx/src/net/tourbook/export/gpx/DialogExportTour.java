@@ -99,7 +99,7 @@ import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String						UI_AVERAGE_SYMBOL			= "Ø ";
+	private static final String						UI_AVERAGE_SYMBOL			= "Ø "; //$NON-NLS-1$
 
 	private static final int						VERTICAL_SECTION_MARGIN		= 10;
 
