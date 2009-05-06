@@ -561,6 +561,7 @@ public class GeoCoord {
 
 	public void updateDegrees() {
 
+		// optimized: dec = Math.abs(decimal);
 		int dec = ((decimal < 0) ? -decimal : decimal);
 		degrees = dec / faktg;
 		
@@ -574,7 +575,7 @@ public class GeoCoord {
 		tertias = dec;
 		
 		direction = decimal < 0 ? directionMinus() : directionPlus();
-
+ 
 		doubleValue = decimal;
 		doubleValue /= faktg;
 	}

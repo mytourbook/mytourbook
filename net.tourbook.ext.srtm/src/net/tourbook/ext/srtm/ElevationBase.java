@@ -19,7 +19,7 @@
 package net.tourbook.ext.srtm;
 
 import java.io.File;
-
+ 
 public abstract class ElevationBase {
 
 	final public GeoLat	gridLat;
@@ -129,13 +129,16 @@ public abstract class ElevationBase {
 			ok++;
 		if (isValidElev4)
 			ok++;
+		
 		if (ok != 4) {
 
 			if (ok == 0) {
 				elevMid = (elev1 + elev2 + elev3 + elev4) / 4;
 				return Short.MIN_VALUE;
 			}
+			
 			elevMid = 0;
+			
 			if (isValidElev1)
 				elevMid += elev1;
 			if (isValidElev2)
@@ -144,7 +147,9 @@ public abstract class ElevationBase {
 				elevMid += elev3;
 			if (isValidElev4)
 				elevMid += elev4;
+			
 			elevMid /= ok;
+			
 			if (!isValidElev1)
 				elev1 = (short) elevMid;
 			if (!isValidElev2)

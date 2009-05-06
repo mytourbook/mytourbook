@@ -168,7 +168,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 
 		/*
-		 * Tour data editor
+		 * tour data editor
 		 */
 		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 3);
 
@@ -176,7 +176,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * general appearance
 		 */
 		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
-
+		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, true);
+	 	
 		/*
 		 * merge tour dialog
 		 */

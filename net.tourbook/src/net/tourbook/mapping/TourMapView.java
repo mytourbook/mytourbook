@@ -85,6 +85,10 @@ import org.eclipse.ui.part.ViewPart;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IZoomListener;
+import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
@@ -101,7 +105,7 @@ public class TourMapView extends ViewPart {
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
 
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
-
+ 
 	public static final int							TOUR_COLOR_DEFAULT					= 0;
 	public static final int							TOUR_COLOR_ALTITUDE					= 10;
 	public static final int							TOUR_COLOR_GRADIENT					= 20;
@@ -212,6 +216,8 @@ public class TourMapView extends ViewPart {
 	private RGB										fMapDimColor;
 
 	private int										fSelectedProfileKey					= 0;
+
+	private MapInfoManager							fMapInfoManager						= MapInfoManager.getInstance();
 
 	public TourMapView() {}
 
@@ -328,6 +334,10 @@ public class TourMapView extends ViewPart {
 
 	void actionShowSlider() {
 
+		if (fTourDataList == null) {
+			return;
+		}
+
 		// repaint map
 		fDirectMappingPainter.setPaintContext(fMap,
 				fActionShowTourInMap.isChecked(),
@@ -413,10 +423,11 @@ public class TourMapView extends ViewPart {
 		paintEntireTour();
 	}
 
-	/**
-	 * observe map preferences
-	 */
-	private void addMapPrefListener() {
+	private void addMapListener() {
+
+		/*
+		 * observe map preferences
+		 */
 		fMapPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
@@ -434,14 +445,21 @@ public class TourMapView extends ViewPart {
 						fMap.queueRedrawMap();
 					}
 				}
-//				else if (property.equals(IPreferences.SRTM_COLORS_UPDATE_MAP)) {
-//
-//					fMap.disposeCachedImages();
-//					fMap.queueRedrawMap();
-//				}
 			}
 		};
 		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(fMapPrefChangeListener);
+
+		fMap.addZoomListener(new IZoomListener() {
+			public void zoomChanged(final ZoomEvent event) {
+				fMapInfoManager.setZoom(event.getZoom());
+			}
+		});
+
+		fMap.addMapListener(new IMapListener() {
+			public void mapInfo(final MapEvent event) {
+				fMapInfoManager.setMapCenter(event.mapCenter);
+			}
+		});
 	}
 
 	private void addPartListener() {
@@ -454,6 +472,7 @@ public class TourMapView extends ViewPart {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMapView.this) {
 					saveState();
+					fMapInfoManager.resetInfo();
 				}
 			}
 
@@ -867,7 +886,7 @@ public class TourMapView extends ViewPart {
 		addSelectionListener();
 		addTourEventListener();
 		addTourbookPrefListener();
-		addMapPrefListener();
+		addMapListener();
 
 		restoreState();
 
@@ -994,6 +1013,15 @@ public class TourMapView extends ViewPart {
 		return fMapDimLevel;
 	}
 
+	public List<MapProvider> getMapProviders() {
+		return fMapProvider;
+	}
+
+//	@Override
+//	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
+//		super.init(site, memento);
+//	}
+
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
 		final TileFactory tileFactory = fMap.getTileFactory();
@@ -1006,15 +1034,6 @@ public class TourMapView extends ViewPart {
 		}
 
 		return rect;
-	}
-
-//	@Override
-//	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-//		super.init(site, memento);
-//	}
-
-	public List<MapProvider> getMapProviders() {
-		return fMapProvider;
 	}
 
 	/**
@@ -1726,7 +1745,7 @@ public class TourMapView extends ViewPart {
 
 		// set dim level/color after the map providers are set
 		if (fMapDimLevel == -1) {
-			fMapDimLevel = 0xd0;
+			fMapDimLevel = 0xff;
 		}
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 		fMap.setDimLevel(fMapDimLevel, dimColor);

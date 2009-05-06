@@ -173,12 +173,13 @@ public interface ITourbookPreferences {
 	 * common appearance
 	 */
 	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";						//$NON-NLS-1$
-
+	public static final String	APPEARANCE_SHOW_MEMORY_MONITOR				= "appearance.show-memory-monitor";						//$NON-NLS-1$
+	
 	/*
 	 * merge tour dialog
 	 */
 	public static final String	MERGE_TOUR_GRAPH_X_AXIS						= "merge.tour.chart-x-axis";								//$NON-NLS-1$
-
+ 
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
 

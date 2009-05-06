@@ -199,8 +199,8 @@ public final class ElevationGlobe extends ElevationBase {
 			i++;
 
 		if (initialized[i] == false) {
-			initialized[i] = true;
 			fGlobei[i] = new GlobeI(i); // first time only !!
+			initialized[i] = true;
 		}
 
 		return fGlobei[i].getElevation(lat, lon);
@@ -227,7 +227,7 @@ public final class ElevationGlobe extends ElevationBase {
 	public String getName() {
 		return "GLOBE"; //$NON-NLS-1$
 	}
-
+ 
 	@Override
 	public short getSecDiff() {
 		// number of degrees seconds between two data points

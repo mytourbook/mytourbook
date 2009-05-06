@@ -119,6 +119,11 @@ public class Messages extends NLS {
 	public static String		modify_mapprovider_dialog_area_title;
 	public static String		modify_mapprovider_dialog_title;
 	public static String		modify_mapprovider_lbl_toggle_info;
+ 
+	public static String	statusLine_mapInfo_data;
+	public static String	statusLine_mapInfo_defaultText;
+	public static String	statusLine_mapInfo_pattern;
+	public static String	statusLine_mapInfo_tooltip;
 
 	static {
 		// initialize resource bundle

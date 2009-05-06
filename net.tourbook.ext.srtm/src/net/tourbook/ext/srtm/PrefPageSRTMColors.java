@@ -199,16 +199,17 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
-			createXmlVertex(profile, 0, 14, 76, 255);
-			createXmlVertex(profile, 100, 198, 235, 197);
-			createXmlVertex(profile, 200, 0, 102, 0);
-			createXmlVertex(profile, 350, 255, 204, 153);
-			createXmlVertex(profile, 500, 204, 153, 0);
-			createXmlVertex(profile, 750, 153, 51, 0);
-			createXmlVertex(profile, 1000, 102, 51, 0);
-			createXmlVertex(profile, 1500, 92, 67, 64);
-			createXmlVertex(profile, 2000, 204, 255, 255);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
+			createXmlVertex(profile, 0, 0, 156, 0);
+			createXmlVertex(profile, 200, 204, 204, 153);
+			createXmlVertex(profile, 400, 204, 153, 0);
+			createXmlVertex(profile, 600, 126, 91, 0);
+			createXmlVertex(profile, 1000, 127, 127, 128);
+			createXmlVertex(profile, 2000, 223, 223, 240);
+			createXmlVertex(profile, 8000, 255, 255, 255);
 
+			
 			profile = createXmlProfile(xmlRoot, //
 					++profileId,
 					"Default 2", //$NON-NLS-1$ 
@@ -216,7 +217,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
-			createXmlVertex(profile, 0, 14, 76, 255);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
 			createXmlVertex(profile, 100, 179, 244, 129);
 			createXmlVertex(profile, 200, 144, 239, 129);
 			createXmlVertex(profile, 300, 104, 225, 172);
@@ -227,7 +229,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 800, 255, 0, 51);
 			createXmlVertex(profile, 900, 255, 204, 204);
 			createXmlVertex(profile, 1000, 204, 255, 255);
-
+ 
 			profile = createXmlProfile(xmlRoot, //
 					++profileId,
 					"Default 3", //$NON-NLS-1$ 
@@ -235,6 +237,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
 			createXmlVertex(profile, 0, 14, 76, 255);
 			createXmlVertex(profile, 500, 166, 219, 156);
 			createXmlVertex(profile, 1000, 51, 153, 0);
@@ -250,6 +254,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 1000, 178, 81, 0);
 			createXmlVertex(profile, 2000, 100, 0, 59);
@@ -262,6 +268,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
 			createXmlVertex(profile, 0, 0, 0, 255);
 			createXmlVertex(profile, 1000, 127, 0, 215);
 			createXmlVertex(profile, 2000, 255, 0, 0);
@@ -279,6 +287,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					SRTMProfile.DEFAULT_IS_SHADOW,
 					SRTMProfile.DEFAULT_SHADOW_VALUE,
 					SRTMProfile.DEFAULT_SRTM_RESOLUTION);
+			createXmlVertex(profile, -9000, 2, 10, 31);
+			createXmlVertex(profile, -1, 14, 76, 255);
 			createXmlVertex(profile, 0, 255, 255, 255);
 			createXmlVertex(profile, 100, 92, 43, 0);
 			createXmlVertex(profile, 150, 166, 77, 0);
@@ -1246,7 +1256,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				if (dialog.open() == Window.OK) {
 					saveProfileModified(originalProfile, dialogProfile);
 				}
-				
+
 				// image orientation has changed
 				disposeProfileImages();
 
@@ -1406,9 +1416,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		saveState();
 	}
 
-	void saveProfile(	final SRTMProfile originalProfile,
-						final SRTMProfile dialogProfile,
-						final boolean isNewProfile) {
+	void saveProfile(final SRTMProfile originalProfile, final SRTMProfile dialogProfile, final boolean isNewProfile) {
 
 		if (isNewProfile) {
 			saveProfileNew(dialogProfile);
@@ -1537,9 +1545,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 */
 	private void saveSelectedProfile() {
 		if (fSelectedProfile != null) {
-			
+
 			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID, fSelectedProfile.getProfileId());
-			
+
 			// this will fire a profile change event
 			fPrefStore.setValue(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY, getProfileKeyHashCode());
 		}

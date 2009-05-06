@@ -20,16 +20,15 @@ package net.tourbook.ext.srtm;
 
 public class ElevationLayer {
 
-	static private ElevationBase[]	fLayer	= new ElevationBase[4];
-	
-	static private ElevationEtopo	fEtopo	= new ElevationEtopo();
-	static private ElevationGlobe	fGlobe	= new ElevationGlobe();
-	static private ElevationSRTM3	fSrtm3	= new ElevationSRTM3();
-	static private ElevationSRTM1	fSrtm1	= new ElevationSRTM1();
+	private static ElevationBase[]	fLayer	= new ElevationBase[4];
 
-	static int						zoom;
-	static int						layerIndex;
-	static int						fileTypIndexStart;
+	private static ElevationEtopo	fEtopo	= new ElevationEtopo();
+	private static ElevationGlobe	fGlobe	= new ElevationGlobe();
+	private static ElevationSRTM3	fSrtm3	= new ElevationSRTM3();
+	private static ElevationSRTM1	fSrtm1	= new ElevationSRTM1();
+
+	private static int				zoom;
+	private static int				fileTypIndexStart;
 
 	public ElevationLayer() {
 
@@ -37,36 +36,14 @@ public class ElevationLayer {
 		fLayer[1] = fGlobe;
 		fLayer[2] = fSrtm3;
 		fLayer[3] = fSrtm1;
-		
+
 		zoom = 0;
 	}
 
 	public short getElevation(final GeoLat lat, final GeoLon lon) {
-		return getElevationPrivate(lat, lon, fileTypIndexStart);
-	}
 
-	public double getElevationDouble(final GeoLat lat, final GeoLon lon) {
+		int layerIndex = fileTypIndexStart;
 
-		layerIndex = Constants.ELEVATION_TYPE_SRTM1;
-		while (layerIndex >= 0) {
-			try {
-				final double hoehe = fLayer[layerIndex].getElevationDouble(lat, lon);
-
-				if (fLayer[layerIndex].isValid(hoehe))
-					return hoehe;
-				else
-					layerIndex--;
-			} catch (final Exception e) {
-				layerIndex--;
-			}
-		}
-		layerIndex = 0;
-		return -500;
-	}
-
-	private short getElevationPrivate(final GeoLat lat, final GeoLon lon, final int layerIndexStart) {
-
-		layerIndex = layerIndexStart;
 		while (layerIndex >= 0) {
 			try {
 				final short hoehe = fLayer[layerIndex].getElevation(lat, lon);
@@ -80,18 +57,27 @@ public class ElevationLayer {
 				layerIndex--;
 			}
 		}
+ 
 		layerIndex = 0;
+
 		return -500;
 	}
 
 	private int getElevationType() {
-		if (zoom <= 4)
+
+		if (zoom <= 4) {
 			return Constants.ELEVATION_TYPE_ETOPO;
-		if (zoom <= 8)
+		}
+
+		if (zoom <= 8) {
 			return Constants.ELEVATION_TYPE_GLOBE;
-		// if (zoom <= 14)
+		}
+
+//		if (zoom <= 14) {
 			return Constants.ELEVATION_TYPE_SRTM3;
-		// return Constants.ELEVATION_TYPE_SRTM1;
+//		}
+//
+//		return Constants.ELEVATION_TYPE_SRTM1;
 	}
 
 	public String getName() {

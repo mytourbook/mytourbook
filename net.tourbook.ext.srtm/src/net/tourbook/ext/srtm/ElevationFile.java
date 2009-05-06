@@ -59,12 +59,19 @@ public class ElevationFile {
 	}
 
 	private void handleError(final String fileName, final Exception e) {
+		
 		System.out.println("handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-		// e.printStackTrace();
+		
+		if (e instanceof FileNotFoundException) {
+			// done
+		} else {
+			e.printStackTrace();
+		}
+
 		exists = false;
 		// dont return exception      
 	}
-
+ 
 	private void initETOPO(final String fileName) throws Exception {
 
 		try {

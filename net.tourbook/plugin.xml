@@ -635,6 +635,7 @@
             </command>
          </toolbar>
       </menuContribution>
+      
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
@@ -676,9 +677,18 @@
       <menuContribution
             locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
       </menuContribution>
-      
+ 
+      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar id="net.tourbook.mapping.statusline.mapinfo">
+            <control
+                  class="net.tourbook.mapping.MapInfoContribution"
+                  id="net.tourbook.mapping.mapinfo">
+            </control>
+         </toolbar>
+      </menuContribution>
  
    </extension>
+ 
    <extension
          point="org.eclipse.ui.commands">
       <command

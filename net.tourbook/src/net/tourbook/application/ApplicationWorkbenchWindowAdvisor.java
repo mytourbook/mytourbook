@@ -22,10 +22,12 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
-
+ 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -305,17 +307,21 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurer.setInitialSize(new Point(900, 700));
 //		configurer.setShowCoolBar(true);
-//		configurer.setShowStatusLine(true);
 //		configurer.setShowProgressIndicator(true);
+		configurer.setShowStatusLine(false);
 		configurer.setShowPerspectiveBar(true);
 
 		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
 
-		final IPreferenceStore preferenceStore = PlatformUI.getPreferenceStore();
+		final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 
-		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, true);
-		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
-		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
+		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
+		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
+
+		// show memory monitor
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final boolean isMemoryMonitorVisible = prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
+		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
 
 		hookTitleUpdateListeners(configurer);
 	}
