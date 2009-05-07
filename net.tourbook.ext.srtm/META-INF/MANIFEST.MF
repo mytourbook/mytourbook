@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %bundle_name
 Bundle-SymbolicName: net.tourbook.ext.srtm;singleton:=true
-Bundle-Version: 9.04.0.v2009-04-xx
+Bundle-Version: 9.05.0.v2009-05-09
 Bundle-Activator: net.tourbook.ext.srtm.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
@@ -19,3 +19,4 @@ Export-Package: com.enterprisedt,
 Bundle-ClassPath: .,
  edtftpj.jar
 Bundle-Localization: plugin
+Bundle-Vendor: MyTourbook

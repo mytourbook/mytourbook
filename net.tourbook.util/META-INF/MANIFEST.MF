@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Utility Plug-in
 Bundle-SymbolicName: net.tourbook.util;singleton:=true
-Bundle-Version: 9.4.0
+Bundle-Version: 9.05.0.v2009-05-09
 Bundle-Activator: net.tourbook.util.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,

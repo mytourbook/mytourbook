@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import .TUR files
 Bundle-SymbolicName: net.tourbook.device.tur;singleton:=true
-Bundle-Version: 9.01.0.v2009-01-07
+Bundle-Version: 9.05.0.v2009-05-09
 Bundle-Activator: net.tourbook.device.tur.Activator
 Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.4"?>
 
-<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" version="9.01.0.v2009-01-07" useFeatures="true">
+<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" version="9.05.0.v2009-05-09" useFeatures="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
@@ -16,7 +16,7 @@
       <solaris>/net.tourbook/install-settings/config-linux.ini</solaris>
       <win32>/net.tourbook/install-settings/config-win.ini</win32>
    </configIni>
- 
+
    <launcherArgs>
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
 #-consolelog 
@@ -77,15 +77,16 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEk-jWnd5IY8K5tjxB"/>
+      <feature id="org.eclipse.rcp" version="3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"/>
+      <feature id="feature.net.tourbook.ext.eclipse" version="9.05.0.v2009-05-09"/>
+      <feature id="feature.net.tourbook.ext.eclipse.nl_de" version="9.05.0.v2009-05-09"/>
+      <feature id="feature.net.tourbook.ext.eclipse.nl_fr" version="9.05.0.v2009-05-09"/>
       <feature id="feature.net.tourbook.ext.derby" version="10.3.2.1"/>
       <feature id="feature.net.tourbook.ext.ejb3" version="3.3.0"/>
       <feature id="feature.net.tourbook.ext.rxtx" version="2.1.8.v20071231-arduino"/>
       <feature id="feature.net.tourbook.ext.jars" version="9.01.0.v2009-01-07"/>
-      <feature id="feature.net.tourbook.ext.eclipse" version="9.01.0.v2009-01-07"/>
-      <feature id="feature.net.tourbook.ext.eclipse.nl_de" version="9.01.0.v2009-01-07"/>
-      <feature id="feature.net.tourbook" version="9.01.0.v2009-01-07"/>
-      <feature id="feature.net.tourbook.geoclipse" version="0.1.4.v2009-01-07"/>
+      <feature id="feature.net.tourbook" version="9.05.0.v2009-05-09"/>
+      <feature id="feature.net.tourbook.geoclipse" version="9.05.0.v2009-05-09"/>
    </features>
 
 </product>
