@@ -29,6 +29,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -158,6 +159,11 @@ public class TourPainter extends MapPainter {
 		int legendValue = 0;
 
 		int unitLabelIndex = 0;
+//		final Font dialogFont = JFaceResources.getFontRegistry().get(JFaceResources.DEFAULT_FONT);
+//		gc.setFont(dialogFont);
+//		gc.setTextAntialias(SWT.ON);
+
+		final Color textBorderColor = new Color(Display.getCurrent(), 0xF1, 0xEE, 0xE8);
 
 		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
 
@@ -204,18 +210,27 @@ public class TourPainter extends MapPainter {
 								valuePosition);
 
 						// draw unit value and text
-						if (unitLabels == null) {
-//					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-							gc.fillRectangle(legendWidth + 5,
-									valuePosition - valueTextExtent.y / 2,
-									valueTextExtent.x,
-									valueTextExtent.y);
-						}
+//						if (unitLabels == null) {
+//							gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//							gc.fillRectangle(legendWidth + 5,
+//									valuePosition - valueTextExtent.y / 2,
+//									valueTextExtent.x,
+//									valueTextExtent.y);
+//						}
 
-						gc.drawText(valueText, //
-								legendWidth + 5, //
-								valuePosition - valueTextExtent.y / 2, //
-								true);
+						final int devXText = legendWidth + 5;
+						final int devYText = valuePosition - valueTextExtent.y / 2;
+
+						gc.setForeground(textBorderColor);
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+						gc.drawText(valueText, devXText - 1, devYText, true);
+						gc.drawText(valueText, devXText + 1, devYText, true);
+						gc.drawText(valueText, devXText, devYText - 1, true);
+						gc.drawText(valueText, devXText, devYText + 1, true);
+
+						gc.setForeground(legendTextColor);
+						gc.drawText(valueText, devXText, devYText, true);
+
 
 						// prevent to draw this unit again
 						legendUnits.remove(unitValue);
@@ -252,6 +267,8 @@ public class TourPainter extends MapPainter {
 				lineColor.dispose();
 			}
 		}
+
+		textBorderColor.dispose();
 	}
 
 	public static TourPainter getInstance() {

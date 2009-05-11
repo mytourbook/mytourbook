@@ -521,6 +521,12 @@ public class TourMapView extends ViewPart {
 
 					actionDimMap(PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR));
 
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					UI.updateUnits();
+					fMap.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+					fMap.queueRedrawMap();
+
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					// update tour and legend
@@ -835,6 +841,7 @@ public class TourMapView extends ViewPart {
 		fMapLegend = new MapLegend();
 		fMap.setLegend(fMapLegend);
 		fMap.setShowLegend(true);
+		fMap.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
 		fMap.addControlListener(new ControlAdapter() {
 			@Override
