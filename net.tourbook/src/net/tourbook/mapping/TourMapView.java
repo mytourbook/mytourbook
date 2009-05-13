@@ -118,6 +118,7 @@ public class TourMapView extends ViewPart {
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
@@ -138,6 +139,7 @@ public class TourMapView extends ViewPart {
 
 	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	public static final int							LEGEND_UNIT_DISTANCE				= 60;
+
 
 	private Map										fMap;
 
@@ -161,6 +163,7 @@ public class TourMapView extends ViewPart {
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
 	private ActionShowTourInMap						fActionShowTourInMap;
 	private ActionShowLegendInMap					fActionShowLegendInMap;
+	private ActionShowScaleInMap					fActionShowScaleInMap;
 	private ActionShowSliderInMap					fActionShowSliderInMap;
 	private ActionShowSliderInLegend				fActionShowSliderInLegend;
 	private ActionShowStartEndInMap					fActionShowStartEndInMap;
@@ -295,6 +298,14 @@ public class TourMapView extends ViewPart {
 		// update legend
 		actionShowSlider();
 
+		fMap.queueRedrawMap();
+	}
+
+	void actionSetShowScaleInMap() {
+
+		final boolean isScaleVisible = fActionShowScaleInMap.isChecked();
+
+		fMap.setShowScale(isScaleVisible);
 		fMap.queueRedrawMap();
 	}
 
@@ -709,6 +720,7 @@ public class TourMapView extends ViewPart {
 		fActionShowSliderInMap = new ActionShowSliderInMap(this);
 		fActionShowSliderInLegend = new ActionShowSliderInLegend(this);
 		fActionShowLegendInMap = new ActionShowLegendInMap(this);
+		fActionShowScaleInMap = new ActionShowScaleInMap(this);
 		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		fActionShowTourMarker = new ActionShowTourMarker(this);
 		fActionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
@@ -746,6 +758,7 @@ public class TourMapView extends ViewPart {
 		menuMgr.add(fActionShowStartEndInMap);
 		menuMgr.add(fActionShowTourMarker);
 		menuMgr.add(fActionShowLegendInMap);
+		menuMgr.add(fActionShowScaleInMap);
 		menuMgr.add(fActionShowSliderInMap);
 		menuMgr.add(fActionShowSliderInLegend);
 		menuMgr.add(fActionDimMap);
@@ -1020,14 +1033,14 @@ public class TourMapView extends ViewPart {
 		return fMapDimLevel;
 	}
 
-	public List<MapProvider> getMapProviders() {
-		return fMapProvider;
-	}
-
 //	@Override
 //	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 //		super.init(site, memento);
 //	}
+
+	public List<MapProvider> getMapProviders() {
+		return fMapProvider;
+	}
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
@@ -1669,15 +1682,17 @@ public class TourMapView extends ViewPart {
 			fActionShowLegendInMap.setChecked(isShowLegend);
 		} catch (final NumberFormatException e) {}
 
-		// action: show slider in map
-		try {
-			fActionShowSliderInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
-		} catch (final NumberFormatException e) {}
+		// action: show scale
+		boolean isScaleVisible = true;
+		if (settings.get(MEMENTO_SHOW_SCALE_IN_MAP) != null) {
+			isScaleVisible = settings.getBoolean(MEMENTO_SHOW_SCALE_IN_MAP);
+		}
+		fActionShowScaleInMap.setChecked(isScaleVisible);
+		fMap.setShowScale(isScaleVisible);
 
-		// action: show slider in legend
-		try {
-			fActionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
-		} catch (final NumberFormatException e) {}
+		// actions
+		fActionShowSliderInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+		fActionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
 		// restore map factory by selecting the last used map factory
 		fActionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_CURRENT_FACTORY_ID));
@@ -1778,6 +1793,7 @@ public class TourMapView extends ViewPart {
 		settings.put(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked());
 		settings.put(MEMENTO_SHOW_TOUR_MARKER, fActionShowTourMarker.isChecked());
 		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, fActionShowLegendInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, fActionShowScaleInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked());
 

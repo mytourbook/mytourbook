@@ -83,6 +83,8 @@ public class Messages extends NLS {
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 	public static String		map_action_show_legend_in_map;
+	public static String	map_action_show_scale_in_map;
+
 	public static String		map_action_show_slider_in_legend;
 	public static String		map_action_show_slider_in_map;
 	public static String		map_action_show_start_finish_in_map;
