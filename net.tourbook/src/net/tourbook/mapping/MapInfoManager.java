@@ -29,7 +29,7 @@ public class MapInfoManager {
 	private GeoPosition				fMapPropertyCenter;
 
 	private NumberFormat			fNf					= NumberFormat.getNumberInstance();
- 
+
 	private MapInfoControl			fInfoWidget;
 	{
 		fNf.setMinimumFractionDigits(6);
@@ -79,8 +79,12 @@ public class MapInfoManager {
 		}
 
 		double lon = fMapPropertyCenter.getLongitude() % 360;
-		lon = lon > 180 ? lon - 360 : lon;
-		
+		lon = lon > 180 ? //
+				lon - 360
+				: lon < -180 ? //
+						lon + 360
+						: lon;
+
 		fInfoWidget.setText(NLS.bind(Messages.statusLine_mapInfo_data, new Object[] {
 				fNf.format(fMapPropertyCenter.getLatitude()),
 				fNf.format(lon),
