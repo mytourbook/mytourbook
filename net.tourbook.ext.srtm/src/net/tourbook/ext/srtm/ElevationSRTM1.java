@@ -65,15 +65,15 @@ public class ElevationSRTM1 extends ElevationBase {
             		+ lon.minutes * 60 + lon.seconds;
       		else
       			return 3601 * (lat.minutes * 60 + lat.seconds)
-					+ 3599 - lon.minutes * 60 - lon.seconds;
+					+ 3600 - lon.minutes * 60 - lon.seconds;
       	}
       	else {
       		if (lon.direction == GeoLon.DIRECTION_EAST)
-      			return 3601 * (3599 - lat.minutes * 60 - lat.seconds)
+      			return 3601 * (3600 - lat.minutes * 60 - lat.seconds)
             		+ lon.minutes * 60 + lon.seconds;
       		else
-      			return 3601 * (3599 - lat.minutes * 60 - lat.seconds)
-					+ 3599 - lon.minutes * 60 - lon.seconds;
+      			return 3601 * (3600 - lat.minutes * 60 - lat.seconds)
+					+ 3600 - lon.minutes * 60 - lon.seconds;
       	}
       }
 

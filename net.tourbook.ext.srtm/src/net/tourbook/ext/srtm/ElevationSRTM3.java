@@ -75,7 +75,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 					return 1201//
 							* (lat.minutes * 20 + lat.seconds / 3)
-							+ 1199
+							+ 1200
 							- lon.minutes
 							* 20
 							- lon.seconds
@@ -88,7 +88,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 					// NORTH -EAST
 
 					return 1201//
-							* (1199 - lat.minutes * 20 - lat.seconds / 3)
+							* (1200 - lat.minutes * 20 - lat.seconds / 3)
 							+ lon.minutes
 							* 20
 							+ lon.seconds
@@ -98,8 +98,8 @@ public final class ElevationSRTM3 extends ElevationBase {
 					// NORTH - WEST
 
 					return 1201
-							* (1199 - lat.minutes * 20 - lat.seconds / 3)
-							+ 1199
+							* (1200 - lat.minutes * 20 - lat.seconds / 3)
+							+ 1200
 							- lon.minutes
 							* 20
 							- lon.seconds
@@ -120,7 +120,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 //				} else {
 //					return 1201
 //					* (lat.getMinutes() * 20 + lat.getSeconds() / 3)
-//					+ 1199
+//					+ 1200
 //					- lon.getMinutes()
 //					* 20
 //					- lon.getSeconds()
@@ -129,15 +129,15 @@ public final class ElevationSRTM3 extends ElevationBase {
 //			} else {
 //				if (lon.isEast()) {
 //					return 1201
-//					* (1199 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
+//					* (1200 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
 //					+ lon.getMinutes()
 //					* 20
 //					+ lon.getSeconds()
 //					/ 3;
 //				} else {
 //					return 1201
-//					* (1199 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
-//					+ 1199
+//					* (1200 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
+//					+ 1200
 //					- lon.getMinutes()
 //					* 20
 //					- lon.getSeconds()
