@@ -1188,7 +1188,8 @@ public class TourChart extends Chart {
 
 			// show whole chart 
 			synchedChart.getChartDataModel().resetMinMaxValues();
-			synchedChart.onExecuteZoomOut(true);
+//			synchedChart.onExecuteZoomOut(true);
+			synchedChart.onExecuteZoomFitGraph();
 		}
 	}
 

@@ -798,7 +798,7 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().moveSlidersToBorderWithoutCheck();
 	}
 
-	void onExecuteZoomFitGraph() {
+	protected void onExecuteZoomFitGraph() {
 
 		fChartDataModel.resetMinMaxValues();
 
