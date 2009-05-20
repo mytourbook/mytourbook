@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package net.tourbook.plugin;
- 
+
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -23,6 +23,8 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -146,6 +148,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
+	public void log(final String message, final Throwable exception) {
+		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
+	}
+
 	public void setActivePerson(final TourPerson currentPerson) {
 		fCurrentPerson = currentPerson;
 	}
@@ -155,37 +161,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
 	}
 
-//	/**
-//	 * This method is called upon plug-in activation
-//	 */
-//	@Override
-//	public void start(final BundleContext context) throws Exception {
-//		super.start(context);
-//	}
-//
-//	/**
-//	 * This method is called when the plug-in is stopped
-//	 */
-//	@Override
-//	public void stop(final BundleContext context) throws Exception {
-//
-//		super.stop(context);
-//
-//		plugin = null;
-//		resourceBundle = null;
-//
-//		// NetworkServerControl server = new NetworkServerControl();
-//		// server.shutdown();
-//	}
-
 	public void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
 		fSplashHandler = splashHandler;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
@@ -193,13 +172,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		fContext = context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
 	}
+
 }
