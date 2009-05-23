@@ -25,12 +25,12 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Export tours in the GPX data format
  */
-public class ExportTourGPX extends ExportTourExtension {
+public class ExportTourTCX extends ExportTourExtension {
 
 	/**
 	 * plugin extension constructor
 	 */
-	public ExportTourGPX() {}
+	public ExportTourTCX() {}
 
 	@Override
 	public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
@@ -39,7 +39,7 @@ public class ExportTourGPX extends ExportTourExtension {
 				tourDataList,
 				tourStartIndex,
 				tourEndIndex,
-				"/format-templates/gpx-1.0.vm" //$NON-NLS-1$
+				"/format-templates/tcx-2.0.vm" //$NON-NLS-1$
 		).open();
 	}
 

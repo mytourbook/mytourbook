@@ -50,6 +50,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.dinopolis.gpstool.gpsinput.GPSRoute;
 import org.dinopolis.gpstool.gpsinput.GPSTrack;
+import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.GPSWaypoint;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
@@ -99,15 +100,20 @@ import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String						UI_AVERAGE_SYMBOL			= "Ø "; //$NON-NLS-1$
+	private static final String						ZERO						= "0";
+
+	private static final String						UI_AVERAGE_SYMBOL			= "Ø ";												//$NON-NLS-1$
 
 	private static final int						VERTICAL_SECTION_MARGIN		= 10;
 
 	private static final int						SIZING_TEXT_FIELD_WIDTH		= 250;
 	private static final int						COMBO_HISTORY_LENGTH		= 20;
 
+	private final String							fFormatTemplate;
+
 	private final IDialogSettings					fState						= TourbookPlugin.getDefault()
-																						.getDialogSettingsSection("DialogExportTour");	//$NON-NLS-1$
+																						.getDialogSettingsSection(
+																								"DialogExportTour");					//$NON-NLS-1$
 
 	private static final String						STATE_IS_MERGE_ALL_TOURS	= "isMergeAllTours";									//$NON-NLS-1$
 	private static final String						STATE_IS_EXPORT_TOUR_RANGE	= "isExportTourRange";									//$NON-NLS-1$
@@ -120,15 +126,13 @@ public class DialogExportTour extends TitleAreaDialog {
 	private static final String						STATE_EXPORT_FILE_NAME		= "exportFileName";									//$NON-NLS-1$
 	private static final String						STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";									//$NON-NLS-1$
 
-	private final static DecimalFormat				fIntFormatter				= (DecimalFormat) NumberFormat.getInstance(Locale.US);
-	private final static DecimalFormat				fDouble2Formatter			= (DecimalFormat) NumberFormat.getInstance(Locale.US);
-	private final static DecimalFormat				fDouble6Formatter			= (DecimalFormat) NumberFormat.getInstance(Locale.US);
-	private final static OneArgumentMessageFormat	fStringFormatter			= new OneArgumentMessageFormat("{0}", Locale.US);		//$NON-NLS-1$
-	private final static SimpleDateFormat			fDateFormat					= new SimpleDateFormat();
-
+	private static final DecimalFormat				fIntFormatter				= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	private static final DecimalFormat				fDouble2Formatter			= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	private static final DecimalFormat				fDouble6Formatter			= (DecimalFormat) NumberFormat.getInstance(Locale.US);
+	private static final OneArgumentMessageFormat	fStringFormatter			= new OneArgumentMessageFormat("{0}", Locale.US);		//$NON-NLS-1$
+	private static final SimpleDateFormat			fDateFormat					= new SimpleDateFormat();
 	private static final DateFormat					fTimeFormatter				= DateFormat.getTimeInstance(DateFormat.MEDIUM);
-
-	private static NumberFormat						fNumberFormatter			= NumberFormat.getNumberInstance();
+	private static final NumberFormat				fNumberFormatter			= NumberFormat.getNumberInstance();
 
 	private static String							fDlgDefaultMessage;
 
@@ -175,7 +179,8 @@ public class DialogExportTour extends TitleAreaDialog {
 							final ExportTourExtension exportExtensionPoint,
 							final ArrayList<TourData> tourDataList,
 							final int tourStartIndex,
-							final int tourEndIndex) {
+							final int tourEndIndex,
+							final String formatTemplate) {
 
 		super(parentShell);
 
@@ -183,6 +188,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
 		fExportExtensionPoint = exportExtensionPoint;
+		fFormatTemplate = formatTemplate;
 
 		fTourDataList = tourDataList;
 		fTourStartIndex = tourStartIndex;
@@ -206,6 +212,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		context.put("double2formatter", fDouble2Formatter); //$NON-NLS-1$
 		context.put("stringformatter", fStringFormatter); //$NON-NLS-1$
 
+		/*
+		 * GPX & TCX fields
+		 */
+
 		// current time, date
 		final Calendar now = Calendar.getInstance();
 		final Date creationDate = now.getTime();
@@ -224,24 +234,6 @@ public class DialogExportTour extends TitleAreaDialog {
 				.append(version.getQualifier())
 				.append(" - http://mytourbook.sourceforge.net")//$NON-NLS-1$
 				.toString());
-
-//		// device infos
-//		final String productName = productInfo.getProductName();
-//		context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
-//		context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
-//		context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
-//		context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
-////
-//		// Version
-//		String pluginmajorversion = "0"; //$NON-NLS-1$
-//		String pluginminorversion = "0"; //$NON-NLS-1$
-//		final Version version = Activator.getDefault().getVersion();
-//		if (version != null) {
-//			pluginmajorversion = "" + version.getMajor(); //$NON-NLS-1$
-//			pluginminorversion = "" + version.getMinor(); //$NON-NLS-1$
-//		}
-//		context.put("pluginmajorversion", pluginmajorversion); //$NON-NLS-1$
-//		context.put("pluginminorversion", pluginminorversion); //$NON-NLS-1$
 
 		// extent of waypoint, routes and tracks:
 		double min_latitude = 90.0;
@@ -289,71 +281,104 @@ public class DialogExportTour extends TitleAreaDialog {
 		context.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
 		context.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
 
-//		Date starttime = null;
-//		Date endtime = null;
-//		int heartNum = 0;
-//		long heartSum = 0;
-//		int cadNum = 0;
-//		long cadSum = 0;
-//		short maximumheartrate = 0;
-//		double totaldistance = 0;
-//
-//		for (final Iterator<?> trackIter = tracks.iterator(); trackIter.hasNext();) {
-//			final GPSTrack track = (GPSTrack) trackIter.next();
-//			for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
-//				final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
-//
-//				// starttime, totaltime
-//				if (wp.getDate() != null) {
-//					if (starttime == null)
-//						starttime = wp.getDate();
-//					endtime = wp.getDate();
-//				}
-//				if (wp instanceof GarminTrackpointAdapter) {
-//					final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
-//
-//					// averageheartrate, maximumheartrate
-//					if (gta.hasValidHeartrate()) {
-//						heartSum += gta.getHeartrate();
-//						heartNum++;
-//						if (gta.getHeartrate() > maximumheartrate)
-//							maximumheartrate = gta.getHeartrate();
-//					}
-//
-//					// averagecadence
-//					if (gta.hasValidCadence()) {
-//						cadSum += gta.getCadence();
-//						cadNum++;
-//					}
-//
-//					// totaldistance
-//					if (gta.hasValidDistance())
-//						totaldistance = gta.getDistance();
-//				}
-//			}
-//		}
-//
-//		if (starttime != null) {
-//			context.put("starttime", starttime); //$NON-NLS-1$
-//		} else
-//			context.put("starttime", creationDate); //$NON-NLS-1$
-//
-//		if (starttime != null && endtime != null) {
-//			context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
-//		} else
-//			context.put("totaltime", (double) 0); //$NON-NLS-1$
-//
-//		context.put("totaldistance", totaldistance); //$NON-NLS-1$
-//
-//		if (maximumheartrate != 0) {
-//			context.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
-//		}
-//		if (heartNum != 0) {
-//			context.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
-//		}
-//		if (cadNum != 0) {
-//			context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
-//		}
+		/*
+		 * additional TCX fields
+		 */
+
+		// Version
+		String pluginMajorVersion = ZERO; //$NON-NLS-1$
+		String pluginMinorVersion = ZERO; //$NON-NLS-1$
+		String pluginMicroVersion = ZERO; //$NON-NLS-1$
+		String pluginQualifierVersion = ZERO; //$NON-NLS-1$
+		if (version != null) {
+			pluginMajorVersion = Integer.toString(version.getMajor());
+			pluginMinorVersion = Integer.toString(version.getMinor());
+			pluginMicroVersion = Integer.toString(version.getMicro());
+			pluginQualifierVersion = version.getQualifier();
+		}
+		context.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
+		context.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
+		context.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
+		context.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
+
+//		// device infos
+//		final String productName = productInfo.getProductName();
+//		context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
+//		context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
+//		context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
+//		context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// time, heart, cadence, min/max
+		Date starttime = null;
+		Date endtime = null;
+		int heartNum = 0;
+		long heartSum = 0;
+		int cadNum = 0;
+		long cadSum = 0;
+		short maximumheartrate = 0;
+		double totaldistance = 0;
+
+		for (final Iterator<?> trackIter = tracks.iterator(); trackIter.hasNext();) {
+			final GPSTrack track = (GPSTrack) trackIter.next();
+			for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+
+				final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+
+				// starttime, totaltime
+				if (wp.getDate() != null) {
+					if (starttime == null) {
+						starttime = wp.getDate();
+					}
+					endtime = wp.getDate();
+				}
+
+				if (wp instanceof GarminTrackpointAdapter) {
+
+					final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+
+					// averageheartrate, maximumheartrate
+					if (gta.hasValidHeartrate()) {
+						heartSum += gta.getHeartrate();
+						heartNum++;
+						if (gta.getHeartrate() > maximumheartrate)
+							maximumheartrate = gta.getHeartrate();
+					}
+
+					// averagecadence
+					if (gta.hasValidCadence()) {
+						cadSum += gta.getCadence();
+						cadNum++;
+					}
+
+					// totaldistance
+					if (gta.hasValidDistance())
+						totaldistance = gta.getDistance();
+				}
+			}
+		}
+
+		if (starttime != null) {
+			context.put("starttime", starttime); //$NON-NLS-1$
+		} else
+			context.put("starttime", creationDate); //$NON-NLS-1$
+
+		if (starttime != null && endtime != null) {
+			context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
+		} else
+			context.put("totaltime", (double) 0); //$NON-NLS-1$
+
+		context.put("totaldistance", totaldistance); //$NON-NLS-1$
+
+		if (maximumheartrate != 0) {
+			context.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
+		}
+		if (heartNum != 0) {
+			context.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
+		}
+
+		if (cadNum != 0) {
+			context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -632,10 +657,8 @@ public class DialogExportTour extends TitleAreaDialog {
 			// label: unit
 			fLblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
 			fLblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
-			GridDataFactory.fillDefaults()
-					.grab(true, false)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(fLblCoumouflageSpeedUnit);
+			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(
+					fLblCoumouflageSpeedUnit);
 		}
 	}
 
@@ -801,7 +824,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			final TourData tourData = fTourDataList.get(0);
 
-			final GarminTrack track = getTrack(tourData,
+			final GarminTrack track = getTrack(
+					tourData,
 					TourManager.getTourDateTime(tourData),
 					isCamouflageSpeed,
 					camouflageSpeed[0]);
@@ -873,7 +897,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 							// create tracklist
 							trackList.clear();
-							final GarminTrack track = getTrack(tourData,
+							final GarminTrack track = getTrack(
+									tourData,
 									TourManager.getTourDateTime(tourData),
 									isCamouflageSpeed,
 									camouflageSpeed[0]);
@@ -888,7 +913,8 @@ public class DialogExportTour extends TitleAreaDialog {
 									public void run() {
 
 										// display exported filepath
-										fLblExportedFilePath.setText(NLS.bind(Messages.dialog_export_lbl_exportFilePath,
+										fLblExportedFilePath.setText(NLS.bind(
+												Messages.dialog_export_lbl_exportFilePath,
 												filePath.toOSString()));
 
 										// !!! force label update !!!
@@ -899,7 +925,8 @@ public class DialogExportTour extends TitleAreaDialog {
 								});
 
 								try {
-									doExportTour(trackList,
+									doExportTour(
+											trackList,
 											wayPointList,
 											filePath.toOSString(),
 											fileCollisionBehaviour,
@@ -946,8 +973,9 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		context.put("printroutes", new Boolean(false)); //$NON-NLS-1$
 
-		final Reader templateReader = new InputStreamReader(this.getClass()
-				.getResourceAsStream("/format-templates/gpx-1.0.vm")); //$NON-NLS-1$
+		// tcx
+
+		final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(fFormatTemplate));
 
 		boolean isOverwrite = true;
 		final File exportFile = new File(exportFileName);
@@ -1023,6 +1051,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
 		final int[] distanceSerie = tourData.distanceSerie;
+		final int[] cadenceSerie = tourData.cadenceSerie;
+		final int[] pulseSerie = tourData.pulseSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
@@ -1033,6 +1063,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		final boolean isAltitude = altitudeSerie != null && altitudeSerie.length > 0;
 		final boolean isDistance = distanceSerie != null && distanceSerie.length > 0;
+		final boolean isPulse = pulseSerie != null && pulseSerie.length > 0;
+		final boolean isCadence = cadenceSerie != null && cadenceSerie.length > 0;
 
 		int prevTime = -1;
 		DateTime lastTrackDateTime = null;
@@ -1052,7 +1084,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		 */
 		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
 
-			final GarminTrackpointAdapter trackPoint = new GarminTrackpointAdapter(new GarminTrackpointD304());
+			final GarminTrackpointD304 tp304 = new GarminTrackpointD304();
+			final GarminTrackpointAdapter trackPoint = new GarminTrackpointAdapter(tp304);
 
 			// mark as a new track to create the <trkseg>...</trkseg> tags
 			if (serieIndex == startIndex) {
@@ -1079,6 +1112,18 @@ public class DialogExportTour extends TitleAreaDialog {
 				// keep recorded speed
 
 				currentTime = timeSerie[serieIndex];
+			}
+
+			if (isDistance) {
+				trackPoint.setDistance(distanceSerie[serieIndex]);
+			}
+
+			if (isCadence) {
+				tp304.setCadence((short) cadenceSerie[serieIndex]);
+			}
+
+			if (isPulse) {
+				tp304.setHeartrate((short) pulseSerie[serieIndex]);
 			}
 
 			// ignore trackpoints which have the same time
@@ -1326,7 +1371,8 @@ public class DialogExportTour extends TitleAreaDialog {
 			final int startTime = minTourData.timeSerie[fTourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			fComboFile.setText(UI.format_yyyymmdd_hhmmss(tourTime.getYear(),
+			fComboFile.setText(UI.format_yyyymmdd_hhmmss(
+					tourTime.getYear(),
 					tourTime.getMonthOfYear(),
 					tourTime.getDayOfMonth(),
 					tourTime.getHourOfDay(),
@@ -1391,9 +1437,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		// build file path with extension
-		filePath = filePath.addTrailingSeparator()
-				.append(fileName)
-				.addFileExtension(fExportExtensionPoint.getFileExtension());
+		filePath = filePath.addTrailingSeparator().append(fileName).addFileExtension(
+				fExportExtensionPoint.getFileExtension());
 
 		final File newFile = new File(filePath.toOSString());
 
@@ -1407,7 +1452,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// file already exists
 
-			setMessage(NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
+			setMessage(
+					NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
 					IMessageProvider.WARNING);
 			returnValue = true;
 

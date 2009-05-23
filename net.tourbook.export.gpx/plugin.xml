@@ -9,6 +9,12 @@
             id="net.tourbook.export.gpx"
             name="GPX">
       </export>
+      <export
+            class="net.tourbook.export.gpx.ExportTourTCX"
+            fileextension="tcx"
+            id="net.tourbook.export.tcx"
+            name="TCX">
+      </export>
    </extension>
 
 </plugin>
