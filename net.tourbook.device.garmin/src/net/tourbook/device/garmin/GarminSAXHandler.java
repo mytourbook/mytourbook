@@ -56,8 +56,6 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String		TAG_TIME					= "Time";														//$NON-NLS-1$
 	private static final String		TAG_VALUE					= "Value";														//$NON-NLS-1$
 
-	private static final String		DEFALULT_UNIQUE_KEY			= "42984";														//$NON-NLS-1$
-
 	private static final Calendar	fCalendar					= GregorianCalendar.getInstance();
 	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
 
@@ -357,11 +355,6 @@ public class GarminSAXHandler extends DefaultHandler {
 			return;
 		}
 
-		// check if the distance is set
-//		if (fTimeDataList.get(0).absoluteDistance == Float.MIN_VALUE) {
-//		computeDistanceFromLatLon();
-//		}
-
 		validateTimeSeries();
 
 		// create data object for each tour
@@ -392,16 +385,37 @@ public class GarminSAXHandler extends DefaultHandler {
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
-		if (distanceSerie == null) {
-			uniqueKey = DEFALULT_UNIQUE_KEY;
-		} else {
-			final int lastDistance = distanceSerie[distanceSerie.length - 1];
-			if (lastDistance < 0) {
-				uniqueKey = DEFALULT_UNIQUE_KEY;
+
+		if (fDeviceDataReader.isCreateTourIdWithTime) {
+
+			/*
+			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
+			 * export and import found a wrong tour when exporting was done with camouflage speed ->
+			 * this will result in a NEW tour
+			 */
+			final int tourRecordingTime = tourData.getTourRecordingTime();
+
+			if (distanceSerie == null) {
+				uniqueKey = Integer.toString(tourRecordingTime);
 			} else {
-				uniqueKey = Integer.toString(lastDistance);
+
+				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+
+				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+			}
+
+		} else {
+
+			/*
+			 * original version to create tour id
+			 */
+			if (distanceSerie == null) {
+				uniqueKey = "42984"; //$NON-NLS-1$
+			} else {
+				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 			}
 		}
+
 		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported

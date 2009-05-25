@@ -128,56 +128,56 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		}
 	}
 
-	private void computeAltitudeUpDown(final TourData tourData) {
-
-		final int[] timeSerie = tourData.timeSerie;
-		final int[] altitudeSerie = tourData.altitudeSerie;
-
-		if (timeSerie == null || altitudeSerie == null) {
-			return;
-		}
-
-		final int serieLength = timeSerie.length;
-
-		if (serieLength == 0) {
-			return;
-		}
-
-		int lastTime = 0;
-		int currentAltitude = altitudeSerie[0];
-		int lastAltitude = currentAltitude;
-
-		int altitudeUp = 0;
-		int altitudeDown = 0;
-
-		final int minTimeDiff = 10;
-
-		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-
-			final int currentTime = timeSerie[timeIndex];
-
-			final int timeDiff = currentTime - lastTime;
-
-			currentAltitude = altitudeSerie[timeIndex];
-
-			if (timeDiff >= minTimeDiff) {
-
-				final int altitudeDiff = currentAltitude - lastAltitude;
-
-				if (altitudeDiff >= 0) {
-					altitudeUp += altitudeDiff;
-				} else {
-					altitudeDown += altitudeDiff;
-				}
-
-				lastTime = currentTime;
-				lastAltitude = currentAltitude;
-			}
-		}
-
-		tourData.setTourAltUp(altitudeUp);
-		tourData.setTourAltDown(-altitudeDown);
-	}
+//	private void computeAltitudeUpDown(final TourData tourData) {
+//
+//		final int[] timeSerie = tourData.timeSerie;
+//		final int[] altitudeSerie = tourData.altitudeSerie;
+//
+//		if (timeSerie == null || altitudeSerie == null) {
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		if (serieLength == 0) {
+//			return;
+//		}
+//
+//		int lastTime = 0;
+//		int currentAltitude = altitudeSerie[0];
+//		int lastAltitude = currentAltitude;
+//
+//		int altitudeUp = 0;
+//		int altitudeDown = 0;
+//
+//		final int minTimeDiff = 10;
+//
+//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
+//
+//			final int currentTime = timeSerie[timeIndex];
+//
+//			final int timeDiff = currentTime - lastTime;
+//
+//			currentAltitude = altitudeSerie[timeIndex];
+//
+//			if (timeDiff >= minTimeDiff) {
+//
+//				final int altitudeDiff = currentAltitude - lastAltitude;
+//
+//				if (altitudeDiff >= 0) {
+//					altitudeUp += altitudeDiff;
+//				} else {
+//					altitudeDown += altitudeDiff;
+//				}
+//
+//				lastTime = currentTime;
+//				lastAltitude = currentAltitude;
+//			}
+//		}
+//
+//		tourData.setTourAltUp(altitudeUp);
+//		tourData.setTourAltDown(-altitudeDown);
+//	}
 
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
@@ -418,6 +418,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
+
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
 		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 		tourData.setStartSecond((short) fCalendar.get(Calendar.SECOND));
@@ -433,7 +434,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setTourImportFilePath(fImportFilePath);
 
 		tourData.createTimeSeries(fTimeDataList, true);
-		computeAltitudeUpDown(tourData);
+		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
