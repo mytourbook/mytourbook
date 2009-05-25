@@ -3,11 +3,8 @@
    <description url="http://mytourbook.sourceforge.net/updates/">
       MyTourbook Update Site
    </description>
-   <feature url="features/patch6.jar" id="patch.net.tourbook.feature.9.01.0.v2009-01-07-patch6" version="9.01.0.v2009-01-07-patch6" patch="true">
-      <category name="MyTourbook 9.01"/>
+   <feature url="features/patch8.jar" id="net.tourbook.patch.9.05.1.patch8" version="9.05.1.v2009-05-25-patch8" patch="true">
+      <category name="MyTourbook 9.05.01"/>
    </feature>
-   <feature url="features/patch7.jar" id="net.tourbook.patch" version="9.01.0.v2009-02-02-patch7" patch="true">
-      <category name="MyTourbook 9.01"/>
-   </feature>
-   <category-def name="MyTourbook 9.01" label="MyTourbook 9.01"/>
+   <category-def name="MyTourbook 9.05.01" label="MyTourbook 9.05.01"/>
 </site>
