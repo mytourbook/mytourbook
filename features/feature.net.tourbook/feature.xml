@@ -2,10 +2,9 @@
 <feature
       id="feature.net.tourbook"
       label="%Feature_Name"
-      version="9.01.0.v2009-01-07"
+      version="9.05.0.v2009-05-09"
       provider-name="MyTourbook"
-      plugin="net.tourbook.branding"
-      >
+      plugin="net.tourbook.branding">
 
    <description>
       MyTourbook Application
@@ -431,6 +430,48 @@ POSSIBILITY OF SUCH DAMAGES.
 
    <plugin
          id="net.tourbook.statistics"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.nmea"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.export.gpx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.jars.importExport"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.srtm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.tilefactory.srtm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.util"
          download-size="0"
          install-size="0"
          version="0.0.0"

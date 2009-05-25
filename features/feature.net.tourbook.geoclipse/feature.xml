@@ -2,11 +2,11 @@
 <feature
       id="feature.net.tourbook.geoclipse"
       label="Geoclipse Feature"
-      version="0.1.4.v2009-01-07"
+      version="9.05.0.v2009-05-09"
       provider-name="Geoclipse">
 
    <copyright>
-      (c) Copyright Wolfgang Schramm and Contributors 2005, 2008. 
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2009. 
 All rights reserved.
    </copyright>
 
