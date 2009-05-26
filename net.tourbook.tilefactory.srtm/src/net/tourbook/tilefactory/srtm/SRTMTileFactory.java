@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.tilefactory.srtm;
 
 import net.tourbook.ext.srtm.ElevationColor;
@@ -212,6 +213,11 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		}
 
 		@Override
+		public String getTileOSFolder() {
+			return FACTORY_OS_NAME;
+		}
+
+		@Override
 		public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
 
 			// get profile specific tile path
@@ -252,12 +258,6 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 			return url.toString();
 		}
-
-//		@Override
-//		public int hashCode() {
-//			return elevationColor.hashCode();
-//		}
-
 	}
 
 	public SRTMTileFactory() {
