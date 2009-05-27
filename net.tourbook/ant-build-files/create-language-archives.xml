@@ -8,10 +8,11 @@
 
 	<property name="mt-trunk" value=".." />
 
-	<property name="archive-folder" value="${basedir}/translations" />
-	<property name="archive-file" value="${archive-folder}/mt-translation" />
+	<property name="archive-export-folder" value="${basedir}/translations/export" />
+	<property name="archive-file" value="${archive-export-folder}/mt-translation" />
 	<property name="archive-file-ext" value="zip" />
-	<property name="archive-default-filepath" value="${archive-file}-default.${archive-file-ext}" />
+	
+	<property name="default-archive-filepath" value="${archive-file}-default.${archive-file-ext}" />
 
 	<!--
 		DEFAULT target
@@ -20,37 +21,47 @@
 
 		<!-- delete all existing archives -->
 		<delete>
-			<fileset dir="${archive-folder}" includes="**/*" />
+			<fileset dir="${archive-export-folder}" includes="**/*" />
 		</delete>
 
-		<antcall target="create-archive-with-all-files" />
-		<antcall target="create-archive-default" />
+		<antcall target="create-archive-with-all-languages" />
+		<!-- 
+		<antcall target="create-default-archive" />
+		-->
 
-		<!-- create archive: EN,DE -->
-		<antcall target="create-archive-default-with-language">
-			<param name="language" value="_de" />
+		<!-- create archive: EN -->
+		<antcall target="create-archive-with-one-language">
+			<param name="archive-language" value="_en" />
+			<param name="search-language" value="" />
 		</antcall>
 
-		<!-- create archive: EN,FR -->
-		<antcall target="create-archive-default-with-language">
-			<param name="language" value="_fr" />
+		<!-- create archive: DE -->
+		<antcall target="create-archive-with-one-language">
+			<param name="archive-language" value="_de" />
+			<param name="search-language" value="_de" />
 		</antcall>
 
 		<!-- create archive: FR -->
 		<antcall target="create-archive-with-one-language">
-			<param name="language" value="_fr" />
+			<param name="archive-language" value="_fr" />
+			<param name="search-language" value="_fr" />
 		</antcall>
 
-		<delete file="${archive-default-filepath}" />
+		<delete file="${default-archive-filepath}" />
 
+		<!-- create archive: EN,FR 
+		<antcall target="create-default-archive-with-language">
+			<param name="language" value="_fr" />
+		</antcall>
+		-->
 	</target>
 
 	<!--
 		create archive which contain all language files
 	-->
-	<target name="create-archive-with-all-files">
+	<target name="create-archive-with-all-languages">
 
-		<property name="archive-filepath" value="${archive-file}.${archive-file-ext}" />
+		<property name="archive-filepath" value="${archive-file}_ALL.${archive-file-ext}" />
 
 		<zip destfile="${archive-filepath}">
 			<fileset dir="${mt-trunk}" id="fileset-all">
@@ -62,13 +73,31 @@
 
 	</target>
 
+	<!--
+		create single language specific archive 
+	-->
+	<target name="create-archive-with-one-language">
+
+		<property name="archive-filepath" value="${archive-file}${archive-language}.${archive-file-ext}" />
+
+		<echo message="create archive: ${archive-filepath}" />
+
+		<zip destfile="${archive-filepath}">
+			<fileset dir="${mt-trunk}" id="fileset-language">
+				<include name="**/plugin${search-language}.properties" />
+				<include name="**/src/**/messages${search-language}.properties" />
+				<exclude name="**/bin/**" />
+			</fileset>
+		</zip>
+
+	</target>
 
 	<!-- 
 		creates the default archive, which contains only the english property files 
 	-->
-	<target name="create-archive-default">
+	<target name="create-default-archive">
 
-		<zip destfile="${archive-default-filepath}">
+		<zip destfile="${default-archive-filepath}">
 			<fileset dir="${mt-trunk}">
 				<include name="**/plugin.properties" />
 				<include name="**/src/**/messages.properties" />
@@ -81,13 +110,13 @@
 	<!--
 		create language specific archive by adding the language files to the default archive (en)
 	-->
-	<target name="create-archive-default-with-language">
+	<target name="create-default-archive-with-language">
 
 		<property name="archive-filepath" value="${archive-file}_en${language}.${archive-file-ext}" />
 
 		<echo message="create archive: ${archive-filepath}" />
 
-		<copy file="${archive-default-filepath}" tofile="${archive-filepath}" overwrite="true" />
+		<copy file="${default-archive-filepath}" tofile="${archive-filepath}" overwrite="true" />
 
 		<zip destfile="${archive-filepath}" update="true" duplicate="preserve">
 			<fileset dir="${mt-trunk}" id="fileset-language">
@@ -99,23 +128,5 @@
 
 	</target>
 
-	<!--
-		create single language specific archive 
-	-->
-	<target name="create-archive-with-one-language">
-
-		<property name="archive-filepath" value="${archive-file}${language}.${archive-file-ext}" />
-
-		<echo message="create archive: ${archive-filepath}" />
-
-		<zip destfile="${archive-filepath}">
-			<fileset dir="${mt-trunk}" id="fileset-language">
-				<include name="**/plugin${language}.properties" />
-				<include name="**/src/**/messages${language}.properties" />
-				<exclude name="**/bin/**" />
-			</fileset>
-		</zip>
-
-	</target>
 
 </project>
