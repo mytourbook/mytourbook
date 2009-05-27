@@ -1221,10 +1221,19 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * @return Return <code>true</code> when a part of a tour can be exported
 	 */
 	private boolean isExportTourPart() {
-		return fChkExportTourRange.getSelection()
-				&& fTourDataList.size() == 1
-				&& fTourStartIndex != -1
-				&& fTourEndIndex != -1;
+
+		final boolean[] result = new boolean[1];
+
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				result[0] = fChkExportTourRange.getSelection()
+						&& fTourDataList.size() == 1
+						&& fTourStartIndex != -1
+						&& fTourEndIndex != -1;
+			}
+		});
+
+		return result[0];
 	}
 
 	@Override
