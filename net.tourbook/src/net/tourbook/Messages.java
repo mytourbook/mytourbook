@@ -747,6 +747,18 @@ public class Messages extends NLS {
 	public static String		tour_merger_label_adjust_seconds;
 	public static String		tour_merger_save_target_tour;
 
+	public static String	tour_segmenter_label_createSegmentsWith;
+
+	public static String	tour_segmenter_segType_byDistance_defaultDistance;
+
+	public static String	tour_segmenter_segType_byDistance_label;
+
+	public static String	tour_segmenter_type_byDistance;
+
+	public static String	tour_segmenter_type_byMarker;
+
+	public static String	tour_segmenter_type_douglasPeucker;
+
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
 
