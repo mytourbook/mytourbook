@@ -1370,7 +1370,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			// display the start date/time
 
 			final DateTime dtTour = new DateTime(minTourData.getStartYear(),
-					minTourData.getStartMonth() - 1,
+					minTourData.getStartMonth(),
 					minTourData.getStartDay(),
 					minTourData.getStartHour(),
 					minTourData.getStartMinute(),
