@@ -17,12 +17,16 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.algorithm.Point;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSegment;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.plugin.TourbookPlugin;
@@ -71,6 +75,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -95,9 +100,13 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
+	private static final int				MAX_DISTANCE_SCALE_MILE			= 80;
+	private static final int				MAX_DISTANCE_SCALE_METRIC		= 100;
+
 	public static final String				ID								= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
 	private static final String				STATE_SELECTED_SEGMENTER_INDEX	= "selectedSegmenterIndex";			//$NON-NLS-1$
+	private static final String				STATE_SELECTED_DISTANCE			= "selectedDistance";					//$NON-NLS-1$
 
 	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
 																					.getDialogSettingsSection(ID);
@@ -114,7 +123,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private PageBook						fPageBookSegmenter;
 	private Composite						fPageSegTypeDP;
-	private Label							fPageSegTypeByMarker;
+	private Composite						fPageSegTypeByMarker;
 	private Composite						fPageSegTypeByDistance;
 
 	private Scale							fScaleDistance;
@@ -148,6 +157,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private PostSelectionProvider			fPostSelectionProvider;
 
 	private final NumberFormat				fNf								= NumberFormat.getNumberInstance();
+	private int								fMaxDistanceScale;
+	private int								fScaleDistancePage;
 
 	private boolean							fShowSegmentsInChart;
 
@@ -225,7 +236,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-	private class ViewSorter extends ViewerSorter {
+	private static class ViewSorter extends ViewerSorter {
 
 		// private static final int ASCENDING = 0;
 
@@ -351,8 +362,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 					recreateViewer(null);
 
+					/*
+					 * update distance scale
+					 */
+					setMaxDistanceScale();
+					fScaleDistance.setMaximum(fMaxDistanceScale);
+					fScaleDistance.setPageIncrement(fScaleDistancePage);
+					updateUIDistance();
+
+					createSegments();
+
 					// refresh tour with the new measurement system
-					fireSegmentLayerChanged();
+//					fireSegmentLayerChanged();
 				}
 			}
 		};
@@ -496,6 +517,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		setMaxDistanceScale();
+
 		// define all columns
 		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
@@ -553,6 +576,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (selectedSegmenter == SegmenterType.ByMarker) {
 
+			createSegmentsByMarker();
 		}
 
 		// update table and create the tour segments in tour data
@@ -597,6 +621,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			segmentSerieIndex.add(lastDistanceSerieIndex);
 		}
+
+		fTourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
+	}
+
+	private void createSegmentsByMarker() {
+
+		final int[] timeSerie = fTourData.timeSerie;
+		final Set<TourMarker> tourMarkers = fTourData.getTourMarkers();
+
+		// sort markers by time - they are unsorted
+		final ArrayList<TourMarker> markerList = new ArrayList<TourMarker>(tourMarkers);
+		Collections.sort(markerList, new Comparator<TourMarker>() {
+			public int compare(final TourMarker tm1, final TourMarker tm2) {
+				return tm1.getSerieIndex() - tm2.getSerieIndex();
+			}
+		});
+
+		final ArrayList<Integer> segmentSerieIndex = new ArrayList<Integer>();
+
+		// set first segment at tour start
+		segmentSerieIndex.add(0);
+
+		// create segment for each marker
+		for (final TourMarker tourMarker : markerList) {
+			segmentSerieIndex.add(tourMarker.getSerieIndex());
+		}
+
+		// add segment end at the tour end
+		segmentSerieIndex.add(timeSerie.length - 1);
 
 		fTourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
 	}
@@ -698,6 +751,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(3, 3, 3, 2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			// tour title
 			fLblTitle = new ImageComboLabel(container, SWT.NONE);
@@ -724,7 +778,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fPageBookSegmenter);
 			{
 				fPageSegTypeDP = createUISegmenterDP(fPageBookSegmenter);
-				fPageSegTypeByMarker = new Label(fPageBookSegmenter, SWT.NONE);
+				fPageSegTypeByMarker = createUISegmenterByMarker(fPageBookSegmenter);
 				fPageSegTypeByDistance = createUISegmenterByDistance(fPageBookSegmenter);
 			}
 		}
@@ -746,7 +800,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// scale: distance
 			fScaleDistance = new Scale(container, SWT.HORIZONTAL);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleDistance);
-			fScaleDistance.setMaximum(100);
+			fScaleDistance.setMaximum(fMaxDistanceScale);
+			fScaleDistance.setPageIncrement(fScaleDistancePage);
 			fScaleDistance.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -759,8 +814,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			fLabelDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.hint(pc.convertWidthInCharsToPixels(7), SWT.DEFAULT)
+					.hint(pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
 					.applyTo(fLabelDistanceValue);
+		}
+
+		return container;
+	}
+
+	private Composite createUISegmenterByMarker(final Composite parent) {
+
+		/*
+		 * display NONE, this is not easy to do - or I didn't find an easier way
+		 */
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			final Canvas canvas = new Canvas(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).hint(1, 1).applyTo(canvas);
 		}
 
 		return container;
@@ -786,7 +857,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			fScaleTolerance.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangedTolerance(getDPTolerance(), false);
+					onChangedTolerance(getDPTolerance());
 					setTourDirty();
 				}
 			});
@@ -1105,11 +1176,32 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private float getDistance() {
 
-		float scaleDistance = fScaleDistance.getSelection() * 100 / UI.UNIT_VALUE_DISTANCE;
+		final float selectedDistance = fScaleDistance.getSelection();
+		float scaleDistance;
 
-		// ensure the distance in not below 100m
-		if (scaleDistance < 100) {
-			scaleDistance = 100;
+		if (UI.UNIT_VALUE_DISTANCE == UI.UNIT_MILE) {
+
+			// miles are displayed
+
+			scaleDistance = (selectedDistance) * 1000 / 8;
+
+			if (scaleDistance == 0) {
+				scaleDistance = 1000 / 8;
+			}
+
+			// convert mile -> meters
+			scaleDistance *= UI.UNIT_MILE;
+
+		} else {
+
+			// meters are displayed
+
+			scaleDistance = selectedDistance * MAX_DISTANCE_SCALE_METRIC;
+
+			// ensure the distance in not below 100m
+			if (scaleDistance < 100) {
+				scaleDistance = 100;
+			}
 		}
 
 		return scaleDistance;
@@ -1136,30 +1228,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onChangedDistance() {
 
-		final float scaleDistance = getDistance();
-
-		final float selectedDistance = scaleDistance / 1000;
-
-		if (selectedDistance >= 10) {
-			fNf.setMinimumFractionDigits(0);
-			fNf.setMaximumFractionDigits(0);
-		} else {
-			fNf.setMinimumFractionDigits(1);
-			fNf.setMaximumFractionDigits(1);
-		}
-
-		// update UI
-		fLabelDistanceValue.setText(fNf.format(selectedDistance) + UI.SPACE + UI.UNIT_LABEL_DISTANCE);
+		updateUIDistance();
 
 		createSegments();
 	}
 
-	private void onChangedTolerance(final int dpTolerance, final boolean forceRecalc) {
+	private void onChangedTolerance(final int dpTolerance/* , final boolean forceRecalc */) {
 
 		// update label in the ui
 		fLabelToleranceValue.setText(Integer.toString(dpTolerance));
 
-		if (fTourData == null || (fDpTolerance == dpTolerance && forceRecalc == false)) {
+		if (fTourData == null || (fDpTolerance == dpTolerance /* && forceRecalc == false */)) {
 			return;
 		}
 
@@ -1208,7 +1287,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						final TourEditor tourEditor = (TourEditor) editorPart;
 
 						// check if editor changed
-						if (fTourChart != null & fTourChart == tourEditor.getTourChart()) {
+						if (fTourChart != null && fTourChart == tourEditor.getTourChart()) {
 							return;
 						}
 
@@ -1303,6 +1382,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			fPageBookSegmenter.showPage(fPageSegTypeByDistance);
 		}
 
+		fPageSegmenter.layout();
+
 		createSegments();
 	}
 
@@ -1329,18 +1410,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void restoreState() {
 
+		// selected segmenter
 		int segmenterIndex = 0;
 		try {
 			segmenterIndex = fViewState.getInt(STATE_SELECTED_SEGMENTER_INDEX);
 		} catch (final NumberFormatException e) {}
-
 		fCboSegmenterType.select(segmenterIndex);
 
-		if (checkDataValidation(fTourData)) {
+		// selected distance
+		int stateDistance = 10;
+		try {
+			stateDistance = fViewState.getInt(STATE_SELECTED_DISTANCE);
+		} catch (final NumberFormatException e) {}
+		fScaleDistance.setSelection(stateDistance);
+		updateUIDistance();
 
-			// combo seem not to fire the select event
-			onSelectSegmenterType();
-		}
 	}
 
 	private void saveState() {
@@ -1348,6 +1432,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fColumnManager.saveState(fViewState);
 
 		fViewState.put(STATE_SELECTED_SEGMENTER_INDEX, fCboSegmenterType.getSelectionIndex());
+		fViewState.put(STATE_SELECTED_DISTANCE, fScaleDistance.getSelection());
 	}
 
 	private TourData saveTour() {
@@ -1374,12 +1459,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fScaleTolerance.setFocus();
 	}
 
+	private void setMaxDistanceScale() {
+
+		if (UI.UNIT_VALUE_DISTANCE == UI.UNIT_MILE) {
+
+			// imperial
+
+			fMaxDistanceScale = MAX_DISTANCE_SCALE_MILE;
+			fScaleDistancePage = 8;
+
+		} else {
+
+			// metric
+
+			fMaxDistanceScale = MAX_DISTANCE_SCALE_METRIC;
+			fScaleDistancePage = 10;
+		}
+	}
+
 	/**
 	 * Sets the tour for the segmenter
 	 * 
 	 * @param tourData
 	 */
 	private void setTour(final TourData tourData) {
+
+		if (tourData == fTourData) {
+			return;
+		}
 
 		fIsDirtyDisabled = true;
 		fTourData = tourData;
@@ -1401,8 +1508,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		fIsDirtyDisabled = false;
 
-		// force the segements to be rebuild for the new tour
-		onChangedTolerance(fDpTolerance, true);
+//		// force the segements to be rebuild for the new tour
+//		onChangedTolerance(fDpTolerance, true);
+
+		onSelectSegmenterType();
 	}
 
 	/**
@@ -1419,4 +1528,71 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	private void updateUIDistance() {
+
+		float scaleDistance = getDistance() / UI.UNIT_VALUE_DISTANCE;
+
+		if (UI.UNIT_VALUE_DISTANCE == UI.UNIT_MILE) {
+
+			// imperial
+
+			scaleDistance /= 1000;
+
+			final int distanceInt = (int) scaleDistance;
+			final float distanceFract = scaleDistance - distanceInt;
+
+			// create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
+			final StringBuilder sb = new StringBuilder();
+			if (distanceInt > 0) {
+				sb.append(Integer.toString(distanceInt));
+				sb.append(UI.SPACE);
+			}
+
+			if (Math.abs(distanceFract - 0.125f) <= 0.01) {
+				sb.append("1/8"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.25f) <= 0.01) {
+				sb.append("1/4"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.375) <= 0.01) {
+				sb.append("3/8"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.5f) <= 0.01) {
+				sb.append("1/2"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.625) <= 0.01) {
+				sb.append("5/8"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.75f) <= 0.01) {
+				sb.append("3/4"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			} else if (Math.abs(distanceFract - 0.875) <= 0.01) {
+				sb.append("7/8"); //$NON-NLS-1$
+				sb.append(UI.SPACE);
+			}
+
+			sb.append(UI.UNIT_LABEL_DISTANCE);
+
+			// update UI
+			fLabelDistanceValue.setText(sb.toString());
+
+
+		} else {
+
+			// metric
+
+			// format distance
+			final float selectedDistance = scaleDistance / 1000;
+			if (selectedDistance >= 10) {
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+			} else {
+				fNf.setMinimumFractionDigits(1);
+				fNf.setMaximumFractionDigits(1);
+			}
+
+			// update UI
+			fLabelDistanceValue.setText(fNf.format(selectedDistance) + UI.SPACE + UI.UNIT_LABEL_DISTANCE);
+		}
+	}
 }
