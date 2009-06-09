@@ -4,10 +4,13 @@
       MyTourbook Update Site
    </description>
    <feature url="features/patch8.jar" id="net.tourbook.patch.9.05.1.patch8" version="9.05.1.v2009-05-25-patch8" patch="true">
-      <category name="MyTourbook 9.05.01"/>
+      <category name="MyTourbook 9.05"/>
    </feature>
    <feature url="features/patch9.jar" id="net.tourbook.patch.9.05.2.patch9" version="9.05.2.v2009-05-26-patch9" patch="true">
-      <category name="MyTourbook 9.05.01"/>
+      <category name="MyTourbook 9.05"/>
    </feature>
-   <category-def name="MyTourbook 9.05.01" label="MyTourbook 9.05.01"/>
+   <feature url="features/patch10.jar" id="net.tourbook.patch.9.05.3.patch10" version="9.05.3.v2009-06-08-patch10" patch="true">
+      <category name="MyTourbook 9.05"/>
+   </feature>
+   <category-def name="MyTourbook 9.05" label="MyTourbook 9.05"/>
 </site>
