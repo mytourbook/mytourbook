@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>MyTourbook Installer</name>
+	<name>installer.mytourbook</name>
 	<comment></comment>
 	<projects>
 	</projects>
-	
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
 </projectDescription>
