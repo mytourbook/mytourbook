@@ -753,11 +753,13 @@ public class Messages extends NLS {
 
 	public static String	tour_segmenter_segType_byDistance_label;
 
+	public static String	tour_segmenter_type_byAltitude;
+
 	public static String	tour_segmenter_type_byDistance;
 
 	public static String	tour_segmenter_type_byMarker;
 
-	public static String	tour_segmenter_type_douglasPeucker;
+	public static String	tour_segmenter_type_byPulse;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

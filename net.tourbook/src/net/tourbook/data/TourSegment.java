@@ -21,10 +21,16 @@ public class TourSegment {
 	public int		serieIndexStart;
 	public int		serieIndexEnd;
 
-	public int		altitude;
-	public int		distance;
 	public int		recordingTime;
 	public int		drivingTime;
+
+	public int		altitude;
+	public int		distance;
+
+	public int		timeTotal;
+	public int		altitudeTotal;
+	public int		distanceTotal;
+
 	public int		altitudeUp;
 	public int		altitudeDown;
 
@@ -33,5 +39,7 @@ public class TourSegment {
 	public float	gradient;
 	public float	pace;
 	public int		power;
+	public int		pulse;
+	public int		pulseDiff;
 
 }

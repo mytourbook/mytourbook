@@ -487,13 +487,19 @@ public class TourData implements Comparable<Object> {
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]						segmentSerieAltitude;
+	public int[]						segmentSerieTime;
+	@Transient
+	public int[]						segmentSerieTimeTotal;
 
 	@Transient
 	public int[]						segmentSerieDistance;
+	@Transient
+	public int[]						segmentSerieDistanceTotal;
 
 	@Transient
-	public int[]						segmentSerieTime;
+	public int[]						segmentSerieAltitude;
+	@Transient
+	public int[]						segmentSerieAltitudeTotal;
 
 	@Transient
 	public int[]						segmentSerieDrivingTime;
@@ -1197,23 +1203,68 @@ public class TourData implements Comparable<Object> {
 
 	private void computeAvgPulse() {
 
-		if (pulseSerie == null) {
+		if (pulseSerie == null || pulseSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
 			return;
 		}
 
-		long pulseSum = 0;
-		int pulseCount = 0;
+		avgPulse = computeAvgPulseSegment(0, timeSerie.length - 1);
+	}
 
-		for (final int pulse : pulseSerie) {
+	private int computeAvgPulseSegment(final int firstIndex, final int lastIndex) {
+
+		// check if data are available
+		if (pulseSerie == null || pulseSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+			return 0;
+		}
+
+		// check for 1 point
+		if (firstIndex == lastIndex) {
+			return pulseSerie[firstIndex];
+		}
+
+		// check for 2 points
+		if (lastIndex - firstIndex == 1) {
+			return (int) (((float) pulseSerie[firstIndex] + pulseSerie[lastIndex]) / 2 + 0.5f);
+		}
+
+		// at least 3 points are available
+		int prevTime = timeSerie[firstIndex];
+		int currentTime = timeSerie[firstIndex];
+		int nextTime = timeSerie[firstIndex + 1];
+
+		float pulseSquare = 0;
+		float timeSquare = 0;
+
+		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+
+			final float pulse = pulseSerie[serieIndex];
+
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
+
+			if (serieIndex > firstIndex) {
+				// prev is available
+				timeDiffPrev = ((float) currentTime - prevTime) / 2;
+			}
+
+			if (serieIndex < lastIndex) {
+				// next is available
+				timeDiffNext = ((float) nextTime - currentTime) / 2;
+			}
+
 			if (pulse > 0) {
-				pulseCount++;
-				pulseSum += pulse;
+				pulseSquare += pulse * timeDiffPrev + pulse * timeDiffNext;
+				timeSquare += timeDiffPrev + timeDiffNext;
+			}
+
+			if (serieIndex < lastIndex) {
+				prevTime = currentTime;
+				currentTime = nextTime;
+				nextTime = timeSerie[serieIndex + 1];
 			}
 		}
 
-		if (pulseCount > 0) {
-			avgPulse = (int) pulseSum / pulseCount;
-		}
+		return timeSquare == 0f ? 0 : (int) (pulseSquare / timeSquare + 0.5f);
 	}
 
 	private void computeAvgTemperature() {
@@ -1395,9 +1446,8 @@ public class TourData implements Comparable<Object> {
 		int lowIndexAdjustment = 0;
 		int highIndexAdjustment = 1;
 
-		final int speedTimeSlice = TourbookPlugin.getDefault()
-				.getPreferenceStore()
-				.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+		final int speedTimeSlice = TourbookPlugin.getDefault().getPreferenceStore().getInt(
+				ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
 
 		final int slices = speedTimeSlice / deviceTimeInterval;
 
@@ -1811,7 +1861,8 @@ public class TourData implements Comparable<Object> {
 
 				for (final double latitude : latitudeSerie) {
 
-					short srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude),
+					short srtmValue = elevationSRTM3.getElevation(
+							new GeoLat(latitude),
 							new GeoLon(longitudeSerie[serieIndex]));
 
 					/*
@@ -2391,10 +2442,18 @@ public class TourData implements Comparable<Object> {
 		int distanceStart = distanceSerie[firstSerieIndex];
 		int altitudeStart = altitudeSerie[firstSerieIndex];
 		int timeStart = timeSerie[firstSerieIndex];
+		int timeTotal = 0;
+		int distanceTotal = 0;
+		int altitudeTotal = 0;
 
-		segmentSerieAltitude = new int[segmentSerieLength];
-		segmentSerieDistance = new int[segmentSerieLength];
 		segmentSerieTime = new int[segmentSerieLength];
+		segmentSerieDistance = new int[segmentSerieLength];
+		segmentSerieAltitude = new int[segmentSerieLength];
+
+		segmentSerieTimeTotal = new int[segmentSerieLength];
+		segmentSerieDistanceTotal = new int[segmentSerieLength];
+		segmentSerieAltitudeTotal = new int[segmentSerieLength];
+
 		segmentSerieDrivingTime = new int[segmentSerieLength];
 		segmentSerieAltitudeDown = new int[segmentSerieLength];
 
@@ -2403,8 +2462,8 @@ public class TourData implements Comparable<Object> {
 		segmentSeriePace = new float[segmentSerieLength];
 		segmentSeriePower = new float[segmentSerieLength];
 		segmentSerieGradient = new float[segmentSerieLength];
-		segmentSeriePulse = new float[segmentSerieLength];
 		segmentSerieCadence = new float[segmentSerieLength];
+		segmentSeriePulse = new float[segmentSerieLength];
 
 		for (int iSegment = 1; iSegment < segmentSerieLength; iSegment++) {
 
@@ -2422,69 +2481,93 @@ public class TourData implements Comparable<Object> {
 			// compute difference values between start and end
 			final int altitudeEnd = altitudeSerie[segmentEndIndex];
 			final int distanceEnd = distanceSerie[segmentEndIndex];
+
 			final int timeEnd = timeSerie[segmentEndIndex];
-			final int recordingTime = timeEnd - timeStart;
-			final int drivingTime;
+			final int recordingTimeDiff = timeEnd - timeStart;
+			final int drivingTimeDiff;
 
-			segmentSerieAltitude[segmentIndex] = segment.altitude = altitudeEnd - altitudeStart;
-			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
+			final int altitudeDiff = altitudeEnd - altitudeStart;
+			final int distanceDiff = distanceEnd - distanceStart;
 
-			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
+			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTimeDiff;
+			segmentSerieAltitude[segmentIndex] = segment.altitude = altitudeDiff;
+			segmentSerieDistance[segmentIndex] = segment.distance = distanceDiff;
 
-			final int drivingTimeTemp = recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex);
+			// total time/distance 
+			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += recordingTimeDiff;
+			segmentSerieDistanceTotal[segmentIndex] = segment.distanceTotal = distanceTotal += distanceDiff;
+
+			// total altitude 
+			if (altitudeDiff > 0) {
+				segmentSerieAltitudeTotal[segmentIndex] = segment.altitudeTotal = altitudeTotal += altitudeDiff;
+			} else {
+				segmentSerieAltitudeTotal[segmentIndex] = segment.altitudeTotal = altitudeTotal;
+			}
+
+			final int drivingTimeTemp = recordingTimeDiff - getBreakTime(segmentStartIndex, segmentEndIndex);
 			segmentSerieDrivingTime[segmentIndex] = //
 			segment.drivingTime = //
-			drivingTime = (0 >= drivingTimeTemp) ? 0 : drivingTimeTemp;
+			drivingTimeDiff = (0 >= drivingTimeTemp) ? 0 : drivingTimeTemp;
 
 			final int[] localPowerSerie = getPowerSerie();
 			int altitudeUp = 0;
 			int altitudeDown = 0;
-			int pulseSum = 0;
+//			int pulseSum = 0;
 			int powerSum = 0;
 
 			int altitude1 = altitudeSerie[segmentStartIndex];
 
-			// compute altitude up/down, pulse and power for a segment
+			// get computed values: altitude up/down, pulse and power for a segment
 			for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
 				final int altitude2 = altitudeSerie[serieIndex];
-				final int altitudeDiff = altitude2 - altitude1;
+				final int altitude2Diff = altitude2 - altitude1;
 				altitude1 = altitude2;
 
-				altitudeUp += altitudeDiff >= 0 ? altitudeDiff : 0;
-				altitudeDown += altitudeDiff < 0 ? altitudeDiff : 0;
+				altitudeUp += altitude2Diff >= 0 ? altitude2Diff : 0;
+				altitudeDown += altitude2Diff < 0 ? altitude2Diff : 0;
 
 				powerSum += localPowerSerie[serieIndex];
 
-				if (pulseSerie != null) {
-					pulseSum += pulseSerie[serieIndex];
-				}
+//				if (pulseSerie != null) {
+//					pulseSum += pulseSerie[serieIndex];
+//				}
 			}
 
 			segment.altitudeUp = altitudeUp;
 			segmentSerieAltitudeDown[segmentIndex] = segment.altitudeDown = altitudeDown;
 
 			final int segmentDistance = segment.distance;
+			if (segmentDistance != 0) {
 
-			segmentSerieSpeed[segmentIndex] = segment.speed //
-			= drivingTime == 0 ? 0 : (float) ((float) segmentDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
+				// speed
+				segmentSerieSpeed[segmentIndex] = segment.speed = drivingTimeDiff == 0 ? //
+						0
+						: (float) ((float) segmentDistance / drivingTimeDiff * 3.6 / UI.UNIT_VALUE_DISTANCE);
 
-			segment.pace //
-			= segmentDistance == 0 ? 0 : (float) (drivingTime * 1000 / segmentDistance * UI.UNIT_VALUE_DISTANCE);
-			segmentSeriePace[segmentIndex] = segment.pace / 60;
+				// pace
+				segment.pace = segmentDistance == 0 ? //
+						0
+						: (float) (drivingTimeDiff * 1000 / segmentDistance * UI.UNIT_VALUE_DISTANCE);
+				segmentSeriePace[segmentIndex] = segment.pace / 60;
 
-			segmentSerieGradient[segmentIndex] = segment.gradient //
-			= (float) segment.altitude * 100 / segmentDistance;
+				// gradient
+				segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
+						* 100
+						/ segmentDistance;
+			}
 
-			segmentSerieAltimeter[segmentIndex] = recordingTime == 0 ? 0 : (float) (altitudeUp + altitudeDown)
-					/ recordingTime
-					* 3600
-					/ UI.UNIT_VALUE_ALTITUDE;
+			segmentSerieAltimeter[segmentIndex] = recordingTimeDiff == 0 ? //
+					0
+					: (float) (altitudeUp + altitudeDown) / recordingTimeDiff * 3600 / UI.UNIT_VALUE_ALTITUDE;
 
-			segmentSeriePower[segmentIndex] = segment.power = powerSum / (segmentEndIndex - segmentStartIndex);
+			final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
+			segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 ? 0 : powerSum / segmentIndexDiff;
 
 			if (segmentSeriePulse != null) {
-				segmentSeriePulse[segmentIndex] = pulseSum / (segmentEndIndex - segmentStartIndex);
+				final int segmentAvgPulse = computeAvgPulseSegment(segmentStartIndex, segmentEndIndex);
+				segmentSeriePulse[segmentIndex] = segment.pulse = segmentAvgPulse;
+				segment.pulseDiff = segmentAvgPulse - avgPulse;
 			}
 
 			// end point of current segment is the start of the next segment

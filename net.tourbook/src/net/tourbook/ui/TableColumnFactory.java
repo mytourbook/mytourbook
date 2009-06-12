@@ -42,8 +42,25 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 		
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory ALTITUDE_TOTAL = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeTotal", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_altitudeTotal_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitudeTotal_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
 			return colDef;
 		};
 	};
@@ -79,7 +96,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+																			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -131,12 +148,46 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
 			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 			
 			return colDef;
 		};
 	};
 	
+	public static final TableColumnFactory AVG_PULSE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgPulse", SWT.TRAIL); //$NON-NLS-1$
+		
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_label);
+			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + Messages.ColumnFactory_pulse);
+			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + Messages.ColumnFactory_pulse);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory AVG_PULSE_DIFFERENCE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgPulseDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_difference_label);
+			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE+ Messages.ColumnFactory_pulse);
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + Messages.ColumnFactory_pulse);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pulse_difference_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory AVG_SPEED = new TableColumnFactory() {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -147,7 +198,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_SPEED);
 			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_SPEED); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -237,7 +288,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(10);
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
@@ -246,6 +297,25 @@ public abstract class TableColumnFactory {
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory DISTANCE_TOTAL = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distanceTotal", SWT.TRAIL); //$NON-NLS-1$
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_distanceTotal_label);
+			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_distanceTotal_tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
 			return colDef;
 		};
 	};
@@ -261,7 +331,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_driving_time);
 			colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_driving_time_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+																			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -291,7 +361,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_gradient);
 			colDef.setColumnUnit(Messages.ColumnFactory_gradient);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_gradient_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -439,7 +509,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "pulse", SWT.TRAIL); //$NON-NLS-1$
-		
+			
 			colDef.setColumnLabel(Messages.ColumnFactory_pulse_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_pulse);
 			colDef.setColumnUnit(Messages.ColumnFactory_pulse);
@@ -461,8 +531,25 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_recording_time);
 			colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_recording_time_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 		
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory RECORDING_TIME_TOTAL = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "recordingTimeTotal", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_recording_timeTotal_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_recording_time);
+			colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_recording_timeTotal_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
 			return colDef;
 		};
 	};
@@ -478,7 +565,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
 			colDef.setColumnUnit(UI.UNIT_LABEL_SPEED); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_speed_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};

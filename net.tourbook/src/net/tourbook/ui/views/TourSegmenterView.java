@@ -115,6 +115,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final int				COLUMN_SPEED					= 10;
 	private static final int				COLUMN_PACE						= 20;
 	private static final int				COLUMN_GRADIENT					= 30;
+	private static final int				COLUMN_PULSE					= 40;
 
 	private PageBook						fPageBook;
 	private Composite						fPageSegmenter;
@@ -179,13 +180,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * {@link #fSegmenterTypes} and {@link #fSegmenterTypeNames} must be in synch
 	 */
 	private final static String[]			fSegmenterTypeNames				= new String[] {
-			Messages.tour_segmenter_type_douglasPeucker,
+			Messages.tour_segmenter_type_byAltitude,
+			Messages.tour_segmenter_type_byPulse,
 			Messages.tour_segmenter_type_byDistance,
 			Messages.tour_segmenter_type_byMarker,
 																			//
 																			};
 	private final static SegmenterType[]	fSegmenterTypes					= new SegmenterType[] {
-			SegmenterType.DouglasPeucker, //
+			SegmenterType.ByAltitudeWithDP, //
+			SegmenterType.ByPulseWithDP, //
 			SegmenterType.ByDistance,
 			SegmenterType.ByMarker, //
 																			};
@@ -208,7 +211,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	private enum SegmenterType {
-		DouglasPeucker, //
+		ByAltitudeWithDP, //
+		ByPulseWithDP, //
 		ByMarker, //
 		ByDistance
 	}
@@ -272,6 +276,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			case COLUMN_PACE:
 				rc = (int) ((segment1.pace - segment2.pace) * 100);
+				break;
+
+			case COLUMN_PULSE:
+				rc = segment1.pulse - segment2.pulse;
 				break;
 
 			case COLUMN_GRADIENT:
@@ -566,9 +574,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final SegmenterType selectedSegmenter = fSegmenterTypes[fCboSegmenterType.getSelectionIndex()];
 
-		if (selectedSegmenter == SegmenterType.DouglasPeucker) {
+		if (selectedSegmenter == SegmenterType.ByAltitudeWithDP) {
 
-			createSegmentsDB();
+			createSegmentsByAltitudeWithDP();
+
+		} else if (selectedSegmenter == SegmenterType.ByPulseWithDP) {
+
+			createSegmentsByPulseWithDP();
 
 		} else if (selectedSegmenter == SegmenterType.ByDistance) {
 
@@ -583,6 +595,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		reloadViewer();
 
 		fireSegmentLayerChanged();
+	}
+
+	/**
+	 * create Douglas-Peucker segments from distance and altitude
+	 */
+	private void createSegmentsByAltitudeWithDP() {
+
+		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
+		final int[] altitudeSerie = fTourData.altitudeSerie;
+
+		// convert data series into points
+		final Point graphPoints[] = new Point[distanceSerie.length];
+		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+			graphPoints[serieIndex] = new Point(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+		}
+
+		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(fDpTolerance, graphPoints);
+		final Object[] simplePoints = dpSimplifier.simplify();
+
+		/*
+		 * copie the data index for the simplified points into the tour data
+		 */
+
+		final int[] segmentSerieIndex = fTourData.segmentSerieIndex = new int[simplePoints.length];
+
+		for (int iPoint = 0; iPoint < simplePoints.length; iPoint++) {
+			final Point point = (Point) simplePoints[iPoint];
+			segmentSerieIndex[iPoint] = point.serieIndex;
+		}
 	}
 
 	private void createSegmentsByDistance() {
@@ -655,16 +696,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * create Douglas-Peucker segments from distance and altitude
+	 * create Douglas-Peucker segments from time and pulse
 	 */
-	private void createSegmentsDB() {
+	private void createSegmentsByPulseWithDP() {
 
-		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
-		final int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] timeSerie = fTourData.timeSerie;
+		final int[] pulseSerie = fTourData.pulseSerie;
 
-		final Point graphPoints[] = new Point[distanceSerie.length];
-		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
-			graphPoints[iPoint] = new Point(distanceSerie[iPoint], altitudeSerie[iPoint], iPoint);
+		if (pulseSerie == null || pulseSerie.length < 2) {
+			fTourData.segmentSerieIndex = null;
+			return;
+		}
+
+		// convert data series into points
+		final Point graphPoints[] = new Point[timeSerie.length];
+		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+			graphPoints[serieIndex] = new Point(timeSerie[serieIndex], pulseSerie[serieIndex], serieIndex);
 		}
 
 		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(fDpTolerance, graphPoints);
@@ -673,7 +720,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		/*
 		 * copie the data index for the simplified points into the tour data
 		 */
-
 		final int[] segmentSerieIndex = fTourData.segmentSerieIndex = new int[simplePoints.length];
 
 		for (int iPoint = 0; iPoint < simplePoints.length; iPoint++) {
@@ -896,6 +942,58 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		};
 
 		/*
+		 * column: TOTAL recording time
+		 */
+		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(UI.format_hh_mm_ss(segment.timeTotal));
+			}
+		});
+
+		/*
+		 * column: TOTAL distance (km/mile)
+		 */
+		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(3);
+				fNf.setMaximumFractionDigits(3);
+
+				cell.setText(fNf.format((segment.distanceTotal) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+			}
+		});
+
+		/*
+		 * column: TOTAL altitude (m/ft)
+		 */
+		colDef = TableColumnFactory.ALTITUDE_TOTAL.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+
+				cell.setText(fNf.format(segment.altitudeTotal / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+
+		/*
 		 * column: driving time
 		 */
 		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
@@ -948,7 +1046,83 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
-		 * column: speed
+		 * column: gradient
+		 */
+		colDef = TableColumnFactory.GRADIENT.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				fSegmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				fNf.setMinimumFractionDigits(1);
+				fNf.setMaximumFractionDigits(1);
+
+				cell.setText(fNf.format(segment.gradient));
+			}
+		});
+
+		/*
+		 * column: altitude up m/h
+		 */
+		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					if (result == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						fNf.setMinimumFractionDigits(1);
+						fNf.setMaximumFractionDigits(0);
+						cell.setText(fNf.format(result));
+					}
+				}
+			}
+		});
+
+		/*
+		 * column: altitude down m/h
+		 */
+		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					if (result == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						fNf.setMinimumFractionDigits(1);
+						fNf.setMaximumFractionDigits(0);
+						cell.setText(fNf.format(result));
+					}
+				}
+			}
+		});
+
+		/*
+		 * column: average speed
 		 */
 		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
@@ -994,13 +1168,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
-		 * column: gradient
+		 * column: average pulse
 		 */
-		colDef = TableColumnFactory.GRADIENT.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_PULSE);
 				fSegmentViewer.refresh();
 			}
 		});
@@ -1008,64 +1183,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final TourSegment segment = (TourSegment) cell.getElement();
-				fNf.setMinimumFractionDigits(1);
-				fNf.setMaximumFractionDigits(1);
+				final int pulse = ((TourSegment) cell.getElement()).pulse;
 
-				cell.setText(fNf.format(segment.gradient));
-			}
-		});
-
-		/*
-		 * column: altitude up m/h
-		 */
-		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(fColumnManager, pixelConverter);
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				if (segment.drivingTime == 0) {
+				if (pulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
-					if (result == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						fNf.setMinimumFractionDigits(1);
-						fNf.setMaximumFractionDigits(0);
-						cell.setText(fNf.format(result));
-					}
+					cell.setText(Integer.toString(pulse));
 				}
 			}
 		});
 
 		/*
-		 * column: altitude down m/h
+		 * column: pulse difference
 		 */
-		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(fColumnManager, pixelConverter);
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final TourSegment segment = (TourSegment) cell.getElement();
-				if (segment.drivingTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
+				final int pulseDiff = ((TourSegment) cell.getElement()).pulseDiff;
+
+				if (pulseDiff == 0) {
+					cell.setText(UI.DASH);
 				} else {
-					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
-					if (result == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						fNf.setMinimumFractionDigits(1);
-						fNf.setMaximumFractionDigits(0);
-						cell.setText(fNf.format(result));
-					}
+					cell.setText(Integer.toString(pulseDiff));
 				}
 			}
 		});
-
 	}
 
 	@Override
@@ -1367,9 +1512,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void onSelectSegmenterType() {
 
 		final SegmenterType selectedSegmenter = fSegmenterTypes[fCboSegmenterType.getSelectionIndex()];
-		if (selectedSegmenter == SegmenterType.DouglasPeucker) {
-
-			// Douglas-Peucker Segmenter
+		if (selectedSegmenter == SegmenterType.ByAltitudeWithDP || //
+			selectedSegmenter == SegmenterType.ByPulseWithDP) {
 
 			fPageBookSegmenter.showPage(fPageSegTypeDP);
 
@@ -1575,7 +1719,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			// update UI
 			fLabelDistanceValue.setText(sb.toString());
-
 
 		} else {
 

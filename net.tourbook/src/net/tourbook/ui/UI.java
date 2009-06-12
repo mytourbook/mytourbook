@@ -88,6 +88,7 @@ public class UI {
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String						SPACE							= " ";											//$NON-NLS-1$
 	public static final String						UNDERSCORE						= "_";											//$NON-NLS-1$
+	public static final String						DASH							= "-";											//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
@@ -131,6 +132,7 @@ public class UI {
 
 	public static final String						SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
 	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
+	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
@@ -211,9 +213,11 @@ public class UI {
 		 */
 		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
+		IMAGE_REGISTRY.put(
+				IMAGE_TOUR_TYPE_FILTER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
+		IMAGE_REGISTRY.put(
+				IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
 		/*
@@ -299,7 +303,8 @@ public class UI {
 					.append(UI.NEW_LINE2)
 					.append(UI.NEW_LINE)
 					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-					.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+					.append(
+							"However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
 
@@ -448,11 +453,25 @@ public class UI {
 
 		fFormatterSB.setLength(0);
 
-		return fFormatter.format(//
-		Messages.Format_hhmmss,
-				(time / 3600),
-				((time % 3600) / 60),
-				((time % 3600) % 60)).toString();
+		if (time >= 3600) {
+
+			// display hours
+
+			return fFormatter.format(//
+					Messages.Format_hhmmss,
+					(time / 3600),
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		} else {
+
+			// ignore hours
+
+			return fFormatter.format(//
+					Messages.Format_hhmm,
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+		}
 	}
 
 	public static Formatter format_mm_ss(final long time) {
@@ -462,12 +481,17 @@ public class UI {
 		return fFormatter.format(Messages.Format_hhmm, (time / 60), (time % 60));
 	}
 
-	public static String format_yyyymmdd_hhmmss(final int year, final int month, final int day, final int hour, final int minute, final int second) {
+	public static String format_yyyymmdd_hhmmss(final int year,
+												final int month,
+												final int day,
+												final int hour,
+												final int minute,
+												final int second) {
 
 		fFormatterSB.setLength(0);
 
 		return fFormatter.format(//
-		Messages.Format_yyyymmdd_hhmmss,
+				Messages.Format_yyyymmdd_hhmmss,
 				year,
 				month,
 				day,
@@ -477,7 +501,7 @@ public class UI {
 				.toString();
 	}
 
- 	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
+	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
 
 		if (tourData == null) {
 			return UI.EMPTY_STRING;
@@ -486,7 +510,7 @@ public class UI {
 		fFormatterSB.setLength(0);
 
 		return fFormatter.format(//
-		Messages.Format_yyyymmdd_hhmmss,
+				Messages.Format_yyyymmdd_hhmmss,
 				tourData.getStartYear(),
 				tourData.getStartMonth(),
 				tourData.getStartDay(),
@@ -697,7 +721,8 @@ public class UI {
 
 			openTourEditor(true);
 
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.dialog_is_tour_editor_modified_title,
 					Messages.dialog_is_tour_editor_modified_message);
 
@@ -968,8 +993,8 @@ public class UI {
 		/*
 		 * distance
 		 */
-		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE)
-				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE).equals(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
 
 			// set imperial measure system
 
@@ -993,8 +1018,8 @@ public class UI {
 		/*
 		 * altitude
 		 */
-		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE)
-				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT)) {
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE).equals(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT)) {
 
 			// set imperial measure system
 
@@ -1016,8 +1041,8 @@ public class UI {
 		/*
 		 * temperature
 		 */
-		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE)
-				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F)) {
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE).equals(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F)) {
 
 			// set imperial measure system
 
