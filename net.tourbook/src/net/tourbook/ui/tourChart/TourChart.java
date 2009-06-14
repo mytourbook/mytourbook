@@ -121,6 +121,7 @@ public class TourChart extends Chart {
 	private boolean							fIsSegmentLayerVisible					= false;
 	private boolean							fIs2ndAltiLayerVisible					= false;
 	private I2ndAltiLayer					f2ndAltiLayerProvider;
+	private boolean							fIsMouseModeSet;
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
@@ -198,7 +199,8 @@ public class TourChart extends Chart {
 
 	public void actionShowSRTMData(final boolean isItemChecked) {
 
-		TourbookPlugin.getDefault().getPreferenceStore().setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE,
+		TourbookPlugin.getDefault().getPreferenceStore().setValue(
+				ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE,
 				isItemChecked);
 
 		fTourChartConfig.isSRTMDataVisible = isItemChecked;
@@ -367,28 +369,32 @@ public class TourChart extends Chart {
 					isChartModified = true;
 				}
 
-				isChartModified = setMinDefaultValue(property,
+				isChartModified = setMinDefaultValue(
+						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
 						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
 						TourManager.GRAPH_PACE,
 						TourManager.PACE_DIVISOR);
 
-				isChartModified = setMaxDefaultValue(property,
+				isChartModified = setMaxDefaultValue(
+						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
 						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
 						TourManager.GRAPH_PACE,
 						TourManager.PACE_DIVISOR);
 
-				isChartModified = setMinDefaultValue(property,
+				isChartModified = setMinDefaultValue(
+						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 						TourManager.GRAPH_ALTIMETER,
 						0);
 
-				isChartModified = setMinDefaultValue(property,
+				isChartModified = setMinDefaultValue(
+						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
@@ -427,70 +433,80 @@ public class TourChart extends Chart {
 	 */
 	private void createGraphActionProxies() {
 
-		createGraphActionProxy(TourManager.GRAPH_ALTITUDE,
+		createGraphActionProxy(
+				TourManager.GRAPH_ALTITUDE,
 				COMMAND_ID_GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image__graph_altitude,
 				Messages.Image__graph_altitude_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_SPEED,
+		createGraphActionProxy(
+				TourManager.GRAPH_SPEED,
 				COMMAND_ID_GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
 				Messages.Image__graph_speed_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_PACE,
+		createGraphActionProxy(
+				TourManager.GRAPH_PACE,
 				COMMAND_ID_GRAPH_PACE,
 				Messages.Graph_Label_Pace,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
 				Messages.Image__graph_pace_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_POWER,
+		createGraphActionProxy(
+				TourManager.GRAPH_POWER,
 				COMMAND_ID_GRAPH_POWER,
 				Messages.Graph_Label_Power,
 				Messages.Tour_Action_graph_power_tooltip,
 				Messages.Image__graph_power,
 				Messages.Image__graph_power_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
+		createGraphActionProxy(
+				TourManager.GRAPH_ALTIMETER,
 				COMMAND_ID_GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image__graph_altimeter,
 				Messages.Image__graph_altimeter_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_PULSE,
+		createGraphActionProxy(
+				TourManager.GRAPH_PULSE,
 				COMMAND_ID_GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image__graph_heartbeat,
 				Messages.Image__graph_heartbeat_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_TEMPERATURE,
+		createGraphActionProxy(
+				TourManager.GRAPH_TEMPERATURE,
 				COMMAND_ID_GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_CADENCE,
+		createGraphActionProxy(
+				TourManager.GRAPH_CADENCE,
 				COMMAND_ID_GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image__graph_cadence,
 				Messages.Image__graph_cadence_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_GRADIENT,
+		createGraphActionProxy(
+				TourManager.GRAPH_GRADIENT,
 				COMMAND_ID_GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradient,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);
 
-		createGraphActionProxy(TourManager.GRAPH_TOUR_COMPARE,
+		createGraphActionProxy(
+				TourManager.GRAPH_TOUR_COMPARE,
 				COMMAND_ID_GRAPH_TOUR_COMPARE,
 				Messages.Graph_Label_Tour_Compare,
 				Messages.Tour_Action_graph_tour_compare_tooltip,
@@ -742,9 +758,8 @@ public class TourChart extends Chart {
 
 		final boolean canShowSRTMData = fTourChartConfig.canShowSRTMData;
 		fActionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setEnabled(canShowSRTMData);
-		fActionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setChecked(canShowSRTMData
-				? fTourChartConfig.isSRTMDataVisible
-				: false);
+		fActionProxies.get(COMMAND_ID_SHOW_SRTM_DATA).setChecked(
+				canShowSRTMData ? fTourChartConfig.isSRTMDataVisible : false);
 
 		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
 		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
@@ -1016,14 +1031,16 @@ public class TourChart extends Chart {
 		}
 
 		/*
-		 * show merge layer only together with the altitude graph
+		 * display merge layer only together with the altitude graph
 		 */
 		if (fLayer2ndAltiSerie != null && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
 			chartCustomLayers.add(fLayer2ndAltiSerie);
 		}
 
+		// set custom layers, no layers are set when layer list is empty
 		yData.setCustomLayers(chartCustomLayers);
 
+		// set segment data series
 		if (segmentDataSerie != null) {
 			yData.setCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES, segmentDataSerie);
 		}
@@ -1257,7 +1274,7 @@ public class TourChart extends Chart {
 
 		fIsSegmentLayerVisible = isLayerVisible;
 
-		if (fIsSegmentLayerVisible) {
+		if (isLayerVisible) {
 			createSegmentLayer();
 		} else {
 			fSegmentLayer = null;
@@ -1343,7 +1360,8 @@ public class TourChart extends Chart {
 		fTourData = newTourData;
 		fTourChartConfig = newChartConfig;
 
-		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(newTourData,
+		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
+				newTourData,
 				newChartConfig,
 				isPropertyChanged);
 
@@ -1375,12 +1393,16 @@ public class TourChart extends Chart {
 		updateChart(newChartDataModel);
 
 		/*
-		 * this must be done after the chart is created because is sets an action
+		 * this must be done after the chart is created because is sets an action, set it only once
+		 * when the chart is displayed the first time otherwise it's annoying
 		 */
-		setMouseMode(TourbookPlugin.getDefault()
-				.getPreferenceStore()
-				.getString(ITourbookPreferences.GRAPH_MOUSE_MODE)
-				.equals(Chart.MOUSE_MODE_SLIDER));
+		if (fIsMouseModeSet == false) {
+
+			fIsMouseModeSet = true;
+
+			setMouseMode(TourbookPlugin.getDefault().getPreferenceStore().getString(
+					ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
+		}
 	}
 
 	/**

@@ -106,46 +106,10 @@ public class ChartSegmentLayer implements IChartLayer {
 				lastPoint.y = devYSegment;
 			}
 
-			gc.setForeground(colorLine);
-
 			// draw a line from the marker to the top of the graph
 			gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 			gc.setLineStyle(SWT.LINE_DOT);
 			gc.drawLine(devXOffset, devYSegment, devXOffset, devYBottom - devGraphHeight);
-
-			gc.setForeground(colorLine);
-
-//			// draw marker label
-//			final String markerLabel = chartMarker.markerLabel;
-//			if (markerLabel.length() > 0) {
-//
-//				labelExtend = gc.textExtent(markerLabel);
-//
-//				final int xPos = devXOffset - labelExtend.y;
-//				int yPos = yMarkerBar - labelExtend.y;
-//
-//				yPos = devYBottom - 5;
-//
-//				if (chart.getAdvancedGraphics()) {
-//
-//					final Transform tr = new Transform(display);
-//					tr.translate(xPos, yPos);
-//					tr.rotate(-90f);
-//
-//					gc.setTransform(tr);
-//					// gc.setAntialias(SWT.ON);
-//
-//					gc.drawText(markerLabel, 0, 0, true);
-//
-//					gc.setTransform(null);
-//					// gc.setAntialias(SWT.OFF);
-//
-//					tr.dispose();
-//
-//				} else {
-//					gc.drawText(markerLabel, xPos, yPos, true);
-//				}
-//			}
 		}
 
 		colorLine.dispose();

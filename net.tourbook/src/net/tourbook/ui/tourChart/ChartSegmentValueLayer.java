@@ -61,6 +61,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
+		final int devGraphHeight = drawingData.getDevGraphHeight();
 
 		final int graphYBottom = drawingData.getGraphYBottom();
 
@@ -78,14 +79,13 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final float scaleY = drawingData.getScaleY();
 
 		final Color lineColor = new Color(display, lineColorRGB);
-		gc.setForeground(lineColor);
 
 		Point lastPoint = null;
 
 		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
 			final int serieIndex = segmentSerie[segmentIndex];
-			final int xDevOffset = (int) (fXDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
+			final int devXOffset = (int) (fXDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
 			final int devYGraph = (int) ((graphYValue - graphYBottom) * scaleY);
@@ -100,16 +100,25 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			}
 
 			if (lastPoint == null) {
-				lastPoint = new Point(xDevOffset, devYMarker);
+				lastPoint = new Point(devXOffset, devYMarker);
 			} else {
+
+				gc.setForeground(lineColor);
+
 				gc.setLineStyle(SWT.LINE_DOT);
 				gc.drawLine(lastPoint.x, lastPoint.y, lastPoint.x, devYMarker);
-				gc.setLineStyle(SWT.LINE_SOLID);
-				gc.drawLine(lastPoint.x, devYMarker, xDevOffset, devYMarker);
 
-				lastPoint.x = xDevOffset;
+				gc.setLineStyle(SWT.LINE_SOLID);
+				gc.drawLine(lastPoint.x, devYMarker, devXOffset, devYMarker);
+
+				lastPoint.x = devXOffset;
 				lastPoint.y = devYMarker;
 			}
+
+			// draw a line from the marker to the top of the graph
+			gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+			gc.setLineStyle(SWT.LINE_DOT);
+			gc.drawLine(devXOffset, devYMarker, devXOffset, devYTop);
 		}
 
 		lineColor.dispose();
