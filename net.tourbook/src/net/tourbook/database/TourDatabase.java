@@ -880,7 +880,10 @@ public class TourDatabase {
 
 	/**
 	 * Persist {@link TourData} in the database and updates the tour data cache with the persisted
-	 * tour
+	 * tour<br>
+	 * <br>
+	 * When a tour has no person the tour will not be saved, a person must be set first before the
+	 * tour can be saved
 	 * 
 	 * @param tourData
 	 * @return persisted {@link TourData} or <code>null</code> when saving fails
@@ -1172,7 +1175,8 @@ public class TourDatabase {
 
 				} else if (currentDbVersion > TOURBOOK_DB_VERSION) {
 
-					MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					MessageDialog.openInformation(
+							Display.getCurrent().getActiveShell(),
 							Messages.tour_database_version_info_title,
 							NLS.bind(Messages.tour_database_version_info_message, currentDbVersion, TOURBOOK_DB_VERSION));
 				}

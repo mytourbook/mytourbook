@@ -225,10 +225,6 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Label_original_values;
 	public static String		Dlg_AdjustAltitude_Label_start_altitude;
 	public static String		Dlg_AdjustAltitude_Label_start_altitude_tooltip;
-//	public static String		Dlg_AdjustAltitude_Message_adjust_end;
-//	public static String		Dlg_AdjustAltitude_Message_adjust_max;
-//	public static String		Dlg_AdjustAltitude_Message_adjust_start_and_end;
-//	public static String		Dlg_AdjustAltitude_Message_adjust_whole_tour;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;
@@ -334,7 +330,6 @@ public class Messages extends NLS {
 	public static String		Image__show_distance_on_x_axis;
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
-
 	public static String		Image__spline_point;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;
@@ -364,7 +359,6 @@ public class Messages extends NLS {
 	public static String		import_data_action_assignMergedTour_default;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
-
 	public static String		import_data_action_createTourIdWithTime;
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
@@ -402,6 +396,7 @@ public class Messages extends NLS {
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
+
 	public static String		merge_tour_source_graph_altitude;
 	public static String		merge_tour_source_graph_altitude_tooltip;
 	public static String		merge_tour_source_graph_cadence;
@@ -436,7 +431,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_autozoom;
 	public static String		Pref_Graphs_Check_force_minimum_for_altimeter;
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
-
 	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
@@ -500,7 +494,7 @@ public class Messages extends NLS {
 	public static String		pref_map_layout_symbol_line;
 	public static String		pref_map_layout_symbol_square;
 	public static String		pref_map_layout_symbol_width;
- 
+
 	public static String		pref_regional_decimalSeparator;
 	public static String		pref_regional_description;
 	public static String		pref_regional_groupSeparator;
@@ -528,7 +522,6 @@ public class Messages extends NLS {
 	public static String		pref_tourtag_dlg_rename_title;
 	public static String		pref_tourtag_dlg_rename_title_category;
 	public static String		pref_tourtag_dlg_reset_message;
-
 	public static String		pref_tourtag_dlg_reset_title;
 	public static String		pref_tourtag_hint;
 	public static String		pref_tourtag_viewer_title;
@@ -737,7 +730,6 @@ public class Messages extends NLS {
 	public static String		tour_merger_chk_use_synced_start_time_tooltip;
 	public static String		tour_merger_dialog_header_message;
 	public static String		tour_merger_dialog_header_title;
-
 	public static String		tour_merger_dialog_title;
 	public static String		tour_merger_group_adjust_altitude;
 	public static String		tour_merger_group_adjust_time;
@@ -747,19 +739,16 @@ public class Messages extends NLS {
 	public static String		tour_merger_label_adjust_seconds;
 	public static String		tour_merger_save_target_tour;
 
-	public static String	tour_segmenter_label_createSegmentsWith;
-
-	public static String	tour_segmenter_segType_byDistance_defaultDistance;
-
-	public static String	tour_segmenter_segType_byDistance_label;
-
-	public static String	tour_segmenter_type_byAltitude;
-
-	public static String	tour_segmenter_type_byDistance;
-
-	public static String	tour_segmenter_type_byMarker;
-
-	public static String	tour_segmenter_type_byPulse;
+	public static String		tour_segmenter_button_updateAltitude;
+	public static String		tour_segmenter_button_updateAltitude_tooltip;
+	public static String		tour_segmenter_label_createSegmentsWith;
+	public static String		tour_segmenter_label_tourAltitude_tooltip;
+	public static String		tour_segmenter_segType_byDistance_defaultDistance;
+	public static String		tour_segmenter_segType_byDistance_label;
+	public static String		tour_segmenter_type_byAltitude;
+	public static String		tour_segmenter_type_byDistance;
+	public static String		tour_segmenter_type_byMarker;
+	public static String		tour_segmenter_type_byPulse;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

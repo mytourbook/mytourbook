@@ -2439,9 +2439,10 @@ public class TourData implements Comparable<Object> {
 		final int firstSerieIndex = segmentSerieIndex[0];
 
 		// get start values
+		int timeStart = timeSerie[firstSerieIndex];
 		int distanceStart = distanceSerie[firstSerieIndex];
 		int altitudeStart = altitudeSerie[firstSerieIndex];
-		int timeStart = timeSerie[firstSerieIndex];
+
 		int timeTotal = 0;
 		int distanceTotal = 0;
 		int altitudeTotal = 0;
@@ -2500,19 +2501,19 @@ public class TourData implements Comparable<Object> {
 			// total altitude 
 			if (altitudeDiff > 0) {
 				segmentSerieAltitudeTotal[segmentIndex] = segment.altitudeTotal = altitudeTotal += altitudeDiff;
+
 			} else {
 				segmentSerieAltitudeTotal[segmentIndex] = segment.altitudeTotal = altitudeTotal;
 			}
 
 			final int drivingTimeTemp = recordingTimeDiff - getBreakTime(segmentStartIndex, segmentEndIndex);
-			segmentSerieDrivingTime[segmentIndex] = //
-			segment.drivingTime = //
-			drivingTimeDiff = (0 >= drivingTimeTemp) ? 0 : drivingTimeTemp;
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTimeDiff = (0 >= drivingTimeTemp)
+					? 0
+					: drivingTimeTemp;
 
 			final int[] localPowerSerie = getPowerSerie();
 			int altitudeUp = 0;
 			int altitudeDown = 0;
-//			int pulseSum = 0;
 			int powerSum = 0;
 
 			int altitude1 = altitudeSerie[segmentStartIndex];
@@ -2528,10 +2529,6 @@ public class TourData implements Comparable<Object> {
 				altitudeDown += altitude2Diff < 0 ? altitude2Diff : 0;
 
 				powerSum += localPowerSerie[serieIndex];
-
-//				if (pulseSerie != null) {
-//					pulseSum += pulseSerie[serieIndex];
-//				}
 			}
 
 			segment.altitudeUp = altitudeUp;
@@ -2564,7 +2561,10 @@ public class TourData implements Comparable<Object> {
 			final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
 			segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 ? 0 : powerSum / segmentIndexDiff;
 
-			if (segmentSeriePulse != null) {
+			if (pulseSerie == null || pulseSerie.length == 0) {
+				// hide pulse in the view
+				segment.pulseDiff = Integer.MIN_VALUE;
+			} else {
 				final int segmentAvgPulse = computeAvgPulseSegment(segmentStartIndex, segmentEndIndex);
 				segmentSeriePulse[segmentIndex] = segment.pulse = segmentAvgPulse;
 				segment.pulseDiff = segmentAvgPulse - avgPulse;
@@ -3317,7 +3317,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
-	 * @return returns the person for whom the tour data is saved or <code>null</code> when the tour
+	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
 	 *         is not saved in the database
 	 */
 	public TourPerson getTourPerson() {

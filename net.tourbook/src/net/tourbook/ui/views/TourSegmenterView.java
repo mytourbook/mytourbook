@@ -75,6 +75,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -136,6 +137,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Label							fLabelToleranceValue;
 	private ImageComboLabel					fLblTitle;
 	private Combo							fCboSegmenterType;
+	private Label							fLblAltitudeUp;
 
 	private TableViewer						fSegmentViewer;
 	private ColumnManager					fColumnManager;
@@ -175,6 +177,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private boolean							fIsDirtyDisabled				= false;
 
 	private boolean							fIsClearView;
+	private Button							fBtnSaveTour;
+	private int								fAltitudeUp;
+	private int								fAltitudeDown;
 
 	/**
 	 * {@link #fSegmenterTypes} and {@link #fSegmenterTypeNames} must be in synch
@@ -233,7 +238,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			if (fTourData == null) {
 				return new Object[0];
 			} else {
-				return fTourData.createTourSegments();
+
+				final Object[] tourSegments = fTourData.createTourSegments();
+
+				updateUIAltitude();
+
+				return tourSegments;
 			}
 		}
 
@@ -379,9 +389,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					updateUIDistance();
 
 					createSegments();
-
-					// refresh tour with the new measurement system
-//					fireSegmentLayerChanged();
 				}
 			}
 		};
@@ -630,7 +637,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
 		final int lastDistanceSerieIndex = distanceSerie.length - 1;
-//		final int maxDistance = distanceSerie[lastDistanceSerieIndex];
 
 		final float segmentDistance = getDistance();
 		final ArrayList<Integer> segmentSerieIndex = new ArrayList<Integer>();
@@ -794,17 +800,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void createUIHeader(final Composite parent) {
 
+		final PixelConverter pc = new PixelConverter(parent);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(3, 3, 3, 2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(3, 3, 3, 2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			// tour title
 			fLblTitle = new ImageComboLabel(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fLblTitle);
+			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fLblTitle);
 
 			// label: create segments with
 			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 			label.setText(Messages.tour_segmenter_label_createSegmentsWith);
 
 			// combo: segmenter type
@@ -819,9 +828,36 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fCboSegmenterType.add(segmenterType);
 			}
 
+			// tour/computed altitude
+			final Composite altitudeContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(altitudeContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(altitudeContainer);
+			{
+				// label: computed altitude up
+				fLblAltitudeUp = new Label(altitudeContainer, SWT.TRAIL);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.CENTER)
+						.grab(true, false)
+						.hint(pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
+						.applyTo(fLblAltitudeUp);
+				fLblAltitudeUp.setToolTipText(Messages.tour_segmenter_label_tourAltitude_tooltip);
+
+				// button: update tour
+				fBtnSaveTour = new Button(altitudeContainer, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(5, 0).applyTo(fBtnSaveTour);
+				fBtnSaveTour.setText(Messages.tour_segmenter_button_updateAltitude);
+				fBtnSaveTour.setToolTipText(Messages.tour_segmenter_button_updateAltitude_tooltip);
+				fBtnSaveTour.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSaveTourAltitude();
+					}
+				});
+			}
+
 			// pagebook: segmenter type
 			fPageBookSegmenter = new PageBook(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fPageBookSegmenter);
+			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fPageBookSegmenter);
 			{
 				fPageSegTypeDP = createUISegmenterDP(fPageBookSegmenter);
 				fPageSegTypeByMarker = createUISegmenterByMarker(fPageBookSegmenter);
@@ -1204,7 +1240,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final int pulseDiff = ((TourSegment) cell.getElement()).pulseDiff;
 
-				if (pulseDiff == 0) {
+				if (pulseDiff == Integer.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else if (pulseDiff == 0) {
 					cell.setText(UI.DASH);
 				} else {
 					cell.setText(Integer.toString(pulseDiff));
@@ -1395,6 +1433,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		createSegments();
 	}
 
+	private void onSaveTourAltitude() {
+
+		fTourData.setTourAltUp(fAltitudeUp);
+		fTourData.setTourAltDown(fAltitudeDown);
+
+		fIsTourDirty = true;
+
+		fTourData = saveTour();
+	}
+
 	/**
 	 * handle a tour selection event
 	 * 
@@ -1513,7 +1561,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final SegmenterType selectedSegmenter = fSegmenterTypes[fCboSegmenterType.getSelectionIndex()];
 		if (selectedSegmenter == SegmenterType.ByAltitudeWithDP || //
-			selectedSegmenter == SegmenterType.ByPulseWithDP) {
+				selectedSegmenter == SegmenterType.ByPulseWithDP) {
 
 			fPageBookSegmenter.showPage(fPageSegTypeDP);
 
@@ -1549,6 +1597,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	public void reloadViewer() {
+		// force input to be reloaded
 		fSegmentViewer.setInput(new Object[0]);
 	}
 
@@ -1650,10 +1699,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fScaleTolerance.setSelection((int) tolerance);
 		fLabelToleranceValue.setText(Integer.toString(fTourData.getDpTolerance()));
 
-		fIsDirtyDisabled = false;
+		fBtnSaveTour.setEnabled(fTourData.getTourPerson() != null);
 
-//		// force the segements to be rebuild for the new tour
-//		onChangedTolerance(fDpTolerance, true);
+		fIsDirtyDisabled = false;
 
 		onSelectSegmenterType();
 	}
@@ -1670,6 +1718,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (fTourData != null && fSavedDpTolerance != fTourData.getDpTolerance()) {
 			fIsTourDirty = true;
 		}
+	}
+
+	/**
+	 * update ascending altitude computed value
+	 */
+	private void updateUIAltitude() {
+
+		final int[] altitudeSegments = fTourData.segmentSerieAltitude;
+
+		if (altitudeSegments == null) {
+			fLblAltitudeUp.setText(UI.EMPTY_STRING);
+			return;
+		}
+
+		fAltitudeUp = 0;
+		fAltitudeDown = 0;
+
+		for (final int altitude : altitudeSegments) {
+			if (altitude > 0) {
+				fAltitudeUp += altitude;
+			} else {
+				fAltitudeDown += altitude;
+			}
+		}
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append(Integer.toString((int) (fAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+		sb.append(UI.SLASH_WITH_SPACE);
+		sb.append(Integer.toString((int) (fTourData.getTourAltUp() / UI.UNIT_VALUE_ALTITUDE)));
+		sb.append(UI.SPACE);
+		sb.append(UI.UNIT_LABEL_ALTITUDE);
+
+		fLblAltitudeUp.setText(sb.toString());
 	}
 
 	private void updateUIDistance() {
