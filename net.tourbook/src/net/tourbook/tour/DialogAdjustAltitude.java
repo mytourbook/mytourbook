@@ -66,7 +66,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -161,7 +160,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private int							fPrevAltiMax;
 	private int							fPrevAltiStart;
-	private Text						fTxtAltitudeValue;
 
 	{
 		fNF.setMinimumFractionDigits(0);
@@ -257,7 +255,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			// first adjust end alti to start alti, secondly adjust max
 			computeAltitudeEnd(metricAltitudeSerie, fMetricAdjustedAltitudeNoneSRTM, metricAltitudeSerie[0]);
-			computeAltitudeStartAndMax(fMetricAdjustedAltitudeNoneSRTM,
+			computeAltitudeStartAndMax(
+					fMetricAdjustedAltitudeNoneSRTM,
 					fMetricAdjustedAltitudeNoneSRTM,
 					newAltiStart,
 					newAltiMax);
@@ -946,7 +945,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		fDlgContainer = new Composite(container, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fDlgContainer);
-		GridLayoutFactory.fillDefaults().margins(10, 0).applyTo(fDlgContainer);
+		GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(fDlgContainer);
+//		fDlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
 		createUI(fDlgContainer);
 
@@ -1015,13 +1015,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		final Composite startEndContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(startEndContainer);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(startEndContainer);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(startEndContainer);
 		{
 			/*
@@ -1109,10 +1107,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		 * button container
 		 */
 		final Composite buttonContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.indent(20, 0)
-				.applyTo(buttonContainer);
+		GridDataFactory.fillDefaults().indent(20, 0).applyTo(buttonContainer);
 		GridLayoutFactory.fillDefaults().applyTo(buttonContainer);
+//		buttonContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
 			 * button: reset values
@@ -1348,8 +1345,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		fTourChartConfig.isSRTMDataVisible = true;
 
 		// overwrite x-axis from pref store
-		fTourChartConfig.setIsShowTimeOnXAxis(fPrefStore.getString(ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT)
-				.equals(TourManager.X_AXIS_TIME));
+		fTourChartConfig.setIsShowTimeOnXAxis(fPrefStore.getString(
+				ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT).equals(TourManager.X_AXIS_TIME));
 	}
 
 	private void enableFieldsWithoutSRTM() {
@@ -1594,7 +1591,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_MAX_HEIGHT:
 
 			fPageBookOptions.showPage(fPageOptionNoSRTM);
-			onChangeAltitude();
+//			onChangeAltitude();
+			onResetAdjustments();
 
 			break;
 
