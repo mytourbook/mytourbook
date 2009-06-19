@@ -200,6 +200,7 @@ public class TourData implements Comparable<Object> {
 	 * distance data serie
 	 */
 	private int							tourDistance;
+
 	/**
 	 * total recording time in seconds
 	 */
@@ -517,6 +518,8 @@ public class TourData implements Comparable<Object> {
 
 	@Transient
 	public float[]						segmentSeriePace;
+	@Transient
+	public float[]						segmentSeriePaceDiff;
 
 	@Transient
 	public float[]						segmentSeriePower;
@@ -2450,6 +2453,10 @@ public class TourData implements Comparable<Object> {
 		int altitudeUp = 0;
 		int altitudeDown = 0;
 
+		final int tourPace = (int) (tourDistance == 0
+				? 0
+				: (tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE)));
+
 		segmentSerieRecordingTime = new int[segmentSerieLength];
 		segmentSerieDrivingTime = new int[segmentSerieLength];
 		segmentSerieBreakTime = new int[segmentSerieLength];
@@ -2466,6 +2473,7 @@ public class TourData implements Comparable<Object> {
 
 		segmentSerieSpeed = new float[segmentSerieLength];
 		segmentSeriePace = new float[segmentSerieLength];
+
 		segmentSeriePower = new float[segmentSerieLength];
 		segmentSerieGradient = new float[segmentSerieLength];
 		segmentSerieCadence = new float[segmentSerieLength];
@@ -2550,9 +2558,10 @@ public class TourData implements Comparable<Object> {
 				// pace
 				final float segmentPace = segmentDistance == 0 ? //
 						0
-						: (float) (drivingTime * 1000 / segmentDistance * UI.UNIT_VALUE_DISTANCE);
-				segment.pace = segmentPace;
-				segmentSeriePace[segmentIndex] = segment.pace / 60;
+						: (float) (drivingTime * 1000 / (segmentDistance * UI.UNIT_VALUE_DISTANCE));
+				segment.pace = (int) segmentPace;
+				segment.paceDiff = segment.pace - tourPace;
+				segmentSeriePace[segmentIndex] = segmentPace / 60;
 
 				// gradient
 				segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitudeDiff

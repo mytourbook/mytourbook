@@ -40,8 +40,8 @@ public class TourSegment {
 	public float	gradient;
 	public int		power;
 
-	public float	pace;
-	public float	paceDiff;
+	public int		pace;
+	public int		paceDiff;
 	public int		pulse;
 	public int		pulseDiff;
 

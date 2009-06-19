@@ -480,7 +480,13 @@ public class UI {
 
 		fFormatterSB.setLength(0);
 
-		return fFormatter.format(Messages.Format_hhmm, (time / 60), (time % 60));
+		if (time < 0) {
+			fFormatterSB.append(UI.DASH);
+		}
+
+		final long timeAbs = time < 0 ? 0 - time : time;
+
+		return fFormatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60));
 	}
 
 	public static String format_yyyymmdd_hhmmss(final int year,

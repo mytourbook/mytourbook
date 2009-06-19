@@ -285,7 +285,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				break;
 
 			case COLUMN_PACE:
-				rc = (int) ((segment1.pace - segment2.pace) * 100);
+				rc = ((segment1.pace - segment2.pace) * 100);
 				break;
 
 			case COLUMN_PULSE:
@@ -1030,6 +1030,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
+		 * column: recording time
+		 */
+		colDef = TableColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(UI.format_hh_mm_ss(segment.recordingTime));
+			}
+		});
+
+		/*
 		 * column: driving time
 		 */
 		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
@@ -1202,6 +1216,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				cell.setText(UI.format_mm_ss((long) pace).toString());
 			}
 		});
+
 		/*
 		 * column: pace difference
 		 */
@@ -1212,15 +1227,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float segmentPaceDiff = segment.paceDiff;
+				final float paceDiff = segment.paceDiff;
 
-				if (Float.isNaN(segmentPaceDiff)) {
-					cell.setText(UI.EMPTY_STRING);
-				} else if (segmentPaceDiff == 0) {
-					cell.setText(UI.DASH);
-				} else {
-					cell.setText(UI.format_mm_ss((long) (segmentPaceDiff * UI.UNIT_VALUE_DISTANCE)).toString());
-				}
+				cell.setText(UI.format_mm_ss((long) paceDiff).toString());
 			}
 		});
 
