@@ -1011,9 +1011,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
-		 * column: TOTAL altitude (m/ft)
+		 * column: distance (km/mile)
 		 */
-		colDef = TableColumnFactory.ALTITUDE_TOTAL.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1022,10 +1022,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				fNf.setMinimumFractionDigits(0);
-				fNf.setMaximumFractionDigits(0);
+				fNf.setMinimumFractionDigits(3);
+				fNf.setMaximumFractionDigits(3);
 
-				cell.setText(fNf.format(segment.altitudeTotal / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(fNf.format((segment.distanceDiff) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
 		});
 
@@ -1044,28 +1044,28 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
-		 * column: distance (km/mile)
+		 * column: break time
 		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.PAUSED_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-
 				final TourSegment segment = (TourSegment) cell.getElement();
-
-				fNf.setMinimumFractionDigits(3);
-				fNf.setMaximumFractionDigits(3);
-
-				cell.setText(fNf.format((segment.distance) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+				final int breakTime = segment.breakTime;
+				if (breakTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_hh_mm_ss(breakTime));
+				}
 			}
 		});
 
 		/*
-		 * column: altitude (m/ft)
+		 * column: altitude diff (m/ft)
 		 */
-		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_DIFF.createColumn(fColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1077,7 +1077,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fNf.setMinimumFractionDigits(0);
 				fNf.setMaximumFractionDigits(0);
 
-				cell.setText(fNf.format(segment.altitude / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(fNf.format(segment.altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
 			}
 		});
 
@@ -1119,7 +1119,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					final float result = (segment.altitudeUpH / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
@@ -1145,7 +1145,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					final float result = (segment.altitudeDownH / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
@@ -1202,6 +1202,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				cell.setText(UI.format_mm_ss((long) pace).toString());
 			}
 		});
+		/*
+		 * column: pace difference
+		 */
+		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float segmentPaceDiff = segment.paceDiff;
+
+				if (Float.isNaN(segmentPaceDiff)) {
+					cell.setText(UI.EMPTY_STRING);
+				} else if (segmentPaceDiff == 0) {
+					cell.setText(UI.DASH);
+				} else {
+					cell.setText(UI.format_mm_ss((long) (segmentPaceDiff * UI.UNIT_VALUE_DISTANCE)).toString());
+				}
+			}
+		});
 
 		/*
 		 * column: average pulse
@@ -1249,6 +1270,45 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 		});
+
+		/*
+		 * column: total altitude up (m/ft)
+		 */
+		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+
+				cell.setText(fNf.format(segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+
+		/*
+		 * column: total altitude down (m/ft)
+		 */
+		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+
+				cell.setText(fNf.format(segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+
 	}
 
 	@Override
@@ -1725,7 +1785,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void updateUIAltitude() {
 
-		final int[] altitudeSegments = fTourData.segmentSerieAltitude;
+		final int[] altitudeSegments = fTourData.segmentSerieAltitudeDiff;
 
 		if (altitudeSegments == null) {
 			fLblAltitudeUp.setText(UI.EMPTY_STRING);

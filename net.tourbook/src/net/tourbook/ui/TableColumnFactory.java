@@ -48,17 +48,17 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory ALTITUDE_TOTAL = new TableColumnFactory() {
+	public static final TableColumnFactory ALTITUDE_DIFF = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeTotal", SWT.TRAIL); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiff", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_altitudeTotal_label); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
-			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_altitudeTotal_tooltip);
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
 			return colDef;
@@ -71,14 +71,13 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			
-			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 		
 			return colDef;
 		};
@@ -92,11 +91,11 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_h_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
-																			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_h_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -108,7 +107,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE;//$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "/ " + UI.UNIT_LABEL_ALTITUDE;//$NON-NLS-1$
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label); 
 			colDef.setColumnHeader(unitLabel); 
@@ -128,10 +127,10 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_h_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_h_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
@@ -148,6 +147,22 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
 			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory AVG_PACE_DIFFERENCE = new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgPaceDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_pace_difference_label);
+			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 			
 			return colDef;
@@ -179,8 +194,8 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgPulseDiff", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_difference_label);
-			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE+ Messages.ColumnFactory_pulse);
-			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + Messages.ColumnFactory_pulse);
+			colDef.setColumnHeader(Messages.ColumnFactory_pulse_difference);
+			colDef.setColumnUnit( Messages.ColumnFactory_pulse_difference);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pulse_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
@@ -288,7 +303,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(10);
+																			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
@@ -308,10 +323,11 @@ public abstract class TableColumnFactory {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distanceTotal", SWT.TRAIL); //$NON-NLS-1$
 			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
-			
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_DISTANCE;//$NON-NLS-1$
+
 			colDef.setColumnLabel(Messages.ColumnFactory_distanceTotal_label);
-			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
-			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_distanceTotal_tooltip);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
@@ -486,6 +502,23 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory PAUSED_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "pausedTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_paused_time_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_paused_time);
+			colDef.setColumnUnit(Messages.ColumnFactory_paused_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_paused_time_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory POWER = new TableColumnFactory() {
 		
 		@Override
@@ -543,10 +576,11 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "recordingTimeTotal", SWT.TRAIL); //$NON-NLS-1$
-			
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_recording_time;//$NON-NLS-1$
+
 			colDef.setColumnLabel(Messages.ColumnFactory_recording_timeTotal_label);
-			colDef.setColumnHeader(Messages.ColumnFactory_recording_time);
-			colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_recording_timeTotal_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			

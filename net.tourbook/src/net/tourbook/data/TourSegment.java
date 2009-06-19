@@ -23,22 +23,25 @@ public class TourSegment {
 
 	public int		recordingTime;
 	public int		drivingTime;
-
-	public int		altitude;
-	public int		distance;
-
+	public int		breakTime;
 	public int		timeTotal;
-	public int		altitudeTotal;
+
+	public int		distanceDiff;
 	public int		distanceTotal;
 
 	public int		altitudeUp;
 	public int		altitudeDown;
+	public int		altitudeDiff;
 
-	// computed values
+	public int		altitudeUpH;
+	public int		altitudeDownH;
+
 	public float	speed;
 	public float	gradient;
-	public float	pace;
 	public int		power;
+
+	public float	pace;
+	public float	paceDiff;
 	public int		pulse;
 	public int		pulseDiff;
 

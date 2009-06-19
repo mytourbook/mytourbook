@@ -990,13 +990,13 @@ public class TourChart extends Chart {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
 		}
 
-		setCustomGraphData(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitudeDiff, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
-		setCustomGraphData(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
+		setCustomGraphData(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltitudeUpH, yDataWithLabels);
 		setCustomGraphData(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 	}
 

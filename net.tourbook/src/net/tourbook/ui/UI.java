@@ -134,6 +134,7 @@ public class UI {
 	public static final String						SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
 	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
 	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
+	public static final String						SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
 
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
