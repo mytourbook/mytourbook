@@ -18,5 +18,20 @@
             type="serial">
       </device>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.garmin.PrefPageTCX"
+            id="net.tourbook.device.garmin.prefPage"
+            name="TCX">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.tourbook.device.garmin.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

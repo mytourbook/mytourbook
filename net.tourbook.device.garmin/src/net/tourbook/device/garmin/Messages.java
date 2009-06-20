@@ -18,13 +18,23 @@ package net.tourbook.device.garmin;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
+
 	private static final String	BUNDLE_NAME	= "net.tourbook.device.garmin.messages";	//$NON-NLS-1$
+
 	public static String		Garmin_commuication_error;
 	public static String		Garmin_data_transfer_error;
 	public static String		Garmin_error_receiving_data;
 	public static String		Garmin_no_connection;
 	public static String		Garmin_Transfer_msg;
 	public static String		Garmin_unknown_device;
+
+	public static String		prefPage_tcx_check_importIntoDescriptionField;
+	public static String		prefPage_tcx_check_importIntoTitleField;
+	public static String		prefPage_tcx_group_importNotes;
+	public static String		prefPage_tcx_label_importNotes;
+	public static String		prefPage_tcx_radio_importIntoTitleAll;
+	public static String		prefPage_tcx_radio_importIntoTitleTruncated;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

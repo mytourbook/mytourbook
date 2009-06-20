@@ -29,6 +29,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -45,6 +46,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String		TAG_HISTORY					= "History";													//$NON-NLS-1$
 
 	private static final String		TAG_LAP						= "Lap";														//$NON-NLS-1$
+	private static final String		TAG_NOTES					= "Notes";														//$NON-NLS-1$
 	private static final String		TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
 
 	private static final String		TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
@@ -92,6 +94,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private long					fCurrentTime;
 
 	private StringBuilder			fCharacters					= new StringBuilder();
+	private boolean					fIsInNotes;
+	private String					fTourNotes;
 
 	{
 		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
@@ -117,7 +121,10 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| fIsInDistance
 				|| fIsInCadence
 				|| fIsInHeartRate
-				|| fIsInHeartRateValue) {
+				|| fIsInHeartRateValue
+				|| fIsInNotes
+		//
+		) {
 
 			fCharacters.append(chars, startIndex, length);
 		}
@@ -168,6 +175,12 @@ public class GarminSAXHandler extends DefaultHandler {
 					fSetLapStartTime = false;
 					fLapStart.add(fCurrentTime);
 				}
+
+			} else if (name.equals(TAG_NOTES)) {
+
+				fIsInNotes = false;
+
+				fTourNotes = fCharacters.toString();
 
 			} else if (name.equals(TAG_LAP)) {
 
@@ -360,6 +373,9 @@ public class GarminSAXHandler extends DefaultHandler {
 		// create data object for each tour
 		final TourData tourData = new TourData();
 
+		// set tour notes
+		setTourNotes(tourData);
+
 		/*
 		 * set tour start date/time
 		 */
@@ -434,6 +450,40 @@ public class GarminSAXHandler extends DefaultHandler {
 		fIsImported = true;
 	}
 
+	/**
+	 * Set the notes into the description and/or title field
+	 * 
+	 * @param tourData
+	 */
+	private void setTourNotes(final TourData tourData) {
+
+		if (fTourNotes == null || fTourNotes.length() == 0) {
+			return;
+		}
+
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+		final boolean isDescriptionField = store.getBoolean(IPreferences.IS_IMPORT_INTO_DESCRIPTION_FIELD);
+		final boolean isTitleField = store.getBoolean(IPreferences.IS_IMPORT_INTO_TITLE_FIELD);
+
+		if (isDescriptionField) {
+			tourData.setTourDescription(new String(fTourNotes));
+		}
+
+		if (isTitleField) {
+
+			final boolean isImportAll = store.getBoolean(IPreferences.IS_TITLE_IMPORT_ALL);
+			final int titleCharacters = store.getInt(IPreferences.NUMBER_OF_TITLE_CHARACTERS);
+
+			if (isImportAll) {
+				tourData.setTourTitle(new String(fTourNotes));
+			} else {
+				final int endIndex = Math.min(fTourNotes.length(), titleCharacters);
+				tourData.setTourTitle(fTourNotes.substring(0, endIndex));
+			}
+		}
+	}
+
 	@Override
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
@@ -484,6 +534,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					fLapStart.clear();
 
 					fTimeDataList.clear();
+					fTourNotes = null;
 				}
 
 			} else if (fDataVersion == 2) {
@@ -550,6 +601,19 @@ public class GarminSAXHandler extends DefaultHandler {
 					fLapStart.clear();
 
 					fTimeDataList.clear();
+					fTourNotes = null;
+				}
+			}
+
+			// common tags
+			if (fDataVersion == 1 || fDataVersion == 2) {
+
+				if (fIsInActivity || fIsInCourse) {
+
+					if (name.equals(TAG_NOTES)) {
+						fIsInNotes = true;
+						fCharacters.delete(0, fCharacters.length());
+					}
 				}
 			}
 
