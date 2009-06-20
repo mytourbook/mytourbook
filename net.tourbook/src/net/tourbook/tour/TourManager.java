@@ -138,7 +138,10 @@ public class TourManager {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		final int[] timeSerie = tourData.timeSerie;
 
-		if (timeSerie == null || timeSerie.length == 0) {
+		if (timeSerie == null
+				|| timeSerie.length == 0
+				|| startIndex >= distanceSerie.length
+				|| endIndex >= distanceSerie.length) {
 			return 0;
 		}
 
@@ -314,7 +317,8 @@ public class TourManager {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
-		calendar.set(tourData.getStartYear(),
+		calendar.set(
+				tourData.getStartYear(),
 				tourData.getStartMonth() - 1,
 				tourData.getStartDay(),
 				tourData.getStartHour(),
@@ -1153,11 +1157,13 @@ public class TourManager {
 			// adjust pace when it's defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
 
-				yDataPace.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * PACE_DIVISOR,
+				yDataPace.setVisibleMinValue(
+						prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * PACE_DIVISOR,
 						true);
 
 				// set max value after min value
-				yDataPace.setVisibleMaxValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * PACE_DIVISOR,
+				yDataPace.setVisibleMaxValue(
+						prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * PACE_DIVISOR,
 						true);
 			}
 		}
@@ -1198,7 +1204,8 @@ public class TourManager {
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
 			yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO,
+			yDataAltimeter.setCustomData(
+					CUSTOM_DATA_ANALYZER_INFO,
 					new TourChartAnalyzerInfo(true, computeAltimeterAvg));
 			yDataAltimeter.setShowYSlider(true);
 			setGraphColor(prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
@@ -1206,7 +1213,8 @@ public class TourManager {
 
 			// adjust min altitude when it's defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED)) {
-				yDataAltimeter.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
+				yDataAltimeter.setVisibleMinValue(
+						prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
 						true);
 			}
 		}
@@ -1521,10 +1529,10 @@ public class TourManager {
 		}
 
 		try {
-			PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow()
-					.getActivePage()
-					.openEditor(new TourEditorInput(tourId), TourEditor.ID, true);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+					new TourEditorInput(tourId),
+					TourEditor.ID,
+					true);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();
@@ -1624,7 +1632,8 @@ public class TourManager {
 					.append(UI.NEW_LINE2)
 					.append(UI.NEW_LINE)
 					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-					.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+					.append(
+							"However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
 

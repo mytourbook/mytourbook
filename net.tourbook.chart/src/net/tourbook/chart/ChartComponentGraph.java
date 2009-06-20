@@ -968,7 +968,8 @@ public class ChartComponentGraph extends Canvas {
 				actionSelectBars();
 				hideToolTip();
 
-				fChart.fillContextMenu(menuMgr,
+				fChart.fillContextMenu(
+						menuMgr,
 						contextLeftSlider,
 						contextRightSlider,
 						fHoveredBarSerieIndex,
@@ -1535,7 +1536,8 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorDarkSelected);
 			gc.setBackground(colorBrightSelected);
 
-			gc.fillGradientRectangle(barShapeSelected.x + 1,
+			gc.fillGradientRectangle(
+					barShapeSelected.x + 1,
 					barShapeSelected.y + 1,
 					barShapeSelected.width - 1,
 					barShapeSelected.height - 1,
@@ -1543,7 +1545,8 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw bar border
 			gc.setForeground(colorLineSelected);
-			gc.drawRoundRectangle(barShapeSelected.x,
+			gc.drawRoundRectangle(
+					barShapeSelected.x,
 					barShapeSelected.y,
 					barShapeSelected.width,
 					barShapeSelected.height,
@@ -1660,7 +1663,8 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
-				final int devNonScrolledImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH,
+				final int devNonScrolledImageWidth = Math.max(
+						ChartComponents.CHART_MIN_WIDTH,
 						getDevVisibleChartWidth());
 
 				final int devNewImageWidth = canScrollZoomedChart
@@ -1671,8 +1675,9 @@ public class ChartComponentGraph extends Canvas {
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devNewImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT,
-						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
+				final int devNewImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math.min(
+						getDevVisibleGraphHeight(),
+						ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
 				 * when the image is the same size as the new we will redraw it only if it is set to
@@ -1905,7 +1910,8 @@ public class ChartComponentGraph extends Canvas {
 				gc.setForeground(colorDark);
 				gc.setBackground(colorBright);
 
-				gc.fillGradientRectangle(hoveredBarShape.x + 1,
+				gc.fillGradientRectangle(
+						hoveredBarShape.x + 1,
 						hoveredBarShape.y + 1,
 						hoveredBarShape.width - 1,
 						hoveredBarShape.height - 1,
@@ -1913,7 +1919,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// draw bar border
 				gc.setForeground(colorLine);
-				gc.drawRoundRectangle(hoveredBarShape.x,
+				gc.drawRoundRectangle(
+						hoveredBarShape.x,
 						hoveredBarShape.y,
 						hoveredBarShape.width,
 						hoveredBarShape.height,
@@ -2035,7 +2042,8 @@ public class ChartComponentGraph extends Canvas {
 
 			// synch marker is not displayed
 
-			drawLineGraphSegment(gc,
+			drawLineGraphSegment(
+					gc,
 					drawingData,
 					0,
 					xValues.length,
@@ -2053,7 +2061,8 @@ public class ChartComponentGraph extends Canvas {
 			final int noneMarkerAlpha = 0x60;
 
 			// draw the x-marker
-			drawLineGraphSegment(gc,
+			drawLineGraphSegment(
+					gc,
 					drawingData,
 					xData.getSynchMarkerStartIndex(),
 					xData.getSynchMarkerEndIndex() + 1,
@@ -2064,7 +2073,8 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment before the marker
-			drawLineGraphSegment(gc,
+			drawLineGraphSegment(
+					gc,
 					drawingData,
 					0,
 					xData.getSynchMarkerStartIndex() + 1,
@@ -2075,7 +2085,8 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment after the marker
-			drawLineGraphSegment(gc,
+			drawLineGraphSegment(
+					gc,
 					drawingData,
 					xData.getSynchMarkerEndIndex() - 0,
 					xValues.length,
@@ -2119,6 +2130,11 @@ public class ChartComponentGraph extends Canvas {
 		final int xValues[] = xData.getHighValues()[0];
 		final int yValues[] = highValues[0];
 
+		// check array bounds
+		if (startIndex >= xValues.length) {
+			return;
+		}
+
 		final boolean isPath2 = highValues.length > 1;
 		int[] yValues2 = null;
 		if (isPath2) {
@@ -2148,9 +2164,9 @@ public class ChartComponentGraph extends Canvas {
 		// draw the lines into the path
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
-			// make sure the x-index is not higher than the yValues length
+			// check array bounds
 			if (xValueIndex >= yValues.length) {
-				return;
+				break;
 			}
 
 			int graphX = xValues[xValueIndex];
@@ -2285,7 +2301,8 @@ public class ChartComponentGraph extends Canvas {
 
 			gc.setClipping(path);
 
-			gc.fillGradientRectangle(0,
+			gc.fillGradientRectangle(
+					0,
 					(int) (devY0 - (graphYBottom * scaleY)) + 1,
 					devChartWidth + 5,
 					-devGraphHeight,
@@ -2302,7 +2319,8 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * fill above 0 line
 			 */
-			gc.fillGradientRectangle(0,
+			gc.fillGradientRectangle(
+					0,
 					(int) (devY0 - (graphFillYBottom * scaleY)) + 1,
 					devChartWidth,
 					(int) -Math.min(devGraphHeight, Math.abs(devYTop - devY0)),
@@ -2314,7 +2332,8 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorBg2);
 			gc.setBackground(colorBg1);
 
-			gc.fillGradientRectangle(0,
+			gc.fillGradientRectangle(
+					0,
 					devYBottom,
 					devChartWidth,
 					(int) -Math.min(devGraphHeight, devYBottom - devY0),
@@ -2643,12 +2662,14 @@ public class ChartComponentGraph extends Canvas {
 			final int valueXStartWithOffset = valueXStart + valueDraggingDiff;
 			final int valueXEndWithOffset = valueXEnd + valueDraggingDiff;
 
-			fMovedXMarkerStartValueIndex = computeXMarkerValue(xValues,
+			fMovedXMarkerStartValueIndex = computeXMarkerValue(
+					xValues,
 					synchStartIndex,
 					valueDraggingDiff,
 					valueXStartWithOffset);
 
-			fMovedXMarkerEndValueIndex = computeXMarkerValue(xValues,
+			fMovedXMarkerEndValueIndex = computeXMarkerValue(
+					xValues,
 					synchEndIndex,
 					valueDraggingDiff,
 					valueXEndWithOffset);
@@ -2735,7 +2756,8 @@ public class ChartComponentGraph extends Canvas {
 
 			gc.setAlpha(0x80);
 
-			gc.fillGradientRectangle(devMovedXStart,
+			gc.fillGradientRectangle(
+					devMovedXStart,
 					graphBottom,
 					devMovedXEnd - devMovedXStart,
 					graphTop - graphBottom,
@@ -4326,7 +4348,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// call the listener which is registered for dragged x-marker
 				if (fChart.fXMarkerDraggingListener != null) {
-					fChart.fXMarkerDraggingListener.xMarkerMoved(fMovedXMarkerStartValueIndex,
+					fChart.fXMarkerDraggingListener.xMarkerMoved(
+							fMovedXMarkerStartValueIndex,
 							fMovedXMarkerEndValueIndex);
 				}
 
