@@ -276,10 +276,10 @@ public class TourMapView extends ViewPart {
 	void actionSetDefaultPosition() {
 		if (fDefaultPosition == null) {
 			fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
-			fMap.setCenterPosition(new GeoPosition(0, 0));
+			fMap.setGeoCenterPosition(new GeoPosition(0, 0));
 		} else {
 			fMap.setZoom(fDefaultZoom);
-			fMap.setCenterPosition(fDefaultPosition);
+			fMap.setGeoCenterPosition(fDefaultPosition);
 		}
 		fMap.queueRedrawMap();
 	}
@@ -658,7 +658,7 @@ public class TourMapView extends ViewPart {
 
 			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
 
-			fMap.setCenterPosition(geoPosition);
+			fMap.setGeoCenterPosition(geoPosition);
 		}
 	}
 
@@ -1264,7 +1264,7 @@ public class TourMapView extends ViewPart {
 			fPOIPosition = poi.getPosition();
 
 			fMap.setZoom(poi.getRecommendedZoom());
-			fMap.setCenterPosition(fPOIPosition);
+			fMap.setGeoCenterPosition(fPOIPosition);
 			fMap.queueRedrawMap();
 
 			enableActions();
@@ -1449,7 +1449,7 @@ public class TourMapView extends ViewPart {
 
 				// position tour to the previous position
 				fMap.setZoom(tourData.mapZoomLevel);
-				fMap.setCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
+				fMap.setGeoCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
 			}
 		}
@@ -1870,7 +1870,7 @@ public class TourMapView extends ViewPart {
 
 		final int sliderIndex = Math.max(0, Math.min(fCurrentSelectedSliderValueIndex, latitudeSerie.length - 1));
 
-		fMap.setCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+		fMap.setGeoCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
 	}
 
@@ -1906,7 +1906,7 @@ public class TourMapView extends ViewPart {
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
-			fMap.setCenterPosition(px);
+			fMap.setGeoCenterPosition(px);
 
 			// check zoom level
 			if (++zoom >= maximumZoomLevel) {
@@ -1925,7 +1925,7 @@ public class TourMapView extends ViewPart {
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
-			fMap.setCenterPosition(px);
+			fMap.setGeoCenterPosition(px);
 
 			// check zoom level
 			if (++zoom >= maximumZoomLevel) {

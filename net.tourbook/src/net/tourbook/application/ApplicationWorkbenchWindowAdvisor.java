@@ -308,10 +308,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		configurer.setInitialSize(new Point(900, 700));
-//		configurer.setShowCoolBar(true);
+		configurer.setShowPerspectiveBar(true);
+
+		configurer.setShowCoolBar(true);
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowStatusLine(false);
-		configurer.setShowPerspectiveBar(true);
 
 		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
 

@@ -24,54 +24,34 @@ public class Messages extends NLS {
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
 
-	public static String	ColumnFactory_altitude_difference_label;
-
-	public static String	ColumnFactory_altitude_difference_tooltip;
-
-	public static String	ColumnFactory_altitude_down_h_label;
-
-	public static String	ColumnFactory_altitude_down_h_tooltip;
-
+	public static String		ColumnFactory_altitude_difference_label;
+	public static String		ColumnFactory_altitude_difference_tooltip;
+	public static String		ColumnFactory_altitude_down_h_label;
+	public static String		ColumnFactory_altitude_down_h_tooltip;
 	public static String		ColumnFactory_altitude_down_label;
 	public static String		ColumnFactory_altitude_down_tooltip;
 	public static String		ColumnFactory_altitude_label;
 	public static String		ColumnFactory_altitude_tooltip;
-	public static String	ColumnFactory_altitude_up_h_label;
-
-	public static String	ColumnFactory_altitude_up_h_tooltip;
-
+	public static String		ColumnFactory_altitude_up_h_label;
+	public static String		ColumnFactory_altitude_up_h_tooltip;
 	public static String		ColumnFactory_altitude_up_label;
 	public static String		ColumnFactory_altitude_up_tooltip;
-
-	public static String	ColumnFactory_altitudeTotal_label;
-
-	public static String	ColumnFactory_altitudeTotal_tooltip;
 	public static String		ColumnFactory_avg_cadence;
 	public static String		ColumnFactory_avg_cadence_label;
 	public static String		ColumnFactory_avg_cadence_tooltip;
-	public static String	ColumnFactory_avg_pace_difference_label;
-
-	public static String	ColumnFactory_avg_pace_difference_tooltip;
-
+	public static String		ColumnFactory_avg_pace_difference_label;
+	public static String		ColumnFactory_avg_pace_difference_tooltip;
 	public static String		ColumnFactory_avg_pace_label;
 	public static String		ColumnFactory_avg_pace_tooltip;
 	public static String		ColumnFactory_avg_pulse;
-
-	public static String	ColumnFactory_avg_pulse_difference_label;
-
-	public static String	ColumnFactory_avg_pulse_difference_tooltip;
+	public static String		ColumnFactory_avg_pulse_difference_label;
+	public static String		ColumnFactory_avg_pulse_difference_tooltip;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
 	public static String		ColumnFactory_avg_speed_label;
 	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
-	public static String	ColumnFactory_break_time;
-
-	public static String	ColumnFactory_break_time_label;
-
-	public static String	ColumnFactory_break_time_tooltip;
-
 	public static String		ColumnFactory_cadence;
 	public static String		ColumnFactory_cadence_label;
 	public static String		ColumnFactory_cadence_tooltip;
@@ -87,10 +67,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_device_tooltip;
 	public static String		ColumnFactory_distance_label;
 	public static String		ColumnFactory_distance_tooltip;
-
-	public static String	ColumnFactory_distanceTotal_label;
-
-	public static String	ColumnFactory_distanceTotal_tooltip;
+	public static String		ColumnFactory_distanceTotal_label;
+	public static String		ColumnFactory_distanceTotal_tooltip;
 	public static String		ColumnFactory_driving_time;
 	public static String		ColumnFactory_driving_time_label;
 	public static String		ColumnFactory_driving_time_tooltip;
@@ -131,17 +109,14 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_profile_label;
 	public static String		ColumnFactory_profile_tooltip;
 	public static String		ColumnFactory_pulse;
-
-	public static String	ColumnFactory_pulse_difference;
+	public static String		ColumnFactory_pulse_difference;
 	public static String		ColumnFactory_pulse_label;
 	public static String		ColumnFactory_pulse_tooltip;
 	public static String		ColumnFactory_recording_time;
 	public static String		ColumnFactory_recording_time_label;
 	public static String		ColumnFactory_recording_time_tooltip;
-
-	public static String	ColumnFactory_recording_timeTotal_label;
-
-	public static String	ColumnFactory_recording_timeTotal_tooltip;
+	public static String		ColumnFactory_recording_timeTotal_label;
+	public static String		ColumnFactory_recording_timeTotal_tooltip;
 	public static String		ColumnFactory_reference_tour;
 	public static String		ColumnFactory_sequence;
 	public static String		ColumnFactory_sequence_label;
