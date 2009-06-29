@@ -68,7 +68,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 
 		public SRTMTileFactoryInfo() {
 
-			super(MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			super(FACTORY_ID, MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		public RGB[][] drawTile(final Tile tile) {
