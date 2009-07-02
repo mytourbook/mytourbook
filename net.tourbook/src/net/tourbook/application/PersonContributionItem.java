@@ -141,7 +141,9 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fComboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+				if (fPrefChangeListener != null) {
+					plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+				}
 			}
 		});
 
@@ -200,6 +202,25 @@ public class PersonContributionItem extends CustomControlContribution {
 		plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 	}
 
+	/**
+	 * select the person which was set in the dialog settings
+	 */
+	private void reselectLastPerson() {
+
+		Long lastPersonId;
+		try {
+
+			lastPersonId = plugin.getDialogSettings().getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
+
+			// try to reselect the last person
+			reselectPerson(lastPersonId);
+
+		} catch (final NumberFormatException e) {
+			// no last person id, select all
+			fComboPeople.select(0);
+		}
+	}
+
 	private void reselectPerson(final long previousPersonId) {
 
 		if (fPeople == null) {
@@ -226,25 +247,6 @@ public class PersonContributionItem extends CustomControlContribution {
 		}
 
 		plugin.setActivePerson(currentPerson);
-	}
-
-	/**
-	 * select the person which was set in the dialog settings
-	 */
-	private void reselectLastPerson() {
-
-		Long lastPersonId;
-		try {
-
-			lastPersonId = plugin.getDialogSettings().getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
-
-			// try to reselect the last person
-			reselectPerson(lastPersonId);
-
-		} catch (final NumberFormatException e) {
-			// no last person id, select all
-			fComboPeople.select(0);
-		}
 	}
 
 	/**
