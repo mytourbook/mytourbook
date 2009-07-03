@@ -223,11 +223,17 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 					// check if this tour data editor contains a tour which must be updated
 
+					if (fTourData == null) {
+						return;
+					}
+
+					final Long tourId = fTourData.getTourId();
+
 					// update editor
-					if (UI.containsTourId(eventData, fTourData.getTourId()) != null) {
+					if (UI.containsTourId(eventData, tourId) != null) {
 
 						// reload tour data and update chart
-						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
+						updateChart(TourManager.getInstance().getTourData(tourId));
 					}
 				}
 			}
@@ -325,7 +331,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void fireSliderPosition() {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				TourManager.fireEvent(TourEventId.SLIDER_POSITION_CHANGED,
+				TourManager.fireEvent(
+						TourEventId.SLIDER_POSITION_CHANGED,
 						fTourChart.getChartInfo(),
 						TourChartView.this);
 			}
@@ -432,8 +439,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
-						.getTourId());
+				final TourData tourData = TourManager.getInstance().getTourData(
+						compareResultItem.getComparedTourData().getTourId());
 				updateChart(tourData);
 			}
 
