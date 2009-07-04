@@ -87,6 +87,7 @@ public class UI {
 
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String						SPACE							= " ";											//$NON-NLS-1$
+	public static final String						COLON_SPACE						= ": ";										//$NON-NLS-1$
 	public static final String						UNDERSCORE						= "_";											//$NON-NLS-1$
 	public static final String						DASH							= "-";											//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
@@ -674,8 +675,7 @@ public class UI {
 	private static String getSQLExceptionText(final SQLException e) {
 
 		final StringBuilder sb = new StringBuilder()//
-		.append(UI.NEW_LINE)
-				.append("--- SQLException ---") //$NON-NLS-1$
+				.append("SQLException") //$NON-NLS-1$
 				.append(UI.NEW_LINE2)
 				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
 				.append(UI.NEW_LINE)
@@ -938,8 +938,15 @@ public class UI {
 
 		while (e != null) {
 
-			System.out.println(getSQLExceptionText(e));
+			final String sqlExceptionText = getSQLExceptionText(e);
+
+			System.out.println(sqlExceptionText);
 			e.printStackTrace();
+
+			if (e instanceof SQLException) {
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", //$NON-NLS-1$ 
+						sqlExceptionText);
+			}
 
 			e = e.getNextException();
 		}
@@ -949,6 +956,7 @@ public class UI {
 	public static void showSQLException(final SQLException e, final String sqlStatement) {
 
 		MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", "SQL statement: "//$NON-NLS-1$ //$NON-NLS-2$
+				+ UI.NEW_LINE2
 				+ sqlStatement
 				+ getSQLExceptionText(e));
 	}

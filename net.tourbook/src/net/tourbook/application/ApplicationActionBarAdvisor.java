@@ -95,6 +95,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
+		fileMenu.add(new Separator("databaseTools")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
 
 		/*

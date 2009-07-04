@@ -166,6 +166,11 @@ public class Messages extends NLS {
 
 	public static String		app_btn_browse;
 
+	public static String	app_db_consistencyCheck_checkFailed;
+
+	public static String	app_db_consistencyCheck_checkIsOK;
+
+	public static String		app_db_consistencyCheck_dlgTitle;
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
 

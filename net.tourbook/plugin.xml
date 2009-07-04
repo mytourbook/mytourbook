@@ -494,6 +494,17 @@
       </menuContribution>
 
       <menuContribution
+            locationURI="menu:file?after=databaseTools">
+         <command
+               commandId="net.tourbook.command.dbTool.consistencyCheck"
+               label="%command_dbtool_consistency_check"
+               mnemonic="%command_dbtool_consistency_check_mnemonic"
+               style="push"
+               >
+         </command>
+      </menuContribution>
+
+      <menuContribution
             locationURI="menu:views?before=defaultViews">
          <command
                commandId="net.tourbook.command.selectedTour"
@@ -837,6 +848,11 @@
             defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
             id="net.tourbook.command.createNewTour"
             name="%command_createNewTour">
+      </command>
+      <command
+            id="net.tourbook.command.dbTool.consistencyCheck"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
+            name="%command_dbtool_consistency_check">
       </command>
    </extension>
    
