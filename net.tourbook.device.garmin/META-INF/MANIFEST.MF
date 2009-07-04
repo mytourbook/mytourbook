@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: net.tourbook.device.garmin;singleton:=true
-Bundle-Version: 9.05.5.v2009-06-21-patch12
+Bundle-Version: 9.07.0.v2009-07-05
 Bundle-Activator: net.tourbook.device.garmin.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
