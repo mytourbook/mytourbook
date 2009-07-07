@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.ejb3"
       label="Ejb3 Service"
-      version="3.3.0"
+      version="3.4.0"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

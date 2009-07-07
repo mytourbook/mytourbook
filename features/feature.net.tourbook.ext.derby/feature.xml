@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.derby"
       label="Derby Database"
-      version="10.3.2.1"
+      version="10.5.1.1"
       plugin="net.tourbook.branding">
 
    <description url="http://www.example.com/description">

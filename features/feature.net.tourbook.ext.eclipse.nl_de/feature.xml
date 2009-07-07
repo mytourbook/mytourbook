@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse.nl_de"
       label="Eclipse German Translation"
-      version="9.05.0.v2009-05-09"
+      version="9.07.0.v2009-07-05"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">
@@ -162,7 +162,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.frameworkadmin.equinox.nl_de"
+         id="org.eclipse.equinox.app.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -170,7 +170,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.frameworkadmin.nl_de"
+         id="org.eclipse.equinox.common.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -178,7 +178,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.simpleconfigurator.manipulator.nl_de"
+         id="org.eclipse.equinox.ds.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -186,7 +186,39 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.simpleconfigurator.nl_de"
+         id="org.eclipse.equinox.launcher.nl_de"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.preferences.nl_de"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.registry.nl_de"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.security.nl_de"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.util.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
