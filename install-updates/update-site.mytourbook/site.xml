@@ -12,5 +12,15 @@
    <feature url="features/patch10.jar" id="net.tourbook.patch.9.05.3.patch10" version="9.05.3.v2009-06-08-patch10" patch="true">
       <category name="MyTourbook 9.05"/>
    </feature>
-   <category-def name="MyTourbook 9.05" label="MyTourbook 9.05"/>
+   <feature url="features/patch11.jar" id="patch.net.tourbook.9.05.4.patch11" version="9.05.4.v2009-06-16-patch11" patch="true">
+      <category name="MyTourbook 9.05"/>
+   </feature>
+   <feature url="features/patch12.jar" id="patch.net.tourbook.9.05.5.patch12" version="9.05.5.v2009-06-21-patch12" patch="true">
+      <category name="MyTourbook 9.05"/>
+   </feature>
+   <category-def name="MyTourbook 9.05" label="MyTourbook 9.05">
+      <description>
+         MyTourbook 9.05
+      </description>
+   </category-def>
 </site>
