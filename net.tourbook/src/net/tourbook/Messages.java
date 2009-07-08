@@ -750,7 +750,11 @@ public class Messages extends NLS {
 	public static String		tour_segmenter_label_tourAltitude_tooltip;
 	public static String		tour_segmenter_segType_byDistance_defaultDistance;
 	public static String		tour_segmenter_segType_byDistance_label;
+
+	public static String	tour_segmenter_segType_byUpDownAlti_label;
 	public static String		tour_segmenter_type_byAltitude;
+
+	public static String	tour_segmenter_type_byComputedAltiUpDown;
 	public static String		tour_segmenter_type_byDistance;
 	public static String		tour_segmenter_type_byMarker;
 	public static String		tour_segmenter_type_byPulse;

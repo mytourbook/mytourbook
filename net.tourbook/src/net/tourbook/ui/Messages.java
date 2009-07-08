@@ -99,8 +99,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_pace_label;
 	public static String		ColumnFactory_pace_tooltip;
+	public static String		ColumnFactory_paused_relative_time;
 	public static String		ColumnFactory_paused_time;
 	public static String		ColumnFactory_paused_time_label;
+	public static String		ColumnFactory_paused_time_relative_label;
+	public static String		ColumnFactory_paused_time_relative_tooltip;
 	public static String		ColumnFactory_paused_time_tooltip;
 	public static String		ColumnFactory_power;
 	public static String		ColumnFactory_power_label;
