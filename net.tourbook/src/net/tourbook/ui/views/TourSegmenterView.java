@@ -127,6 +127,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Composite						fPageSegTypeDP;
 	private Composite						fPageSegTypeByMarker;
 	private Composite						fPageSegTypeByDistance;
+	private Composite						fPageSegTypeByComputedAltiUpDown;
 
 	private Scale							fScaleDistance;
 	private Label							fLabelDistanceValue;
@@ -180,6 +181,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Button							fBtnSaveTour;
 	private int								fAltitudeUp;
 	private int								fAltitudeDown;
+	private Combo							fCboAltiUpDown;
 
 	/**
 	 * {@link #fSegmenterTypes} and {@link #fSegmenterTypeNames} must be in synch
@@ -189,6 +191,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			Messages.tour_segmenter_type_byPulse,
 			Messages.tour_segmenter_type_byDistance,
 			Messages.tour_segmenter_type_byMarker,
+			Messages.tour_segmenter_type_byComputedAltiUpDown,
 																			//
 																			};
 	private final static SegmenterType[]	fSegmenterTypes					= new SegmenterType[] {
@@ -196,6 +199,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			SegmenterType.ByPulseWithDP, //
 			SegmenterType.ByDistance,
 			SegmenterType.ByMarker, //
+			SegmenterType.ByComputedAltiUpDown, //
 																			};
 
 	private class ActionShowSegments extends Action {
@@ -219,7 +223,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		ByAltitudeWithDP, //
 		ByPulseWithDP, //
 		ByMarker, //
-		ByDistance
+		ByDistance, //
+		ByComputedAltiUpDown
 	}
 
 	/**
@@ -596,6 +601,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		} else if (selectedSegmenter == SegmenterType.ByMarker) {
 
 			createSegmentsByMarker();
+
+		} else if (selectedSegmenter == SegmenterType.ByComputedAltiUpDown) {
+
+			createSegmentsByComputedAltiUpDown();
 		}
 
 		// update table and create the tour segments in tour data
@@ -631,6 +640,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			final Point point = (Point) simplePoints[iPoint];
 			segmentSerieIndex[iPoint] = point.serieIndex;
 		}
+	}
+
+	private void createSegmentsByComputedAltiUpDown() {
+
+		final int[] altitudeSerie = fTourData.altitudeSerie;
+
+		final ArrayList<Integer> segmentSerieIndex = new ArrayList<Integer>();
+
+		// set first segment at tour start
+		segmentSerieIndex.add(0);
+
+		// create segment when the altitude up/down is computed
+		fTourData.computeAltitudeUpDown(segmentSerieIndex, fCboAltiUpDown.getSelectionIndex() + 1);
+
+		// add segment end at the tour end
+		segmentSerieIndex.add(altitudeSerie.length - 1);
+
+		fTourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
 	}
 
 	private void createSegmentsByDistance() {
@@ -862,8 +889,44 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fPageSegTypeDP = createUISegmenterDP(fPageBookSegmenter);
 				fPageSegTypeByMarker = createUISegmenterByMarker(fPageBookSegmenter);
 				fPageSegTypeByDistance = createUISegmenterByDistance(fPageBookSegmenter);
+				fPageSegTypeByComputedAltiUpDown = createUISegmenterByComputedAltiUpDown(fPageBookSegmenter);
 			}
 		}
+	}
+
+	private Composite createUISegmenterByComputedAltiUpDown(final Composite parent) {
+
+//		final PixelConverter pc = new PixelConverter(parent);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			// label: min alti diff
+			Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.tour_segmenter_segType_byUpDownAlti_label);
+
+			// combo: min altitude
+			fCboAltiUpDown = new Combo(container, SWT.READ_ONLY);
+			fCboAltiUpDown.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					createSegments();
+				}
+			});
+
+			for (int altiUpDown = 1; altiUpDown < 11; altiUpDown++) {
+				fCboAltiUpDown.add(Integer.toString(altiUpDown));
+			}
+			fCboAltiUpDown.select(2);
+
+			// label: unit
+			label = new Label(container, SWT.NONE);
+			label.setText(" m");
+
+		}
+
+		return container;
 	}
 
 	private Composite createUISegmenterByDistance(final Composite parent) {
@@ -1641,6 +1704,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		} else if (selectedSegmenter == SegmenterType.ByDistance) {
 
 			fPageBookSegmenter.showPage(fPageSegTypeByDistance);
+
+		} else if (selectedSegmenter == SegmenterType.ByComputedAltiUpDown) {
+
+			fPageBookSegmenter.showPage(fPageSegTypeByComputedAltiUpDown);
 		}
 
 		fPageSegmenter.layout();

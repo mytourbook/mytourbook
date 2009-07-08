@@ -624,6 +624,86 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	private TourData					fMergeSourceTourData;
 
+	public class HoehenAddierer {
+
+		boolean	isFirstValue		= true;
+
+		double	prevAltitude		= 0;
+		double	altitudeUpTotal		= 0;
+		double	altitudeUpSubTotal	= 0;
+
+		int		altitudeDiff		= 5;	// Meter; MUSS int sein!
+
+		public HoehenAddierer() {
+			init();
+		}
+
+		public HoehenAddierer(final int hoeheEps) {
+			init();
+			this.altitudeDiff = hoeheEps;
+		}
+
+		public void add(final double altitude) {
+
+			if (altitude <= 0) {
+				return; // insb. nicht NaN (not a number)
+			}
+
+			if (isFirstValue) {
+				// ignore first value
+				isFirstValue = false;
+			} else {
+
+				if (altitude > prevAltitude) {
+
+					altitudeUpSubTotal += altitude - prevAltitude;
+
+				} else if (altitude < prevAltitude) {
+
+					if (altitudeUpSubTotal > altitudeDiff) {
+						altitudeUpTotal += altitudeUpSubTotal;
+					}
+
+					altitudeUpSubTotal = 0;
+				}
+			}
+
+			prevAltitude = altitude;
+		}
+
+		public void add(final long hoehe) {
+			add((double) hoehe);
+		}
+
+		public int getEps() {
+			return altitudeDiff;
+		}
+
+		public double getSum() {
+			return altitudeUpTotal;
+		}
+
+		public void init() {
+			isFirstValue = true;
+			altitudeUpSubTotal = 0;
+			altitudeUpTotal = 0;
+			prevAltitude = 0;
+		}
+
+		public void last() {
+			// muss nach letztem Datenpunkt für mögliche Addition des "Rests" aufgerufen werden
+			if (altitudeUpSubTotal > altitudeDiff) {
+				altitudeUpTotal += altitudeUpSubTotal;
+			}
+			altitudeUpSubTotal = 0;
+		}
+
+		public void setEps(final int hoeheEps) {
+			this.altitudeDiff = hoeheEps;
+		}
+
+	}
+
 	public TourData() {}
 
 	/**
@@ -1139,16 +1219,157 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public void computeAltitudeUpDown() {
+		computeAltitudeUpDownInternal(null, 5);
+	}
 
-		if (altitudeSerie == null || timeSerie == null) {
+	public void computeAltitudeUpDown(final ArrayList<Integer> segmentSerieIndexParameter, final int minAltiDiff) {
+		computeAltitudeUpDownInternal(segmentSerieIndexParameter, minAltiDiff);
+	}
+
+	private void computeAltitudeUpDownInternal(	final ArrayList<Integer> segmentSerieIndexParameter,
+												final int altitudeMinDiff) {
+
+		// check if data are available
+		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
+			return;
+		}
+
+		int prevAltitude = 0;
+		int prevAltiDiff = 0;
+
+		int altitudeUpTotal = 0;
+		int altitudeUpSubTotal = 0;
+		int altitudeDownTotal = 0;
+		int altitudeDownSubTotal = 0;
+
+		final int serieLength = timeSerie.length;
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			final int altitude = altitudeSerie[serieIndex];
+			int altiDiff = 0;
+
+			if (serieIndex == serieLength - 1) {
+
+				// last data point
+
+				if (altitudeUpSubTotal > altitudeMinDiff) {
+					altitudeUpTotal += altitudeUpSubTotal;
+				}
+
+				if (altitudeDownSubTotal < -altitudeMinDiff) {
+					altitudeDownTotal += altitudeDownSubTotal;
+				}
+
+			} else if (serieIndex > 0) {
+
+				// ignore first value
+
+				altiDiff = altitude - prevAltitude;
+
+				if (altiDiff > 0) {
+
+					// current altitude is up
+
+					if (prevAltiDiff > 0) {
+
+						// tour is ascending
+
+						altitudeUpSubTotal += altiDiff;
+
+					} else if (prevAltiDiff < 0) {
+
+						// angel changed, tour is now ascending
+
+						if (altitudeDownSubTotal <= -altitudeMinDiff) {
+
+							altitudeDownTotal += altitudeDownSubTotal;
+
+							// create segment
+							if (segmentSerieIndexParameter != null) {
+								segmentSerieIndexParameter.add(serieIndex - 1);
+							}
+						}
+
+						altitudeUpSubTotal = altiDiff;
+						altitudeDownSubTotal = 0;
+
+//						System.out.println("-- segment --");
+//						// TODO remove SYSTEM.OUT.PRINTLN
+					}
+
+//					System.out.println(serieIndex + 1 + "\t"
+////							+ distance
+////							+ "\t"
+//							+ altitude
+//							+ "\t"
+//							+ altiDiff
+//							+ "\t"
+//							+ altitudeUpSubTotal);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+				} else if (altiDiff < 0) {
+
+					// current altitude is down
+
+					if (prevAltiDiff < 0) {
+
+						// tour is descending
+
+						altitudeDownSubTotal += prevAltiDiff;
+
+					} else if (prevAltiDiff > 0) {
+
+						// angle changed, tour is now descending
+
+						if (altitudeUpSubTotal >= altitudeMinDiff) {
+
+							altitudeUpTotal += altitudeUpSubTotal;
+
+							// create segment
+							if (segmentSerieIndexParameter != null) {
+								segmentSerieIndexParameter.add(serieIndex - 1);
+							}
+						}
+
+						altitudeUpSubTotal = 0;
+						altitudeDownSubTotal = altiDiff;
+
+//						System.out.println("-- segment --");
+//						// TODO remove SYSTEM.OUT.PRINTLN
+
+					}
+
+//					System.out.println(serieIndex + 1 + "\t"
+////							+ distance
+////							+ "\t"
+//							+ altitude
+//							+ "\t"
+//							+ altiDiff
+//							+ "\t"
+//							+ altitudeDownSubTotal);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+				}
+			}
+
+			if (altiDiff != 0) {
+				prevAltiDiff = altiDiff;
+			}
+
+			prevAltitude = altitude;
+		}
+
+		setTourAltUp(altitudeUpTotal);
+		setTourAltDown(-altitudeDownTotal);
+	}
+
+	private void computeAltitudeUpDownWithTime() {
+
+		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
 			return;
 		}
 
 		final int serieLength = timeSerie.length;
-
-		if (serieLength == 0) {
-			return;
-		}
 
 		int lastTime = 0;
 		int currentAltitude = altitudeSerie[0];
@@ -2780,6 +3001,11 @@ public class TourData implements Comparable<Object> {
 		}
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
@@ -2815,11 +3041,6 @@ public class TourData implements Comparable<Object> {
 		return ignoreTimeCounter;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * @return the calories
 	 */
@@ -2839,6 +3060,15 @@ public class TourData implements Comparable<Object> {
 		return deviceModeName;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
+
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
@@ -2848,15 +3078,6 @@ public class TourData implements Comparable<Object> {
 			return devicePluginName;
 		}
 	}
-
-// not used 5.10.2008 
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
@@ -3331,14 +3552,6 @@ public class TourData implements Comparable<Object> {
 		return tourMarkers;
 	}
 
-	/**
-	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
-	 *         is not saved in the database
-	 */
-	public TourPerson getTourPerson() {
-		return tourPerson;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3379,6 +3592,14 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	/**
+	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
+	 *         is not saved in the database
+	 */
+	public TourPerson getTourPerson() {
+		return tourPerson;
+	}
+
 	public int getTourRecordingTime() {
 		return tourRecordingTime;
 	}
@@ -3394,17 +3615,17 @@ public class TourData implements Comparable<Object> {
 		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @return Returns the tags {@link #tourTags} which are defined for this tour
 	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @return the tourTitle

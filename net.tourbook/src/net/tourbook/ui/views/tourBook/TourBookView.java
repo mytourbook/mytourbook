@@ -110,16 +110,17 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID								= "net.tourbook.views.tourListView";				//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
 	private final IDialogSettings			fState							= TourbookPlugin.getDefault()
-																					.getDialogSettingsSection("ViewTourBook");	//$NON-NLS-1$
+																					.getDialogSettingsSection(
+																							"ViewTourBook");				//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_YEAR				= "selectedYear";									//$NON-NLS-1$
-	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";									//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOURS			= "selectedTours";									//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR				= "selectedYear";								//$NON-NLS-1$
+	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";								//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOURS			= "selectedTours";								//$NON-NLS-1$
 
-	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";						//$NON-NLS-1$
+	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";					//$NON-NLS-1$
 
 	private TreeViewer						fTourViewer;
 
@@ -168,7 +169,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private int								fSelectedYear					= -1;
 	private int								fSelectedMonth					= -1;
 //	private long							fSelectedTourId;
-	private ArrayList<Long>					fSelectedTourIds				= new ArrayList<Long>();							;
+	private ArrayList<Long>					fSelectedTourIds				= new ArrayList<Long>();						;
 
 	private Composite						fViewerContainer;
 
@@ -312,8 +313,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					readDisplayFormats();
 
-					fTourViewer.getTree()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					fTourViewer.getTree().setLinesVisible(
+							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 
@@ -464,9 +465,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(TourbookPlugin.getDefault().getPluginPreferences().getBoolean(
+				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TreeViewer(tree);
 		fColumnManager.createColumns(fTourViewer);
@@ -740,6 +740,37 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final TVITourBookItem item = (TVITourBookItem) element;
 
 				final long dbPausedTime = item.colPausedTime;
+
+				if (dbPausedTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					if (fIsDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(dbPausedTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(dbPausedTime + 30).toString());
+					}
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: relative paused time %
+		 */
+		colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				/*
+				 * display paused time relative to the recording time
+				 */
+
+				final Object element = cell.getElement();
+				final TVITourBookItem item = (TVITourBookItem) element;
+
+				final long dbPausedTime = item.colPausedTime;
 				final long dbRecordingTime = item.colRecordingTime;
 
 				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
@@ -815,7 +846,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbAltitudeDown == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (-dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
 				}
 
 				setCellColor(cell, element);
@@ -1457,11 +1488,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT)
-				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT)
-				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

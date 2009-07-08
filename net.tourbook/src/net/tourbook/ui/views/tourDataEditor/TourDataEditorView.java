@@ -4323,6 +4323,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		updateTourDataFromUI();
 
+		fTourData.computeAltitudeUpDown();
+		fTourData.computeTourDrivingTime();
+		fTourData.computeComputedValues();
+
 		/*
 		 * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
 		 * flag can be set before to prevent an out of synch error

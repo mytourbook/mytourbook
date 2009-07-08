@@ -283,6 +283,22 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			return colDef;
 		};
 	};
+	
+	public static final TreeColumnFactory PAUSED_TIME_RELATIVE = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "pausedTimeRelative", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_paused_time_relative_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_paused_relative_time);
+			colDef.setColumnUnit(Messages.ColumnFactory_paused_relative_time);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_paused_time_relative_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
 
 	public static final TreeColumnFactory RECORDING_TIME = new TreeColumnFactory() {
 		@Override
