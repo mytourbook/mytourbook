@@ -21,6 +21,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -51,32 +52,54 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
 		final Group colorGroup = new Group(parent, SWT.NONE);
-		colorGroup.setText(Messages.pref_view_layout_label_color_group);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(colorGroup);
+		GridLayoutFactory.fillDefaults()//
+				.margins(5, 5)
+				.spacing(30, LayoutConstants.getSpacing().y)
+				.numColumns(2)
+				.applyTo(colorGroup);
+		colorGroup.setText(Messages.pref_view_layout_label_color_group);
 
-		// color: tag category
-		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY,
-				Messages.pref_view_layout_label_category,
-				colorGroup));
+		final Composite containerDefaultView = new Composite(colorGroup, SWT.NONE);
+		{
+			// color: tag category
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY,
+					Messages.pref_view_layout_label_category,
+					containerDefaultView));
 
-		// color: tag 
-		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE, //
-				Messages.pref_view_layout_label_title,
-				colorGroup));
+			// color: tag 
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE, //
+					Messages.pref_view_layout_label_title,
+					containerDefaultView));
 
-		// color: sub tag (year)
-		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB,
-				Messages.pref_view_layout_label_sub,
-				colorGroup));
+			// color: sub tag (year)
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB,
+					Messages.pref_view_layout_label_sub,
+					containerDefaultView));
 
-		// color: sub sub tag (month)
-		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB,
-				Messages.pref_view_layout_label_sub_sub,
-				colorGroup));
+			// color: sub sub tag (month)
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB,
+					Messages.pref_view_layout_label_sub_sub,
+					containerDefaultView));
+//
+//			GridLayout gl = (GridLayout) containerDefaultView.getLayout();
+//			gl.marginHeight = 5;
+//			gl.marginWidth = 5;
+		}
 
-		GridLayout gl = (GridLayout) colorGroup.getLayout();
-		gl.marginHeight = 5;
-		gl.marginWidth = 5;
+		final Composite containerSegmenter = new Composite(colorGroup, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(containerSegmenter);
+		{
+			// color: up
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP,
+					Messages.pref_view_layout_label_segmenter_up,
+					containerSegmenter));
+
+			// color: down
+			addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
+					Messages.pref_view_layout_label_segmenter_down,
+					containerSegmenter));
+		}
 
 		/*
 		 * container: column time format
@@ -110,7 +133,7 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 				false));
 
 		// set group margin after the fields are created
-		gl = (GridLayout) formatGroup.getLayout();
+		final GridLayout gl = (GridLayout) formatGroup.getLayout();
 		gl.marginHeight = 5;
 		gl.marginWidth = 5;
 		gl.numColumns = 2;
@@ -133,7 +156,7 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 
 			fIsModified = false;
 
-			UI.setTagColorsFromPrefStore();
+			UI.setViewColorsFromPrefStore();
 
 			// fire one event for all modified colors
 			getPreferenceStore().setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());

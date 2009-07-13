@@ -110,6 +110,8 @@ public class UI {
 	public static final String						VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
 	public static final String						VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
 	public static final String						VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
+	public static final String						VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
+	public static final String						VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
@@ -136,6 +138,8 @@ public class UI {
 	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
 	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 	public static final String						SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
+	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
+	public static final String						SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
 
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
@@ -209,7 +213,7 @@ public class UI {
 	static {
 
 		updateUnits();
-		setTagColorsFromPrefStore();
+		setViewColorsFromPrefStore();
 
 		/*
 		 * load images into the image registry
@@ -675,7 +679,7 @@ public class UI {
 	private static String getSQLExceptionText(final SQLException e) {
 
 		final StringBuilder sb = new StringBuilder()//
-				.append("SQLException") //$NON-NLS-1$
+		.append("SQLException") //$NON-NLS-1$
 				.append(UI.NEW_LINE2)
 				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
 				.append(UI.NEW_LINE)
@@ -907,7 +911,7 @@ public class UI {
 	 * 
 	 * @param prefs
 	 */
-	public static void setTagColorsFromPrefStore() {
+	public static void setViewColorsFromPrefStore() {
 
 		/*
 		 * set colors
@@ -925,6 +929,11 @@ public class UI {
 				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
 		colorRegistry.put(VIEW_COLOR_TOUR, //
 				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
+
+		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_UP, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP));
+		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_DOWN, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN));
 	}
 
 	public static GridData setWidth(final Control control, final int width) {

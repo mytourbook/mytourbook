@@ -35,6 +35,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/*
 	 * @see
+	 * 
 	 * org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences
 	 * ()
 	 */
@@ -47,13 +48,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * regional settings
 		 */
 		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, true);
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+		store.setDefault(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
 
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+		store.setDefault(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
 
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+		store.setDefault(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
 
 		store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
@@ -82,15 +86,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 			final String graphPrefName = graphDefinition.getGraphPrefName();
 
-			PreferenceConverter.setDefault(store,
+			PreferenceConverter.setDefault(
+					store,
 					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
 					graphDefinition.getDefaultGradientBright());
 
-			PreferenceConverter.setDefault(store,
+			PreferenceConverter.setDefault(
+					store,
 					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
 					graphDefinition.getDefaultGradientDark());
 
-			PreferenceConverter.setDefault(store,
+			PreferenceConverter.setDefault(
+					store,
 					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
 					graphDefinition.getDefaultLineColor());
 
@@ -149,12 +156,22 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR,
 				new RGB(0x00, 0x00, 0x00));
 
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP,
+				new RGB(0xFF, 0x79, 0x7C));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
+				new RGB(0x3B, 0xFF, 0x36));
+
 		/*
 		 * view formats
 		 */
-		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
+		store.setDefault(
+				ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
-		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
+		store.setDefault(
+				ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
@@ -177,7 +194,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
 		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, true);
-	 	
+
 		/*
 		 * merge tour dialog
 		 */

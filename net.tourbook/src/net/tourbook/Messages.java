@@ -35,9 +35,7 @@ public class Messages extends NLS {
 	public static String		dialog_export_chk_overwriteFiles_tooltip;
 
 	public static String		dialog_export_chk_tourRangeDisabled;
-
 	public static String		dialog_export_chk_tourRangeWithDistance;
-
 	public static String		dialog_export_chk_tourRangeWithoutDistance;
 	public static String		dialog_export_dialog_message;
 	public static String		dialog_export_dialog_title;
@@ -47,22 +45,14 @@ public class Messages extends NLS {
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
-//	public static String		dialog_export_invalid_path;
-//	public static String		dialog_export_label_exportFileName;
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
-//	public static String		dialog_export_label_timeUnitSeconds;
 	public static String		dialog_export_lbl_exportFilePath;
 	public static String		dialog_export_msg_fileAlreadyExists;
 	public static String		dialog_export_msg_fileNameIsInvalid;
 	public static String		dialog_export_msg_pathIsNotAvailable;
-//	public static String		dialog_export_rdo_filenameFromTour;
-//	public static String		dialog_export_rdo_filenameFromTour_tooltip;
-//	public static String		dialog_export_rdo_filenameManual;
-//	public static String		dialog_export_rdo_filenameManual_tooltip;
 	public static String		dialog_export_shell_text;
-//	public static String		dialog_export_txt_fileName_tooltip;
 	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		dialog_is_tour_editor_modified_message;
@@ -135,7 +125,6 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
 
-//	public static String		adjust_altitude_lbl_altitude;
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
@@ -166,11 +155,10 @@ public class Messages extends NLS {
 
 	public static String		app_btn_browse;
 
-	public static String	app_db_consistencyCheck_checkFailed;
-
-	public static String	app_db_consistencyCheck_checkIsOK;
-
+	public static String		app_db_consistencyCheck_checkFailed;
+	public static String		app_db_consistencyCheck_checkIsOK;
 	public static String		app_db_consistencyCheck_dlgTitle;
+
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
 
@@ -539,6 +527,10 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_format_hh_mm;
 	public static String		pref_view_layout_label_format_hh_mm_ss;
 	public static String		pref_view_layout_label_recording_time_format;
+	public static String		pref_view_layout_label_segmenter_down;
+
+	public static String		pref_view_layout_label_segmenter_up;
+
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
@@ -751,10 +743,10 @@ public class Messages extends NLS {
 	public static String		tour_segmenter_segType_byDistance_defaultDistance;
 	public static String		tour_segmenter_segType_byDistance_label;
 
-	public static String	tour_segmenter_segType_byUpDownAlti_label;
+	public static String		tour_segmenter_segType_byUpDownAlti_label;
 	public static String		tour_segmenter_type_byAltitude;
 
-	public static String	tour_segmenter_type_byComputedAltiUpDown;
+	public static String		tour_segmenter_type_byComputedAltiUpDown;
 	public static String		tour_segmenter_type_byDistance;
 	public static String		tour_segmenter_type_byMarker;
 	public static String		tour_segmenter_type_byPulse;

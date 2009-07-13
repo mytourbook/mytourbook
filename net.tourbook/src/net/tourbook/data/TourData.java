@@ -504,9 +504,9 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	public int[]						segmentSerieAltitudeDiff;
 	@Transient
-	public int[]						segmentSerieAltitudeUp;
-	@Transient
-	public int[]						segmentSerieAltitudeDown;
+	public int[]						segmentSerieComputedAltitudeDiff;
+//	@Transient
+//	public int[]						segmentSerieComputedAltitudeDown;
 
 	@Transient
 	public float[]						segmentSerieAltitudeUpH;
@@ -1218,140 +1218,231 @@ public class TourData implements Comparable<Object> {
 		gradientSerie = dataSerieGradient;
 	}
 
+	/**
+	 * computes and sets altitude up/down values into {@link TourData}
+	 */
 	public void computeAltitudeUpDown() {
-		computeAltitudeUpDownInternal(null, 5);
+
+		final AltitudeUpDown altiUpDown = computeAltitudeUpDownInternal(null, 5);
+
+		if (altiUpDown != null) {
+			setTourAltUp(altiUpDown.altitudeUp);
+			setTourAltDown(altiUpDown.altitudeDown);
+		}
+
 	}
 
-	public void computeAltitudeUpDown(final ArrayList<Integer> segmentSerieIndexParameter, final int minAltiDiff) {
-		computeAltitudeUpDownInternal(segmentSerieIndexParameter, minAltiDiff);
+	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+												final int minAltiDiff) {
+		return computeAltitudeUpDownInternal(segmentSerieIndexParameter, minAltiDiff);
 	}
 
-	private void computeAltitudeUpDownInternal(	final ArrayList<Integer> segmentSerieIndexParameter,
-												final int altitudeMinDiff) {
+	/**
+	 * compute altitude up/down since version 9.07.1
+	 */
+	private AltitudeUpDown computeAltitudeUpDownInternal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
+															final int altitudeMinDiff) {
 
 		// check if data are available
 		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
-			return;
+			return null;
 		}
 
+		final boolean isCreateSegments = segmentSerie != null;
+
 		int prevAltitude = 0;
+		int prevSegmentAltitude = 0;
 		int prevAltiDiff = 0;
 
 		int altitudeUpTotal = 0;
 		int altitudeUpSubTotal = 0;
 		int altitudeDownTotal = 0;
 		int altitudeDownSubTotal = 0;
+		int segmentAltitudeMin = 0;
+		int segmentAltitudeMax = 0;
 
 		final int serieLength = timeSerie.length;
+		int currentSegmentSerieIndex = 0;
+//
+//		System.out.println("altitudeMinDiff " + altitudeMinDiff);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final int altitude = altitudeSerie[serieIndex];
 			int altiDiff = 0;
 
-			if (serieIndex == serieLength - 1) {
+			if (serieIndex == 0) {
+
+				// first data point
+
+				if (isCreateSegments) {
+
+					// create start for the first segment
+					segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, 0));
+
+					segmentAltitudeMin = altitude;
+					segmentAltitudeMax = altitude;
+				}
+
+				prevSegmentAltitude = altitude;
+
+			} else if (serieIndex == serieLength - 1) {
 
 				// last data point
 
-				if (altitudeUpSubTotal > altitudeMinDiff) {
+				if (altitudeUpSubTotal >= altitudeMinDiff) {
 					altitudeUpTotal += altitudeUpSubTotal;
 				}
 
-				if (altitudeDownSubTotal < -altitudeMinDiff) {
+				if (altitudeDownSubTotal <= -altitudeMinDiff) {
 					altitudeDownTotal += altitudeDownSubTotal;
 				}
 
-			} else if (serieIndex > 0) {
+				// check if last segment is set
+				if (isCreateSegments && serieIndex != currentSegmentSerieIndex) {
 
-				// ignore first value
+					// create end point for the last segment
+
+					int segmentMinMaxDiff = segmentAltitudeMax - segmentAltitudeMin;
+//					int segAltiDiff = segmentMinMaxDiff >= altitudeMinDiff ? segmentMinMaxDiff : 0;
+
+					segmentMinMaxDiff = altitude > prevSegmentAltitude ? segmentMinMaxDiff : -segmentMinMaxDiff;
+
+					segmentSerie.add(new AltitudeUpDownSegment(serieIndex, segmentMinMaxDiff));
+				}
+
+//				System.out.println(serieIndex + "\t" + altitudeUpSubTotal + "\t" + altitudeUpTotal);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+			} else if (serieIndex > 0) {
 
 				altiDiff = altitude - prevAltitude;
 
 				if (altiDiff > 0) {
 
-					// current altitude is up
+					// altitude is ascending
 
-					if (prevAltiDiff > 0) {
+					/*
+					 * compares with equal 0 (== 0) to prevent initialization error, otherwise the
+					 * value is >0 or <0
+					 */
+					if (prevAltiDiff >= 0) {
 
-						// tour is ascending
+						// tour is ascending again
 
 						altitudeUpSubTotal += altiDiff;
 
+						segmentAltitudeMax = segmentAltitudeMax < altitude ? altitude : segmentAltitudeMax;
+
 					} else if (prevAltiDiff < 0) {
 
-						// angel changed, tour is now ascending
+						// angel changed, tour was descending and is now ascending
 
 						if (altitudeDownSubTotal <= -altitudeMinDiff) {
 
 							altitudeDownTotal += altitudeDownSubTotal;
 
-							// create segment
-							if (segmentSerieIndexParameter != null) {
-								segmentSerieIndexParameter.add(serieIndex - 1);
+							if (isCreateSegments) {
+
+								// create segment point for the descending altitude
+
+								currentSegmentSerieIndex = serieIndex - 1;
+
+								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, //
+										segmentAltitudeMin - segmentAltitudeMax));
+
+//								System.out.println(serieIndex
+//										+ "\t"
+//										+ altitudeUpSubTotal
+//										+ "\t"
+//										+ segmentAltitudeMin
+//										+ "\t"
+//										+ segmentAltitudeMax
+//										+ " ||");
+//								System.out.println();
+//								// TODO remove SYSTEM.OUT.PRINTLN
+
+								segmentAltitudeMin = prevAltitude;
+								segmentAltitudeMax = prevAltitude + altiDiff;
+
+								prevSegmentAltitude = prevAltitude;
 							}
 						}
 
 						altitudeUpSubTotal = altiDiff;
 						altitudeDownSubTotal = 0;
-
-//						System.out.println("-- segment --");
-//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
-
-//					System.out.println(serieIndex + 1 + "\t"
-////							+ distance
-////							+ "\t"
-//							+ altitude
-//							+ "\t"
-//							+ altiDiff
-//							+ "\t"
-//							+ altitudeUpSubTotal);
-//					// TODO remove SYSTEM.OUT.PRINTLN
 
 				} else if (altiDiff < 0) {
 
-					// current altitude is down
+					// altitude is descending
 
-					if (prevAltiDiff < 0) {
+					/*
+					 * compares to == 0 to prevent initialization error, otherwise the value is >0
+					 * or <0
+					 */
+					if (prevAltiDiff <= 0) {
 
-						// tour is descending
+						// tour is descending again
 
-						altitudeDownSubTotal += prevAltiDiff;
+						altitudeDownSubTotal += altiDiff;
+
+						segmentAltitudeMin = segmentAltitudeMin > altitude ? altitude : segmentAltitudeMin;
 
 					} else if (prevAltiDiff > 0) {
 
-						// angle changed, tour is now descending
+						// angel changed, tour was ascending and is now descending
 
 						if (altitudeUpSubTotal >= altitudeMinDiff) {
 
 							altitudeUpTotal += altitudeUpSubTotal;
 
 							// create segment
-							if (segmentSerieIndexParameter != null) {
-								segmentSerieIndexParameter.add(serieIndex - 1);
+							if (isCreateSegments) {
+
+								currentSegmentSerieIndex = serieIndex - 1;
+
+								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, //
+										segmentAltitudeMax - segmentAltitudeMin));
+
+//								System.out.println(serieIndex
+//										+ "\t"
+//										+ altitudeUpSubTotal
+//										+ "\t"
+//										+ segmentAltitudeMin
+//										+ "\t"
+//										+ segmentAltitudeMax
+//										+ " ||");
+//								System.out.println();
+//								// TODO remove SYSTEM.OUT.PRINTLN
+
+								// initialize new segment
+								segmentAltitudeMin = prevAltitude + altiDiff;
+								segmentAltitudeMax = prevAltitude;
+
+								prevSegmentAltitude = prevAltitude;
 							}
 						}
 
 						altitudeUpSubTotal = 0;
 						altitudeDownSubTotal = altiDiff;
-
-//						System.out.println("-- segment --");
-//						// TODO remove SYSTEM.OUT.PRINTLN
-
 					}
-
-//					System.out.println(serieIndex + 1 + "\t"
-////							+ distance
-////							+ "\t"
-//							+ altitude
-//							+ "\t"
-//							+ altiDiff
-//							+ "\t"
-//							+ altitudeDownSubTotal);
-//					// TODO remove SYSTEM.OUT.PRINTLN
 				}
+
+//				System.out.println(serieIndex
+//						+ "\t"
+//						+ altitudeUpSubTotal
+//						+ "\t"
+//						+ segmentAltitudeMin
+//						+ "\t"
+//						+ segmentAltitudeMax
+//						+ "\t"
+//						+ altiDiff);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
+			// prevent setting previous alti to 0
 			if (altiDiff != 0) {
 				prevAltiDiff = altiDiff;
 			}
@@ -1359,53 +1450,59 @@ public class TourData implements Comparable<Object> {
 			prevAltitude = altitude;
 		}
 
-		setTourAltUp(altitudeUpTotal);
-		setTourAltDown(-altitudeDownTotal);
+//		System.out.println("");
+//		System.out.println("");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
 	}
 
-	private void computeAltitudeUpDownWithTime() {
-
-		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
-			return;
-		}
-
-		final int serieLength = timeSerie.length;
-
-		int lastTime = 0;
-		int currentAltitude = altitudeSerie[0];
-		int lastAltitude = currentAltitude;
-
-		int altitudeUp = 0;
-		int altitudeDown = 0;
-
-		final int minTimeDiff = 10;
-
-		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-
-			final int currentTime = timeSerie[timeIndex];
-
-			final int timeDiff = currentTime - lastTime;
-
-			currentAltitude = altitudeSerie[timeIndex];
-
-			if (timeDiff >= minTimeDiff) {
-
-				final int altitudeDiff = currentAltitude - lastAltitude;
-
-				if (altitudeDiff >= 0) {
-					altitudeUp += altitudeDiff;
-				} else {
-					altitudeDown += altitudeDiff;
-				}
-
-				lastTime = currentTime;
-				lastAltitude = currentAltitude;
-			}
-		}
-
-		setTourAltUp(altitudeUp);
-		setTourAltDown(-altitudeDown);
-	}
+//	/**
+//	 * compute altitude up/down which was used until version 9.07.0
+//	 */
+//	private void computeAltitudeUpDownWithTime() {
+//
+//		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		int lastTime = 0;
+//		int currentAltitude = altitudeSerie[0];
+//		int lastAltitude = currentAltitude;
+//
+//		int altitudeUp = 0;
+//		int altitudeDown = 0;
+//
+//		final int minTimeDiff = 10;
+//
+//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
+//
+//			final int currentTime = timeSerie[timeIndex];
+//
+//			final int timeDiff = currentTime - lastTime;
+//
+//			currentAltitude = altitudeSerie[timeIndex];
+//
+//			if (timeDiff >= minTimeDiff) {
+//
+//				final int altitudeDiff = currentAltitude - lastAltitude;
+//
+//				if (altitudeDiff >= 0) {
+//					altitudeUp += altitudeDiff;
+//				} else {
+//					altitudeDown += altitudeDiff;
+//				}
+//
+//				lastTime = currentTime;
+//				lastAltitude = currentAltitude;
+//			}
+//		}
+//
+//		setTourAltUp(altitudeUp);
+//		setTourAltDown(-altitudeDown);
+//	}
 
 	private void computeAvgCadence() {
 
@@ -2686,8 +2783,8 @@ public class TourData implements Comparable<Object> {
 		segmentSerieDistanceDiff = new int[segmentSerieLength];
 		segmentSerieDistanceTotal = new int[segmentSerieLength];
 
-		segmentSerieAltitudeUp = new int[segmentSerieLength];
-		segmentSerieAltitudeDown = new int[segmentSerieLength];
+//		segmentSerieComputedAltitudeUp = new int[segmentSerieLength];
+//		segmentSerieComputedAltitudeDown = new int[segmentSerieLength];
 		segmentSerieAltitudeDiff = new int[segmentSerieLength];
 		segmentSerieAltitudeUpH = new float[segmentSerieLength];
 		segmentSerieAltitudeDownH = new int[segmentSerieLength];
@@ -2700,12 +2797,12 @@ public class TourData implements Comparable<Object> {
 		segmentSerieCadence = new float[segmentSerieLength];
 		segmentSeriePulse = new float[segmentSerieLength];
 
-		for (int iSegment = 1; iSegment < segmentSerieLength; iSegment++) {
+		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
 
-			final int segmentIndex = iSegment;
+//			final int segmentIndex = iSegment;
 
-			final int segmentStartIndex = segmentSerieIndex[iSegment - 1];
-			final int segmentEndIndex = segmentSerieIndex[iSegment];
+			final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
+			final int segmentEndIndex = segmentSerieIndex[segmentIndex];
 
 			final TourSegment segment = new TourSegment();
 			tourSegments.add(segment);
@@ -2735,14 +2832,18 @@ public class TourData implements Comparable<Object> {
 
 			// total altitude 
 			final int altitudeDiff = altitudeEnd - altitudeStart;
-			segmentSerieAltitudeDiff[segmentIndex] = segment.altitudeDiff = altitudeDiff;
+			segmentSerieAltitudeDiff[segmentIndex] = segment.altitudeDiffSegmentBorder = altitudeDiff;
 			if (altitudeDiff > 0) {
-				segmentSerieAltitudeUp[segmentIndex] = segment.altitudeUp = altitudeUp += altitudeDiff;
-				segmentSerieAltitudeDown[segmentIndex] = segment.altitudeDown = altitudeDown;
+				segment.altitudeUpTotal = altitudeUp += altitudeDiff;
+				segment.altitudeDownTotal = altitudeDown;
 
 			} else {
-				segmentSerieAltitudeUp[segmentIndex] = segment.altitudeUp = altitudeUp;
-				segmentSerieAltitudeDown[segmentIndex] = segment.altitudeDown = altitudeDown += altitudeDiff;
+				segment.altitudeUpTotal = altitudeUp;
+				segment.altitudeDownTotal = altitudeDown += altitudeDiff;
+			}
+
+			if (segmentSerieComputedAltitudeDiff != null && segmentIndex < segmentSerieComputedAltitudeDiff.length) {
+				segment.computedAltitudeDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
 			}
 
 			final int[] localPowerSerie = getPowerSerie();
@@ -2785,7 +2886,7 @@ public class TourData implements Comparable<Object> {
 				segmentSeriePace[segmentIndex] = segmentPace / 60;
 
 				// gradient
-				segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitudeDiff
+				segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitudeDiffSegmentBorder
 						* 100
 						/ segmentDistance;
 			}

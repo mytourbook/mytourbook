@@ -25,6 +25,7 @@ import net.tourbook.Messages;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.algorithm.Point;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.data.AltitudeUpDownSegment;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSegment;
@@ -61,6 +62,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -112,11 +114,58 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
 																					.getDialogSettingsSection(ID);
 
+	final Preferences						fPrefStore						= TourbookPlugin.getDefault()
+																					.getPluginPreferences();
+
 	private static final int				COLUMN_DEFAULT					= 0;									// sort by time
 	private static final int				COLUMN_SPEED					= 10;
 	private static final int				COLUMN_PACE						= 20;
 	private static final int				COLUMN_GRADIENT					= 30;
 	private static final int				COLUMN_PULSE					= 40;
+
+	private static final int[]				ALTITUDE_MINIMUM				= new int[] {
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10,
+			12,
+			14,
+			16,
+			18,
+			20,
+			25,
+			30,
+			35,
+			40,
+			45,
+			50,
+			60,
+			70,
+			80,
+			90,
+			100,
+			120,
+			140,
+			160,
+			180,
+			200,
+			250,
+			300,
+			350,
+			400,
+			450,
+			500,
+			600,
+			700,
+			800,
+			900,
+			1000															};
 
 	private PageBook						fPageBook;
 	private Composite						fPageSegmenter;
@@ -394,6 +443,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					updateUIDistance();
 
 					createSegments();
+
+				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+					fSegmentViewer.getTable().setLinesVisible(
+							fPrefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+					fSegmentViewer.refresh();
+
+					/*
+					 * the tree must be redrawn because the styled text does not show with the new
+					 * color
+					 */
+					fSegmentViewer.getTable().redraw();
 				}
 			}
 		};
@@ -584,6 +646,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void createSegments() {
 
+		// disable computed altitude
+		fTourData.segmentSerieComputedAltitudeDiff = null;
+
 		final SegmenterType selectedSegmenter = fSegmenterTypes[fCboSegmenterType.getSelectionIndex()];
 
 		if (selectedSegmenter == SegmenterType.ByAltitudeWithDP) {
@@ -604,7 +669,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (selectedSegmenter == SegmenterType.ByComputedAltiUpDown) {
 
-			createSegmentsByComputedAltiUpDown();
+			createSegmentsByAltiUpDown();
 		}
 
 		// update table and create the tour segments in tour data
@@ -642,22 +707,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createSegmentsByComputedAltiUpDown() {
+	private void createSegmentsByAltiUpDown() {
 
-		final int[] altitudeSerie = fTourData.altitudeSerie;
+		final int selectedMinAltiDiff = ALTITUDE_MINIMUM[fCboAltiUpDown.getSelectionIndex()];
+		final ArrayList<AltitudeUpDownSegment> tourSegements = new ArrayList<AltitudeUpDownSegment>();
 
-		final ArrayList<Integer> segmentSerieIndex = new ArrayList<Integer>();
+		// create segment when the altitude up/down is changing
+		fTourData.computeAltitudeUpDown(tourSegements, selectedMinAltiDiff);
 
-		// set first segment at tour start
-		segmentSerieIndex.add(0);
+		// convert segment list into array
+		int serieIndex = 0;
+		final int segmentLength = tourSegements.size();
+		final int[] segmentSerieIndex = fTourData.segmentSerieIndex = new int[segmentLength];
+		final int[] altitudeDiff = fTourData.segmentSerieComputedAltitudeDiff = new int[segmentLength];
 
-		// create segment when the altitude up/down is computed
-		fTourData.computeAltitudeUpDown(segmentSerieIndex, fCboAltiUpDown.getSelectionIndex() + 1);
+		for (final AltitudeUpDownSegment altitudeUpDownSegment : tourSegements) {
 
-		// add segment end at the tour end
-		segmentSerieIndex.add(altitudeSerie.length - 1);
+			segmentSerieIndex[serieIndex] = altitudeUpDownSegment.serieIndex;
+			altitudeDiff[serieIndex] = altitudeUpDownSegment.computedAltitudeDiff;
 
-		fTourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
+			serieIndex++;
+		}
 	}
 
 	private void createSegmentsByDistance() {
@@ -889,12 +959,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fPageSegTypeDP = createUISegmenterDP(fPageBookSegmenter);
 				fPageSegTypeByMarker = createUISegmenterByMarker(fPageBookSegmenter);
 				fPageSegTypeByDistance = createUISegmenterByDistance(fPageBookSegmenter);
-				fPageSegTypeByComputedAltiUpDown = createUISegmenterByComputedAltiUpDown(fPageBookSegmenter);
+				fPageSegTypeByComputedAltiUpDown = createUISegmenterByAltiUpDown(fPageBookSegmenter);
 			}
 		}
 	}
 
-	private Composite createUISegmenterByComputedAltiUpDown(final Composite parent) {
+	private Composite createUISegmenterByAltiUpDown(final Composite parent) {
 
 //		final PixelConverter pc = new PixelConverter(parent);
 
@@ -908,6 +978,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			// combo: min altitude
 			fCboAltiUpDown = new Combo(container, SWT.READ_ONLY);
+			fCboAltiUpDown.setVisibleItemCount(20);
 			fCboAltiUpDown.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -915,8 +986,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 
-			for (int altiUpDown = 1; altiUpDown < 11; altiUpDown++) {
-				fCboAltiUpDown.add(Integer.toString(altiUpDown));
+			for (final int minAlti : ALTITUDE_MINIMUM) {
+				fCboAltiUpDown.add(Integer.toString(minAlti));
 			}
 			fCboAltiUpDown.select(2);
 
@@ -1140,9 +1211,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		/*
-		 * column: altitude diff (m/ft)
+		 * column: altitude diff segment border (m/ft)
 		 */
-		colDef = TableColumnFactory.ALTITUDE_DIFF.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(fColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1154,7 +1225,32 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fNf.setMinimumFractionDigits(0);
 				fNf.setMaximumFractionDigits(0);
 
-				cell.setText(fNf.format(segment.altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
+				final int altitudeDiff = segment.altitudeDiffSegmentBorder;
+
+				cell.setText(fNf.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
+				setCellColor(cell, altitudeDiff);
+			}
+		});
+
+		/*
+		 * column: computed altitude diff (m/ft)
+		 */
+		colDef = TableColumnFactory.ALTITUDE_COMPUTED_DIFF_SEGMENT.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+
+				final int altitudeDiff = segment.computedAltitudeDiff;
+
+				cell.setText(fNf.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
+				setCellColor(cell, altitudeDiff);
 			}
 		});
 
@@ -1358,7 +1454,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fNf.setMinimumFractionDigits(0);
 				fNf.setMaximumFractionDigits(0);
 
-				cell.setText(fNf.format(segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(fNf.format(segment.altitudeUpTotal / UI.UNIT_VALUE_ALTITUDE));
 			}
 		});
 
@@ -1377,7 +1473,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fNf.setMinimumFractionDigits(0);
 				fNf.setMaximumFractionDigits(0);
 
-				cell.setText(fNf.format(segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(fNf.format(segment.altitudeDownTotal / UI.UNIT_VALUE_ALTITUDE));
 			}
 		});
 
@@ -1783,6 +1879,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return savedTour;
 	}
 
+	private void setCellColor(final ViewerCell cell, final int altiDiff) {
+
+		if (altiDiff == 0) {
+			cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		} else if (altiDiff > 0) {
+			cell.setBackground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_BG_SEGMENTER_UP));
+		} else if (altiDiff < 0) {
+			cell.setBackground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_BG_SEGMENTER_DOWN));
+		}
+	}
+
 	@Override
 	public void setFocus() {
 		fScaleTolerance.setFocus();
@@ -1861,13 +1968,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void updateUIAltitude() {
 
-		final int[] altitudeSegments = fTourData.segmentSerieAltitudeDiff;
+		final SegmenterType selectedSegmenter = fSegmenterTypes[fCboSegmenterType.getSelectionIndex()];
+		int[] altitudeSegments;
+		if (selectedSegmenter == SegmenterType.ByComputedAltiUpDown) {
+			altitudeSegments = fTourData.segmentSerieComputedAltitudeDiff;
+		} else {
+			altitudeSegments = fTourData.segmentSerieAltitudeDiff;
+		}
 
 		if (altitudeSegments == null) {
 			fLblAltitudeUp.setText(UI.EMPTY_STRING);
 			return;
 		}
 
+		// compute total alti up/down from the segments
 		fAltitudeUp = 0;
 		fAltitudeDown = 0;
 

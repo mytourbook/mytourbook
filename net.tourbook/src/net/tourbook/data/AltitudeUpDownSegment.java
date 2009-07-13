@@ -15,34 +15,18 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-public class TourSegment {
+public class AltitudeUpDownSegment {
 
-	public int		serieIndexStart;
-	public int		serieIndexEnd;
+	public int	serieIndex;
 
-	public int		recordingTime;
-	public int		drivingTime;
-	public int		breakTime;
-	public int		timeTotal;
+	public int	computedAltitudeDiff;
 
-	public int		distanceDiff;
-	public int		distanceTotal;
+	@SuppressWarnings("unused")
+	private AltitudeUpDownSegment() {}
 
-	public int		altitudeUpTotal;
-	public int		altitudeDownTotal;
-	public int		altitudeDiffSegmentBorder;
-	public int		computedAltitudeDiff;
-
-	public int		altitudeUpH;
-	public int		altitudeDownH;
-
-	public float	speed;
-	public float	gradient;
-	public int		power;
-
-	public int		pace;
-	public int		paceDiff;
-	public int		pulse;
-	public int		pulseDiff;
+	public AltitudeUpDownSegment(final int segmentSerieIndex, final int altitudeDiff) {
+		serieIndex = segmentSerieIndex;
+		computedAltitudeDiff = altitudeDiff;
+	}
 
 }

@@ -19,11 +19,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";		//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";			//$NON-NLS-1$
 
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
 
+	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
 	public static String		ColumnFactory_altitude_down_h_label;

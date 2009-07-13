@@ -146,6 +146,8 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_LAYOUT_COLOR_SUB						= "view.layout.color.sub";									//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_SUB_SUB					= "view.layout.color.sub-sub";								//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_TOUR						= "view.layout.color.tour";								//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP			= "view.layout.colorBg.segmenterUp";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN			= "view.layout.colorBg.segmenterDown";						//$NON-NLS-1$
 
 	public static final String	VIEW_LAYOUT_RECORDING_TIME_FORMAT			= "view.layout.recording-time-format";						//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_DRIVING_TIME_FORMAT				= "view.layout.driving-time-format";						//$NON-NLS-1$
@@ -174,12 +176,12 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";						//$NON-NLS-1$
 	public static final String	APPEARANCE_SHOW_MEMORY_MONITOR				= "appearance.show-memory-monitor";						//$NON-NLS-1$
-	
+
 	/*
 	 * merge tour dialog
 	 */
 	public static final String	MERGE_TOUR_GRAPH_X_AXIS						= "merge.tour.chart-x-axis";								//$NON-NLS-1$
- 
+
 	public static final String	MERGE_TOUR_PREVIEW_CHART					= "merge.tour.preview-chart";								//$NON-NLS-1$
 	public static final String	MERGE_TOUR_ALTITUDE_DIFF_SCALING			= "merge.tour.altitude-diff-scaling";						//$NON-NLS-1$
 

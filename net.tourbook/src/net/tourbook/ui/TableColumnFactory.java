@@ -48,16 +48,33 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory ALTITUDE_DIFF = new TableColumnFactory() {
+	public static final TableColumnFactory ALTITUDE_COMPUTED_DIFF_SEGMENT = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiff", SWT.TRAIL); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeComputedDiffSegment", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE);
-			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_computed_difference_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_BORDER = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiffSegBorder", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
