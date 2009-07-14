@@ -199,6 +199,12 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
+	public static String		compute_tourValues_button_computeValues;
+	public static String		compute_tourValues_button_computeValues_tooltip;
+	public static String		compute_tourValues_dlg_computeValues_message;
+	public static String		compute_tourValues_dlg_computeValues_title;
+	public static String		compute_tourValues_group_computeTourAltitude;
+
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 	public static String		Database_Monitor_db_service_task;

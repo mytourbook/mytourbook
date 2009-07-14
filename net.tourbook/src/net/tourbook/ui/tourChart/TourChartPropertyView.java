@@ -17,6 +17,8 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.data.TourData;
+import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -43,7 +45,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourChartPropertyView extends ViewPart {
+public class TourChartPropertyView extends ViewPart implements IComputeTourValues {
 
 	public static final String	ID	= "net.tourbook.views.TourChartPropertyView";	//$NON-NLS-1$
 
@@ -69,6 +71,13 @@ public class TourChartPropertyView extends ViewPart {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	public boolean computeTourValues(final TourData tourData) {
+
+		tourData.computeComputedValues();
+
+		return true;
 	}
 
 	@Override
@@ -266,11 +275,12 @@ public class TourChartPropertyView extends ViewPart {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+				if (MessageDialog.openConfirm(
+						Display.getCurrent().getActiveShell(),
 						Messages.TourChart_Property_dlg_compute_values_title,
 						Messages.TourChart_Property_dlg_compute_values_message)) {
 
-					TourDatabase.computeComputedValuesForAllTours();
+					TourDatabase.computeComputedValuesForAllTours(TourChartPropertyView.this);
 
 					TourManager.getInstance().removeAllToursFromCache();
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
@@ -313,7 +323,8 @@ public class TourChartPropertyView extends ViewPart {
 		// set new values in the pref store
 
 		// checkbox: use custom settings to compute values
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING,
+		store.setValue(
+				ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING,
 				fChkUseCustomComputeSettings.getSelection());
 
 		// spinner: compute value time slice

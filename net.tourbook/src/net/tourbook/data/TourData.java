@@ -49,6 +49,7 @@ import net.tourbook.ext.srtm.GeoLon;
 import net.tourbook.ext.srtm.NumberForm;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -1219,17 +1220,26 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
-	 * computes and sets altitude up/down values into {@link TourData}
+	 * Computes and sets the altitude up/down values into {@link TourData}
+	 * 
+	 * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
 	 */
-	public void computeAltitudeUpDown() {
+	public boolean computeAltitudeUpDown() {
 
-		final AltitudeUpDown altiUpDown = computeAltitudeUpDownInternal(null, 5);
+		final int prefMinAltitude = TourbookPlugin.getDefault()//
+				.getPreferenceStore()
+				.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
-		if (altiUpDown != null) {
-			setTourAltUp(altiUpDown.altitudeUp);
-			setTourAltDown(altiUpDown.altitudeDown);
+		final AltitudeUpDown altiUpDown = computeAltitudeUpDownInternal(null, prefMinAltitude);
+
+		if (altiUpDown == null) {
+			return false;
 		}
 
+		setTourAltUp(altiUpDown.altitudeUp);
+		setTourAltDown(altiUpDown.altitudeDown);
+
+		return true;
 	}
 
 	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
@@ -1239,6 +1249,12 @@ public class TourData implements Comparable<Object> {
 
 	/**
 	 * compute altitude up/down since version 9.07.1
+	 * 
+	 * @param segmentSerie
+	 *            segments are created for each gradient alternation when segmentSerie is not
+	 *            <code>null</code>
+	 * @param altitudeMinDiff
+	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
 	private AltitudeUpDown computeAltitudeUpDownInternal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
 															final int altitudeMinDiff) {
@@ -1254,18 +1270,17 @@ public class TourData implements Comparable<Object> {
 		int prevSegmentAltitude = 0;
 		int prevAltiDiff = 0;
 
-		int altitudeUpTotal = 0;
-		int altitudeUpSubTotal = 0;
-		int altitudeDownTotal = 0;
-		int altitudeDownSubTotal = 0;
+		int angleAltiUp = 0;
+		int angleAltiDown = 0;
+
 		int segmentAltitudeMin = 0;
 		int segmentAltitudeMax = 0;
 
+		int altitudeUpTotal = 0;
+		int altitudeDownTotal = 0;
+
 		final int serieLength = timeSerie.length;
 		int currentSegmentSerieIndex = 0;
-//
-//		System.out.println("altitudeMinDiff " + altitudeMinDiff);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -1280,10 +1295,10 @@ public class TourData implements Comparable<Object> {
 
 					// create start for the first segment
 					segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, 0));
-
-					segmentAltitudeMin = altitude;
-					segmentAltitudeMax = altitude;
 				}
+
+				segmentAltitudeMin = altitude;
+				segmentAltitudeMax = altitude;
 
 				prevSegmentAltitude = altitude;
 
@@ -1291,29 +1306,25 @@ public class TourData implements Comparable<Object> {
 
 				// last data point
 
-				if (altitudeUpSubTotal >= altitudeMinDiff) {
-					altitudeUpTotal += altitudeUpSubTotal;
-				}
-
-				if (altitudeDownSubTotal <= -altitudeMinDiff) {
-					altitudeDownTotal += altitudeDownSubTotal;
-				}
-
 				// check if last segment is set
-				if (isCreateSegments && serieIndex != currentSegmentSerieIndex) {
+				if (serieIndex != currentSegmentSerieIndex) {
 
 					// create end point for the last segment
 
 					int segmentMinMaxDiff = segmentAltitudeMax - segmentAltitudeMin;
-//					int segAltiDiff = segmentMinMaxDiff >= altitudeMinDiff ? segmentMinMaxDiff : 0;
-
 					segmentMinMaxDiff = altitude > prevSegmentAltitude ? segmentMinMaxDiff : -segmentMinMaxDiff;
 
-					segmentSerie.add(new AltitudeUpDownSegment(serieIndex, segmentMinMaxDiff));
-				}
+					if (isCreateSegments) {
+						segmentSerie.add(new AltitudeUpDownSegment(serieIndex, segmentMinMaxDiff));
+					}
 
-//				System.out.println(serieIndex + "\t" + altitudeUpSubTotal + "\t" + altitudeUpTotal);
-//				// TODO remove SYSTEM.OUT.PRINTLN
+					if (segmentMinMaxDiff > 0) {
+						altitudeUpTotal += segmentMinMaxDiff;
+					}
+					if (segmentMinMaxDiff < 0) {
+						altitudeDownTotal += segmentMinMaxDiff;
+					}
+				}
 
 			} else if (serieIndex > 0) {
 
@@ -1331,7 +1342,7 @@ public class TourData implements Comparable<Object> {
 
 						// tour is ascending again
 
-						altitudeUpSubTotal += altiDiff;
+						angleAltiUp += altiDiff;
 
 						segmentAltitudeMax = segmentAltitudeMax < altitude ? altitude : segmentAltitudeMax;
 
@@ -1339,9 +1350,10 @@ public class TourData implements Comparable<Object> {
 
 						// angel changed, tour was descending and is now ascending
 
-						if (altitudeDownSubTotal <= -altitudeMinDiff) {
+						if (angleAltiDown <= -altitudeMinDiff) {
 
-							altitudeDownTotal += altitudeDownSubTotal;
+							final int segmentAltiDiff = segmentAltitudeMin - segmentAltitudeMax;
+							altitudeDownTotal += segmentAltiDiff;
 
 							if (isCreateSegments) {
 
@@ -1350,28 +1362,17 @@ public class TourData implements Comparable<Object> {
 								currentSegmentSerieIndex = serieIndex - 1;
 
 								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, //
-										segmentAltitudeMin - segmentAltitudeMax));
-
-//								System.out.println(serieIndex
-//										+ "\t"
-//										+ altitudeUpSubTotal
-//										+ "\t"
-//										+ segmentAltitudeMin
-//										+ "\t"
-//										+ segmentAltitudeMax
-//										+ " ||");
-//								System.out.println();
-//								// TODO remove SYSTEM.OUT.PRINTLN
-
-								segmentAltitudeMin = prevAltitude;
-								segmentAltitudeMax = prevAltitude + altiDiff;
-
-								prevSegmentAltitude = prevAltitude;
+										segmentAltiDiff));
 							}
+
+							segmentAltitudeMin = prevAltitude;
+							segmentAltitudeMax = prevAltitude + altiDiff;
+
+							prevSegmentAltitude = prevAltitude;
 						}
 
-						altitudeUpSubTotal = altiDiff;
-						altitudeDownSubTotal = 0;
+						angleAltiUp = altiDiff;
+						angleAltiDown = 0;
 					}
 
 				} else if (altiDiff < 0) {
@@ -1386,7 +1387,7 @@ public class TourData implements Comparable<Object> {
 
 						// tour is descending again
 
-						altitudeDownSubTotal += altiDiff;
+						angleAltiDown += altiDiff;
 
 						segmentAltitudeMin = segmentAltitudeMin > altitude ? altitude : segmentAltitudeMin;
 
@@ -1394,52 +1395,30 @@ public class TourData implements Comparable<Object> {
 
 						// angel changed, tour was ascending and is now descending
 
-						if (altitudeUpSubTotal >= altitudeMinDiff) {
+						if (angleAltiUp >= altitudeMinDiff) {
 
-							altitudeUpTotal += altitudeUpSubTotal;
+							final int segmentAltiDiff = segmentAltitudeMax - segmentAltitudeMin;
+							altitudeUpTotal += segmentAltiDiff;
 
 							// create segment
 							if (isCreateSegments) {
 
 								currentSegmentSerieIndex = serieIndex - 1;
 
-								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, //
-										segmentAltitudeMax - segmentAltitudeMin));
-
-//								System.out.println(serieIndex
-//										+ "\t"
-//										+ altitudeUpSubTotal
-//										+ "\t"
-//										+ segmentAltitudeMin
-//										+ "\t"
-//										+ segmentAltitudeMax
-//										+ " ||");
-//								System.out.println();
-//								// TODO remove SYSTEM.OUT.PRINTLN
-
-								// initialize new segment
-								segmentAltitudeMin = prevAltitude + altiDiff;
-								segmentAltitudeMax = prevAltitude;
-
-								prevSegmentAltitude = prevAltitude;
+								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, segmentAltiDiff));
 							}
+
+							// initialize new segment
+							segmentAltitudeMin = prevAltitude + altiDiff;
+							segmentAltitudeMax = prevAltitude;
+
+							prevSegmentAltitude = prevAltitude;
 						}
 
-						altitudeUpSubTotal = 0;
-						altitudeDownSubTotal = altiDiff;
+						angleAltiUp = 0;
+						angleAltiDown = altiDiff;
 					}
 				}
-
-//				System.out.println(serieIndex
-//						+ "\t"
-//						+ altitudeUpSubTotal
-//						+ "\t"
-//						+ segmentAltitudeMin
-//						+ "\t"
-//						+ segmentAltitudeMax
-//						+ "\t"
-//						+ altiDiff);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
 			// prevent setting previous alti to 0
@@ -1449,10 +1428,6 @@ public class TourData implements Comparable<Object> {
 
 			prevAltitude = altitude;
 		}
-
-//		System.out.println("");
-//		System.out.println("");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
 	}

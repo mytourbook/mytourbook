@@ -524,6 +524,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						fPostSelectionProvider.clearSelection();
 					}
 
+				} else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+					reimportFiles();
+
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					RawDataManager.getInstance().updateTourDataFromDb();

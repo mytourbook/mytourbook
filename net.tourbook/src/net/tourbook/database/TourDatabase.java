@@ -196,7 +196,10 @@ public class TourDatabase {
 		UI.getInstance().setTourTypeImagesDirty();
 	}
 
-	public static void computeComputedValuesForAllTours() {
+	/**
+	 * @param {@link IComputeTourValues} interface to compute values for one tour
+	 */
+	public static void computeComputedValuesForAllTours(final IComputeTourValues runner) {
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -215,8 +218,9 @@ public class TourDatabase {
 					final TourData tourData = getTourFromDb(tourId);
 					if (tourData != null) {
 
-						tourData.computeComputedValues();
-						saveTour(tourData);
+						if (runner.computeTourValues(tourData)) {
+							saveTour(tourData);
+						}
 					}
 
 					monitor.worked(1);

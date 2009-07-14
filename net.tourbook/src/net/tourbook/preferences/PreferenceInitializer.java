@@ -158,7 +158,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP,
-				new RGB(0xFF, 0x79, 0x7C));
+				new RGB(0xFF, 0x5E, 0x62));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
@@ -215,5 +215,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE, false);
 		store.setDefault(ITourbookPreferences.MERGE_TOUR_SET_TOUR_TYPE_ID, TourDatabase.ENTITY_IS_NOT_SAVED);
 
+		/*
+		 * computed values
+		 */
+		store.setDefault(
+				PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE,
+				PrefPageComputedValues.DEFAULT_MIN_ALTITUDE);
 	}
 }
