@@ -632,6 +632,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void createSegments() {
 
+		if (fTourData == null) {
+			fPageBook.showPage(fPageNoData);
+			return;
+		}
+		
 		// disable computed altitude
 		fTourData.segmentSerieComputedAltitudeDiff = null;
 
@@ -1350,9 +1355,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float pace = segment.pace * UI.UNIT_VALUE_DISTANCE;
-
-				cell.setText(UI.format_mm_ss((long) pace).toString());
+				cell.setText(UI.format_mm_ss(segment.pace).toString());
 			}
 		});
 

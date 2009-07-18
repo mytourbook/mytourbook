@@ -2844,18 +2844,16 @@ public class TourData implements Comparable<Object> {
 			segment.altitudeUpH = altitudeUpH;
 			segmentSerieAltitudeDownH[segmentIndex] = segment.altitudeDownH = altitudeDownH;
 
-			final int segmentDistance = segment.distanceDiff;
-			if (segmentDistance != 0) {
+			final float segmentDistance = segment.distanceDiff;
+			if (segmentDistance != 0.0) {
 
 				// speed
 				segmentSerieSpeed[segmentIndex] = segment.speed = drivingTime == 0 ? //
 						0
-						: (float) ((float) segmentDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
+						: (float) (segmentDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
 
 				// pace
-				final float segmentPace = segmentDistance == 0 ? //
-						0
-						: (float) (drivingTime * 1000 / (segmentDistance * UI.UNIT_VALUE_DISTANCE));
+				final float segmentPace = (drivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE));
 				segment.pace = (int) segmentPace;
 				segment.paceDiff = segment.pace - tourPace;
 				segmentSeriePace[segmentIndex] = segmentPace / 60;
