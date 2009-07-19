@@ -16,11 +16,15 @@
 /**
  * @author Alfred Barten
  */
-package net.tourbook.ext.srtm;
+package net.tourbook.ext.srtm.download;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
+
+import net.tourbook.ext.srtm.GeoLat;
+import net.tourbook.ext.srtm.GeoLon;
+import net.tourbook.ext.srtm.Messages;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,7 +43,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 import de.byteholder.geoclipse.map.event.TileEvent;
 import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
-public final class DownloadSRTM3 {
+public final class DownloadSRTM3OLD {
 
 	final static String	host				= "e0srp01u.ecs.nasa.gov";	//$NON-NLS-1$
 	final static String	user				= "anonymous";				//$NON-NLS-1$

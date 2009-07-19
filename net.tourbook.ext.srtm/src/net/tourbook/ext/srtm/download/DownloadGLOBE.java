@@ -16,13 +16,14 @@
 /**
  * @author Alfred Barten
  */
-package net.tourbook.ext.srtm;
- 
-public final class DownloadETOPO extends DownloadResource {
+package net.tourbook.ext.srtm.download;
 
-	final static String	addressPraefix	= "http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO5/TOPO/ETOPO5/"; //$NON-NLS-1$
+public final class DownloadGLOBE extends DownloadResource {
 
-	public static void get(final String remoteName, final String localName) throws Exception {
-		get(addressPraefix, remoteName, localName);
+	private final static String	urlBase	= "http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/";	//$NON-NLS-1$
+
+	public static void get(final String remoteFileName, final String localFilePathName) throws Exception {
+//		get(urlBase, remoteFileName, localFilePathName);
+		HTTPDownloader.get(urlBase, remoteFileName, localFilePathName);
 	}
 }

@@ -20,12 +20,14 @@ package net.tourbook.ext.srtm;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public final class ElevationSRTM3 extends ElevationBase {
 
-	static private SRTM3ElevationFile							srtm3I;
+	private static final String									ELEVATION_ID	= "SRTM3";										//$NON-NLS-1$
 
-	static final private HashMap<Integer, SRTM3ElevationFile>	fileMap	= new HashMap<Integer, SRTM3ElevationFile>();	// default initial 16 Files
+	private static final HashMap<Integer, SRTM3ElevationFile>	fileMap			= new HashMap<Integer, SRTM3ElevationFile>();	// default initial 16 Files
+	private static SRTM3ElevationFile							srtm3I;
 
 	private class SRTM3ElevationFile {
 
@@ -51,12 +53,12 @@ public final class ElevationSRTM3 extends ElevationBase {
 			}
 		}
 
-		public short getElevation(final GeoLat lat, final GeoLon lon) {
+		private short getElevation(final GeoLat lat, final GeoLon lon) {
 			return elevationFile.get(srtmFileOffset(lat, lon));
 		}
 
 		//    Offset in the SRTM3-File
-		public int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
+		private int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
 
 			if (lat.direction == GeoLat.DIRECTION_SOUTH) {
 				if (lon.direction == GeoLon.DIRECTION_EAST) {
@@ -147,6 +149,19 @@ public final class ElevationSRTM3 extends ElevationBase {
 //		}
 	}
 
+	/**
+	 * Clears the file cache by closing and removing all evaluation files
+	 */
+	public static synchronized void clearElevationFileCache() {
+
+		// close all files
+		for (final Entry<Integer, SRTM3ElevationFile> entry : fileMap.entrySet()) {
+			entry.getValue().elevationFile.close();
+		}
+
+		fileMap.clear();
+	}
+
 	public ElevationSRTM3() {
 		gridLat.setDegreesMinutesSecondsDirection(0, 0, 3, 'N');
 		gridLon.setDegreesMinutesSecondsDirection(0, 0, 3, 'E');
@@ -211,7 +226,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 	@Override
 	public String getName() {
-		return "SRTM3"; //$NON-NLS-1$
+		return ELEVATION_ID;
 	}
 
 	@Override

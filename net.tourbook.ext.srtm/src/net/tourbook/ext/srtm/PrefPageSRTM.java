@@ -13,10 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ext.srtm;
 
-import java.text.NumberFormat;
+import net.tourbook.util.IExternalTourEvents;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -28,36 +27,56 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreferencePage {
 
+	public static final String		PROTOCOL_HTTP			= "http://";											//$NON-NLS-1$
+	public static final String		PROTOCOL_FTP			= "ftp://";											//$NON-NLS-1$
+
 	private static final String		PREF_PAGE_SRTM_COLORS	= "net.tourbook.ext.srtm.PrefPageSRTMColors";			//$NON-NLS-1$
 
-	final static NumberFormat		nf						= NumberFormat.getNumberInstance();
+	private IPreferenceStore		fPrefStore;
 
-	final String					fDefaultSRTMFilePath	= Platform.getInstanceLocation().getURL().getPath();
+	private String					fDefaultSRTMFilePath	= Platform.getInstanceLocation().getURL().getPath();
 
 	private Composite				fPrefContainer;
-	private Group					fLocationContainer;
 	private Composite				fPathContainer;
 
 	private BooleanFieldEditor		fUseDefaultLocation;
 	private DirectoryFieldEditor	fDataPathEditor;
 
+	private Button					fRdoSRTM3FtpUrl;
+	private Text					fTxtSRTM3FtpUrl;
+	private Button					fRdoSRTM3HttpUrl;
+	private Text					fTxtSRTM3HttpUrl;
+
+	// original values when page is opened
+	private boolean					fBackupIsFtp;
+	private String					fBackupFtpUrl;
+	private String					fBackupHttpUrl;
+
 	@Override
 	protected Control createContents(final Composite parent) {
 
+		fPrefStore = Activator.getDefault().getPreferenceStore();
+
 		createUI(parent);
+
+		restoreState();
 
 		enableControls();
 
@@ -76,58 +95,92 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		GridDataFactory.swtDefaults().grab(true, false).applyTo(fPrefContainer);
 		GridLayoutFactory.fillDefaults().applyTo(fPrefContainer);
 		GridDataFactory.swtDefaults().applyTo(fPrefContainer);
-//		fPrefContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		createUICacheSettings(fPrefContainer);
-		createUISRTMPageLink(fPrefContainer);
+		createUISrtm3Url(fPrefContainer);
+		createUISrtmPageLink(fPrefContainer);
 	}
 
 	private void createUICacheSettings(final Composite parent) {
 
-		final IPreferenceStore prefStore = getPreferenceStore();
-
-		fLocationContainer = new Group(parent, SWT.NONE);
-		fLocationContainer.setText(Messages.prefPage_srtm_group_label_data_location);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fLocationContainer);
-//		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-
-		// field: use default location
-		fUseDefaultLocation = new BooleanFieldEditor(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
-				Messages.prefPage_srtm_chk_use_default_location,
-				fLocationContainer);
-		fUseDefaultLocation.setPage(this);
-		fUseDefaultLocation.setPreferenceStore(prefStore);
-		fUseDefaultLocation.load();
-		fUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				enableControls();
-			}
-		});
-		new Label(fLocationContainer, SWT.NONE);
-
-		fPathContainer = new Composite(fLocationContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fPathContainer);
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.prefPage_srtm_group_label_data_location);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		{
-			// field: path for the srtm data
-			fDataPathEditor = new DirectoryFieldEditor(IPreferences.SRTM_DATA_FILEPATH,
-					Messages.prefPage_srtm_editor_data_filepath,
-					fPathContainer);
-			fDataPathEditor.setPage(this);
-			fDataPathEditor.setPreferenceStore(prefStore);
-			fDataPathEditor.setEmptyStringAllowed(false);
-			fDataPathEditor.load();
-//			fDataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-//				public void propertyChange(final PropertyChangeEvent event) {
-//					updateDataInfo();
-//				}
-//			});
+			// field: use default location
+			fUseDefaultLocation = new BooleanFieldEditor(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
+					Messages.prefPage_srtm_chk_use_default_location,
+					group);
+			fUseDefaultLocation.setPage(this);
+			fUseDefaultLocation.setPreferenceStore(fPrefStore);
+			fUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					enableControls();
+				}
+			});
+			new Label(group, SWT.NONE);
+
+			fPathContainer = new Composite(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fPathContainer);
+			{
+				// field: path for the srtm data
+				fDataPathEditor = new DirectoryFieldEditor(IPreferences.SRTM_DATA_FILEPATH,
+						Messages.prefPage_srtm_editor_data_filepath,
+						fPathContainer);
+				fDataPathEditor.setPage(this);
+				fDataPathEditor.setPreferenceStore(fPrefStore);
+				fDataPathEditor.setEmptyStringAllowed(false);
+			}
 		}
 
 		// !!! set layout after the editor was created because the editor sets the parents layout
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(fLocationContainer);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 	}
 
-	private void createUISRTMPageLink(final Composite parent) {
+	private void createUISrtm3Url(final Composite parent) {
+
+		final SelectionAdapter selectListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+				validateData();
+			}
+		};
+
+		final ModifyListener modifyListener = new ModifyListener() {
+			public void modifyText(final ModifyEvent e) {
+				validateData();
+			}
+		};
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.prefPage_srtm_group_label_srtm3);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			// radio: http url
+			fRdoSRTM3HttpUrl = new Button(group, SWT.RADIO);
+			fRdoSRTM3HttpUrl.setText(Messages.prefPage_srtm_radio_srtm3HttpUrl);
+			fRdoSRTM3HttpUrl.addSelectionListener(selectListener);
+
+			// text: http url
+			fTxtSRTM3HttpUrl = new Text(group, SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtSRTM3HttpUrl);
+			fTxtSRTM3HttpUrl.addModifyListener(modifyListener);
+
+			// radio: ftp url
+			fRdoSRTM3FtpUrl = new Button(group, SWT.RADIO);
+			fRdoSRTM3FtpUrl.setText(Messages.prefPage_srtm_radio_srtm3FtpUrl);
+			fRdoSRTM3FtpUrl.addSelectionListener(selectListener);
+
+			// text: ftp url
+			fTxtSRTM3FtpUrl = new Text(group, SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtSRTM3FtpUrl);
+			fTxtSRTM3FtpUrl.addModifyListener(modifyListener);
+		}
+	}
+
+	private void createUISrtmPageLink(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().indent(0, 20).applyTo(container);
@@ -148,7 +201,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 	@Override
 	protected IPreferenceStore doGetPreferenceStore() {
-		return Activator.getDefault().getPreferenceStore();
+		return fPrefStore;
 	}
 
 	private void enableControls() {
@@ -161,6 +214,11 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		} else {
 			fDataPathEditor.setEnabled(true, fPathContainer);
 		}
+
+		// SRTM3 server
+		final boolean isFTP = fRdoSRTM3FtpUrl.getSelection();
+		fTxtSRTM3FtpUrl.setEnabled(isFTP);
+		fTxtSRTM3HttpUrl.setEnabled(!isFTP);
 	}
 
 	public void init(final IWorkbench workbench) {}
@@ -180,6 +238,18 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 		fUseDefaultLocation.loadDefault();
 
+		fPrefStore.setToDefault(IPreferences.STATE_IS_SRTM3_FTP);
+		fPrefStore.setToDefault(IPreferences.STATE_SRTM3_HTTP_URL);
+		fPrefStore.setToDefault(IPreferences.STATE_SRTM3_FTP_URL);
+
+		// update controls
+		final boolean isFtp = fPrefStore.getDefaultBoolean(IPreferences.STATE_IS_SRTM3_FTP);
+		fRdoSRTM3FtpUrl.setSelection(isFtp);
+		fRdoSRTM3HttpUrl.setSelection(!isFtp);
+
+		fTxtSRTM3FtpUrl.setText(fPrefStore.getDefaultString(IPreferences.STATE_SRTM3_FTP_URL));
+		fTxtSRTM3HttpUrl.setText(fPrefStore.getDefaultString(IPreferences.STATE_SRTM3_HTTP_URL));
+
 		enableControls();
 
 		super.performDefaults();
@@ -192,12 +262,51 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			return false;
 		}
 
-		fUseDefaultLocation.store();
-		fDataPathEditor.store();
+		saveState();
+
+		/*
+		 * when the srtm3 server has been modified, clear the file cache to reload the files from
+		 * the new location
+		 */
+		if (fBackupIsFtp != fPrefStore.getBoolean(IPreferences.STATE_IS_SRTM3_FTP)
+				|| fBackupFtpUrl.equalsIgnoreCase(fPrefStore.getString(IPreferences.STATE_SRTM3_FTP_URL)) == false
+				|| fBackupHttpUrl.equalsIgnoreCase(fPrefStore.getString(IPreferences.STATE_SRTM3_HTTP_URL)) == false) {
+
+			ElevationSRTM3.clearElevationFileCache();
+
+			// fire event to clear the tour data cache which remove existing srtm data
+			net.tourbook.util.Activator.getDefault().getPreferenceStore().setValue(
+					IExternalTourEvents.CLEAR_TOURDATA_CACHE,
+					Math.random());
+		}
 
 		return super.performOk();
 	}
 
+	private void restoreState() {
+
+		fUseDefaultLocation.load();
+		fDataPathEditor.load();
+
+		fBackupIsFtp = fPrefStore.getBoolean(IPreferences.STATE_IS_SRTM3_FTP);
+		fRdoSRTM3FtpUrl.setSelection(fBackupIsFtp);
+		fRdoSRTM3HttpUrl.setSelection(!fBackupIsFtp);
+
+		fBackupFtpUrl = fPrefStore.getString(IPreferences.STATE_SRTM3_FTP_URL);
+		fBackupHttpUrl = fPrefStore.getString(IPreferences.STATE_SRTM3_HTTP_URL);
+		fTxtSRTM3FtpUrl.setText(fBackupFtpUrl);
+		fTxtSRTM3HttpUrl.setText(fBackupHttpUrl);
+	}
+
+	private void saveState() {
+
+		fUseDefaultLocation.store();
+		fDataPathEditor.store();
+
+		fPrefStore.setValue(IPreferences.STATE_IS_SRTM3_FTP, fRdoSRTM3FtpUrl.getSelection());
+		fPrefStore.setValue(IPreferences.STATE_SRTM3_HTTP_URL, fTxtSRTM3HttpUrl.getText().trim());
+		fPrefStore.setValue(IPreferences.STATE_SRTM3_FTP_URL, fTxtSRTM3FtpUrl.getText().trim());
+	}
 
 	private boolean validateData() {
 
@@ -207,13 +316,40 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 				&& (!fDataPathEditor.isValid() || fDataPathEditor.getStringValue().trim().length() == 0)) {
 
 			isValid = false;
-			setErrorMessage(net.tourbook.ext.srtm.Messages.prefPage_srtm_msg_invalid_data_path);
+
+			setErrorMessage(Messages.prefPage_srtm_msg_invalid_data_path);
 			fDataPathEditor.setFocus();
+		}
+
+		if (fRdoSRTM3FtpUrl.getSelection()) {
+
+			// check ftp url
+
+			if (fTxtSRTM3FtpUrl.getText().trim().toLowerCase().startsWith(PROTOCOL_FTP) == false) {
+
+				isValid = false;
+
+				setErrorMessage(Messages.prefPage_srtm_msg_invalidSrtm3FtpUrl);
+				fTxtSRTM3FtpUrl.setFocus();
+			}
+		} else {
+
+			// check http url
+
+			if (fTxtSRTM3HttpUrl.getText().trim().toLowerCase().startsWith(PROTOCOL_HTTP) == false) {
+
+				isValid = false;
+
+				setErrorMessage(Messages.prefPage_srtm_msg_invalidSrtm3HttpUrl);
+				fTxtSRTM3HttpUrl.setFocus();
+			}
 		}
 
 		if (isValid) {
 			setErrorMessage(null);
 		}
+
+		setValid(isValid);
 
 		return isValid;
 	}

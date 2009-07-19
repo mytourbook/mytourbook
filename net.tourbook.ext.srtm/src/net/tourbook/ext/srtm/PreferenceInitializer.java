@@ -27,18 +27,23 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 
-		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
 
-		store.setDefault(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH, true);
+		prefStore.setDefault(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH, true);
 
 		// set srtm default data path to the working directory
-		store.setDefault(IPreferences.SRTM_DATA_FILEPATH, Platform.getInstanceLocation().getURL().getPath());
+		prefStore.setDefault(IPreferences.SRTM_DATA_FILEPATH, Platform.getInstanceLocation().getURL().getPath());
 
 		// set srtm actual color profile index
-		store.setDefault(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID, 0);
-		store.setDefault(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY, 0);
+		prefStore.setDefault(IPreferences.SRTM_COLORS_SELECTED_PROFILE_ID, 0);
+		prefStore.setDefault(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY, 0);
 
 		// apply profile when it's selected in the profile list
-		store.setDefault(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED, false);
+		prefStore.setDefault(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED, false);
+
+		// srtm3 server
+		prefStore.setDefault(IPreferences.STATE_IS_SRTM3_FTP, false);
+		prefStore.setDefault(IPreferences.STATE_SRTM3_FTP_URL, "ftp://e0srp01u.ecs.nasa.gov");
+		prefStore.setDefault(IPreferences.STATE_SRTM3_HTTP_URL, "http://dds.cr.usgs.gov");
 	}
 }

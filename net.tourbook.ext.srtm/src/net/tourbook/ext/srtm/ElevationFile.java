@@ -21,18 +21,20 @@ package net.tourbook.ext.srtm;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
+
+import net.tourbook.ext.srtm.download.DownloadETOPO;
+import net.tourbook.ext.srtm.download.DownloadGLOBE;
+import net.tourbook.ext.srtm.download.DownloadSRTM3;
 
 public class ElevationFile {
 
 	private FileChannel	fileChannel;
 	private ShortBuffer	shortBuffer;
+
 	private boolean		exists	= false;
-
-	public static void main(final String[] args) throws Exception {
-
-	}
 
 	public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
 		switch (elevationTyp) {
@@ -51,6 +53,19 @@ public class ElevationFile {
 		}
 	}
 
+	public void close()  {
+
+		if (fileChannel == null) {
+			return;
+		}
+
+		try {
+			fileChannel.close();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public short get(final int index) {
 		if (!exists) {
 			return (-32767);
@@ -59,9 +74,9 @@ public class ElevationFile {
 	}
 
 	private void handleError(final String fileName, final Exception e) {
-		
+
 		System.out.println("handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		if (e instanceof FileNotFoundException) {
 			// done
 		} else {
@@ -71,7 +86,7 @@ public class ElevationFile {
 		exists = false;
 		// dont return exception      
 	}
- 
+
 	private void initETOPO(final String fileName) throws Exception {
 
 		try {
@@ -99,10 +114,15 @@ public class ElevationFile {
 		} catch (final FileNotFoundException e1) {
 			try {
 				// download gzip-File <fileName>.gz and unzip
-				final String localName = fileName + ".gz"; //$NON-NLS-1$
-				final String remoteName = localName.substring(localName.lastIndexOf(File.separator) + 1);
-				DownloadGLOBE.get(remoteName, localName);
-				FileZip.gunzip(localName);
+				final String localZipName = fileName + ".gz"; //$NON-NLS-1$
+				final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
+				DownloadGLOBE.get(remoteFileName, localZipName);
+				FileZip.gunzip(localZipName);
+
+				// delete zip archive file, this is not needed any more
+				final File zipArchive = new File(localZipName);
+				zipArchive.delete();
+
 				open(fileName);
 
 			} catch (final Exception e2) {
@@ -123,10 +143,6 @@ public class ElevationFile {
 		}
 	}
 
-//   private void close() throws Exception {
-//      fileChannel.close();
-//   }
-
 	private void initSRTM3(final String fileName) throws Exception {
 
 		try {
@@ -135,8 +151,8 @@ public class ElevationFile {
 			try {
 				//  download zip-File <fileName>.zip and unzip
 				final String localZipName = fileName + ".zip"; //$NON-NLS-1$
-				final String remoteName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
-				DownloadSRTM3.get(remoteName, localZipName);
+				final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
+				DownloadSRTM3.get(remoteFileName, localZipName);
 				FileZip.unzip(localZipName);
 
 				// delete zip archive file, this is not needed any more

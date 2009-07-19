@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ext.srtm;
+package net.tourbook.ext.srtm.download;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import net.tourbook.ext.srtm.Activator;
 import net.tourbook.util.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,7 +36,7 @@ import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 public class DownloadResource {
 
-	protected static final void get(final String addressPraefix, final String remoteName, final String localName)
+	protected static final void get(final String urlBase, final String remoteFileName, final String localFilePathName)
 			throws Exception {
 
 		final TileInfoManager tileInfoMgr = TileInfoManager.getInstance();
@@ -45,7 +46,7 @@ public class DownloadResource {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEvent.LOADING_SRTM_DATA_MONITOR, remoteName, numWritten[0]);
+				tileInfoMgr.updateSRTMTileInfo(TileEvent.LOADING_SRTM_DATA_MONITOR, remoteFileName, numWritten[0]);
 
 				// rescedule every 200ms
 				this.schedule(200);
@@ -59,9 +60,9 @@ public class DownloadResource {
 			protected IStatus run(final IProgressMonitor monitor) {
 
 				try {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteFileName, 0);
 
-					final String address = addressPraefix + remoteName;
+					final String address = urlBase + remoteFileName;
 
 					System.out.println("load " + address); //$NON-NLS-1$
 					OutputStream outputStream = null;
@@ -69,7 +70,7 @@ public class DownloadResource {
 					try {
 
 						final URL url = new URL(address);
-						outputStream = new BufferedOutputStream(new FileOutputStream(localName));
+						outputStream = new BufferedOutputStream(new FileOutputStream(localFilePathName));
 						final URLConnection urlConnection = url.openConnection();
 						inputStream = urlConnection.getInputStream();
 
@@ -98,13 +99,13 @@ public class DownloadResource {
 						}
 					}
 
-					System.out.println("get " + remoteName + " -> " + localName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					System.out.println("get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				} catch (final Exception e) {
 
 					System.out.println(e.getMessage());
 
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.ERROR_LOADING_SRTM_DATA, remoteName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.ERROR_LOADING_SRTM_DATA, remoteFileName, 0);
 
 					return new Status(IStatus.ERROR, //
 							Activator.PLUGIN_ID,
@@ -113,7 +114,7 @@ public class DownloadResource {
 							e);
 
 				} finally {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteFileName, 0);
 				}
 
 				return Status.OK_STATUS;

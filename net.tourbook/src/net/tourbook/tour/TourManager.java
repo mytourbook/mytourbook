@@ -39,12 +39,15 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.IExternalTourEvents;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -562,7 +565,28 @@ public class TourManager {
 		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
 	}
 
-	private TourManager() {}
+	private TourManager() {
+
+		final IPreferenceStore prefStore = net.tourbook.util.Activator.getDefault().getPreferenceStore();
+
+		prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				if (event.getProperty().equals(IExternalTourEvents.CLEAR_TOURDATA_CACHE)) {
+
+					clearTourDataCache();
+
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+
+							// fire modify event
+							TourManager.fireEvent(TourEventId.UPDATE_UI);
+						}
+					});
+				}
+			}
+		});
+	}
 
 	public void addTourEventListener(final ITourEventListener listener) {
 		fTourEventListeners.add(listener);

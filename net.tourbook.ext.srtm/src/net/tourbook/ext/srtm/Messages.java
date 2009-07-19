@@ -18,6 +18,7 @@ package net.tourbook.ext.srtm;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
+
 	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages";		//$NON-NLS-1$
 
 	public static String		app_ui_N;
@@ -59,13 +60,23 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_dlg_delete_profile_title;
 	public static String		prefPage_srtm_editor_data_filepath;
 	public static String		prefPage_srtm_group_label_data_location;
+
+	public static String		prefPage_srtm_group_label_srtm3;
 	public static String		prefPage_srtm_link_srtmProfiles;
 	public static String		prefPage_srtm_msg_invalid_data_path;
+
+	public static String		prefPage_srtm_msg_invalidSrtm3FtpUrl;
+
+	public static String		prefPage_srtm_msg_invalidSrtm3HttpUrl;
 	public static String		prefPage_srtm_profile_add;
 	public static String		prefPage_srtm_profile_duplicate;
 	public static String		prefPage_srtm_profile_edit;
 	public static String		prefPage_srtm_profile_option_apply_when_selected;
 	public static String		prefPage_srtm_profile_remove;
+	public static String		prefPage_srtm_radio_srtm3FtpUrl;
+
+	public static String		prefPage_srtm_radio_srtm3HttpUrl;
+
 	public static String		prefPage_srtm_resolution_title;
 	public static String		prefPage_srtm_resolution_very_fine;
 	public static String		prefPage_srtm_resolution_fine;
@@ -107,6 +118,13 @@ public class Messages extends NLS {
 	public static String		color_chooser_hue;
 	public static String		color_chooser_saturation;
 	public static String		color_chooser_brightness;
+
+	public static String		error_message_cannotConnectToServer;
+	public static String		error_message_timeoutWhenConnectingToServer;
+
+	public static String		job_name_downloadMonitor;
+	public static String		job_name_ftpDownload;
+	public static String		job_name_httpDownload;
 
 	public static String		rgv_vertex_class_cast_exception;
 

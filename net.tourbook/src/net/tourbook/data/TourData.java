@@ -386,7 +386,8 @@ public class TourData implements Comparable<Object> {
 	private int[]						altitudeSerieImperial;
 
 	/**
-	 * SRTM altitude values
+	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
+	 * length()==0 data are invalid
 	 */
 	@Transient
 	private int[]						srtmSerie;
