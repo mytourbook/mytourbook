@@ -24,8 +24,8 @@
 			<fileset dir="${archive-export-folder}" includes="**/*" />
 		</delete>
 
-		<antcall target="create-archive-with-all-languages" />
 		<!-- 
+		<antcall target="create-archive-with-all-languages" />
 		<antcall target="create-default-archive" />
 		-->
 
