@@ -26,7 +26,16 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartUtil {
 
-	private final static NumberFormat	fNf	= NumberFormat.getNumberInstance();
+	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
+	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
+
+	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
+
+	private final static NumberFormat	fNf				= NumberFormat.getNumberInstance();
+
+	private static StringBuilder		fFormatterSB	= new StringBuilder();
+	private static Formatter			fFormatter		= new Formatter(fFormatterSB);
 
 	/**
 	 * Checks if an image can be reused, this is true if the image exists and has the same size
@@ -57,7 +66,7 @@ public class ChartUtil {
 	 * 
 	 * @param display
 	 * @param image
-	 *        image which will be disposed if the image is not null
+	 *            image which will be disposed if the image is not null
 	 * @param rect
 	 * @return returns a new created image
 	 */
@@ -97,18 +106,34 @@ public class ChartUtil {
 		return null;
 	}
 
+	public static String format_mm_ss(final long time) {
+
+		fFormatterSB.setLength(0);
+
+		if (time < 0) {
+			fFormatterSB.append(SYMBOL_DASH);
+		}
+
+		final long timeAbs = time < 0 ? 0 - time : time;
+
+		return fFormatter.format(FORMAT_MM_SS, (timeAbs / 60), (timeAbs % 60)).toString();
+	}
+
 	/**
 	 * @param value
-	 *        The value which is formatted
+	 *            The value which is formatted
 	 * @param divisor
-	 *        Divisor by which the value is divided
+	 *            Divisor by which the value is divided
 	 * @param precision
-	 *        Decimal numbers after the decimal point
+	 *            Decimal numbers after the decimal point
 	 * @param removeDecimalZero
-	 *        True removes trailing zeros after a decimal point
+	 *            True removes trailing zeros after a decimal point
 	 * @return
 	 */
-	public static String formatInteger(final int value, final int divisor, final int precision, final boolean removeDecimalZero) {
+	public static String formatInteger(	final int value,
+										final int divisor,
+										final int precision,
+										final boolean removeDecimalZero) {
 
 		final float divValue = (float) value / divisor;
 
@@ -133,7 +158,7 @@ public class ChartUtil {
 
 	public static String formatValue(final int value, final int unitType, final float divisor, final boolean showSeconds) {
 
-		String valueText = ""; //$NON-NLS-1$
+		String valueText = EMPTY_STRING;
 
 		// format the unit label
 		switch (unitType) {
@@ -149,20 +174,27 @@ public class ChartUtil {
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
-			valueText = new Formatter().format(Messages.Format_time_hhmm,
+			valueText = new Formatter().format(
+					Messages.Format_time_hhmm,
 					(long) (value / 3600),
 					(long) ((value % 3600) / 60)).toString();
+			break;
+
+		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
+			valueText = format_mm_ss(value);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 
 			if (showSeconds) {
-				valueText = new Formatter().format(Messages.Format_time_hhmmss,
+				valueText = new Formatter().format(
+						Messages.Format_time_hhmmss,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60),
 						(long) ((value % 3600) % 60)).toString();
 			} else {
-				valueText = new Formatter().format(Messages.Format_time_hhmm,
+				valueText = new Formatter().format(
+						Messages.Format_time_hhmm,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60)).toString();
 			}

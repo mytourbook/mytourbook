@@ -25,52 +25,67 @@ public class ChartDataYSerie extends ChartDataSerie {
 	/**
 	 * the bars has only a low and high value
 	 */
-	public static final int			BAR_LAYOUT_SINGLE_SERIE	= 1;
+	public static final int			BAR_LAYOUT_SINGLE_SERIE		= 1;
 
 	/**
 	 * the bars are displayed one of the other
 	 */
-	public static final int			BAR_LAYOUT_STACKED		= 2;
+	public static final int			BAR_LAYOUT_STACKED			= 2;
 
 	/**
 	 * the bars are displayed beside each other
 	 */
-	public static final int			BAR_LAYOUT_BESIDE		= 3;
+	public static final int			BAR_LAYOUT_BESIDE			= 3;
 
-	public static final String		YDATA_INFO				= "yDataInfo";					//$NON-NLS-1$
+	public static final String		YDATA_INFO					= "yDataInfo";					//$NON-NLS-1$
 
-	public static final int			FILL_METHOD_NOFILL		= 0;
-	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;
-	public static final int			FILL_METHOD_FILL_ZERO	= 2;
+	public static final int			FILL_METHOD_NOFILL			= 0;
+	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
+	public static final int			FILL_METHOD_FILL_ZERO		= 2;
 
-	private int						fChartLayout			= BAR_LAYOUT_SINGLE_SERIE;
+	/**
+	 * Slider label format: n.1
+	 */
+	public static final int			SLIDER_LABEL_FORMAT_DEFAULT	= 0;							//$NON-NLS-1$
+	/**
+	 * Slider label format: mm:ss
+	 */
+	public static final int			SLIDER_LABEL_FORMAT_MM_SS	= 1;							//$NON-NLS-1$
 
+	private int						fSliderLabelFormat			= SLIDER_LABEL_FORMAT_DEFAULT;
+	private int						fChartLayout				= BAR_LAYOUT_SINGLE_SERIE;
 	private String					fYTitle;
+
 	/**
 	 * contains the color index for each value
 	 */
 	private int[][]					fColorIndex;
 
-	private int						graphFillMethod			= FILL_METHOD_NOFILL;
+	private int						graphFillMethod				= FILL_METHOD_NOFILL;
 
-	private boolean					showYSlider				= false;
+	private boolean					showYSlider					= false;
 
 	/**
 	 * <p>
 	 * true: the direction is from bottom to top by increasing number <br>
 	 * false: the direction is from top to bottom by increasing number
 	 */
-	private boolean					yAxisDirection			= true;
+	private boolean					yAxisDirection				= true;
 
 	/**
 	 * Contains a list with all layers which are drawn on top of the graph
 	 */
-	private ArrayList<IChartLayer>	fCustomLayers			= new ArrayList<IChartLayer>();
+	private ArrayList<IChartLayer>	fCustomLayers				= new ArrayList<IChartLayer>();
 
 	private ChartYSlider			ySliderTop;
 
 	private ChartYSlider			ySliderBottom;
 	private final int				fChartType;
+
+	/**
+	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
+	 */
+//	private int[]					fYData2ndSerie;
 
 	public ChartDataYSerie(	final int chartType,
 							final int chartLayout,
@@ -154,9 +169,21 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return graphFillMethod;
 	}
 
+	/**
+	 * @return Returns the format how the slider label will be formatted, which can be <br>
+	 *         {@link #SLIDER_LABEL_FORMAT_DEFAULT}<br> {@link #SLIDER_LABEL_FORMAT_MM_SS}
+	 */
+	public int getSliderLabelFormat() {
+		return fSliderLabelFormat;
+	}
+
 	public String getXTitle() {
 		return null;
 	}
+
+//	public int[] getYData2ndSerie() {
+//		return fYData2ndSerie;
+//	}
 
 	/**
 	 * @return Returns the ySliderBottom.
@@ -397,6 +424,13 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	/**
+	 * @param sliderLabelFormat
+	 */
+	public void setSliderLabelFormat(final int sliderLabelFormat) {
+		fSliderLabelFormat = sliderLabelFormat;
+	}
+
+	/**
 	 * set the direction for the y axis <code>
 	 * true: the direction is from bottom to top by increasing number
 	 * false: the direction is from top to bottom by increasing number
@@ -407,6 +441,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public void setYAxisDirection(final boolean axisDirection) {
 		yAxisDirection = axisDirection;
 	}
+
+//	public void setYData2ndSerie(final int[] yData2ndSerie) {
+//		fYData2ndSerie = yData2ndSerie;
+//	}
 
 	/**
 	 * @param title

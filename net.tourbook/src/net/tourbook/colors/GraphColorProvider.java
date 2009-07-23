@@ -96,11 +96,27 @@ public class GraphColorProvider {
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
 
 	private static final LegendColor		LEGEND_COLOR_ALTITUDE		= new LegendColor(new ValueColor[] {
-			new ValueColor(10, 161, 85, 0),
-			new ValueColor(50, 232, 169, 0),
-			new ValueColor(100, 0, 241, 0),
-			new ValueColor(150, 0, 154, 255),
-			new ValueColor(190, 144, 219, 255)							},
+																		//
+			new ValueColor(10, 130, 0, 157),
+			new ValueColor(50, 255, 85, 13),
+			new ValueColor(100, 255, 255, 0),
+			new ValueColor(150, 0, 170, 9),
+			new ValueColor(190, 23, 163, 255)
+
+//			<legendcolor prefname="altitude">
+//			<valuecolor blue="157"	green="0"	red="130" value="10"/>
+//			<valuecolor blue="13"	green="85"	red="255" value="50"/>
+//			<valuecolor blue="0"	green="255" red="255" value="100"/>
+//			<valuecolor blue="9"	green="170" red="0" value="150"/>
+//			<valuecolor blue="255"	green="163"	red="23" value="190"/>
+
+																		//
+//			new ValueColor(10, 161, 85, 0),
+//			new ValueColor(50, 232, 169, 0),
+//			new ValueColor(100, 0, 241, 0),
+//			new ValueColor(150, 0, 154, 255),
+//			new ValueColor(190, 144, 219, 255)							//
+																		},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				15,
 																				LegendColor.BRIGHTNESS_LIGHTNING,
@@ -187,8 +203,10 @@ public class GraphColorProvider {
 			new ColorDefinition(PREF_GRAPH_PACE,//
 					Messages.Graph_Label_Pace,
 					new RGB(255, 255, 255),
-					new RGB(0, 47, 211),
-					new RGB(0, 43, 210),
+					new RGB(0x9C, 0x2F, 0xFF),
+					new RGB(0x9C, 0x2F, 0xFF),
+//					new RGB(0, 47, 211),
+//					new RGB(0, 43, 210),
 					LEGEND_COLOR_PACE),
 
 			new ColorDefinition(PREF_GRAPH_POWER,//
@@ -249,8 +267,6 @@ public class GraphColorProvider {
 	private static GraphColorProvider		instance;
 
 	private ColorDefinition[]				fGraphColorDefinitions;
-
-	public GraphColorProvider() {}
 
 	public static GraphColorProvider getInstance() {
 		if (instance == null) {
@@ -339,6 +355,8 @@ public class GraphColorProvider {
 			}
 		}
 	}
+
+	public GraphColorProvider() {}
 
 	/**
 	 * @param preferenceName

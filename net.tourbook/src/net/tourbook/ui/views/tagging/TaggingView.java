@@ -972,10 +972,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final Object element = cell.getElement();
 				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
-				if (pace == 0) {
+				if (pace == 0.0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(UI.format_mm_ss((long) pace).toString());
+					cell.setText(UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);

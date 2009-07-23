@@ -83,8 +83,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					fChkMoveSlidersWhenZoomed;
 
 	private BooleanFieldEditor		fEditPaceMinMaxCheckbox;
-	private IntegerFieldEditor		fEditPaceMinEditor;
-	private IntegerFieldEditor		fEditPaceMaxEditor;
+	private IntegerFieldEditor		fEditPaceMin;
+	private IntegerFieldEditor		fEditPaceMax;
 	private BooleanFieldEditor		fEditAltimeterMinCheckbox;
 	private IntegerFieldEditor		fEditAltimeterMinEditor;
 	private BooleanFieldEditor		fEditGradientMinCheckbox;
@@ -181,7 +181,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		createGraphList();
 		checkboxList.setInput(this);
 
-		final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(
+				ITourbookPreferences.GRAPH_VISIBLE));
 
 		// check all graphs which are defined in the prefs
 		final ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
@@ -336,142 +337,161 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		final IPreferenceStore prefStore = getPreferenceStore();
 		GridData gd;
+		Label label;
 
 		// the editor container removes all margins
 		final Group groupMinValue = new Group(container, SWT.NONE);
 		groupMinValue.setText(Messages.Pref_Graphs_force_minimum_value);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupMinValue);
+		{
+			/*
+			 * checkbox: pace min/max value
+			 */
+			fEditPaceMinMaxCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
+					Messages.Pref_Graphs_Check_force_minmax_for_pace,
+					groupMinValue);
+			fEditPaceMinMaxCheckbox.setPreferenceStore(prefStore);
+			fEditPaceMinMaxCheckbox.setPage(this);
+			fEditPaceMinMaxCheckbox.load();
+			fEditPaceMinMaxCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					final boolean isChecked = (Boolean) event.getNewValue();
+					fEditPaceMin.setEnabled(isChecked, groupMinValue);
+					fEditPaceMax.setEnabled(isChecked, groupMinValue);
+				}
+			});
 
-		/*
-		 * checkbox: pace min/max value
-		 */
-		fEditPaceMinMaxCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
-				Messages.Pref_Graphs_Check_force_minmax_for_pace,
-				groupMinValue);
-		fEditPaceMinMaxCheckbox.setPreferenceStore(prefStore);
-		fEditPaceMinMaxCheckbox.setPage(this);
-		fEditPaceMinMaxCheckbox.load();
-		fEditPaceMinMaxCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				fEditPaceMinEditor.setEnabled(isChecked, groupMinValue);
-				fEditPaceMaxEditor.setEnabled(isChecked, groupMinValue);
-			}
-		});
+			// paceholder
+			new Label(groupMinValue, SWT.NONE);
+			new Label(groupMinValue, SWT.NONE);
 
-		// paceholder
-		new Label(groupMinValue, SWT.NONE);
+			/*
+			 * editor: pace min value
+			 */
+			fEditPaceMin = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+					Messages.Pref_Graphs_Text_min_value,
+					groupMinValue);
+			fEditPaceMin.setPreferenceStore(prefStore);
+			fEditPaceMin.setPage(this);
+			fEditPaceMin.setTextLimit(4);
+			fEditPaceMin.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+			fEditPaceMin.load();
+			UI.setFieldWidth(groupMinValue, fEditPaceMin, DEFAULT_FIELD_WIDTH);
+			gd = new GridData();
+			gd.horizontalIndent = COLUMN_INDENT;
+			fEditPaceMin.getLabelControl(groupMinValue).setLayoutData(gd);
 
-		/*
-		 * editor: pace min value
-		 */
-		fEditPaceMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				groupMinValue);
-		fEditPaceMinEditor.setPreferenceStore(prefStore);
-		fEditPaceMinEditor.setPage(this);
-		fEditPaceMinEditor.setTextLimit(4);
-		fEditPaceMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		fEditPaceMinEditor.load();
-		UI.setFieldWidth(groupMinValue, fEditPaceMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		fEditPaceMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+			fEditPaceMin.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
 
-		fEditPaceMinEditor.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
+			// label: minutes
+			label = new Label(groupMinValue, SWT.NONE);
+			label.setText(Messages.app_unit_minutes);
 
-		/*
-		 * editor: pace max value
-		 */
-		fEditPaceMaxEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
-				Messages.Pref_Graphs_Text_max_value,
-				groupMinValue);
-		fEditPaceMaxEditor.setPreferenceStore(prefStore);
-		fEditPaceMaxEditor.setPage(this);
-		fEditPaceMaxEditor.setTextLimit(4);
-		fEditPaceMaxEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		fEditPaceMaxEditor.load();
-		UI.setFieldWidth(groupMinValue, fEditPaceMaxEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		fEditPaceMaxEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+			/*
+			 * editor: pace max value
+			 */
+			fEditPaceMax = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+					Messages.Pref_Graphs_Text_max_value,
+					groupMinValue);
+			fEditPaceMax.setPreferenceStore(prefStore);
+			fEditPaceMax.setPage(this);
+			fEditPaceMax.setTextLimit(4);
+			fEditPaceMax.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+			fEditPaceMax.load();
+			UI.setFieldWidth(groupMinValue, fEditPaceMax, DEFAULT_FIELD_WIDTH);
+			gd = new GridData();
+			gd.horizontalIndent = COLUMN_INDENT;
+			fEditPaceMax.getLabelControl(groupMinValue).setLayoutData(gd);
 
-		fEditPaceMaxEditor.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
+			fEditPaceMax.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
 
-		/*
-		 * checkbox: altimeter min value
-		 */
-		fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
-				groupMinValue);
-		fEditAltimeterMinCheckbox.setPreferenceStore(prefStore);
-		fEditAltimeterMinCheckbox.setPage(this);
-		fEditAltimeterMinCheckbox.load();
-		fEditAltimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				fEditAltimeterMinEditor.setEnabled(isChecked, groupMinValue);
-			}
-		});
+			// label: minutes
+			label = new Label(groupMinValue, SWT.NONE);
+			label.setText(Messages.app_unit_minutes);
 
-		// paceholder
-		new Label(groupMinValue, SWT.NONE);
+			/*
+			 * checkbox: altimeter min value
+			 */
+			fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
+					Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
+					groupMinValue);
+			fEditAltimeterMinCheckbox.setPreferenceStore(prefStore);
+			fEditAltimeterMinCheckbox.setPage(this);
+			fEditAltimeterMinCheckbox.load();
+			fEditAltimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					final boolean isChecked = (Boolean) event.getNewValue();
+					fEditAltimeterMinEditor.setEnabled(isChecked, groupMinValue);
+				}
+			});
 
-		/*
-		 * editor: altimeter min value
-		 */
-		fEditAltimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				groupMinValue);
-		fEditAltimeterMinEditor.setPreferenceStore(prefStore);
-		fEditAltimeterMinEditor.setPage(this);
-		fEditAltimeterMinEditor.setTextLimit(4);
-		fEditAltimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		fEditAltimeterMinEditor.load();
-		UI.setFieldWidth(groupMinValue, fEditAltimeterMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		fEditAltimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+			// paceholder
+			new Label(groupMinValue, SWT.NONE);
+			new Label(groupMinValue, SWT.NONE);
 
-		fEditAltimeterMinEditor.setEnabled(fEditAltimeterMinCheckbox.getBooleanValue(), groupMinValue);
+			/*
+			 * editor: altimeter min value
+			 */
+			fEditAltimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+					Messages.Pref_Graphs_Text_min_value,
+					groupMinValue);
+			fEditAltimeterMinEditor.setPreferenceStore(prefStore);
+			fEditAltimeterMinEditor.setPage(this);
+			fEditAltimeterMinEditor.setTextLimit(4);
+			fEditAltimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+			fEditAltimeterMinEditor.load();
+			UI.setFieldWidth(groupMinValue, fEditAltimeterMinEditor, DEFAULT_FIELD_WIDTH);
+			gd = new GridData();
+			gd.horizontalIndent = COLUMN_INDENT;
+			fEditAltimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
 
-		/*
-		 * checkbox: gradient min value
-		 */
-		fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
-				groupMinValue);
-		fEditGradientMinCheckbox.setPreferenceStore(prefStore);
-		fEditGradientMinCheckbox.setPage(this);
-		fEditGradientMinCheckbox.load();
-		fEditGradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				fEditGradientMinEditor.setEnabled(isChecked, groupMinValue);
-			}
-		});
+			fEditAltimeterMinEditor.setEnabled(fEditAltimeterMinCheckbox.getBooleanValue(), groupMinValue);
 
-		// add placeholder
-		new Label(groupMinValue, SWT.NONE);
+			// paceholder
+			new Label(groupMinValue, SWT.NONE);
 
-		/*
-		 * editor: gradient min value
-		 */
-		fEditGradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				groupMinValue);
-		fEditGradientMinEditor.setPreferenceStore(prefStore);
-		fEditGradientMinEditor.setPage(this);
-		fEditGradientMinEditor.setTextLimit(4);
-		fEditGradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		fEditGradientMinEditor.load();
-		UI.setFieldWidth(groupMinValue, fEditGradientMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		fEditGradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
-		fEditGradientMinEditor.setEnabled(fEditGradientMinCheckbox.getBooleanValue(), groupMinValue);
+			/*
+			 * checkbox: gradient min value
+			 */
+			fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
+					Messages.Pref_Graphs_Check_force_minimum_for_gradient,
+					groupMinValue);
+			fEditGradientMinCheckbox.setPreferenceStore(prefStore);
+			fEditGradientMinCheckbox.setPage(this);
+			fEditGradientMinCheckbox.load();
+			fEditGradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent event) {
+					final boolean isChecked = (Boolean) event.getNewValue();
+					fEditGradientMinEditor.setEnabled(isChecked, groupMinValue);
+				}
+			});
 
-		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMinValue);
+			// add placeholder
+			new Label(groupMinValue, SWT.NONE);
+			new Label(groupMinValue, SWT.NONE);
+
+			/*
+			 * editor: gradient min value
+			 */
+			fEditGradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+					Messages.Pref_Graphs_Text_min_value,
+					groupMinValue);
+			fEditGradientMinEditor.setPreferenceStore(prefStore);
+			fEditGradientMinEditor.setPage(this);
+			fEditGradientMinEditor.setTextLimit(4);
+			fEditGradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+			fEditGradientMinEditor.load();
+			UI.setFieldWidth(groupMinValue, fEditGradientMinEditor, DEFAULT_FIELD_WIDTH);
+			gd = new GridData();
+			gd.horizontalIndent = COLUMN_INDENT;
+			fEditGradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+			fEditGradientMinEditor.setEnabled(fEditGradientMinCheckbox.getBooleanValue(), groupMinValue);
+
+			// add placeholder
+			new Label(groupMinValue, SWT.NONE);
+		}
+
+		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(3).applyTo(groupMinValue);
 	}
 
 	private void createUIMouseMode(final Composite container) {
@@ -752,12 +772,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
 				fChkZoomToSlider.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
+		prefStore.setValue(
+				ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
 				fChkMoveSlidersWhenZoomed.getSelection());
 
 		fEditPaceMinMaxCheckbox.store();
-		fEditPaceMinEditor.store();
-		fEditPaceMaxEditor.store();
+		fEditPaceMin.store();
+		fEditPaceMax.store();
 		fEditAltimeterMinCheckbox.store();
 		fEditAltimeterMinEditor.store();
 		fEditGradientMinCheckbox.store();
@@ -784,7 +805,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			final Graph graph = (Graph) graphs[graphIndex];
 			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
 		}
-		prefstore.setValue(ITourbookPreferences.GRAPH_VISIBLE,
+		prefstore.setValue(
+				ITourbookPreferences.GRAPH_VISIBLE,
 				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
 
 		// convert the array of all table items into a string which is store in

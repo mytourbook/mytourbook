@@ -181,7 +181,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private DateFormat						fDateFormatter						= DateFormat.getDateInstance(DateFormat.SHORT);
 	private DateFormat						fTimeFormatter						= DateFormat.getTimeInstance(DateFormat.SHORT);
 	private NumberFormat					fNumberFormatter					= NumberFormat.getNumberInstance();
-	private DateFormat						fDurationFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT,
+	private DateFormat						fDurationFormatter					= DateFormat.getTimeInstance(
+																						DateFormat.SHORT,
 																						Locale.GERMAN);
 
 	protected TourPerson					fActivePerson;
@@ -267,7 +268,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			importFilePathName = tourData.getTourImportFilePath();
 
 			if (importFilePathName == null) {
-				MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+				MessageDialog.openInformation(
+						Display.getCurrent().getActiveShell(),
 						Messages.import_data_dlg_reimport_title,
 						Messages.import_data_dlg_reimport_message);
 				return;
@@ -276,7 +278,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final File file = new File(importFilePathName);
 		if (file.exists() == false) {
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.import_data_dlg_reimport_title,
 					NLS.bind(Messages.import_data_dlg_reimport_invalid_file_message, importFilePathName));
 			return;
@@ -447,8 +450,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					fTourViewer.getTable()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					fTourViewer.getTable().setLinesVisible(
+							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 
@@ -810,7 +813,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
 
 				if (recordingTime != 0) {
-					fCalendar.set(0,
+					fCalendar.set(
+							0,
 							0,
 							0,
 							recordingTime / 3600,
@@ -892,10 +896,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
 
-				final int pace = (int) (tourDistance == 0 ? 0 : (drivingTime * 1000 / tourDistance)
-						* UI.UNIT_VALUE_DISTANCE);
+				final float pace = tourDistance == 0 ? //
+						0
+						: (float) drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
-				cell.setText(UI.format_mm_ss(pace).toString());
+				cell.setText(UI.format_mm_ss((long) pace));
 			}
 		});
 
@@ -1148,7 +1153,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 		if (person != null) {
-			fActionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person,
+			fActionSaveTourWithPerson.setText(NLS.bind(
+					Messages.import_data_action_save_tour_with_person,
 					person.getName()));
 			fActionSaveTourWithPerson.setPerson(person);
 		}
@@ -1166,7 +1172,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (canMergeIntoTour) {
 
 			final Calendar calendar = GregorianCalendar.getInstance();
-			calendar.set(firstValidTour.getStartYear(),
+			calendar.set(
+					firstValidTour.getStartYear(),
 					firstValidTour.getStartMonth() - 1,
 					firstValidTour.getStartDay(),
 					firstValidTour.getStartHour(),

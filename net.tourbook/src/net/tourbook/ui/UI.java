@@ -481,7 +481,7 @@ public class UI {
 		}
 	}
 
-	public static Formatter format_mm_ss(final long time) {
+	public static String format_mm_ss(final long time) {
 
 		fFormatterSB.setLength(0);
 
@@ -491,7 +491,7 @@ public class UI {
 
 		final long timeAbs = time < 0 ? 0 - time : time;
 
-		return fFormatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60));
+		return fFormatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
 	}
 
 	public static String format_yyyymmdd_hhmmss(final int year,

@@ -801,7 +801,7 @@ public class TourChartAnalyzerView extends ViewPart {
 				analyzerInfo = new TourChartAnalyzerInfo();
 			}
 
-			final int xAxisUnit = serieData.getAxisUnit();
+			final int unitType = serieData.getAxisUnit();
 			final int valueDivisor = serieData.getValueDivisor();
 
 			final int[] values = serieData.getHighValues()[0];
@@ -873,25 +873,25 @@ public class TourChartAnalyzerView extends ViewPart {
 			 */
 			if (graphInfo.leftValue != leftValue) {
 				graphInfo.leftValue = leftValue;
-				graphInfo.left.setText(ChartUtil.formatValue(leftValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.left.setText(ChartUtil.formatValue(leftValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
 				outCounter++;
 			}
 
 			if (graphInfo.rightValue != rightValue) {
 				graphInfo.rightValue = rightValue;
-				graphInfo.right.setText(ChartUtil.formatValue(rightValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.right.setText(ChartUtil.formatValue(rightValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
 				outCounter++;
 			}
 
 			if (graphInfo.minValue != min) {
 				graphInfo.minValue = min;
-				graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.min.setText(ChartUtil.formatValue(min, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
 				outCounter++;
 			}
 
 			if (graphInfo.maxValue != max) {
 				graphInfo.maxValue = max;
-				graphInfo.max.setText(ChartUtil.formatValue(max, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.max.setText(ChartUtil.formatValue(max, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
 				outCounter++;
 			}
 
@@ -919,7 +919,7 @@ public class TourChartAnalyzerView extends ViewPart {
 				} else {
 					if (graphInfo.avgValue != avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.avg.setText(ChartUtil.formatValue((int) avgValue, xAxisUnit, valueDivisor, true)
+						graphInfo.avg.setText(ChartUtil.formatValue((int) avgValue, unitType, valueDivisor, true)
 								+ " "); //$NON-NLS-1$
 						outCounter++;
 					}
@@ -933,7 +933,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			final int diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
-				graphInfo.diff.setText(ChartUtil.formatValue(diffValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.diff.setText(ChartUtil.formatValue(diffValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
 				outCounter++;
 			}
 		}

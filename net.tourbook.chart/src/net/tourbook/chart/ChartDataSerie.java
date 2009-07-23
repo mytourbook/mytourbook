@@ -26,15 +26,12 @@ public abstract class ChartDataSerie {
 	public static final int			AXIS_UNIT_HOUR_MINUTE			= 20;
 	public static final int			AXIS_UNIT_HOUR_MINUTE_24H		= 21;
 	public static final int			AXIS_UNIT_HOUR_MINUTE_SECOND	= 22;
+	public static final int			AXIS_UNIT_MINUTE_SECOND			= 23;
 	public static final int			AXIS_UNIT_MONTH					= 30;
 	public static final int			AXIS_UNIT_DAY					= 40;
 	public static final int			AXIS_UNIT_YEAR					= 50;
 
 	public static final int			X_AXIS_UNIT_WEEK				= 100;
-
-//	public static enum OverlayStatus {
-//		NOT_SET, IN_QUEUE, IMAGE_AVAILABLE, NO_IMAGE
-//	};
 
 	/**
 	 * Default color, when default color is not set

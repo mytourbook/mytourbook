@@ -169,23 +169,26 @@ public class ChartComponentAxis extends Canvas {
 			final float scaleY = drawingData.getScaleY();
 			final ChartDataYSerie yData = drawingData.getYData();
 
+			final String title = yData.getYTitle();
+			final String unitLabel = yData.getUnitLabel();
 			final boolean yAxisDirection = yData.isYAxisDirection();
+
 			final int graphYBottom = drawingData.getGraphYBottom();
 			final int devGraphHeight = drawingData.getDevGraphHeight();
 
 			final int devYBottom = drawingData.getDevYBottom();
 			final int devYTop = devYBottom - devGraphHeight;
-			final String unitText = yData.getUnitLabel();
-
-			final String title = yData.getYTitle();
 
 			if (fIsLeft && title != null) {
 
-				final Color colorLine = new Color(Display.getCurrent(), yData.getDefaultRGB());
-				gc.setForeground(colorLine);
+				// create title with unit label
+				final StringBuilder sbTitle = new StringBuilder(title);
+				if (unitLabel.length() > 0) {
+					sbTitle.append(ChartUtil.DASH_WITH_SPACE);
+					sbTitle.append(unitLabel);
+				}
 
-				String yTitle = title + (unitText.equals("") ? "" : " - " + unitText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+				String yTitle = sbTitle.toString();
 				Point labelExtend = gc.textExtent(yTitle);
 
 				final int devChartHeight = devYBottom - devYTop;
@@ -193,26 +196,28 @@ public class ChartComponentAxis extends Canvas {
 				// draw only the unit text and not the title when there is not
 				// enough space
 				if (labelExtend.x > devChartHeight) {
-					yTitle = unitText;
+					yTitle = unitLabel;
 					labelExtend = gc.textExtent(yTitle);
 				}
 
 				final int xPos = labelExtend.y / 2;
 				final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
+				final Color fgColor = new Color(Display.getCurrent(), yData.getDefaultRGB());
+				gc.setForeground(fgColor);
+
 				final Transform tr = new Transform(display);
-				tr.translate(xPos, yPos);
-				tr.rotate(-90f);
+				{
+					tr.translate(xPos, yPos);
+					tr.rotate(-90f);
 
-				gc.setTransform(tr);
+					gc.setTransform(tr);
+					gc.drawText(yTitle, 0, 0, true);
 
-				gc.drawText(yTitle, 0, 0, true);
-
-				gc.setTransform(null);
-
+					gc.setTransform(null);
+				}
 				tr.dispose();
-
-				colorLine.dispose();
+				fgColor.dispose();
 			}
 
 			int devY;
@@ -283,7 +288,7 @@ public class ChartComponentAxis extends Canvas {
 	 * 
 	 * @param list
 	 * @param isLeft
-	 *        true if the axis is on the left side
+	 *            true if the axis is on the left side
 	 */
 	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
 		chartDrawingData = list;

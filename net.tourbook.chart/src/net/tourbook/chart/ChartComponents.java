@@ -376,9 +376,10 @@ public class ChartComponents extends Composite {
 	 */
 	private void computeYValues(final ChartDrawingData drawingData, final int graphCount, final int currentGraph) {
 
-		final ChartDataSerie yData = drawingData.getYData();
+		final ChartDataYSerie yData = drawingData.getYData();
 
-		final Point graphSize = fComponentGraph.getVisibleSizeWithHBar(fVisibleGraphRect.width,
+		final Point graphSize = fComponentGraph.getVisibleSizeWithHBar(
+				fVisibleGraphRect.width,
 				fVisibleGraphRect.height);
 
 		// height of one chart graph including the slider bar
@@ -402,13 +403,13 @@ public class ChartComponents extends Composite {
 		 * scaled to the device
 		 */
 
-		final int axisUnit = yData.getAxisUnit();
+		final int unitType = yData.getAxisUnit();
 		int graphMinValue = yData.getVisibleMinValue();
 		int graphMaxValue = yData.getVisibleMaxValue();
 
-		boolean adjustGraphUnit = false;
 		// clip max value
-		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		boolean adjustGraphUnit = false;
+		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 			graphMaxValue = 24 * 3600;
 			adjustGraphUnit = true;
 		}
@@ -426,10 +427,11 @@ public class ChartComponents extends Composite {
 
 		// round the unit
 		float graphUnit = 0;
-		switch (axisUnit) {
+		switch (unitType) {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
 			graphUnit = ChartUtil.roundTimeValue(graphUnitValue);
 			break;
 
@@ -457,7 +459,7 @@ public class ChartComponents extends Composite {
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
 
-		if (adjustGraphUnit || axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		if (adjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
 			// max value exeeds 24h
 
@@ -516,16 +518,16 @@ public class ChartComponents extends Composite {
 		drawingData.setDevSliderHeight(devSliderBarHeight);
 
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
-
 		int graphValue = graphMinValue;
 		int maxUnits = 0;
+		final int valueDivisor = yData.getValueDivisor();
 
 		// loop: create unit label for all units
 		while (graphValue <= graphMaxValue) {
-			unitList.add(new ChartUnit(graphValue, ChartUtil.formatValue(graphValue,
-					axisUnit,
-					yData.getValueDivisor(),
-					false)));
+
+			final String unitLabel = ChartUtil.formatValue(graphValue, unitType, valueDivisor, false);
+
+			unitList.add(new ChartUnit(graphValue, unitLabel));
 
 			// prevent endless loops when the unit is 0
 			if (graphValue == graphMaxValue || maxUnits > 1000) {
@@ -536,7 +538,7 @@ public class ChartComponents extends Composite {
 			maxUnits++;
 		}
 
-		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
+		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
 
 			unitList.add(new ChartUnit(graphMaxValue, "")); //$NON-NLS-1$
 		}

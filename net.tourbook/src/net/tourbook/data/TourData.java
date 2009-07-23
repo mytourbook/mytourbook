@@ -430,11 +430,29 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	private boolean						isSpeedSerieFromDevice			= false;
 
+	/**
+	 * pace in min/km
+	 */
 	@Transient
-	private int[]						paceSerie;
+	private int[]						paceSerieMinute;
 
+	/**
+	 * pace in sec/km
+	 */
 	@Transient
-	private int[]						paceSerieImperial;
+	private int[]						paceSerieSeconds;
+
+	/**
+	 * pace in min/mile
+	 */
+	@Transient
+	private int[]						paceSerieMinuteImperial;
+
+	/**
+	 * pace in sec/mile
+	 */
+	@Transient
+	private int[]						paceSerieSecondsImperial;
 
 	@Transient
 	private int[]						powerSerie;
@@ -859,12 +877,16 @@ public class TourData implements Comparable<Object> {
 			powerSerie = null;
 		}
 
-		paceSerie = null;
+		paceSerieMinute = null;
+		paceSerieSeconds = null;
+		paceSerieMinuteImperial = null;
+		paceSerieSecondsImperial = null;
+
 		altimeterSerie = null;
 		gradientSerie = null;
 
 		speedSerieImperial = null;
-		paceSerieImperial = null;
+		paceSerieMinuteImperial = null;
 		altimeterSerieImperial = null;
 		altitudeSerieImperial = null;
 
@@ -1691,7 +1713,10 @@ public class TourData implements Comparable<Object> {
 	 */
 	public void computeSpeedSerie() {
 
-		if (speedSerie != null && speedSerieImperial != null && paceSerie != null && paceSerieImperial != null) {
+		if (speedSerie != null
+				&& speedSerieImperial != null
+				&& paceSerieMinute != null
+				&& paceSerieMinuteImperial != null) {
 			return;
 		}
 
@@ -1739,8 +1764,11 @@ public class TourData implements Comparable<Object> {
 
 		speedSerie = new int[serieLength];
 		speedSerieImperial = new int[serieLength];
-		paceSerie = new int[serieLength];
-		paceSerieImperial = new int[serieLength];
+
+		paceSerieMinute = new int[serieLength];
+		paceSerieSeconds = new int[serieLength];
+		paceSerieMinuteImperial = new int[serieLength];
+		paceSerieSecondsImperial = new int[serieLength];
 
 		int lowIndexAdjustment = 0;
 		int highIndexAdjustment = 1;
@@ -1772,16 +1800,16 @@ public class TourData implements Comparable<Object> {
 			final int serieIndexHighMin = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
 			final int distIndexHigh = ((0 >= serieIndexHighMin) ? 0 : serieIndexHighMin);
 
-			final int distance = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
-			final float time = deviceTimeInterval * (distIndexHigh - distIndexLow);
+			final int distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
+			final float timeDiff = deviceTimeInterval * (distIndexHigh - distIndexLow);
 
 			/*
 			 * speed
 			 */
 			int speedMetric = 0;
 			int speedImperial = 0;
-			if (time != 0) {
-				final float speed = (distance * 36F) / time;
+			if (timeDiff != 0) {
+				final float speed = (distDiff * 36F) / timeDiff;
 				speedMetric = (int) (speed);
 				speedImperial = (int) (speed / UI.UNIT_MILE);
 			}
@@ -1792,19 +1820,32 @@ public class TourData implements Comparable<Object> {
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
 			/*
-			 * pace
+			 * pace (computed with divisor 10)
 			 */
-			int paceMetric = 0;
-			int paceImperial = 0;
+			float paceMetricSeconds = 0;
+			float paceImperialSeconds = 0;
+			int paceMetricMinute = 0;
+			int paceImperialMinute = 0;
 
-			if (speedMetric != 0 && distance != 0) {
-				final float pace = time * 166.66f / distance;
-				paceMetric = (int) (pace);
-				paceImperial = (int) (pace * UI.UNIT_MILE);
+			if (speedMetric != 0 && distDiff != 0) {
+
+//				final float pace = timeDiff * 166.66f / distDiff;
+//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
+
+//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
+				paceMetricSeconds = timeDiff * 10000 / distDiff;
+				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
+
+//				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceImperialMinute = (int) ((paceImperialSeconds / 60));
 			}
 
-			paceSerie[serieIndex] = paceMetric;
-			paceSerieImperial[serieIndex] = paceImperial;
+			paceSerieMinute[serieIndex] = paceMetricMinute;
+			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+
+			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
+			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 		}
 
 		maxSpeed /= 10;
@@ -1855,8 +1896,11 @@ public class TourData implements Comparable<Object> {
 
 		speedSerie = new int[serieLength];
 		speedSerieImperial = new int[serieLength];
-		paceSerie = new int[serieLength];
-		paceSerieImperial = new int[serieLength];
+
+		paceSerieMinute = new int[serieLength];
+		paceSerieSeconds = new int[serieLength];
+		paceSerieMinuteImperial = new int[serieLength];
+		paceSerieSecondsImperial = new int[serieLength];
 
 		int lowIndexAdjustmentDefault = 0;
 		int highIndexAdjustmentDefault = 0;
@@ -1920,16 +1964,16 @@ public class TourData implements Comparable<Object> {
 
 			distIndexHigh = (0 >= serieIndexHighAdjustedMin) ? 0 : serieIndexHighAdjustedMin;
 
-			final int distance = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
-			final float time = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
+			final int distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
+			final float timeDiff = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
 
 			/*
 			 * speed
 			 */
 			int speedMetric = 0;
 			int speedImperial = 0;
-			if (time != 0) {
-				final float speed = (distance * 36F) / time;
+			if (timeDiff != 0) {
+				final float speed = (distDiff * 36F) / timeDiff;
 				speedMetric = (int) (speed);
 				speedImperial = (int) (speed / UI.UNIT_MILE);
 			}
@@ -1940,18 +1984,32 @@ public class TourData implements Comparable<Object> {
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
 			/*
-			 * pace
+			 * pace (computed with divisor 10)
 			 */
-			int paceMetric = 0;
-			int paceImperial = 0;
+			float paceMetricSeconds = 0;
+			float paceImperialSeconds = 0;
+			int paceMetricMinute = 0;
+			int paceImperialMinute = 0;
 
-			if (speedMetric != 0 && distance != 0) {
-				final float pace = time * 166.66f / distance;
-				paceMetric = (int) (pace);
-				paceImperial = (int) (pace * UI.UNIT_MILE);
+			if (speedMetric != 0 && distDiff != 0) {
+
+//				final float pace = timeDiff * 166.66f / distDiff;
+//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
+
+//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
+				paceMetricSeconds = timeDiff * 10000 / distDiff;
+				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
+
+//				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceImperialMinute = (int) ((paceImperialSeconds / 60));
 			}
-			paceSerie[serieIndex] = paceMetric;
-			paceSerieImperial[serieIndex] = paceImperial;
+
+			paceSerieMinute[serieIndex] = paceMetricMinute;
+			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+
+			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
+			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 		}
 
 		maxSpeed /= 10;
@@ -1981,8 +2039,11 @@ public class TourData implements Comparable<Object> {
 
 		speedSerie = new int[serieLength];
 		speedSerieImperial = new int[serieLength];
-		paceSerie = new int[serieLength];
-		paceSerieImperial = new int[serieLength];
+
+		paceSerieMinute = new int[serieLength];
+		paceSerieSeconds = new int[serieLength];
+		paceSerieMinuteImperial = new int[serieLength];
+		paceSerieSecondsImperial = new int[serieLength];
 
 		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
 
@@ -2084,19 +2145,32 @@ public class TourData implements Comparable<Object> {
 			maxSpeed = Math.max(maxSpeed, speedMetric);
 
 			/*
-			 * pace
+			 * pace (computed with divisor 10)
 			 */
-			int paceMetric = 0;
-			int paceImperial = 0;
+			float paceMetricSeconds = 0;
+			float paceImperialSeconds = 0;
+			int paceMetricMinute = 0;
+			int paceImperialMinute = 0;
 
 			if (speedMetric != 0 && distDiff != 0) {
-				final float pace = timeDiff * 166.66f / distDiff;
-				paceMetric = (int) (pace);
-				paceImperial = (int) (pace * UI.UNIT_MILE);
+
+//				final float pace = timeDiff * 166.66f / distDiff;
+//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
+
+//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
+				paceMetricSeconds = timeDiff * 10000 / (float) distDiff;
+				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
+
+//				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceMetricMinute = (int) ((paceMetricSeconds / 60));
+				paceImperialMinute = (int) ((paceImperialSeconds / 60));
 			}
 
-			paceSerie[serieIndex] = paceMetric;
-			paceSerieImperial[serieIndex] = paceImperial;
+			paceSerieMinute[serieIndex] = paceMetricMinute;
+			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+
+			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
+			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 		}
 
 		maxSpeed /= 10;
@@ -2794,10 +2868,10 @@ public class TourData implements Comparable<Object> {
 			// time
 			final int recordingTime = timeEnd - timeStart;
 			final int breakTime = getBreakTime(segmentStartIndex, segmentEndIndex);
-			final int drivingTime = recordingTime - breakTime;
+			final float drivingTime = recordingTime - breakTime;
 
 			segmentSerieRecordingTime[segmentIndex] = segment.recordingTime = recordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTime;
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (int) drivingTime;
 			segmentSerieBreakTime[segmentIndex] = segment.breakTime = breakTime;
 			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += recordingTime;
 
@@ -2849,15 +2923,15 @@ public class TourData implements Comparable<Object> {
 			if (segmentDistance != 0.0) {
 
 				// speed
-				segmentSerieSpeed[segmentIndex] = segment.speed = drivingTime == 0 ? //
-						0
-						: (float) (segmentDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
+				segmentSerieSpeed[segmentIndex] = segment.speed = drivingTime == 0.0f ? //
+						0.0f
+						: segmentDistance / drivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
 				// pace
 				final float segmentPace = (drivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE));
 				segment.pace = (int) segmentPace;
 				segment.paceDiff = segment.pace - tourPace;
-				segmentSeriePace[segmentIndex] = segmentPace / 60;
+				segmentSeriePace[segmentIndex] = segmentPace;
 
 				// gradient
 				segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitudeDiffSegmentBorder
@@ -3296,21 +3370,45 @@ public class TourData implements Comparable<Object> {
 
 			// use metric system
 
-			if (paceSerie == null) {
+			if (paceSerieMinute == null) {
 				computeSpeedSerie();
 			}
 
-			return paceSerie;
+			return paceSerieMinute;
 
 		} else {
 
 			// use imperial system
 
-			if (paceSerieImperial == null) {
+			if (paceSerieMinuteImperial == null) {
 				computeSpeedSerie();
 			}
 
-			return paceSerieImperial;
+			return paceSerieMinuteImperial;
+		}
+	}
+
+	public int[] getPaceSerieSeconds() {
+
+		if (UI.UNIT_VALUE_DISTANCE == 1) {
+
+			// use metric system
+
+			if (paceSerieMinute == null) {
+				computeSpeedSerie();
+			}
+
+			return paceSerieSeconds;
+
+		} else {
+
+			// use imperial system
+
+			if (paceSerieMinuteImperial == null) {
+				computeSpeedSerie();
+			}
+
+			return paceSerieSecondsImperial;
 		}
 	}
 

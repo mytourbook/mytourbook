@@ -1046,13 +1046,23 @@ public class ChartComponentGraph extends Canvas {
 		// create slider label for each graph
 		for (final ChartDrawingData drawingData : fDrawingData) {
 
-			// final ChartDataXSerie xData = drawingData.getXData();
 			final ChartDataYSerie yData = drawingData.getYData();
+			final int labelFormat = yData.getSliderLabelFormat();
 			final int valueDivisor = yData.getValueDivisor();
-			if (valueDivisor == 1) {
-				nf.setMinimumFractionDigits(0);
-			} else if (valueDivisor == 10) {
-				nf.setMinimumFractionDigits(1);
+
+			if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS) {
+
+				// format: mm:ss
+
+			} else {
+
+				// use default format: ChartDataYSerie.SLIDER_LABEL_FORMAT_DEFAULT
+
+				if (valueDivisor == 1) {
+					nf.setMinimumFractionDigits(0);
+				} else if (valueDivisor == 10) {
+					nf.setMinimumFractionDigits(1);
+				}
 			}
 
 			final ChartXSliderLabel label = new ChartXSliderLabel();
@@ -1071,17 +1081,23 @@ public class ChartComponentGraph extends Canvas {
 			final StringBuilder labelText = new StringBuilder();
 
 			// create the slider text
-			// labelText.append(ChartUtil
-			// .formatValue(valueX, xAxisUnit, xData.getValueDivisor(), true));
-			// labelText.append(' ');
-			// labelText.append(xData.getUnitLabel());
-			// labelText.append(" ");
+			if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS) {
 
-			if (valueDivisor == 1) {
-				labelText.append(nf.format(yValue));
+				// format: mm:ss
+
+				labelText.append(ChartUtil.format_mm_ss(yValue));
+
 			} else {
-				labelText.append(nf.format((float) yValue / valueDivisor));
+
+				// use default format: ChartDataYSerie.SLIDER_LABEL_FORMAT_DEFAULT
+
+				if (valueDivisor == 1) {
+					labelText.append(nf.format(yValue));
+				} else {
+					labelText.append(nf.format((float) yValue / valueDivisor));
+				}
 			}
+
 			labelText.append(' ');
 			labelText.append(yData.getUnitLabel());
 			labelText.append(' ');

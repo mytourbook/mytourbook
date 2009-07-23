@@ -369,23 +369,23 @@ public class TourChart extends Chart {
 					isChartModified = true;
 				}
 
-				isChartModified = setMinDefaultValue(
+				isChartModified |= setMinDefaultValue(
 						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
 						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
 						TourManager.GRAPH_PACE,
-						TourManager.PACE_DIVISOR);
+						60);
 
-				isChartModified = setMaxDefaultValue(
+				isChartModified |= setMaxDefaultValue(
 						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
 						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
 						TourManager.GRAPH_PACE,
-						TourManager.PACE_DIVISOR);
+						60);
 
-				isChartModified = setMinDefaultValue(
+				isChartModified |= setMinDefaultValue(
 						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
@@ -393,7 +393,7 @@ public class TourChart extends Chart {
 						TourManager.GRAPH_ALTIMETER,
 						0);
 
-				isChartModified = setMinDefaultValue(
+				isChartModified |= setMinDefaultValue(
 						property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
@@ -1075,7 +1075,8 @@ public class TourChart extends Chart {
 
 				if (isMaxEnabled) {
 					// set visible max value from the preferences
-					yData.setVisibleMaxValue(prefStore.getInt(tabMaxValue) * valueDivisor);
+					final int maxValue = prefStore.getInt(tabMaxValue);
+					yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
 
 				} else {
 					// reset visible max value to the original min value
@@ -1118,7 +1119,8 @@ public class TourChart extends Chart {
 
 				if (isMinEnabled) {
 					// set visible min value from the preferences
-					yData.setVisibleMinValue(prefStore.getInt(tabMinValue) * valueDivisor);
+					final int minValue = prefStore.getInt(tabMinValue);
+					yData.setVisibleMinValue(valueDivisor == 0 ? minValue : minValue * valueDivisor);
 
 				} else {
 					// reset visible min value to the original min value

@@ -25,15 +25,12 @@ public class Messages extends NLS {
 	public static String		dialog_export_chk_camouflageSpeed;
 	public static String		dialog_export_chk_camouflageSpeed_tooltip;
 	public static String		dialog_export_chk_camouflageSpeedInput_tooltip;
-
 	public static String		dialog_export_chk_exportMarkers;
-
 	public static String		dialog_export_chk_exportMarkers_tooltip;
 	public static String		dialog_export_chk_mergeAllTours;
 	public static String		dialog_export_chk_mergeAllTours_tooltip;
 	public static String		dialog_export_chk_overwriteFiles;
 	public static String		dialog_export_chk_overwriteFiles_tooltip;
-
 	public static String		dialog_export_chk_tourRangeDisabled;
 	public static String		dialog_export_chk_tourRangeWithDistance;
 	public static String		dialog_export_chk_tourRangeWithoutDistance;
@@ -74,7 +71,6 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
 	public static String		action_export_tour;
-
 	public static String		action_tag_add;
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;
@@ -88,21 +84,15 @@ public class Messages extends NLS {
 	public static String		action_tag_set_all_confirm_title;
 	public static String		action_tag_set_all_tag_structures;
 	public static String		action_tag_set_tag_expand_type;
-
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
-
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
-
 	public static String		action_tour_editor_delete_time_slices_keep_time;
 	public static String		action_tour_editor_delete_time_slices_remove_time;
 	public static String		action_tour_editor_delete_tour_marker;
-
 	public static String		action_tourbook_select_year_month_tours;
-
 	public static String		action_tourCatalog_open_compare_wizard;
-
 	public static String		action_tourType_modify_tourTypes;
 
 	public static String		adjust_altitude_action_create_spline_point;
@@ -124,7 +114,6 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_invalid_data_message;
 	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
-
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
 	public static String		adjust_altitude_type_adjust_whole_tour;
@@ -161,6 +150,8 @@ public class Messages extends NLS {
 
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
+
+	public static String	app_unit_minutes;
 
 	public static String		App_Action_set_tour_type;
 
@@ -748,10 +739,8 @@ public class Messages extends NLS {
 	public static String		tour_segmenter_label_tourAltitude_tooltip;
 	public static String		tour_segmenter_segType_byDistance_defaultDistance;
 	public static String		tour_segmenter_segType_byDistance_label;
-
 	public static String		tour_segmenter_segType_byUpDownAlti_label;
 	public static String		tour_segmenter_type_byAltitude;
-
 	public static String		tour_segmenter_type_byComputedAltiUpDown;
 	public static String		tour_segmenter_type_byDistance;
 	public static String		tour_segmenter_type_byMarker;

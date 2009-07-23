@@ -2712,15 +2712,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (fSeriePace != null) {
+				if (fSeriePace == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					fNumberFormatter.setMinimumFractionDigits(1);
 					fNumberFormatter.setMaximumFractionDigits(1);
 
-					cell.setText(fNumberFormatter.format((float) fSeriePace[timeSlice.serieIndex] / 10));
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
+					final long pace = fSeriePace[timeSlice.serieIndex];
+					cell.setText(UI.format_mm_ss(pace));
 				}
 			}
 		});
@@ -3205,7 +3205,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fSerieGradient = fTourData.getGradientSerie();
 		fSerieSpeed = fTourData.getSpeedSerie();
-		fSeriePace = fTourData.getPaceSerie();
+		fSeriePace = fTourData.getPaceSerieSeconds();
 		fSeriePower = fTourData.getPowerSerie();
 
 		fAltitudeEditingSupport.setDataSerie(fSerieAltitude);

@@ -104,7 +104,6 @@ public class TourManager {
 			GRAPH_TOUR_COMPARE												};
 
 	private static final int					SPEED_DIVISOR				= 10;
-	public static final int						PACE_DIVISOR				= 10;
 	public static final int						GRADIENT_DIVISOR			= 10;
 
 	private static TourManager					instance;
@@ -287,6 +286,10 @@ public class TourManager {
 	 * @return returns the date of this tour
 	 */
 	public static String getTourDateShort(final TourData tourData) {
+
+		if (tourData == null) {
+			return UI.EMPTY_STRING;
+		}
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
@@ -863,7 +866,8 @@ public class TourManager {
 					if (distance == 0) {
 						return 0;
 					} else {
-						return (float) (time * 16.666 / distance);
+//						return (float) (time * 16.666 / distance);
+						return time * 10000 / distance;
 					}
 				}
 			}
@@ -1104,9 +1108,9 @@ public class TourManager {
 			yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
 			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 			yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			yDataAltitude.setShowYSlider(true);
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
-			yDataAltitude.setShowYSlider(true);
 
 			setGraphColor(prefStore, yDataAltitude, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 			adjustMinMax(yDataAltitude);
@@ -1126,9 +1130,9 @@ public class TourManager {
 			yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 			yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
 			yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
-			yDataPulse.setShowYSlider(true);
 
 			setGraphColor(prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
@@ -1147,12 +1151,10 @@ public class TourManager {
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
 			yDataSpeed.setValueDivisor(SPEED_DIVISOR);
 			yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
-			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-					true,
-					computeSpeedAvg,
-					2));
 			yDataSpeed.setShowYSlider(true);
+			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
+			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, true, computeSpeedAvg, 2));
 
 			setGraphColor(prefStore, yDataSpeed, GraphColorProvider.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
@@ -1161,7 +1163,7 @@ public class TourManager {
 		/*
 		 * pace
 		 */
-		final int[] paceSerie = tourData.getPaceSerie();
+		final int[] paceSerie = tourData.getPaceSerieSeconds();
 		ChartDataYSerie yDataPace = null;
 		if (paceSerie != null) {
 
@@ -1169,26 +1171,24 @@ public class TourManager {
 
 			yDataPace.setYTitle(Messages.Graph_Label_Pace);
 			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
-			yDataPace.setValueDivisor(PACE_DIVISOR);
 			yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
-			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computePaceAvg, 1));
 			yDataPace.setShowYSlider(true);
+			yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
+			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
+			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
+			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, false, computePaceAvg, 1));
 
 			setGraphColor(prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
 
-			// adjust pace when it's defined in the pref store
+			// adjust pace min/max values when it's defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
 
-				yDataPace.setVisibleMinValue(
-						prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * PACE_DIVISOR,
-						true);
+				yDataPace.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60, true);
 
 				// set max value after min value
-				yDataPace.setVisibleMaxValue(
-						prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * PACE_DIVISOR,
-						true);
+				yDataPace.setVisibleMaxValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60, true);
 			}
 		}
 
@@ -1204,12 +1204,10 @@ public class TourManager {
 			yDataPower.setYTitle(Messages.Graph_Label_Power);
 			yDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
 			yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
-			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
-			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-					false,
-					computePowerAvg,
-					0));
 			yDataPower.setShowYSlider(true);
+			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
+			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, false, computePowerAvg, 0));
 
 			setGraphColor(prefStore, yDataPower, GraphColorProvider.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
@@ -1227,11 +1225,11 @@ public class TourManager {
 			yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
 			yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
-			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-			yDataAltimeter.setCustomData(
-					CUSTOM_DATA_ANALYZER_INFO,
-					new TourChartAnalyzerInfo(true, computeAltimeterAvg));
 			yDataAltimeter.setShowYSlider(true);
+			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
+			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, computeAltimeterAvg));
+
 			setGraphColor(prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
 			chartDataModel.addXyData(yDataAltimeter);
 
@@ -1256,12 +1254,11 @@ public class TourManager {
 			yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 			yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
 			yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
-			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
-			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-					true,
-					computeGradientAvg,
-					1));
 			yDataGradient.setShowYSlider(true);
+			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
+			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, true, computeGradientAvg, 1));
+
 			setGraphColor(prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
@@ -1287,6 +1284,7 @@ public class TourManager {
 			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
 			setGraphColor(prefStore, yDataCadence, GraphColorProvider.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
 		}
@@ -1306,6 +1304,7 @@ public class TourManager {
 			yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
+
 			setGraphColor(prefStore, yDataTemperature, GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
 			adjustMinMax(yDataTemperature);
 			chartDataModel.addXyData(yDataTemperature);
@@ -1325,6 +1324,7 @@ public class TourManager {
 			yDataTourCompare.setShowYSlider(true);
 			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
+
 			setGraphColor(prefStore, yDataTourCompare, GraphColorProvider.PREF_GRAPH_TOUR_COMPARE);
 			chartDataModel.addXyData(yDataTourCompare);
 		}

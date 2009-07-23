@@ -957,7 +957,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (pace == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(UI.format_mm_ss((long) pace).toString());
+					cell.setText(UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);
