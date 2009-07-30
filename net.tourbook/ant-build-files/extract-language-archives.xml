@@ -7,11 +7,9 @@
 	-->
 
 	<property name="mt-trunk" value=".." />
-	<property name="mt-language-archive-dir" value="${mt-trunk}/../mytourbook LANGUAGE archives" />
 
+	<property name="dir-with-language-archive" value="${mt-trunk}/../mytourbook LANGUAGE archives" />
 	<property name="temp-unzip-dir" value="${mt-trunk}/../ant-temp-unzip" />
-	<property name="dir-with-correct-structur-debug" value="${mt-trunk}/../ant-dir-with-correct-structur" />
-	<property name="dir-with-correct-structur" value="${mt-trunk}" />
 
 	<!--
 		DEFAULT target
@@ -28,11 +26,9 @@
 			<param name="archive-language" value="de" />
 		</antcall>
 
-		<!-- clear temp folder 
+		<!-- clear temp folder -->
 		<echo message="delete temp dirs" />
-		<delete dir="${temp-dir}" />
-		<delete dir="${temp-with-correct-structur}" />
-		-->
+		<delete dir="${temp-unzip-dir}" />
 
 	</target>
 
@@ -50,20 +46,21 @@
 		<!-- clear temp folder -->
 		<echo message="delete temp dirs" />
 		<delete dir="${temp-unzip-dir}" />
-		<delete dir="${dir-with-correct-structur}" />
 
+		<echo message="expand archive into ${temp-unzip-dir}" />
 		<unzip dest="${temp-unzip-dir}">
 
 			<patternset includes="**/*${archive-language}.properties" />
 
 			<!-- using fileset to ignore missing archives -->
-			<fileset dir="${mt-language-archive-dir}">
+			<fileset dir="${dir-with-language-archive}">
 				<include name="mt-${archive-language}.zip" />
 				<exclude name="exclude" />
 			</fileset>
 		</unzip>
 
-		<copy todir="${dir-with-correct-structur}" verbose="true">
+		<echo message="copy archive to ${mt-trunk}" />
+		<copy todir="${mt-trunk}" overwrite="true" verbose="false">
 
 			<fileset dir="${temp-unzip-dir}" includes="**/*" />
 
