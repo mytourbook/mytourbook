@@ -216,7 +216,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * synchronize start time
 		 */
-		fCalendar.set(fSourceTour.getStartYear(),
+		fCalendar.set(
+				fSourceTour.getStartYear(),
 				fSourceTour.getStartMonth() - 1,
 				fSourceTour.getStartDay(),
 				fSourceTour.getStartHour(),
@@ -224,7 +225,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				fSourceTour.getStartSecond());
 		final long sourceStartTime = fCalendar.getTimeInMillis();
 
-		fCalendar.set(fTargetTour.getStartYear(),
+		fCalendar.set(
+				fTargetTour.getStartYear(),
 				fTargetTour.getStartMonth() - 1,
 				fTargetTour.getStartDay(),
 				fTargetTour.getStartHour(),
@@ -600,11 +602,13 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		createActions();
 		restoreState();
 
-		setTitle(NLS.bind(Messages.tour_merger_dialog_header_title,
+		setTitle(NLS.bind(
+				Messages.tour_merger_dialog_header_title,
 				TourManager.getTourTitle(fTargetTour),
 				fTargetTour.getDeviceName()));
 
-		setMessage(NLS.bind(Messages.tour_merger_dialog_header_message,
+		setMessage(NLS.bind(
+				Messages.tour_merger_dialog_header_message,
 				TourManager.getTourTitle(fSourceTour),
 				fSourceTour.getDeviceName()));
 
@@ -806,10 +810,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * scale: adjust seconds
 		 */
 		fLabelAdjustSecondsValue = new Label(timeContainer, SWT.TRAIL);
-		GridDataFactory.fillDefaults()
-				.align(SWT.END, SWT.CENTER)
-				.hint(valueWidth, SWT.DEFAULT)
-				.applyTo(fLabelAdjustSecondsValue);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(valueWidth, SWT.DEFAULT).applyTo(
+				fLabelAdjustSecondsValue);
 
 		label = new Label(timeContainer, SWT.NONE);
 		label.setText(UI.SPACE);
@@ -838,10 +840,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		 * scale: adjust minutes
 		 */
 		fLabelAdjustMinuteValue = new Label(timeContainer, SWT.TRAIL);
-		GridDataFactory.fillDefaults()
-				.align(SWT.END, SWT.CENTER)
-				.hint(valueWidth, SWT.DEFAULT)
-				.applyTo(fLabelAdjustMinuteValue);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).hint(valueWidth, SWT.DEFAULT).applyTo(
+				fLabelAdjustMinuteValue);
 
 		label = new Label(timeContainer, SWT.NONE);
 		label.setText(UI.SPACE);
@@ -1084,7 +1084,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * checkbox: merge pulse
 		 */
-		fChkMergePulse = createUIMergeAction(group,
+		fChkMergePulse = createUIMergeAction(
+				group,
 				TourManager.GRAPH_PULSE,
 				Messages.merge_tour_source_graph_heartbeat,
 				Messages.merge_tour_source_graph_heartbeat_tooltip,
@@ -1094,7 +1095,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * checkbox: merge temperature
 		 */
-		fChkMergeTemperature = createUIMergeAction(group,
+		fChkMergeTemperature = createUIMergeAction(
+				group,
 				TourManager.GRAPH_TEMPERATURE,
 				Messages.merge_tour_source_graph_temperature,
 				Messages.merge_tour_source_graph_temperature_tooltip,
@@ -1104,7 +1106,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * checkbox: merge cadence
 		 */
-		fChkMergeCadence = createUIMergeAction(group,
+		fChkMergeCadence = createUIMergeAction(
+				group,
 				TourManager.GRAPH_CADENCE,
 				Messages.merge_tour_source_graph_cadence,
 				Messages.merge_tour_source_graph_cadence_tooltip,
@@ -1114,7 +1117,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		/*
 		 * checkbox: merge altitude
 		 */
-		fChkMergeAltitude = createUIMergeAction(group,
+		fChkMergeAltitude = createUIMergeAction(
+				group,
 				TourManager.GRAPH_ALTITUDE,
 				Messages.merge_tour_source_graph_altitude,
 				Messages.merge_tour_source_graph_altitude_tooltip,
@@ -1220,17 +1224,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		GridLayoutFactory.fillDefaults().numColumns(5).spacing(VH_SPACING, VH_SPACING).applyTo(aaContainer);
 
 		fLblAdjustAltiValueTime = new Label(aaContainer, SWT.TRAIL);
-		GridDataFactory.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
-				.applyTo(fLblAdjustAltiValueTime);
+		GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT).applyTo(
+				fLblAdjustAltiValueTime);
 
 		fLblAdjustAltiValueTimeUnit = new Label(aaContainer, SWT.NONE);
 		fLblAdjustAltiValueTimeUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/min"); //$NON-NLS-1$
 
 		fLblAdjustAltiValueDistance = new Label(aaContainer, SWT.TRAIL);
-		GridDataFactory.fillDefaults()
-				.hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
-				.applyTo(fLblAdjustAltiValueDistance);
+		GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(10), SWT.DEFAULT).applyTo(
+				fLblAdjustAltiValueDistance);
 
 		fLblAdjustAltiValueDistanceUnit = new Label(aaContainer, SWT.NONE);
 		fLblAdjustAltiValueDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
@@ -1339,10 +1341,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		}
 
 		// overwrite x-axis from pref store
-		fTourChartConfig.setIsShowTimeOnXAxis(TourbookPlugin.getDefault()
-				.getPreferenceStore()
-				.getString(ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS)
-				.equals(TourManager.X_AXIS_TIME));
+		fTourChartConfig.setIsShowTimeOnXAxis(TourbookPlugin.getDefault().getPreferenceStore().getString(
+				ITourbookPreferences.MERGE_TOUR_GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME));
 
 		fTourChart.addDataModelListener(new IDataModelListener() {
 
@@ -1730,12 +1730,16 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private void saveTour() {
 
+		boolean isMerged = false;
+
 		if (fChkMergeAltitude.getSelection()) {
 
 			// set target altitude values
 
 			if ((fChkAdjustAltiFromStart.getSelection() || fChkAdjustAltiFromSource.getSelection())
 					&& fSourceTour.dataSerieAdjustedAlti != null) {
+
+				isMerged = true;
 
 				// update target altitude from adjuste source altitude
 				fTargetTour.altitudeSerie = fSourceTour.dataSerieAdjustedAlti;
@@ -1747,6 +1751,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		if (fChkMergePulse.getSelection()) {
 			// pulse is already merged
+			isMerged = true;
 		} else {
 			// restore original pulse values because these values should not be saved
 			fTargetTour.pulseSerie = fBackupTargetPulseSerie;
@@ -1754,13 +1759,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		if (fChkMergeTemperature.getSelection()) {
 			// temperature is already merged
+			isMerged = true;
 		} else {
 			// restore original temperature values because these values should not be saved
 			fTargetTour.temperatureSerie = fBackupTargetTemperatureSerie;
 		}
 
 		if (fChkMergeCadence.getSelection()) {
-			// pulse is already merged
+			// cadence is already merged
+			isMerged = true;
 		} else {
 			// restore original cadence values because these values should not be saved
 			fTargetTour.cadenceSerie = fBackupTargetCadenceSerie;
@@ -1771,6 +1778,10 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 			// restore backup values
 
 			fSourceTour.setTourType(fBackupSourceTourType);
+		}
+
+		if (isMerged) {
+			fTargetTour.computeComputedValues();
 		}
 
 		// set tour id into which the tour is merged
