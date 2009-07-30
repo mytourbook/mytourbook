@@ -10,7 +10,8 @@
 	<property name="mt-language-archive-dir" value="${mt-trunk}/../mytourbook LANGUAGE archives" />
 
 	<property name="temp-unzip-dir" value="${mt-trunk}/../ant-temp-unzip" />
-	<property name="temp-with-correct-structur" value="${mt-trunk}/../ant-temp-with-correct-structur" />
+	<property name="dir-with-correct-structur-debug" value="${mt-trunk}/../ant-dir-with-correct-structur" />
+	<property name="dir-with-correct-structur" value="${mt-trunk}" />
 
 	<!--
 		DEFAULT target
@@ -49,7 +50,7 @@
 		<!-- clear temp folder -->
 		<echo message="delete temp dirs" />
 		<delete dir="${temp-unzip-dir}" />
-		<delete dir="${temp-with-correct-structur}" />
+		<delete dir="${dir-with-correct-structur}" />
 
 		<unzip dest="${temp-unzip-dir}">
 
@@ -62,7 +63,7 @@
 			</fileset>
 		</unzip>
 
-		<copy todir="${temp-with-correct-structur}" verbose="true">
+		<copy todir="${dir-with-correct-structur}" verbose="true">
 
 			<fileset dir="${temp-unzip-dir}" includes="**/*" />
 
