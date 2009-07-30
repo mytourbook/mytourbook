@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>net.tourbook.rxtx.win32</name>
+ 	<name>net.tourbook.rxtx.win32</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -15,8 +15,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.babel.editor.rbeBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.eclipse.babel.editor.rbeNature</nature>
 	</natures>
 </projectDescription>
