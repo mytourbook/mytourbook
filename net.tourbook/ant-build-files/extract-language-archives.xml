@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-translation-file" default="unzip-all-archives" basedir="..">
+
+	<!--
+		create archive files with translatable property files
+	-->
+
+	<property name="mt-trunk" value=".." />
+	<property name="mt-language-archive-dir" value="${mt-trunk}/../mytourbook LANGUAGE archives" />
+
+	<property name="temp-unzip-dir" value="${mt-trunk}/../ant-temp-unzip" />
+	<property name="temp-with-correct-structur" value="${mt-trunk}/../ant-temp-with-correct-structur" />
+
+	<!--
+		DEFAULT target
+	-->
+	<target name="unzip-all-archives">
+
+		<!-- unzip archive: FR -->
+		<antcall target="unzip-archive-for-one-language">
+			<param name="archive-language" value="fr" />
+		</antcall>
+
+		<!-- unzip archive: DE -->
+		<antcall target="unzip-archive-for-one-language">
+			<param name="archive-language" value="de" />
+		</antcall>
+
+		<!-- clear temp folder 
+		<echo message="delete temp dirs" />
+		<delete dir="${temp-dir}" />
+		<delete dir="${temp-with-correct-structur}" />
+		-->
+
+	</target>
+
+	<!--
+		DEBUG target
+	-->
+	<target name="debug">
+
+
+	</target>
+
+
+	<target name="unzip-archive-for-one-language">
+
+		<!-- clear temp folder -->
+		<echo message="delete temp dirs" />
+		<delete dir="${temp-unzip-dir}" />
+		<delete dir="${temp-with-correct-structur}" />
+
+		<unzip dest="${temp-unzip-dir}">
+
+			<patternset includes="**/*${archive-language}.properties" />
+
+			<!-- using fileset to ignore missing archives -->
+			<fileset dir="${mt-language-archive-dir}">
+				<include name="mt-${archive-language}.zip" />
+				<exclude name="exclude" />
+			</fileset>
+		</unzip>
+
+		<copy todir="${temp-with-correct-structur}" verbose="true">
+
+			<fileset dir="${temp-unzip-dir}" includes="**/*" />
+
+			<mapper>
+				<regexpmapper from="^(.*)\\src\\de\.byteholder(.*)$$" to="\\de\.byteholder\2" />
+				<regexpmapper from="^(.*)\\src\\net\.tourbook(.*)$$" to="\\net\.tourbook\2" />
+			</mapper>
+
+		</copy>
+
+	</target>
+
+</project>

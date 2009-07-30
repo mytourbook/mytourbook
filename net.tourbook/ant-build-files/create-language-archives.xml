@@ -8,8 +8,8 @@
 
 	<property name="mt-trunk" value=".." />
 
-	<property name="archive-export-folder" value="${basedir}/translations/export" />
-	<property name="archive-file" value="${archive-export-folder}/mt-translation" />
+	<property name="archive-export-dir" value="${basedir}/translations/export" />
+	<property name="archive-file-name" value="${archive-export-dir}/mt-translation" />
 	<property name="archive-file-ext" value="zip" />
 
 	<property name="temp-dir" value="${mt-trunk}/../ant-temp" />
@@ -23,26 +23,42 @@
 
 		<!-- delete all existing archives -->
 		<delete>
-			<fileset dir="${archive-export-folder}" includes="**/*" />
+			<fileset dir="${archive-export-dir}" />
 		</delete>
+
+		<!-- clear temp folder -->
+		<echo message="delete temp dir: ${temp-dir}" />
+		<delete dir="${temp-dir}" />
+
+		<!-- create empty language files -->
+		<antcall target="create-empty-files" />
+
 
 		<!-- create archive: EN -->
 		<antcall target="create-archive-for-one-language">
 			<param name="search-language" value="" />
+			<param name="file-language" value="" />
 			<param name="archive-language" value="_en" />
 		</antcall>
 
 		<!-- create archive: DE -->
 		<antcall target="create-archive-for-one-language">
 			<param name="search-language" value="_de" />
+			<param name="file-language" value="_de" />
 			<param name="archive-language" value="_de" />
 		</antcall>
 
 		<!-- create archive: FR -->
 		<antcall target="create-archive-for-one-language">
 			<param name="search-language" value="_fr" />
+			<param name="file-language" value="_fr" />
 			<param name="archive-language" value="_fr" />
 		</antcall>
+
+
+		<!-- clear temp folder -->
+		<echo message="delete temp dir: ${temp-dir}" />
+		<delete dir="${temp-dir}" />
 
 	</target>
 
@@ -51,28 +67,6 @@
 	-->
 	<target name="debug">
 
-		<!-- clear temp folder -->
-		<echo message="delete temp dir: ${temp-dir}" />
-		<delete>
-			<fileset dir="${temp-dir}" includes="**/*" />
-		</delete>
-
-		<!-- create empty language files -->
-		<antcall target="create-empty-files" />
-
-		<!-- create archive: FR -->
-		<antcall target="create-archive-for-one-language">
-			<param name="archive-language" value="_fr" />
-			<param name="search-language" value="_fr" />
-		</antcall>
-
-
-		<!-- clear temp folder
-		<echo message="delete temp dir: ${temp-dir}" />
-		<delete>
-			<fileset dir="${temp-dir}" includes="**/*" />
-		</delete>
-		 -->
 
 	</target>
 
@@ -102,18 +96,21 @@
 
 	<target name="create-archive-for-one-language">
 
-		<property name="archive-filepath" value="${archive-file}${archive-language}.${archive-file-ext}" />
+		<property name="archive-filepath" value="${archive-file-name}${archive-language}.${archive-file-ext}" />
 		<echo message="create archive: ${archive-filepath}" />
+
+		<echo message="delete old language files ${language-files-dir}" />
+		<delete dir="${language-files-dir}" />
 
 		<echo message="copy empty language files to ${language-files-dir}" />
 		<copy todir="${language-files-dir}">
 			<fileset dir="${empty-files-dir}" />
 		</copy>
 
-		<echo message="rename empty language files" />
+		<echo message="rename empty language files to ${file-language} in ${language-files-dir}" />
 		<move todir="${language-files-dir}">
 			<fileset dir="${language-files-dir}" />
-			<mapper type="glob" from="*.properties" to="*${archive-language}.properties" />
+			<regexpmapper from="^(.*)\.properties$$" to="\1${file-language}.properties" />
 		</move>
 
 		<echo message="overwrite language files to ${language-files-dir}" />
@@ -125,28 +122,11 @@
 			</fileset>
 		</copy>
 
-		<echo message="create archive from language files in ${language-files-dir}" />
+		<echo message="create language archive ${archive-filepath} in ${language-files-dir}" />
 		<zip destfile="${archive-filepath}">
 			<fileset dir="${language-files-dir}" />
 		</zip>
 
 	</target>
-
-	<target name="create-archive-with-one-language-OLD">
-
-		<property name="archive-filepath" value="${archive-file}${archive-language}.${archive-file-ext}" />
-
-		<echo message="create archive: ${archive-filepath}" />
-
-		<zip destfile="${archive-filepath}">
-			<fileset dir="${mt-trunk}" id="fileset-language">
-				<include name="**/plugin${search-language}.properties" />
-				<include name="**/src/**/messages${search-language}.properties" />
-				<exclude name="**/bin/**" />
-			</fileset>
-		</zip>
-
-	</target>
-
 
 </project>

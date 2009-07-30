@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>net.tourbook.device.ciclotour.text</name>
+ 	<name>net.tourbook.device.ciclotour.text</name>
 	<comment></comment>
 	<projects>
 		<project>net.tourbook</project>
@@ -22,9 +22,15 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.babel.editor.rbeBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.babel.editor.rbeNature</nature>
 	</natures>
 </projectDescription>
