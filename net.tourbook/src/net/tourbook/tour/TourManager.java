@@ -866,8 +866,7 @@ public class TourManager {
 					if (distance == 0) {
 						return 0;
 					} else {
-//						return (float) (time * 16.666 / distance);
-						return time * 10000 / distance;
+						return time * 1000 / distance;
 					}
 				}
 			}

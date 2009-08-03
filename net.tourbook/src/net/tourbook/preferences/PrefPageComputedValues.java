@@ -120,16 +120,23 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+//				.align(SWT.BEGINNING, SWT.BEGINNING)
+				.grab(true, false)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().applyTo(container);
 		{
 			final Group group = new Group(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+			GridDataFactory.fillDefaults()//
+//					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.grab(true, false)
+					.applyTo(group);
 			GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 			group.setText(Messages.compute_tourValues_group_computeTourAltitude);
 			{
 				// label: min alti diff
-				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.tour_segmenter_segType_byUpDownAlti_label);
+				Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.compute_tourValues_label_minAltiDifference);
 
 				// combo: min altitude
 				fCboMinAltitude = new Combo(group, SWT.READ_ONLY);
@@ -142,16 +149,32 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				fLblMinAltitude = new Label(group, SWT.NONE);
 				fLblMinAltitude.setText(UI.UNIT_LABEL_ALTITUDE);
 
-				// button: compute computed values
-				final Button btnComputValues = new Button(group, SWT.NONE);
-				btnComputValues.setText(Messages.compute_tourValues_button_computeValues);
-				btnComputValues.setToolTipText(Messages.compute_tourValues_button_computeValues_tooltip);
-				btnComputValues.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onComputeValues();
-					}
-				});
+				// label: description
+				label = new Label(group, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.span(3, 1)
+						.indent(0, 10)
+						.hint(300, SWT.DEFAULT)
+						.grab(true, false)
+						.applyTo(label);
+				label.setText(Messages.compute_tourValues_label_description);
+
+				final Composite btnContainer = new Composite(group, SWT.NONE);
+				GridDataFactory.fillDefaults().span(3, 1).applyTo(btnContainer);
+				GridLayoutFactory.fillDefaults().applyTo(btnContainer);
+				{
+					// button: compute computed values
+					final Button btnComputValues = new Button(btnContainer, SWT.NONE);
+					GridDataFactory.fillDefaults().indent(0, 20).applyTo(btnComputValues);
+					btnComputValues.setText(Messages.compute_tourValues_button_computeValues);
+					btnComputValues.setToolTipText(Messages.compute_tourValues_button_computeValues_tooltip);
+					btnComputValues.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(final SelectionEvent e) {
+							onComputeValues();
+						}
+					});
+				}
 			}
 		}
 

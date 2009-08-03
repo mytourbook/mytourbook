@@ -1271,7 +1271,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
-	 * compute altitude up/down since version 9.07.1
+	 * compute altitude up/down since version 9.08
 	 * 
 	 * @param segmentSerie
 	 *            segments are created for each gradient alternation when segmentSerie is not
@@ -2154,14 +2154,9 @@ public class TourData implements Comparable<Object> {
 
 			if (speedMetric != 0 && distDiff != 0) {
 
-//				final float pace = timeDiff * 166.66f / distDiff;
-//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
-
-//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
 				paceMetricSeconds = timeDiff * 10000 / (float) distDiff;
 				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
 
-//				paceMetricMinute = (int) ((paceMetricSeconds / 60));
 				paceMetricMinute = (int) ((paceMetricSeconds / 60));
 				paceImperialMinute = (int) ((paceImperialSeconds / 60));
 			}

@@ -151,7 +151,7 @@ public class Messages extends NLS {
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
 
-	public static String	app_unit_minutes;
+	public static String		app_unit_minutes;
 
 	public static String		App_Action_set_tour_type;
 
@@ -195,6 +195,10 @@ public class Messages extends NLS {
 	public static String		compute_tourValues_dlg_computeValues_message;
 	public static String		compute_tourValues_dlg_computeValues_title;
 	public static String		compute_tourValues_group_computeTourAltitude;
+
+	public static String		compute_tourValues_label_description;
+
+	public static String		compute_tourValues_label_minAltiDifference;
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
@@ -603,7 +607,6 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_load_all_tours;
-	public static String		Tour_Database_update_computed_values;
 	public static String		Tour_Database_update_tour;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
@@ -641,6 +644,10 @@ public class Messages extends NLS {
 	public static String		tour_data_label_feature_since_version_9_01;
 	public static String		tour_data_label_manually_created_tour;
 
+	public static String		tour_database_computeComputedValues_resultMessage;
+	public static String		tour_database_computeComputedValues_resultTitle;
+	public static String		tour_database_computeComputeValues_mainTask;
+	public static String		tour_database_computeComputeValues_subTask;
 	public static String		tour_database_version_info_message;
 	public static String		tour_database_version_info_title;
 

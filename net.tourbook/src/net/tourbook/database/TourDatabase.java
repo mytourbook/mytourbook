@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -201,39 +203,87 @@ public class TourDatabase {
 	 */
 	public static void computeComputedValuesForAllTours(final IComputeTourValues runner) {
 
+		final Shell shell = Display.getDefault().getActiveShell();
+
+		final NumberFormat nf = NumberFormat.getNumberInstance();
+		nf.setMinimumFractionDigits(0);
+		nf.setMaximumFractionDigits(0);
+
+		final int[] tourCounter = new int[] { 0 };
+		final int[] elevation = new int[] { 0, 0 };
+
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				final ArrayList<Long> tourList = getAllTourIds();
 
-				monitor.beginTask(Messages.Tour_Database_update_computed_values, tourList.size());
+				monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, tourList.size());
 
 				// loop over all tours and calculate and set new columns
-				int tourCounter = 1;
 				for (final Long tourId : tourList) {
 
-					monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
-							new Object[] { tourCounter++, tourList.size() }));
+					monitor.subTask(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
+							new Object[] { tourCounter[0]++, //
+									tourList.size(),
+									nf.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+									UI.UNIT_LABEL_ALTITUDE,//
+							}));
 
 					final TourData tourData = getTourFromDb(tourId);
 					if (tourData != null) {
 
+						// get old value
+						elevation[0] += tourData.getTourAltUp();
+
 						if (runner.computeTourValues(tourData)) {
-							saveTour(tourData);
+
+							final TourData savedTourData = saveTour(tourData);
+
+							// get new value
+							elevation[1] += savedTourData.getTourAltUp();
 						}
 					}
 
 					monitor.worked(1);
+
+					// check if canceled
+					if (monitor.isCanceled()) {
+						break;
+					}
+
+//					// debug test
+//					if (tourCounter[0] > 100) {
+//						break;
+//					}
 				}
 			}
 		};
 
 		try {
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+
+			new ProgressMonitorDialog(shell).run(true, true, runnable);
+
 		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
+		} finally {
+
+			final int prefMinAltitude = TourbookPlugin.getDefault()//
+					.getPreferenceStore()
+					.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+
+			MessageDialog.openInformation(shell, Messages.tour_database_computeComputedValues_resultTitle, NLS.bind(
+					Messages.tour_database_computeComputedValues_resultMessage,
+					new Object[] {
+							Integer.toString(tourCounter[0]),
+							prefMinAltitude,
+							UI.UNIT_LABEL_ALTITUDE,
+							nf.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+							UI.UNIT_LABEL_ALTITUDE,
+					//
+					} //
+			));
 		}
 	}
 
