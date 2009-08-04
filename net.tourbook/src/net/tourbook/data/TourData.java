@@ -644,86 +644,6 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	private TourData					fMergeSourceTourData;
 
-	public class HoehenAddierer {
-
-		boolean	isFirstValue		= true;
-
-		double	prevAltitude		= 0;
-		double	altitudeUpTotal		= 0;
-		double	altitudeUpSubTotal	= 0;
-
-		int		altitudeDiff		= 5;	// Meter; MUSS int sein!
-
-		public HoehenAddierer() {
-			init();
-		}
-
-		public HoehenAddierer(final int hoeheEps) {
-			init();
-			this.altitudeDiff = hoeheEps;
-		}
-
-		public void add(final double altitude) {
-
-			if (altitude <= 0) {
-				return; // insb. nicht NaN (not a number)
-			}
-
-			if (isFirstValue) {
-				// ignore first value
-				isFirstValue = false;
-			} else {
-
-				if (altitude > prevAltitude) {
-
-					altitudeUpSubTotal += altitude - prevAltitude;
-
-				} else if (altitude < prevAltitude) {
-
-					if (altitudeUpSubTotal > altitudeDiff) {
-						altitudeUpTotal += altitudeUpSubTotal;
-					}
-
-					altitudeUpSubTotal = 0;
-				}
-			}
-
-			prevAltitude = altitude;
-		}
-
-		public void add(final long hoehe) {
-			add((double) hoehe);
-		}
-
-		public int getEps() {
-			return altitudeDiff;
-		}
-
-		public double getSum() {
-			return altitudeUpTotal;
-		}
-
-		public void init() {
-			isFirstValue = true;
-			altitudeUpSubTotal = 0;
-			altitudeUpTotal = 0;
-			prevAltitude = 0;
-		}
-
-		public void last() {
-			// muss nach letztem Datenpunkt für mögliche Addition des "Rests" aufgerufen werden
-			if (altitudeUpSubTotal > altitudeDiff) {
-				altitudeUpTotal += altitudeUpSubTotal;
-			}
-			altitudeUpSubTotal = 0;
-		}
-
-		public void setEps(final int hoeheEps) {
-			this.altitudeDiff = hoeheEps;
-		}
-
-	}
-
 	public TourData() {}
 
 	/**
@@ -4090,6 +4010,11 @@ public class TourData implements Comparable<Object> {
 		this.startSecond = startSecond;
 	}
 
+	/**
+	 * Set the week of the tour, 0 is the first week in the year
+	 * 
+	 * @param startWeek
+	 */
 	public void setStartWeek(final short startWeek) {
 		this.startWeek = startWeek;
 	}

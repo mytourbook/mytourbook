@@ -79,6 +79,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long					colAvgCadence;
 	long					colAvgTemperature;
 
+	int						colWeek;
+
 	TVITourBookItem(final TourBookView view) {
 		fView = view;
 	}

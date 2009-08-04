@@ -90,7 +90,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	protected Long					fActiveTourId;
 
-	private ITourEventListener		fTourPropertyListener;
+	private ITourEventListener		fTourEventListener;
 	private ISelectionListener		fPostSelectionListener;
 
 	private void addPartListener() {
@@ -194,12 +194,12 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
 
-				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					if (part == TourStatisticsView.this) {
 						return;
@@ -215,12 +215,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 					// update statistics
 					refreshStatistics();
 
-				} else if (propertyId == TourEventId.UPDATE_UI) {
+				} else if (eventId == TourEventId.UPDATE_UI || //
+						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 					refreshStatistics();
 				}
 			}
 		};
-		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(fTourEventListener);
 	}
 
 	@Override
@@ -236,7 +237,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		addPartListener();
 		addPrefListener();
 		addSelectionListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
@@ -264,7 +265,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		getViewSite().getPage().removePartListener(fPartListener);
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 

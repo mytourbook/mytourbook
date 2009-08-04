@@ -42,8 +42,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.joda.time.DateTime;
 
-public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage, IComputeTourValues {
+public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
+
+	public static final String	STATE_COMPUTED_VALUE_MIN_ALTITUDE	= "computedValue.minAltitude";						//$NON-NLS-1$
 
 	public static final int[]	ALTITUDE_MINIMUM					= new int[] {
 			1,
@@ -92,20 +95,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	public static final int		DEFAULT_MIN_ALTITUDE_INDEX			= 4;
 	public static final int		DEFAULT_MIN_ALTITUDE				= ALTITUDE_MINIMUM[DEFAULT_MIN_ALTITUDE_INDEX];
 
-	public static final String	STATE_COMPUTED_VALUE_MIN_ALTITUDE	= "computedValue.minAltitude";						//$NON-NLS-1$
-
 	private IPreferenceStore	fPrefStore							= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private Combo				fCboMinAltitude;
 	private Label				fLblMinAltitude;
-
-	public PrefPageComputedValues() {
-//		noDefaultAndApplyButton();
-	}
-
-	public boolean computeTourValues(final TourData tourData) {
-		return tourData.computeAltitudeUpDown();
-	}
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -120,72 +113,121 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.align(SWT.BEGINNING, SWT.BEGINNING)
-				.grab(true, false)
-				.applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().applyTo(container);
 		{
-			final Group group = new Group(container, SWT.NONE);
+			// label: description
+			Label label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
-//					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.hint(300, SWT.DEFAULT)
 					.grab(true, false)
-					.applyTo(group);
-			GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-			group.setText(Messages.compute_tourValues_group_computeTourAltitude);
-			{
-				// label: min alti diff
-				Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.compute_tourValues_label_minAltiDifference);
+					.applyTo(label);
+			label.setText(Messages.compute_tourValues_label_description);
 
-				// combo: min altitude
-				fCboMinAltitude = new Combo(group, SWT.READ_ONLY);
-				fCboMinAltitude.setVisibleItemCount(20);
-				for (final int minAlti : PrefPageComputedValues.ALTITUDE_MINIMUM) {
-					fCboMinAltitude.add(Integer.toString((int) (minAlti / UI.UNIT_VALUE_ALTITUDE)));
-				}
+			// spacer
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, -10).applyTo(label);
 
-				// label: unit
-				fLblMinAltitude = new Label(group, SWT.NONE);
-				fLblMinAltitude.setText(UI.UNIT_LABEL_ALTITUDE);
+			createUIElevationGain(container);
 
-				// label: description
-				label = new Label(group, SWT.WRAP);
-				GridDataFactory.fillDefaults()//
-						.span(3, 1)
-						.indent(0, 10)
-						.hint(300, SWT.DEFAULT)
-						.grab(true, false)
-						.applyTo(label);
-				label.setText(Messages.compute_tourValues_label_description);
-
-				final Composite btnContainer = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().span(3, 1).applyTo(btnContainer);
-				GridLayoutFactory.fillDefaults().applyTo(btnContainer);
-				{
-					// button: compute computed values
-					final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-					GridDataFactory.fillDefaults().indent(0, 20).applyTo(btnComputValues);
-					btnComputValues.setText(Messages.compute_tourValues_button_computeValues);
-					btnComputValues.setToolTipText(Messages.compute_tourValues_button_computeValues_tooltip);
-					btnComputValues.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onComputeValues();
-						}
-					});
-				}
-			}
+			/**
+			 * 4.8.2009 this is currently disabled because a new field in the db is required which
+			 * holds the year of the week<br>
+			 * <br>
+			 * all plugins must be adjusted which set's the week number of a tour
+			 */
+//			createUIWeek(container);
 		}
 
 		return container;
 	}
 
+	private void createUIElevationGain(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		group.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
+		{
+			// label: min alti diff
+			Label label = new Label(group, SWT.NONE);
+			label.setText(Messages.compute_tourValueElevation_label_minAltiDifference);
+
+			// combo: min altitude
+			fCboMinAltitude = new Combo(group, SWT.READ_ONLY);
+			fCboMinAltitude.setVisibleItemCount(20);
+			for (final int minAlti : PrefPageComputedValues.ALTITUDE_MINIMUM) {
+				fCboMinAltitude.add(Integer.toString((int) (minAlti / UI.UNIT_VALUE_ALTITUDE)));
+			}
+
+			// label: unit
+			fLblMinAltitude = new Label(group, SWT.NONE);
+			fLblMinAltitude.setText(UI.UNIT_LABEL_ALTITUDE);
+
+			// label: description
+			label = new Label(group, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.span(3, 1)
+					.indent(0, 10)
+					.hint(300, SWT.DEFAULT)
+					.grab(true, false)
+					.applyTo(label);
+			label.setText(Messages.compute_tourValueElevation_label_description);
+
+			final Composite btnContainer = new Composite(group, SWT.NONE);
+			GridDataFactory.fillDefaults().span(3, 1).applyTo(btnContainer);
+			GridLayoutFactory.fillDefaults().applyTo(btnContainer);
+			{
+				// button: compute computed values
+				final Button btnComputValues = new Button(btnContainer, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
+				btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
+				btnComputValues.setToolTipText(Messages.compute_tourValueElevation_button_computeValues_tooltip);
+				btnComputValues.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onComputeElevationGainValues();
+					}
+				});
+			}
+		}
+	}
+
+	private void createUIWeek(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+		group.setText(Messages.compute_tourValueWeek_group_week);
+		{
+			// button: compute computed values
+			final Button btnComputValues = new Button(group, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
+			btnComputValues.setText(Messages.compute_tourValueWeek_button_computeWeekValues);
+			btnComputValues.setToolTipText(Messages.compute_tourValueWeek_button_computeWeekValues_tooltip);
+			btnComputValues.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onComputeWeekValues();
+				}
+			});
+		}
+	}
+
+	private void fireModifyEvent() {
+
+		TourManager.getInstance().removeAllToursFromCache();
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+		// fire unique event for all changes
+		TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+	}
+
 	public void init(final IWorkbench workbench) {}
 
-	private void onComputeValues() {
+	private void onComputeElevationGainValues() {
 
-		final int altiMin = PrefPageComputedValues.ALTITUDE_MINIMUM[fCboMinAltitude.getSelectionIndex()];
+		final int altiMin = ALTITUDE_MINIMUM[fCboMinAltitude.getSelectionIndex()];
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
@@ -197,13 +239,46 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			saveState();
 
-			TourDatabase.computeComputedValuesForAllTours(PrefPageComputedValues.this);
+			TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
 
-			TourManager.getInstance().removeAllToursFromCache();
-			TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+				public boolean computeTourValues(final TourData tourData) {
+					return tourData.computeAltitudeUpDown();
+				}
+			});
 
-			// fire unique event for all changes
-			TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+			fireModifyEvent();
+		}
+	}
+
+	private void onComputeWeekValues() {
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.compute_tourValueWeek_dlg_title,
+				Messages.compute_tourValueWeek_dlg_message)) {
+
+			saveState();
+
+			TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+
+				public boolean computeTourValues(final TourData tourData) {
+
+					final DateTime dtTour = new DateTime(tourData.getStartYear(),
+							tourData.getStartMonth(),
+							tourData.getStartDay(),
+							tourData.getStartHour(),
+							tourData.getStartMinute(),
+							tourData.getStartSecond(),
+							0);
+
+					tourData.setStartWeek((short) dtTour.getWeekOfWeekyear());
+//					dtTour.getWeekyear()
+
+					return true;
+				}
+			});
+
+			fireModifyEvent();
 		}
 	}
 
@@ -246,13 +321,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		}
 
 		fCboMinAltitude.select(minAltiIndex);
+
 	}
 
 	private void saveState() {
 
-		fPrefStore.setValue(
-				STATE_COMPUTED_VALUE_MIN_ALTITUDE,
-				PrefPageComputedValues.ALTITUDE_MINIMUM[fCboMinAltitude.getSelectionIndex()]);
+		fPrefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, ALTITUDE_MINIMUM[fCboMinAltitude.getSelectionIndex()]);
 	}
 
 }

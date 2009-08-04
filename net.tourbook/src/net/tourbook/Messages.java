@@ -190,15 +190,22 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
-	public static String		compute_tourValues_button_computeValues;
-	public static String		compute_tourValues_button_computeValues_tooltip;
+	public static String		compute_tourValueElevation_button_computeValues;
+	public static String		compute_tourValueElevation_button_computeValues_tooltip;
+	public static String		compute_tourValueElevation_group_computeTourAltitude;
+	public static String		compute_tourValueElevation_label_description;
+	public static String		compute_tourValueElevation_label_minAltiDifference;
 	public static String		compute_tourValues_dlg_computeValues_message;
 	public static String		compute_tourValues_dlg_computeValues_title;
-	public static String		compute_tourValues_group_computeTourAltitude;
-
 	public static String		compute_tourValues_label_description;
 
-	public static String		compute_tourValues_label_minAltiDifference;
+	public static String		compute_tourValueWeek_button_computeWeekValues;
+	public static String		compute_tourValueWeek_button_computeWeekValues_tooltip;
+	public static String		compute_tourValueWeek_dlg_message;
+	public static String		compute_tourValueWeek_dlg_title;
+	public static String		compute_tourValueWeek_group_week;
+	public static String		compute_tourValueWeek_label_weekDescription;
+	public static String		compute_tourValueWeek_label_weekStartingDay;
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
@@ -836,6 +843,20 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 
 	public static String		ui_tour_not_defined;
+
+	public static String		week_day_label_friday;
+
+	public static String		week_day_label_monday;
+
+	public static String		week_day_label_saturday;
+
+	public static String		week_day_label_sunday;
+
+	public static String		week_day_label_thursday;
+
+	public static String		week_day_label_tuesday;
+
+	public static String		week_day_label_wednesday;
 
 	static {
 		// initialize resource bundle

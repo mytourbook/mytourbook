@@ -1034,6 +1034,28 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 
 		/*
+		 * column: week
+		 */
+		colDef = TreeColumnFactory.WEEK.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int week = ((TVITourBookItem) element).colWeek;
+
+				if (week == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(week));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
 		 * column: timeinterval
 		 */
 		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);

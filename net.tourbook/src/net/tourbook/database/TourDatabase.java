@@ -201,7 +201,7 @@ public class TourDatabase {
 	/**
 	 * @param {@link IComputeTourValues} interface to compute values for one tour
 	 */
-	public static void computeComputedValuesForAllTours(final IComputeTourValues runner) {
+	public static void computeValuesForAllTours(final IComputeTourValues runner) {
 
 		final Shell shell = Display.getDefault().getActiveShell();
 

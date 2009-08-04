@@ -218,6 +218,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * computed values
 		 */
+		// minimum altitude difference
 		store.setDefault(
 				PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE,
 				PrefPageComputedValues.DEFAULT_MIN_ALTITUDE);

@@ -280,7 +280,7 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 						Messages.TourChart_Property_dlg_compute_values_title,
 						Messages.TourChart_Property_dlg_compute_values_message)) {
 
-					TourDatabase.computeComputedValuesForAllTours(TourChartPropertyView.this);
+					TourDatabase.computeValuesForAllTours(TourChartPropertyView.this);
 
 					TourManager.getInstance().removeAllToursFromCache();
 					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);

@@ -470,6 +470,22 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 
+	
+	public static final TreeColumnFactory WEEK = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourWeek", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnHeader(Messages.ColumnFactory_tour_week_header);
+			colDef.setColumnLabel(Messages.ColumnFactory_tour_week_label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_week_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
+			
+			return colDef;
+		};
+	};
+	
 
 
 	public abstract TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter);
