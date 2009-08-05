@@ -16,6 +16,12 @@
 	-->
 	<target name="unzip-all-archives">
 
+		<!-- create temp dir 
+		<echo message="create temp dir: ${temp-unzip-dir}" />
+		-->
+		<mkdir dir="${temp-unzip-dir}" />
+
+
 		<!-- unzip archive: FR -->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="fr" />
@@ -26,8 +32,10 @@
 			<param name="archive-language" value="de" />
 		</antcall>
 
-		<!-- clear temp folder -->
-		<echo message="delete temp dirs" />
+
+		<!-- delete temp dir 
+		<echo message="delete temp dir: ${temp-unzip-dir}" />
+		-->
 		<delete dir="${temp-unzip-dir}" />
 
 	</target>
@@ -43,11 +51,16 @@
 
 	<target name="unzip-archive-for-one-language">
 
-		<!-- clear temp folder -->
-		<echo message="delete temp dirs" />
-		<delete dir="${temp-unzip-dir}" />
+		<!-- delete temp dir content -->
+		<echo message="delete temp dir content: ${temp-unzip-dir}" />
+		<delete includeemptydirs="true">
+			<fileset dir="${temp-unzip-dir}" includes="**/*" />
+		</delete>
 
+
+		<!--
 		<echo message="expand archive into ${temp-unzip-dir}" />
+		-->
 		<unzip dest="${temp-unzip-dir}">
 
 			<patternset includes="**/*${archive-language}.properties" />
@@ -59,7 +72,9 @@
 			</fileset>
 		</unzip>
 
+		<!--
 		<echo message="copy archive to ${mt-trunk}" />
+		-->
 		<copy todir="${mt-trunk}" overwrite="true" verbose="false">
 
 			<fileset dir="${temp-unzip-dir}" includes="**/*" />
