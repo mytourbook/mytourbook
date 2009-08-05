@@ -391,7 +391,7 @@ public class Chart extends ViewForm {
 
 		if (fChartContextProvider != null && showOnlySliderContext == false && fIsFirstContextMenu) {
 			fChartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
- 		}
+		}
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
@@ -1145,9 +1145,12 @@ public class Chart extends ViewForm {
 	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
 	 * 
 	 * @param chartDataModel
+	 * @param isShowAllData
+	 *            set <code>true</code> to show the entire data in the chart, otherwise the min max
+	 *            values will be kept
 	 */
-	public void updateChart(final ChartDataModel chartDataModel) {
-		updateChart(chartDataModel, true);
+	public void updateChart(final ChartDataModel chartDataModel, final boolean isShowAllData) {
+		updateChart(chartDataModel, true, isShowAllData);
 	}
 
 	/**
@@ -1158,15 +1161,20 @@ public class Chart extends ViewForm {
 	 * @param chartDataModel
 	 * @param isResetSelection
 	 *            <code>true</code> to reset the last selection in the chart
+	 * @param isShowAllData
+	 *            set <code>true</code> to show the entire data in the chart, otherwise the min max
+	 *            values will be kept
 	 */
-	public void updateChart(final ChartDataModel chartDataModel, final boolean isResetSelection) {
+	public void updateChart(final ChartDataModel chartDataModel,
+							final boolean isResetSelection,
+							final boolean isShowAllData) {
 
 		if (chartDataModel == null || (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
 			fChartDataModel = emptyModel;
-			fChartComponents.setModel(emptyModel);
+			fChartComponents.setModel(emptyModel, false);
 
 			return;
 		}
@@ -1174,7 +1182,7 @@ public class Chart extends ViewForm {
 		fChartDataModel = chartDataModel;
 
 		createActions();
-		fChartComponents.setModel(chartDataModel);
+		fChartComponents.setModel(chartDataModel, isShowAllData);
 
 		// reset last selected x-data
 		if (isResetSelection) {

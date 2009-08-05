@@ -566,7 +566,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the data in the chart
-		fChart.updateChart(chartModel, false);
+		fChart.updateChart(chartModel, false, true);
 
 		// try to select the previous selected tour
 		selectTour(selectedTourId);

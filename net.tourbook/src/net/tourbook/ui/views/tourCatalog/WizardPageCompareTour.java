@@ -146,7 +146,8 @@ public class WizardPageCompareTour extends WizardPage {
 
 				case COLUMN_RECORDING:
 					final long recordingTime = tourItem.colRecordingTime;
-					return new Formatter().format(Messages.Format_hhmm,
+					return new Formatter().format(
+							Messages.Format_hhmm,
 							(recordingTime / 3600),
 							((recordingTime % 3600) / 60)).toString();
 
@@ -447,9 +448,10 @@ public class WizardPageCompareTour extends WizardPage {
 //				fTourChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 //						prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-			fCompTourChart.updateChart(chartDataModel);
+			fCompTourChart.updateChart(chartDataModel, false);
 
-			fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
+			fChartGroup.setText(NLS.bind(
+					Messages.tourCatalog_wizard_Group_selected_tour_2,
 					TourManager.getTourDateShort(tourData)));
 
 			fPageBook.showPage(fCompTourChart);

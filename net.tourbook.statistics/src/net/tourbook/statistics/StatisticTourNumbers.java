@@ -673,7 +673,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the new data in the chart
-		statAltitudeChart.updateChart(chartDataModel);
+		statAltitudeChart.updateChart(chartDataModel, true);
 	}
 
 	/**
@@ -731,7 +731,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the new data fDataModel in the chart
-		statDistanceChart.updateChart(chartDataModel);
+		statDistanceChart.updateChart(chartDataModel, true);
 	}
 
 	private void updateCharts() {
@@ -833,8 +833,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		statDurationChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-		// show the new data fDataModel in the chart
-		statDurationChart.updateChart(chartDataModel);
+		// show the new data data model in the chart
+		statDurationChart.updateChart(chartDataModel, true);
 	}
 
 	/**

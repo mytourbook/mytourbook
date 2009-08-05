@@ -1054,10 +1054,10 @@ public class ChartComponents extends Composite {
 	/**
 	 * set the chart data model and redraw the chart
 	 * 
-	 * @param fChartDataModel
-	 * @throws ChartIsEmptyException
+	 * @param chartModel
+	 * @param isShowAllData
 	 */
-	void setModel(final ChartDataModel chartModel) {
+	void setModel(final ChartDataModel chartModel, final boolean isShowAllData) {
 
 		fChartDataModel = chartModel;
 
@@ -1065,7 +1065,7 @@ public class ChartComponents extends Composite {
 		 * when the data model is changed update the visible y-values to use the full visible area
 		 * for drawing the chart
 		 */
-		if (fChartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR) {
+		if (fChartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR && isShowAllData) {
 			fComponentGraph.updateYDataMinMaxValues();
 		}
 

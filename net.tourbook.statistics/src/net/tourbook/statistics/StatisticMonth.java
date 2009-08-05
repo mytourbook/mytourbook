@@ -328,7 +328,7 @@ public abstract class StatisticMonth extends YearStatistic {
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the fDataModel in the chart
-		fChart.updateChart(chartDataModel);
+		fChart.updateChart(chartDataModel, true);
 	}
 
 	@Override

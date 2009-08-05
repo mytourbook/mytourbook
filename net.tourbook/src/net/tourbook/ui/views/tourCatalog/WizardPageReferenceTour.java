@@ -360,15 +360,16 @@ public class WizardPageReferenceTour extends WizardPage {
 
 			// set grid size
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-			fRefTourChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+			fRefTourChart.setGridDistance(
+					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-			fRefTourChart.updateChart(chartDataModel);
+			fRefTourChart.updateChart(chartDataModel, false);
 
 		} else {
 
 			// hide the chart
-			fRefTourChart.updateChart(null);
+			fRefTourChart.updateChart(null, false);
 			fChartGroup.setText(""); //$NON-NLS-1$
 		}
 	}

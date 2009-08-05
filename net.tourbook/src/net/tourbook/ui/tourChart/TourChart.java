@@ -1238,9 +1238,9 @@ public class TourChart extends Chart {
 	}
 
 	@Override
-	public void updateChart(final ChartDataModel chartDataModel) {
+	public void updateChart(final ChartDataModel chartDataModel, final boolean isShowAllData) {
 
-		super.updateChart(chartDataModel);
+		super.updateChart(chartDataModel, isShowAllData);
 
 		if (chartDataModel == null) {
 			fTourData = null;
@@ -1354,8 +1354,11 @@ public class TourChart extends Chart {
 		}
 
 		// keep min/max values for the 'old' chart in the chart config
-		if (fTourChartConfig != null && fTourChartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
-			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getChartDataModel());
+		if (fTourChartConfig != null) {
+			final ChartYDataMinMaxKeeper oldMinMaxKeeper = fTourChartConfig.getMinMaxKeeper();
+			if (oldMinMaxKeeper != null && keepMinMaxValues) {
+				oldMinMaxKeeper.saveMinMaxValues(getChartDataModel());
+			}
 		}
 
 		// set current tour data and chart config
@@ -1377,9 +1380,10 @@ public class TourChart extends Chart {
 		}
 
 		// restore min/max values from the chart config
-		final ChartYDataMinMaxKeeper chartConfigMinMaxKeeper = newChartConfig.getMinMaxKeeper();
-		if (chartConfigMinMaxKeeper != null && keepMinMaxValues) {
-			chartConfigMinMaxKeeper.setMinMaxValues(newChartDataModel);
+		final ChartYDataMinMaxKeeper newMinMaxKeeper = newChartConfig.getMinMaxKeeper();
+		final boolean isMinMaxKeeper = newMinMaxKeeper != null && keepMinMaxValues;
+		if (isMinMaxKeeper) {
+			newMinMaxKeeper.setMinMaxValues(newChartDataModel);
 		}
 
 		if (fChartDataModelListener != null) {
@@ -1392,7 +1396,7 @@ public class TourChart extends Chart {
 
 		setCustomGraphData();
 
-		updateChart(newChartDataModel);
+		updateChart(newChartDataModel, !isMinMaxKeeper);
 
 		/*
 		 * this must be done after the chart is created because is sets an action, set it only once

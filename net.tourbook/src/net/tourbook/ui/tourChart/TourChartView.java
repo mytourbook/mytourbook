@@ -245,7 +245,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void clearView() {
 
 		fTourData = null;
-		fTourChart.updateChart(null);
+		fTourChart.updateChart(null, false);
 
 		fPageBook.showPage(fPageNoChart);
 

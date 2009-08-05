@@ -397,7 +397,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-		fChart.updateChart(chartDataModel);
+		fChart.updateChart(chartDataModel, true);
 	}
 
 	@Override

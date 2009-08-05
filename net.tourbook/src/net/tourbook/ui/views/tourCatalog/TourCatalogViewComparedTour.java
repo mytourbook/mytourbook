@@ -392,7 +392,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		xData.setSynchMarkerValueIndex(movedValueIndex, movedEndIndex);
 		setRangeMarkers(xData);
 
-		fTourChart.updateChart(chartDataModel);
+		fTourChart.updateChart(chartDataModel, true);
 
 		// keep marker position for saving the tour
 		fMovedStartIndex = movedValueIndex;
@@ -518,7 +518,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				xData.setSynchMarkerValueIndex(fDefaultStartIndex, fDefaultEndIndex);
 				setRangeMarkers(xData);
 
-				fTourChart.updateChart(chartDataModel);
+				fTourChart.updateChart(chartDataModel, true);
 				enableSaveAction();
 
 				fireChangeEvent(fDefaultStartIndex, fDefaultEndIndex, speed, true);
@@ -551,7 +551,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 
 		msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
-		msgBox.setMessage(NLS.bind(Messages.tourCatalog_view_dlg_save_compared_tour_message,
+		msgBox.setMessage(NLS.bind(
+				Messages.tourCatalog_view_dlg_save_compared_tour_message,
 				TourManager.getTourTitleDetailed(fTourData)));
 
 		final int answer = msgBox.open();
@@ -633,7 +634,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		xData.setSynchMarkerValueIndex(fDefaultStartIndex, fDefaultEndIndex);
 
-		fTourChart.updateChart(chartDataModel);
+		fTourChart.updateChart(chartDataModel, true);
 
 		setDataDirty(false);
 
