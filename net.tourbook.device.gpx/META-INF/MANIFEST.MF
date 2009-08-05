@@ -10,5 +10,14 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.device,
  net.tourbook.rxtx
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
+Export-Package: net.tourbook.device.gpx;
+  uses:="org.eclipse.ui.plugin,
+   org.osgi.framework,
+   org.xml.sax.helpers,
+   net.tourbook.importdata,
+   org.xml.sax"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.joda.time,
+ org.joda.time.format

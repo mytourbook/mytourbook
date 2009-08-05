@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009 Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -31,6 +31,8 @@ import net.tourbook.importdata.TourbookDevice;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -67,6 +69,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");	//$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");		//$NON-NLS-1$
+
+	private static final DateTimeFormatter	fDateTimeParser			= ISODateTimeFormat.dateTimeParser();
 
 	private int								fGpxVersion				= -1;
 	private boolean							fInTrk					= false;
@@ -128,57 +132,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		}
 	}
 
-//	private void computeAltitudeUpDown(final TourData tourData) {
-//
-//		final int[] timeSerie = tourData.timeSerie;
-//		final int[] altitudeSerie = tourData.altitudeSerie;
-//
-//		if (timeSerie == null || altitudeSerie == null) {
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		if (serieLength == 0) {
-//			return;
-//		}
-//
-//		int lastTime = 0;
-//		int currentAltitude = altitudeSerie[0];
-//		int lastAltitude = currentAltitude;
-//
-//		int altitudeUp = 0;
-//		int altitudeDown = 0;
-//
-//		final int minTimeDiff = 10;
-//
-//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-//
-//			final int currentTime = timeSerie[timeIndex];
-//
-//			final int timeDiff = currentTime - lastTime;
-//
-//			currentAltitude = altitudeSerie[timeIndex];
-//
-//			if (timeDiff >= minTimeDiff) {
-//
-//				final int altitudeDiff = currentAltitude - lastAltitude;
-//
-//				if (altitudeDiff >= 0) {
-//					altitudeUp += altitudeDiff;
-//				} else {
-//					altitudeDown += altitudeDiff;
-//				}
-//
-//				lastTime = currentTime;
-//				lastAltitude = currentAltitude;
-//			}
-//		}
-//
-//		tourData.setTourAltUp(altitudeUp);
-//		tourData.setTourAltDown(-altitudeDown);
-//	}
-
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
@@ -209,21 +162,26 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					fIsInTime = false;
 
 					try {
-						fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
-					} catch (final ParseException e) {
+						fTimeData.absoluteTime = fCurrentTime = fDateTimeParser.parseDateTime(timeString).getMillis();
+					} catch (final Exception e0) {
 						try {
-							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ.parse(timeString).getTime();
-						} catch (final ParseException e2) {
+							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
+						} catch (final ParseException e1) {
 							try {
-								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString)
+								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ.parse(timeString)
 										.getTime();
-							} catch (final ParseException e3) {
+							} catch (final ParseException e2) {
+								try {
+									fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString)
+											.getTime();
+								} catch (final ParseException e3) {
 
-								fIsError = true;
+									fIsError = true;
 
-								final String message = e3.getMessage();
-								MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-								System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
+									final String message = e3.getMessage();
+									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+									System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
+								}
 							}
 						}
 					}
@@ -316,7 +274,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			fTimeData.absoluteDistance = 0;
 		} else {
 			if (fTimeData.absoluteDistance == Float.MIN_VALUE) {
-				fTimeData.absoluteDistance = fAbsoluteDistance += DeviceReaderTools.computeDistance(fPrevTimeData.latitude,
+				fTimeData.absoluteDistance = fAbsoluteDistance += DeviceReaderTools.computeDistance(
+						fPrevTimeData.latitude,
 						fPrevTimeData.longitude,
 						fTimeData.latitude,
 						fTimeData.longitude);
