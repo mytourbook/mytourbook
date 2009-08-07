@@ -1955,7 +1955,7 @@ public class TourData implements Comparable<Object> {
 		}
 
 		final int serieLength = timeSerie.length;
-		final int serieLengthLast = serieLength - 1;
+		final int lastSerieIndex = serieLength - 1;
 
 		speedSerie = new int[serieLength];
 		speedSerieImperial = new int[serieLength];
@@ -1965,39 +1965,91 @@ public class TourData implements Comparable<Object> {
 		paceSerieMinuteImperial = new int[serieLength];
 		paceSerieSecondsImperial = new int[serieLength];
 
-		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
+		final boolean isCheckPosition = latitudeSerie != null && longitudeSerie != null;
+		boolean isLatLongEqual = false;
+		int equalStartIndex = 0;
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			// check if a lat and long diff is available
-			if (checkPosition && serieIndex > 0 && serieIndex < serieLengthLast - 1) {
-
-				if (latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1]
-						&& longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1]) {
-					continue;
-				}
-			}
-
-			final int serieIndexPrev = serieIndex - 1;
+			final int prevSerieIndex = serieIndex - 1;
 
 			// adjust index to the array size
-			int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
-			int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
+			int lowIndex = ((0 >= prevSerieIndex) ? 0 : prevSerieIndex);
+			int highIndex = ((serieIndex <= lastSerieIndex) ? serieIndex : lastSerieIndex);
 
 			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
 			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
-			boolean toggleIndex = true;
+			// check if a lat and long diff is available
+			if (isCheckPosition && serieIndex > 0 && serieIndex < lastSerieIndex - 1) {
+
+				if (latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex]
+						&& longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex]) {
+
+					if (isLatLongEqual == false) {
+						equalStartIndex = prevSerieIndex;
+						isLatLongEqual = true;
+					}
+
+					if (distDiff == 0) {
+						continue;
+					}
+
+				} else if (isLatLongEqual) {
+
+					/*
+					 * lat/long equality ended, compute distance for all datapoints which has the
+					 * same lat/long because this was not correctly computed from the device
+					 */
+
+					isLatLongEqual = false;
+
+					final int equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
+					final int equalDistDiff = distanceSerie[serieIndex] - distanceSerie[equalStartIndex];
+					int speedMetric = 0;
+					int speedImperial = 0;
+
+					for (int equalSerieIndex = equalStartIndex + 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
+
+						final int equalSegmentTimeDiff = timeSerie[equalSerieIndex] - timeSerie[equalSerieIndex - 1];
+
+						final int equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
+								(int) (((float) equalSegmentTimeDiff / equalTimeDiff) * equalDistDiff);
+
+						distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
+
+						// compute speed for this segment
+						if (equalSegmentTimeDiff == 0 || equalSegmentDistDiff == 0) {
+							speedMetric = 0;
+						} else {
+							speedMetric = (int) ((equalSegmentDistDiff * 36f) / equalSegmentTimeDiff);
+							speedMetric = speedMetric < 0 ? 0 : speedMetric;
+
+							speedImperial = (int) ((equalSegmentDistDiff * 36f) / (equalSegmentTimeDiff * UI.UNIT_MILE));
+							speedImperial = speedImperial < 0 ? 0 : speedImperial;
+						}
+
+						setSpeed(
+								equalSerieIndex,
+								speedMetric,
+								speedImperial,
+								equalSegmentTimeDiff,
+								equalSegmentDistDiff);
+					}
+				}
+			}
+
+			boolean swapIndexDirection = true;
 
 			while (timeDiff < minTimeDiff) {
 
 				// toggle between low and high index
-				if (toggleIndex) {
+				if (swapIndexDirection) {
 					highIndex++;
 				} else {
 					lowIndex--;
 				}
-				toggleIndex = !toggleIndex;
+				swapIndexDirection = !swapIndexDirection;
 
 				// check array scope
 				if (lowIndex < 0 || highIndex >= serieLength) {
@@ -2018,7 +2070,7 @@ public class TourData implements Comparable<Object> {
 			 * check if a time difference is available between 2 time data, this can happen in gps
 			 * data that lat+long is available but no time
 			 */
-			highIndex = (highIndex <= serieLengthLast) ? highIndex : serieLengthLast;
+			highIndex = (highIndex <= lastSerieIndex) ? highIndex : lastSerieIndex;
 			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
 
 			boolean isTimeValid = true;
@@ -2036,15 +2088,21 @@ public class TourData implements Comparable<Object> {
 			if (isTimeValid && serieIndex > 0 && timeDiff != 0) {
 
 				// check if a lat and long diff is available
-				if (checkPosition && lowIndex > 0 && highIndex < serieLengthLast - 1) {
+				if (isCheckPosition && lowIndex > 0 && highIndex < lastSerieIndex - 1) {
 
 					if (latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1]
 							&& longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1]) {
-						continue;
+
+						if (distDiff == 0) {
+							continue;
+						}
 					}
+
 					if (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1]
 							&& latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]) {
-						continue;
+						if (distDiff == 0) {
+							continue;
+						}
 					}
 				}
 
@@ -2059,33 +2117,8 @@ public class TourData implements Comparable<Object> {
 					speedImperial = speedImperial < 0 ? 0 : speedImperial;
 				}
 			}
-			speedSerie[serieIndex] = speedMetric;
-			speedSerieImperial[serieIndex] = speedImperial;
 
-			maxSpeed = Math.max(maxSpeed, speedMetric);
-
-			/*
-			 * pace (computed with divisor 10)
-			 */
-			float paceMetricSeconds = 0;
-			float paceImperialSeconds = 0;
-			int paceMetricMinute = 0;
-			int paceImperialMinute = 0;
-
-			if (speedMetric != 0 && distDiff != 0) {
-
-				paceMetricSeconds = timeDiff * 10000 / (float) distDiff;
-				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
-
-				paceMetricMinute = (int) ((paceMetricSeconds / 60));
-				paceImperialMinute = (int) ((paceImperialSeconds / 60));
-			}
-
-			paceSerieMinute[serieIndex] = paceMetricMinute;
-			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
-
-			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
-			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
+			setSpeed(serieIndex, speedMetric, speedImperial, timeDiff, distDiff);
 		}
 
 		maxSpeed /= 10;
@@ -3065,11 +3098,6 @@ public class TourData implements Comparable<Object> {
 		}
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
@@ -3105,6 +3133,11 @@ public class TourData implements Comparable<Object> {
 		return ignoreTimeCounter;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * @return the calories
 	 */
@@ -3124,15 +3157,6 @@ public class TourData implements Comparable<Object> {
 		return deviceModeName;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
-
 	public String getDeviceName() {
 		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
@@ -3142,6 +3166,15 @@ public class TourData implements Comparable<Object> {
 			return devicePluginName;
 		}
 	}
+
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
@@ -3640,6 +3673,14 @@ public class TourData implements Comparable<Object> {
 		return tourMarkers;
 	}
 
+	/**
+	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
+	 *         is not saved in the database
+	 */
+	public TourPerson getTourPerson() {
+		return tourPerson;
+	}
+
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3680,14 +3721,6 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
-	/**
-	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
-	 *         is not saved in the database
-	 */
-	public TourPerson getTourPerson() {
-		return tourPerson;
-	}
-
 	public int getTourRecordingTime() {
 		return tourRecordingTime;
 	}
@@ -3703,17 +3736,17 @@ public class TourData implements Comparable<Object> {
 		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
-
 	/**
 	 * @return Returns the tags {@link #tourTags} which are defined for this tour
 	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;
 	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	/**
 	 * @return the tourTitle
@@ -3971,6 +4004,41 @@ public class TourData implements Comparable<Object> {
 
 	public void setMergeTargetTourId(final Long mergeTargetTourId) {
 		this.mergeTargetTourId = mergeTargetTourId;
+	}
+
+	private void setSpeed(	final int serieIndex,
+							final int speedMetric,
+							final int speedImperial,
+							final int timeDiff,
+							final int distDiff) {
+
+		speedSerie[serieIndex] = speedMetric;
+		speedSerieImperial[serieIndex] = speedImperial;
+
+		maxSpeed = Math.max(maxSpeed, speedMetric);
+
+		/*
+		 * pace (computed with divisor 10)
+		 */
+		float paceMetricSeconds = 0;
+		float paceImperialSeconds = 0;
+		int paceMetricMinute = 0;
+		int paceImperialMinute = 0;
+
+		if (speedMetric != 0 && distDiff != 0) {
+
+			paceMetricSeconds = timeDiff * 10000 / (float) distDiff;
+			paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
+
+			paceMetricMinute = (int) ((paceMetricSeconds / 60));
+			paceImperialMinute = (int) ((paceImperialSeconds / 60));
+		}
+
+		paceSerieMinute[serieIndex] = paceMetricMinute;
+		paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
+
+		paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
+		paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 	}
 
 	public void setStartAltitude(final short startAltitude) {

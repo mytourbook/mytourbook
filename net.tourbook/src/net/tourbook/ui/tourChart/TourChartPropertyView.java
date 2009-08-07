@@ -19,13 +19,11 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -40,7 +38,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
@@ -265,31 +262,31 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 			}
 		});
 
-		/*
-		 * button: update computed values
-		 */
-		final Button btnComputValues = new Button(container, SWT.NONE);
-		btnComputValues.setText(Messages.TourChart_Property_button_compute_values);
-		btnComputValues.setToolTipText(Messages.TourChart_Property_button_compute_values_tooltip);
-		btnComputValues.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				if (MessageDialog.openConfirm(
-						Display.getCurrent().getActiveShell(),
-						Messages.TourChart_Property_dlg_compute_values_title,
-						Messages.TourChart_Property_dlg_compute_values_message)) {
-
-					TourDatabase.computeValuesForAllTours(TourChartPropertyView.this);
-
-					TourManager.getInstance().removeAllToursFromCache();
-					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
-
-					// fire unique event for all changes
-					TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, null);
-				}
-			}
-		});
+//		/*
+//		 * button: update computed values
+//		 */
+//		final Button btnComputValues = new Button(container, SWT.NONE);
+//		btnComputValues.setText(Messages.TourChart_Property_button_compute_values);
+//		btnComputValues.setToolTipText(Messages.TourChart_Property_button_compute_values_tooltip);
+//		btnComputValues.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(final SelectionEvent e) {
+//
+//				if (MessageDialog.openConfirm(
+//						Display.getCurrent().getActiveShell(),
+//						Messages.TourChart_Property_dlg_compute_values_title,
+//						Messages.TourChart_Property_dlg_compute_values_message)) {
+//
+//					TourDatabase.computeValuesForAllTours(TourChartPropertyView.this);
+//
+//					TourManager.getInstance().removeAllToursFromCache();
+//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
+//
+//					// fire unique event for all changes
+//					TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, null);
+//				}
+//			}
+//		});
 
 		/*
 		 * setup scrolled container
@@ -348,8 +345,8 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 				: ChartDataModel.CHART_TYPE_BAR;
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
 
-		TourManager.getInstance().removeAllToursFromCache();
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
+//		TourManager.getInstance().removeAllToursFromCache();
+//		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
 
 		// fire unique event for all changes
 		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);

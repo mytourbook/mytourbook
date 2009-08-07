@@ -656,6 +656,8 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_message;
 	public static String		tour_database_version_info_title;
 
+	public static String	tour_editor_csvTimeSliceExport;
+
 	public static String		tour_editor_dlg_create_tour_message;
 	public static String		tour_editor_dlg_create_tour_title;
 	public static String		tour_editor_dlg_delete_marker_message;

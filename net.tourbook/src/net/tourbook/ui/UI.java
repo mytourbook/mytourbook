@@ -94,6 +94,8 @@ public class UI {
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
 	public static final String						SLASH_WITH_SPACE				= " / ";										//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+	public static final char						TAB								= '\t';										//$NON-NLS-1$
+	public static final char						DOT								= '.';											//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
@@ -323,6 +325,26 @@ public class UI {
 		return true;
 	}
 
+	/**
+	 * @param file
+	 * @return Returns <code>true</code> when the file should be overwritten, otherwise
+	 *         <code>false</code>
+	 */
+	public static boolean confirmOverwrite(final File file) {
+
+		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		final MessageDialog dialog = new MessageDialog(shell,
+				Messages.app_dlg_confirmFileOverwrite_title,
+				null,
+				NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
+				MessageDialog.QUESTION,
+				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.CANCEL_LABEL },
+				0);
+		dialog.open();
+
+		return dialog.getReturnCode() == 0;
+	}
+
 	public static boolean confirmOverwrite(final FileCollisionBehavior fileCollision, final File file) {
 
 		final boolean[] isOverwrite = { false };
@@ -456,6 +478,12 @@ public class UI {
 		return fFormatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
 	}
 
+	/**
+	 * ignore hours when they are 0
+	 * 
+	 * @param time
+	 * @return
+	 */
 	public static String format_hh_mm_ss(final long time) {
 
 		fFormatterSB.setLength(0);
@@ -479,6 +507,24 @@ public class UI {
 					((time % 3600) / 60),
 					((time % 3600) % 60)).toString();
 		}
+	}
+
+	/**
+	 * force hours to be displayed
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static String format_hhh_mm_ss(final long time) {
+
+		fFormatterSB.setLength(0);
+		// display hours
+
+		return fFormatter.format(//
+				Messages.Format_hhmmss,
+				(time / 3600),
+				((time % 3600) / 60),
+				((time % 3600) % 60)).toString();
 	}
 
 	public static String format_mm_ss(final long time) {

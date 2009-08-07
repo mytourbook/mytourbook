@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +85,7 @@ import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -141,6 +148,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -168,16 +176,18 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider {
 
+	private static final String					CSV_FILE_EXTENSION				= "csv";
+
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
 	final IDialogSettings						fViewState						= TourbookPlugin.getDefault()
 																						.getDialogSettingsSection(ID);
 	final IDialogSettings						fViewStateSlice					= TourbookPlugin.getDefault()
 																						.getDialogSettingsSection(//
-																						ID + ".slice");					//$NON-NLS-1$
+																								ID + ".slice");			//$NON-NLS-1$
 	final IDialogSettings						fViewStateMarker				= TourbookPlugin.getDefault()
 																						.getDialogSettingsSection(//
-																						ID + ".marker");					//$NON-NLS-1$
+																								ID + ".marker");			//$NON-NLS-1$
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
@@ -189,9 +199,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
 
-	private static final String					MEMENTO_SELECTED_TAB			= "tourDataEditor.selectedTab";			//$NON-NLS-1$
-	private static final String					MEMENTO_ROW_EDIT_MODE			= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
-	private static final String					MEMENTO_IS_EDIT_MODE			= "tourDataEditor.isEditMode";				//$NON-NLS-1$
+	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";			//$NON-NLS-1$
+	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
+	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
+	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
 
 	/*
 	 * data series which are displayed in the viewer
@@ -234,6 +245,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionDeleteTimeSlicesRemoveTime	fActionDeleteTimeSlicesRemoveTime;
 	private ActionCreateTourMarker				fActionCreateTourMarker;
 	private ActionExport						fActionExportTour;
+	private ActionCSVTimeSliceExport			fActionCsvTimeSliceExport;
 
 	private ActionSetTourTag					fActionAddTag;
 	private ActionSetTourTag					fActionRemoveTag;
@@ -822,7 +834,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// check if a person is selected
 		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
 		if (activePerson == null) {
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_create_tour_title,
 					Messages.tour_editor_dlg_create_tour_message);
 			return;
@@ -873,6 +886,186 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTextTitle.setFocus();
 	}
 
+	void actionCsvTimeSliceExport() {
+
+		// get selected time slices
+		final StructuredSelection selection = (StructuredSelection) fSliceViewer.getSelection();
+		if (selection.size() == 0) {
+			return;
+		}
+
+		/*
+		 * get export filename
+		 */
+		final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+		dialog.setText(Messages.dialog_export_file_dialog_text);
+
+		dialog.setFilterPath(fViewState.get(STATE_CSV_EXPORT_PATH));
+		dialog.setFilterExtensions(new String[] { CSV_FILE_EXTENSION });
+		dialog.setFileName(UI.format_yyyymmdd_hhmmss(fTourData) + UI.DOT + CSV_FILE_EXTENSION);//$NON-NLS-1$
+
+		final String selectedFilePath = dialog.open();
+		if (selectedFilePath == null) {
+			return;
+		}
+
+		final File exportFilePath = new Path(selectedFilePath).toFile();
+
+		// keep export path
+		fViewState.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
+
+		if (exportFilePath.exists()) {
+			if (UI.confirmOverwrite(exportFilePath) == false) {
+				// don't overwrite file, nothing more to do
+				return;
+			}
+		}
+
+		/*
+		 * write time slices into csv file
+		 */
+		Writer exportWriter = null;
+		try {
+
+			exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(selectedFilePath), UI.UTF_8));
+			final StringBuilder sb = new StringBuilder();
+
+			writeCSVHeader(exportWriter, sb);
+
+			for (final Object selectedItem : selection.toArray()) {
+
+				final int serieIndex = ((TimeSlice) selectedItem).serieIndex;
+
+				// truncate buffer
+				sb.setLength(0);
+
+				// no.
+				sb.append(Integer.toString(serieIndex + 1));
+				sb.append(UI.TAB);
+
+				// time hh:mm:ss
+				if (fSerieTime != null) {
+					sb.append(UI.format_hh_mm_ss(fSerieTime[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// time in seconds
+				if (fSerieTime != null) {
+					sb.append(Integer.toString(fSerieTime[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// distance
+				if (fSerieDistance != null) {
+					fNumberFormatter.setMinimumFractionDigits(3);
+					fNumberFormatter.setMaximumFractionDigits(3);
+					sb.append(fNumberFormatter.format(((float) fSerieDistance[serieIndex])
+							/ 1000
+							/ UI.UNIT_VALUE_DISTANCE));
+				}
+				sb.append(UI.TAB);
+
+				// altitude
+				if (fSerieAltitude != null) {
+					sb.append(Integer.toString((int) (fSerieAltitude[serieIndex] / UI.UNIT_VALUE_ALTITUDE)));
+				}
+				sb.append(UI.TAB);
+
+				// gradient
+				if (fSerieGradient != null) {
+					fNumberFormatter.setMinimumFractionDigits(1);
+					fNumberFormatter.setMaximumFractionDigits(1);
+					sb.append(fNumberFormatter.format((float) fSerieGradient[serieIndex] / 10));
+				}
+				sb.append(UI.TAB);
+
+				// pulse
+				if (fSeriePulse != null) {
+					sb.append(Integer.toString(fSeriePulse[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// marker
+				final TourMarker tourMarker = fMarkerMap.get(serieIndex);
+				if (tourMarker != null) {
+					sb.append(tourMarker.getLabel());
+				}
+				sb.append(UI.TAB);
+
+				// temperature
+				if (fSerieTemperature != null) {
+
+					final int metricTemperature = fSerieTemperature[serieIndex];
+
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						// use imperial system
+						sb.append(Integer.toString((int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD)));
+					} else {
+						// use metric system
+						sb.append(Integer.toString(metricTemperature));
+					}
+				}
+				sb.append(UI.TAB);
+
+				// cadence
+				if (fSerieCadence != null) {
+					sb.append(Integer.toString(fSerieCadence[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// speed
+				if (fSerieSpeed != null) {
+					fNumberFormatter.setMinimumFractionDigits(1);
+					fNumberFormatter.setMaximumFractionDigits(1);
+					sb.append(fNumberFormatter.format((float) fSerieSpeed[serieIndex] / 10));
+				}
+				sb.append(UI.TAB);
+
+				// pace
+				if (fSeriePace != null) {
+					fNumberFormatter.setMinimumFractionDigits(1);
+					fNumberFormatter.setMaximumFractionDigits(1);
+					sb.append(UI.format_hhh_mm_ss(fSeriePace[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// power
+				if (fSeriePower != null) {
+					sb.append(Integer.toString(fSeriePower[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// longitude
+				if (fSerieLongitude != null) {
+					sb.append(Double.toString(fSerieLongitude[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// latitude
+				if (fSerieLatitude != null) {
+					sb.append(Double.toString(fSerieLatitude[serieIndex]));
+				}
+				sb.append(UI.TAB);
+
+				// end of line
+				sb.append(UI.SYSTEM_NEW_LINE);
+				exportWriter.write(sb.toString());
+			}
+
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} finally {
+
+			if (exportWriter != null) {
+				try {
+					exportWriter.close();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	/**
 	 * delete selected time slices
 	 * 
@@ -882,7 +1075,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// a tour with reference tours is currently not supported 
 		if (fIsReferenceTourAvailable) {
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_delete_rows_title,
 					Messages.tour_editor_dlg_delete_rows_message);
 			return;
@@ -928,7 +1122,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else {
 
-					MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					MessageDialog.openInformation(
+							Display.getCurrent().getActiveShell(),
 							Messages.tour_editor_dlg_delete_rows_title,
 							Messages.tour_editor_dlg_delete_rows_not_successive);
 					return;
@@ -1187,7 +1382,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (isTourValid()) {
 						updateTourDataFromUI();
 					} else {
-						MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+						MessageDialog.openInformation(
+								Display.getCurrent().getActiveShell(),
 								Messages.tour_editor_dlg_discard_tour_title,
 								Messages.tour_editor_dlg_discard_tour_message);
 						discardModifications();
@@ -1347,7 +1543,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// there is a marker within the deleted time slices
 
-				if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+				if (MessageDialog.openConfirm(
+						Display.getCurrent().getActiveShell(),
 						Messages.tour_editor_dlg_delete_marker_title,
 						Messages.tour_editor_dlg_delete_marker_message)) {
 					return true;
@@ -1424,6 +1621,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionCreateTourMarker = new ActionCreateTourMarker(this);
 		fActionDeleteTourMarker = new ActionDeleteTourMarker(this);
 		fActionExportTour = new ActionExport(this);
+		fActionCsvTimeSliceExport = new ActionCSVTimeSliceExport(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true, false);
 		fActionRemoveTag = new ActionSetTourTag(this, false, false);
@@ -1573,7 +1771,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						// wrong characters are entered, display an error message
 
-						fMessageManager.addMessage(widget.getData(WIDGET_KEY),
+						fMessageManager.addMessage(
+								widget.getData(WIDGET_KEY),
 								e.getLocalizedMessage(),
 								null,
 								IMessageProvider.ERROR,
@@ -2514,7 +2713,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void update(final ViewerCell cell) {
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				cell.setText(UI.format_hh_mm_ss(fSerieTime[serieIndex]));
+				if (fSerieTime != null) {
+					cell.setText(UI.format_hh_mm_ss(fSerieTime[serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
 			}
 		});
 
@@ -2978,19 +3181,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionExportTour);
+		menuMgr.add(fActionCsvTimeSliceExport);
 
 		/*
 		 * enable actions
 		 */
 		final StructuredSelection sliceSelection = (StructuredSelection) fSliceViewer.getSelection();
 
-		final boolean isOneTimeSlice = sliceSelection.size() == 1;
+		final boolean isOneSliceSelected = sliceSelection.size() == 1;
 		final boolean isSliceSelected = sliceSelection.size() > 0;
 		final boolean isTourInDb = isTourInDb();
 
 		// check if a marker can be created
 		boolean canCreateMarker = false;
-		if (isOneTimeSlice) {
+		if (isOneSliceSelected) {
 			final TimeSlice timeSlice = (TimeSlice) sliceSelection.getFirstElement();
 			canCreateMarker = fMarkerMap.containsKey(timeSlice.serieIndex) == false;
 		}
@@ -3004,7 +3208,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		fActionCreateTourMarker.setEnabled(fIsEditMode && isTourInDb && isOneTimeSlice && canCreateMarker);
+		fActionCreateTourMarker.setEnabled(fIsEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
 		fActionOpenMarkerDialog.setEnabled(fIsEditMode && isTourInDb);
 
 		// select marker
@@ -3014,6 +3218,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionDeleteTimeSlicesKeepTime.setEnabled(fIsEditMode && isTourInDb && isSliceSelected);
 
 		fActionExportTour.setEnabled(true);
+		fActionCsvTimeSliceExport.setEnabled(isSliceSelected);
 
 		// set start/end position in export action
 		if (isSliceSelected) {
@@ -3493,8 +3698,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean isRowSelectionMode() {
 
 		if (fIsRowEditMode == false) {
-			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display.getCurrent()
-					.getActiveShell(),
+			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_delete_rows_title,
 					Messages.tour_editor_dlg_delete_rows_mode_message,
 					Messages.tour_editor_dlg_delete_rows_mode_toggle_message,
@@ -3681,7 +3886,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// tour is modified but not yet saved in the database
 
-				fMessageManager.addMessage(WIDGET_KEY_PERSON,
+				fMessageManager.addMessage(
+						WIDGET_KEY_PERSON,
 						Messages.tour_editor_message_person_is_required,
 						null,
 						IMessageProvider.ERROR,
@@ -3809,10 +4015,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					fPageEditorForm.setText(UI.EMPTY_STRING);
 
 					// show info
-					fMessageManager.addMessage(MESSAGE_KEY_ANOTHER_SELECTION,
-							NLS.bind(Messages.tour_editor_message_show_another_tour, getTourTitle()),
-							null,
-							IMessageProvider.WARNING);
+					fMessageManager.addMessage(MESSAGE_KEY_ANOTHER_SELECTION, NLS.bind(
+							Messages.tour_editor_message_show_another_tour,
+							getTourTitle()), null, IMessageProvider.WARNING);
 
 					fIsInfoInTitle = true;
 				}
@@ -4052,7 +4257,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// tour is not saved, reloading tour data is not possible
 
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_reload_data_title,
 					Messages.tour_editor_dlg_reload_data_message);
 
@@ -4231,15 +4437,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void restoreStateBeforeUI() {
 
-		fIsRowEditMode = fViewState.getBoolean(MEMENTO_ROW_EDIT_MODE);
-		fIsEditMode = fViewState.getBoolean(MEMENTO_IS_EDIT_MODE);
+		fIsRowEditMode = fViewState.getBoolean(STATE_ROW_EDIT_MODE);
+		fIsEditMode = fViewState.getBoolean(STATE_IS_EDIT_MODE);
 	}
 
 	private void restoreStateWithUI() {
 
 		// select tab
 		try {
-			fTabFolder.setSelection(fViewState.getInt(MEMENTO_SELECTED_TAB));
+			fTabFolder.setSelection(fViewState.getInt(STATE_SELECTED_TAB));
 		} catch (final NumberFormatException e) {
 			fTabFolder.setSelection(fTabTour);
 		}
@@ -4251,11 +4457,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void saveState() {
 
 		// selected tab
-		fViewState.put(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
+		fViewState.put(STATE_SELECTED_TAB, fTabFolder.getSelectionIndex());
 
 		// row/column edit mode
-		fViewState.put(MEMENTO_IS_EDIT_MODE, fActionToggleReadEditMode.isChecked());
-		fViewState.put(MEMENTO_ROW_EDIT_MODE, fActionToggleRowSelectMode.isChecked());
+		fViewState.put(STATE_IS_EDIT_MODE, fActionToggleReadEditMode.isChecked());
+		fViewState.put(STATE_ROW_EDIT_MODE, fActionToggleRowSelectMode.isChecked());
 
 		// viewer state
 		fSliceColumnManager.saveState(fViewStateSlice);
@@ -5008,7 +5214,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateUITitle() {
 
-		updateUITitle(fDtTourDate.getYear(),
+		updateUITitle(
+				fDtTourDate.getYear(),
 				fDtTourDate.getMonth(),
 				fDtTourDate.getDay(),
 				fDtStartTime.getHours(),
@@ -5065,6 +5272,73 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				fPageEditorForm.setText(title);
 			}
 		});
+	}
+
+	private void writeCSVHeader(final Writer exportWriter, final StringBuilder sb) throws IOException {
+		
+		// no.
+		sb.append("#");
+		sb.append(UI.TAB);
+
+		// time hh:mm:ss
+		sb.append("hh:mm:ss");
+		sb.append(UI.TAB);
+
+		// time in seconds
+		sb.append("sec");
+		sb.append(UI.TAB);
+
+		// distance
+		sb.append(UI.UNIT_LABEL_DISTANCE);
+		sb.append(UI.TAB);
+
+		// altitude
+		sb.append(UI.UNIT_LABEL_ALTITUDE);
+		sb.append(UI.TAB);
+
+		// gradient
+		sb.append("%");
+		sb.append(UI.TAB);
+
+		// pulse
+		sb.append("bpm");
+		sb.append(UI.TAB);
+
+		// marker
+		sb.append("marker");
+		sb.append(UI.TAB);
+
+		// temperature
+		sb.append(UI.UNIT_LABEL_TEMPERATURE);
+		sb.append(UI.TAB);
+
+		// cadence
+		sb.append("rpm");
+		sb.append(UI.TAB);
+
+		// speed
+		sb.append(UI.UNIT_LABEL_SPEED);
+		sb.append(UI.TAB);
+
+		// pace
+		sb.append(UI.UNIT_LABEL_PACE);
+		sb.append(UI.TAB);
+
+		// power
+		sb.append("W");
+		sb.append(UI.TAB);
+
+		// longitude
+		sb.append("longitude");
+		sb.append(UI.TAB);
+
+		// latitude
+		sb.append("latitude");
+		sb.append(UI.TAB);
+
+		// end of line
+		sb.append(UI.SYSTEM_NEW_LINE);
+		exportWriter.write(sb.toString());
 	}
 
 }
