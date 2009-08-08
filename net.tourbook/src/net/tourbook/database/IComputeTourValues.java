@@ -23,9 +23,22 @@ import net.tourbook.data.TourData;
 public interface IComputeTourValues {
 
 	/**
-	 * @param tourData
+	 * @param oldTourData
 	 * @return Returns <code>true</code> when {@link TourData} was modified and the tour needs to be
 	 *         saved
 	 */
-	public boolean computeTourValues(TourData tourData);
+	public boolean computeTourValues(TourData oldTourData);
+
+	/**
+	 * @return Returns the text which is displayed at the end of the task to the user to show the
+	 *         result of the computation
+	 */
+	public String getResultText();
+
+	/**
+	 * @param savedTourData
+	 * @return Returns the text which should be displayed in the progress bar when one tour was
+	 *         computed
+	 */
+	public String getSubTaskText(TourData savedTourData);
 }

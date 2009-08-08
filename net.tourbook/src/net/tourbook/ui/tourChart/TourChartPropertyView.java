@@ -17,12 +17,11 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.data.TourData;
-import net.tourbook.database.IComputeTourValues;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,40 +41,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourChartPropertyView extends ViewPart implements IComputeTourValues {
+public class TourChartPropertyView extends ViewPart /* implements IComputeTourValues */{
 
 	public static final String	ID	= "net.tourbook.views.TourChartPropertyView";	//$NON-NLS-1$
-
-	private Spinner				fSpinnerComputeValues;
-	private Spinner				fSpinnerClipValues;
 
 	private Button				fRadioLineChartType;
 	private Button				fRadioBarChartType;
 
-	private Button				fChkUseCustomComputeSettings;
 	private Button				fChkUseCustomClipSettings;
+	private Spinner				fSpinnerClipValues;
 
 	private Button				fChkUseCustomPaceClipping;
 	private Spinner				fSpinnerPaceClipping;
 
-	private void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
-
-		// accelerate with Ctrl + Shift key
-		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
-
-		final Spinner spinner = (Spinner) event.widget;
-		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
-
-		spinner.setSelection(spinner.getSelection() + newValue);
-	}
-
-	public boolean computeTourValues(final TourData tourData) {
-
-		tourData.computeComputedValues();
-
-		return true;
-	}
+//
+//	public boolean computeTourValues(final TourData tourData) {
+//
+//		tourData.computeComputedValues();
+//
+//		return true;
+//	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -139,43 +124,6 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 		final Composite containerCustomizeValues = new Composite(container, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(0, 0).applyTo(containerCustomizeValues);
 
-		// check: use custom settings to compute values
-		fChkUseCustomComputeSettings = new Button(containerCustomizeValues, SWT.CHECK);
-		fChkUseCustomComputeSettings.setText(Messages.TourChart_Property_check_customize_value_computing);
-		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
-		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				onChangeProperty();
-			}
-		});
-
-		/*
-		 * computed value time slice
-		 */
-		label = new Label(containerCustomizeValues, SWT.NONE);
-		label.setText(Messages.TourChart_Property_label_time_slices);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		label.setLayoutData(gd);
-
-		fSpinnerComputeValues = new Spinner(containerCustomizeValues, SWT.HORIZONTAL | SWT.BORDER);
-		fSpinnerComputeValues.setMaximum(1000);
-
-		fSpinnerComputeValues.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeProperty();
-			}
-		});
-
-		fSpinnerComputeValues.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				adjustSpinnerValueOnMouseScroll(event);
-				onChangeProperty();
-			}
-		});
-
 		/*
 		 * value clipping
 		 */
@@ -214,7 +162,7 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 
 		fSpinnerClipValues.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
-				adjustSpinnerValueOnMouseScroll(event);
+				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
 		});
@@ -257,36 +205,10 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 
 		fSpinnerPaceClipping.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
-				adjustSpinnerValueOnMouseScroll(event);
+				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
 		});
-
-//		/*
-//		 * button: update computed values
-//		 */
-//		final Button btnComputValues = new Button(container, SWT.NONE);
-//		btnComputValues.setText(Messages.TourChart_Property_button_compute_values);
-//		btnComputValues.setToolTipText(Messages.TourChart_Property_button_compute_values_tooltip);
-//		btnComputValues.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//
-//				if (MessageDialog.openConfirm(
-//						Display.getCurrent().getActiveShell(),
-//						Messages.TourChart_Property_dlg_compute_values_title,
-//						Messages.TourChart_Property_dlg_compute_values_message)) {
-//
-//					TourDatabase.computeValuesForAllTours(TourChartPropertyView.this);
-//
-//					TourManager.getInstance().removeAllToursFromCache();
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
-//
-//					// fire unique event for all changes
-//					TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, null);
-//				}
-//			}
-//		});
 
 		/*
 		 * setup scrolled container
@@ -303,7 +225,6 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 
 	private void enableControls() {
 
-		fSpinnerComputeValues.setEnabled(fChkUseCustomComputeSettings.getSelection());
 		fSpinnerClipValues.setEnabled(fChkUseCustomClipSettings.getSelection());
 		fSpinnerPaceClipping.setEnabled(fChkUseCustomPaceClipping.getSelection());
 	}
@@ -318,14 +239,6 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// set new values in the pref store
-
-		// checkbox: use custom settings to compute values
-		store.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING,
-				fChkUseCustomComputeSettings.getSelection());
-
-		// spinner: compute value time slice
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE, fSpinnerComputeValues.getSelection());
 
 		// checkbox: clip values
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING, fChkUseCustomClipSettings.getSelection());
@@ -357,9 +270,6 @@ public class TourChartPropertyView extends ViewPart implements IComputeTourValue
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// get values from pref store
-
-		fChkUseCustomComputeSettings.setSelection(store.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING));
-		fSpinnerComputeValues.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE));
 
 		fChkUseCustomClipSettings.setSelection(store.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING));
 		fSpinnerClipValues.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE));

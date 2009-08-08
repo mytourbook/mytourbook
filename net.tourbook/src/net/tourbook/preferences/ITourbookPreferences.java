@@ -91,10 +91,9 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	APP_DATA_FILTER_IS_MODIFIED					= "application.data-filter-is-modified";					//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
+	public static final String	APP_DATA_SPEED_MIN_TIMESLICE_VALUE			= "application.data-speed-min-timeslice-value";			//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_VALUE_COMPUTING			= "graph.property.is.value_computing";						//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE		= "graph.property.timeslice.value_computing";				//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_CHARTTYPE					= "graph.property.chartType";								//$NON-NLS-1$
 
 	public static final String	GRAPH_PROPERTY_IS_VALUE_CLIPPING			= "graph.property.is.value_clipping";						//$NON-NLS-1$
 	public static final String	GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE		= "graph.property.timeslice.value_clipping";				//$NON-NLS-1$

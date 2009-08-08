@@ -153,6 +153,8 @@ public class Messages extends NLS {
 
 	public static String		app_unit_minutes;
 
+	public static String	app_unit_seconds;
+
 	public static String		App_Action_set_tour_type;
 
 	public static String		App_measurement_imperial;
@@ -195,9 +197,27 @@ public class Messages extends NLS {
 	public static String		compute_tourValueElevation_group_computeTourAltitude;
 	public static String		compute_tourValueElevation_label_description;
 	public static String		compute_tourValueElevation_label_minAltiDifference;
+
+	public static String	compute_tourValueElevation_resultText;
+
+	public static String	compute_tourValueElevation_subTaskText;
+	public static String	compute_tourValues_dlg_computeSpeedValues_message;
+
+	public static String	compute_tourValues_dlg_computeSpeedValues_title;
+
 	public static String		compute_tourValues_dlg_computeValues_message;
 	public static String		compute_tourValues_dlg_computeValues_title;
 	public static String		compute_tourValues_label_description;
+
+	public static String	compute_tourValueSpeed_button_computeValues;
+
+	public static String	compute_tourValueSpeed_button_computeValues_tooltip;
+
+	public static String	compute_tourValueSpeed_group_speed;
+
+	public static String	compute_tourValueSpeed_label_description;
+
+	public static String	compute_tourValueSpeed_label_minDistanceDifference;
 
 	public static String		compute_tourValueWeek_button_computeWeekValues;
 	public static String		compute_tourValueWeek_button_computeWeekValues_tooltip;
@@ -843,6 +863,12 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 
 	public static String		ui_tour_not_defined;
+
+	public static String		compute_tourValueSpeed_label_minTimeDifference;
+
+	public static String	compute_tourValueSpeed_resultText;
+
+	public static String	compute_tourValueSpeed_subTaskText;
 
 	static {
 		// initialize resource bundle

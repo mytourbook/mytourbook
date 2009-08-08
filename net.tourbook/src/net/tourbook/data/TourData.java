@@ -96,6 +96,10 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
 
+	@Transient
+	private static IPreferenceStore		fPrefStore						= TourbookPlugin.getDefault()
+																				.getPreferenceStore();
+
 	/**
 	 * entity id which identifies the tour
 	 */
@@ -251,10 +255,9 @@ public class TourData implements Comparable<Object> {
 	private float						maxSpeed;																	// db-version 4
 
 	private int							avgPulse;																	// db-version 4
-
 	private int							avgCadence;																// db-version 4
-
 	private int							avgTemperature;															// db-version 4
+
 	private String						tourTitle;																	// db-version 4
 	private String						tourDescription;															// db-version 4
 
@@ -882,60 +885,42 @@ public class TourData implements Comparable<Object> {
 		int adjustIndexLow;
 		int adjustmentIndexHigh;
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
-
-			// use custom settings to compute altimeter and gradient
-
-			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
-			final int slices = computeTimeSlice / deviceTimeInterval;
-
-			final int slice2 = slices / 2;
-			adjustmentIndexHigh = (1 >= slice2) ? 1 : slice2;
-			adjustIndexLow = slice2;
-
-			// round up
-			if (adjustIndexLow + adjustmentIndexHigh < slices) {
-				adjustmentIndexHigh++;
-			}
-
-		} else {
-
-			// use internal algorithm to compute altimeter and gradient
-
-//			if (deviceTimeInterval <= 2) {
-//				adjustIndexLow = 15;
-//				adjustmentIndexHigh = 15;
-//				
-//			} else if (deviceTimeInterval <= 5) {
-//				adjustIndexLow = 5;
-//				adjustmentIndexHigh = 6;
-//				
-//			} else if (deviceTimeInterval <= 10) {
-//				adjustIndexLow = 2;
-//				adjustmentIndexHigh = 3;
-//			} else {
-//				adjustIndexLow = 1;
-//				adjustmentIndexHigh = 2;
+//		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
+//
+//			// use custom settings to compute altimeter and gradient
+//
+//			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+//			final int slices = computeTimeSlice / deviceTimeInterval;
+//
+//			final int slice2 = slices / 2;
+//			adjustmentIndexHigh = (1 >= slice2) ? 1 : slice2;
+//			adjustIndexLow = slice2;
+//
+//			// round up
+//			if (adjustIndexLow + adjustmentIndexHigh < slices) {
+//				adjustmentIndexHigh++;
 //			}
+//
+//		} else {
 
-			if (deviceTimeInterval <= 2) {
-				adjustIndexLow = 15;
-				adjustmentIndexHigh = 15;
+		// use internal algorithm to compute altimeter and gradient
 
-			} else if (deviceTimeInterval <= 5) {
-				adjustIndexLow = 4;
-				adjustmentIndexHigh = 4;
+		if (deviceTimeInterval <= 2) {
+			adjustIndexLow = 15;
+			adjustmentIndexHigh = 15;
 
-			} else if (deviceTimeInterval <= 10) {
-				adjustIndexLow = 2;
-				adjustmentIndexHigh = 3;
-			} else {
-				adjustIndexLow = 1;
-				adjustmentIndexHigh = 2;
-			}
+		} else if (deviceTimeInterval <= 5) {
+			adjustIndexLow = 4;
+			adjustmentIndexHigh = 4;
+
+		} else if (deviceTimeInterval <= 10) {
+			adjustIndexLow = 2;
+			adjustmentIndexHigh = 3;
+		} else {
+			adjustIndexLow = 1;
+			adjustmentIndexHigh = 2;
 		}
+//		}
 
 		/*
 		 * compute values
@@ -1001,18 +986,17 @@ public class TourData implements Comparable<Object> {
 		final int dataSerieAltimeter[] = new int[serieLength];
 		final int dataSerieGradient[] = new int[serieLength];
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final boolean isCustomProperty = prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING);
+		// get minimum time/distance differences
+		final int minTimeDiff = fPrefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
-		// get minimum difference
-		int minTimeDiff;
-		if (isCustomProperty) {
-			// use custom settings to compute altimeter and gradient
-			minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
-		} else {
-			// use internal algorithm to compute altimeter and gradient
-			minTimeDiff = 16;
-		}
+//		if (isCustomProperty) {
+//			// use custom settings to compute altimeter and gradient
+//			minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+//		} else {
+//			// use internal algorithm to compute altimeter and gradient
+//			minTimeDiff = 16;
+//		}
+
 		final int minDistanceDiff = minTimeDiff;
 
 		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
@@ -1102,7 +1086,7 @@ public class TourData implements Comparable<Object> {
 
 			if (isTimeValid) {
 
-				if (timeDiff > 50 && isCustomProperty == false) {
+				if (timeDiff > 50 /* && isCustomProperty == false */) {
 //					dataSerieAltimeter[serieIndex] = 300;
 					continue;
 				}
@@ -1650,125 +1634,12 @@ public class TourData implements Comparable<Object> {
 
 			// speed is computed from distance and time
 
-			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
-
-				// compute speed for custom settings
-
-				if (deviceTimeInterval == -1) {
-					computeSpeedSerieInternalWithVariableInterval();
-				} else {
-					computeSpeedSerieCustomWithFixedInterval();
-				}
+			if (deviceTimeInterval == -1) {
+				computeSpeedSerieInternalWithVariableInterval();
 			} else {
-
-				// compute speed with internal algorithm
-
-				if (deviceTimeInterval == -1) {
-					computeSpeedSerieInternalWithVariableInterval();
-				} else {
-					computeSpeedSerieInternalWithFixedInterval();
-				}
+				computeSpeedSerieInternalWithFixedInterval();
 			}
 		}
-	}
-
-	private void computeSpeedSerieCustomWithFixedInterval() {
-
-		if (distanceSerie == null) {
-			return;
-		}
-
-		final int serieLength = timeSerie.length;
-
-		speedSerie = new int[serieLength];
-		speedSerieImperial = new int[serieLength];
-
-		paceSerieMinute = new int[serieLength];
-		paceSerieSeconds = new int[serieLength];
-		paceSerieMinuteImperial = new int[serieLength];
-		paceSerieSecondsImperial = new int[serieLength];
-
-		int lowIndexAdjustment = 0;
-		int highIndexAdjustment = 1;
-
-		final int speedTimeSlice = TourbookPlugin.getDefault().getPreferenceStore().getInt(
-				ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
-
-		final int slices = speedTimeSlice / deviceTimeInterval;
-
-		final int slice2 = slices / 2;
-		highIndexAdjustment = (1 >= slice2) ? 1 : slice2;
-		lowIndexAdjustment = slice2;
-
-		// round up
-		if (lowIndexAdjustment + highIndexAdjustment < slices) {
-			highIndexAdjustment++;
-		}
-
-		final int serieLengthLast = serieLength - 1;
-
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			// adjust index to the array size, this is optimized to NOT use Math functions
-			final int serieIndexLow = serieIndex - lowIndexAdjustment;
-			final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
-			final int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
-
-			final int serieIndexHigh = serieIndex + highIndexAdjustment;
-			final int serieIndexHighMin = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
-			final int distIndexHigh = ((0 >= serieIndexHighMin) ? 0 : serieIndexHighMin);
-
-			final int distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
-			final float timeDiff = deviceTimeInterval * (distIndexHigh - distIndexLow);
-
-			/*
-			 * speed
-			 */
-			int speedMetric = 0;
-			int speedImperial = 0;
-			if (timeDiff != 0) {
-				final float speed = (distDiff * 36F) / timeDiff;
-				speedMetric = (int) (speed);
-				speedImperial = (int) (speed / UI.UNIT_MILE);
-			}
-
-			speedSerie[serieIndex] = speedMetric;
-			speedSerieImperial[serieIndex] = speedImperial;
-
-			maxSpeed = Math.max(maxSpeed, speedMetric);
-
-			/*
-			 * pace (computed with divisor 10)
-			 */
-			float paceMetricSeconds = 0;
-			float paceImperialSeconds = 0;
-			int paceMetricMinute = 0;
-			int paceImperialMinute = 0;
-
-			if (speedMetric != 0 && distDiff != 0) {
-
-//				final float pace = timeDiff * 166.66f / distDiff;
-//				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
-
-//				paceMetricSeconds = 10* timeDiff * 1000 / (float) distDiff;
-				paceMetricSeconds = timeDiff * 10000 / distDiff;
-				paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
-
-//				paceMetricMinute = (int) ((paceMetricSeconds / 60));
-				paceMetricMinute = (int) ((paceMetricSeconds / 60));
-				paceImperialMinute = (int) ((paceImperialSeconds / 60));
-			}
-
-			paceSerieMinute[serieIndex] = paceMetricMinute;
-			paceSerieMinuteImperial[serieIndex] = paceImperialMinute;
-
-			paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
-			paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
-		}
-
-		maxSpeed /= 10;
 	}
 
 	/**
@@ -1947,12 +1818,7 @@ public class TourData implements Comparable<Object> {
 		int minTimeDiff;
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
-			minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
-			minTimeDiff = minTimeDiff < 1 ? 1 : minTimeDiff;
-		} else {
-			minTimeDiff = 10;
-		}
+		minTimeDiff = prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
 		final int serieLength = timeSerie.length;
 		final int lastSerieIndex = serieLength - 1;
@@ -2006,35 +1872,42 @@ public class TourData implements Comparable<Object> {
 
 					final int equalTimeDiff = timeSerie[serieIndex] - timeSerie[equalStartIndex];
 					final int equalDistDiff = distanceSerie[serieIndex] - distanceSerie[equalStartIndex];
+
 					int speedMetric = 0;
 					int speedImperial = 0;
 
-					for (int equalSerieIndex = equalStartIndex + 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
+					if (equalTimeDiff > 20 && equalDistDiff < 10) {
+						// speed must be greater than 1.8 km/h
+					} else {
 
-						final int equalSegmentTimeDiff = timeSerie[equalSerieIndex] - timeSerie[equalSerieIndex - 1];
+						for (int equalSerieIndex = equalStartIndex + 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
 
-						final int equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
-								(int) (((float) equalSegmentTimeDiff / equalTimeDiff) * equalDistDiff);
+							final int equalSegmentTimeDiff = timeSerie[equalSerieIndex]
+									- timeSerie[equalSerieIndex - 1];
 
-						distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
+							final int equalSegmentDistDiff = equalTimeDiff == 0 ? 0 : //
+									(int) (((float) equalSegmentTimeDiff / equalTimeDiff) * equalDistDiff);
 
-						// compute speed for this segment
-						if (equalSegmentTimeDiff == 0 || equalSegmentDistDiff == 0) {
-							speedMetric = 0;
-						} else {
-							speedMetric = (int) ((equalSegmentDistDiff * 36f) / equalSegmentTimeDiff);
-							speedMetric = speedMetric < 0 ? 0 : speedMetric;
+							distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
 
-							speedImperial = (int) ((equalSegmentDistDiff * 36f) / (equalSegmentTimeDiff * UI.UNIT_MILE));
-							speedImperial = speedImperial < 0 ? 0 : speedImperial;
+							// compute speed for this segment
+							if (equalSegmentTimeDiff == 0 || equalSegmentDistDiff == 0) {
+								speedMetric = 0;
+							} else {
+								speedMetric = (int) ((equalSegmentDistDiff * 36f) / equalSegmentTimeDiff);
+								speedMetric = speedMetric < 0 ? 0 : speedMetric;
+
+								speedImperial = (int) ((equalSegmentDistDiff * 36f) / (equalSegmentTimeDiff * UI.UNIT_MILE));
+								speedImperial = speedImperial < 0 ? 0 : speedImperial;
+							}
+
+							setSpeed(
+									equalSerieIndex,
+									speedMetric,
+									speedImperial,
+									equalSegmentTimeDiff,
+									equalSegmentDistDiff);
 						}
-
-						setSpeed(
-								equalSerieIndex,
-								speedMetric,
-								speedImperial,
-								equalSegmentTimeDiff,
-								equalSegmentDistDiff);
 					}
 				}
 			}

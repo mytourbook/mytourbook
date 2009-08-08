@@ -55,6 +55,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -70,6 +71,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
@@ -235,6 +237,18 @@ public class UI {
 		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
+	}
+
+	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
+		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+
+		final Spinner spinner = (Spinner) event.widget;
+		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
+
+		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
 	/**

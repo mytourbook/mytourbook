@@ -395,7 +395,9 @@ public class Chart extends ViewForm {
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			// create menu for bar charts
+			/*
+			 * create menu for bar charts
+			 */
 
 			// get the context provider from the data model
 			final IChartContextProvider barChartContextProvider = (IChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
@@ -406,7 +408,9 @@ public class Chart extends ViewForm {
 
 		} else {
 
-			// create menu for line charts
+			/*
+			 * create menu for line charts
+			 */
 
 			// set text for mouse wheel mode
 			final Action actionMouseMode = fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction();
@@ -427,9 +431,9 @@ public class Chart extends ViewForm {
 
 			menuMgr.add(new Separator());
 			menuMgr.add(actionMouseMode);
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
 		}
 

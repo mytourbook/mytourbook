@@ -222,5 +222,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(
 				PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE,
 				PrefPageComputedValues.DEFAULT_MIN_ALTITUDE);
+
+		// speed minimum time slice value in seconds
+		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
 	}
 }

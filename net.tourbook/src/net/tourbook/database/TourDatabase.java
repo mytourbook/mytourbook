@@ -48,7 +48,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -198,6 +197,26 @@ public class TourDatabase {
 		UI.getInstance().setTourTypeImagesDirty();
 	}
 
+	private static void computeComputedValuesForAllTours(final IProgressMonitor monitor) {
+
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		// loop: all tours, compute computed fields and save the tour
+		int tourCounter = 1;
+		for (final Long tourId : tourList) {
+
+			monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
+					new Object[] { tourCounter++, tourList.size() }));
+
+			final TourData tourData = getTourFromDb(tourId);
+			if (tourData != null) {
+
+				tourData.computeComputedValues();
+				saveTour(tourData);
+			}
+		}
+	}
+
 	/**
 	 * @param {@link IComputeTourValues} interface to compute values for one tour
 	 */
@@ -210,7 +229,6 @@ public class TourDatabase {
 		nf.setMaximumFractionDigits(0);
 
 		final int[] tourCounter = new int[] { 0 };
-		final int[] elevation = new int[] { 0, 0 };
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -222,27 +240,27 @@ public class TourDatabase {
 				// loop over all tours and calculate and set new columns
 				for (final Long tourId : tourList) {
 
-					monitor.subTask(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
-							new Object[] { tourCounter[0]++, //
-									tourList.size(),
-									nf.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-									UI.UNIT_LABEL_ALTITUDE,//
-							}));
+					final TourData oldTourData = getTourFromDb(tourId);
+					TourData savedTourData = null;
 
-					final TourData tourData = getTourFromDb(tourId);
-					if (tourData != null) {
-
-						// get old value
-						elevation[0] += tourData.getTourAltUp();
-
-						if (runner.computeTourValues(tourData)) {
-
-							final TourData savedTourData = saveTour(tourData);
-
-							// get new value
-							elevation[1] += savedTourData.getTourAltUp();
+					if (oldTourData != null) {
+						if (runner.computeTourValues(oldTourData)) {
+							savedTourData = saveTour(oldTourData);
 						}
 					}
+
+					// create sub task text
+					final StringBuilder sb = new StringBuilder();
+					sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
+							new Object[] { tourCounter[0]++, tourList.size(), }));
+
+					final String runnerSubTaskText = runner.getSubTaskText(savedTourData);
+					if (runnerSubTaskText != null) {
+						sb.append(UI.DASH_WITH_SPACE);
+						sb.append(runnerSubTaskText);
+					}
+
+					monitor.subTask(sb.toString());
 
 					monitor.worked(1);
 
@@ -269,41 +287,24 @@ public class TourDatabase {
 			e.printStackTrace();
 		} finally {
 
-			final int prefMinAltitude = TourbookPlugin.getDefault()//
-					.getPreferenceStore()
-					.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+			// create result text
+			final StringBuilder sb = new StringBuilder();
+			{
+				sb.append(NLS.bind(
+						Messages.tour_database_computeComputedValues_resultMessage,
+						Integer.toString(tourCounter[0])));
 
-			MessageDialog.openInformation(shell, Messages.tour_database_computeComputedValues_resultTitle, NLS.bind(
-					Messages.tour_database_computeComputedValues_resultMessage,
-					new Object[] {
-							Integer.toString(tourCounter[0]),
-							prefMinAltitude,
-							UI.UNIT_LABEL_ALTITUDE,
-							nf.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-							UI.UNIT_LABEL_ALTITUDE,
-					//
-					} //
-			));
-		}
-	}
-
-	private static void computeComputedValuesForAllTours(final IProgressMonitor monitor) {
-
-		final ArrayList<Long> tourList = getAllTourIds();
-
-		// loop: all tours, compute computed fields and save the tour
-		int tourCounter = 1;
-		for (final Long tourId : tourList) {
-
-			monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
-					new Object[] { tourCounter++, tourList.size() }));
-
-			final TourData tourData = getTourFromDb(tourId);
-			if (tourData != null) {
-
-				tourData.computeComputedValues();
-				saveTour(tourData);
+				final String runnerResultText = runner.getResultText();
+				if (runnerResultText != null) {
+					sb.append(UI.NEW_LINE2);
+					sb.append(runnerResultText);
+				}
 			}
+
+			MessageDialog.openInformation(
+					shell,
+					Messages.tour_database_computeComputedValues_resultTitle,
+					sb.toString());
 		}
 	}
 
