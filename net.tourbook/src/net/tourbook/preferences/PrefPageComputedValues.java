@@ -204,7 +204,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		{
 			// label: min alti diff
 			Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.compute_tourValueSpeed_label_minTimeDifference);
+			label.setText(Messages.compute_tourValueSpeed_label_speedTimeSlice);
 
 			// combo: min altitude
 			fSpinnerMinTime = new Spinner(container, SWT.BORDER);
@@ -291,9 +291,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	@Override
 	public boolean okToLeave() {
-
 		saveUIState();
-
 		return super.okToLeave();
 	}
 
@@ -317,9 +315,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
-				Messages.compute_tourValues_dlg_computeValues_title,
+				Messages.compute_tourValueElevation_dlg_computeValues_title,
 				NLS.bind(
-						Messages.compute_tourValues_dlg_computeValues_message,
+						Messages.compute_tourValueElevation_dlg_computeValues_message,
 						Integer.toString((int) (altiMin / UI.UNIT_VALUE_ALTITUDE)),
 						UI.UNIT_LABEL_ALTITUDE))) {
 
@@ -378,55 +376,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		}
 	}
 
-//	private void onComputeWeekValues() {
-//
-//		if (MessageDialog.openConfirm(
-//				Display.getCurrent().getActiveShell(),
-//				Messages.compute_tourValueWeek_dlg_title,
-//				Messages.compute_tourValueWeek_dlg_message)) {
-//
-//			saveState();
-//
-//			TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
-//
-//				public boolean computeTourValues(final TourData tourData) {
-//
-//					final DateTime dtTour = new DateTime(tourData.getStartYear(),
-//							tourData.getStartMonth(),
-//							tourData.getStartDay(),
-//							tourData.getStartHour(),
-//							tourData.getStartMinute(),
-//							tourData.getStartSecond(),
-//							0);
-//
-//					tourData.setStartWeek((short) dtTour.getWeekOfWeekyear());
-////					dtTour.getWeekyear()
-//
-//					return true;
-//				}
-//
-//				public String getResultText() {
-//					// TODO Auto-generated method stub
-//					return null;
-//				}
-//
-//				public String getSubTaskText(final TourData oldTourData, final TourData savedTourData) {
-//					// TODO Auto-generated method stub
-//					return null;
-//				}
-//			});
-//
-//			fireModifyEvent();
-//		}
-//	}
-
 	private void onComputeSpeedValues() {
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
-				Messages.compute_tourValues_dlg_computeSpeedValues_title,
+				Messages.compute_tourValueSpeed_dlg_computeValues_title,
 				NLS.bind(
-						Messages.compute_tourValues_dlg_computeSpeedValues_message,
+						Messages.compute_tourValueSpeed_dlg_computeValues_message,
 						fSpinnerMinTime.getSelection(),
 						Messages.app_unit_seconds//
 				))) {
@@ -481,6 +437,54 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			fireModifyEvent();
 		}
+	}
+
+//	private void onComputeWeekValues() {
+//
+//		if (MessageDialog.openConfirm(
+//				Display.getCurrent().getActiveShell(),
+//				Messages.compute_tourValueWeek_dlg_title,
+//				Messages.compute_tourValueWeek_dlg_message)) {
+//
+//			saveState();
+//
+//			TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+//
+//				public boolean computeTourValues(final TourData tourData) {
+//
+//					final DateTime dtTour = new DateTime(tourData.getStartYear(),
+//							tourData.getStartMonth(),
+//							tourData.getStartDay(),
+//							tourData.getStartHour(),
+//							tourData.getStartMinute(),
+//							tourData.getStartSecond(),
+//							0);
+//
+//					tourData.setStartWeek((short) dtTour.getWeekOfWeekyear());
+////					dtTour.getWeekyear()
+//
+//					return true;
+//				}
+//
+//				public String getResultText() {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//
+//				public String getSubTaskText(final TourData oldTourData, final TourData savedTourData) {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//			});
+//
+//			fireModifyEvent();
+//		}
+//	}
+
+	@Override
+	public boolean performCancel() {
+		saveUIState();
+		return super.performCancel();
 	}
 
 	@Override

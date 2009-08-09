@@ -153,7 +153,7 @@ public class Messages extends NLS {
 
 	public static String		app_unit_minutes;
 
-	public static String	app_unit_seconds;
+	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
 
@@ -194,35 +194,26 @@ public class Messages extends NLS {
 
 	public static String		compute_tourValueElevation_button_computeValues;
 	public static String		compute_tourValueElevation_button_computeValues_tooltip;
+	public static String		compute_tourValueElevation_dlg_computeValues_message;
+	public static String		compute_tourValueElevation_dlg_computeValues_title;
 	public static String		compute_tourValueElevation_group_computeTourAltitude;
 	public static String		compute_tourValueElevation_label_description;
 	public static String		compute_tourValueElevation_label_minAltiDifference;
+	public static String		compute_tourValueElevation_resultText;
+	public static String		compute_tourValueElevation_subTaskText;
 
-	public static String	compute_tourValueElevation_resultText;
-
-	public static String	compute_tourValueElevation_subTaskText;
-	public static String	compute_tourValues_dlg_computeSpeedValues_message;
-
-	public static String	compute_tourValues_dlg_computeSpeedValues_title;
-
-	public static String		compute_tourValues_dlg_computeValues_message;
-	public static String		compute_tourValues_dlg_computeValues_title;
-	public static String		compute_tourValues_label_description;
-
-	public static String	compute_tourValueSpeed_button_computeValues;
-
-	public static String	compute_tourValueSpeed_button_computeValues_tooltip;
-
-	public static String	compute_tourValueSpeed_group_speed;
-
-	public static String	compute_tourValueSpeed_label_description;
-
-	public static String	compute_tourValueSpeed_label_minDistanceDifference;
+	public static String		compute_tourValueSpeed_button_computeValues;
+	public static String		compute_tourValueSpeed_button_computeValues_tooltip;
+	public static String		compute_tourValueSpeed_dlg_computeValues_message;
+	public static String		compute_tourValueSpeed_dlg_computeValues_title;
+	public static String		compute_tourValueSpeed_group_speed;
+	public static String		compute_tourValueSpeed_label_description;
+	public static String		compute_tourValueSpeed_label_speedTimeSlice;
+	public static String		compute_tourValueSpeed_resultText;
+	public static String		compute_tourValueSpeed_subTaskText;
 
 	public static String		compute_tourValueWeek_button_computeWeekValues;
 	public static String		compute_tourValueWeek_button_computeWeekValues_tooltip;
-	public static String		compute_tourValueWeek_dlg_message;
-	public static String		compute_tourValueWeek_dlg_title;
 	public static String		compute_tourValueWeek_group_week;
 
 	public static String		Database_Confirm_update;
@@ -676,7 +667,7 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_message;
 	public static String		tour_database_version_info_title;
 
-	public static String	tour_editor_csvTimeSliceExport;
+	public static String		tour_editor_csvTimeSliceExport;
 
 	public static String		tour_editor_dlg_create_tour_message;
 	public static String		tour_editor_dlg_create_tour_title;
@@ -843,15 +834,10 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
 
-	public static String		TourChart_Property_button_compute_values;
-	public static String		TourChart_Property_button_compute_values_tooltip;
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
-	public static String		TourChart_Property_check_customize_value_computing;
-	public static String		TourChart_Property_dlg_compute_values_message;
-	public static String		TourChart_Property_dlg_compute_values_title;
 	public static String		TourChart_Property_label_chart_type;
 	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
@@ -863,12 +849,6 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 
 	public static String		ui_tour_not_defined;
-
-	public static String		compute_tourValueSpeed_label_minTimeDifference;
-
-	public static String	compute_tourValueSpeed_resultText;
-
-	public static String	compute_tourValueSpeed_subTaskText;
 
 	static {
 		// initialize resource bundle
