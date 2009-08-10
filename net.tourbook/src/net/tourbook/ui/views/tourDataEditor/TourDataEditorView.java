@@ -3620,7 +3620,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			// tour is not in the database, try to get it from the raw data manager
 
-			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getTourDataMap();
+			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
 			tourData = rawData.get(tourId);
 		}
 

@@ -81,7 +81,7 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
 		}
 
 		final TourData mergeFromTour = selectedFromTour.get(0);
-		final Collection<TourData> importedTours = RawDataManager.getInstance().getTourDataMap().values();
+		final Collection<TourData> importedTours = RawDataManager.getInstance().getImportedTours().values();
 
 		final ArrayList<TourData> sortedTours = new ArrayList<TourData>(importedTours);
 		Collections.sort(sortedTours);

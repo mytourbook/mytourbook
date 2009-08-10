@@ -809,11 +809,12 @@ public class TourChartAnalyzerView extends ViewPart {
 				break;
 			}
 
-			if (valuesIndexLeft > values.length) {
-				valuesIndexLeft = values.length - 1;
+			final int endIndex = values.length - 1;
+			if (valuesIndexLeft > endIndex) {
+				valuesIndexLeft = endIndex;
 			}
-			if (valuesIndexRight > values.length) {
-				valuesIndexRight = values.length - 1;
+			if (valuesIndexRight > endIndex) {
+				valuesIndexRight = endIndex;
 			}
 
 			valuesIndexLeft = Math.max(0, valuesIndexLeft);

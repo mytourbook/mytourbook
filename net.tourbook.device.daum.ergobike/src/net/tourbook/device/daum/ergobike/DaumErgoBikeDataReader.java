@@ -204,7 +204,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			int cadence;
 			int pulse;
 			int power;
-			int speed;
+			float speed;
 			boolean isFirstTime = true;
 
 			String tokenLine;
@@ -220,7 +220,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
 				cadence = (int) parseFloat(tokenizer.nextToken()); // 					6  RPM
-				speed = (int) parseFloat(tokenizer.nextToken()); // 					7  Speed (km/h)
+				speed = parseFloat(tokenizer.nextToken()); // 					7  Speed (km/h)
 				power = Integer.parseInt(tokenizer.nextToken()); //						8  Watt
 				tokenizer.nextToken(); // 												9  Gear
 				tokenizer.nextToken(); // 												10 Device Active
@@ -238,7 +238,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				timeData.cadence = cadence;
 				timeData.pulse = pulse;
 				timeData.power = power;
-				timeData.speed = speed;
+				timeData.speed = (int) (speed * 10);
 
 				// prepare next data point
 				previousTime = time;

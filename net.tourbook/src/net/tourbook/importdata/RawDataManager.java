@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,12 +34,16 @@ import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
@@ -57,34 +62,34 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String		RAW_DATA_LAST_SELECTED_PATH						= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
-	private static final String		TEMP_IMPORTED_FILE								= "received-device-data.txt";					//$NON-NLS-1$
+	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
-	private static RawDataManager	instance										= null;
+	private static RawDataManager	instance							= null;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData				fDeviceData										= new DeviceData();
+	private DeviceData				fDeviceData							= new DeviceData();
 
 	/**
 	 * contains tours which were imported or received
 	 */
-	private HashMap<Long, TourData>	fImportedTourData								= new HashMap<Long, TourData>();
+	private HashMap<Long, TourData>	fImportedTourData					= new HashMap<Long, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>			fImportedFileNames								= new HashSet<String>();
+	private HashSet<String>			fImportedFileNames					= new HashSet<String>();
 
 	private boolean					fIsImported;
 
 	private boolean					fImportCanceled;
 
-	private int						fImportSettingsImportYear						= -1;
+	private int						fImportSettingsImportYear			= -1;
 	private boolean					fImportSettingsIsMergeTracks;
-	private boolean					fImportSettingsIsChecksumValidation				= true;
+	private boolean					fImportSettingsIsChecksumValidation	= true;
 	private boolean					fImportSettingsCreateTourIdWithTime	= false;
 
 	private String					fLastImportedFile;
@@ -105,16 +110,16 @@ public class RawDataManager {
 
 	public static void showMsgBoxInvalidFormat(final ArrayList<String> notImportedFiles) {
 
-		final MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
-
 		final StringBuilder fileText = new StringBuilder();
 		for (final String fileName : notImportedFiles) {
-			fileText.append('\n');
+			fileText.append(UI.NEW_LINE);
 			fileText.append(fileName);
 		}
 
-		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString()));
-		msgBox.open();
+		final String errorMessage = NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
+		MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.app_error_title, errorMessage);
+
+		System.out.println(errorMessage);
 	}
 
 	private RawDataManager() {}
@@ -184,7 +189,7 @@ public class RawDataManager {
 		final String lastSelectedPath = prefStore.getString(RAW_DATA_LAST_SELECTED_PATH);
 
 		// setup open dialog
-		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(), (SWT.OPEN | SWT.MULTI));
+		final FileDialog fileDialog = new FileDialog(Display.getDefault().getActiveShell(), (SWT.OPEN | SWT.MULTI));
 		fileDialog.setFilterExtensions(filterExtensions);
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setFilterPath(lastSelectedPath);
@@ -230,7 +235,7 @@ public class RawDataManager {
 
 				if (importCounter > 0) {
 
-					rawDataManager.updateTourDataFromDb();
+					rawDataManager.updateTourDataFromDb(null);
 
 					final RawDataView view = showRawDataView();
 					if (view != null) {
@@ -256,6 +261,13 @@ public class RawDataManager {
 	}
 
 	/**
+	 * @return Returns all {@link TourData} which has been imported or received, tour id is the key
+	 */
+	public HashMap<Long, TourData> getImportedTours() {
+		return fImportedTourData;
+	}
+
+	/**
 	 * @return Returns the import year or <code>-1</code> when the year was not set
 	 */
 	public int getImportYear() {
@@ -263,15 +275,8 @@ public class RawDataManager {
 	}
 
 	/**
-	 * @return the tour data which has been imported or received, tour id is the key
-	 */
-	public HashMap<Long, TourData> getTourDataMap() {
-		return fImportedTourData;
-	}
-
-	/**
-	 * Import the raw data from a file and save the imported data in the fields
-	 * {@link #fImportedTourData}
+	 * Import a tour from a file, all imported tours can be retrieved with
+	 * {@link #getImportedTours()}
 	 * 
 	 * @param importFile
 	 *            the file to be imported
@@ -424,7 +429,7 @@ public class RawDataManager {
 
 						if (destFileName == null) {
 
-							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
 									"The filename for the received data" //$NON-NLS-1$
 											+ " could not be created from the file '" //$NON-NLS-1$
 											+ sourceFileName
@@ -598,73 +603,109 @@ public class RawDataManager {
 	}
 
 	/**
-	 * update {@link TourData} from the database for all saved tours
+	 * update {@link TourData} from the database for all imported tours, displays a progress dialog
+	 * 
+	 * @param monitor
 	 */
-	public void updateTourDataFromDb() {
+	public void updateTourDataFromDb(final IProgressMonitor monitor) {
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
+		if (fImportedTourData.size() < 50) {
+			updateTourDataFromDbTask(null);
+		} else {
 
-//				boolean isReplaced = false;
+			if (monitor == null) {
+				try {
+					new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+							true,
+							false,
+							new IRunnableWithProgress() {
 
-				long editorTourId = -1;
+								public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+										InterruptedException {
 
-				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-				if (tourDataEditor != null) {
-					final TourData tourData = tourDataEditor.getTourData();
-					if (tourData != null) {
-						editorTourId = tourData.getTourId();
-					}
-				}
-
-				for (final TourData mapTourData : fImportedTourData.values()) {
-
-					if (mapTourData.isTourDeleted) {
-						continue;
-					}
-
-					final Long tourId = mapTourData.getTourId();
-
-					try {
-
-						final TourData dbTourData = TourManager.getInstance().getTourDataFromDb(tourId);
-						if (dbTourData != null) {
-
-							/*
-							 * tour is saved in the database, set rawdata file name to display the
-							 * filepath
-							 */
-							dbTourData.importRawDataFile = mapTourData.importRawDataFile;
-
-							final Long dbTourId = dbTourData.getTourId();
-
-							// replace existing tours but do not add new tours
-							if (fImportedTourData.containsKey(dbTourId)) {
-
-								/*
-								 * check if the tour editor contains this tour, this should not be
-								 * necessary, just make sure the correct tour is used !!!
-								 */
-								if (editorTourId == dbTourId) {
-									fImportedTourData.put(dbTourId, tourDataEditor.getTourData());
-								} else {
-									fImportedTourData.put(dbTourId, dbTourData);
+									updateTourDataFromDbTask(monitor);
 								}
+							});
 
-//								isReplaced = true;
-							}
+				} catch (final InvocationTargetException e) {
+					e.printStackTrace();
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			} else {
+				updateTourDataFromDbTask(monitor);
+			}
+		}
+	}
+
+	private void updateTourDataFromDbTask(final IProgressMonitor monitor) {
+
+		int workedDone = 0;
+		final int workedAll = fImportedTourData.size();
+
+		if (monitor != null) {
+			monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, workedAll);
+		}
+
+		long editorTourId = -1;
+
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if (tourDataEditor != null) {
+			final TourData tourData = tourDataEditor.getTourData();
+			if (tourData != null) {
+				editorTourId = tourData.getTourId();
+			}
+		}
+
+		for (final TourData mapTourData : fImportedTourData.values()) {
+
+			if (monitor != null) {
+				monitor.worked(1);
+				monitor.subTask(NLS.bind(Messages.import_data_updateDataFromDatabase_subTask, workedDone++, workedAll));
+			}
+
+			if (mapTourData.isTourDeleted) {
+				continue;
+			}
+
+			final Long tourId = mapTourData.getTourId();
+
+			try {
+
+				final TourData dbTourData = TourManager.getInstance().getTourDataFromDb(tourId);
+				if (dbTourData != null) {
+
+					/*
+					 * tour is saved in the database, set rawdata file name to display
+					 * the
+					 * filepath
+					 */
+					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
+
+					final Long dbTourId = dbTourData.getTourId();
+
+					// replace existing tours but do not add new tours
+					if (fImportedTourData.containsKey(dbTourId)) {
+
+						/*
+						 * check if the tour editor contains this tour, this should not
+						 * be
+						 * necessary, just make sure the correct tour is used !!!
+						 */
+						if (editorTourId == dbTourId) {
+							fImportedTourData.put(dbTourId, tourDataEditor.getTourData());
+						} else {
+							fImportedTourData.put(dbTourId, dbTourData);
 						}
-					} catch (final Exception e) {
-						e.printStackTrace();
 					}
 				}
-
-//				if (isReplaced) {
-				// prevent async error
-				TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
-//				}
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
-		});
+		}
+
+		// prevent async error
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 	}
 
 	/**

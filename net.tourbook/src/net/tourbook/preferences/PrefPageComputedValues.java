@@ -305,6 +305,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		// spinner: compute value time slice
 		fPrefStore.setValue(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, fSpinnerMinTime.getSelection());
 
+		// force all tours to recompute the speed
+		TourManager.getInstance().clearTourDataCache();
+
 		// fire unique event for all changes
 		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
@@ -466,15 +469,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 //					return true;
 //				}
 //
-//				public String getResultText() {
-//					// TODO Auto-generated method stub
-//					return null;
-//				}
-//
-//				public String getSubTaskText(final TourData oldTourData, final TourData savedTourData) {
-//					// TODO Auto-generated method stub
-//					return null;
-//				}
 //			});
 //
 //			fireModifyEvent();

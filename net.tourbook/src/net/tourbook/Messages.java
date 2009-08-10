@@ -151,6 +151,8 @@ public class Messages extends NLS {
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
 
+	public static String	app_error_title;
+
 	public static String		app_unit_minutes;
 
 	public static String		app_unit_seconds;
@@ -381,7 +383,15 @@ public class Messages extends NLS {
 	public static String		import_data_dlg_reimport_title;
 	public static String		import_data_dlg_save_tour_msg;
 	public static String		import_data_dlg_save_tour_title;
+	public static String	import_data_importTours_subTask;
+
+	public static String	import_data_importTours_task;
+
 	public static String		import_data_label_unknown_device;
+
+	public static String	import_data_updateDataFromDatabase_subTask;
+
+	public static String	import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
