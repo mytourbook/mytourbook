@@ -205,50 +205,80 @@ public class RawDataManager {
 		final String[] selectedFileNames = fileDialog.getFileNames();
 		setImportCanceled(false);
 
-		Display.getDefault().asyncExec(new Runnable() {
+//		Display.getDefault().asyncExec(new Runnable() {
+//
+//			public void run() {
 
-			public void run() {
+		try {
+			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+					true,
+					false,
+					new IRunnableWithProgress() {
 
-				final RawDataManager rawDataManager = RawDataManager.getInstance();
-				final ArrayList<String> notImportedFiles = new ArrayList<String>();
+						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+								InterruptedException {
 
-				int importCounter = 0;
+							int workedDone = 0;
+							final int workedAll = selectedFileNames.length;
 
-				final Path filePath = new Path(firstFileName);
+							monitor.beginTask(Messages.import_data_importTours_task, workedAll);
 
-				// keep last selected path
-				final String selectedPath = filePath.removeLastSegments(1).makeAbsolute().toString();
-				prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
+							final RawDataManager rawDataManager = RawDataManager.getInstance();
+							final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
-				// loop: import all selected files
-				for (String fileName : selectedFileNames) {
+							int importCounter = 0;
 
-					// replace filename, keep the directory path
-					fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
+							final Path filePath = new Path(firstFileName);
 
-					if (rawDataManager.importRawData(new File(fileName), null, false, null)) {
-						importCounter++;
-					} else {
-						notImportedFiles.add(fileName);
-					}
-				}
+							// keep last selected path
+							final String selectedPath = filePath.removeLastSegments(1).makeAbsolute().toString();
+							prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
 
-				if (importCounter > 0) {
+							// loop: import all selected files
+							for (String fileName : selectedFileNames) {
 
-					rawDataManager.updateTourDataFromDb(null);
+								// replace filename, keep the directory path
+								fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
 
-					final RawDataView view = showRawDataView();
-					if (view != null) {
-						view.reloadViewer();
-						view.selectFirstTour();
-					}
-				}
+								monitor.worked(1);
+								monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+										new Object[] { workedDone++, workedAll, fileName }));
 
-				if (notImportedFiles.size() > 0) {
-					showMsgBoxInvalidFormat(notImportedFiles);
-				}
-			}
-		});
+								if (rawDataManager.importRawData(new File(fileName), null, false, null)) {
+									importCounter++;
+								} else {
+									notImportedFiles.add(fileName);
+								}
+							}
+
+							if (importCounter > 0) {
+
+								rawDataManager.updateTourDataFromDb(monitor);
+
+								Display.getDefault().syncExec(new Runnable() {
+									public void run() {
+										final RawDataView view = showRawDataView();
+										if (view != null) {
+											view.reloadViewer();
+											view.selectFirstTour();
+										}
+									}
+								});
+							}
+
+							if (notImportedFiles.size() > 0) {
+								showMsgBoxInvalidFormat(notImportedFiles);
+							}
+						}
+					});
+
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+//			}
+//		});
 
 	}
 
@@ -609,7 +639,7 @@ public class RawDataManager {
 	 */
 	public void updateTourDataFromDb(final IProgressMonitor monitor) {
 
-		if (fImportedTourData.size() < 50) {
+		if (fImportedTourData.size() < 5) {
 			updateTourDataFromDbTask(null);
 		} else {
 
@@ -705,7 +735,11 @@ public class RawDataManager {
 		}
 
 		// prevent async error
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+			}
+		});
 	}
 
 	/**

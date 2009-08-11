@@ -563,6 +563,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
+					// save imported file names
+					final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
+					fState.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+
 					reimportAllImportFiles();
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
@@ -1542,10 +1546,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (monitor != null) {
 				monitor.worked(1);
-				monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, new Object[] {
-						workedDone++,
-						workedAll,
-						fileName }));
+				monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+						new Object[] { workedDone++, workedAll, fileName }));
 			}
 
 			final File file = new File(fileName);
@@ -1561,22 +1563,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (importCounter > 0) {
 
 			rawDataMgr.updateTourDataFromDb(monitor);
-			reloadViewer();
 
+			final Object[] tourData = new Object[1];
+			final int[] selectedTourIndex = new int[1];
 			// restore selected tour
 			try {
-				final Integer selectedTourIndex = fState.getInt(STATE_SELECTED_TOUR_INDEX);
-				final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
+				selectedTourIndex[0] = fState.getInt(STATE_SELECTED_TOUR_INDEX);
+			} catch (final NumberFormatException e) {
+
+			} finally {
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						if (tourData != null) {
-							fTourViewer.setSelection(new StructuredSelection(tourData), true);
+
+						tourData[0] = fTourViewer.getElementAt(selectedTourIndex[0]);
+						reloadViewer();
+
+						if (tourData[0] != null) {
+							fTourViewer.setSelection(new StructuredSelection(tourData[0]), true);
 						}
 					}
 				});
-
-			} catch (final NumberFormatException e) {}
+			}
 		}
 
 		if (notImportedFiles.size() > 0) {
@@ -1654,10 +1662,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// save imported file names
 		final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
 		fState.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
-
-//		fViewState.put(STATE_IMPORTED_FILENAMES,
-//				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
-//						FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
 		fState.put(STATE_SELECTED_TOUR_INDEX, table.getSelectionIndex());

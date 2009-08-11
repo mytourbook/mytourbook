@@ -147,7 +147,7 @@ public class WizardImportData extends Wizard {
 					fileCollision);
 		}
 
-		rawDataManager.updateTourDataFromDb();
+		rawDataManager.updateTourDataFromDb(null);
 
 		// show imported data in the raw data view
 		try {
