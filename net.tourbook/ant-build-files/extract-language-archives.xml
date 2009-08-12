@@ -27,9 +27,9 @@
 			<param name="archive-language" value="fr" />
 		</antcall>
 
-		<!-- unzip archive: DE -->
+		<!-- unzip archive: NL -->
 		<antcall target="unzip-archive-for-one-language">
-			<param name="archive-language" value="de" />
+			<param name="archive-language" value="nl" />
 		</antcall>
 
 
