@@ -20,7 +20,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
@@ -38,7 +40,6 @@ import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -1287,10 +1288,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-//	Long getActiveTourId() {
-//		return fSelectedTourId;
-//	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
@@ -1311,14 +1308,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * @param tourIds
 	 * @return Return all tours for one month
 	 */
-	private void getMonthTourIds(final TVITourBookMonth monthItem, final ArrayList<Long> tourIds) {
+	private void getMonthTourIds(final TVITourBookMonth monthItem, final HashMap<Long, Long> tourIds) {
 
 		// get all tours for the month item
 		for (final TreeViewerItem viewerItem : monthItem.getFetchedChildren()) {
 			if (viewerItem instanceof TVITourBookTour) {
 
 				final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
-				tourIds.add(tourItem.getTourId());
+				tourIds.put(tourItem.getTourId(), null);
 			}
 		}
 	}
@@ -1327,8 +1324,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return fPostSelectionProvider;
 	}
 
-	private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final ArrayList<Long> tourIds) {
-		for (final Long tourId : tourIds) {
+	private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final Set<Long> tourIdSet) {
+		for (final Long tourId : tourIdSet) {
 			selectedTourData.add(TourManager.getInstance().getTourData(tourId));
 		}
 	}
@@ -1339,7 +1336,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		final ArrayList<Long> tourIds = new ArrayList<Long>();
+		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
 
 		if (selectedTours.size() < 2) {
 
@@ -1372,7 +1369,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one tour is selected
 
-				tourIds.add(((TVITourBookTour) selectedItem).getTourId());
+				tourIds.put(((TVITourBookTour) selectedItem).getTourId(), null);
 			}
 
 		} else {
@@ -1384,7 +1381,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object viewItem = tourIterator.next();
 
 				if (viewItem instanceof TVITourBookTour) {
-					tourIds.add(((TVITourBookTour) viewItem).getTourId());
+					tourIds.put(((TVITourBookTour) viewItem).getTourId(), null);
 				}
 			}
 		}
@@ -1395,11 +1392,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		if (tourIds.size() > 1) {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 				public void run() {
-					getSelectedTourData(selectedTourData, tourIds);
+					getSelectedTourData(selectedTourData, tourIds.keySet());
 				}
 			});
 		} else {
-			getSelectedTourData(selectedTourData, tourIds);
+			getSelectedTourData(selectedTourData, tourIds.keySet());
 		}
 
 		return selectedTourData;
@@ -1411,94 +1408,97 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
 
-		fSelectedTourIds.clear();
+		final boolean isSelectAllChildren = fActionSelectAllTours.isChecked();
+
+		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
+
+		boolean isFirstYear = true;
+		boolean isFirstMonth = true;
+		boolean isFirstTour = true;
 
 		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
-		if (selectedTours.size() < 2) {
+		// loop: all selected items
+		for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
 
-			// one item is selected
+			final Object treeItem = itemIterator.next();
 
-			final Object selectedItem = selectedTours.getFirstElement();
-			if (selectedItem instanceof TVITourBookYear) {
+			if (isSelectAllChildren) {
 
-				// year is selected
+				// get ALL tours from all selected tree items (year/month/tour)
 
-				final TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
-				fSelectedYear = yearItem.fTourYear;
+				if (treeItem instanceof TVITourBookYear) {
 
-				if (fActionSelectAllTours.isChecked()) {
+					// year is selected
+
+					final TVITourBookYear yearItem = ((TVITourBookYear) treeItem);
+					if (isFirstYear) {
+						// keep selected year
+						isFirstYear = false;
+						fSelectedYear = yearItem.fTourYear;
+					}
 
 					// get all tours for the selected year
-					final ArrayList<Long> tourIds = new ArrayList<Long>();
-
 					for (final TreeViewerItem viewerItem : yearItem.getFetchedChildren()) {
 						if (viewerItem instanceof TVITourBookMonth) {
 							getMonthTourIds((TVITourBookMonth) viewerItem, tourIds);
 						}
 					}
 
-					if (tourIds.size() > 0) {
-						fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+				} else if (treeItem instanceof TVITourBookMonth) {
+
+					// month is selected
+
+					final TVITourBookMonth monthItem = (TVITourBookMonth) treeItem;
+					if (isFirstMonth) {
+						// keep selected year/month
+						isFirstMonth = false;
+						fSelectedYear = monthItem.fTourYear;
+						fSelectedMonth = monthItem.fTourMonth;
 					}
-				}
-
-			} else if (selectedItem instanceof TVITourBookMonth) {
-
-				// month is selected
-
-				final TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
-				fSelectedYear = monthItem.fTourYear;
-				fSelectedMonth = monthItem.fTourMonth;
-
-				if (fActionSelectAllTours.isChecked()) {
 
 					// get all tours for the selected month
-					final ArrayList<Long> tourIds = new ArrayList<Long>();
-
 					getMonthTourIds(monthItem, tourIds);
-					if (tourIds.size() > 0) {
-						fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
-					}
-				}
 
-			} else if (selectedItem instanceof TVITourBookTour) {
+				} else if (treeItem instanceof TVITourBookTour) {
 
-				// tour is selected
+					// tour is selected
 
-				final TVITourBookTour tourItem = (TVITourBookTour) selectedItem;
-
-				fSelectedYear = tourItem.fTourYear;
-				fSelectedMonth = tourItem.fTourMonth;
-
-				final Long tourId = tourItem.getTourId();
-				fSelectedTourIds.add(tourId);
-
-				fPostSelectionProvider.setSelection(new SelectionTourId(tourId));
-			}
-
-		} else {
-
-			// multiple items are selected
-
-			boolean isFirstTour = true;
-
-			// get all selected tours
-			for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-
-				final Object viewItem = tourIterator.next();
-				if (viewItem instanceof TVITourBookTour) {
-
-					final TVITourBookTour tourItem = (TVITourBookTour) viewItem;
-					fSelectedTourIds.add(tourItem.getTourId());
-
+					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 					if (isFirstTour) {
+						// keep selected tour
 						isFirstTour = false;
-
 						fSelectedYear = tourItem.fTourYear;
 						fSelectedMonth = tourItem.fTourMonth;
 					}
+
+					tourIds.put(tourItem.getTourId(), null);
+				}
+
+			} else {
+
+				// get only selected tours
+
+				if (treeItem instanceof TVITourBookTour) {
+
+					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
+
+					if (isFirstTour) {
+						// keep selected tour
+						isFirstTour = false;
+						fSelectedYear = tourItem.fTourYear;
+						fSelectedMonth = tourItem.fTourMonth;
+					}
+
+					tourIds.put(tourItem.getTourId(), null);
 				}
 			}
+		}
+
+		if (tourIds.size() > 0) {
+
+			// keep selected tour id's
+			fSelectedTourIds.clear();
+			fSelectedTourIds.addAll(tourIds.keySet());
 
 			fPostSelectionProvider.setSelection(new SelectionTourIds(fSelectedTourIds));
 		}
