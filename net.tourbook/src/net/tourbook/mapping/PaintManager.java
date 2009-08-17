@@ -81,7 +81,9 @@ public class PaintManager {
 	}
 
 	public void setLegendProvider(final ILegendProvider legendProvider) {
-		fLegendProvider = legendProvider;
+		if (legendProvider != null) {
+			fLegendProvider = legendProvider;
+		}
 	}
 
 	public void setShowStartEnd(final boolean isVisible) {

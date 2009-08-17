@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 public class LegendColor {
@@ -53,11 +52,18 @@ public class LegendColor {
 
 	public LegendColor() {}
 
+	/**
+	 * @param valueColors
+	 * @param minBrightness
+	 * @param minBrightnessFactor
+	 * @param maxBrightness
+	 * @param maxBrightnessFactor
+	 */
 	public LegendColor(	final ValueColor[] valueColors,
-						final int minBrightness,
-						final int minBrightnessFactor,
-						final int maxBrightness,
-						final int maxBrightnessFactor) {
+				final int minBrightness,
+				final int minBrightnessFactor,
+				final int maxBrightness,
+				final int maxBrightnessFactor) {
 
 		this.valueColors = valueColors;
 		this.minBrightness = minBrightness;
@@ -66,15 +72,26 @@ public class LegendColor {
 		this.maxBrightnessFactor = maxBrightnessFactor;
 	}
 
+	/**
+	 * @param valueColors
+	 * @param minBrightness
+	 * @param minBrightnessFactor
+	 * @param maxBrightness
+	 * @param maxBrightnessFactor
+	 * @param isMinOverwrite
+	 * @param minOverwrite
+	 * @param isMaxOverwrite
+	 * @param maxOverwrite
+	 */
 	public LegendColor(	final ValueColor[] valueColors,
-						final int minBrightness,
-						final int minBrightnessFactor,
-						final int maxBrightness,
-						final int maxBrightnessFactor,
-						final boolean isMinOverwrite,
-						final int minOverwrite,
-						final boolean isMaxOverwrite,
-						final int maxOverwrite) {
+				final int minBrightness,
+				final int minBrightnessFactor,
+				final int maxBrightness,
+				final int maxBrightnessFactor,
+				final boolean isMinOverwrite,
+				final int minOverwrite,
+				final boolean isMaxOverwrite,
+				final int maxOverwrite) {
 
 		this.valueColors = valueColors;
 		this.minBrightness = minBrightness;
@@ -88,74 +105,74 @@ public class LegendColor {
 		this.overwriteMaxValue = maxOverwrite;
 	}
 
-	/**
-	 * create a string which is a java contructor for the {@link LegendColor}
-	 * 
-	 * <pre>
-	 * 
-	 * new LegendColor(new ValueColor[] {
-	 * 		new ValueColor(10, 161, 85, 0),
-	 * 		new ValueColor(50, 232, 169, 0),
-	 * 		new ValueColor(100, 96, 218, 0),
-	 * 		new ValueColor(150, 107, 193, 255),
-	 * 		new ValueColor(190, 206, 247, 255) }, LegendColor.BRIGHTNESS_DIMMING, 15, LegendColor.BRIGHTNESS_LIGHTNING, 100)
-	 * 
-	 * </pre>
-	 */
-	public String createConstructorString() {
-
-		final StringBuilder buffer = new StringBuilder();
-
-		buffer.append('\n');
-		buffer.append('\n');
-		buffer.append("new LegendColor(new ValueColor[] {"); //$NON-NLS-1$
-		buffer.append('\n');
-
-		int index = 0;
-		for (final ValueColor valueColor : valueColors) {
-			buffer.append(valueColor.toString());
-
-			if (index++ != valueColors.length - 1) {
-				buffer.append(',');
-			}
-			buffer.append('\n');
-		}
-		buffer.append("}, "); //$NON-NLS-1$
-		buffer.append('\n');
-
-		buffer.append("LegendColor."); //$NON-NLS-1$
-		buffer.append(getBrightnessJavaText(minBrightness));
-		buffer.append(",\n"); //$NON-NLS-1$
-
-		buffer.append(minBrightnessFactor);
-		buffer.append(",\n"); //$NON-NLS-1$
-
-		buffer.append("LegendColor."); //$NON-NLS-1$
-		buffer.append(getBrightnessJavaText(maxBrightness));
-		buffer.append(",\n"); //$NON-NLS-1$
-
-		buffer.append(maxBrightnessFactor);
-		buffer.append(")\n"); //$NON-NLS-1$
-
-		return buffer.toString();
-	}
-
-	private String getBrightnessJavaText(final int brightness) {
-
-		switch (brightness) {
-		case BRIGHTNESS_DEFAULT:
-			return "BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
-		case BRIGHTNESS_DIMMING:
-			return "BRIGHTNESS_DIMMING"; //$NON-NLS-1$
-		case BRIGHTNESS_LIGHTNING:
-			return "BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
-
-		default:
-			break;
-		}
-
-		return ""; //$NON-NLS-1$
-	}
+//	/**
+//	 * create a string which is a java contructor for the {@link LegendColor}
+//	 * 
+//	 * <pre>
+//	 * 
+//	 * new LegendColor(new ValueColor[] {
+//	 * 		new ValueColor(10, 161, 85, 0),
+//	 * 		new ValueColor(50, 232, 169, 0),
+//	 * 		new ValueColor(100, 96, 218, 0),
+//	 * 		new ValueColor(150, 107, 193, 255),
+//	 * 		new ValueColor(190, 206, 247, 255) }, LegendColor.BRIGHTNESS_DIMMING, 15, LegendColor.BRIGHTNESS_LIGHTNING, 100)
+//	 * 
+//	 * </pre>
+//	 */
+//	public String createConstructorString() {
+//
+//		final StringBuilder buffer = new StringBuilder();
+//
+//		buffer.append('\n');
+//		buffer.append('\n');
+//		buffer.append("new LegendColor(new ValueColor[] {"); //$NON-NLS-1$
+//		buffer.append('\n');
+//
+//		int index = 0;
+//		for (final ValueColor valueColor : valueColors) {
+//			buffer.append(valueColor.toString());
+//
+//			if (index++ != valueColors.length - 1) {
+//				buffer.append(',');
+//			}
+//			buffer.append('\n');
+//		}
+//		buffer.append("}, "); //$NON-NLS-1$
+//		buffer.append('\n');
+//
+//		buffer.append("LegendColor."); //$NON-NLS-1$
+//		buffer.append(getBrightnessJavaText(minBrightness));
+//		buffer.append(",\n"); //$NON-NLS-1$
+//
+//		buffer.append(minBrightnessFactor);
+//		buffer.append(",\n"); //$NON-NLS-1$
+//
+//		buffer.append("LegendColor."); //$NON-NLS-1$
+//		buffer.append(getBrightnessJavaText(maxBrightness));
+//		buffer.append(",\n"); //$NON-NLS-1$
+//
+//		buffer.append(maxBrightnessFactor);
+//		buffer.append(")\n"); //$NON-NLS-1$
+//
+//		return buffer.toString();
+//	}
+//
+//	private String getBrightnessJavaText(final int brightness) {
+//
+//		switch (brightness) {
+//		case BRIGHTNESS_DEFAULT:
+//			return "BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
+//		case BRIGHTNESS_DIMMING:
+//			return "BRIGHTNESS_DIMMING"; //$NON-NLS-1$
+//		case BRIGHTNESS_LIGHTNING:
+//			return "BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
+//
+//		default:
+//			break;
+//		}
+//
+//		return ""; //$NON-NLS-1$
+//	}
 
 	/**
 	 * Creates a copy for this {@link LegendColor}

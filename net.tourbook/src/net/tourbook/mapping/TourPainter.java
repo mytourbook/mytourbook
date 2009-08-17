@@ -29,7 +29,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -230,7 +229,6 @@ public class TourPainter extends MapPainter {
 
 						gc.setForeground(legendTextColor);
 						gc.drawText(valueText, devXText, devYText, true);
-
 
 						// prevent to draw this unit again
 						legendUnits.remove(unitValue);
@@ -600,7 +598,8 @@ public class TourPainter extends MapPainter {
 					if (paintManager.isShowStartEndInMap()) {
 
 						// draw end marker
-						isMarkerInTile = drawMarker(gc,
+						isMarkerInTile = drawMarker(
+								gc,
 								map,
 								tile,
 								latitudeSerie[latitudeSerie.length - 1],
@@ -630,7 +629,8 @@ public class TourPainter extends MapPainter {
 							final int serieIndex = tourMarker.getSerieIndex();
 
 							// draw tour marker
-							isTourMarkerInTile2 = drawTourMarker(gc,
+							isTourMarkerInTile2 = drawTourMarker(
+									gc,
 									map,
 									tile,
 									latitudeSerie[serieIndex],
@@ -700,7 +700,6 @@ public class TourPainter extends MapPainter {
 
 			// draw default dot when data are not available
 
-//			gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 			gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 
 		} else {
@@ -708,12 +707,9 @@ public class TourPainter extends MapPainter {
 			// draw dot with the color from the legend provider
 
 			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
-
 			{
 				if (LINE_WIDTH == 2) {
 					// oval is not filled with width of 2
-//					gc.setForeground(lineColor);
-//					gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 					gc.setBackground(lineColor);
 					gc.fillRectangle(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 				} else {
@@ -721,7 +717,6 @@ public class TourPainter extends MapPainter {
 					gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 				}
 			}
-
 			lineColor.dispose();
 		}
 	}
@@ -807,11 +802,6 @@ public class TourPainter extends MapPainter {
 						isTourInTile = true;
 
 						drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
-
-						// initialize previous pixel
-//						if (devPreviousPosition == null) {
-//							devPreviousPosition = devPosition;
-//						}
 					}
 
 					lastInsideIndex = serieIndex;
@@ -828,11 +818,6 @@ public class TourPainter extends MapPainter {
 					 */
 
 					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
-
-					// initialize previous pixel
-//					if (devPreviousPosition == null) {
-//						devPreviousPosition = devPosition;
-//					}
 				}
 
 				devPreviousPosition = devPosition;
@@ -997,7 +982,13 @@ public class TourPainter extends MapPainter {
 
 	private void getDataSerie(final TourData tourData) {
 
-		fLegendProvider = PaintManager.getInstance().getLegendProvider();
+		final ILegendProvider legendProvider = PaintManager.getInstance().getLegendProvider();
+		if (legendProvider == null) {
+			fDataSerie = null;
+			return;
+		}
+
+		fLegendProvider = legendProvider;
 
 		switch (fLegendProvider.getTourColorId()) {
 		case TourMapView.TOUR_COLOR_ALTITUDE:

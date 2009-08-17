@@ -101,17 +101,20 @@ import de.byteholder.gpx.ext.PointOfInterest;
 public class TourMapView extends ViewPart {
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
-
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
 
+	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
+	public static final int							LEGEND_UNIT_DISTANCE				= 60;
+
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
- 
+
 	public static final int							TOUR_COLOR_DEFAULT					= 0;
 	public static final int							TOUR_COLOR_ALTITUDE					= 10;
 	public static final int							TOUR_COLOR_GRADIENT					= 20;
 	public static final int							TOUR_COLOR_PULSE					= 30;
 	public static final int							TOUR_COLOR_SPEED					= 40;
 	public static final int							TOUR_COLOR_PACE						= 50;
+//	public static final int							TOUR_COLOR_TOURTYPE					= 100;
 
 	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";				//$NON-NLS-1$
@@ -136,10 +139,6 @@ public class TourMapView extends ViewPart {
 
 	final static String								PREF_SHOW_TILE_INFO					= "map.debug.show.tile-info";				//$NON-NLS-1$
 	final static String								PREF_DEBUG_MAP_DIM_LEVEL			= "map.debug.dim-map";						//$NON-NLS-1$
-
-	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
-	public static final int							LEGEND_UNIT_DISTANCE				= 60;
-
 
 	private Map										fMap;
 
@@ -176,6 +175,7 @@ public class TourMapView extends ViewPart {
 	private ActionTourColor							fActionTourColorPulse;
 	private ActionTourColor							fActionTourColorSpeed;
 	private ActionTourColor							fActionTourColorPace;
+//	private ActionTourColor							fActionTourColorTourType;
 	private ActionZoomIn							fActionZoomIn;
 	private ActionZoomOut							fActionZoomOut;
 	private ActionZoomCentered						fActionZoomCentered;
@@ -331,12 +331,14 @@ public class TourMapView extends ViewPart {
 
 	void actionSetTourColor(final int colorId) {
 
-		PaintManager.getInstance().setLegendProvider(getLegendProvider(colorId));
+		final ILegendProvider legendProvider = getLegendProvider(colorId);
+
+		PaintManager.getInstance().setLegendProvider(legendProvider);
 
 		fMap.disposeOverlayImageCache();
 		fMap.queueRedrawMap();
 
-		createLegendImage(getLegendProvider(colorId));
+		createLegendImage(legendProvider);
 	}
 
 	void actionSetZoomCentered() {
@@ -350,7 +352,8 @@ public class TourMapView extends ViewPart {
 		}
 
 		// repaint map
-		fDirectMappingPainter.setPaintContext(fMap,
+		fDirectMappingPainter.setPaintContext(
+				fMap,
 				fActionShowTourInMap.isChecked(),
 				fTourDataList.get(0),
 				fCurrentLeftSliderValueIndex,
@@ -705,6 +708,12 @@ public class TourMapView extends ViewPart {
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
+//		fActionTourColorTourType = new ActionTourColor(this,
+//				TOUR_COLOR_TOURTYPE,
+//				Messages.map_action_tour_color_tourType_tooltip,
+//				Messages.image_action_tour_color_tourType,
+//				Messages.image_action_tour_color_tourType_disabled);
+
 		fActionZoomIn = new ActionZoomIn(this);
 		fActionZoomOut = new ActionZoomOut(this);
 		fActionZoomCentered = new ActionZoomCentered(this);
@@ -737,6 +746,7 @@ public class TourMapView extends ViewPart {
 		viewTbm.add(fActionTourColorSpeed);
 		viewTbm.add(fActionTourColorPace);
 		viewTbm.add(fActionTourColorGradient);
+//		viewTbm.add(fActionTourColorTourType);
 		viewTbm.add(new Separator());
 		viewTbm.add(fActionShowTourInMap);
 		viewTbm.add(fActionZoomShowEntireTour);
@@ -828,21 +838,29 @@ public class TourMapView extends ViewPart {
 
 	private void createLegendProviders() {
 
-		fLegendProviders.put(TourMapView.TOUR_COLOR_PULSE, //
+		fLegendProviders.put(//
+				TourMapView.TOUR_COLOR_PULSE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PULSE));
 
-		fLegendProviders.put(TourMapView.TOUR_COLOR_ALTITUDE, //
+		fLegendProviders.put(//
+				TourMapView.TOUR_COLOR_ALTITUDE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_ALTITUDE));
 
-		fLegendProviders.put(TourMapView.TOUR_COLOR_SPEED, //
+		fLegendProviders.put(//
+				TourMapView.TOUR_COLOR_SPEED, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_SPEED));
 
-		fLegendProviders.put(TourMapView.TOUR_COLOR_PACE, //
+		fLegendProviders.put(//
+				TourMapView.TOUR_COLOR_PACE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PACE));
 
-		fLegendProviders.put(TourMapView.TOUR_COLOR_GRADIENT, //
+		fLegendProviders.put(//
+				TourMapView.TOUR_COLOR_GRADIENT, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_GRADIENT));
 
+//		fLegendProviders.put(//
+//				TourMapView.TOUR_COLOR_TOURTYPE, //
+//				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_TOURTYPE));
 	}
 
 	@Override
@@ -993,6 +1011,7 @@ public class TourMapView extends ViewPart {
 			fActionTourColorPulse.setEnabled(false);
 			fActionTourColorSpeed.setEnabled(false);
 			fActionTourColorPace.setEnabled(false);
+//			fActionTourColorTourType.setEnabled(false);
 
 		} else if (isForceTourColor) {
 
@@ -1001,6 +1020,7 @@ public class TourMapView extends ViewPart {
 			fActionTourColorPulse.setEnabled(true);
 			fActionTourColorSpeed.setEnabled(true);
 			fActionTourColorPace.setEnabled(true);
+//			fActionTourColorTourType.setEnabled(true);
 
 		} else if (isOneTour) {
 
@@ -1010,6 +1030,7 @@ public class TourMapView extends ViewPart {
 			fActionTourColorPulse.setEnabled(oneTourData.pulseSerie != null);
 			fActionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
 			fActionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
+//			fActionTourColorTourType.setEnabled(true);
 
 		} else {
 
@@ -1018,6 +1039,7 @@ public class TourMapView extends ViewPart {
 			fActionTourColorPulse.setEnabled(false);
 			fActionTourColorSpeed.setEnabled(false);
 			fActionTourColorPace.setEnabled(false);
+//			fActionTourColorTourType.setEnabled(false);
 		}
 	}
 
@@ -1171,7 +1193,8 @@ public class TourMapView extends ViewPart {
 				paintOneTour(tourData, false, true);
 
 				final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
-				paintTourSliders(tourData,
+				paintTourSliders(
+						tourData,
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
 						chartInfo.selectedSliderValuesIndex);
@@ -1200,7 +1223,8 @@ public class TourMapView extends ViewPart {
 
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
-						paintTourSliders(tourData,
+						paintTourSliders(
+								tourData,
 								chartInfo.leftSliderValuesIndex,
 								chartInfo.rightSliderValuesIndex,
 								chartInfo.selectedSliderValuesIndex);
@@ -1284,8 +1308,8 @@ public class TourMapView extends ViewPart {
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
-						.getTourId());
+				final TourData tourData = TourManager.getInstance().getTourData(
+						compareResultItem.getComparedTourData().getTourId());
 				paintOneTour(tourData, false, true);
 			}
 
@@ -1345,7 +1369,8 @@ public class TourMapView extends ViewPart {
 		final TourData firstTourData = fTourDataList.get(0);
 
 		// set slider position
-		fDirectMappingPainter.setPaintContext(fMap,
+		fDirectMappingPainter.setPaintContext(
+				fMap,
 				fActionShowTourInMap.isChecked(),
 				firstTourData,
 				fCurrentLeftSliderValueIndex,
@@ -1410,7 +1435,8 @@ public class TourMapView extends ViewPart {
 		fTourDataList.add(tourData);
 
 		// set the paint context (slider position) for the direct mapping painter
-		fDirectMappingPainter.setPaintContext(fMap,
+		fDirectMappingPainter.setPaintContext(
+				fMap,
 				isShowTour,
 				tourData,
 				fCurrentLeftSliderValueIndex,
@@ -1570,7 +1596,8 @@ public class TourMapView extends ViewPart {
 		fCurrentRightSliderValueIndex = rightSliderValuesIndex;
 		fCurrentSelectedSliderValueIndex = selectedSliderIndex;
 
-		fDirectMappingPainter.setPaintContext(fMap,
+		fDirectMappingPainter.setPaintContext(
+				fMap,
 				fActionShowTourInMap.isChecked(),
 				tourData,
 				leftSliderValuesIndex,
@@ -1734,13 +1761,16 @@ public class TourMapView extends ViewPart {
 				fActionTourColorPace.setChecked(true);
 				break;
 
+//			case TOUR_COLOR_TOURTYPE:
+//				fActionTourColorTourType.setChecked(true);
+//				break;
+
 			default:
 				fActionTourColorAltitude.setChecked(true);
 				break;
 			}
 
-			final ILegendProvider legendProvider = getLegendProvider(colorId);
-			paintManager.setLegendProvider(legendProvider);
+			paintManager.setLegendProvider(getLegendProvider(colorId));
 
 		} catch (final NumberFormatException e) {
 			fActionTourColorAltitude.setChecked(true);
@@ -1820,6 +1850,8 @@ public class TourMapView extends ViewPart {
 			colorId = TOUR_COLOR_SPEED;
 		} else if (fActionTourColorPace.isChecked()) {
 			colorId = TOUR_COLOR_PACE;
+//		} else if (fActionTourColorTourType.isChecked()) {
+//			colorId = TOUR_COLOR_TOURTYPE;
 		} else {
 			colorId = TOUR_COLOR_ALTITUDE;
 		}
@@ -2262,6 +2294,9 @@ public class TourMapView extends ViewPart {
 			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, Messages.graph_label_gradient_unit);
 
 			break;
+
+//		case TOUR_COLOR_TOURTYPE:
+//			return false;
 
 		default:
 			break;

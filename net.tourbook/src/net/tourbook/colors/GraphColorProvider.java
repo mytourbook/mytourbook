@@ -205,8 +205,6 @@ public class GraphColorProvider {
 					new RGB(255, 255, 255),
 					new RGB(0x9C, 0x2F, 0xFF),
 					new RGB(0x9C, 0x2F, 0xFF),
-//					new RGB(0, 47, 211),
-//					new RGB(0, 43, 210),
 					LEGEND_COLOR_PACE),
 
 			new ColorDefinition(PREF_GRAPH_POWER,//
