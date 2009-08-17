@@ -3013,6 +3013,7 @@ public class ChartComponentGraph extends Canvas {
 		int skippedUnits = 0;
 		boolean isOptimized = false;
 
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
 		final boolean isLineChart = fChartComponents.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR;
 
 		if (isLineChart && canScrollZoomedChart == false && fDevGraphImageXOffset > 0) {
@@ -3020,7 +3021,7 @@ public class ChartComponentGraph extends Canvas {
 			unitCounterLeft = (int) (fDevGraphImageXOffset / devUnitWidth);
 			devXOffset -= fDevGraphImageXOffset % devUnitWidth;
 
-			unitCounterRight = (int) ((fDevGraphImageXOffset + getDevVisibleChartWidth()) / devUnitWidth);
+			unitCounterRight = (int) ((fDevGraphImageXOffset + devVisibleChartWidth) / devUnitWidth);
 
 			isOptimized = true;
 		}
@@ -3040,6 +3041,7 @@ public class ChartComponentGraph extends Canvas {
 
 					unitCounter++;
 					skippedUnits++;
+
 					continue;
 				}
 
@@ -3068,13 +3070,14 @@ public class ChartComponentGraph extends Canvas {
 					}
 
 					final Point unitValueExtend = gc.textExtent(unit.valueLabel);
+					final int unitValueExtendX = unitValueExtend.x;
 
 					// draw the unit value
 					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
 
 						// draw the unit value BETWEEN two units
 
-						final int devXUnitCentered = (int) Math.max(0, ((devUnitWidth - unitValueExtend.x) / 2) + 0);
+						final int devXUnitCentered = (int) Math.max(0, ((devUnitWidth - unitValueExtendX) / 2) + 0);
 
 						gc.drawText(unit.valueLabel, devXUnitTick + devXUnitCentered, devYBottom + 7, true);
 
@@ -3086,7 +3089,7 @@ public class ChartComponentGraph extends Canvas {
 						 * when the chart is zoomed and not scrolled, prevent to clip the text at
 						 * the left border
 						 */
-						final int unitValueExtend2 = unitValueExtend.x / 2;
+						final int unitValueExtend2 = unitValueExtendX / 2;
 						if (unitCounter == 0 || devXUnitTick >= 0) {
 
 							if (unitCounter == 0) {
@@ -3101,7 +3104,7 @@ public class ChartComponentGraph extends Canvas {
 									if (isUnitLabelPrinted == false) {
 										isUnitLabelPrinted = true;
 										gc.drawText(drawingData.getXData().getUnitLabel(),//
-												devXUnitTick + unitValueExtend.x + 2,
+												devXUnitTick + unitValueExtendX + 2,
 												devYBottom + 7,
 												true);
 									}
@@ -3111,9 +3114,20 @@ public class ChartComponentGraph extends Canvas {
 
 								// center the unit text
 
-								if (devXUnitTick - unitValueExtend2 >= 0) {
+								int devXUnitValue = devXUnitTick - unitValueExtend2;
+								if (devXUnitValue >= 0) {
 
-									gc.drawText(unit.valueLabel, devXUnitTick - unitValueExtend2, devYBottom + 7, true);
+									if ((devXUnitTick + unitValueExtend2) > devVisibleChartWidth) {
+
+										/*
+										 * unit value would be clipped at the chart border, move it
+										 * to the left to make it fully visible
+										 */
+
+										devXUnitValue = devVisibleChartWidth - unitValueExtendX;
+									}
+
+									gc.drawText(unit.valueLabel, devXUnitValue, devYBottom + 7, true);
 
 									// draw unit label (km, mi, h)
 									if (isUnitLabelPrinted == false) {
