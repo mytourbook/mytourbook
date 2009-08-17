@@ -1857,9 +1857,9 @@ public class TourData implements Comparable<Object> {
 						isLatLongEqual = true;
 					}
 
-					if (distDiff == 0) {
-						continue;
-					}
+//					if (distDiff == 0) {
+					continue;
+//					}
 
 				} else if (isLatLongEqual) {
 

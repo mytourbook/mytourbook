@@ -61,6 +61,7 @@ import net.tourbook.tour.ITourSaveListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -3779,6 +3780,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				isCurrentTourSelected = true;
 			}
 
+		} else if (selection instanceof SelectionTourIds) {
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds != null && tourIds.size() > 0) {
+
+				fSelectionTourId = tourIds.get(0);
+
+				if (currentTourId == fSelectionTourId) {
+					isCurrentTourSelected = true;
+				}
+			}
+
 		} else if (selection instanceof SelectionChartInfo) {
 
 			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
@@ -4047,6 +4060,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		} else if (selection instanceof SelectionTourId) {
 
 			displayTour(((SelectionTourId) selection).getTourId());
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds != null && tourIds.size() > 0) {
+				displayTour(tourIds.get(0));
+			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
 
@@ -5275,7 +5295,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	private void writeCSVHeader(final Writer exportWriter, final StringBuilder sb) throws IOException {
-		
+
 		// no.
 		sb.append("#");
 		sb.append(UI.TAB);
