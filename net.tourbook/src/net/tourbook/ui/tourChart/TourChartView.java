@@ -32,6 +32,7 @@ import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -368,6 +369,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				}
 
 				updateChart(selectionTourData);
+			}
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
+			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
+			if (tourIds != null && tourIds.size() > 0) {
+				updateChart(tourIds.get(0));
 			}
 
 		} else if (selection instanceof SelectionTourId) {
