@@ -106,6 +106,10 @@ public class HTTPDownloader {
 					return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, //
 							NLS.bind(Messages.error_message_timeoutWhenConnectingToServer, urlBase),
 							e);
+//				} catch (final FileNotFoundException e) {
+//					return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, //
+//							NLS.bind(Messages.error_message_fileNotFoundException, address),
+//							e);
 				} catch (final Exception e) {
 					return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
 

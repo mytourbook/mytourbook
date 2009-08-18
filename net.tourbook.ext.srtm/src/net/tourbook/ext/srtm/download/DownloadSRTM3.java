@@ -31,7 +31,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DownloadSRTM3 {
 
-	private static final String		URL_SEPARATOR		= "/";
+	public static final String		URL_SEPARATOR		= "/";
 
 	private final static int		DirEurasia			= 0;
 	private final static int		DirNorth_America	= 1;
@@ -40,16 +40,21 @@ public class DownloadSRTM3 {
 	private final static int		DirAustralia		= 4;
 	private final static int		DirIslands			= 5;
 
-	private static String[]			dirs				= { "/srtm/version2/SRTM3/Eurasia", // 0 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/North_America", //	1 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/South_America", //	2 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/Africa", //			3 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/Australia", //		4 //$NON-NLS-1$
-			"/srtm/version2/SRTM3/Islands" //			5 //$NON-NLS-1$
+	private static String[]			dirs				= { "/SRTM3/Eurasia", // 0 //$NON-NLS-1$
+			"/SRTM3/North_America", //	1 //$NON-NLS-1$
+			"/SRTM3/South_America", //	2 //$NON-NLS-1$
+			"/SRTM3/Africa", //			3 //$NON-NLS-1$
+			"/SRTM3/Australia", //		4 //$NON-NLS-1$
+			"/SRTM3/Islands" //			5 //$NON-NLS-1$
 														};
 
 	private static FTPDownloader	fFtpDownloader		= null;
 
+	/**
+	 * @param remoteFileName
+	 * @param localZipName
+	 * @throws Exception
+	 */
 	public static void get(final String remoteFileName, final String localZipName) throws Exception {
 
 		final String remoteFilePath = getDir(remoteFileName);
@@ -77,20 +82,26 @@ public class DownloadSRTM3 {
 			// download from HTTP server
 
 			String baseUrl = prefStore.getString(IPreferences.STATE_SRTM3_HTTP_URL);
+
+			// remove separator at the end
 			if (baseUrl.endsWith(URL_SEPARATOR)) {
-				// remove separator at the end
 				baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
 			}
 
-			HTTPDownloader.get(new StringBuilder().append(baseUrl)
+			final String url = new StringBuilder().append(baseUrl)
 					.append(remoteFilePath)
 					.append(URL_SEPARATOR)
-					.toString(),//
-					remoteFileName,
-					localZipName);
+					.toString();
+
+			HTTPDownloader.get(url, remoteFileName, localZipName);
 		}
 	}
 
+	/**
+	 * @param pathName
+	 * @return
+	 * @throws Exception
+	 */
 	private static String getDir(final String pathName) throws Exception {
 
 		final String fileName = pathName.substring(pathName.lastIndexOf(File.separator) + 1);

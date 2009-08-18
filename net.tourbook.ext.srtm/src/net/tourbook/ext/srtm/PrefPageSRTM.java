@@ -15,9 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ext.srtm;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import net.tourbook.util.IExternalTourEvents;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -26,7 +31,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,6 +41,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -42,12 +50,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
+import de.byteholder.geoclipse.swt.UI;
+
 public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String		PROTOCOL_HTTP			= "http://";											//$NON-NLS-1$
 	public static final String		PROTOCOL_FTP			= "ftp://";											//$NON-NLS-1$
 
 	private static final String		PREF_PAGE_SRTM_COLORS	= "net.tourbook.ext.srtm.PrefPageSRTMColors";			//$NON-NLS-1$
+
+//	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
 
 	private IPreferenceStore		fPrefStore;
 
@@ -173,10 +185,27 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			fRdoSRTM3FtpUrl.setText(Messages.prefPage_srtm_radio_srtm3FtpUrl);
 			fRdoSRTM3FtpUrl.addSelectionListener(selectListener);
 
+			/*
+			 * is disabled becuase the server is currently not available 2009-08-18 and
+			 * the connection test feature cannot be tested
+			 */
+			fRdoSRTM3FtpUrl.setEnabled(false);
+
 			// text: ftp url
 			fTxtSRTM3FtpUrl = new Text(group, SWT.BORDER);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtSRTM3FtpUrl);
 			fTxtSRTM3FtpUrl.addModifyListener(modifyListener);
+
+			// button: test connection
+			final Button btnTestConnection = new Button(group, SWT.NONE);
+			GridDataFactory.swtDefaults().indent(0, 10).span(2, 1).applyTo(btnTestConnection);
+			btnTestConnection.setText(Messages.prefPage_srtm_button_testConnection);
+			btnTestConnection.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onCheckConnection();
+				}
+			});
 		}
 	}
 
@@ -231,6 +260,61 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		}
 
 		return super.okToLeave();
+	}
+
+	private void onCheckConnection() {
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
+
+				String baseUrl;
+				if (fRdoSRTM3FtpUrl.getSelection()) {
+
+					// check ftp connection
+
+//					baseUrl = fTxtSRTM3FtpUrl.getText().trim();
+//
+//					final FTPClient ftp = new FTPClient();
+
+				} else {
+
+					// check http connection
+
+					baseUrl = fTxtSRTM3HttpUrl.getText().trim();
+
+					try {
+						final URL url = new URL(baseUrl);
+						final HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+						urlConn.connect();
+
+						final int response = urlConn.getResponseCode();
+						final String responseMessage = urlConn.getResponseMessage();
+
+						final String message = response == HttpURLConnection.HTTP_OK//
+								? NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionOK_message, baseUrl)
+								: NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionFAILED_message,//
+										new Object[] {
+												baseUrl,
+												Integer.toString(response),
+												responseMessage == null ? UI.EMPTY_STRING : responseMessage });
+
+						MessageDialog.openInformation(
+								Display.getCurrent().getActiveShell(),
+								Messages.prefPage_srtm_checkHTTPConnection_title,
+								message);
+
+					} catch (final IOException e) {
+
+						MessageDialog.openInformation(
+								Display.getCurrent().getActiveShell(),
+								Messages.prefPage_srtm_checkHTTPConnection_title,
+								NLS.bind(Messages.prefPage_srtm_checkHTTPConnection_message, baseUrl));
+
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 
 	@Override

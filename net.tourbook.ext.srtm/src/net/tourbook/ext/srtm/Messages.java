@@ -51,6 +51,11 @@ public class Messages extends NLS {
 	public static String		profileViewer_column_label_shadowValue_tooltip;
 
 	public static String		prefPage_srtm_btn_adjust_columns;
+	public static String		prefPage_srtm_button_testConnection;
+	public static String		prefPage_srtm_checkHTTPConnection_message;
+	public static String		prefPage_srtm_checkHTTPConnection_title;
+	public static String		prefPage_srtm_checkHTTPConnectionFAILED_message;
+	public static String		prefPage_srtm_checkHTTPConnectionOK_message;
 	public static String		prefPage_srtm_chk_use_default_location;
 	public static String		prefPage_srtm_confirm_defaults_message;
 	public static String		prefPage_srtm_confirm_defaults_title;
@@ -60,13 +65,10 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_dlg_delete_profile_title;
 	public static String		prefPage_srtm_editor_data_filepath;
 	public static String		prefPage_srtm_group_label_data_location;
-
 	public static String		prefPage_srtm_group_label_srtm3;
 	public static String		prefPage_srtm_link_srtmProfiles;
 	public static String		prefPage_srtm_msg_invalid_data_path;
-
 	public static String		prefPage_srtm_msg_invalidSrtm3FtpUrl;
-
 	public static String		prefPage_srtm_msg_invalidSrtm3HttpUrl;
 	public static String		prefPage_srtm_profile_add;
 	public static String		prefPage_srtm_profile_duplicate;
@@ -74,9 +76,7 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_profile_option_apply_when_selected;
 	public static String		prefPage_srtm_profile_remove;
 	public static String		prefPage_srtm_radio_srtm3FtpUrl;
-
 	public static String		prefPage_srtm_radio_srtm3HttpUrl;
-
 	public static String		prefPage_srtm_resolution_title;
 	public static String		prefPage_srtm_resolution_very_fine;
 	public static String		prefPage_srtm_resolution_fine;
@@ -120,6 +120,7 @@ public class Messages extends NLS {
 	public static String		color_chooser_brightness;
 
 	public static String		error_message_cannotConnectToServer;
+	public static String		error_message_fileNotFoundException;
 	public static String		error_message_timeoutWhenConnectingToServer;
 
 	public static String		job_name_downloadMonitor;

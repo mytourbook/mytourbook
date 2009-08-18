@@ -40,6 +40,7 @@ import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -1500,7 +1501,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fSelectedTourIds.clear();
 			fSelectedTourIds.addAll(tourIds.keySet());
 
-			fPostSelectionProvider.setSelection(new SelectionTourIds(fSelectedTourIds));
+			final ISelection selection = tourIds.size() == 1
+					? new SelectionTourId(fSelectedTourIds.get(0))
+					: new SelectionTourIds(fSelectedTourIds);
+
+			fPostSelectionProvider.setSelection(selection);
 		}
 
 		enableActions();

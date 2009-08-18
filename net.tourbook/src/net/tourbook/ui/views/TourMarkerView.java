@@ -34,6 +34,7 @@ import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -585,6 +586,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 			fTourChart = null;
 			tourId = ((SelectionTourId) selection).getTourId();
+
+		} else if (selection instanceof SelectionTourIds) {
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds != null && tourIds.size() > 0) {
+				fTourChart = null;
+				tourId = tourIds.get(0);
+			}
 
 		} else if (selection instanceof SelectionActiveEditor) {
 

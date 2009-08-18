@@ -43,10 +43,9 @@ public class Messages extends NLS {
 	public static String		image_action_tour_color_pulse_disabled;
 	public static String		image_action_tour_color_speed;
 	public static String		image_action_tour_color_speed_disabled;
+	public static String		image_action_tour_color_tourType;
+	public static String		image_action_tour_color_tourType_disabled;
 
-	public static String	image_action_tour_color_tourType;
-
-	public static String	image_action_tour_color_tourType_disabled;
 	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
@@ -87,8 +86,7 @@ public class Messages extends NLS {
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 	public static String		map_action_show_legend_in_map;
-	public static String	map_action_show_scale_in_map;
-
+	public static String		map_action_show_scale_in_map;
 	public static String		map_action_show_slider_in_legend;
 	public static String		map_action_show_slider_in_map;
 	public static String		map_action_show_start_finish_in_map;
@@ -101,8 +99,7 @@ public class Messages extends NLS {
 	public static String		map_action_tour_color_pase_tooltip;
 	public static String		map_action_tour_color_pulse_tooltip;
 	public static String		map_action_tour_color_speed_tooltip;
-
-	public static String	map_action_tour_color_tourType_tooltip;
+	public static String		map_action_tour_color_tourType_tooltip;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
 	public static String		map_action_zoom_level_centered_tour;
@@ -127,11 +124,11 @@ public class Messages extends NLS {
 	public static String		modify_mapprovider_dialog_area_title;
 	public static String		modify_mapprovider_dialog_title;
 	public static String		modify_mapprovider_lbl_toggle_info;
- 
-	public static String	statusLine_mapInfo_data;
-	public static String	statusLine_mapInfo_defaultText;
-	public static String	statusLine_mapInfo_pattern;
-	public static String	statusLine_mapInfo_tooltip;
+
+	public static String		statusLine_mapInfo_data;
+	public static String		statusLine_mapInfo_defaultText;
+	public static String		statusLine_mapInfo_pattern;
+	public static String		statusLine_mapInfo_tooltip;
 
 	static {
 		// initialize resource bundle

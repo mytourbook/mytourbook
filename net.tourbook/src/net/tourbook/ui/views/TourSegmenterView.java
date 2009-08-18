@@ -38,6 +38,7 @@ import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -1719,6 +1720,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 
 					nextTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+				} else if (selection instanceof SelectionTourIds) {
+
+					final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+					if (tourIds != null && tourIds.size() > 0) {
+
+						final Long tourId = tourIds.get(0);
+
+						if (fTourData != null) {
+							if (fTourData.getTourId().equals(tourId)) {
+								// don't reload the same tour
+								return;
+							}
+						}
+
+						nextTourData = TourManager.getInstance().getTourData(tourId);
+					}
 
 				} else if (selection instanceof SelectionDeletedTours) {
 
