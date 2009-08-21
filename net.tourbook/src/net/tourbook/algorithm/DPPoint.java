@@ -16,30 +16,52 @@
 
 package net.tourbook.algorithm;
 
-public class Vector extends DPPoint {
+public class DPPoint {
 
-	public Vector(final int x, final int y, final int serieIndex) {
-		super(x, y, serieIndex);
+	/**
+	 * x coordinate
+	 */
+	public int	x;
+
+	/**
+	 * y coordinate
+	 */
+	public int	y;
+
+	/**
+	 * Index of this point in the original time serie
+	 */
+	public int	serieIndex;
+
+	public DPPoint(final int x, final int y, final int serieIndex) {
+		this.x = x;
+		this.y = y;
+		this.serieIndex = serieIndex;
 	}
 
 	/**
-	 * Vector product
+	 * Difference
 	 * 
-	 * @param vector
+	 * @param point
 	 * @return
 	 */
-	public long dot(final Vector vector) {
-		return (long) x * vector.x + (long) y * vector.y;
+	public Vector diff(final DPPoint point) {
+		return new Vector(x - point.x, y - point.y, serieIndex);
 	}
 
 	/**
-	 * Scalar Product
+	 * Squared Distance
 	 * 
-	 * @param scalar
+	 * @param point
 	 * @return
 	 */
-	public Vector dot(final float scalar) {
-		return new Vector((int) (scalar * x), (int) (scalar * y), serieIndex);
+	public long d2(final DPPoint point) {
+		final Vector difference = diff(point);
+		return difference.dot(difference);
+	}
+
+	public DPPoint add(final Vector vector) {
+		return new DPPoint(x + vector.x, y + vector.y, serieIndex);
 	}
 
 }

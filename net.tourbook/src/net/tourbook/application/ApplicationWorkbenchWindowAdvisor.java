@@ -97,7 +97,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		String title = null;
 		final IProduct product = Platform.getProduct();
 		if (product != null) {
-			title = product.getName() + " - " + MyTourbookSplashHandler.APP_BUILD_ID_VERSION; //$NON-NLS-1$ 
+			title = product.getName() + " - " + AppVersion.APP_BUILD_ID_VERSION; //$NON-NLS-1$ 
 		}
 		if (title == null) {
 			title = UI.EMPTY_STRING;
@@ -291,7 +291,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
+		configurer.setTitle(Messages.App_Title + " - " + AppVersion.APP_BUILD_ID); //$NON-NLS-1$
 
 	}
 
@@ -314,7 +314,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowStatusLine(false);
 
-		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
+		configurer.setTitle(Messages.App_Title + " - " + AppVersion.APP_BUILD_ID); //$NON-NLS-1$
 
 		final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 

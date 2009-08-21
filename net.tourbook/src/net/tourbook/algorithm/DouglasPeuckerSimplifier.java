@@ -25,14 +25,14 @@ public class DouglasPeuckerSimplifier {
 	 */
 	private int			tolerance;
 
-	private Point[]		graphPoints;
+	private DPPoint[]		graphPoints;
 
 	/**
 	 * Contains true for each point in graphPoints which remains for the simplifyed graph
 	 */
 	private boolean[]	usedPoints;
 
-	public DouglasPeuckerSimplifier(final int tolerance, final Point[] graphPoints) {
+	public DouglasPeuckerSimplifier(final int tolerance, final DPPoint[] graphPoints) {
 		this.tolerance = tolerance;
 		this.graphPoints = graphPoints;
 	}
@@ -53,11 +53,11 @@ public class DouglasPeuckerSimplifier {
 		simplifySection(0, graphPoints.length - 1);
 
 		// create a point list with all simplified points
-		final ArrayList<Point> simplifiedPoints = new ArrayList<Point>();
+		final ArrayList<DPPoint> simplifiedPoints = new ArrayList<DPPoint>();
 		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
 			if (usedPoints[iPoint]) {
-				final Point graphPoint = graphPoints[iPoint];
-				simplifiedPoints.add(new Point(graphPoint.x, graphPoint.y, iPoint));
+				final DPPoint graphPoint = graphPoints[iPoint];
+				simplifiedPoints.add(new DPPoint(graphPoint.x, graphPoint.y, iPoint));
 			}
 		}
 
@@ -82,8 +82,8 @@ public class DouglasPeuckerSimplifier {
 		final long tol2 = tolerance * tolerance;
 
 		// Segment S = { v[j], v[k] }; // segment from v[j] to v[k]
-		final Point startPoint = graphPoints[startIndex];
-		final Point endPoint = graphPoints[endIndex];
+		final DPPoint startPoint = graphPoints[startIndex];
+		final DPPoint endPoint = graphPoints[endIndex];
 
 		// Vector u = S.P1 - S.P0; // segment direction vector
 		final Vector u = endPoint.diff(startPoint);
@@ -95,13 +95,13 @@ public class DouglasPeuckerSimplifier {
 		// compute using the Feb 2001 Algorithm's dist_Point_to_Segment()
 		// Note: this works in any dimension (2D, 3D, ...)
 		Vector w;
-		Point Pb; // base of perpendicular from v[i] to S
+		DPPoint Pb; // base of perpendicular from v[i] to S
 		long cw, dv2; // dv2 = distance v[i] to S squared
 		float b;
 
 		for (int i = startIndex + 1; i < endIndex; i++) {
 
-			final Point currentPoint = graphPoints[i];
+			final DPPoint currentPoint = graphPoints[i];
 
 			// compute distance squared dv2
 

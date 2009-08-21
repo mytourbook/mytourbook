@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
  * Foundation version 2 of the License.
@@ -13,55 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+package net.tourbook.ui.views;
 
-package net.tourbook.algorithm;
+import net.tourbook.ui.views.TourSegmenterView.SegmenterType;
 
-public class Point {
+class TourSegmenter implements Comparable<Object> {
 
-	/**
-	 * x coordinate
-	 */
-	public int	x;
+	SegmenterType	segmenterType;
+	String			name;
+	int				requiredDataSeries;
 
-	/**
-	 * y coordinate
-	 */
-	public int	y;
-
-	/**
-	 * Index of this point in the original time serie
-	 */
-	public int	serieIndex;
-
-	public Point(final int x, final int y, final int serieIndex) {
-		this.x = x;
-		this.y = y;
-		this.serieIndex = serieIndex;
+	public TourSegmenter(final SegmenterType segmenterType, final String name, final int requiredDataSeries) {
+		this.segmenterType = segmenterType;
+		this.name = name;
+		this.requiredDataSeries = requiredDataSeries;
 	}
 
-	/**
-	 * Difference
-	 * 
-	 * @param point
-	 * @return
-	 */
-	public Vector diff(final Point point) {
-		return new Vector(x - point.x, y - point.y, serieIndex);
-	}
+	public int compareTo(final Object obj) {
 
-	/**
-	 * Squared Distance
-	 * 
-	 * @param point
-	 * @return
-	 */
-	public long d2(final Point point) {
-		final Vector difference = diff(point);
-		return difference.dot(difference);
-	}
+		if (obj instanceof TourSegmenter) {
+			final TourSegmenter otherSegmenter = (TourSegmenter) obj;
+			return name.compareTo(otherSegmenter.name);
+		}
 
-	public Point add(final Vector vector) {
-		return new Point(x + vector.x, y + vector.y, serieIndex);
+		return 0;
 	}
 
 }

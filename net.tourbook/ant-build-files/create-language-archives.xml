@@ -55,6 +55,13 @@
 			<param name="archive-language" value="_fr" />
 		</antcall>
 
+		<!-- create archive: NL -->
+		<antcall target="create-archive-for-one-language">
+			<param name="search-language" value="_nl" />
+			<param name="file-language" value="_nl" />
+			<param name="archive-language" value="_nl" />
+		</antcall>
+
 
 		<!-- clear temp folder -->
 		<echo message="delete temp dir: ${temp-dir}" />
