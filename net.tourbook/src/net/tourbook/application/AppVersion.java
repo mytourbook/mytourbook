@@ -2,9 +2,11 @@ package net.tourbook.application;
 
 public interface AppVersion {
 
-	public static final String	APP_BUILD_ID_VERSION	= "9.08.01";								//$NON-NLS-1$
+	public static final String	APP_BUILD_ID_VERSION	= "9.08.01?????";							//$NON-NLS-1$
 	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-08-21";	//$NON-NLS-1$
 
+//	public static final String	APP_BUILD_ID_VERSION	= "9.08.01";								//$NON-NLS-1$
+//	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-08-21";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID_VERSION	= "9.07.0";								//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2009-07-05";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID_VERSION	= "9.05.5";								//$NON-NLS-1$
