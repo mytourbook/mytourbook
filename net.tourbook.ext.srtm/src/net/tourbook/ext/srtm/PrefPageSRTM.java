@@ -142,6 +142,11 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 				fDataPathEditor.setPage(this);
 				fDataPathEditor.setPreferenceStore(fPrefStore);
 				fDataPathEditor.setEmptyStringAllowed(false);
+				fDataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+					public void propertyChange(final PropertyChangeEvent event) {
+						validateData();
+					}
+				});
 			}
 		}
 
@@ -403,9 +408,8 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 			setErrorMessage(Messages.prefPage_srtm_msg_invalid_data_path);
 			fDataPathEditor.setFocus();
-		}
 
-		if (fRdoSRTM3FtpUrl.getSelection()) {
+		} else if (fRdoSRTM3FtpUrl.getSelection()) {
 
 			// check ftp url
 
@@ -416,6 +420,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 				setErrorMessage(Messages.prefPage_srtm_msg_invalidSrtm3FtpUrl);
 				fTxtSRTM3FtpUrl.setFocus();
 			}
+
 		} else {
 
 			// check http url
