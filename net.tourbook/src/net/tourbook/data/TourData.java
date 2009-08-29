@@ -2708,6 +2708,8 @@ public class TourData implements Comparable<Object> {
 			segmentSerieBreakTime[segmentIndex] = segment.breakTime = breakTime;
 			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += recordingTime;
 
+			float segmentDistance = 0.0f;
+
 			/*
 			 * distance
 			 */
@@ -2722,7 +2724,7 @@ public class TourData implements Comparable<Object> {
 				// end point of current segment is the start of the next segment
 				distanceStart = distanceEnd;
 
-				final float segmentDistance = segment.distanceDiff;
+				segmentDistance = segment.distanceDiff;
 				if (segmentDistance != 0.0) {
 
 					// speed
@@ -2735,11 +2737,6 @@ public class TourData implements Comparable<Object> {
 					segment.pace = (int) segmentPace;
 					segment.paceDiff = segment.pace - tourPace;
 					segmentSeriePace[segmentIndex] = segmentPace;
-
-					// gradient
-					segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitudeDiffSegmentBorder
-							* 100
-							/ segmentDistance;
 				}
 			}
 
@@ -2800,6 +2797,13 @@ public class TourData implements Comparable<Object> {
 
 				// end point of current segment is the start of the next segment
 				altitudeStart = altitudeEnd;
+			}
+
+			if (isDistanceSerie && isAltitudeSerie && segmentDistance != 0.0) {
+
+				// gradient
+				segmentSerieGradient[segmentIndex] = segment.gradient = //
+				(float) segment.altitudeDiffSegmentBorder * 100 / segmentDistance;
 			}
 
 			if (isPulseSerie) {
