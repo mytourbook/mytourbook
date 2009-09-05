@@ -505,4 +505,12 @@ END OF TERMS AND CONDITIONS
          fragment="true"
          unpack="false"/>
 
+   <plugin
+         id="org.eclipse.ui.views.log.nl_fr"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
 </feature>

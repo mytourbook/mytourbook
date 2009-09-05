@@ -81,7 +81,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 												final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 		this.wbAdvisor = wbAdvisor;
-
 	}
 
 	private String computeTitle() {

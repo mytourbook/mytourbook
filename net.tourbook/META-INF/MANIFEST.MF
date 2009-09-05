@@ -10,6 +10,7 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
+ org.eclipse.ui.views.log,
  org.eclipse.core.runtime,
  org.eclipse.core.expressions,
  org.eclipse.core.databinding,
