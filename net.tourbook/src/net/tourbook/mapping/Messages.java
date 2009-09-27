@@ -43,9 +43,6 @@ public class Messages extends NLS {
 	public static String		image_action_tour_color_pulse_disabled;
 	public static String		image_action_tour_color_speed;
 	public static String		image_action_tour_color_speed_disabled;
-	public static String		image_action_tour_color_tourType;
-	public static String		image_action_tour_color_tourType_disabled;
-
 	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
@@ -99,7 +96,6 @@ public class Messages extends NLS {
 	public static String		map_action_tour_color_pase_tooltip;
 	public static String		map_action_tour_color_pulse_tooltip;
 	public static String		map_action_tour_color_speed_tooltip;
-	public static String		map_action_tour_color_tourType_tooltip;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
 	public static String		map_action_zoom_level_centered_tour;

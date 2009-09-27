@@ -66,7 +66,7 @@
 			<patternset includes="**/*${archive-language}.properties" />
 
 			<!-- using fileset to ignore missing archives -->
-			<fileset dir="${dir-with-language-archive}">
+			<fileset dir="${dir-with-language-archive}/import">
 				<include name="mt-${archive-language}.zip" />
 				<exclude name="exclude" />
 			</fileset>

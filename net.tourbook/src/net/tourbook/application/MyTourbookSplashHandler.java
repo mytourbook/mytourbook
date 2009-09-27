@@ -33,7 +33,7 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
  * splash handler accordingly.
  */
-public class MyTourbookSplashHandler extends BasicSplashHandler implements AppVersion {
+public class MyTourbookSplashHandler extends BasicSplashHandler implements ApplicationVersion {
 
 	@Override
 	public void init(final Shell splash) {
