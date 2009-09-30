@@ -246,7 +246,7 @@ public class SRTMTileFactory extends DefaultTileFactory {
 		}
 
 		@Override
-		public String getTileUrl(final int x, final int y, final int zoom) {
+		public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
 			final StringBuilder url = new StringBuilder(this.getBaseURL()).append(SEPARATOR)
 					.append(zoom)
 					.append(SEPARATOR)
