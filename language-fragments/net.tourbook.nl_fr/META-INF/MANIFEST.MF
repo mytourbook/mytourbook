@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: net.tourbook french translation
+Bundle-Name: net.tourbook - french translation
 Bundle-SymbolicName: net.tourbook.nl_fr
 Bundle-Version: 9.08.0.v2009-09-30
 Bundle-Vendor: MyTourbook
