@@ -7,8 +7,9 @@
 	-->
 
 	<property name="mt-trunk" value=".." />
+	<property name="language-fragments" value="${mt-trunk}/language-fragments" />
 
-	<property name="dir-with-language-archive" value="${mt-trunk}/../mytourbook LANGUAGE archives" />
+	<property name="dir-with-language-archive" value="${mt-trunk}/../mytourbook-LANGUAGE-archives" />
 	<property name="temp-unzip-dir" value="${mt-trunk}/../ant-temp-unzip" />
 
 	<!--
@@ -73,15 +74,36 @@
 		</unzip>
 
 		<!--
-		<echo message="copy archive to ${mt-trunk}" />
+		<echo message="copy archive into the project plugins />
 		-->
 		<copy todir="${mt-trunk}" overwrite="true" verbose="false">
 
-			<fileset dir="${temp-unzip-dir}" includes="**/*" />
+			<fileset dir="${temp-unzip-dir}" includes="**/*">
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+			</fileset>
 
 			<mapper>
 				<regexpmapper from="^(.*)\\src\\de\.byteholder(.*)$$" to="\\de\.byteholder\2" />
 				<regexpmapper from="^(.*)\\src\\net\.tourbook(.*)$$" to="\\net\.tourbook\2" />
+			</mapper>
+
+		</copy>
+
+		<!--
+		<echo message="copy archive into language fragments  />
+		-->
+		<copy todir="${language-fragments}" overwrite="true" verbose="false" includeemptydirs="false">
+
+			<fileset dir="${temp-unzip-dir}" includes="**/*">
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+			</fileset>
+
+			<mapper>
+				<regexpmapper from="^(.*)\\src\\(de\.byteholder[^\\]*)(.*)$$" to="\\\2\.nl_${archive-language}\3" />
+				<regexpmapper from="^(.*)\\src\\(net\.tourbook[^\\]*)(.*)$$" to="\\\2\.nl_${archive-language}\3" />
 			</mapper>
 
 		</copy>

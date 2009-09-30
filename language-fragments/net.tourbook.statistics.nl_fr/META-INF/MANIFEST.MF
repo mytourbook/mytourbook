@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: net.tourbook.statistics - french translation
 Bundle-SymbolicName: net.tourbook.statistics.nl_fr
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 9.08.2.v2009-09-30-patch14
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.statistics;bundle-version="9.8.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
