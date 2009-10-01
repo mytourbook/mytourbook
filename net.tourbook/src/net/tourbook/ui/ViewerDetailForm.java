@@ -201,5 +201,6 @@ public class ViewerDetailForm {
 	 */
 	public void setViewerWidth(final Integer viewerWidth) {
 		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
+		onResize();
 	}
 }

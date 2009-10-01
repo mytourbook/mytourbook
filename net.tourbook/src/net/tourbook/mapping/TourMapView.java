@@ -516,7 +516,7 @@ public class TourMapView extends ViewPart {
 
 					final boolean isShowTileInfo = store.getBoolean(PREF_SHOW_TILE_INFO);
 
-					fMap.setDrawTileBorders(isShowTileInfo);
+					fMap.setShowDebugInfo(isShowTileInfo);
 					fMap.queueRedrawMap();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
@@ -1791,7 +1791,7 @@ public class TourMapView extends ViewPart {
 
 		// debug info
 		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
-		fMap.setDrawTileBorders(isShowTileInfo);
+		fMap.setShowDebugInfo(isShowTileInfo);
 
 		// set dim level/color after the map providers are set
 		if (fMapDimLevel == -1) {
