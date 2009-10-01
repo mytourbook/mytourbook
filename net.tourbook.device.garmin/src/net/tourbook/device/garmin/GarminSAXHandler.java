@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,76 +28,88 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class GarminSAXHandler extends DefaultHandler {
 
-	private static final String		TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
-	private static final String		TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
+	private static final String				TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
+	private static final String				TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 
-	private static final String		TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
+	private static final String				TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
 
-	private static final String		TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
-	private static final String		TAG_COURSE					= "Course";													//$NON-NLS-1$
-	private static final String		TAG_HISTORY					= "History";													//$NON-NLS-1$
+	private static final String				TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
+	private static final String				TAG_COURSE					= "Course";													//$NON-NLS-1$
+	private static final String				TAG_HISTORY					= "History";													//$NON-NLS-1$
 
-	private static final String		TAG_LAP						= "Lap";														//$NON-NLS-1$
-	private static final String		TAG_NOTES					= "Notes";														//$NON-NLS-1$
-	private static final String		TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
+	private static final String				TAG_LAP						= "Lap";														//$NON-NLS-1$
+	private static final String				TAG_NOTES					= "Notes";														//$NON-NLS-1$
+	private static final String				TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
 
-	private static final String		TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
-	private static final String		TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
-	private static final String		TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
-	private static final String		TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
-	private static final String		TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
-	private static final String		TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
-	private static final String		TAG_TIME					= "Time";														//$NON-NLS-1$
-	private static final String		TAG_VALUE					= "Value";														//$NON-NLS-1$
+	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
+	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
+	private static final String				TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
+	private static final String				TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
+	private static final String				TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
+	private static final String				TAG_TIME					= "Time";														//$NON-NLS-1$
+	private static final String				TAG_VALUE					= "Value";														//$NON-NLS-1$
 
-	private static final Calendar	fCalendar					= GregorianCalendar.getInstance();
-	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+	private static final Calendar			fCalendar					= GregorianCalendar.getInstance();
+//	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
 
-	private int						fDataVersion				= -1;
-	private boolean					fIsInActivity				= false;
-	private boolean					fIsInCourse					= false;
+	private static final DateTimeFormatter	fDateTimeParser				= ISODateTimeFormat.dateTimeParser();
 
-	private boolean					fIsInLap					= false;
-	private boolean					fIsInTrackpoint				= false;
-	private boolean					fIsInTime					= false;
-	private boolean					fIsInLatitude				= false;
-	private boolean					fIsInLongitude				= false;
-	private boolean					fIsInAltitude				= false;
-	private boolean					fIsInDistance				= false;
-	private boolean					fIsInCadence;
+	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");		//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT_RFC822			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");				//$NON-NLS-1$
 
-	private boolean					fIsInHeartRate				= false;
-	private boolean					fIsInHeartRateValue			= false;
+	private int								fDataVersion				= -1;
+	private boolean							fIsInActivity				= false;
+	private boolean							fIsInCourse					= false;
 
-	private ArrayList<TimeData>		fTimeDataList				= new ArrayList<TimeData>();
-	private TimeData				fTimeData;
-	private TourbookDevice			fDeviceDataReader;
+	private boolean							fIsInLap					= false;
+	private boolean							fIsInTrackpoint				= false;
+	private boolean							fIsInTime					= false;
+	private boolean							fIsInLatitude				= false;
+	private boolean							fIsInLongitude				= false;
+	private boolean							fIsInAltitude				= false;
+	private boolean							fIsInDistance				= false;
+	private boolean							fIsInCadence;
 
-	private String					fImportFilePath;
+	private boolean							fIsInHeartRate				= false;
+	private boolean							fIsInHeartRateValue			= false;
 
-	private HashMap<Long, TourData>	fTourDataMap;
+	private ArrayList<TimeData>				fTimeDataList				= new ArrayList<TimeData>();
+	private TimeData						fTimeData;
+	private TourbookDevice					fDeviceDataReader;
 
-	private int						fLapCounter;
-	private boolean					fSetLapMarker				= false;
-	private boolean					fSetLapStartTime			= false;
-	private ArrayList<Long>			fLapStart					= new ArrayList<Long>();
+	private String							fImportFilePath;
 
-	private boolean					fIsImported;
-	private long					fCurrentTime;
+	private HashMap<Long, TourData>			fTourDataMap;
 
-	private StringBuilder			fCharacters					= new StringBuilder();
-	private boolean					fIsInNotes;
-	private String					fTourNotes;
+	private int								fLapCounter;
+	private boolean							fSetLapMarker				= false;
+	private boolean							fSetLapStartTime			= false;
+	private ArrayList<Long>					fLapStart					= new ArrayList<Long>();
+
+	private boolean							fIsImported;
+	private long							fCurrentTime;
+
+	private StringBuilder					fCharacters					= new StringBuilder();
+	private boolean							fIsInNotes;
+	private String							fTourNotes;
 
 	{
-		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+		TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
@@ -312,7 +323,28 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			fIsInTime = false;
 
-			fCurrentTime = iso.parse(fCharacters.toString()).getTime();
+			final String timeString = fCharacters.toString();
+
+			try {
+				fCurrentTime = fDateTimeParser.parseDateTime(timeString).getMillis();
+			} catch (final Exception e0) {
+				try {
+					fCurrentTime = TIME_FORMAT.parse(timeString).getTime();
+				} catch (final ParseException e1) {
+					try {
+						fCurrentTime = TIME_FORMAT_SSSZ.parse(timeString).getTime();
+					} catch (final ParseException e2) {
+						try {
+							fCurrentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
+						} catch (final ParseException e3) {
+
+							final String message = e3.getMessage();
+							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+							System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
+						}
+					}
+				}
+			}
 
 			fTimeData.absoluteTime = fCurrentTime;
 

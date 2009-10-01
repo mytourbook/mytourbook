@@ -9,5 +9,8 @@
    <feature url="features/patch13.jar" id="patch.net.tourbook.9.08.1.patch13" version="9.08.1.v2009-08-21-patch13" patch="true">
       <category name="MyTourbook 9.08"/>
    </feature>
+   <feature url="features/patch15.jar" id="patch.net.tourbook.9.08.3.patch15" version="9.08.3.v2009-09-30-patch15" patch="true">
+      <category name="MyTourbook 9.08"/>
+   </feature>
    <category-def name="MyTourbook 9.08" label="MyTourbook 9.08"/>
 </site>

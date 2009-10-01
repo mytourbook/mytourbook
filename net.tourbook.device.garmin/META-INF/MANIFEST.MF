@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: net.tourbook.device.garmin;singleton:=true
-Bundle-Version: 9.08.0.v2009-08-17
+Bundle-Version: 9.08.3.v2009-09-30-patch15
 Bundle-Activator: net.tourbook.device.garmin.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -20,3 +20,5 @@ Bundle-ClassPath: .,
  dinopolis-util-0.5.4mt.jar,
  gpsinput-0.5.4mt.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.joda.time,
+ org.joda.time.format
