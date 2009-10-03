@@ -8,6 +8,7 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
+Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.ui.views.log,
@@ -24,7 +25,6 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.util,
  de.byteholder.geoclipse,
  de.byteholder.gpx
-Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook,
  net.tourbook.colors,
  net.tourbook.data,
