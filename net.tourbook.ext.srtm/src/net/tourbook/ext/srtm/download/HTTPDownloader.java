@@ -52,14 +52,14 @@ public class HTTPDownloader {
 			 * display info in the status line when this is running in the UI thread because the
 			 * download will be blocking the UI thread until the download is finished
 			 */
-			tileInfoMgr.updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteFileName, -99);
+			tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_START_LOADING, remoteFileName, -99);
 		}
 
 		final Job monitorJob = new Job(Messages.job_name_downloadMonitor) { //$NON-NLS-1$
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEvent.LOADING_SRTM_DATA_MONITOR, remoteFileName, numWritten[0]);
+				tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_LOADING_MONITOR, remoteFileName, numWritten[0]);
 
 				// update every 200ms
 				this.schedule(200);
@@ -72,7 +72,7 @@ public class HTTPDownloader {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteFileName, 0);
+				tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_START_LOADING, remoteFileName, 0);
 
 				final String address = urlBase + remoteFileName;
 
@@ -126,7 +126,7 @@ public class HTTPDownloader {
 						e.printStackTrace();
 					}
 
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_END_LOADING, remoteFileName, 0);
 				}
 
 				System.out.println("get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

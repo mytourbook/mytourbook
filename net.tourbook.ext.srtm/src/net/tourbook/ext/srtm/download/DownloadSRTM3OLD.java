@@ -124,7 +124,7 @@ public final class DownloadSRTM3OLD {
 
 					ftp.setProgressMonitor(new FTPProgressMonitor() {
 						public void bytesTransferred(final long count) {
-							tileInfoMgr.updateSRTMTileInfo(TileEvent.LOADING_SRTM_DATA_MONITOR, remoteName, count);
+							tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_LOADING_MONITOR, remoteName, count);
 						}
 					});
 
@@ -140,10 +140,10 @@ public final class DownloadSRTM3OLD {
 					// ignore this error because the data can not be available
 					
 					e.printStackTrace();
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.ERROR_LOADING_SRTM_DATA, remoteName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_ERROR_LOADING, remoteName, 0);
 
 				} finally {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.END_LOADING_SRTM_DATA, remoteName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_END_LOADING, remoteName, 0);
 				}
 
 				return Status.OK_STATUS;
@@ -241,6 +241,6 @@ public final class DownloadSRTM3OLD {
 	}
 
 	private static void showTileInfo(final String remoteName, final int status) {
-		TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.START_LOADING_SRTM_DATA, remoteName, status);
+		TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.SRTM_DATA_START_LOADING, remoteName, status);
 	}
 }
