@@ -39,7 +39,7 @@ import com.enterprisedt.net.ftp.FTPMessageCollector;
 import com.enterprisedt.net.ftp.FTPProgressMonitor;
 import com.enterprisedt.net.ftp.FTPTransferType;
 
-import de.byteholder.geoclipse.map.event.TileEvent;
+import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 public final class FTPDownloader {
@@ -113,7 +113,7 @@ public final class FTPDownloader {
 
 					ftp.setProgressMonitor(new FTPProgressMonitor() {
 						public void bytesTransferred(final long count) {
-							tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_LOADING_MONITOR, remoteFileName, count);
+							tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, count);
 						}
 					});
 
@@ -137,10 +137,10 @@ public final class FTPDownloader {
 					// ignore this error because the data can be unavailable
 
 					e.printStackTrace();
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_ERROR_LOADING, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_ERROR_LOADING, remoteFileName, 0);
 
 				} finally {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_END_LOADING, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_END_LOADING, remoteFileName, 0);
 				}
 
 				return Status.OK_STATUS;
@@ -172,6 +172,6 @@ public final class FTPDownloader {
 	}
 
 	private void showTileInfo(final String remoteName, final int status) {
-		TileInfoManager.getInstance().updateSRTMTileInfo(TileEvent.SRTM_DATA_START_LOADING, remoteName, status);
+		TileInfoManager.getInstance().updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteName, status);
 	}
 }

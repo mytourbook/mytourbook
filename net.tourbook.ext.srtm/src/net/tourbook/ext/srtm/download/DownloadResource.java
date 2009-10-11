@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.byteholder.geoclipse.map.event.TileEvent;
+import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 public class DownloadResource {
@@ -46,7 +46,7 @@ public class DownloadResource {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_LOADING_MONITOR, remoteFileName, numWritten[0]);
+				tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, numWritten[0]);
 
 				// rescedule every 200ms
 				this.schedule(200);
@@ -60,7 +60,7 @@ public class DownloadResource {
 			protected IStatus run(final IProgressMonitor monitor) {
 
 				try {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_START_LOADING, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, 0);
 
 					final String address = urlBase + remoteFileName;
 
@@ -105,7 +105,7 @@ public class DownloadResource {
 
 					System.out.println(e.getMessage());
 
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_ERROR_LOADING, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_ERROR_LOADING, remoteFileName, 0);
 
 					return new Status(IStatus.ERROR, //
 							Activator.PLUGIN_ID,
@@ -114,7 +114,7 @@ public class DownloadResource {
 							e);
 
 				} finally {
-					tileInfoMgr.updateSRTMTileInfo(TileEvent.SRTM_DATA_END_LOADING, remoteFileName, 0);
+					tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_END_LOADING, remoteFileName, 0);
 				}
 
 				return Status.OK_STATUS;
