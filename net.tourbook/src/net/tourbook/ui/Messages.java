@@ -56,6 +56,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_cadence;
 	public static String		ColumnFactory_cadence_label;
 	public static String		ColumnFactory_cadence_tooltip;
+	public static String		ColumnFactory_calories;
+	public static String		ColumnFactory_calories_label;
+	public static String		ColumnFactory_calories_tooltip;
 	public static String		ColumnFactory_date;
 	public static String		ColumnFactory_date_label;
 	public static String		ColumnFactory_date_tooltip;

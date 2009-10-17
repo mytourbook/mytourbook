@@ -201,6 +201,22 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 	
+	public static final TreeColumnFactory CALORIES = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "calories", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_calories_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_calories);
+			colDef.setColumnUnit(Messages.ColumnFactory_calories);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_calories_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+			return colDef;
+		};
+	};
+	
 	public static final TreeColumnFactory DRIVING_TIME = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

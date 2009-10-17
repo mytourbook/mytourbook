@@ -676,6 +676,26 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 
 		/*
+		 * column: calories
+		 */
+
+		colDef = TreeColumnFactory.CALORIES.createColumn(fColumnManager, pixelConverter);
+		//colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long caloriesSum = ((TVITourBookItem) element).colCalories;
+
+				cell.setText(Long.toString(caloriesSum));
+
+				setCellColor(cell, element);
+			}
+		});
+
+
+		/*
 		 * column: recording time (h)
 		 */
 		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);

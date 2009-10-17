@@ -48,9 +48,11 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String				TAG_COURSE					= "Course";													//$NON-NLS-1$
 	private static final String				TAG_HISTORY					= "History";													//$NON-NLS-1$
 
+	//private static final String		TAG_ID						= "Id";
 	private static final String				TAG_LAP						= "Lap";														//$NON-NLS-1$
 	private static final String				TAG_NOTES					= "Notes";														//$NON-NLS-1$
 	private static final String				TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
+	private static final String				TAG_CALORIES				= "Calories";													//$NON-NLS-1$
 
 	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
 	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
@@ -75,13 +77,15 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean							fIsInCourse					= false;
 
 	private boolean							fIsInLap					= false;
+	//private boolean					fIsInId						= false;
+	private boolean							fIsInCalories				= false;
 	private boolean							fIsInTrackpoint				= false;
 	private boolean							fIsInTime					= false;
 	private boolean							fIsInLatitude				= false;
 	private boolean							fIsInLongitude				= false;
 	private boolean							fIsInAltitude				= false;
 	private boolean							fIsInDistance				= false;
-	private boolean							fIsInCadence;
+	private boolean							fIsInCadence				= false;
 
 	private boolean							fIsInHeartRate				= false;
 	private boolean							fIsInHeartRateValue			= false;
@@ -101,6 +105,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private boolean							fIsImported;
 	private long							fCurrentTime;
+	private String							fActivitySport				= null;
+	//private String					fId			 				= null;
+	private int								fCalories;
 
 	private StringBuilder					fCharacters					= new StringBuilder();
 	private boolean							fIsInNotes;
@@ -126,6 +133,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
 		if (fIsInTime
+		//|| fIsInId
+				|| fIsInCalories
 				|| fIsInLatitude
 				|| fIsInLongitude
 				|| fIsInAltitude
@@ -149,7 +158,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-//		System.out.println("</" + name + ">");
+		//System.out.println("</" + name + ">");
 
 		try {
 
@@ -197,12 +206,23 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				fIsInLap = false;
 
-			} else if (name.equals(TAG_ACTIVITY)) {
+			} else if (name.equals(TAG_CALORIES)) {
+				fIsInCalories = false;
+				try {
+					/* every lab has a calorie value */
+					fCalories += Integer.parseInt(fCharacters.toString());
+					fCharacters.delete(0, fCharacters.length());
+				} catch (NumberFormatException e) {}
+			}
+			/*
+			 * else if (name.equals(TAG_ID)) { fIsInId = false; fId = fCharacters.toString();
+			 * fCharacters.delete(0, fCharacters.length()); }
+			 */
+			else if (name.equals(TAG_ACTIVITY)) {
 
 				/*
 				 * version 2: activity and tour ends
 				 */
-
 				fIsInActivity = false;
 
 				setTourData();
@@ -430,6 +450,10 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.createTimeSeries(fTimeDataList, true);
 		tourData.computeAltitudeUpDown();
 
+		tourData.setDeviceModeName(fActivitySport);
+
+		tourData.setCalories(fCalories);
+
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
@@ -464,7 +488,15 @@ public class GarminSAXHandler extends DefaultHandler {
 			}
 		}
 
-		final Long tourId = tourData.createTourId(uniqueKey);
+		Long tourId;
+
+		/*
+		 * if (fId != null) { try{ tourId = Long.parseLong(fId); } catch (final
+		 * NumberFormatException e) { tourId = tourData.createTourId(uniqueKey); } } else
+		 */
+		{
+			tourId = tourData.createTourId(uniqueKey);
+		}
 
 		// check if the tour is already imported
 		if (fTourDataMap.containsKey(tourId) == false) {
@@ -520,7 +552,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
 
-//		System.out.print("<" + name + ">");
+		//System.out.print("<" + name + ">");
 
 		if (fDataVersion > 0) {
 
@@ -589,6 +621,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 							// create new time item
 							fTimeData = new TimeData();
+						} else if (name.equals(TAG_CALORIES)) {
+							fIsInCalories = true;
+							fCharacters.delete(0, fCharacters.length());
 						}
 
 					} else if (name.equals(TAG_LAP)) {
@@ -600,7 +635,9 @@ public class GarminSAXHandler extends DefaultHandler {
 							fSetLapMarker = true;
 						}
 						fSetLapStartTime = true;
-					}
+					} /*
+					 * else if (name.equals(TAG_ID)) { fIsInId = true; }
+					 */
 
 				} else if (fIsInCourse) {
 
@@ -624,6 +661,11 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					if (name.equals(TAG_ACTIVITY)) {
 						fIsInActivity = true;
+
+						/* get sport type */
+
+						fActivitySport = attributes.getValue("Sport");
+
 					} else if (name.equals(TAG_COURSE)) {
 						fIsInCourse = true;
 					}

@@ -192,6 +192,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
+	private static final String					WIDGET_KEY_TOURCALORIES			= "tourCalories";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
 
@@ -308,6 +309,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private DateTime							fDtDrivingTime;
 	private DateTime							fDtPausedTime;
 
+	private Text								fCalTourCalories;
+
 	/*
 	 * tab: info
 	 */
@@ -364,6 +367,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private KeyAdapter							fKeyListener;
 	private ModifyListener						fModifyListener;
 	private ModifyListener						fVerifyFloatValue;
+	private ModifyListener						fVerifyIntValue;
 	private SelectionAdapter					fTourTimeListener;
 	private SelectionAdapter					fDateTimeListener;
 	private PixelConverter						fPixelConverter;
@@ -1796,6 +1800,52 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		};
+		
+		fVerifyIntValue = new ModifyListener() {
+
+			public void modifyText(final ModifyEvent event) {
+
+				if (fIsDirtyDisabled || fIsSavingInProgress) {
+					return;
+				}
+
+				final Text widget = (Text) event.widget;
+				final String valueText = widget.getText().trim();
+
+				if (valueText.length() > 0) {
+					try {
+
+						Integer.parseInt(valueText);
+
+						fMessageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
+
+					} catch (final IllegalArgumentException e) {
+
+						// wrong characters are entered, display an error message
+
+						fMessageManager.addMessage(widget.getData(WIDGET_KEY),
+								e.getLocalizedMessage(),
+								null,
+								IMessageProvider.ERROR,
+								widget);
+					}
+				}
+
+				/*
+				 * set tour dirty must be set after validation because an error can occur which
+				 * enables actions
+				 */
+				if (fIsTourDirty) {
+					/*
+					 * when an error occured previously and is now solved, the save action must be
+					 * enabled
+					 */
+					enableActions();
+				} else {
+					setTourDirty();
+				}
+			}
+		};
 	}
 
 	/**
@@ -2114,6 +2164,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTextTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
 
 		fLblTourDistanceUnit = tk.createLabel(tourDtContainer, UI.UNIT_LABEL_DISTANCE);
+
+		/*
+		 * calories
+		 */
+
+		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_calories);
+
+		fCalTourCalories = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
+		GridDataFactory.fillDefaults().applyTo(fCalTourCalories);
+		fCalTourCalories.addModifyListener(fVerifyIntValue);
+		fCalTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);		
+
+		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_calories_unit);
 
 		/*
 		 * container: 2. column
@@ -3139,6 +3202,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fDtPausedTime.setEnabled(canEdit && fIsManualTour);
 
 		fTextTourDistance.setEnabled(canEdit && fIsManualTour);
+
+		fCalTourCalories.setEnabled(canEdit && fIsManualTour);
 
 		fTagLink.setEnabled(canEdit);
 		fTourTypeLink.setEnabled(canEdit);
@@ -4905,6 +4970,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						+ fDtDrivingTime.getSeconds());
 			}
 
+			try
+			{
+				final String tempStr = fCalTourCalories.getText().trim();
+
+				if (tempStr.length() == 0){
+					fTourData.setCalories(0);
+				}
+				else{
+					int cal = Integer.parseInt(tempStr);
+					fTourData.setCalories(cal);
+				}
+			}
+			catch (NumberFormatException e)
+			{
+				// wrong characters are entered, display an error message, should not happen
+
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error in calories field", e.getLocalizedMessage());//$NON-NLS-1$
+
+				e.printStackTrace();
+			}
+
+
 		} catch (final IllegalArgumentException e) {
 
 			// this should not happen (but it happend when developing the tour data editor :-)
@@ -5222,6 +5309,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int pausedTime = recordingTime - drivingTime;
 		fDtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
+		// calories
+		int cal = fTourData.getCalories();
+		fCalTourCalories.setText(Integer.toString(cal));
+		
 		UI.updateUITourType(fTourData.getTourType(), fLblTourType);
 		UI.updateUITags(fTourData, fLblTourTags);
 

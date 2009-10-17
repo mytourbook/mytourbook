@@ -41,7 +41,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 													+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
 													+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
 													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-													+ "AVG(AVGTEMPERATURE)";	//	14	//$NON-NLS-1$
+													+ "AVG(AVGTEMPERATURE),"	//	14	//$NON-NLS-1$
+													+ "SUM(CALORIES)";//			15	//$NON-NLS-1$
 
 	TourBookView			fView;
 
@@ -59,6 +60,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	String					fTourTitle;
 
 	long					colCounter;
+
+	long					colCalories;
 
 	long					colDistance;
 
@@ -112,6 +115,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colAvgPulse = result.getLong(startIndex + 11);
 		colAvgCadence = result.getLong(startIndex + 12);
 		colAvgTemperature = result.getLong(startIndex + 13);
+		
+		colCalories = result.getLong(startIndex + 14);
 
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}

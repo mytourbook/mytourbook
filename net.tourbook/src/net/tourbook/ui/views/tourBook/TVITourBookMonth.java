@@ -75,7 +75,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ "Tmarker.markerId,"//					21	//$NON-NLS-1$ 
 				+ "startHour," //						22	//$NON-NLS-1$
 				+ "startMinute," //						23	//$NON-NLS-1$
-				+ "startWeek" //						24	//$NON-NLS-1$
+				+ "startWeek," //						24	//$NON-NLS-1$
+				+ "calories" //							25	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -173,6 +174,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 					final int dbMinute = result.getInt(23);
 
 					tourItem.colWeek = result.getInt(24);
+
+					tourItem.colCalories = result.getInt(25);
 
 					fCalendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.fTourDate = fCalendar.getTimeInMillis();

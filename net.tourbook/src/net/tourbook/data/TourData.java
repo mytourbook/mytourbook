@@ -264,7 +264,7 @@ public class TourData implements Comparable<Object> {
 	private String						tourStartPlace;															// db-version 4
 	private String						tourEndPlace;																// db-version 4
 
-	private String						calories;																	// db-version 4
+	private Integer						calories;																	// db-version 4
 	private float						bikerWeight;																// db-version 4
 
 	/**
@@ -3051,7 +3051,10 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * @return the calories
 	 */
-	public String getCalories() {
+	public int getCalories() {
+		if (calories == null) {
+			return 0;
+		}
 		return calories;
 	}
 
@@ -3838,7 +3841,7 @@ public class TourData implements Comparable<Object> {
 	 * @param calories
 	 *            the calories to set
 	 */
-	public void setCalories(final String calories) {
+	public void setCalories(final int calories) {
 		this.calories = calories;
 	}
 

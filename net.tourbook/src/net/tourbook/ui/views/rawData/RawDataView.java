@@ -883,6 +883,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 
 		/*
+		 * column: calories (cal)
+		 */
+
+		colDef = TableColumnFactory.CALORIES.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int tourCalories = ((TourData) cell.getElement()).getCalories();
+				cell.setText(Integer.toString(tourCalories));	
+			}
+		});
+		
+		/*
 		 * column: distance (km/mile)
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);

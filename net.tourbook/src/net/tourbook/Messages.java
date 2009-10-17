@@ -717,6 +717,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_start_time;
 	public static String		tour_editor_label_time;
 	public static String		tour_editor_label_time_unit;
+	public static String		tour_editor_label_tour_calories;
+	public static String		tour_editor_label_tour_calories_unit;
 	public static String		tour_editor_label_tour_date;
 	public static String		tour_editor_label_tour_distance;
 	public static String		tour_editor_label_tour_id;

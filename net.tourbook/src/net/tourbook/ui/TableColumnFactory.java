@@ -253,6 +253,23 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory CALORIES = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "calories", SWT.TRAIL); //$NON-NLS-1$
+	
+			colDef.setColumnLabel(Messages.ColumnFactory_calories_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_calories);
+			colDef.setColumnUnit(Messages.ColumnFactory_calories);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_calories_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory DB_STATUS = new TableColumnFactory() {
 
 		@Override
