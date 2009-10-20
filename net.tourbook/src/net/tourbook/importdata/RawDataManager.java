@@ -110,23 +110,30 @@ public class RawDataManager {
 
 	public static void showMsgBoxInvalidFormat(final ArrayList<String> notImportedFiles) {
 
-		final StringBuilder fileText = new StringBuilder();
-		for (final String fileName : notImportedFiles) {
-			fileText.append(UI.NEW_LINE);
-			fileText.append(fileName);
-		}
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
 
-		final String errorMessage = NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
-		MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.app_error_title, errorMessage);
+				final StringBuilder fileText = new StringBuilder();
+				for (final String fileName : notImportedFiles) {
+					fileText.append(UI.NEW_LINE);
+					fileText.append(fileName);
+				}
 
-		System.out.println(errorMessage);
+				final String errorMessage = NLS
+						.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
+				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.app_error_title, errorMessage);
+
+				System.out.println(errorMessage);
+			}
+		});
 	}
 
 	private RawDataManager() {}
 
 	void actionImportFromDevice() {
 
-		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+		new WizardImportDialog(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 				new WizardImportData(),
 				Messages.Import_Wizard_Dlg_title).open();
 
@@ -137,7 +144,8 @@ public class RawDataManager {
 
 		final WizardImportData importWizard = new WizardImportData();
 
-		final WizardDialog dialog = new WizardImportDialog(PlatformUI.getWorkbench()
+		final WizardDialog dialog = new WizardImportDialog(PlatformUI
+				.getWorkbench()
 				.getActiveWorkbenchWindow()
 				.getShell(), importWizard, Messages.Import_Wizard_Dlg_title);
 
@@ -459,25 +467,27 @@ public class RawDataManager {
 
 						if (destFileName == null) {
 
-							MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
-									"The filename for the received data" //$NON-NLS-1$
-											+ " could not be created from the file '" //$NON-NLS-1$
-											+ sourceFileName
-											+ "'\n\n" //$NON-NLS-1$
-											+ "The received data will be saved in the temp file '" //$NON-NLS-1$
-											+ new Path(destinationPath).addTrailingSeparator().toString()
-											+ TEMP_IMPORTED_FILE
-											+ "'\n\n" //$NON-NLS-1$
-											+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
-											+ "\n\n" //$NON-NLS-1$
-											+ "When you think the received data are correct, " //$NON-NLS-1$
-											+ "you can send the received data file to the author of MyTourbook to analyze it."); //$NON-NLS-1$
+							MessageDialog
+									.openError(Display.getDefault().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
+											"The filename for the received data" //$NON-NLS-1$
+													+ " could not be created from the file '" //$NON-NLS-1$
+													+ sourceFileName
+													+ "'\n\n" //$NON-NLS-1$
+													+ "The received data will be saved in the temp file '" //$NON-NLS-1$
+													+ new Path(destinationPath).addTrailingSeparator().toString()
+													+ TEMP_IMPORTED_FILE
+													+ "'\n\n" //$NON-NLS-1$
+													+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
+													+ "\n\n" //$NON-NLS-1$
+													+ "When you think the received data are correct, " //$NON-NLS-1$
+													+ "you can send the received data file to the author of MyTourbook to analyze it."); //$NON-NLS-1$
 
 							destFileName = TEMP_IMPORTED_FILE;
 						}
 					}
 				}
-				final File newFile = new File((new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
+				final File newFile = new File(
+						(new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
 
 				// get source file
 				final File fileIn = new File(sourceFileName);
@@ -490,7 +500,8 @@ public class RawDataManager {
 					if (fileCollision.value == FileCollisionBehavior.ASK) {
 
 						final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-						final MessageDialog messageDialog = new MessageDialog(shell,
+						final MessageDialog messageDialog = new MessageDialog(
+								shell,
 								Messages.Import_Wizard_Message_Title,
 								null,
 								NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
