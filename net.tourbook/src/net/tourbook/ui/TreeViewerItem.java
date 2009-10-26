@@ -32,14 +32,14 @@ public abstract class TreeViewerItem {
 	/**
 	 * Adds a new child to this tree item
 	 * 
-	 * @param newTreeItem
+	 * @param childItem
 	 */
-	public void addChild(final TreeViewerItem newTreeItem) {
-
+	public void addChild(final TreeViewerItem childItem) {
+ 
 		// set parent for the new child item
-		newTreeItem.setParentItem(this);
+		childItem.setParentItem(this);
 
-		getFetchedChildren().add(newTreeItem);
+		getFetchedChildren().add(childItem);
 	}
 
 	/**
