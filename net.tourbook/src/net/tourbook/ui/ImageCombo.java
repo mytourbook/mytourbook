@@ -144,9 +144,7 @@ public final class ImageCombo extends Composite {
 		fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 		int arrowStyle = SWT.ARROW | SWT.DOWN;
-		if ((style & SWT.FLAT) != 0) {
-			arrowStyle |= SWT.FLAT;
-		}
+
 		arrow = new Button(this, arrowStyle);
 
 		listener = new Listener() {
@@ -806,6 +804,7 @@ public final class ImageCombo extends Composite {
 			hasFocus = true;
 
 			fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION));
+			fLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
 
 			final Shell shell = getShell();
 			shell.removeListener(SWT.Deactivate, listener);
@@ -829,6 +828,7 @@ public final class ImageCombo extends Composite {
 			hasFocus = false;
 
 			fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			fLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
 
 			final Shell shell = getShell();
 			shell.removeListener(SWT.Deactivate, listener);
