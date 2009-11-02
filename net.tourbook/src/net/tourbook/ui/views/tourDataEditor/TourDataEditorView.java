@@ -181,12 +181,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
-	final IDialogSettings						fViewState						= TourbookPlugin.getDefault()
+	final IDialogSettings						fViewState						= TourbookPlugin
+																						.getDefault()
 																						.getDialogSettingsSection(ID);
-	final IDialogSettings						fViewStateSlice					= TourbookPlugin.getDefault()
+	final IDialogSettings						fViewStateSlice					= TourbookPlugin
+																						.getDefault()
 																						.getDialogSettingsSection(//
 																								ID + ".slice");			//$NON-NLS-1$
-	final IDialogSettings						fViewStateMarker				= TourbookPlugin.getDefault()
+	final IDialogSettings						fViewStateMarker				= TourbookPlugin
+																						.getDefault()
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
 
@@ -1004,7 +1007,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
 						// use imperial system
-						sb.append(Integer.toString((int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD)));
+						sb
+								.append(Integer
+										.toString((int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD)));
 					} else {
 						// use metric system
 						sb.append(Integer.toString(metricTemperature));
@@ -1594,7 +1599,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else {
 
-			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getCurrent()
+			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display
+					.getCurrent()
 					.getActiveShell(),//
 					Messages.tour_editor_dlg_revert_tour_title, // title
 					Messages.tour_editor_dlg_revert_tour_message, // message
@@ -1631,10 +1637,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionAddTag = new ActionSetTourTag(this, true, false);
 		fActionRemoveTag = new ActionSetTourTag(this, false, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this, false);
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
-		fActionOpenTourTypePrefs = new ActionOpenPrefDialog(Messages.action_tourType_modify_tourTypes,
+		fActionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.action_tourType_modify_tourTypes,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
@@ -1800,7 +1808,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		};
-		
+
 		fVerifyIntValue = new ModifyListener() {
 
 			public void modifyText(final ModifyEvent event) {
@@ -1823,7 +1831,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						// wrong characters are entered, display an error message
 
-						fMessageManager.addMessage(widget.getData(WIDGET_KEY),
+						fMessageManager.addMessage(
+								widget.getData(WIDGET_KEY),
 								e.getLocalizedMessage(),
 								null,
 								IMessageProvider.ERROR,
@@ -2047,8 +2056,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //				Section.SHORT_TITLE_BAR
 				Section.TITLE_BAR
 		// | Section.DESCRIPTION 
-		// | Section.EXPANDED
-		);
+				// | Section.EXPANDED
+				);
 
 		section.setText(title);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
@@ -2174,7 +2183,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fCalTourCalories = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
 		GridDataFactory.fillDefaults().applyTo(fCalTourCalories);
 		fCalTourCalories.addModifyListener(fVerifyIntValue);
-		fCalTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);		
+		fCalTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);
 
 		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_calories_unit);
 
@@ -2837,7 +2846,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (fSerieAltitude != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) (fSerieAltitude[timeSlice.serieIndex] / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Integer
+							.toString((int) (fSerieAltitude[timeSlice.serieIndex] / UI.UNIT_VALUE_ALTITUDE)));
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
@@ -2921,7 +2931,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
 
 						// use imperial system
-						cell.setText(Integer.toString((int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD)));
+						cell
+								.setText(Integer
+										.toString((int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD)));
 
 					} else {
 
@@ -3732,7 +3744,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private boolean isDiscardTour() {
 
-		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+		final MessageDialog dialog = new MessageDialog(
+				Display.getCurrent().getActiveShell(),
 				Messages.tour_editor_dlg_save_tour_title,
 				null,
 				NLS.bind(Messages.tour_editor_dlg_save_invalid_tour, TourManager.getTourDateFull(fTourData)),
@@ -3924,7 +3937,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
-				final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData()
+				final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement)
+						.getComparedTourData()
 						.getTourId();
 
 				fSelectionTourId = comparedTourTourId;
@@ -4572,14 +4586,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		// confirm save/discard/cancel
-		final int returnCode = new MessageDialog(Display.getCurrent().getActiveShell(),
+		final int returnCode = new MessageDialog(
+				Display.getCurrent().getActiveShell(),
 				Messages.tour_editor_dlg_save_tour_title,
 				null,
 				NLS.bind(Messages.tour_editor_dlg_save_tour_message, TourManager.getTourDateFull(fTourData)),
 				MessageDialog.QUESTION,
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL },
 				0)//
-		.open();
+				.open();
 
 		if (returnCode == 0) {
 
@@ -4730,7 +4745,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void setCellEditSupport(final TableViewer viewer) {
 
-		final TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer,
+		final TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
+				viewer,
 				new FocusCellOwnerDrawHighlighter(viewer));
 
 		final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
@@ -4743,7 +4759,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 
-		TableViewerEditor.create(viewer, //
+		TableViewerEditor.create(//
+				viewer,
 				focusCellManager,
 				actSupport,
 				ColumnViewerEditor.TABBING_HORIZONTAL //
@@ -4970,27 +4987,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						+ fDtDrivingTime.getSeconds());
 			}
 
-			try
-			{
+			try {
 				final String tempStr = fCalTourCalories.getText().trim();
 
-				if (tempStr.length() == 0){
+				if (tempStr.length() == 0) {
 					fTourData.setCalories(0);
-				}
-				else{
-					int cal = Integer.parseInt(tempStr);
+				} else {
+					final int cal = Integer.parseInt(tempStr);
 					fTourData.setCalories(cal);
 				}
-			}
-			catch (NumberFormatException e)
-			{
+			} catch (final NumberFormatException e) {
 				// wrong characters are entered, display an error message, should not happen
 
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error in calories field", e.getLocalizedMessage());//$NON-NLS-1$
+				MessageDialog.openError(
+						Display.getCurrent().getActiveShell(),
+						"Error in calories field", e.getLocalizedMessage());//$NON-NLS-1$
 
 				e.printStackTrace();
 			}
-
 
 		} catch (final IllegalArgumentException e) {
 
@@ -5310,9 +5324,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fDtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
 		// calories
-		int cal = fTourData.getCalories();
+		final int cal = fTourData.getCalories();
 		fCalTourCalories.setText(Integer.toString(cal));
-		
+
 		UI.updateUITourType(fTourData.getTourType(), fLblTourType);
 		UI.updateUITags(fTourData, fLblTourTags);
 
