@@ -25,6 +25,8 @@ public class Messages extends NLS {
 	public static String		dialog_export_chk_camouflageSpeed;
 	public static String		dialog_export_chk_camouflageSpeed_tooltip;
 	public static String		dialog_export_chk_camouflageSpeedInput_tooltip;
+	public static String		dialog_export_chk_exportNotes;
+	public static String		dialog_export_chk_exportNotes_tooltip;
 	public static String		dialog_export_chk_exportMarkers;
 	public static String		dialog_export_chk_exportMarkers_tooltip;
 	public static String		dialog_export_chk_mergeAllTours;

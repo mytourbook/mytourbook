@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $double6formatter.applyPattern("0.000000") $intformatter.applyPattern("0") $double2formatter.applyPattern("0.00")
-<TrainingCenterDatabase
-	xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+
 	<Activities>
 		<Activity Sport="Biking">
 			<Id>$dateformatter.format($starttime)</Id>
 			<Lap StartTime="$dateformatter.format($starttime)">
 				<TotalTimeSeconds>$double2formatter.format($totaltime)</TotalTimeSeconds>
 				<DistanceMeters>$double6formatter.format($totaldistance)</DistanceMeters>
-				<Calories>0</Calories>
+				<Calories>$lap.getCalories()</Calories>
 #if($averageheartrate)
-				<AverageHeartRateBpm>
+				<AverageHeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
 					<Value>$averageheartrate</Value>
 				</AverageHeartRateBpm>
 #end
 #if($maximumheartrate)
-				<MaximumHeartRateBpm>
+				<MaximumHeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
 					<Value>$maximumheartrate</Value>
 				</MaximumHeartRateBpm>
 #end
@@ -44,16 +42,21 @@
 						<DistanceMeters>$double6formatter.format($point.Distance)</DistanceMeters>
 #end
 #if($point.hasValidHeartrate())
-						<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t"><Value>$point.Heartrate</Value></HeartRateBpm>
-#end
+						<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+						  <Value>$point.Heartrate</Value>
+						</HeartRateBpm>
 #if($point.hasValidCadence())
 						<Cadence type="CadenceValue_t">$point.Cadence</Cadence>
+#end
 #end
 					</Trackpoint>
 #end
 				</Track>
 #end
 			</Lap>
+#if ($lap.hasNotes())
+			<Notes>$lap.getNotes()</Notes>
+#end
             <Creator xsi:type="Device_t">
               <Name>$creator</Name>
               <UnitId></UnitId>

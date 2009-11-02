@@ -100,7 +100,7 @@ import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String						ZERO						= "0"; //$NON-NLS-1$
+	private static final String						ZERO						= "0";													//$NON-NLS-1$
 
 	private static final String						UI_AVERAGE_SYMBOL			= "Ø ";												//$NON-NLS-1$
 
@@ -118,6 +118,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private static final String						STATE_IS_MERGE_ALL_TOURS	= "isMergeAllTours";									//$NON-NLS-1$
 	private static final String						STATE_IS_EXPORT_TOUR_RANGE	= "isExportTourRange";									//$NON-NLS-1$
 	private static final String						STATE_IS_EXPORT_MARKERS		= "isExportMarkers";									//$NON-NLS-1$
+	private static final String						STATE_IS_EXPORT_NOTES		= "isExportNotes";										//$NON-NLS-1$
 
 	private static final String						STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";									//$NON-NLS-1$
 	private static final String						STATE_CAMOUFLAGE_SPEED		= "camouflageSpeedValue";								//$NON-NLS-1$
@@ -154,6 +155,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private Button									fChkExportTourRange;
 	private Button									fChkMergeAllTours;
 	private Button									fChkExportMarkers;
+	private Button									fChkExportNotes;
 
 	private Button									fChkCamouflageSpeed;
 	private Text									fTxtCamouflageSpeed;
@@ -204,7 +206,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * @param context
 	 *            the velocity context holding all the data
 	 */
-	private void addValuesToContext(final VelocityContext context) {
+	private void addValuesToContext(final VelocityContext context, final GarminLap lap) {
 
 		context.put("dateformatter", fDateFormat); //$NON-NLS-1$
 		context.put("intformatter", fIntFormatter); //$NON-NLS-1$
@@ -220,6 +222,9 @@ public class DialogExportTour extends TitleAreaDialog {
 		final Calendar now = Calendar.getInstance();
 		final Date creationDate = now.getTime();
 		context.put("creation_date", creationDate); //$NON-NLS-1$
+
+		// lap data
+		context.put("lap", lap); //$NON-NLS-1$
 
 		// creator
 		final Version version = Activator.getDefault().getVersion();
@@ -608,6 +613,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		{
 			createUIOptionCamouflageSpeed(group);
 			createUIOptionExportMarkers(group);
+			createUIOptionExportNotes(group);
 			createUIOptionMergeTours(group);
 			createUIOptionTourPart(group);
 		}
@@ -660,6 +666,17 @@ public class DialogExportTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(
 					fLblCoumouflageSpeedUnit);
 		}
+	}
+
+	private void createUIOptionExportNotes(final Composite parent) {
+
+		/*
+		 * checkbox: export notes
+		 */
+		fChkExportNotes = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkExportNotes);
+		fChkExportNotes.setText(Messages.dialog_export_chk_exportNotes);
+		fChkExportNotes.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);	
 	}
 
 	private void createUIOptionExportMarkers(final Composite parent) {
@@ -824,6 +841,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			final TourData tourData = fTourDataList.get(0);
 
+			final GarminLap tourLap = getLap(tourData, fChkExportNotes.getSelection());
+
 			final GarminTrack track = getTrack(
 					tourData,
 					TourManager.getTourDateTime(tourData),
@@ -839,7 +858,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				getWaypoints(wayPointList, tourData);
 			}
 
-			doExportTour(trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
+			doExportTour(tourLap, trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
 
 		} else {
 
@@ -856,8 +875,12 @@ public class DialogExportTour extends TitleAreaDialog {
 				fTrackStartDateTime = TourManager.getTourDateTime(fTourDataList.get(0));
 				DateTime trackDateTime;
 
-				// create tracklist
+				final GarminLap tourLap = new GarminLap();
+
+				// create tracklist and lap
 				for (final TourData tourData : fTourDataList) {
+
+					mergeLap(tourLap, tourData, fChkExportNotes.getSelection());
 
 					if (isCamouflageSpeed) {
 						trackDateTime = fTrackStartDateTime;
@@ -871,16 +894,24 @@ public class DialogExportTour extends TitleAreaDialog {
 					}
 				}
 
-				doExportTour(trackList, wayPointList, completeFilePath, fileCollisionBehaviour, isOverwriteFiles);
+				doExportTour(
+						tourLap,
+						trackList,
+						wayPointList,
+						completeFilePath,
+						fileCollisionBehaviour,
+						isOverwriteFiles);
 
 			} else {
 
 				/*
 				 * export each tour separately
 				 */
-
+				
 				final String exportPathName = getExportPathName();
+				final boolean addNotes = fChkExportNotes.getSelection();
 				fProgressIndicator.beginTask(fTourDataList.size());
+				
 
 				final Job exportJob = new Job("export files") { //$NON-NLS-1$
 					@Override
@@ -894,6 +925,8 @@ public class DialogExportTour extends TitleAreaDialog {
 							// get filepath
 							final IPath filePath = exportFilePath.append(UI.format_yyyymmdd_hhmmss(tourData))
 									.addFileExtension(fExportExtensionPoint.getFileExtension());
+
+							final GarminLap tourLap = getLap(tourData, addNotes);
 
 							// create tracklist
 							trackList.clear();
@@ -926,6 +959,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 								try {
 									doExportTour(
+											tourLap,
 											trackList,
 											wayPointList,
 											filePath.toOSString(),
@@ -956,7 +990,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 	}
 
-	private void doExportTour(	final ArrayList<GarminTrack> tList,
+	private void doExportTour(	final GarminLap lap,
+								final ArrayList<GarminTrack> tList,
 								final ArrayList<GarminWaypoint> wayPointList,
 								final String exportFileName,
 								final FileCollisionBehavior fileCollisionBehaviour,
@@ -966,12 +1001,13 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		// set properties in the context
 		context.put("tracks", tList); //$NON-NLS-1$
-		context.put("printtracks", new Boolean(true)); //$NON-NLS-1$
+
+		context.put("printtracks", Boolean.valueOf(true)); //$NON-NLS-1$
 
 		context.put("waypoints", wayPointList); //$NON-NLS-1$
-		context.put("printwaypoints", new Boolean(wayPointList.size() > 0)); //$NON-NLS-1$
+		context.put("printwaypoints", Boolean.valueOf(wayPointList.size() > 0)); //$NON-NLS-1$
 
-		context.put("printroutes", new Boolean(false)); //$NON-NLS-1$
+		context.put("printroutes", Boolean.valueOf(false)); //$NON-NLS-1$
 
 		// tcx
 
@@ -992,7 +1028,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile),
 					UI.UTF_8));
 
-			addValuesToContext(context);
+			addValuesToContext(context, lap);
 
 			Velocity.evaluate(context, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 			exportWriter.close();
@@ -1142,6 +1178,41 @@ public class DialogExportTour extends TitleAreaDialog {
 		fTrackStartDateTime = lastTrackDateTime;
 
 		return track;
+	}
+
+	private GarminLap getLap(final TourData tourData, boolean addNotes) {
+
+		final GarminLap lap = new GarminLap();
+
+		lap.setCalories(tourData.getCalories());
+
+		if (addNotes) {
+			final String notes = tourData.getTourDescription();
+			if (notes != null && notes.length() > 0)
+				lap.setNotes(notes);
+		}
+		return lap;
+	}
+
+	private void mergeLap(GarminLap tourLap, TourData tourData, boolean mergeNotes) {
+
+		int calories = tourLap.getCalories();
+		calories += tourData.getCalories();
+		tourLap.setCalories(calories);
+
+		if (mergeNotes) {
+			final String notes = tourData.getTourDescription();
+			if (notes != null && notes.length() > 0) {
+				String lapNotes = tourLap.getNotes();
+
+				if (lapNotes == null) {
+					tourLap.setNotes(notes);
+				} else {
+					tourLap.setNotes(lapNotes + "\n" + notes);
+				}
+			}
+		}
+
 	}
 
 	private String[] getUniqueItems(final String[] pathItems, final String currentItem) {
@@ -1294,6 +1365,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		fChkMergeAllTours.setSelection(fState.getBoolean(STATE_IS_MERGE_ALL_TOURS));
 		fChkExportTourRange.setSelection(fState.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
 		fChkExportMarkers.setSelection(fState.getBoolean(STATE_IS_EXPORT_MARKERS));
+		fChkExportNotes.setSelection(fState.getBoolean(STATE_IS_EXPORT_NOTES));
 
 		// camouflage speed
 		fChkCamouflageSpeed.setSelection(fState.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
@@ -1331,6 +1403,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		fState.put(STATE_IS_OVERWRITE_FILES, fChkOverwriteFiles.getSelection());
 		fState.put(STATE_IS_EXPORT_MARKERS, fChkExportMarkers.getSelection());
+		fState.put(STATE_IS_EXPORT_NOTES, fChkExportNotes.getSelection());
 	}
 
 	private void setError(final String message) {
@@ -1491,5 +1564,4 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		return returnValue;
 	}
-
 }
