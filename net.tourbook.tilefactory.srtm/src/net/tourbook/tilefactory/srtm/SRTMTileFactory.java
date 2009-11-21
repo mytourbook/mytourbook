@@ -29,16 +29,16 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
 
-import de.byteholder.geoclipse.map.DefaultTileFactory;
+import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
-
+ 
 /**
  * @author Michael Kanis
  * @author Alfred Barten
  */
-public class SRTMTileFactory extends DefaultTileFactory {
+public class SRTMTileFactory extends TileFactoryImpl {
 
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
