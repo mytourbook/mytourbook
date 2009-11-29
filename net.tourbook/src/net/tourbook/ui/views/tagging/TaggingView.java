@@ -107,12 +107,13 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID								= "net.tourbook.views.tagViewID";		//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tagViewID";			//$NON-NLS-1$
 
-	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
+	final IDialogSettings					fViewState						= TourbookPlugin
+ 																					.getDefault()
 																					.getDialogSettingsSection(ID);
 
-	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";					//$NON-NLS-1$
+	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";						//$NON-NLS-1$
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
@@ -153,11 +154,15 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private IPropertyChangeListener			fPrefChangeListener;
 
-	private final Image						fImgTagCategory					= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
+	private final Image						fImgTagCategory					= TourbookPlugin
+																					.getImageDescriptor(
+																							Messages.Image__tag_category)
 																					.createImage();
-	private final Image						fImgTag							= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
-																					.createImage();
-	private final Image						fImgTagRoot						= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
+	private final Image						fImgTag							= TourbookPlugin.getImageDescriptor(
+																					Messages.Image__tag).createImage();
+	private final Image						fImgTagRoot						= TourbookPlugin
+																					.getImageDescriptor(
+																							Messages.Image__tag_root)
 																					.createImage();
 
 	private IPartListener2					fPartListener;
@@ -203,7 +208,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
-	 * The comparator is necessary to set and restore the expanded elements
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+	 * <br>
+	 * The comparator is necessary to set and restore the expanded elements <br>
+	 * <br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 	 */
 	private class TagComparer implements IElementComparer {
 
@@ -350,8 +359,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					readDisplayFormats();
 
-					fTagViewer.getTree()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					fTagViewer.getTree().setLinesVisible(
+							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTagViewer.refresh();
 
@@ -404,9 +413,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						final boolean isAddMode = changedTags.isAddMode();
 
 						// get a clone of the modified tours/tags because the tours are removed from the list
-						final ChangedTags changedTagsClone = new ChangedTags(changedTags.getModifiedTags(),
-								changedTags.getModifiedTours(),
-								isAddMode);
+						final ChangedTags changedTagsClone = new ChangedTags(changedTags.getModifiedTags(), changedTags
+								.getModifiedTours(), isAddMode);
 
 						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
@@ -449,7 +457,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionCollapseAll = new ActionCollapseAll(this);
 		fActionCollapseOthers = new ActionCollapseOthers(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
@@ -517,9 +526,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(TourbookPlugin.getDefault().getPluginPreferences().getBoolean(
+				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTagViewer = new TreeViewer(tree);
 		fColumnManager.createColumns(fTagViewer);
@@ -1283,11 +1291,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT)
-				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT)
-				.equals(PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
