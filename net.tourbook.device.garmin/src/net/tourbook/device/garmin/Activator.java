@@ -57,11 +57,14 @@ public class Activator extends AbstractUIPlugin {
 
 	@Override
 	public void start(final BundleContext context) throws Exception {
+
+		// get bundle version
 		final Bundle bundle = context.getBundle();
 		if (bundle instanceof AbstractBundle) {
 			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
 			version = abstractBundle.getVersion();
 		}
+
 		super.start(context);
 	}
 
