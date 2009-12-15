@@ -443,6 +443,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private ScrolledComposite					fScrolledTabInfo;
 
+	private FormToolkit							fToolkit;
+
 	private final class MarkerEditingSupport extends EditingSupport {
 
 		private final TextCellEditor	fCellEditor;
@@ -2504,10 +2506,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fPageNoTour = new Label(fPageBook, SWT.NONE);
 		fPageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
 
-		final FormToolkit toolkit = new FormToolkit(parent.getDisplay());
+		fToolkit = new FormToolkit(parent.getDisplay());
 
-		fPageEditorForm = toolkit.createForm(fPageBook);
-		toolkit.decorateFormHeading(fPageEditorForm);
+		fPageEditorForm = fToolkit.createForm(fPageBook);
+		fToolkit.decorateFormHeading(fPageEditorForm);
 
 		fMessageManager = new MessageManager(fPageEditorForm);
 		fPixelConverter = new PixelConverter(parent);
@@ -2537,7 +2539,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fTabTour = new CTabItem(fTabFolder, SWT.FLAT);
 		fTabTour.setText(Messages.tour_editor_tabLabel_tour);
-		fTabTour.setControl(createUITabTour(fTabFolder, toolkit));
+		fTabTour.setControl(createUITabTour(fTabFolder, fToolkit));
 
 		fTabMarker = new CTabItem(fTabFolder, SWT.FLAT);
 		fTabMarker.setText(Messages.tour_editor_tabLabel_tour_marker);
@@ -2549,7 +2551,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fTabInfo = new CTabItem(fTabFolder, SWT.FLAT);
 		fTabInfo.setText(Messages.tour_editor_tabLabel_info);
-		fTabInfo.setControl(createUITabInfo(fTabFolder, toolkit));
+		fTabInfo.setControl(createUITabInfo(fTabFolder, fToolkit));
 
 	}
 
@@ -3159,6 +3161,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.getInstance().removeTourEventListener(fTourEventListener);
 		TourManager.getInstance().removeTourSaveListener(fTourSaveListener);
+
+		if (fToolkit != null) {
+			fToolkit.dispose();
+		}
 
 		super.dispose();
 	}
