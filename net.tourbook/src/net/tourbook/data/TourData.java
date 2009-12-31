@@ -97,7 +97,8 @@ public class TourData implements Comparable<Object> {
 	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
 
 	@Transient
-	private static IPreferenceStore		fPrefStore						= TourbookPlugin.getDefault()
+	private static IPreferenceStore		fPrefStore						= TourbookPlugin
+																				.getDefault()
 																				.getPreferenceStore();
 
 	/**
@@ -240,7 +241,7 @@ public class TourData implements Comparable<Object> {
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short						deviceTimeInterval;														// db-version 3
+	private short						deviceTimeInterval				= -1;										// db-version 3
 
 	/**
 	 * maximum altitude in metric system
@@ -2055,9 +2056,8 @@ public class TourData implements Comparable<Object> {
 
 				for (final double latitude : latitudeSerie) {
 
-					short srtmValue = elevationSRTM3.getElevation(
-							new GeoLat(latitude),
-							new GeoLon(longitudeSerie[serieIndex]));
+					short srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(
+							longitudeSerie[serieIndex]));
 
 					/*
 					 * set invalid values to the previous valid value
@@ -2477,6 +2477,12 @@ public class TourData implements Comparable<Object> {
 					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
+				// speed
+				if (isSpeed) {
+					final int tdSpeed = timeData.speed;
+					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
+				}
+
 				timeIndex++;
 			}
 
@@ -2547,9 +2553,6 @@ public class TourData implements Comparable<Object> {
 
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
-//					if (tdSpeed == Integer.MIN_VALUE) {
-//						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-//					}
 					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
@@ -3862,7 +3865,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
+	 * Time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
 	 * the time slices are not equally
 	 * 
 	 * @param deviceTimeInterval
@@ -4109,7 +4112,7 @@ public class TourData implements Comparable<Object> {
 	public String toString() {
 
 		return new StringBuilder()//
-		.append("[TourData]") //$NON-NLS-1$ 
+				.append("[TourData]") //$NON-NLS-1$ 
 				.append(" tourId:") //$NON-NLS-1$
 				.append(tourId)
 				.append(" object:") //$NON-NLS-1$

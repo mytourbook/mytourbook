@@ -251,7 +251,7 @@ public class FitDataReader extends TourbookDevice {
 		timeData.pulse = pulse;
 		timeData.temperature = temperature;
 
-//		timeData.speed = (int) speedD;
+		timeData.speed = (int) speedD;
 
 		timeData.absoluteTime = (time + bigBangTimeDiff) * 1000;
 		timeData.absoluteAltitude = altitude;
@@ -381,6 +381,9 @@ public class FitDataReader extends TourbookDevice {
 			tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
 			tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 			tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
+
+			// set time interval to compute computed values correctly
+			tourData.setDeviceTimeInterval((short) -1);
 
 			tourData.importRawDataFile = importFileName;
 			tourData.setTourImportFilePath(importFileName);
