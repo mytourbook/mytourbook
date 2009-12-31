@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,22 +15,30 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import net.tourbook.plugin.TourbookPlugin;
+
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public class ActionModifyMapProvider extends Action {
+import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 
-	private TourMapView	fMapView;
+public class ActionManageMapProviders extends Action {
 
-	public ActionModifyMapProvider(final TourMapView mapView) {
+	public ActionManageMapProviders() {
 
-		super(Messages.map_action_modify_map_provider, AS_PUSH_BUTTON);
+		super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-		fMapView = mapView;
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__options));
 	}
 
 	@Override
 	public void run() {
-		fMapView.actionOpenMapProviderDialog();
+		PreferencesUtil.createPreferenceDialogOn(
+				Display.getCurrent().getActiveShell(),
+				PrefPageMapProviders.PREF_PAGE_MAP_PROVIDER_ID,
+				null,
+				null).open();
 	}
 
 }

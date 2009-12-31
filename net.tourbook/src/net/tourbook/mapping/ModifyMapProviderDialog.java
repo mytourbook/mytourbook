@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,11 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -48,13 +46,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+
 public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 	private final IDialogSettings	fDialogSettings;
 	private final IPreferenceStore	fPrefStore;
 
 	private TourMapView				fMappingView;
-	private ArrayList<MapProvider>	fMapProviders;
+	private ArrayList<MP>			fMapProviders;
 	private Button					fBtnUp;
 	private Button					fBtnDown;
 	private CheckboxTableViewer		fCheckboxList;
@@ -104,29 +105,29 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void createMapProviderList() {
 
-		final List<MapProvider> mapProviders = fMappingView.getMapProviders();
+		final ArrayList<MP> allMapProvider = MapProviderManager.getInstance().getAllMapProviders(true);
 
-		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
-		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
+		final String[] storedMpIds = StringToArrayConverter.convertStringToArray(//
+				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
 
-		fMapProviders = new ArrayList<MapProvider>();
+		fMapProviders = new ArrayList<MP>();
 
 		// put all map providers into the viewer which are defined in the pref store
-		for (final String storeMapProvider : storedProviderIds) {
+		for (final String storeMpId : storedMpIds) {
 
 			// find the stored map provider in the available map providers
-			for (final MapProvider mapProvider : mapProviders) {
-				if (mapProvider.getTileFactory().getInfo().getFactoryID().equals(storeMapProvider)) {
-					fMapProviders.add(mapProvider);
+			for (final MP mp : allMapProvider) {
+				if (mp.getId().equals(storeMpId)) {
+					fMapProviders.add(mp);
 					break;
 				}
 			}
 		}
 
 		// make sure that all available map providers are in the viewer
-		for (final MapProvider tileFactory : mapProviders) {
-			if (!fMapProviders.contains(tileFactory)) {
-				fMapProviders.add(tileFactory);
+		for (final MP mp : allMapProvider) {
+			if (!fMapProviders.contains(mp)) {
+				fMapProviders.add(mp);
 			}
 		}
 	}
@@ -208,8 +209,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		fCheckboxList.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(final Object element) {
-				final MapProvider tileFactory = (MapProvider) element;
-				return tileFactory.getTileFactory().getInfo().getFactoryName();
+				return ((MP) element).getName();
 			}
 		});
 
@@ -217,7 +217,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// keep the checked status
-				final MapProvider item = (MapProvider) event.getElement();
+				final MP item = (MP) event.getElement();
 				item.setCanBeToggled(event.getChecked());
 
 				// select the checked item
@@ -241,14 +241,14 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		 * check all map providers which are defined in the pref store
 		 */
 		final String[] storeProviderIds = StringToArrayConverter.convertStringToArray(//
-		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
+				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
 
-		final ArrayList<MapProvider> checkedProviders = new ArrayList<MapProvider>();
+		final ArrayList<MP> checkedProviders = new ArrayList<MP>();
 
-		for (final MapProvider mapProvider : fMapProviders) {
-			final String factoryId = mapProvider.getTileFactory().getInfo().getFactoryID();
+		for (final MP mapProvider : fMapProviders) {
+			final String mpId = mapProvider.getId();
 			for (final String storedProviderId : storeProviderIds) {
-				if (factoryId.equals(storedProviderId)) {
+				if (mpId.equals(storedProviderId)) {
 					mapProvider.setCanBeToggled(true);
 					checkedProviders.add(mapProvider);
 					break;
@@ -294,7 +294,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void move(final TableItem item, final int index) {
 
-		final MapProvider tileFactory = (MapProvider) item.getData();
+		final MP tileFactory = (MP) item.getData();
 		item.dispose();
 
 		fCheckboxList.insert(tileFactory, index);
@@ -359,12 +359,12 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final String[] prefGraphsChecked = new String[mapProviders.length];
 
 		for (int graphIndex = 0; graphIndex < mapProviders.length; graphIndex++) {
-			final MapProvider mapTileFactory = (MapProvider) mapProviders[graphIndex];
-			prefGraphsChecked[graphIndex] = mapTileFactory.getTileFactory().getInfo().getFactoryID();
+			final MP mp = (MP) mapProviders[graphIndex];
+			prefGraphsChecked[graphIndex] = mp.getId();
 		}
 
-		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST,
-				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
+		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST, StringToArrayConverter
+				.convertArrayToString(prefGraphsChecked));
 
 		/*
 		 * save order of all map providers
@@ -373,12 +373,10 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final String[] mapProviderIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			mapProviderIds[itemIndex] = ((MapProvider) items[itemIndex].getData()).getTileFactory()
-					.getInfo()
-					.getFactoryID();
+			mapProviderIds[itemIndex] = ((MP) items[itemIndex].getData()).getId();
 		}
 
-		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER,
-				StringToArrayConverter.convertArrayToString(mapProviderIds));
+		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER, StringToArrayConverter
+				.convertArrayToString(mapProviderIds));
 	}
 }

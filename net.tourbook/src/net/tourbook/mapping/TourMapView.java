@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -17,7 +17,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.chart.Chart;
@@ -87,6 +86,8 @@ import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
@@ -127,7 +128,7 @@ public class TourMapView extends ViewPart {
 	private static final String						MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";					//$NON-NLS-1$
 
 	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
-	private static final String						MEMENTO_CURRENT_FACTORY_ID			= "current.factory-id";					//$NON-NLS-1$
+	private static final String						MEMENTO_SELECTED_MAP_PROVIDER_ID	= "selected.map-provider-id";				//$NON-NLS-1$
 
 	private static final String						MEMENTO_DEFAULT_POSITION_ZOOM		= "default.position.zoom-level";			//$NON-NLS-1$
 	private static final String						MEMENTO_DEFAULT_POSITION_LATITUDE	= "default.position.latitude";				//$NON-NLS-1$
@@ -183,8 +184,6 @@ public class TourMapView extends ViewPart {
 	private boolean									fIsMapSynchedWithTour;
 	private boolean									fIsMapSynchedWithSlider;
 	private boolean									fIsPositionCentered;
-
-	private List<MapProvider>						fMapProvider;
 
 	private int										fDefaultZoom;
 	private GeoPosition								fDefaultPosition					= null;
@@ -508,7 +507,6 @@ public class TourMapView extends ViewPart {
 
 				final String property = event.getProperty();
 				final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-//				final IPreferenceStore mapPrefStore = net.tourbook.ext.srtm.Activator.getDefault().getPreferenceStore();
 
 				if (property.equals(PREF_SHOW_TILE_INFO)) {
 
@@ -654,7 +652,7 @@ public class TourMapView extends ViewPart {
 			final Rectangle2D positionRect = getPositionRect(positionBounds, zoom);
 
 			final Point2D center = new Point2D.Double(//
-			positionRect.getX() + positionRect.getWidth() / 2,
+					positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 
 			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
@@ -676,31 +674,36 @@ public class TourMapView extends ViewPart {
 
 	private void createActions() {
 
-		fActionTourColorAltitude = new ActionTourColor(this,
+		fActionTourColorAltitude = new ActionTourColor(
+				this,
 				TOUR_COLOR_ALTITUDE,
 				Messages.map_action_tour_color_altitude_tooltip,
 				Messages.image_action_tour_color_altitude,
 				Messages.image_action_tour_color_altitude_disabled);
 
-		fActionTourColorGradient = new ActionTourColor(this,
+		fActionTourColorGradient = new ActionTourColor(
+				this,
 				TOUR_COLOR_GRADIENT,
 				Messages.map_action_tour_color_gradient_tooltip,
 				Messages.image_action_tour_color_gradient,
 				Messages.image_action_tour_color_gradient_disabled);
 
-		fActionTourColorPulse = new ActionTourColor(this,
+		fActionTourColorPulse = new ActionTourColor(
+				this,
 				TOUR_COLOR_PULSE,
 				Messages.map_action_tour_color_pulse_tooltip,
 				Messages.image_action_tour_color_pulse,
 				Messages.image_action_tour_color_pulse_disabled);
 
-		fActionTourColorSpeed = new ActionTourColor(this,
+		fActionTourColorSpeed = new ActionTourColor(
+				this,
 				TOUR_COLOR_SPEED,
 				Messages.map_action_tour_color_speed_tooltip,
 				Messages.image_action_tour_color_speed,
 				Messages.image_action_tour_color_speed_disabled);
 
-		fActionTourColorPace = new ActionTourColor(this,
+		fActionTourColorPace = new ActionTourColor(
+				this,
 				TOUR_COLOR_PACE,
 				Messages.map_action_tour_color_pase_tooltip,
 				Messages.image_action_tour_color_pace,
@@ -905,15 +908,6 @@ public class TourMapView extends ViewPart {
 			}
 		});
 
-		// create list with all map factories
-		fMapProvider = new ArrayList<MapProvider>();
-		final List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
-		for (final TileFactory tileFactory : tileFactories) {
-
-			final MapProvider mapProvider = new MapProvider(tileFactory, tileFactory.getProjection());
-			fMapProvider.add(mapProvider);
-		}
-
 		createActions();
 		createLegendProviders();
 
@@ -924,21 +918,27 @@ public class TourMapView extends ViewPart {
 		addTourbookPrefListener();
 		addMapListener();
 
-		restoreState();
+		// register overlays which draw the tour
+		GeoclipseExtensions.registerOverlays(fMap);
 
-		// show map from last selection
-//		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+		// initialize map when part is created and the map size is > 0
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
 
-		if (fTourDataList.size() == 0) {
-			// a tour is not displayed, find a tour provider which provides a tour
-			showToursFromTourProvider();
-		} else {
-			fMap.redrawMap();
-		}
+				restoreState();
 
-		if (fMapDimLevel < 30) {
-			showDimWarning();
-		}
+				if (fTourDataList.size() == 0) {
+					// a tour is not displayed, find a tour provider which provides a tour
+					showToursFromTourProvider();
+				} else {
+					fMap.redrawMap();
+				}
+
+				if (fMapDimLevel < 30) {
+					showDimWarning();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -947,8 +947,13 @@ public class TourMapView extends ViewPart {
 		fTourDataList.clear();
 
 		// dispose tilefactory resources
-		for (final MapProvider mapProvider : fMapProvider) {
-			mapProvider.getTileFactory().dispose();
+
+		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		for (final MP mapProvider : allMapProviders) {
+			final TileFactory tileFactory = mapProvider.getTileFactory();
+			if (tileFactory != null) {
+				tileFactory.dispose();
+			}
 		}
 
 		fMap.disposeOverlayImageCache();
@@ -1051,15 +1056,6 @@ public class TourMapView extends ViewPart {
 
 	public int getMapDimLevel() {
 		return fMapDimLevel;
-	}
-
-//	@Override
-//	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-//		super.init(site, memento);
-//	}
-
-	public List<MapProvider> getMapProviders() {
-		return fMapProvider;
 	}
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
@@ -1473,7 +1469,8 @@ public class TourMapView extends ViewPart {
 
 				// position tour to the previous position
 				fMap.setZoom(tourData.mapZoomLevel);
-				fMap.setGeoCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
+				fMap.setGeoCenterPosition(new GeoPosition(
+						tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
 			}
 		}
@@ -1720,7 +1717,7 @@ public class TourMapView extends ViewPart {
 		fActionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
 		// restore map factory by selecting the last used map factory
-		fActionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_CURRENT_FACTORY_ID));
+		fActionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// restore: default position
 		try {
@@ -1728,8 +1725,8 @@ public class TourMapView extends ViewPart {
 		} catch (final NumberFormatException e) {}
 
 		try {
-			fDefaultPosition = new GeoPosition(settings.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE),
-					settings.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE));
+			fDefaultPosition = new GeoPosition(settings.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE), settings
+					.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE));
 		} catch (final NumberFormatException e) {
 			fDefaultPosition = new GeoPosition(0, 0);
 		}
@@ -1825,7 +1822,7 @@ public class TourMapView extends ViewPart {
 		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked());
 
-		settings.put(MEMENTO_CURRENT_FACTORY_ID, fActionSelectMapProvider.getSelectedFactory().getInfo().getFactoryID());
+		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, fActionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (fDefaultPosition == null) {
 			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getTileFactory().getInfo().getMinimumZoomLevel());
@@ -1933,8 +1930,10 @@ public class TourMapView extends ViewPart {
 		while (!viewport.contains(positionRect)) {
 
 			// center position in the map
-			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
-					positionRect.getY() + positionRect.getHeight() / 2);
+			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect
+					.getY()
+					+ positionRect.getHeight()
+					/ 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
 			fMap.setGeoCenterPosition(px);
 
@@ -1952,8 +1951,10 @@ public class TourMapView extends ViewPart {
 		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
 
 			// center position in the map
-			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
-					positionRect.getY() + positionRect.getHeight() / 2);
+			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect
+					.getY()
+					+ positionRect.getHeight()
+					/ 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
 			fMap.setGeoCenterPosition(px);
 
@@ -2007,7 +2008,8 @@ public class TourMapView extends ViewPart {
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
 
-					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display.getCurrent()
+					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display
+							.getCurrent()
 							.getActiveShell(),//
 							Messages.map_dlg_dim_warning_title, // title
 							Messages.map_dlg_dim_warning_message, // message
@@ -2016,7 +2018,9 @@ public class TourMapView extends ViewPart {
 							null,
 							null);
 
-					store.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog.getToggleState());
+					store
+							.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog
+									.getToggleState());
 				}
 			});
 		}

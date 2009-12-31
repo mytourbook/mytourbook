@@ -78,10 +78,14 @@ public class Messages extends NLS {
 	public static String		map_action_change_tile_factory_tooltip;
 	public static String		map_action_dim_map;
 	public static String		map_action_dim_map_disabled;
-	public static String		map_action_modify_map_provider;
+
 	public static String		map_action_reload_map;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
+
+	public static String	Map_Action_ManageMapProviders;
+
+	public static String	Map_Action_SetDefaultMapProviders;
 	public static String		map_action_show_legend_in_map;
 	public static String		map_action_show_scale_in_map;
 	public static String		map_action_show_slider_in_legend;

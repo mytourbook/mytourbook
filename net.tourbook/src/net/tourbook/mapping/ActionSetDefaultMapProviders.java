@@ -13,38 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.util.Projection;
+import org.eclipse.jface.action.Action;
 
-public class MapProvider /* extends DefaultTileFactory */{
+public class ActionSetDefaultMapProviders extends Action {
 
-	/**
-	 * status if this map provider can be toggled with in the map provider button
-	 */
-	private boolean		fCanBeToggled	= false;
+	private TourMapView	fMapView;
 
-	private TileFactory	fTileFactory;
-	private Projection	fProjection;
+	public ActionSetDefaultMapProviders(final TourMapView mapView) {
 
-	public MapProvider(final TileFactory tileFactory, final Projection projection) {
-//		super(tileFactory.getInfo());
-		fTileFactory = tileFactory;
-		fProjection = projection;
+		super(Messages.Map_Action_SetDefaultMapProviders, AS_PUSH_BUTTON);
+
+		fMapView = mapView;
 	}
 
-	boolean canBeToggled() {
-		return fCanBeToggled;
-	}
-
-	public TileFactory getTileFactory() {
-		return fTileFactory;
-	}
-
-	void setCanBeToggled(final boolean canBeToggled) {
-		fCanBeToggled = canBeToggled;
+	@Override
+	public void run() {
+		fMapView.actionOpenMapProviderDialog();
 	}
 
 }
