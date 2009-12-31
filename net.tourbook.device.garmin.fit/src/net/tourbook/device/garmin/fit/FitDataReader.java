@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -71,7 +71,6 @@ t.|timestamp  |latitude   |longitude  |distance   |unknown1   |elev.|speed|unk.2
 04 9b 88 da 24 0f 32 1a 24 76 1d 4e 04 82 47 05 00 ff ff ff 7f e6 0d d6 23 ff ff 7e ff ff 15 
 
  *******************************************************************************/
- 
 
 package net.tourbook.device.garmin.fit;
 
@@ -86,6 +85,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
@@ -131,16 +131,18 @@ import net.tourbook.importdata.TourbookDevice;
 //tourData.setTourType
 
 public class FitDataReader extends TourbookDevice {
-	
-	private int distance = 0;
-	private int oldDistance = 0;
-	private int oldAltitude = 0;
-	private int oldTime = 0;
-	private int tourAltUp = 0;
-	private int tourAltDown = 0;
-	private boolean pulseExists = false;
-	private boolean cadenceExists = false;
-	private Calendar fCalendar = GregorianCalendar.getInstance();
+
+	private int			distance		= 0;
+	private int			oldAltitude		= 0;
+	private int			tourAltUp		= 0;
+	private int			tourAltDown		= 0;
+	private boolean		pulseExists		= false;
+	private boolean		cadenceExists	= false;
+
+	private Calendar	fCalendar		= GregorianCalendar.getInstance();
+
+	private boolean		isFirstTP		= true;
+	private static int	bigBangTimeDiff	= 7304 * 86400;					// # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
 
 	public FitDataReader() {
 		canReadFromDevice = false;
@@ -157,8 +159,16 @@ public class FitDataReader extends TourbookDevice {
 		return false;
 	}
 
+	private int getChar(final char[] a, final int i) {
+		return a[i];
+	}
+
 	public String getDeviceModeName(final int profileId) {
 		return null;
+	}
+
+	private int getLong(final char[] a, final int i) {
+		return 256 * (256 * (256 * a[i + 3] + a[i + 2]) + a[i + 1]) + a[i];
 	}
 
 	@Override
@@ -166,47 +176,44 @@ public class FitDataReader extends TourbookDevice {
 		return null;
 	}
 
+	private int getShort(final char[] a, final int i) {
+		return 256 * a[i + 1] + a[i];
+	}
+
 	@Override
 	public int getStartSequenceSize() {
 		return -1;
 	}
 
-	public int getTransferDataSize() {
-		return -1;
-	}
-	
-	private int getLong(char[]a, int i) {
-		return 256 * (256 * (256 * (int) a[i+3] + (int) a[i+2]) + (int) a[i+1]) + (int) a[i]; 
-	}
+	private TimeData getTimeData(	final char[] a,
+									final int timeOff,
+									final int latOff,
+									final int lonOff,
+									final int distOff,
+									final int altitudeOff,
+									final int speedOff,
+									final int pulseOff,
+									final int cadenceOff,
+									final int temperatureOff) {
 
-	private int getShort(char[]a, int i) {
-		return 256 * (int) a[i+1] + (int) a[i]; 
-	}
-
-	private int getChar(char[]a, int i) {
-		return (int) a[i]; 
-	}
-
-	private TimeData getTimeData(char[]a, int timeOff, int latOff, int lonOff, int distOff, int altitudeOff, int speedOff, int pulseOff, int cadenceOff, int temperatureOff) {
-		      
 		final int LONG_MAX = 2147483647;
 		// int deltaTime = 7304 * 86400; // # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
 
-		int time = getLong(a, timeOff);
+		final int time = getLong(a, timeOff);
 		// time += deltaTime;
 
-		int lat = getLong(a, latOff);
+		final int lat = getLong(a, latOff);
 		if (lat == LONG_MAX)
 			return null;
-		double latD = 180. * lat / LONG_MAX;
+		final double latD = 180. * lat / LONG_MAX;
 		if (latD > 90. || latD < -90.)
 			return null;
 
-		int lon = getLong(a, lonOff);
+		final int lon = getLong(a, lonOff);
 		if (lon == LONG_MAX)
 			return null;
 
-		double lonD = 180. * lon / LONG_MAX;
+		final double lonD = 180. * lon / LONG_MAX;
 
 		distance = getLong(a, distOff);
 		distance /= 100;
@@ -215,37 +222,41 @@ public class FitDataReader extends TourbookDevice {
 		double altitudeD = altitude;
 		altitudeD = altitudeD / 5 - 500;
 		altitude = (int) altitudeD;
-		final short altitudeDiff = (short)(altitude - oldAltitude);
+		final short altitudeDiff = (short) (altitude - oldAltitude);
 
-		int speed = getShort(a, speedOff);
-		double speedD = 3.6 * speed / 100; // [0.1 km/h]
+		final int speed = getShort(a, speedOff);
+		final double speedD = 3.6 * speed / 100; // [0.1 km/h]
 
 		int pulse = getChar(a, pulseOff);
 		if (pulse == 0xFF)
 			pulse = 0;
 		else
 			pulseExists = true;
-		
+
 		int cadence = getChar(a, cadenceOff);
-		if (cadence == 0xFF) 
+		if (cadence == 0xFF)
 			cadence = 0;
 		else
 			cadenceExists = true;
 
 		int temperature = getChar(a, temperatureOff);
-		if (temperature > 128) 
+		if (temperature > 128)
 			temperature -= 256;
 
-		TimeData timeData = new TimeData();		      
+		final TimeData timeData = new TimeData();
 		timeData.latitude = latD;
 		timeData.longitude = lonD;
-		timeData.altitude = altitudeDiff;
+
 		timeData.cadence = cadence;
-		timeData.distance = distance - oldDistance;
 		timeData.pulse = pulse;
 		timeData.temperature = temperature;
-		timeData.speed = (int)speedD;
-		
+
+//		timeData.speed = (int) speedD;
+
+		timeData.absoluteTime = (time + bigBangTimeDiff) * 1000;
+		timeData.absoluteAltitude = altitude;
+		timeData.absoluteDistance = distance;
+
 //		System.out.println("timeData.latitude " + timeData.latitude);
 //		System.out.println("timeData.longitude " + timeData.longitude);
 //		System.out.println("timeData.altitude " + timeData.altitude + " " + altitude);
@@ -254,32 +265,33 @@ public class FitDataReader extends TourbookDevice {
 //		System.out.println("timeData.temperature " + timeData.temperature);
 //		System.out.println("timeData.pulse " + timeData.pulse);
 //		System.out.println("timeData.speed " + timeData.speed);
-		
-		if (oldTime == 0) { // first trackpoint
-			// int deltaTime = 7304 * 86400; // # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
-			timeData.time = 0;
-			
-			long calendarTime = time;
-			// calendarTime += deltaTime; is right, but doesn't work!
-			calendarTime *= 1000;			
-			fCalendar.setTimeInMillis(calendarTime);
-		}
-		else
-		{
-			timeData.time = time - oldTime;
-			// first altitude contains the start altitude and not the difference
+
+		if (isFirstTP) {
+
+			// first trackpoint
+
+			isFirstTP = false;
+
+			fCalendar.setTimeInMillis(timeData.absoluteTime);
+
+		} else {
+
 			tourAltUp += ((altitudeDiff > 0) ? altitudeDiff : 0);
-			tourAltDown += ((timeData.altitude < 0) ? -timeData.altitude : 0);
+			tourAltDown += ((altitudeDiff < 0) ? -altitudeDiff : 0);
 		}
 
-		oldDistance = distance;
 		oldAltitude = altitude;
-		oldTime = time;
-		
+
 		return timeData;
 	}
 
-	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
+	public int getTransferDataSize() {
+		return -1;
+	}
+
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> tourDataMap) {
 
 		boolean returnValue = false;
 
@@ -288,78 +300,75 @@ public class FitDataReader extends TourbookDevice {
 		try {
 			if (validateRawData(importFileName) == false)
 				return false;
-			
+
 			final int BUFSIZE = 33;
-		      char[] a = new char[BUFSIZE];
-		      for (int i = 0; i < BUFSIZE; i++)
-		         a[i] = 0;			
-			
-	        FileInputStream fileInputStream = new FileInputStream(importFileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "ISO-8859-1"); 
-            bufferedReader = new BufferedReader(inputStreamReader);
-			
+			final char[] a = new char[BUFSIZE];
+			for (int i = 0; i < BUFSIZE; i++)
+				a[i] = 0;
+
+			final FileInputStream fileInputStream = new FileInputStream(importFileName);
+			final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "ISO-8859-1");
+			bufferedReader = new BufferedReader(inputStreamReader);
+
 			TimeData timeData = null;
-			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();			
-			
+			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+
 			do {
-                int ir = bufferedReader.read();
-                if (ir == -1) break;
-	            
-	            for (int j = 0; j < BUFSIZE-1; j++)
-	               a[j] = a[j+1];
-	            a[BUFSIZE-1] = (char) ir;
-	            
-	            timeData = null;
-	            if (  a[ 0] == 0x05 
-	               && a[17] == 0xFF 
-	               && a[18] == 0xFF
-	               && a[19] == 0xFF
-	               && a[20] == 0x7F
-	               && a[25] == 0xFF 
-	               && a[26] == 0xFF
-	               && a[27] == 0xFF
-	               && a[28] == 0x7F
-	               && a[31] == 0xFF                  
-	               ) {
-	               // Version >= 1.54
-	               timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 29, 30, 32);
-	            } else 
-	            if (  a[ 0] == 0x05 
-	               && a[17] == 0xFF 
-	               && a[18] == 0xFF
-	               && a[19] == 0xFF
-	               && a[20] == 0x7F
-	               && a[25] == 0xFF 
-	               && a[26] == 0xFF
-	               && a[29] == 0xFF                  
-	               ) {
-	               // Version <= 1.53
-	               timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 27, 28, 30);
-	            } else 
-	            if (  a[ 0] == 0x04 
-	               && a[17] == 0xFF 
-	               && a[18] == 0xFF
-	               && a[19] == 0xFF
-	               && a[20] == 0x7F
-	               && a[25] == 0xFF 
-	               && a[26] == 0xFF
-	               && a[29] == 0xFF                  
-	               && a[30] != 0xFF // temperature                  
-	               ) {
-	               // Version <= 1.46
-	               timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 27, 28, 30);
-	            }
-	               
-	            if (timeData != null)
-	            	timeDataList.add(timeData);
-	         }
+				final int ir = bufferedReader.read();
+				if (ir == -1)
+					break;
+
+				for (int j = 0; j < BUFSIZE - 1; j++)
+					a[j] = a[j + 1];
+				a[BUFSIZE - 1] = (char) ir;
+
+				timeData = null;
+				if (a[0] == 0x05
+						&& a[17] == 0xFF
+						&& a[18] == 0xFF
+						&& a[19] == 0xFF
+						&& a[20] == 0x7F
+						&& a[25] == 0xFF
+						&& a[26] == 0xFF
+						&& a[27] == 0xFF
+						&& a[28] == 0x7F
+						&& a[31] == 0xFF) {
+					// Version >= 1.54
+					timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 29, 30, 32);
+				} else if (a[0] == 0x05
+						&& a[17] == 0xFF
+						&& a[18] == 0xFF
+						&& a[19] == 0xFF
+						&& a[20] == 0x7F
+						&& a[25] == 0xFF
+						&& a[26] == 0xFF
+						&& a[29] == 0xFF) {
+					// Version <= 1.53
+					timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 27, 28, 30);
+				} else if (a[0] == 0x04
+						&& a[17] == 0xFF
+						&& a[18] == 0xFF
+						&& a[19] == 0xFF
+						&& a[20] == 0x7F
+						&& a[25] == 0xFF
+						&& a[26] == 0xFF
+						&& a[29] == 0xFF
+						&& a[30] != 0xFF // temperature                  
+				) {
+					// Version <= 1.46
+					timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 27, 28, 30);
+				}
+
+				if (timeData != null)
+					timeDataList.add(timeData);
+			}
 			while (true);
-	         bufferedReader.close();
+			bufferedReader.close();
 
 			// set tour data
 			final TourData tourData = new TourData();
 
-			String tourTitle = importFileName.substring(importFileName.lastIndexOf(File.separator)+1);
+			final String tourTitle = importFileName.substring(importFileName.lastIndexOf(File.separator) + 1);
 			tourData.setTourTitle(tourTitle);
 			tourData.setTourDescription(tourTitle);
 
@@ -370,12 +379,12 @@ public class FitDataReader extends TourbookDevice {
 			tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 			tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
 			tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-			tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH)+1));
+			tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 			tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 
 			tourData.importRawDataFile = importFileName;
 			tourData.setTourImportFilePath(importFileName);
-			
+
 			// set the start distance, this is not available in a .fit file but it's required to create the tour-id
 			tourData.setStartDistance(distance);
 
@@ -393,7 +402,7 @@ public class FitDataReader extends TourbookDevice {
 				if (!pulseExists)
 					firstTimeData.pulse = Integer.MIN_VALUE;
 				if (!cadenceExists)
-					firstTimeData.temperature = Integer.MIN_VALUE;
+					firstTimeData.cadence = Integer.MIN_VALUE;
 
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
@@ -421,27 +430,26 @@ public class FitDataReader extends TourbookDevice {
 		return returnValue;
 	}
 
-
 	/**
 	 * checks if the data file has a valid .fit data format
 	 * 
 	 * @return true for a valid .fit data format
 	 */
 	public boolean validateRawData(final String fileName) {
-				
+
 		BufferedReader fileReader = null;
 
 		try {
 
 			fileReader = new BufferedReader(new FileReader(fileName));
-			char[] buf = new char[12];
-			int nChar = fileReader.read(buf, 0, 12);
+			final char[] buf = new char[12];
+			final int nChar = fileReader.read(buf, 0, 12);
 			if (nChar < 12)
 				return false;
-			
-			String fileType = "" + buf[9] + buf[10] + buf[11];
-			
-			System.out.println("FitDataReader: fileType = " + fileType);				
+
+			final String fileType = "" + buf[9] + buf[10] + buf[11];
+
+			System.out.println("FitDataReader: fileType = " + fileType);
 
 			if (!fileType.equals("FIT")) {
 				return false;
@@ -465,4 +473,3 @@ public class FitDataReader extends TourbookDevice {
 	}
 
 }
-
