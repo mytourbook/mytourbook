@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Sample Action Set"
+            visible="true"
+            id="de.byteholder.geoclipse.poi.actionSet">
+         <action
+               class="de.byteholder.geoclipse.poi.ShowPoiViewAction"
+               icon="icons/find.png"
+               id="de.byteholder.geoclipse.poi.ShowPlacesViewAction"
+               label="&amp;Places search"
+               menubarPath="window/views"
+               style="push"
+               toolbarPath="views"
+               tooltip="Search for places and show them on the map">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="de.byteholder.geoclipse.mapcategory"
+            class="de.byteholder.geoclipse.poi.PoiView"
+            icon="icons/find.png"
+            id="de.byteholder.geoclipse.poi.poiView"
+            name="Places"/>
+   </extension>
+
+</plugin>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jdom-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-api-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-arcgrid-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-arcsde-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-brewer-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-charts-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-coverage-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-coverageio-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-coverageio-netcdf-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-coveragetools-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-cql-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-data-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-directory-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-access-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-extension-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-wkt-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-feature-pregeneralized-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-geometry-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-geotiff-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-gml-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-gpx-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-graph-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-gtopo30-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-image-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-imageio-ext-gdal-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-imagemosaic-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-imagemosaic-jdbc-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-imagepyramid-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-introduction-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-jts-wrapper-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-legacy-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-libraryJTS-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-main-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-mappane-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-mappane-use-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-metadata-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-mif-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-mysql-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-oracle-spatial-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-postgis-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-postgis-versioned-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-process-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-property-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-referencing-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-referencing3D-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-render-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-repository-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-sde-dummy-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-temporal-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-tiger-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-validation-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-vpf-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-wfs-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-wps-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xml-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xml-gpx-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-core-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-filter-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-gml2-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-gml3-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-kml-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-ows-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-sld-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-wcs-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-wfs-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-wps-2.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jts-1.9.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/geoapi-2.2.0.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry kind="lib" path="lib/gt-wms-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension-point id="tilefactory" name="TileFactory" schema="schema/tilefactory.exsd"/>
+
+   <extension-point id="mapOverlay" name="MapOverlay" schema="schema/mapOverlay.exsd"/>
+     <extension
+         point="org.eclipse.ui.preferencePages">
+        <page
+              class="de.byteholder.geoclipse.preferences.PrefPageMap"
+              id="de.byteholder.geoclipse.preferences.map"
+              name="%pref_page_map">
+        </page>
+      <page
+            category="de.byteholder.geoclipse.preferences.map"
+            class="de.byteholder.geoclipse.preferences.PrefPageCache"
+            id="de.byteholder.geoclipse.preferences.PrefPageCache"
+            name="%pref_page_cache">
+      </page>
+      <page
+            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
+            name="%pref_page_provider">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar id="de.byteholder.geoclipse.toolbar.tileinfo">
+            <control
+                  class="de.byteholder.geoclipse.tileinfo.TileInfoContribution"
+                  id="de.byteholder.geoclipse.tileinfo">
+               <visibleWhen>
+                  <test
+                        forcePluginActivation="true"
+                        property="de.byteholder.geoclipse.tester.someProperty"
+                        value="true">
+                  </test>
+               </visibleWhen>
+            </control>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   
+   
+  	<extension point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+			id="de.byteholder.geoclipse.tester.propertyTester"
+			namespace="de.byteholder.geoclipse.tester"
+			properties="someProperty"
+			type="java.lang.Object"
+			class="de.byteholder.geoclipse.tileinfo.TrimPropertyTester">
+	  	</propertyTester>
+	</extension>
+   
+</plugin>

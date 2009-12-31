@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %PLUGIN_NAME
+Bundle-SymbolicName: de.byteholder.geoclipse.poi; singleton:=true
+Bundle-Version: 9.08.0.v2009-08-17
+Bundle-Activator: de.byteholder.geoclipse.poi.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.byteholder.geoclipse.libraries,
+ de.byteholder.gpx
+Eclipse-LazyStart: true
+Bundle-Vendor: %PLUGIN_PROVIDER
+Export-Package: de.byteholder.geoclipse.poi;
+  uses:="org.eclipse.core.runtime,
+   org.eclipse.jface.resource,
+   org.eclipse.ui,
+   de.byteholder.gpx,
+   org.eclipse.ui.plugin,
+   org.eclipse.ui.part,
+   org.eclipse.jface.action,
+   org.eclipse.swt.graphics,
+   org.eclipse.jface.viewers,
+   org.osgi.framework,
+   org.eclipse.swt.widgets"

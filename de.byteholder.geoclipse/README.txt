@@ -1,0 +1,1 @@
+Images used for BeanInfo's come from two LGPL image sets: crystal-office-icons and nuvola.
