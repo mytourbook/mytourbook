@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Import tours from .FIT files
+Bundle-SymbolicName: net.tourbook.device.garmin.fit;singleton:=true
+Bundle-Version: 9.07.0.v2009-07-05
+Bundle-Activator: net.tourbook.device.garmin.fit.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook,
+ net.tourbook.ext.ejb3;bundle-version="3.4.0"
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: net.tourbook.chart
