@@ -132,6 +132,8 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class FitDataReader extends TourbookDevice {
 
+	private static int	BIG_BANG_TIME_DIFF	= 7304 * 86400;					// # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
+
 	private int			distance		= 0;
 	private int			oldAltitude		= 0;
 	private int			tourAltUp		= 0;
@@ -142,7 +144,7 @@ public class FitDataReader extends TourbookDevice {
 	private Calendar	fCalendar		= GregorianCalendar.getInstance();
 
 	private boolean		isFirstTP		= true;
-	private static int	bigBangTimeDiff	= 7304 * 86400;					// # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
+
 
 	public FitDataReader() {
 		canReadFromDevice = false;
@@ -199,7 +201,7 @@ public class FitDataReader extends TourbookDevice {
 		final int LONG_MAX = 2147483647;
 		// int deltaTime = 7304 * 86400; // # sec 1/1/1970 (Unix Epoch) - 12/31/1989 (Garmin Epoch)
 
-		final int time = getLong(a, timeOff);
+		final long time = getLong(a, timeOff);
 		// time += deltaTime;
 
 		final int lat = getLong(a, latOff);
@@ -243,7 +245,11 @@ public class FitDataReader extends TourbookDevice {
 		if (temperature > 128)
 			temperature -= 256;
 
+		/*
+		 * create time slice
+		 */
 		final TimeData timeData = new TimeData();
+
 		timeData.latitude = latD;
 		timeData.longitude = lonD;
 
@@ -253,7 +259,7 @@ public class FitDataReader extends TourbookDevice {
 
 		timeData.speed = (int) speedD;
 
-		timeData.absoluteTime = (time + bigBangTimeDiff) * 1000;
+		timeData.absoluteTime = (time + BIG_BANG_TIME_DIFF) * 1000;
 		timeData.absoluteAltitude = altitude;
 		timeData.absoluteDistance = distance;
 

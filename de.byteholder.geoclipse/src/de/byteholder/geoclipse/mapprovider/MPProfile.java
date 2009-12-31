@@ -26,6 +26,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 
+import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
@@ -367,7 +368,7 @@ public class MPProfile extends MP {
 	public TileFactory getTileFactory() {
 
 		if (fTileFactory == null) {
-			return null;
+			synchronizeMPWrapper();
 		}
 
 		// initialize tile factory when it's not done yet
@@ -443,9 +444,10 @@ public class MPProfile extends MP {
 		final String validClassName = validMapProvider.getClass().getName();
 		if (wrapperClassName.equals(validClassName) == false) {
 
-			StatusUtil.showStatus(NLS.bind(
-					"The map provider '{0}' has the wrong class '{1}' instead of '{2}' and will be ignored", //$NON-NLS-1$
-					new Object[] { mpWrapper.getMapProviderId(), wrapperClassName, validClassName }), new Exception());
+			StatusUtil.showStatus(NLS.bind(Messages.DBG056_MapProfile_WrongClassForMapProvider, new Object[] {
+					mpWrapper.getMapProviderId(),
+					wrapperClassName,
+					validClassName }), new Exception());
 
 			return false;
 		}
@@ -529,14 +531,9 @@ public class MPProfile extends MP {
 				 * there are mappers in the profile which do not exist in the available map
 				 * provider list, these mappers will be ignored
 				 */
-
 				final StringBuilder sb = new StringBuilder();
 
-				sb.append("The map profile \"");//$NON-NLS-1$
-				sb.append(getName());
-				sb.append("\" contains map providers, which are not available any more, they will be ignored:");//$NON-NLS-1$
-				sb.append(UI.NEW_LINE);
-				sb.append(UI.NEW_LINE);
+				sb.append(NLS.bind(Messages.DBG055_MapProfile_InvalidMapProvider, getName()));
 
 				for (final MapProviderWrapper mpWrapper : remainingMpWrappers) {
 					sb.append(mpWrapper.getMapProviderId());
@@ -552,5 +549,4 @@ public class MPProfile extends MP {
 
 		fTileFactory = new TileFactoryProfile(this);
 	}
-
 }
