@@ -193,7 +193,7 @@ public class ChartLabelLayer implements IChartLayer {
 				if (isVertical) {
 
 					/*
-					 * vertical position
+					 * label is vertical
 					 */
 
 					// draw label to the left side of the marker
@@ -231,7 +231,7 @@ public class ChartLabelLayer implements IChartLayer {
 				} else {
 
 					/*
-					 * horizontal position
+					 * label is horizontal
 					 */
 
 					// don't draw the marker before the chart
@@ -250,8 +250,8 @@ public class ChartLabelLayer implements IChartLayer {
 					}
 
 					// force label to be not above the top
-					if (devYMarker - labelHeight < devYTop) {
-						devYMarker = devYTop + labelHeight;
+					if (devYMarker /*- labelHeight*/< devYTop) {
+						devYMarker = devYTop;// + labelHeight;
 					}
 
 					gc.drawText(chartMarker.markerLabel, devXMarker, devYMarker, true);
