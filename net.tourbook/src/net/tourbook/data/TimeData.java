@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -26,7 +26,7 @@ import java.sql.Date;
 import net.tourbook.ui.UI;
 
 /**
- * Contains data for one time slice
+ * Contains data for one time slice, when MIN_VALUE is finally set, these data are not available
  */
 public class TimeData implements Serializable {
 
@@ -38,6 +38,12 @@ public class TimeData implements Serializable {
 	 * contains the difference to the previous time in seconds
 	 */
 	public int					time;
+
+	/**
+	 * Contains the time value from {@link Date#getTime()} or {@link Long#MIN_VALUE} when the time
+	 * is not set. This time value is set when the tour is created by GPS devices
+	 */
+	public long					absoluteTime		= Long.MIN_VALUE;
 
 	/**
 	 * absolute value for temperature
@@ -61,10 +67,20 @@ public class TimeData implements Serializable {
 	public int					altitude			= Integer.MIN_VALUE;
 
 	/**
+	 * contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set
+	 */
+	public float				absoluteAltitude	= Float.MIN_VALUE;
+
+	/**
 	 * relative value for distance in meters, this is the difference for the distance with the
 	 * previous time slice
 	 */
 	public int					distance			= Integer.MIN_VALUE;
+
+	/**
+	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set
+	 */
+	public float				absoluteDistance	= Float.MIN_VALUE;
 
 	/**
 	 * absolute value for power, power is typically provided by an ergo trainer
@@ -76,22 +92,6 @@ public class TimeData implements Serializable {
 	 * bike computer
 	 */
 	public int					speed				= Integer.MIN_VALUE;
-
-	/**
-	 * contains the time value from {@link Date#getTime()} or {@link Long#MIN_VALUE} when the time
-	 * is not set
-	 */
-	public long					absoluteTime		= Long.MIN_VALUE;
-
-	/**
-	 * contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set
-	 */
-	public float				absoluteAltitude	= Float.MIN_VALUE;
-
-	/**
-	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set
-	 */
-	public float				absoluteDistance	= Float.MIN_VALUE;
 
 	/**
 	 * absolute value for latitude
@@ -114,7 +114,7 @@ public class TimeData implements Serializable {
 	public String toString() {
 
 		final StringBuilder sb = new StringBuilder()//
-		.append("absoluteTime:") //				//$NON-NLS-1$
+				.append("absoluteTime:") //				//$NON-NLS-1$
 				.append(absoluteTime)
 				.append(UI.DASH_WITH_SPACE)
 				.append("marker:") //		//$NON-NLS-1$
