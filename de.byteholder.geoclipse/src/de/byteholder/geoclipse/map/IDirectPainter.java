@@ -1,4 +1,4 @@
-package de.byteholder.geoclipse.swt;
+package de.byteholder.geoclipse.map;
 
 public interface IDirectPainter {
 

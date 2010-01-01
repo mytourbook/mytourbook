@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import org.eclipse.core.runtime.ListenerList;
 
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.UI;
+import de.byteholder.geoclipse.map.UI;
 import de.byteholder.gpx.GeoPosition;
 
 /**

@@ -11,7 +11,6 @@ package de.byteholder.geoclipse.map;
 
 import org.eclipse.swt.graphics.GC;
 
-import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.gpx.Waypoint;
 
 /**

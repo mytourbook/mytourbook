@@ -1,4 +1,4 @@
-package de.byteholder.geoclipse.swt;
+package de.byteholder.geoclipse.map;
 
 import java.io.File;
 

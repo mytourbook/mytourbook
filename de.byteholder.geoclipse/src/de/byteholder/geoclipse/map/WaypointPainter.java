@@ -19,8 +19,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.MapPainter;
 import de.byteholder.gpx.Waypoint;
 
 /**

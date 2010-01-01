@@ -16,10 +16,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import de.byteholder.geoclipse.Activator;
+import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.UI;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMP extends TitleAreaDialog {

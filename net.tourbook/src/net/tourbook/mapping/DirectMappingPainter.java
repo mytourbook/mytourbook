@@ -25,11 +25,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+import de.byteholder.geoclipse.map.DirectPainterContext;
+import de.byteholder.geoclipse.map.IDirectPainter;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.DirectPainterContext;
-import de.byteholder.geoclipse.swt.IDirectPainter;
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {

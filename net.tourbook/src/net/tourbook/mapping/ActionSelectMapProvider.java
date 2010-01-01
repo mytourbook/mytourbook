@@ -33,11 +33,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
+import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
-import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator, IMapProviderListener {
 

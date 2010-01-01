@@ -80,6 +80,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
 import de.byteholder.geoclipse.map.event.IMapListener;
@@ -88,8 +90,6 @@ import de.byteholder.geoclipse.map.event.MapEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.ext.PointOfInterest;
 

@@ -38,10 +38,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.MapPainter;
 import de.byteholder.gpx.GeoPosition;
 
 /**

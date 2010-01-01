@@ -67,8 +67,8 @@ import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
-import de.byteholder.geoclipse.swt.UI;
 import de.byteholder.gpx.GeoPosition;
 
 /**

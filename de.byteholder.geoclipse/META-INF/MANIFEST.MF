@@ -20,7 +20,6 @@ Export-Package: de.byteholder.geoclipse,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,
  de.byteholder.geoclipse.preferences,
- de.byteholder.geoclipse.swt,
  de.byteholder.geoclipse.tileinfo,
  de.byteholder.geoclipse.util
 Import-Package: org.eclipse.core.expressions,

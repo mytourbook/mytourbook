@@ -31,7 +31,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.UI;
+import de.byteholder.geoclipse.map.UI;
 
 /**
  * Wraps all map providers into a map profile, these map providers can be selected individually

@@ -13,7 +13,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
 
-import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.gpx.Waypoint;
 
 /**

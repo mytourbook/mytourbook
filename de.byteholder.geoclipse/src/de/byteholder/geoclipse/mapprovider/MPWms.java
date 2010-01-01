@@ -38,7 +38,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.UI;
+import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.util.Util;
 
 public class MPWms extends MP {

@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.swt.Map;
-import de.byteholder.geoclipse.swt.MapPainter;
 import de.byteholder.gpx.GeoPosition;
 
 public class GeoclipseExtensions {

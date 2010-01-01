@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
-import de.byteholder.geoclipse.swt.UI;
+import de.byteholder.geoclipse.map.UI;
 
 public class MPCustom extends MP {
 

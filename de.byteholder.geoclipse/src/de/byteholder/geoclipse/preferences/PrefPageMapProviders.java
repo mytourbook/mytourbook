@@ -105,6 +105,7 @@ import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileImageCache;
+import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom;
 import de.byteholder.geoclipse.mapprovider.DialogMPProfile;
@@ -118,7 +119,6 @@ import de.byteholder.geoclipse.mapprovider.MPWms;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
 import de.byteholder.geoclipse.mapprovider.MapProviderWrapper;
-import de.byteholder.geoclipse.swt.UI;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
 import de.byteholder.geoclipse.util.PixelConverter;
 

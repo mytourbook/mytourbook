@@ -50,7 +50,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-import de.byteholder.geoclipse.swt.UI;
+import de.byteholder.geoclipse.map.UI;
 
 public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreferencePage {
 

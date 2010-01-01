@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 

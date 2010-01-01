@@ -39,7 +39,7 @@ public class TileImageCache {
 	/**
 	 * max. number of images in the image cache
 	 */
-	private static int								MAX_CACHE_ENTRIES			= 128;
+	private static int								MAX_CACHE_ENTRIES			= 100;
 
 	private static final String						FILE_EXTENSION_PNG			= "png";									//$NON-NLS-1$
 	private static final String						FILE_EXTENSION_GIF			= "gif";									//$NON-NLS-1$
@@ -51,7 +51,6 @@ public class TileImageCache {
 	public static final String						TILE_OFFLINE_CACHE_OS_PATH	= "offline-map";							//$NON-NLS-1$
 
 	private final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
-
 	private final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
 
 	private final TileFactoryInfo					fFactoryInfo;
@@ -202,20 +201,20 @@ public class TileImageCache {
 			fDisplay.syncExec(new Runnable() {
 				public void run() {
 
-					final GC gc = new GC(tileImage);
+					final GC gcTileImage = new GC(tileImage);
 					final Color dimColor = new Color(fDisplay, fTileFactory.getDimColor());
 					{
-						gc.setBackground(dimColor);
-						gc.fillRectangle(imageBounds);
+						gcTileImage.setBackground(dimColor);
+						gcTileImage.fillRectangle(imageBounds);
 
-						gc.setAlpha(dimmingAlphaValue);
+						gcTileImage.setAlpha(dimmingAlphaValue);
 						{
-							gc.drawImage(loadedImage, 0, 0);
+							gcTileImage.drawImage(loadedImage, 0, 0);
 						}
-						gc.setAlpha(0xff);
+						gcTileImage.setAlpha(0xff);
 					}
 					dimColor.dispose();
-					gc.dispose();
+					gcTileImage.dispose();
 
 					loadedImage.dispose();
 				}
@@ -234,7 +233,7 @@ public class TileImageCache {
 
 		final Collection<Image> images = fImageCache.values();
 		for (final Image image : images) {
-			if (image != null && !image.isDisposed()) {
+			if (image != null) {
 				try {
 					image.dispose();
 				} catch (final Exception e) {
@@ -408,10 +407,11 @@ public class TileImageCache {
 			for (int cacheIndex = MAX_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
 
 				// remove and dispose oldest image
+
 				final String headTileKey = fImageCacheFifo.poll();
 				final Image oldestImage = fImageCache.remove(headTileKey);
 
-				if (oldestImage != null && !oldestImage.isDisposed()) {
+				if (oldestImage != null) {
 					try {
 						oldestImage.dispose();
 					} catch (final Exception e) {
@@ -439,7 +439,7 @@ public class TileImageCache {
 
 					// dispose cached image which has the same key but is another image
 
-					if (cachedImage != null && cachedImage.isDisposed() == false) {
+					if (cachedImage != null) {
 						try {
 							cachedImage.dispose();
 						} catch (final Exception e) {
@@ -463,9 +463,9 @@ public class TileImageCache {
 			}
 
 		} catch (final Exception e) {
-
 			StatusUtil.log(e.getMessage(), e);
 		}
+
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package de.byteholder.geoclipse.swt;
+package de.byteholder.geoclipse.map;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
