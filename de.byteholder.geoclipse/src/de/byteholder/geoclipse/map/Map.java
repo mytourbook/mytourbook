@@ -66,7 +66,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.byteholder.geoclipse.map.Tile.OverlayStatus;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
@@ -84,7 +83,7 @@ public class Map extends Canvas {
 	/**
 	 * Image which contains the map
 	 */
-	private Image								mapImage;
+	private Image								fMapImage;
 
 	/**
 	 * The position, in <I>map coordinates</I> of the center point. This is defined as the distance
@@ -175,12 +174,12 @@ public class Map extends Canvas {
 	/**
 	 * cache for overlay image which are part of another tile
 	 */
-	private final OverlayImageCache				fOverlayPartImageCache;
+	private final OverlayImageCache				fPartOverlayImageCache;
 
 	/**
 	 * This queue contains tiles which overlay image must be painted
 	 */
-	private final ConcurrentLinkedQueue<Tile>	fPaintOverlayQueue			= new ConcurrentLinkedQueue<Tile>();
+	private final ConcurrentLinkedQueue<Tile>	fTileOverlayPaintQueue		= new ConcurrentLinkedQueue<Tile>();
 
 	private boolean								isDrawOverlayRunning		= false;
 
@@ -210,8 +209,11 @@ public class Map extends Canvas {
 	 */
 	private Rectangle							fMapViewport;
 
-	private List<IZoomListener>					zoomListeners;
+	private Point								fViewPortSize;
+	private int									fViewPortBorder;
+	private Rectangle							fMapImageSize;
 
+	private List<IZoomListener>					zoomListeners;
 	private final ListenerList					fMapListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	// measurement system
@@ -227,22 +229,16 @@ public class Map extends Canvas {
 	private Color								defaultBackgroundColor;
 
 	/**
-	 * when <code>true</code> the loading image is not displayed
+	 * when <code>true</code> the loading... image is not displayed
 	 */
 	private boolean								fIsLiveView;
 
-	private Rectangle							fMapRect;
-
-	private Point								fViewPortSize;
-
-	private int									fViewPortBorder;
-
 	private long								fRequestedRedrawTime;
-
-	protected long								fDrawTime;
+	private long								fDrawTime;
 
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
+
 		private static final int	OFFSET	= 10;
 
 		@Override
@@ -281,7 +277,7 @@ public class Map extends Canvas {
 				final double y = bounds.getCenterY() + delta_y;
 				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
 				setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
-				redrawMap();
+				queueMapRedraw();
 			}
 		}
 	}
@@ -359,7 +355,7 @@ public class Map extends Canvas {
 			final double y = bounds.getY() + ey;
 			final Point2D.Double pixelCenter = new Point2D.Double(x, y);
 			setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
-			redrawMap();
+			queueMapRedraw();
 		}
 	}
 
@@ -380,7 +376,7 @@ public class Map extends Canvas {
 					 * Because we are not in the UI thread, we have to queue the call for redraw and
 					 * cannot do it directly.
 					 */
-					redrawMap();
+					queueMapRedraw();
 
 					tile.deleteObserver(this);
 				}
@@ -490,7 +486,7 @@ public class Map extends Canvas {
 		defaultBackgroundColor = new Color(display, DefaultBackgroundRGB);
 
 		fOverlayImageCache = new OverlayImageCache();
-		fOverlayPartImageCache = new OverlayImageCache();
+		fPartOverlayImageCache = new OverlayImageCache();
 
 		overlayThread = new Thread("PaintOverlayImages") { //$NON-NLS-1$
 			@Override
@@ -500,7 +496,7 @@ public class Map extends Canvas {
 
 					try {
 
-						Thread.sleep(20);
+						Thread.sleep(50);
 
 						if (isDrawOverlayRunning == false) {
 
@@ -509,7 +505,7 @@ public class Map extends Canvas {
 							final long currentTime = System.currentTimeMillis();
 
 							if (currentTime > nextOverlayRedrawTime + 50) {
-								if (fPaintOverlayQueue.size() > 0) {
+								if (fTileOverlayPaintQueue.size() > 0) {
 
 									// create overlay images
 									paintOverlay10();
@@ -544,7 +540,7 @@ public class Map extends Canvas {
 	 */
 	public void addOverlayPainter(final MapPainter overlay) {
 		overlays.add(overlay);
-		redrawMap();
+		queueMapRedraw();
 	}
 
 //	public void addTileListener(final ITileListener tileListener) {
@@ -581,7 +577,7 @@ public class Map extends Canvas {
 		setMapPixelCenter(fTileFactory.pixelToGeo(center, zoom), center);
 		setZoom(zoom);
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	@Override
@@ -608,8 +604,8 @@ public class Map extends Canvas {
 	 */
 	public synchronized void disposeOverlayImageCache() {
 		fOverlayImageCache.dispose();
-		fOverlayPartImageCache.dispose();
-		fPaintOverlayQueue.clear();
+		fPartOverlayImageCache.dispose();
+		fTileOverlayPaintQueue.clear();
 	}
 
 	private void disposeResource(final Resource resource) {
@@ -634,13 +630,13 @@ public class Map extends Canvas {
 		try {
 
 			// check or create map image
-			Image image = mapImage;
-			if (image == null || image.isDisposed() || canReuseImage(image, fMapRect) == false) {
-				image = createImage(getDisplay(), image, fMapRect);
+			Image image = fMapImage;
+			if (image == null || image.isDisposed() || canReuseImage(image, fMapImageSize) == false) {
+				image = createImage(getDisplay(), image, fMapImageSize);
 			}
-			mapImage = image;
+			fMapImage = image;
 
-			gc = new GC(mapImage);
+			gc = new GC(fMapImage);
 			{
 				drawMapTiles(gc);
 				drawMapLegend(gc);
@@ -655,7 +651,7 @@ public class Map extends Canvas {
 			e.printStackTrace();
 
 			// map image is corrupt
-			mapImage.dispose();
+			fMapImage.dispose();
 
 		} finally {
 			if (gc != null) {
@@ -1170,9 +1166,18 @@ public class Map extends Canvas {
 		gc.drawString(text.toString(), devTilePosition.x + leftMargin, devTilePosition.y + topMargin);
 	}
 
+	/**
+	 * Draw overlay image when it's available or request the image
+	 * 
+	 * @param gc
+	 * @param tile
+	 * @param devTileRectangle
+	 */
 	private void drawTileOverlay(final GC gc, final Tile tile, final Rectangle devTileRectangle) {
 
-		if (tile.getOverlayStatus() == Tile.OverlayStatus.NO_IMAGE) {
+		OverlayStatus overlayStatus = tile.getOverlayStatus();
+
+		if (overlayStatus == OverlayStatus.OVERLAY_CHECKED_NO_IMAGE) {
 
 			// overlay has no image, nothing to do
 
@@ -1192,7 +1197,7 @@ public class Map extends Canvas {
 				// overlay image is available in the cache
 
 				tile.setOverlayImage(overlayImage);
-				tile.setOverlayStatus(Tile.OverlayStatus.IMAGE_AVAILABLE);
+//				tile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
 			}
 		}
 
@@ -1206,17 +1211,19 @@ public class Map extends Canvas {
 
 			// check overlay status
 
-			if (tile.getOverlayStatus() == Tile.OverlayStatus.IMAGE_AVAILABLE) {
+			if (overlayStatus == OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE) {
 
-				// something is wrong, force the image to be recreated
-				tile.setOverlayStatus(Tile.OverlayStatus.NOT_SET);
+				// overlay image should be available but is not, force the image to be recreated
+				tile.setOverlayStatus(overlayStatus = OverlayStatus.OVERLAY_NOT_CHECKED);
 			}
 
 			// draw overlay image when this was not yet done
-			final OverlayStatus overlayStatus = tile.getOverlayStatus();
-			if (overlayStatus == Tile.OverlayStatus.NOT_SET || overlayStatus == Tile.OverlayStatus.IS_PART_IMAGE) {
-				tile.setOverlayStatus(Tile.OverlayStatus.IN_QUEUE);
-				fPaintOverlayQueue.add(tile);
+			if (overlayStatus == OverlayStatus.OVERLAY_NOT_CHECKED) {
+
+				// request tile overlay image
+				tile.setOverlayStatus(OverlayStatus.IS_REQUESTED);
+
+				fTileOverlayPaintQueue.add(tile);
 			}
 		}
 	}
@@ -1391,6 +1398,42 @@ public class Map extends Canvas {
 		return panEnabled;
 	}
 
+	private boolean isPartImageModified(final ImageData overlayImageData,
+										final int srcXStart,
+										final int srcYStart,
+										final int tileSize) {
+
+		final int transRed = fTransparentRGB.red;
+		final int transGreen = fTransparentRGB.green;
+		final int transBlue = fTransparentRGB.blue;
+
+		final byte[] srcData = overlayImageData.data;
+		final int srcBytesPerLine = overlayImageData.bytesPerLine;
+
+		int srcIndex;
+		int srcRed, srcGreen, srcBlue;
+
+		for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
+
+			final int srcYBytesPerLine = srcY * srcBytesPerLine;
+
+			for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
+
+				srcIndex = srcYBytesPerLine + (srcX * 3);
+
+				srcBlue = srcData[srcIndex] & 0xFF;
+				srcGreen = srcData[srcIndex + 1] & 0xFF;
+				srcRed = srcData[srcIndex + 2] & 0xFF;
+
+				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Indicates if the map should recenter itself on mouse clicks.
 	 * 
@@ -1434,7 +1477,7 @@ public class Map extends Canvas {
 			fTileFactory.resetAll(false);
 		}
 
-		disposeResource(mapImage);
+		disposeResource(fMapImage);
 
 		disposeResource(cursorPan);
 		disposeResource(cursorDefault);
@@ -1446,7 +1489,7 @@ public class Map extends Canvas {
 		}
 
 		fOverlayImageCache.dispose();
-		fOverlayPartImageCache.dispose();
+		fPartOverlayImageCache.dispose();
 
 		if (directMapPainter != null) {
 			directMapPainter.dispose();
@@ -1506,7 +1549,7 @@ public class Map extends Canvas {
 //		long endTime = System.currentTimeMillis();
 //		System.out.println("onMouseMove:\t\t" + (endTime - startTime) + " ms");
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/*
@@ -1521,10 +1564,10 @@ public class Map extends Canvas {
 
 		// draw map image to the screen
 
-		if (mapImage != null && !mapImage.isDisposed()) {
+		if (fMapImage != null && !fMapImage.isDisposed()) {
 
 			final GC gc = event.gc;
-			gc.drawImage(mapImage, 0, 0);
+			gc.drawImage(fMapImage, 0, 0);
 
 			if (directMapPainter != null) {
 				directMapPainterContext.gc = gc;
@@ -1553,9 +1596,9 @@ public class Map extends Canvas {
 		mapWidth = Math.max(1, mapWidth);
 		mapHeight = Math.max(1, mapHeight);
 
-		fMapRect = new Rectangle(mapWidth, mapHeight);
+		fMapImageSize = new Rectangle(mapWidth, mapHeight);
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	private void paintOverlay10() {
@@ -1593,7 +1636,7 @@ public class Map extends Canvas {
 					isDrawOverlayRunning = false;
 				}
 
-				redrawMap();
+				queueMapRedraw();
 			}
 		};
 
@@ -1604,7 +1647,7 @@ public class Map extends Canvas {
 
 		Tile tile;
 
-		while ((tile = fPaintOverlayQueue.poll()) != null) {
+		while ((tile = fTileOverlayPaintQueue.poll()) != null) {
 
 			// check overlay image in the cache
 			final Image overlayImage = fOverlayImageCache.get(getOverlayKey(tile));
@@ -1613,9 +1656,9 @@ public class Map extends Canvas {
 				// overlay image is valid
 
 				tile.setOverlayImage(overlayImage);
-				tile.setOverlayStatus(Tile.OverlayStatus.IMAGE_AVAILABLE);
+//				tile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
 
-				return;
+				continue;
 			}
 
 			// check zoom level
@@ -1626,11 +1669,18 @@ public class Map extends Canvas {
 			} else {
 
 				// tile has a different zoom level, ignore this tile
-				tile.setOverlayStatus(Tile.OverlayStatus.NOT_SET);
+				tile.setOverlayStatus(OverlayStatus.OVERLAY_NOT_CHECKED);
 			}
 		}
 	}
 
+	/**
+	 * Paints the overlay into the overlay image which is bigger than the tile image so that the
+	 * drawings are not clipped at the tile border. The overlay image is afterwards splitted into
+	 * parts which are drawn into the tile images
+	 * 
+	 * @param tile
+	 */
 	private void paintOverlay30Tile(final Tile tile) {
 
 		final int parts = 3;
@@ -1671,9 +1721,9 @@ public class Map extends Canvas {
 
 			} else {
 
-				// the overlay does not show anything in the current tile
+				// the current tile has nothing to show in an overlay image
 
-				tile.setOverlayStatus(Tile.OverlayStatus.NO_IMAGE);
+				tile.setOverlayStatus(OverlayStatus.OVERLAY_CHECKED_NO_IMAGE);
 			}
 		}
 		gc.dispose();
@@ -1682,7 +1732,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Splits the tile image into 3*3 parts
+	 * Splits the overlay tile image into 3*3 parts
 	 * 
 	 * <pre>
 	 * 
@@ -1707,14 +1757,12 @@ public class Map extends Canvas {
 											final Color transparentColor) {
 
 		final TileCache tileCache = fTileFactory.getTileCache();
+		final ImageData overlayImageData = overlayImage.getImageData();
 
 		final int tileZoom = tile.getZoom();
 		final int tileX = tile.getX();
 		final int tileY = tile.getY();
 		final int maxTiles = (int) Math.pow(2, tileZoom);
-
-//		System.out.println(tile.toString());
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		for (int yIndex = 0; yIndex < 3; yIndex++) {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -1722,6 +1770,14 @@ public class Map extends Canvas {
 				// check bounds
 				if ((tileX - xIndex < 0 || tileX + xIndex > maxTiles)
 						|| (tileY - yIndex < 0 || tileY + yIndex > maxTiles)) {
+					continue;
+				}
+
+				final int srcX = tileSize * xIndex;
+				final int srcY = tileSize * yIndex;
+
+				// check if there are any drawings in the current part
+				if (isPartImageModified(overlayImageData, srcX, srcY, tileSize) == false) {
 					continue;
 				}
 
@@ -1734,40 +1790,30 @@ public class Map extends Canvas {
 
 				partImageData.transparentPixel = partImageData.palette.getPixel(fTransparentRGB);
 
-				final Image partImage = new Image(display, partImageData);
+				final Image partOverlayImage = new Image(display, partImageData);
 
 				// draw into part image
-				final GC gcPartImage = new GC(partImage);
+				final GC gcPartImage = new GC(partOverlayImage);
 				{
 					gcPartImage.setBackground(transparentColor);
-					gcPartImage.fillRectangle(partImage.getBounds());
+					gcPartImage.fillRectangle(partOverlayImage.getBounds());
 
-					/*
-					 * draw existing image into the part image
-					 */
-					Image cachedImage = fOverlayImageCache.get(partOverlayTileKey);
+					Image cachedImage;
+
+//					// draw existing part overlay image into the part image
+//					cachedImage = fPartOverlayImageCache.get(partOverlayTileKey);
+//					if (cachedImage != null && cachedImage.isDisposed() == false) {
+//						gcPartImage.drawImage(cachedImage, 0, 0);
+//					}
+
+					// draw existing overlay image into the part image
+					cachedImage = fOverlayImageCache.get(partOverlayTileKey);
 					if (cachedImage != null && cachedImage.isDisposed() == false) {
 						gcPartImage.drawImage(cachedImage, 0, 0);
 					}
 
-					cachedImage = fOverlayPartImageCache.get(partOverlayTileKey);
-					if (cachedImage != null && cachedImage.isDisposed() == false) {
-						gcPartImage.drawImage(cachedImage, 0, 0);
-					}
-
-					/*
-					 * draw part from overlay image into the part image
-					 */
-					gcPartImage.drawImage(
-							overlayImage,
-							tileSize * xIndex,
-							tileSize * yIndex,
-							tileSize,
-							tileSize,
-							0,
-							0,
-							tileSize,
-							tileSize);
+					// draw part from overlay image into the part image
+					gcPartImage.drawImage(overlayImage, srcX, srcY, tileSize, tileSize, 0, 0, tileSize, tileSize);
 
 					final Tile partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
 					if (partTile != null) {
@@ -1776,16 +1822,17 @@ public class Map extends Canvas {
 						if (isCenterPart) {
 
 							// set status only for the center part, otherwise the other parts are not painted
-							partTile.setOverlayImage(partImage);
-							partTile.setOverlayStatus(Tile.OverlayStatus.IMAGE_AVAILABLE);
+							partTile.setOverlayImage(partOverlayImage);
 						}
+
+						partTile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
 					}
 
 					// keep image
 					if (isCenterPart) {
-						fOverlayImageCache.add(partOverlayTileKey, partImage);
+						fOverlayImageCache.add(partOverlayTileKey, partOverlayImage);
 					} else {
-						fOverlayPartImageCache.add(partOverlayTileKey, partImage);
+						fPartOverlayImageCache.add(partOverlayTileKey, partOverlayImage);
 					}
 				}
 				gcPartImage.dispose();
@@ -1794,21 +1841,9 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Re-centers the map to have the current address location be at the center of the map,
-	 * accounting for the map's width and height.
-	 * 
-	 * @see getAddressLocation
-	 */
-	public void recenterToAddressLocation() {
-		final GeoPosition addressLocation = getAddressLocation();
-		setMapPixelCenter(addressLocation, fTileFactory.geoToPixel(addressLocation, getZoom()));
-		redrawMap();
-	}
-
-	/**
 	 * Put a map redraw into a queue, the last entry in the queue will be executed
 	 */
-	public void redrawMap() {
+	public void queueMapRedraw() {
 
 		if (isDisposed() || fTileFactory == null) {
 			return;
@@ -1880,12 +1915,24 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * Re-centers the map to have the current address location be at the center of the map,
+	 * accounting for the map's width and height.
+	 * 
+	 * @see getAddressLocation
+	 */
+	public void recenterToAddressLocation() {
+		final GeoPosition addressLocation = getAddressLocation();
+		setMapPixelCenter(addressLocation, fTileFactory.geoToPixel(addressLocation, getZoom()));
+		queueMapRedraw();
+	}
+
+	/**
 	 * Reload the map by discarding all cached tiles and entries in the loading queue
 	 */
 	public synchronized void reload() {
 
 		fTileFactory.resetAll(false);
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	public void removeMapListener(final IMapListener listner) {
@@ -1899,7 +1946,7 @@ public class Map extends Canvas {
 	 */
 	public void removeOverlayPainter(final MapPainter overlay) {
 		overlays.remove(overlay);
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	public void removeZoomListener(final IZoomListener listner) {
@@ -1908,7 +1955,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Reset overlay information for the current map provider by setting the overlay status to
-	 * {@link OverlayStatus#NOT_SET} in all tiles
+	 * {@link OverlayStatus#OVERLAY_NOT_CHECKED} in all tiles
 	 */
 	public synchronized void resetOverlays() {
 		if (fTileFactory != null) {
@@ -1922,7 +1969,7 @@ public class Map extends Canvas {
 			fTileFactory.resetAll(false);
 		}
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -1940,7 +1987,7 @@ public class Map extends Canvas {
 
 		fTileFactory = tileFactory;
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -1953,7 +2000,7 @@ public class Map extends Canvas {
 	public void setAddressLocation(final GeoPosition addressLocation) {
 		this.addressLocation = addressLocation;
 		setMapPixelCenter(addressLocation, fTileFactory.geoToPixel(addressLocation, getZoom()));
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -1993,7 +2040,7 @@ public class Map extends Canvas {
 			}
 		});
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -2106,7 +2153,7 @@ public class Map extends Canvas {
 	 */
 	public void setShowDebugInfo(final boolean isShowDebugInfo) {
 		fIsShowTileInfo = isShowDebugInfo;
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -2119,7 +2166,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * set status if overlays are painted, a {@link #redrawMap()} must be called to update the
+	 * set status if overlays are painted, a {@link #queueMapRedraw()} must be called to update the
 	 * map
 	 * 
 	 * @param showOverlays
@@ -2162,7 +2209,7 @@ public class Map extends Canvas {
 			}
 		}
 
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	/**
@@ -2233,11 +2280,11 @@ public class Map extends Canvas {
 
 	public void zoomIn() {
 		setZoom(getZoom() + 1);
-		redrawMap();
+		queueMapRedraw();
 	}
 
 	public void zoomOut() {
 		setZoom(getZoom() - 1);
-		redrawMap();
+		queueMapRedraw();
 	}
 }

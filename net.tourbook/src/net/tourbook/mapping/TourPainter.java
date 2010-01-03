@@ -914,10 +914,10 @@ public class TourPainter extends MapPainter {
 					gc.fillRectangle(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 				} else {
 					gc.setBackground(lineColor);
-					gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
-
-					gc.setLineWidth(1);
-					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+					gc.fillOval(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+ 
+//					gc.setLineWidth(1);
+//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 //					gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 				}
 			}

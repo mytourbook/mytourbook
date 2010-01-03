@@ -35,13 +35,13 @@ public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
 
-	private static final String				COLUMN_2		= "  ";
-	private static final String				COLUMN_4		= "    ";
-	private static final String				COLUMN_5		= "     ";
+	private static final String				COLUMN_2					= "  ";
+	private static final String				COLUMN_4					= "    ";
+	private static final String				COLUMN_5					= "     ";
 
-	private OverlayStatus					overlayStatus	= OverlayStatus.NOT_SET;
-
-	private boolean							isLoading		= false;
+	private OverlayStatus					overlayStatus				= OverlayStatus.OVERLAY_NOT_CHECKED;
+ 
+	private boolean							isLoading					= false;
 
 	/**
 	 * If an error occurs while loading a tile, store the exception here.
@@ -56,14 +56,14 @@ public class Tile extends Observable {
 	/**
 	 * Map image for this tile
 	 */
-	private Image							mapImage		= null;
+	private Image							mapImage					= null;
 
 	/**
 	 * Overlay image for this tile
 	 */
-	private Image							overlayImage	= null;
+	private Image							overlayImage				= null;
 
-	private boolean							fIsOfflineError	= false;
+	private boolean							fIsOfflineError				= false;
 
 	private String							fTileKey;
 
@@ -82,7 +82,7 @@ public class Tile extends Observable {
 	/**
 	 * contains the error message when loading of the image fails
 	 */
-	private String							fLoadingError	= null;
+	private String							fLoadingError				= null;
 
 	private boolean							fIsOfflineImageAvailable;
 
@@ -123,17 +123,6 @@ public class Tile extends Observable {
 	private ConcurrentHashMap<String, Tile>	fChildrenWithErrors;
 	private String							tileCreatorId;
 
-	public static enum OverlayStatus {
-		NOT_SET,
-		//
-		IN_QUEUE,
-		//		
-		IMAGE_AVAILABLE,
-		//
-		NO_IMAGE,
-		//
-		IS_PART_IMAGE,
-	}
 
 	/**
 	 * create a key for a tile
@@ -493,6 +482,14 @@ public class Tile extends Observable {
 		return fParentTile != null;
 	}
 
+//	/**
+//	 * @return Returns <code>true</code> when the overlay image {@link #getOverlayImage()} is not a
+//	 *         part overlay image
+//	 */
+//	public boolean isFinalPartImage() {
+//		return fIsFinalOverlayPartImage;
+//	}
+
 	/**
 	 * @return Returns <code>true</code> when the tile image is currently being loaded
 	 */
@@ -524,34 +521,6 @@ public class Tile extends Observable {
 		return fIsOfflineError;
 	}
 
-//	public void setBboxOLD(final TileFactoryInfo info, final Projection projection) {
-//
-//		final int tileSize = info.getTileSize();
-//
-//		final int devX = x * tileSize;
-//		final int devY = y * tileSize;
-//
-//		final Point2D.Double topLeft = new Point2D.Double(devX, devY);
-//		final Point2D.Double bottomRight = new Point2D.Double(devX + tileSize, devY + tileSize);
-//
-////		bboxTopLeft = projection.pixelToGeo(topLeft, zoom, info);
-////		bboxBottomRight = projection.pixelToGeo(bottomRight, zoom, info);
-////
-////		/*
-////		 * adjust latitude to the north/south pole
-////		 */
-////		final double top = Math.abs(bboxTopLeft.getLatitude());
-////		final double topDiff = top - MAX_LATITUDE_85_05112877;
-////		if (topDiff > 0.0) {
-////			bboxTopLeft.setLatitude(MAX_LATITUDE_85_05112877);
-////		}
-////		final double bottom = Math.abs(bboxBottomRight.getLatitude());
-////		final double bottomDiff = bottom - MAX_LATITUDE_85_05112877;
-////		if (bottomDiff > 0.0) {
-////			bboxBottomRight.setLatitude(-MAX_LATITUDE_85_05112877);
-////		}
-//	}
-
 	/**
 	 * notify image observers that the image has changed
 	 */
@@ -562,17 +531,10 @@ public class Tile extends Observable {
 	}
 
 	/**
-	 * reset overlay in this tile, by resetting the status status
+	 * reset overlay in this tile, by resetting the status state
 	 */
 	public void resetOverlay() {
-
-// disabled image dispose to keep the image
-
-//		if (overlayImage != null && !overlayImage.isDisposed()) {
-//			overlayImage.dispose();
-//		}
-
-		overlayStatus = OverlayStatus.NOT_SET;
+		overlayStatus = OverlayStatus.OVERLAY_NOT_CHECKED;
 		overlayImage = null;
 	}
 
@@ -619,6 +581,10 @@ public class Tile extends Observable {
 	public void setFuture(final Future<?> future) {
 		fFuture = future;
 	}
+
+//	public void setIsFinalOverlayImage(final boolean fIsFinalOverlayImage) {
+//		this.fIsFinalOverlayPartImage = fIsFinalOverlayImage;
+//	}
 
 	public void setIsOfflineImageAvailable(final boolean isOfflineImageAvailable) {
 		fIsOfflineImageAvailable = isOfflineImageAvailable;

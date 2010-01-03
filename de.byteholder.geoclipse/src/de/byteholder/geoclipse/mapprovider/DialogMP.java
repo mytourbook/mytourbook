@@ -82,8 +82,8 @@ public class DialogMP extends TitleAreaDialog {
 		fMap.setZoom(fMapProvider.getFavoriteZoom());
 		fMap.setGeoCenterPosition(fMapProvider.getFavoritePosition());
 
-		fMap.redrawMap();
-	}
+		fMap.queueMapRedraw();
+ 	}
 
 	@Override
 	protected void configureShell(final Shell shell) {

@@ -52,8 +52,13 @@ public abstract class TileFactory {
 	 */
 	protected final TileCache			fTileCache				= new TileCache();
 
+	/**
+	 * cache for tile images
+	 */
+	protected TileImageCache			fTileImageCache;
+
 	public static void addTileListener(final ITileListener tileListener) {
-		fTileListeners.add(tileListener);
+ 		fTileListeners.add(tileListener);
 	}
 
 	public static ListenerList getTileListeners() {
@@ -191,6 +196,10 @@ public abstract class TileFactory {
 
 	public TileCache getTileCache() {
 		return fTileCache;
+	}
+
+	public TileImageCache getTileImageCache() {
+		return fTileImageCache;
 	}
 
 	/**

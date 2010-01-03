@@ -77,12 +77,8 @@ public class TileFactoryImpl extends TileFactory {
 	 */
 	private LinkedBlockingDeque<Tile>				fTileWaitingQueue	= new LinkedBlockingDeque<Tile>();
 
-	/**
-	 * cache for tile images
-	 */
-	private TileImageCache							fTileImageCache;
 
-	/**
+ 	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
 	 */
 	private Image									fLoadingImage;
@@ -434,6 +430,7 @@ public class TileFactoryImpl extends TileFactory {
 		return tile;
 	}
 
+	@Override
 	public TileImageCache getTileImageCache() {
 		return fTileImageCache;
 	}

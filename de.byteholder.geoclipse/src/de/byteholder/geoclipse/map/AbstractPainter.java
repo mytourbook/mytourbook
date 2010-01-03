@@ -2,17 +2,16 @@ package de.byteholder.geoclipse.map;
 
 import org.eclipse.swt.graphics.GC;
 
-
 public abstract class AbstractPainter<T> implements Painter<T> {
-
-	protected T	parameter;
+ 
+	protected T	fMap;
 
 	/**
 	 * Dispose resources in the {@link Painter}
 	 */
 	protected abstract void dispose();
 
-	protected abstract void doPaint(GC gc, T parameter);
+	protected abstract void doPaint(GC gc, T map);
 
 	/**
 	 * @param gc
@@ -25,13 +24,13 @@ public abstract class AbstractPainter<T> implements Painter<T> {
 	protected abstract boolean doPaint(GC gc, T map, Tile tile, int parts);
 
 	public void paint(final GC gc, final T parameter) {
-		this.parameter = parameter;
-		doPaint(gc, this.parameter);
+		fMap = parameter;
+		doPaint(gc, fMap);
 	}
 
 	/**
 	 * @param gc
-	 * @param parameter
+	 * @param map
 	 * @param tile
 	 * @param tileSize
 	 * @param parts
@@ -40,8 +39,8 @@ public abstract class AbstractPainter<T> implements Painter<T> {
 	 * @param transparentColor
 	 * @return
 	 */
-	public boolean paint(final GC gc, final T parameter, final Tile tile, final int parts) {
-		this.parameter = parameter;
-		return doPaint(gc, this.parameter, tile, parts);
+	public boolean paint(final GC gc, final T map, final Tile tile, final int parts) {
+		fMap = map;
+		return doPaint(gc, fMap, tile, parts);
 	}
 }

@@ -304,17 +304,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	public void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
-		fMap.redrawMap();
-	}
+		fMap.queueMapRedraw();
+ 	}
 
 	public void actionZoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	public void actionZoomOutToMinZoom() {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	@Override

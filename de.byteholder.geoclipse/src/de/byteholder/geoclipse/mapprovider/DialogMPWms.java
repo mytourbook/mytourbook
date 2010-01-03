@@ -219,22 +219,22 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		updateMapPosition();
 
-		fMap.redrawMap();
-	}
+		fMap.queueMapRedraw();
+ 	}
 
 	public void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	public void actionZoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	public void actionZoomOutToMinZoom() {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	/**
@@ -1371,7 +1371,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
 
 		// display map with new image size
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	private void onSelectWmsMap() {
@@ -1418,7 +1418,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
 
 		// display map 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	private void resetMap(final GeoPosition center, final int zoom) {
@@ -1433,7 +1433,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMap.setGeoCenterPosition(center);
 
 		// display map 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	private void restoreState() {

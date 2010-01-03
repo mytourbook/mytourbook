@@ -278,8 +278,8 @@ public class TourMapView extends ViewPart {
 			fMap.setZoom(fDefaultZoom);
 			fMap.setGeoCenterPosition(fDefaultPosition);
 		}
-		fMap.redrawMap();
-	}
+		fMap.queueMapRedraw();
+ 	}
 
 	void actionSetShowLegendInMap() {
 
@@ -295,7 +295,7 @@ public class TourMapView extends ViewPart {
 		// update legend
 		actionShowSlider();
 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionSetShowScaleInMap() {
@@ -303,7 +303,7 @@ public class TourMapView extends ViewPart {
 		final boolean isScaleVisible = fActionShowScaleInMap.isChecked();
 
 		fMap.setShowScale(isScaleVisible);
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionSetShowStartEndInMap() {
@@ -311,7 +311,7 @@ public class TourMapView extends ViewPart {
 		PaintManager.getInstance().setShowStartEnd(fActionShowStartEndInMap.isChecked());
 
 		fMap.disposeOverlayImageCache();
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionSetShowTourInMap() {
@@ -323,7 +323,7 @@ public class TourMapView extends ViewPart {
 		PaintManager.getInstance().setShowTourMarker(fActionShowTourMarker.isChecked());
 
 		fMap.disposeOverlayImageCache();
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionSetTourColor(final int colorId) {
@@ -333,7 +333,7 @@ public class TourMapView extends ViewPart {
 		PaintManager.getInstance().setLegendProvider(legendProvider);
 
 		fMap.disposeOverlayImageCache();
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 
 		createLegendImage(legendProvider);
 	}
@@ -412,18 +412,18 @@ public class TourMapView extends ViewPart {
 	void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
 		centerTour();
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionZoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
 		centerTour();
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionZoomShowEntireMap() {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	void actionZoomShowEntireTour() {
@@ -453,7 +453,7 @@ public class TourMapView extends ViewPart {
 						fSelectedProfileKey = prefProfileKey;
 
 						fMap.disposeCachedImages();
-						fMap.redrawMap();
+						fMap.queueMapRedraw();
 					}
 				}
 			}
@@ -515,7 +515,7 @@ public class TourMapView extends ViewPart {
 					final boolean isShowTileInfo = store.getBoolean(PREF_SHOW_TILE_INFO);
 
 					fMap.setShowDebugInfo(isShowTileInfo);
-					fMap.redrawMap();
+					fMap.queueMapRedraw();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
@@ -535,7 +535,7 @@ public class TourMapView extends ViewPart {
 
 					UI.updateUnits();
 					fMap.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-					fMap.redrawMap();
+					fMap.queueMapRedraw();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
@@ -544,7 +544,7 @@ public class TourMapView extends ViewPart {
 					createLegendImage(PaintManager.getInstance().getLegendProvider());
 
 					fMap.disposeOverlayImageCache();
-					fMap.redrawMap();
+					fMap.queueMapRedraw();
 				}
 			}
 		};
@@ -580,7 +580,7 @@ public class TourMapView extends ViewPart {
 
 					createLegendImage(PaintManager.getInstance().getLegendProvider());
 
-					fMap.redrawMap();
+					fMap.queueMapRedraw();
 				}
 			}
 		};
@@ -931,7 +931,7 @@ public class TourMapView extends ViewPart {
 					// a tour is not displayed, find a tour provider which provides a tour
 					showToursFromTourProvider();
 				} else {
-					fMap.redrawMap();
+					fMap.queueMapRedraw();
 				}
 
 				if (fMapDimLevel < 30) {
@@ -1283,7 +1283,7 @@ public class TourMapView extends ViewPart {
 
 			fMap.setZoom(poi.getRecommendedZoom());
 			fMap.setGeoCenterPosition(fPOIPosition);
-			fMap.redrawMap();
+			fMap.queueMapRedraw();
 
 			enableActions();
 
@@ -1379,7 +1379,7 @@ public class TourMapView extends ViewPart {
 
 		setTourZoomLevel(tourBounds, false);
 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	/**
@@ -1488,7 +1488,7 @@ public class TourMapView extends ViewPart {
 //			fMap.resetOverlayImageCache();
 		}
 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	/**
@@ -1527,7 +1527,7 @@ public class TourMapView extends ViewPart {
 		}
 
 		createLegendImage(PaintManager.getInstance().getLegendProvider());
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -1571,7 +1571,7 @@ public class TourMapView extends ViewPart {
 				}
 
 				createLegendImage(PaintManager.getInstance().getLegendProvider());
-				fMap.redrawMap();
+				fMap.queueMapRedraw();
 			}
 		});
 	}
@@ -1604,7 +1604,7 @@ public class TourMapView extends ViewPart {
 
 			setMapToSliderBounds(tourData);
 
-			fMap.redrawMap();
+			fMap.queueMapRedraw();
 
 		} else {
 
@@ -1622,7 +1622,7 @@ public class TourMapView extends ViewPart {
 
 		paintAllTours();
 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	private void restoreState() {
@@ -1994,7 +1994,7 @@ public class TourMapView extends ViewPart {
 		fMap.setShowOverlays(false);
 		fMap.setShowLegend(false);
 
-		fMap.redrawMap();
+		fMap.queueMapRedraw();
 	}
 
 	/**
