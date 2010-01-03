@@ -298,8 +298,9 @@ public class MPProfile extends MP {
 							// create a unique tile for each child (map provider)
 							childMP.getId());
 
-					childTile.setParentTile(parentTile);
+					childTileFactory.doPostCreation(childTile);
 
+					childTile.setParentTile(parentTile);
 					childTile.setBoundingBoxEPSG4326();
 
 					if (childTileFactory instanceof TileFactoryWms) {

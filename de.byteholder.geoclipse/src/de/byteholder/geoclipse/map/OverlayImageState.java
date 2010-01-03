@@ -16,27 +16,21 @@
 
 package de.byteholder.geoclipse.map;
 
-public enum OverlayStatus {
+public enum OverlayImageState {
 
 	/**
 	 * The overlay image state is not yet set
 	 */
-	OVERLAY_NOT_CHECKED,
+	NOT_SET,
 
 	/**
-	 * Overlay image is requested
+	 * An overlay image for this tile is not available
 	 */
-	IS_REQUESTED,
+	NO_IMAGE,
 
 	/**
-	 * Overlay image is available
+	 * This tile has content for an overlay imag
 	 */
-	OVERLAY_IS_CHECKED_IS_AVAILABLE,
-
-	/**
-	 * An overlay image is not available
-	 */
-	OVERLAY_CHECKED_NO_IMAGE,
+	HAS_CONTENT,
 
 }
- 

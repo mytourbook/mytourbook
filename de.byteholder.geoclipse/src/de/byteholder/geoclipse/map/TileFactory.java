@@ -93,7 +93,7 @@ public abstract class TileFactory {
 	 * 
 	 * @param tile
 	 */
-	protected void doPostCreation(final Tile tile) {
+	public void doPostCreation(final Tile tile) {
 	// default does nothing
 	}
 

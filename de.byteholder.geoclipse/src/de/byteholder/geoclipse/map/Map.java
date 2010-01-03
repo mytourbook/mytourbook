@@ -174,7 +174,7 @@ public class Map extends Canvas {
 	/**
 	 * cache for overlay image which are part of another tile
 	 */
-	private final OverlayImageCache				fPartOverlayImageCache;
+//	private final OverlayImageCache				fPartOverlayImageCache;
 
 	/**
 	 * This queue contains tiles which overlay image must be painted
@@ -486,7 +486,7 @@ public class Map extends Canvas {
 		defaultBackgroundColor = new Color(display, DefaultBackgroundRGB);
 
 		fOverlayImageCache = new OverlayImageCache();
-		fPartOverlayImageCache = new OverlayImageCache();
+//		fPartOverlayImageCache = new OverlayImageCache();
 
 		overlayThread = new Thread("PaintOverlayImages") { //$NON-NLS-1$
 			@Override
@@ -496,7 +496,7 @@ public class Map extends Canvas {
 
 					try {
 
-						Thread.sleep(50);
+						Thread.sleep(20);
 
 						if (isDrawOverlayRunning == false) {
 
@@ -604,7 +604,7 @@ public class Map extends Canvas {
 	 */
 	public synchronized void disposeOverlayImageCache() {
 		fOverlayImageCache.dispose();
-		fPartOverlayImageCache.dispose();
+//		fPartOverlayImageCache.dispose();
 		fTileOverlayPaintQueue.clear();
 	}
 
@@ -1172,60 +1172,85 @@ public class Map extends Canvas {
 	 * @param gc
 	 * @param tile
 	 * @param devTileRectangle
+	 *            Position of the tile
 	 */
 	private void drawTileOverlay(final GC gc, final Tile tile, final Rectangle devTileRectangle) {
 
-		OverlayStatus overlayStatus = tile.getOverlayStatus();
+		/*
+		 * Priority 1: draw overlay image
+		 */
+		final OverlayImageState imageState = tile.getOverlayImageState();
 
-		if (overlayStatus == OverlayStatus.OVERLAY_CHECKED_NO_IMAGE) {
-
-			// overlay has no image, nothing to do
-
+		if (tile.getX() == 34328 && tile.getY() == 22950) {
+			int a = 0;
+			a++;
+		}
+		if (imageState == OverlayImageState.NO_IMAGE) {
+			// there is no image for the tile overlay
 			return;
 		}
 
-		// tile can have an overlay image
-		Image overlayImage = tile.getOverlayImage();
-		if (overlayImage == null) {
+		Image overlayImage = null;
 
-			// try to get the overlay image from the cache
+		if (imageState == OverlayImageState.HAS_CONTENT) {
 
-			overlayImage = fOverlayImageCache.get(getOverlayKey(tile));
+			// tile can have an overlay image
 
-			if (overlayImage != null) {
+			// get overlay image from the tile
+			overlayImage = tile.getOverlayImage();
 
-				// overlay image is available in the cache
+			if (overlayImage == null) {
 
-				tile.setOverlayImage(overlayImage);
-//				tile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
+				// get the overlay image from the cache
+				overlayImage = fOverlayImageCache.get(getOverlayKey(tile));
+
+				if (overlayImage != null) {
+
+					// overlay image is available in the cache, keep the image in the tile
+					tile.setOverlayImage(overlayImage);
+				}
 			}
 		}
 
+		// draw overlay image
 		if (overlayImage != null) {
-
-			// draw overlay image
-
 			gc.drawImage(overlayImage, devTileRectangle.x, devTileRectangle.y);
-
-		} else {
-
-			// check overlay status
-
-			if (overlayStatus == OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE) {
-
-				// overlay image should be available but is not, force the image to be recreated
-				tile.setOverlayStatus(overlayStatus = OverlayStatus.OVERLAY_NOT_CHECKED);
-			}
-
-			// draw overlay image when this was not yet done
-			if (overlayStatus == OverlayStatus.OVERLAY_NOT_CHECKED) {
-
-				// request tile overlay image
-				tile.setOverlayStatus(OverlayStatus.IS_REQUESTED);
-
-				fTileOverlayPaintQueue.add(tile);
-			}
 		}
+
+		/*
+		 * Priority 2: check state for the overlay
+		 */
+		final int overlayContent = tile.getOverlayContent();
+		final OverlayTourStatus tourState = tile.getOverlayTourStatus();
+
+		if (tourState == OverlayTourStatus.IS_CHECKED) {
+
+			// it is possible that the image is disposed but the tile has overlay content
+
+			if (overlayImage == null) {
+
+				if (overlayContent != 0) {
+
+					queueOverlayPainting(tile);
+					return;
+				}
+
+				// tile has no overlay content -> image
+				tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+			}
+
+			// tour is check, all is OK
+			return;
+		}
+
+		// when tile is queued, nothing more to do, just wait
+		if (tourState == OverlayTourStatus.IS_QUEUED) {
+			return;
+		}
+
+		// overlay tour status is not yet checked, overlayTourStatus == OverlayTourStatus.NOT_CHECKED
+		queueOverlayPainting(tile);
+
 	}
 
 	private void fireMapEvent(final GeoPosition geoPosition) {
@@ -1489,7 +1514,7 @@ public class Map extends Canvas {
 		}
 
 		fOverlayImageCache.dispose();
-		fPartOverlayImageCache.dispose();
+//		fPartOverlayImageCache.dispose();
 
 		if (directMapPainter != null) {
 			directMapPainter.dispose();
@@ -1649,27 +1674,22 @@ public class Map extends Canvas {
 
 		while ((tile = fTileOverlayPaintQueue.poll()) != null) {
 
-			// check overlay image in the cache
-			final Image overlayImage = fOverlayImageCache.get(getOverlayKey(tile));
-			if (overlayImage != null && !overlayImage.isDisposed()) {
-
-				// overlay image is valid
-
-				tile.setOverlayImage(overlayImage);
-//				tile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
-
-				continue;
-			}
-
 			// check zoom level
 			if (tile.getZoom() == fMapZoomLevel) {
 
+				if (tile.getX() == 17166 && tile.getY() == 11472) {
+					int a = 0;
+					a++;
+				}
+
 				paintOverlay30Tile(tile);
+
+				tile.setOverlayTourStatus(OverlayTourStatus.IS_CHECKED);
 
 			} else {
 
 				// tile has a different zoom level, ignore this tile
-				tile.setOverlayStatus(OverlayStatus.OVERLAY_NOT_CHECKED);
+				tile.setOverlayTourStatus(OverlayTourStatus.NOT_CHECKED);
 			}
 		}
 	}
@@ -1718,12 +1738,6 @@ public class Map extends Canvas {
 				 */
 
 				paintOverlay40SplitParts(tile, overlayImage, display, tileSize, transparentColor);
-
-			} else {
-
-				// the current tile has nothing to show in an overlay image
-
-				tile.setOverlayStatus(OverlayStatus.OVERLAY_CHECKED_NO_IMAGE);
 			}
 		}
 		gc.dispose();
@@ -1763,9 +1777,13 @@ public class Map extends Canvas {
 		final int tileX = tile.getX();
 		final int tileY = tile.getY();
 		final int maxTiles = (int) Math.pow(2, tileZoom);
+		Tile partTile;
 
 		for (int yIndex = 0; yIndex < 3; yIndex++) {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
+
+//				// 1, 2, 4, 8, 16...
+//				partFlag = partFlag == 0 ? 1 : partFlag * 2;
 
 				// check bounds
 				if ((tileX - xIndex < 0 || tileX + xIndex > maxTiles)
@@ -1778,11 +1796,13 @@ public class Map extends Canvas {
 
 				// check if there are any drawings in the current part
 				if (isPartImageModified(overlayImageData, srcX, srcY, tileSize) == false) {
+
+					// there are no drawings within the current part
 					continue;
 				}
 
+				final String partKey = getOverlayKey(tile, xIndex - 1, yIndex - 1);
 				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
-				final String partOverlayTileKey = getOverlayKey(tile, xIndex - 1, yIndex - 1);
 
 				// create transparent part image
 				final ImageData partImageData = new ImageData(tileSize, tileSize, 24, //
@@ -1790,52 +1810,58 @@ public class Map extends Canvas {
 
 				partImageData.transparentPixel = partImageData.palette.getPixel(fTransparentRGB);
 
-				final Image partOverlayImage = new Image(display, partImageData);
+				final Image partImage = new Image(display, partImageData);
 
 				// draw into part image
-				final GC gcPartImage = new GC(partOverlayImage);
+				final GC gcPartImage = new GC(partImage);
 				{
 					gcPartImage.setBackground(transparentColor);
-					gcPartImage.fillRectangle(partOverlayImage.getBounds());
+					gcPartImage.fillRectangle(partImage.getBounds());
 
 					Image cachedImage;
 
 //					// draw existing part overlay image into the part image
-//					cachedImage = fPartOverlayImageCache.get(partOverlayTileKey);
+//					cachedImage = fPartOverlayImageCache.get(partKey);
 //					if (cachedImage != null && cachedImage.isDisposed() == false) {
 //						gcPartImage.drawImage(cachedImage, 0, 0);
 //					}
 
 					// draw existing overlay image into the part image
-					cachedImage = fOverlayImageCache.get(partOverlayTileKey);
+					cachedImage = fOverlayImageCache.get(partKey);
 					if (cachedImage != null && cachedImage.isDisposed() == false) {
 						gcPartImage.drawImage(cachedImage, 0, 0);
 					}
 
-					// draw part from overlay image into the part image
+					// draw overlay image part into the part image
 					gcPartImage.drawImage(overlayImage, srcX, srcY, tileSize, tileSize, 0, 0, tileSize, tileSize);
 
-					final Tile partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
+					if (isCenterPart) {
+						partTile = tile;
+					} else {
+						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
+					}
+
 					if (partTile != null) {
 
-						// set image into the center tile
-						if (isCenterPart) {
+						// set image into the part
 
-							// set status only for the center part, otherwise the other parts are not painted
-							partTile.setOverlayImage(partOverlayImage);
-						}
+						partTile.setOverlayImage(partImage);
 
-						partTile.setOverlayStatus(OverlayStatus.OVERLAY_IS_CHECKED_IS_AVAILABLE);
+						// set a flag that the tile has overlay content
+						partTile.incrementOverlayContent();
 					}
 
 					// keep image
-					if (isCenterPart) {
-						fOverlayImageCache.add(partOverlayTileKey, partOverlayImage);
-					} else {
-						fPartOverlayImageCache.add(partOverlayTileKey, partOverlayImage);
-					}
+//					if (isCenterPart) {
+					fOverlayImageCache.add(partKey, partImage);
+//					} else {
+//						fPartOverlayImageCache.add(partKey, partImage);
+//					}
 				}
 				gcPartImage.dispose();
+
+				tile.setOverlayImageState(OverlayImageState.HAS_CONTENT);
+
 			}
 		}
 	}
@@ -1915,6 +1941,19 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * Set tile in the overlay painting queue
+	 * 
+	 * @param tile
+	 */
+	private void queueOverlayPainting(final Tile tile) {
+
+		tile.setOverlayTourStatus(OverlayTourStatus.IS_QUEUED);
+		tile.setOverlayImageState(OverlayImageState.NOT_SET);
+
+		fTileOverlayPaintQueue.add(tile);
+	}
+
+	/**
 	 * Re-centers the map to have the current address location be at the center of the map,
 	 * accounting for the map's width and height.
 	 * 
@@ -1955,7 +1994,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Reset overlay information for the current map provider by setting the overlay status to
-	 * {@link OverlayStatus#OVERLAY_NOT_CHECKED} in all tiles
+	 * {@link OverlayTourStatus#OVERLAY_NOT_CHECKED} in all tiles
 	 */
 	public synchronized void resetOverlays() {
 		if (fTileFactory != null) {

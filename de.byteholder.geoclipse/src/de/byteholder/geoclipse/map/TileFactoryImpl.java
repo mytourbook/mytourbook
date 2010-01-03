@@ -368,6 +368,9 @@ public class TileFactoryImpl extends TileFactory {
 
 				doPostCreation(tile);
 
+				// added to cache because overlays created the same tile over and over again			
+				fTileCache.add(tileKey, tile);
+
 			} else {
 
 				// tile is available in the loading map

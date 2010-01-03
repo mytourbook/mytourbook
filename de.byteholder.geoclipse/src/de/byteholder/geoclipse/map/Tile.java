@@ -35,13 +35,37 @@ public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
 
-	private static final String				COLUMN_2					= "  ";
-	private static final String				COLUMN_4					= "    ";
-	private static final String				COLUMN_5					= "     ";
+	private static final String				COLUMN_2			= "  ";
+	private static final String				COLUMN_4			= "    ";
+	private static final String				COLUMN_5			= "     ";
 
-	private OverlayStatus					overlayStatus				= OverlayStatus.OVERLAY_NOT_CHECKED;
- 
-	private boolean							isLoading					= false;
+	private OverlayTourStatus				fOverlayTourStatus	= OverlayTourStatus.NOT_CHECKED;
+	private OverlayImageState				fOverlayImageState	= OverlayImageState.NOT_SET;
+	private int								fOverlayContent		= 0;
+
+//	/**
+//	 * <pre>
+//	 * 
+//	 * y,x
+//	 * 
+//	 * 0,0		0,1		0,2
+//	 * 1,0		1,1		1,2
+//	 * 2,0		2,1		2,2
+//	 * 
+//	 * </pre>
+//	 */
+//
+//	public static int						OVERLAY_CONTENT_0_0			= 0x0001;							// 0000 0000 0000 0001
+//	public static int						OVERLAY_CONTENT_0_1			= 0x0002;							// 0000 0000 0000 0010
+//	public static int						OVERLAY_CONTENT_0_2			= 0x0004;							// 0000 0000 0000 0100
+//	public static int						OVERLAY_CONTENT_1_0			= 0x0008;							// 0000 0000 0000 1000
+//	public static int						OVERLAY_CONTENT_1_1			= 0x0010;							// 0000 0000 0001 0000
+//	public static int						OVERLAY_CONTENT_1_2			= 0x0020;							// 0000 0000 0010 0000
+//	public static int						OVERLAY_CONTENT_2_0			= 0x0040;							// 0000 0000 0100 0000
+//	public static int						OVERLAY_CONTENT_2_1			= 0x0080;							// 0000 0000 1000 0000
+//	public static int						OVERLAY_CONTENT_2_2			= 0x0100;							// 0000 0001 0000 0000
+
+	private boolean							isLoading			= false;
 
 	/**
 	 * If an error occurs while loading a tile, store the exception here.
@@ -56,14 +80,14 @@ public class Tile extends Observable {
 	/**
 	 * Map image for this tile
 	 */
-	private Image							mapImage					= null;
+	private Image							mapImage			= null;
 
 	/**
 	 * Overlay image for this tile
 	 */
-	private Image							overlayImage				= null;
+	private Image							overlayImage		= null;
 
-	private boolean							fIsOfflineError				= false;
+	private boolean							fIsOfflineError		= false;
 
 	private String							fTileKey;
 
@@ -82,7 +106,7 @@ public class Tile extends Observable {
 	/**
 	 * contains the error message when loading of the image fails
 	 */
-	private String							fLoadingError				= null;
+	private String							fLoadingError		= null;
 
 	private boolean							fIsOfflineImageAvailable;
 
@@ -122,7 +146,6 @@ public class Tile extends Observable {
 	 */
 	private ConcurrentHashMap<String, Tile>	fChildrenWithErrors;
 	private String							tileCreatorId;
-
 
 	/**
 	 * create a key for a tile
@@ -403,6 +426,10 @@ public class Tile extends Observable {
 		return fOfflinePath;
 	}
 
+	public int getOverlayContent() {
+		return fOverlayContent;
+	}
+
 	/**
 	 * @return Returns the overlay image for this tile or <code>null</code> when the image is not
 	 *         available or invalid
@@ -411,8 +438,12 @@ public class Tile extends Observable {
 		return getCheckedImage(overlayImage);
 	}
 
-	public OverlayStatus getOverlayStatus() {
-		return overlayStatus;
+	public OverlayImageState getOverlayImageState() {
+		return fOverlayImageState;
+	}
+
+	public OverlayTourStatus getOverlayTourStatus() {
+		return fOverlayTourStatus;
 	}
 
 	public Tile getParentTile() {
@@ -468,6 +499,14 @@ public class Tile extends Observable {
 		return y;
 	}
 
+//	/**
+//	 * @return Returns <code>true</code> when the overlay image {@link #getOverlayImage()} is not a
+//	 *         part overlay image
+//	 */
+//	public boolean isFinalPartImage() {
+//		return fIsFinalOverlayPartImage;
+//	}
+
 	/**
 	 * @return the zoom level that this tile belongs in
 	 */
@@ -481,14 +520,6 @@ public class Tile extends Observable {
 	public boolean isChildTile() {
 		return fParentTile != null;
 	}
-
-//	/**
-//	 * @return Returns <code>true</code> when the overlay image {@link #getOverlayImage()} is not a
-//	 *         part overlay image
-//	 */
-//	public boolean isFinalPartImage() {
-//		return fIsFinalOverlayPartImage;
-//	}
 
 	/**
 	 * @return Returns <code>true</code> when the tile image is currently being loaded
@@ -534,7 +565,12 @@ public class Tile extends Observable {
 	 * reset overlay in this tile, by resetting the status state
 	 */
 	public void resetOverlay() {
-		overlayStatus = OverlayStatus.OVERLAY_NOT_CHECKED;
+
+		fOverlayTourStatus = OverlayTourStatus.NOT_CHECKED;
+		fOverlayImageState = OverlayImageState.NOT_SET;
+
+		fOverlayContent = 0;
+
 		overlayImage = null;
 	}
 
@@ -569,6 +605,10 @@ public class Tile extends Observable {
 		fChildrenWithErrors.put(childTile.getTileKey(), childTile);
 	}
 
+//	public void setIsFinalOverlayImage(final boolean fIsFinalOverlayImage) {
+//		this.fIsFinalOverlayPartImage = fIsFinalOverlayImage;
+//	}
+
 	/**
 	 * Set custom data which can be retrieved with {@link #getData()}
 	 * 
@@ -581,10 +621,6 @@ public class Tile extends Observable {
 	public void setFuture(final Future<?> future) {
 		fFuture = future;
 	}
-
-//	public void setIsFinalOverlayImage(final boolean fIsFinalOverlayImage) {
-//		this.fIsFinalOverlayPartImage = fIsFinalOverlayImage;
-//	}
 
 	public void setIsOfflineImageAvailable(final boolean isOfflineImageAvailable) {
 		fIsOfflineImageAvailable = isOfflineImageAvailable;
@@ -671,12 +707,27 @@ public class Tile extends Observable {
 		fOfflinePath = osTilePath;
 	}
 
+	/**
+	 * Increments the overlay content counter
+	 */
+	public void incrementOverlayContent() {
+		fOverlayContent++;
+	}
+
+//	public void setOverlayContent(final int overlayContent) {
+//		fOverlayContent = overlayContent;
+//	}
+
 	public void setOverlayImage(final Image image) {
 		overlayImage = image;
 	}
 
-	public void setOverlayStatus(final OverlayStatus newStatus) {
-		overlayStatus = newStatus;
+	public void setOverlayImageState(final OverlayImageState overlayImageState) {
+		fOverlayImageState = overlayImageState;
+	}
+
+	public void setOverlayTourStatus(final OverlayTourStatus overlayTourStatus) {
+		fOverlayTourStatus = overlayTourStatus;
 	}
 
 	public void setParentTile(final Tile parentTile) {

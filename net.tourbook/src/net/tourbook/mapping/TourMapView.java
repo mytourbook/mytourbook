@@ -261,10 +261,6 @@ public class TourMapView extends ViewPart {
 		fMap.reload();
 	}
 
-	void actionResetTileOverlays() {
-		fMap.resetOverlays();
-	}
-
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = fMap.getZoom();
 		fDefaultPosition = fMap.getCenterPosition();
@@ -279,7 +275,7 @@ public class TourMapView extends ViewPart {
 			fMap.setGeoCenterPosition(fDefaultPosition);
 		}
 		fMap.queueMapRedraw();
- 	}
+	}
 
 	void actionSetShowLegendInMap() {
 
