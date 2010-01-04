@@ -13,7 +13,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
  */
 class OverlayImageCache {
 
-	private static final int						MAX_CACHE_ENTRIES	= 200;										//100;
+	private static final int						MAX_CACHE_ENTRIES	= 150;
 
 	private final ConcurrentHashMap<String, Image>	fImageCache			= new ConcurrentHashMap<String, Image>();
 	private final ConcurrentLinkedQueue<String>		fImageCacheFifo		= new ConcurrentLinkedQueue<String>();
@@ -47,7 +47,18 @@ class OverlayImageCache {
 			 * check if the image is already in the cache
 			 */
 			final Image cachedImage = fImageCache.get(tileKey);
-			if (cachedImage != null) {
+			if (cachedImage == null) {
+
+				// this is a new image
+
+				fImageCache.put(tileKey, overlayImage);
+				fImageCacheFifo.add(tileKey);
+
+				return;
+
+			} else {
+
+				// an image for the key already exists
 
 				if (cachedImage == overlayImage) {
 
@@ -73,13 +84,6 @@ class OverlayImageCache {
 					return;
 				}
 
-			} else {
-
-				// put a new image into the cache
-				fImageCache.put(tileKey, overlayImage);
-				fImageCacheFifo.add(tileKey);
-
-				return;
 			}
 
 		} catch (final Exception e) {

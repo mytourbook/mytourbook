@@ -717,6 +717,8 @@ public class TourPainter extends MapPainter {
 		java.awt.Point devPosition;
 		java.awt.Point devPreviousPosition = null;
 
+		boolean isFirstPosition = true;
+
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
@@ -739,8 +741,8 @@ public class TourPainter extends MapPainter {
 		gc.setForeground(systemColorBlue);
 		gc.setBackground(systemColorBlue);
 
-//		int lastInsideIndex = -99;
-//		java.awt.Point lastInsidePosition = null;
+		int lastInsideIndex = -99;
+		java.awt.Point lastInsidePosition = null;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
@@ -781,28 +783,41 @@ public class TourPainter extends MapPainter {
 
 						isTourInTile = true;
 
+						if (isFirstPosition) {
+
+							isFirstPosition = false;
+
+							devPreviousPosition.x += devPartOffset;
+							devPreviousPosition.y += devPartOffset;
+						}
+
 						// adjust positions with the part offset
 						devPosition.x += devPartOffset;
 						devPosition.y += devPartOffset;
 
-						drawTour20Line(gc, serieIndex, devPosition, devPreviousPosition);
+						drawTour20Line(gc, serieIndex, devPreviousPosition, devPosition);
 					}
 
-//					lastInsideIndex = serieIndex;
-//					lastInsidePosition = devPosition;
+					lastInsideIndex = serieIndex;
+					lastInsidePosition = devPosition;
 				}
 
 				// current position is outside the tile
 
-//				if (serieIndex == lastInsideIndex + 1 && lastInsidePosition != null) {
-//
-//					/*
-//					 * this position is the first which is outside of the tile, draw a line from the
-//					 * last inside to the first outside position
-//					 */
-//
-//					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
-//				}
+				if (serieIndex == lastInsideIndex + 1 && lastInsidePosition != null) {
+
+					/*
+					 * this position is the first which is outside of the tile, draw a line from the
+					 * last inside to the first outside position
+					 */
+
+					devPosition.x += devPartOffset;
+					devPosition.y += devPartOffset;
+
+					drawTour20Line(gc, serieIndex, lastInsidePosition, devPosition);
+
+					isFirstPosition = true;
+				}
 
 				devPreviousPosition = devPosition;
 
@@ -846,14 +861,14 @@ public class TourPainter extends MapPainter {
 
 	private void drawTour20Line(final GC gc,
 								final int serieIndex,
-								final java.awt.Point devPosition,
-								final java.awt.Point devPreviousPosition) {
+								final java.awt.Point devPositionFrom,
+								final java.awt.Point devPositionTo) {
 
 		if (fDataSerie == null) {
 
 			// draw default line when data are not available
 
-			gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+			gc.drawLine(devPositionFrom.x, devPositionFrom.y, devPositionTo.x, devPositionTo.y);
 
 		} else {
 
@@ -863,7 +878,7 @@ public class TourPainter extends MapPainter {
 
 			{
 				gc.setForeground(lineColor);
-				gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+				gc.drawLine(devPositionFrom.x, devPositionFrom.y, devPositionTo.x, devPositionTo.y);
 			}
 
 			lineColor.dispose();

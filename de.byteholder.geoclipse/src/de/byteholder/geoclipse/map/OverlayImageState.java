@@ -29,8 +29,9 @@ public enum OverlayImageState {
 	NO_IMAGE,
 
 	/**
-	 * This tile has content for an overlay imag
+	 * This tile has content for an overlay image, this state is set when the tile has content not
+	 * when the content is from a part
 	 */
-	HAS_CONTENT,
+	TILE_HAS_CONTENT,
 
 }

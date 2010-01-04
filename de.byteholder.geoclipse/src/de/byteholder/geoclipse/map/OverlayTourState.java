@@ -16,12 +16,12 @@
 
 package de.byteholder.geoclipse.map;
 
-public enum OverlayTourStatus {
+public enum OverlayTourState {
 
 	/**
-	 * The overlay tours are not yet checked
+	 * This tile is not yet checked if it contains tours
 	 */
-	NOT_CHECKED,
+	TILE_IS_NOT_CHECKED,
 
 	/**
 	 * Tile is queued to check the tours
@@ -29,8 +29,8 @@ public enum OverlayTourStatus {
 	IS_QUEUED,
 
 	/**
-	 * Tours in this tile are checked if the tours are within the tile
+	 * This tile is checked if it contains tours
 	 */
-	IS_CHECKED,
+	TILE_IS_CHECKED,
 
 }
