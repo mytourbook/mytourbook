@@ -622,20 +622,7 @@ public class Tile extends Observable {
 	 * @param loading
 	 */
 	public void setLoading(final boolean loading) {
-
 		isLoading = loading;
-
-		if (loading == false) {
-
-//			System.out.println(System.nanoTime()
-//					+ "\t"
-//					+ Thread.currentThread()
-//					+ "\tsetLoading() is done\t\t"
-//					+ getTileKey());
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
-//			notifyImageObservers();
-		}
 	}
 
 	/**

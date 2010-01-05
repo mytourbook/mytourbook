@@ -1198,17 +1198,22 @@ public class Map extends Canvas {
 		final OverlayImageState imageState = tile.getOverlayImageState();
 		final int overlayContent = tile.getOverlayContent();
 
-		if (tile.getX() == 17219 && tile.getY() == 11504) {
-			int a = 0;
-			a++;
-		}
+//		System.out.println(tile);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+//		if (tile.getX() == 17219 && tile.getY() == 11504) {
+//			int a = 0;
+//			a++;
+//		}
 
 		if (imageState == OverlayImageState.NO_IMAGE && overlayContent == 0) {
 			// there is no image for the tile overlay
 			return;
 		}
 
+		Image drawingImage = null;
 		Image partOverlayImage = null;
+		Image tileOverlayImage = null;
 
 		if (overlayContent > 0) {
 
@@ -1217,12 +1222,24 @@ public class Map extends Canvas {
 			final String overlayKey = getOverlayKey(tile);
 
 			// get overlay image from the cache
-			partOverlayImage = fPartOverlayImageCache.get(overlayKey);
+			drawingImage = partOverlayImage = fPartOverlayImageCache.get(overlayKey);
+
+			if (partOverlayImage == null) {
+
+				/**
+				 * get image from the tile, it's possible that the part image is disposed but the
+				 * tile image is still available
+				 */
+				tileOverlayImage = tile.getOverlayImage();
+				if (tileOverlayImage != null && tileOverlayImage.isDisposed() == false) {
+					drawingImage = tileOverlayImage;
+				}
+			}
 		}
 
 		// draw overlay image
-		if (partOverlayImage != null) {
-			gc.drawImage(partOverlayImage, devTileRectangle.x, devTileRectangle.y);
+		if (drawingImage != null) {
+			gc.drawImage(drawingImage, devTileRectangle.x, devTileRectangle.y);
 		}
 
 		/*
@@ -1238,7 +1255,10 @@ public class Map extends Canvas {
 			 * check if the tile overlay image (not the surrounding part images) is available, when
 			 * not the image must be created
 			 */
-			final Image tileOverlayImage = tile.getOverlayImage();
+			if (tileOverlayImage == null) {
+				tileOverlayImage = tile.getOverlayImage();
+			}
+
 			if (tileOverlayImage == null || tileOverlayImage.isDisposed()) {
 
 				// check if tile has overlay content
@@ -1252,7 +1272,7 @@ public class Map extends Canvas {
 
 				} else {
 
-					// tile with overlay content but without image, this is not good, create image again
+					// tile has overlay content but no image, this is not good, create image again
 
 					if (imageState == OverlayImageState.TILE_HAS_CONTENT) {
 
@@ -1269,7 +1289,7 @@ public class Map extends Canvas {
 
 							// this method will do an endless loop and is disabled
 							// -> this problem is currently not solved
-//							queueOverlayPainting(tile);
+							//	queueOverlayPainting(tile);
 							return;
 						}
 					}
@@ -1280,8 +1300,13 @@ public class Map extends Canvas {
 				// image is available
 
 				if (imageState == OverlayImageState.NOT_SET) {
-					// something is wrong
-					queueOverlayPainting(tile);
+
+					if (overlayContent == 0) {
+						tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+					} else {
+						// something is wrong
+						queueOverlayPainting(tile);
+					}
 				}
 
 			}
@@ -1577,8 +1602,6 @@ public class Map extends Canvas {
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
 
-//		long startTime = System.currentTimeMillis();
-
 		fMouseMovePosition = new Point(mouseEvent.x, mouseEvent.y);
 
 		if ((isLeftMouseButtonPressed && panEnabled) == false) {
@@ -1616,9 +1639,6 @@ public class Map extends Canvas {
 		// force a repaint of the moved map
 		isMapPanned = true;
 		redraw();
-
-//		long endTime = System.currentTimeMillis();
-//		System.out.println("onMouseMove:\t\t" + (endTime - startTime) + " ms");
 
 		queueMapRedraw();
 	}
@@ -1720,16 +1740,8 @@ public class Map extends Canvas {
 
 		while ((tile = fTileOverlayPaintQueue.poll()) != null) {
 
-			// check zoom level
+			// skip tiles from another zoom level
 			if (tile.getZoom() == fMapZoomLevel) {
-
-				if (tile.getX() == 17219 && tile.getY() == 11504) {
-					int a = 0;
-					a++;
-				}
-//
-//				System.out.println("queue: " + tile);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				paintOverlay30PaintTile(tile);
 
@@ -1777,12 +1789,20 @@ public class Map extends Canvas {
 
 			if (isOverlayPainted) {
 
-				/*
-				 * overlay image is created, devide overlay image into part images where the center
+				/**
+				 * overlay image is created, split overlay image into 3*3 part images where the
+				 * center
 				 * image is the requested tile image
 				 */
-
 				paintOverlay40SplitParts(tile, partedOverlayImage, display, tileSize, transparentColor);
+
+			} else {
+
+				if (tile.getOverlayContent() == 0) {
+					tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+				} else {
+					tile.setOverlayImageState(OverlayImageState.TILE_HAS_PART_CONTENT);
+				}
 			}
 		}
 		gc.dispose();
@@ -1817,17 +1837,12 @@ public class Map extends Canvas {
 
 		final TileCache tileCache = fTileFactory.getTileCache();
 		final ImageData overlayImageData = overlayImage.getImageData();
+		Tile partTile = null;
 
 		final int tileZoom = tile.getZoom();
 		final int tileX = tile.getX();
 		final int tileY = tile.getY();
 		final int maxTiles = (int) Math.pow(2, tileZoom);
-		Tile partTile;
-
-//		if (tile.getX() == 68660 && tile.getY() == 45907) {
-//			int a = 0;
-//			a++;
-//		}
 
 		for (int yIndex = 0; yIndex < 3; yIndex++) {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -1859,6 +1874,17 @@ public class Map extends Canvas {
 					gcPartImage.fillRectangle(partImage.getBounds());
 
 					Image cachedImage;
+
+					// draw existing part tile image into the new part image
+					if (isCenterPart == false) {
+						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
+						if (partTile != null) {
+							final Image partTileImage = partTile.getOverlayImage();
+							if (partTileImage != null && partTileImage.isDisposed() == false) {
+								gcPartImage.drawImage(partTileImage, 0, 0);
+							}
+						}
+					}
 
 					// draw existing part overlay image into the part image
 					cachedImage = fPartOverlayImageCache.get(partKey);
@@ -1892,9 +1918,15 @@ public class Map extends Canvas {
 
 						// update state in the part tile, set a flag that the tile has overlay content
 
-						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
 						if (partTile != null) {
+
 							partTile.incrementOverlayContent();
+
+							final OverlayImageState partImageState = partTile.getOverlayImageState();
+							if (partImageState == OverlayImageState.NOT_SET
+									|| partImageState == OverlayImageState.NO_IMAGE) {
+								partTile.setOverlayImageState(OverlayImageState.TILE_HAS_PART_CONTENT);
+							}
 						}
 					}
 
@@ -1949,7 +1981,7 @@ public class Map extends Canvas {
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-			getDisplay().asyncExec(synchImageRunnable);
+//			getDisplay().asyncExec(synchImageRunnable);
 
 		} else {
 
@@ -2182,7 +2214,6 @@ public class Map extends Canvas {
 
 		fMapPixelCenter = mapPixelCenter;
 
-//		fireMapEvent(mapGeoCenter);
 		updateMouseMapPosition();
 	}
 

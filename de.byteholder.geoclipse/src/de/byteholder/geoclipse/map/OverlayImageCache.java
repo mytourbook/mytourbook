@@ -13,7 +13,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
  */
 class OverlayImageCache {
 
-	private static final int						MAX_CACHE_ENTRIES	= 150;
+	private static final int						MAX_CACHE_ENTRIES	= 100;
 
 	private final ConcurrentHashMap<String, Image>	fImageCache			= new ConcurrentHashMap<String, Image>();
 	private final ConcurrentLinkedQueue<String>		fImageCacheFifo		= new ConcurrentLinkedQueue<String>();

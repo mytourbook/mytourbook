@@ -45,10 +45,6 @@ class TileImageLoader implements Runnable {
 
 		} else {
 
-			// keep tiles in the cache
-// disabled because overlays created the same tile over and over again			
-//			fTileFactoryImpl.getTileCache().add(tileKey, tile);
-
 			// remove from loading map
 			fTileFactoryImpl.getLoadingTiles().remove(tileKey);
 		}
