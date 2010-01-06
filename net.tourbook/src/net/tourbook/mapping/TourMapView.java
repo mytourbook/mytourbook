@@ -340,7 +340,7 @@ public class TourMapView extends ViewPart {
 
 	void actionShowSlider() {
 
-		if (fTourDataList == null) {
+		if (fTourDataList == null || fTourDataList.size() == 0) {
 			return;
 		}
 
@@ -946,7 +946,7 @@ public class TourMapView extends ViewPart {
 
 		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 		for (final MP mapProvider : allMapProviders) {
-			final TileFactory tileFactory = mapProvider.getTileFactory();
+			final TileFactory tileFactory = mapProvider.getTileFactory(false);
 			if (tileFactory != null) {
 				tileFactory.dispose();
 			}
@@ -1481,7 +1481,8 @@ public class TourMapView extends ViewPart {
 
 			fMap.setOverlayKey(tourData.getTourId().toString());
 			fMap.resetOverlays();
-//			fMap.resetOverlayImageCache();
+			fMap.disposeOverlayImageCache();
+
 		}
 
 		fMap.queueMapRedraw();
@@ -1520,6 +1521,7 @@ public class TourMapView extends ViewPart {
 
 			fMap.setOverlayKey(Long.toString(newOverlayKey));
 			fMap.resetOverlays();
+			fMap.disposeOverlayImageCache();
 		}
 
 		createLegendImage(PaintManager.getInstance().getLegendProvider());

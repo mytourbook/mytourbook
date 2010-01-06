@@ -31,9 +31,6 @@ public class TileFactoryWms extends TileFactoryImpl {
 	private WmsTileFactoryInfo	fFactoryInfo;
 
 	public TileFactoryWms(final MPWms wmsMapProvider) {
-
-//		super();
-
 		fWmsMapProvider = wmsMapProvider;
 	}
 
@@ -81,8 +78,18 @@ public class TileFactoryWms extends TileFactoryImpl {
 	}
 
 	@Override
+	public MP getMapProvider() {
+		return fWmsMapProvider;
+	}
+
+	@Override
 	public int getTileSize() {
 		return fWmsMapProvider.getImageSize();
+	}
+
+	@Override
+	public void setMapProvider(final MP mapProvider) {
+	// this is done in the constructor
 	}
 }
 

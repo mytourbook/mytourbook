@@ -29,16 +29,23 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
 
-import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
- 
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+
 /**
  * @author Michael Kanis
  * @author Alfred Barten
  */
 public class SRTMTileFactory extends TileFactoryImpl {
+
+	/**
+	 * Map provider which created this tile factory
+	 */
+	private MP							fMapProvider;
 
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
@@ -56,7 +63,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 
 		private static final String		SEPARATOR		= "/";					//$NON-NLS-1$
 		private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
-		private static final String		FILE_EXT		= "png";				//$NON-NLS-1$
+		private static final String		FILE_EXT		= MapProviderManager.FILE_EXTENSION_PNG;
 
 		private static final int		MIN_ZOOM		= 0;
 		private static final int		MAX_ZOOM		= 17;
@@ -160,12 +167,14 @@ public class SRTMTileFactory extends TileFactoryImpl {
 				final GeoLat geoLatOld = new GeoLat();
 				final GeoLon geoLon = new GeoLon();
 				final GeoLon geoLonOld = new GeoLon();
-				for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld.set(lat)) {
+				for (int pixelY = 0, mapY = mapStartY; pixelY <= tileSize; pixelY += grid, mapY += grid, geoLatOld
+						.set(lat)) {
 
 					lat = constMx1 * Math.atan(Math.exp(pi - constMx2 * mapY)) - 90.; // Mercator
 					geoLat.set(lat);
 
-					for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, geoLonOld.set(lon)) {
+					for (int pixelX = 0, mapX = mapStartX; pixelX <= tileSize; pixelX += grid, mapX += grid, geoLonOld
+							.set(lon)) {
 
 						lon = constMy * mapX - 180.; // Mercator
 						geoLon.set(lon);
@@ -227,7 +236,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 			}
 
 			return new Path(fullPath)//
-			.append(FACTORY_OS_NAME)
+					.append(FACTORY_OS_NAME)
 					.append(tilePath)
 					.append(Integer.toString(zoomLevel))
 					.append(Integer.toString(x))
@@ -247,14 +256,8 @@ public class SRTMTileFactory extends TileFactoryImpl {
 
 		@Override
 		public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
-			final StringBuilder url = new StringBuilder(this.getBaseURL()).append(SEPARATOR)
-					.append(zoom)
-					.append(SEPARATOR)
-					.append(x)
-					.append(SEPARATOR)
-					.append(y)
-					.append('.')
-					.append(FILE_EXT);
+			final StringBuilder url = new StringBuilder(this.getBaseURL()).append(SEPARATOR).append(zoom).append(
+					SEPARATOR).append(x).append(SEPARATOR).append(y).append('.').append(FILE_EXT);
 
 			return url.toString();
 		}
@@ -272,6 +275,16 @@ public class SRTMTileFactory extends TileFactoryImpl {
 		 */
 		final SRTMProfile selectedProfile = PrefPageSRTMColors.getSelectedProfile();
 		tile.setData(selectedProfile);
+	}
+
+	@Override
+	public MP getMapProvider() {
+		return fMapProvider;
+	}
+
+	@Override
+	public void setMapProvider(final MP mp) {
+		fMapProvider = mp;
 	}
 }
 

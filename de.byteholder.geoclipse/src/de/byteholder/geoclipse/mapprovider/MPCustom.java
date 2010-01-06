@@ -67,7 +67,11 @@ public class MPCustom extends MP {
 	}
 
 	@Override
-	public TileFactoryCustom getTileFactory() {
+	public TileFactoryCustom getTileFactory(final boolean initTileFactory) {
+
+		if (initTileFactory == false) {
+			return fTileFactory;
+		}
 
 		// initialize tile factory when it's not yet done
 		fTileFactory.getInfo();
@@ -84,7 +88,7 @@ public class MPCustom extends MP {
 				.append(Integer.toString(zoomLevel))
 				.append(Integer.toString(x))
 				.append(Integer.toString(y))
-				.addFileExtension(MapProviderManager.getFileExtension(getImageFormat()));
+				.addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
 		return filePath;
 	}
@@ -99,7 +103,7 @@ public class MPCustom extends MP {
 				fDefaultFactoryInfo = MapProviderManager
 						.getInstance()
 						.getDefaultMapProvider()
-						.getTileFactory()
+						.getTileFactory(true)
 						.getInfo();
 			}
 

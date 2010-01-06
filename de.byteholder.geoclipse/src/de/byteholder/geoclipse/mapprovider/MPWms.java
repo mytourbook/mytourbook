@@ -54,7 +54,6 @@ public class MPWms extends MP {
 //	private static final String			SRS_EPSG_3785		= "EPSG:3785";				//$NON-NLS-1$
 //	private static final String			SRS_EPSG_900913		= "EPSG:900913";			//$NON-NLS-1$
 
-
 	private static final char			COMMA				= ',';
 
 	private boolean						fIsWmsAvailable		= true;
@@ -278,10 +277,21 @@ public class MPWms extends MP {
 	}
 
 	@Override
-	public TileFactory getTileFactory() {
+	public TileFactory getTileFactory(final boolean initTileFactory) {
+
+		if (initTileFactory == false) {
+			return fTileFactory;
+		}
 
 		if (fTileFactory == null) {
-			return null;
+
+			final MPWms mpWms = MapProviderManager.checkWms(this, null);
+
+			if (mpWms == null) {
+				return null;
+			}
+
+			initializeLayers();
 		}
 
 		// initialize tile factory when it's not done yet
@@ -381,7 +391,7 @@ public class MPWms extends MP {
 				.append(Integer.toString(zoomLevel))
 				.append(Integer.toString(x))
 				.append(Integer.toString(y))
-				.addFileExtension(MapProviderManager.getFileExtension(getImageFormat()));
+				.addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
 		return filePath;
 	}
@@ -391,6 +401,61 @@ public class MPWms extends MP {
 	 */
 	public WMSCapabilities getWmsCaps() {
 		return fWmsCaps;
+	}
+
+	/**
+	 * Set layer sort order<br>
+	 * <br>
+	 * Sort layers in reverse order because the sorting order is used when the map's are loaded
+	 * from the server and is used as offline file path
+	 */
+	public void initializeLayers() {
+
+		if (fMtLayers == null) {
+			// wms is not yet loaded
+			StatusUtil.showStatus("wms is not initialized", new Exception());//$NON-NLS-1$
+			return;
+		}
+
+		fMtLayersReverse.clear();
+		fMtLayersReverse.addAll(fMtLayers);
+
+		Collections.sort(fMtLayersReverse, new Comparator<MtLayer>() {
+
+			public int compare(final MtLayer mt1, final MtLayer mt2) {
+
+				if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
+
+					// sort by name
+					return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
+
+				} else {
+
+					// sort by position 
+					return -mt1.getPositionIndex() - -mt2.getPositionIndex();
+				}
+			}
+		});
+
+		/*
+		 * sort none reverse layers, this sorting is used when the custom tile key is created
+		 */
+		Collections.sort(fMtLayers, new Comparator<MtLayer>() {
+
+			public int compare(final MtLayer mt1, final MtLayer mt2) {
+
+				if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
+
+					// sort by name
+					return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
+
+				} else {
+
+					// sort by position 
+					return mt1.getPositionIndex() - mt2.getPositionIndex();
+				}
+			}
+		});
 	}
 
 	/**
@@ -484,61 +549,6 @@ public class MPWms extends MP {
 		if (fTileFactory != null) {
 			fTileFactory.getInfo().initializeZoomLevel(minZoom, maxZoom);
 		}
-	}
-
-	/**
-	 * Set layer sort order<br>
-	 * <br>
-	 * Sort layers in reverse order because the sorting order is used when the map's are loaded
-	 * from the server and is used as offline file path
-	 */
-	public void sortLayers() {
-
-		if (fMtLayers == null) {
-			// wms is not yet loaded
-			StatusUtil.showStatus("wms is not initialized", new Exception());//$NON-NLS-1$
-			return;
-		}
-
-		fMtLayersReverse.clear();
-		fMtLayersReverse.addAll(fMtLayers);
-
-		Collections.sort(fMtLayersReverse, new Comparator<MtLayer>() {
-
-			public int compare(final MtLayer mt1, final MtLayer mt2) {
-
-				if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
-
-					// sort by name
-					return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
-
-				} else {
-
-					// sort by position 
-					return -mt1.getPositionIndex() - -mt2.getPositionIndex();
-				}
-			}
-		});
-
-		/*
-		 * sort none reverse layers, this sorting is used when the custom tile key is created
-		 */
-		Collections.sort(fMtLayers, new Comparator<MtLayer>() {
-
-			public int compare(final MtLayer mt1, final MtLayer mt2) {
-
-				if (mt1.getPositionIndex() == -1 || mt2.getPositionIndex() == -1) {
-
-					// sort by name
-					return mt1.getGeoLayer().compareTo(mt2.getGeoLayer());
-
-				} else {
-
-					// sort by position 
-					return mt1.getPositionIndex() - mt2.getPositionIndex();
-				}
-			}
-		});
 	}
 
 }

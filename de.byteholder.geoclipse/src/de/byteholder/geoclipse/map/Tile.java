@@ -225,7 +225,7 @@ public class Tile extends Observable {
 		this.zoom = zoom;
 		this.tileCreatorId = tileCreatorId;
 
-		fTileKey = getTileKey(tileFactory, x, y, zoom, tileCreatorId, null, null);
+		fTileKey = getTileKey(tileFactory, x, y, zoom, tileCreatorId, null, tileFactory.getProjection().getId());
 	}
 
 	@Override
@@ -458,8 +458,8 @@ public class Tile extends Observable {
 		return fTileKey;
 	}
 
-	public String getTileKey(final int xOffset, final int yOffset) {
-		return getTileKey(fTileFactory, x + xOffset, y + yOffset, zoom, tileCreatorId, null, null);
+	public String getTileKey(final int xOffset, final int yOffset, final String projectionId) {
+		return getTileKey(fTileFactory, x + xOffset, y + yOffset, zoom, tileCreatorId, null, projectionId);
 	}
 
 	public long getTimeEndLoading() {

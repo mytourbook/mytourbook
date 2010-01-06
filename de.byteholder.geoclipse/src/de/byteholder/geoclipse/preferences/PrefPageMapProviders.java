@@ -1316,7 +1316,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private void deleteOfflineMapFiles(final MP mapProvider) {
 
 		// reset state that offline images are available
-		final TileFactory tileFactory = mapProvider.getTileFactory();
+		final TileFactory tileFactory = mapProvider.getTileFactory(false);
 		if (tileFactory != null) {
 			tileFactory.resetTileImageAvailability();
 		}
@@ -1975,7 +1975,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
 
 					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
-					fTxtUrl.setText(pluginMapProvider.getTileFactory().getInfo().getBaseURL());
+					fTxtUrl.setText(pluginMapProvider.getTileFactory(true).getInfo().getBaseURL());
 				}
 
 				updateUIOfflineInfoDetail(mapProvider);

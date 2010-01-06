@@ -44,6 +44,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -93,6 +94,7 @@ public class MapProviderManager {
 	public static final String				MIME_GIF										= "image/gif";						//$NON-NLS-1$
 	public static final String				MIME_JPG										= "image/jpg";						//$NON-NLS-1$
 	public static final String				MIME_JPEG										= "image/jpeg";					//$NON-NLS-1$
+
 	public static final String				DEFAULT_IMAGE_FORMAT							= MIME_PNG;						//$NON-NLS-1$
 
 	public static final String				FILE_EXTENSION_PNG								= "png";							//$NON-NLS-1$
@@ -243,13 +245,15 @@ public class MapProviderManager {
 																									ListenerList.IDENTITY);
 
 	/**
-	 * Checks if the WMS is initialized, if not it will be done (it is loading the WMS layers)
+	 * Checks if the WMS is initialized, if not it will be done (it is loading the WMS layers). It
+	 * also creates the wms tile factory.
 	 * 
 	 * @param mpWms
 	 *            can be <code>null</code> when capsUrl is <code>not null</code> to do an initial
 	 *            loading
 	 * @param capsUrl
-	 * @return Returns <code>true</code> when WMS is initialized, otherwise <code>false</code>
+	 * @return Returns a wms map provider or <code>null</code> when the wms cannot be initialized
+	 *         which happens when an connection to the wms server cannot be established
 	 */
 	public static MPWms checkWms(final MPWms mpWms, final String capsUrl) {
 
@@ -349,18 +353,6 @@ public class MapProviderManager {
 		}
 	}
 
-	public static String getFileExtension(final String mimeImageFormat) {
-
-		if (mimeImageFormat.equalsIgnoreCase(MIME_JPG) || mimeImageFormat.equalsIgnoreCase(MIME_JPEG)) {
-			return FILE_EXTENSION_JPG;
-		} else if (mimeImageFormat.equalsIgnoreCase(MIME_GIF)) {
-			return FILE_EXTENSION_GIF;
-		} else {
-			// use png as default
-			return FILE_EXTENSION_PNG;
-		}
-	}
-
 	/**
 	 * Convert {@link DirectPosition} into a {@link GeoPosition}
 	 * 
@@ -383,6 +375,64 @@ public class MapProviderManager {
 		}
 
 		return new GeoPosition(latitude, longitude);
+	}
+
+	/**
+	 * @param imageType
+	 *            SWT image format like {@link SWT#IMAGE_PNG}
+	 * @return Returns <code>null</code> when the image type cannot be recognized
+	 */
+	public static String getImageFileExtension(final int imageType) {
+
+		switch (imageType) {
+		case SWT.IMAGE_JPEG:
+			return FILE_EXTENSION_JPG;
+
+		case SWT.IMAGE_GIF:
+			return FILE_EXTENSION_GIF;
+
+		case SWT.IMAGE_PNG:
+			return FILE_EXTENSION_PNG;
+
+		default:
+		}
+
+		return null;
+	}
+
+	public static String getImageFileExtension(final String mimeImageFormat) {
+
+		if (mimeImageFormat.equalsIgnoreCase(MIME_JPG) || mimeImageFormat.equalsIgnoreCase(MIME_JPEG)) {
+			return FILE_EXTENSION_JPG;
+		} else if (mimeImageFormat.equalsIgnoreCase(MIME_GIF)) {
+			return FILE_EXTENSION_GIF;
+		} else {
+			// use png as default
+			return FILE_EXTENSION_PNG;
+		}
+	}
+
+	/**
+	 * @param imageType
+	 *            SWT image format like {@link SWT#IMAGE_PNG}
+	 * @return Returns <code>null</code> when the image type cannot be recognized
+	 */
+	public static String getImageMimeType(final int imageType) {
+
+		switch (imageType) {
+		case SWT.IMAGE_JPEG:
+			return MIME_JPG;
+
+		case SWT.IMAGE_GIF:
+			return MIME_GIF;
+
+		case SWT.IMAGE_PNG:
+			return MIME_PNG;
+
+		default:
+		}
+
+		return null;
 	}
 
 	public static MapProviderManager getInstance() {
@@ -688,7 +738,7 @@ public class MapProviderManager {
 
 		fAllMapProviders = new ArrayList<MP>();
 
-		// add internal tile factories
+		// create default tile factories
 		fDefaultTileFactory = new MPPlugin(new TileFactoryOSM());
 
 		fAllMapProviders.add(fDefaultTileFactory);
@@ -738,6 +788,9 @@ public class MapProviderManager {
 			}
 
 			if (isValid) {
+
+				// create a map provider for the plugin tile factory
+
 				fAllMapProviders.add(new MPPlugin(pluginMapFactory));
 			}
 		}
@@ -909,7 +962,7 @@ public class MapProviderManager {
 				isValid = withMapProfile;
 
 			} else if (mapProvider instanceof MPPlugin) {
-				if (((MPPlugin) mapProvider).getTileFactory().getInfo().isMapEmpty()) {
+				if (((MPPlugin) mapProvider).getTileFactory(true).getInfo().isMapEmpty()) {
 					// ignore empty map providers
 					isValid = false;
 				}

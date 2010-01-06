@@ -298,7 +298,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		fMpProfile.setIsSaveImage(false);
 
 		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
-		fDefaultTileFactory = fDefaultMapProvider.getTileFactory();
+		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
 
 	}
 
@@ -324,7 +324,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.getTileFactory().resetAll(false);
+				fMpProfile.getTileFactory(true).resetAll(false);
 			}
 		});
 
@@ -870,7 +870,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						 * remove parent tiles from loading cache because they can have loading
 						 * errors (from their children) which prevents them to be loaded again
 						 */
-						fMpProfile.getTileFactory().resetParentTiles();
+						fMpProfile.getTileFactory(true).resetParentTiles();
 					}
 
 					enableProfileMapButton();
@@ -1589,7 +1589,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory mpTileFactory = fMpProfile.getTileFactory();
+			final TileFactory mpTileFactory = fMpProfile.getTileFactory(true);
 
 			setMapZoomLevelFromInfo(mpTileFactory.getInfo());
 
@@ -1616,7 +1616,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// update layers BEFORE the tile factory is set in the map
 		updateModelFromUI();
 
-		final TileFactory mpTileFactory = fMpProfile.getTileFactory();
+		final TileFactory mpTileFactory = fMpProfile.getTileFactory(true);
 
 		/**
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1861,7 +1861,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.getTileFactory().resetAll(false);
+				fMpProfile.getTileFactory(true).resetAll(false);
 
 				// model is saved in the dialog opening code
 				updateModelFromUI();
@@ -2346,7 +2346,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					 * remove parent tiles from loading cache because they can have loading
 					 * errors (from their children) which prevents them to be loaded again
 					 */
-					fMpProfile.getTileFactory().resetParentTiles();
+					fMpProfile.getTileFactory(true).resetParentTiles();
 				}
 
 				mpWrapper.setIsDisplayedInMap(isWmsDisplayed);
@@ -2464,7 +2464,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						}
 					}
 
-					mpWms.sortLayers();
+					mpWms.initializeLayers();
 				}
 			}
 		}
@@ -2597,7 +2597,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		MPProfile.updateWrapperTileFactory(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		final TileFactory tileFactory = fMpProfile.getTileFactory();
+		final TileFactory tileFactory = fMpProfile.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		// set position to previous position

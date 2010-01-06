@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,6 +18,12 @@ package de.byteholder.geoclipse.mapprovider;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
 
+/**
+ * This is a map provider for a plugin tile factory. <br>
+ * <br>
+ * The plugin tile factory must implement the
+ * methods {@link TileFactory#setMapProvider(MP)} and {@link TileFactory#getMapProvider()}
+ */
 public class MPPlugin extends MP {
 
 	private TileFactory	fTileFactory;
@@ -26,8 +32,10 @@ public class MPPlugin extends MP {
 
 		fTileFactory = tileFactory;
 
+		tileFactory.setMapProvider(this);
+
 		final TileFactoryInfo factoryInfo = tileFactory.getInfo();
-  
+
 		setMapProviderId(factoryInfo.getFactoryID());
 		setName(factoryInfo.getFactoryName());
 		setOfflineFolder(factoryInfo.getTileOSFolder());
@@ -38,7 +46,8 @@ public class MPPlugin extends MP {
 		fTileFactory.disposeCachedImages();
 	}
 
-	public TileFactory getTileFactory() {
+	@Override
+	public TileFactory getTileFactory(final boolean initTileFactory) {
 		return fTileFactory;
 	}
 }

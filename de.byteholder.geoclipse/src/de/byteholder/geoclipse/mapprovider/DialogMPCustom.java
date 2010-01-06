@@ -89,7 +89,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "IsShowTileInfo";									//$NON-NLS-1$
 	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";							//$NON-NLS-1$
 	private static final String				DIALOG_SETTINGS_EXAMPLE_URL				= "ExampleUrl";										//$NON-NLS-1$
-	private static final String				DEFAULT_EXAMPLE							= "http://topo.geofabrik.de/relief/11/1076/719.png";	//$NON-NLS-1$
+
+	// feldberg
+//	private static final String				DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/16/34225/22815.png";	//$NON-NLS-1$
+
+	// tremola
+	private static final String				DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/15/17165/11587.png";	//$NON-NLS-1$
 
 	/*
 	 * UI controls
@@ -185,7 +190,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private String							fCustomUrl;
 	private String							fPreviousCustomUrl;
 
-	private MPCustom						fCustomMapProvider;
+	private MPCustom						fMpCustom;
 	private MPPlugin						fDefaultMapProvider;
 	private TileFactory						fDefaultTileFactory;
 
@@ -204,6 +209,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private int								fPreviousMaxZoom;
 
 	private Label							fLblLog;
+	private Text							fTxtImageFormat;
 
 	private static final ReentrantLock		LOG_LOCK								= new ReentrantLock();
 
@@ -297,16 +303,16 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		fDialogSettings = Activator.getDefault().getDialogSettingsSection("DialogCustomConfiguration");//$NON-NLS-1$
 
 		fPrefPageMapFactory = mapFactory;
-		fCustomMapProvider = customMapProvider;
+		fMpCustom = customMapProvider;
 
 		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
-		fDefaultTileFactory = fDefaultMapProvider.getTileFactory();
+		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
 	}
 
 	public void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
 		fMap.queueMapRedraw();
- 	}
+	}
 
 	public void actionZoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
@@ -355,7 +361,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		restoreState();
 
 		// initialize after the shell size is set
-		initializeUIFromModel(fCustomMapProvider);
+		initializeUIFromModel(fMpCustom);
 
 		enableControls();
 	}
@@ -476,7 +482,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				PART_ROWS.add(createUI210PartRow(fPartContainer, 11, pixelConverter));
 			}
 
-			createUI220Detail(container);
+			createUI220Detail(container, pixelConverter);
 			createUI240DebugInfo(container);
 		}
 	}
@@ -521,7 +527,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		return new PartRow(combo, paraWidgets);
 	}
 
-	private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent, final PixelConverter pixelConverter) {
+	private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(	final Composite parent,
+																final PixelConverter pixelConverter) {
 
 		final HashMap<WIDGET_KEY, Widget> paraWidgets = new HashMap<WIDGET_KEY, Widget>();
 
@@ -532,9 +539,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 				// validate values
 				if (event.widget == (Spinner) paraWidgets.get(WIDGET_KEY.SPINNER_RANDOM_START)) {
-					onSelectRandSpinnerMin(paraWidgets);
+					onSelectRandomSpinnerMin(paraWidgets);
 				} else {
-					onSelectRandSpinnerMax(paraWidgets);
+					onSelectRandomSpinnerMax(paraWidgets);
 				}
 			}
 		};
@@ -633,7 +640,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 						if (fIsInitUI) {
 							return;
 						}
-						onSelectRandSpinnerMin(paraWidgets);
+						onSelectRandomSpinnerMin(paraWidgets);
 					}
 				});
 				fromSpinner.addModifyListener(new ModifyListener() {
@@ -641,7 +648,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 						if (fIsInitUI) {
 							return;
 						}
-						onSelectRandSpinnerMin(paraWidgets);
+						onSelectRandomSpinnerMin(paraWidgets);
 					}
 				});
 
@@ -662,12 +669,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 						if (fIsInitUI) {
 							return;
 						}
-						onSelectRandSpinnerMax(paraWidgets);
+						onSelectRandomSpinnerMax(paraWidgets);
 					}
 				});
 				toSpinner.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						onSelectRandSpinnerMax(paraWidgets);
+						onSelectRandomSpinnerMax(paraWidgets);
 					}
 				});
 
@@ -695,7 +702,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		return UI.EMPTY_STRING;
 	}
 
-	private void createUI220Detail(final Composite parent) {
+	private void createUI220Detail(final Composite parent, final PixelConverter pixelConverter) {
 
 		Label label;
 		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
@@ -716,12 +723,23 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
+			// label: image format
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText(Messages.Dialog_CustomConfig_Label_ImageFormat);
+
+			// label: image format value
+			fTxtImageFormat = new Text(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtImageFormat);
+			fTxtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
+
+			// ################################################
+
 			// label: min zoomlevel
 			label = new Label(container, SWT.NONE);
 			label.setText(Messages.Dialog_CustomConfig_Label_ZoomLevel);
 
-			// ################################################
-
+			// container: zoom
 			final Composite zoomContainer = new Composite(container, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(zoomContainer);
 			{
@@ -997,37 +1015,41 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private void initializeUIFromModel(final MPCustom mapProvider) {
 
-		fCustomMapProvider = mapProvider;
+		fMpCustom = mapProvider;
 
 		fIsInitUI = true;
 		{
 			updateUIUrlParts();
 			updateUICustomUrl();
 
-			// zoom level
-			final int minZoomLevel = fCustomMapProvider.getMinZoomLevel();
-			final int maxZoomLevel = fCustomMapProvider.getMaxZoomLevel();
+			/*
+			 * set zoom level
+			 */
+			final int minZoomLevel = fMpCustom.getMinZoomLevel();
+			final int maxZoomLevel = fMpCustom.getMaxZoomLevel();
 			fSpinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
 			fSpinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
 
 			fPreviousCustomUrl = mapProvider.getCustomUrl();
 			fPreviousMinZoom = minZoomLevel;
 			fPreviousMaxZoom = maxZoomLevel;
+
+			fTxtImageFormat.setText(fMpCustom.getImageFormat());
 		}
 		fIsInitUI = false;
 
 		// show map provider in the message area
-		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fCustomMapProvider.getName());
+		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpCustom.getName());
 		setMessage(fDefaultMessage);
 
 		// set factory and display map
-		final TileFactory tileFactory = fCustomMapProvider.getTileFactory();
+		final TileFactory tileFactory = fMpCustom.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		if (true) {
 			// set position to previous position
-			fMap.setZoom(fCustomMapProvider.getLastUsedZoom());
-			fMap.setGeoCenterPosition(fCustomMapProvider.getLastUsedPosition());
+			fMap.setZoom(fMpCustom.getLastUsedZoom());
+			fMap.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
 		}
 	}
 
@@ -1043,7 +1065,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private void onSelectCustomMap() {
 
 		// check if the tile factory has changed
-		final TileFactory customTileFactory = fCustomMapProvider.getTileFactory();
+		final TileFactory customTileFactory = fMpCustom.getTileFactory(true);
 		if (fMap.getTileFactory() != customTileFactory) {
 
 			/*
@@ -1078,10 +1100,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		updateModelFromUI();
 
 		// reset all images
-		fCustomMapProvider.getTileFactory().resetAll(false);
+		fMpCustom.getTileFactory(true).resetAll(false);
 
 		// delete offline images to force the reload and to test the modified url
-		fPrefPageMapFactory.deleteOfflineMap(fCustomMapProvider);
+		fPrefPageMapFactory.deleteOfflineMap(fMpCustom);
 	}
 
 	private void onSelectOsmMap() {
@@ -1093,7 +1115,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory tileFactory = fCustomMapProvider.getTileFactory();
+			final TileFactory tileFactory = fMpCustom.getTileFactory(true);
 
 			setMapZoomLevelFromInfo(tileFactory.getInfo());
 
@@ -1132,7 +1154,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		updateUICustomUrl();
 	}
 
-	private void onSelectRandSpinnerMax(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
+	private void onSelectRandomSpinnerMax(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
 
 		/*
 		 * ensure the to value is larger than the from value
@@ -1156,7 +1178,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		updateUICustomUrl();
 	}
 
-	private void onSelectRandSpinnerMin(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
+	private void onSelectRandomSpinnerMin(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
 
 		/*
 		 * ensure the from value is smaller than the to value
@@ -1389,7 +1411,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
-		fCustomMapProvider.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
+		fMpCustom.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
 
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
@@ -1405,12 +1427,15 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		/*
 		 * keep position
 		 */
-		fCustomMapProvider.setLastUsedZoom(fMap.getZoom());
-		fCustomMapProvider.setLastUsedPosition(fMap.getCenterPosition());
+		fMpCustom.setLastUsedZoom(fMap.getZoom());
+		fMpCustom.setLastUsedPosition(fMap.getCenterPosition());
 
 		if (fCustomUrl != null) {
-			fCustomMapProvider.setCustomUrl(fCustomUrl);
+			fMpCustom.setCustomUrl(fCustomUrl);
 		}
+
+		// update image format from the mp, the image format is set in the mp when images are loaded
+		fTxtImageFormat.setText(fMpCustom.getImageFormat());
 	}
 
 	/**
@@ -1497,7 +1522,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			rowIndex++;
 		}
 
-		fCustomMapProvider.setUrlParts(urlParts);
+		fMpCustom.setUrlParts(urlParts);
 	}
 
 	/**
@@ -1566,7 +1591,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private void updateUIUrlParts() {
 
 		int rowIndex = 0;
-		final ArrayList<UrlPart> urlParts = fCustomMapProvider.getUrlParts();
+		final ArrayList<UrlPart> urlParts = fMpCustom.getUrlParts();
 
 		for (final UrlPart urlPart : urlParts) {
 

@@ -614,7 +614,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Clear the overlay image cache
+	 * Disposes all overlay image cache and the overlay painting queue
 	 */
 	public synchronized void disposeOverlayImageCache() {
 
@@ -937,9 +937,6 @@ public class Map extends Canvas {
 
 			// map image contains an error, it could not be loaded
 
-			/*
-			 * image was disposed,
-			 */
 			final Image errorImage = fTileFactory.getErrorImage();
 			final org.eclipse.swt.graphics.Rectangle imageBounds = errorImage.getBounds();
 
@@ -1407,10 +1404,11 @@ public class Map extends Canvas {
 	 * @param tile
 	 * @param xOffset
 	 * @param yOffset
+	 * @param projectionId
 	 * @return
 	 */
-	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset) {
-		return fOverlayKey + tile.getTileKey(xOffset, yOffset);
+	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
+		return fOverlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
 	}
 
 	public List<MapPainter> getOverlays() {
@@ -1836,6 +1834,7 @@ public class Map extends Canvas {
 											final Color transparentColor) {
 
 		final TileCache tileCache = fTileFactory.getTileCache();
+		final String projectionId = fTileFactory.getProjection().getId();
 		final ImageData overlayImageData = overlayImage.getImageData();
 		Tile partTile = null;
 
@@ -1863,7 +1862,7 @@ public class Map extends Canvas {
 					continue;
 				}
 
-				final String partKey = getOverlayKey(tile, xIndex - 1, yIndex - 1);
+				final String partKey = getOverlayKey(tile, xIndex - 1, yIndex - 1, projectionId);
 				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
 
 				// draw into part image
@@ -1877,7 +1876,7 @@ public class Map extends Canvas {
 
 					// draw existing part tile image into the new part image
 					if (isCenterPart == false) {
-						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1));
+						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1, projectionId));
 						if (partTile != null) {
 							final Image partTileImage = partTile.getOverlayImage();
 							if (partTileImage != null && partTileImage.isDisposed() == false) {

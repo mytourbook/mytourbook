@@ -178,7 +178,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private int								fStatUpdateCounter						= 0;
 
-	private MPWms							fWmsMapProvider;
+	private MPWms							fMpWms;
 
 	private TileFactory						fDefaultTileFactory;
 
@@ -196,9 +196,9 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fDialogSettings = Activator.getDefault().getDialogSettingsSection("DialogWmsConfiguration");//$NON-NLS-1$
 
 		fPrefPageMapFactory = mapFactory;
-		fWmsMapProvider = wmsMapProvider;
+		fMpWms = wmsMapProvider;
 
-		fDefaultTileFactory = MapProviderManager.getInstance().getDefaultMapProvider().getTileFactory();
+		fDefaultTileFactory = MapProviderManager.getInstance().getDefaultMapProvider().getTileFactory(true);
 	}
 
 	void actionSetZoomToShowEntireLayer() {
@@ -220,7 +220,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		updateMapPosition();
 
 		fMap.queueMapRedraw();
- 	}
+	}
 
 	public void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
@@ -276,7 +276,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	public boolean close() {
 
 		// clear loading queue
-		fWmsMapProvider.getTileFactory().resetAll(false);
+		fMpWms.getTileFactory(true).resetAll(false);
 
 		saveState();
 
@@ -314,7 +314,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		restoreState();
 
 		// initialize after the shell size is set
-		initializeUIFromModel(fWmsMapProvider);
+		initializeUIFromModel(fMpWms);
 
 		// force the viewer to do the layout to remove horizontal scollbar
 		fViewerContainer.layout();
@@ -416,7 +416,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		{
 			final Composite viewerContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(viewerContainer);
-			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(viewerContainer);
+			GridLayoutFactory.fillDefaults().spacing(0, 2).applyTo(viewerContainer);
 			{
 				// header
 				createUILayer10Header(viewerContainer);
@@ -443,7 +443,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		{
 			// label: wms layer
 			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(label);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+//					.indent(-3, 0)
+					.grab(true, false)
+					.applyTo(label);
 			label.setText(Messages.Dialog_WmsConfig_Label_Layers);
 
 			// ############################################################
@@ -1004,7 +1008,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void enableControls() {
 
-		fBtnShowOsmMap.setEnabled(fWmsMapProvider.getImageSize() == MapProviderManager.OSM_IMAGE_SIZE);
+		fBtnShowOsmMap.setEnabled(fMpWms.getImageSize() == MapProviderManager.OSM_IMAGE_SIZE);
 
 		fIsTileImageLogging = fChkShowTileImageLog.getSelection();
 
@@ -1060,19 +1064,19 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void initializeUIFromModel(final MPWms mapProvider) {
 
-		fWmsMapProvider = mapProvider;
+		fMpWms = mapProvider;
 
 		/*
 		 * get layers
 		 */
 		fAllMtLayers.clear();
-		final ArrayList<MtLayer> allMtLayers = fWmsMapProvider.getMtLayers();
+		final ArrayList<MtLayer> allMtLayers = fMpWms.getMtLayers();
 		fAllMtLayers.addAll(allMtLayers);
 
 		// check layers
 		if (fAllMtLayers.size() == 0) {
 			StatusUtil.showStatus(
-					NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, fWmsMapProvider.getName()),
+					NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, fMpWms.getName()),
 					new Exception());
 			return;
 		}
@@ -1083,19 +1087,19 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * set fields
 		 */
-		fChkLoadTransparentImages.setSelection(fWmsMapProvider.isTransparent());
+		fChkLoadTransparentImages.setSelection(fMpWms.isTransparent());
 
 		/*
 		 * url: set initially the caps url, this will be overwritten from the tile url when a tile
 		 * is loaded
 		 */
-		fTileUrl = fWmsMapProvider.getCapabilitiesUrl();
+		fTileUrl = fMpWms.getCapabilitiesUrl();
 		fCboTileImageLog.add(fTileUrl);
 
 		/*
 		 * image size
 		 */
-		final String imageSize = Integer.toString(fWmsMapProvider.getImageSize());
+		final String imageSize = Integer.toString(fMpWms.getImageSize());
 		int listIndex = 0;
 		int sizeIndex = -1;
 		for (final String listImageSize : MapProviderManager.IMAGE_SIZE) {
@@ -1108,18 +1112,18 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		if (sizeIndex == -1) {
 			sizeIndex = 0;
 			// correct map provider value
-			fWmsMapProvider.setImageSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
+			fMpWms.setImageSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
 		}
 		fComboImageSize.select(sizeIndex);
 
 		/*
-		 * image format
+		 * set image format
 		 */
-		final String currentImageFormat = fWmsMapProvider.getImageFormat();
+		final String currentImageFormat = fMpWms.getImageFormat();
 		int formatIndex = 0;
 		int selectedFormatIndex = -1;
 		fComboImageFormat.removeAll();
-		for (final String imageFormat : fWmsMapProvider.getImageFormats()) {
+		for (final String imageFormat : fMpWms.getImageFormats()) {
 
 			fComboImageFormat.add(imageFormat);
 
@@ -1137,7 +1141,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// show map provider in the message area
-		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fWmsMapProvider.getName());
+		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpWms.getName());
 		setMessage(fDefaultMessage);
 
 		// show layers into the viewer
@@ -1219,7 +1223,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectImageFormat() {
 
-		final String oldValue = fWmsMapProvider.getImageFormat();
+		final String oldValue = fMpWms.getImageFormat();
 		final String newValue = fComboImageFormat.getItem(fComboImageFormat.getSelectionIndex());
 
 		if (oldValue.equals(newValue)) {
@@ -1231,14 +1235,14 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int zoom = fMap.getZoom();
 
 		// set image format
-		fWmsMapProvider.setImageFormat(newValue);
+		fMpWms.setImageFormat(newValue);
 
 		resetMap(center, zoom);
 	}
 
 	private void onSelectImageSize() {
 
-		final int oldValue = fWmsMapProvider.getImageSize();
+		final int oldValue = fMpWms.getImageSize();
 		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
@@ -1250,7 +1254,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int zoom = fMap.getZoom();
 
 		// set image size and initialize tile factory
-		fWmsMapProvider.setImageSize(newValue);
+		fMpWms.setImageSize(newValue);
 
 		enableControls();
 
@@ -1259,7 +1263,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectLayer() {
 
-		final int oldValue = fWmsMapProvider.getImageSize();
+		final int oldValue = fMpWms.getImageSize();
 		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
@@ -1267,7 +1271,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// set image size and initialize tile factory
-		fWmsMapProvider.setImageSize(newValue);
+		fMpWms.setImageSize(newValue);
 	}
 
 //	private void onSelectNextMapProvider() {
@@ -1362,13 +1366,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectTransparentImage() {
 
-		fWmsMapProvider.setTransparent(fChkLoadTransparentImages.getSelection());
+		fMpWms.setTransparent(fChkLoadTransparentImages.getSelection());
 
 		// reset all images
-		fWmsMapProvider.getTileFactory().resetAll(true);
+		fMpWms.getTileFactory(true).resetAll(true);
 
 		// delete offline images because they are invalid for the new image size
-		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
+		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
 
 		// display map with new image size
 		fMap.queueMapRedraw();
@@ -1377,7 +1381,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void onSelectWmsMap() {
 
 		// check if the tile factory has changed
-		final TileFactory customTileFactory = fWmsMapProvider.getTileFactory();
+		final TileFactory customTileFactory = fMpWms.getTileFactory(true);
 		if (fMap.getTileFactory() != customTileFactory) {
 
 			/*
@@ -1412,7 +1416,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		updateModelFromUI();
 
 		// reset all images
-		fWmsMapProvider.getTileFactory().resetAll(false);
+		fMpWms.getTileFactory(true).resetAll(false);
 
 		// delete offline images to force the reload to test the modified url
 //		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
@@ -1424,10 +1428,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void resetMap(final GeoPosition center, final int zoom) {
 
 		// reset all images
-		fWmsMapProvider.getTileFactory().resetAll(false);
+		fMpWms.getTileFactory(true).resetAll(false);
 
 		// delete offline images because they are invalid for the new image size
-		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
+		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
 
 		fMap.setZoom(zoom);
 		fMap.setGeoCenterPosition(center);
@@ -1716,16 +1720,16 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// update layers BEFORE the tile factory is set
-		fWmsMapProvider.sortLayers();
+		fMpWms.initializeLayers();
 
 		// set factory and display map
-		final TileFactory tileFactory = fWmsMapProvider.getTileFactory();
+		final TileFactory tileFactory = fMpWms.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		if (isUpdatePosition) {
 			// set position to previous position
-			fMap.setZoom(fWmsMapProvider.getLastUsedZoom());
-			fMap.setGeoCenterPosition(fWmsMapProvider.getLastUsedPosition());
+			fMap.setZoom(fMpWms.getLastUsedZoom());
+			fMap.setGeoCenterPosition(fMpWms.getLastUsedPosition());
 		}
 
 	}
@@ -1734,8 +1738,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 * keep zoom+position
 	 */
 	private void updateMapPosition() {
-		fWmsMapProvider.setLastUsedZoom(fMap.getZoom());
-		fWmsMapProvider.setLastUsedPosition(fMap.getCenterPosition());
+		fMpWms.setLastUsedZoom(fMap.getZoom());
+		fMpWms.setLastUsedPosition(fMap.getCenterPosition());
 	}
 
 	private void updateModelFromUI() {

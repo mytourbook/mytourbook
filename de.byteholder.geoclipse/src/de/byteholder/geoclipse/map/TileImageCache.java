@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.logging.StatusUtil;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 /**
@@ -40,10 +41,6 @@ public class TileImageCache {
 	 * max. number of images in the image cache
 	 */
 	private static int								MAX_CACHE_ENTRIES			= 100;
-
-	private static final String						FILE_EXTENSION_PNG			= "png";									//$NON-NLS-1$
-	private static final String						FILE_EXTENSION_GIF			= "gif";									//$NON-NLS-1$
-	private static final String						FILE_EXTENSION_JPG			= "jpg";									//$NON-NLS-1$
 
 	/**
 	 * relative OS path for storing offline map image files
@@ -244,33 +241,6 @@ public class TileImageCache {
 
 		fImageCache.clear();
 		fImageCacheFifo.clear();
-	}
-
-	/**
-	 * @param imageType
-	 * @return Returns <code>null</code> when the image type cannot be recognized
-	 */
-	private String getFileExtension(final int imageType) {
-
-		String fileExtension = null;
-
-		switch (imageType) {
-		case SWT.IMAGE_JPEG:
-			fileExtension = FILE_EXTENSION_JPG;
-			break;
-
-		case SWT.IMAGE_GIF:
-			fileExtension = FILE_EXTENSION_GIF;
-			break;
-
-		case SWT.IMAGE_PNG:
-			fileExtension = FILE_EXTENSION_PNG;
-			break;
-
-		default:
-		}
-
-		return fileExtension;
 	}
 
 	/**
@@ -539,10 +509,10 @@ public class TileImageCache {
 
 			imageType = tileImageData[0].type;
 
-			final String fileExtension = getFileExtension(imageType);
+			final String fileExtension = MapProviderManager.getImageFileExtension(imageType);
 			final String extension;
 			if (fileExtension == null) {
-				extension = FILE_EXTENSION_PNG;
+				extension = MapProviderManager.FILE_EXTENSION_PNG;
 				imageType = SWT.IMAGE_PNG;
 			} else {
 				extension = fileExtension;
@@ -551,6 +521,9 @@ public class TileImageCache {
 			final IPath fullImageFilePath = tilePathWithoutExt.addFileExtension(extension);
 
 			imageLoader.save(fullImageFilePath.toOSString(), imageType);
+
+			// update map provider with the image format
+			tileFactory.getMapProvider().setImageFormat(MapProviderManager.getImageMimeType(imageType));
 
 		} catch (final Exception e) {
 

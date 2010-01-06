@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 
@@ -49,7 +50,7 @@ import de.byteholder.gpx.GeoPosition;
  * @author Wolfgang Schramm
  * @author Alfred Barten
  */
-public class TileFactoryImpl extends TileFactory {
+public abstract class TileFactoryImpl extends TileFactory {
 
 	private static int								THREAD_POOL_SIZE	= 20;
 
@@ -59,8 +60,6 @@ public class TileFactoryImpl extends TileFactory {
 	private static ExecutorService					fExecutorService;
 
 	private TileFactoryInfo							fFactoryInfo;
-
-
 
 	/**
 	 * contains tiles which are currently being loaded or which have loading errors when loading
@@ -77,8 +76,7 @@ public class TileFactoryImpl extends TileFactory {
 	 */
 	private LinkedBlockingDeque<Tile>				fTileWaitingQueue	= new LinkedBlockingDeque<Tile>();
 
-
- 	/**
+	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
 	 */
 	private Image									fLoadingImage;
@@ -163,7 +161,10 @@ public class TileFactoryImpl extends TileFactory {
 	@Override
 	public void dispose() {
 
-		fTileImageCache.dispose();
+		if (fTileImageCache != null) {
+			fTileImageCache.dispose();
+		}
+
 		fLoadingTiles.clear();
 
 		if (fLoadingImage != null) {
@@ -286,6 +287,9 @@ public class TileFactoryImpl extends TileFactory {
 		return fLoadingTiles;
 	}
 
+	@Override
+	public abstract MP getMapProvider();
+
 	/**
 	 * Get <b>number of tiles</b> of the world bitmap at the current zoom level
 	 * 
@@ -323,8 +327,14 @@ public class TileFactoryImpl extends TileFactory {
 		}
 		tilePositionX = tilePositionX % numTilesWidth;
 
-		final String tileKey = Tile.getTileKey(null, tilePositionX, tilePositionY, zoom, null, fFactoryInfo
-				.getCustomTileKey(), projection.getId());
+		final String tileKey = Tile.getTileKey(//
+				null,
+				tilePositionX,
+				tilePositionY,
+				zoom,
+				null,
+				fFactoryInfo.getCustomTileKey(),
+				projection.getId());
 
 		/*
 		 * check if tile is available in the tile cache and the tile image is available

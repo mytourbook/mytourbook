@@ -20,7 +20,7 @@ class OSMTileFactoryInfo extends TileFactoryInfo {
 	private static final int	TOTAL_ZOOM		= 17;
 
 	private static final String	BASE_URL		= "http://tile.openstreetmap.org";	//$NON-NLS-1$
-	private static final String	FILE_EXT		= "png";							//$NON-NLS-1$
+	private static final String	FILE_EXT		= MapProviderManager.FILE_EXTENSION_PNG;
 
 	public OSMTileFactoryInfo() {
 		super(FACTORY_ID, MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -74,8 +74,19 @@ class OSMTileFactoryInfo extends TileFactoryInfo {
 public class TileFactoryOSM extends TileFactoryImpl {
 
 	private static OSMTileFactoryInfo	info	= new OSMTileFactoryInfo();
+	private MP							fMp;
 
 	public TileFactoryOSM() {
 		super(info);
+	}
+
+	@Override
+	public MP getMapProvider() {
+		return fMp;
+	}
+
+	@Override
+	public void setMapProvider(final MP mapProvider) {
+		fMp = mapProvider;
 	}
 }

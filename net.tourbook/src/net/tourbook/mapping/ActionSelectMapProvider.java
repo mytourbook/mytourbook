@@ -208,7 +208,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		if (fSelectedMP != null) {
 
 			// map profile tile offline images are deleted, reset state  
-			fSelectedMP.getTileFactory().resetTileImageAvailability();
+			fSelectedMP.getTileFactory(true).resetTileImageAvailability();
 		}
 
 		createMapProviderActions();
@@ -346,19 +346,14 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		fSelectedMP = mp;
 
-		final TileFactory mpTileFactory = mp.getTileFactory();
-
-		/*
-		 * initialize tile factory (error and loading message)
-		 */
-		mpTileFactory.getInfo();
+		final TileFactory mpTileFactory = mp.getTileFactory(true);
 
 		final Map map = fMappingView.getMap();
 
 		map.setTileFactory(mpTileFactory);
 
 		// reset overlays must be done after the new map provider is set
-		map.resetOverlays();
+//		map.resetOverlays();
 
 		// set map dim level
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();

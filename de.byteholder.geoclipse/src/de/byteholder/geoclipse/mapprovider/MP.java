@@ -251,10 +251,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
+	 * @param initTileFactory
 	 * @return Returns the tile factory which provides the map images or <code>null</code> when the
-	 *         tile factory is no initialized
+	 *         tile factory cannot be initialized
 	 */
-	public abstract TileFactory getTileFactory();
+	public abstract TileFactory getTileFactory(final boolean initTileFactory);
 
 	@Override
 	public int hashCode() {
@@ -265,7 +266,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void setCanBeToggled(final boolean canBeToggled) {
-		fCanBeToggled=canBeToggled;
+		fCanBeToggled = canBeToggled;
 	}
 
 	public void setDescription(final String fDescription) {

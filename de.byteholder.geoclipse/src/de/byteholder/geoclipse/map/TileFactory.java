@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -58,7 +59,7 @@ public abstract class TileFactory {
 	protected TileImageCache			fTileImageCache;
 
 	public static void addTileListener(final ITileListener tileListener) {
- 		fTileListeners.add(tileListener);
+		fTileListeners.add(tileListener);
 	}
 
 	public static ListenerList getTileListeners() {
@@ -153,6 +154,8 @@ public abstract class TileFactory {
 	 * @return the current property value
 	 */
 	public abstract Image getLoadingImage();
+
+	public abstract MP getMapProvider();
 
 	/**
 	 * Returns a Dimension containing the width and height of the map, in tiles at the current zoom
@@ -294,6 +297,8 @@ public abstract class TileFactory {
 	public void setIsTransparentColors(final boolean isTransparentColors) {
 		fIsTransparentColors = isTransparentColors;
 	}
+
+	public abstract void setMapProvider(final MP mapProvider);
 
 	public void setProfileAlpha(final int alpha) {
 

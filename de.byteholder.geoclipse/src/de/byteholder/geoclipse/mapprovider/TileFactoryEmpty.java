@@ -35,6 +35,7 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 	private static TileFactoryInfo	emptyFactoryInfo	= new EmptyTileFactoryInfo();
 
 	private Image					tileImage			= createTileImage();
+	private MP						fMp;
 
 	private static class EmptyTileFactoryInfo extends TileFactoryInfo {
 
@@ -104,6 +105,11 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 		super.dispose();
 	}
 
+	@Override
+	public MP getMapProvider() {
+		return fMp;
+	}
+
 	/**
 	 * Returns the tile that is located at the given tilePoint for this zoom. For example, if
 	 * getMapSize() returns 10x20 for this zoom, and the tilePoint is (3,5), then the appropriate
@@ -146,5 +152,10 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 
 	public int getTileSize(final int zoom) {
 		return TILE_SIZE;
+	}
+
+	@Override
+	public void setMapProvider(final MP mapProvider) {
+		fMp = mapProvider;
 	}
 }

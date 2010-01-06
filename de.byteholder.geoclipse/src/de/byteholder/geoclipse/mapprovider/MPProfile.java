@@ -104,7 +104,7 @@ public class MPProfile extends MP {
 			if (mpWrapper.isDisplayedInMap()) {
 
 				final MP wrapperMp = mpWrapper.getMapProvider();
-				final TileFactory tileFactory = wrapperMp.getTileFactory();
+				final TileFactory tileFactory = wrapperMp.getTileFactory(false);
 
 				if (tileFactory != null) {
 					tileFactory.setIsTransparentColors(mpWrapper.isTransparentColors());
@@ -258,7 +258,7 @@ public class MPProfile extends MP {
 			if (mpWrapper.isDisplayedInMap() && mpWrapper.isEnabled()) {
 
 				final MP childMP = mapProvider;
-				final TileFactory childTileFactory = childMP.getTileFactory();
+				final TileFactory childTileFactory = childMP.getTileFactory(true);
 
 				// check if this child is already being loaded
 				final String childTileKey = Tile.getTileKey(
@@ -268,7 +268,7 @@ public class MPProfile extends MP {
 						parentZoom,
 						childMP.getId(),
 						null,
-						null);
+						childTileFactory.getProjection().getId());
 
 				Tile childTile = loadingTiles.get(childTileKey);
 
@@ -366,7 +366,11 @@ public class MPProfile extends MP {
 	}
 
 	@Override
-	public TileFactory getTileFactory() {
+	public TileFactory getTileFactory(final boolean initTileFactory) {
+
+		if (initTileFactory == false) {
+			return fTileFactory;
+		}
 
 		if (fTileFactory == null) {
 			synchronizeMPWrapper();
@@ -385,7 +389,7 @@ public class MPProfile extends MP {
 				.append(Integer.toString(zoomLevel))
 				.append(Integer.toString(x))
 				.append(Integer.toString(y))
-				.addFileExtension(MapProviderManager.getFileExtension(getImageFormat()));
+				.addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
 		return filePath;
 	}

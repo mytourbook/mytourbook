@@ -128,8 +128,18 @@ public class TileFactoryProfile extends TileFactoryImpl implements ITileChildren
 		return fFactoryInfo;
 	}
 
+	@Override
+	public MP getMapProvider() {
+		return fProfileMapProvider;
+	}
+
 	public ParentImageStatus getParentImage(final Tile parentTile, final Tile childTile) {
 		return fProfileMapProvider.createParentImage(parentTile);
+	}
+
+	@Override
+	public void setMapProvider(final MP mapProvider) {
+	// this is done in the constructor
 	}
 
 }

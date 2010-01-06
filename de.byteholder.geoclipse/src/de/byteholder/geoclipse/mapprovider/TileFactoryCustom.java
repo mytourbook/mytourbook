@@ -17,8 +17,8 @@ package de.byteholder.geoclipse.mapprovider;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
 
 class CustomTileFactoryInfo extends TileFactoryInfo {
@@ -117,6 +117,16 @@ public class TileFactoryCustom extends TileFactoryImpl {
 		}
 
 		return fFactoryInfo;
+	}
+
+	@Override
+	public MP getMapProvider() {
+		return fCustomMapProvider;
+	}
+
+	@Override
+	public void setMapProvider(final MP mp) {
+	// this is done in the constructor
 	}
 
 }

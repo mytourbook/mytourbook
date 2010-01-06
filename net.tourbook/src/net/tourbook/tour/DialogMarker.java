@@ -255,6 +255,7 @@ public class DialogMarker extends TitleAreaDialog {
 			 * the markers are already set into the tour data because the original values are
 			 * modified
 			 */
+
 			restoreVisibleType();
 
 		} else {
@@ -804,7 +805,8 @@ public class DialogMarker extends TitleAreaDialog {
 		onChangeMarkerUI();
 
 		// set slider position
-		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+				fTourChart,
 				newSelectedMarker.getSerieIndex(),
 				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 	}
