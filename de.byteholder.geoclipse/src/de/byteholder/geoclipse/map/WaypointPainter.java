@@ -67,6 +67,7 @@ public class WaypointPainter extends MapPainter {
 		final Dimension sizeInTiles = map.getTileFactory().getMapSize(zoom);
 		final int tileSize = map.getTileFactory().getTileSize();
 		final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
+		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		double vpx = viewportBounds.getX();
 		// normalize the left edge of the viewport to be positive
@@ -102,7 +103,7 @@ public class WaypointPainter extends MapPainter {
 				t.translate(x, y);
 				gc.setTransform(t);
 
-				paintWaypoint(w, map, gc);
+				paintWaypoint(w, map, gc, devPartOffset);
 
 				gc.setTransform(null);
 				t.dispose();
@@ -116,7 +117,7 @@ public class WaypointPainter extends MapPainter {
 				t.translate(x, y);
 				gc.setTransform(t);
 
-				paintWaypoint(w, map, gc);
+				paintWaypoint(w, map, gc, devPartOffset);
 
 				gc.setTransform(null);
 				t.dispose();
@@ -151,13 +152,14 @@ public class WaypointPainter extends MapPainter {
 	 *            the current waypoint
 	 * @param map
 	 *            the current map
+	 * @param devPartOffset
 	 * @param g
 	 *            the current graphics context
 	 * @see setRenderer(WaypointRenderer)
 	 * @see WaypointRenderer
 	 */
-	protected void paintWaypoint(final Waypoint w, final Map map, final GC gc) {
-		renderer.paintWaypoint(gc, map, w);
+	protected void paintWaypoint(final Waypoint w, final Map map, final GC gc, final int devPartOffset) {
+		renderer.paintWaypoint(gc, map, w, devPartOffset);
 	}
 
 	/**

@@ -725,7 +725,6 @@ public class TourPainter extends MapPainter {
 		final int mapZoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
-//		final int maxTiles = (int) Math.pow(mapZoomLevel, 2);
 
 		// get viewport for the current tile
 		final int worldTileX = tile.getX() * tileSize;

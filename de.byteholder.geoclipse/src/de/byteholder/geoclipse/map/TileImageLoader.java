@@ -5,17 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
@@ -60,9 +57,9 @@ class TileImageLoader implements Runnable {
 	}
 
 	/**
-	 * load tile from a url
+	 * Get tile tile image from offline file, url or tile painter
 	 */
-	private void loadTileImage(final Tile tile) {
+	private void getTileImage(final Tile tile) {
 
 		String loadingError = null;
 		Tile parentTile = null;
@@ -87,111 +84,119 @@ class TileImageLoader implements Runnable {
 
 			if (tileImageData == null) {
 
-				/*
-				 * offline image is not available, load tile image from a url
-				 */
-
 				isSaveImage = true;
-				InputStream inputStream = null;
 
-				try {
+				final ITilePainter tilePainter = tile.getTileFactory().getInfo().getTilePainter();
 
-					final ITileLoader tileLoader = factoryInfo.getTileLoader();
+				if (tilePainter != null) {
 
-					if (tileLoader instanceof ITileLoader) {
+					tileImageData = paintTileImage(tile, tilePainter);
 
-						/*
-						 * get image from a tile loader (this feature is used to load images
-						 * from a wms server)
-						 */
-
-						try {
-							inputStream = tileLoader.getTileImageStream(tile);
-						} catch (final Exception e) {
-							loadingError = e.getMessage();
-							StatusUtil.log(loadingError, e);
-							throw e;
-						}
-
-					} else {
-
-						/*
-						 * get image from a url (this was the behaviour before wms was
-						 * supported)
-						 */
-
-						final URL url;
-
-						try {
-
-							url = fTileFactoryImpl.getURL(tile);
-
-						} catch (final Exception e) {
-							loadingError = e.getMessage();
-							throw e;
-						}
-
-						try {
-
-							inputStream = url.openStream();
-
-						} catch (final UnknownHostException e) {
-
-							loadingError = NLS.bind(
-									Messages.DBG053_Loading_Error_UnknownHostException,
-									tile.getUrl(),
-									e.getMessage());
-
-// this is hidden because it can happen very often
-//							StatusUtil.log(loadingError, e);
-							throw e;
-
-						} catch (final FileNotFoundException e) {
-
-							loadingError = NLS.bind(
-									Messages.DBG052_Loading_Error_FileNotFoundException,
-									tile.getUrl(),
-									e.getMessage());
-
-// this is hidden because it can happen very often
-//							StatusUtil.logStatus(loadingError, e);
-							throw e;
-
-						} catch (final Exception e) {
-
-							loadingError = NLS.bind(//
-									Messages.DBG054_Loading_Error_FromUrl,
-									tile.getUrl(),
-									e.getMessage());
-// this is hidden because it can happen very often
-//							StatusUtil.logStatus(loadingError, e);
-							throw e;
-						}
-					}
-
-					tileImageData = new ImageLoader().load(inputStream);
-
-				} catch (final Exception e) {
+				} else {
 
 					/*
-					 * exception occures when loading the image, don't remove them from the
-					 * loading list, so that the tiles don't get reloaded
+					 * offline image is not available, load tile image from a url
 					 */
 
-					try {
-						if (inputStream != null) {
-							inputStream.close();
-						}
-					} catch (final IOException e1) {
-						StatusUtil.log(e.getMessage(), e);
-					}
+					InputStream inputStream = null;
 
-					fTileFactoryImpl.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+					try {
+
+						final ITileLoader tileLoader = factoryInfo.getTileLoader();
+
+						if (tileLoader instanceof ITileLoader) {
+
+							/*
+							 * get image from a tile loader (this feature is used to load images
+							 * from a wms server)
+							 */
+
+							try {
+								inputStream = tileLoader.getTileImageStream(tile);
+							} catch (final Exception e) {
+								loadingError = e.getMessage();
+								StatusUtil.log(loadingError, e);
+								throw e;
+							}
+
+						} else {
+
+							/*
+							 * get image from a url (this was the behaviour before wms was
+							 * supported)
+							 */
+
+							final URL url;
+
+							try {
+
+								url = fTileFactoryImpl.getURL(tile);
+
+							} catch (final Exception e) {
+								loadingError = e.getMessage();
+								throw e;
+							}
+
+							try {
+
+								inputStream = url.openStream();
+
+							} catch (final UnknownHostException e) {
+
+								loadingError = NLS.bind(Messages.DBG053_Loading_Error_UnknownHostException, tile
+										.getUrl(), e.getMessage());
+
+								// this is hidden because it can happen very often
+								// StatusUtil.log(loadingError, e);
+								throw e;
+
+							} catch (final FileNotFoundException e) {
+
+								loadingError = NLS.bind(Messages.DBG052_Loading_Error_FileNotFoundException, tile
+										.getUrl(), e.getMessage());
+
+								// this is hidden because it can happen very often
+								// StatusUtil.log(loadingError, e);
+								throw e;
+
+							} catch (final Exception e) {
+
+								loadingError = NLS.bind(//
+										Messages.DBG054_Loading_Error_FromUrl,
+										tile.getUrl(),
+										e.getMessage());
+
+								// this is hidden because it can happen very often
+								// StatusUtil.log(loadingError, e);
+								throw e;
+							}
+						}
+
+						tileImageData = new ImageLoader().load(inputStream);
+
+					} catch (final Exception e) {
+
+						/*
+						 * exception occures when loading the image, don't remove them from the
+						 * loading list, so that the tiles don't get reloaded
+						 */
+
+						try {
+							if (inputStream != null) {
+								inputStream.close();
+							}
+						} catch (final IOException e1) {
+							StatusUtil.log(e.getMessage(), e);
+						}
+
+						fTileFactoryImpl.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+					}
 				}
 			}
 
-			/*
-			 * tile image is loaded from a url or from a offline file or is not availabel
+			/**
+			 * tile image is loaded from a url or from an offline file, is painted or is not
+			 * available
 			 */
 
 			boolean isCreateImage = true;
@@ -300,94 +305,51 @@ class TileImageLoader implements Runnable {
 	/**
 	 * paint tile based on SRTM data
 	 */
-	private void paintTileImage(final Tile tile, final ITilePainter tilePainter) {
+	private ImageData[] paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
 		fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
+		final ImageData[] paintedImageData = new ImageData[1];
+
 		try {
 
-			final Display display = Display.getDefault();
+			/*
+			 * create tile image data from RGB data
+			 */
 
 			// create RGB data for the tile
 			final RGB[][] rgbData = tilePainter.drawTile(tile);
 
-			// needs to run in the UI thread!
-			display.asyncExec(new Runnable() {
-				public void run() {
+			final int tileSize = rgbData[0].length;
 
-					/*
-					 * create tile image from RGB data
-					 */
-					final ImageData[] paintedImageData = new ImageData[1];
+			final ImageData tileImageData = new ImageData(//
+					tileSize,
+					tileSize,
+					24,
+					new PaletteData(0xFF, 0xFF00, 0xFF0000));
 
-					final int tileSize = rgbData[0].length;
-					final Image paintedImage = new Image(display, tileSize, tileSize);
+			final byte[] pixelData = tileImageData.data;
+			final int bytesPerLine = tileImageData.bytesPerLine;
 
-					final HashMap<Integer, Color> usedMapColors = new HashMap<Integer, Color>();
+			for (int drawX = 0; drawX < rgbData.length; drawX++) {
 
-					final GC gc = new GC(paintedImage);
-					{
-						for (int drawX = 0; drawX < rgbData.length; drawX++) {
-							final RGB[] rgbX = rgbData[drawX];
+				final int xBytesPerLine = drawX * bytesPerLine;
+				final RGB[] rgbX = rgbData[drawX];
 
-							for (int drawY = 0; drawY < rgbX.length; drawY++) {
+				for (int drawY = 0; drawY < rgbX.length; drawY++) {
 
-								final RGB rgb = rgbX[drawY];
+					final int dataIndex = xBytesPerLine + (drawY * 3);
 
-								Color mapColor = usedMapColors.get(rgb.hashCode());
-								if (mapColor == null) {
-									mapColor = new Color(display, rgb);
-									usedMapColors.put(rgb.hashCode(), mapColor);
-								}
+					final RGB rgb = rgbX[drawY];
 
-								gc.setForeground(mapColor);
-								gc.drawPoint(drawX, drawY);
-							}
-						}
-					}
-					gc.dispose();
-
-					paintedImageData[0] = paintedImage.getImageData();
-					paintedImage.dispose();
-
-					// dispose all used colors
-					for (final Color color : usedMapColors.values()) {
-						color.dispose();
-					}
-
-					if (paintedImageData == null) {
-
-						tile.setLoadingError(Messages.DBG047_Loading_Error_InvalidPaintingData);
-
-					} else {
-
-						/*
-						 * tile image is painted
-						 */
-
-						final String tileKey = tile.getTileKey();
-
-						final Image tileImage = fTileFactoryImpl.getTileImageCache().createImage(
-								paintedImageData,
-								tile,
-								tileKey,
-								true);
-
-						if (tile.setMapImage(tileImage)) {
-
-							// image is valid
-							fTileFactoryImpl.getLoadingTiles().remove(tileKey);
-
-						} else {
-
-							// keep invalid tiles in the list of loaded images, that they are not loaded again
-							tile.setLoadingError(Messages.DBG046_Loading_Error_InvalidPaintingImage);
-						}
-					}
-
-					fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
+					pixelData[dataIndex] = (byte) (rgb.blue & 0xff);
+					pixelData[dataIndex + 1] = (byte) (rgb.green & 0xff);
+					pixelData[dataIndex + 2] = (byte) (rgb.red & 0xff);
 				}
-			});
+			}
+			paintedImageData[0] = tileImageData;
+
+			fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
 		} catch (final Exception e) {
 
@@ -396,12 +358,9 @@ class TileImageLoader implements Runnable {
 			fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
 
 			StatusUtil.log(e.getMessage(), e);
-
-		} finally {
-
-			finalizeTile(tile, true);
 		}
 
+		return paintedImageData;
 	}
 
 	public void run() {
@@ -445,7 +404,7 @@ class TileImageLoader implements Runnable {
 
 				// this parent tile has no chilren which needs to be loaded, behave as a normal tile
 
-				loadTileImage(tile);
+				getTileImage(tile);
 
 			} else {
 
@@ -454,16 +413,7 @@ class TileImageLoader implements Runnable {
 
 		} else {
 
-			final ITilePainter tilePainter = tile.getTileFactory().getInfo().getTilePainter();
-
-			if (tilePainter != null) {
-
-				paintTileImage(tile, tilePainter);
-
-			} else {
-
-				loadTileImage(tile);
-			}
+			getTileImage(tile);
 		}
 
 		// loading has finished

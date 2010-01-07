@@ -86,6 +86,8 @@ public abstract class TileFactory {
 	 */
 	public abstract void disposeCachedImages();
 
+	public abstract void disposeTiles();
+
 	/**
 	 * Is called directly after the tile was created and before other tile action are done.<br>
 	 * <br>

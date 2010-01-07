@@ -182,6 +182,13 @@ public abstract class TileFactoryImpl extends TileFactory {
 		fTileImageCache.dispose();
 	}
 
+	@Override
+	public void disposeTiles() {
+		fLoadingTiles.clear();
+		fTileCache.clear();
+		fTileImageCache.dispose();
+	}
+
 	/**
 	 * Convert a GeoPosition to a Point2D pixel coordinate in the world bitmap
 	 * 

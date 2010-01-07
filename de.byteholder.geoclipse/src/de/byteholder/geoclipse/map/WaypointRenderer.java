@@ -20,13 +20,14 @@ import de.byteholder.gpx.Waypoint;
  * @author joshua.marinacci@sun.com
  */
 public interface WaypointRenderer {
-    /**
-     * paint the specified waypoint on the specified map and graphics context
-     * 
-     * @param g 
-     * @param map 
-     * @param waypoint 
-     */
-    public void paintWaypoint(GC gc, Map map, Waypoint waypoint);
+	/**
+	 * paint the specified waypoint on the specified map and graphics context
+	 * 
+	 * @param g
+	 * @param map
+	 * @param waypoint
+	 * @param devPartOffset
+	 */
+    public void paintWaypoint(GC gc, Map map, Waypoint waypoint, int devPartOffset);
     
 }

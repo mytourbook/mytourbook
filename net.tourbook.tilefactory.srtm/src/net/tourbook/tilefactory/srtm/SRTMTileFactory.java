@@ -57,12 +57,12 @@ public class SRTMTileFactory extends TileFactoryImpl {
 
 	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
 
-		private static final String		FACTORY_ID		= "srtm";				//$NON-NLS-1$
-		private static final String		FACTORY_NAME	= "SRTM";				//$NON-NLS-1$
-		private static final String		FACTORY_OS_NAME	= "srtm";				//$NON-NLS-1$
+		private static final String		FACTORY_ID		= "srtm";									//$NON-NLS-1$
+		private static final String		FACTORY_NAME	= "SRTM";									//$NON-NLS-1$
+		private static final String		FACTORY_OS_NAME	= "srtm";									//$NON-NLS-1$
 
-		private static final String		SEPARATOR		= "/";					//$NON-NLS-1$
-		private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
+		private static final String		SEPARATOR		= "/";										//$NON-NLS-1$
+		private static final String		BASE_URL		= "file://dummy";							//$NON-NLS-1$
 		private static final String		FILE_EXT		= MapProviderManager.FILE_EXTENSION_PNG;
 
 		private static final int		MIN_ZOOM		= 0;
@@ -100,17 +100,12 @@ public class SRTMTileFactory extends TileFactoryImpl {
 			final int grid = srtmProfile.getResolutionValue();
 
 			System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
-					+ "(L=" //$NON-NLS-1$
-					+ elevationLayer.getName()
-					+ ", G=" //$NON-NLS-1$
-					+ grid
-					+ ", X=" //$NON-NLS-1$
-					+ tileX
-					+ ", Y=" //$NON-NLS-1$
-					+ tileY
-					+ ", Z=" //$NON-NLS-1$
-					+ tileZoom
-					+ ")"); //$NON-NLS-1$
+					+ ("(L=" + elevationLayer.getName())//$NON-NLS-1$
+					+ (", G=" + grid)//$NON-NLS-1$
+					+ (", X=" + tileX) //$NON-NLS-1$
+					+ (", Y=" + tileY) //$NON-NLS-1$
+					+ (", Z=" + tileZoom) //$NON-NLS-1$
+					+ (")")); //$NON-NLS-1$
 
 			double lon = 0.;
 			double lat = 0.;
@@ -153,7 +148,8 @@ public class SRTMTileFactory extends TileFactoryImpl {
 						} else {
 							rgb = srtmProfile.getRGB((int) elev);
 						}
-						rgbData[drawX][drawY] = rgb;
+
+						rgbData[drawY][drawX] = rgb;
 
 						elevOld = elev;
 					}
@@ -201,7 +197,8 @@ public class SRTMTileFactory extends TileFactoryImpl {
 							for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
 								rgb = srtmProfile.getRGB((int) elev);
-								rgbData[drawX][drawY] = rgb;
+
+								rgbData[drawY][drawX] = rgb;
 							}
 						}
 					}

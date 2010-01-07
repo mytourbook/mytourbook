@@ -22,24 +22,25 @@ import de.byteholder.gpx.Waypoint;
  * @author joshy
  */
 public class DefaultWaypointRenderer implements WaypointRenderer {
-    
-    public DefaultWaypointRenderer() {
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @param gc
-     * @param map
-     * @param waypoint
-     * @return
-     */
-    public void paintWaypoint(GC gc, Map map, Waypoint waypoint) {
+
+	public DefaultWaypointRenderer() {}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @param gc
+	 * @param map
+	 * @param waypoint
+	 * @return
+	 */
+	public void paintWaypoint(final GC gc, final Map map, final Waypoint waypoint, final int devPartOffset) {
 
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		
-		gc.drawOval(-10, -10, 20, 20);
 
-		gc.drawLine(-10, 0, 10, 0);
-		gc.drawLine(0, -10, 0, 10);
+		gc.drawOval(devPartOffset + -10, devPartOffset + -10, 20, 20);
+
+		gc.drawLine(devPartOffset + -10, devPartOffset + 0, devPartOffset + 10, devPartOffset + 0);
+		gc.drawLine(devPartOffset + 0, devPartOffset + -10, devPartOffset + 0, devPartOffset + 10);
 	}
+
 }

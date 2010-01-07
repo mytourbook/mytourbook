@@ -34,7 +34,8 @@ public class ElevationFile {
 	private FileChannel	fileChannel;
 	private ShortBuffer	shortBuffer;
 
-	private boolean		exists	= false;
+	private boolean		exists				= false;
+	private boolean		fIsLocalFileError	= false;
 
 	public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
 		switch (elevationTyp) {
@@ -53,7 +54,7 @@ public class ElevationFile {
 		}
 	}
 
-	public void close()  {
+	public void close() {
 
 		if (fileChannel == null) {
 			return;
@@ -145,12 +146,24 @@ public class ElevationFile {
 
 	private void initSRTM3(final String fileName) throws Exception {
 
+		if (fIsLocalFileError) {
+			return;
+		}
+
 		try {
 			open(fileName);
 		} catch (final FileNotFoundException e1) {
 			try {
 				//  download zip-File <fileName>.zip and unzip
 				final String localZipName = fileName + ".zip"; //$NON-NLS-1$
+
+				// check if local zip file exists with a size == 0
+				final File localFile = new File(localZipName);
+				if (localFile.exists() && localFile.length() == 0) {
+					fIsLocalFileError = true;
+					throw new Exception("local file is empty");
+				}
+
 				final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
 				DownloadSRTM3.get(remoteFileName, localZipName);
 				FileZip.unzip(localZipName);

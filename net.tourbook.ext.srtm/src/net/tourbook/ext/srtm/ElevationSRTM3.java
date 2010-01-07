@@ -35,6 +35,9 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 		private SRTM3ElevationFile(final GeoLat lat, final GeoLon lon) {
 
+			System.out.println(lat + " - " + lon);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 			final String srtm3DataPath = getElevationDataPath("srtm3"); //$NON-NLS-1$
 			final String srtm3Suffix = ".hgt"; //$NON-NLS-1$
 

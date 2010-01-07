@@ -448,7 +448,7 @@ public class TourMapView extends ViewPart {
 
 						fSelectedProfileKey = prefProfileKey;
 
-						fMap.disposeCachedImages();
+						fMap.disposeTiles();
 						fMap.queueMapRedraw();
 					}
 				}

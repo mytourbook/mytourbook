@@ -609,10 +609,6 @@ public class Map extends Canvas {
 		reload();
 	}
 
-	public void disposeCachedImages() {
-		fTileFactory.disposeCachedImages();
-	}
-
 	/**
 	 * Disposes all overlay image cache and the overlay painting queue
 	 */
@@ -628,6 +624,10 @@ public class Map extends Canvas {
 		if (resource != null && !resource.isDisposed()) {
 			resource.dispose();
 		}
+	}
+
+	public void disposeTiles() {
+		fTileFactory.disposeTiles();
 	}
 
 	/**
