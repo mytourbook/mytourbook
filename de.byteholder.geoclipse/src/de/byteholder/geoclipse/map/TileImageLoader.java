@@ -12,7 +12,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
@@ -318,7 +317,7 @@ class TileImageLoader implements Runnable {
 			 */
 
 			// create RGB data for the tile
-			final RGB[][] rgbData = tilePainter.drawTile(tile);
+			final int[][] rgbData = tilePainter.drawTile(tile);
 
 			final int tileSize = rgbData[0].length;
 
@@ -334,17 +333,22 @@ class TileImageLoader implements Runnable {
 			for (int drawX = 0; drawX < rgbData.length; drawX++) {
 
 				final int xBytesPerLine = drawX * bytesPerLine;
-				final RGB[] rgbX = rgbData[drawX];
+				final int[] rgbX = rgbData[drawX];
 
 				for (int drawY = 0; drawY < rgbX.length; drawY++) {
 
 					final int dataIndex = xBytesPerLine + (drawY * 3);
 
-					final RGB rgb = rgbX[drawY];
+					final int rgb = rgbX[drawY];
 
-					pixelData[dataIndex] = (byte) (rgb.blue & 0xff);
-					pixelData[dataIndex + 1] = (byte) (rgb.green & 0xff);
-					pixelData[dataIndex + 2] = (byte) (rgb.red & 0xff);
+					final int blue = (byte) ((rgb & 0xFF0000) >> 16);
+					final int green = (byte) ((rgb & 0xFF00) >> 8);
+					final int red = (byte) ((rgb & 0xFF) >> 0);
+
+
+					pixelData[dataIndex] = (byte) (blue & 0xff);
+					pixelData[dataIndex + 1] = (byte) (green & 0xff);
+					pixelData[dataIndex + 2] = (byte) (red & 0xff);
 				}
 			}
 			paintedImageData[0] = tileImageData;

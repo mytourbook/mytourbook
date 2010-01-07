@@ -1,6 +1,5 @@
 package de.byteholder.geoclipse.map;
 
-import org.eclipse.swt.graphics.RGB;
 
 public interface ITilePainter {
 
@@ -10,6 +9,6 @@ public interface ITilePainter {
 	 * @param tile
 	 * @return RGB data of the drawn tile
 	 */
-	RGB[][] drawTile(Tile tile);
+	int[][] drawTile(Tile tile);
 
 }

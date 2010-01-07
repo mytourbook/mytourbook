@@ -27,7 +27,6 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
@@ -78,7 +77,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 			super(FACTORY_ID, MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
-		public RGB[][] drawTile(final Tile tile) {
+		public int[][] drawTile(final Tile tile) {
 
 			final SRTMProfile srtmProfile = (SRTMProfile) tile.getData();
 
@@ -90,7 +89,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 			final int zoomPower = (int) Math.pow(2., tileZoom);
 			final int mapPower = zoomPower * tileSize;
 
-			final RGB[][] rgbData = new RGB[tileSize][tileSize];
+			final int[][] rgbData = new int[tileSize][tileSize];
 
 			elevationLayer.setZoom(tileZoom);
 
@@ -116,7 +115,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 			final double constMy = 360. / mapPower;
 			int mapStartX = tileX * tileSize;
 			final int mapStartY = tileY * tileSize;
-			RGB rgb;
+			int rgb;
 
 			if (grid == 1) {
 

@@ -131,8 +131,12 @@ public class SRTMProfile {
 
 			final long elev = elevMax * x / horizontal;
 
-			final RGB rgb = getRGB(elev);
-			final Color color = new Color(display, rgb);
+			final int rgb = getRGB(elev);
+			final byte blue = (byte) ((rgb & 0xFF0000) >> 16);
+			final byte green = (byte) ((rgb & 0xFF00) >> 8);
+			final byte red = (byte) ((rgb & 0xFF) >> 0);
+
+			final Color color = new Color(display, red & 0xFF, green & 0xFF, blue & 0xFF);
 			{
 				gc.setForeground(color);
 
@@ -158,7 +162,6 @@ public class SRTMProfile {
 				}
 			}
 			color.dispose();
-			
 
 		}
 
@@ -174,10 +177,14 @@ public class SRTMProfile {
 				continue;
 			}
 
-			final RGB rgb = getRGB(elev);
-			rgb.red = 255 - rgb.red;
-			rgb.green = 255 - rgb.green;
-			rgb.blue = 255 - rgb.blue;
+			final int rgb = getRGB(elev);
+			byte blue = (byte) ((rgb & 0xFF0000) >> 16);
+			byte green = (byte) ((rgb & 0xFF00) >> 8);
+			byte red = (byte) ((rgb & 0xFF) >> 0);
+
+			red = (byte) (255 - red);
+			green = (byte) (255 - green);
+			blue = (byte) (255 - blue);
 
 			int x = elevMax == 0 ? 0 : (int) (elev * horizontal / elevMax);
 			x = Math.max(x, 13);
@@ -194,7 +201,7 @@ public class SRTMProfile {
 				transform.setElements(1, 0, 0, 1, dx, dy);
 			}
 
-			final Color color = new Color(display, rgb);
+			final Color color = new Color(display, red & 0xFF, green & 0xFF, blue & 0xFF);
 			{
 				gc.setTransform(transform);
 				gc.setForeground(color);
@@ -327,16 +334,23 @@ public class SRTMProfile {
 		}
 	}
 
-	public RGB getRGB(final long elev) {
+	public int getRGB(final long elev) {
 
 		final int vertexSize = fVertexArray.length;
 
 		if (vertexSize == 0) {
-			return new RGB(255, 255, 255);
+//			return new RGB(255, 255, 255);
+			return 0xFFFFFF;
 		}
 
 		if (vertexSize == 1) {
-			return fVertexArray[0].getRGB();
+
+			final RGB rgb = fVertexArray[0].getRGB();
+
+			return (//
+					(rgb.blue & 0xFF) << 16)
+					+ ((rgb.green & 0xFF) << 8)
+					+ (rgb.red & 0xFF);
 		}
 
 		for (int ix = vertexSize - 2; ix >= 0; ix--) {
@@ -366,6 +380,7 @@ public class SRTMProfile {
 					green = 0xFF;
 				if (blue > 0xFF)
 					blue = 0xFF;
+
 				if (red < 0)
 					red = 0;
 				if (green < 0)
@@ -373,26 +388,40 @@ public class SRTMProfile {
 				if (blue < 0)
 					blue = 0;
 
-				return new RGB(red, green, blue);
+//				return new RGB(red, green, blue);
+
+				return (//
+						(blue & 0xFF) << 16)
+						+ ((green & 0xFF) << 8)
+						+ (red & 0xFF);
 			}
 		}
-		return new RGB(255, 255, 255);
+//		return new RGB(255, 255, 255);
+		return 0xFFFFFF;
 	}
 
 	public int getSavedProfileKeyHashCode() {
 		return fSavedProfileKeyHashCode;
 	}
 
-	public RGB getShadowRGB(final int elev) {
+	public int getShadowRGB(final int elev) {
 
 		final float dimFactor = fShadowValue;
-		final RGB rgb = getRGB(elev);
+		final int rgb = getRGB(elev);
 
-		rgb.red *= dimFactor;
-		rgb.green *= dimFactor;
-		rgb.blue *= dimFactor;
+		byte blue = (byte) ((rgb & 0xFF0000) >> 16);
+		byte green = (byte) ((rgb & 0xFF00) >> 8);
+		byte red = (byte) ((rgb & 0xFF) >> 0);
 
-		return rgb;
+		red *= dimFactor;
+		green *= dimFactor;
+		blue *= dimFactor;
+
+//		return rgb;
+		return (//
+				(blue & 0xFF) << 16)
+				+ ((green & 0xFF) << 8)
+				+ (red & 0xFF);
 	}
 
 	public float getShadowValue() {

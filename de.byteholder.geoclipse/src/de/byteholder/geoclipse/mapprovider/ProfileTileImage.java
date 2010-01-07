@@ -471,9 +471,9 @@ final class ProfileTileImage {
 
 	public void setBackgroundColor(final int backgroundColor) {
 
-		final byte bgBlue = (byte) ((backgroundColor & 0xFF0000) >> 16);
-		final byte bgGreen = (byte) ((backgroundColor & 0xFF00) >> 8);
-		final byte bgRed = (byte) ((backgroundColor & 0xFF) >> 0);
+		final byte blue = (byte) ((backgroundColor & 0xFF0000) >> 16);
+		final byte green = (byte) ((backgroundColor & 0xFF00) >> 8);
+		final byte red = (byte) ((backgroundColor & 0xFF) >> 0);
 
 		final ImageData dst = fTileImageData;
 
@@ -490,9 +490,9 @@ final class ProfileTileImage {
 
 				final int dataIndex = dstYBytesPerLine + (dstX * 3);
 
-				dstData[dataIndex] = bgBlue;
-				dstData[dataIndex + 1] = bgGreen;
-				dstData[dataIndex + 2] = bgRed;
+				dstData[dataIndex] = blue;
+				dstData[dataIndex + 1] = green;
+				dstData[dataIndex + 2] = red;
 			}
 		}
 
