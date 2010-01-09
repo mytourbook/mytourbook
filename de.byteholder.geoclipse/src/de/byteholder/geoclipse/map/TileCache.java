@@ -1,5 +1,6 @@
 package de.byteholder.geoclipse.map;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TileCache {
 
-	private static final int						MAX_TILE_CACHE_ENTRIES	= 1048;
+	private static final int						MAX_TILE_CACHE_ENTRIES	= 2000;
 
 	private final ConcurrentHashMap<String, Tile>	tileCache				= new ConcurrentHashMap<String, Tile>();
 	private final ConcurrentLinkedQueue<String>		tileCacheFifo			= new ConcurrentLinkedQueue<String>();
@@ -19,10 +20,37 @@ public class TileCache {
 		final int cacheSize = tileCacheFifo.size();
 		if (cacheSize > MAX_TILE_CACHE_ENTRIES) {
 
-			// remove cache items 
+			// remove cached tiles 
 			for (int cacheIndex = MAX_TILE_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
-				final String head = tileCacheFifo.poll();
-				tileCache.remove(head);
+
+				final Tile removedTile = tileCache.remove(tileCacheFifo.poll());
+
+				ArrayList<Tile> tileChildren = removedTile.getChildren();
+				if (tileChildren != null) {
+
+					// this is a parent tile, remove also all child tiles
+
+					removeTileChildren(tileChildren);
+
+				} else {
+
+					final Tile parentTile = removedTile.getParentTile();
+
+					if (parentTile == null) {
+
+						// this is a 'normal' tile without parent or children
+
+					} else {
+
+						// this is a child tile
+
+						tileChildren = parentTile.getChildren();
+						if (tileChildren != null) {
+							removeTileChildren(tileChildren);
+						}
+					}
+
+				}
 			}
 		}
 
@@ -31,6 +59,22 @@ public class TileCache {
 	}
 
 	public synchronized void clear() {
+
+		final Collection<Tile> tiles = tileCache.values();
+		for (final Tile tile : tiles) {
+
+			// remove children to prevent memory leaks
+			final ArrayList<Tile> tileChildren = tile.getChildren();
+			if (tileChildren != null) {
+
+				for (final Tile tileChild : tileChildren) {
+					tileChild.setParentTile(null);
+				}
+
+				tileChildren.clear();
+			}
+		}
+
 		tileCache.clear();
 		tileCacheFifo.clear();
 	}
@@ -40,16 +84,21 @@ public class TileCache {
 	}
 
 	/**
-	 * Removes the tile from the tile cache
+	 * Removes tile children to prevent memory leaks
 	 * 
-	 * @param tileKey
+	 * @param tileChildren
 	 */
-	public void remove(final String tileKey) {
+	private void removeTileChildren(final ArrayList<Tile> tileChildren) {
 
-		final Tile removedTile = tileCache.remove(tileKey);
-		if (removedTile != null) {
-			tileCacheFifo.remove(removedTile);
+		for (final Tile tileChild : tileChildren) {
+
+			// remove orphan child
+			tileCache.remove(tileChild.getTileKey());
+
+			tileChild.setParentTile(null);
 		}
+
+		tileChildren.clear();
 	}
 
 	/**

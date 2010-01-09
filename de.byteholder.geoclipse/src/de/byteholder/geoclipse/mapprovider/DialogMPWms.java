@@ -180,6 +180,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private MPWms							fMpWms;
 
+	private MPPlugin						fDefaultMapProvider;
 	private TileFactory						fDefaultTileFactory;
 
 	// load tile image logging
@@ -198,7 +199,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fPrefPageMapFactory = mapFactory;
 		fMpWms = wmsMapProvider;
 
-		fDefaultTileFactory = MapProviderManager.getInstance().getDefaultMapProvider().getTileFactory(true);
+		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
+		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
 	}
 
 	void actionSetZoomToShowEntireLayer() {
@@ -1295,55 +1297,24 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectOsmMap() {
 
-		if (fIsTileImageLogging) {
-//			toggle
+		if (fMap.getTileFactory() == fDefaultTileFactory) {
+
+			// toggle map, display wms
+
+			onSelectWmsMap();
+
 		} else {
 
+			// display OSM
+
+			fDefaultMapProvider.setStateToReloadOfflineCounter();
+
+			// ensure the map is using the correct zoom levels
+			setMapZoomLevelFromInfo(fDefaultTileFactory.getInfo());
+
+			fMap.resetTileFactory(fDefaultTileFactory);
 		}
-		// ensure the map is using the correct zoom levels
-		setMapZoomLevelFromInfo(fDefaultTileFactory.getInfo());
-
-		fMap.resetTileFactory(fDefaultTileFactory);
 	}
-
-//	private void onSelectWmsMap() {
-//
-//		// check if the tile factory has changed
-//		final TileFactory wmsTileFactory = fWmsMapProvider.getTileFactory();
-//		if (fMap.getTileFactory() != wmsTileFactory) {
-//
-//			// ensure the map is using the correct zoom levels
-//			setMapZoomLevelFromInfo(wmsTileFactory.getInfo());
-//
-//			fMap.resetTileFactory(wmsTileFactory);
-//		}
-//
-////		final int minZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-////		final int maxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-////
-////		// check if the custom url or zoom level has changed
-////		if (fCustomUrl.equals(fPreviousCustomUrl) && fPreviousMinZoom == minZoom && fPreviousMaxZoom == maxZoom) {
-////			// do nothing and optimize performace
-////			return;
-////		}
-////
-////		// keep values for the next check
-////		fPreviousCustomUrl = fCustomUrl;
-////		fPreviousMinZoom = minZoom;
-////		fPreviousMaxZoom = maxZoom;
-//
-//		updateModelFromUI();
-//
-//		// reset all tiles + images
-//		fWmsMapProvider.getTileFactory().resetAll();
-//
-//		// delete offline images to force the reload to test the modified url
-////		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
-//
-//		// display map 
-//		fMap.queueRedrawMap();
-//
-//	}
 
 //	private void onSelectPreviousMapProvider() {
 //
@@ -1385,7 +1356,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		if (fMap.getTileFactory() != customTileFactory) {
 
 			/*
-			 * select custom map provider
+			 * select wms map provider
 			 */
 			/**
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1399,27 +1370,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			fMap.resetTileFactory(customTileFactory);
 		}
 
-//		final int minZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-//		final int maxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-//
-//		// check if the custom url or zoom level has changed
-//		if (fCustomUrl.equals(fPreviousCustomUrl) && fPreviousMinZoom == minZoom && fPreviousMaxZoom == maxZoom) {
-//			// do nothing and optimize performace
-//			return;
-//		}
-//
-//		// keep values for the next check
-//		fPreviousCustomUrl = fCustomUrl;
-//		fPreviousMinZoom = minZoom;
-//		fPreviousMaxZoom = maxZoom;
-
 		updateModelFromUI();
 
 		// reset all images
 		fMpWms.getTileFactory(true).resetAll(false);
-
-		// delete offline images to force the reload to test the modified url
-//		fPrefPageMapFactory.deleteOfflineMap(fWmsMapProvider);
 
 		// display map 
 		fMap.queueMapRedraw();

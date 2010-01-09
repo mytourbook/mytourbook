@@ -714,9 +714,6 @@ public abstract class TileFactoryImpl extends TileFactory {
 				fTileCache.clear();
 				fTileImageCache.dispose();
 
-				fTileCache.clear();
-				fTileImageCache.dispose();
-
 			} finally {
 				RESET_LOCK.unlock();
 			}

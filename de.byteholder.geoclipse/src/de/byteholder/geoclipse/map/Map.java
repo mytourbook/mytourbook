@@ -239,26 +239,28 @@ public class Map extends Canvas {
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
 
-		private static final int	OFFSET	= 10;
-
 		@Override
 		public void keyPressed(final KeyEvent e) {
+
+			// accelerate with Ctrl + Shift key
+			int offset = (e.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
+			offset *= (e.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
 
 			int delta_x = 0;
 			int delta_y = 0;
 
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
-				delta_x = -OFFSET;
+				delta_x = -offset;
 				break;
 			case SWT.ARROW_RIGHT:
-				delta_x = OFFSET;
+				delta_x = offset;
 				break;
 			case SWT.ARROW_UP:
-				delta_y = -OFFSET;
+				delta_y = -offset;
 				break;
 			case SWT.ARROW_DOWN:
-				delta_y = OFFSET;
+				delta_y = offset;
 				break;
 			}
 
@@ -272,11 +274,14 @@ public class Map extends Canvas {
 			}
 
 			if (delta_x != 0 || delta_y != 0) {
+
 				final Rectangle bounds = getViewport();
 				final double x = bounds.getCenterX() + delta_x;
 				final double y = bounds.getCenterY() + delta_y;
 				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
+
 				setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
+
 				queueMapRedraw();
 			}
 		}

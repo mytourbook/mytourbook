@@ -192,6 +192,8 @@ public class Messages extends NLS {
 	public static String		DBG055_MapProfile_InvalidMapProvider;
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
 
+	public static String	DBG057_MapProfile_NoParentTile;
+
 	public static String		Tile_Error_NoMapProvider;
 
 	public static String		Tile_Factory_Name_Hidden;

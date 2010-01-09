@@ -16,10 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
+import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 
 /**
@@ -35,9 +37,9 @@ public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
 
-	private static final String				COLUMN_2			= "  ";
-	private static final String				COLUMN_4			= "    ";
-	private static final String				COLUMN_5			= "     ";
+	private static final String				COLUMN_2			= "  ";								//$NON-NLS-1$
+	private static final String				COLUMN_4			= "    ";								//$NON-NLS-1$
+	private static final String				COLUMN_5			= "     ";								//$NON-NLS-1$
 
 	private OverlayTourState				fOverlayTourState	= OverlayTourState.TILE_IS_NOT_CHECKED;
 	private OverlayImageState				fOverlayImageState	= OverlayImageState.NOT_SET;
@@ -127,7 +129,7 @@ public class Tile extends Observable {
 
 	private ReentrantLock					PARENT_LOCK;
 
-	private ImageData[]						fChildIileImageData;
+	private ImageData[]						fChildTileImageData;
 
 	private TileFactory						fTileFactory;
 
@@ -270,10 +272,10 @@ public class Tile extends Observable {
 	 */
 	public ParentImageStatus createParentImage(final ImageData[] childImageData) {
 
-		fChildIileImageData = childImageData;
+		fChildTileImageData = childImageData;
 
 		if (fParentTile == null) {
-			StatusUtil.showStatus("parent tile is not set", new Exception());
+			StatusUtil.showStatus(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
 			return null;
 		}
 
@@ -376,7 +378,7 @@ public class Tile extends Observable {
 	}
 
 	public ImageData[] getChildImageData() {
-		return fChildIileImageData;
+		return fChildTileImageData;
 	}
 
 	/**
@@ -509,12 +511,12 @@ public class Tile extends Observable {
 		fOverlayContent++;
 	}
 
-	/**
-	 * @return Returns <code>true</code> when this tile is a child of another tile
-	 */
-	public boolean isChildTile() {
-		return fParentTile != null;
-	}
+//	/**
+//	 * @return Returns <code>true</code> when this tile is a child of another tile
+//	 */
+//	public boolean isChildTile() {
+//		return fParentTile != null;
+//	}
 
 	/**
 	 * @return Returns <code>true</code> when the tile image is currently being loaded
@@ -660,10 +662,10 @@ public class Tile extends Observable {
 	 */
 	public boolean setMapImage(final Image newImage) {
 
-		if (newImage != null) {
-			int a = 0;
-			a++;
-		}
+//		if (newImage != null) {
+//			int a = 0;
+//			a++;
+//		}
 
 		mapImage = getCheckedImage(newImage);
 
@@ -730,15 +732,15 @@ public class Tile extends Observable {
 						false
 						: true;
 
-		return (" z=" + Integer.toString(zoom).concat(COLUMN_2).substring(0, 2)) //
-				+ (" x=" + Integer.toString(x).concat(COLUMN_5).substring(0, 5))
-				+ (" y=" + Integer.toString(y).concat(COLUMN_5).substring(0, 5))
-				+ (isLoading ? " LOAD" : COLUMN_5)
-				+ (" img=" + (isImageOK ? "OK" : COLUMN_2))
-				+ (isLoadingError() ? " ERR" : COLUMN_4)
+		return (" z=" + Integer.toString(zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
+				+ (" x=" + Integer.toString(x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (" y=" + Integer.toString(y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
+				+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
 				//
 				//                        0123456789012345678901234567890123456789		
-				+ (" " + fTileKey.concat("                                        ").substring(0, 40))
+				+ (" " + fTileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 		;
 	}

@@ -280,69 +280,80 @@ public class MapProviderManager {
 		return returnMpWms[0];
 	}
 
+	/**
+	 * @param mpWms
+	 * @param capsUrl
+	 * @param returnMpWms
+	 *            Contains the checked wms map provider
+	 */
 	private static void checkWmsRunnable(final MPWms mpWms, final String capsUrl, final MPWms[] returnMpWms) {
 
-		try {
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+		final IRunnableWithProgress progressRunnable = new IRunnableWithProgress() {
 
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-					final String capsUrlFinal = mpWms == null ? //
-							capsUrl
-							: mpWms.getCapabilitiesUrl();
+				final String capsUrlFinal = mpWms == null ? //
+						capsUrl
+						: mpWms.getCapabilitiesUrl();
 
-					monitor.beginTask(Messages.MP_Manager_Task_GetWms, 1);
-					monitor.subTask(capsUrlFinal);
+				monitor.beginTask(Messages.MP_Manager_Task_GetWms, 1);
+				monitor.subTask(capsUrlFinal);
 
-					try {
+				try {
 
-						returnMpWms[0] = initializeWMS(mpWms, capsUrlFinal);
+					returnMpWms[0] = initializeWMS(mpWms, capsUrlFinal);
 
-					} catch (final Exception e) {
+				} catch (final Exception e) {
 
-						StatusUtil.showStatus(e.getMessage(), e);
+					StatusUtil.showStatus(e.getMessage(), e);
 
-						/*
-						 * disable this wms map provider, it is possible that
-						 * the server is currently not available
-						 */
-						for (final MP mapProvider : fAllMapProviders) {
+					/*
+					 * disable this wms map provider, it is possible that
+					 * the server is currently not available
+					 */
+					for (final MP mapProvider : fAllMapProviders) {
 
-							if (mapProvider instanceof MPWms) {
+						if (mapProvider instanceof MPWms) {
 
-								final MPWms wmsMp = (MPWms) mapProvider;
+							final MPWms wmsMp = (MPWms) mapProvider;
 
-								if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
-									wmsMp.setWmsEnabled(false);
-								}
+							if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
+								wmsMp.setWmsEnabled(false);
+							}
 
-							} else if (mapProvider instanceof MPProfile) {
+						} else if (mapProvider instanceof MPProfile) {
 
-								final MPProfile mpProfile = (MPProfile) mapProvider;
+							final MPProfile mpProfile = (MPProfile) mapProvider;
 
-								for (final MapProviderWrapper mpWrapper : mpProfile.getAllWrappers()) {
-									if (mpWrapper.getMapProvider() instanceof MPWms) {
-										final MPWms wmsMp = (MPWms) mpWrapper.getMapProvider();
-										if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
-											wmsMp.setWmsEnabled(false);
-										}
+							for (final MapProviderWrapper mpWrapper : mpProfile.getAllWrappers()) {
+								if (mpWrapper.getMapProvider() instanceof MPWms) {
+									final MPWms wmsMp = (MPWms) mpWrapper.getMapProvider();
+									if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
+										wmsMp.setWmsEnabled(false);
 									}
 								}
 							}
 						}
-
-						returnMpWms[0] = null;
 					}
+
+					returnMpWms[0] = null;
 				}
-			};
+			}
+		};
 
-			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(false, false, runnable);
+		final Display display = Display.getDefault();
 
-		} catch (final InvocationTargetException e1) {
-			StatusUtil.showStatus(e1.getMessage(), e1);
-		} catch (final InterruptedException e1) {
-			StatusUtil.showStatus(e1.getMessage(), e1);
-		}
+		display.syncExec(new Runnable() {
+			public void run() {
+				try {
+					new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
+				} catch (final InvocationTargetException e1) {
+					StatusUtil.showStatus(e1.getMessage(), e1);
+				} catch (final InterruptedException e1) {
+					StatusUtil.showStatus(e1.getMessage(), e1);
+				}
+			}
+		});
 	}
 
 	private static void fireChangeEvent() {
@@ -631,6 +642,8 @@ public class MapProviderManager {
 				}
 			}
 		}
+
+		updatedWmsMapProvider.initializeLayers();
 
 		// replace wms map provider in the list of map providers
 		if (oldWmsMapProvider != null) {

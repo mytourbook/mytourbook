@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -94,7 +95,9 @@ public class MPWms extends MP {
 	 */
 	private int							fDisplayedLayers;
 
-	public MPWms() {}
+	private static final ReentrantLock	MP_WMS_LOCK			= new ReentrantLock();
+
+	MPWms() {}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -105,6 +108,10 @@ public class MPWms extends MP {
 
 		mapProvider.fMtLayers = cloneMtLayer(mapProvider, fMtLayers);
 		mapProvider.fMtLayersReverse = cloneMtLayer(mapProvider, fMtLayersReverse);
+
+//		if (fMtLayers != null) {
+//			mapProvider.initializeLayers();
+//		}
 
 		mapProvider.fOfflineLayers = cloneOfflineLayer(mapProvider, fOfflineLayers);
 
@@ -245,12 +252,12 @@ public class MPWms extends MP {
 		return customTileKey;
 	}
 
-	/**
-	 * @return Returns number of layers which are displayed in the map
-	 */
-	public int getDisplayedLayers() {
-		return fDisplayedLayers;
-	}
+//	/**
+//	 * @return Returns number of layers which are displayed in the map
+//	 */
+//	public int getDisplayedLayers() {
+//		return fDisplayedLayers;
+//	}
 
 	String getGetMapUrl() {
 		return fMapUrl;
@@ -285,9 +292,7 @@ public class MPWms extends MP {
 
 		if (fTileFactory == null) {
 
-			final MPWms mpWms = MapProviderManager.checkWms(this, null);
-
-			if (mpWms == null) {
+			if (MapProviderManager.checkWms(this, null) == null) {
 				return null;
 			}
 
@@ -304,10 +309,21 @@ public class MPWms extends MP {
 
 		if (fWmsServer == null) {
 
-			// load wms caps
+			MP_WMS_LOCK.lock();
+			try {
+				// recheck again
+				if (fWmsServer == null) {
 
-			if (MapProviderManager.checkWms(this, null) == null) {
-				throw new GeoException();
+					// load wms caps
+
+					if (MapProviderManager.checkWms(this, null) == null) {
+						throw new GeoException();
+					}
+
+					initializeLayers();
+				}
+			} finally {
+				MP_WMS_LOCK.unlock();
 			}
 		}
 
@@ -404,12 +420,12 @@ public class MPWms extends MP {
 	}
 
 	/**
-	 * Set layer sort order<br>
+	 * Initialize and sort layers which are loaded from the wms server<br>
 	 * <br>
 	 * Sort layers in reverse order because the sorting order is used when the map's are loaded
 	 * from the server and is used as offline file path
 	 */
-	public void initializeLayers() {
+	void initializeLayers() {
 
 		if (fMtLayers == null) {
 			// wms is not yet loaded
@@ -498,7 +514,7 @@ public class MPWms extends MP {
 	}
 
 	/**
-	 * @return Returns <code>false</code> when a connection to the WMS server fails
+	 * @return Returns <code>false</code> when a connection to the WMS server failed
 	 */
 	public boolean isWmsAvailable() {
 		return fIsWmsAvailable;
@@ -510,7 +526,7 @@ public class MPWms extends MP {
 		}
 	}
 
-	public void setDisplayedLayers(final int displayedLayers) {
+	void setDisplayedLayers(final int displayedLayers) {
 		fDisplayedLayers = displayedLayers;
 	}
 

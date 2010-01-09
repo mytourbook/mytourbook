@@ -24,14 +24,15 @@ import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryImpl;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
- 
+
 public class TileFactoryWms extends TileFactoryImpl {
 
-	private MPWms		fWmsMapProvider;
+	private MPWms				fMpWms;
+
 	private WmsTileFactoryInfo	fFactoryInfo;
 
 	public TileFactoryWms(final MPWms wmsMapProvider) {
-		fWmsMapProvider = wmsMapProvider;
+		fMpWms = wmsMapProvider;
 	}
 
 	/**
@@ -42,7 +43,7 @@ public class TileFactoryWms extends TileFactoryImpl {
 	 */
 	public TileFactoryWms(final MPWms mapProvider, final TileFactoryWms fTileFactory) {
 
-		fWmsMapProvider = mapProvider;
+		fMpWms = mapProvider;
 
 		// create factory info
 		getInfo();
@@ -58,18 +59,18 @@ public class TileFactoryWms extends TileFactoryImpl {
 			 */
 
 			fFactoryInfo = new WmsTileFactoryInfo();
-			fFactoryInfo.wmsMapProvider = fWmsMapProvider;
+			fFactoryInfo.mpWms = fMpWms;
 
-			final int minimumZoomLevel = fWmsMapProvider.getMinZoomLevel();
-			final int maximumZoomLevel = fWmsMapProvider.getMaxZoomLevel();
+			final int minimumZoomLevel = fMpWms.getMinZoomLevel();
+			final int maximumZoomLevel = fMpWms.getMaxZoomLevel();
 			final int totalMapZoom = maximumZoomLevel;
 
-			fFactoryInfo.initializeInfo(
-					fWmsMapProvider.getId(),
+			fFactoryInfo.initializeInfo(//
+					fMpWms.getId(),
 					minimumZoomLevel,
 					maximumZoomLevel,
 					totalMapZoom,
-					fWmsMapProvider.getImageSize());
+					fMpWms.getImageSize());
 
 			initializeTileFactory(fFactoryInfo);
 		}
@@ -79,12 +80,12 @@ public class TileFactoryWms extends TileFactoryImpl {
 
 	@Override
 	public MP getMapProvider() {
-		return fWmsMapProvider;
+		return fMpWms;
 	}
 
 	@Override
 	public int getTileSize() {
-		return fWmsMapProvider.getImageSize();
+		return fMpWms.getImageSize();
 	}
 
 	@Override
@@ -98,27 +99,27 @@ public class TileFactoryWms extends TileFactoryImpl {
  */
 class WmsTileFactoryInfo extends TileFactoryInfo implements ITileLoader {
 
-	MPWms	wmsMapProvider;
+	MPWms	mpWms;
 
 	public WmsTileFactoryInfo() {}
 
 	@Override
 	public String getCustomTileKey() {
-		return wmsMapProvider.getCustomTileKey();
+		return mpWms.getCustomTileKey();
 	}
 
 	@Override
 	public String getFactoryID() {
-		return wmsMapProvider.getId();
+		return mpWms.getId();
 	}
 
 	@Override
 	public String getFactoryName() {
-		return wmsMapProvider.getName();
+		return mpWms.getName();
 	}
 
 	public InputStream getTileImageStream(final Tile tile) throws GeoException {
-		return wmsMapProvider.getTileImageStream(tile);
+		return mpWms.getTileImageStream(tile);
 	}
 
 	@Override
@@ -128,12 +129,12 @@ class WmsTileFactoryInfo extends TileFactoryInfo implements ITileLoader {
 
 	@Override
 	public String getTileOSFolder() {
-		return wmsMapProvider.getOfflineFolder();
+		return mpWms.getOfflineFolder();
 	}
 
 	@Override
 	public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
-		return wmsMapProvider.getTileOSPath(fullPath, x, y, zoomLevel);
+		return mpWms.getTileOSPath(fullPath, x, y, zoomLevel);
 	}
 
 	@Override
@@ -145,7 +146,7 @@ class WmsTileFactoryInfo extends TileFactoryInfo implements ITileLoader {
 	@Override
 	public void setFactoryId(final String factoryId) {
 
-		wmsMapProvider.setMapProviderId(factoryId);
+		mpWms.setMapProviderId(factoryId);
 
 		/*
 		 * !!! very importand !!!

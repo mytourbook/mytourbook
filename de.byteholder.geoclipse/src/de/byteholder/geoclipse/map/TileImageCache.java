@@ -40,7 +40,7 @@ public class TileImageCache {
 	/**
 	 * max. number of images in the image cache
 	 */
-	private static int								MAX_CACHE_ENTRIES			= 100;
+	private static int								MAX_CACHE_ENTRIES			= 150;
 
 	/**
 	 * relative OS path for storing offline map image files

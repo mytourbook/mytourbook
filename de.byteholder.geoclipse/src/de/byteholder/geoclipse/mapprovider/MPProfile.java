@@ -55,7 +55,7 @@ public class MPProfile extends MP {
 	private boolean							fIsSaveImage			= true;
 
 	/**
-	 * sort map provider wrapper by position (by name when position is not available)
+	 * Sort map provider wrapper by position (by name when position is not available)
 	 * 
 	 * @param mpWrapper
 	 */
@@ -93,7 +93,7 @@ public class MPProfile extends MP {
 	}
 
 	/**
-	 * updates values from the wrapper into the tile factory
+	 * Updates values from the wrapper into the tile factory
 	 * 
 	 * @param allMpWrapper
 	 */
@@ -184,6 +184,10 @@ public class MPProfile extends MP {
 		ImageData brightnessImageData = null;
 		boolean isChildError = false;
 
+//		System.out.println();
+//		System.out.println(parentTile.getTileKey());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		// loop: all children
 		for (final Tile childTile : tileChildren) {
 
@@ -217,6 +221,9 @@ public class MPProfile extends MP {
 
 				continue;
 			}
+
+//			System.out.println("\t" + childTile.getUrl());
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// draw child image into the parent image
 			parentImage.drawImage(childImageData[0], childTile, brightnessImageData, brightnessTile);

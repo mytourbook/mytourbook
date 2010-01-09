@@ -68,14 +68,14 @@ public class MapProviderWrapper implements Cloneable {
 	@SuppressWarnings("unused")
 	private MapProviderWrapper() {}
 
-	public MapProviderWrapper(final MP mapProvider) {
+	MapProviderWrapper(final MP mapProvider) {
 
 		fMapProviderId = mapProvider.getId();
 
 		setMapProvider(mapProvider);
 	}
 
-	public MapProviderWrapper(final String mapProviderId) {
+	MapProviderWrapper(final String mapProviderId) {
 		fMapProviderId = mapProviderId;
 	}
 
@@ -113,11 +113,11 @@ public class MapProviderWrapper implements Cloneable {
 		return true;
 	}
 
-	public int getAlpha() {
+	int getAlpha() {
 		return fAlpha;
 	}
 
-	public int getBrightness() {
+	int getBrightness() {
 		return fBrightnessValue;
 	}
 
@@ -135,24 +135,24 @@ public class MapProviderWrapper implements Cloneable {
 		return fMapProviderId;
 	}
 
-	public int getPositionIndex() {
+	int getPositionIndex() {
 		return fPositionIndex;
 	}
 
-	public int[] getTransparentColors() {
+	int[] getTransparentColors() {
 		return fTransparentColor;
 	}
 
-	public String getType() {
+	String getType() {
 		return fType;
 	}
 
-	/**
-	 * @return Returns layers which have been saved in the xml file
-	 */
-	public ArrayList<LayerOfflineData> getWmsOfflineLayerList() {
-		return fWmsOfflineLayerList;
-	}
+//	/**
+//	 * @return Returns layers which have been saved in the xml file
+//	 */
+//	public ArrayList<LayerOfflineData> getWmsOfflineLayerList() {
+//		return fWmsOfflineLayerList;
+//	}
 
 	@Override
 	public int hashCode() {
@@ -162,11 +162,11 @@ public class MapProviderWrapper implements Cloneable {
 		return result;
 	}
 
-	public boolean isBrightness() {
+	boolean isBrightness() {
 		return fIsBrightness;
 	}
 
-	public boolean isDisplayedInMap() {
+	boolean isDisplayedInMap() {
 		return fIsDisplayedInMap;
 	}
 
@@ -174,47 +174,47 @@ public class MapProviderWrapper implements Cloneable {
 	 * @return Returns <code>true</code> when this map provider can be used, <code>false</code> when
 	 *         a wms server is not available
 	 */
-	public boolean isEnabled() {
+	boolean isEnabled() {
 		return fIsEnabled;
 	}
 
-	public boolean isTransparentBlack() {
+	boolean isTransparentBlack() {
 		return fIsBlackTransparent;
 	}
 
-	public boolean isTransparentColors() {
+	boolean isTransparentColors() {
 		return fIsTransparentColors;
 	}
 
-	public void setAlpha(final int alpha) {
+	void setAlpha(final int alpha) {
 		fAlpha = alpha;
 	}
 
-	public void setBrightness(final int brightnessValue) {
+	void setBrightness(final int brightnessValue) {
 		fBrightnessValue = brightnessValue;
 	}
 
-	public void setEnabled(final boolean isEnabled) {
+	void setEnabled(final boolean isEnabled) {
 		fIsEnabled = isEnabled;
 	}
 
-	public void setIsBrightness(final boolean isBrightness) {
+	void setIsBrightness(final boolean isBrightness) {
 		fIsBrightness = isBrightness;
 	}
 
-	public void setIsDisplayedInMap(final boolean isDisplayed) {
+	void setIsDisplayedInMap(final boolean isDisplayed) {
 		fIsDisplayedInMap = isDisplayed;
 	}
 
-	public void setIsTransparentBlack(final boolean isBlackTransparent) {
+	void setIsTransparentBlack(final boolean isBlackTransparent) {
 		fIsBlackTransparent = isBlackTransparent;
 	}
 
-	public void setIsTransparentColors(final boolean isTransColors) {
+	void setIsTransparentColors(final boolean isTransColors) {
 		fIsTransparentColors = isTransColors;
 	}
 
-	public void setMapProvider(final MP newMapProvider) {
+	void setMapProvider(final MP newMapProvider) {
 
 		final MP oldMapProvider = fMapProvider;
 		fMapProvider = newMapProvider;
@@ -315,19 +315,19 @@ public class MapProviderWrapper implements Cloneable {
 		fMapProvider.setMapProviderId(newFactoryId);
 	}
 
-	public void setPositionIndex(final int positionIndex) {
+	void setPositionIndex(final int positionIndex) {
 		fPositionIndex = positionIndex;
 	}
 
-	public void setTransparentColors(final int[] transColors) {
+	void setTransparentColors(final int[] transColors) {
 		fTransparentColor = transColors;
 	}
 
-	public void setType(final String type) {
+	void setType(final String type) {
 		fType = type;
 	}
 
-	public void setWmsOfflineLayerList(final ArrayList<LayerOfflineData> wmsOfflineLayerList) {
+	void setWmsOfflineLayerList(final ArrayList<LayerOfflineData> wmsOfflineLayerList) {
 		fWmsOfflineLayerList = wmsOfflineLayerList;
 	}
 

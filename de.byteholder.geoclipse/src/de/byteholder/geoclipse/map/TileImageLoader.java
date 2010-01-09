@@ -83,19 +83,21 @@ class TileImageLoader implements Runnable {
 
 			if (tileImageData == null) {
 
+				// offline image is not available
+
 				isSaveImage = true;
 
 				final ITilePainter tilePainter = tile.getTileFactory().getInfo().getTilePainter();
 
 				if (tilePainter != null) {
 
+					// paint tile image
+
 					tileImageData = paintTileImage(tile, tilePainter);
 
 				} else {
 
-					/*
-					 * offline image is not available, load tile image from a url
-					 */
+					// load tile image from a url
 
 					InputStream inputStream = null;
 
@@ -216,7 +218,8 @@ class TileImageLoader implements Runnable {
 				isCreateImage = false;
 			}
 
-			if (tile.isChildTile()) {
+			parentTile = tile.getParentTile();
+			if (parentTile != null) {
 
 				/*
 				 * the current tile is a child of a parent tile, create the parent image with
@@ -230,7 +233,9 @@ class TileImageLoader implements Runnable {
 					tileImageCache.saveOfflineImage(tile, tileImageData);
 				}
 
-				parentTile = tile.getParentTile();
+//				if (parentTile == null) {
+//					throw new Exception(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, tile.getTileKey()));
+//				}
 
 				// set image into child
 				final ParentImageStatus parentImageStatus = tile.createParentImage(tileImageData);
@@ -289,7 +294,7 @@ class TileImageLoader implements Runnable {
 		} catch (final Exception e) {
 
 			// this should not happen
-			StatusUtil.log(Messages.DBG048_Loading_Error_DefaultException, e);
+			StatusUtil.log(NLS.bind(Messages.DBG048_Loading_Error_DefaultException, tile.getTileKey()), e);
 
 		} finally {
 
@@ -345,7 +350,6 @@ class TileImageLoader implements Runnable {
 					final int green = (byte) ((rgb & 0xFF00) >> 8);
 					final int red = (byte) ((rgb & 0xFF) >> 0);
 
-
 					pixelData[dataIndex] = (byte) (blue & 0xff);
 					pixelData[dataIndex + 1] = (byte) (green & 0xff);
 					pixelData[dataIndex + 2] = (byte) (red & 0xff);
@@ -382,7 +386,7 @@ class TileImageLoader implements Runnable {
 			return;
 		}
 
-		final boolean isChildTile = tile.isChildTile();
+		final boolean isChildTile = tile.getParentTile() != null;
 		final boolean isParentTile = fTileFactoryImpl instanceof ITileChildrenCreator && isChildTile == false;
 
 		fTileFactoryImpl.fireTileEvent(TileEventId.TILE_START_LOADING, tile);

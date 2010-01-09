@@ -252,6 +252,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	/**
 	 * @param initTileFactory
+	 *            When <code>true</code> the tile factory will be initialized when not yet done
 	 * @return Returns the tile factory which provides the map images or <code>null</code> when the
 	 *         tile factory cannot be initialized
 	 */
