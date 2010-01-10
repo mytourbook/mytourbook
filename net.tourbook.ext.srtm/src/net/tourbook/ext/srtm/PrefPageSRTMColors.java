@@ -95,7 +95,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.byteholder.geoclipse.map.TileImageCache;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
@@ -1037,7 +1037,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		try {
 
-			final TileFactoryInfo srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+			final TileFactoryInfo_OLD srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
 
 			final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
 			IPath tileCacheOSPathFolder = null;
@@ -1074,7 +1074,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		try {
 
-			final TileFactoryInfo srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+			final TileFactoryInfo_OLD srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
 
 			final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
 			IPath tileCacheOSPathFolder = null;

@@ -88,8 +88,8 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -181,7 +181,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private MPWms							fMpWms;
 
 	private MPPlugin						fDefaultMapProvider;
-	private TileFactory						fDefaultTileFactory;
+	private TileFactory_OLD						fDefaultTileFactory;
 
 	// load tile image logging
 	private boolean							fIsTileImageLogging;
@@ -311,7 +311,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		setTitle(Messages.Dialog_WmsConfig_DialogArea_Title);
 
-		TileFactory.addTileListener(this);
+		TileFactory_OLD.addTileListener(this);
 
 		restoreState();
 
@@ -1048,7 +1048,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private Rectangle getPositionBounds(final Set<GeoPosition> positions, final int zoom) {
 
-		final TileFactory tileFactory = fMap.getTileFactory();
+		final TileFactory_OLD tileFactory = fMap.getTileFactory();
 
 		final GeoPosition pos1 = positions.iterator().next();
 		final java.awt.Point point1 = tileFactory.geoToPixel(pos1, zoom);
@@ -1220,7 +1220,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			fFormTk.dispose();
 		}
 
-		TileFactory.removeTileListener(DialogMPWms.this);
+		TileFactory_OLD.removeTileListener(DialogMPWms.this);
 	}
 
 	private void onSelectImageFormat() {
@@ -1352,7 +1352,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void onSelectWmsMap() {
 
 		// check if the tile factory has changed
-		final TileFactory customTileFactory = fMpWms.getTileFactory(true);
+		final TileFactory_OLD customTileFactory = fMpWms.getTileFactory(true);
 		if (fMap.getTileFactory() != customTileFactory) {
 
 			/*
@@ -1425,7 +1425,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	/**
 	 * ensure the map is using the correct zoom levels
 	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo factoryInfo) {
+	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
 
 		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
 		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();
@@ -1460,8 +1460,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			return;
 		}
 
-		final TileFactory tileFactory = fMap.getTileFactory();
-		final TileFactoryInfo tileInfo = tileFactory.getInfo();
+		final TileFactory_OLD tileFactory = fMap.getTileFactory();
+		final TileFactoryInfo_OLD tileInfo = tileFactory.getInfo();
 
 		final int maximumZoomLevel = tileInfo.getMaximumZoomLevel();
 		int zoom = tileInfo.getMinimumZoomLevel();
@@ -1677,7 +1677,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMpWms.initializeLayers();
 
 		// set factory and display map
-		final TileFactory tileFactory = fMpWms.getTileFactory(true);
+		final TileFactory_OLD tileFactory = fMpWms.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		if (isUpdatePosition) {

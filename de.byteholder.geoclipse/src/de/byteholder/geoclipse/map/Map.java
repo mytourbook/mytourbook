@@ -103,7 +103,7 @@ public class Map extends Canvas {
 	/**
 	 * Factory used by this component to grab the tiles necessary for painting the map.
 	 */
-	private TileFactory							fTileFactory;
+	private TileFactory_OLD							fTileFactory;
 
 	/**
 	 * The position in latitude/longitude of the "address" being mapped. This is a special
@@ -569,7 +569,7 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final TileFactoryInfo factoryInfo = fTileFactory.getInfo();
+		final TileFactoryInfo_OLD factoryInfo = fTileFactory.getInfo();
 		int zoom = factoryInfo.getMinimumZoomLevel();
 		Rectangle rect = getBoundingRect(positions, zoom);
 
@@ -1430,7 +1430,7 @@ public class Map extends Canvas {
 	 * 
 	 * @return Returns the current tile factory
 	 */
-	public TileFactory getTileFactory() {
+	public TileFactory_OLD getTileFactory() {
 		return fTileFactory;
 	}
 
@@ -2093,7 +2093,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param tileFactory
 	 */
-	public synchronized void resetTileFactory(final TileFactory tileFactory) {
+	public synchronized void resetTileFactory(final TileFactory_OLD tileFactory) {
 
 		if (fTileFactory != null) {
 			// keep tiles with loading errors that they are not loaded again when the factory has not changed
@@ -2300,7 +2300,7 @@ public class Map extends Canvas {
 	 * @param factory
 	 *            the new property value
 	 */
-	public void setTileFactory(final TileFactory factory) {
+	public void setTileFactory(final TileFactory_OLD factory) {
 
 		GeoPosition center = null;
 		int zoom = 0;
@@ -2340,7 +2340,7 @@ public class Map extends Canvas {
 
 		fTileFactory.resetTileQueue();
 
-		final TileFactoryInfo info = fTileFactory.getInfo();
+		final TileFactoryInfo_OLD info = fTileFactory.getInfo();
 
 		// do nothing if we are out of the valid zoom levels
 		if (info != null && (zoom < info.getMinimumZoomLevel() || zoom > info.getMaximumZoomLevel())) {

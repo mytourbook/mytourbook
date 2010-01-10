@@ -16,7 +16,7 @@
 package de.byteholder.geoclipse.tileinfo;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 
@@ -42,7 +42,7 @@ public class TileInfoManager implements ITileListener {
 	 */
 	public TileInfoManager() {
 //		getMapProviders();
-		TileFactory.addTileListener(this);
+		TileFactory_OLD.addTileListener(this);
 	}
 
 //	private void getMapProviders() {

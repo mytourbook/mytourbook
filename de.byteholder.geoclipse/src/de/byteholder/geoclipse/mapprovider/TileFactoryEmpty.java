@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
 /**
  * A null implementation of TileFactory. Draws empty areas.
@@ -32,12 +32,12 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 
 	private static final int		TILE_SIZE			= 256;
 
-	private static TileFactoryInfo	emptyFactoryInfo	= new EmptyTileFactoryInfo();
+	private static TileFactoryInfo_OLD	emptyFactoryInfo	= new EmptyTileFactoryInfo();
 
 	private Image					tileImage			= createTileImage();
-	private MP						fMp;
+	private MP_OLD						fMp;
 
-	private static class EmptyTileFactoryInfo extends TileFactoryInfo {
+	private static class EmptyTileFactoryInfo extends TileFactoryInfo_OLD {
 
 		public EmptyTileFactoryInfo() {
 			super(FACTORY_ID, 0, 17, 18, TILE_SIZE, true, true, "", "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -106,7 +106,7 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 	}
 
 	@Override
-	public MP getMapProvider() {
+	public MP_OLD getMapProvider() {
 		return fMp;
 	}
 
@@ -155,7 +155,7 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 	}
 
 	@Override
-	public void setMapProvider(final MP mapProvider) {
+	public void setMapProvider(final MP_OLD mapProvider) {
 		fMp = mapProvider;
 	}
 }

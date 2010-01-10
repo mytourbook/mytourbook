@@ -22,6 +22,6 @@ public interface IOfflineInfoListener {
 	 * 
 	 * @param mapProvider
 	 */
-	void offlineInfoIsDirty(MP mapProvider);
+	void offlineInfoIsDirty(MP_OLD mapProvider);
 
 }

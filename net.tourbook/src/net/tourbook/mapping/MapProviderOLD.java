@@ -17,7 +17,7 @@
 package net.tourbook.mapping;
 
 import de.byteholder.geoclipse.map.Projection;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 
 public class MapProviderOLD /* extends DefaultTileFactory */{
 
@@ -26,10 +26,10 @@ public class MapProviderOLD /* extends DefaultTileFactory */{
 	 */
 	private boolean		fCanBeToggled	= false;
 
-	private TileFactory	fTileFactory;
+	private TileFactory_OLD	fTileFactory;
 	private Projection	fProjection;
 
-	public MapProviderOLD(final TileFactory tileFactory, final Projection projection) {
+	public MapProviderOLD(final TileFactory_OLD tileFactory, final Projection projection) {
 //		super(tileFactory.getInfo());
 		fTileFactory = tileFactory;
 		fProjection = projection;
@@ -39,7 +39,7 @@ public class MapProviderOLD /* extends DefaultTileFactory */{
 		return fCanBeToggled;
 	}
 
-	public TileFactory getTileFactory() {
+	public TileFactory_OLD getTileFactory() {
 		return fTileFactory;
 	}
 

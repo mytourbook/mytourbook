@@ -12,7 +12,7 @@ public class CylindricalProjection extends Projection {
 	private static final String	PROJECTION_ID	= "cyl";	//$NON-NLS-1$
 
 	@Override
-	public Point geoToPixel(final GeoPosition c, final int zoom, final TileFactoryInfo info) {
+	public Point geoToPixel(final GeoPosition c, final int zoom, final TileFactoryInfo_OLD info) {
 
 		final int tileSize = info.getTileSize();
 
@@ -32,7 +32,7 @@ public class CylindricalProjection extends Projection {
 		return new Point((int) x, (int) y);
 	}
 
-	private Point2D.Double geoToPixelDouble(final GeoPosition c, final int zoom, final TileFactoryInfo info) {
+	private Point2D.Double geoToPixelDouble(final GeoPosition c, final int zoom, final TileFactoryInfo_OLD info) {
 
 		final int tileSize = info.getTileSize();
 
@@ -56,7 +56,7 @@ public class CylindricalProjection extends Projection {
 	public double getHorizontalDistance(final GeoPosition position1,
 										final GeoPosition position2,
 										final int zoom,
-										final TileFactoryInfo info) {
+										final TileFactoryInfo_OLD info) {
 
 		final Double devPos1 = geoToPixelDouble(position1, zoom, info);
 		final Double devPos2 = geoToPixelDouble(position2, zoom, info);
@@ -70,7 +70,7 @@ public class CylindricalProjection extends Projection {
 	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point2D pixel, final int zoom, final TileFactoryInfo info) {
+	public GeoPosition pixelToGeo(final Point2D pixel, final int zoom, final TileFactoryInfo_OLD info) {
 
 		final int tileSize = info.getTileSize();
 

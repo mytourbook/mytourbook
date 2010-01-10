@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -27,7 +27,7 @@ import de.byteholder.gpx.GeoPosition;
  * 
  * @author joshy
  */
-public abstract class TileFactory {
+public abstract class TileFactory_OLD {
 
 	protected boolean					daemonize				= true;
 
@@ -73,7 +73,7 @@ public abstract class TileFactory {
 	}
 
 	/** Creates a new instance of TileFactory */
-	protected TileFactory() {}
+	protected TileFactory_OLD() {}
 
 	/**
 	 * In this method the implementing Factroy can dispose all of its temporary images and other SWT
@@ -148,7 +148,7 @@ public abstract class TileFactory {
 	 * 
 	 * @return the TileFactoryInfo for this TileFactory
 	 */
-	public abstract TileFactoryInfo getInfo();
+	public abstract TileFactoryInfo_OLD getInfo();
 
 	/**
 	 * A property for an image which will be display when an image is still loading.
@@ -157,7 +157,7 @@ public abstract class TileFactory {
 	 */
 	public abstract Image getLoadingImage();
 
-	public abstract MP getMapProvider();
+	public abstract MP_OLD getMapProvider();
 
 	/**
 	 * Returns a Dimension containing the width and height of the map, in tiles at the current zoom
@@ -300,7 +300,7 @@ public abstract class TileFactory {
 		fIsTransparentColors = isTransparentColors;
 	}
 
-	public abstract void setMapProvider(final MP mapProvider);
+	public abstract void setMapProvider(final MP_OLD mapProvider);
 
 	public void setProfileAlpha(final int alpha) {
 

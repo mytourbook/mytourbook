@@ -50,7 +50,7 @@ public class TileImageCache {
 	private final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
 	private final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
 
-	private final TileFactoryInfo					fFactoryInfo;
+	private final TileFactoryInfo_OLD					fFactoryInfo;
 
 	/**
 	 * Path from user preferences where tile images are stored
@@ -59,7 +59,7 @@ public class TileImageCache {
 
 	private static boolean							fUseOffLineCache;
 
-	private TileFactory								fTileFactory;
+	private TileFactory_OLD								fTileFactory;
 
 	/**
 	 * This display is used because {@link Display#getDefault()} is synchronized which propably
@@ -124,7 +124,7 @@ public class TileImageCache {
 	 * @param factoryInfo
 	 * @param display
 	 */
-	public TileImageCache(final TileFactory tileFactory, final TileFactoryInfo factoryInfo, final Display display) {
+	public TileImageCache(final TileFactory_OLD tileFactory, final TileFactoryInfo_OLD factoryInfo, final Display display) {
 
 		fTileFactory = tileFactory;
 		fFactoryInfo = factoryInfo;
@@ -449,7 +449,7 @@ public class TileImageCache {
 			return;
 		}
 
-		final TileFactory tileFactory = tile.getTileFactory();
+		final TileFactory_OLD tileFactory = tile.getTileFactory();
 		final IPath tileImageFilePath = getTileImagePath(tile);
 
 		if (tileImageFilePath == null) {

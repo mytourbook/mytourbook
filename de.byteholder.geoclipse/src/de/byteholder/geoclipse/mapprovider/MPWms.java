@@ -38,11 +38,11 @@ import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.util.Util;
 
-public class MPWms extends MP {
+public class MPWms extends MP_OLD {
 
 	private static final String			SRS_EPSG_4326		= "EPSG:4326";				//$NON-NLS-1$
 
@@ -284,7 +284,7 @@ public class MPWms extends MP {
 	}
 
 	@Override
-	public TileFactory getTileFactory(final boolean initTileFactory) {
+	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
 
 		if (initTileFactory == false) {
 			return fTileFactory;

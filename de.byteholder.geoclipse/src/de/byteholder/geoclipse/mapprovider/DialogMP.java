@@ -35,7 +35,7 @@ public class DialogMP extends TitleAreaDialog {
 	private static final DateTimeFormatter	fDateTimeFormatter		= ISODateTimeFormat.hourMinuteSecondMillis();
 
 	// the config dialogs use different map providers
-	private MP								fMapProvider;
+	private MP_OLD								fMapProvider;
 
 	// map is shared
 	protected Map							fMap;
@@ -60,7 +60,7 @@ public class DialogMP extends TitleAreaDialog {
 //		System.out.println();
 //	}
 
-	public DialogMP(final Shell parentShell, final MP mapProvider) {
+	public DialogMP(final Shell parentShell, final MP_OLD mapProvider) {
 		super(parentShell);
 		fMapProvider = mapProvider;
 	}

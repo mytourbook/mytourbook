@@ -18,17 +18,17 @@
  */
 package net.tourbook.ext.srtm;
 
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
 public class ElevationColor {
 
-	private static TileFactoryInfo	fTileFactoryInfo;
+	private static TileFactoryInfo_OLD	fTileFactoryInfo;
 
-	public static TileFactoryInfo getTileFactoryInfo() {
+	public static TileFactoryInfo_OLD getTileFactoryInfo() {
 		return fTileFactoryInfo;
 	}
 
-	public ElevationColor(final TileFactoryInfo tileFactoryInfo) {
+	public ElevationColor(final TileFactoryInfo_OLD tileFactoryInfo) {
 		PrefPageSRTMColors.initVertexLists();
 		fTileFactoryInfo = tileFactoryInfo;
 	}

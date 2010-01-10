@@ -82,13 +82,13 @@ import org.eclipse.ui.part.ViewPart;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
-import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.ext.PointOfInterest;
@@ -944,9 +944,9 @@ public class TourMapView extends ViewPart {
 
 		// dispose tilefactory resources
 
-		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
-		for (final MP mapProvider : allMapProviders) {
-			final TileFactory tileFactory = mapProvider.getTileFactory(false);
+		final ArrayList<MP_OLD> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		for (final MP_OLD mapProvider : allMapProviders) {
+			final TileFactory_OLD tileFactory = mapProvider.getTileFactory(false);
 			if (tileFactory != null) {
 				tileFactory.dispose();
 			}
@@ -1056,7 +1056,7 @@ public class TourMapView extends ViewPart {
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
-		final TileFactory tileFactory = fMap.getTileFactory();
+		final TileFactory_OLD tileFactory = fMap.getTileFactory();
 		final Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
 
@@ -1915,8 +1915,8 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		final TileFactory tileFactory = fMap.getTileFactory();
-		final TileFactoryInfo tileInfo = tileFactory.getInfo();
+		final TileFactory_OLD tileFactory = fMap.getTileFactory();
+		final TileFactoryInfo_OLD tileInfo = tileFactory.getInfo();
 
 		final int maximumZoomLevel = tileInfo.getMaximumZoomLevel();
 		int zoom = tileInfo.getMinimumZoomLevel();

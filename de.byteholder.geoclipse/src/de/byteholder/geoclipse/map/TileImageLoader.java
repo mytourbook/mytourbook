@@ -71,8 +71,8 @@ class TileImageLoader implements Runnable {
 
 			final TileImageCache tileImageCache = fTileFactoryImpl.getTileImageCache();
 
-			final TileFactory tileFactory = tile.getTileFactory();
-			final TileFactoryInfo factoryInfo = tileFactory.getInfo();
+			final TileFactory_OLD tileFactory = tile.getTileFactory();
+			final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
 			final boolean useOfflineImage = tileFactory.isUseOfflineImage();
 
 			// load image from offline cache

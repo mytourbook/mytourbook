@@ -5,9 +5,9 @@ import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
-class OSMTileFactoryInfo extends TileFactoryInfo {
+class OSMTileFactoryInfo extends TileFactoryInfo_OLD {
 
 	static final String			FACTORY_ID		= "osm";							//$NON-NLS-1$
 	private static final String	FACTORY_OS_NAME	= "osm";							//$NON-NLS-1$
@@ -74,19 +74,19 @@ class OSMTileFactoryInfo extends TileFactoryInfo {
 public class TileFactoryOSM extends TileFactoryImpl {
 
 	private static OSMTileFactoryInfo	info	= new OSMTileFactoryInfo();
-	private MP							fMp;
+	private MP_OLD							fMp;
 
 	public TileFactoryOSM() {
 		super(info);
 	}
 
 	@Override
-	public MP getMapProvider() {
+	public MP_OLD getMapProvider() {
 		return fMp;
 	}
 
 	@Override
-	public void setMapProvider(final MP mapProvider) {
+	public void setMapProvider(final MP_OLD mapProvider) {
 		fMp = mapProvider;
 	}
 }

@@ -109,8 +109,8 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -126,8 +126,8 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
 
-	private static final int				MAP_MAX_ZOOM_LEVEL						= MP.UI_MAX_ZOOM_LEVEL
-																							- MP.UI_MIN_ZOOM_LEVEL;
+	private static final int				MAP_MAX_ZOOM_LEVEL						= MP_OLD.UI_MAX_ZOOM_LEVEL
+																							- MP_OLD.UI_MIN_ZOOM_LEVEL;
 
 	public static final String				DEFAULT_URL								= "http://";								//$NON-NLS-1$
 
@@ -238,7 +238,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private int								fStatErrorLoading;
 
 	private MPPlugin						fDefaultMapProvider;
-	private TileFactory						fDefaultTileFactory;
+	private TileFactory_OLD						fDefaultTileFactory;
 
 	private boolean							fIsInitUI								= false;
 
@@ -406,7 +406,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		setTitle(Messages.Dialog_MapProfile_DialogArea_Title);
 
-		TileFactory.addTileListener(this);
+		TileFactory_OLD.addTileListener(this);
 
 		restoreState();
 
@@ -596,7 +596,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 							// expand/collapse current item
 
-							final MP mapProvider = ((TVIMapProvider) selectedItem)
+							final MP_OLD mapProvider = ((TVIMapProvider) selectedItem)
 									.getMapProviderWrapper()
 									.getMapProvider();
 
@@ -747,7 +747,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-					final MP mapProvider = mpWrapper.getMapProvider();
+					final MP_OLD mapProvider = mpWrapper.getMapProvider();
 
 					styledString.append(mapProvider.getName());
 
@@ -816,7 +816,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final TVIMapProvider tvi = (TVIMapProvider) element;
-					final MP mapProvider = tvi.getMapProviderWrapper().getMapProvider();
+					final MP_OLD mapProvider = tvi.getMapProviderWrapper().getMapProvider();
 
 					if (mapProvider instanceof MPWms) {
 
@@ -1263,9 +1263,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				fSpinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMinZoom);
-				fSpinMinZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				fSpinMinZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				fSpinMinZoom.setSelection(MP.UI_MIN_ZOOM_LEVEL);
+				fSpinMinZoom.setMinimum(MP_OLD.UI_MIN_ZOOM_LEVEL);
+				fSpinMinZoom.setMaximum(MP_OLD.UI_MAX_ZOOM_LEVEL);
+				fSpinMinZoom.setSelection(MP_OLD.UI_MIN_ZOOM_LEVEL);
 				fSpinMinZoom.addMouseWheelListener(mouseWheelListener);
 				fSpinMinZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1295,9 +1295,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				fSpinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMaxZoom);
-				fSpinMaxZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				fSpinMaxZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+				fSpinMaxZoom.setMinimum(MP_OLD.UI_MIN_ZOOM_LEVEL);
+				fSpinMaxZoom.setMaximum(MP_OLD.UI_MAX_ZOOM_LEVEL);
+				fSpinMaxZoom.setSelection(MP_OLD.UI_MAX_ZOOM_LEVEL);
 				fSpinMaxZoom.addMouseWheelListener(mouseWheelListener);
 				fSpinMaxZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1589,7 +1589,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory mpTileFactory = fMpProfile.getTileFactory(true);
+			final TileFactory_OLD mpTileFactory = fMpProfile.getTileFactory(true);
 
 			setMapZoomLevelFromInfo(mpTileFactory.getInfo());
 
@@ -1616,7 +1616,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// update layers BEFORE the tile factory is set in the map
 		updateModelFromUI();
 
-		final TileFactory mpTileFactory = fMpProfile.getTileFactory(true);
+		final TileFactory_OLD mpTileFactory = fMpProfile.getTileFactory(true);
 
 		/**
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1872,7 +1872,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	}
 
 	private void onDispose() {
-		TileFactory.removeTileListener(DialogMPProfile.this);
+		TileFactory_OLD.removeTileListener(DialogMPProfile.this);
 
 		if (fImageMap != null) {
 			fImageMap.dispose();
@@ -2044,11 +2044,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMax() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+			fSpinMaxZoom.setSelection(MP_OLD.UI_MAX_ZOOM_LEVEL);
 		}
 
 		if (mapMaxValue < mapMinValue) {
@@ -2060,8 +2060,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMin() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMinValue > mapMaxValue) {
 			fSpinMinZoom.setSelection(mapMaxValue + 1);
@@ -2198,7 +2198,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	/**
 	 * ensure the map is using the correct zoom levels from the tile factory
 	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo factoryInfo) {
+	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
 
 		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
 		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();
@@ -2320,7 +2320,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				final MapProviderWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
 				boolean isWmsDisplayed = mpWrapper.isDisplayedInMap();
 
-				final MP mapProvider = mpWrapper.getMapProvider();
+				final MP_OLD mapProvider = mpWrapper.getMapProvider();
 				if (mapProvider instanceof MPWms) {
 
 					// visibility for a wms map provider can be toggled only a layer
@@ -2386,8 +2386,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int oldZoomLevel = fMap.getZoom();
 		final GeoPosition mapCenter = fMap.getCenterPosition();
 
-		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
 		fMpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
@@ -2415,7 +2415,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			mpWrapper.setPositionIndex(tblItemIndex++);
 
 			// update wms layer
-			final MP mapProvider = mpWrapper.getMapProvider();
+			final MP_OLD mapProvider = mpWrapper.getMapProvider();
 			if (mapProvider instanceof MPWms) {
 
 				final MPWms mpWms = (MPWms) mapProvider;
@@ -2546,7 +2546,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		if (tviParent instanceof TVIMapProvider) {
 
 			final MapProviderWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
-			final MP mapProvider = parentMpWrapper.getMapProvider();
+			final MP_OLD mapProvider = parentMpWrapper.getMapProvider();
 
 			if (mapProvider instanceof MPWms) {
 
@@ -2575,8 +2575,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// zoom level
 			final int minZoomLevel = fMpProfile.getMinZoomLevel();
 			final int maxZoomLevel = fMpProfile.getMaxZoomLevel();
-			fSpinMinZoom.setSelection(minZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
-			fSpinMaxZoom.setSelection(maxZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
+			fSpinMinZoom.setSelection(minZoomLevel + MP_OLD.UI_MIN_ZOOM_LEVEL);
+			fSpinMaxZoom.setSelection(maxZoomLevel + MP_OLD.UI_MIN_ZOOM_LEVEL);
 
 			final int color = fMpProfile.getBackgroundColor();
 			fColorImageBackground.setColorValue(new RGB(
@@ -2597,7 +2597,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		MPProfile.updateWrapperTileFactory(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		final TileFactory tileFactory = fMpProfile.getTileFactory(true);
+		final TileFactory_OLD tileFactory = fMpProfile.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		// set position to previous position

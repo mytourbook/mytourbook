@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 
@@ -50,7 +50,7 @@ import de.byteholder.gpx.GeoPosition;
  * @author Wolfgang Schramm
  * @author Alfred Barten
  */
-public abstract class TileFactoryImpl extends TileFactory {
+public abstract class TileFactoryImpl extends TileFactory_OLD {
 
 	private static int								THREAD_POOL_SIZE	= 20;
 
@@ -59,7 +59,7 @@ public abstract class TileFactoryImpl extends TileFactory {
 
 	private static ExecutorService					fExecutorService;
 
-	private TileFactoryInfo							fFactoryInfo;
+	private TileFactoryInfo_OLD							fFactoryInfo;
 
 	/**
 	 * contains tiles which are currently being loaded or which have loading errors when loading
@@ -93,12 +93,12 @@ public abstract class TileFactoryImpl extends TileFactory {
 	public TileFactoryImpl() {}
 
 	/**
-	 * Creates a new instance of {@link TileFactoryImpl} using the spcified {@link TileFactoryInfo}
+	 * Creates a new instance of {@link TileFactoryImpl} using the spcified {@link TileFactoryInfo_OLD}
 	 * 
 	 * @param info
 	 *            a TileFactoryInfo to configure this TileFactory
 	 */
-	public TileFactoryImpl(final TileFactoryInfo info) {
+	public TileFactoryImpl(final TileFactoryInfo_OLD info) {
 		initializeTileFactory(info);
 	}
 
@@ -272,7 +272,7 @@ public abstract class TileFactoryImpl extends TileFactory {
 	 * @return a TileFactoryInfo
 	 */
 	@Override
-	public TileFactoryInfo getInfo() {
+	public TileFactoryInfo_OLD getInfo() {
 		return fFactoryInfo;
 	}
 
@@ -295,7 +295,7 @@ public abstract class TileFactoryImpl extends TileFactory {
 	}
 
 	@Override
-	public abstract MP getMapProvider();
+	public abstract MP_OLD getMapProvider();
 
 	/**
 	 * Get <b>number of tiles</b> of the world bitmap at the current zoom level
@@ -429,7 +429,7 @@ public abstract class TileFactoryImpl extends TileFactory {
 
 			// start loading the image
 
-			if (TileFactoryInfo.isTileValid(tilePositionX, tilePositionY, zoom, fFactoryInfo)) {
+			if (TileFactoryInfo_OLD.isTileValid(tilePositionX, tilePositionY, zoom, fFactoryInfo)) {
 
 				if (useOfflineImage) {
 					// set state if an offline image for the current tile is available
@@ -511,7 +511,7 @@ public abstract class TileFactoryImpl extends TileFactory {
 		return url;
 	}
 
-	public void initializeTileFactory(final TileFactoryInfo info) {
+	public void initializeTileFactory(final TileFactoryInfo_OLD info) {
 
 		fFactoryInfo = info;
 

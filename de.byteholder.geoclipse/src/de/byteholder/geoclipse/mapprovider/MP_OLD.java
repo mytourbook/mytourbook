@@ -17,15 +17,15 @@ package de.byteholder.geoclipse.mapprovider;
 
 import org.eclipse.core.runtime.ListenerList;
 
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.gpx.GeoPosition;
 
 /**
- * A map provider ({@link MP}) wraps a plugin or custom tile factory and contains data to display a
+ * A map provider ({@link MP_OLD}) wraps a plugin or custom tile factory and contains data to display a
  * map provider in the UI
  */
-public abstract class MP implements Cloneable, Comparable<Object> {
+public abstract class MP_OLD implements Cloneable, Comparable<Object> {
 
 	public static final int				OFFLINE_INFO_NOT_READ			= -1;
 
@@ -99,7 +99,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 	}
 
-	public MP() {}
+	public MP_OLD() {}
 
 	public boolean canBeToggled() {
 		return fCanBeToggled;
@@ -108,7 +108,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 
-		final MP mapProvider = (MP) super.clone();
+		final MP_OLD mapProvider = (MP_OLD) super.clone();
 
 		if (this instanceof MPProfile) {
 
@@ -135,7 +135,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public int compareTo(final Object otherObject) {
 
-		final MP otherMapProvider = (MP) otherObject;
+		final MP_OLD otherMapProvider = (MP_OLD) otherObject;
 
 		if (this instanceof MPPlugin && otherMapProvider instanceof MPPlugin) {
 
@@ -164,11 +164,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MP)) {
+		if (!(obj instanceof MP_OLD)) {
 			return false;
 		}
 
-		final MP other = (MP) obj;
+		final MP_OLD other = (MP_OLD) obj;
 		if (fMapProviderId == null) {
 			if (other.fMapProviderId != null) {
 				return false;
@@ -180,7 +180,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return true;
 	}
 
-	private void fireOfflineReloadEvent(final MP mapProvider) {
+	private void fireOfflineReloadEvent(final MP_OLD mapProvider) {
 
 		final Object[] allListeners = fOfflineReloadEventListeners.getListeners();
 		for (final Object listener : allListeners) {
@@ -256,7 +256,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return Returns the tile factory which provides the map images or <code>null</code> when the
 	 *         tile factory cannot be initialized
 	 */
-	public abstract TileFactory getTileFactory(final boolean initTileFactory);
+	public abstract TileFactory_OLD getTileFactory(final boolean initTileFactory);
 
 	@Override
 	public int hashCode() {
@@ -329,10 +329,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public void setStateToReloadOfflineCounter() {
 
-		if (fOfflineFileCounter != MP.OFFLINE_INFO_NOT_READ) {
+		if (fOfflineFileCounter != MP_OLD.OFFLINE_INFO_NOT_READ) {
 
-			fOfflineFileCounter = MP.OFFLINE_INFO_NOT_READ;
-			fOfflineFileSize = MP.OFFLINE_INFO_NOT_READ;
+			fOfflineFileCounter = MP_OLD.OFFLINE_INFO_NOT_READ;
+			fOfflineFileSize = MP_OLD.OFFLINE_INFO_NOT_READ;
 
 			fireOfflineReloadEvent(this);
 		}

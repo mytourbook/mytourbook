@@ -40,7 +40,7 @@ public abstract class Projection {
 	 * @param zoomLevel
 	 *            the zoom level to extract the pixel coordinate for
 	 */
-	public abstract Point geoToPixel(GeoPosition geoPosition, int zoomLevel, TileFactoryInfo tileFactoryInfo);
+	public abstract Point geoToPixel(GeoPosition geoPosition, int zoomLevel, TileFactoryInfo_OLD tileFactoryInfo);
 
 	/**
 	 * @param position1
@@ -51,7 +51,7 @@ public abstract class Projection {
 	public abstract double getHorizontalDistance(	GeoPosition position1,
 													GeoPosition position2,
 													int zoom,
-													TileFactoryInfo info);
+													TileFactoryInfo_OLD info);
 
 	/**
 	 * @return Returns the id for the projection, each projection must have a unique id
@@ -61,6 +61,6 @@ public abstract class Projection {
 	/**
 	 * convert an on screen pixel coordinate and a zoom level to a geo position
 	 */
-	public abstract GeoPosition pixelToGeo(Point2D pixelCoordinate, int zoom, TileFactoryInfo info);
+	public abstract GeoPosition pixelToGeo(Point2D pixelCoordinate, int zoom, TileFactoryInfo_OLD info);
 
 }

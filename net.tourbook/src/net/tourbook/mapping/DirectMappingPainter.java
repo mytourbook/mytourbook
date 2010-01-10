@@ -29,7 +29,7 @@ import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -82,7 +82,7 @@ public class DirectMappingPainter implements IDirectPainter {
 									int sliderValueIndex,
 									final Image markerImage) {
 
-		final TileFactory tileFactory = fMap.getTileFactory();
+		final TileFactory_OLD tileFactory = fMap.getTileFactory();
 		final int zoomLevel = fMap.getZoom();
 
 		final double[] latitudeSerie = fTourData.latitudeSerie;

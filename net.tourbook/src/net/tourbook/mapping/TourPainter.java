@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -683,7 +683,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final TileFactory tileFactory = map.getTileFactory();
+		final TileFactory_OLD tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
 
@@ -721,7 +721,7 @@ public class TourPainter extends MapPainter {
 
 		boolean isTourInTile = false;
 
-		final TileFactory tileFactory = map.getTileFactory();
+		final TileFactory_OLD tileFactory = map.getTileFactory();
 		final int mapZoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
@@ -971,7 +971,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final TileFactory tileFactory = map.getTileFactory();
+		final TileFactory_OLD tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;

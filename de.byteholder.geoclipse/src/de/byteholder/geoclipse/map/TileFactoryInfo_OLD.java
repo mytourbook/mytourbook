@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IPath;
  * 
  * @author joshy
  */
-public abstract class TileFactoryInfo {
+public abstract class TileFactoryInfo_OLD {
 
 	private String		factoryId;
 
@@ -84,7 +84,7 @@ public abstract class TileFactoryInfo {
 	 *          level. For example, if the zoom level is 0 (zoomed all the way out, there is only
 	 *          one tile), x,y must be 0,0
 	 */
-	public static boolean isTileValid(final int x, final int y, final int zoomLevel, final TileFactoryInfo info) {
+	public static boolean isTileValid(final int x, final int y, final int zoomLevel, final TileFactoryInfo_OLD info) {
  
 		//int x = (int)coord.getX();
 		//int y = (int)coord.getY();
@@ -114,7 +114,7 @@ public abstract class TileFactoryInfo {
 		return true;
 	}
 
-	public TileFactoryInfo() {}
+	public TileFactoryInfo_OLD() {}
 
 	/**
 	 * Creates a new instance of TileFactoryInfo. Note that TileFactoryInfo should be considered
@@ -149,7 +149,7 @@ public abstract class TileFactoryInfo {
 	 * false if based on the center line. @param yt2b true if tile y is measured from the top (north
 	 * pole) to the bottom (south pole) or else false if based on the equator.
 	 */
-	public TileFactoryInfo(	final String factoryId,
+	public TileFactoryInfo_OLD(	final String factoryId,
 							final int minimumZoomLevel,
 							final int maximumZoomLevel,
 							final int totalMapZoom,
@@ -183,10 +183,10 @@ public abstract class TileFactoryInfo {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof TileFactoryInfo)) {
+		if (!(obj instanceof TileFactoryInfo_OLD)) {
 			return false;
 		}
-		final TileFactoryInfo other = (TileFactoryInfo) obj;
+		final TileFactoryInfo_OLD other = (TileFactoryInfo_OLD) obj;
 		if (factoryId == null) {
 			if (other.factoryId != null) {
 				return false;

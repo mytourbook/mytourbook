@@ -24,9 +24,9 @@ import de.byteholder.geoclipse.map.ITileChildrenCreator;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
-class ProfileTileFactoryInfo extends TileFactoryInfo {
+class ProfileTileFactoryInfo extends TileFactoryInfo_OLD {
 
 	MPProfile	mpProfile;
 
@@ -104,7 +104,7 @@ public class TileFactoryProfile extends TileFactoryImpl implements ITileChildren
 	}
 
 	@Override
-	public TileFactoryInfo getInfo() {
+	public TileFactoryInfo_OLD getInfo() {
 
 		if (fFactoryInfo == null) {
 
@@ -129,7 +129,7 @@ public class TileFactoryProfile extends TileFactoryImpl implements ITileChildren
 	}
 
 	@Override
-	public MP getMapProvider() {
+	public MP_OLD getMapProvider() {
 		return fProfileMapProvider;
 	}
 
@@ -138,7 +138,7 @@ public class TileFactoryProfile extends TileFactoryImpl implements ITileChildren
 	}
 
 	@Override
-	public void setMapProvider(final MP mapProvider) {
+	public void setMapProvider(final MP_OLD mapProvider) {
 	// this is done in the constructor
 	}
 

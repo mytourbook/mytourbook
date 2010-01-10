@@ -103,7 +103,7 @@ import org.geotools.data.ows.WMSRequest;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.logging.StatusUtil;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;
@@ -111,7 +111,7 @@ import de.byteholder.geoclipse.mapprovider.DialogMPCustom;
 import de.byteholder.geoclipse.mapprovider.DialogMPProfile;
 import de.byteholder.geoclipse.mapprovider.DialogMPWms;
 import de.byteholder.geoclipse.mapprovider.IOfflineInfoListener;
-import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.geoclipse.mapprovider.MPCustom;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 import de.byteholder.geoclipse.mapprovider.MPProfile;
@@ -141,17 +141,17 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	/**
 	 * contains all visible map providers
 	 */
-	private ArrayList<MP>						fMapProviders;
+	private ArrayList<MP_OLD>						fMapProviders;
 
 	/**
 	 * map provider's which are used when getting offline info
 	 */
-	private ArrayList<MP>						fOfflineJobMapProviders		= new ArrayList<MP>();
+	private ArrayList<MP_OLD>						fOfflineJobMapProviders		= new ArrayList<MP_OLD>();
 
 	private IOfflineInfoListener				fOfflineJobInfoListener;
 
 	private Job									fOfflineJobGetInfo;
-	private MP									fOfflineJobMapProvider;
+	private MP_OLD									fOfflineJobMapProvider;
 	private int									fOfflineJobFileCounter;
 	private int									fOfflineJobFileSize;
 	private int									fOfflineJobFileCounterUIUpdate;
@@ -172,9 +172,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	/**
 	 * map provider which is currently selected in the list
 	 */
-	private MP									fSelectedMapProvider;
+	private MP_OLD									fSelectedMapProvider;
 
-	private MP									fNewMapProvider;
+	private MP_OLD									fNewMapProvider;
 
 	/*
 	 * UI controls
@@ -278,7 +278,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	void actionRefreshOfflineInfo(final boolean isRefreshSelectedMapProvider) {
 
-		MP updateMapProvider = null;
+		MP_OLD updateMapProvider = null;
 
 		if (isRefreshSelectedMapProvider) {
 
@@ -294,7 +294,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * refresh all map providers
 			 */
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP_OLD mapProvider : fMapProviders) {
 				mapProvider.setStateToReloadOfflineCounter();
 			}
 
@@ -312,7 +312,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		fOfflineJobInfoListener = new IOfflineInfoListener() {
 
-			public void offlineInfoIsDirty(final MP mapProvider) {
+			public void offlineInfoIsDirty(final MP_OLD mapProvider) {
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
@@ -329,7 +329,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		};
 
-		MP.addOfflineInfoListener(fOfflineJobInfoListener);
+		MP_OLD.addOfflineInfoListener(fOfflineJobInfoListener);
 	}
 
 	private String checkBaseUrl(final String baseUrl) {
@@ -357,7 +357,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// check if the id is already used
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP_OLD mapProvider : fMapProviders) {
 
 				final String otherFactoryId = mapProvider.getId();
 
@@ -406,7 +406,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// check if the offline folder is already used
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP_OLD mapProvider : fMapProviders) {
 
 				if (fIsNewMapProvider) {
 
@@ -615,7 +615,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final MP mapProvider = (MP) cell.getElement();
+				final MP_OLD mapProvider = (MP_OLD) cell.getElement();
 
 				if (mapProvider instanceof MPWms) {
 					cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeWms);
@@ -640,7 +640,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final MP mapProvider = (MP) cell.getElement();
+				final MP_OLD mapProvider = (MP_OLD) cell.getElement();
 
 				cell.setText(mapProvider.getName());
 			}
@@ -655,7 +655,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final MP mapProvider = (MP) cell.getElement();
+				final MP_OLD mapProvider = (MP_OLD) cell.getElement();
 
 				cell.setText(mapProvider.getOfflineFolder());
 			}
@@ -672,7 +672,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				String layer = UI.EMPTY_STRING;
 
-				final MP mapProvider = (MP) cell.getElement();
+				final MP_OLD mapProvider = (MP_OLD) cell.getElement();
 				if (mapProvider instanceof MPWms) {
 
 					final MPWms wmsMapProvider = (MPWms) mapProvider;
@@ -697,8 +697,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
-				if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
+				final int offlineTileCounter = ((MP_OLD) cell.getElement()).getOfflineFileCounter();
+				if (offlineTileCounter == MP_OLD.OFFLINE_INFO_NOT_READ) {
 					cell.setText(Messages.pref_map_lable_NA);
 				} else if (offlineTileCounter > 0) {
 					cell.setText(Integer.toString(offlineTileCounter));
@@ -717,8 +717,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
-				if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
+				final long offlineTileSize = ((MP_OLD) cell.getElement()).getOfflineFileSize();
+				if (offlineTileSize == MP_OLD.OFFLINE_INFO_NOT_READ) {
 					cell.setText(Messages.pref_map_lable_NA);
 				} else if (offlineTileSize > 0) {
 					cell.setText(fNf.format((float) offlineTileSize / 1024 / 1024));
@@ -737,8 +737,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-				final MP mp1 = (MP) e1;
-				final MP mp2 = (MP) e2;
+				final MP_OLD mp1 = (MP_OLD) e1;
+				final MP_OLD mp2 = (MP_OLD) e2;
 
 				final boolean thisIsPlugin = e1 instanceof MPPlugin;
 				final boolean otherIsPlugin = e2 instanceof MPPlugin;
@@ -1301,7 +1301,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 	}
 
-	public void deleteOfflineMap(final MP mapProvider) {
+	public void deleteOfflineMap(final MP_OLD mapProvider) {
 
 		deleteOfflineMapFiles(mapProvider);
 
@@ -1313,10 +1313,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		fMapProviderViewer.getTable().setFocus();
 	}
 
-	private void deleteOfflineMapFiles(final MP mapProvider) {
+	private void deleteOfflineMapFiles(final MP_OLD mapProvider) {
 
 		// reset state that offline images are available
-		final TileFactory tileFactory = mapProvider.getTileFactory(false);
+		final TileFactory_OLD tileFactory = mapProvider.getTileFactory(false);
 		if (tileFactory != null) {
 			tileFactory.resetTileImageAvailability();
 		}
@@ -1392,7 +1392,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			fMpDropTarget.dispose();
 		}
 
-		MP.removeOfflineInfoListener(fOfflineJobInfoListener);
+		MP_OLD.removeOfflineInfoListener(fOfflineJobInfoListener);
 
 		super.dispose();
 	}
@@ -1400,7 +1400,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private void doImportMP(final String importFilePath) {
 
 		// create map provider from xml file
-		final ArrayList<MP> importedMPs = MapProviderManager.getInstance().importMapProvider(importFilePath);
+		final ArrayList<MP_OLD> importedMPs = MapProviderManager.getInstance().importMapProvider(importFilePath);
 
 		// select imported map provider
 		if (importedMPs != null) {
@@ -1411,7 +1411,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			fMapProviders.addAll(importedMPs);
 
 			// update viewer
-			fMapProviderViewer.add(importedMPs.toArray(new MP[importedMPs.size()]));
+			fMapProviderViewer.add(importedMPs.toArray(new MP_OLD[importedMPs.size()]));
 
 			// select map provider in the viewer
 			fMapProviderViewer.setSelection(new StructuredSelection(importedMPs.get(0)), true);
@@ -1916,9 +1916,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private void onSelectMapProvider(final SelectionChangedEvent event) {
 
 		final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
-		if (firstElement instanceof MP) {
+		if (firstElement instanceof MP_OLD) {
 
-			final MP mapProvider = (MP) firstElement;
+			final MP_OLD mapProvider = (MP_OLD) firstElement;
 
 			fSelectedMapProvider = mapProvider;
 
@@ -2106,7 +2106,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 
 			// enable all wms map providers that they can be selected with next/previous
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP_OLD mapProvider : fMapProviders) {
 
 				if (mapProvider instanceof MPWms) {
 					((MPWms) mapProvider).setWmsEnabled(true);
@@ -2234,8 +2234,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		 */
 		final String lastMapProviderId = fPrefStore
 				.getString(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER);
-		MP lastMapProvider = null;
-		for (final MP mapProvider : fMapProviders) {
+		MP_OLD lastMapProvider = null;
+		for (final MP_OLD mapProvider : fMapProviders) {
 			if (mapProvider.getId().equals(lastMapProviderId)) {
 				lastMapProvider = mapProvider;
 				break;
@@ -2355,7 +2355,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 	}
 
-	private void setEmptyMapProviderUI(final MP mapProvider) {
+	private void setEmptyMapProviderUI(final MP_OLD mapProvider) {
 
 		fIsNewMapProvider = true;
 		fNewMapProvider = mapProvider;
@@ -2454,7 +2454,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 *            when set this map provider will be updated, when <code>null</code> only the
 	 *            offline info of the not updated map providers will be updated
 	 */
-	private void startJobOfflineInfo(final MP updateMapProvider) {
+	private void startJobOfflineInfo(final MP_OLD updateMapProvider) {
 
 		stopJobOfflineInfo();
 
@@ -2463,8 +2463,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		if (updateMapProvider == null) {
 
 			// check if offline info is already read
-			for (final MP mapProvider : fMapProviders) {
-				if (mapProvider.getOfflineFileCounter() == MP.OFFLINE_INFO_NOT_READ) {
+			for (final MP_OLD mapProvider : fMapProviders) {
+				if (mapProvider.getOfflineFileCounter() == MP_OLD.OFFLINE_INFO_NOT_READ) {
 					fOfflineJobMapProviders.add(mapProvider);
 				}
 			}
@@ -2498,7 +2498,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				fIsOfflineJobCanceled = false;
 
-				for (final MP mapProvider : fOfflineJobMapProviders) {
+				for (final MP_OLD mapProvider : fOfflineJobMapProviders) {
 
 					final String tileOSFolder = mapProvider.getOfflineFolder();
 					if (tileOSFolder == null) {
@@ -2537,8 +2537,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					if (fIsOfflineJobCanceled) {
 						// set result invalid
-						fOfflineJobFileCounter = MP.OFFLINE_INFO_NOT_READ;
-						fOfflineJobFileSize = MP.OFFLINE_INFO_NOT_READ;
+						fOfflineJobFileCounter = MP_OLD.OFFLINE_INFO_NOT_READ;
+						fOfflineJobFileSize = MP_OLD.OFFLINE_INFO_NOT_READ;
 					}
 
 					updateUIOfflineInfo();
@@ -2611,7 +2611,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * get/create map provider
 		 */
-		final MP mapProvider;
+		final MP_OLD mapProvider;
 		String oldFactoryId = null;
 		String oldOfflineFolder = null;
 
@@ -2645,7 +2645,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// id is modified, update all profiles with the new id
 
-			for (final MP mp : MapProviderManager.getInstance().getAllMapProviders()) {
+			for (final MP_OLD mp : MapProviderManager.getInstance().getAllMapProviders()) {
 
 				if (mp instanceof MPProfile) {
 					for (final MapProviderWrapper mpWrapper : ((MPProfile) mp).getAllWrappers()) {
@@ -2719,14 +2719,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	/**
 	 * update offline info detail
 	 */
-	private void updateUIOfflineInfoDetail(final MP mapProvider) {
+	private void updateUIOfflineInfoDetail(final MP_OLD mapProvider) {
 
 		final int offlineTileCounter = mapProvider.getOfflineFileCounter();
 		final long offlineTileSize = mapProvider.getOfflineFileSize();
 
 		final StringBuilder sb = new StringBuilder();
 
-		if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
+		if (offlineTileCounter == MP_OLD.OFFLINE_INFO_NOT_READ) {
 
 			sb.append(Messages.Pref_Map_Lable_NotRetrieved);
 
@@ -2763,7 +2763,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			long tileSize = 0;
 			boolean isNA = false;
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP_OLD mapProvider : fMapProviders) {
 				final int offlineFileCounter = mapProvider.getOfflineFileCounter();
 				if (offlineFileCounter > 0) {
 					tileCounter += offlineFileCounter;

@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 
 /**
  * part of this class is copied from {@link CompositeImageDescriptor} and heavily modified
@@ -54,7 +54,7 @@ final class ProfileTileImage {
 	 */
 	final void drawImage(final ImageData src, final Tile srcTile, final ImageData brt, final Tile brtTile) {
 
-		final TileFactory srcTileFactory = srcTile.getTileFactory();
+		final TileFactory_OLD srcTileFactory = srcTile.getTileFactory();
 
 		final float externalAlpha = (float) srcTileFactory.getProfileAlpha() / 100;
 		int[] transparentPixel = null;
@@ -146,7 +146,7 @@ final class ProfileTileImage {
 		// brightness image must have the same image size
 		if (brt != null && src.width == brt.width && src.height == brt.height) {
 
-			final TileFactory brtTileFactory = brtTile.getTileFactory();
+			final TileFactory_OLD brtTileFactory = brtTile.getTileFactory();
 
 			brtData = brt.data;
 			brtAlphaData = brt.alphaData;

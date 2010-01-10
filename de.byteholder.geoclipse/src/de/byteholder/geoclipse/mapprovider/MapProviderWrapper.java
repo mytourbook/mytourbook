@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import java.util.ArrayList;
 
 /**
- * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
+ * This is a wrapper for a map provider ({@link MP_OLD}) within a map profile ({@link MPProfile})
  */
 public class MapProviderWrapper implements Cloneable {
 
@@ -27,7 +27,7 @@ public class MapProviderWrapper implements Cloneable {
 	 */
 	private String						fMapProviderId;
 
-	private MP							fMapProvider;
+	private MP_OLD							fMapProvider;
 
 	/**
 	 * position index is the sorting position within the map profile viewer
@@ -68,7 +68,7 @@ public class MapProviderWrapper implements Cloneable {
 	@SuppressWarnings("unused")
 	private MapProviderWrapper() {}
 
-	MapProviderWrapper(final MP mapProvider) {
+	MapProviderWrapper(final MP_OLD mapProvider) {
 
 		fMapProviderId = mapProvider.getId();
 
@@ -84,7 +84,7 @@ public class MapProviderWrapper implements Cloneable {
 
 		final MapProviderWrapper clonedMpWrapper = (MapProviderWrapper) super.clone();
 
-		final MP clonedMapProvider = (MP) fMapProvider.clone();
+		final MP_OLD clonedMapProvider = (MP_OLD) fMapProvider.clone();
 
 		clonedMpWrapper.fMapProvider = clonedMapProvider;
 
@@ -121,7 +121,7 @@ public class MapProviderWrapper implements Cloneable {
 		return fBrightnessValue;
 	}
 
-	public MP getMapProvider() {
+	public MP_OLD getMapProvider() {
 
 		// check map provider
 //		if (fMapProvider == null) {
@@ -214,9 +214,9 @@ public class MapProviderWrapper implements Cloneable {
 		fIsTransparentColors = isTransColors;
 	}
 
-	void setMapProvider(final MP newMapProvider) {
+	void setMapProvider(final MP_OLD newMapProvider) {
 
-		final MP oldMapProvider = fMapProvider;
+		final MP_OLD oldMapProvider = fMapProvider;
 		fMapProvider = newMapProvider;
 
 		if (newMapProvider instanceof MPWms) {

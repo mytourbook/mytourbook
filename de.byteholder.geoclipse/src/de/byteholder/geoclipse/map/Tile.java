@@ -131,7 +131,7 @@ public class Tile extends Observable {
 
 	private ImageData[]						fChildTileImageData;
 
-	private TileFactory						fTileFactory;
+	private TileFactory_OLD						fTileFactory;
 
 	/**
 	 * custom part for the tile image file path
@@ -162,7 +162,7 @@ public class Tile extends Observable {
 	 * @param projectionId
 	 * @return
 	 */
-	public static String getTileKey(final TileFactory tileFactory,
+	public static String getTileKey(final TileFactory_OLD tileFactory,
 									final int x,
 									final int y,
 									final int zoom,
@@ -218,7 +218,7 @@ public class Tile extends Observable {
 	 * @param zoom
 	 * @param tileCreatorId
 	 */
-	public Tile(final TileFactory tileFactory, final int x, final int y, final int zoom, final String tileCreatorId) {
+	public Tile(final TileFactory_OLD tileFactory, final int x, final int y, final int zoom, final String tileCreatorId) {
 
 		fTileFactory = tileFactory;
 
@@ -299,7 +299,7 @@ public class Tile extends Observable {
 					if (areAllChildrenLoaded(tileChildren)) {
 
 						// create parent image when all childs are loaded
-						final TileFactory parentTileFactory = fParentTile.fTileFactory;
+						final TileFactory_OLD parentTileFactory = fParentTile.fTileFactory;
 						if (parentTileFactory instanceof ITileChildrenCreator) {
 
 							return ((ITileChildrenCreator) parentTileFactory).getParentImage(fParentTile, this);
@@ -452,7 +452,7 @@ public class Tile extends Observable {
 		return fTileCustomPath;
 	}
 
-	public TileFactory getTileFactory() {
+	public TileFactory_OLD getTileFactory() {
 		return fTileFactory;
 	}
 

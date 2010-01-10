@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 
-public class MPCustom extends MP {
+public class MPCustom extends MP_OLD {
 
 	private String				fCustomUrl	= UI.EMPTY_STRING;
 
@@ -32,7 +32,7 @@ public class MPCustom extends MP {
 
 	private ArrayList<UrlPart>	fUrlParts	= new ArrayList<UrlPart>();
 
-	private TileFactoryInfo		fDefaultFactoryInfo;
+	private TileFactoryInfo_OLD		fDefaultFactoryInfo;
 
 	public MPCustom() {
 		fTileFactory = new TileFactoryCustom(this);

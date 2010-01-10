@@ -57,8 +57,8 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -192,7 +192,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private MPCustom						fMpCustom;
 	private MPPlugin						fDefaultMapProvider;
-	private TileFactory						fDefaultTileFactory;
+	private TileFactory_OLD						fDefaultTileFactory;
 
 	private boolean							fIsInitUI								= false;
 
@@ -342,7 +342,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 
-				TileFactory.removeTileListener(DialogMPCustom.this);
+				TileFactory_OLD.removeTileListener(DialogMPCustom.this);
 			}
 		});
 	}
@@ -356,7 +356,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		setTitle(Messages.Dialog_CustomConfig_DialogArea_Title);
 
-		TileFactory.addTileListener(this);
+		TileFactory_OLD.addTileListener(this);
 
 		restoreState();
 
@@ -1043,7 +1043,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		setMessage(fDefaultMessage);
 
 		// set factory and display map
-		final TileFactory tileFactory = fMpCustom.getTileFactory(true);
+		final TileFactory_OLD tileFactory = fMpCustom.getTileFactory(true);
 		fMap.resetTileFactory(tileFactory);
 
 		if (true) {
@@ -1065,7 +1065,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private void onSelectCustomMap() {
 
 		// check if the tile factory has changed
-		final TileFactory customTileFactory = fMpCustom.getTileFactory(true);
+		final TileFactory_OLD customTileFactory = fMpCustom.getTileFactory(true);
 		if (fMap.getTileFactory() != customTileFactory) {
 
 			/*
@@ -1115,7 +1115,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory tileFactory = fMpCustom.getTileFactory(true);
+			final TileFactory_OLD tileFactory = fMpCustom.getTileFactory(true);
 
 			setMapZoomLevelFromInfo(tileFactory.getInfo());
 
@@ -1287,7 +1287,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * ensure the map is using the correct zoom levels from the tile factory
 	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo factoryInfo) {
+	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
 
 		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
 		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();

@@ -30,13 +30,13 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.UI;
 
 /**
  * Wraps all map providers into a map profile, these map providers can be selected individually
  */
-public class MPProfile extends MP {
+public class MPProfile extends MP_OLD {
 
 	public static final String				WMS_CUSTOM_TILE_PATH	= "all-map-profile-wms";	//$NON-NLS-1$
 
@@ -103,8 +103,8 @@ public class MPProfile extends MP {
 
 			if (mpWrapper.isDisplayedInMap()) {
 
-				final MP wrapperMp = mpWrapper.getMapProvider();
-				final TileFactory tileFactory = wrapperMp.getTileFactory(false);
+				final MP_OLD wrapperMp = mpWrapper.getMapProvider();
+				final TileFactory_OLD tileFactory = wrapperMp.getTileFactory(false);
 
 				if (tileFactory != null) {
 					tileFactory.setIsTransparentColors(mpWrapper.isTransparentColors());
@@ -138,7 +138,7 @@ public class MPProfile extends MP {
 			final MapProviderWrapper clonedMpWrapper = (MapProviderWrapper) mpWrapper.clone();
 
 			// set wms properties
-			final MP clonedMP = clonedMpWrapper.getMapProvider();
+			final MP_OLD clonedMP = clonedMpWrapper.getMapProvider();
 			if (clonedMP instanceof MPWms) {
 
 				final MPWms clonedWmsMp = (MPWms) clonedMP;
@@ -252,7 +252,7 @@ public class MPProfile extends MP {
 		for (final MapProviderWrapper mpWrapper : fMpWrappers) {
 
 			final int parentZoom = parentTile.getZoom();
-			final MP mapProvider = mpWrapper.getMapProvider();
+			final MP_OLD mapProvider = mpWrapper.getMapProvider();
 
 			if (parentZoom < mapProvider.getMinZoomLevel() || parentZoom > mapProvider.getMaxZoomLevel()) {
 
@@ -264,8 +264,8 @@ public class MPProfile extends MP {
 			// create child tile for each visible map provider
 			if (mpWrapper.isDisplayedInMap() && mpWrapper.isEnabled()) {
 
-				final MP childMP = mapProvider;
-				final TileFactory childTileFactory = childMP.getTileFactory(true);
+				final MP_OLD childMP = mapProvider;
+				final TileFactory_OLD childTileFactory = childMP.getTileFactory(true);
 
 				// check if this child is already being loaded
 				final String childTileKey = Tile.getTileKey(
@@ -335,13 +335,13 @@ public class MPProfile extends MP {
 	 * @param mapProvider
 	 * @return
 	 */
-	private MapProviderWrapper createWrapper(final MP mapProvider) {
+	private MapProviderWrapper createWrapper(final MP_OLD mapProvider) {
 
 		MapProviderWrapper mpWrapper = null;
 
 		try {
 
-			final MP clonedMapProvider = (MP) mapProvider.clone();
+			final MP_OLD clonedMapProvider = (MP_OLD) mapProvider.clone();
 
 			mpWrapper = new MapProviderWrapper(clonedMapProvider);
 
@@ -373,7 +373,7 @@ public class MPProfile extends MP {
 	}
 
 	@Override
-	public TileFactory getTileFactory(final boolean initTileFactory) {
+	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
 
 		if (initTileFactory == false) {
 			return fTileFactory;
@@ -432,9 +432,9 @@ public class MPProfile extends MP {
 	 * @param validMapProvider
 	 * @return Returns <code>false</code> when the synchronization fails
 	 */
-	private boolean synchMpWrapper(final MapProviderWrapper mpWrapper, final MP validMapProvider) {
+	private boolean synchMpWrapper(final MapProviderWrapper mpWrapper, final MP_OLD validMapProvider) {
 
-		final MP wrapperMapProvider = mpWrapper.getMapProvider();
+		final MP_OLD wrapperMapProvider = mpWrapper.getMapProvider();
 		if (wrapperMapProvider == null) {
 
 			/*
@@ -442,7 +442,7 @@ public class MPProfile extends MP {
 			 */
 
 			try {
-				mpWrapper.setMapProvider((MP) validMapProvider.clone());
+				mpWrapper.setMapProvider((MP_OLD) validMapProvider.clone());
 			} catch (final CloneNotSupportedException e) {
 				StatusUtil.showStatus(e.getMessage(), e);
 				return false;
@@ -476,7 +476,7 @@ public class MPProfile extends MP {
 	 */
 	public void synchronizeMPWrapper() {
 
-		final ArrayList<MP> allMPsWithoutProfile = MapProviderManager.getInstance().getAllMapProviders(false);
+		final ArrayList<MP_OLD> allMPsWithoutProfile = MapProviderManager.getInstance().getAllMapProviders(false);
 
 		if (fMpWrappers == null) {
 
@@ -486,7 +486,7 @@ public class MPProfile extends MP {
 
 			fMpWrappers = new ArrayList<MapProviderWrapper>();
 
-			for (final MP mapProvider : allMPsWithoutProfile) {
+			for (final MP_OLD mapProvider : allMPsWithoutProfile) {
 				fMpWrappers.add(createWrapper(mapProvider));
 			}
 
@@ -502,7 +502,7 @@ public class MPProfile extends MP {
 			fMpWrappers = new ArrayList<MapProviderWrapper>();
 
 			// loop: all available map providers
-			for (final MP validMapProvider : allMPsWithoutProfile) {
+			for (final MP_OLD validMapProvider : allMPsWithoutProfile) {
 
 				final String validMapProviderId = validMapProvider.getId();
 

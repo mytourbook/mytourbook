@@ -15,26 +15,26 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import de.byteholder.geoclipse.map.TileFactory;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
 /**
  * This is a map provider for a plugin tile factory. <br>
  * <br>
  * The plugin tile factory must implement the
- * methods {@link TileFactory#setMapProvider(MP)} and {@link TileFactory#getMapProvider()}
+ * methods {@link TileFactory_OLD#setMapProvider(MP_OLD)} and {@link TileFactory_OLD#getMapProvider()}
  */
-public class MPPlugin extends MP {
+public class MPPlugin extends MP_OLD {
 
-	private TileFactory	fTileFactory;
+	private TileFactory_OLD	fTileFactory;
 
-	public MPPlugin(final TileFactory tileFactory) {
+	public MPPlugin(final TileFactory_OLD tileFactory) {
 
 		fTileFactory = tileFactory;
 
 		tileFactory.setMapProvider(this);
 
-		final TileFactoryInfo factoryInfo = tileFactory.getInfo();
+		final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
 
 		setMapProviderId(factoryInfo.getFactoryID());
 		setName(factoryInfo.getFactoryName());
@@ -47,7 +47,7 @@ public class MPPlugin extends MP {
 	}
 
 	@Override
-	public TileFactory getTileFactory(final boolean initTileFactory) {
+	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
 		return fTileFactory;
 	}
 }

@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.RegistryFactory;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
-import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.gpx.GeoPosition;
 
 public class GeoclipseExtensions {
@@ -36,7 +36,7 @@ public class GeoclipseExtensions {
 
 	private int							startZoom		= 0;
 
-	private ArrayList<TileFactory>		fTileFactories;
+	private ArrayList<TileFactory_OLD>		fTileFactories;
 
 	public static GeoclipseExtensions getInstance() {
 
@@ -97,10 +97,10 @@ public class GeoclipseExtensions {
 //		return factories;
 //	}
 
-	public TileFactory findTileFactory(final String className) {
+	public TileFactory_OLD findTileFactory(final String className) {
 
-		final List<TileFactory> factories = readFactories();
-		for (final TileFactory factory : factories) {
+		final List<TileFactory_OLD> factories = readFactories();
+		for (final TileFactory_OLD factory : factories) {
 			if (factory.getClass().getName().equals(className)) {
 				return factory;
 			}
@@ -112,7 +112,7 @@ public class GeoclipseExtensions {
 	/**
 	 * @return Returns a list with all available map/tile factories
 	 */
-	public List<TileFactory> readFactories() {
+	public List<TileFactory_OLD> readFactories() {
 
 		if (fTileFactories != null) {
 			return fTileFactories;
@@ -122,7 +122,7 @@ public class GeoclipseExtensions {
 		final IExtensionPoint point = registry.getExtensionPoint("de.byteholder.geoclipse.tilefactory"); //$NON-NLS-1$
 		final IExtension[] extensions = point.getExtensions();
 
-		fTileFactories = new ArrayList<TileFactory>();
+		fTileFactories = new ArrayList<TileFactory_OLD>();
 
 		for (final IExtension extension : extensions) {
 			final IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -136,8 +136,8 @@ public class GeoclipseExtensions {
 				e.printStackTrace();
 			}
 
-			if (o != null && o instanceof TileFactory) {
-				fTileFactories.add((TileFactory) o);
+			if (o != null && o instanceof TileFactory_OLD) {
+				fTileFactories.add((TileFactory_OLD) o);
 			}
 		}
 

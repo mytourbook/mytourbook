@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.Path;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo;
-import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
+import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
 /**
@@ -44,7 +44,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 	/**
 	 * Map provider which created this tile factory
 	 */
-	private MP							fMapProvider;
+	private MP_OLD							fMapProvider;
 
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
@@ -54,7 +54,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 	@SuppressWarnings("unused")
 	private static final ElevationColor	elevationColor	= new ElevationColor(info);
 
-	private static class SRTMTileFactoryInfo extends TileFactoryInfo implements ITilePainter {
+	private static class SRTMTileFactoryInfo extends TileFactoryInfo_OLD implements ITilePainter {
 
 		private static final String		FACTORY_ID		= "srtm";									//$NON-NLS-1$
 		private static final String		FACTORY_NAME	= "SRTM";									//$NON-NLS-1$
@@ -274,12 +274,12 @@ public class SRTMTileFactory extends TileFactoryImpl {
 	}
 
 	@Override
-	public MP getMapProvider() {
+	public MP_OLD getMapProvider() {
 		return fMapProvider;
 	}
 
 	@Override
-	public void setMapProvider(final MP mp) {
+	public void setMapProvider(final MP_OLD mp) {
 		fMapProvider = mp;
 	}
 }

@@ -154,7 +154,7 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public Point geoToPixel(GeoPosition geoPosition, final int zoomLevel, final TileFactoryInfo info) {
+	public Point geoToPixel(GeoPosition geoPosition, final int zoomLevel, final TileFactoryInfo_OLD info) {
 
 		if (geoPosition == null) {
 			geoPosition = new GeoPosition(0.0, 0.0);
@@ -209,7 +209,7 @@ public final class Mercator extends Projection {
 
 	private Point2D.Double geoToPixelDouble(final GeoPosition geoPosition,
 											final int zoomLevel,
-											final TileFactoryInfo info) {
+											final TileFactoryInfo_OLD info) {
 
 		final double latitude = geoPosition.getLatitude();
 		final double longitude = geoPosition.getLongitude();
@@ -260,7 +260,7 @@ public final class Mercator extends Projection {
 	public double getHorizontalDistance(final GeoPosition position1,
 										final GeoPosition position2,
 										final int zoom,
-										final TileFactoryInfo info) {
+										final TileFactoryInfo_OLD info) {
 
 		final Double devPos1 = geoToPixelDouble(position1, zoom, info);
 		final Double devPos2 = geoToPixelDouble(position2, zoom, info);
@@ -290,7 +290,7 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo info) {
+	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo_OLD info) {
 
 		// this reverses geoToPixel
 
@@ -311,7 +311,7 @@ public final class Mercator extends Projection {
 		return wc;
 	}
 
-	public GeoPosition pixelToGeoTEST(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo info) {
+	public GeoPosition pixelToGeoTEST(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo_OLD info) {
 
 		// this reverses geoToPixel
 
