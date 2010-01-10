@@ -27,7 +27,7 @@ import de.byteholder.gpx.GeoPosition;
  * 
  * @author joshy
  */
-public abstract class TileFactory_OLD {
+public abstract class OLD_TileFactory_OLD {
 
 	protected boolean					daemonize				= true;
 

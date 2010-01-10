@@ -25,7 +25,7 @@ import de.byteholder.gpx.GeoPosition;
  * A map provider ({@link MP_OLD}) wraps a plugin or custom tile factory and contains data to display a
  * map provider in the UI
  */
-public abstract class MP_OLD implements Cloneable, Comparable<Object> {
+public abstract class OLD_MP_OLD implements Cloneable, Comparable<Object> {
 
 	public static final int				OFFLINE_INFO_NOT_READ			= -1;
 

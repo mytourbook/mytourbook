@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IPath;
  * 
  * @author joshy
  */
-public abstract class TileFactoryInfo_OLD {
+public abstract class OLD_TileFactoryInfo_OLD {
 
 	private String		factoryId;
 
