@@ -34,9 +34,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
-import de.byteholder.geoclipse.mapprovider.MP_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator, IMapProviderListener {
@@ -56,9 +55,9 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	/**
 	 * tile factory which is currently selected
 	 */
-	private MP_OLD									fSelectedMP;
+	private MP									fSelectedMP;
 
-	private ArrayList<MP_OLD>						fSortedMapProviders;
+	private ArrayList<MP>						fSortedMapProviders;
 	private ArrayList<MPAction>					fSortedMapProviderActions;
 
 	private int									fMapProviderToggleCounter;
@@ -68,11 +67,11 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 */
 	private class MPAction extends Action {
 
-		private final MP_OLD		mp;
+		private final MP		mp;
 		private final String	actionLabel;
 		private boolean			fCanBeToggled;
 
-		public MPAction(final MP_OLD mp, final String label) {
+		public MPAction(final MP mp, final String label) {
 
 			super(label, AS_RADIO_BUTTON);
 
@@ -193,7 +192,8 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	}
 
 	/**
-	 * @return Returns the map provider {@link MP_OLD} which is currently selected or OSM when there is
+	 * @return Returns the map provider {@link MP_OLD} which is currently selected or OSM when there
+	 *         is
 	 *         no selected map provider
 	 */
 	public MP_OLD getSelectedMapProvider() {
@@ -233,7 +233,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 			}
 		}
 
-		MP_OLD newMp;
+		MP newMp;
 
 		if (sortedToggleMapProviderActions.size() > 0) {
 
@@ -300,7 +300,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 			for (final MPAction mapProviderAction : fMPActions.values()) {
 
-				final MP_OLD mp = mapProviderAction.mp;
+				final MP mp = mapProviderAction.mp;
 
 				// check mp ID
 				if (mp.getId().equals(selectedMpId)) {
@@ -318,7 +318,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		 * if map provider is not set, get default map provider
 		 */
 		for (final MPAction mapProviderAction : fMPActions.values()) {
-			final MP_OLD mp = mapProviderAction.mp;
+			final MP mp = mapProviderAction.mp;
 			if (mp.getId().equals(MapProviderManager.DEFAULT_MAP_PROVIDER_ID)) {
 				mapProviderAction.setChecked(true);
 				selectMapProviderInTheMap(mp);
@@ -337,7 +337,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		}
 	}
 
-	private void selectMapProviderInTheMap(final MP_OLD mp) {
+	private void selectMapProviderInTheMap(final MP mp) {
 
 		// check if a new map provider is selected
 		if (fSelectedMP != null && fSelectedMP == mp) {
@@ -346,11 +346,11 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		fSelectedMP = mp;
 
-		final TileFactory_OLD mpTileFactory = mp.getTileFactory(true);
+//		final TileFactory_OLD mpTileFactory = mp.getTileFactory(true);
 
 		final Map map = fMappingView.getMap();
 
-		map.setTileFactory(mpTileFactory);
+		map.setTileFactory(mp);
 
 		// reset overlays must be done after the new map provider is set
 //		map.resetOverlays();
@@ -370,7 +370,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 * @param mp
 	 * @param mpAction
 	 */
-	private void updateActionToggleState(final MP_OLD mp, final MPAction mpAction) {
+	private void updateActionToggleState(final MP mp, final MPAction mpAction) {
 
 		final boolean canBeToggled = mp.canBeToggled();
 
@@ -390,19 +390,19 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 */
 	void updateMapProviders() {
 
-		final List<MP_OLD> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		final List<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 
 		// get sorted map providers from the pref store
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
 				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
 
-		final ArrayList<MP_OLD> mapProviders = new ArrayList<MP_OLD>();
+		final ArrayList<MP> mapProviders = new ArrayList<MP>();
 
 		// set all map provider which are in the pref store
 		for (final String storeMpId : storedProviderIds) {
 
 			// find the stored map provider in the available map providers
-			for (final MP_OLD mp : allMapProviders) {
+			for (final MP mp : allMapProviders) {
 				if (mp.getId().equals(storeMpId)) {
 					mapProviders.add(mp);
 					break;
@@ -411,7 +411,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		}
 
 		// make sure that all available map providers are in the list
-		for (final MP_OLD mp : allMapProviders) {
+		for (final MP mp : allMapProviders) {
 			if (!mapProviders.contains(mp)) {
 				mapProviders.add(mp);
 			}
@@ -423,7 +423,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		final String[] toggleIds = StringToArrayConverter.convertStringToArray(//
 				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
 
-		for (final MP_OLD mp : allMapProviders) {
+		for (final MP mp : allMapProviders) {
 
 			final String mpId = mp.getId();
 
@@ -443,7 +443,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		final ArrayList<MPAction> sortedMapProviderActions = new ArrayList<MPAction>();
 
 		// add all map providers
-		for (final MP_OLD mp : fSortedMapProviders) {
+		for (final MP mp : fSortedMapProviders) {
 
 			final MPAction mapProviderAction = fMPActions.get(mp.getId());
 

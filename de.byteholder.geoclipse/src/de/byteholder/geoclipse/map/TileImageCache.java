@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ *   
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
 import java.io.File;
@@ -24,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.logging.StatusUtil;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -40,7 +56,7 @@ public class TileImageCache {
 	/**
 	 * max. number of images in the image cache
 	 */
-	private static int								MAX_CACHE_ENTRIES			= 150;
+	private static int								MAX_CACHE_ENTRIES			= 100;
 
 	/**
 	 * relative OS path for storing offline map image files
@@ -50,8 +66,6 @@ public class TileImageCache {
 	private final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
 	private final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
 
-	private final TileFactoryInfo_OLD					fFactoryInfo;
-
 	/**
 	 * Path from user preferences where tile images are stored
 	 */
@@ -59,7 +73,7 @@ public class TileImageCache {
 
 	private static boolean							fUseOffLineCache;
 
-	private TileFactory_OLD								fTileFactory;
+	private MP										fMp;
 
 	/**
 	 * This display is used because {@link Display#getDefault()} is synchronized which propably
@@ -120,15 +134,15 @@ public class TileImageCache {
 	}
 
 	/**
-	 * @param tileFactory
+	 * @param mp
 	 * @param factoryInfo
 	 * @param display
 	 */
-	public TileImageCache(final TileFactory_OLD tileFactory, final TileFactoryInfo_OLD factoryInfo, final Display display) {
+	public TileImageCache(final MP mp) {
 
-		fTileFactory = tileFactory;
-		fFactoryInfo = factoryInfo;
-		fDisplay = display;
+		fMp = mp;
+
+		fDisplay = Display.getDefault();
 
 		setTileCachePath();
 	}
@@ -170,7 +184,7 @@ public class TileImageCache {
 	 */
 	private Image createImageInternal(final String tileKey, final ImageData loadedImageData) {
 
-		final int dimmingAlphaValue = fTileFactory.getDimLevel();
+		final int dimmingAlphaValue = fMp.getDimLevel();
 		if (dimmingAlphaValue == 0xFF) {
 
 			// tile image is not dimmed
@@ -199,7 +213,7 @@ public class TileImageCache {
 				public void run() {
 
 					final GC gcTileImage = new GC(tileImage);
-					final Color dimColor = new Color(fDisplay, fTileFactory.getDimColor());
+					final Color dimColor = new Color(fDisplay, fMp.getDimColor());
 					{
 						gcTileImage.setBackground(dimColor);
 						gcTileImage.fillRectangle(imageBounds);
@@ -349,7 +363,7 @@ public class TileImageCache {
 		}
 
 		// append tile path
-		final IPath tilePath = tile.getTileFactory().getInfo().getTileOSPath(
+		final IPath tilePath = tile.getMP().getTileOSPath(
 				tileCachePath.toOSString(),
 				tile.getX(),
 				tile.getY(),
@@ -449,12 +463,12 @@ public class TileImageCache {
 			return;
 		}
 
-		final TileFactory_OLD tileFactory = tile.getTileFactory();
+		final MP mp = tile.getMP();
 		final IPath tileImageFilePath = getTileImagePath(tile);
 
 		if (tileImageFilePath == null) {
 			StatusUtil.log("a tile path is not available in the tile factory: " // $NON-NLS-1$
-					+ tileFactory.getInfo().getFactoryName(), new Exception());
+					+ mp.getName(), new Exception());
 			return;
 		}
 
@@ -523,7 +537,7 @@ public class TileImageCache {
 			imageLoader.save(fullImageFilePath.toOSString(), imageType);
 
 			// update map provider with the image format
-			tileFactory.getMapProvider().setImageFormat(MapProviderManager.getImageMimeType(imageType));
+			mp.setImageFormat(MapProviderManager.getImageMimeType(imageType));
 
 		} catch (final Exception e) {
 
@@ -541,7 +555,7 @@ public class TileImageCache {
 	 * @param tile
 	 *            the tile which is checked
 	 */
-	void setOfflineImageAvailability(final Tile tile) {
+	public void setOfflineImageAvailability(final Tile tile) {
 
 		if (fUseOffLineCache == false) {
 			return;
@@ -556,7 +570,7 @@ public class TileImageCache {
 		 */
 		try {
 
-			final IPath tilePath = fFactoryInfo.getTileOSPath(//
+			final IPath tilePath = tile.getMP().getTileOSPath(//
 					fOSTileCachePath,
 					tile.getX(),
 					tile.getY(),

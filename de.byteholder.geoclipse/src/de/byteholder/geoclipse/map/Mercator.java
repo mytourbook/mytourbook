@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -154,7 +155,7 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public Point geoToPixel(GeoPosition geoPosition, final int zoomLevel, final TileFactoryInfo_OLD info) {
+	public Point geoToPixel(GeoPosition geoPosition, final int zoomLevel, final MP mp) {
 
 		if (geoPosition == null) {
 			geoPosition = new GeoPosition(0.0, 0.0);
@@ -170,9 +171,9 @@ public final class Mercator extends Projection {
 //			latitude = 73.333333;
 //		}
 
-		final Point2D devMapCenter = info.getMapCenterInPixelsAtZoom(zoomLevel);
+		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoomLevel);
 
-		final double x = devMapCenter.getX() + (longitude * info.getLongitudeDegreeWidthInPixels(zoomLevel));
+		final double x = devMapCenter.getX() + (longitude * mp.getLongitudeDegreeWidthInPixels(zoomLevel));
 
 		double e = Math.sin(latitude * (Math.PI / 180.0));
 		if (e > 0.9999) {
@@ -186,7 +187,7 @@ public final class Mercator extends Projection {
 				+ 0.5
 				* Math.log((1 + e) / (1 - e))
 				* -1
-				* info.getLongitudeRadianWidthInPixels(zoomLevel);
+				* mp.getLongitudeRadianWidthInPixels(zoomLevel);
 
 //		System.out.println(""//
 //				+ " mapsize: "
@@ -209,14 +210,14 @@ public final class Mercator extends Projection {
 
 	private Point2D.Double geoToPixelDouble(final GeoPosition geoPosition,
 											final int zoomLevel,
-											final TileFactoryInfo_OLD info) {
+ final MP mp) {
 
 		final double latitude = geoPosition.getLatitude();
 		final double longitude = geoPosition.getLongitude();
 
-		final Point2D mapCenterInPixels = info.getMapCenterInPixelsAtZoom(zoomLevel);
+		final Point2D mapCenterInPixels = mp.getMapCenterInPixelsAtZoom(zoomLevel);
 
-		final double x = mapCenterInPixels.getX() + (longitude * info.getLongitudeDegreeWidthInPixels(zoomLevel));
+		final double x = mapCenterInPixels.getX() + (longitude * mp.getLongitudeDegreeWidthInPixels(zoomLevel));
 
 		double e = Math.sin(latitude * (Math.PI / 180.0));
 		if (e > 0.9999) {
@@ -230,7 +231,7 @@ public final class Mercator extends Projection {
 				+ 0.5
 				* Math.log((1 + e) / (1 - e))
 				* -1
-				* info.getLongitudeRadianWidthInPixels(zoomLevel);
+				* mp.getLongitudeRadianWidthInPixels(zoomLevel);
 
 		return new Point2D.Double(x, y);
 	}
@@ -260,10 +261,10 @@ public final class Mercator extends Projection {
 	public double getHorizontalDistance(final GeoPosition position1,
 										final GeoPosition position2,
 										final int zoom,
-										final TileFactoryInfo_OLD info) {
+										final MP mp) {
 
-		final Double devPos1 = geoToPixelDouble(position1, zoom, info);
-		final Double devPos2 = geoToPixelDouble(position2, zoom, info);
+		final Double devPos1 = geoToPixelDouble(position1, zoom, mp);
+		final Double devPos2 = geoToPixelDouble(position2, zoom, mp);
 
 		final double devXDiff = devPos1.y - devPos2.y;
 
@@ -290,18 +291,18 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo_OLD info) {
+	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final MP mp) {
 
 		// this reverses geoToPixel
 
 		final double pixelX = pixelCoordinate.getX();
 		final double pixelY = pixelCoordinate.getY();
 
-		final Point2D devMapCenter = info.getMapCenterInPixelsAtZoom(zoom);
+		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
 
-		final double flon = (pixelX - devMapCenter.getX()) / info.getLongitudeDegreeWidthInPixels(zoom);
+		final double flon = (pixelX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 
-		final double e1 = (pixelY - devMapCenter.getY()) / (-1 * info.getLongitudeRadianWidthInPixels(zoom));
+		final double e1 = (pixelY - devMapCenter.getY()) / (-1 * mp.getLongitudeRadianWidthInPixels(zoom));
 
 		final double e2 = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
 		final double flat = e2;
@@ -311,14 +312,14 @@ public final class Mercator extends Projection {
 		return wc;
 	}
 
-	public GeoPosition pixelToGeoTEST(final Point2D pixelCoordinate, final int zoom, final TileFactoryInfo_OLD info) {
+	public GeoPosition pixelToGeoTEST(final Point2D pixelCoordinate, final int zoom, final MP mp) {
 
 		// this reverses geoToPixel
 
 		
 		final double devX = pixelCoordinate.getX();
 		final double devY = pixelCoordinate.getY();
-		final Point2D devMapCenter = info.getMapCenterInPixelsAtZoom(zoom);
+		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
 		
 //		function y2lat(a) { return 180/Math.PI * (2 * Math.atan(Math.exp(a*Math.PI/180)) - Math.PI/2); }
 
@@ -327,9 +328,9 @@ public final class Mercator extends Projection {
 
 
 
-		final double longitude = (devX - devMapCenter.getX()) / info.getLongitudeDegreeWidthInPixels(zoom);
+		final double longitude = (devX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 
-		final double e1 = (devY - devMapCenter.getY()) / (-1 * info.getLongitudeRadianWidthInPixels(zoom));
+		final double e1 = (devY - devMapCenter.getY()) / (-1 * mp.getLongitudeRadianWidthInPixels(zoom));
 
 		final double latitude = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
 

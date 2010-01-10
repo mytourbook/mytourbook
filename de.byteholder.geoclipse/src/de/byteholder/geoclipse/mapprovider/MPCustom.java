@@ -21,10 +21,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 
-public class MPCustom extends MP_OLD {
+public class MPCustom extends MP {
 
 	private String				fCustomUrl	= UI.EMPTY_STRING;
 
@@ -93,6 +92,7 @@ public class MPCustom extends MP_OLD {
 		return filePath;
 	}
 
+	@Override
 	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
 
 		if (fUrlParts.size() == 0) {

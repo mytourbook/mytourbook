@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -38,11 +38,10 @@ import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.util.Util;
 
-public class MPWms extends MP_OLD {
+public class MPWms extends MP {
 
 	private static final String			SRS_EPSG_4326		= "EPSG:4326";				//$NON-NLS-1$
 
@@ -198,6 +197,7 @@ public class MPWms extends MP_OLD {
 	/**
 	 * create unique key for all visible layers
 	 */
+	@Override
 	String getCustomTileKey() {
 
 		final StringBuilder sb = new StringBuilder();

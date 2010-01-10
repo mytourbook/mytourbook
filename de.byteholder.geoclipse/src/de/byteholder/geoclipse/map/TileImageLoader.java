@@ -16,19 +16,20 @@ import org.eclipse.swt.graphics.PaletteData;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
  * This class loads the tile images. The run method is called from the executer in the thread queue.
  */
-class TileImageLoader implements Runnable {
+public class TileImageLoader implements Runnable {
 
-	private final TileFactoryImpl	fTileFactoryImpl;
+	private final MP	fMp;
 
 	/**
-	 * @param defaultTileFactory
+	 * @param mp
 	 */
-	TileImageLoader(final TileFactoryImpl defaultTileFactory) {
-		fTileFactoryImpl = defaultTileFactory;
+	public TileImageLoader(final MP mp) {
+		fMp = mp;
 	}
 
 	private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
@@ -42,7 +43,7 @@ class TileImageLoader implements Runnable {
 		} else {
 
 			// remove from loading map
-			fTileFactoryImpl.getLoadingTiles().remove(tileKey);
+			fMp.getLoadingTiles().remove(tileKey);
 		}
 
 		// set tile state, notify observer (Map is an observer)
@@ -52,7 +53,7 @@ class TileImageLoader implements Runnable {
 			tile.notifyImageObservers();
 		}
 
-		fTileFactoryImpl.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
+		fMp.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
 	}
 
 	/**
@@ -69,11 +70,10 @@ class TileImageLoader implements Runnable {
 
 			boolean isSaveImage = false;
 
-			final TileImageCache tileImageCache = fTileFactoryImpl.getTileImageCache();
+			final TileImageCache tileImageCache = fMp.getTileImageCache();
 
-			final TileFactory_OLD tileFactory = tile.getTileFactory();
-			final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
-			final boolean useOfflineImage = tileFactory.isUseOfflineImage();
+			final MP mp = tile.getMP();
+			final boolean useOfflineImage = mp.isUseOfflineImage();
 
 			// load image from offline cache
 			ImageData[] tileImageData = null;
@@ -87,9 +87,9 @@ class TileImageLoader implements Runnable {
 
 				isSaveImage = true;
 
-				final ITilePainter tilePainter = tile.getTileFactory().getInfo().getTilePainter();
+				final ITilePainter tilePainter = mp.getTilePainter();
 
-				if (tilePainter != null) {
+				if (tilePainter instanceof ITilePainter) {
 
 					// paint tile image
 
@@ -103,7 +103,7 @@ class TileImageLoader implements Runnable {
 
 					try {
 
-						final ITileLoader tileLoader = factoryInfo.getTileLoader();
+						final ITileLoader tileLoader = mp.getTileLoader();
 
 						if (tileLoader instanceof ITileLoader) {
 
@@ -131,7 +131,7 @@ class TileImageLoader implements Runnable {
 
 							try {
 
-								url = fTileFactoryImpl.getURL(tile);
+								url = fMp.getTileURL(tile);
 
 							} catch (final Exception e) {
 								loadingError = e.getMessage();
@@ -190,7 +190,7 @@ class TileImageLoader implements Runnable {
 							StatusUtil.log(e.getMessage(), e);
 						}
 
-						fTileFactoryImpl.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+						fMp.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
 					}
 				}
 			}
@@ -311,7 +311,7 @@ class TileImageLoader implements Runnable {
 	 */
 	private ImageData[] paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
-		fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
+		fMp.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
 		final ImageData[] paintedImageData = new ImageData[1];
 
@@ -357,13 +357,13 @@ class TileImageLoader implements Runnable {
 			}
 			paintedImageData[0] = tileImageData;
 
-			fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
+			fMp.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
 		} catch (final Exception e) {
 
 			tile.setLoadingError(Messages.DBG045_Loading_Error_PaintingError + e.getMessage());
 
-			fTileFactoryImpl.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
+			fMp.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
 
 			StatusUtil.log(e.getMessage(), e);
 		}
@@ -377,7 +377,7 @@ class TileImageLoader implements Runnable {
 		 * load/create tile image
 		 */
 		// get tile from queue
-		final LinkedBlockingDeque<Tile> tileWaitingQueue = fTileFactoryImpl.getTileWaitingQueue();
+		final LinkedBlockingDeque<Tile> tileWaitingQueue = fMp.getTileWaitingQueue();
 
 		final Tile tile = tileWaitingQueue.pollLast();
 
@@ -387,9 +387,9 @@ class TileImageLoader implements Runnable {
 		}
 
 		final boolean isChildTile = tile.getParentTile() != null;
-		final boolean isParentTile = fTileFactoryImpl instanceof ITileChildrenCreator && isChildTile == false;
+		final boolean isParentTile = fMp instanceof ITileChildrenCreator && isChildTile == false;
 
-		fTileFactoryImpl.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
+		fMp.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
 
 		if (isParentTile) {
 

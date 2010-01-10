@@ -15,39 +15,44 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
-
 /**
- * This is a map provider for a plugin tile factory. <br>
+ * This is a plugin map provider. <br>
  * <br>
- * The plugin tile factory must implement the
- * methods {@link TileFactory_OLD#setMapProvider(MP_OLD)} and {@link TileFactory_OLD#getMapProvider()}
  */
-public class MPPlugin extends MP_OLD {
-
-	private TileFactory_OLD	fTileFactory;
-
-	public MPPlugin(final TileFactory_OLD tileFactory) {
-
-		fTileFactory = tileFactory;
-
-		tileFactory.setMapProvider(this);
-
-		final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
-
-		setMapProviderId(factoryInfo.getFactoryID());
-		setName(factoryInfo.getFactoryName());
-		setOfflineFolder(factoryInfo.getTileOSFolder());
-	}
+public abstract class MPPlugin extends MP {
 
 	@Override
-	public void disposeCachedImages() {
-		fTileFactory.disposeCachedImages();
-	}
+	public abstract String getId();
 
 	@Override
-	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
-		return fTileFactory;
-	}
+	public abstract String getName();
+
+	@Override
+	public abstract String getOfflineFolder();
+
+// mp2	
+//	private TileFactory_OLD	fTileFactory;
+//
+//	public MPPlugin(final TileFactory_OLD tileFactory) {
+//
+//		fTileFactory = tileFactory;
+//
+//		tileFactory.setMapProvider(this);
+//
+//		final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
+//
+//		setMapProviderId(factoryInfo.getFactoryID());
+//		setName(factoryInfo.getFactoryName());
+//		setOfflineFolder(factoryInfo.getTileOSFolder());
+//	}
+//
+//	@Override
+//	public void disposeCachedImages() {
+//		fTileFactory.disposeCachedImages();
+//	}
+//
+//	@Override
+//	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
+//		return fTileFactory;
+//	}
 }

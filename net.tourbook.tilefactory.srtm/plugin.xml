@@ -4,7 +4,7 @@
    <extension
          point="de.byteholder.geoclipse.tilefactory">
       <tilefactory
-            class="net.tourbook.tilefactory.srtm.SRTMTileFactory"
+            class="net.tourbook.tilefactory.srtm.SRTMMapProvider"
             name="SRTM Map Provider"/>
    </extension>
 

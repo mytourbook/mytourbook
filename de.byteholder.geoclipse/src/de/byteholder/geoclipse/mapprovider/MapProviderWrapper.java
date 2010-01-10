@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import java.util.ArrayList;
 
 /**
- * This is a wrapper for a map provider ({@link MP_OLD}) within a map profile ({@link MPProfile})
+ * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
  */
 public class MapProviderWrapper implements Cloneable {
 
@@ -27,7 +27,7 @@ public class MapProviderWrapper implements Cloneable {
 	 */
 	private String						fMapProviderId;
 
-	private MP_OLD							fMapProvider;
+	private MP							fMp;
 
 	/**
 	 * position index is the sorting position within the map profile viewer
@@ -68,7 +68,7 @@ public class MapProviderWrapper implements Cloneable {
 	@SuppressWarnings("unused")
 	private MapProviderWrapper() {}
 
-	MapProviderWrapper(final MP_OLD mapProvider) {
+	MapProviderWrapper(final MP mapProvider) {
 
 		fMapProviderId = mapProvider.getId();
 
@@ -84,9 +84,9 @@ public class MapProviderWrapper implements Cloneable {
 
 		final MapProviderWrapper clonedMpWrapper = (MapProviderWrapper) super.clone();
 
-		final MP_OLD clonedMapProvider = (MP_OLD) fMapProvider.clone();
+		final MP clonedMapProvider = (MP) fMp.clone();
 
-		clonedMpWrapper.fMapProvider = clonedMapProvider;
+		clonedMpWrapper.fMp = clonedMapProvider;
 
 		return clonedMpWrapper;
 	}
@@ -121,14 +121,14 @@ public class MapProviderWrapper implements Cloneable {
 		return fBrightnessValue;
 	}
 
-	public MP_OLD getMapProvider() {
+	public MP getMapProvider() {
 
 		// check map provider
 //		if (fMapProvider == null) {
 //			StatusUtil.showStatus("map provider is not set", new Exception());//$NON-NLS-1$
 //		}
 
-		return fMapProvider;
+		return fMp;
 	}
 
 	public String getMapProviderId() {
@@ -214,10 +214,10 @@ public class MapProviderWrapper implements Cloneable {
 		fIsTransparentColors = isTransColors;
 	}
 
-	void setMapProvider(final MP_OLD newMapProvider) {
+	void setMapProvider(final MP newMapProvider) {
 
-		final MP_OLD oldMapProvider = fMapProvider;
-		fMapProvider = newMapProvider;
+		final MP oldMapProvider = fMp;
+		fMp = newMapProvider;
 
 		if (newMapProvider instanceof MPWms) {
 
@@ -312,7 +312,7 @@ public class MapProviderWrapper implements Cloneable {
 	 */
 	public void setMapProviderId(final String newFactoryId) {
 		fMapProviderId = newFactoryId;
-		fMapProvider.setMapProviderId(newFactoryId);
+		fMp.setMapProviderId(newFactoryId);
 	}
 
 	void setPositionIndex(final int positionIndex) {

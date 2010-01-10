@@ -114,67 +114,6 @@ public abstract class OLD_TileFactoryInfo_OLD {
 		return true;
 	}
 
-	public TileFactoryInfo_OLD() {}
-
-	/**
-	 * Creates a new instance of TileFactoryInfo. Note that TileFactoryInfo should be considered
-	 * invariate, meaning that subclasses should ensure all of the properties stay the same after
-	 * the class is constructed. Returning different values of getTileSize() for example is
-	 * considered an error and may result in unexpected behavior.
-	 * 
-	 * @param factoryId
-	 * @param minimumZoomLevel
-	 *            The minimum zoom level
-	 * @param maximumZoomLevel
-	 *            the maximum zoom level
-	 * @param totalMapZoom
-	 *            the top zoom level, essentially the height of the pyramid
-	 * @param tileSize
-	 *            the size of the tiles in pixels (must be square)
-	 * @param xr2l
-	 *            if the x goes r to l (is this backwards?)
-	 * @param yt2b
-	 *            if the y goes top to bottom
-	 * @param baseURL
-	 *            the base url for grabbing tiles
-	 * @param xparam
-	 *            the x parameter for the tile url
-	 * @param yparam
-	 *            the y parameter for the tile url
-	 * @param zparam
-	 *            the z parameter for the tile url
-	 */
-	/*
-	 * @param xr2l true if tile x is measured from the far left of the map to the far right, or else
-	 * false if based on the center line. @param yt2b true if tile y is measured from the top (north
-	 * pole) to the bottom (south pole) or else false if based on the equator.
-	 */
-	public TileFactoryInfo_OLD(	final String factoryId,
-							final int minimumZoomLevel,
-							final int maximumZoomLevel,
-							final int totalMapZoom,
-							final int tileSize,
-							final boolean xr2l,
-							final boolean yt2b,
-							final String baseURL,
-							final String xparam,
-							final String yparam,
-							final String zparam) {
-
-		initializeInfo(
-				factoryId,
-				minimumZoomLevel,
-				maximumZoomLevel,
-				totalMapZoom,
-				tileSize,
-				xr2l,
-				yt2b,
-				baseURL,
-				xparam,
-				yparam,
-				zparam);
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -253,9 +192,6 @@ public abstract class OLD_TileFactoryInfo_OLD {
 		return new Dimension(getMapWidthInTilesAtZoom(zoom), getMapWidthInTilesAtZoom(zoom));
 	}
 
-	/*
-	 * public void setTotalMapZoom(int totalMapZoom) { this.totalMapZoom = totalMapZoom; }
-	 */
 	/**
 	 * @param zoom
 	 * @return
@@ -317,6 +253,23 @@ public abstract class OLD_TileFactoryInfo_OLD {
 		return null;
 	}
 
+	/**
+	 * @return Tile painter which is painting a tile or <code>null</code> when the tile is loaded
+	 *         from a url
+	 */
+	public ITilePainter getTilePainter() {
+		return null;
+	}
+
+	/**
+	 * Get the tile size.
+	 * 
+	 * @return the tile size
+	 */
+	public int getTileSize() {
+		return tileSize;
+	}
+
 //	public String getTileUrl(final int x, final int y, final int zoom) {
 //
 //		//System.out.println("getting tile at zoom: " + zoom);
@@ -345,23 +298,6 @@ public abstract class OLD_TileFactoryInfo_OLD {
 //	public int getTotalMapZoom() {
 //		return totalMapZoom;
 //	}
-
-	/**
-	 * @return Tile painter which is painting a tile or <code>null</code> when the tile is loaded
-	 *         from a url
-	 */
-	public ITilePainter getTilePainter() {
-		return null;
-	}
-
-	/**
-	 * Get the tile size.
-	 * 
-	 * @return the tile size
-	 */
-	public int getTileSize() {
-		return tileSize;
-	}
 
 	/**
 	 * Returns the tile url for the specified tile at the specified zoom level. By default it will
@@ -556,6 +492,67 @@ public abstract class OLD_TileFactoryInfo_OLD {
 
 	public void setFactoryId(final String factoryId) {
 		this.factoryId = factoryId;
+	}
+
+	public TileFactoryInfo_OLD() {}
+
+	/**
+	 * Creates a new instance of TileFactoryInfo. Note that TileFactoryInfo should be considered
+	 * invariate, meaning that subclasses should ensure all of the properties stay the same after
+	 * the class is constructed. Returning different values of getTileSize() for example is
+	 * considered an error and may result in unexpected behavior.
+	 * 
+	 * @param factoryId
+	 * @param minimumZoomLevel
+	 *            The minimum zoom level
+	 * @param maximumZoomLevel
+	 *            the maximum zoom level
+	 * @param totalMapZoom
+	 *            the top zoom level, essentially the height of the pyramid
+	 * @param tileSize
+	 *            the size of the tiles in pixels (must be square)
+	 * @param xr2l
+	 *            if the x goes r to l (is this backwards?)
+	 * @param yt2b
+	 *            if the y goes top to bottom
+	 * @param baseURL
+	 *            the base url for grabbing tiles
+	 * @param xparam
+	 *            the x parameter for the tile url
+	 * @param yparam
+	 *            the y parameter for the tile url
+	 * @param zparam
+	 *            the z parameter for the tile url
+	 */
+	/*
+	 * @param xr2l true if tile x is measured from the far left of the map to the far right, or else
+	 * false if based on the center line. @param yt2b true if tile y is measured from the top (north
+	 * pole) to the bottom (south pole) or else false if based on the equator.
+	 */
+	public TileFactoryInfo_OLD(	final String factoryId,
+							final int minimumZoomLevel,
+							final int maximumZoomLevel,
+							final int totalMapZoom,
+							final int tileSize,
+							final boolean xr2l,
+							final boolean yt2b,
+							final String baseURL,
+							final String xparam,
+							final String yparam,
+							final String zparam) {
+
+		initializeInfo(
+				factoryId,
+				minimumZoomLevel,
+				maximumZoomLevel,
+				totalMapZoom,
+				tileSize,
+				xr2l,
+				yt2b,
+				baseURL,
+				xparam,
+				yparam,
+				zparam);
 	}
 
 }

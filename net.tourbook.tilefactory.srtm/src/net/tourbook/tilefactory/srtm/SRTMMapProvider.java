@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -30,21 +30,19 @@ import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
-import de.byteholder.geoclipse.mapprovider.MP_OLD;
+import de.byteholder.geoclipse.mapprovider.MPPlugin;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
 /**
  * @author Michael Kanis
  * @author Alfred Barten
  */
-public class SRTMTileFactory extends TileFactoryImpl {
+public class SRTMMapProvider extends MPPlugin {
 
-	/**
-	 * Map provider which created this tile factory
-	 */
-	private MP_OLD							fMapProvider;
+//	/**
+//	 * Map provider which created this tile factory
+//	 */
+//	private MP_OLD							fMapProvider;
 
 	private static SRTMTileFactoryInfo	info			= new SRTMTileFactoryInfo();
 
@@ -259,7 +257,7 @@ public class SRTMTileFactory extends TileFactoryImpl {
 		}
 	}
 
-	public SRTMTileFactory() {
+	public SRTMMapProvider() {
 		super(info);
 	}
 
@@ -273,15 +271,16 @@ public class SRTMTileFactory extends TileFactoryImpl {
 		tile.setData(selectedProfile);
 	}
 
-	@Override
-	public MP_OLD getMapProvider() {
-		return fMapProvider;
-	}
-
-	@Override
-	public void setMapProvider(final MP_OLD mp) {
-		fMapProvider = mp;
-	}
+// mp2
+//	@Override
+//	public MP_OLD getMapProvider() {
+//		return fMapProvider;
+//	}
+//
+//	@Override
+//	public void setMapProvider(final MP_OLD mp) {
+//		fMapProvider = mp;
+//	}
 }
 
 //	private ImageData[] paintTileOLD(final Tile tile) {

@@ -66,8 +66,6 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.logging.StatusUtil;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 import de.byteholder.gpx.GeoPosition;
@@ -202,7 +200,7 @@ public class MapProviderManager {
 	/**
 	 * Id for the default map provider
 	 */
-	public static String					DEFAULT_MAP_PROVIDER_ID							= OSMTileFactoryInfo.FACTORY_ID;
+	public static String					DEFAULT_MAP_PROVIDER_ID							= OSMMapProvider.FACTORY_ID;
 
 	/**
 	 * size for osm images
@@ -233,7 +231,7 @@ public class MapProviderManager {
 	/**
 	 * contains all available map providers, including empty map provider and map profiles
 	 */
-	private static ArrayList<MP_OLD>			fAllMapProviders;
+	private static ArrayList<MP>			fAllMapProviders;
 
 	private static final ReentrantLock		WMS_LOCK										= new ReentrantLock();
 
@@ -311,7 +309,7 @@ public class MapProviderManager {
 					 * disable this wms map provider, it is possible that
 					 * the server is currently not available
 					 */
-					for (final MP_OLD mapProvider : fAllMapProviders) {
+					for (final MP mapProvider : fAllMapProviders) {
 
 						if (mapProvider instanceof MPWms) {
 
@@ -455,7 +453,7 @@ public class MapProviderManager {
 		return instance;
 	}
 
-	private static String getMapProviderType(final MP_OLD mapProvider) {
+	private static String getMapProviderType(final MP mapProvider) {
 
 		if (mapProvider instanceof MPCustom) {
 			return MAP_PROVIDER_TYPE_CUSTOM;
@@ -658,7 +656,7 @@ public class MapProviderManager {
 	 * 
 	 * @param allMapProviders
 	 */
-	public static void replaceMapProvider(final MP_OLD mapProviderReplacement) {
+	public static void replaceMapProvider(final MP mapProviderReplacement) {
 
 		final String replaceMapProviderId = mapProviderReplacement.getId();
 		boolean isMapProviderReplaced = false;
@@ -667,7 +665,7 @@ public class MapProviderManager {
 		/*
 		 * replace map provider in the model
 		 */
-		for (final MP_OLD mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : fAllMapProviders) {
 
 			if (replaceMapProviderId.equals(mapProvider.getId())) {
 
@@ -698,7 +696,7 @@ public class MapProviderManager {
 			 */
 
 			// loop: all profiles
-			for (final MP_OLD mapProvider : fAllMapProviders) {
+			for (final MP mapProvider : fAllMapProviders) {
 				if (mapProvider instanceof MPProfile) {
 
 					final MPProfile mapProfile = (MPProfile) mapProvider;
@@ -707,14 +705,14 @@ public class MapProviderManager {
 					// loop: all map provider within a profile
 					for (final MapProviderWrapper mpWrapper : mpWrapperList) {
 
-						final MP_OLD profileMapProvider = mpWrapper.getMapProvider();
+						final MP profileMapProvider = mpWrapper.getMapProvider();
 
 						if (profileMapProvider != null && profileMapProvider.getId().equals(replaceMapProviderId)) {
 
 							// replace map provider with a clone of the original map provider
 
 							try {
-								mpWrapper.setMapProvider((MP_OLD) mapProviderReplacement.clone());
+								mpWrapper.setMapProvider((MP) mapProviderReplacement.clone());
 							} catch (final CloneNotSupportedException e) {
 								StatusUtil.showStatus(e.getMessage(), e);
 							}
@@ -727,7 +725,7 @@ public class MapProviderManager {
 
 	private MapProviderManager() {}
 
-	public void addMapProvider(final MP_OLD mapProvider) {
+	public void addMapProvider(final MP mapProvider) {
 		fAllMapProviders.add(mapProvider);
 	}
 
@@ -749,10 +747,10 @@ public class MapProviderManager {
 	 */
 	private void createMapProviders() {
 
-		fAllMapProviders = new ArrayList<MP_OLD>();
+		fAllMapProviders = new ArrayList<MP>();
 
 		// create default tile factories
-		fDefaultTileFactory = new MPPlugin(new TileFactoryOSM());
+		fDefaultTileFactory = new MPPluginOSM();
 
 		fAllMapProviders.add(fDefaultTileFactory);
 
@@ -767,7 +765,7 @@ public class MapProviderManager {
 
 			boolean isValid = true;
 
-			for (final MP_OLD checkedMapProvider : fAllMapProviders) {
+			for (final MP checkedMapProvider : fAllMapProviders) {
 
 				// check factory id
 				if (checkedMapProvider.getId().equalsIgnoreCase(pluginFactoryId)) {
@@ -814,8 +812,8 @@ public class MapProviderManager {
 		final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 		final String filename = stateLocation.append(CUSTOM_MAP_PROVIDER_FILE).toFile().getAbsolutePath();
 
-		final ArrayList<MP_OLD> importedMapProviders = readXml(filename, false, false);
-		for (final MP_OLD mp : importedMapProviders) {
+		final ArrayList<MP> importedMapProviders = readXml(filename, false, false);
+		for (final MP mp : importedMapProviders) {
 
 			/*
 			 * ignore plugin map providers, they should be already in the list but can occure in the
@@ -830,7 +828,7 @@ public class MapProviderManager {
 		 * initialize map profiles, this MUST be done AFTER all external map providers are read from
 		 * the xml file because they are referenced in the profile map provider
 		 */
-		for (final MP_OLD mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : fAllMapProviders) {
 			if (mapProvider instanceof MPProfile) {
 				((MPProfile) mapProvider).synchronizeMPWrapper();
 			}
@@ -902,7 +900,7 @@ public class MapProviderManager {
 				sb.toString());
 	}
 
-	public void exportMapProvider(final MP_OLD mapProvider, final File file) {
+	public void exportMapProvider(final MP mapProvider, final File file) {
 
 		BufferedWriter writer = null;
 
@@ -948,7 +946,7 @@ public class MapProviderManager {
 	 * @return Returns the backend list with all available map providers, including empty map
 	 *         provider and map profiles
 	 */
-	public ArrayList<MP_OLD> getAllMapProviders() {
+	public ArrayList<MP> getAllMapProviders() {
 
 		checkMapProviders();
 
@@ -960,13 +958,13 @@ public class MapProviderManager {
 	 *            when <code>true</code> the map profiles are included otherwise they are ignored
 	 * @return Returns a list with all available map providers but without empty map providers
 	 */
-	public ArrayList<MP_OLD> getAllMapProviders(final boolean withMapProfile) {
+	public ArrayList<MP> getAllMapProviders(final boolean withMapProfile) {
 
 		checkMapProviders();
 
-		final ArrayList<MP_OLD> mapProviders = new ArrayList<MP_OLD>();
+		final ArrayList<MP> mapProviders = new ArrayList<MP>();
 
-		for (final MP_OLD mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : fAllMapProviders) {
 
 			boolean isValid = true;
 
@@ -975,10 +973,11 @@ public class MapProviderManager {
 				isValid = withMapProfile;
 
 			} else if (mapProvider instanceof MPPlugin) {
-				if (((MPPlugin) mapProvider).getTileFactory(true).getInfo().isMapEmpty()) {
-					// ignore empty map providers
-					isValid = false;
-				}
+// mp2				
+//				if (((MPPlugin) mapProvider).getTileFactory(true).getInfo().isMapEmpty()) {
+//					// ignore empty map providers
+//					isValid = false;
+//				}
 			}
 
 			if (isValid) {
@@ -1085,9 +1084,9 @@ public class MapProviderManager {
 	 *         Multiple map providers are returned when a map profile contains map providers
 	 *         which do not yet exists
 	 */
-	public ArrayList<MP_OLD> importMapProvider(final String importFilePath) {
+	public ArrayList<MP> importMapProvider(final String importFilePath) {
 
-		final ArrayList<MP_OLD> importedMPList = readXml(importFilePath, true, true);
+		final ArrayList<MP> importedMPList = readXml(importFilePath, true, true);
 		if (importedMPList.size() > 0) {
 
 			// validate map provider
@@ -1112,9 +1111,9 @@ public class MapProviderManager {
 	 * @return Returns a list with all map providers from a xml file including wrapped plugin map
 	 *         provider
 	 */
-	private ArrayList<MP_OLD> readXml(final String filename, final boolean isShowExistError, final boolean isMpImport) {
+	private ArrayList<MP> readXml(final String filename, final boolean isShowExistError, final boolean isMpImport) {
 
-		final ArrayList<MP_OLD> validMapProviders = new ArrayList<MP_OLD>();
+		final ArrayList<MP> validMapProviders = new ArrayList<MP>();
 		InputStreamReader reader = null;
 		fErrorLog.clear();
 
@@ -1181,11 +1180,11 @@ public class MapProviderManager {
 	 * @param mementoRoot
 	 * @param tagNameRootChildren
 	 */
-	private void readXml2(	final ArrayList<MP_OLD> validMapProviders,
+	private void readXml2(	final ArrayList<MP> validMapProviders,
 							final XMLMemento mementoRoot,
 							final String tagNameRootChildren) {
 
-		final ArrayList<MP_OLD> allMapProviders = getAllMapProviders();
+		final ArrayList<MP> allMapProviders = getAllMapProviders();
 		final IMemento[] tagMapProviderList = mementoRoot.getChildren(tagNameRootChildren);
 
 		for (final IMemento tagMapProvider : tagMapProviderList) {
@@ -1229,7 +1228,7 @@ public class MapProviderManager {
 
 			// check if the factory id is already used, ignore the duplicated factory
 			boolean isValid = true;
-			for (final MP_OLD checkMapProvider : validMapProviders) {
+			for (final MP checkMapProvider : validMapProviders) {
 				if (checkMapProvider.getId().equalsIgnoreCase(mapProviderId)) {
 					logError(NLS.bind(//
 							Messages.DBG009_Error_MapProfileDuplicate,
@@ -1246,7 +1245,7 @@ public class MapProviderManager {
 			// check plugin map provider, they are also added to the list
 			if (mapProviderType.equals(MAP_PROVIDER_TYPE_PLUGIN)) {
 
-				for (final MP_OLD mp : allMapProviders) {
+				for (final MP mp : allMapProviders) {
 					if (mp.getId().equalsIgnoreCase(mapProviderId) && mp instanceof MPPlugin) {
 
 						validMapProviders.add(mp);
@@ -1279,7 +1278,7 @@ public class MapProviderManager {
 			/*
 			 * read map provider specific fields
 			 */
-			MP_OLD mapProvider = null;
+			MP mapProvider = null;
 
 			if (mapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM)) {
 
@@ -1309,7 +1308,7 @@ public class MapProviderManager {
 				mapProvider.setOfflineFolder(offlineFolder);
 
 				// image
-				mapProvider.setImageSize(imageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : imageSize);
+				mapProvider.setTileSize(imageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : imageSize);
 				mapProvider.setImageFormat(imageFormat == null ? DEFAULT_IMAGE_FORMAT : imageFormat);
 
 				// zoom level
@@ -1687,7 +1686,7 @@ public class MapProviderManager {
 		return mapProvider;
 	}
 
-	public void remove(final MP_OLD mapProvider) {
+	public void remove(final MP mapProvider) {
 		fAllMapProviders.remove(mapProvider);
 	}
 
@@ -1705,18 +1704,18 @@ public class MapProviderManager {
 	 * @return Returns the valid map provider or profile map providers which are not yet created. <br>
 	 *         Returns <code>null</code> when the map provider is not valid.
 	 */
-	private ArrayList<MP_OLD> validateImportedMP(final ArrayList<MP_OLD> importedMPList) {
+	private ArrayList<MP> validateImportedMP(final ArrayList<MP> importedMPList) {
 
-		final ArrayList<MP_OLD> newMPs = new ArrayList<MP_OLD>();
-		final ArrayList<MP_OLD> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+		final ArrayList<MP> newMPs = new ArrayList<MP>();
+		final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
 
 		/*
 		 * first map provider is the main map provider, the others are wrapped map providers
 		 */
-		final MP_OLD importedMP = importedMPList.get(0);
+		final MP importedMP = importedMPList.get(0);
 
 		// check imported mp against existing mp's
-		for (final MP_OLD mp : existingMPs) {
+		for (final MP mp : existingMPs) {
 
 			// check ID
 			if (mp.equals(importedMP)) {
@@ -1770,7 +1769,7 @@ public class MapProviderManager {
 	 * @param newMPs
 	 * @return
 	 */
-	private ArrayList<MP_OLD> validateImportedProfile(final ArrayList<MP_OLD> importedMPList, final ArrayList<MP_OLD> newMPs) {
+	private ArrayList<MP> validateImportedProfile(final ArrayList<MP> importedMPList, final ArrayList<MP> newMPs) {
 
 		final MPProfile importedMP = (MPProfile) importedMPList.get(0);
 
@@ -1781,9 +1780,9 @@ public class MapProviderManager {
 		 * this list contains map providers which are wrapped in the profile but must be defined as
 		 * a ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER, this includes plugin map provider
 		 */
-		final ArrayList<MP_OLD> importedMpWrapperList = new ArrayList<MP_OLD>(importedMPList);
+		final ArrayList<MP> importedMpWrapperList = new ArrayList<MP>(importedMPList);
 
-		final ArrayList<MP_OLD> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+		final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
 		final MPProfile importedMpProfile = importedMP;
 		final ArrayList<MapProviderWrapper> importedProfileWrappers = importedMpProfile.getAllWrappers();
 
@@ -1792,10 +1791,10 @@ public class MapProviderManager {
 
 			// check wrapper map provider
 
-			MP_OLD wrappedMP = null;
+			MP wrappedMP = null;
 
 			// get map provider by id, wrapper and and map provider are linked with the id
-			for (final MP_OLD importedWrappedMp : importedMpWrapperList) {
+			for (final MP importedWrappedMp : importedMpWrapperList) {
 				if (importedWrappedMp.getId().equalsIgnoreCase(importedWrapper.getMapProviderId())) {
 					wrappedMP = importedWrappedMp;
 					break;
@@ -1815,10 +1814,10 @@ public class MapProviderManager {
 
 			final String importedWrapperMPClassName = wrappedMP.getClass().getName();
 
-			MP_OLD checkedMP = null;
+			MP checkedMP = null;
 
 			// check if the imported wrapper mp is available in the existing mp's
-			for (final MP_OLD existingMp : existingMPs) {
+			for (final MP existingMp : existingMPs) {
 
 				// check ID/class/folder
 
@@ -1908,7 +1907,7 @@ public class MapProviderManager {
 
 					// check folder for none Wms map provider, profile wms map providers are using another folder structure
 
-					for (final MP_OLD existingMp : existingMPs) {
+					for (final MP existingMp : existingMPs) {
 
 						if (existingMp.getOfflineFolder().equalsIgnoreCase(wrappedMP.getOfflineFolder())) {
 
@@ -1951,7 +1950,7 @@ public class MapProviderManager {
 
 			final XMLMemento xmlMemento = createXmlRoot(false);
 
-			for (final MP_OLD mapProvider : fAllMapProviders) {
+			for (final MP mapProvider : fAllMapProviders) {
 
 				if (mapProvider instanceof MPWms || mapProvider instanceof MPCustom || mapProvider instanceof MPProfile) {
 
@@ -1980,7 +1979,7 @@ public class MapProviderManager {
 		fireChangeEvent();
 	}
 
-	private void writeXml(final MP_OLD mapProvider, final IMemento tagMapProvider) {
+	private void writeXml(final MP mapProvider, final IMemento tagMapProvider) {
 
 		final GeoPosition lastUsedPosition = mapProvider.getLastUsedPosition();
 		final GeoPosition favoritePosition = mapProvider.getFavoritePosition();
@@ -1994,7 +1993,7 @@ public class MapProviderManager {
 		tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mapProvider.getOfflineFolder());
 
 		// image
-		tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mapProvider.getImageSize());
+		tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mapProvider.getTileSize());
 		tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mapProvider.getImageFormat());
 
 		// zoom level
@@ -2092,7 +2091,7 @@ public class MapProviderManager {
 
 		for (final MapProviderWrapper mpWrapper : mapProfile.getAllWrappers()) {
 
-			final MP_OLD mapProvider = mpWrapper.getMapProvider();
+			final MP mapProvider = mpWrapper.getMapProvider();
 
 			final String mpType = getMapProviderType(mapProvider);
 			if (mpType == null) {

@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.RegistryFactory;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.gpx.GeoPosition;
 
 public class GeoclipseExtensions {
@@ -97,17 +96,18 @@ public class GeoclipseExtensions {
 //		return factories;
 //	}
 
-	public TileFactory_OLD findTileFactory(final String className) {
-
-		final List<TileFactory_OLD> factories = readFactories();
-		for (final TileFactory_OLD factory : factories) {
-			if (factory.getClass().getName().equals(className)) {
-				return factory;
-			}
-		}
-
-		return null;
-	}
+// mp2	
+//	public TileFactory_OLD findTileFactory(final String className) {
+//
+//		final List<TileFactory_OLD> factories = readFactories();
+//		for (final TileFactory_OLD factory : factories) {
+//			if (factory.getClass().getName().equals(className)) {
+//				return factory;
+//			}
+//		}
+//
+//		return null;
+//	}
 
 	/**
 	 * @return Returns a list with all available map/tile factories

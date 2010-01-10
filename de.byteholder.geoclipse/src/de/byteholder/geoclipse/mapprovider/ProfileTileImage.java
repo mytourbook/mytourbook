@@ -54,7 +54,7 @@ final class ProfileTileImage {
 	 */
 	final void drawImage(final ImageData src, final Tile srcTile, final ImageData brt, final Tile brtTile) {
 
-		final TileFactory_OLD srcTileFactory = srcTile.getTileFactory();
+		final TileFactory_OLD srcTileFactory = srcTile.getMP();
 
 		final float externalAlpha = (float) srcTileFactory.getProfileAlpha() / 100;
 		int[] transparentPixel = null;
@@ -146,7 +146,7 @@ final class ProfileTileImage {
 		// brightness image must have the same image size
 		if (brt != null && src.width == brt.width && src.height == brt.height) {
 
-			final TileFactory_OLD brtTileFactory = brtTile.getTileFactory();
+			final TileFactory_OLD brtTileFactory = brtTile.getMP();
 
 			brtData = brt.data;
 			brtAlphaData = brt.alphaData;

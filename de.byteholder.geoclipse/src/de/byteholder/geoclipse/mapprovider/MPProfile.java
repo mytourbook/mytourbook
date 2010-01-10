@@ -30,13 +30,12 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.UI;
 
 /**
  * Wraps all map providers into a map profile, these map providers can be selected individually
  */
-public class MPProfile extends MP_OLD {
+public class MPProfile extends MP {
 
 	public static final String				WMS_CUSTOM_TILE_PATH	= "all-map-profile-wms";	//$NON-NLS-1$
 
@@ -212,7 +211,7 @@ public class MPProfile extends MP_OLD {
 				continue;
 			}
 
-			if (childTile.getTileFactory().isProfileBrightness()) {
+			if (childTile.getMP().isProfileBrightness()) {
 
 				// use the brightness of the current tile for the next tile
 

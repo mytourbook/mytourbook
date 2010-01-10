@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.mapprovider.MP_OLD;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 
@@ -50,16 +49,15 @@ import de.byteholder.gpx.GeoPosition;
  * @author Wolfgang Schramm
  * @author Alfred Barten
  */
-public abstract class TileFactoryImpl extends TileFactory_OLD {
-
-	private static int								THREAD_POOL_SIZE	= 20;
+public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 
 	private static final ReentrantLock				RESET_LOCK			= new ReentrantLock();
 	private static final ReentrantLock				EXECUTOR_LOCK		= new ReentrantLock();
 
+	private static int								THREAD_POOL_SIZE	= 20;
 	private static ExecutorService					fExecutorService;
 
-	private TileFactoryInfo_OLD							fFactoryInfo;
+	private TileFactoryInfo_OLD						fFactoryInfo;
 
 	/**
 	 * contains tiles which are currently being loaded or which have loading errors when loading
@@ -85,22 +83,6 @@ public abstract class TileFactoryImpl extends TileFactory_OLD {
 	 * This is the image displayed when the real tile image could not be loaded.
 	 */
 	private Image									fErrorImage;
-
-	/**
-	 * when using the default constructor, the method {@link initializeTilefactory} must be called
-	 * to initialize the tile factory
-	 */
-	public TileFactoryImpl() {}
-
-	/**
-	 * Creates a new instance of {@link TileFactoryImpl} using the spcified {@link TileFactoryInfo_OLD}
-	 * 
-	 * @param info
-	 *            a TileFactoryInfo to configure this TileFactory
-	 */
-	public TileFactoryImpl(final TileFactoryInfo_OLD info) {
-		initializeTileFactory(info);
-	}
 
 	private void createErrorImage() {
 
@@ -479,11 +461,7 @@ public abstract class TileFactoryImpl extends TileFactory_OLD {
 	 */
 	URL getURL(final Tile tile) throws Exception {
 
-		final String urlString = tile.getTileFactory().getInfo().getTileUrl(
-				tile.getX(),
-				tile.getY(),
-				tile.getZoom(),
-				tile);
+		final String urlString = tile.getMP().getInfo().getTileUrl(tile.getX(), tile.getY(), tile.getZoom(), tile);
 
 		if (urlString == null) {
 			final Exception e = new Exception();
@@ -768,5 +746,22 @@ public abstract class TileFactoryImpl extends TileFactory_OLD {
 				}
 			}
 		}
+	}
+
+	/**
+	 * when using the default constructor, the method {@link initializeTilefactory} must be called
+	 * to initialize the tile factory
+	 */
+	public TileFactoryImpl() {}
+
+	/**
+	 * Creates a new instance of {@link TileFactoryImpl} using the spcified
+	 * {@link TileFactoryInfo_OLD}
+	 * 
+	 * @param info
+	 *            a TileFactoryInfo to configure this TileFactory
+	 */
+	public TileFactoryImpl(final TileFactoryInfo_OLD info) {
+		initializeTileFactory(info);
 	}
 }

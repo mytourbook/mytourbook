@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
@@ -131,7 +132,7 @@ public class Tile extends Observable {
 
 	private ImageData[]						fChildTileImageData;
 
-	private TileFactory_OLD						fTileFactory;
+	private MP								fMp;
 
 	/**
 	 * custom part for the tile image file path
@@ -152,7 +153,7 @@ public class Tile extends Observable {
 	/**
 	 * create a key for a tile
 	 * 
-	 * @param tileFactory
+	 * @param mp
 	 * @param x
 	 * @param y
 	 * @param zoom
@@ -162,25 +163,26 @@ public class Tile extends Observable {
 	 * @param projectionId
 	 * @return
 	 */
-	public static String getTileKey(final TileFactory_OLD tileFactory,
+	public static String getTileKey(final MP mp,
 									final int x,
 									final int y,
 									final int zoom,
 									final String tileCreatorId,
-									String customTileKey,
-									String projectionId) {
+									final String customTileKey,
+									final String projectionId) {
 
-		// get tile parameter from the tile factory when they are not yet set
-		if (tileFactory != null) {
-
-			if (customTileKey == null) {
-				customTileKey = tileFactory.getInfo().getCustomTileKey();
-			}
-
-			if (projectionId == null) {
-				projectionId = tileFactory.getProjection().getId();
-			}
-		}
+// mp2
+//		// get tile parameter from the tile factory when they are not yet set
+//		if (mp != null) {
+//
+//			if (customTileKey == null) {
+//				customTileKey = mp.getInfo().getCustomTileKey();
+//			}
+//
+//			if (projectionId == null) {
+//				projectionId = mp.getProjection().getId();
+//			}
+//		}
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -211,23 +213,23 @@ public class Tile extends Observable {
 	/**
 	 * Create a new Tile at the specified tile point and zoom level
 	 * 
-	 * @param tileFactory
+	 * @param mp
 	 *            contains tile factory or <code>null</code> when an empty tile is created
 	 * @param x
 	 * @param y
 	 * @param zoom
 	 * @param tileCreatorId
 	 */
-	public Tile(final TileFactory_OLD tileFactory, final int x, final int y, final int zoom, final String tileCreatorId) {
+	public Tile(final MP mp, final int x, final int y, final int zoom, final String tileCreatorId) {
 
-		fTileFactory = tileFactory;
+		fMp = mp;
 
 		this.x = x;
 		this.y = y;
 		this.zoom = zoom;
 		this.tileCreatorId = tileCreatorId;
 
-		fTileKey = getTileKey(tileFactory, x, y, zoom, tileCreatorId, null, tileFactory.getProjection().getId());
+		fTileKey = getTileKey(mp, x, y, zoom, tileCreatorId, null, mp.getProjection().getId());
 	}
 
 	@Override
@@ -299,7 +301,7 @@ public class Tile extends Observable {
 					if (areAllChildrenLoaded(tileChildren)) {
 
 						// create parent image when all childs are loaded
-						final TileFactory_OLD parentTileFactory = fParentTile.fTileFactory;
+						final MP parentTileFactory = fParentTile.fMp;
 						if (parentTileFactory instanceof ITileChildrenCreator) {
 
 							return ((ITileChildrenCreator) parentTileFactory).getParentImage(fParentTile, this);
@@ -326,12 +328,12 @@ public class Tile extends Observable {
 	 */
 	public ArrayList<Tile> createTileChildren(final ConcurrentHashMap<String, Tile> loadingTiles) {
 
-		if (fTileFactory instanceof ITileChildrenCreator) {
+		if (fMp instanceof ITileChildrenCreator) {
 
 			if (fTileChildren == null) {
 
 				PARENT_LOCK = new ReentrantLock();
-				fTileChildren = ((ITileChildrenCreator) fTileFactory).createTileChildren(this, loadingTiles);
+				fTileChildren = ((ITileChildrenCreator) fMp).createTileChildren(this, loadingTiles);
 			}
 
 			return fTileChildren;
@@ -422,6 +424,13 @@ public class Tile extends Observable {
 	}
 
 	/**
+	 * @return Returns the map provider for this tile
+	 */
+	public MP getMP() {
+		return fMp;
+	}
+
+	/**
 	 * @return Returns the path which was used to load the offline image
 	 */
 	public String getOfflinePath() {
@@ -452,16 +461,12 @@ public class Tile extends Observable {
 		return fTileCustomPath;
 	}
 
-	public TileFactory_OLD getTileFactory() {
-		return fTileFactory;
-	}
-
 	public String getTileKey() {
 		return fTileKey;
 	}
 
 	public String getTileKey(final int xOffset, final int yOffset, final String projectionId) {
-		return getTileKey(fTileFactory, x + xOffset, y + yOffset, zoom, tileCreatorId, null, projectionId);
+		return getTileKey(fMp, x + xOffset, y + yOffset, zoom, tileCreatorId, null, projectionId);
 	}
 
 	public long getTimeEndLoading() {

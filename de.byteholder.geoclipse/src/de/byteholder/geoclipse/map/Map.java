@@ -70,6 +70,7 @@ import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 import de.byteholder.gpx.GeoPosition;
 
@@ -103,7 +104,7 @@ public class Map extends Canvas {
 	/**
 	 * Factory used by this component to grab the tiles necessary for painting the map.
 	 */
-	private TileFactory_OLD							fTileFactory;
+	private MP									fMP;
 
 	/**
 	 * The position in latitude/longitude of the "address" being mapped. This is a special
@@ -280,7 +281,7 @@ public class Map extends Canvas {
 				final double y = bounds.getCenterY() + delta_y;
 				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
 
-				setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
+				setMapPixelCenter(fMP.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
 
 				queueMapRedraw();
 			}
@@ -359,7 +360,7 @@ public class Map extends Canvas {
 			final double x = bounds.getX() + ex;
 			final double y = bounds.getY() + ey;
 			final Point2D.Double pixelCenter = new Point2D.Double(x, y);
-			setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
+			setMapPixelCenter(fMP.pixelToGeo(pixelCenter, fMapZoomLevel), pixelCenter);
 			queueMapRedraw();
 		}
 	}
@@ -569,17 +570,16 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final TileFactoryInfo_OLD factoryInfo = fTileFactory.getInfo();
-		int zoom = factoryInfo.getMinimumZoomLevel();
+		int zoom = fMP.getMinimumZoomLevel();
 		Rectangle rect = getBoundingRect(positions, zoom);
 
-		while (getViewport().contains(rect) && zoom < factoryInfo.getMaximumZoomLevel()) {
+		while (getViewport().contains(rect) && zoom < fMP.getMaximumZoomLevel()) {
 			zoom++;
 			rect = getBoundingRect(positions, zoom);
 		}
 		final Point2D center = new Point2D.Double(rect.getCenterX(), rect.getCenterY());
 
-		setMapPixelCenter(fTileFactory.pixelToGeo(center, zoom), center);
+		setMapPixelCenter(fMP.pixelToGeo(center, zoom), center);
 		setZoom(zoom);
 
 		queueMapRedraw();
@@ -606,10 +606,10 @@ public class Map extends Canvas {
 
 	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
 
-		fTileFactory.setDimLevel(dimLevel, dimColor);
+		fMP.setDimLevel(dimLevel, dimColor);
 
 		// remove all cached map images
-		fTileFactory.dispose();
+		fMP.dispose();
 
 		reload();
 	}
@@ -632,7 +632,7 @@ public class Map extends Canvas {
 	}
 
 	public void disposeTiles() {
-		fTileFactory.disposeTiles();
+		fMP.disposeTiles();
 	}
 
 	/**
@@ -724,10 +724,9 @@ public class Map extends Canvas {
 		final double latitude = mapCenter.getLatitude();
 		final double longitude = mapCenter.getLongitude();
 
-		final double devDistance = fTileFactory.getDistance(
-				new GeoPosition(latitude - 0.5, longitude),
-				new GeoPosition(latitude + 0.5, longitude),
-				fMapZoomLevel);
+		final double devDistance = fMP.getDistance(new GeoPosition(latitude - 0.5, longitude), new GeoPosition(
+				latitude + 0.5,
+				longitude), fMapZoomLevel);
 
 		final double scaleLat = metricWidth * (devScaleWidth / devDistance);
 
@@ -840,8 +839,8 @@ public class Map extends Canvas {
 
 		final Rectangle devVisibleViewport = new Rectangle(0, 0, devVisibleWidth, devVisibleHeight);
 
-		final int tileSize = fTileFactory.getTileSize();
-		final Dimension tileMapSize = fTileFactory.getMapSize(fMapZoomLevel);
+		final int tileSize = fMP.getTileSize();
+		final Dimension tileMapSize = fMP.getMapSize(fMapZoomLevel);
 
 		// get the visible tiles which can be displayed in the viewport area
 		final int numTileWidth = (int) Math.ceil((double) devVisibleWidth / (double) tileSize);
@@ -909,7 +908,7 @@ public class Map extends Canvas {
 							final Rectangle devTileRectangle) {
 
 		// get tile from the tile factory, this also starts the loading of the tile image
-		final Tile tile = fTileFactory.getTile(tilePositionX, tilePositionY, fMapZoomLevel);
+		final Tile tile = fMP.getTile(tilePositionX, tilePositionY, fMapZoomLevel);
 
 		drawTileImage(gc, tile, devTileRectangle);
 
@@ -942,7 +941,7 @@ public class Map extends Canvas {
 
 			// map image contains an error, it could not be loaded
 
-			final Image errorImage = fTileFactory.getErrorImage();
+			final Image errorImage = fMP.getErrorImage();
 			final org.eclipse.swt.graphics.Rectangle imageBounds = errorImage.getBounds();
 
 			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
@@ -957,7 +956,7 @@ public class Map extends Canvas {
 
 			//map image could not be loaded from offline file
 
-			gc.drawImage(fTileFactory.getErrorImage(), devTilePosition.x, devTilePosition.y);
+			gc.drawImage(fMP.getErrorImage(), devTilePosition.x, devTilePosition.y);
 
 			drawTileInfoError(gc, devTilePosition, tile); //$NON-NLS-1$
 
@@ -987,7 +986,7 @@ public class Map extends Canvas {
 				 * offline image is not availabe, show loading... message
 				 */
 
-				gc.drawImage(fTileFactory.getLoadingImage(), devTilePosition.x, devTilePosition.y);
+				gc.drawImage(fMP.getLoadingImage(), devTilePosition.x, devTilePosition.y);
 			}
 		}
 	}
@@ -1011,7 +1010,7 @@ public class Map extends Canvas {
 		}
 
 		final Display display = getDisplay();
-		final int tileSize = fTileFactory.getTileSize();
+		final int tileSize = fMP.getTileSize();
 
 		// draw tile border
 		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
@@ -1044,7 +1043,7 @@ public class Map extends Canvas {
 
 		final Display display = getDisplay();
 
-		final int tileSize = fTileFactory.getTileSize();
+		final int tileSize = fMP.getTileSize();
 
 		// draw tile border
 		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
@@ -1355,11 +1354,11 @@ public class Map extends Canvas {
 	}
 
 	public Rectangle getBoundingRect(final Set<GeoPosition> positions, final int zoom) {
-		final java.awt.Point point1 = fTileFactory.geoToPixel(positions.iterator().next(), zoom);
+		final java.awt.Point point1 = fMP.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle rect = new Rectangle(point1.x, point1.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
-			final java.awt.Point point = fTileFactory.geoToPixel(pos, zoom);
+			final java.awt.Point point = fMP.geoToPixel(pos, zoom);
 			rect.add(new Rectangle(point.x, point.y, 0, 0));
 		}
 		return rect;
@@ -1383,11 +1382,11 @@ public class Map extends Canvas {
 	 */
 	public GeoPosition getCenterPosition() {
 
-		if (fTileFactory == null) {
+		if (fMP == null) {
 			return null;
 		}
 
-		return fTileFactory.pixelToGeo(getCenter(), fMapZoomLevel);
+		return fMP.pixelToGeo(getCenter(), fMapZoomLevel);
 	}
 
 	/**
@@ -1430,8 +1429,8 @@ public class Map extends Canvas {
 	 * 
 	 * @return Returns the current tile factory
 	 */
-	public TileFactory_OLD getTileFactory() {
-		return fTileFactory;
+	public MP getTileFactory() {
+		return fMP;
 	}
 
 	/**
@@ -1572,8 +1571,8 @@ public class Map extends Canvas {
 
 	private void onDispose(final DisposeEvent e) {
 
-		if (fTileFactory != null) {
-			fTileFactory.resetAll(false);
+		if (fMP != null) {
+			fMP.resetAll(false);
 		}
 
 		disposeResource(fMapImage);
@@ -1629,13 +1628,13 @@ public class Map extends Canvas {
 			newCenterY = 0;
 		}
 
-		final int maxHeight = (int) (fTileFactory.getMapSize(getZoom()).getHeight() * fTileFactory.getTileSize());
+		final int maxHeight = (int) (fMP.getMapSize(getZoom()).getHeight() * fMP.getTileSize());
 		if (newCenterY > maxHeight) {
 			newCenterY = maxHeight;
 		}
 
 		final Point2D.Double mapCenter = new Point2D.Double(newCenterX, newCenterY);
-		setMapPixelCenter(fTileFactory.pixelToGeo(mapCenter, fMapZoomLevel), mapCenter);
+		setMapPixelCenter(fMP.pixelToGeo(mapCenter, fMapZoomLevel), mapCenter);
 
 		fMousePanPosition = movePosition;
 
@@ -1769,7 +1768,7 @@ public class Map extends Canvas {
 	private void paintOverlay30PaintTile(final Tile tile) {
 
 		final int parts = 3;
-		final int tileSize = fTileFactory.getInfo().getTileSize();
+		final int tileSize = fMP.getTileSize();
 		final int partedTileSize = tileSize * parts;
 
 		boolean isOverlayPainted = false;
@@ -1838,8 +1837,8 @@ public class Map extends Canvas {
 											final int tileSize,
 											final Color transparentColor) {
 
-		final TileCache tileCache = fTileFactory.getTileCache();
-		final String projectionId = fTileFactory.getProjection().getId();
+		final TileCache tileCache = fMP.getTileCache();
+		final String projectionId = fMP.getProjection().getId();
 		final ImageData overlayImageData = overlayImage.getImageData();
 		Tile partTile = null;
 
@@ -1947,7 +1946,7 @@ public class Map extends Canvas {
 	 */
 	public void queueMapRedraw() {
 
-		if (isDisposed() || fTileFactory == null) {
+		if (isDisposed() || fMP == null) {
 			return;
 		}
 
@@ -2037,7 +2036,7 @@ public class Map extends Canvas {
 	 */
 	public void recenterToAddressLocation() {
 		final GeoPosition addressLocation = getAddressLocation();
-		setMapPixelCenter(addressLocation, fTileFactory.geoToPixel(addressLocation, getZoom()));
+		setMapPixelCenter(addressLocation, fMP.geoToPixel(addressLocation, getZoom()));
 		queueMapRedraw();
 	}
 
@@ -2046,7 +2045,7 @@ public class Map extends Canvas {
 	 */
 	public synchronized void reload() {
 
-		fTileFactory.resetAll(false);
+		fMP.resetAll(false);
 		queueMapRedraw();
 	}
 
@@ -2073,15 +2072,15 @@ public class Map extends Canvas {
 	 * {@link OverlayTourState#OVERLAY_NOT_CHECKED} in all tiles
 	 */
 	public synchronized void resetOverlays() {
-		if (fTileFactory != null) {
-			fTileFactory.resetOverlays();
+		if (fMP != null) {
+			fMP.resetOverlays();
 		}
 	}
 
 	public synchronized void resetTileFactory() {
 
-		if (fTileFactory != null) {
-			fTileFactory.resetAll(false);
+		if (fMP != null) {
+			fMP.resetAll(false);
 		}
 
 		queueMapRedraw();
@@ -2091,16 +2090,16 @@ public class Map extends Canvas {
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
 	 * position as the previous tile factory
 	 * 
-	 * @param tileFactory
+	 * @param mp
 	 */
-	public synchronized void resetTileFactory(final TileFactory_OLD tileFactory) {
+	public synchronized void resetTileFactory(final MP mp) {
 
-		if (fTileFactory != null) {
+		if (fMP != null) {
 			// keep tiles with loading errors that they are not loaded again when the factory has not changed
-			fTileFactory.resetAll(fTileFactory == tileFactory);
+			fMP.resetAll(fMP == mp);
 		}
 
-		fTileFactory = tileFactory;
+		fMP = mp;
 
 		queueMapRedraw();
 	}
@@ -2114,7 +2113,7 @@ public class Map extends Canvas {
 	 */
 	public void setAddressLocation(final GeoPosition addressLocation) {
 		this.addressLocation = addressLocation;
-		setMapPixelCenter(addressLocation, fTileFactory.geoToPixel(addressLocation, getZoom()));
+		setMapPixelCenter(addressLocation, fMP.geoToPixel(addressLocation, getZoom()));
 		queueMapRedraw();
 	}
 
@@ -2125,8 +2124,8 @@ public class Map extends Canvas {
 	 * @param dimColor
 	 */
 	public void setDimLevel(final int mapDimLevel, final RGB dimColor) {
-		if (fTileFactory != null) {
-			fTileFactory.setDimLevel(mapDimLevel, dimColor);
+		if (fMP != null) {
+			fMP.setDimLevel(mapDimLevel, dimColor);
 		}
 	}
 
@@ -2150,7 +2149,7 @@ public class Map extends Canvas {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				if (!isDisposed()) {
-					setMapPixelCenter(geoPosition, fTileFactory.geoToPixel(geoPosition, fMapZoomLevel));
+					setMapPixelCenter(geoPosition, fMP.geoToPixel(geoPosition, fMapZoomLevel));
 				}
 			}
 		});
@@ -2202,8 +2201,8 @@ public class Map extends Canvas {
 			}
 
 			// don't let the user pan over the bottom edge
-			final Dimension mapSize = fTileFactory.getMapSize(getZoom());
-			final int mapHeight = (int) mapSize.getHeight() * fTileFactory.getTileSize();
+			final Dimension mapSize = fMP.getMapSize(getZoom());
+			final int mapHeight = (int) mapSize.getHeight() * fMP.getTileSize();
 			if (newVP.y + newVP.height > mapHeight) {
 				final double centerY = mapHeight - viewportHeight / 2;
 				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
@@ -2297,30 +2296,33 @@ public class Map extends Canvas {
 	/**
 	 * Set the tile factory for the map and redraw the map with the new tile factory
 	 * 
-	 * @param factory
+	 * @param mp
 	 *            the new property value
 	 */
-	public void setTileFactory(final TileFactory_OLD factory) {
+	public void setTileFactory(final MP mp) {
 
 		GeoPosition center = null;
 		int zoom = 0;
 		boolean refresh = false;
 
-		if (fTileFactory != null) {
+		if (fMP != null) {
 			center = getCenterPosition();
 			zoom = getZoom();
 			refresh = true;
 		}
 
-		fTileFactory = factory;
+		fMP = mp;
 
 		if (refresh) {
 			setZoom(zoom);
 			setGeoCenterPosition(center);
 		} else {
-			if (factory.getInfo() != null) {
-				setZoom(factory.getInfo().getDefaultZoomLevel());
-			}
+// mp2			
+//			if (mp.getInfo() != null) {
+//				setZoom(mp.getInfo().getDefaultZoomLevel());
+//			}
+
+			setZoom(mp.getDefaultZoomLevel());
 		}
 
 		queueMapRedraw();
@@ -2334,32 +2336,31 @@ public class Map extends Canvas {
 	 */
 	public void setZoom(int zoom) {
 
-		if (fTileFactory == null) {
+		if (fMP == null) {
 			return;
 		}
 
-		fTileFactory.resetTileQueue();
-
-		final TileFactoryInfo_OLD info = fTileFactory.getInfo();
+// mp2
+//		fMP.resetTileQueue();
 
 		// do nothing if we are out of the valid zoom levels
-		if (info != null && (zoom < info.getMinimumZoomLevel() || zoom > info.getMaximumZoomLevel())) {
-			zoom = Math.max(zoom, info.getMinimumZoomLevel());
-			zoom = Math.min(zoom, info.getMaximumZoomLevel());
+		if ((zoom < fMP.getMinimumZoomLevel() || zoom > fMP.getMaximumZoomLevel())) {
+			zoom = Math.max(zoom, fMP.getMinimumZoomLevel());
+			zoom = Math.min(zoom, fMP.getMaximumZoomLevel());
 		}
 
 		final int oldzoom = fMapZoomLevel;
 		final Point2D oldCenter = getCenter();
-		final Dimension oldMapSize = fTileFactory.getMapSize(oldzoom);
+		final Dimension oldMapSize = fMP.getMapSize(oldzoom);
 		fMapZoomLevel = zoom;
 
-		final Dimension mapSize = fTileFactory.getMapSize(zoom);
+		final Dimension mapSize = fMP.getMapSize(zoom);
 
 		final Point2D.Double pixelCenter = new Point2D.Double(oldCenter.getX()
 				* (mapSize.getWidth() / oldMapSize.getWidth()), oldCenter.getY()
 				* (mapSize.getHeight() / oldMapSize.getHeight()));
 
-		setMapPixelCenter(fTileFactory.pixelToGeo(pixelCenter, zoom), pixelCenter);
+		setMapPixelCenter(fMP.pixelToGeo(pixelCenter, zoom), pixelCenter);
 
 		fireZoomEvent(zoom);
 	}
@@ -2381,7 +2382,7 @@ public class Map extends Canvas {
 	private void updateMouseMapPosition() {
 
 		// check position, can be initially be null
-		if (fMouseMovePosition == null || fTileFactory == null) {
+		if (fMouseMovePosition == null || fMP == null) {
 			return;
 		}
 
@@ -2389,7 +2390,7 @@ public class Map extends Canvas {
 		final int worldMouseX = viewPort.x + fMouseMovePosition.x;
 		final int worldMouseY = viewPort.y + fMouseMovePosition.y;
 
-		fireMapEvent(fTileFactory.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), fMapZoomLevel));
+		fireMapEvent(fMP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), fMapZoomLevel));
 	}
 
 	public void zoomIn() {
