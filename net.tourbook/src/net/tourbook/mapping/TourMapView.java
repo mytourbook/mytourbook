@@ -82,13 +82,11 @@ import org.eclipse.ui.part.ViewPart;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
-import de.byteholder.geoclipse.mapprovider.MP_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.ext.PointOfInterest;
@@ -268,7 +266,7 @@ public class TourMapView extends ViewPart {
 
 	void actionSetDefaultPosition() {
 		if (fDefaultPosition == null) {
-			fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+			fMap.setZoom(fMap.getTileFactory().getMinimumZoomLevel());
 			fMap.setGeoCenterPosition(new GeoPosition(0, 0));
 		} else {
 			fMap.setZoom(fDefaultZoom);
@@ -418,7 +416,7 @@ public class TourMapView extends ViewPart {
 	}
 
 	void actionZoomShowEntireMap() {
-		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+		fMap.setZoom(fMap.getTileFactory().getMinimumZoomLevel());
 		fMap.queueMapRedraw();
 	}
 
@@ -944,12 +942,9 @@ public class TourMapView extends ViewPart {
 
 		// dispose tilefactory resources
 
-		final ArrayList<MP_OLD> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
-		for (final MP_OLD mapProvider : allMapProviders) {
-			final TileFactory_OLD tileFactory = mapProvider.getTileFactory(false);
-			if (tileFactory != null) {
-				tileFactory.dispose();
-			}
+		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		for (final MP mp : allMapProviders) {
+			mp.dispose();
 		}
 
 		fMap.disposeOverlayImageCache();
@@ -1056,12 +1051,12 @@ public class TourMapView extends ViewPart {
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
-		final TileFactory_OLD tileFactory = fMap.getTileFactory();
-		final Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
+		final MP mp = fMap.getTileFactory();
+		final Point2D point1 = mp.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
 
 		for (final GeoPosition pos : positions) {
-			final Point2D point = tileFactory.geoToPixel(pos, zoom);
+			final Point2D point = mp.geoToPixel(pos, zoom);
 			rect.add(point);
 		}
 
@@ -1823,7 +1818,7 @@ public class TourMapView extends ViewPart {
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, fActionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (fDefaultPosition == null) {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getTileFactory().getMinimumZoomLevel());
 			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
@@ -1915,11 +1910,10 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		final TileFactory_OLD tileFactory = fMap.getTileFactory();
-		final TileFactoryInfo_OLD tileInfo = tileFactory.getInfo();
+		final MP mp = fMap.getTileFactory();
 
-		final int maximumZoomLevel = tileInfo.getMaximumZoomLevel();
-		int zoom = tileInfo.getMinimumZoomLevel();
+		final int maximumZoomLevel = mp.getMaximumZoomLevel();
+		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle2D positionRect = getPositionRect(positions, zoom);
 		java.awt.Rectangle viewport = fMap.getViewport();
@@ -1932,7 +1926,7 @@ public class TourMapView extends ViewPart {
 					.getY()
 					+ positionRect.getHeight()
 					/ 2);
-			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
+			final GeoPosition px = mp.pixelToGeo(center, zoom);
 			fMap.setGeoCenterPosition(px);
 
 			// check zoom level
@@ -1953,7 +1947,7 @@ public class TourMapView extends ViewPart {
 					.getY()
 					+ positionRect.getHeight()
 					/ 2);
-			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
+			final GeoPosition px = mp.pixelToGeo(center, zoom);
 			fMap.setGeoCenterPosition(px);
 
 			// check zoom level

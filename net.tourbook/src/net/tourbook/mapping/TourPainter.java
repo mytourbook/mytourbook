@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
 /**
@@ -683,16 +683,16 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final TileFactory_OLD tileFactory = map.getTileFactory();
+		final MP mp = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
-		final int tileSize = tileFactory.getInfo().getTileSize();
+		final int tileSize = mp.getTileSize();
 
 		// get world viewport for the current tile
 		final int worldTileX = tile.getX() * tileSize;
 		final int worldTileY = tile.getY() * tileSize;
 
 		// convert lat/long into world pixels
-		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
@@ -721,9 +721,9 @@ public class TourPainter extends MapPainter {
 
 		boolean isTourInTile = false;
 
-		final TileFactory_OLD tileFactory = map.getTileFactory();
+		final MP mp = map.getTileFactory();
 		final int mapZoomLevel = map.getZoom();
-		final int tileSize = tileFactory.getInfo().getTileSize();
+		final int tileSize = mp.getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get viewport for the current tile
@@ -743,7 +743,7 @@ public class TourPainter extends MapPainter {
 		/*
 		 * world positions are cached to optimize performance when multiple tours are selected
 		 */
-		final String projectionId = tileFactory.getProjection().getId();
+		final String projectionId = mp.getProjection().getId();
 		java.awt.Point worldPositions[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
 		final boolean createWorldPosition = worldPositions == null;
 		if (createWorldPosition) {
@@ -777,7 +777,8 @@ public class TourPainter extends MapPainter {
 
 				// convert lat/long into world pixels which depends on the map projection
 
-				tileWorldPos = tileFactory.geoToPixel(new GeoPosition(
+				tileWorldPos = mp.geoToPixel(
+						new GeoPosition(
 						latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex]), mapZoomLevel);
 
@@ -971,9 +972,9 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final TileFactory_OLD tileFactory = map.getTileFactory();
+		final MP tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
-		final int tileSize = tileFactory.getInfo().getTileSize();
+		final int tileSize = tileFactory.getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get world viewport for the current tile

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,19 +18,19 @@
  */
 package net.tourbook.ext.srtm;
 
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 public class ElevationColor {
 
-	private static TileFactoryInfo_OLD	fTileFactoryInfo;
+	private static MP	fMp;
 
-	public static TileFactoryInfo_OLD getTileFactoryInfo() {
-		return fTileFactoryInfo;
+	public static MP getMapProvider() {
+		return fMp;
 	}
 
-	public ElevationColor(final TileFactoryInfo_OLD tileFactoryInfo) {
+	public ElevationColor(final MP mp) {
 		PrefPageSRTMColors.initVertexLists();
-		fTileFactoryInfo = tileFactoryInfo;
+		fMp = mp;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -17,7 +17,6 @@
  * @author Wolfgang Schramm
  * @author Alfred Barten
  */
-
 package net.tourbook.ext.srtm;
 
 import java.io.BufferedWriter;
@@ -41,6 +40,7 @@ import net.tourbook.util.TableColumnDefinition;
 import net.tourbook.util.UI;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -95,31 +95,31 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.byteholder.geoclipse.map.TileImageCache;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
 	private final static IPreferenceStore	fPrefStore				= Activator.getDefault().getPreferenceStore();
 
-	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";								//$NON-NLS-1$
-	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";									//$NON-NLS-1$
+	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";							//$NON-NLS-1$
+	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";								//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_PROFILE	= "profile";										//$NON-NLS-1$
-	private static final String				TAG_PROFILE_ID			= "profileId";										//$NON-NLS-1$
-	private static final String				TAG_NAME				= "name";											//$NON-NLS-1$
-	private static final String				TAG_IMAGE_PATH			= "imagePath";										//$NON-NLS-1$
-	private static final String				TAG_IS_SHADOW			= "isShadow";										//$NON-NLS-1$
-	private static final String				TAG_SHADOW_VALUE		= "shadowValue";									//$NON-NLS-1$
-	private static final String				TAG_RESOLUTION			= "resolution";									//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_PROFILE	= "profile";									//$NON-NLS-1$
+	private static final String				TAG_PROFILE_ID			= "profileId";									//$NON-NLS-1$
+	private static final String				TAG_NAME				= "name";										//$NON-NLS-1$
+	private static final String				TAG_IMAGE_PATH			= "imagePath";									//$NON-NLS-1$
+	private static final String				TAG_IS_SHADOW			= "isShadow";									//$NON-NLS-1$
+	private static final String				TAG_SHADOW_VALUE		= "shadowValue";								//$NON-NLS-1$
+	private static final String				TAG_RESOLUTION			= "resolution";								//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";										//$NON-NLS-1$
-	private static final String				TAG_ALTITUDE			= "altitude";										//$NON-NLS-1$
-	private static final String				TAG_RED					= "red";											//$NON-NLS-1$
-	private static final String				TAG_GREEN				= "green";											//$NON-NLS-1$
-	private static final String				TAG_BLUE				= "blue";											//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";									//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE			= "altitude";									//$NON-NLS-1$
+	private static final String				TAG_RED					= "red";										//$NON-NLS-1$
+	private static final String				TAG_GREEN				= "green";										//$NON-NLS-1$
+	private static final String				TAG_BLUE				= "blue";										//$NON-NLS-1$
 
-	private final IDialogSettings			fState					= Activator.getDefault()
-																			.getDialogSettingsSection("SRTMColors");	//$NON-NLS-1$
+	private final IDialogSettings			fState					= Activator.getDefault().getDialogSettingsSection(
+																			"SRTMColors");							//$NON-NLS-1$
 
 	private static ArrayList<SRTMProfile>	fProfileList			= new ArrayList<SRTMProfile>();
 	private static SRTMProfile				fSelectedProfile		= null;
@@ -209,7 +209,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 2000, 223, 223, 240);
 			createXmlVertex(profile, 8000, 255, 255, 255);
 
-			
 			profile = createXmlProfile(xmlRoot, //
 					++profileId,
 					"Default 2", //$NON-NLS-1$ 
@@ -229,7 +228,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 800, 255, 0, 51);
 			createXmlVertex(profile, 900, 255, 204, 204);
 			createXmlVertex(profile, 1000, 204, 255, 255);
- 
+
 			profile = createXmlProfile(xmlRoot, //
 					++profileId,
 					"Default 3", //$NON-NLS-1$ 
@@ -642,7 +641,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		/*
 		 * checkbox: pace min/max value
 		 */
-		fBooleanEditorApplyOption = new BooleanFieldEditor(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED,
+		fBooleanEditorApplyOption = new BooleanFieldEditor(
+				IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED,
 				Messages.prefPage_srtm_profile_option_apply_when_selected,
 				parent);
 		fBooleanEditorApplyOption.setPreferenceStore(fPrefStore);
@@ -1037,13 +1037,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		try {
 
-			final TileFactoryInfo_OLD srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+			final MP mp = ElevationColor.getMapProvider();
 
-			final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
-			IPath tileCacheOSPathFolder = null;
-			if (tileCacheOSPath != null) {
-				tileCacheOSPathFolder = srtmFactoryInfo.getTileOSPathFolder(tileCacheOSPath);
-			}
+			final IPath tileCacheOSPathFolder = getOfflineFolder(mp);
 			if (tileCacheOSPathFolder == null) {
 				return;
 			}
@@ -1074,14 +1070,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		try {
 
-			final TileFactoryInfo_OLD srtmFactoryInfo = ElevationColor.getTileFactoryInfo();
+			final MP mp = ElevationColor.getMapProvider();
 
-			final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
-			IPath tileCacheOSPathFolder = null;
-			if (tileCacheOSPath != null) {
-				tileCacheOSPathFolder = srtmFactoryInfo.getTileOSPathFolder(tileCacheOSPath);
-			}
-
+			final IPath tileCacheOSPathFolder = getOfflineFolder(mp);
 			if (tileCacheOSPathFolder == null) {
 				return;
 			}
@@ -1130,7 +1121,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			// open color chooser dialog
 
-			final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent().getActiveShell(),
+			final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(
+					Display.getCurrent().getActiveShell(),
 					null,
 					newProfile,
 					fProfileList,
@@ -1170,6 +1162,18 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 
 		return width;
+	}
+
+	private IPath getOfflineFolder(final MP mp) {
+
+		IPath tileCacheOSPathFolder = null;
+
+		final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
+		if (tileCacheOSPath != null) {
+			tileCacheOSPathFolder = new Path(tileCacheOSPath).append(mp.getTileOSFolder());
+		}
+
+		return tileCacheOSPathFolder;
 	}
 
 	/**
@@ -1246,7 +1250,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 				final SRTMProfile dialogProfile = new SRTMProfile(originalProfile);
 
-				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(Display.getCurrent().getActiveShell(),
+				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(
+						Display.getCurrent().getActiveShell(),
 						originalProfile,
 						dialogProfile,
 						fProfileList,
@@ -1269,7 +1274,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private void onRemoveProfile() {
 
 		// confirm removal
-		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
 				Messages.prefPage_srtm_dlg_delete_profile_title,
 				Messages.prefPage_srtm_dlg_delete_profile_msg) == false) {
 			return;
@@ -1350,7 +1356,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	@Override
 	protected void performDefaults() {
 
-		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
 				Messages.prefPage_srtm_confirm_defaults_title,
 				Messages.prefPage_srtm_confirm_defaults_message)) {
 
@@ -1511,7 +1518,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			for (final SRTMProfile profile : fProfileList) {
 
-				final IMemento xmlProfile = createXmlProfile(xmlRoot,
+				final IMemento xmlProfile = createXmlProfile(
+						xmlRoot,
 						profile.getProfileId(),
 						profile.getProfileName(),
 						profile.getTilePath(),

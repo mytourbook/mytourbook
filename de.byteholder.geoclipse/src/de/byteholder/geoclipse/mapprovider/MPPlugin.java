@@ -21,14 +21,13 @@ package de.byteholder.geoclipse.mapprovider;
  */
 public abstract class MPPlugin extends MP {
 
+	public abstract String getBaseURL() ;
+
 	@Override
 	public abstract String getId();
 
 	@Override
 	public abstract String getName();
-
-	@Override
-	public abstract String getOfflineFolder();
 
 // mp2	
 //	private TileFactory_OLD	fTileFactory;

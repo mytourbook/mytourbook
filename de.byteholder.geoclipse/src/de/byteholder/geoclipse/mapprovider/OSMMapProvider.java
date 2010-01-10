@@ -20,10 +20,10 @@ import org.eclipse.core.runtime.Path;
 
 import de.byteholder.geoclipse.map.Tile;
 
-class MPPluginOSM extends MPPlugin {
+class OSMMapProvider extends MPPlugin {
 
-	private static final String	FACTORY_ID		= "osm";									//$NON-NLS-1$
-	private static final String	FACTORY_OS_NAME	= "osm";									//$NON-NLS-1$
+	static final String			FACTORY_ID		= "osm";									//$NON-NLS-1$
+	private static final String	OFFLINE_FOLDER	= "osm";									//$NON-NLS-1$
 	private static final String	FACTORY_NAME	= "OpenStreetMap";							//$NON-NLS-1$
 
 	private static final String	SEPARATOR		= "/";										//$NON-NLS-1$
@@ -37,11 +37,14 @@ class MPPluginOSM extends MPPlugin {
 	private static final String	BASE_URL		= "http://tile.openstreetmap.org";			//$NON-NLS-1$
 	private static final String	FILE_EXT		= MapProviderManager.FILE_EXTENSION_PNG;
 
-	public MPPluginOSM() {
-
-		super();
+	public OSMMapProvider() {
 
 		setZoomLevel(MIN_ZOOM, MAX_ZOOM);
+	}
+
+	@Override
+	public String getBaseURL() {
+		return BASE_URL;
 	}
 
 	@Override
@@ -55,18 +58,18 @@ class MPPluginOSM extends MPPlugin {
 	}
 
 	@Override
-	public String getOfflineFolder() {
-		return FACTORY_OS_NAME;
+	public String getTileOSFolder() {
+		return OFFLINE_FOLDER;
 	}
 
 	@Override
-	public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
+	public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
 		return new Path(fullPath)//
-				.append(FACTORY_OS_NAME)
-				.append(Integer.toString(zoomLevel))
-				.append(Integer.toString(x))
-				.append(Integer.toString(y))
+				.append(OFFLINE_FOLDER)
+				.append(Integer.toString(tile.getZoom()))
+				.append(Integer.toString(tile.getX()))
+				.append(Integer.toString(tile.getY()))
 				.addFileExtension(FILE_EXT);
 	}
 
@@ -84,6 +87,11 @@ class MPPluginOSM extends MPPlugin {
 				.append('.')
 				.append(FILE_EXT)
 				.toString();
+	}
+
+	@Override
+	public void setTileOSFolder(final String offlineFolder) {
+	// folder is static, nothing to do
 	}
 
 // mp2	

@@ -750,18 +750,17 @@ public class MapProviderManager {
 		fAllMapProviders = new ArrayList<MP>();
 
 		// create default tile factories
-		fDefaultTileFactory = new MPPluginOSM();
+		fDefaultTileFactory = new OSMMapProvider();
 
 		fAllMapProviders.add(fDefaultTileFactory);
 
 		/*
 		 * add plugin map providers
 		 */
-		final List<TileFactory_OLD> allMapFactories = GeoclipseExtensions.getInstance().readFactories();
-		for (final TileFactory_OLD pluginMapFactory : allMapFactories) {
+		final List<MPPlugin> allMapFactories = GeoclipseExtensions.getInstance().readFactories();
+		for (final MPPlugin mpPlugin : allMapFactories) {
 
-			final TileFactoryInfo_OLD pluginFactoryInfo = pluginMapFactory.getInfo();
-			final String pluginFactoryId = pluginFactoryInfo.getFactoryID();
+			final String pluginFactoryId = mpPlugin.getId();
 
 			boolean isValid = true;
 
@@ -772,7 +771,7 @@ public class MapProviderManager {
 
 					StatusUtil.showStatus(NLS.bind(Messages.DBG003_Error_InvalidFactoryId, new Object[] {
 							pluginFactoryId,
-							pluginFactoryInfo.getFactoryName(),
+							mpPlugin.getName(),
 							checkedMapProvider.getName() //
 							}), new Exception());
 
@@ -781,15 +780,15 @@ public class MapProviderManager {
 				}
 
 				// check offline folder
-				final String pluginOfflineFolder = pluginFactoryInfo.getTileOSFolder();
-				final String checkedOfflineFolder = checkedMapProvider.getOfflineFolder();
+				final String pluginOfflineFolder = mpPlugin.getTileOSFolder();
+				final String checkedOfflineFolder = checkedMapProvider.getTileOSFolder();
 				if (pluginOfflineFolder != null
 						&& checkedOfflineFolder != null
 						&& checkedOfflineFolder.equalsIgnoreCase(pluginOfflineFolder)) {
 
 					StatusUtil.showStatus(NLS.bind(Messages.DBG004_Error_InvalidOfflineFolder, new Object[] {
 							pluginOfflineFolder,
-							pluginFactoryInfo.getFactoryName(),
+							mpPlugin.getName(),
 							checkedMapProvider.getName() //
 							}), new Exception());
 
@@ -800,9 +799,9 @@ public class MapProviderManager {
 
 			if (isValid) {
 
-				// create a map provider for the plugin tile factory
+				// add valid map providers
 
-				fAllMapProviders.add(new MPPlugin(pluginMapFactory));
+				fAllMapProviders.add(mpPlugin);
 			}
 		}
 
@@ -1305,7 +1304,7 @@ public class MapProviderManager {
 				mapProvider.setMapProviderId(mapProviderId);
 				mapProvider.setName(mapProviderName);
 				mapProvider.setDescription(description == null ? UI.EMPTY_STRING : description);
-				mapProvider.setOfflineFolder(offlineFolder);
+				mapProvider.setTileOSFolder(offlineFolder);
 
 				// image
 				mapProvider.setTileSize(imageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : imageSize);
@@ -1728,12 +1727,12 @@ public class MapProviderManager {
 			}
 
 			// check offline folder
-			final String importedOfflineFolder = importedMP.getOfflineFolder();
-			if (mp.getOfflineFolder().equalsIgnoreCase(importedOfflineFolder)) {
+			final String importedOfflineFolder = importedMP.getTileOSFolder();
+			if (mp.getTileOSFolder().equalsIgnoreCase(importedOfflineFolder)) {
 
 				// duplicate folder
 				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.Import_Error_Dialog_Title, NLS
-						.bind(Messages.DBG022_Import_Error_DuplicateOfflineFolder, mp.getId(), mp.getOfflineFolder()));
+						.bind(Messages.DBG022_Import_Error_DuplicateOfflineFolder, mp.getId(), mp.getTileOSFolder()));
 
 				return null;
 			}
@@ -1841,7 +1840,7 @@ public class MapProviderManager {
 						} else {
 
 							// check offline folder
-							if (existingMp.getOfflineFolder().equalsIgnoreCase(wrappedMP.getOfflineFolder())) {
+							if (existingMp.getTileOSFolder().equalsIgnoreCase(wrappedMP.getTileOSFolder())) {
 
 								// same offline folder
 
@@ -1862,7 +1861,7 @@ public class MapProviderManager {
 												new Object[] {
 														importedMP.getId(),
 														wrappedMP.getId(),
-														wrappedMP.getOfflineFolder(),
+														wrappedMP.getTileOSFolder(),
 														existingMp.getId() }));
 								return null;
 							}
@@ -1909,7 +1908,7 @@ public class MapProviderManager {
 
 					for (final MP existingMp : existingMPs) {
 
-						if (existingMp.getOfflineFolder().equalsIgnoreCase(wrappedMP.getOfflineFolder())) {
+						if (existingMp.getTileOSFolder().equalsIgnoreCase(wrappedMP.getTileOSFolder())) {
 
 							// folder is already used by another mp
 
@@ -1919,7 +1918,7 @@ public class MapProviderManager {
 									NLS.bind(Messages.DBG026_Import_Error_ProfileDuplicateOfflineFolder, new Object[] {
 											importedMP.getId(),
 											wrappedMP.getId(),
-											wrappedMP.getOfflineFolder(),
+											wrappedMP.getTileOSFolder(),
 											existingMp.getId() }));
 
 							return null;
@@ -1979,36 +1978,36 @@ public class MapProviderManager {
 		fireChangeEvent();
 	}
 
-	private void writeXml(final MP mapProvider, final IMemento tagMapProvider) {
+	private void writeXml(final MP mp, final IMemento tagMapProvider) {
 
-		final GeoPosition lastUsedPosition = mapProvider.getLastUsedPosition();
-		final GeoPosition favoritePosition = mapProvider.getFavoritePosition();
+		final GeoPosition lastUsedPosition = mp.getLastUsedPosition();
+		final GeoPosition favoritePosition = mp.getFavoritePosition();
 
 		/*
 		 * set common fields
 		 */
-		tagMapProvider.putString(ATTR_MP_ID, mapProvider.getId());
-		tagMapProvider.putString(ATTR_MP_NAME, mapProvider.getName());
-		tagMapProvider.putString(ATTR_MP_DESCRIPTION, mapProvider.getDescription());
-		tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mapProvider.getOfflineFolder());
+		tagMapProvider.putString(ATTR_MP_ID, mp.getId());
+		tagMapProvider.putString(ATTR_MP_NAME, mp.getName());
+		tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
+		tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getTileOSFolder());
 
 		// image
-		tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mapProvider.getTileSize());
-		tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mapProvider.getImageFormat());
+		tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
+		tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mp.getImageFormat());
 
 		// zoom level
-		tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mapProvider.getMinZoomLevel());
-		tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mapProvider.getMaxZoomLevel());
+		tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mp.getMinZoomLevel());
+		tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mp.getMaxZoomLevel());
 
 		// favorite position
-		tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mapProvider.getFavoriteZoom());
+		tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());
 		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition
 				.getLatitude());
 		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition
 				.getLongitude());
 
 		// last used position
-		tagMapProvider.putInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL, mapProvider.getLastUsedZoom());
+		tagMapProvider.putInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL, mp.getLastUsedZoom());
 		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition
 				.getLatitude());
 		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition
@@ -2017,19 +2016,19 @@ public class MapProviderManager {
 		/*
 		 * add special fields for each map provider
 		 */
-		if (mapProvider instanceof MPWms) {
+		if (mp instanceof MPWms) {
 
-			writeXmlWms((MPWms) mapProvider, tagMapProvider);
+			writeXmlWms((MPWms) mp, tagMapProvider);
 
-		} else if (mapProvider instanceof MPCustom) {
+		} else if (mp instanceof MPCustom) {
 
-			writeXmlCustom((MPCustom) mapProvider, tagMapProvider);
+			writeXmlCustom((MPCustom) mp, tagMapProvider);
 
-		} else if (mapProvider instanceof MPProfile) {
+		} else if (mp instanceof MPProfile) {
 
-			writeXmlProfile((MPProfile) mapProvider, tagMapProvider);
+			writeXmlProfile((MPProfile) mp, tagMapProvider);
 
-		} else if (mapProvider instanceof MPPlugin) {
+		} else if (mp instanceof MPPlugin) {
 
 			// plugin mp can be exported in the map profile 
 			tagMapProvider.putString(ATTR_MP_TYPE, MAP_PROVIDER_TYPE_PLUGIN);

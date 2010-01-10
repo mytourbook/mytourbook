@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,9 +16,9 @@
 package de.byteholder.geoclipse.tileinfo;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 public class TileInfoManager implements ITileListener {
 
@@ -42,7 +42,7 @@ public class TileInfoManager implements ITileListener {
 	 */
 	public TileInfoManager() {
 //		getMapProviders();
-		TileFactory_OLD.addTileListener(this);
+		MP.addTileListener(this);
 	}
 
 //	private void getMapProviders() {

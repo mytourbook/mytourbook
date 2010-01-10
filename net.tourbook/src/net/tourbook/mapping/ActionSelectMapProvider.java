@@ -124,7 +124,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 * 
 	 * @param selectedMp
 	 */
-	private void checkSelectedMP(final MP_OLD selectedMp) {
+	private void checkSelectedMP(final MP selectedMp) {
 
 		final String selectedMpId = selectedMp.getId();
 
@@ -144,9 +144,9 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		fMPActions.clear();
 
-		final ArrayList<MP_OLD> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
+		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 
-		for (final MP_OLD mp : allMapProviders) {
+		for (final MP mp : allMapProviders) {
 			fMPActions.put(mp.getId(), new MPAction(mp, mp.getName()));
 		}
 	}
@@ -171,7 +171,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		fMenu = new Menu(parent);
 
 		// add all map providers
-		for (final MP_OLD mp : fSortedMapProviders) {
+		for (final MP mp : fSortedMapProviders) {
 
 			final MPAction mpAction = fMPActions.get(mp.getId());
 
@@ -192,11 +192,11 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	}
 
 	/**
-	 * @return Returns the map provider {@link MP_OLD} which is currently selected or OSM when there
+	 * @return Returns the map provider {@link MP} which is currently selected or OSM when there
 	 *         is
 	 *         no selected map provider
 	 */
-	public MP_OLD getSelectedMapProvider() {
+	public MP getSelectedMapProvider() {
 		if (fSelectedMP == null) {
 			return fMPActions.get(0).mp;
 		}
@@ -208,7 +208,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		if (fSelectedMP != null) {
 
 			// map profile tile offline images are deleted, reset state  
-			fSelectedMP.getTileFactory(true).resetTileImageAvailability();
+			fSelectedMP.resetTileImageAvailability();
 		}
 
 		createMapProviderActions();

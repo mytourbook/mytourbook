@@ -84,7 +84,8 @@ public class TileImageCache {
 	private static final ReentrantLock				CREATE_DIR_LOCK				= new ReentrantLock();
 
 	/**
-	 * @return OS path for the tile cache or null, when offline cache is not used and otherwise
+	 * @return OS path for the tile cache or <code>null</code> when offline cache is not used or
+	 *         otherwise
 	 */
 	public static String getTileCacheOSPath() {
 
@@ -363,12 +364,7 @@ public class TileImageCache {
 		}
 
 		// append tile path
-		final IPath tilePath = tile.getMP().getTileOSPath(
-				tileCachePath.toOSString(),
-				tile.getX(),
-				tile.getY(),
-				tile.getZoom(),
-				tile);
+		final IPath tilePath = tile.getMP().getTileOSPath(tileCachePath.toOSString(), tile);
 
 		return tilePath;
 	}
@@ -570,12 +566,7 @@ public class TileImageCache {
 		 */
 		try {
 
-			final IPath tilePath = tile.getMP().getTileOSPath(//
-					fOSTileCachePath,
-					tile.getX(),
-					tile.getY(),
-					tile.getZoom(),
-					tile);
+			final IPath tilePath = tile.getMP().getTileOSPath(fOSTileCachePath, tile);
 
 			if (tilePath == null) {
 				return;

@@ -24,18 +24,19 @@ import org.eclipse.core.runtime.RegistryFactory;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
-import de.byteholder.gpx.GeoPosition;
+import de.byteholder.geoclipse.mapprovider.MPPlugin;
 
 public class GeoclipseExtensions {
 
 	private static GeoclipseExtensions	fInstance;
 
-	// the position to start with
-	private GeoPosition					startPosition	= new GeoPosition(0, 0);
+// mp2	
+//	// the position to start with
+//	private GeoPosition					startPosition	= new GeoPosition(0, 0);
+//
+//	private int							startZoom		= 0;
 
-	private int							startZoom		= 0;
-
-	private ArrayList<TileFactory_OLD>		fTileFactories;
+	private ArrayList<MPPlugin>			fTileFactories;
 
 	public static GeoclipseExtensions getInstance() {
 
@@ -112,7 +113,7 @@ public class GeoclipseExtensions {
 	/**
 	 * @return Returns a list with all available map/tile factories
 	 */
-	public List<TileFactory_OLD> readFactories() {
+	public List<MPPlugin> readFactories() {
 
 		if (fTileFactories != null) {
 			return fTileFactories;
@@ -122,7 +123,7 @@ public class GeoclipseExtensions {
 		final IExtensionPoint point = registry.getExtensionPoint("de.byteholder.geoclipse.tilefactory"); //$NON-NLS-1$
 		final IExtension[] extensions = point.getExtensions();
 
-		fTileFactories = new ArrayList<TileFactory_OLD>();
+		fTileFactories = new ArrayList<MPPlugin>();
 
 		for (final IExtension extension : extensions) {
 			final IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -136,8 +137,8 @@ public class GeoclipseExtensions {
 				e.printStackTrace();
 			}
 
-			if (o != null && o instanceof TileFactory_OLD) {
-				fTileFactories.add((TileFactory_OLD) o);
+			if (o != null && o instanceof MPPlugin) {
+				fTileFactories.add((MPPlugin) o);
 			}
 		}
 

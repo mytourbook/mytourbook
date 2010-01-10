@@ -29,7 +29,7 @@ import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
+import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -82,7 +82,7 @@ public class DirectMappingPainter implements IDirectPainter {
 									int sliderValueIndex,
 									final Image markerImage) {
 
-		final TileFactory_OLD tileFactory = fMap.getTileFactory();
+		final MP mp = fMap.getTileFactory();
 		final int zoomLevel = fMap.getZoom();
 
 		final double[] latitudeSerie = fTourData.latitudeSerie;
@@ -90,7 +90,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
 		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
-		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[sliderValueIndex],
+		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(
+				latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
 
 		// check if slider is visible

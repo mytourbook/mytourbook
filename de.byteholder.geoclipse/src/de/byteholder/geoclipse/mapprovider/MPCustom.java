@@ -93,6 +93,12 @@ public class MPCustom extends MP {
 	}
 
 	@Override
+	public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
 
 		if (fUrlParts.size() == 0) {
