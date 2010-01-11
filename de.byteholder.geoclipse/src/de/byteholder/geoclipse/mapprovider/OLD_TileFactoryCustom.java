@@ -48,14 +48,14 @@ class CustomTileFactoryInfo extends TileFactoryInfo_OLD {
 	}
 
 	@Override
-	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
-		return customMapProvider.getTileUrl(x, y, zoom, tile);
+	public String getTileUrl(final Tile tile) {
+		return customMapProvider.getTileUrl(tile);
 	}
 
 	@Override
 	public void setFactoryId(final String factoryId) {
 
-		customMapProvider.setMapProviderId(factoryId);
+		customMapProvider.setId(factoryId);
 
 		/*
 		 * !!! very importand !!!
@@ -67,7 +67,7 @@ class CustomTileFactoryInfo extends TileFactoryInfo_OLD {
 	}
 }
 
-public class TileFactoryCustom extends TileFactoryImpl {
+public class OLD_TileFactoryCustom extends TileFactoryImpl {
 
 	private MPCustom				fCustomMapProvider;
 
@@ -120,7 +120,7 @@ public class TileFactoryCustom extends TileFactoryImpl {
 	}
 
 	@Override
-	public MP_OLD getMapProvider() {
+	public MP_OLD getMP() {
 		return fCustomMapProvider;
 	}
 

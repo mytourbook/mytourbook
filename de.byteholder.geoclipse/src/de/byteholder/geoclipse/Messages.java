@@ -51,12 +51,10 @@ public class Messages extends NLS {
 	public static String		Dialog_CustomConfig_DialogTitle;
 	public static String		Dialog_CustomConfig_Label_Alpha;
 	public static String		Dialog_CustomConfig_Label_Alpha_Tooltip;
-
-	public static String	Dialog_CustomConfig_Label_ImageFormat;
+	public static String		Dialog_CustomConfig_Label_ImageFormat;
 	public static String		Dialog_CustomConfig_Label_UrlParts;
 	public static String		Dialog_CustomConfig_Label_ZoomLevel;
-
-	public static String	Dialog_CustomConfig_Text_ImageFormat_Tooltip;
+	public static String		Dialog_CustomConfig_Text_ImageFormat_Tooltip;
 
 	public static String		Dialog_MapConfig_Button_LiveView;
 	public static String		Dialog_MapConfig_Button_LiveView_Tooltip;
@@ -191,8 +189,7 @@ public class Messages extends NLS {
 	public static String		DBG054_Loading_Error_FromUrl;
 	public static String		DBG055_MapProfile_InvalidMapProvider;
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
-
-	public static String	DBG057_MapProfile_NoParentTile;
+	public static String		DBG057_MapProfile_NoParentTile;
 
 	public static String		Tile_Error_NoMapProvider;
 

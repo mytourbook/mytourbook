@@ -82,7 +82,7 @@ public class DirectMappingPainter implements IDirectPainter {
 									int sliderValueIndex,
 									final Image markerImage) {
 
-		final MP mp = fMap.getTileFactory();
+		final MP mp = fMap.getMapProvider();
 		final int zoomLevel = fMap.getZoom();
 
 		final double[] latitudeSerie = fTourData.latitudeSerie;

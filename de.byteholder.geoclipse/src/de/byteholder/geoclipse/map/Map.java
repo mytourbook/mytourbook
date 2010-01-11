@@ -910,6 +910,9 @@ public class Map extends Canvas {
 		// get tile from the tile factory, this also starts the loading of the tile image
 		final Tile tile = fMP.getTile(tilePositionX, tilePositionY, fMapZoomLevel);
 
+		System.out.println(tile.getTileKey());
+// TODO remove SYSTEM.OUT.PRINTLN
+
 		drawTileImage(gc, tile, devTileRectangle);
 
 		if (fIsDrawOverlays) {
@@ -1397,6 +1400,15 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * Get the current map provider
+	 * 
+	 * @return Returns the current map provider
+	 */
+	public MP getMapProvider() {
+		return fMP;
+	}
+
+	/**
 	 * @param tileKey
 	 * @return Returns the key to identify overlay images in the image cache
 	 */
@@ -1422,15 +1434,6 @@ public class Map extends Canvas {
 	public java.awt.Point getRelativePixel(final java.awt.Point absolutePixel) {
 		final Rectangle viewport = getViewport();
 		return new java.awt.Point(absolutePixel.x - viewport.x, absolutePixel.y - viewport.y);
-	}
-
-	/**
-	 * Get the current factory
-	 * 
-	 * @return Returns the current tile factory
-	 */
-	public MP getTileFactory() {
-		return fMP;
 	}
 
 	/**
@@ -1984,7 +1987,7 @@ public class Map extends Canvas {
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-//			getDisplay().asyncExec(synchImageRunnable);
+			getDisplay().asyncExec(synchImageRunnable);
 
 		} else {
 
@@ -2101,7 +2104,8 @@ public class Map extends Canvas {
 
 		fMP = mp;
 
-		queueMapRedraw();
+// don't do a map redraw because the map zoom/position is not yet set correctly
+//		queueMapRedraw();
 	}
 
 	/**

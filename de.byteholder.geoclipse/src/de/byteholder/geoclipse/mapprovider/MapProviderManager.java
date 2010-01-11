@@ -323,9 +323,9 @@ public class MapProviderManager {
 
 							final MPProfile mpProfile = (MPProfile) mapProvider;
 
-							for (final MapProviderWrapper mpWrapper : mpProfile.getAllWrappers()) {
-								if (mpWrapper.getMapProvider() instanceof MPWms) {
-									final MPWms wmsMp = (MPWms) mpWrapper.getMapProvider();
+							for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
+								if (mpWrapper.getMP() instanceof MPWms) {
+									final MPWms wmsMp = (MPWms) mpWrapper.getMP();
 									if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
 										wmsMp.setWmsEnabled(false);
 									}
@@ -700,19 +700,19 @@ public class MapProviderManager {
 				if (mapProvider instanceof MPProfile) {
 
 					final MPProfile mapProfile = (MPProfile) mapProvider;
-					final ArrayList<MapProviderWrapper> mpWrapperList = mapProfile.getAllWrappers();
+					final ArrayList<MPWrapper> mpWrapperList = mapProfile.getAllWrappers();
 
 					// loop: all map provider within a profile
-					for (final MapProviderWrapper mpWrapper : mpWrapperList) {
+					for (final MPWrapper mpWrapper : mpWrapperList) {
 
-						final MP profileMapProvider = mpWrapper.getMapProvider();
+						final MP profileMapProvider = mpWrapper.getMP();
 
 						if (profileMapProvider != null && profileMapProvider.getId().equals(replaceMapProviderId)) {
 
 							// replace map provider with a clone of the original map provider
 
 							try {
-								mpWrapper.setMapProvider((MP) mapProviderReplacement.clone());
+								mpWrapper.setMP((MP) mapProviderReplacement.clone());
 							} catch (final CloneNotSupportedException e) {
 								StatusUtil.showStatus(e.getMessage(), e);
 							}
@@ -780,8 +780,8 @@ public class MapProviderManager {
 				}
 
 				// check offline folder
-				final String pluginOfflineFolder = mpPlugin.getTileOSFolder();
-				final String checkedOfflineFolder = checkedMapProvider.getTileOSFolder();
+				final String pluginOfflineFolder = mpPlugin.getOfflineFolder();
+				final String checkedOfflineFolder = checkedMapProvider.getOfflineFolder();
 				if (pluginOfflineFolder != null
 						&& checkedOfflineFolder != null
 						&& checkedOfflineFolder.equalsIgnoreCase(pluginOfflineFolder)) {
@@ -916,11 +916,11 @@ public class MapProviderManager {
 				final MPProfile mpProfile = (MPProfile) mapProvider;
 
 				// create xml for each map provider which is visible
-				for (final MapProviderWrapper mpWrapper : mpProfile.getAllWrappers()) {
+				for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
 					if (mpWrapper.isDisplayedInMap()) {
 
 						writeXml(//
-								mpWrapper.getMapProvider(),
+								mpWrapper.getMP(),
 								xmlMemento.createChild(ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER));
 					}
 				}
@@ -987,6 +987,9 @@ public class MapProviderManager {
 		return mapProviders;
 	}
 
+	/**
+	 * @return Return the default map provider which is currently OpenstreetMap
+	 */
 	public MPPlugin getDefaultMapProvider() {
 		return fDefaultTileFactory;
 	}
@@ -1301,10 +1304,10 @@ public class MapProviderManager {
 			if (mapProvider != null) {
 
 				// id
-				mapProvider.setMapProviderId(mapProviderId);
+				mapProvider.setId(mapProviderId);
 				mapProvider.setName(mapProviderName);
 				mapProvider.setDescription(description == null ? UI.EMPTY_STRING : description);
-				mapProvider.setTileOSFolder(offlineFolder);
+				mapProvider.setOfflineFolder(offlineFolder);
 
 				// image
 				mapProvider.setTileSize(imageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : imageSize);
@@ -1439,7 +1442,7 @@ public class MapProviderManager {
 	 */
 	private MPProfile readXmlProfile(final IMemento tagMapProvider, final String mapProviderId) {
 
-		final ArrayList<MapProviderWrapper> mpWrapperList = new ArrayList<MapProviderWrapper>();
+		final ArrayList<MPWrapper> mpWrapperList = new ArrayList<MPWrapper>();
 		final MPProfile mapProfile = new MPProfile(mpWrapperList);
 
 		final Integer backgroundColor = tagMapProvider.getInteger(ATTR_PMP_BACKGROUND_COLOR);
@@ -1480,7 +1483,7 @@ public class MapProviderManager {
 			}
 			// check if a map provider id is already in the list
 			boolean isIdValid = true;
-			for (final MapProviderWrapper mpWrapper : mpWrapperList) {
+			for (final MPWrapper mpWrapper : mpWrapperList) {
 				if (mpWrapper.getMapProviderId().equalsIgnoreCase(mpId)) {
 					isIdValid = false;
 					break;
@@ -1507,7 +1510,7 @@ public class MapProviderManager {
 			/*
 			 * initial data are valid, create map provider wrapper
 			 */
-			final MapProviderWrapper mpWrapper = new MapProviderWrapper(mpId);
+			final MPWrapper mpWrapper = new MPWrapper(mpId);
 
 			mpWrapper.setType(mpType);
 			mpWrapper.setIsDisplayedInMap(isDisplayed);
@@ -1634,7 +1637,7 @@ public class MapProviderManager {
 		 */
 		final IMemento[] tagLayers = mementoMapProvider.getChildren(TAG_LAYER);
 
-		int displayedLayers = 0;
+//		int displayedLayers = 0;
 		final ArrayList<LayerOfflineData> offlineLayerList = new ArrayList<LayerOfflineData>();
 		for (final IMemento tagLayer : tagLayers) {
 
@@ -1675,12 +1678,12 @@ public class MapProviderManager {
 
 			offlineLayerList.add(offlineLayer);
 
-			if (layerIsDisplayed) {
-				displayedLayers++;
-			}
+//			if (layerIsDisplayed) {
+//				displayedLayers++;
+//			}
 		}
 		mapProvider.setOfflineLayers(offlineLayerList);
-		mapProvider.setDisplayedLayers(displayedLayers);
+//		mapProvider.setDisplayedLayers(displayedLayers);
 
 		return mapProvider;
 	}
@@ -1727,12 +1730,12 @@ public class MapProviderManager {
 			}
 
 			// check offline folder
-			final String importedOfflineFolder = importedMP.getTileOSFolder();
-			if (mp.getTileOSFolder().equalsIgnoreCase(importedOfflineFolder)) {
+			final String importedOfflineFolder = importedMP.getOfflineFolder();
+			if (mp.getOfflineFolder().equalsIgnoreCase(importedOfflineFolder)) {
 
 				// duplicate folder
 				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.Import_Error_Dialog_Title, NLS
-						.bind(Messages.DBG022_Import_Error_DuplicateOfflineFolder, mp.getId(), mp.getTileOSFolder()));
+						.bind(Messages.DBG022_Import_Error_DuplicateOfflineFolder, mp.getId(), mp.getOfflineFolder()));
 
 				return null;
 			}
@@ -1783,10 +1786,10 @@ public class MapProviderManager {
 
 		final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
 		final MPProfile importedMpProfile = importedMP;
-		final ArrayList<MapProviderWrapper> importedProfileWrappers = importedMpProfile.getAllWrappers();
+		final ArrayList<MPWrapper> importedProfileWrappers = importedMpProfile.getAllWrappers();
 
 		// check all wrappers
-		for (final MapProviderWrapper importedWrapper : importedProfileWrappers) {
+		for (final MPWrapper importedWrapper : importedProfileWrappers) {
 
 			// check wrapper map provider
 
@@ -1840,7 +1843,7 @@ public class MapProviderManager {
 						} else {
 
 							// check offline folder
-							if (existingMp.getTileOSFolder().equalsIgnoreCase(wrappedMP.getTileOSFolder())) {
+							if (existingMp.getOfflineFolder().equalsIgnoreCase(wrappedMP.getOfflineFolder())) {
 
 								// same offline folder
 
@@ -1861,7 +1864,7 @@ public class MapProviderManager {
 												new Object[] {
 														importedMP.getId(),
 														wrappedMP.getId(),
-														wrappedMP.getTileOSFolder(),
+														wrappedMP.getOfflineFolder(),
 														existingMp.getId() }));
 								return null;
 							}
@@ -1908,7 +1911,7 @@ public class MapProviderManager {
 
 					for (final MP existingMp : existingMPs) {
 
-						if (existingMp.getTileOSFolder().equalsIgnoreCase(wrappedMP.getTileOSFolder())) {
+						if (existingMp.getOfflineFolder().equalsIgnoreCase(wrappedMP.getOfflineFolder())) {
 
 							// folder is already used by another mp
 
@@ -1918,7 +1921,7 @@ public class MapProviderManager {
 									NLS.bind(Messages.DBG026_Import_Error_ProfileDuplicateOfflineFolder, new Object[] {
 											importedMP.getId(),
 											wrappedMP.getId(),
-											wrappedMP.getTileOSFolder(),
+											wrappedMP.getOfflineFolder(),
 											existingMp.getId() }));
 
 							return null;
@@ -1989,7 +1992,7 @@ public class MapProviderManager {
 		tagMapProvider.putString(ATTR_MP_ID, mp.getId());
 		tagMapProvider.putString(ATTR_MP_NAME, mp.getName());
 		tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
-		tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getTileOSFolder());
+		tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getOfflineFolder());
 
 		// image
 		tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
@@ -2088,11 +2091,11 @@ public class MapProviderManager {
 		 * map provider specific fields
 		 */
 
-		for (final MapProviderWrapper mpWrapper : mapProfile.getAllWrappers()) {
+		for (final MPWrapper mpWrapper : mapProfile.getAllWrappers()) {
 
-			final MP mapProvider = mpWrapper.getMapProvider();
+			final MP mp = mpWrapper.getMP();
 
-			final String mpType = getMapProviderType(mapProvider);
+			final String mpType = getMapProviderType(mp);
 			if (mpType == null) {
 				continue;
 			}
@@ -2106,7 +2109,7 @@ public class MapProviderManager {
 			final IMemento tagProfileMapProvider = tagProfile.createChild(TAG_MAP_PROVIDER_WRAPPER);
 
 			tagProfileMapProvider.putString(ATTR_PMP_MAP_PROVIDER_TYPE, mpType);
-			tagProfileMapProvider.putString(ATTR_PMP_MAP_PROVIDER_ID, mapProvider.getId());
+			tagProfileMapProvider.putString(ATTR_PMP_MAP_PROVIDER_ID, mp.getId());
 			tagProfileMapProvider.putInteger(ATTR_PMP_POSITION, mpWrapper.getPositionIndex());
 			tagProfileMapProvider.putBoolean(ATTR_PMP_IS_DISPLAYED, isDisplayedInMap);
 			tagProfileMapProvider.putInteger(ATTR_PMP_ALPHA, mpWrapper.getAlpha());
@@ -2132,8 +2135,8 @@ public class MapProviderManager {
 			}
 
 			// wms layers
-			if (mapProvider instanceof MPWms) {
-				writeXmlWmsLayers(tagProfileMapProvider, (MPWms) mapProvider);
+			if (mp instanceof MPWms) {
+				writeXmlWmsLayers(tagProfileMapProvider, (MPWms) mp);
 			}
 		}
 

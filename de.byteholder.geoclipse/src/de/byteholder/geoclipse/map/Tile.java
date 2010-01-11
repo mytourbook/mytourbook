@@ -186,26 +186,26 @@ public class Tile extends Observable {
 
 		final StringBuilder sb = new StringBuilder();
 
-		if (tileCreatorId != null) {
-			sb.append(tileCreatorId);
-			sb.append('-');
-		}
-
-		if (customTileKey != null) {
-			sb.append(customTileKey);
-			sb.append('-');
-		}
-
-		if (projectionId != null) {
-			sb.append(projectionId);
-			sb.append('-');
-		}
-
 		sb.append(zoom);
 		sb.append('-');
 		sb.append(x);
 		sb.append('-');
 		sb.append(y);
+
+		if (tileCreatorId != null) {
+			sb.append('-');
+			sb.append(tileCreatorId);
+		}
+
+		if (customTileKey != null) {
+			sb.append('-');
+			sb.append(customTileKey);
+		}
+
+		if (projectionId != null) {
+			sb.append('-');
+			sb.append(projectionId);
+		}
 
 		return sb.toString();
 	}
@@ -301,10 +301,10 @@ public class Tile extends Observable {
 					if (areAllChildrenLoaded(tileChildren)) {
 
 						// create parent image when all childs are loaded
-						final MP parentTileFactory = fParentTile.fMp;
-						if (parentTileFactory instanceof ITileChildrenCreator) {
+						final MP parentMp = fParentTile.fMp;
+						if (parentMp instanceof ITileChildrenCreator) {
 
-							return ((ITileChildrenCreator) parentTileFactory).getParentImage(fParentTile, this);
+							return ((ITileChildrenCreator) parentMp).getParentImage(fParentTile, this);
 						}
 
 					} else {

@@ -37,11 +37,12 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
+import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.util.Util;
 
-public class MPWms extends MP {
+public class MPWms extends MP implements ITileLoader {
 
 	private static final String			SRS_EPSG_4326		= "EPSG:4326";				//$NON-NLS-1$
 
@@ -69,8 +70,6 @@ public class MPWms extends MP {
 	private String						fCapsUrl			= UI.EMPTY_STRING;
 	private String						fMapUrl;
 
-	private TileFactoryWms				fTileFactory;
-
 	private List<String>				fAllImageFormats;
 
 	/**
@@ -89,10 +88,10 @@ public class MPWms extends MP {
 
 	private boolean						fIsLoadTransparentImages;
 
-	/**
-	 * number of layers which are displayed in the map
-	 */
-	private int							fDisplayedLayers;
+//	/**
+//	 * number of layers which are displayed in the map
+//	 */
+//	private int							fDisplayedLayers;
 
 	private static final ReentrantLock	MP_WMS_LOCK			= new ReentrantLock();
 
@@ -102,8 +101,6 @@ public class MPWms extends MP {
 	public Object clone() throws CloneNotSupportedException {
 
 		final MPWms mapProvider = (MPWms) super.clone();
-
-		mapProvider.fTileFactory = new TileFactoryWms(mapProvider, fTileFactory);
 
 		mapProvider.fMtLayers = cloneMtLayer(mapProvider, fMtLayers);
 		mapProvider.fMtLayersReverse = cloneMtLayer(mapProvider, fMtLayersReverse);
@@ -169,13 +166,6 @@ public class MPWms extends MP {
 		sb.append(bbox.top);
 
 		return sb.toString();
-	}
-
-	@Override
-	public void disposeCachedImages() {
-		if (fTileFactory != null) {
-			fTileFactory.disposeCachedImages();
-		}
 	}
 
 	/**
@@ -283,29 +273,30 @@ public class MPWms extends MP {
 		return fOfflineLayers;
 	}
 
-	@Override
-	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
+// mp2	
+//	@Override
+//	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
+//
+//		if (initTileFactory == false) {
+//			return fTileFactory;
+//		}
+//
+//		if (fTileFactory == null) {
+//
+//			if (MapProviderManager.checkWms(this, null) == null) {
+//				return null;
+//			}
+//
+//			initializeLayers();
+//		}
+//
+//		// initialize tile factory when it's not done yet
+//		fTileFactory.getInfo();
+//
+//		return fTileFactory;
+//	}
 
-		if (initTileFactory == false) {
-			return fTileFactory;
-		}
-
-		if (fTileFactory == null) {
-
-			if (MapProviderManager.checkWms(this, null) == null) {
-				return null;
-			}
-
-			initializeLayers();
-		}
-
-		// initialize tile factory when it's not done yet
-		fTileFactory.getInfo();
-
-		return fTileFactory;
-	}
-
-	InputStream getTileImageStream(final Tile tile) throws GeoException {
+	public InputStream getTileImageStream(final Tile tile) throws GeoException {
 
 		if (fWmsServer == null) {
 
@@ -340,7 +331,7 @@ public class MPWms extends MP {
 			throw new GeoException(NLS.bind(Messages.DBG043_Wms_Server_Error_CannotConnectToServer, getId()));
 		}
 
-		final int imageSize = getImageSize();
+		final int imageSize = getTileSize();
 
 		mapRequest.setDimensions(imageSize, imageSize);
 		mapRequest.setFormat(Util.encodeSpace(getImageFormat()));
@@ -389,10 +380,8 @@ public class MPWms extends MP {
 		}
 	}
 
-	/**
-	 * create OS path
-	 */
-	IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel) {
+	@Override
+	public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
 		IPath filePath = new Path(fullPath);
 		filePath = filePath.append(getOfflineFolder());
@@ -403,13 +392,14 @@ public class MPWms extends MP {
 			filePath = filePath.append(customTileKey);
 		}
 
-		filePath = filePath
-				.append(Integer.toString(zoomLevel))
-				.append(Integer.toString(x))
-				.append(Integer.toString(y))
+		filePath = filePath//
+				.append(Integer.toString(tile.getZoom()))
+				.append(Integer.toString(tile.getX()))
+				.append(Integer.toString(tile.getY()))
 				.addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
 		return filePath;
+
 	}
 
 	/**
@@ -505,8 +495,6 @@ public class MPWms extends MP {
 
 			setImageFormat(imageFormat == null ? fAllImageFormats.get(0) : imageFormat);
 		}
-
-		fTileFactory = new TileFactoryWms(this);
 	}
 
 	boolean isTransparent() {
@@ -526,22 +514,8 @@ public class MPWms extends MP {
 		}
 	}
 
-	void setDisplayedLayers(final int displayedLayers) {
-		fDisplayedLayers = displayedLayers;
-	}
-
 	public void setGetMapUrl(final String mapUrl) {
 		fMapUrl = mapUrl;
-	}
-
-	@Override
-	public void setImageSize(final int tileSize) {
-
-		super.setImageSize(tileSize);
-
-		if (fTileFactory != null) {
-			fTileFactory.getInfo().initializeMapSize(tileSize);
-		}
 	}
 
 	void setOfflineLayers(final ArrayList<LayerOfflineData> offlineLayers) {
@@ -554,17 +528,6 @@ public class MPWms extends MP {
 
 	public void setWmsEnabled(final boolean isEnabled) {
 		fIsWmsAvailable = isEnabled;
-	}
-
-	@Override
-	public void setZoomLevel(final int minZoom, final int maxZoom) {
-
-		super.setZoomLevel(minZoom, maxZoom);
-
-		// initialize zoom level in the tile factory info because the map gets zoom data from this location
-		if (fTileFactory != null) {
-			fTileFactory.getInfo().initializeZoomLevel(minZoom, maxZoom);
-		}
 	}
 
 }

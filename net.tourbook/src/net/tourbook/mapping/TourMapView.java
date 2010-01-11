@@ -266,7 +266,7 @@ public class TourMapView extends ViewPart {
 
 	void actionSetDefaultPosition() {
 		if (fDefaultPosition == null) {
-			fMap.setZoom(fMap.getTileFactory().getMinimumZoomLevel());
+			fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
 			fMap.setGeoCenterPosition(new GeoPosition(0, 0));
 		} else {
 			fMap.setZoom(fDefaultZoom);
@@ -416,7 +416,7 @@ public class TourMapView extends ViewPart {
 	}
 
 	void actionZoomShowEntireMap() {
-		fMap.setZoom(fMap.getTileFactory().getMinimumZoomLevel());
+		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
 		fMap.queueMapRedraw();
 	}
 
@@ -649,7 +649,7 @@ public class TourMapView extends ViewPart {
 					positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 
-			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
+			final GeoPosition geoPosition = fMap.getMapProvider().pixelToGeo(center, zoom);
 
 			fMap.setGeoCenterPosition(geoPosition);
 		}
@@ -1051,7 +1051,7 @@ public class TourMapView extends ViewPart {
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
-		final MP mp = fMap.getTileFactory();
+		final MP mp = fMap.getMapProvider();
 		final Point2D point1 = mp.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
 
@@ -1818,7 +1818,7 @@ public class TourMapView extends ViewPart {
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, fActionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (fDefaultPosition == null) {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getTileFactory().getMinimumZoomLevel());
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getMapProvider().getMinimumZoomLevel());
 			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
@@ -1910,7 +1910,7 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		final MP mp = fMap.getTileFactory();
+		final MP mp = fMap.getMapProvider();
 
 		final int maximumZoomLevel = mp.getMaximumZoomLevel();
 		int zoom = mp.getMinimumZoomLevel();

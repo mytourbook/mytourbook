@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -185,10 +186,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private String									fDescription					= UI.EMPTY_STRING;
 
-//	/**
-//	 * OS folder to save offline images
-//	 */
-//	private String									fOfflineFolder;
+	/**
+	 * OS folder to save offline images
+	 */
+	private String									fOfflineFolder;
 
 	/**
 	 * number of files in the offline cache
@@ -207,6 +208,25 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * State if the map provider can be toggled in the map
 	 */
 	private boolean									fCanBeToggled;
+
+	/*
+	 * Profile map provider values
+	 */
+	/**
+	 * alpha values for the map provider, 100 is opaque, 0 is transparent
+	 */
+	private int										fProfileAlpha					= 100;
+
+	private boolean									fIsProfileTransparentColors		= false;
+	private int[]									fProfileTransparentColor		= null;
+
+	/**
+	 * when <code>true</code> the color black is transparent
+	 */
+	private boolean									fIsProfileBlackTransparent;
+
+	private boolean									fIsProfileBrightness;
+	private int										fProfileBrightnessValue;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
 		fOfflineReloadEventListeners.add(listener);
@@ -252,7 +272,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		fTileImageCache = new TileImageCache(this);
 
-		initializeMapSize(fMaxZoomLevel, fTileSize);
+		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
 
 	}
 
@@ -326,11 +346,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 					gc.setBackground(bgColor);
 					gc.fillRectangle(0, 0, tileSize, tileSize);
 
-// mp2					
-//					if (fFactoryInfo.isMapEmpty() == false) {
-//						gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-//						gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
-//					}
+					gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+					gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
 				}
 				gc.dispose();
 				bgColor.dispose();
@@ -355,11 +372,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 					gc.setBackground(bgColor);
 					gc.fillRectangle(0, 0, tileSize, tileSize);
 
-// mp2					
-//					if (fFactoryInfo.isMapEmpty() == false) {
-//						gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-//						gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
-//					}
+					gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+					gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
 				}
 				gc.dispose();
 				bgColor.dispose();
@@ -466,7 +480,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * @return Returns a custom tile key, default returns <code>null</code>
 	 */
-	public String getCustomTileKey() {
+	String getCustomTileKey() {
 		return null;
 	}
 
@@ -678,6 +692,26 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return fOfflineFileSize;
 	}
 
+	/**
+	 * @return Returns the folder where tile files will be cached relativ to the common offline
+	 *         image path
+	 */
+	public String getOfflineFolder() {
+		return fOfflineFolder;
+	}
+
+	int getProfileAlpha() {
+		return fProfileAlpha;
+	}
+
+	int getProfileBrightness() {
+		return fProfileBrightnessValue;
+	}
+
+	int[] getProfileTransparentColors() {
+		return fProfileTransparentColor;
+	}
+
 	public Projection getProjection() {
 		return fProjection;
 	}
@@ -826,28 +860,17 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return fTileCache;
 	}
 
-//	public String getOfflineFolder() {
-//		return fOfflineFolder;
-//	}
-
 	public TileImageCache getTileImageCache() {
 		return fTileImageCache;
 	}
 
 	/**
 	 * @return Returns a tile loader which can load the tile images, the method
-	 *         {@link #getTileUrl(int, int, int, Tile)} will be ignored when a tile loader is set
+	 *         {@link #getTileUrl(Tile)} will be ignored when a tile loader is set
 	 */
 	public ITileLoader getTileLoader() {
 		return null;
 	}
-
-	/**
-	 * @return Returns the folder where tile files will be cached relativ to the common offline
-	 *         image path
-	 */
-	//	 this is the same as: getOfflineFolder()
-	public abstract String getTileOSFolder();
 
 	/**
 	 * @param fullPath
@@ -902,22 +925,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * <br>
 	 * This method will be ignored when {@link #getTileLoader()} returns a tile loader.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param zoom
-	 *            the zoom level
 	 * @param tile
 	 * @return a valid url to load the tile
 	 */
-	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
+	public String getTileUrl(final Tile tile) {
 		return null;
 	}
-
-//	/**
-//	 * @param offlineImagePath
-//	 * @return Path where tile files will are cached relative to the offline image path
-//	 */
-//	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
 	/**
 	 * Gets the URL of a tile.
@@ -927,11 +940,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 * @throws Exception
 	 */
-	public URL getTileURL(final Tile tile) throws Exception {
+	public URL getTileURLEncoded(final Tile tile) throws Exception {
 
 // mp2		
 //		final String urlString = tile.getMP().getTileUrl(tile.getX(), tile.getY(), tile.getZoom(), tile);
-		final String urlString = getTileUrl(tile.getX(), tile.getY(), tile.getZoom(), tile);
+		final String urlString = getTileUrl(tile);
 
 		if (urlString == null) {
 			final Exception e = new Exception();
@@ -972,17 +985,17 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void initializeMapSize(final int tileSize) {
-		initializeMapSize(fMaxZoomLevel, tileSize);
+		initializeMapWithZoomAndSize(fMaxZoomLevel, tileSize);
 	}
 
-	private void initializeMapSize(final int totalMapZoom, final int tileSize) {
+	private void initializeMapWithZoomAndSize(final int maxZoom, final int tileSize) {
 
 		fTileSize = tileSize;
 
 		// map width (in pixel) is one tile at zoomlevel 0
 		int devMapSize = tileSize;
 
-		final int mapArrayLength = totalMapZoom + 1;
+		final int mapArrayLength = maxZoom + 1;
 
 		longitudeDegreeWidthInPixels = new double[mapArrayLength];
 		longitudeRadianWidthInPixels = new double[mapArrayLength];
@@ -991,7 +1004,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		mapWidthInTilesAtZoom = new int[mapArrayLength];
 
 		// get map values for each zoom level
-		for (int z = 0; z <= totalMapZoom; ++z) {
+		for (int z = 0; z <= maxZoom; ++z) {
 
 			// how wide is each degree of longitude in pixels
 			longitudeDegreeWidthInPixels[z] = (double) devMapSize / 360;
@@ -1008,13 +1021,31 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 	}
 
-	public void initializeZoomLevel(final int minZoom, final int maxZoom) {
+	private void initializeZoomLevel(final int minZoom, final int maxZoom) {
 
 		fMinZoomLevel = minZoom;
 		fMaxZoomLevel = maxZoom;
 
-		initializeMapSize(fMaxZoomLevel, fTileSize);
+		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
 	}
+
+	boolean isProfileBrightness() {
+		return fIsProfileBrightness;
+	}
+
+	boolean isProfileTransparentBlack() {
+		return fIsProfileBlackTransparent;
+	}
+
+	boolean isProfileTransparentColors() {
+		return fIsProfileTransparentColors;
+	}
+
+//	/**
+//	 * @param offlineImagePath
+//	 * @return Path where tile files will are cached relative to the offline image path
+//	 */
+//	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
 	/**
 	 * @returns Return <code>true</code> if this point in <em>tiles</em> is valid at this zoom
@@ -1289,19 +1320,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fFavoriteZoom = favoriteZoom;
 	}
 
-	public void setImageFormat(final String imageFormat) {
-		fImageFormat = imageFormat;
-	}
-
-	public void setLastUsedPosition(final GeoPosition position) {
-		fLastUsedPosition = position;
-	}
-
-	public void setLastUsedZoom(final int zoom) {
-		fLastUsedZoom = zoom;
-	}
-
-	public void setMapProviderId(final String mapProviderId) {
+	public void setId(final String mapProviderId) {
 
 		fMapProviderId = mapProviderId;
 
@@ -1312,6 +1331,30 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		 * be distinguished with the equals/hashcode methods
 		 */
 		//		super.setFactoryId(factoryId);
+	}
+
+	public void setImageFormat(final String imageFormat) {
+		fImageFormat = imageFormat;
+	}
+
+	void setIsProfileBrightness(final boolean isBrightness) {
+		fIsProfileBrightness = isBrightness;
+	}
+
+	void setIsProfileTransparentColors(final boolean isTransColors) {
+		fIsProfileTransparentColors = isTransColors;
+	}
+
+	void setIsProfileTransparentBlack(final boolean isBlackTransparent) {
+		fIsProfileBlackTransparent = isBlackTransparent;
+	}
+
+	public void setLastUsedPosition(final GeoPosition position) {
+		fLastUsedPosition = position;
+	}
+
+	public void setLastUsedZoom(final int zoom) {
+		fLastUsedZoom = zoom;
 	}
 
 	public void setName(final String mapProviderName) {
@@ -1326,6 +1369,28 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fOfflineFileSize = offlineFileSize;
 	}
 
+	/**
+	 * Sets the folder where offline images are saved, this folder is relativ to the common offline
+	 * folder path
+	 * 
+	 * @param offlineFolder
+	 */
+	public void setOfflineFolder(final String offlineFolder) {
+		fOfflineFolder = offlineFolder;
+	}
+
+	void setProfileAlpha(final int alpha) {
+		fProfileAlpha = alpha;
+	}
+
+	void setProfileBrightness(final int brightnessValue) {
+		fProfileBrightnessValue = brightnessValue;
+	}
+
+	void setProfileTransparentColors(final int[] transColors) {
+		fProfileTransparentColor = transColors;
+	}
+
 	public void setStateToReloadOfflineCounter() {
 
 		if (fOfflineFileCounter != OFFLINE_INFO_NOT_READ) {
@@ -1337,20 +1402,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 	}
 
-//	public void setOfflineFolder(final String offlineFolder) {
-//		fOfflineFolder = offlineFolder;
-//	}
-
 	/**
-	 * Sets the folder where offline images are saved, this folder is relativ to the offline folder
-	 * path
+	 * Sets the tile image size and updates the internal datastructures.
 	 * 
-	 * @param offlineFolder
+	 * @param tileSize
 	 */
-	public abstract void setTileOSFolder(String offlineFolder);
-
 	public void setTileSize(final int tileSize) {
-		fTileSize = tileSize;
+		initializeMapSize(tileSize);
 	}
 
 	public void setUseOfflineImage(final boolean useOfflineImage) {
@@ -1358,14 +1416,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * Sets the min/max zoom levels which this map provider supports
+	 * Sets the min/max zoom levels which this map provider supports and updates the internal
+	 * datastructures.
 	 * 
 	 * @param minZoom
 	 * @param maxZoom
 	 */
 	public void setZoomLevel(final int minZoom, final int maxZoom) {
-		fMinZoomLevel = minZoom;
-		fMaxZoomLevel = maxZoom;
+		initializeZoomLevel(minZoom, maxZoom);
 	}
 
 	/**

@@ -1170,7 +1170,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		final String tileCacheOSPath = TileImageCache.getTileCacheOSPath();
 		if (tileCacheOSPath != null) {
-			tileCacheOSPathFolder = new Path(tileCacheOSPath).append(mp.getTileOSFolder());
+			tileCacheOSPathFolder = new Path(tileCacheOSPath).append(mp.getOfflineFolder());
 		}
 
 		return tileCacheOSPathFolder;

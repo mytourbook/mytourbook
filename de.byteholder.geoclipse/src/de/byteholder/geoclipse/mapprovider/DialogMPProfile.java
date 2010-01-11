@@ -109,8 +109,6 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -126,8 +124,8 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
 
-	private static final int				MAP_MAX_ZOOM_LEVEL						= MP_OLD.UI_MAX_ZOOM_LEVEL
-																							- MP_OLD.UI_MIN_ZOOM_LEVEL;
+	private static final int				MAP_MAX_ZOOM_LEVEL						= MP.UI_MAX_ZOOM_LEVEL
+																							- MP.UI_MIN_ZOOM_LEVEL;
 
 	public static final String				DEFAULT_URL								= "http://";								//$NON-NLS-1$
 
@@ -237,8 +235,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private int								fStatEndLoading;
 	private int								fStatErrorLoading;
 
-	private MPPlugin						fDefaultMapProvider;
-	private TileFactory_OLD						fDefaultTileFactory;
+	private MPPlugin						fDefaultMP;
 
 	private boolean							fIsInitUI								= false;
 
@@ -297,15 +294,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 */
 		fMpProfile.setIsSaveImage(false);
 
-		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
-		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
-
+		fDefaultMP = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
 	public void actionZoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
 		fMap.queueMapRedraw();
- 	}
+	}
 
 	public void actionZoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
@@ -313,7 +308,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	}
 
 	public void actionZoomOutToMinZoom() {
-		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
 		fMap.queueMapRedraw();
 	}
 
@@ -324,7 +319,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.getTileFactory(true).resetAll(false);
+				fMpProfile.resetAll(false);
 			}
 		});
 
@@ -406,7 +401,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		setTitle(Messages.Dialog_MapProfile_DialogArea_Title);
 
-		TileFactory_OLD.addTileListener(this);
+		MP.addTileListener(this);
 
 		restoreState();
 
@@ -596,9 +591,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 							// expand/collapse current item
 
-							final MP_OLD mapProvider = ((TVIMapProvider) selectedItem)
-									.getMapProviderWrapper()
-									.getMapProvider();
+							final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP();
 
 							if ((mapProvider instanceof MPWms) == false) {
 
@@ -746,8 +739,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-					final MP_OLD mapProvider = mpWrapper.getMapProvider();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MP mapProvider = mpWrapper.getMP();
 
 					styledString.append(mapProvider.getName());
 
@@ -790,7 +783,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
 					cell.setText(Boolean.toString(mpWrapper.isDisplayedInMap()));
 
@@ -816,7 +809,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final TVIMapProvider tvi = (TVIMapProvider) element;
-					final MP_OLD mapProvider = tvi.getMapProviderWrapper().getMapProvider();
+					final MP mapProvider = tvi.getMapProviderWrapper().getMP();
 
 					if (mapProvider instanceof MPWms) {
 
@@ -839,7 +832,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
 					return mpWrapper.isDisplayedInMap();
 
@@ -860,7 +853,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
 					mpWrapper.setIsDisplayedInMap(isChecked);
 
@@ -870,7 +863,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						 * remove parent tiles from loading cache because they can have loading
 						 * errors (from their children) which prevents them to be loaded again
 						 */
-						fMpProfile.getTileFactory(true).resetParentTiles();
+						fMpProfile.resetParentTiles();
 					}
 
 					enableProfileMapButton();
@@ -908,7 +901,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
 					cell.setText(Integer.toString(mpWrapper.getAlpha()));
 
@@ -935,7 +928,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (element instanceof TVIMapProvider) {
 
-					final MapProviderWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
 					cell.setText(mpWrapper.isBrightness()
 							? Integer.toString(mpWrapper.getBrightness())
@@ -1263,9 +1256,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				fSpinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMinZoom);
-				fSpinMinZoom.setMinimum(MP_OLD.UI_MIN_ZOOM_LEVEL);
-				fSpinMinZoom.setMaximum(MP_OLD.UI_MAX_ZOOM_LEVEL);
-				fSpinMinZoom.setSelection(MP_OLD.UI_MIN_ZOOM_LEVEL);
+				fSpinMinZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
+				fSpinMinZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
+				fSpinMinZoom.setSelection(MP.UI_MIN_ZOOM_LEVEL);
 				fSpinMinZoom.addMouseWheelListener(mouseWheelListener);
 				fSpinMinZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1295,9 +1288,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				fSpinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMaxZoom);
-				fSpinMaxZoom.setMinimum(MP_OLD.UI_MIN_ZOOM_LEVEL);
-				fSpinMaxZoom.setMaximum(MP_OLD.UI_MAX_ZOOM_LEVEL);
-				fSpinMaxZoom.setSelection(MP_OLD.UI_MAX_ZOOM_LEVEL);
+				fSpinMaxZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
+				fSpinMaxZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
+				fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
 				fSpinMaxZoom.addMouseWheelListener(mouseWheelListener);
 				fSpinMaxZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1582,29 +1575,27 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void displayOsmMap() {
 
-		if (fMap.getTileFactory() == fDefaultTileFactory) {
+		if (fMap.getMapProvider() == fDefaultMP) {
 
 			// toggle tile factory
 
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory_OLD mpTileFactory = fMpProfile.getTileFactory(true);
+			setMapZoomLevelFromInfo(fMpProfile);
 
-			setMapZoomLevelFromInfo(mpTileFactory.getInfo());
-
-			fMap.resetTileFactory(mpTileFactory);
+			fMap.resetTileFactory(fMpProfile);
 
 		} else {
 
 			// display OSM
 
 			// ensure the map is using the correct zoom levels
-			setMapZoomLevelFromInfo(fDefaultTileFactory.getInfo());
+			setMapZoomLevelFromInfo(fDefaultMP);
 
-			fDefaultMapProvider.setStateToReloadOfflineCounter();
+			fDefaultMP.setStateToReloadOfflineCounter();
 
-			fMap.resetTileFactory(fDefaultTileFactory);
+			fMap.resetTileFactory(fDefaultMP);
 		}
 	}
 
@@ -1616,8 +1607,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// update layers BEFORE the tile factory is set in the map
 		updateModelFromUI();
 
-		final TileFactory_OLD mpTileFactory = fMpProfile.getTileFactory(true);
-
 		/**
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 		 * <br>
@@ -1625,9 +1614,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 * <br>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 		 */
-		setMapZoomLevelFromInfo(mpTileFactory.getInfo());
+		setMapZoomLevelFromInfo(fMpProfile);
 
-		fMap.resetTileFactory(mpTileFactory);
+		fMap.resetTileFactory(fMpProfile);
 	}
 
 	private void enableControls() {
@@ -1731,7 +1720,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		boolean isEnabled = false;
 
 		// check if a wrapper is displayed and enabled
-		for (final MapProviderWrapper mpWrapper : fMpProfile.getAllWrappers()) {
+		for (final MPWrapper mpWrapper : fMpProfile.getAllWrappers()) {
 			if (mpWrapper.isDisplayedInMap() && mpWrapper.isEnabled()) {
 				isEnabled = true;
 				break;
@@ -1861,7 +1850,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.getTileFactory(true).resetAll(false);
+				fMpProfile.resetAll(false);
 
 				// model is saved in the dialog opening code
 				updateModelFromUI();
@@ -1872,7 +1861,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	}
 
 	private void onDispose() {
-		TileFactory_OLD.removeTileListener(DialogMPProfile.this);
+
+		MP.removeTileListener(DialogMPProfile.this);
 
 		if (fImageMap != null) {
 			fImageMap.dispose();
@@ -1974,7 +1964,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// update alpha in the map provider 
 
-			final MapProviderWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
+			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 			final boolean isBlack = fChkTransparentBlack.getSelection();
 
 			// update model
@@ -2037,18 +2027,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 ////		System.out.println("top: " + fBboxTop);
 ////		System.out.println("bot: " + fBboxBottom);
 ////		System.out.println();
-////		// TODO remove SYSTEM.OUT.PRINTLN
 //
 ////		displayProfileMap(false);
 //	}
 
 	private void onModifyZoomSpinnerMax() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			fSpinMaxZoom.setSelection(MP_OLD.UI_MAX_ZOOM_LEVEL);
+			fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
 		}
 
 		if (mapMaxValue < mapMinValue) {
@@ -2060,8 +2049,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMin() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMinValue > mapMaxValue) {
 			fSpinMinZoom.setSelection(mapMaxValue + 1);
@@ -2092,7 +2081,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		if (firstElement instanceof TVIMapProvider) {
 
-			final MapProviderWrapper selectedMpWrapper = ((TVIMapProvider) firstElement).getMapProviderWrapper();
+			final MPWrapper selectedMpWrapper = ((TVIMapProvider) firstElement).getMapProviderWrapper();
 
 			fIsInitUI = true;
 			{
@@ -2198,10 +2187,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	/**
 	 * ensure the map is using the correct zoom levels from the tile factory
 	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
+	private void setMapZoomLevelFromInfo(final MP mp) {
 
-		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
-		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();
+		final int factoryMinZoom = mp.getMinimumZoomLevel();
+		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
 		final int mapZoom = fMap.getZoom();
 		final GeoPosition mapCenter = fMap.getCenterPosition();
@@ -2317,10 +2306,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			if (itemData instanceof TVIMapProvider) {
 
-				final MapProviderWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
+				final MPWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
 				boolean isWmsDisplayed = mpWrapper.isDisplayedInMap();
 
-				final MP_OLD mapProvider = mpWrapper.getMapProvider();
+				final MP mapProvider = mpWrapper.getMP();
 				if (mapProvider instanceof MPWms) {
 
 					// visibility for a wms map provider can be toggled only a layer
@@ -2346,7 +2335,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					 * remove parent tiles from loading cache because they can have loading
 					 * errors (from their children) which prevents them to be loaded again
 					 */
-					fMpProfile.getTileFactory(true).resetParentTiles();
+					fMpProfile.resetParentTiles();
 				}
 
 				mpWrapper.setIsDisplayedInMap(isWmsDisplayed);
@@ -2386,8 +2375,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int oldZoomLevel = fMap.getZoom();
 		final GeoPosition mapCenter = fMap.getCenterPosition();
 
-		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
-		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - MP_OLD.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
 		fMpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
@@ -2410,12 +2399,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		int tblItemIndex = 0;
 		for (final TreeItem treeItem : fTreeViewer.getTree().getItems()) {
 
-			final MapProviderWrapper mpWrapper = ((TVIMapProvider) treeItem.getData()).getMapProviderWrapper();
+			final MPWrapper mpWrapper = ((TVIMapProvider) treeItem.getData()).getMapProviderWrapper();
 
 			mpWrapper.setPositionIndex(tblItemIndex++);
 
 			// update wms layer
-			final MP_OLD mapProvider = mpWrapper.getMapProvider();
+			final MP mapProvider = mpWrapper.getMP();
 			if (mapProvider instanceof MPWms) {
 
 				final MPWms mpWms = (MPWms) mapProvider;
@@ -2500,7 +2489,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// update alpha in the map provider 
 
-			final MapProviderWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
+			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
 			// update model
 			final int newAlpha = fSpinAlpha.getSelection();
@@ -2522,7 +2511,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// update brightness in the map provider 
 
-			final MapProviderWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
+			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
 			mpWrapper.setIsBrightness(fChkBrightness.getSelection());
 			mpWrapper.setBrightness(fScaleBright.getSelection());
@@ -2545,8 +2534,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final TreeViewerItem tviParent = tviLayer.getParentItem();
 		if (tviParent instanceof TVIMapProvider) {
 
-			final MapProviderWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
-			final MP_OLD mapProvider = parentMpWrapper.getMapProvider();
+			final MPWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
+			final MP mapProvider = parentMpWrapper.getMP();
 
 			if (mapProvider instanceof MPWms) {
 
@@ -2575,8 +2564,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// zoom level
 			final int minZoomLevel = fMpProfile.getMinZoomLevel();
 			final int maxZoomLevel = fMpProfile.getMaxZoomLevel();
-			fSpinMinZoom.setSelection(minZoomLevel + MP_OLD.UI_MIN_ZOOM_LEVEL);
-			fSpinMaxZoom.setSelection(maxZoomLevel + MP_OLD.UI_MIN_ZOOM_LEVEL);
+			fSpinMinZoom.setSelection(minZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
+			fSpinMaxZoom.setSelection(maxZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
 
 			final int color = fMpProfile.getBackgroundColor();
 			fColorImageBackground.setColorValue(new RGB(
@@ -2591,14 +2580,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpProfile.getName());
 		setMessage(fDefaultMessage);
 
-		final ArrayList<MapProviderWrapper> allMpWrappers = fMpProfile.getAllWrappers();
+		final ArrayList<MPWrapper> allMpWrappers = fMpProfile.getAllWrappers();
 
 		MPProfile.sortMpWrapper(allMpWrappers);
 		MPProfile.updateWrapperTileFactory(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		final TileFactory_OLD tileFactory = fMpProfile.getTileFactory(true);
-		fMap.resetTileFactory(tileFactory);
+		fMap.resetTileFactory(fMpProfile);
 
 		// set position to previous position
 		fMap.setZoom(fMpProfile.getLastUsedZoom());

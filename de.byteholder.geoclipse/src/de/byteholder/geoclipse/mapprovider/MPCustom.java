@@ -27,14 +27,10 @@ public class MPCustom extends MP {
 
 	private String				fCustomUrl	= UI.EMPTY_STRING;
 
-	private TileFactoryCustom	fTileFactory;
-
 	private ArrayList<UrlPart>	fUrlParts	= new ArrayList<UrlPart>();
 
-	private TileFactoryInfo_OLD		fDefaultFactoryInfo;
-
 	public MPCustom() {
-		fTileFactory = new TileFactoryCustom(this);
+
 	}
 
 	@Override
@@ -43,8 +39,6 @@ public class MPCustom extends MP {
 		final MPCustom mapProvider = (MPCustom) super.clone();
 
 		mapProvider.fCustomUrl = new String(fCustomUrl);
-
-		mapProvider.fTileFactory = new TileFactoryCustom(mapProvider, fTileFactory);
 
 		// clone url parts
 		final ArrayList<UrlPart> newUrlParts = new ArrayList<UrlPart>();
@@ -56,64 +50,34 @@ public class MPCustom extends MP {
 		return mapProvider;
 	}
 
-	@Override
-	public void disposeCachedImages() {
-		fTileFactory.disposeCachedImages();
-	}
-
 	public String getCustomUrl() {
 		return fCustomUrl;
 	}
 
 	@Override
-	public TileFactoryCustom getTileFactory(final boolean initTileFactory) {
-
-		if (initTileFactory == false) {
-			return fTileFactory;
-		}
-
-		// initialize tile factory when it's not yet done
-		fTileFactory.getInfo();
-
-		return fTileFactory;
-	}
-
-	public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel) {
+	public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
 		IPath filePath = new Path(fullPath);
+
 		filePath = filePath.append(getOfflineFolder());
 
-		filePath = filePath
-				.append(Integer.toString(zoomLevel))
-				.append(Integer.toString(x))
-				.append(Integer.toString(y))
+		filePath = filePath//
+				.append(Integer.toString(tile.getZoom()))
+				.append(Integer.toString(tile.getX()))
+				.append(Integer.toString(tile.getY()))
 				.addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
 		return filePath;
 	}
 
 	@Override
-	public IPath getTileOSPath(final String fullPath, final int x, final int y, final int zoomLevel, final Tile tile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
+	public String getTileUrl(final Tile tile) {
 
 		if (fUrlParts.size() == 0) {
 
 			// url parts are not set yet, display openstreetmap
 
-			if (fDefaultFactoryInfo == null) {
-				fDefaultFactoryInfo = MapProviderManager
-						.getInstance()
-						.getDefaultMapProvider()
-						.getTileFactory(true)
-						.getInfo();
-			}
-
-			return fDefaultFactoryInfo.getTileUrl(x, y, zoom, tile);
+			return MapProviderManager.getInstance().getDefaultMapProvider().getTileUrl(tile);
 
 		} else {
 
@@ -127,11 +91,11 @@ public class MPCustom extends MP {
 					break;
 
 				case X:
-					sb.append(Integer.toString(x));
+					sb.append(Integer.toString(tile.getX()));
 					break;
 
 				case Y:
-					sb.append(Integer.toString(y));
+					sb.append(Integer.toString(tile.getY()));
 					break;
 
 //				case LAT_TOP:
@@ -151,7 +115,7 @@ public class MPCustom extends MP {
 //					break;
 
 				case ZOOM:
-					sb.append(Integer.toString(zoom));
+					sb.append(Integer.toString(tile.getZoom()));
 					break;
 
 				case RANDOM_INTEGER:
@@ -189,18 +153,6 @@ public class MPCustom extends MP {
 		fUrlParts.clear();
 
 		fUrlParts = urlParts;
-	}
-
-	@Override
-	public void setZoomLevel(final int minZoom, final int maxZoom) {
-
-		super.setZoomLevel(minZoom, maxZoom);
-
-		// initialize the new zoom level by setting internal data
-		if (fTileFactory != null) {
-			fTileFactory.getInfo().initializeZoomLevel(minZoom, maxZoom);
-		}
-
 	}
 
 }

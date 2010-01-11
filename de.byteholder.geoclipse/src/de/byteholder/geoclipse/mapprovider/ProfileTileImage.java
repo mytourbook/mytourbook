@@ -22,10 +22,11 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
 
 /**
- * part of this class is copied from {@link CompositeImageDescriptor} and heavily modified
+ * Creates the tile image for the profile map provider {@link MPProfile} <br>
+ * <br>
+ * Part of this class is copied from {@link CompositeImageDescriptor} and heavily modified
  */
 final class ProfileTileImage {
 
@@ -54,19 +55,19 @@ final class ProfileTileImage {
 	 */
 	final void drawImage(final ImageData src, final Tile srcTile, final ImageData brt, final Tile brtTile) {
 
-		final TileFactory_OLD srcTileFactory = srcTile.getMP();
+		final MP srcMp = srcTile.getMP();
 
-		final float externalAlpha = (float) srcTileFactory.getProfileAlpha() / 100;
+		final float externalAlpha = (float) srcMp.getProfileAlpha() / 100;
 		int[] transparentPixel = null;
 
 		/*
 		 * set transparent pixel
 		 */
-		if (srcTileFactory.isTransparentColor()) {
+		if (srcMp.isProfileTransparentColors()) {
 
 			// transparent colors are set
 
-			final int[] transparentColors = srcTileFactory.getTransparentColors();
+			final int[] transparentColors = srcMp.getProfileTransparentColors();
 
 			if (src.palette.isDirect) {
 
@@ -146,7 +147,7 @@ final class ProfileTileImage {
 		// brightness image must have the same image size
 		if (brt != null && src.width == brt.width && src.height == brt.height) {
 
-			final TileFactory_OLD brtTileFactory = brtTile.getMP();
+			final MP brtMp = brtTile.getMP();
 
 			brtData = brt.data;
 			brtAlphaData = brt.alphaData;
@@ -158,7 +159,7 @@ final class ProfileTileImage {
 //			brtAlpha = brtTileFactory.getProfileAlpha();
 
 			// adjust brightness to 0.0 ... 1.0
-			selectedBrightness = brtTileFactory.getProfileBrightness() / 100f;
+			selectedBrightness = brtMp.getProfileBrightness() / 100f;
 		}
 
 		// source data

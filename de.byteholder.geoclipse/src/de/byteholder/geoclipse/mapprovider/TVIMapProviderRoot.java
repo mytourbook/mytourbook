@@ -21,10 +21,10 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 public class TVIMapProviderRoot extends TVIMapProviderItem {
 
-	private ArrayList<MapProviderWrapper>	fMpWrapperList;
+	private ArrayList<MPWrapper>	fMpWrapperList;
 
 	public TVIMapProviderRoot(	final ContainerCheckedTreeViewer mapProviderViewer,
-								final ArrayList<MapProviderWrapper> mpWrapperList) {
+								final ArrayList<MPWrapper> mpWrapperList) {
 
 		super(mapProviderViewer);
 
@@ -35,7 +35,7 @@ public class TVIMapProviderRoot extends TVIMapProviderItem {
 	protected void fetchChildren() {
 
 		// create map provider
-		for (final MapProviderWrapper mpWrapper : fMpWrapperList) {
+		for (final MPWrapper mpWrapper : fMpWrapperList) {
 			addChild(new TVIMapProvider(getTreeViewer(), mpWrapper));
 		}
 	}

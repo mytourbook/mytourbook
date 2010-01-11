@@ -15,39 +15,16 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import java.io.InputStream;
-
 import org.eclipse.core.runtime.IPath;
 
-import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactoryImpl;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 
-public class TileFactoryWms extends TileFactoryImpl {
+public class OLD_TileFactoryWms extends TileFactoryImpl {
 
 	private MPWms				fMpWms;
 
 	private WmsTileFactoryInfo	fFactoryInfo;
-
-	public TileFactoryWms(final MPWms wmsMapProvider) {
-		fMpWms = wmsMapProvider;
-	}
-
-	/**
-	 * Clone constructor
-	 * 
-	 * @param mapProvider
-	 * @param fTileFactory
-	 */
-	public TileFactoryWms(final MPWms mapProvider, final TileFactoryWms fTileFactory) {
-
-		fMpWms = mapProvider;
-
-		// create factory info
-		getInfo();
-	}
 
 	@Override
 	public TileFactoryInfo_OLD getInfo() {
@@ -79,7 +56,7 @@ public class TileFactoryWms extends TileFactoryImpl {
 	}
 
 	@Override
-	public MP_OLD getMapProvider() {
+	public MP_OLD getMP() {
 		return fMpWms;
 	}
 
@@ -91,6 +68,24 @@ public class TileFactoryWms extends TileFactoryImpl {
 	@Override
 	public void setMapProvider(final MP_OLD mapProvider) {
 	// this is done in the constructor
+	}
+
+	public TileFactoryWms(final MPWms wmsMapProvider) {
+		fMpWms = wmsMapProvider;
+	}
+
+	/**
+	 * Clone constructor
+	 * 
+	 * @param mapProvider
+	 * @param fTileFactory
+	 */
+	public TileFactoryWms(final MPWms mapProvider, final TileFactoryWms fTileFactory) {
+
+		fMpWms = mapProvider;
+
+		// create factory info
+		getInfo();
 	}
 }
 
@@ -118,9 +113,9 @@ class WmsTileFactoryInfo extends TileFactoryInfo_OLD implements ITileLoader {
 		return mpWms.getName();
 	}
 
-	public InputStream getTileImageStream(final Tile tile) throws GeoException {
-		return mpWms.getTileImageStream(tile);
-	}
+//	public InputStream getTileImageStream(final Tile tile) throws GeoException {
+//		return mpWms.getTileImageStream(tile);
+//	}
 
 	@Override
 	public ITileLoader getTileLoader() {
@@ -138,7 +133,7 @@ class WmsTileFactoryInfo extends TileFactoryInfo_OLD implements ITileLoader {
 	}
 
 	@Override
-	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
+	public String getTileUrl(final Tile tile) {
 		// this map provider is supporting the ITileLoader interface
 		return null;
 	}
@@ -146,7 +141,7 @@ class WmsTileFactoryInfo extends TileFactoryInfo_OLD implements ITileLoader {
 	@Override
 	public void setFactoryId(final String factoryId) {
 
-		mpWms.setMapProviderId(factoryId);
+		mpWms.setId(factoryId);
 
 		/*
 		 * !!! very importand !!!

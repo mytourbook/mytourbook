@@ -38,20 +38,16 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
  */
 public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 
-	/**
-	 * !!! this is NOT unused but annotaded with "unused" to remove the warning !!!!
-	 */
 	private static ElevationColor	elevationColor;
 
 	private static final String		FACTORY_ID		= "srtm";				//$NON-NLS-1$
 	private static final String		FACTORY_NAME	= "SRTM";				//$NON-NLS-1$
 	private static final String		OFFLINE_FOLDER	= "srtm";				//$NON-NLS-1$
 
-	private static final String		BASE_URL		= "file://dummy";		//$NON-NLS-1$
-
 	private static final int		MIN_ZOOM		= 0;
 	private static final int		MAX_ZOOM		= 17;
-//	private static final int		TOTAL_ZOOM		= 17;
+
+	private static final String		DESCRIPTION		= Messages.SRTM_MapProvider_Description;
 
 	// initialize SRTM loading
 	public final NumberForm			numberForm		= new NumberForm();
@@ -59,11 +55,14 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 
 	public SRTMMapProvider() {
 
+		setId(FACTORY_ID);
+		setName(FACTORY_NAME);
+		setDescription(DESCRIPTION);
+		setZoomLevel(MIN_ZOOM, MAX_ZOOM);
+
 		if (elevationColor == null) {
 			elevationColor = new ElevationColor(this);
 		}
-
-		setZoomLevel(MIN_ZOOM, MAX_ZOOM);
 	}
 
 	@Override
@@ -97,7 +96,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 		// i.e. it gives the resolution of the image!
 		final int grid = srtmProfile.getResolutionValue();
 
-		System.out.println(Messages.getString("srtm_tile_factory_painting_tile") //$NON-NLS-1$
+		System.out.println(Messages.SRTM_MapProvider_Log_PaintingTile
 				+ ("(L=" + elevationLayer.getName())//$NON-NLS-1$
 				+ (", G=" + grid)//$NON-NLS-1$
 				+ (", X=" + tileX) //$NON-NLS-1$
@@ -206,11 +205,6 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 	}
 
 	@Override
-	public String getBaseURL() {
-		return BASE_URL;
-	}
-
-	@Override
 	public String getId() {
 		return FACTORY_ID;
 	}
@@ -221,7 +215,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 	}
 
 	@Override
-	public String getTileOSFolder() {
+	public String getOfflineFolder() {
 		return OFFLINE_FOLDER;
 	}
 
@@ -246,11 +240,6 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 	@Override
 	public ITilePainter getTilePainter() {
 		return this;
-	}
-
-	@Override
-	public void setTileOSFolder(final String offlineFolder) {
-	// folder is static, nothing to do
 	}
 
 // mp2

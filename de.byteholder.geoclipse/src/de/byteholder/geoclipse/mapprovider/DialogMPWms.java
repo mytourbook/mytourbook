@@ -88,8 +88,6 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -181,7 +179,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private MPWms							fMpWms;
 
 	private MPPlugin						fDefaultMapProvider;
-	private TileFactory_OLD						fDefaultTileFactory;
 
 	// load tile image logging
 	private boolean							fIsTileImageLogging;
@@ -200,7 +197,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMpWms = wmsMapProvider;
 
 		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
-		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
 	}
 
 	void actionSetZoomToShowEntireLayer() {
@@ -235,7 +231,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	}
 
 	public void actionZoomOutToMinZoom() {
-		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
 		fMap.queueMapRedraw();
 	}
 
@@ -278,7 +274,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	public boolean close() {
 
 		// clear loading queue
-		fMpWms.getTileFactory(true).resetAll(false);
+		fMpWms.resetAll(false);
 
 		saveState();
 
@@ -311,7 +307,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		setTitle(Messages.Dialog_WmsConfig_DialogArea_Title);
 
-		TileFactory_OLD.addTileListener(this);
+		MP.addTileListener(this);
 
 		restoreState();
 
@@ -1010,7 +1006,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void enableControls() {
 
-		fBtnShowOsmMap.setEnabled(fMpWms.getImageSize() == MapProviderManager.OSM_IMAGE_SIZE);
+		fBtnShowOsmMap.setEnabled(fMpWms.getTileSize() == MapProviderManager.OSM_IMAGE_SIZE);
 
 		fIsTileImageLogging = fChkShowTileImageLog.getSelection();
 
@@ -1048,16 +1044,16 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private Rectangle getPositionBounds(final Set<GeoPosition> positions, final int zoom) {
 
-		final TileFactory_OLD tileFactory = fMap.getTileFactory();
+		final MP mp = fMap.getMapProvider();
 
 		final GeoPosition pos1 = positions.iterator().next();
-		final java.awt.Point point1 = tileFactory.geoToPixel(pos1, zoom);
+		final java.awt.Point point1 = mp.geoToPixel(pos1, zoom);
 
 		final Rectangle rect = new Rectangle(point1.x, point1.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
 
-			final java.awt.Point point = tileFactory.geoToPixel(pos, zoom);
+			final java.awt.Point point = mp.geoToPixel(pos, zoom);
 
 			rect.add(new Rectangle(point.x, point.y, 0, 0));
 		}
@@ -1101,7 +1097,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * image size
 		 */
-		final String imageSize = Integer.toString(fMpWms.getImageSize());
+		final String imageSize = Integer.toString(fMpWms.getTileSize());
 		int listIndex = 0;
 		int sizeIndex = -1;
 		for (final String listImageSize : MapProviderManager.IMAGE_SIZE) {
@@ -1112,9 +1108,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			listIndex++;
 		}
 		if (sizeIndex == -1) {
+
 			sizeIndex = 0;
-			// correct map provider value
-			fMpWms.setImageSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
+
+			// update map provider value
+			fMpWms.setTileSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
 		}
 		fComboImageSize.select(sizeIndex);
 
@@ -1220,7 +1218,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			fFormTk.dispose();
 		}
 
-		TileFactory_OLD.removeTileListener(DialogMPWms.this);
+		MP.removeTileListener(this);
 	}
 
 	private void onSelectImageFormat() {
@@ -1244,7 +1242,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectImageSize() {
 
-		final int oldValue = fMpWms.getImageSize();
+		final int oldValue = fMpWms.getTileSize();
 		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
@@ -1256,7 +1254,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int zoom = fMap.getZoom();
 
 		// set image size and initialize tile factory
-		fMpWms.setImageSize(newValue);
+		fMpWms.setTileSize(newValue);
 
 		enableControls();
 
@@ -1265,7 +1263,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectLayer() {
 
-		final int oldValue = fMpWms.getImageSize();
+		final int oldValue = fMpWms.getTileSize();
 		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
@@ -1273,7 +1271,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// set image size and initialize tile factory
-		fMpWms.setImageSize(newValue);
+		fMpWms.setTileSize(newValue);
 	}
 
 //	private void onSelectNextMapProvider() {
@@ -1297,7 +1295,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectOsmMap() {
 
-		if (fMap.getTileFactory() == fDefaultTileFactory) {
+		if (fMap.getMapProvider() == fDefaultMapProvider) {
 
 			// toggle map, display wms
 
@@ -1310,9 +1308,9 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			fDefaultMapProvider.setStateToReloadOfflineCounter();
 
 			// ensure the map is using the correct zoom levels
-			setMapZoomLevelFromInfo(fDefaultTileFactory.getInfo());
+			updateMapZoomLevels(fDefaultMapProvider);
 
-			fMap.resetTileFactory(fDefaultTileFactory);
+			fMap.resetTileFactory(fDefaultMapProvider);
 		}
 	}
 
@@ -1340,7 +1338,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMpWms.setTransparent(fChkLoadTransparentImages.getSelection());
 
 		// reset all images
-		fMpWms.getTileFactory(true).resetAll(true);
+		fMpWms.resetAll(true);
 
 		// delete offline images because they are invalid for the new image size
 		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
@@ -1352,8 +1350,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void onSelectWmsMap() {
 
 		// check if the tile factory has changed
-		final TileFactory_OLD customTileFactory = fMpWms.getTileFactory(true);
-		if (fMap.getTileFactory() != customTileFactory) {
+		if (fMap.getMapProvider() != fMpWms) {
 
 			/*
 			 * select wms map provider
@@ -1365,15 +1362,15 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			 * <br>
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 			 */
-			setMapZoomLevelFromInfo(customTileFactory.getInfo());
+			updateMapZoomLevels(fMpWms);
 
-			fMap.resetTileFactory(customTileFactory);
+			fMap.resetTileFactory(fMpWms);
 		}
 
 		updateModelFromUI();
 
 		// reset all images
-		fMpWms.getTileFactory(true).resetAll(false);
+		fMpWms.resetAll(false);
 
 		// display map 
 		fMap.queueMapRedraw();
@@ -1382,7 +1379,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void resetMap(final GeoPosition center, final int zoom) {
 
 		// reset all images
-		fMpWms.getTileFactory(true).resetAll(false);
+		fMpWms.resetAll(false);
 
 		// delete offline images because they are invalid for the new image size
 		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
@@ -1423,28 +1420,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	}
 
 	/**
-	 * ensure the map is using the correct zoom levels
-	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
-
-		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
-		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();
-
-		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getCenterPosition();
-
-		if (mapZoom < factoryMinZoom) {
-			fMap.setZoom(factoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
-		}
-
-		if (mapZoom > factoryMaxZoom) {
-			fMap.setZoom(factoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
-		}
-	}
-
-	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
 	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
 	 * so that the entire city and it's points are visible without panning.
@@ -1460,11 +1435,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			return;
 		}
 
-		final TileFactory_OLD tileFactory = fMap.getTileFactory();
-		final TileFactoryInfo_OLD tileInfo = tileFactory.getInfo();
+		final MP mp = fMap.getMapProvider();
 
-		final int maximumZoomLevel = tileInfo.getMaximumZoomLevel();
-		int zoom = tileInfo.getMinimumZoomLevel();
+		final int maximumZoomLevel = mp.getMaximumZoomLevel();
+
+		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle2D positionRect = getPositionBounds(positions, zoom);
 
@@ -1528,7 +1503,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 					positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 
-			final GeoPosition devCenter = tileFactory.pixelToGeo(center, zoom);
+			final GeoPosition devCenter = mp.pixelToGeo(center, zoom);
 			fMap.setGeoCenterPosition(devCenter);
 
 			// check zoom level
@@ -1677,8 +1652,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMpWms.initializeLayers();
 
 		// set factory and display map
-		final TileFactory_OLD tileFactory = fMpWms.getTileFactory(true);
-		fMap.resetTileFactory(tileFactory);
+		fMap.resetTileFactory(fMpWms);
 
 		if (isUpdatePosition) {
 			// set position to previous position
@@ -1694,6 +1668,28 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void updateMapPosition() {
 		fMpWms.setLastUsedZoom(fMap.getZoom());
 		fMpWms.setLastUsedPosition(fMap.getCenterPosition());
+	}
+
+	/**
+	 * ensure the map is using the correct zoom levels
+	 */
+	private void updateMapZoomLevels(final MP mp) {
+
+		final int factoryMinZoom = mp.getMinimumZoomLevel();
+		final int factoryMaxZoom = mp.getMaximumZoomLevel();
+
+		final int mapZoom = fMap.getZoom();
+		final GeoPosition mapCenter = fMap.getCenterPosition();
+
+		if (mapZoom < factoryMinZoom) {
+			fMap.setZoom(factoryMinZoom);
+			fMap.setGeoCenterPosition(mapCenter);
+		}
+
+		if (mapZoom > factoryMaxZoom) {
+			fMap.setZoom(factoryMaxZoom);
+			fMap.setGeoCenterPosition(mapCenter);
+		}
 	}
 
 	private void updateModelFromUI() {

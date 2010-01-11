@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ *   
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,7 +39,7 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DialogMP extends TitleAreaDialog {
 
-	private static final String				TIME_SPACER				= "       ";
+	private static final String				TIME_SPACER				= "       ";									//$NON-NLS-1$
 
 	private static final String				COLUMN_SPACER			= "  ";										//$NON-NLS-1$
 
@@ -34,35 +49,17 @@ public class DialogMP extends TitleAreaDialog {
 
 	private static final DateTimeFormatter	fDateTimeFormatter		= ISODateTimeFormat.hourMinuteSecondMillis();
 
-	// the config dialogs use different map providers
-	private MP_OLD								fMapProvider;
+	// the config dialogs is using different map providers
+	private MP								fMp;
 
 	// map is shared
 	protected Map							fMap;
 
 	private Font							fFontMono;
 
-//	private static void displayAllLoadedFonts(final Shell shell) {
-//		// display all scalable fonts in the system
-//		FontData[] fd = shell.getDisplay().getFontList(null, true);
-//		for (int i = 0; i < fd.length; i++) {
-//			System.out.println(fd[i].getName());
-//		}
-//		// and the non-scalable ones
-//		fd = shell.getDisplay().getFontList(null, false);
-//		for (int i = 0; i < fd.length; i++) {
-//			System.out.println(fd[i].getName());
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//		}
-//		System.out.println();
-//		System.out.println();
-//		System.out.println();
-//	}
-
-	public DialogMP(final Shell parentShell, final MP_OLD mapProvider) {
+	public DialogMP(final Shell parentShell, final MP mp) {
 		super(parentShell);
-		fMapProvider = mapProvider;
+		fMp = mp;
 	}
 
 	protected void actionSetFavoritePosition() {
@@ -70,27 +67,25 @@ public class DialogMP extends TitleAreaDialog {
 		final int zoom = fMap.getZoom();
 		final GeoPosition centerPosition = fMap.getCenterPosition();
 
-		fMapProvider.setFavoriteZoom(zoom);
-		fMapProvider.setFavoritePosition(centerPosition);
+		fMp.setFavoriteZoom(zoom);
+		fMp.setFavoritePosition(centerPosition);
 
-		fMapProvider.setLastUsedZoom(zoom);
-		fMapProvider.setLastUsedPosition(centerPosition);
+		fMp.setLastUsedZoom(zoom);
+		fMp.setLastUsedPosition(centerPosition);
 	}
 
 	protected void actionShowFavoritePosition() {
 
-		fMap.setZoom(fMapProvider.getFavoriteZoom());
-		fMap.setGeoCenterPosition(fMapProvider.getFavoritePosition());
+		fMap.setZoom(fMp.getFavoriteZoom());
+		fMap.setGeoCenterPosition(fMp.getFavoritePosition());
 
 		fMap.queueMapRedraw();
- 	}
+	}
 
 	@Override
 	protected void configureShell(final Shell shell) {
 
 		super.configureShell(shell);
-
-//		displayAllLoadedFonts(shell);
 
 		createMonoFont(shell.getDisplay());
 

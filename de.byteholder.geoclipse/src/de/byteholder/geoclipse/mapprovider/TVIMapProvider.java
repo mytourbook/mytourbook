@@ -19,9 +19,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIMapProvider extends TVIMapProviderItem {
 
-	private MapProviderWrapper	fMpWrapper;
+	private MPWrapper	fMpWrapper;
 
-	public TVIMapProvider(final TreeViewer treeViewer, final MapProviderWrapper mpWrapper) {
+	public TVIMapProvider(final TreeViewer treeViewer, final MPWrapper mpWrapper) {
 
 		super(treeViewer);
 
@@ -32,12 +32,12 @@ public class TVIMapProvider extends TVIMapProviderItem {
 	protected void fetchChildren() {
 
 		// only WMS has children
-		if ((fMpWrapper.getMapProvider() instanceof MPWms) == false) {
+		if ((fMpWrapper.getMP() instanceof MPWms) == false) {
 			return;
 		}
 
 		// check if wms is loaded
-		final MPWms wmsMapProvider = (MPWms) fMpWrapper.getMapProvider();
+		final MPWms wmsMapProvider = (MPWms) fMpWrapper.getMP();
  
 		if (MapProviderManager.checkWms(wmsMapProvider, null) == null) {
 			return;
@@ -49,14 +49,14 @@ public class TVIMapProvider extends TVIMapProviderItem {
 		}
 	}
 
-	public MapProviderWrapper getMapProviderWrapper() {
+	public MPWrapper getMapProviderWrapper() {
 		return fMpWrapper;
 	}
 
 	@Override
 	public boolean hasChildren() {
 
-		if (fMpWrapper.getMapProvider() instanceof MPWms) {
+		if (fMpWrapper.getMP() instanceof MPWms) {
 			// wms has children
 			return true;
 		} else {

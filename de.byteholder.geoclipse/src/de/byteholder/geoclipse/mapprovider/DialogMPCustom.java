@@ -57,8 +57,6 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.TileFactory_OLD;
-import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -191,8 +189,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private String							fPreviousCustomUrl;
 
 	private MPCustom						fMpCustom;
-	private MPPlugin						fDefaultMapProvider;
-	private TileFactory_OLD						fDefaultTileFactory;
+	private MP								fDefaultMapProvider;
 
 	private boolean							fIsInitUI								= false;
 
@@ -306,7 +303,6 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		fMpCustom = customMapProvider;
 
 		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
-		fDefaultTileFactory = fDefaultMapProvider.getTileFactory(true);
 	}
 
 	public void actionZoomIn() {
@@ -320,7 +316,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	}
 
 	public void actionZoomOutToMinZoom() {
-		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
 		fMap.queueMapRedraw();
 	}
 
@@ -342,7 +338,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 
-				TileFactory_OLD.removeTileListener(DialogMPCustom.this);
+				MP.removeTileListener(DialogMPCustom.this);
 			}
 		});
 	}
@@ -356,7 +352,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		setTitle(Messages.Dialog_CustomConfig_DialogArea_Title);
 
-		TileFactory_OLD.addTileListener(this);
+		MP.addTileListener(this);
 
 		restoreState();
 
@@ -1013,9 +1009,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 //		return null;
 	}
 
-	private void initializeUIFromModel(final MPCustom mapProvider) {
+	private void initializeUIFromModel(final MPCustom mp) {
 
-		fMpCustom = mapProvider;
+		fMpCustom = mp;
 
 		fIsInitUI = true;
 		{
@@ -1030,7 +1026,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			fSpinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
 			fSpinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
 
-			fPreviousCustomUrl = mapProvider.getCustomUrl();
+			fPreviousCustomUrl = mp.getCustomUrl();
 			fPreviousMinZoom = minZoomLevel;
 			fPreviousMaxZoom = maxZoomLevel;
 
@@ -1043,14 +1039,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		setMessage(fDefaultMessage);
 
 		// set factory and display map
-		final TileFactory_OLD tileFactory = fMpCustom.getTileFactory(true);
-		fMap.resetTileFactory(tileFactory);
+		fMap.resetTileFactory(mp);
 
-		if (true) {
-			// set position to previous position
-			fMap.setZoom(fMpCustom.getLastUsedZoom());
-			fMap.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
-		}
+		// set position to previous position
+		fMap.setZoom(fMpCustom.getLastUsedZoom());
+		fMap.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
 	}
 
 	@Override
@@ -1063,25 +1056,6 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	}
 
 	private void onSelectCustomMap() {
-
-		// check if the tile factory has changed
-		final TileFactory_OLD customTileFactory = fMpCustom.getTileFactory(true);
-		if (fMap.getTileFactory() != customTileFactory) {
-
-			/*
-			 * select custom map provider
-			 */
-			/**
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 * <br>
-			 * ensure the map is using the correct zoom levels before other map actions are done<br>
-			 * <br>
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 */
-			setMapZoomLevelFromInfo(customTileFactory.getInfo());
-
-			fMap.resetTileFactory(customTileFactory);
-		}
 
 		final int minZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 		final int maxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
@@ -1100,37 +1074,46 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		updateModelFromUI();
 
 		// reset all images
-		fMpCustom.getTileFactory(true).resetAll(false);
+		fMpCustom.resetAll(false);
 
 		// delete offline images to force the reload and to test the modified url
 		fPrefPageMapFactory.deleteOfflineMap(fMpCustom);
+
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * <br>
+		 * ensure the map is using the correct zoom levels before other map actions are done<br>
+		 * <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 */
+		updateMapZoomLevel(fMpCustom);
+
+		fMap.resetTileFactory(fMpCustom);
 	}
 
 	private void onSelectOsmMap() {
 
-		if (fMap.getTileFactory() == fDefaultTileFactory) {
+		if (fMap.getMapProvider() == fDefaultMapProvider) {
 
 			// toggle map
 
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			final TileFactory_OLD tileFactory = fMpCustom.getTileFactory(true);
+			updateMapZoomLevel(fMpCustom);
 
-			setMapZoomLevelFromInfo(tileFactory.getInfo());
-
-			fMap.resetTileFactory(tileFactory);
+			fMap.resetTileFactory(fMpCustom);
 
 		} else {
 
 			// display OSM
 
 			// ensure the map is using the correct zoom levels
-			setMapZoomLevelFromInfo(fDefaultTileFactory.getInfo());
+			updateMapZoomLevel(fDefaultMapProvider);
 
 			fDefaultMapProvider.setStateToReloadOfflineCounter();
 
-			fMap.resetTileFactory(fDefaultTileFactory);
+			fMap.resetTileFactory(fDefaultMapProvider);
 		}
 	}
 
@@ -1284,28 +1267,6 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		return partTypeIndex;
 	}
 
-	/**
-	 * ensure the map is using the correct zoom levels from the tile factory
-	 */
-	private void setMapZoomLevelFromInfo(final TileFactoryInfo_OLD factoryInfo) {
-
-		final int factoryMinZoom = factoryInfo.getMinimumZoomLevel();
-		final int factoryMaxZoom = factoryInfo.getMaximumZoomLevel();
-
-		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getCenterPosition();
-
-		if (mapZoom < factoryMinZoom) {
-			fMap.setZoom(factoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
-		}
-
-		if (mapZoom > factoryMaxZoom) {
-			fMap.setZoom(factoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
-		}
-	}
-
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
@@ -1394,6 +1355,28 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		}
 
 		fDisplay.asyncExec(infoRunnable);
+	}
+
+	/**
+	 * ensure the map is using the correct zoom levels from the tile factory
+	 */
+	private void updateMapZoomLevel(final MP mp) {
+
+		final int factoryMinZoom = mp.getMinimumZoomLevel();
+		final int factoryMaxZoom = mp.getMaximumZoomLevel();
+
+		final int mapZoom = fMap.getZoom();
+		final GeoPosition mapCenter = fMap.getCenterPosition();
+
+		if (mapZoom < factoryMinZoom) {
+			fMap.setZoom(factoryMinZoom);
+			fMap.setGeoCenterPosition(mapCenter);
+		}
+
+		if (mapZoom > factoryMaxZoom) {
+			fMap.setZoom(factoryMaxZoom);
+			fMap.setGeoCenterPosition(mapCenter);
+		}
 	}
 
 	private void updateModelFromUI() {

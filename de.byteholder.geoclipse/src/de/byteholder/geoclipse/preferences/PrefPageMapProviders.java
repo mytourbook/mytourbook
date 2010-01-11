@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -117,7 +117,7 @@ import de.byteholder.geoclipse.mapprovider.MPProfile;
 import de.byteholder.geoclipse.mapprovider.MPWms;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
-import de.byteholder.geoclipse.mapprovider.MapProviderWrapper;
+import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
 import de.byteholder.geoclipse.util.PixelConverter;
 
@@ -331,21 +331,21 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		MP.addOfflineInfoListener(fOfflineJobInfoListener);
 	}
 
-	private String checkBaseUrl(final String baseUrl) {
-
-		if (baseUrl == null || baseUrl.length() == 0) {
-			return Messages.pref_map_validationError_baseUrlIsRequired;
-		} else {
-
-			try {
-				new URL(baseUrl);
-			} catch (final MalformedURLException e) {
-				return Messages.pref_map_validationError_invalidUrl;
-			}
-		}
-
-		return null;
-	}
+//	private String checkBaseUrl(final String baseUrl) {
+//
+//		if (baseUrl == null || baseUrl.length() == 0) {
+//			return Messages.pref_map_validationError_baseUrlIsRequired;
+//		} else {
+//
+//			try {
+//				new URL(baseUrl);
+//			} catch (final MalformedURLException e) {
+//				return Messages.pref_map_validationError_invalidUrl;
+//			}
+//		}
+//
+//		return null;
+//	}
 
 	private String checkMapProviderId(final String factoryId) {
 
@@ -411,7 +411,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					// new map provider: folder with the same name is not allowed
 
-					if (offlineFolder.equalsIgnoreCase(mapProvider.getTileOSFolder())) {
+					if (offlineFolder.equalsIgnoreCase(mapProvider.getOfflineFolder())) {
 						error = Messages.pref_map_validationError_offlineFolderIsAlreadyUsed;
 						break;
 					}
@@ -424,7 +424,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 						// check other map providers but not the same which is selected
 
-						if (offlineFolder.equalsIgnoreCase(mapProvider.getTileOSFolder())) {
+						if (offlineFolder.equalsIgnoreCase(mapProvider.getOfflineFolder())) {
 							error = Messages.pref_map_validationError_offlineFolderIsAlreadyUsed;
 							break;
 						}
@@ -656,7 +656,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				final MP mapProvider = (MP) cell.getElement();
 
-				cell.setText(mapProvider.getTileOSFolder());
+				cell.setText(mapProvider.getOfflineFolder());
 			}
 		});
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
@@ -677,9 +677,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					final MPWms wmsMapProvider = (MPWms) mapProvider;
 
 					final StringBuilder sb = new StringBuilder();
-//					sb.append(" (");//$NON-NLS-1$
 					sb.append(wmsMapProvider.getAvailableLayers());
-//					sb.append(")");//$NON-NLS-1$
 
 					layer = sb.toString();
 				}
@@ -1200,10 +1198,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			fIsModifiedOfflineFolder = false;
 
 			// update model
-			wmsMapProvider.setMapProviderId(uniqueId);
+			wmsMapProvider.setId(uniqueId);
 			wmsMapProvider.setName(providerName);
 			wmsMapProvider.setDescription(wmsAbstract);
-			wmsMapProvider.setTileOSFolder(uniqueId);
+			wmsMapProvider.setOfflineFolder(uniqueId);
 
 			wmsMapProvider.setGetMapUrl(getMapUrl);
 			wmsMapProvider.setCapabilitiesUrl(capsUrl);
@@ -1324,7 +1322,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// check map provider offline folder
-		final String tileOSFolder = mp.getTileOSFolder();
+		final String tileOSFolder = mp.getOfflineFolder();
 		if (tileOSFolder == null) {
 			return;
 		}
@@ -1927,7 +1925,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				fTxtDescription.setText(mapProvider.getDescription());
 
 				// offline folder
-				final String tileOSFolder = mapProvider.getTileOSFolder();
+				final String tileOSFolder = mapProvider.getOfflineFolder();
 				if (tileOSFolder == null) {
 					fTxtOfflineFolder.setText(UI.EMPTY_STRING);
 				} else {
@@ -1936,9 +1934,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				if (mapProvider instanceof MPWms) {
 
-					/*
-					 * wms map provider
-					 */
+					// wms map provider
+
 					final MPWms wmsMapProvider = (MPWms) mapProvider;
 
 					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
@@ -1946,9 +1943,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				} else if (mapProvider instanceof MPCustom) {
 
-					/*
-					 * custom map provider
-					 */
+					// custom map provider
+
 					final MPCustom customMapProvider = (MPCustom) mapProvider;
 
 					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
@@ -1956,22 +1952,20 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				} else if (mapProvider instanceof MPProfile) {
 
-					/*
-					 * map profile
-					 */
+					// map profile
 
 					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
 					fTxtUrl.setText(UI.EMPTY_STRING);
 
 				} else if (mapProvider instanceof MPPlugin) {
 
-					/*
-					 * plugin map provider
-					 */
+					// plugin map provider
+
 					final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
+					final String baseURL = pluginMapProvider.getBaseURL();
 
 					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
-					fTxtUrl.setText(pluginMapProvider.getBaseURL());
+					fTxtUrl.setText(baseURL == null ? UI.EMPTY_STRING : baseURL);
 				}
 
 				updateUIOfflineInfoDetail(mapProvider);
@@ -2112,9 +2106,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					final MPProfile mpProfile = (MPProfile) mapProvider;
 
-					for (final MapProviderWrapper mpWrapper : mpProfile.getAllWrappers()) {
-						if (mpWrapper.getMapProvider() instanceof MPWms) {
-							((MPWms) mpWrapper.getMapProvider()).setWmsEnabled(true);
+					for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
+						if (mpWrapper.getMP() instanceof MPWms) {
+							((MPWms) mpWrapper.getMP()).setWmsEnabled(true);
 						}
 					}
 				}
@@ -2496,7 +2490,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				for (final MP mapProvider : fOfflineJobMapProviders) {
 
-					final String tileOSFolder = mapProvider.getTileOSFolder();
+					final String tileOSFolder = mapProvider.getOfflineFolder();
 					if (tileOSFolder == null) {
 						continue;
 					}
@@ -2625,7 +2619,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		} else {
 			mapProvider = fSelectedMapProvider;
 			oldFactoryId = mapProvider.getId();
-			oldOfflineFolder = mapProvider.getTileOSFolder();
+			oldOfflineFolder = mapProvider.getOfflineFolder();
 		}
 
 		// check if offline folder has changed
@@ -2644,7 +2638,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			for (final MP mp : MapProviderManager.getInstance().getAllMapProviders()) {
 
 				if (mp instanceof MPProfile) {
-					for (final MapProviderWrapper mpWrapper : ((MPProfile) mp).getAllWrappers()) {
+					for (final MPWrapper mpWrapper : ((MPProfile) mp).getAllWrappers()) {
 
 						if (mpWrapper.getMapProviderId().equals(oldFactoryId)) {
 							mpWrapper.setMapProviderId(factoryId);
@@ -2655,10 +2649,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// update fields
-		mapProvider.setMapProviderId(factoryId);
+		mapProvider.setId(factoryId);
 		mapProvider.setName(factoryName);
 		mapProvider.setDescription(fTxtDescription.getText().trim());
-		mapProvider.setTileOSFolder(offlineFolder);
+		mapProvider.setOfflineFolder(offlineFolder);
 
 		// update viewer
 		if (fIsNewMapProvider) {

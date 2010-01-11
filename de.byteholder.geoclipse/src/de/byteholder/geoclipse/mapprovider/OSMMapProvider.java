@@ -31,14 +31,14 @@ class OSMMapProvider extends MPPlugin {
 	private static final int	MIN_ZOOM		= 0;
 	private static final int	MAX_ZOOM		= 17;
 
-// mp2, I have no idea for what this is used	
-//	private static final int	TOTAL_ZOOM		= 17;
-
 	private static final String	BASE_URL		= "http://tile.openstreetmap.org";			//$NON-NLS-1$
 	private static final String	FILE_EXT		= MapProviderManager.FILE_EXTENSION_PNG;
 
 	public OSMMapProvider() {
 
+		// set necessary fields
+		setId(FACTORY_ID);
+		setName(FACTORY_NAME);
 		setZoomLevel(MIN_ZOOM, MAX_ZOOM);
 	}
 
@@ -58,7 +58,7 @@ class OSMMapProvider extends MPPlugin {
 	}
 
 	@Override
-	public String getTileOSFolder() {
+	public String getOfflineFolder() {
 		return OFFLINE_FOLDER;
 	}
 
@@ -74,24 +74,19 @@ class OSMMapProvider extends MPPlugin {
 	}
 
 	@Override
-	public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
+	public String getTileUrl(final Tile tile) {
 
 		return new StringBuilder()//
 				.append(BASE_URL)
 				.append(SEPARATOR)
-				.append(zoom)
+				.append(tile.getZoom())
 				.append(SEPARATOR)
-				.append(x)
+				.append(tile.getX())
 				.append(SEPARATOR)
-				.append(y)
+				.append(tile.getY())
 				.append('.')
 				.append(FILE_EXT)
 				.toString();
-	}
-
-	@Override
-	public void setTileOSFolder(final String offlineFolder) {
-	// folder is static, nothing to do
 	}
 
 // mp2	

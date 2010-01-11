@@ -23,17 +23,18 @@ import de.byteholder.geoclipse.mapprovider.MP;
  */
 public class TileImageLoader implements Runnable {
 
-	private final MP	fMp;
+//	private final MP	fMp;
 
 	/**
 	 * @param mp
 	 */
 	public TileImageLoader(final MP mp) {
-		fMp = mp;
+//		fMp = mp;
 	}
 
 	private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
 
+		final MP mp = tile.getMP();
 		final String tileKey = tile.getTileKey();
 
 		if (tile.isLoadingError()) {
@@ -43,7 +44,7 @@ public class TileImageLoader implements Runnable {
 		} else {
 
 			// remove from loading map
-			fMp.getLoadingTiles().remove(tileKey);
+			mp.getLoadingTiles().remove(tileKey);
 		}
 
 		// set tile state, notify observer (Map is an observer)
@@ -53,7 +54,7 @@ public class TileImageLoader implements Runnable {
 			tile.notifyImageObservers();
 		}
 
-		fMp.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
+		mp.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
 	}
 
 	/**
@@ -70,9 +71,9 @@ public class TileImageLoader implements Runnable {
 
 			boolean isSaveImage = false;
 
-			final TileImageCache tileImageCache = fMp.getTileImageCache();
-
 			final MP mp = tile.getMP();
+			final TileImageCache tileImageCache = mp.getTileImageCache();
+
 			final boolean useOfflineImage = mp.isUseOfflineImage();
 
 			// load image from offline cache
@@ -131,7 +132,7 @@ public class TileImageLoader implements Runnable {
 
 							try {
 
-								url = fMp.getTileURL(tile);
+								url = mp.getTileURLEncoded(tile);
 
 							} catch (final Exception e) {
 								loadingError = e.getMessage();
@@ -190,7 +191,7 @@ public class TileImageLoader implements Runnable {
 							StatusUtil.log(e.getMessage(), e);
 						}
 
-						fMp.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+						mp.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
 					}
 				}
 			}
@@ -311,7 +312,9 @@ public class TileImageLoader implements Runnable {
 	 */
 	private ImageData[] paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
-		fMp.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
+		final MP mp = tile.getMP();
+
+		mp.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
 		final ImageData[] paintedImageData = new ImageData[1];
 
@@ -357,13 +360,13 @@ public class TileImageLoader implements Runnable {
 			}
 			paintedImageData[0] = tileImageData;
 
-			fMp.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
+			mp.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
 		} catch (final Exception e) {
 
 			tile.setLoadingError(Messages.DBG045_Loading_Error_PaintingError + e.getMessage());
 
-			fMp.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
+			mp.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
 
 			StatusUtil.log(e.getMessage(), e);
 		}
@@ -377,7 +380,7 @@ public class TileImageLoader implements Runnable {
 		 * load/create tile image
 		 */
 		// get tile from queue
-		final LinkedBlockingDeque<Tile> tileWaitingQueue = fMp.getTileWaitingQueue();
+		final LinkedBlockingDeque<Tile> tileWaitingQueue = mp.getTileWaitingQueue();
 
 		final Tile tile = tileWaitingQueue.pollLast();
 
@@ -387,9 +390,9 @@ public class TileImageLoader implements Runnable {
 		}
 
 		final boolean isChildTile = tile.getParentTile() != null;
-		final boolean isParentTile = fMp instanceof ITileChildrenCreator && isChildTile == false;
+		final boolean isParentTile = mp instanceof ITileChildrenCreator && isChildTile == false;
 
-		fMp.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
+		mp.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
 
 		if (isParentTile) {
 

@@ -683,7 +683,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final MP mp = map.getTileFactory();
+		final MP mp = map.getMapProvider();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = mp.getTileSize();
 
@@ -721,7 +721,7 @@ public class TourPainter extends MapPainter {
 
 		boolean isTourInTile = false;
 
-		final MP mp = map.getTileFactory();
+		final MP mp = map.getMapProvider();
 		final int mapZoomLevel = map.getZoom();
 		final int tileSize = mp.getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
@@ -972,7 +972,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final MP tileFactory = map.getTileFactory();
+		final MP tileFactory = map.getMapProvider();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getTileSize();
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;

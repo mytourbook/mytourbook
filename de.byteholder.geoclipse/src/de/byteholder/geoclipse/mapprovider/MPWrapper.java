@@ -20,7 +20,7 @@ import java.util.ArrayList;
 /**
  * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
  */
-public class MapProviderWrapper implements Cloneable {
+public class MPWrapper implements Cloneable {
 
 	/**
 	 * unique id which identifies the map provider, this is a copy from the map provider
@@ -47,6 +47,9 @@ public class MapProviderWrapper implements Cloneable {
 	 */
 	private String						fType;
 
+	private boolean						fIsEnabled				= true;
+
+
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
@@ -60,33 +63,33 @@ public class MapProviderWrapper implements Cloneable {
 	 */
 	private boolean						fIsBlackTransparent;
 
-	private boolean						fIsEnabled				= true;
-
 	private boolean						fIsBrightness;
 	private int							fBrightnessValue;
 
 	@SuppressWarnings("unused")
-	private MapProviderWrapper() {}
+	private MPWrapper() {}
 
-	MapProviderWrapper(final MP mapProvider) {
+	MPWrapper(final MP mapProvider) {
 
 		fMapProviderId = mapProvider.getId();
 
-		setMapProvider(mapProvider);
+		setMP(mapProvider);
 	}
 
-	MapProviderWrapper(final String mapProviderId) {
+	MPWrapper(final String mapProviderId) {
 		fMapProviderId = mapProviderId;
 	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 
-		final MapProviderWrapper clonedMpWrapper = (MapProviderWrapper) super.clone();
+		// clone wrapper
+		final MPWrapper clonedMpWrapper = (MPWrapper) super.clone();
 
-		final MP clonedMapProvider = (MP) fMp.clone();
+		// clone map provider
+		final MP clonedMP = (MP) fMp.clone();
 
-		clonedMpWrapper.fMp = clonedMapProvider;
+		clonedMpWrapper.fMp = clonedMP;
 
 		return clonedMpWrapper;
 	}
@@ -99,10 +102,10 @@ public class MapProviderWrapper implements Cloneable {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MapProviderWrapper)) {
+		if (!(obj instanceof MPWrapper)) {
 			return false;
 		}
-		final MapProviderWrapper other = (MapProviderWrapper) obj;
+		final MPWrapper other = (MPWrapper) obj;
 		if (fMapProviderId == null) {
 			if (other.fMapProviderId != null) {
 				return false;
@@ -121,7 +124,11 @@ public class MapProviderWrapper implements Cloneable {
 		return fBrightnessValue;
 	}
 
-	public MP getMapProvider() {
+	public String getMapProviderId() {
+		return fMapProviderId;
+	}
+
+	public MP getMP() {
 
 		// check map provider
 //		if (fMapProvider == null) {
@@ -129,10 +136,6 @@ public class MapProviderWrapper implements Cloneable {
 //		}
 
 		return fMp;
-	}
-
-	public String getMapProviderId() {
-		return fMapProviderId;
 	}
 
 	int getPositionIndex() {
@@ -214,14 +217,24 @@ public class MapProviderWrapper implements Cloneable {
 		fIsTransparentColors = isTransColors;
 	}
 
-	void setMapProvider(final MP newMapProvider) {
+	/**
+	 * Sets a new factory id, this happens when it is modified in the UI
+	 * 
+	 * @param newFactoryId
+	 */
+	public void setMapProviderId(final String newFactoryId) {
+		fMapProviderId = newFactoryId;
+		fMp.setId(newFactoryId);
+	}
+
+	void setMP(final MP newMP) {
 
 		final MP oldMapProvider = fMp;
-		fMp = newMapProvider;
+		fMp = newMP;
 
-		if (newMapProvider instanceof MPWms) {
+		if (newMP instanceof MPWms) {
 
-			final MPWms newWmsMapProvider = (MPWms) newMapProvider;
+			final MPWms newWmsMapProvider = (MPWms) newMP;
 			final ArrayList<MtLayer> newMtLayers = newWmsMapProvider.getMtLayers();
 
 			if (newMtLayers == null) {
@@ -303,16 +316,6 @@ public class MapProviderWrapper implements Cloneable {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Sets a new factory id, this happens when it is modified in the UI
-	 * 
-	 * @param newFactoryId
-	 */
-	public void setMapProviderId(final String newFactoryId) {
-		fMapProviderId = newFactoryId;
-		fMp.setMapProviderId(newFactoryId);
 	}
 
 	void setPositionIndex(final int positionIndex) {

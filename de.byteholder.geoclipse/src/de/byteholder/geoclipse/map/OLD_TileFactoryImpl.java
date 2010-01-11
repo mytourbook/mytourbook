@@ -277,7 +277,7 @@ public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 	}
 
 	@Override
-	public abstract MP_OLD getMapProvider();
+	public abstract MP_OLD getMP();
 
 	/**
 	 * Get <b>number of tiles</b> of the world bitmap at the current zoom level
@@ -461,7 +461,7 @@ public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 	 */
 	URL getURL(final Tile tile) throws Exception {
 
-		final String urlString = tile.getMP().getInfo().getTileUrl(tile.getX(), tile.getY(), tile.getZoom(), tile);
+		final String urlString = tile.getMP().getInfo().getTileUrl(tile);
 
 		if (urlString == null) {
 			final Exception e = new Exception();

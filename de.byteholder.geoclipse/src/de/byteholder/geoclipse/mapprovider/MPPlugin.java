@@ -21,7 +21,9 @@ package de.byteholder.geoclipse.mapprovider;
  */
 public abstract class MPPlugin extends MP {
 
-	public abstract String getBaseURL() ;
+	public String getBaseURL() {
+		return null;
+	}
 
 	@Override
 	public abstract String getId();
@@ -29,29 +31,6 @@ public abstract class MPPlugin extends MP {
 	@Override
 	public abstract String getName();
 
-// mp2	
-//	private TileFactory_OLD	fTileFactory;
-//
-//	public MPPlugin(final TileFactory_OLD tileFactory) {
-//
-//		fTileFactory = tileFactory;
-//
-//		tileFactory.setMapProvider(this);
-//
-//		final TileFactoryInfo_OLD factoryInfo = tileFactory.getInfo();
-//
-//		setMapProviderId(factoryInfo.getFactoryID());
-//		setName(factoryInfo.getFactoryName());
-//		setOfflineFolder(factoryInfo.getTileOSFolder());
-//	}
-//
-//	@Override
-//	public void disposeCachedImages() {
-//		fTileFactory.disposeCachedImages();
-//	}
-//
-//	@Override
-//	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
-//		return fTileFactory;
-//	}
+	@Override
+	public abstract String getOfflineFolder();
 }

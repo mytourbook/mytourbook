@@ -25,7 +25,7 @@ import de.byteholder.geoclipse.map.TileFactoryInfo_OLD;
  * 
  * @author joshy
  */
-public class TileFactoryEmpty extends TileFactoryImpl {
+public class OLD_TileFactoryEmpty extends TileFactoryImpl {
 
 	private static final String		FACTORY_ID			= "empty-tile-factory";				//$NON-NLS-1$
 	private static final String		FACTORY_NAME		= Messages.Tile_Factory_Name_Hidden;
@@ -64,7 +64,7 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 		}
 
 		@Override
-		public String getTileUrl(final int x, final int y, final int zoom, final Tile tile) {
+		public String getTileUrl(final Tile tile) {
 			return null;
 		}
 
@@ -106,7 +106,7 @@ public class TileFactoryEmpty extends TileFactoryImpl {
 	}
 
 	@Override
-	public MP_OLD getMapProvider() {
+	public MP_OLD getMP() {
 		return fMp;
 	}
 
