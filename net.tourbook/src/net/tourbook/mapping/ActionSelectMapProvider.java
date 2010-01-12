@@ -350,8 +350,8 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		final Map map = fMappingView.getMap();
 
-		map.setTileFactory(mp);
-
+		map.setMapProvider(mp);
+ 
 		// reset overlays must be done after the new map provider is set
 //		map.resetOverlays();
 

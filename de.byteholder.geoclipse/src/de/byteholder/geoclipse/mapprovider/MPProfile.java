@@ -18,8 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.ConcurrentHashMap;
-
+ 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
@@ -31,6 +30,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ITileChildrenCreator;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.TileCache;
 import de.byteholder.geoclipse.map.UI;
 
 /**
@@ -157,21 +157,24 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	 * Creates tile children for all mp wrapper which are displayed in one tile
 	 * 
 	 * @param parentTile
-	 * @param loadingTiles
-	 * @return
+	 * @return Returns a list with children which are not yet available in the tile cache or error
+	 *         cache, children are skipped when they already exist and have loading errord
 	 */
-	public ArrayList<Tile> createTileChildren(final Tile parentTile, final ConcurrentHashMap<String, Tile> loadingTiles) {
+	public ArrayList<Tile> createTileChildren(final Tile parentTile) {
 
 		final ArrayList<Tile> tileChildren = new ArrayList<Tile>();
+
+		final TileCache tileCache = getTileCache();
+		final TileCache errorTiles = getErrorTiles();
 
 		for (final MPWrapper mpWrapper : fMpWrappers) {
 
 			final int parentZoom = parentTile.getZoom();
-			final MP mp = mpWrapper.getMP();
+			final MP wrapperMP = mpWrapper.getMP();
 
-			if (parentZoom < mp.getMinZoomLevel() || parentZoom > mp.getMaxZoomLevel()) {
+			if (parentZoom < wrapperMP.getMinZoomLevel() || parentZoom > wrapperMP.getMaxZoomLevel()) {
 
-				// ignore map providers which does not support the current zoom level
+				// ignore map providers which do not support the current zoom level
 
 				continue;
 			}
@@ -179,9 +182,10 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			// create child tile for each visible map provider
 			if (mpWrapper.isDisplayedInMap() && mpWrapper.isEnabled()) {
 
-				final MP childMp = mp;
+				final MP childMp = wrapperMP;
 
 				// check if this child is already being loaded
+
 				final String childTileKey = Tile.getTileKey(
 						childMp,
 						parentTile.getX(),
@@ -191,11 +195,15 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 						null,
 						childMp.getProjection().getId());
 
-				Tile childTile = loadingTiles.get(childTileKey);
+				// check if a tile with the requested child tile key is already in a cache
+				Tile childTile = tileCache.get(childTileKey);
+				if (childTile != null) {
+					childTile = errorTiles.get(childTileKey);
+				}
 
 				if (childTile != null) {
 
-					// child is currently being loaded or has a loading error
+					// child tile is currently being loaded or has a loading error
 
 					if (childTile.isLoadingError()) {
 
@@ -212,9 +220,9 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 					childTile = new Tile(//
 							childMp,
+							parentZoom,
 							parentTile.getX(),
 							parentTile.getY(),
-							parentZoom,
 
 							// create a unique tile for each child (map provider)
 							childMp.getId());
@@ -267,12 +275,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		}
 
 		return mpWrapper;
-	}
-
-	@Override
-	public void disposeCachedImages() {
-	// TODO Auto-generated method stub
-
 	}
 
 	/**

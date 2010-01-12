@@ -609,8 +609,8 @@ public class Map extends Canvas {
 		fMP.setDimLevel(dimLevel, dimColor);
 
 		// remove all cached map images
-		fMP.dispose();
-
+		fMP.disposeTileImages();
+ 
 		reload();
 	}
 
@@ -907,11 +907,8 @@ public class Map extends Canvas {
 							final int tilePositionY,
 							final Rectangle devTileRectangle) {
 
-		// get tile from the tile factory, this also starts the loading of the tile image
+		// get tile from the map provider, this also starts the loading of the tile image
 		final Tile tile = fMP.getTile(tilePositionX, tilePositionY, fMapZoomLevel);
-
-		System.out.println(tile.getTileKey());
-// TODO remove SYSTEM.OUT.PRINTLN
 
 		drawTileImage(gc, tile, devTileRectangle);
 
@@ -1499,6 +1496,15 @@ public class Map extends Canvas {
 		return panEnabled;
 	}
 
+	/**
+	 * Checks if a part within the image data is modified.
+	 * 
+	 * @param overlayImageData
+	 * @param srcXStart
+	 * @param srcYStart
+	 * @param tileSize
+	 * @return Returns <code>true</code> when a part is modified
+	 */
 	private boolean isPartImageModified(final ImageData overlayImageData,
 										final int srcXStart,
 										final int srcYStart,
@@ -1840,7 +1846,7 @@ public class Map extends Canvas {
 											final int tileSize,
 											final Color transparentColor) {
 
-		final TileCache tileCache = fMP.getTileCache();
+		final TileCache tileCache = MP.getTileCache();
 		final String projectionId = fMP.getProjection().getId();
 		final ImageData overlayImageData = overlayImage.getImageData();
 		Tile partTile = null;
@@ -1883,8 +1889,10 @@ public class Map extends Canvas {
 
 					// draw existing part tile image into the new part image
 					if (isCenterPart == false) {
+
 						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1, projectionId));
 						if (partTile != null) {
+
 							final Image partTileImage = partTile.getOverlayImage();
 							if (partTileImage != null && partTileImage.isDisposed() == false) {
 								gcPartImage.drawImage(partTileImage, 0, 0);
@@ -2080,34 +2088,6 @@ public class Map extends Canvas {
 		}
 	}
 
-	public synchronized void resetTileFactory() {
-
-		if (fMP != null) {
-			fMP.resetAll(false);
-		}
-
-		queueMapRedraw();
-	}
-
-	/**
-	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
-	 * position as the previous tile factory
-	 * 
-	 * @param mp
-	 */
-	public synchronized void resetTileFactory(final MP mp) {
-
-		if (fMP != null) {
-			// keep tiles with loading errors that they are not loaded again when the factory has not changed
-			fMP.resetAll(fMP == mp);
-		}
-
-		fMP = mp;
-
-// don't do a map redraw because the map zoom/position is not yet set correctly
-//		queueMapRedraw();
-	}
-
 	/**
 	 * Gets the current address location of the map
 	 * 
@@ -2224,6 +2204,67 @@ public class Map extends Canvas {
 		updateMouseMapPosition();
 	}
 
+	/**
+	 * Sets the map provider for the map and redraws the map
+	 * 
+	 * @param mp
+	 *            new map provider
+	 */
+	public void setMapProvider(final MP mp) {
+
+		GeoPosition center = null;
+		int zoom = 0;
+		boolean refresh = false;
+
+		if (fMP != null) {
+			center = getCenterPosition();
+			zoom = getZoom();
+			refresh = true;
+		}
+
+		fMP = mp;
+
+		if (refresh) {
+			setZoom(zoom);
+			setGeoCenterPosition(center);
+		} else {
+			setZoom(mp.getDefaultZoomLevel());
+		}
+
+		queueMapRedraw();
+	}
+
+//	public synchronized void setMapProviderWithReset() {
+//
+//		if (fMP != null) {
+//			fMP.resetAll(false);
+//		}
+//
+//		queueMapRedraw();
+//	}
+
+	/**
+	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
+	 * position as the previous tile factory
+	 * 
+	 * @param mp
+	 * @param isDrawMap
+	 *            When <code>true</code> the map is queued to be redrawn
+	 */
+	public synchronized void setMapProviderWithReset(final MP mp, final boolean isDrawMap) {
+
+		if (fMP != null) {
+			// keep tiles with loading errors that they are not loaded again when the factory has not changed
+			fMP.resetAll(fMP == mp);
+		}
+
+		fMP = mp;
+
+		if (isDrawMap) {
+			queueMapRedraw();
+		}
+	}
+
 	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
 		fDistanceUnitValue = distanceUnitValue;
 		fDistanceUnitLabel = distanceUnitLabel;
@@ -2295,41 +2336,6 @@ public class Map extends Canvas {
 
 	public void setShowScale(final boolean isScaleVisible) {
 		fIsScaleVisible = isScaleVisible;
-	}
-
-	/**
-	 * Set the tile factory for the map and redraw the map with the new tile factory
-	 * 
-	 * @param mp
-	 *            the new property value
-	 */
-	public void setTileFactory(final MP mp) {
-
-		GeoPosition center = null;
-		int zoom = 0;
-		boolean refresh = false;
-
-		if (fMP != null) {
-			center = getCenterPosition();
-			zoom = getZoom();
-			refresh = true;
-		}
-
-		fMP = mp;
-
-		if (refresh) {
-			setZoom(zoom);
-			setGeoCenterPosition(center);
-		} else {
-// mp2			
-//			if (mp.getInfo() != null) {
-//				setZoom(mp.getInfo().getDefaultZoomLevel());
-//			}
-
-			setZoom(mp.getDefaultZoomLevel());
-		}
-
-		queueMapRedraw();
 	}
 
 	/**

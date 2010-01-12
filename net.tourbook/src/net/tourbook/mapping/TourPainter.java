@@ -778,9 +778,8 @@ public class TourPainter extends MapPainter {
 				// convert lat/long into world pixels which depends on the map projection
 
 				tileWorldPos = mp.geoToPixel(
-						new GeoPosition(
-						latitudeSerie[serieIndex],
-						longitudeSerie[serieIndex]), mapZoomLevel);
+						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
+ 						mapZoomLevel);
 
 				worldPositions[serieIndex] = tileWorldPos;
 
@@ -793,7 +792,14 @@ public class TourPainter extends MapPainter {
 				// convert world position into device position
 				devPosition = new java.awt.Point(tileWorldPos.x - worldTileX, tileWorldPos.y - worldTileY);
 
-				if (tileViewport.contains(tileWorldPos.x, tileWorldPos.y)) {
+				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				final int x = tileWorldPos.x;
+				final int y = tileWorldPos.y;
+
+				if ((x >= tileViewport.x)
+						&& (y >= tileViewport.y)
+						&& x < (tileViewport.x + tileViewport.width)
+						&& y < (tileViewport.y + tileViewport.height)) {
 
 					// current position is inside the tile
 
@@ -844,7 +850,13 @@ public class TourPainter extends MapPainter {
 
 				// draw tour with dots/squares
 
-				if (tileViewport.contains(tileWorldPos.x, tileWorldPos.y)) {
+				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				final int x = tileWorldPos.x;
+				final int y = tileWorldPos.y;
+				if ((x >= tileViewport.x)
+						&& (y >= tileViewport.y)
+						&& x < (tileViewport.x + tileViewport.width)
+						&& y < (tileViewport.y + tileViewport.height)) {
 
 					// current position is inside the tile
 

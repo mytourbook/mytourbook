@@ -56,32 +56,30 @@ public class TileImageCache {
 	/**
 	 * max. number of images in the image cache
 	 */
-	private static int								MAX_CACHE_ENTRIES			= 100;
-
+	private static int										MAX_CACHE_ENTRIES			= 200;
+ 
 	/**
 	 * relative OS path for storing offline map image files
 	 */
-	public static final String						TILE_OFFLINE_CACHE_OS_PATH	= "offline-map";							//$NON-NLS-1$
+	public static final String								TILE_OFFLINE_CACHE_OS_PATH	= "offline-map";							//$NON-NLS-1$
 
-	private final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
-	private final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
+	private static final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
+	private static final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
 
 	/**
 	 * Path from user preferences where tile images are stored
 	 */
-	private static String							fOSTileCachePath;
+	private static String									fOSTileCachePath;
 
-	private static boolean							fUseOffLineCache;
+	private static boolean									fUseOffLineCache;
 
-	private MP										fMp;
+	private static final ReentrantLock						CREATE_DIR_LOCK				= new ReentrantLock();
 
 	/**
 	 * This display is used because {@link Display#getDefault()} is synchronized which propably
 	 * causes the UI to be not smooth when images are loaded and the map is dragged at the same time
 	 */
-	private Display									fDisplay;
-
-	private static final ReentrantLock				CREATE_DIR_LOCK				= new ReentrantLock();
+	private Display											fDisplay;
 
 	/**
 	 * @return OS path for the tile cache or <code>null</code> when offline cache is not used or
@@ -135,13 +133,10 @@ public class TileImageCache {
 	}
 
 	/**
-	 * @param mp
 	 * @param factoryInfo
 	 * @param display
 	 */
-	public TileImageCache(final MP mp) {
-
-		fMp = mp;
+	public TileImageCache() {
 
 		fDisplay = Display.getDefault();
 
@@ -171,21 +166,24 @@ public class TileImageCache {
 			saveOfflineImage(tile, loadedImageData);
 		}
 
-		return createImageInternal(tileKey, loadedImageData[0]);
+		return createImageInternal(tile, tileKey, loadedImageData[0]);
 	}
 
 	/**
 	 * dim tile image, this must be synchronized because other threads could call this method at the
 	 * same time and the map tiles are not drawn
 	 * 
+	 * @param tile
 	 * @param tileKey
 	 *            tile key which is used to keep the image in the cache
 	 * @param loadedImageData
 	 * @return
 	 */
-	private Image createImageInternal(final String tileKey, final ImageData loadedImageData) {
+	private Image createImageInternal(final Tile tile, final String tileKey, final ImageData loadedImageData) {
 
-		final int dimmingAlphaValue = fMp.getDimLevel();
+		final MP mp = tile.getMP();
+
+		final int dimmingAlphaValue = mp.getDimLevel();
 		if (dimmingAlphaValue == 0xFF) {
 
 			// tile image is not dimmed
@@ -214,7 +212,7 @@ public class TileImageCache {
 				public void run() {
 
 					final GC gcTileImage = new GC(tileImage);
-					final Color dimColor = new Color(fDisplay, fMp.getDimColor());
+					final Color dimColor = new Color(fDisplay, mp.getDimColor());
 					{
 						gcTileImage.setBackground(dimColor);
 						gcTileImage.fillRectangle(imageBounds);
@@ -326,7 +324,7 @@ public class TileImageCache {
 	/**
 	 * @param tile
 	 * @return Returns the tile image from the cache, returns <code>null</code> when the image is
-	 *         not available in the cache
+	 *         not available in the cache or is disposed
 	 */
 	public Image getTileImage(final Tile tile) {
 
@@ -557,6 +555,7 @@ public class TileImageCache {
 			return;
 		}
 
+		// don't check when it's already available
 		if (tile.isOfflimeImageAvailable()) {
 			return;
 		}

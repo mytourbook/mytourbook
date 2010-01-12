@@ -115,12 +115,12 @@ import de.byteholder.geoclipse.mapprovider.MPCustom;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 import de.byteholder.geoclipse.mapprovider.MPProfile;
 import de.byteholder.geoclipse.mapprovider.MPWms;
+import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
-import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
 import de.byteholder.geoclipse.util.PixelConverter;
-
+ 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String					PREF_PAGE_MAP_PROVIDER_ID	= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
@@ -1355,7 +1355,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			updateUIOfflineInfoTotal();
 
 			// clear map image cache
-			mp.disposeCachedImages();
+			mp.disposeTileImages();
 		}
 	}
 

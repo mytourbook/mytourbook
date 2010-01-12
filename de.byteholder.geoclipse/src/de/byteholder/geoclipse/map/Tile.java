@@ -19,12 +19,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.mapprovider.MP;
-
+ 
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
  * zoom level.
@@ -119,9 +118,17 @@ public class Tile extends Observable {
 	private String							fOfflinePath;
 
 	/**
-	 * When set, this {@link Tile} is a part of the parent tile
+	 * Contains the parent tile when this tile is a child tile. This field can be null to preserve
+	 * the child. The field {@link #fIsChild} determines if this tile was a child of a parent tile.
 	 */
 	private Tile							fParentTile;
+
+	/**
+	 * Is <code>true</code> when this is is a child tile. It is possible that the parent tile field
+	 * {@link #fParentTile} is set to <code>null</code> to keep the tile in a cache when the tile
+	 * has loading errors
+	 */
+	private boolean							fIsChild			= false;
 
 	/**
 	 * When set, this is a parent tile which has children tiles
@@ -141,9 +148,10 @@ public class Tile extends Observable {
 
 	// time for statistics
 	private long							fTimeIsQueued;
-	private long							fTimeStartLoading;
-	private long							fTimeEndLoading;
 
+	private long							fTimeStartLoading;
+
+	private long							fTimeEndLoading;
 	/**
 	 * contains children which contains loading errors
 	 */
@@ -171,20 +179,10 @@ public class Tile extends Observable {
 									final String customTileKey,
 									final String projectionId) {
 
-// mp2
-//		// get tile parameter from the tile factory when they are not yet set
-//		if (mp != null) {
-//
-//			if (customTileKey == null) {
-//				customTileKey = mp.getInfo().getCustomTileKey();
-//			}
-//
-//			if (projectionId == null) {
-//				projectionId = mp.getProjection().getId();
-//			}
-//		}
-
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(50);
+//		sb.append("-mpid:");
+		sb.append(mp.getId());
+		sb.append('-');
 
 		sb.append(zoom);
 		sb.append('-');
@@ -192,18 +190,22 @@ public class Tile extends Observable {
 		sb.append('-');
 		sb.append(y);
 
+
 		if (tileCreatorId != null) {
 			sb.append('-');
+//			sb.append("-ci:");
 			sb.append(tileCreatorId);
 		}
 
 		if (customTileKey != null) {
 			sb.append('-');
+//			sb.append("-ck:");
 			sb.append(customTileKey);
 		}
 
 		if (projectionId != null) {
 			sb.append('-');
+//			sb.append("-pi:");
 			sb.append(projectionId);
 		}
 
@@ -214,13 +216,13 @@ public class Tile extends Observable {
 	 * Create a new Tile at the specified tile point and zoom level
 	 * 
 	 * @param mp
-	 *            contains tile factory or <code>null</code> when an empty tile is created
+	 *            map provider which creates the tile image
+	 * @param zoom
 	 * @param x
 	 * @param y
-	 * @param zoom
 	 * @param tileCreatorId
 	 */
-	public Tile(final MP mp, final int x, final int y, final int zoom, final String tileCreatorId) {
+	public Tile(final MP mp, final int zoom, final int x, final int y, final String tileCreatorId) {
 
 		fMp = mp;
 
@@ -323,23 +325,48 @@ public class Tile extends Observable {
 	}
 
 	/**
-	 * @param loadingTiles
-	 * @return Returns the tile children or <code>null</code> when the tile has no children
+	 * Creates tile children for all mp wrapper which are displayed in one tile
+	 * 
+	 * @return Returns the tile children or <code>null</code> when the tile has no children. A list
+	 *         is returned with children which are not yet available in the tile cache or error
+	 *         cache, children are skipped when they already exist and have loading errord
 	 */
-	public ArrayList<Tile> createTileChildren(final ConcurrentHashMap<String, Tile> loadingTiles) {
+	public ArrayList<Tile> createTileChildren() {
 
 		if (fMp instanceof ITileChildrenCreator) {
 
 			if (fTileChildren == null) {
 
 				PARENT_LOCK = new ReentrantLock();
-				fTileChildren = ((ITileChildrenCreator) fMp).createTileChildren(this, loadingTiles);
+				fTileChildren = ((ITileChildrenCreator) fMp).createTileChildren(this);
 			}
 
 			return fTileChildren;
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Tile)) {
+			return false;
+		}
+		final Tile other = (Tile) obj;
+		if (fTileKey == null) {
+			if (other.fTileKey != null) {
+				return false;
+			}
+		} else if (!fTileKey.equals(other.fTileKey)) {
+			return false;
+		}
+		return true;
 	}
 
 	public BoundingBoxEPSG4326 getBbox() {
@@ -360,13 +387,13 @@ public class Tile extends Observable {
 			return null;
 		}
 
-		// check image bounds
-		final Rectangle imageBounds = image.getBounds();
-		if (imageBounds.width <= 0 || imageBounds.height <= 0) {
-			image.dispose();
-			image = null;
-			return null;
-		}
+//		// check image bounds
+//		final Rectangle imageBounds = image.getBounds();
+//		if (imageBounds.width <= 0 || imageBounds.height <= 0) {
+//			image.dispose();
+//			image = null;
+//			return null;
+//		}
 
 		return image;
 	}
@@ -509,11 +536,12 @@ public class Tile extends Observable {
 		return zoom;
 	}
 
-	/**
-	 * Increments the overlay content counter
-	 */
-	public void incrementOverlayContent() {
-		fOverlayContent++;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fTileKey == null) ? 0 : fTileKey.hashCode());
+		return result;
 	}
 
 //	/**
@@ -524,6 +552,31 @@ public class Tile extends Observable {
 //	}
 
 	/**
+	 * Increments the overlay content counter
+	 */
+	public void incrementOverlayContent() {
+		fOverlayContent++;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when this is is a child tile, it is possible that the
+	 *         parent tile field {@link #fParentTile} was set to null, to keep the tile in a cache
+	 *         when the tile has loading errors
+	 */
+	public boolean isChild() {
+		return fIsChild;
+	}
+
+	public boolean isImageValid() {
+
+		if (mapImage == null) {
+			return false;
+		}
+
+		return getCheckedImage(mapImage) != null;
+	}
+
+	/**
 	 * @return Returns <code>true</code> when the tile image is currently being loaded
 	 */
 	public boolean isLoading() {
@@ -531,7 +584,7 @@ public class Tile extends Observable {
 	}
 
 	/**
-	 * @return Returns <code>true</code> when loading of the tile image from the internet failed
+	 * @return Returns <code>true</code> when loading of the tile image failed
 	 */
 	public boolean isLoadingError() {
 		return fLoadingError != null && fLoadingError.length() > 0;
@@ -633,7 +686,7 @@ public class Tile extends Observable {
 	}
 
 	/**
-	 * Set error message when loading of the image failed
+	 * Set error message when loading of the image failed, an existing tile image will be disposed
 	 * 
 	 * @param loadingError
 	 */
@@ -653,6 +706,9 @@ public class Tile extends Observable {
 		}
 
 		if (fParentTile != null) {
+
+			// this is a child tile, set error into the parent tile
+
 			fParentTile.setChildLoadingError(this);
 		}
 
@@ -662,7 +718,7 @@ public class Tile extends Observable {
 	 * Set the map image for this tile, the image is checked before it is set
 	 * 
 	 * @param newImage
-	 * @return Returns <code>true</code> when the image was set, <code>false</code> when the image
+	 * @return <code>true</code> when the image was set, <code>false</code> when the image
 	 *         is invalid
 	 */
 	public boolean setMapImage(final Image newImage) {
@@ -704,6 +760,7 @@ public class Tile extends Observable {
 
 	public void setParentTile(final Tile parentTile) {
 		fParentTile = parentTile;
+		fIsChild = true;
 	}
 
 	public void setTileCustomPath(final String tileCustomPath) {

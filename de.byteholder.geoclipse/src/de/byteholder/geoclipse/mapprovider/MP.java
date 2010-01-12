@@ -21,8 +21,6 @@ import java.awt.geom.Point2D;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -74,11 +72,42 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public static final int							UI_MAX_ZOOM_LEVEL				= 18;
 
 	// loading tiles pool
-	private static int								THREAD_POOL_SIZE				= 20;
+	private static final int						THREAD_POOL_SIZE				= 20;
 	private static ExecutorService					fExecutorService;
 
 	private static final ReentrantLock				EXECUTOR_LOCK					= new ReentrantLock();
 	private static final ReentrantLock				RESET_LOCK						= new ReentrantLock();
+
+	/**
+	 * Cache for tiles which do not have loading errors
+	 */
+	private static final TileCache					fTileCache						= new TileCache(2000);
+
+	/**
+	 * Contains tiles which has loading errors, they are kept in this map that they are not loaded
+	 * again
+	 */
+	private static final TileCache					fErrorTiles						= new TileCache(10000);
+
+	/**
+	 * Cache for tile images
+	 */
+	private static final TileImageCache				fTileImageCache					= new TileImageCache();
+
+	/**
+	 * This queue contains tiles which needs to be loaded, only the number of
+	 * {@link #THREAD_POOL_SIZE} can be loaded at the same time, the other tiles are waiting in this
+	 * queue. <br>
+	 * <br>
+	 * TODO !!!!! THIS IS JDK 1.6 !!!!!!!
+	 */
+	private static final LinkedBlockingDeque<Tile>	fTileWaitingQueue				= new LinkedBlockingDeque<Tile>();
+
+	/**
+	 * Listener which throws {@link ITileListener} events
+	 */
+	private final static ListenerList				fTileListeners					= new ListenerList(
+																							ListenerList.IDENTITY);
 
 	private int										fDimmingAlphaValue				= 0xFF;
 	private RGB										fDimmingColor;
@@ -120,35 +149,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private double[]								longitudeRadianWidthInPixels;
 
-	/**
-	 * cache for tiles which do not have loading errors
-	 */
-	private final TileCache							fTileCache						= new TileCache();
-
-	/**
-	 * cache for tile images
-	 */
-	private final TileImageCache					fTileImageCache;
-
-	/**
-	 * contains tiles which are currently being loaded or which have loading errors when loading
-	 * failed
-	 */
-	private final ConcurrentHashMap<String, Tile>	fLoadingTiles					= new ConcurrentHashMap<String, Tile>();
-
-	/**
-	 * This queue contains tiles which needs to be loaded, only the number of
-	 * {@link #THREAD_POOL_SIZE} can be loaded at the same time, the other tiles are waiting in this
-	 * queue. <br>
-	 * <br>
-	 * !!!!! THIS IS JDK 1.6 !!!!!!!
-	 */
-	private LinkedBlockingDeque<Tile>				fTileWaitingQueue				= new LinkedBlockingDeque<Tile>();
-
 	private boolean									fUseOfflineImage				= true;
-
-	private final static ListenerList				fTileListeners					= new ListenerList(
-																							ListenerList.IDENTITY);
 
 	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
@@ -236,8 +237,27 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fTileListeners.add(tileListener);
 	}
 
+	public static void fireTileEvent(final TileEventId tileEventId, final Tile tile) {
+		for (final Object listener : fTileListeners.getListeners()) {
+			final ITileListener tileListener = (ITileListener) listener;
+			tileListener.tileEvent(tileEventId, tile);
+		}
+	}
+
+	public static TileCache getErrorTiles() {
+		return fErrorTiles;
+	}
+
+	public static TileCache getTileCache() {
+		return fTileCache;
+	}
+
 	public static ListenerList getTileListeners() {
 		return fTileListeners;
+	}
+
+	public static LinkedBlockingDeque<Tile> getTileWaitingQueue() {
+		return fTileWaitingQueue;
 	}
 
 	public static void removeOfflineInfoListener(final IOfflineInfoListener listener) {
@@ -269,8 +289,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public MP() {
 
 		fProjection = new Mercator();
-
-		fTileImageCache = new TileImageCache(this);
 
 		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
 
@@ -385,13 +403,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * In this method the implementing Factroy can dispose all of its temporary images and other SWT
 	 * objects that need to be disposed.
 	 */
-	public void dispose() {
+	public void disposeAllImages() {
 
 		if (fTileImageCache != null) {
 			fTileImageCache.dispose();
 		}
-
-		fLoadingTiles.clear();
 
 		if (fLoadingImage != null) {
 			fLoadingImage.dispose();
@@ -402,14 +418,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 	}
 
-	public void disposeCachedImages() {
-		fLoadingTiles.clear();
+	public void disposeTileImages() {
 		fTileImageCache.dispose();
 	}
 
 	public void disposeTiles() {
-		fLoadingTiles.clear();
-		fTileCache.clear();
+		fTileCache.removeAll();
+		fErrorTiles.removeAll();
 		fTileImageCache.dispose();
 	}
 
@@ -454,13 +469,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		final Object[] allListeners = fOfflineReloadEventListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((IOfflineInfoListener) listener).offlineInfoIsDirty(mapProvider);
-		}
-	}
-
-	public void fireTileEvent(final TileEventId tileEventId, final Tile tile) {
-		for (final Object listener : fTileListeners.getListeners()) {
-			final ITileListener tileListener = (ITileListener) listener;
-			tileListener.tileEvent(tileEventId, tile);
 		}
 	}
 
@@ -551,6 +559,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 						final String threadName = "tile-pool-" + fCount++; //$NON-NLS-1$
 
 						final Thread thread = new Thread(r, threadName);
+
 						thread.setPriority(Thread.MIN_PRIORITY);
 						thread.setDaemon(true);
 
@@ -605,14 +614,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * @return Returns a list with tiles which are currently being loaded or which have loading
-	 *         errors when loading failed
-	 */
-	public ConcurrentHashMap<String, Tile> getLoadingTiles() {
-		return fLoadingTiles;
-	}
-
-	/**
 	 * @param zoom
 	 * @return
 	 */
@@ -649,8 +650,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public int getMapWidthInTilesAtZoom(int zoom) {
 
-		// ensure array bounds
-		zoom = Math.min(zoom, mapWidthInTilesAtZoom.length - 1);
+		// ensure array bounds, this is Math.min() inline
+		final int b = mapWidthInTilesAtZoom.length - 1;
+		zoom = (zoom <= b) ? zoom : b;
 
 		return mapWidthInTilesAtZoom[zoom];
 	}
@@ -741,7 +743,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		tilePositionX = tilePositionX % numTilesWidth;
 
 		final String tileKey = Tile.getTileKey(//
-				null,
+				this,
 				tilePositionX,
 				tilePositionY,
 				zoom,
@@ -756,10 +758,16 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		if (tile != null) {
 
-			// cache contains tile
+			// tile is available
 
 			// check tile image
-			if (tile.getCheckedMapImage() != null) {
+			if (tile.isImageValid()) {
+
+				/*
+				 * tile image is available, this is the shortest path to check if an image for a
+				 * tile position is availabe
+				 */
+
 				return tile;
 			}
 
@@ -768,57 +776,50 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 				return tile;
 			}
 
-			// check loading error
+			// check if the old implementation was not correctly transfered to the cache with error tiles
 			if (tile.isLoadingError()) {
+				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 1: "
+						+ tile.getTileKey(), null);
 				return tile;
 			}
 
-			// tile image is disposed
+			// tile image is not available until now
 		}
 
 		/*
-		 * check if tile is being loaded, this list contains ALL tiles which have loading errors
+		 * check if the tile has a loading error
+		 */
+		final Tile errorTile = fErrorTiles.get(tileKey);
+		if (errorTile != null) {
+
+			// tiles with an error do not have an image
+
+			// check if the old implementation was not correctly transfered to the cache with error tiles
+			if (tile != null) {
+				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 2: "
+						+ tile.getTileKey(), null);
+			}
+
+			return errorTile;
+		}
+
+		/*
+		 * create new tile
 		 */
 		if (tile == null) {
 
-			tile = fLoadingTiles.get(tileKey);
-			if (tile == null) {
+			// tile is not being loaded, create a new tile 
 
-				// tile is not being loaded, create a new tile 
+			tile = new Tile(this, zoom, tilePositionX, tilePositionY, null);
+			tile.setBoundingBoxEPSG4326();
 
-				tile = new Tile(this, tilePositionX, tilePositionY, zoom, null);
-				tile.setBoundingBoxEPSG4326();
+			doPostCreation(tile);
 
-				doPostCreation(tile);
-
-				// keep all tiles in a cache
-				fTileCache.add(tileKey, tile);
-
-			} else {
-
-				// tile is available in the loading map
-
-				// check loading state
-				if (tile.isLoading()) {
-					return tile;
-				}
-
-				// check if loading failed
-				if (tile.isLoadingError()) {
-					return tile;
-				}
-
-				// when the tile has an image, use it
-				final Image tileImage = tile.getCheckedMapImage();
-				if (tileImage != null) {
-					return tile;
-				}
-
-//				// this case should not happen
-//				StatusUtil.showStatus(
-//						"Tile is in loading map but has an invalid state: " + tileKey + "\t" + tile,
-//						new Exception());
-			}
+			/*
+			 * keep tiles in the cache, tiles with loading errors will be transferred to the tile
+			 * cache with loading errors, this is done in the TileImageLoader
+			 */
+			fTileCache.add(tileKey, tile);
 		}
 
 		/*
@@ -833,17 +834,17 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		if (cachedTileImage == null) {
 
-			// start loading the image
+			// an image is not available, start loading it
 
 			if (isTileValid(tilePositionX, tilePositionY, zoom)) {
 
+				// set state if an offline image for the current tile is available
 				if (useOfflineImage) {
-					// set state if an offline image for the current tile is available
 					fTileImageCache.setOfflineImageAvailability(tile);
 				}
 
 				// LOAD/CREATE image
-				putTilesInWaitingQueue(tile);
+				putTileInWaitingQueue(tile);
 			}
 
 		} else {
@@ -854,10 +855,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 
 		return tile;
-	}
-
-	public TileCache getTileCache() {
-		return fTileCache;
 	}
 
 	public TileImageCache getTileImageCache() {
@@ -972,10 +969,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return url;
 	}
 
-	public LinkedBlockingDeque<Tile> getTileWaitingQueue() {
-		return fTileWaitingQueue;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -1037,15 +1030,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return fIsProfileBlackTransparent;
 	}
 
-	boolean isProfileTransparentColors() {
-		return fIsProfileTransparentColors;
-	}
-
 //	/**
 //	 * @param offlineImagePath
 //	 * @return Path where tile files will are cached relative to the offline image path
 //	 */
 //	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
+
+	boolean isProfileTransparentColors() {
+		return fIsProfileTransparentColors;
+	}
 
 	/**
 	 * @returns Return <code>true</code> if this point in <em>tiles</em> is valid at this zoom
@@ -1053,9 +1046,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *          one tile), x,y must be 0,0
 	 */
 	public boolean isTileValid(final int x, final int y, final int zoomLevel) {
-
-		//int x = (int)coord.getX();
-		//int y = (int)coord.getY();
 
 		// check if off the map to the top or left
 		if (x < 0 || y < 0) {
@@ -1107,12 +1097,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		tile.setLoading(true);
 
-		fLoadingTiles.put(tile.getTileKey(), tile);
-
 		fTileWaitingQueue.add(tile);
 
 		// create loading task
-		final Future<?> future = getExecutor().submit(new TileImageLoader(this));
+		final Future<?> future = getExecutor().submit(new TileImageLoader());
 
 		// keep loading task
 		tile.setFuture(future);
@@ -1125,31 +1113,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * 
 	 * @param tile
 	 */
-	private void putTilesInWaitingQueue(final Tile tile) {
+	private void putTileInWaitingQueue(final Tile tile) {
 
-		// prevent to start loading when loading is already started
+		// prevent to load it more than once
 		if (tile.isLoading()) {
 			return;
 		}
 
-		final String tileKey = tile.getTileKey();
-		final Tile loadingTile = fLoadingTiles.get(tileKey);
-
-		// check if the tile is available in the loading queue
-		if (loadingTile != null) {
-
-			/*
-			 * tile is corrupt, when tile.isLoading() == false, it should NOT be in loadingTiles
-			 */
-
-			// remove invalid tile
-			fLoadingTiles.remove(tileKey);
-
-			// log disabled: happened too often
-// 			StatusUtil.log("Loading Tile Map contains an invalid tile: " + tileKey, new Exception());
-
-			return;
-		}
+//		final String tileKey = tile.getTileKey();
 
 		try {
 
@@ -1157,7 +1128,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			if (tile.isOfflimeImageAvailable() == false) {
 
-				final ArrayList<Tile> tileChildren = tile.createTileChildren(fLoadingTiles);
+				final ArrayList<Tile> tileChildren = tile.createTileChildren();
 				if (tileChildren != null) {
 
 					// this is a parent child, put all child tiles into the loading queue
@@ -1170,28 +1141,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 						 * error
 						 */
 
-						// set loading error for the parent tile
+						// set loading error into the parent tile
 						tile.setLoadingError(Messages.Tile_Error_NoMapProvider);
 					}
 
 					for (final Tile tileChild : tileChildren) {
-
-						/*
-						 * check if a tile is already in the loading queue, this can be the case
-						 * when a child has a loading error
-						 */
-						boolean isLoadChild = true;
-						final Tile loadingChild = fLoadingTiles.get(tileChild.getTileKey());
-
-						if (loadingChild != null) {
-							if (loadingChild.isLoadingError()) {
-								isLoadChild = false;
-							}
-						}
-
-						if (isLoadChild) {
-							putOneTileInWaitingQueue(tileChild);
-						}
+						putOneTileInWaitingQueue(tileChild);
 					}
 				}
 			}
@@ -1207,27 +1162,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		{
 			try {
 
-				stopLoadingTiles();
-
 				fTileWaitingQueue.clear();
+				fTileCache.stopLoadingTiles();
 
-				// clear loading map
-				if (keepTilesWithLoadingError) {
-
-					// remove tiles which has no error
-					final Collection<Tile> loadingTiles = fLoadingTiles.values();
-
-					for (final Tile tile : loadingTiles) {
-						if (tile.isLoadingError() == false) {
-							fLoadingTiles.remove(tile.getTileKey());
-						}
-					}
-
-				} else {
-					fLoadingTiles.clear();
+				if (keepTilesWithLoadingError == false) {
+					fErrorTiles.removeAll();
 				}
 
-				fTileCache.clear();
+				fTileCache.removeAll();
 				fTileImageCache.dispose();
 
 			} finally {
@@ -1240,12 +1182,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public synchronized void resetOverlays() {
 
-		stopLoadingTiles();
-
 		fTileWaitingQueue.clear();
-		fLoadingTiles.clear();
+		fTileCache.stopLoadingTiles();
 
 		fTileCache.resetOverlays();
+		fErrorTiles.resetOverlays();
 
 		fireTileEvent(TileEventId.TILE_RESET_QUEUES, null);
 	}
@@ -1256,23 +1197,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		{
 			try {
 
-				stopLoadingTiles();
-
 				fTileWaitingQueue.clear();
+				fTileCache.stopLoadingTiles();
 
-				// remove parent tiles
-				for (final Tile tile : fLoadingTiles.values()) {
+				fErrorTiles.removeParentTiles();
 
-					/*
-					 * check if this is a parent tile, child tiles are not removed to prevent
-					 * loading them again
-					 */
-					if (tile.getChildren() != null) {
-						fLoadingTiles.remove(tile.getTileKey());
-					}
-				}
-
-				fTileCache.clear();
+				fTileCache.removeAll();
 				fTileImageCache.dispose();
 
 			} finally {
@@ -1309,7 +1239,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fDimmingColor = dimColor;
 
 		// dispose all cached images
-		disposeCachedImages();
+		disposeTileImages();
 	}
 
 	public void setFavoritePosition(final GeoPosition fFavoritePosition) {
@@ -1341,12 +1271,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fIsProfileBrightness = isBrightness;
 	}
 
-	void setIsProfileTransparentColors(final boolean isTransColors) {
-		fIsProfileTransparentColors = isTransColors;
-	}
-
 	void setIsProfileTransparentBlack(final boolean isBlackTransparent) {
 		fIsProfileBlackTransparent = isBlackTransparent;
+	}
+
+	void setIsProfileTransparentColors(final boolean isTransColors) {
+		fIsProfileTransparentColors = isTransColors;
 	}
 
 	public void setLastUsedPosition(final GeoPosition position) {
@@ -1424,30 +1354,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public void setZoomLevel(final int minZoom, final int maxZoom) {
 		initializeZoomLevel(minZoom, maxZoom);
-	}
-
-	/**
-	 * stop downloading tiles
-	 */
-	private void stopLoadingTiles() {
-
-		for (final Tile tile : fLoadingTiles.values()) {
-
-			if (tile.isLoading()) {
-
-				// reset loading state
-				tile.setLoading(false);
-
-				final Future<?> future = tile.getFuture();
-
-				if (future != null) {
-
-					if (future.isCancelled() == false) {
-						future.cancel(true);
-					}
-				}
-			}
-		}
 	}
 
 	@Override

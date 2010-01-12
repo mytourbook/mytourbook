@@ -23,28 +23,23 @@ import de.byteholder.geoclipse.mapprovider.MP;
  */
 public class TileImageLoader implements Runnable {
 
-//	private final MP	fMp;
-
 	/**
-	 * @param mp
+ 	 * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
+	 * from the tile waiting queue {@link MP#getTileWaitingQueue()}
 	 */
-	public TileImageLoader(final MP mp) {
-//		fMp = mp;
-	}
+	public TileImageLoader() {}
 
 	private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
 
-		final MP mp = tile.getMP();
 		final String tileKey = tile.getTileKey();
 
 		if (tile.isLoadingError()) {
 
-			// keep tile with loading error in the loading queue to prevent loading it again
+			// move tile from tile cache into the cache which contails tiles with errors
 
-		} else {
+			MP.getErrorTiles().add(tileKey, tile);
 
-			// remove from loading map
-			mp.getLoadingTiles().remove(tileKey);
+			MP.getTileCache().remove(tileKey);
 		}
 
 		// set tile state, notify observer (Map is an observer)
@@ -54,7 +49,7 @@ public class TileImageLoader implements Runnable {
 			tile.notifyImageObservers();
 		}
 
-		mp.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
+		MP.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
 	}
 
 	/**
@@ -63,9 +58,10 @@ public class TileImageLoader implements Runnable {
 	private void getTileImage(final Tile tile) {
 
 		String loadingError = null;
-		Tile parentTile = null;
 		boolean isNotifyObserver = true;
 		boolean isParentFinal = false;
+
+		Tile parentTile = null;
 
 		try {
 
@@ -191,7 +187,7 @@ public class TileImageLoader implements Runnable {
 							StatusUtil.log(e.getMessage(), e);
 						}
 
-						mp.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+						MP.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
 					}
 				}
 			}
@@ -233,10 +229,6 @@ public class TileImageLoader implements Runnable {
 				if (tileImageData != null && isSaveImage) {
 					tileImageCache.saveOfflineImage(tile, tileImageData);
 				}
-
-//				if (parentTile == null) {
-//					throw new Exception(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, tile.getTileKey()));
-//				}
 
 				// set image into child
 				final ParentImageStatus parentImageStatus = tile.createParentImage(tileImageData);
@@ -287,7 +279,7 @@ public class TileImageLoader implements Runnable {
 
 				if (imageTile.setMapImage(tileImage) == false) {
 
-					// keep image in loading list and set an error to prevent it loading a second time
+					// set an error to prevent it loading a second time
 					tile.setLoadingError(Messages.DBG049_Loading_Error_ImageIsInvalid);
 				}
 			}
@@ -312,9 +304,7 @@ public class TileImageLoader implements Runnable {
 	 */
 	private ImageData[] paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
-		final MP mp = tile.getMP();
-
-		mp.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
+		MP.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
 		final ImageData[] paintedImageData = new ImageData[1];
 
@@ -360,13 +350,13 @@ public class TileImageLoader implements Runnable {
 			}
 			paintedImageData[0] = tileImageData;
 
-			mp.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
+			MP.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
 		} catch (final Exception e) {
 
 			tile.setLoadingError(Messages.DBG045_Loading_Error_PaintingError + e.getMessage());
 
-			mp.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
+			MP.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
 
 			StatusUtil.log(e.getMessage(), e);
 		}
@@ -380,27 +370,23 @@ public class TileImageLoader implements Runnable {
 		 * load/create tile image
 		 */
 		// get tile from queue
-		final LinkedBlockingDeque<Tile> tileWaitingQueue = mp.getTileWaitingQueue();
+		final LinkedBlockingDeque<Tile> tileWaitingQueue = MP.getTileWaitingQueue();
 
 		final Tile tile = tileWaitingQueue.pollLast();
 
 		if (tile == null) {
-			// waiting queue is reset
+			// it's possible that the waiting queue was reset
 			return;
 		}
 
-		final boolean isChildTile = tile.getParentTile() != null;
-		final boolean isParentTile = mp instanceof ITileChildrenCreator && isChildTile == false;
+//		final boolean isChildTile = tile.getParentTile() != null;
+		final boolean isParentTile = tile.getMP() instanceof ITileChildrenCreator;// && isChildTile == false;
 
-		mp.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
+		MP.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
 
 		if (isParentTile) {
 
-			/*
-			 * current tile is a parent tile, keep it in the loading queue until all children
-			 * are
-			 * loaded
-			 */
+			// current tile is a parent tile
 
 			if (tile.isLoadingError()) {
 
@@ -419,7 +405,7 @@ public class TileImageLoader implements Runnable {
 
 			} else {
 
-				// a parent is loaded and finalized when the last child was loaded
+				// a parent gets finalized when the last child is loaded
 			}
 
 		} else {

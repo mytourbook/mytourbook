@@ -167,8 +167,8 @@ public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 	@Override
 	public void disposeTiles() {
 		fLoadingTiles.clear();
-		fTileCache.clear();
-		fTileImageCache.dispose();
+		fTileCache.removeAll();
+ 		fTileImageCache.dispose();
 	}
 
 	/**
@@ -642,7 +642,7 @@ public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 					fLoadingTiles.clear();
 				}
 
-				fTileCache.clear();
+				fTileCache.removeAll();
 				fTileImageCache.dispose();
 
 			} finally {
@@ -689,7 +689,7 @@ public abstract class OLD_TileFactoryImpl extends TileFactory_OLD {
 					}
 				}
 
-				fTileCache.clear();
+				fTileCache.removeAll();
 				fTileImageCache.dispose();
 
 			} finally {

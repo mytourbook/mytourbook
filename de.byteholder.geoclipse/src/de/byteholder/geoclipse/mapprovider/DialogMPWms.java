@@ -1310,8 +1310,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			// ensure the map is using the correct zoom levels
 			updateMapZoomLevels(fDefaultMapProvider);
 
-			fMap.resetTileFactory(fDefaultMapProvider);
-		}
+			fMap.setMapProviderWithReset(fDefaultMapProvider, true);
+ 		}
 	}
 
 //	private void onSelectPreviousMapProvider() {
@@ -1355,16 +1355,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			/*
 			 * select wms map provider
 			 */
-			/**
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 * <br>
-			 * ensure the map is using the correct zoom levels before other map actions are done<br>
-			 * <br>
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 */
-			updateMapZoomLevels(fMpWms);
-
-			fMap.resetTileFactory(fMpWms);
 		}
 
 		updateModelFromUI();
@@ -1372,8 +1362,16 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		// reset all images
 		fMpWms.resetAll(false);
 
-		// display map 
-		fMap.queueMapRedraw();
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * <br>
+		 * ensure the map is using the correct zoom levels before other map actions are done<br>
+		 * <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 */
+		updateMapZoomLevels(fMpWms);
+
+		fMap.setMapProviderWithReset(fMpWms, true);
 	}
 
 	private void resetMap(final GeoPosition center, final int zoom) {
@@ -1652,14 +1650,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		fMpWms.initializeLayers();
 
 		// set factory and display map
-		fMap.resetTileFactory(fMpWms);
+		fMap.setMapProviderWithReset(fMpWms, true);
 
 		if (isUpdatePosition) {
 			// set position to previous position
 			fMap.setZoom(fMpWms.getLastUsedZoom());
 			fMap.setGeoCenterPosition(fMpWms.getLastUsedPosition());
 		}
-
 	}
 
 	/*

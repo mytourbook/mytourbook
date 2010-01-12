@@ -1039,8 +1039,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		setMessage(fDefaultMessage);
 
 		// set factory and display map
-		fMap.resetTileFactory(mp);
-
+		fMap.setMapProviderWithReset(mp, true);
+ 
 		// set position to previous position
 		fMap.setZoom(fMpCustom.getLastUsedZoom());
 		fMap.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
@@ -1088,7 +1088,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 */
 		updateMapZoomLevel(fMpCustom);
 
-		fMap.resetTileFactory(fMpCustom);
+		fMap.setMapProviderWithReset(fMpCustom, true);
 	}
 
 	private void onSelectOsmMap() {
@@ -1102,7 +1102,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			updateMapZoomLevel(fMpCustom);
 
-			fMap.resetTileFactory(fMpCustom);
+			fMap.setMapProviderWithReset(fMpCustom, true);
 
 		} else {
 
@@ -1113,7 +1113,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			fDefaultMapProvider.setStateToReloadOfflineCounter();
 
-			fMap.resetTileFactory(fDefaultMapProvider);
+			fMap.setMapProviderWithReset(fDefaultMapProvider, true);
 		}
 	}
 

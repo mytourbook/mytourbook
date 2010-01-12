@@ -944,8 +944,8 @@ public class TourMapView extends ViewPart {
 
 		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 		for (final MP mp : allMapProviders) {
-			mp.dispose();
-		}
+			mp.disposeAllImages();
+ 		}
 
 		fMap.disposeOverlayImageCache();
 

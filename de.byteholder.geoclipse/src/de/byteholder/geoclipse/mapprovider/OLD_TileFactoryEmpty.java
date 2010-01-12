@@ -142,8 +142,8 @@ public class OLD_TileFactoryEmpty extends TileFactoryImpl {
 		if (tile != null) {
 			return tile;
 		}
-
-		tile = new Tile(null, tilePositionX, tilePositionY, zoom, null);
+ 
+		tile = new Tile(null, zoom, tilePositionX, tilePositionY, null);
 		tile.setMapImage(tileImage);
 		getTileCache().add(tileKey, tile);
 

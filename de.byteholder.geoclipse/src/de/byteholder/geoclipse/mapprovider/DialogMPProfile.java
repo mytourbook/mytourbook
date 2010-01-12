@@ -408,8 +408,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// initialize after the shell size is set
 		updateUIFromModel(fMpProfile);
 
-		displayProfileMap(false);
-
+		onSelectMapProfile(false);
+ 
 		enableProfileMapButton();
 		fTreeViewer.getTree().setFocus();
 	}
@@ -619,7 +619,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(final SelectionChangedEvent event) {
-					onSelectMapProvider(event.getSelection());
+					onSelectMP(event.getSelection());
 				}
 			});
 
@@ -1406,7 +1406,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			fBtnShowProfileMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					displayProfileMap(true);
+					onSelectMapProfile(true);
 				}
 			});
 
@@ -1419,7 +1419,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			fBtnShowOsmMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					displayOsmMap();
+					onSelectMapOSM();
 				}
 			});
 
@@ -1573,52 +1573,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		return colorSelector;
 	}
 
-	private void displayOsmMap() {
-
-		if (fMap.getMapProvider() == fDefaultMP) {
-
-			// toggle tile factory
-
-			// update layers BEFORE the tile factory is set in the map
-			updateModelFromUI();
-
-			setMapZoomLevelFromInfo(fMpProfile);
-
-			fMap.resetTileFactory(fMpProfile);
-
-		} else {
-
-			// display OSM
-
-			// ensure the map is using the correct zoom levels
-			setMapZoomLevelFromInfo(fDefaultMP);
-
-			fDefaultMP.setStateToReloadOfflineCounter();
-
-			fMap.resetTileFactory(fDefaultMP);
-		}
-	}
-
-	/**
-	 * Display profile map provider
-	 */
-	private void displayProfileMap(final boolean isDeleteOffline) {
-
-		// update layers BEFORE the tile factory is set in the map
-		updateModelFromUI();
-
-		/**
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-		 * <br>
-		 * ensure the map is using the correct zoom levels before other map actions are done<br>
-		 * <br>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-		 */
-		setMapZoomLevelFromInfo(fMpProfile);
-
-		fMap.resetTileFactory(fMpProfile);
-	}
-
 	private void enableControls() {
 
 		final ITreeSelection selection = (ITreeSelection) fTreeViewer.getSelection();
@@ -1731,8 +1685,33 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		if (isEnabled == false) {
 			// hide profile map
-			displayOsmMap();
+			onSelectMapOSM();
 		}
+	}
+
+	/**
+	 * @param colorSelector
+	 * @return Returns the color value of the {@link ColorSelector} or -1 when the color is black
+	 */
+	private int getColorValue(final ColorSelector colorSelector) {
+
+		final RGB rgb = colorSelector.getColorValue();
+
+		colorSelector.getButton().setToolTipText(rgb.toString());
+
+		final int colorValue = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
+
+		return colorValue == 0 ? -1 : colorValue;
+	}
+
+	@Override
+	protected IDialogSettings getDialogBoundsSettings() {
+
+		// keep window size and position
+		return fDialogSettings;
+
+		// disable bounds
+//		return null;
 	}
 
 //	private void createUIBBoxTest(final Composite parent) {
@@ -1796,31 +1775,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 //			});
 //		}
 //	}
-
-	/**
-	 * @param colorSelector
-	 * @return Returns the color value of the {@link ColorSelector} or -1 when the color is black
-	 */
-	private int getColorValue(final ColorSelector colorSelector) {
-
-		final RGB rgb = colorSelector.getColorValue();
-
-		colorSelector.getButton().setToolTipText(rgb.toString());
-
-		final int colorValue = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
-
-		return colorValue == 0 ? -1 : colorValue;
-	}
-
-	@Override
-	protected IDialogSettings getDialogBoundsSettings() {
-
-		// keep window size and position
-		return fDialogSettings;
-
-		// disable bounds
-//		return null;
-	}
 
 	long getDragStartTime() {
 		return fDragStartTime;
@@ -2009,28 +1963,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	}
 
-//	private void onModifyBbox() {
-//
-//		fBboxTop = (float) fSpinnerBboxTop.getSelection() / 100000;
-//		fBboxBottom = (float) fSpinnerBboxBottom.getSelection() / 100000;
-//
-//		// delete offline images to force the reload to test the modified url
-//		for (final MapProviderWrapper mpWrapper : fMpProfile.getAllWrappers()) {
-//
-//			if (mpWrapper.isDisplayedInMap()) {
-//				fPrefPageMapProvider.deleteOfflineMap(mpWrapper.getMapProvider());
-//			}
-//		}
-////
-////		System.out.println();
-////		System.out.println();
-////		System.out.println("top: " + fBboxTop);
-////		System.out.println("bot: " + fBboxBottom);
-////		System.out.println();
-//
-////		displayProfileMap(false);
-//	}
-
 	private void onModifyZoomSpinnerMax() {
 
 		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
@@ -2059,6 +1991,28 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		updateLiveView();
 	}
 
+//	private void onModifyBbox() {
+//
+//		fBboxTop = (float) fSpinnerBboxTop.getSelection() / 100000;
+//		fBboxBottom = (float) fSpinnerBboxBottom.getSelection() / 100000;
+//
+//		// delete offline images to force the reload to test the modified url
+//		for (final MapProviderWrapper mpWrapper : fMpProfile.getAllWrappers()) {
+//
+//			if (mpWrapper.isDisplayedInMap()) {
+//				fPrefPageMapProvider.deleteOfflineMap(mpWrapper.getMapProvider());
+//			}
+//		}
+////
+////		System.out.println();
+////		System.out.println();
+////		System.out.println("top: " + fBboxTop);
+////		System.out.println("bot: " + fBboxBottom);
+////		System.out.println();
+//
+////		displayProfileMap(false);
+//	}
+
 	private void onScaleDoubleClick(final Widget widget) {
 
 		final Scale scale = (Scale) widget;
@@ -2069,7 +2023,62 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		onModifyProperties();
 	}
 
-	private void onSelectMapProvider(final ISelection selection) {
+	/**
+	 * Toggle OSM/Profile map
+	 */
+	private void onSelectMapOSM() {
+
+		// toggle tile factory
+		if (fMap.getMapProvider() == fDefaultMP) {
+
+			// display profile map provider
+
+			// update layers BEFORE the tile factory is set in the map
+			updateModelFromUI();
+
+			setMapZoomLevelFromInfo(fMpProfile);
+
+			fMap.setMapProviderWithReset(fMpProfile, true);
+
+		} else {
+
+			// display OSM
+
+			fDefaultMP.setStateToReloadOfflineCounter();
+
+			// ensure the map is using the correct zoom levels
+			setMapZoomLevelFromInfo(fDefaultMP);
+
+			fMap.setMapProviderWithReset(fDefaultMP, true);
+		}
+	}
+
+	/**
+	 * Display map with the profile map provider
+	 */
+	private void onSelectMapProfile(final boolean isDeleteOffline) {
+
+		// update layers BEFORE the tile factory is set in the map
+		updateModelFromUI();
+
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * <br>
+		 * ensure the map is using the correct zoom levels before other map actions are done<br>
+		 * <br>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 */
+		setMapZoomLevelFromInfo(fMpProfile);
+
+		fMap.setMapProviderWithReset(fMpProfile, true);
+	}
+
+	/**
+	 * A map provider is selected in the mp list
+	 * 
+	 * @param selection
+	 */
+	private void onSelectMP(final ISelection selection) {
 
 		Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
@@ -2362,7 +2371,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	void updateLiveView() {
 		if (fIsLiveView) {
-			displayProfileMap(false);
+			onSelectMapProfile(false);
 		}
 	}
 
@@ -2586,7 +2595,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		MPProfile.updateWrapperTileFactory(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		fMap.resetTileFactory(fMpProfile);
+		fMap.setMapProviderWithReset(fMpProfile, true);
 
 		// set position to previous position
 		fMap.setZoom(fMpProfile.getLastUsedZoom());
