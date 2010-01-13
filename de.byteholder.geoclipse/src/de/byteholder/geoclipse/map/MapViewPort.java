@@ -14,30 +14,26 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
- 
-import java.util.ArrayList;
 
-/**
- * Creates tile children and draws the parent image
- */
-public interface ITileChildrenCreator {
+public class MapViewPort {
 
-	/**
-	 * Creates sub tiles
-	 * 
-	 * @param parentTile
-	 * @param loadingTiles
-	 */
-	public ArrayList<Tile> createTileChildren(Tile parentTile);
+	public int	mapZoomLevel;
+	public int	tilePosMinX;
+	public int	tilePosMaxX;
+	public int	tilePosMinY;
+	public int	tilePosMaxY;
 
-	/**
-	 * Draw parent image by drawing all children over each other. When all children have errors, an
-	 * image with the background color is returned
-	 * 
-	 * @param parentTile
-	 * @return Returns the image data for the parent image and the status if the image could be
-	 *         painted
-	 */
-	public ParentImageStatus getParentImage(Tile parentTile);
+	public MapViewPort(	final int mapZoomLevel,
+						final int tilePosMinX,
+						final int tilePosMaxX,
+						final int tilePosMinY,
+						final int tilePosMaxY) {
+
+		this.mapZoomLevel = mapZoomLevel;
+		this.tilePosMinX = tilePosMinX;
+		this.tilePosMaxX = tilePosMaxX;
+		this.tilePosMinY = tilePosMinY;
+		this.tilePosMaxY = tilePosMaxY;
+	}
 
 }

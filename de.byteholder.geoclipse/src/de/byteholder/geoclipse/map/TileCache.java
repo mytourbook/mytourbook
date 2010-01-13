@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
- 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,14 +37,13 @@ public class TileCache {
 
 	public void add(final String tileKey, final Tile tile) {
 
+		// check if space is available in the cache
 		final int cacheSize = tileCacheFifo.size();
 		if (cacheSize > fMaxTiles) {
 
 			// remove cached tiles 
 			for (int cacheIndex = fMaxTiles; cacheIndex < cacheSize; cacheIndex++) {
-
-				final Tile removedTile = tileCache.remove(tileCacheFifo.poll());
-				removeTileChildren(removedTile);
+				removeTile(tileCacheFifo.poll());
 			}
 		}
 
@@ -60,8 +59,7 @@ public class TileCache {
 
 		tileCacheFifo.remove(tileKey);
 
-		final Tile removedTile = tileCache.remove(tileKey);
-		removeTileChildren(removedTile);
+		removeTile(tileKey);
 	}
 
 	/**
@@ -99,36 +97,29 @@ public class TileCache {
 			 * check if this is a parent tile, child tiles are not removed to prevent
 			 * loading them again
 			 */
-			if (tile.getChildren() != null) {
-				final String tileKey = tile.getTileKey();
+			final ArrayList<Tile> tileChildren = tile.getChildren();
+			if (tileChildren != null) {
 
-				final Tile removedTile = tileCache.remove(tileKey);
+				// set parent to null in each child because the parent will be removed
+				for (final Tile tileChild : tileChildren) {
+					tileChild.setParentTile(null);
+				}
 
-				tileCacheFifo.remove(tileKey);
+				// remove parent 
+				final String parentTileKey = tile.getTileKey();
+				tileCache.remove(parentTileKey);
+				tileCacheFifo.remove(parentTileKey);
 			}
 		}
-
 	}
 
-	/**
-	 * Removes tile children to prevent memory leaks
-	 * 
-	 * @param tileChildren
-	 */
-	private void removeTileChildren(final ArrayList<Tile> tileChildren) {
+	private void removeTile(final String tileKey) {
 
-		for (final Tile tileChild : tileChildren) {
+		final Tile removedTile = tileCache.remove(tileKey);
 
-			// remove orphan child
-			tileCache.remove(tileChild.getTileKey());
-
-			tileChild.setParentTile(null);
+		if (removedTile == null) {
+			return;
 		}
-
-		tileChildren.clear();
-	}
-
-	private void removeTileChildren(final Tile removedTile) {
 
 		ArrayList<Tile> tileChildren = removedTile.getChildren();
 		if (tileChildren != null) {
@@ -158,19 +149,40 @@ public class TileCache {
 	}
 
 	/**
+	 * Removes tile children to prevent memory leaks
+	 * 
+	 * @param tileChildren
+	 */
+	private void removeTileChildren(final ArrayList<Tile> tileChildren) {
+
+		for (final Tile tileChild : tileChildren) {
+
+			if (tileChild.isLoading()) {
+				continue;
+			}
+
+			// remove orphan child
+			tileCache.remove(tileChild.getTileKey());
+
+			tileChild.setParentTile(null);
+		}
+
+		tileChildren.clear();
+	}
+
+	/**
 	 * Reset overlay state for all tiles in the cache
 	 */
 	public void resetOverlays() {
 
-		final Collection<Tile> tiles = tileCache.values();
-		for (final Tile tile : tiles) {
+		for (final Tile tile : tileCache.values()) {
 			tile.resetOverlay();
 		}
 	}
 
 	public void resetTileImageAvailability() {
-		final Collection<Tile> tiles = tileCache.values();
-		for (final Tile tile : tiles) {
+
+		for (final Tile tile : tileCache.values()) {
 			tile.setIsOfflineImageAvailable(false);
 		}
 	}

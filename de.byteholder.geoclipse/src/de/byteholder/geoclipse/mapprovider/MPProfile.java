@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
- 
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
@@ -288,25 +288,8 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		return fBackgroundColor;
 	}
 
-// mp2	
-//	@Override
-//	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
-//
-//		if (initTileFactory == false) {
-//			return fTileFactory;
-//		}
-//
-//		if (fTileFactory == null) {
-//			synchronizeMPWrapper();
-//		}
-//
-//		// initialize tile factory when it's not done yet
-//		fTileFactory.getInfo();
-//
-//		return fTileFactory;
-//	}
 
-	public ParentImageStatus getParentImage(final Tile parentTile, final Tile childTile) {
+	public ParentImageStatus getParentImage(final Tile parentTile) {
 
 		final ArrayList<Tile> tileChildren = parentTile.getChildren();
 		if (tileChildren == null) {
@@ -324,9 +307,9 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		boolean isChildError = false;
 
 		// loop: all children
-		for (final Tile childTile1 : tileChildren) {
+		for (final Tile childTile : tileChildren) {
 
-			final String childLoadingError = childTile1.getLoadingError();
+			final String childLoadingError = childTile.getLoadingError();
 
 			if (childLoadingError != null) {
 
@@ -337,9 +320,9 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				continue;
 			}
 
-			final ImageData[] childImageData = childTile1.getChildImageData();
+			final ImageData childImageData = childTile.getChildImageData();
 
-			if (childImageData == null || childImageData[0] == null) {
+			if (childImageData == null) {
 
 				// loading of this child has not yet finished
 				isFinal = false;
@@ -347,25 +330,25 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				continue;
 			}
 
-			if (childTile1.getMP().isProfileBrightness()) {
+			if (childTile.getMP().isProfileBrightness()) {
 
 				// use the brightness of the current tile for the next tile
 
-				brightnessTile = childTile1;
-				brightnessImageData = childImageData[0];
+				brightnessTile = childTile;
+				brightnessImageData = childImageData;
 
 				continue;
 			}
 
 			// draw child image into the parent image
-			parentImage.drawImage(childImageData[0], childTile1, brightnessImageData, brightnessTile);
+			parentImage.drawImage(childImageData, childTile, brightnessImageData, brightnessTile);
 
 			brightnessTile = null;
 			brightnessImageData = null;
 		}
 
 		return new ParentImageStatus(//
-				new ImageData[] { parentImage.getImageData() },
+				parentImage.getImageData(),
 				isFinal,
 				fIsSaveImage && isChildError == false);
 	}

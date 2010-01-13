@@ -459,7 +459,8 @@ final class ProfileTileImage {
 	}
 
 	/**
-	 * @return Return image data without transparency
+	 * @return Returns image data of an image which has no transparency, these images are faster
+	 *         painted
 	 */
 	public ImageData getImageData() {
 

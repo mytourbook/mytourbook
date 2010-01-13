@@ -79,7 +79,7 @@ public class Map extends Canvas {
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
-	protected int								fMapZoomLevel				= 1;
+	private int									fMapZoomLevel				= 1;
 
 	/**
 	 * Image which contains the map
@@ -237,6 +237,22 @@ public class Map extends Canvas {
 	private long								fRequestedRedrawTime;
 	private long								fDrawTime;
 
+//	private int									counter;
+
+	/*
+	 * these 4 tile positions correspond to the tiles which are needed to draw the map
+	 */
+	private int									fTilePosMinX;
+	private int									fTilePosMaxX;
+	private int									fTilePosMinY;
+	private int									fTilePosMaxY;
+
+	// viewport data which are changed when map is resized or zoomed
+	private Rectangle							fDevVisibleViewport;
+	private Dimension							fMapTileSize;
+	private int									fWorldViewportX;
+	private int									fWorldViewportY;
+
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
 
@@ -244,8 +260,8 @@ public class Map extends Canvas {
 		public void keyPressed(final KeyEvent e) {
 
 			// accelerate with Ctrl + Shift key
-			int offset = (e.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-			offset *= (e.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+			int offset = (e.stateMask & SWT.CONTROL) != 0 ? 20 : 1;
+			offset *= (e.stateMask & SWT.SHIFT) != 0 ? 10 : 1;
 
 			int delta_x = 0;
 			int delta_y = 0;
@@ -332,7 +348,6 @@ public class Map extends Canvas {
 		}
 
 		public void mouseMove(final MouseEvent e) {
-
 			onMouseMove(e);
 		}
 
@@ -610,7 +625,7 @@ public class Map extends Canvas {
 
 		// remove all cached map images
 		fMP.disposeTileImages();
- 
+
 		reload();
 	}
 
@@ -829,64 +844,69 @@ public class Map extends Canvas {
 	 */
 	private void drawMapTiles(final GC gc) {
 
-		// optimize performance by keeping the viewport
-		final Rectangle viewport = fMapViewport = getViewport();
-
-		final int worldViewportX = viewport.x;
-		final int worldViewportY = viewport.y;
-		final int devVisibleWidth = viewport.width;
-		final int devVisibleHeight = viewport.height;
-
-		final Rectangle devVisibleViewport = new Rectangle(0, 0, devVisibleWidth, devVisibleHeight);
+//		// optimize performance by keeping the viewport
+//		final Rectangle viewport = fMapViewport = getViewport();
+//
+//		final int worldViewportX = viewport.x;
+//		final int worldViewportY = viewport.y;
+//		final int devVisibleWidth = viewport.width;
+//		final int devVisibleHeight = viewport.height;
+//
+//		final Rectangle devVisibleViewport = new Rectangle(0, 0, devVisibleWidth, devVisibleHeight);
+//
+//		final int tileSize = fMP.getTileSize();
+//		final Dimension tileMapSize = fMP.getMapSize(fMapZoomLevel);
+//
+//		// get the visible tiles which can be displayed in the viewport area
+//		final int numTileWidth = (int) Math.ceil((double) devVisibleWidth / (double) tileSize);
+//		final int numTileHeight = (int) Math.ceil((double) devVisibleHeight / (double) tileSize);
+//
+//		/*
+//		 * tpx and tpy are the x- and y-values for the offset of the visible screen to the Map's
+//		 * origin.
+//		 */
+//		final int tileOffsetX = (int) Math.floor((double) worldViewportX / (double) tileSize);
+//		final int tileOffsetY = (int) Math.floor((double) worldViewportY / (double) tileSize);
+//
+//		fTilePosMinX = tileOffsetX;
+//		fTilePosMinY = tileOffsetY;
+//		fTilePosMaxX = tileOffsetX + numTileWidth;
+//		fTilePosMaxY = tileOffsetY + numTileHeight;
 
 		final int tileSize = fMP.getTileSize();
-		final Dimension tileMapSize = fMP.getMapSize(fMapZoomLevel);
-
-		// get the visible tiles which can be displayed in the viewport area
-		final int numTileWidth = (int) Math.ceil((double) devVisibleWidth / (double) tileSize);
-		final int numTileHeight = (int) Math.ceil((double) devVisibleHeight / (double) tileSize);
-
-		/*
-		 * tpx and tpy are the x- and y-values for the offset of the visible screen to the Map's
-		 * origin.
-		 */
-		final int vox = (int) Math.floor((double) worldViewportX / (double) tileSize);
-		final int voy = (int) Math.floor((double) worldViewportY / (double) tileSize);
-		final Point tileOffset = new Point(vox, voy);
-
-		final int tileOffsetX = tileOffset.x;
-		final int tileOffsetY = tileOffset.y;
 
 		final Display display = getDisplay();
 
 		/*
 		 * draw all visible tiles
 		 */
-		for (int relativeX = 0; relativeX <= numTileWidth; relativeX++) {
-			for (int relativeY = 0; relativeY <= numTileHeight; relativeY++) {
+//				for (int relativeX = 0; relativeX <= numTileWidth; relativeX++) {
+//					for (int relativeY = 0; relativeY <= numTileHeight; relativeY++) {
+		for (int tilePosX = fTilePosMinX; tilePosX <= fTilePosMaxX; tilePosX++) {
+			for (int tilePosY = fTilePosMinY; tilePosY <= fTilePosMaxY; tilePosY++) {
 
-				// get tile position of the tile  
-				final int tilePositionX = tileOffsetX + relativeX;
-				final int tilePositionY = tileOffsetY + relativeY;
+//				// get tile position of the tile  
+//				final int tilePositionX = tileOffsetX + tilePosX;
+//				final int tilePositionY = tileOffsetY + tilePosY;
 
 				// get device rectangle for this tile
-				final Rectangle devTilePosition = new Rectangle(
-						tilePositionX * tileSize - worldViewportX,
-						tilePositionY * tileSize - worldViewportY,
+				final Rectangle devTilePosition = new Rectangle(//
+						tilePosX * tileSize - fWorldViewportX,
+						tilePosY * tileSize - fWorldViewportY,
 						tileSize,
 						tileSize);
 
 				// check if current tile is within the painting area
-				if (devTilePosition.intersects(devVisibleViewport)) {
+				if (devTilePosition.intersects(fDevVisibleViewport)) {
 
 					/*
 					 * get the tile from the factory. the tile must not have been completely
 					 * downloaded after this step.
 					 */
 
-					if (isTileOnMap(tilePositionX, tilePositionY, tileMapSize)) {
+					if (isTileOnMap(tilePosX, tilePosY, fMapTileSize)) {
 
-						drawTile(gc, tilePositionX, tilePositionY, devTilePosition);
+						drawTile(gc, tilePosX, tilePosY, devTilePosition);
 
 					} else {
 
@@ -1198,14 +1218,6 @@ public class Map extends Canvas {
 		 */
 		final OverlayImageState imageState = tile.getOverlayImageState();
 		final int overlayContent = tile.getOverlayContent();
-
-//		System.out.println(tile);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-//		if (tile.getX() == 17219 && tile.getY() == 11504) {
-//			int a = 0;
-//			a++;
-//		}
 
 		if (imageState == OverlayImageState.NO_IMAGE && overlayContent == 0) {
 			// there is no image for the tile overlay
@@ -1651,6 +1663,8 @@ public class Map extends Canvas {
 		isMapPanned = true;
 		redraw();
 
+		updateViewPortData();
+
 		queueMapRedraw();
 	}
 
@@ -1699,6 +1713,8 @@ public class Map extends Canvas {
 		mapHeight = Math.max(1, mapHeight);
 
 		fMapImageSize = new Rectangle(mapWidth, mapHeight);
+
+		updateViewPortData();
 
 		queueMapRedraw();
 	}
@@ -1995,7 +2011,7 @@ public class Map extends Canvas {
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-			getDisplay().asyncExec(synchImageRunnable);
+//			getDisplay().asyncExec(synchImageRunnable);
 
 		} else {
 
@@ -2372,6 +2388,8 @@ public class Map extends Canvas {
 
 		setMapPixelCenter(fMP.pixelToGeo(pixelCenter, zoom), pixelCenter);
 
+		updateViewPortData();
+
 		fireZoomEvent(zoom);
 	}
 
@@ -2401,6 +2419,48 @@ public class Map extends Canvas {
 		final int worldMouseY = viewPort.y + fMouseMovePosition.y;
 
 		fireMapEvent(fMP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), fMapZoomLevel));
+	}
+
+	/**
+	 * Sets all viewport data which are necessary in {@link #drawMapTiles(GC)}
+	 */
+	private void updateViewPortData() {
+
+		if (fMP == null) {
+			// the map has currently no map provider
+			return;
+		}
+
+		// optimize performance by keeping the viewport
+		final Rectangle viewport = fMapViewport = getViewport();
+
+		fWorldViewportX = viewport.x;
+		fWorldViewportY = viewport.y;
+		final int devVisibleWidth = viewport.width;
+		final int devVisibleHeight = viewport.height;
+
+		fDevVisibleViewport = new Rectangle(0, 0, devVisibleWidth, devVisibleHeight);
+
+		final int tileSize = fMP.getTileSize();
+		fMapTileSize = fMP.getMapSize(fMapZoomLevel);
+
+		// get the visible tiles which can be displayed in the viewport area
+		final int numTileWidth = (int) Math.ceil((double) devVisibleWidth / (double) tileSize);
+		final int numTileHeight = (int) Math.ceil((double) devVisibleHeight / (double) tileSize);
+
+		/*
+		 * tpx and tpy are the x- and y-values for the offset of the visible screen to the Map's
+		 * origin.
+		 */
+		final int tileOffsetX = (int) Math.floor((double) fWorldViewportX / (double) tileSize);
+		final int tileOffsetY = (int) Math.floor((double) fWorldViewportY / (double) tileSize);
+
+		fTilePosMinX = tileOffsetX;
+		fTilePosMinY = tileOffsetY;
+		fTilePosMaxX = tileOffsetX + numTileWidth;
+		fTilePosMaxY = tileOffsetY + numTileHeight;
+
+		fMP.setMapViewPort(new MapViewPort(fMapZoomLevel, fTilePosMinX, fTilePosMaxX, fTilePosMinY, fTilePosMaxY));
 	}
 
 	public void zoomIn() {

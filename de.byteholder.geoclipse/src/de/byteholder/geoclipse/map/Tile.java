@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.ImageData;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.mapprovider.MP;
- 
+
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
  * zoom level.
@@ -45,27 +45,17 @@ public class Tile extends Observable {
 	private OverlayImageState				fOverlayImageState	= OverlayImageState.NOT_SET;
 	private int								fOverlayContent		= 0;
 
-//	/**
-//	 * <pre>
-//	 * 
-//	 * y,x
-//	 * 
-//	 * 0,0		0,1		0,2
-//	 * 1,0		1,1		1,2
-//	 * 2,0		2,1		2,2
-//	 * 
-//	 * </pre>
-//	 */
-//
-//	public static int						OVERLAY_CONTENT_0_0			= 0x0001;							// 0000 0000 0000 0001
-//	public static int						OVERLAY_CONTENT_0_1			= 0x0002;							// 0000 0000 0000 0010
-//	public static int						OVERLAY_CONTENT_0_2			= 0x0004;							// 0000 0000 0000 0100
-//	public static int						OVERLAY_CONTENT_1_0			= 0x0008;							// 0000 0000 0000 1000
-//	public static int						OVERLAY_CONTENT_1_1			= 0x0010;							// 0000 0000 0001 0000
-//	public static int						OVERLAY_CONTENT_1_2			= 0x0020;							// 0000 0000 0010 0000
-//	public static int						OVERLAY_CONTENT_2_0			= 0x0040;							// 0000 0000 0100 0000
-//	public static int						OVERLAY_CONTENT_2_1			= 0x0080;							// 0000 0000 1000 0000
-//	public static int						OVERLAY_CONTENT_2_2			= 0x0100;							// 0000 0001 0000 0000
+	/**
+	 * <pre>
+	 * 
+	 * y,x
+	 * 
+	 * 0,0		0,1		0,2
+	 * 1,0		1,1		1,2
+	 * 2,0		2,1		2,2
+	 * 
+	 * </pre>
+	 */
 
 	private boolean							isLoading			= false;
 
@@ -137,7 +127,7 @@ public class Tile extends Observable {
 
 	private ReentrantLock					PARENT_LOCK;
 
-	private ImageData[]						fChildTileImageData;
+	private ImageData						fChildTileImageData;
 
 	private MP								fMp;
 
@@ -152,6 +142,7 @@ public class Tile extends Observable {
 	private long							fTimeStartLoading;
 
 	private long							fTimeEndLoading;
+
 	/**
 	 * contains children which contains loading errors
 	 */
@@ -180,7 +171,7 @@ public class Tile extends Observable {
 									final String projectionId) {
 
 		final StringBuilder sb = new StringBuilder(50);
-//		sb.append("-mpid:");
+
 		sb.append(mp.getId());
 		sb.append('-');
 
@@ -190,22 +181,18 @@ public class Tile extends Observable {
 		sb.append('-');
 		sb.append(y);
 
-
 		if (tileCreatorId != null) {
 			sb.append('-');
-//			sb.append("-ci:");
 			sb.append(tileCreatorId);
 		}
 
 		if (customTileKey != null) {
 			sb.append('-');
-//			sb.append("-ck:");
 			sb.append(customTileKey);
 		}
 
 		if (projectionId != null) {
 			sb.append('-');
-//			sb.append("-pi:");
 			sb.append(projectionId);
 		}
 
@@ -247,9 +234,9 @@ public class Tile extends Observable {
 
 		for (final Tile childTile : tileChildren) {
 
-			final ImageData[] childImageData = childTile.getChildImageData();
+			final ImageData childImageData = childTile.getChildImageData();
 
-			if (childImageData == null || childImageData[0] == null) {
+			if (childImageData == null) {
 
 				// child image data are not available
 
@@ -274,7 +261,7 @@ public class Tile extends Observable {
 	 * @param childImageData
 	 * @return
 	 */
-	public ParentImageStatus createParentImage(final ImageData[] childImageData) {
+	public ParentImageStatus createParentImage(final ImageData childImageData) {
 
 		fChildTileImageData = childImageData;
 
@@ -306,7 +293,15 @@ public class Tile extends Observable {
 						final MP parentMp = fParentTile.fMp;
 						if (parentMp instanceof ITileChildrenCreator) {
 
-							return ((ITileChildrenCreator) parentMp).getParentImage(fParentTile, this);
+							final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
+									.getParentImage(fParentTile);
+
+							// prevent memory leaks: remove image data in the chilren tiles
+							for (final Tile childTile : tileChildren) {
+								childTile.fChildTileImageData = null;
+							}
+
+							return parentImageStatus;
 						}
 
 					} else {
@@ -406,7 +401,7 @@ public class Tile extends Observable {
 		return getCheckedImage(mapImage);
 	}
 
-	public ImageData[] getChildImageData() {
+	public ImageData getChildImageData() {
 		return fChildTileImageData;
 	}
 
@@ -544,19 +539,19 @@ public class Tile extends Observable {
 		return result;
 	}
 
-//	/**
-//	 * @return Returns <code>true</code> when this tile is a child of another tile
-//	 */
-//	public boolean isChildTile() {
-//		return fParentTile != null;
-//	}
-
 	/**
 	 * Increments the overlay content counter
 	 */
 	public void incrementOverlayContent() {
 		fOverlayContent++;
 	}
+
+//	/**
+//	 * @return Returns <code>true</code> when this tile is a child of another tile
+//	 */
+//	public boolean isChildTile() {
+//		return fParentTile != null;
+//	}
 
 	/**
 	 * @return Returns <code>true</code> when this is is a child tile, it is possible that the
@@ -676,8 +671,7 @@ public class Tile extends Observable {
 	}
 
 	/**
-	 * Set loading status, when loading is set to <code>false</code> the oberservs (which is the
-	 * Map) are notified
+	 * Set loading status
 	 * 
 	 * @param loading
 	 */

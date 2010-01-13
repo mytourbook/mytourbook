@@ -43,6 +43,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapViewPort;
 import de.byteholder.geoclipse.map.Mercator;
 import de.byteholder.geoclipse.map.Projection;
 import de.byteholder.geoclipse.map.Tile;
@@ -63,6 +64,10 @@ import de.byteholder.gpx.GeoPosition;
  */
 public abstract class MP implements Cloneable, Comparable<Object> {
 
+	private static final int						TILE_CACHE_SIZE					= 2000;													//2000;
+	private static final int						ERROR_CACHE_SIZE				= 10000;													//10000;
+	private static final int						IMAGE_CACHE_SIZE				= 200;
+
 	public static final int							OFFLINE_INFO_NOT_READ			= -1;
 
 	/**
@@ -81,18 +86,19 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * Cache for tiles which do not have loading errors
 	 */
-	private static final TileCache					fTileCache						= new TileCache(2000);
+	private static final TileCache					fTileCache						= new TileCache(TILE_CACHE_SIZE);
 
 	/**
 	 * Contains tiles which has loading errors, they are kept in this map that they are not loaded
 	 * again
 	 */
-	private static final TileCache					fErrorTiles						= new TileCache(10000);
+	private static final TileCache					fErrorTiles						= new TileCache(ERROR_CACHE_SIZE);
 
 	/**
 	 * Cache for tile images
 	 */
-	private static final TileImageCache				fTileImageCache					= new TileImageCache();
+	private static final TileImageCache				fTileImageCache					= new TileImageCache(
+																							IMAGE_CACHE_SIZE);
 
 	/**
 	 * This queue contains tiles which needs to be loaded, only the number of
@@ -210,9 +216,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private boolean									fCanBeToggled;
 
-	/*
-	 * Profile map provider values
-	 */
+	//
+	// Profile map provider values
+	//
+
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
@@ -228,6 +235,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private boolean									fIsProfileBrightness;
 	private int										fProfileBrightnessValue;
+	private MapViewPort								fMapViewPort;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
 		fOfflineReloadEventListeners.add(listener);
@@ -296,6 +304,35 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public boolean canBeToggled() {
 		return fCanBeToggled;
+	}
+
+	/**
+	 * Checks if a tile is displayed in the map viewport.
+	 * 
+	 * @param tile
+	 *            Tile which is checked
+	 * @return Returns <code>true</code> when the tile is displayed in the current map viewport.
+	 */
+	public boolean checkViewPort(final Tile tile) {
+
+		// check zoom level
+		if (tile.getZoom() != fMapViewPort.mapZoomLevel) {
+			return false;
+		}
+
+		// check position
+		final int tileX = tile.getX();
+		final int tileY = tile.getY();
+
+		if (tileX >= fMapViewPort.tilePosMinX
+				&& tileX <= fMapViewPort.tilePosMaxX
+				&& tileY >= fMapViewPort.tilePosMinY
+				&& tileY <= fMapViewPort.tilePosMaxY) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -1022,6 +1059,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
 	}
 
+//	/**
+//	 * @param offlineImagePath
+//	 * @return Path where tile files will are cached relative to the offline image path
+//	 */
+//	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
+
 	boolean isProfileBrightness() {
 		return fIsProfileBrightness;
 	}
@@ -1029,12 +1072,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	boolean isProfileTransparentBlack() {
 		return fIsProfileBlackTransparent;
 	}
-
-//	/**
-//	 * @param offlineImagePath
-//	 * @return Path where tile files will are cached relative to the offline image path
-//	 */
-//	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
 	boolean isProfileTransparentColors() {
 		return fIsProfileTransparentColors;
@@ -1285,6 +1322,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public void setLastUsedZoom(final int zoom) {
 		fLastUsedZoom = zoom;
+	}
+
+	public void setMapViewPort(final MapViewPort mapViewPort) {
+		fMapViewPort = mapViewPort;
 	}
 
 	public void setName(final String mapProviderName) {

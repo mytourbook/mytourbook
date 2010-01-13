@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ *   
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
 import java.io.FileNotFoundException;
@@ -24,7 +39,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 public class TileImageLoader implements Runnable {
 
 	/**
- 	 * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
+	 * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
 	 * from the tile waiting queue {@link MP#getTileWaitingQueue()}
 	 */
 	public TileImageLoader() {}
@@ -73,7 +88,7 @@ public class TileImageLoader implements Runnable {
 			final boolean useOfflineImage = mp.isUseOfflineImage();
 
 			// load image from offline cache
-			ImageData[] tileImageData = null;
+			ImageData tileImageData = null;
 			if (useOfflineImage) {
 				tileImageData = tileImageCache.getOfflineTileImageData(tile);
 			}
@@ -170,7 +185,11 @@ public class TileImageLoader implements Runnable {
 							}
 						}
 
-						tileImageData = new ImageLoader().load(inputStream);
+						final ImageData[] loadedImageData = new ImageLoader().load(inputStream);
+
+						if (loadedImageData != null && loadedImageData.length > 0) {
+							tileImageData = loadedImageData[0];
+						}
 
 					} catch (final Exception e) {
 
@@ -302,11 +321,11 @@ public class TileImageLoader implements Runnable {
 	/**
 	 * paint tile based on SRTM data
 	 */
-	private ImageData[] paintTileImage(final Tile tile, final ITilePainter tilePainter) {
+	private ImageData paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
 		MP.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
-		final ImageData[] paintedImageData = new ImageData[1];
+		ImageData tileImageData = null;
 
 		try {
 
@@ -319,7 +338,7 @@ public class TileImageLoader implements Runnable {
 
 			final int tileSize = rgbData[0].length;
 
-			final ImageData tileImageData = new ImageData(//
+			tileImageData = new ImageData(//
 					tileSize,
 					tileSize,
 					24,
@@ -348,7 +367,6 @@ public class TileImageLoader implements Runnable {
 					pixelData[dataIndex + 2] = (byte) (red & 0xff);
 				}
 			}
-			paintedImageData[0] = tileImageData;
 
 			MP.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
@@ -361,7 +379,7 @@ public class TileImageLoader implements Runnable {
 			StatusUtil.log(e.getMessage(), e);
 		}
 
-		return paintedImageData;
+		return tileImageData;
 	}
 
 	public void run() {
@@ -379,38 +397,60 @@ public class TileImageLoader implements Runnable {
 			return;
 		}
 
-//		final boolean isChildTile = tile.getParentTile() != null;
-		final boolean isParentTile = tile.getMP() instanceof ITileChildrenCreator;// && isChildTile == false;
+		final MP mp = tile.getMP();
 
-		MP.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
+		final boolean isParentTile = mp instanceof ITileChildrenCreator;
 
-		if (isParentTile) {
+////		System.out.println("tileWaitingQueue: " + tileWaitingQueue.size());
+////		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		// check parent tiles and tiles which are not a child
+//		// (isParentTile || tile.isChild() == false) && 
+//		if (tile.isChild() == false && mp.checkViewPort(tile) == false) {
+//
+//			// optimize speed, load only those tile images which are currently displayed in the map viewport
+//
+////			System.out.println("skipped: " + tile.getTileKey());
+////			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			// remove tile from cache, so that the next time the tile is loaded again
+//			MP.getTileCache().remove(tile.getTileKey());
+//
+//		} else {
 
-			// current tile is a parent tile
+		{
+			// current tile is in the viewport of the map
 
-			if (tile.isLoadingError()) {
+			MP.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
 
-				/*
-				 * parent tile has a loading error, this can happen when it contains no child
-				 * because it does not support the zooming level
-				 */
+			if (isParentTile) {
 
-				finalizeTile(tile, true);
+				// current tile is a parent tile
 
-			} else if (tile.isOfflimeImageAvailable()) {
+				if (tile.isLoadingError()) {
 
-				// this parent tile has no chilren which needs to be loaded, behave as a normal tile
+					/*
+					 * parent tile has a loading error, this can happen when it contains no child
+					 * because it does not support the zooming level
+					 */
 
-				getTileImage(tile);
+					finalizeTile(tile, true);
+
+				} else if (tile.isOfflimeImageAvailable()) {
+
+					// this parent tile has no chilren which needs to be loaded, behave as a normal tile
+
+					getTileImage(tile);
+
+				} else {
+
+					// a parent gets finalized when the last child is loaded
+				}
 
 			} else {
 
-				// a parent gets finalized when the last child is loaded
+				getTileImage(tile);
 			}
-
-		} else {
-
-			getTileImage(tile);
 		}
 
 		// loading has finished

@@ -56,7 +56,7 @@ public class TileImageCache {
 	/**
 	 * max. number of images in the image cache
 	 */
-	private static int										MAX_CACHE_ENTRIES			= 200;
+//	private static int										MAX_CACHE_ENTRIES			= 200;
  
 	/**
 	 * relative OS path for storing offline map image files
@@ -80,6 +80,8 @@ public class TileImageCache {
 	 * causes the UI to be not smooth when images are loaded and the map is dragged at the same time
 	 */
 	private Display											fDisplay;
+
+	private int												fMaxCacheSize				= 10;
 
 	/**
 	 * @return OS path for the tile cache or <code>null</code> when offline cache is not used or
@@ -136,7 +138,9 @@ public class TileImageCache {
 	 * @param factoryInfo
 	 * @param display
 	 */
-	public TileImageCache() {
+	public TileImageCache(final int maxCacheSize) {
+
+		fMaxCacheSize = maxCacheSize;
 
 		fDisplay = Display.getDefault();
 
@@ -157,7 +161,7 @@ public class TileImageCache {
 	 * @param isSaveImage
 	 * @return
 	 */
-	public Image createImage(	final ImageData[] loadedImageData,
+	public Image createImage(	final ImageData loadedImageData,
 								final Tile tile,
 								final String tileKey,
 								final boolean isSaveImage) {
@@ -166,7 +170,7 @@ public class TileImageCache {
 			saveOfflineImage(tile, loadedImageData);
 		}
 
-		return createImageInternal(tile, tileKey, loadedImageData[0]);
+		return createImageInternal(tile, tileKey, loadedImageData);
 	}
 
 	/**
@@ -262,7 +266,7 @@ public class TileImageCache {
 	 * @param tile
 	 * @return Returns image data from the offline image file or <code>null</code> otherwise
 	 */
-	public ImageData[] getOfflineTileImageData(final Tile tile) {
+	public ImageData getOfflineTileImageData(final Tile tile) {
 
 		if (fUseOffLineCache == false) {
 			return null;
@@ -298,7 +302,7 @@ public class TileImageCache {
 
 						// loading image data was successful
 
-						return loadedImageData;
+						return loadedImageData[0];
 					}
 
 				} catch (final Exception e) {
@@ -379,10 +383,10 @@ public class TileImageCache {
 		 * check if the max number of images is reached, remove oldest image from the cache
 		 */
 		final int cacheSize = fImageCacheFifo.size();
-		if (cacheSize >= MAX_CACHE_ENTRIES) {
+		if (cacheSize >= fMaxCacheSize) {
 
 			// remove cache items 
-			for (int cacheIndex = MAX_CACHE_ENTRIES; cacheIndex < cacheSize; cacheIndex++) {
+			for (int cacheIndex = fMaxCacheSize; cacheIndex < cacheSize; cacheIndex++) {
 
 				// remove and dispose oldest image
 
@@ -451,7 +455,7 @@ public class TileImageCache {
 	 * @param tileImageData
 	 *            {@link ImageData} which is loaded from the internet
 	 */
-	void saveOfflineImage(final Tile tile, final ImageData[] tileImageData) {
+	void saveOfflineImage(final Tile tile, final ImageData tileImageData) {
 
 		if (fUseOffLineCache == false) {
 			return;
@@ -513,9 +517,9 @@ public class TileImageCache {
 		try {
 
 			final ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = tileImageData;
+			imageLoader.data = new ImageData[] { tileImageData };
 
-			imageType = tileImageData[0].type;
+			imageType = tileImageData.type;
 
 			final String fileExtension = MapProviderManager.getImageFileExtension(imageType);
 			final String extension;
