@@ -170,8 +170,8 @@ public class Tile extends Observable {
 									final String customTileKey,
 									final String projectionId) {
 
-		final StringBuilder sb = new StringBuilder(50);
-
+		final StringBuilder sb = new StringBuilder(100);
+ 
 		sb.append(mp.getId());
 		sb.append('-');
 

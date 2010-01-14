@@ -135,25 +135,25 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * The number of tiles wide at each zoom level
 	 */
-	private int[]									mapWidthInTilesAtZoom;
-
+	private int[]									fMapWidthInTilesAtZoom;
+ 
 	/**
 	 * An array of coordinates in <em>pixels</em> that indicates the center in the world map for the
 	 * given zoom level.
 	 */
-	private Point2D[]								mapCenterInPixelsAtZoom;
+	private Point2D[]								fMapCenterInPixelsAtZoom;
 
 	/**
 	 * An array of doubles that contain the number of pixels per degree of longitude at a give zoom
 	 * level.
 	 */
-	private double[]								longitudeDegreeWidthInPixels;
+	private double[]								fLongitudeDegreeWidthInPixels;
 
 	/**
 	 * An array of doubles that contain the number of radians per degree of longitude at a given
 	 * zoom level (where longitudeRadianWidthInPixels[0] is the most zoomed out)
 	 */
-	private double[]								longitudeRadianWidthInPixels;
+	private double[]								fLongitudeRadianWidthInPixels;
 
 	private boolean									fUseOfflineImage				= true;
 
@@ -395,7 +395,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				fErrorImage = new Image(display, tileSize, tileSize);
 
-				final Color bgColor = new Color(display, Map.DefaultBackgroundRGB);
+				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
 				final GC gc = new GC(getErrorImage());
 				{
 					gc.setBackground(bgColor);
@@ -421,7 +421,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				fLoadingImage = new Image(display, tileSize, tileSize);
 
-				final Color bgColor = new Color(display, Map.DefaultBackgroundRGB);
+				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
 				final GC gc = new GC(getLoadingImage());
 				{
 					gc.setBackground(bgColor);
@@ -655,7 +655,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public double getLongitudeDegreeWidthInPixels(final int zoom) {
-		return longitudeDegreeWidthInPixels[zoom];
+		return fLongitudeDegreeWidthInPixels[zoom];
 	}
 
 	/**
@@ -663,7 +663,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public double getLongitudeRadianWidthInPixels(final int zoom) {
-		return longitudeRadianWidthInPixels[zoom];
+		return fLongitudeRadianWidthInPixels[zoom];
 	}
 
 	/**
@@ -671,27 +671,28 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public Point2D getMapCenterInPixelsAtZoom(final int zoom) {
-		return mapCenterInPixelsAtZoom[zoom];
-	}
-
-	/**
-	 * @return the size of the map at the given zoom, in tiles (num tiles tall by num tiles wide)
-	 */
-	public Dimension getMapSize(final int zoom) {
-		return new Dimension(getMapWidthInTilesAtZoom(zoom), getMapWidthInTilesAtZoom(zoom));
+		return fMapCenterInPixelsAtZoom[zoom];
 	}
 
 	/**
 	 * @param zoom
 	 * @return
 	 */
-	public int getMapWidthInTilesAtZoom(int zoom) {
+	private int getMapSizeInTiles(int zoom) {
 
 		// ensure array bounds, this is Math.min() inline
-		final int b = mapWidthInTilesAtZoom.length - 1;
+		final int b = fMapWidthInTilesAtZoom.length - 1;
 		zoom = (zoom <= b) ? zoom : b;
 
-		return mapWidthInTilesAtZoom[zoom];
+		return fMapWidthInTilesAtZoom[zoom];
+	}
+
+	/**
+	 * @return the size of the map at the given zoom, in tiles (num tiles tall by num tiles wide)
+	 */
+	public Dimension getMapTileSize(final int zoom) {
+		final int mapTileSize = getMapSizeInTiles(zoom);
+		return new Dimension(mapTileSize, mapTileSize);
 	}
 
 	/**
@@ -773,7 +774,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		 * create tile key, wrap the tiles horizontally --> mod the x with the max width and use
 		 * that
 		 */
-		final int numTilesWidth = (int) getMapSize(zoom).getWidth();
+//		final int numTilesWidth = (int) getMapSize(zoom).getWidth();
+		final int numTilesWidth = getMapSizeInTiles(zoom);
+
 		if (tilePositionX < 0) {
 			tilePositionX = numTilesWidth - (Math.abs(tilePositionX) % numTilesWidth);
 		}
@@ -1027,25 +1030,25 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		final int mapArrayLength = maxZoom + 1;
 
-		longitudeDegreeWidthInPixels = new double[mapArrayLength];
-		longitudeRadianWidthInPixels = new double[mapArrayLength];
+		fLongitudeDegreeWidthInPixels = new double[mapArrayLength];
+		fLongitudeRadianWidthInPixels = new double[mapArrayLength];
 
-		mapCenterInPixelsAtZoom = new Point2D.Double[mapArrayLength];
-		mapWidthInTilesAtZoom = new int[mapArrayLength];
+		fMapCenterInPixelsAtZoom = new Point2D.Double[mapArrayLength];
+		fMapWidthInTilesAtZoom = new int[mapArrayLength];
 
 		// get map values for each zoom level
 		for (int z = 0; z <= maxZoom; ++z) {
 
 			// how wide is each degree of longitude in pixels
-			longitudeDegreeWidthInPixels[z] = (double) devMapSize / 360;
+			fLongitudeDegreeWidthInPixels[z] = (double) devMapSize / 360;
 
 			// how wide is each radian of longitude in pixels
-			longitudeRadianWidthInPixels[z] = devMapSize / (2.0 * Math.PI);
+			fLongitudeRadianWidthInPixels[z] = devMapSize / (2.0 * Math.PI);
 
 			final int devMapSize2 = devMapSize / 2;
 
-			mapCenterInPixelsAtZoom[z] = new Point2D.Double(devMapSize2, devMapSize2);
-			mapWidthInTilesAtZoom[z] = devMapSize / tileSize;
+			fMapCenterInPixelsAtZoom[z] = new Point2D.Double(devMapSize2, devMapSize2);
+			fMapWidthInTilesAtZoom[z] = devMapSize / tileSize;
 
 			devMapSize *= 2;
 		}

@@ -18,8 +18,8 @@ public class CylindricalProjection extends Projection {
 		final int tileSize = mp.getTileSize();
 
 		// calc the pixels per degree
-		final Dimension mapSizeInTiles = mp.getMapSize(zoom);
-
+		final Dimension mapSizeInTiles = mp.getMapTileSize(zoom);
+ 
 		final double size_in_pixels = mapSizeInTiles.getWidth() * tileSize;
 		final double ppd = size_in_pixels / 360;
 
@@ -38,7 +38,7 @@ public class CylindricalProjection extends Projection {
 		final int tileSize = mp.getTileSize();
 
 		// calc the pixels per degree
-		final Dimension mapSizeInTiles = mp.getMapSize(zoom);
+		final Dimension mapSizeInTiles = mp.getMapTileSize(zoom);
 
 		final double size_in_pixels = mapSizeInTiles.getWidth() * tileSize;
 		final double ppd = size_in_pixels / 360;
@@ -76,7 +76,7 @@ public class CylindricalProjection extends Projection {
 		final int tileSize = mp.getTileSize();
 
 		// calc the pixels per degree
-		final Dimension mapSizeInTiles = mp.getMapSize(zoom);
+		final Dimension mapSizeInTiles = mp.getMapTileSize(zoom);
 		final double size_in_pixels = mapSizeInTiles.getWidth() * tileSize;
 		final double ppd = size_in_pixels / 360;
 

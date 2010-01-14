@@ -38,10 +38,10 @@ public class BoundingBoxEPSG4326 {
 		final BoundingBoxEPSG4326 bb = new BoundingBoxEPSG4326();
 
 		bb.left = OsmMercator.XToLon(x * TILE_SIZE, zoom);
-		bb.bottom = OsmMercator.YToLat((y + 1) * TILE_SIZE, zoom);
+ 		bb.right = OsmMercator.XToLon((x + 1) * TILE_SIZE, zoom);
 
-		bb.right = OsmMercator.XToLon((x + 1) * TILE_SIZE, zoom);
 		bb.top = OsmMercator.YToLat(y * TILE_SIZE, zoom);
+		bb.bottom = OsmMercator.YToLat((y + 1) * TILE_SIZE, zoom);
 
 //		bb.top = tile2lat(y, zoom);
 //		bb.bottom = tile2lat(y + 1, zoom);

@@ -256,8 +256,8 @@ public class TourMapView extends ViewPart {
 	}
 
 	void actionReloadFailedMapImages() {
-		fMap.reload();
-	}
+		fMap.resetAll();
+ 	}
 
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = fMap.getZoom();

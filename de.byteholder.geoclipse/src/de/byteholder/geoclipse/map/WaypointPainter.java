@@ -64,8 +64,8 @@ public class WaypointPainter extends MapPainter {
 		// figure out which waypoints are within this map viewport
 		final Rectangle viewportBounds = map.getViewport();
 		final int zoom = map.getZoom();
-		final Dimension sizeInTiles = map.getMapProvider().getMapSize(zoom);
-		final int tileSize = map.getMapProvider().getTileSize();
+		final Dimension sizeInTiles = map.getMapProvider().getMapTileSize(zoom);
+ 		final int tileSize = map.getMapProvider().getTileSize();
 		final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
