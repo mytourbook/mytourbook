@@ -968,15 +968,7 @@ public class MapProviderManager {
 			boolean isValid = true;
 
 			if (mapProvider instanceof MPProfile) {
-
 				isValid = withMapProfile;
-
-			} else if (mapProvider instanceof MPPlugin) {
-// mp2				
-//				if (((MPPlugin) mapProvider).getTileFactory(true).getInfo().isMapEmpty()) {
-//					// ignore empty map providers
-//					isValid = false;
-//				}
 			}
 
 			if (isValid) {

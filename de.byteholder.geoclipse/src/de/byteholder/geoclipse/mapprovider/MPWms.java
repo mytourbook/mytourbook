@@ -273,28 +273,6 @@ public class MPWms extends MP implements ITileLoader {
 		return fOfflineLayers;
 	}
 
-// mp2	
-//	@Override
-//	public TileFactory_OLD getTileFactory(final boolean initTileFactory) {
-//
-//		if (initTileFactory == false) {
-//			return fTileFactory;
-//		}
-//
-//		if (fTileFactory == null) {
-//
-//			if (MapProviderManager.checkWms(this, null) == null) {
-//				return null;
-//			}
-//
-//			initializeLayers();
-//		}
-//
-//		// initialize tile factory when it's not done yet
-//		fTileFactory.getInfo();
-//
-//		return fTileFactory;
-//	}
 
 	public InputStream getTileImageStream(final Tile tile) throws GeoException {
 

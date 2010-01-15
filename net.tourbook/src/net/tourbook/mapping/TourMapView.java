@@ -261,7 +261,7 @@ public class TourMapView extends ViewPart {
 
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = fMap.getZoom();
-		fDefaultPosition = fMap.getCenterPosition();
+		fDefaultPosition = fMap.getGeoCenter();
 	}
 
 	void actionSetDefaultPosition() {
@@ -1446,7 +1446,7 @@ public class TourMapView extends ViewPart {
 				 */
 				fPreviousTourData.mapZoomLevel = fMap.getZoom();
 
-				final GeoPosition centerPosition = fMap.getCenterPosition();
+				final GeoPosition centerPosition = fMap.getGeoCenter();
 				fPreviousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
 				fPreviousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
 			}
@@ -1916,7 +1916,7 @@ public class TourMapView extends ViewPart {
 		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle2D positionRect = getPositionRect(positions, zoom);
-		java.awt.Rectangle viewport = fMap.getViewport();
+		java.awt.Rectangle viewport = fMap.getMapPixelViewport();
 
 		// zoom until the tour is visible in the map
 		while (!viewport.contains(positionRect)) {
@@ -1936,7 +1936,7 @@ public class TourMapView extends ViewPart {
 			fMap.setZoom(zoom);
 
 			positionRect = getPositionRect(positions, zoom);
-			viewport = fMap.getViewport();
+			viewport = fMap.getMapPixelViewport();
 		}
 
 		// zoom in until the tour is larger than the viewport
@@ -1957,7 +1957,7 @@ public class TourMapView extends ViewPart {
 			fMap.setZoom(zoom);
 
 			positionRect = getPositionRect(positions, zoom);
-			viewport = fMap.getViewport();
+			viewport = fMap.getMapPixelViewport();
 		}
 
 		// the algorithm generated a larger zoom level as necessary

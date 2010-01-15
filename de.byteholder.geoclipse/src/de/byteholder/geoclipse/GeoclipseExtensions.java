@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -11,8 +11,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse;
-
-import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -26,15 +25,11 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 
+
 public class GeoclipseExtensions {
 
 	private static GeoclipseExtensions	fInstance;
 
-// mp2	
-//	// the position to start with
-//	private GeoPosition					startPosition	= new GeoPosition(0, 0);
-//
-//	private int							startZoom		= 0;
 
 	private ArrayList<MPPlugin>			fTileFactories;
 
@@ -73,43 +68,6 @@ public class GeoclipseExtensions {
 
 	private GeoclipseExtensions() {}
 
-//	/**
-//	 * Initializes the map and sets the first available map provider as default
-//	 * 
-//	 * @param map
-//	 * @return Returns a list with all registered map provider plugins
-//	 */
-//	public List<TileFactory> readExtensions(final Map map) {
-//
-//		final List<TileFactory> factories = readFactories();
-//
-//		final TileFactory tf = (factories != null && factories.size() > 0) ? factories.get(0) : null;
-//
-//		// create the tile factory
-//		if (tf != null) {
-//			map.setTileFactory(tf);
-//			map.setGeoCenterPosition(startPosition);
-//			map.setZoom(startZoom);
-//		}
-//
-//		registerOverlays(map);
-//
-//		return factories;
-//	}
-
-// mp2	
-//	public TileFactory_OLD findTileFactory(final String className) {
-//
-//		final List<TileFactory_OLD> factories = readFactories();
-//		for (final TileFactory_OLD factory : factories) {
-//			if (factory.getClass().getName().equals(className)) {
-//				return factory;
-//			}
-//		}
-//
-//		return null;
-//	}
-
 	/**
 	 * @return Returns a list with all available map/tile factories
 	 */
@@ -141,19 +99,6 @@ public class GeoclipseExtensions {
 				fTileFactories.add((MPPlugin) o);
 			}
 		}
-
-//		/*
-//		 * set the base url from the pref store, the base url can be overwritten in the pref page
-//		 */
-//		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
-//		for (final TileFactory tileFactory : fTileFactories) {
-//
-//			final String baseURL = prefStore.getString(tileFactory.getPrefStoreBaseUrlName());
-//
-//			if (baseURL.length() > 0) {
-//				tileFactory.getInfo().setBaseURL(baseURL);
-//			}
-//		}
 
 		return fTileFactories;
 	}

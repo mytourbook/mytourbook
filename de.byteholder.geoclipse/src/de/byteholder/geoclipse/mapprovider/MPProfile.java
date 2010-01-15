@@ -370,17 +370,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		fBackgroundColor = backgroundColor;
 	}
 
-// mp2
-//	@Override
-//	public void setZoomLevel(final int minZoom, final int maxZoom) {
-//
-//		super.setZoomLevel(minZoom, maxZoom);
-//
-//		// initialize zoom level in the tile factory info because the map gets zoom data from this location
-//		if (fTileFactory != null) {
-//			fTileFactory.getInfo().initializeZoomLevel(minZoom, maxZoom);
-//		}
-//	}
 
 	public void setBackgroundColor(final RGB rgb) {
 		fBackgroundColor = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);

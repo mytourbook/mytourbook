@@ -76,23 +76,18 @@ import de.byteholder.gpx.GeoPosition;
 
 public class Map extends Canvas {
 
+	// [181,208,208] is the color of water in the standard OSM material
+	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
+
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
 	private int									_mapZoomLevel				= 1;
- 
+
 	/**
 	 * Image which contains the map
 	 */
 	private Image								_mapImage;
-
-	/**
-	 * The position, in <I>map coordinates</I> of the center point. This is defined as the distance
-	 * from the top and left edges of the map in pixels. Dragging the map component will change the
-	 * center position. Zooming in/out will cause the center to be recalculated so as to remain in
-	 * the center of the new "map".
-	 */
-	protected Point2D							_mapPixelCenter				= new Point2D.Double(0, 0);
 
 	/**
 	 * Indicates whether or not to draw the borders between tiles. Defaults to false.
@@ -133,8 +128,6 @@ public class Map extends Canvas {
 	private boolean								_recenterOnClickEnabled		= true;
 
 	private boolean								_zoomOnDoubleClickEnabled	= true;
-
-//	private boolean								_restrictOutsidePanning		= true;
 
 	/**
 	 * The overlay to delegate to for painting the "foreground" of the map component. This would
@@ -206,13 +199,26 @@ public class Map extends Canvas {
 	private boolean								_isLegendVisible;
 
 	/**
-	 * viewport of the map when the {@link #mapImage} is painted
+	 * The position, in <I>map coordinates</I> of the center point. This is defined as the distance
+	 * from the top and left edges of the map in pixels. Dragging the map component will change the
+	 * center position. Zooming in/out will cause the center to be recalculated so as to remain in
+	 * the center of the new "map".
 	 */
-	private Rectangle							_mapViewport;
+	private Point2D								_mapCenterInWorldPixel		= new Point2D.Double(0, 0);
 
-	private Rectangle							_mapViewport2;
-	private Point								_viewPortSize;
-	private int									_viewPortBorder;
+	/**
+	 * Viewport in the world map where the {@link #_mapImage} is painted<br>
+	 * <br>
+	 * <b>x</b> and <b>y</b> contains the position in world pixel, <br>
+	 * <b>width</b> and <b>height</b> contains the visible area in device pixel
+	 */
+	private Rectangle							_mapPixelViewport;
+
+	/**
+	 * Contains the client area of the map without trimmings, this rectangle has the width and
+	 * height of the map image
+	 */
+	private org.eclipse.swt.graphics.Rectangle	_clientArea;
 
 	private List<IZoomListener>					_zoomListeners;
 	private final ListenerList					_mapListeners				= new ListenerList(ListenerList.IDENTITY);
@@ -224,9 +230,6 @@ public class Map extends Canvas {
 	private boolean								_isScaleVisible				= false;
 
 	private static final RGB					_transparentRGB				= new RGB(0xff, 0xff, 0xfe);
-
-	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
 	private Color								_defaultBackgroundColor;
 
 	/**
@@ -236,8 +239,6 @@ public class Map extends Canvas {
 
 	private long								_requestedRedrawTime;
 	private long								_drawTime;
-
-//	private int									counter;
 
 	/*
 	 * these 4 tile positions correspond to the tiles which are needed to draw the map
@@ -294,12 +295,13 @@ public class Map extends Canvas {
 
 			if (delta_x != 0 || delta_y != 0) {
 
-				final Rectangle bounds = getViewport();
+				final Rectangle bounds = getMapPixelViewport();
 				final double x = bounds.getCenterX() + delta_x;
 				final double y = bounds.getCenterY() + delta_y;
 				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
 
-				setMapPixelCenter(_MP.pixelToGeo(pixelCenter, _mapZoomLevel), pixelCenter);
+				setMapCenterInWoldPixel(pixelCenter);
+
 				updateViewPortData();
 
 				queueMapRedraw();
@@ -374,11 +376,11 @@ public class Map extends Canvas {
 		}
 
 		private void recenterMap(final int ex, final int ey) {
-			final Rectangle bounds = getViewport();
+			final Rectangle bounds = getMapPixelViewport();
 			final double x = bounds.getX() + ex;
 			final double y = bounds.getY() + ey;
 			final Point2D.Double pixelCenter = new Point2D.Double(x, y);
-			setMapPixelCenter(_MP.pixelToGeo(pixelCenter, _mapZoomLevel), pixelCenter);
+			setMapCenterInWoldPixel(pixelCenter);
 			queueMapRedraw();
 		}
 	}
@@ -415,7 +417,7 @@ public class Map extends Canvas {
 	 * @param newHeight
 	 * @return
 	 */
-	public static boolean canReuseImage(final Image image, final Rectangle rect) {
+	public static boolean canReuseImage(final Image image, final org.eclipse.swt.graphics.Rectangle clientArea) {
 
 		// check if we could reuse the existing image
 
@@ -425,7 +427,7 @@ public class Map extends Canvas {
 			// image exist, check for the bounds
 			final org.eclipse.swt.graphics.Rectangle oldBounds = image.getBounds();
 
-			if (!(oldBounds.width == rect.width && oldBounds.height == rect.height)) {
+			if (!(oldBounds.width == clientArea.width && oldBounds.height == clientArea.height)) {
 				return false;
 			}
 		}
@@ -439,17 +441,20 @@ public class Map extends Canvas {
 	 * @param display
 	 * @param image
 	 *            image which will be disposed if the image is not null
-	 * @param rect
+	 * @param clientArea
 	 * @return returns a new created image
 	 */
-	public static Image createImage(final Display display, final Image image, final Rectangle rect) {
+	public static Image createImage(final Display display,
+									final Image image,
+									final org.eclipse.swt.graphics.Rectangle clientArea) {
 
 		if (image != null && !image.isDisposed()) {
 			image.dispose();
 		}
 
-		final int width = Math.max(1, rect.width);
-		final int height = Math.max(1, rect.height);
+		// ensure the image has a width/height of 1, otherwise this causes troubles
+		final int width = Math.max(1, clientArea.width);
+		final int height = Math.max(1, clientArea.height);
 
 		return new Image(display, width, height);
 	}
@@ -672,8 +677,8 @@ public class Map extends Canvas {
 
 			// check or create map image
 			Image image = _mapImage;
-			if (image == null || image.isDisposed() || canReuseImage(image, _mapViewport2) == false) {
-				image = createImage(getDisplay(), image, _mapViewport2);
+			if (image == null || image.isDisposed() || canReuseImage(image, _clientArea) == false) {
+				image = createImage(getDisplay(), image, _clientArea);
 			}
 			_mapImage = image;
 
@@ -724,7 +729,7 @@ public class Map extends Canvas {
 		final org.eclipse.swt.graphics.Rectangle imageBounds = legendImage.getBounds();
 
 		// draw legend on bottom left
-		int yPos = _mapViewport.height - 5 - imageBounds.height;
+		int yPos = _mapPixelViewport.height - 5 - imageBounds.height;
 		yPos = Math.max(5, yPos);
 
 		final Point legendPosition = new Point(5, yPos);
@@ -735,12 +740,12 @@ public class Map extends Canvas {
 
 	private void drawMapScale(final GC gc) {
 
-		final int viewPortWidth = _mapViewport.width;
+		final int viewPortWidth = _mapPixelViewport.width;
 
 		final int devScaleWidth = viewPortWidth / 3;
 		final float metricWidth = 111.32f / _distanceUnitValue;
 
-		final GeoPosition mapCenter = getCenterPosition();
+		final GeoPosition mapCenter = getGeoCenter();
 		final double latitude = mapCenter.getLatitude();
 		final double longitude = mapCenter.getLongitude();
 
@@ -776,7 +781,7 @@ public class Map extends Canvas {
 		final Point textExtent = gc.textExtent(scaleText);
 
 		final int devX1 = viewPortWidth - 5 - devScaleWidth;
-		int devY = _mapViewport.height - 5 - 3;
+		int devY = _mapPixelViewport.height - 5 - 3;
 //		final int x1 = viewPortWidth / 2 - devScaleWidth / 2;
 //		int devY = fMapViewport.height / 2;
 
@@ -1346,28 +1351,18 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
-	 * system, not as lat/longs.
-	 * 
-	 * @return the current center of the map as a pixel value
-	 */
-	public Point2D getCenter() {
-		return _mapPixelCenter;
-	}
-
-	/**
 	 * A property indicating the center position of the map, or <code>null</code> when a tile
 	 * factory is not set
 	 * 
-	 * @return the current center position
+	 * @return Returns the current center position of the map in latitude/longitude
 	 */
-	public GeoPosition getCenterPosition() {
+	public GeoPosition getGeoCenter() {
 
 		if (_MP == null) {
 			return null;
 		}
 
-		return _MP.pixelToGeo(getCenter(), _mapZoomLevel);
+		return _MP.pixelToGeo(_mapCenterInWorldPixel, _mapZoomLevel);
 	}
 
 	/**
@@ -1375,6 +1370,15 @@ public class Map extends Canvas {
 	 */
 	public MapLegend getLegend() {
 		return _mapLegend;
+	}
+
+	/**
+	 * @return Returns the map viewport<br>
+	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
+	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
+	 */
+	public Rectangle getMapPixelViewport() {
+		return getWorldPixelTopLeftViewport(_mapCenterInWorldPixel);
 	}
 
 	/**
@@ -1409,42 +1413,37 @@ public class Map extends Canvas {
 		return _overlays;
 	}
 
-	public java.awt.Point getRelativePixel(final java.awt.Point absolutePixel) {
-		final Rectangle viewport = getViewport();
-		return new java.awt.Point(absolutePixel.x - viewport.x, absolutePixel.y - viewport.y);
-	}
-
-	/**
-	 * @return Returns the viewport<br>
-	 *         <b>x</b> and <b>y</b> contains the position in world pixel, <br>
-	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
-	 */
-	public Rectangle getViewport() {
-		return getViewport(getCenter());
-	}
+//	/**
+//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
+//	 * system, not as lat/longs.
+//	 * 
+//	 * @return Returns the current center of the map in as a world pixel value
+//	 */
+//	public Point2D getCenterInWorldPixel() {
+//		return _mapCenterInWorldPixel;
+//	}
 
 	/**
 	 * Returns the bounds of the viewport in pixels. This can be used to transform points into the
 	 * world bitmap coordinate space. The viewport is the part of the map, that you can currently
 	 * see on the screen.
 	 * 
-	 * @return the bounds in <em>pixels</em> of the "view" of this map
+	 * @return Returns the bounds in <em>pixels</em> of the "view" of this map
 	 */
-	private Rectangle getViewport(final Point2D center) {
+	private Rectangle getWorldPixelTopLeftViewport(final Point2D center) {
 
-		if (_viewPortSize == null) {
-			_viewPortSize = getSize();
-			_viewPortBorder = getBorderWidth();
+		if (_clientArea == null) {
+			_clientArea = getClientArea();
 		}
 
 		// calculate the "visible" viewport area in pixels
-		final int devWidth = _viewPortSize.x - 2 * _viewPortBorder;
-		final int devHeight = _viewPortSize.y - 2 * _viewPortBorder;
+		final int devWidth = _clientArea.width;
+		final int devHeight = _clientArea.height;
 
-		final int worldWidth = (int) (center.getX() - devWidth / 2d);
-		final int worldHeight = (int) (center.getY() - devHeight / 2d);
+		final int worldX = (int) (center.getX() - devWidth / 2d);
+		final int worldY = (int) (center.getY() - devHeight / 2d);
 
-		final Rectangle viewPort = new Rectangle(worldWidth, worldHeight, devWidth, devHeight);
+		final Rectangle viewPort = new Rectangle(worldX, worldY, devWidth, devHeight);
 
 		return viewPort;
 	}
@@ -1609,8 +1608,8 @@ public class Map extends Canvas {
 		 * set new map center
 		 */
 		final Point movePosition = new Point(mouseEvent.x, mouseEvent.y);
-		final double mapPixelCenterX = _mapPixelCenter.getX();
-		final double mapPixelCenterY = _mapPixelCenter.getY();
+		final double mapPixelCenterX = _mapCenterInWorldPixel.getX();
+		final double mapPixelCenterY = _mapCenterInWorldPixel.getY();
 		final double newCenterX = mapPixelCenterX - (movePosition.x - _mousePanPosition.x);
 		double newCenterY = mapPixelCenterY - (movePosition.y - _mousePanPosition.y);
 
@@ -1624,7 +1623,7 @@ public class Map extends Canvas {
 		}
 
 		final Point2D.Double mapCenter = new Point2D.Double(newCenterX, newCenterY);
-		setMapPixelCenter(_MP.pixelToGeo(mapCenter, _mapZoomLevel), mapCenter);
+		setMapCenterInWoldPixel(mapCenter);
 
 		_mousePanPosition = movePosition;
 
@@ -1656,7 +1655,7 @@ public class Map extends Canvas {
 
 			if (_directMapPainter != null) {
 				_directMapPainterContext.gc = gc;
-				_directMapPainterContext.viewport = _mapViewport;
+				_directMapPainterContext.viewport = _mapPixelViewport;
 				_directMapPainter.paint(_directMapPainterContext);
 			}
 		}
@@ -1664,24 +1663,12 @@ public class Map extends Canvas {
 
 	private void onResize() {
 
-		// get map size, enforce minimum size
-
 		/*
-		 * the method getSize() is only correct in a dialog when it's called in the create() method
-		 * after super.create();
+		 * the method getClientArea() is only correct in a dialog when it's called in the create()
+		 * method after super.create();
 		 */
-		_viewPortSize = getSize();
-		_viewPortBorder = getBorderWidth();
 
-		final Rectangle mapViewport = getViewport();
-
-		int mapWidth = mapViewport.width;
-		int mapHeight = mapViewport.height;
-
-		mapWidth = Math.max(1, mapWidth);
-		mapHeight = Math.max(1, mapHeight);
-
-		_mapViewport2 = new Rectangle(mapWidth, mapHeight);
+		_clientArea = getClientArea();
 
 		updateViewPortData();
 
@@ -2031,8 +2018,8 @@ public class Map extends Canvas {
 	 * @see getAddressLocation
 	 */
 	public void recenterToAddressLocation() {
-		final GeoPosition addressLocation = getAddressLocation();
-		setMapPixelCenter(addressLocation, _MP.geoToPixel(addressLocation, _mapZoomLevel));
+		final GeoPosition geoLocation = getAddressLocation();
+		setMapCenterInWoldPixel(_MP.geoToPixel(geoLocation, _mapZoomLevel));
 		queueMapRedraw();
 	}
 
@@ -2082,8 +2069,8 @@ public class Map extends Canvas {
 	 * @see getAddressLocation()
 	 */
 	public void setAddressLocation(final GeoPosition addressLocation) {
-		this._addressLocation = addressLocation;
-		setMapPixelCenter(addressLocation, _MP.geoToPixel(addressLocation, _mapZoomLevel));
+		_addressLocation = addressLocation;
+		setMapCenterInWoldPixel(_MP.geoToPixel(addressLocation, _mapZoomLevel));
 		queueMapRedraw();
 	}
 
@@ -2109,19 +2096,16 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * A property indicating the center position of the map
+	 * Set the center of the map to a geo position (with lat/long)
 	 * 
 	 * @param geoPosition
-	 *            the new property value
+	 *            Center position in lat/lon
 	 */
 	public void setGeoCenterPosition(final GeoPosition geoPosition) {
 
 		if (Thread.currentThread() == _displayThread) {
 
-			System.out.println(geoPosition);
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-			setMapPixelCenter(geoPosition, _MP.geoToPixel(geoPosition, _mapZoomLevel));
+			setMapCenterInWoldPixel(_MP.geoToPixel(geoPosition, _mapZoomLevel));
 
 		} else {
 
@@ -2130,11 +2114,13 @@ public class Map extends Canvas {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					if (!isDisposed()) {
-						setMapPixelCenter(geoPosition, _MP.geoToPixel(geoPosition, _mapZoomLevel));
+						setMapCenterInWoldPixel(_MP.geoToPixel(geoPosition, _mapZoomLevel));
 					}
 				}
 			});
 		}
+
+		updateViewPortData();
 
 		queueMapRedraw();
 	}
@@ -2159,48 +2145,92 @@ public class Map extends Canvas {
 		_isLiveView = isLiveView;
 	}
 
-	/**
-	 * Sets the center of the map in pixel coordinates.
-	 * 
-	 * @param fMapPixelCenter
-	 *            the new center of the map in pixel coordinates
-	 */
-	private void setMapPixelCenter(final GeoPosition mapGeoCenter, Point2D mapPixelCenter) {
-
+//	/**
+//	 * Sets the center of the map in pixel coordinates.
+//	 * 
+//	 * @param fMapPixelCenter
+//	 *            the new center of the map in pixel coordinates
+//	 */
+//	private void setMapPixelCenterNEW(final GeoPosition mapGeoCenter, Point2D mapPixelCenter) {
+//
+////		if (isRestrictOutsidePanning()) {
+//
+//			/*
+//			 * check if the center is within the map
+//			 */
+//
+//			final int viewportHeight = getViewport().height;
+//			final Rectangle newVP = getViewport(mapPixelCenter);
+//
+//			// don't let the user pan over the top edge
+//			if (newVP.y < 0) {
+//				final double centerY = viewportHeight / 2d;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
+//
+//			// don't let the user pan over the bottom edge
+//			final Dimension mapSize = _MP.getMapTileSize(_mapZoomLevel);
+//			final int mapHeight = (int) mapSize.getHeight() * _MP.getTileSize();
+//			if (newVP.y + newVP.height > mapHeight) {
+//				final double centerY = mapHeight - viewportHeight / 2;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
+//
+//			// if map is too small then just center it
+//			if (mapHeight < newVP.height) {
+//				final double centerY = mapHeight / 2d;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
+////		}
+//
+//		_mapPixelCenter = mapPixelCenter;
+//
+//		updateMouseMapPosition();
+//	}
+//
+//	/**
+//	 * Sets the center of the map in pixel coordinates.
+//	 * 
+//	 * @param fMapPixelCenter
+//	 *            the new center of the map in pixel coordinates
+//	 */
+//	private void setMapPixelCenterOLD(final GeoPosition mapGeoCenter, Point2D mapPixelCenter) {
+//
 //		if (isRestrictOutsidePanning()) {
-
-			/*
-			 * check if the center is within the map
-			 */
-
-			final int viewportHeight = getViewport().height;
-			final Rectangle newVP = getViewport(mapPixelCenter);
-
-			// don't let the user pan over the top edge
-			if (newVP.y < 0) {
-				final double centerY = viewportHeight / 2d;
-				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-			}
-
-			// don't let the user pan over the bottom edge
-			final Dimension mapSize = _MP.getMapTileSize(_mapZoomLevel);
-			final int mapHeight = (int) mapSize.getHeight() * _MP.getTileSize();
-			if (newVP.y + newVP.height > mapHeight) {
-				final double centerY = mapHeight - viewportHeight / 2;
-				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-			}
-
-			// if map is too small then just center it
-			if (mapHeight < newVP.height) {
-				final double centerY = mapHeight / 2d;
-				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-			}
+//
+//			/*
+//			 * check if the center is within the map
+//			 */
+//
+//			final int viewportHeight = getViewport().height;
+//			final Rectangle newVP = getViewport(mapPixelCenter);
+//
+//			// don't let the user pan over the top edge
+//			if (newVP.y < 0) {
+//				final double centerY = viewportHeight / 2d;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
+//
+//			// don't let the user pan over the bottom edge
+//			final Dimension mapSize = fTileFactory.getMapSize(getZoom());
+//			final int mapHeight = (int) mapSize.getHeight() * fTileFactory.getTileSize();
+//			if (newVP.y + newVP.height > mapHeight) {
+//				final double centerY = mapHeight - viewportHeight / 2;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
+//
+//			// if map is too small then just center it
+//			if (mapHeight < newVP.height) {
+//				final double centerY = mapHeight / 2d;
+//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
+//			}
 //		}
-
-		_mapPixelCenter = mapPixelCenter;
-
-		updateMouseMapPosition();
-	}
+//
+//		fMapPixelCenter = mapPixelCenter;
+//
+////		fireMapEvent(mapGeoCenter);
+//		updateMouseMapPosition();
+//	}
 
 //	public synchronized void setMapProviderWithReset() {
 //
@@ -2210,6 +2240,46 @@ public class Map extends Canvas {
 //
 //		queueMapRedraw();
 //	}
+
+	/**
+	 * Sets the center of the map in pixel coordinates.
+	 * 
+	 * @param centerInWorldPixel
+	 */
+	private void setMapCenterInWoldPixel(Point2D centerInWorldPixel) {
+
+		/*
+		 * check if the center is within the map
+		 */
+
+		final int viewportPixelHeight = getMapPixelViewport().height;
+		final Rectangle newPixelVP = getWorldPixelTopLeftViewport(centerInWorldPixel);
+
+		// don't let the user pan over the top edge
+		if (newPixelVP.y < 0) {
+			final double centerY = viewportPixelHeight / 2d;
+			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+		}
+
+		// don't let the user pan over the bottom edge
+		final Dimension mapTileSize = _MP.getMapTileSize(_mapZoomLevel);
+		final int mapHeight = (int) mapTileSize.getHeight() * _MP.getTileSize();
+
+		if (newPixelVP.y + newPixelVP.height > mapHeight) {
+			final double centerY = mapHeight - viewportPixelHeight / 2;
+			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+		}
+
+		// if map is too small then just center it
+		if (mapHeight < newPixelVP.height) {
+			final double centerY = mapHeight / 2d;
+			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+		}
+
+		_mapCenterInWorldPixel = centerInWorldPixel;
+
+		updateMouseMapPosition();
+	}
 
 	/**
 	 * Sets the map provider for the map and redraws the map
@@ -2224,7 +2294,7 @@ public class Map extends Canvas {
 		boolean refresh = false;
 
 		if (_MP != null) {
-			center = getCenterPosition();
+			center = getGeoCenter();
 			zoom = _mapZoomLevel;
 			refresh = true;
 		}
@@ -2337,42 +2407,44 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Set the current zoom level and centers the map to the previous center
+	 * Set the zoom level for the map and centers the map to the previous center. The zoom level is
+	 * checked if the map provider supports the requested zoom level.
 	 * 
-	 * @param zoom
+	 * @param newZoomLevel
 	 *            the new zoom level, the zoom level is adjusted to the min/max zoom levels
 	 */
-	public void setZoom(int zoom) {
+	public void setZoom(int newZoomLevel) {
 
 		if (_MP == null) {
 			return;
 		}
 
-// mp2
-//		fMP.resetTileQueue();
-
-		// do nothing if we are out of the valid zoom levels
-		if ((zoom < _MP.getMinimumZoomLevel() || zoom > _MP.getMaximumZoomLevel())) {
-			zoom = Math.max(zoom, _MP.getMinimumZoomLevel());
-			zoom = Math.min(zoom, _MP.getMaximumZoomLevel());
+		// check if the requested zoom level is within the bounds of the map provider
+		final int mpMinimumZoomLevel = _MP.getMinimumZoomLevel();
+		final int mpMaximumZoomLevel = _MP.getMaximumZoomLevel();
+		if ((newZoomLevel < mpMinimumZoomLevel || newZoomLevel > mpMaximumZoomLevel)) {
+			// adjust zoom level
+			newZoomLevel = Math.max(newZoomLevel, mpMinimumZoomLevel);
+			newZoomLevel = Math.min(newZoomLevel, mpMaximumZoomLevel);
 		}
 
 		final int oldzoom = _mapZoomLevel;
-		final Point2D oldCenter = getCenter();
-		final Dimension oldMapSize = _MP.getMapTileSize(oldzoom);
-		_mapZoomLevel = zoom;
+		final Point2D oldCenter = _mapCenterInWorldPixel;
+		final Dimension oldMapTileSize = _MP.getMapTileSize(oldzoom);
 
-		final Dimension mapSize = _MP.getMapTileSize(zoom);
+		_mapZoomLevel = newZoomLevel;
+
+		final Dimension mapTileSize = _MP.getMapTileSize(newZoomLevel);
 
 		final Point2D.Double pixelCenter = new Point2D.Double(//
-				oldCenter.getX() * (mapSize.getWidth() / oldMapSize.getWidth()),
-				oldCenter.getY() * (mapSize.getHeight() / oldMapSize.getHeight()));
+				oldCenter.getX() * (mapTileSize.getWidth() / oldMapTileSize.getWidth()),
+				oldCenter.getY() * (mapTileSize.getHeight() / oldMapTileSize.getHeight()));
 
-		setMapPixelCenter(_MP.pixelToGeo(pixelCenter, zoom), pixelCenter);
+		setMapCenterInWoldPixel(pixelCenter);
 
 		updateViewPortData();
 
-		fireZoomEvent(zoom);
+		fireZoomEvent(newZoomLevel);
 	}
 
 	/**
@@ -2396,7 +2468,7 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final Rectangle viewPort = getViewport();
+		final Rectangle viewPort = getMapPixelViewport();
 		final int worldMouseX = viewPort.x + _mouseMovePosition.x;
 		final int worldMouseY = viewPort.y + _mouseMovePosition.y;
 
@@ -2404,7 +2476,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Sets all viewport data which are necessary in {@link #drawMapTiles(GC)}
+	 * Sets all viewport data which are necessary to draw the map tiles in {@link #drawMapTiles(GC)}
 	 */
 	private void updateViewPortData() {
 
@@ -2414,21 +2486,22 @@ public class Map extends Canvas {
 		}
 
 		// optimize performance by keeping the viewport
-		final Rectangle viewport = _mapViewport = getViewport();
+		final Rectangle viewport = _mapPixelViewport = getMapPixelViewport();
 
 		_worldViewportX = viewport.x;
 		_worldViewportY = viewport.y;
-		final int devVisibleWidth = viewport.width;
-		final int devVisibleHeight = viewport.height;
 
-		_devVisibleViewport = new Rectangle(0, 0, devVisibleWidth, devVisibleHeight);
+		final int visiblePixelWidth = viewport.width;
+		final int visiblePixelHeight = viewport.height;
+
+		_devVisibleViewport = new Rectangle(0, 0, visiblePixelWidth, visiblePixelHeight);
 
 		final int tileSize = _MP.getTileSize();
 		_mapTileSize = _MP.getMapTileSize(_mapZoomLevel);
 
 		// get the visible tiles which can be displayed in the viewport area
-		final int numTileWidth = (int) Math.ceil((double) devVisibleWidth / (double) tileSize);
-		final int numTileHeight = (int) Math.ceil((double) devVisibleHeight / (double) tileSize);
+		final int numTileWidth = (int) Math.ceil((double) visiblePixelWidth / (double) tileSize);
+		final int numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) tileSize);
 
 		/*
 		 * tpx and tpy are the x- and y-values for the offset of the visible screen to the Map's
@@ -2442,7 +2515,7 @@ public class Map extends Canvas {
 		_tilePosMaxX = tileOffsetX + numTileWidth;
 		_tilePosMaxY = tileOffsetY + numTileHeight;
 
-		_MP.setMapViewPort(new MapViewPort(_mapZoomLevel, _tilePosMinX, _tilePosMaxX, _tilePosMinY, _tilePosMaxY));
+		_MP.setMapViewPort(new MapViewPortData(_mapZoomLevel, _tilePosMinX, _tilePosMaxX, _tilePosMinY, _tilePosMaxY));
 	}
 
 	public void zoomIn() {

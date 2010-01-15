@@ -1231,7 +1231,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// keep current position and zoom-level
-		final GeoPosition center = fMap.getCenterPosition();
+		final GeoPosition center = fMap.getGeoCenter();
 		final int zoom = fMap.getZoom();
 
 		// set image format
@@ -1250,7 +1250,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// keep current position and zoom-level
-		final GeoPosition center = fMap.getCenterPosition();
+		final GeoPosition center = fMap.getGeoCenter();
 		final int zoom = fMap.getZoom();
 
 		// set image size and initialize tile factory
@@ -1445,7 +1445,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			positionRect.setRect(positionRect.getX(), 0.0d, positionRect.getWidth(), positionRect.getHeight());
 //		}
 
-		java.awt.Rectangle viewport = fMap.getViewport();
+		java.awt.Rectangle viewport = fMap.getMapPixelViewport();
 
 //		System.out.println();
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -1512,7 +1512,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			fMap.setZoom(zoom);
 
 			positionRect = getPositionBounds(positions, zoom);
-			viewport = fMap.getViewport();
+			viewport = fMap.getMapPixelViewport();
 		}
 
 		// the algorithm generated a larger zoom level as necessary
@@ -1664,7 +1664,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 	private void updateMapPosition() {
 		fMpWms.setLastUsedZoom(fMap.getZoom());
-		fMpWms.setLastUsedPosition(fMap.getCenterPosition());
+		fMpWms.setLastUsedPosition(fMap.getGeoCenter());
 	}
 
 	/**
@@ -1676,7 +1676,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
 		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getCenterPosition();
+		final GeoPosition mapCenter = fMap.getGeoCenter();
 
 		if (mapZoom < factoryMinZoom) {
 			fMap.setZoom(factoryMinZoom);

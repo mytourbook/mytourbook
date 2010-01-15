@@ -43,7 +43,7 @@ import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapViewPort;
+import de.byteholder.geoclipse.map.MapViewPortData;
 import de.byteholder.geoclipse.map.Mercator;
 import de.byteholder.geoclipse.map.Projection;
 import de.byteholder.geoclipse.map.Tile;
@@ -235,7 +235,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private boolean									fIsProfileBrightness;
 	private int										fProfileBrightnessValue;
-	private MapViewPort								fMapViewPort;
+	private MapViewPortData								fMapViewPort;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
 		fOfflineReloadEventListeners.add(listener);
@@ -688,7 +688,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * @return the size of the map at the given zoom, in tiles (num tiles tall by num tiles wide)
+	 * @return Returns the size of the map at the given zoom in tiles (num tiles tall by num tiles
+	 *         wide)
 	 */
 	public Dimension getMapTileSize(final int zoom) {
 		final int mapTileSize = getMapSizeInTiles(zoom);
@@ -979,8 +980,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public URL getTileURLEncoded(final Tile tile) throws Exception {
 
-// mp2		
-//		final String urlString = tile.getMP().getTileUrl(tile.getX(), tile.getY(), tile.getZoom(), tile);
 		final String urlString = getTileUrl(tile);
 
 		if (urlString == null) {
@@ -1327,7 +1326,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fLastUsedZoom = zoom;
 	}
 
-	public void setMapViewPort(final MapViewPort mapViewPort) {
+	public void setMapViewPort(final MapViewPortData mapViewPort) {
 		fMapViewPort = mapViewPort;
 	}
 

@@ -1366,7 +1366,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
 		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getCenterPosition();
+		final GeoPosition mapCenter = fMap.getGeoCenter();
 
 		if (mapZoom < factoryMinZoom) {
 			fMap.setZoom(factoryMinZoom);
@@ -1388,7 +1388,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 * initialized the map with new zoom levels !!!
 		 */
 		final int oldZoomLevel = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getCenterPosition();
+		final GeoPosition mapCenter = fMap.getGeoCenter();
 
 		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
@@ -1411,7 +1411,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 * keep position
 		 */
 		fMpCustom.setLastUsedZoom(fMap.getZoom());
-		fMpCustom.setLastUsedPosition(fMap.getCenterPosition());
+		fMpCustom.setLastUsedPosition(fMap.getGeoCenter());
 
 		if (fCustomUrl != null) {
 			fMpCustom.setCustomUrl(fCustomUrl);

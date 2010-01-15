@@ -88,49 +88,4 @@ class OSMMapProvider extends MPPlugin {
 				.append(FILE_EXT)
 				.toString();
 	}
-
-// mp2	
-//	public OSMMapProvider() {
-//		super(FACTORY_ID, MIN_ZOOM, MAX_ZOOM, TOTAL_ZOOM, 256, true, true, BASE_URL, "x", "y", "z"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//	}
-//	
-//	@Override
-//	public String getFactoryID() {
-//		return FACTORY_ID;
-//	}
-//
-//	@Override
-//	public String getFactoryName() {
-//		return FACTORY_NAME;
-//	}
-//
-//	@Override
-//	public String getTileOSFolder() {
-//		return FACTORY_OS_NAME;
-//	}
 }
-
-// mp2
-//
-///**
-// * @author Michael Kanis
-// */
-//public class TileFactoryOSM extends TileFactoryImpl {
-//
-//	private static OSMTileFactoryInfo	info	= new OSMTileFactoryInfo();
-//	private MP_OLD							fMp;
-//
-//	public TileFactoryOSM() {
-//		super(info);
-//	}
-//
-//	@Override
-//	public MP_OLD getMapProvider() {
-//		return fMp;
-//	}
-//
-//	@Override
-//	public void setMapProvider(final MP_OLD mapProvider) {
-//		fMp = mapProvider;
-//	}
-//}

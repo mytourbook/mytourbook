@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-public class MapViewPort {
+public class MapViewPortData {
 
 	public int	mapZoomLevel;
 	public int	tilePosMinX;
@@ -23,7 +23,7 @@ public class MapViewPort {
 	public int	tilePosMinY;
 	public int	tilePosMaxY;
 
-	public MapViewPort(	final int mapZoomLevel,
+	public MapViewPortData(	final int mapZoomLevel,
 						final int tilePosMinX,
 						final int tilePosMaxX,
 						final int tilePosMinY,
