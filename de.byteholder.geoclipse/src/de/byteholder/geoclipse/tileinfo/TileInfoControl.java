@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -25,18 +25,16 @@ import de.byteholder.geoclipse.Messages;
 
 public class TileInfoControl extends CLabel {
 
-	private static final String	INFO_PATTERN	= "Q:000  T:000.000.000  P:000.000.000  S:00.00 xxxxx"; //$NON-NLS-1$
-
 	public TileInfoControl(final Composite parent, final int style) {
 
 		super(parent, style);
 
-		setToolTipText(Messages.tileInfo_control_tooltip_title
-				+ Messages.tileInfo_control_tooltip_line1
-				+ Messages.tileInfo_control_tooltip_line2
-				+ Messages.tileInfo_control_tooltip_line3
-				+ Messages.tileInfo_control_tooltip_line4//
-				+ Messages.tileInfo_control_tooltip_line5//
+		setToolTipText(Messages.TileInfo_Control_Tooltip_Title
+				+ Messages.TileInfo_Control_Tooltip_Line1
+				+ Messages.TileInfo_Control_Tooltip_Line2
+				+ Messages.TileInfo_Control_Tooltip_Line3
+				+ Messages.TileInfo_Control_Tooltip_Line4//
+				+ Messages.TileInfo_Control_Tooltip_Line5//
 		);
 	}
 
@@ -44,7 +42,7 @@ public class TileInfoControl extends CLabel {
 	public Point computeSize(final int wHint, final int hHint, final boolean changed) {
 
 		final GC gc = new GC(this);
-		final Point p = gc.textExtent(INFO_PATTERN);
+		final Point p = gc.textExtent(Messages.TileInfo_Control_Pattern);
 		gc.dispose();
 
 		return p;
@@ -80,7 +78,7 @@ public class TileInfoControl extends CLabel {
 			return;
 		}
 
-		setText(NLS.bind(Messages.tileInfo_control_statisticsAll, new Object[] {
+		setText(NLS.bind(Messages.TileInfo_Control_Tooltip_StatisticsAll, new Object[] {
 				queue,
 				endLoading,
 				startLoading,

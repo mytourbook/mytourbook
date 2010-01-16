@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -55,21 +55,24 @@ public class TourPainter extends MapPainter {
 	private static int			LINE_WIDTH			= 7;
 	private int					LINE_WIDTH2			= LINE_WIDTH / 2;
 
+	private static final int	MARGIN				= 2;
+	private static final int	MARKER_POLE			= 16;
+
 	private static final String	SPACER				= " ";						//$NON-NLS-1$
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
 	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
 	private static final String	IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
 
-	private static TourPainter	fInstance;
+	private static TourPainter	_instance;
 
-	private final Image			fImageStartMarker;
-	private final Image			fImageEndMarker;
-	private final Image			fImageTourMarker;
-	private final Image			fPositionImage;
-	private final Image			fMarkerImage;
+	private final Image			_imageStartMarker;
+	private final Image			_imageEndMarker;
+	private final Image			_imageTourMarker;
+	private final Image			_positionImage;
+	private final Image			_markerImage;
 
-	private int[]				fDataSerie;
-	private ILegendProvider		fLegendProvider;
+	private int[]				_dataSerie;
+	private ILegendProvider		_legendProvider;
 
 	/**
 	 * Draw legend colors into the legend bounds
@@ -274,11 +277,11 @@ public class TourPainter extends MapPainter {
 
 	public static TourPainter getInstance() {
 
-		if (fInstance == null) {
-			fInstance = new TourPainter();
+		if (_instance == null) {
+			_instance = new TourPainter();
 		}
 
-		return fInstance;
+		return _instance;
 	}
 
 	/**
@@ -412,17 +415,17 @@ public class TourPainter extends MapPainter {
 
 		super();
 
-		fInstance = this;
+		_instance = this;
 
 		final Display display = Display.getCurrent();
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
 		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
-		fPositionImage = createPositionImage(systemColorBlue);
-		fMarkerImage = createPositionImage(systemColorRed);
+		_positionImage = createPositionImage(systemColorBlue);
+		_markerImage = createPositionImage(systemColorRed);
 
-		fImageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
-		fImageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
-		fImageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
+		_imageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
+		_imageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
+		_imageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
 	}
 
 	private Image createPositionImage(final Color positionColor) {
@@ -461,90 +464,14 @@ public class TourPainter extends MapPainter {
 		return transparentImage;
 	}
 
-	/**
-	 * create an image for the tour marker
-	 * 
-	 * @param labelExtent
-	 * @param markerLabel
-	 * @return
-	 */
-	private Image createTourMarkerImage(final String markerLabel, final Point labelExtent) {
-
-		final int MARGIN = 5;
-		final int MARKER_POLE = 26;
-
-		final int bannerWidth = labelExtent.x + 2 * MARGIN;
-		final int bannerHeight = labelExtent.y + 2 * MARGIN;
-		final int bannerWidth2 = bannerWidth / 2;
-
-		final int markerWidth = bannerWidth;
-		final int markerHeight = bannerHeight + MARKER_POLE;
-		final int arcSize = 5;
-
-		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
-
-		final ImageData overlayImageData = new ImageData(markerWidth, markerHeight, 24, //
-				new PaletteData(0xff, 0xff00, 0xff00000));
-
-		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
-
-		final Display display = Display.getCurrent();
-		final Image markerImage = new Image(display, overlayImageData);
-		final Rectangle markerImageBounds = markerImage.getBounds();
-
-		final Color transparentColor = new Color(display, rgbTransparent);
-		final Color bannerColor = new Color(display, 0x65, 0xF9, 0x1F);
-		final Color bannerBorderColor = new Color(display, 0x69, 0xAF, 0x3D);
-
-		final GC gc = new GC(markerImage);
-
-		{
-			// fill transparent color
-			gc.setBackground(transparentColor);
-			gc.fillRectangle(markerImageBounds);
-
-			gc.setBackground(bannerColor);
-			gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-			// draw banner border
-			gc.setForeground(bannerBorderColor);
-			gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-			// draw text
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.drawText(markerLabel, //
-					MARGIN,
-					MARGIN,
-					true);
-
-			// draw pole
-//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gc.setForeground(bannerBorderColor);
-			gc.drawLine(bannerWidth2, bannerHeight, bannerWidth2, bannerHeight + MARKER_POLE);
-			gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-			// draw image debug border
-//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//			gc.drawRectangle(0, 0, markerImageBounds.width - 1, markerImageBounds.height - 1);
-		}
-
-		gc.dispose();
-
-		bannerColor.dispose();
-		bannerBorderColor.dispose();
-		transparentColor.dispose();
-
-		return markerImage;
-	}
-
 	@Override
 	protected void dispose() {
 
-		disposeImage(fImageTourMarker);
-		disposeImage(fImageStartMarker);
-		disposeImage(fImageEndMarker);
-		disposeImage(fPositionImage);
-		disposeImage(fMarkerImage);
+		disposeImage(_imageTourMarker);
+		disposeImage(_imageStartMarker);
+		disposeImage(_imageEndMarker);
+		disposeImage(_positionImage);
+		disposeImage(_markerImage);
 
 	}
 
@@ -573,6 +500,7 @@ public class TourPainter extends MapPainter {
 			public void run() {
 				boolean isTourInTile = false;
 
+				// draw tour below the marker
 				for (final TourData tourData : tourDataList) {
 
 					if (tourData == null) {
@@ -586,11 +514,8 @@ public class TourPainter extends MapPainter {
 						continue;
 					}
 
-					getDataSerie(tourData);
+					setDataSerie(tourData);
 
-					/*
-					 * draw tour
-					 */
 					final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
 
 					isTourInTile = isTourInTile || isDrawTourInTile;
@@ -608,7 +533,7 @@ public class TourPainter extends MapPainter {
 								tile,
 								latitudeSerie[latitudeSerie.length - 1],
 								longitudeSerie[longitudeSerie.length - 1],
-								fImageEndMarker);
+								_imageEndMarker);
 
 						isTourInTile = isTourInTile || isMarkerInTile;
 
@@ -618,13 +543,34 @@ public class TourPainter extends MapPainter {
 								tile,
 								latitudeSerie[0],
 								longitudeSerie[0],
-								fImageStartMarker);
+								_imageStartMarker);
 					}
 
-					boolean isTourMarkerInTile = false;
+					isTourInTile = isTourInTile || isMarkerInTile;
+				}
 
-					// draw tour marker
-					if (paintManager.isShowTourMarker()) {
+				if (paintManager.isShowTourMarker()) {
+
+					// draw marker above the tour
+
+					for (final TourData tourData : tourDataList) {
+
+						if (tourData == null) {
+							continue;
+						}
+
+						// check if geo position is available
+						final double[] latitudeSerie = tourData.latitudeSerie;
+						final double[] longitudeSerie = tourData.longitudeSerie;
+						if (latitudeSerie == null || longitudeSerie == null) {
+							continue;
+						}
+
+						setDataSerie(tourData);
+
+						boolean isTourMarkerInTile = false;
+
+						// draw tour marker
 
 						boolean isTourMarkerInTile2 = false;
 
@@ -654,17 +600,17 @@ public class TourPainter extends MapPainter {
 									tile,
 									latitudeSerie[serieIndex],
 									longitudeSerie[serieIndex],
-									fImageTourMarker,
+									_imageTourMarker,
 									tourMarker,
 									parts);
 
 							isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
 						}
 
+						isTourInTile = isTourInTile || isTourMarkerInTile;
 					}
-
-					isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
 				}
+
 				isInTile[0] = isTourInTile;
 			}
 		});
@@ -767,6 +713,7 @@ public class TourPainter extends MapPainter {
 		final boolean isDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
 		final boolean isDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
 
+		// get line width from pref store
 		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
 		LINE_WIDTH2 = LINE_WIDTH / 2;
 		gc.setLineWidth(LINE_WIDTH);
@@ -779,7 +726,7 @@ public class TourPainter extends MapPainter {
 
 				tileWorldPos = mp.geoToPixel(
 						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
- 						mapZoomLevel);
+						mapZoomLevel);
 
 				worldPositions[serieIndex] = tileWorldPos;
 
@@ -895,7 +842,7 @@ public class TourPainter extends MapPainter {
 								final java.awt.Point devPositionFrom,
 								final java.awt.Point devPositionTo) {
 
-		if (fDataSerie == null) {
+		if (_dataSerie == null) {
 
 			// draw default line when data are not available
 
@@ -905,7 +852,7 @@ public class TourPainter extends MapPainter {
 
 			// draw line with the color from the legend provider
 
-			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
 
 			{
 				gc.setForeground(lineColor);
@@ -919,7 +866,7 @@ public class TourPainter extends MapPainter {
 
 	private void drawTour30Square(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
 
-		if (fDataSerie == null) {
+		if (_dataSerie == null) {
 
 			// draw default square when data are not available
 
@@ -929,7 +876,7 @@ public class TourPainter extends MapPainter {
 
 			// draw square with the color from the legend provider
 
-			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
 
 			{
 				gc.setBackground(lineColor);
@@ -942,7 +889,7 @@ public class TourPainter extends MapPainter {
 
 	private void drawTour40Dot(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
 
-		if (fDataSerie == null) {
+		if (_dataSerie == null) {
 
 			// draw default dot when data are not available
 
@@ -952,7 +899,7 @@ public class TourPainter extends MapPainter {
 
 			// draw dot with the color from the legend provider
 
-			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
 			{
 				if (LINE_WIDTH == 2) {
 					// oval is not filled by a width of 2
@@ -999,8 +946,8 @@ public class TourPainter extends MapPainter {
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
 		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
-		int devPosX;
-		int devPosY;
+		int devX;
+		int devY;
 
 		final boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
 
@@ -1009,119 +956,98 @@ public class TourPainter extends MapPainter {
 			final String markerLabel = tourMarker.getLabel();
 			final Point labelExtent = gc.textExtent(markerLabel);
 
-			if (markerLabel.length() > 3) {
-
-				// draw marker with more than 3 characters
-
-				final Image tourMarkerImage = createTourMarkerImage(markerLabel, labelExtent);
+			final Image tourMarkerImage = drawTourMarkerImage(markerLabel, labelExtent);
+			{
 				final Rectangle markerBounds = tourMarkerImage.getBounds();
 
-				devPosX = devMarkerPosX - markerBounds.width / 2;
-				devPosY = devMarkerPosY - markerBounds.height;
+				devX = devMarkerPosX - markerBounds.width / 2;
+				devY = devMarkerPosY - markerBounds.height;
 
-				devPosX += devPartOffset;
-				devPosY += devPartOffset;
+				devX += devPartOffset;
+				devY += devPartOffset;
 
-				gc.drawImage(tourMarkerImage,//
-						devPosX,
-						devPosY);
-
-				tourMarkerImage.dispose();
-
-			} else {
-
-				// draw marker with 3 or less characters
-
-				// get marker size
-				final Rectangle bounds = markerImage.getBounds();
-				final int markerWidth = bounds.width;
-
-				final int markerWidth2 = markerWidth / 2;
-				final int markerHeight = bounds.height;
-
-				devPosX = devMarkerPosX - markerWidth2;
-				devPosY = devMarkerPosY - markerHeight;
-
-				devPosX += devPartOffset;
-				devPosY += devPartOffset;
-
-				gc.drawImage(markerImage, devPosX, devPosY);
-
-				gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-				gc.drawText(markerLabel, //
-						devPosX + markerWidth2 - (labelExtent.x / 2),
-						devPosY + markerWidth2 - (labelExtent.y / 2),
-						true);
+				gc.drawImage(tourMarkerImage, devX, devY);
 			}
+			tourMarkerImage.dispose();
+
 		}
 
 		return isMarkerInTile;
 	}
 
-	private void getDataSerie(final TourData tourData) {
+	/**
+	 * create an image for the tour marker
+	 * 
+	 * @param labelExtent
+	 * @param markerLabel
+	 * @return
+	 */
+	private Image drawTourMarkerImage(final String markerLabel, final Point labelExtent) {
 
-		final ILegendProvider legendProvider = PaintManager.getInstance().getLegendProvider();
-		if (legendProvider == null) {
-			fDataSerie = null;
-			return;
+		final int bannerWidth = labelExtent.x + 2 * MARGIN;
+		final int bannerHeight = labelExtent.y + 2 * MARGIN;
+		final int bannerWidth2 = bannerWidth / 2;
+
+		final int markerWidth = bannerWidth;
+		final int markerHeight = bannerHeight + MARKER_POLE;
+		final int arcSize = 5;
+
+		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
+
+		final ImageData overlayImageData = new ImageData(//
+				markerWidth,
+				markerHeight,
+				24,
+				new PaletteData(0xff, 0xff00, 0xff00000));
+
+		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
+
+		final Display display = Display.getCurrent();
+		final Image markerImage = new Image(display, overlayImageData);
+		final Rectangle markerImageBounds = markerImage.getBounds();
+
+		final Color transparentColor = new Color(display, rgbTransparent);
+		final Color bannerColor = new Color(display, 0x65, 0xF9, 0x1F);
+		final Color bannerBorderColor = new Color(display, 0x69, 0xAF, 0x3D);
+
+		final GC gc = new GC(markerImage);
+
+		{
+			// fill transparent color
+			gc.setBackground(transparentColor);
+			gc.fillRectangle(markerImageBounds);
+
+			gc.setBackground(bannerColor);
+			gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+			// draw banner border
+			gc.setForeground(bannerBorderColor);
+			gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+			// draw text
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			gc.drawText(markerLabel, //
+					MARGIN,
+					MARGIN,
+					true);
+
+			// draw pole
+			gc.setForeground(bannerBorderColor);
+			gc.drawLine(bannerWidth2, bannerHeight, bannerWidth2, bannerHeight + MARKER_POLE);
+			gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+			// draw image debug border
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.drawRectangle(0, 0, markerImageBounds.width - 1, markerImageBounds.height - 1);
 		}
 
-		fLegendProvider = legendProvider;
+		gc.dispose();
 
-		switch (fLegendProvider.getTourColorId()) {
-		case TourMapView.TOUR_COLOR_ALTITUDE:
+		bannerColor.dispose();
+		bannerBorderColor.dispose();
+		transparentColor.dispose();
 
-			final int[] altitudeSerie = tourData.getAltitudeSerie();
-			if (altitudeSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = altitudeSerie;
-			}
-			break;
-
-		case TourMapView.TOUR_COLOR_GRADIENT:
-
-			final int[] gradientSerie = tourData.getGradientSerie();
-			if (gradientSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = gradientSerie;
-			}
-			break;
-
-		case TourMapView.TOUR_COLOR_PULSE:
-
-			final int[] pulseSerie = tourData.pulseSerie;
-			if (pulseSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = pulseSerie;
-			}
-			break;
-
-		case TourMapView.TOUR_COLOR_SPEED:
-
-			final int[] speedSerie = tourData.getSpeedSerie();
-			if (speedSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = speedSerie;
-			}
-			break;
-
-		case TourMapView.TOUR_COLOR_PACE:
-
-			final int[] paceSerie = tourData.getPaceSerie();
-			if (paceSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = paceSerie;
-			}
-			break;
-
-		default:
-			break;
-		}
+		return markerImage;
 	}
 
 	/**
@@ -1132,7 +1058,7 @@ public class TourPainter extends MapPainter {
 	 */
 	public int getLegendValuePosition(final Rectangle legendBounds, final int valueIndex) {
 
-		if (fDataSerie == null || valueIndex >= fDataSerie.length) {
+		if (_dataSerie == null || valueIndex >= _dataSerie.length) {
 			return Integer.MIN_VALUE;
 		}
 
@@ -1140,11 +1066,11 @@ public class TourPainter extends MapPainter {
 		 * ONLY VERTICAL LEGENDS ARE SUPPORTED
 		 */
 
-		final int dataValue = fDataSerie[valueIndex];
+		final int dataValue = _dataSerie[valueIndex];
 
 		int valuePosition = 0;
 
-		final LegendConfig config = fLegendProvider.getLegendConfig();
+		final LegendConfig config = _legendProvider.getLegendConfig();
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
@@ -1225,6 +1151,77 @@ public class TourPainter extends MapPainter {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Sets the data serie which is painted
+	 * 
+	 * @param tourData
+	 */
+	private void setDataSerie(final TourData tourData) {
+
+		final ILegendProvider legendProvider = PaintManager.getInstance().getLegendProvider();
+		if (legendProvider == null) {
+			_dataSerie = null;
+			return;
+		}
+
+		_legendProvider = legendProvider;
+
+		switch (_legendProvider.getTourColorId()) {
+		case TourMapView.TOUR_COLOR_ALTITUDE:
+
+			final int[] altitudeSerie = tourData.getAltitudeSerie();
+			if (altitudeSerie == null) {
+				_dataSerie = null;
+			} else {
+				_dataSerie = altitudeSerie;
+			}
+			break;
+
+		case TourMapView.TOUR_COLOR_GRADIENT:
+
+			final int[] gradientSerie = tourData.getGradientSerie();
+			if (gradientSerie == null) {
+				_dataSerie = null;
+			} else {
+				_dataSerie = gradientSerie;
+			}
+			break;
+
+		case TourMapView.TOUR_COLOR_PULSE:
+
+			final int[] pulseSerie = tourData.pulseSerie;
+			if (pulseSerie == null) {
+				_dataSerie = null;
+			} else {
+				_dataSerie = pulseSerie;
+			}
+			break;
+
+		case TourMapView.TOUR_COLOR_SPEED:
+
+			final int[] speedSerie = tourData.getSpeedSerie();
+			if (speedSerie == null) {
+				_dataSerie = null;
+			} else {
+				_dataSerie = speedSerie;
+			}
+			break;
+
+		case TourMapView.TOUR_COLOR_PACE:
+
+			final int[] paceSerie = tourData.getPaceSerie();
+			if (paceSerie == null) {
+				_dataSerie = null;
+			} else {
+				_dataSerie = paceSerie;
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 
 }

@@ -40,46 +40,45 @@ import de.byteholder.gpx.GeoPosition;
 public class DialogMP extends TitleAreaDialog {
 
 	private static final String				TIME_SPACER				= "       ";									//$NON-NLS-1$
-
 	private static final String				COLUMN_SPACER			= "  ";										//$NON-NLS-1$
 
 	private static final String				DEFAULT_MONO_FONT		= "Courier";
 
 	protected static final int				MAX_VISIBLE_LOG_ENTRIES	= 500;
 
-	private static final DateTimeFormatter	fDateTimeFormatter		= ISODateTimeFormat.hourMinuteSecondMillis();
+	private static final DateTimeFormatter	_dtFormatter			= ISODateTimeFormat.hourMinuteSecondMillis();
 
 	// the config dialogs is using different map providers
-	private MP								fMp;
+	private MP								_mp;
 
 	// map is shared
-	protected Map							fMap;
+	protected Map							_map;
 
-	private Font							fFontMono;
+	private Font							_fontMono;
 
 	public DialogMP(final Shell parentShell, final MP mp) {
 		super(parentShell);
-		fMp = mp;
+		_mp = mp;
 	}
 
 	protected void actionSetFavoritePosition() {
 
-		final int zoom = fMap.getZoom();
-		final GeoPosition centerPosition = fMap.getGeoCenter();
+		final int zoom = _map.getZoom();
+		final GeoPosition centerPosition = _map.getGeoCenter();
 
-		fMp.setFavoriteZoom(zoom);
-		fMp.setFavoritePosition(centerPosition);
+		_mp.setFavoriteZoom(zoom);
+		_mp.setFavoritePosition(centerPosition);
 
-		fMp.setLastUsedZoom(zoom);
-		fMp.setLastUsedPosition(centerPosition);
+		_mp.setLastUsedZoom(zoom);
+		_mp.setLastUsedPosition(centerPosition);
 	}
 
 	protected void actionShowFavoritePosition() {
 
-		fMap.setZoom(fMp.getFavoriteZoom());
-		fMap.setGeoCenterPosition(fMp.getFavoritePosition());
+		_map.setZoom(_mp.getFavoriteZoom());
+		_map.setGeoCenterPosition(_mp.getFavoritePosition());
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	@Override
@@ -91,8 +90,8 @@ public class DialogMP extends TitleAreaDialog {
 
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				if (fFontMono != null) {
-					fFontMono.dispose();
+				if (_fontMono != null) {
+					_fontMono.dispose();
 				}
 			}
 		});
@@ -105,14 +104,14 @@ public class DialogMP extends TitleAreaDialog {
 		final String loggingFontPrefs = prefStore.getString(IMappingPreferences.THEME_FONT_LOGGING);
 		if (loggingFontPrefs.length() > 0) {
 			try {
-				fFontMono = new Font(display, new FontData(loggingFontPrefs));
+				_fontMono = new Font(display, new FontData(loggingFontPrefs));
 			} catch (final Exception e) {
 				// ignore
 			}
 		}
 
-		if (fFontMono == null) {
-			fFontMono = new Font(display, DEFAULT_MONO_FONT, 8, SWT.NORMAL);
+		if (_fontMono == null) {
+			_fontMono = new Font(display, DEFAULT_MONO_FONT, 8, SWT.NORMAL);
 		}
 	}
 
@@ -137,7 +136,7 @@ public class DialogMP extends TitleAreaDialog {
 			}
 
 			sb.setLength(0);
-			sb.append(fDateTimeFormatter.print(logEntry.time));
+			sb.append(_dtFormatter.print(logEntry.time));
 			sb.append(COLUMN_SPACER);
 			sb.append(logEntry.counter);
 			sb.append(COLUMN_SPACER);
@@ -198,10 +197,10 @@ public class DialogMP extends TitleAreaDialog {
 	}
 
 	protected Font getMonoFont() {
-		return fFontMono;
+		return _fontMono;
 	}
 
-	protected void setMap(final Map map) {
-		fMap = map;
-	}
+//	protected void setMap(final Map map) {
+//		_map = map;
+//	}
 }

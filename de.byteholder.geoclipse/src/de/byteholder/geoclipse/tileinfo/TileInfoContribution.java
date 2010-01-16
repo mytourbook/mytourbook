@@ -229,7 +229,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 				if (fSRTMReceivedBytes == -99) {
 
-					fInfoWidget.updateInfo(NLS.bind(Messages.tileInfo_control_statistics_downloadDataFile, //
+					fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataFile, //
 							new Object[] { Integer.toString(fStatIsQueued % 1000), fSRTMRemoteName }));
 
 				} else {
@@ -238,13 +238,13 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 					for (int index = 0; index < -fSRTMReceivedBytes; index++) {
 						sb.append('.');
 					}
-					fInfoWidget.updateInfo(NLS.bind(Messages.tileInfo_control_statistics_downloadDataInit, //
+					fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataInit, //
 							new Object[] { Integer.toString(fStatIsQueued % 1000), fSRTMRemoteName, sb.toString() }));
 				}
 
 			} else {
 
-				fInfoWidget.updateInfo(NLS.bind(Messages.tileInfo_control_statistics_downloadData, new Object[] {
+				fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadData, new Object[] {
 						Integer.toString(fStatIsQueued % 1000),
 						fSRTMRemoteName,
 						Long.toString(fSRTMReceivedBytes) }));
@@ -265,7 +265,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 				+ fStatErrorSRTM;
 
 		if (statSum == 0) {
-			fInfoWidget.updateInfo(Messages.tileInfo_control_defaultTitle);
+			fInfoWidget.updateInfo(Messages.TileInfo_Control_DefaultTitle);
 		} else {
 
 			// show maximum with 3 or 2 decimals

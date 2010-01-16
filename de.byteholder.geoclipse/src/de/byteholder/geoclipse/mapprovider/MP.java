@@ -136,7 +136,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * The number of tiles wide at each zoom level
 	 */
 	private int[]									fMapWidthInTilesAtZoom;
- 
+
 	/**
 	 * An array of coordinates in <em>pixels</em> that indicates the center in the world map for the
 	 * given zoom level.
@@ -235,7 +235,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private boolean									fIsProfileBrightness;
 	private int										fProfileBrightnessValue;
-	private MapViewPortData								fMapViewPort;
+	private MapViewPortData							fMapViewPort;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
 		fOfflineReloadEventListeners.add(listener);
@@ -785,9 +785,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		final String tileKey = Tile.getTileKey(//
 				this,
+				zoom,
 				tilePositionX,
 				tilePositionY,
-				zoom,
 				null,
 				getCustomTileKey(),
 				fProjection.getId());
@@ -819,7 +819,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			// check if the old implementation was not correctly transfered to the cache with error tiles
 			if (tile.isLoadingError()) {
-				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 1: "
+				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
 						+ tile.getTileKey(), null);
 				return tile;
 			}
@@ -837,7 +837,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			// check if the old implementation was not correctly transfered to the cache with error tiles
 			if (tile != null) {
-				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 2: "
+				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
 						+ tile.getTileKey(), null);
 			}
 
@@ -903,14 +903,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * @return Returns a tile loader which can load the tile images, the method
-	 *         {@link #getTileUrl(Tile)} will be ignored when a tile loader is set
-	 */
-	public ITileLoader getTileLoader() {
-		return null;
-	}
-
-	/**
 	 * @param fullPath
 	 *            File system path on the local file system where the tile path is appended
 	 * @param zoomLevel
@@ -961,7 +953,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * 
 	 * Note that the URL can be a <CODE>file:</CODE> url.<br>
 	 * <br>
-	 * This method will be ignored when {@link #getTileLoader()} returns a tile loader.
+	 * This method will be ignored when the map provider is an instance of {@link ITileLoader}. <br>
 	 * 
 	 * @param tile
 	 * @return a valid url to load the tile
@@ -1159,8 +1151,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 			return;
 		}
 
-//		final String tileKey = tile.getTileKey();
-
 		try {
 
 			putOneTileInWaitingQueue(tile);
@@ -1181,7 +1171,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 						 */
 
 						// set loading error into the parent tile
-						tile.setLoadingError(Messages.Tile_Error_NoMapProvider);
+						tile.setLoadingError(Messages.TileInfo_Error_NoMapProvider);
 					}
 
 					for (final Tile tileChild : tileChildren) {

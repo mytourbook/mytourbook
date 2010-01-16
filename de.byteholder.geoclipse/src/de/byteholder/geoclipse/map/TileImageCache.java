@@ -57,7 +57,7 @@ public class TileImageCache {
 	 * max. number of images in the image cache
 	 */
 //	private static int										MAX_CACHE_ENTRIES			= 200;
- 
+
 	/**
 	 * relative OS path for storing offline map image files
 	 */
@@ -409,11 +409,22 @@ public class TileImageCache {
 			 * check if the image is already in the cache
 			 */
 			final Image cachedImage = fImageCache.get(tileKey);
-			if (cachedImage != null) {
+			if (cachedImage == null) {
+
+				// put a new image into the cache
+
+				fImageCache.put(tileKey, tileImage);
+				fImageCacheFifo.add(tileKey);
+
+				return;
+
+			} else {
+
+				// image is already in the cache
 
 				if (cachedImage == tileImage) {
 
-					// image is already in the cache
+					// keep image in the cache, it is the same as the new image
 
 					return;
 
@@ -434,20 +445,11 @@ public class TileImageCache {
 
 					return;
 				}
-
-			} else {
-
-				// put a new image into the cache
-				fImageCache.put(tileKey, tileImage);
-				fImageCacheFifo.add(tileKey);
-
-				return;
 			}
 
 		} catch (final Exception e) {
 			StatusUtil.log(e.getMessage(), e);
 		}
-
 	}
 
 	/**

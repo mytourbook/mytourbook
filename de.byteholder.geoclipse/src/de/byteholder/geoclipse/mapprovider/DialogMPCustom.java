@@ -306,18 +306,18 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	}
 
 	public void actionZoomIn() {
-		fMap.setZoom(fMap.getZoom() + 1);
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getZoom() + 1);
+		_map.queueMapRedraw();
 	}
 
 	public void actionZoomOut() {
-		fMap.setZoom(fMap.getZoom() - 1);
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getZoom() - 1);
+		_map.queueMapRedraw();
 	}
 
 	public void actionZoomOutToMinZoom() {
-		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
+		_map.queueMapRedraw();
 	}
 
 	@Override
@@ -819,7 +819,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			fChkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					fMap.setShowDebugInfo(fChkShowTileInfo.getSelection());
+					_map.setShowDebugInfo(fChkShowTileInfo.getSelection());
 				}
 			});
 
@@ -879,16 +879,14 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					.applyTo(fToolbar);
 		}
 
-		fMap = new Map(parent, SWT.BORDER | SWT.FLAT);
+		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.applyTo(fMap);
+				.applyTo(_map);
 
-		super.setMap(fMap);
+		_map.setShowScale(true);
 
-		fMap.setShowScale(true);
-
-		fMap.addMapListener(new IMapListener() {
+		_map.addMapListener(new IMapListener() {
 
 			public void mapInfo(final MapEvent event) {
 
@@ -1039,11 +1037,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		setMessage(fDefaultMessage);
 
 		// set factory and display map
-		fMap.setMapProviderWithReset(mp, true);
+		_map.setMapProviderWithReset(mp, true);
  
 		// set position to previous position
-		fMap.setZoom(fMpCustom.getLastUsedZoom());
-		fMap.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
+		_map.setZoom(fMpCustom.getLastUsedZoom());
+		_map.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
 	}
 
 	@Override
@@ -1088,12 +1086,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 */
 		updateMapZoomLevel(fMpCustom);
 
-		fMap.setMapProviderWithReset(fMpCustom, true);
+		_map.setMapProviderWithReset(fMpCustom, true);
 	}
 
 	private void onSelectOsmMap() {
 
-		if (fMap.getMapProvider() == fDefaultMapProvider) {
+		if (_map.getMapProvider() == fDefaultMapProvider) {
 
 			// toggle map
 
@@ -1102,7 +1100,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			updateMapZoomLevel(fMpCustom);
 
-			fMap.setMapProviderWithReset(fMpCustom, true);
+			_map.setMapProviderWithReset(fMpCustom, true);
 
 		} else {
 
@@ -1113,7 +1111,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			fDefaultMapProvider.setStateToReloadOfflineCounter();
 
-			fMap.setMapProviderWithReset(fDefaultMapProvider, true);
+			_map.setMapProviderWithReset(fDefaultMapProvider, true);
 		}
 	}
 
@@ -1227,7 +1225,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		// debug tile info
 		final boolean isShowDebugInfo = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
 		fChkShowTileInfo.setSelection(isShowDebugInfo);
-		fMap.setShowDebugInfo(isShowDebugInfo);
+		_map.setShowDebugInfo(isShowDebugInfo);
 
 		// tile image loading
 		final boolean isShowImageLogging = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
@@ -1365,17 +1363,17 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		final int factoryMinZoom = mp.getMinimumZoomLevel();
 		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
-		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getGeoCenter();
+		final int mapZoom = _map.getZoom();
+		final GeoPosition mapCenter = _map.getGeoCenter();
 
 		if (mapZoom < factoryMinZoom) {
-			fMap.setZoom(factoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(factoryMinZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 
 		if (mapZoom > factoryMaxZoom) {
-			fMap.setZoom(factoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(factoryMaxZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 	}
 
@@ -1387,8 +1385,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 * !!!! zoom level must be set before any other map methods are called because it
 		 * initialized the map with new zoom levels !!!
 		 */
-		final int oldZoomLevel = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getGeoCenter();
+		final int oldZoomLevel = _map.getZoom();
+		final GeoPosition mapCenter = _map.getGeoCenter();
 
 		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
@@ -1398,20 +1396,20 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
-			fMap.setZoom(newFactoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(newFactoryMinZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 
 		if (oldZoomLevel > newFactoryMaxZoom) {
-			fMap.setZoom(newFactoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(newFactoryMaxZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 
 		/*
 		 * keep position
 		 */
-		fMpCustom.setLastUsedZoom(fMap.getZoom());
-		fMpCustom.setLastUsedPosition(fMap.getGeoCenter());
+		fMpCustom.setLastUsedZoom(_map.getZoom());
+		fMpCustom.setLastUsedPosition(_map.getGeoCenter());
 
 		if (fCustomUrl != null) {
 			fMpCustom.setCustomUrl(fCustomUrl);

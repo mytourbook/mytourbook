@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,7 +18,6 @@ package de.byteholder.geoclipse.mapprovider;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -106,7 +105,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
@@ -135,122 +133,112 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
 	private static final String				DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED	= "IsPropertiesExpanded";					//$NON-NLS-1$
 
-	private IDialogSettings					fDialogSettings;
-
-	private MPProfile						fMpProfile;
-
 	/*
 	 * UI controls
 	 */
-	private Display							fDisplay;
-	private Button							fBtnOk;
+	private Display							_display;
+	private Button							_btnOk;
 
-	private Composite						fLeftContainer;
-	private Composite						fInnerContainer;
-	private ViewerDetailForm				fDetailForm;
+	private Composite						_leftContainer;
+	private Composite						_innerContainer;
+	private ViewerDetailForm				_detailForm;
 
-	private ExpandableComposite				fPropContainer;
-	private Composite						fPropInnerContainer;
+	private ExpandableComposite				_propContainer;
+	private Composite						_propInnerContainer;
 
-	private ContainerCheckedTreeViewer		fTreeViewer;
-	private TVIMapProviderRoot				fRootItem;
+	private ContainerCheckedTreeViewer		_treeViewer;
+	private TVIMapProviderRoot				_rootItem;
 
-	private ToolBar							fToolbar;
-	private Button							fBtnShowProfileMap;
-	private Button							fBtnShowOsmMap;
+	private ToolBar							_toolbar;
+	private Button							_btnShowProfileMap;
+	private Button							_btnShowOsmMap;
 
-	private Label							fLblMapInfo;
-	private Label							fLblTileInfo;
-	private Button							fChkLiveView;
-	private Button							fChkShowTileInfo;
+	private Label							_lblMapInfo;
+	private Label							_lblTileInfo;
+	private Button							_chkLiveView;
+	private Button							_chkShowTileInfo;
 
-	private Spinner							fSpinMinZoom;
-	private Spinner							fSpinMaxZoom;
+	private Spinner							_spinMinZoom;
+	private Spinner							_spinMaxZoom;
 
-	private Spinner							fSpinAlpha;
-	private Scale							fScaleAlpha;
-	private Button							fChkTransparentPixel;
-	private Button							fChkTransparentBlack;
-	private Button							fChkBrightness;
-	private Spinner							fSpinBright;
-	private Scale							fScaleBright;
-	private Label							fLblAlpha;
+	private Spinner							_spinAlpha;
+	private Scale							_scaleAlpha;
+	private Button							_chkTransparentPixel;
+	private Button							_chkTransparentBlack;
+	private Button							_chkBrightness;
+	private Spinner							_spinBright;
+	private Scale							_scaleBright;
+	private Label							_lblAlpha;
 
-	private ExpandableComposite				fTransContainer;
-	private ColorSelector					fColorSelectorTransparent0;
-	private ColorSelector					fColorSelectorTransparent1;
-	private ColorSelector					fColorSelectorTransparent2;
-	private ColorSelector					fColorSelectorTransparent3;
-	private ColorSelector					fColorSelectorTransparent4;
-	private ColorSelector					fColorSelectorTransparent5;
-	private ColorSelector					fColorSelectorTransparent6;
-	private ColorSelector					fColorSelectorTransparent7;
-	private ColorSelector					fColorSelectorTransparent8;
-	private ColorSelector					fColorSelectorTransparent9;
-	private ColorSelector					fColorSelectorTransparent10;
-	private ColorSelector					fColorSelectorTransparent11;
-	private ColorSelector					fColorSelectorTransparent12;
-	private ColorSelector					fColorSelectorTransparent13;
-	private ColorSelector					fColorSelectorTransparent14;
-	private ColorSelector					fColorSelectorTransparent15;
-	private ColorSelector					fColorSelectorTransparent16;
-	private ColorSelector					fColorSelectorTransparent17;
-	private ColorSelector					fColorSelectorTransparent18;
-	private ColorSelector					fColorSelectorTransparent19;
-	private ColorSelector					fColorSelectorTransparent20;
+	private ExpandableComposite				_transparentContainer;
+	private ColorSelector					_colorSelectorTransparent0;
+	private ColorSelector					_colorSelectorTransparent1;
+	private ColorSelector					_colorSelectorTransparent2;
+	private ColorSelector					_colorSelectorTransparent3;
+	private ColorSelector					_colorSelectorTransparent4;
+	private ColorSelector					_colorSelectorTransparent5;
+	private ColorSelector					_colorSelectorTransparent6;
+	private ColorSelector					_colorSelectorTransparent7;
+	private ColorSelector					_colorSelectorTransparent8;
+	private ColorSelector					_colorSelectorTransparent9;
+	private ColorSelector					_colorSelectorTransparent10;
+	private ColorSelector					_colorSelectorTransparent11;
+	private ColorSelector					_colorSelectorTransparent12;
+	private ColorSelector					_colorSelectorTransparent13;
+	private ColorSelector					_colorSelectorTransparent14;
+	private ColorSelector					_colorSelectorTransparent15;
+	private ColorSelector					_colorSelectorTransparent16;
+	private ColorSelector					_colorSelectorTransparent17;
+	private ColorSelector					_colorSelectorTransparent18;
+	private ColorSelector					_colorSelectorTransparent19;
+	private ColorSelector					_colorSelectorTransparent20;
 
-	private ColorSelector					fColorImageBackground;
+	private ColorSelector					_colorImageBackground;
 
-	private FormToolkit						fFormTk									= new FormToolkit(Display
+	private FormToolkit						_formTk									= new FormToolkit(Display
 																							.getCurrent());
-	private ExpandableComposite				fLogContainer;
-	private Button							fChkShowTileImageLog;
-	private Combo							fCboTileImageLog;
-	private Text							fTxtLogDetail;
+	private ExpandableComposite				_logContainer;
+	private Button							_chkShowTileImageLog;
+	private Combo							_cboTileImageLog;
+	private Text							_txtLogDetail;
 
-	// debugging
-//	private Spinner							fSpinnerBboxTop;
-//	private Spinner							fSpinnerBboxBottom;
+	private Image							_imageMap;
+	private Image							_imagePlaceholder;
+	private Image							_imageLayer;
 
 	/*
 	 * none UI items
 	 */
-	// image logging
-	private boolean							fIsTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	fLogEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
-	private NumberFormat					fNfLatLon								= NumberFormat.getNumberInstance();
+	private IDialogSettings					_dialogSettings;
+
+	private MPPlugin						_mpDefault;
+	private MPProfile						_mpProfile;
+
+	private String							_defaultMessage;
+
+	// image logging
+	private boolean							_isTileImageLogging;
+	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+
+	private int								_statUpdateCounter						= 0;
+
+	private int								_statIsQueued;
+	private int								_statStartLoading;
+	private int								_statEndLoading;
+	private int								_statErrorLoading;
+
+	private long							_dragStartTime;
+
+	private boolean							_isInitUI								= false;
+	private boolean							_isLiveView;
+
+	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 	{
 		// initialize lat/lon formatter
-		fNfLatLon.setMinimumFractionDigits(6);
-		fNfLatLon.setMaximumFractionDigits(6);
+		_nfLatLon.setMinimumFractionDigits(6);
+		_nfLatLon.setMaximumFractionDigits(6);
 	}
-
-	private int								fStatUpdateCounter						= 0;
-
-	private String							fDefaultMessage;
-
-	private int								fStatIsQueued;
-	private int								fStatStartLoading;
-	private int								fStatEndLoading;
-	private int								fStatErrorLoading;
-
-	private MPPlugin						fDefaultMP;
-
-	private boolean							fIsInitUI								= false;
-
-	private Image							fImageMap;
-	private Image							fImagePlaceholder;
-	private Image							fImageLayer;
-
-//	private PrefPageMapProviders			fPrefPageMapProvider;
-
-	private long							fDragStartTime;
-
-	protected boolean						fIsLiveView;
-
-//	public static float						fBboxTop								= 1.0f;
-//	public static float						fBboxBottom								= 1.0f;
 
 	private class MapContentProvider implements ITreeContentProvider {
 
@@ -261,7 +249,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return fRootItem.getFetchedChildrenAsArray();
+			return _rootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(final Object element) {
@@ -284,32 +272,32 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
-		fDialogSettings = Activator.getDefault().getDialogSettingsSection("DialogMapProfileConfiguration");//$NON-NLS-1$
+		_dialogSettings = Activator.getDefault().getDialogSettingsSection("DialogMapProfileConfiguration");//$NON-NLS-1$
 
-		fMpProfile = dialogMapProfile;
+		_mpProfile = dialogMapProfile;
 
 		/*
 		 * disable saving of the profile image (not the child images) when the map is displayed in
 		 * this dialoag because this improves performance when the image parameters are modified
 		 */
-		fMpProfile.setIsSaveImage(false);
+		_mpProfile.setIsSaveImage(false);
 
-		fDefaultMP = MapProviderManager.getInstance().getDefaultMapProvider();
+		_mpDefault = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
 	public void actionZoomIn() {
-		fMap.setZoom(fMap.getZoom() + 1);
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getZoom() + 1);
+		_map.queueMapRedraw();
 	}
 
 	public void actionZoomOut() {
-		fMap.setZoom(fMap.getZoom() - 1);
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getZoom() - 1);
+		_map.queueMapRedraw();
 	}
 
 	public void actionZoomOutToMinZoom() {
-		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
+		_map.queueMapRedraw();
 	}
 
 	@Override
@@ -319,7 +307,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.resetAll(false);
+				_mpProfile.resetAll(false);
 			}
 		});
 
@@ -371,7 +359,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	public boolean close() {
 
 		// restore default behaviour
-		fMpProfile.setIsSaveImage(true);
+		_mpProfile.setIsSaveImage(true);
 
 		saveState();
 
@@ -397,7 +385,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		super.create();
 
-		fDisplay = Display.getCurrent();
+		_display = Display.getCurrent();
 
 		setTitle(Messages.Dialog_MapProfile_DialogArea_Title);
 
@@ -406,17 +394,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		restoreState();
 
 		// initialize after the shell size is set
-		updateUIFromModel(fMpProfile);
+		updateUIFromModel(_mpProfile);
 
-		onSelectMapProfile(false);
- 
 		enableProfileMapButton();
-		fTreeViewer.getTree().setFocus();
+		_treeViewer.getTree().setFocus();
 	}
 
 	private void createActions() {
 
-		final ToolBarManager tbm = new ToolBarManager(fToolbar);
+		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
 		tbm.add(new ActionZoomIn(this));
 		tbm.add(new ActionZoomOut(this));
@@ -436,8 +422,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		super.createButtonsForButtonBar(parent);
 
 		// set text for the OK button
-		fBtnOk = getButton(IDialogConstants.OK_ID);
-		fBtnOk.setText(Messages.Dialog_MapConfig_Button_Update);
+		_btnOk = getButton(IDialogConstants.OK_ID);
+		_btnOk.setText(Messages.Dialog_MapConfig_Button_Update);
 	}
 
 	@Override
@@ -464,9 +450,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void createResources() {
 
-		fImageMap = Activator.getImageDescriptor(Messages.Image__Visibility).createImage();
-		fImagePlaceholder = Activator.getImageDescriptor(Messages.Image__Placeholder16).createImage();
-		fImageLayer = Activator.getImageDescriptor(Messages.Image_Action_ZoomShowEntireLayer).createImage();
+		_imageMap = Activator.getImageDescriptor(Messages.Image__Visibility).createImage();
+		_imagePlaceholder = Activator.getImageDescriptor(Messages.Image__Placeholder16).createImage();
+		_imageLayer = Activator.getImageDescriptor(Messages.Image_Action_ZoomShowEntireLayer).createImage();
 	}
 
 	private void createUI(final Composite parent) {
@@ -491,9 +477,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		{
 			// left part (layer selection)
-			fLeftContainer = new Composite(container, SWT.NONE);
-			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(fLeftContainer);
-			createUI110LeftContainer(fLeftContainer, pixelConverter);
+			_leftContainer = new Composite(container, SWT.NONE);
+			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
+			createUI110LeftContainer(_leftContainer, pixelConverter);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -504,56 +490,56 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
 			createUI180Map(mapContainer, pixelConverter);
 
-			fDetailForm = new ViewerDetailForm(container, fLeftContainer, sash, mapContainer, 30);
+			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
 	private void createUI110LeftContainer(final Composite parent, final PixelConverter pixelConverter) {
 
-		fInnerContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fInnerContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fInnerContainer);
+		_innerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_innerContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_innerContainer);
 		{
 			// label: map provider
-			final Label label = new Label(fInnerContainer, SWT.NONE);
+			final Label label = new Label(_innerContainer, SWT.NONE);
 			label.setText(Messages.Dialog_MapConfig_Label_MapProvider);
 			label.setToolTipText(Messages.Dialog_MapConfig_Label_HintDragAndDrop);
 
-			createUI114Viewer(fInnerContainer, pixelConverter);
-			createUI140DialogProperties(fInnerContainer);
+			createUI114Viewer(_innerContainer, pixelConverter);
+			createUI140DialogProperties(_innerContainer);
 
 			/*
 			 * section properties
 			 */
 			final Color parentBackground = parent.getBackground();
 
-			fPropContainer = fFormTk.createExpandableComposite(fInnerContainer, ExpandableComposite.TWISTIE);
+			_propContainer = _formTk.createExpandableComposite(_innerContainer, ExpandableComposite.TWISTIE);
 
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fPropContainer);
-			GridLayoutFactory.fillDefaults().applyTo(fPropContainer);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_propContainer);
+			GridLayoutFactory.fillDefaults().applyTo(_propContainer);
 
-			fPropContainer.setBackground(parentBackground);
-			fPropContainer.setText(Messages.Dialog_MapConfig_Label_Properties);
-			fPropContainer.addExpansionListener(new IExpansionListener() {
+			_propContainer.setBackground(parentBackground);
+			_propContainer.setText(Messages.Dialog_MapConfig_Label_Properties);
+			_propContainer.addExpansionListener(new IExpansionListener() {
 
 				public void expansionStateChanged(final ExpansionEvent e) {
-					fPropContainer.getParent().layout(true);
+					_propContainer.getParent().layout(true);
 				}
 
 				public void expansionStateChanging(final ExpansionEvent e) {}
 			});
 
 			{
-				fPropInnerContainer = fFormTk.createComposite(fPropContainer);
-				fPropContainer.setClient(fPropInnerContainer);
+				_propInnerContainer = _formTk.createComposite(_propContainer);
+				_propContainer.setClient(_propInnerContainer);
 
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(fPropInnerContainer);
-				GridLayoutFactory.fillDefaults().applyTo(fPropInnerContainer);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_propInnerContainer);
+				GridLayoutFactory.fillDefaults().applyTo(_propInnerContainer);
 
-				fPropInnerContainer.setBackground(parentBackground);
+				_propInnerContainer.setBackground(parentBackground);
 				{
-					createUI120MapProviderProperties(fPropInnerContainer);
-					createUI130ProfileProperties(fPropInnerContainer);
+					createUI120MapProviderProperties(_propInnerContainer);
+					createUI130ProfileProperties(_propInnerContainer);
 				}
 			}
 		}
@@ -576,15 +562,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			/*
 			 * tree viewer
 			 */
-			fTreeViewer = new ContainerCheckedTreeViewer(tree);
+			_treeViewer = new ContainerCheckedTreeViewer(tree);
 
-			fTreeViewer.setContentProvider(new MapContentProvider());
-			fTreeViewer.setUseHashlookup(true);
+			_treeViewer.setContentProvider(new MapContentProvider());
+			_treeViewer.setUseHashlookup(true);
 
-			fTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			_treeViewer.addDoubleClickListener(new IDoubleClickListener() {
 				public void doubleClick(final DoubleClickEvent event) {
 
-					final Object selectedItem = ((IStructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+					final Object selectedItem = ((IStructuredSelection) _treeViewer.getSelection()).getFirstElement();
 					if (selectedItem != null) {
 
 						if (selectedItem instanceof TVIMapProvider) {
@@ -603,10 +589,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 								// expand/collapse item
 
-								if (fTreeViewer.getExpandedState(selectedItem)) {
-									fTreeViewer.collapseToLevel(selectedItem, 1);
+								if (_treeViewer.getExpandedState(selectedItem)) {
+									_treeViewer.collapseToLevel(selectedItem, 1);
 								} else {
-									fTreeViewer.expandToLevel(selectedItem, 1);
+									_treeViewer.expandToLevel(selectedItem, 1);
 								}
 							}
 
@@ -617,13 +603,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				}
 			});
 
-			fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			_treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(final SelectionChangedEvent event) {
 					onSelectMP(event.getSelection());
 				}
 			});
 
-			fTreeViewer.addDragSupport(
+			_treeViewer.addDragSupport(
 					DND.DROP_MOVE,
 					new Transfer[] { LocalSelectionTransfer.getTransfer() },
 					new DragSourceListener() {
@@ -647,10 +633,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						public void dragStart(final DragSourceEvent event) {
 
 							final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-							final ITreeSelection selection = (ITreeSelection) fTreeViewer.getSelection();
+							final ITreeSelection selection = (ITreeSelection) _treeViewer.getSelection();
 
 							transfer.setSelection(selection);
-							transfer.setSelectionSetTime(fDragStartTime = event.time & 0xFFFFFFFFL);
+							transfer.setSelectionSetTime(_dragStartTime = event.time & 0xFFFFFFFFL);
 
 							// only ONE map provider/layer is allowed to be dragged
 							final Object firstElement = selection.getFirstElement();
@@ -659,10 +645,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						}
 					});
 
-			fTreeViewer.addDropSupport(
+			_treeViewer.addDropSupport(
 					DND.DROP_MOVE,
 					new Transfer[] { LocalSelectionTransfer.getTransfer() },
-					new ProfileDropAdapter(this, fTreeViewer));
+					new ProfileDropAdapter(this, _treeViewer));
 
 			tree.addKeyListener(new KeyListener() {
 
@@ -683,11 +669,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			 * add editing support for the tree
 			 */
 			final TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(
-					fTreeViewer,
-					new FocusCellOwnerDrawHighlighter(fTreeViewer));
+					_treeViewer,
+					new FocusCellOwnerDrawHighlighter(_treeViewer));
 
 			final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
-					fTreeViewer) {
+					_treeViewer) {
 
 				@Override
 				protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
@@ -698,7 +684,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				}
 			};
 
-			TreeViewerEditor.create(fTreeViewer, //
+			TreeViewerEditor.create(_treeViewer, //
 					focusCellManager,
 					actSupport,
 					ColumnViewerEditor.TABBING_HORIZONTAL //
@@ -726,7 +712,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		/*
 		 * column: map provider
 		 */
-		tvc = new TreeViewerColumn(fTreeViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Dialog_MapProfile_Column_MapProvider);
 		tc.setToolTipText(Messages.Dialog_MapProfile_Column_MapProvider_Tooltip);
@@ -744,7 +730,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 					styledString.append(mapProvider.getName());
 
-					cell.setImage(mpWrapper.isDisplayedInMap() ? fImageMap : fImagePlaceholder);
+					cell.setImage(mpWrapper.isDisplayedInMap() ? _imageMap : _imagePlaceholder);
 
 				} else if (element instanceof TVIWmsLayer) {
 
@@ -756,7 +742,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					styledString.append(mtLayer.getGeoLayer().getName(), StyledString.QUALIFIER_STYLER);
 					styledString.append(")", StyledString.QUALIFIER_STYLER);//$NON-NLS-1$
 
-					cell.setImage(mtLayer.isDisplayedInMap() ? fImageLayer : fImagePlaceholder);
+					cell.setImage(mtLayer.isDisplayedInMap() ? _imageLayer : _imagePlaceholder);
 
 				} else {
 					styledString.append(element.toString());
@@ -771,7 +757,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		/*
 		 * column: is visible
 		 */
-		tvc = new TreeViewerColumn(fTreeViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Dialog_MapProfile_Column_IsVisible);
 		tc.setToolTipText(Messages.Dialog_MapProfile_Column_IsVisible_Tooltip);
@@ -799,9 +785,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			}
 		});
 
-		tvc.setEditingSupport(new EditingSupport(fTreeViewer) {
+		tvc.setEditingSupport(new EditingSupport(_treeViewer) {
 
-			private CheckboxCellEditor	fCellEditor	= new CheckboxCellEditor(fTreeViewer.getTree());
+			private CheckboxCellEditor	fCellEditor	= new CheckboxCellEditor(_treeViewer.getTree());
 
 			@Override
 			protected boolean canEdit(final Object element) {
@@ -863,7 +849,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						 * remove parent tiles from loading cache because they can have loading
 						 * errors (from their children) which prevents them to be loaded again
 						 */
-						fMpProfile.resetParentTiles();
+						_mpProfile.resetParentTiles();
 					}
 
 					enableProfileMapButton();
@@ -889,7 +875,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		/*
 		 * column: alpha
 		 */
-		tvc = new TreeViewerColumn(fTreeViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Dialog_MapProfile_Column_Alpha);
 		tc.setToolTipText(Messages.Dialog_MapProfile_Column_Alpha_Tooltip);
@@ -916,7 +902,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		/*
 		 * column: brightness
 		 */
-		tvc = new TreeViewerColumn(fTreeViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Dialog_MapProfile_Column_Brightness);
 		tc.setToolTipText(Messages.Dialog_MapProfile_Column_Brightness_Tooltip);
@@ -945,7 +931,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		/*
 		 * column: empty to prevent scrolling to the right when the right column is selected
 		 */
-		tvc = new TreeViewerColumn(fTreeViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -967,11 +953,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			// check: brightness
-			fChkBrightness = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(fChkBrightness);
-			fChkBrightness.setText(Messages.Dialog_MapProfile_Button_Brightness);
-			fChkBrightness.setToolTipText(Messages.Dialog_MapProfile_Button_Brightness_Tooltip);
-			fChkBrightness.addSelectionListener(new SelectionAdapter() {
+			_chkBrightness = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkBrightness);
+			_chkBrightness.setText(Messages.Dialog_MapProfile_Button_Brightness);
+			_chkBrightness.setToolTipText(Messages.Dialog_MapProfile_Button_Brightness_Tooltip);
+			_chkBrightness.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					updateMVBrightness();
@@ -979,12 +965,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			});
 
 			// scale: brightness
-			fScaleBright = new Scale(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleBright);
-			fScaleBright.setMinimum(0);
-			fScaleBright.setMaximum(100);
-			fScaleBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
-			fScaleBright.addSelectionListener(new SelectionAdapter() {
+			_scaleBright = new Scale(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleBright);
+			_scaleBright.setMinimum(0);
+			_scaleBright.setMaximum(100);
+			_scaleBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
+			_scaleBright.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onModifyBrightScale();
@@ -992,29 +978,29 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			});
 
 			// spinner: brightness
-			fSpinBright = new Spinner(group, SWT.BORDER);
+			_spinBright = new Spinner(group, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 //					.grab(false, true)
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(fSpinBright);
-			fSpinBright.setMinimum(0);
-			fSpinBright.setMaximum(100);
-			fSpinBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
+					.applyTo(_spinBright);
+			_spinBright.setMinimum(0);
+			_spinBright.setMaximum(100);
+			_spinBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
 
-			fSpinBright.addMouseWheelListener(new MouseWheelListener() {
+			_spinBright.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
 			});
 
-			fSpinBright.addSelectionListener(new SelectionAdapter() {
+			_spinBright.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onModifyBrightSpinner();
 				}
 			});
 
-			fSpinBright.addModifyListener(new ModifyListener() {
+			_spinBright.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
 					onModifyBrightSpinner();
 				}
@@ -1023,18 +1009,18 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ################################################
 
 			// label: alpha
-			fLblAlpha = new Label(group, SWT.NONE);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(fLblAlpha);
-			fLblAlpha.setText(Messages.Dialog_CustomConfig_Label_Alpha);
-			fLblAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
+			_lblAlpha = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblAlpha);
+			_lblAlpha.setText(Messages.Dialog_CustomConfig_Label_Alpha);
+			_lblAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
 
 			// scale: alpha
-			fScaleAlpha = new Scale(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleAlpha);
-			fScaleAlpha.setMinimum(0);
-			fScaleAlpha.setMaximum(100);
-			fScaleAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
-			fScaleAlpha.addSelectionListener(new SelectionAdapter() {
+			_scaleAlpha = new Scale(group, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAlpha);
+			_scaleAlpha.setMinimum(0);
+			_scaleAlpha.setMaximum(100);
+			_scaleAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
+			_scaleAlpha.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onModifyAlphaScale();
@@ -1060,33 +1046,33 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 //			});
 
 			// center scale on mouse double click
-			fScaleAlpha.addListener(SWT.MouseDoubleClick, new Listener() {
+			_scaleAlpha.addListener(SWT.MouseDoubleClick, new Listener() {
 				public void handleEvent(final Event event) {
 					onScaleDoubleClick(event.widget);
 				}
 			});
 
 			// spinner: alpha
-			fSpinAlpha = new Spinner(group, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fSpinAlpha);
-			fSpinAlpha.setMinimum(0);
-			fSpinAlpha.setMaximum(100);
-			fSpinAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
+			_spinAlpha = new Spinner(group, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinAlpha);
+			_spinAlpha.setMinimum(0);
+			_spinAlpha.setMaximum(100);
+			_spinAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
 
-			fSpinAlpha.addMouseWheelListener(new MouseWheelListener() {
+			_spinAlpha.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
 			});
 
-			fSpinAlpha.addSelectionListener(new SelectionAdapter() {
+			_spinAlpha.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onModifyAlphaSpinner();
 				}
 			});
 
-			fSpinAlpha.addModifyListener(new ModifyListener() {
+			_spinAlpha.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
 					onModifyAlphaSpinner();
 				}
@@ -1099,10 +1085,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOptions);
 			{
 				// check: set transparent pixel
-				fChkTransparentPixel = new Button(containerOptions, SWT.CHECK);
-				fChkTransparentPixel.setText(Messages.Dialog_MapConfig_Button_TransparentPixel);
-				fChkTransparentPixel.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentPixel_Tooltip);
-				fChkTransparentPixel.addSelectionListener(new SelectionAdapter() {
+				_chkTransparentPixel = new Button(containerOptions, SWT.CHECK);
+				_chkTransparentPixel.setText(Messages.Dialog_MapConfig_Button_TransparentPixel);
+				_chkTransparentPixel.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentPixel_Tooltip);
+				_chkTransparentPixel.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onModifyTransparentColor();
@@ -1110,10 +1096,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				});
 
 				// check: is black transparent 
-				fChkTransparentBlack = new Button(containerOptions, SWT.CHECK);
-				fChkTransparentBlack.setText(Messages.Dialog_MapConfig_Button_TransparentBlack);
-				fChkTransparentBlack.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentBlack_Tooltip);
-				fChkTransparentBlack.addSelectionListener(new SelectionAdapter() {
+				_chkTransparentBlack = new Button(containerOptions, SWT.CHECK);
+				_chkTransparentBlack.setText(Messages.Dialog_MapConfig_Button_TransparentBlack);
+				_chkTransparentBlack.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentBlack_Tooltip);
+				_chkTransparentBlack.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onModifyTransparentColor();
@@ -1133,28 +1119,28 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		final Color parentBackground = parent.getBackground();
 
-		fTransContainer = fFormTk.createExpandableComposite(parent, ExpandableComposite.NO_TITLE);
+		_transparentContainer = _formTk.createExpandableComposite(parent, ExpandableComposite.NO_TITLE);
 
 		// prevent flickering in the UI
-		fTransContainer.setExpanded(false);
+		_transparentContainer.setExpanded(false);
 
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fTransContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fTransContainer);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_transparentContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_transparentContainer);
 
-		fTransContainer.setBackground(parentBackground);
-		fTransContainer.addExpansionListener(new IExpansionListener() {
+		_transparentContainer.setBackground(parentBackground);
+		_transparentContainer.addExpansionListener(new IExpansionListener() {
 
 			public void expansionStateChanged(final ExpansionEvent e) {
 //				fPropInnerContainer.layout(true);
-				fInnerContainer.layout(true);
+				_innerContainer.layout(true);
 			}
 
 			public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
 		{
-			final Composite clientContainer = fFormTk.createComposite(fTransContainer);
-			fTransContainer.setClient(clientContainer);
+			final Composite clientContainer = _formTk.createComposite(_transparentContainer);
+			_transparentContainer.setClient(clientContainer);
 
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(clientContainer);
 			GridLayoutFactory.fillDefaults().applyTo(clientContainer);
@@ -1185,39 +1171,39 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			final Composite colorContainer0 = new Composite(colorContainerParent, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer0);
 			{
-				fColorSelectorTransparent0 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent1 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent2 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent3 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent4 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent5 = createUIColorSelector(colorContainer0, colorListener, gd);
-				fColorSelectorTransparent6 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent0 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent1 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent2 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent3 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent4 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent5 = createUIColorSelector(colorContainer0, colorListener, gd);
+				_colorSelectorTransparent6 = createUIColorSelector(colorContainer0, colorListener, gd);
 			}
 
 			final Composite colorContainer1 = new Composite(colorContainerParent, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(colorContainer1);
 			GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer1);
 			{
-				fColorSelectorTransparent7 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent8 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent9 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent10 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent11 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent12 = createUIColorSelector(colorContainer1, colorListener, gd);
-				fColorSelectorTransparent13 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent7 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent8 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent9 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent10 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent11 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent12 = createUIColorSelector(colorContainer1, colorListener, gd);
+				_colorSelectorTransparent13 = createUIColorSelector(colorContainer1, colorListener, gd);
 			}
 
 			final Composite colorContainer2 = new Composite(colorContainerParent, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(colorContainer2);
 			GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer2);
 			{
-				fColorSelectorTransparent14 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent15 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent16 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent17 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent18 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent19 = createUIColorSelector(colorContainer2, colorListener, gd);
-				fColorSelectorTransparent20 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent14 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent15 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent16 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent17 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent18 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent19 = createUIColorSelector(colorContainer2, colorListener, gd);
+				_colorSelectorTransparent20 = createUIColorSelector(colorContainer2, colorListener, gd);
 			}
 		}
 	}
@@ -1231,7 +1217,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				Util.adjustSpinnerValueOnMouseScroll(event);
 
 				// validate values
-				if (event.widget == fSpinMinZoom) {
+				if (event.widget == _spinMinZoom) {
 					onModifyZoomSpinnerMin();
 				} else {
 					onModifyZoomSpinnerMax();
@@ -1254,24 +1240,24 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(zoomContainer);
 			{
 				// spinner: min zoom level
-				fSpinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMinZoom);
-				fSpinMinZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				fSpinMinZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				fSpinMinZoom.setSelection(MP.UI_MIN_ZOOM_LEVEL);
-				fSpinMinZoom.addMouseWheelListener(mouseWheelListener);
-				fSpinMinZoom.addSelectionListener(new SelectionAdapter() {
+				_spinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMinZoom);
+				_spinMinZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
+				_spinMinZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
+				_spinMinZoom.setSelection(MP.UI_MIN_ZOOM_LEVEL);
+				_spinMinZoom.addMouseWheelListener(mouseWheelListener);
+				_spinMinZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onModifyZoomSpinnerMin();
 					}
 				});
-				fSpinMinZoom.addModifyListener(new ModifyListener() {
+				_spinMinZoom.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onModifyZoomSpinnerMin();
@@ -1286,24 +1272,24 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// ------------------------------------------------
 
 				// spinner: min zoom level
-				fSpinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMaxZoom);
-				fSpinMaxZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				fSpinMaxZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
-				fSpinMaxZoom.addMouseWheelListener(mouseWheelListener);
-				fSpinMaxZoom.addSelectionListener(new SelectionAdapter() {
+				_spinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMaxZoom);
+				_spinMaxZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
+				_spinMaxZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
+				_spinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+				_spinMaxZoom.addMouseWheelListener(mouseWheelListener);
+				_spinMaxZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onModifyZoomSpinnerMax();
 					}
 				});
-				fSpinMaxZoom.addModifyListener(new ModifyListener() {
+				_spinMaxZoom.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onModifyZoomSpinnerMax();
@@ -1323,13 +1309,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ------------------------------------------------
 
 			// color: image bg color
-			fColorImageBackground = new ColorSelector(group);
+			_colorImageBackground = new ColorSelector(group);
 			GridDataFactory.swtDefaults()//
 					.grab(false, true)
 					.align(SWT.BEGINNING, SWT.BEGINNING)
-					.applyTo(fColorImageBackground.getButton());
+					.applyTo(_colorImageBackground.getButton());
 
-			fColorImageBackground.addListener(new IPropertyChangeListener() {
+			_colorImageBackground.addListener(new IPropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent event) {
 					onModifyImageBgColor();
 				}
@@ -1344,18 +1330,18 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
 			// check: live view
-			fChkLiveView = new Button(container, SWT.CHECK);
+			_chkLiveView = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.END)
-					.applyTo(fChkLiveView);
-			fChkLiveView.setText(Messages.Dialog_MapConfig_Button_LiveView);
-			fChkLiveView.setToolTipText(Messages.Dialog_MapConfig_Button_LiveView_Tooltip);
-			fChkLiveView.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_chkLiveView);
+			_chkLiveView.setText(Messages.Dialog_MapConfig_Button_LiveView);
+			_chkLiveView.setToolTipText(Messages.Dialog_MapConfig_Button_LiveView_Tooltip);
+			_chkLiveView.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
-					fIsLiveView = fChkLiveView.getSelection();
-					fMap.setLiveView(fIsLiveView);
+					_isLiveView = _chkLiveView.getSelection();
+					_map.setLiveView(_isLiveView);
 
 					updateLiveView();
 				}
@@ -1364,27 +1350,27 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ################################################
 
 			// check: show tile info
-			fChkShowTileInfo = new Button(container, SWT.CHECK);
+			_chkShowTileInfo = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.END)
-					.applyTo(fChkShowTileInfo);
-			fChkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
-			fChkShowTileInfo.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_chkShowTileInfo);
+			_chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
+			_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					fMap.setShowDebugInfo(fChkShowTileInfo.getSelection());
+					_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
 				}
 			});
 
 			// ############################################################
 
 			// check: show tile image loading log
-			fChkShowTileImageLog = new Button(container, SWT.CHECK);
+			_chkShowTileImageLog = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
-					.applyTo(fChkShowTileImageLog);
-			fChkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
-			fChkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-			fChkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_chkShowTileImageLog);
+			_chkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
+			_chkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+			_chkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					enableControls();
@@ -1400,10 +1386,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(toolbarContainer);
 		{
 			// button: update map
-			fBtnShowProfileMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowProfileMap.setText(Messages.Dialog_MapProfile_Button_UpdateMap);
-			fBtnShowProfileMap.setToolTipText(Messages.Dialog_MapProfile_Button_UpdateMap_Tooltip);
-			fBtnShowProfileMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowProfileMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowProfileMap.setText(Messages.Dialog_MapProfile_Button_UpdateMap);
+			_btnShowProfileMap.setToolTipText(Messages.Dialog_MapProfile_Button_UpdateMap_Tooltip);
+			_btnShowProfileMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectMapProfile(true);
@@ -1413,10 +1399,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ############################################################
 
 			// button: osm map
-			fBtnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
-			fBtnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-			fBtnShowOsmMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
+			_btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
+			_btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectMapOSM();
@@ -1425,23 +1411,21 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// ############################################################
 
-			fToolbar = new ToolBar(toolbarContainer, SWT.FLAT);
+			_toolbar = new ToolBar(toolbarContainer, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.align(SWT.END, SWT.FILL)
-					.applyTo(fToolbar);
+					.applyTo(_toolbar);
 		}
 
-		fMap = new Map(parent, SWT.BORDER | SWT.FLAT);
+		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.applyTo(fMap);
+				.applyTo(_map);
 
-		super.setMap(fMap);
+		_map.setShowScale(true);
 
-		fMap.setShowScale(true);
-
-		fMap.addZoomListener(new IZoomListener() {
+		_map.addZoomListener(new IZoomListener() {
 			public void zoomChanged(final ZoomEvent event) {
 			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG 
 //				resetMapProfile();
@@ -1449,7 +1433,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			}
 		});
 
-		fMap.addMapListener(new IMapListener() {
+		_map.addMapListener(new IMapListener() {
 
 			public void mapInfo(final MapEvent event) {
 
@@ -1462,9 +1446,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 								lon + 360
 								: lon;
 
-				fLblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						fNfLatLon.format(mapCenter.getLatitude()),
-						fNfLatLon.format(lon),
+				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
+						_nfLatLon.format(mapCenter.getLatitude()),
+						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
@@ -1477,21 +1461,21 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(infoContainer);
 		{
 			// label: map info
-			fLblMapInfo = new Label(infoContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblMapInfo);
+			_lblMapInfo = new Label(infoContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblMapInfo);
 
 			// label: tile info
-			fLblTileInfo = new Label(infoContainer, SWT.TRAIL);
+			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
 			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					fLblTileInfo);
-			fLblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
+					_lblTileInfo);
+			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
 		}
 
 		/*
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 * !!! don't do any map initialization until the tile factory is set !!!
+		 * !!! don't do any map initialization until the map provider is set !!!
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
 	}
@@ -1501,26 +1485,26 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final Font monoFont = getMonoFont();
 		final Color parentBackground = parent.getBackground();
 
-		fLogContainer = fFormTk.createExpandableComposite(parent, ExpandableComposite.TWISTIE);
+		_logContainer = _formTk.createExpandableComposite(parent, ExpandableComposite.TWISTIE);
 
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fLogContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fLogContainer);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_logContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_logContainer);
 
-		fLogContainer.setBackground(parentBackground);
-		fLogContainer.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
-		fLogContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-		fLogContainer.addExpansionListener(new IExpansionListener() {
+		_logContainer.setBackground(parentBackground);
+		_logContainer.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
+		_logContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+		_logContainer.addExpansionListener(new IExpansionListener() {
 
 			public void expansionStateChanged(final ExpansionEvent e) {
-				fLogContainer.getParent().layout(true);
+				_logContainer.getParent().layout(true);
 			}
 
 			public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
 		{
-			final Composite clientContainer = fFormTk.createComposite(fLogContainer);
-			fLogContainer.setClient(clientContainer);
+			final Composite clientContainer = _formTk.createComposite(_logContainer);
+			_logContainer.setClient(clientContainer);
 
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(clientContainer);
 			GridLayoutFactory.fillDefaults().applyTo(clientContainer);
@@ -1529,34 +1513,34 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			{
 				// combo: url log
-				fCboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(fCboTileImageLog);
-				fCboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-				fCboTileImageLog.setVisibleItemCount(40);
-				fFormTk.adapt(fCboTileImageLog, true, true);
-				fCboTileImageLog.setFont(monoFont);
+				_cboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_cboTileImageLog);
+				_cboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+				_cboTileImageLog.setVisibleItemCount(40);
+				_formTk.adapt(_cboTileImageLog, true, true);
+				_cboTileImageLog.setFont(monoFont);
 
-				fCboTileImageLog.addSelectionListener(new SelectionAdapter() {
+				_cboTileImageLog.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						// display selected item in the text field below
-						final int selectionIndex = fCboTileImageLog.getSelectionIndex();
+						final int selectionIndex = _cboTileImageLog.getSelectionIndex();
 						if (selectionIndex != -1) {
-							fTxtLogDetail.setText(fCboTileImageLog.getItem(selectionIndex));
+							_txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
 						}
 					}
 				});
 
 				// label: selected log entry
-				fTxtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
+				_txtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
 						.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(5))
-						.applyTo(fTxtLogDetail);
-				fFormTk.adapt(fTxtLogDetail, false, false);
-				fTxtLogDetail.setFont(monoFont);
-				fTxtLogDetail.setBackground(parentBackground);
+						.applyTo(_txtLogDetail);
+				_formTk.adapt(_txtLogDetail, false, false);
+				_txtLogDetail.setFont(monoFont);
+				_txtLogDetail.setBackground(parentBackground);
 			}
 		}
 	}
@@ -1575,7 +1559,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void enableControls() {
 
-		final ITreeSelection selection = (ITreeSelection) fTreeViewer.getSelection();
+		final ITreeSelection selection = (ITreeSelection) _treeViewer.getSelection();
 		final Object firstElement = selection.getFirstElement();
 
 		boolean isMpSelected = true;
@@ -1587,82 +1571,82 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			isMpSelected = false;
 		}
 
-		final boolean isBrightness = isMpSelected & fChkBrightness.getSelection();
+		final boolean isBrightness = isMpSelected & _chkBrightness.getSelection();
 		final boolean isNoBrightness = isMpSelected & !isBrightness;
-		final boolean isTransparent = isMpSelected & fChkTransparentPixel.getSelection() & !isBrightness;
+		final boolean isTransparent = isMpSelected & _chkTransparentPixel.getSelection() & !isBrightness;
 
-		fChkBrightness.setEnabled(isMpSelected);
-		fSpinBright.setEnabled(isBrightness);
-		fScaleBright.setEnabled(isBrightness);
+		_chkBrightness.setEnabled(isMpSelected);
+		_spinBright.setEnabled(isBrightness);
+		_scaleBright.setEnabled(isBrightness);
 
-		fLblAlpha.setEnabled(isNoBrightness);
-		fSpinAlpha.setEnabled(isNoBrightness);
-		fScaleAlpha.setEnabled(isNoBrightness);
+		_lblAlpha.setEnabled(isNoBrightness);
+		_spinAlpha.setEnabled(isNoBrightness);
+		_scaleAlpha.setEnabled(isNoBrightness);
 
 		/*
 		 * transparent pixel
 		 */
-		fChkTransparentPixel.setEnabled(isNoBrightness);
+		_chkTransparentPixel.setEnabled(isNoBrightness);
 
-		fChkTransparentBlack.setEnabled(isTransparent);
-		fColorSelectorTransparent0.setEnabled(isTransparent);
-		fColorSelectorTransparent1.setEnabled(isTransparent);
-		fColorSelectorTransparent2.setEnabled(isTransparent);
-		fColorSelectorTransparent3.setEnabled(isTransparent);
-		fColorSelectorTransparent4.setEnabled(isTransparent);
-		fColorSelectorTransparent5.setEnabled(isTransparent);
-		fColorSelectorTransparent6.setEnabled(isTransparent);
-		fColorSelectorTransparent7.setEnabled(isTransparent);
-		fColorSelectorTransparent8.setEnabled(isTransparent);
-		fColorSelectorTransparent9.setEnabled(isTransparent);
-		fColorSelectorTransparent10.setEnabled(isTransparent);
-		fColorSelectorTransparent11.setEnabled(isTransparent);
-		fColorSelectorTransparent12.setEnabled(isTransparent);
-		fColorSelectorTransparent13.setEnabled(isTransparent);
-		fColorSelectorTransparent14.setEnabled(isTransparent);
-		fColorSelectorTransparent15.setEnabled(isTransparent);
-		fColorSelectorTransparent16.setEnabled(isTransparent);
-		fColorSelectorTransparent17.setEnabled(isTransparent);
-		fColorSelectorTransparent18.setEnabled(isTransparent);
-		fColorSelectorTransparent19.setEnabled(isTransparent);
-		fColorSelectorTransparent20.setEnabled(isTransparent);
+		_chkTransparentBlack.setEnabled(isTransparent);
+		_colorSelectorTransparent0.setEnabled(isTransparent);
+		_colorSelectorTransparent1.setEnabled(isTransparent);
+		_colorSelectorTransparent2.setEnabled(isTransparent);
+		_colorSelectorTransparent3.setEnabled(isTransparent);
+		_colorSelectorTransparent4.setEnabled(isTransparent);
+		_colorSelectorTransparent5.setEnabled(isTransparent);
+		_colorSelectorTransparent6.setEnabled(isTransparent);
+		_colorSelectorTransparent7.setEnabled(isTransparent);
+		_colorSelectorTransparent8.setEnabled(isTransparent);
+		_colorSelectorTransparent9.setEnabled(isTransparent);
+		_colorSelectorTransparent10.setEnabled(isTransparent);
+		_colorSelectorTransparent11.setEnabled(isTransparent);
+		_colorSelectorTransparent12.setEnabled(isTransparent);
+		_colorSelectorTransparent13.setEnabled(isTransparent);
+		_colorSelectorTransparent14.setEnabled(isTransparent);
+		_colorSelectorTransparent15.setEnabled(isTransparent);
+		_colorSelectorTransparent16.setEnabled(isTransparent);
+		_colorSelectorTransparent17.setEnabled(isTransparent);
+		_colorSelectorTransparent18.setEnabled(isTransparent);
+		_colorSelectorTransparent19.setEnabled(isTransparent);
+		_colorSelectorTransparent20.setEnabled(isTransparent);
 
 		// check if the container must be expanded/collapsed
-		final boolean isTransExpanded = fTransContainer.isExpanded();
+		final boolean isTransExpanded = _transparentContainer.isExpanded();
 
 		if ((isTransExpanded == true && isTransparent == false) || //
 				(isTransExpanded == false && isTransparent == true)) {
 
 			// show/hide transparent color section
-			fTransContainer.setExpanded(isTransparent);
+			_transparentContainer.setExpanded(isTransparent);
 //			fPropInnerContainer.layout(true);
-			fInnerContainer.layout(true);
+			_innerContainer.layout(true);
 		}
 
 		/*
 		 * image logging
 		 */
-		fIsTileImageLogging = fChkShowTileImageLog.getSelection();
+		_isTileImageLogging = _chkShowTileImageLog.getSelection();
 
-		if (fIsTileImageLogging == false) {
+		if (_isTileImageLogging == false) {
 			// remove old log entries
-			fStatUpdateCounter = 0;
-			fCboTileImageLog.removeAll();
-			fTxtLogDetail.setText(UI.EMPTY_STRING);
+			_statUpdateCounter = 0;
+			_cboTileImageLog.removeAll();
+			_txtLogDetail.setText(UI.EMPTY_STRING);
 		}
 
-		fCboTileImageLog.setEnabled(fIsTileImageLogging);
-		fTxtLogDetail.setEnabled(fIsTileImageLogging);
+		_cboTileImageLog.setEnabled(_isTileImageLogging);
+		_txtLogDetail.setEnabled(_isTileImageLogging);
 
 		// check if the container must be expanded/collapsed
-		final boolean isLogExpanded = fLogContainer.isExpanded();
+		final boolean isLogExpanded = _logContainer.isExpanded();
 
-		if ((isLogExpanded == true && fIsTileImageLogging == false)
-				|| (isLogExpanded == false && fIsTileImageLogging == true)) {
+		if ((isLogExpanded == true && _isTileImageLogging == false)
+				|| (isLogExpanded == false && _isTileImageLogging == true)) {
 
 			// show/hide log section
-			fLogContainer.setExpanded(fIsTileImageLogging);
-			fLogContainer.getParent().layout(true);
+			_logContainer.setExpanded(_isTileImageLogging);
+			_logContainer.getParent().layout(true);
 		}
 	}
 
@@ -1674,19 +1658,14 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		boolean isEnabled = false;
 
 		// check if a wrapper is displayed and enabled
-		for (final MPWrapper mpWrapper : fMpProfile.getAllWrappers()) {
+		for (final MPWrapper mpWrapper : _mpProfile.getAllWrappers()) {
 			if (mpWrapper.isDisplayedInMap() && mpWrapper.isEnabled()) {
 				isEnabled = true;
 				break;
 			}
 		}
 
-		fBtnShowProfileMap.setEnabled(isEnabled);
-
-		if (isEnabled == false) {
-			// hide profile map
-			onSelectMapOSM();
-		}
+		_btnShowProfileMap.setEnabled(isEnabled);
 	}
 
 	/**
@@ -1708,7 +1687,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return fDialogSettings;
+		return _dialogSettings;
 
 		// disable bounds
 //		return null;
@@ -1777,11 +1756,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 //	}
 
 	long getDragStartTime() {
-		return fDragStartTime;
+		return _dragStartTime;
 	}
 
 	MPProfile getMpProfile() {
-		return fMpProfile;
+		return _mpProfile;
 	}
 
 	private RGB getRGB(final int colorValue) {
@@ -1794,7 +1773,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	}
 
 	public TVIMapProviderRoot getRootItem() {
-		return fRootItem;
+		return _rootItem;
 	}
 
 	@Override
@@ -1804,7 +1783,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			public void run() {
 
 				// stop downloading images
-				fMpProfile.resetAll(false);
+				_mpProfile.resetAll(false);
 
 				// model is saved in the dialog opening code
 				updateModelFromUI();
@@ -1818,31 +1797,31 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		MP.removeTileListener(DialogMPProfile.this);
 
-		if (fImageMap != null) {
-			fImageMap.dispose();
+		if (_imageMap != null) {
+			_imageMap.dispose();
 		}
-		if (fImagePlaceholder != null) {
-			fImagePlaceholder.dispose();
+		if (_imagePlaceholder != null) {
+			_imagePlaceholder.dispose();
 		}
-		if (fImageLayer != null) {
-			fImageLayer.dispose();
+		if (_imageLayer != null) {
+			_imageLayer.dispose();
 		}
-		if (fFormTk != null) {
-			fFormTk.dispose();
+		if (_formTk != null) {
+			_formTk.dispose();
 		}
 	}
 
 	private void onModifyAlphaScale() {
 
-		if (fIsInitUI) {
+		if (_isInitUI) {
 			return;
 		}
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
-			fSpinAlpha.setSelection(fScaleAlpha.getSelection());
+			_spinAlpha.setSelection(_scaleAlpha.getSelection());
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		updateMVAlpha();
 		updateLiveView();
@@ -1850,15 +1829,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyAlphaSpinner() {
 
-		if (fIsInitUI) {
+		if (_isInitUI) {
 			return;
 		}
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
-			fScaleAlpha.setSelection(fSpinAlpha.getSelection());
+			_scaleAlpha.setSelection(_spinAlpha.getSelection());
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		updateMVAlpha();
 		updateLiveView();
@@ -1866,37 +1845,37 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyBrightScale() {
 
-		if (fIsInitUI) {
+		if (_isInitUI) {
 			return;
 		}
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
-			fSpinBright.setSelection(fScaleBright.getSelection());
+			_spinBright.setSelection(_scaleBright.getSelection());
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		updateMVBrightness();
 	}
 
 	private void onModifyBrightSpinner() {
 
-		if (fIsInitUI) {
+		if (_isInitUI) {
 			return;
 		}
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
-			fScaleBright.setSelection(fSpinBright.getSelection());
+			_scaleBright.setSelection(_spinBright.getSelection());
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		updateMVBrightness();
 	}
 
 	private void onModifyImageBgColor() {
 
-		fMpProfile.setBackgroundColor(fColorImageBackground.getColorValue());
+		_mpProfile.setBackgroundColor(_colorImageBackground.getColorValue());
 
 		updateLiveView();
 	}
@@ -1909,7 +1888,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyTransparentColor() {
 
-		final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+		final Object firstElement = ((StructuredSelection) _treeViewer.getSelection()).getFirstElement();
 		if (firstElement instanceof TVIMapProvider) {
 
 			// map provider is selected
@@ -1919,43 +1898,43 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// update alpha in the map provider 
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
-			final boolean isBlack = fChkTransparentBlack.getSelection();
+			final boolean isBlack = _chkTransparentBlack.getSelection();
 
 			// update model
 
 			final int[] colorValues = new int[22];
 
-			colorValues[0] = getColorValue(fColorSelectorTransparent0);
-			colorValues[1] = getColorValue(fColorSelectorTransparent1);
-			colorValues[2] = getColorValue(fColorSelectorTransparent2);
-			colorValues[3] = getColorValue(fColorSelectorTransparent3);
-			colorValues[4] = getColorValue(fColorSelectorTransparent4);
-			colorValues[5] = getColorValue(fColorSelectorTransparent5);
-			colorValues[6] = getColorValue(fColorSelectorTransparent6);
-			colorValues[7] = getColorValue(fColorSelectorTransparent7);
-			colorValues[8] = getColorValue(fColorSelectorTransparent8);
-			colorValues[9] = getColorValue(fColorSelectorTransparent9);
-			colorValues[10] = getColorValue(fColorSelectorTransparent10);
-			colorValues[11] = getColorValue(fColorSelectorTransparent11);
-			colorValues[12] = getColorValue(fColorSelectorTransparent12);
-			colorValues[13] = getColorValue(fColorSelectorTransparent13);
-			colorValues[14] = getColorValue(fColorSelectorTransparent14);
-			colorValues[15] = getColorValue(fColorSelectorTransparent15);
-			colorValues[16] = getColorValue(fColorSelectorTransparent16);
-			colorValues[17] = getColorValue(fColorSelectorTransparent17);
-			colorValues[18] = getColorValue(fColorSelectorTransparent18);
-			colorValues[19] = getColorValue(fColorSelectorTransparent19);
-			colorValues[20] = getColorValue(fColorSelectorTransparent20);
+			colorValues[0] = getColorValue(_colorSelectorTransparent0);
+			colorValues[1] = getColorValue(_colorSelectorTransparent1);
+			colorValues[2] = getColorValue(_colorSelectorTransparent2);
+			colorValues[3] = getColorValue(_colorSelectorTransparent3);
+			colorValues[4] = getColorValue(_colorSelectorTransparent4);
+			colorValues[5] = getColorValue(_colorSelectorTransparent5);
+			colorValues[6] = getColorValue(_colorSelectorTransparent6);
+			colorValues[7] = getColorValue(_colorSelectorTransparent7);
+			colorValues[8] = getColorValue(_colorSelectorTransparent8);
+			colorValues[9] = getColorValue(_colorSelectorTransparent9);
+			colorValues[10] = getColorValue(_colorSelectorTransparent10);
+			colorValues[11] = getColorValue(_colorSelectorTransparent11);
+			colorValues[12] = getColorValue(_colorSelectorTransparent12);
+			colorValues[13] = getColorValue(_colorSelectorTransparent13);
+			colorValues[14] = getColorValue(_colorSelectorTransparent14);
+			colorValues[15] = getColorValue(_colorSelectorTransparent15);
+			colorValues[16] = getColorValue(_colorSelectorTransparent16);
+			colorValues[17] = getColorValue(_colorSelectorTransparent17);
+			colorValues[18] = getColorValue(_colorSelectorTransparent18);
+			colorValues[19] = getColorValue(_colorSelectorTransparent19);
+			colorValues[20] = getColorValue(_colorSelectorTransparent20);
 
 			// set black color when it's checked
 			colorValues[21] = isBlack ? 0 : -1;
 
-			mpWrapper.setIsTransparentColors(fChkTransparentPixel.getSelection());
+			mpWrapper.setIsTransparentColors(_chkTransparentPixel.getSelection());
 			mpWrapper.setIsTransparentBlack(isBlack);
 			mpWrapper.setTransparentColors(colorValues);
 
 			// update viewer
-			fTreeViewer.update(tviMapProvider, null);
+			_treeViewer.update(tviMapProvider, null);
 
 			updateLiveView();
 			enableControls();
@@ -1965,15 +1944,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMax() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			fSpinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
 		}
 
 		if (mapMaxValue < mapMinValue) {
-			fSpinMinZoom.setSelection(mapMinValue + 1);
+			_spinMinZoom.setSelection(mapMinValue + 1);
 		}
 
 		updateLiveView();
@@ -1981,11 +1960,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMin() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMinValue > mapMaxValue) {
-			fSpinMinZoom.setSelection(mapMaxValue + 1);
+			_spinMinZoom.setSelection(mapMaxValue + 1);
 		}
 
 		updateLiveView();
@@ -2029,27 +2008,27 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private void onSelectMapOSM() {
 
 		// toggle tile factory
-		if (fMap.getMapProvider() == fDefaultMP) {
+		if (_map.getMapProvider() == _mpDefault) {
 
 			// display profile map provider
 
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			setMapZoomLevelFromInfo(fMpProfile);
+			setMapZoomLevelFromInfo(_mpProfile);
 
-			fMap.setMapProviderWithReset(fMpProfile, true);
+			_map.setMapProviderWithReset(_mpProfile, true);
 
 		} else {
 
 			// display OSM
 
-			fDefaultMP.setStateToReloadOfflineCounter();
+			_mpDefault.setStateToReloadOfflineCounter();
 
 			// ensure the map is using the correct zoom levels
-			setMapZoomLevelFromInfo(fDefaultMP);
+			setMapZoomLevelFromInfo(_mpDefault);
 
-			fMap.setMapProviderWithReset(fDefaultMP, true);
+			_map.setMapProviderWithReset(_mpDefault, true);
 		}
 	}
 
@@ -2068,9 +2047,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 * <br>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 		 */
-		setMapZoomLevelFromInfo(fMpProfile);
+		setMapZoomLevelFromInfo(_mpProfile);
 
-		fMap.setMapProviderWithReset(fMpProfile, true);
+		_map.setMapProviderWithReset(_mpProfile, true);
 	}
 
 	/**
@@ -2092,48 +2071,48 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final MPWrapper selectedMpWrapper = ((TVIMapProvider) firstElement).getMapProviderWrapper();
 
-			fIsInitUI = true;
+			_isInitUI = true;
 			{
 				final int alpha = selectedMpWrapper.getAlpha();
 				final int brightness = selectedMpWrapper.getBrightness();
 
-				fSpinAlpha.setSelection(alpha);
-				fScaleAlpha.setSelection(alpha);
+				_spinAlpha.setSelection(alpha);
+				_scaleAlpha.setSelection(alpha);
 
-				fChkBrightness.setSelection(selectedMpWrapper.isBrightness());
-				fSpinBright.setSelection(brightness);
-				fScaleBright.setSelection(brightness);
+				_chkBrightness.setSelection(selectedMpWrapper.isBrightness());
+				_spinBright.setSelection(brightness);
+				_scaleBright.setSelection(brightness);
 
-				fChkTransparentPixel.setSelection(selectedMpWrapper.isTransparentColors());
-				fChkTransparentBlack.setSelection(selectedMpWrapper.isTransparentBlack());
+				_chkTransparentPixel.setSelection(selectedMpWrapper.isTransparentColors());
+				_chkTransparentBlack.setSelection(selectedMpWrapper.isTransparentBlack());
 
 				final int[] transColor = selectedMpWrapper.getTransparentColors();
 				final int colorLength = transColor == null ? 0 : transColor.length;
 				int colorIndex = 0;
 
-				setColorValue(fColorSelectorTransparent0, colorLength > colorIndex++ ? transColor[0] : 0);
-				setColorValue(fColorSelectorTransparent1, colorLength > colorIndex++ ? transColor[1] : 0);
-				setColorValue(fColorSelectorTransparent2, colorLength > colorIndex++ ? transColor[2] : 0);
-				setColorValue(fColorSelectorTransparent3, colorLength > colorIndex++ ? transColor[3] : 0);
-				setColorValue(fColorSelectorTransparent4, colorLength > colorIndex++ ? transColor[4] : 0);
-				setColorValue(fColorSelectorTransparent5, colorLength > colorIndex++ ? transColor[5] : 0);
-				setColorValue(fColorSelectorTransparent6, colorLength > colorIndex++ ? transColor[6] : 0);
-				setColorValue(fColorSelectorTransparent7, colorLength > colorIndex++ ? transColor[7] : 0);
-				setColorValue(fColorSelectorTransparent8, colorLength > colorIndex++ ? transColor[8] : 0);
-				setColorValue(fColorSelectorTransparent9, colorLength > colorIndex++ ? transColor[9] : 0);
-				setColorValue(fColorSelectorTransparent10, colorLength > colorIndex++ ? transColor[10] : 0);
-				setColorValue(fColorSelectorTransparent11, colorLength > colorIndex++ ? transColor[11] : 0);
-				setColorValue(fColorSelectorTransparent12, colorLength > colorIndex++ ? transColor[12] : 0);
-				setColorValue(fColorSelectorTransparent13, colorLength > colorIndex++ ? transColor[13] : 0);
-				setColorValue(fColorSelectorTransparent14, colorLength > colorIndex++ ? transColor[14] : 0);
-				setColorValue(fColorSelectorTransparent15, colorLength > colorIndex++ ? transColor[15] : 0);
-				setColorValue(fColorSelectorTransparent16, colorLength > colorIndex++ ? transColor[16] : 0);
-				setColorValue(fColorSelectorTransparent17, colorLength > colorIndex++ ? transColor[17] : 0);
-				setColorValue(fColorSelectorTransparent18, colorLength > colorIndex++ ? transColor[18] : 0);
-				setColorValue(fColorSelectorTransparent19, colorLength > colorIndex++ ? transColor[19] : 0);
-				setColorValue(fColorSelectorTransparent20, colorLength > colorIndex++ ? transColor[20] : 0);
+				setColorValue(_colorSelectorTransparent0, colorLength > colorIndex++ ? transColor[0] : 0);
+				setColorValue(_colorSelectorTransparent1, colorLength > colorIndex++ ? transColor[1] : 0);
+				setColorValue(_colorSelectorTransparent2, colorLength > colorIndex++ ? transColor[2] : 0);
+				setColorValue(_colorSelectorTransparent3, colorLength > colorIndex++ ? transColor[3] : 0);
+				setColorValue(_colorSelectorTransparent4, colorLength > colorIndex++ ? transColor[4] : 0);
+				setColorValue(_colorSelectorTransparent5, colorLength > colorIndex++ ? transColor[5] : 0);
+				setColorValue(_colorSelectorTransparent6, colorLength > colorIndex++ ? transColor[6] : 0);
+				setColorValue(_colorSelectorTransparent7, colorLength > colorIndex++ ? transColor[7] : 0);
+				setColorValue(_colorSelectorTransparent8, colorLength > colorIndex++ ? transColor[8] : 0);
+				setColorValue(_colorSelectorTransparent9, colorLength > colorIndex++ ? transColor[9] : 0);
+				setColorValue(_colorSelectorTransparent10, colorLength > colorIndex++ ? transColor[10] : 0);
+				setColorValue(_colorSelectorTransparent11, colorLength > colorIndex++ ? transColor[11] : 0);
+				setColorValue(_colorSelectorTransparent12, colorLength > colorIndex++ ? transColor[12] : 0);
+				setColorValue(_colorSelectorTransparent13, colorLength > colorIndex++ ? transColor[13] : 0);
+				setColorValue(_colorSelectorTransparent14, colorLength > colorIndex++ ? transColor[14] : 0);
+				setColorValue(_colorSelectorTransparent15, colorLength > colorIndex++ ? transColor[15] : 0);
+				setColorValue(_colorSelectorTransparent16, colorLength > colorIndex++ ? transColor[16] : 0);
+				setColorValue(_colorSelectorTransparent17, colorLength > colorIndex++ ? transColor[17] : 0);
+				setColorValue(_colorSelectorTransparent18, colorLength > colorIndex++ ? transColor[18] : 0);
+				setColorValue(_colorSelectorTransparent19, colorLength > colorIndex++ ? transColor[19] : 0);
+				setColorValue(_colorSelectorTransparent20, colorLength > colorIndex++ ? transColor[20] : 0);
 			}
-			fIsInitUI = false;
+			_isInitUI = false;
 		}
 
 		enableControls();
@@ -2143,42 +2122,42 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		// restore width for the marker list when the width is available
 		try {
-			fDetailForm.setViewerWidth(fDialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
+			_detailForm.setViewerWidth(_dialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
 		} catch (final NumberFormatException e) {
 			// ignore
 		}
 
 		// show tile info
-		final boolean isShowDebugInfo = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
-		fChkShowTileInfo.setSelection(isShowDebugInfo);
-		fMap.setShowDebugInfo(isShowDebugInfo);
+		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
+		_chkShowTileInfo.setSelection(isShowDebugInfo);
+		_map.setShowDebugInfo(isShowDebugInfo);
 
 		// is live view
-		final boolean isLiveView = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_LIVE_VIEW);
-		fChkLiveView.setSelection(isLiveView);
-		fIsLiveView = isLiveView;
-		fMap.setLiveView(isLiveView);
+		final boolean isLiveView = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_LIVE_VIEW);
+		_chkLiveView.setSelection(isLiveView);
+		_isLiveView = isLiveView;
+		_map.setLiveView(isLiveView);
 
 		// tile image logging
-		final boolean isTileImageLogging = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
-		fChkShowTileImageLog.setSelection(isTileImageLogging);
-		fIsTileImageLogging = isTileImageLogging;
+		final boolean isTileImageLogging = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
+		_chkShowTileImageLog.setSelection(isTileImageLogging);
+		_isTileImageLogging = isTileImageLogging;
 
 		// property container
-		final boolean isPropExpanded = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED);
-		fPropContainer.setExpanded(isPropExpanded);
+		final boolean isPropExpanded = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED);
+		_propContainer.setExpanded(isPropExpanded);
 //		fPropInnerContainer.layout(true);
-		fInnerContainer.layout(true);
+		_innerContainer.layout(true);
 
 	}
 
 	private void saveState() {
 
-		fDialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, fLeftContainer.getSize().x);
-		fDialogSettings.put(DIALOG_SETTINGS_IS_LIVE_VIEW, fChkLiveView.getSelection());
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, fChkShowTileInfo.getSelection());
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, fChkShowTileImageLog.getSelection());
-		fDialogSettings.put(DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED, fPropContainer.isExpanded());
+		_dialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, _leftContainer.getSize().x);
+		_dialogSettings.put(DIALOG_SETTINGS_IS_LIVE_VIEW, _chkLiveView.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, _chkShowTileInfo.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, _chkShowTileImageLog.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED, _propContainer.isExpanded());
 	}
 
 	private void setColorValue(final ColorSelector colorSelector, int colorValue) {
@@ -2201,62 +2180,62 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int factoryMinZoom = mp.getMinimumZoomLevel();
 		final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
-		final int mapZoom = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getGeoCenter();
+		final int mapZoom = _map.getZoom();
+		final GeoPosition mapCenter = _map.getGeoCenter();
 
 		if (mapZoom < factoryMinZoom) {
-			fMap.setZoom(factoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(factoryMinZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 
 		if (mapZoom > factoryMaxZoom) {
-			fMap.setZoom(factoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(factoryMaxZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 	}
 
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
-		if (fIsTileImageLogging == false) {
+		if (_isTileImageLogging == false) {
 			return;
 		}
 
 		final long nanoTime = System.nanoTime();
-		fStatUpdateCounter++;
+		_statUpdateCounter++;
 
 		// update statistics
 		if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
-			fStatIsQueued = 0;
-			fStatStartLoading = 0;
-			fStatEndLoading = 0;
+			_statIsQueued = 0;
+			_statStartLoading = 0;
+			_statEndLoading = 0;
 		} else if (tileEventId == TileEventId.TILE_IS_QUEUED) {
-			fStatIsQueued++;
+			_statIsQueued++;
 			tile.setTimeIsQueued(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_START_LOADING) {
-			fStatStartLoading++;
+			_statStartLoading++;
 			tile.setTimeStartLoading(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_END_LOADING) {
-			fStatEndLoading++;
-			fStatIsQueued--;
+			_statEndLoading++;
+			_statIsQueued--;
 			tile.setTimeEndLoading(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_ERROR_LOADING) {
-			fStatErrorLoading++;
-			fStatIsQueued--;
+			_statErrorLoading++;
+			_statIsQueued--;
 		}
 
 		// when stat is cleared, queue can get negative, prevent this
-		if (fStatIsQueued < 0) {
-			fStatIsQueued = 0;
+		if (_statIsQueued < 0) {
+			_statIsQueued = 0;
 		}
 
 		// create log entry
-		fLogEntries.add(new LogEntry(//
+		_logEntries.add(new LogEntry(//
 				tileEventId,
 				tile,
 				nanoTime,
 				Thread.currentThread().getName(),
-				fStatUpdateCounter));
+				_statUpdateCounter));
 
 		/*
 		 * create runnable which displays the log
@@ -2264,42 +2243,42 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		final Runnable infoRunnable = new Runnable() {
 
-			final int	fRunnableCounter	= fStatUpdateCounter;
+			final int	fRunnableCounter	= _statUpdateCounter;
 
 			public void run() {
 
 				// check if this is the last created runnable
-				if (fRunnableCounter != fStatUpdateCounter) {
+				if (fRunnableCounter != _statUpdateCounter) {
 					// a new update event occured
 					return;
 				}
 
-				if (fLblTileInfo.isDisposed()) {
+				if (_lblTileInfo.isDisposed()) {
 					// widgets are disposed
 					return;
 				}
 
 				// show at most 3 decimals
-				fLblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-						Integer.toString(fStatIsQueued % 1000),
-						Integer.toString(fStatEndLoading % 1000),
-						Integer.toString(fStatStartLoading % 1000),
-						Integer.toString(fStatErrorLoading % 1000), //
+				_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
+						Integer.toString(_statIsQueued % 1000),
+						Integer.toString(_statEndLoading % 1000),
+						Integer.toString(_statStartLoading % 1000),
+						Integer.toString(_statErrorLoading % 1000), //
 				}));
 
-				final String logEntry = displayLogEntries(fLogEntries, fCboTileImageLog);
+				final String logEntry = displayLogEntries(_logEntries, _cboTileImageLog);
 
 				// select new entry
-				fCboTileImageLog.select(fCboTileImageLog.getItemCount() - 1);
+				_cboTileImageLog.select(_cboTileImageLog.getItemCount() - 1);
 
 				// display last log in the detail field
 				if (logEntry.length() > 0) {
-					fTxtLogDetail.setText(logEntry);
+					_txtLogDetail.setText(logEntry);
 				}
 			}
 		};
 
-		fDisplay.asyncExec(infoRunnable);
+		_display.asyncExec(infoRunnable);
 	}
 
 	/**
@@ -2344,7 +2323,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					 * remove parent tiles from loading cache because they can have loading
 					 * errors (from their children) which prevents them to be loaded again
 					 */
-					fMpProfile.resetParentTiles();
+					_mpProfile.resetParentTiles();
 				}
 
 				mpWrapper.setIsDisplayedInMap(isWmsDisplayed);
@@ -2363,14 +2342,14 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			}
 
 			// update viewer
-			fTreeViewer.update(itemData, null);
+			_treeViewer.update(itemData, null);
 
 			updateLiveView();
 		}
 	}
 
 	void updateLiveView() {
-		if (fIsLiveView) {
+		if (_isLiveView) {
 			onSelectMapProfile(false);
 		}
 	}
@@ -2381,32 +2360,32 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 * !!!! zoom level must be set before any other map methods are called because it
 		 * initialized the map with new zoom levels !!!
 		 */
-		final int oldZoomLevel = fMap.getZoom();
-		final GeoPosition mapCenter = fMap.getGeoCenter();
+		final int oldZoomLevel = _map.getZoom();
+		final GeoPosition mapCenter = _map.getGeoCenter();
 
-		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMinZoom = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
-		fMpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
+		_mpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
 
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
-			fMap.setZoom(newFactoryMinZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(newFactoryMinZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 		if (oldZoomLevel > newFactoryMaxZoom) {
-			fMap.setZoom(newFactoryMaxZoom);
-			fMap.setGeoCenterPosition(mapCenter);
+			_map.setZoom(newFactoryMaxZoom);
+			_map.setGeoCenterPosition(mapCenter);
 		}
 
 		// keep map position
-		fMpProfile.setLastUsedZoom(fMap.getZoom());
-		fMpProfile.setLastUsedPosition(fMap.getGeoCenter());
+		_mpProfile.setLastUsedZoom(_map.getZoom());
+		_mpProfile.setLastUsedPosition(_map.getGeoCenter());
 
 		// set positions of map provider 
 		int tblItemIndex = 0;
-		for (final TreeItem treeItem : fTreeViewer.getTree().getItems()) {
+		for (final TreeItem treeItem : _treeViewer.getTree().getItems()) {
 
 			final MPWrapper mpWrapper = ((TVIMapProvider) treeItem.getData()).getMapProviderWrapper();
 
@@ -2420,17 +2399,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				if (mpWrapper.isDisplayedInMap()) {
 
-					// check if wms is locked, this should not happen but it did
-					final ReentrantLock wmsLock = MapProviderManager.getInstance().getWmsLock();
-					if (wmsLock.tryLock()) {
-						wmsLock.unlock();
-					} else {
-
-						StatusUtil.showStatus(Messages.DBG044_Wms_Error_WmsIsLocked, new Exception());
-
-						mpWrapper.setEnabled(false);
-						continue;
-					}
+//					// check if wms is locked, this should not happen but it did
+//					final ReentrantLock wmsLock = MapProviderManager.getInstance().getWmsLock();
+//					if (wmsLock.tryLock()) {
+//						wmsLock.unlock();
+//					} else {
+//
+//						StatusUtil.showStatus(Messages.DBG044_Wms_Error_WmsIsLocked, new Exception());
+//
+//						mpWrapper.setEnabled(false);
+//						continue;
+//					}
 
 					// ensure that the wms layers are loaded from the wms server
 					if (MapProviderManager.checkWms(mpWms, null) == null) {
@@ -2467,15 +2446,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			}
 		}
 
-		MPProfile.sortMpWrapper(fMpProfile.getAllWrappers());
-		MPProfile.updateWrapperTileFactory(fMpProfile.getAllWrappers());
+		MPProfile.sortMpWrapper(_mpProfile.getAllWrappers());
+		MPProfile.updateWrapperFromMP(_mpProfile.getAllWrappers());
 	}
 
 	private void updateMVAlpha() {
 
 		TVIMapProvider tviMapProvider = null;
 
-		final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+		final Object firstElement = ((StructuredSelection) _treeViewer.getSelection()).getFirstElement();
 		if (firstElement instanceof TVIMapProvider) {
 
 			// map provider is selected
@@ -2501,17 +2480,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
 			// update model
-			final int newAlpha = fSpinAlpha.getSelection();
+			final int newAlpha = _spinAlpha.getSelection();
 			mpWrapper.setAlpha(newAlpha);
 
 			// update viewer
-			fTreeViewer.update(tviMapProvider, null);
+			_treeViewer.update(tviMapProvider, null);
 		}
 	}
 
 	private void updateMVBrightness() {
 
-		final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+		final Object firstElement = ((StructuredSelection) _treeViewer.getSelection()).getFirstElement();
 		if (firstElement instanceof TVIMapProvider) {
 
 			// map provider is selected
@@ -2522,11 +2501,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
-			mpWrapper.setIsBrightness(fChkBrightness.getSelection());
-			mpWrapper.setBrightness(fScaleBright.getSelection());
+			mpWrapper.setIsBrightness(_chkBrightness.getSelection());
+			mpWrapper.setBrightness(_scaleBright.getSelection());
 
 			// update viewer
-			fTreeViewer.update(tviMapProvider, null);
+			_treeViewer.update(tviMapProvider, null);
 
 			updateLiveView();
 			enableControls();
@@ -2554,7 +2533,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				enableProfileMapButton();
 
 				// update parent item in the viewer
-				fTreeViewer.update(tviParent, null);
+				_treeViewer.update(tviParent, null);
 			}
 		}
 	}
@@ -2566,43 +2545,43 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	 */
 	private void updateUIFromModel(final MPProfile mapProfile) {
 
-		fMpProfile = mapProfile;
+		_mpProfile = mapProfile;
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
 			// zoom level
-			final int minZoomLevel = fMpProfile.getMinZoomLevel();
-			final int maxZoomLevel = fMpProfile.getMaxZoomLevel();
-			fSpinMinZoom.setSelection(minZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
-			fSpinMaxZoom.setSelection(maxZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
+			final int minZoomLevel = _mpProfile.getMinZoomLevel();
+			final int maxZoomLevel = _mpProfile.getMaxZoomLevel();
+			_spinMinZoom.setSelection(minZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(maxZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
 
-			final int color = fMpProfile.getBackgroundColor();
-			fColorImageBackground.setColorValue(new RGB(
+			final int color = _mpProfile.getBackgroundColor();
+			_colorImageBackground.setColorValue(new RGB(
 					(color & 0xFF) >>> 0,
 					(color & 0xFF00) >>> 8,
 					(color & 0xFF0000) >>> 16));
 
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		// show map provider in the message area
-		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpProfile.getName());
-		setMessage(fDefaultMessage);
+		_defaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, _mpProfile.getName());
+		setMessage(_defaultMessage);
 
-		final ArrayList<MPWrapper> allMpWrappers = fMpProfile.getAllWrappers();
+		final ArrayList<MPWrapper> allMpWrappers = _mpProfile.getAllWrappers();
 
 		MPProfile.sortMpWrapper(allMpWrappers);
-		MPProfile.updateWrapperTileFactory(allMpWrappers);
+		MPProfile.updateWrapperFromMP(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		fMap.setMapProviderWithReset(fMpProfile, true);
+		_map.setMapProviderWithReset(_mpProfile, true);
 
 		// set position to previous position
-		fMap.setZoom(fMpProfile.getLastUsedZoom());
-		fMap.setGeoCenterPosition(fMpProfile.getLastUsedPosition());
+		_map.setZoom(_mpProfile.getLastUsedZoom());
+		_map.setGeoCenterPosition(_mpProfile.getLastUsedPosition());
 
 		// create root item and update viewer
-		fRootItem = new TVIMapProviderRoot(fTreeViewer, allMpWrappers);
-		fTreeViewer.setInput(fRootItem);
+		_rootItem = new TVIMapProviderRoot(_treeViewer, allMpWrappers);
+		_treeViewer.setInput(_rootItem);
 	}
 }

@@ -115,9 +115,9 @@ public class TileImageLoader implements Runnable {
 
 					try {
 
-						final ITileLoader tileLoader = mp.getTileLoader();
+//						final ITileLoader tileLoader = mp.getTileLoader();
 
-						if (tileLoader instanceof ITileLoader) {
+						if (mp instanceof ITileLoader) {
 
 							/*
 							 * get image from a tile loader (this feature is used to load images
@@ -125,7 +125,7 @@ public class TileImageLoader implements Runnable {
 							 */
 
 							try {
-								inputStream = tileLoader.getTileImageStream(tile);
+								inputStream = ((ITileLoader) mp).getTileImageStream(tile);
 							} catch (final Exception e) {
 								loadingError = e.getMessage();
 								StatusUtil.log(loadingError, e);

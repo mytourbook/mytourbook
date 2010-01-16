@@ -44,12 +44,14 @@ import de.byteholder.geoclipse.util.Util;
 
 public class MPWms extends MP implements ITileLoader {
 
+	private static final ReentrantLock	MP_WMS_LOCK			= new ReentrantLock();
+
 	private static final String			SRS_EPSG_4326		= "EPSG:4326";				//$NON-NLS-1$
 
 	/*
 	 * this is spherical mercator (OSM projection) but is only rarely supported
 	 */
-	private static final String			SRS_EPSG_3857		= "EPSG:3857";				//$NON-NLS-1$
+//	private static final String			SRS_EPSG_3857		= "EPSG:3857";				//$NON-NLS-1$
 
 	// this is depricated
 //	private static final String			SRS_EPSG_3785		= "EPSG:3785";				//$NON-NLS-1$
@@ -57,43 +59,36 @@ public class MPWms extends MP implements ITileLoader {
 
 	private static final char			COMMA				= ',';
 
-	private boolean						fIsWmsAvailable		= true;
+	private boolean						_isWmsAvailable		= true;
 
 	/**
-	 * wms server {@link #fWmsServer} and wms caps {@link #fWmsCaps} are set when a connection to
+	 * wms server {@link #_wmsServer} and wms caps {@link #_wmsCaps} are set when a connection to
 	 * the server was successfull, otherwise they are <code>null</code>
 	 */
-	private WebMapServer				fWmsServer;
+	private WebMapServer				_wmsServer;
 
-	private WMSCapabilities				fWmsCaps;
+	private WMSCapabilities				_wmsCaps;
 
-	private String						fCapsUrl			= UI.EMPTY_STRING;
-	private String						fMapUrl;
+	private String						_capsUrl			= UI.EMPTY_STRING;
+	private String						_mapUrl;
 
-	private List<String>				fAllImageFormats;
+	private List<String>				_allImageFormats;
 
 	/**
 	 * contains a list with all layer names, this is necessary to load offline images from the
 	 * filesystem
 	 */
-	private ArrayList<LayerOfflineData>	fOfflineLayers;
+	private ArrayList<LayerOfflineData>	_offlineLayers;
 
 	/**
 	 * Contains all layers which the wms server provides, these
 	 * layers are sorted in the sequence how they are requested from the server
 	 */
-	private ArrayList<MtLayer>			fMtLayers;
+	private ArrayList<MtLayer>			_mtLayers;
 
-	private ArrayList<MtLayer>			fMtLayersReverse	= new ArrayList<MtLayer>();
+	private ArrayList<MtLayer>			_mtLayersReverse	= new ArrayList<MtLayer>();
 
-	private boolean						fIsLoadTransparentImages;
-
-//	/**
-//	 * number of layers which are displayed in the map
-//	 */
-//	private int							fDisplayedLayers;
-
-	private static final ReentrantLock	MP_WMS_LOCK			= new ReentrantLock();
+	private boolean						_isLoadTransparentImages;
 
 	MPWms() {}
 
@@ -102,14 +97,14 @@ public class MPWms extends MP implements ITileLoader {
 
 		final MPWms mapProvider = (MPWms) super.clone();
 
-		mapProvider.fMtLayers = cloneMtLayer(mapProvider, fMtLayers);
-		mapProvider.fMtLayersReverse = cloneMtLayer(mapProvider, fMtLayersReverse);
+		mapProvider._mtLayers = cloneMtLayer(mapProvider, _mtLayers);
+		mapProvider._mtLayersReverse = cloneMtLayer(mapProvider, _mtLayersReverse);
 
 //		if (fMtLayers != null) {
 //			mapProvider.initializeLayers();
 //		}
 
-		mapProvider.fOfflineLayers = cloneOfflineLayer(mapProvider, fOfflineLayers);
+		mapProvider._offlineLayers = cloneOfflineLayer(mapProvider, _offlineLayers);
 
 		return mapProvider;
 	}
@@ -173,15 +168,15 @@ public class MPWms extends MP implements ITileLoader {
 	 */
 	public int getAvailableLayers() {
 
-		if (fMtLayers != null) {
-			return fMtLayers.size();
+		if (_mtLayers != null) {
+			return _mtLayers.size();
 		} else {
-			return fOfflineLayers.size();
+			return _offlineLayers.size();
 		}
 	}
 
 	public String getCapabilitiesUrl() {
-		return fCapsUrl;
+		return _capsUrl;
 	}
 
 	/**
@@ -193,11 +188,11 @@ public class MPWms extends MP implements ITileLoader {
 		final StringBuilder sb = new StringBuilder();
 		int layerIndex = 0;
 
-		if (fMtLayers == null) {
+		if (_mtLayers == null) {
 
 			// layers are not loaded from wms server
 
-			if (fOfflineLayers == null) {
+			if (_offlineLayers == null) {
 
 				// this case should not happen
 				StatusUtil.log("map and offline layers are null", new Exception()); //$NON-NLS-1$
@@ -205,7 +200,7 @@ public class MPWms extends MP implements ITileLoader {
 			}
 
 			// add all layer names to the unique key
-			for (final LayerOfflineData offlineLayer : fOfflineLayers) {
+			for (final LayerOfflineData offlineLayer : _offlineLayers) {
 
 				if (offlineLayer.isDisplayedInMap) {
 
@@ -222,7 +217,7 @@ public class MPWms extends MP implements ITileLoader {
 		} else {
 
 			// create unique key from all visible layers
-			for (final MtLayer mtLayer : fMtLayers) {
+			for (final MtLayer mtLayer : _mtLayers) {
 				if (mtLayer.isDisplayedInMap()) {
 
 					if (layerIndex > 0) {
@@ -242,19 +237,12 @@ public class MPWms extends MP implements ITileLoader {
 		return customTileKey;
 	}
 
-//	/**
-//	 * @return Returns number of layers which are displayed in the map
-//	 */
-//	public int getDisplayedLayers() {
-//		return fDisplayedLayers;
-//	}
-
 	String getGetMapUrl() {
-		return fMapUrl;
+		return _mapUrl;
 	}
 
 	List<String> getImageFormats() {
-		return fAllImageFormats;
+		return _allImageFormats;
 	}
 
 	/**
@@ -262,7 +250,7 @@ public class MPWms extends MP implements ITileLoader {
 	 *         the wms
 	 */
 	ArrayList<MtLayer> getMtLayers() {
-		return fMtLayers;
+		return _mtLayers;
 	}
 
 	/**
@@ -270,18 +258,17 @@ public class MPWms extends MP implements ITileLoader {
 	 *         <code>null</code> when the map provider is not yet saved
 	 */
 	ArrayList<LayerOfflineData> getOfflineLayers() {
-		return fOfflineLayers;
+		return _offlineLayers;
 	}
-
 
 	public InputStream getTileImageStream(final Tile tile) throws GeoException {
 
-		if (fWmsServer == null) {
+		if (_wmsServer == null) {
 
 			MP_WMS_LOCK.lock();
 			try {
 				// recheck again
-				if (fWmsServer == null) {
+				if (_wmsServer == null) {
 
 					// load wms caps
 
@@ -297,8 +284,8 @@ public class MPWms extends MP implements ITileLoader {
 		}
 
 		int visibleLayers = 0;
-		final GetMapRequest mapRequest = fWmsServer.createGetMapRequest();
-		for (final MtLayer mtLayer : fMtLayersReverse) {
+		final GetMapRequest mapRequest = _wmsServer.createGetMapRequest();
+		for (final MtLayer mtLayer : _mtLayersReverse) {
 			if (mtLayer.isDisplayedInMap()) {
 				mapRequest.addLayer(mtLayer.getGeoLayer());
 				visibleLayers++;
@@ -318,7 +305,7 @@ public class MPWms extends MP implements ITileLoader {
 		mapRequest.setSRS(SRS_EPSG_4326);
 //		mapRequest.setSRS(SRS_EPSG_3857);
 		mapRequest.setBBox(createBBox(tile));
-		mapRequest.setTransparent(fIsLoadTransparentImages);
+		mapRequest.setTransparent(_isLoadTransparentImages);
 
 		// keep url
 		final String finalUrl = mapRequest.getFinalURL().toString();
@@ -326,7 +313,7 @@ public class MPWms extends MP implements ITileLoader {
 
 		try {
 
-			final GetMapResponse response = fWmsServer.issueRequest(mapRequest);
+			final GetMapResponse response = _wmsServer.issueRequest(mapRequest);
 
 			// reset the offline file counter to reread the offline files
 			setStateToReloadOfflineCounter();
@@ -384,7 +371,7 @@ public class MPWms extends MP implements ITileLoader {
 	 * @return Returns wms capabilities or <code>null</code> when they are not loaded
 	 */
 	public WMSCapabilities getWmsCaps() {
-		return fWmsCaps;
+		return _wmsCaps;
 	}
 
 	/**
@@ -395,16 +382,16 @@ public class MPWms extends MP implements ITileLoader {
 	 */
 	void initializeLayers() {
 
-		if (fMtLayers == null) {
+		if (_mtLayers == null) {
 			// wms is not yet loaded
 			StatusUtil.showStatus("wms is not initialized", new Exception());//$NON-NLS-1$
 			return;
 		}
 
-		fMtLayersReverse.clear();
-		fMtLayersReverse.addAll(fMtLayers);
+		_mtLayersReverse.clear();
+		_mtLayersReverse.addAll(_mtLayers);
 
-		Collections.sort(fMtLayersReverse, new Comparator<MtLayer>() {
+		Collections.sort(_mtLayersReverse, new Comparator<MtLayer>() {
 
 			public int compare(final MtLayer mt1, final MtLayer mt2) {
 
@@ -424,7 +411,7 @@ public class MPWms extends MP implements ITileLoader {
 		/*
 		 * sort none reverse layers, this sorting is used when the custom tile key is created
 		 */
-		Collections.sort(fMtLayers, new Comparator<MtLayer>() {
+		Collections.sort(_mtLayers, new Comparator<MtLayer>() {
 
 			public int compare(final MtLayer mt1, final MtLayer mt2) {
 
@@ -452,12 +439,12 @@ public class MPWms extends MP implements ITileLoader {
 	 */
 	void initializeWms(final WebMapServer wmsServer, final WMSCapabilities wmsCaps, final ArrayList<MtLayer> allMtLayers) {
 
-		fWmsServer = wmsServer;
-		fWmsCaps = wmsCaps;
+		_wmsServer = wmsServer;
+		_wmsCaps = wmsCaps;
 
-		fMtLayers = allMtLayers;
+		_mtLayers = allMtLayers;
 
-		fAllImageFormats = fWmsCaps.getRequest().getGetMap().getFormats();
+		_allImageFormats = _wmsCaps.getRequest().getGetMap().getFormats();
 
 		if (getImageFormat() == null) {
 
@@ -465,47 +452,47 @@ public class MPWms extends MP implements ITileLoader {
 
 			String imageFormat = null;
 
-			for (final String format : fAllImageFormats) {
+			for (final String format : _allImageFormats) {
 				if (format.equalsIgnoreCase(MapProviderManager.DEFAULT_IMAGE_FORMAT)) {
 					imageFormat = format;
 				}
 			}
 
-			setImageFormat(imageFormat == null ? fAllImageFormats.get(0) : imageFormat);
+			setImageFormat(imageFormat == null ? _allImageFormats.get(0) : imageFormat);
 		}
 	}
 
 	boolean isTransparent() {
-		return fIsLoadTransparentImages;
+		return _isLoadTransparentImages;
 	}
 
 	/**
 	 * @return Returns <code>false</code> when a connection to the WMS server failed
 	 */
 	public boolean isWmsAvailable() {
-		return fIsWmsAvailable;
+		return _isWmsAvailable;
 	}
 
 	public void setCapabilitiesUrl(final String capabilitiesUrl) {
 		if (capabilitiesUrl != null) {
-			fCapsUrl = capabilitiesUrl;
+			_capsUrl = capabilitiesUrl;
 		}
 	}
 
 	public void setGetMapUrl(final String mapUrl) {
-		fMapUrl = mapUrl;
+		_mapUrl = mapUrl;
 	}
 
 	void setOfflineLayers(final ArrayList<LayerOfflineData> offlineLayers) {
-		fOfflineLayers = offlineLayers;
+		_offlineLayers = offlineLayers;
 	}
 
 	void setTransparent(final boolean isTransparent) {
-		fIsLoadTransparentImages = isTransparent;
+		_isLoadTransparentImages = isTransparent;
 	}
 
 	public void setWmsEnabled(final boolean isEnabled) {
-		fIsWmsAvailable = isEnabled;
+		_isWmsAvailable = isEnabled;
 	}
 
 }

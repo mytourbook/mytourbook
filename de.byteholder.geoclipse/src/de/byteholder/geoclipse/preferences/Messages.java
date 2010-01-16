@@ -47,15 +47,13 @@ public class Messages extends NLS {
 	public static String		Pref_Map_Button_CancelTileInfo_Tooltip;
 	public static String		Pref_Map_Button_DeleteMapProvider;
 	public static String		Pref_Map_Button_DeleteOfflineMap;
-	public static String	Pref_Map_Button_Edit;
-
+	public static String		Pref_Map_Button_Edit;
 	public static String		Pref_Map_Button_ExportMP;
 	public static String		Pref_Map_Button_ImportMP;
 	public static String		Pref_Map_Button_RefreshTileInfo_Tooltip;
 	public static String		Pref_Map_Button_RefreshTileInfoNotAssessed_Tooltip;
 	public static String		Pref_Map_Button_RefreshTileInfoSelected_Tooltip;
 	public static String		Pref_Map_Button_UpdateMapProvider;
-
 	public static String		Pref_Map_Dialog_Export_Title;
 	public static String		Pref_Map_Dialog_Import_Title;
 	public static String		Pref_Map_Dialog_WmsInput_Message;
@@ -95,8 +93,7 @@ public class Messages extends NLS {
 	public static String		Pref_Map_ProviderType_Wms;
 
 	public static String		Pref_Map_ValidationError_NameIsRequired;
-
-	public static String	Pref_Map_ValidationError_OfflineFolderIsUsedInMapProfile;
+	public static String		Pref_Map_ValidationError_OfflineFolderIsUsedInMapProfile;
 
 	public static String		Pref_Map_Viewer_Column_ContentServerTypeCustom;
 	public static String		Pref_Map_Viewer_Column_ContentServerTypeMapProfile;
@@ -123,10 +120,8 @@ public class Messages extends NLS {
 	public static String		pref_map_lable_NA;
 	public static String		pref_map_message_loadingWmsCapabilities;
 	public static String		pref_map_show_tile_info;
-	public static String		pref_map_validationError_baseUrlIsRequired;
 	public static String		pref_map_validationError_factoryIdIsAlreadyUsed;
 	public static String		pref_map_validationError_factoryIdIsRequired;
-	public static String		pref_map_validationError_invalidUrl;
 	public static String		pref_map_validationError_offlineFolderInvalidCharacters;
 	public static String		pref_map_validationError_offlineFolderIsAlreadyUsed;
 	public static String		pref_map_validationError_offlineFolderIsRequired;
@@ -147,9 +142,8 @@ public class Messages extends NLS {
 	public static String		prefPage_cache_status_noValue;
 	public static String		prefPage_cache_status_retrieving;
 
-	public static String	Theme_Font_Logging;
-
-	public static String	Theme_Font_Logging_PREVIEW_TEXT;
+	public static String		Theme_Font_Logging;
+	public static String		Theme_Font_Logging_PREVIEW_TEXT;
 
 	public static String		Wms_Error_InvalidUrl;
 

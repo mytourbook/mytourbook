@@ -41,9 +41,9 @@ public class Tile extends Observable {
 	private static final String				COLUMN_4			= "    ";								//$NON-NLS-1$
 	private static final String				COLUMN_5			= "     ";								//$NON-NLS-1$
 
-	private OverlayTourState				fOverlayTourState	= OverlayTourState.TILE_IS_NOT_CHECKED;
-	private OverlayImageState				fOverlayImageState	= OverlayImageState.NOT_SET;
-	private int								fOverlayContent		= 0;
+	private OverlayTourState				_overlayTourState	= OverlayTourState.TILE_IS_NOT_CHECKED;
+	private OverlayImageState				_overlayImageState	= OverlayImageState.NOT_SET;
+	private int								_overlayContent		= 0;
 
 	/**
 	 * <pre>
@@ -57,105 +57,111 @@ public class Tile extends Observable {
 	 * </pre>
 	 */
 
-	private boolean							isLoading			= false;
+	/**
+	 * Map zoom level
+	 */
+	private int								_zoom;
 
 	/**
-	 * If an error occurs while loading a tile, store the exception here.
+	 * Horizontal tile position within the map
 	 */
-	private Throwable						error;
+	private int								_x;
 
 	/**
-	 * The zoom level, x, and y values this tile is for
+	 * Vertical tile position within the map
 	 */
-	private int								zoom, x, y;
+	private int								_y;
+
+	/**
+	 * Map provider which provides the tile image
+	 */
+	private MP								_mp;
 
 	/**
 	 * Map image for this tile
 	 */
-	private Image							mapImage			= null;
+	private Image							_mapImage			= null;
 
 	/**
 	 * Image for the overlay tile, NOT the surrounding part tiles
 	 */
-	private Image							fOverlayImage;
+	private Image							_overlayImage;
 
-	private boolean							fIsOfflineError		= false;
+	private String							_tileKey;
+	private String							_tileKeyCreatorId;
 
-	private String							fTileKey;
-
-	private Object							fCustomData;
+	private Object							_customData;
 
 	// bbox coordinates
-	private BoundingBoxEPSG4326				fBoundingBox;
+	private BoundingBoxEPSG4326				_boundingBox;
 
-	private Future<?>						fFuture;
+	private Future<?>						_future;
 
-	/**
-	 * url which is used to load the tile
-	 */
-	private String							fUrl;
+	private boolean							_isLoading			= false;
+
+	private boolean							_isOfflineError		= false;
 
 	/**
 	 * contains the error message when loading of the image fails
 	 */
-	private String							fLoadingError		= null;
+	private String							_loadingError		= null;
 
-	private boolean							fIsOfflineImageAvailable;
+	/**
+	 * url which is used to load the tile
+	 */
+	private String							_url;
+
+	private boolean							_isOfflineImageAvailable;
 
 	/**
 	 * path which was used to load the offline image
 	 */
-	private String							fOfflinePath;
+	private String							_offlinePath;
+
+	private ReentrantLock					PARENT_LOCK;
 
 	/**
 	 * Contains the parent tile when this tile is a child tile. This field can be null to preserve
-	 * the child. The field {@link #fIsChild} determines if this tile was a child of a parent tile.
+	 * the child. The field {@link #_isChild} determines if this tile was a child of a parent tile.
 	 */
-	private Tile							fParentTile;
+	private Tile							_parentTile;
 
 	/**
 	 * Is <code>true</code> when this is is a child tile. It is possible that the parent tile field
-	 * {@link #fParentTile} is set to <code>null</code> to keep the tile in a cache when the tile
+	 * {@link #_parentTile} is set to <code>null</code> to keep the tile in a cache when the tile
 	 * has loading errors
 	 */
-	private boolean							fIsChild			= false;
+	private boolean							_isChild			= false;
 
 	/**
 	 * When set, this is a parent tile which has children tiles
 	 */
-	private ArrayList<Tile>					fTileChildren;
+	private ArrayList<Tile>					_tileChildren;
 
-	private ReentrantLock					PARENT_LOCK;
-
-	private ImageData						fChildTileImageData;
-
-	private MP								fMp;
+	private ImageData						_childTileImageData;
 
 	/**
-	 * custom part for the tile image file path
+	 * Custom part for the tile image file path
 	 */
-	private String							fTileCustomPath;
+	private String							_tileCustomPath;
 
-	// time for statistics
-	private long							fTimeIsQueued;
-
-	private long							fTimeStartLoading;
-
-	private long							fTimeEndLoading;
+	// times for the statistics
+	private long							_timeIsQueued;
+	private long							_timeStartLoading;
+	private long							_timeEndLoading;
 
 	/**
 	 * contains children which contains loading errors
 	 */
-	private ConcurrentHashMap<String, Tile>	fChildrenWithErrors;
-	private String							tileCreatorId;
+	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
 	/**
 	 * create a key for a tile
 	 * 
 	 * @param mp
+	 * @param zoom
 	 * @param x
 	 * @param y
-	 * @param zoom
 	 * @param tileCreatorId
 	 * @param customTileKey
 	 *            custom tile key which can be <code>null</code> when it's not set
@@ -163,15 +169,15 @@ public class Tile extends Observable {
 	 * @return
 	 */
 	public static String getTileKey(final MP mp,
+									final int zoom,
 									final int x,
 									final int y,
-									final int zoom,
 									final String tileCreatorId,
 									final String customTileKey,
 									final String projectionId) {
 
 		final StringBuilder sb = new StringBuilder(100);
- 
+
 		sb.append(mp.getId());
 		sb.append('-');
 
@@ -211,14 +217,15 @@ public class Tile extends Observable {
 	 */
 	public Tile(final MP mp, final int zoom, final int x, final int y, final String tileCreatorId) {
 
-		fMp = mp;
+		_mp = mp;
 
-		this.x = x;
-		this.y = y;
-		this.zoom = zoom;
-		this.tileCreatorId = tileCreatorId;
+		_zoom = zoom;
+		_x = x;
+		_y = y;
 
-		fTileKey = getTileKey(mp, x, y, zoom, tileCreatorId, null, mp.getProjection().getId());
+		_tileKeyCreatorId = tileCreatorId;
+
+		_tileKey = getTileKey(mp, zoom, x, y, tileCreatorId, null, mp.getProjection().getId());
 	}
 
 	@Override
@@ -263,23 +270,23 @@ public class Tile extends Observable {
 	 */
 	public ParentImageStatus createParentImage(final ImageData childImageData) {
 
-		fChildTileImageData = childImageData;
+		_childTileImageData = childImageData;
 
-		if (fParentTile == null) {
+		if (_parentTile == null) {
 			StatusUtil.showStatus(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
 			return null;
 		}
 
-		final ArrayList<Tile> tileChildren = fParentTile.getChildren();
+		final ArrayList<Tile> tileChildren = _parentTile.getChildren();
 		if (tileChildren != null) {
 
-			final ReentrantLock parentLock = fParentTile.PARENT_LOCK;
+			final ReentrantLock parentLock = _parentTile.PARENT_LOCK;
 			parentLock.lock();
 			{
 				try {
 
 					// check if the parent is already created
-					final Image parentImage = fParentTile.mapImage;
+					final Image parentImage = _parentTile._mapImage;
 					if (parentImage != null && !parentImage.isDisposed()) {
 						// parent image is already created
 						return new ParentImageStatus(null, false, false);
@@ -290,15 +297,15 @@ public class Tile extends Observable {
 					if (areAllChildrenLoaded(tileChildren)) {
 
 						// create parent image when all childs are loaded
-						final MP parentMp = fParentTile.fMp;
+						final MP parentMp = _parentTile._mp;
 						if (parentMp instanceof ITileChildrenCreator) {
 
 							final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-									.getParentImage(fParentTile);
+									.getParentImage(_parentTile);
 
 							// prevent memory leaks: remove image data in the chilren tiles
 							for (final Tile childTile : tileChildren) {
-								childTile.fChildTileImageData = null;
+								childTile._childTileImageData = null;
 							}
 
 							return parentImageStatus;
@@ -328,15 +335,15 @@ public class Tile extends Observable {
 	 */
 	public ArrayList<Tile> createTileChildren() {
 
-		if (fMp instanceof ITileChildrenCreator) {
+		if (_mp instanceof ITileChildrenCreator) {
 
-			if (fTileChildren == null) {
+			if (_tileChildren == null) {
 
 				PARENT_LOCK = new ReentrantLock();
-				fTileChildren = ((ITileChildrenCreator) fMp).createTileChildren(this);
+				_tileChildren = ((ITileChildrenCreator) _mp).createTileChildren(this);
 			}
 
-			return fTileChildren;
+			return _tileChildren;
 		}
 
 		return null;
@@ -354,18 +361,18 @@ public class Tile extends Observable {
 			return false;
 		}
 		final Tile other = (Tile) obj;
-		if (fTileKey == null) {
-			if (other.fTileKey != null) {
+		if (_tileKey == null) {
+			if (other._tileKey != null) {
 				return false;
 			}
-		} else if (!fTileKey.equals(other.fTileKey)) {
+		} else if (!_tileKey.equals(other._tileKey)) {
 			return false;
 		}
 		return true;
 	}
 
 	public BoundingBoxEPSG4326 getBbox() {
-		return fBoundingBox;
+		return _boundingBox;
 	}
 
 	/**
@@ -398,43 +405,33 @@ public class Tile extends Observable {
 	 *         available or is disposed
 	 */
 	public Image getCheckedMapImage() {
-		return getCheckedImage(mapImage);
+		return getCheckedImage(_mapImage);
 	}
 
 	public ImageData getChildImageData() {
-		return fChildTileImageData;
+		return _childTileImageData;
 	}
 
 	/**
 	 * @return Returns children tiles when this tile is a parent, otherwise <code>null</code>
 	 */
 	public ArrayList<Tile> getChildren() {
-		return fTileChildren;
+		return _tileChildren;
 	}
 
 	public ConcurrentHashMap<String, Tile> getChildrenWithErrors() {
-		return fChildrenWithErrors;
+		return _childrenWithErrors;
 	}
 
 	/**
 	 * @return custom data which are set with {@link #setData(Object)}
 	 */
 	public Object getData() {
-		return fCustomData;
-	}
-
-	/**
-	 * Returns the Throwable tied to any error that may have ocurred while loading the tile. This
-	 * error may change several times if multiple errors occur
-	 * 
-	 * @return
-	 */
-	public Throwable getError() {
-		return error;
+		return _customData;
 	}
 
 	public Future<?> getFuture() {
-		return fFuture;
+		return _future;
 	}
 
 	/**
@@ -442,100 +439,100 @@ public class Tile extends Observable {
 	 *         not set
 	 */
 	public String getLoadingError() {
-		return fLoadingError == null ? null : fLoadingError.length() == 0 ? null : fLoadingError;
+		return _loadingError == null ? null : _loadingError.length() == 0 ? null : _loadingError;
 	}
 
 	/**
 	 * @return Returns the map provider for this tile
 	 */
 	public MP getMP() {
-		return fMp;
+		return _mp;
 	}
 
 	/**
 	 * @return Returns the path which was used to load the offline image
 	 */
 	public String getOfflinePath() {
-		return fOfflinePath;
+		return _offlinePath;
 	}
 
 	public int getOverlayContent() {
-		return fOverlayContent;
+		return _overlayContent;
 	}
 
 	public Image getOverlayImage() {
-		return fOverlayImage;
+		return _overlayImage;
 	}
 
 	public OverlayImageState getOverlayImageState() {
-		return fOverlayImageState;
+		return _overlayImageState;
 	}
 
 	public OverlayTourState getOverlayTourStatus() {
-		return fOverlayTourState;
+		return _overlayTourState;
 	}
 
 	public Tile getParentTile() {
-		return fParentTile;
+		return _parentTile;
 	}
 
 	public String getTileCustomPath() {
-		return fTileCustomPath;
+		return _tileCustomPath;
 	}
 
 	public String getTileKey() {
-		return fTileKey;
+		return _tileKey;
 	}
 
 	public String getTileKey(final int xOffset, final int yOffset, final String projectionId) {
-		return getTileKey(fMp, x + xOffset, y + yOffset, zoom, tileCreatorId, null, projectionId);
+		return getTileKey(_mp, _zoom, _x + xOffset, _y + yOffset, _tileKeyCreatorId, null, projectionId);
 	}
 
 	public long getTimeEndLoading() {
-		return fTimeEndLoading;
+		return _timeEndLoading;
 	}
 
 	public long getTimeIsQueued() {
-		return fTimeIsQueued;
+		return _timeIsQueued;
 	}
 
 	public long getTimeStartLoading() {
-		return fTimeStartLoading;
+		return _timeStartLoading;
 	}
 
 	/**
 	 * @return Returns the url which is used to load the tile, or null when it's not loaded
 	 */
 	public String getUrl() {
-		return fUrl;
+		return _url;
 	}
 
 	/**
 	 * @return Returns the tile position for the x-axis
 	 */
 	public int getX() {
-		return x;
+		return _x;
 	}
 
 	/**
 	 * @return Returns the tile position for the y-axis
 	 */
 	public int getY() {
-		return y;
+		return _y;
 	}
 
 	/**
 	 * @return the zoom level that this tile belongs in
 	 */
 	public int getZoom() {
-		return zoom;
+		return _zoom;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fTileKey == null) ? 0 : fTileKey.hashCode());
+		result = prime * result + ((_tileKey == null) ? 0 : _tileKey.hashCode());
 		return result;
 	}
 
@@ -543,7 +540,7 @@ public class Tile extends Observable {
 	 * Increments the overlay content counter
 	 */
 	public void incrementOverlayContent() {
-		fOverlayContent++;
+		_overlayContent++;
 	}
 
 //	/**
@@ -555,34 +552,34 @@ public class Tile extends Observable {
 
 	/**
 	 * @return Returns <code>true</code> when this is is a child tile, it is possible that the
-	 *         parent tile field {@link #fParentTile} was set to null, to keep the tile in a cache
+	 *         parent tile field {@link #_parentTile} was set to null, to keep the tile in a cache
 	 *         when the tile has loading errors
 	 */
 	public boolean isChild() {
-		return fIsChild;
+		return _isChild;
 	}
 
 	public boolean isImageValid() {
 
-		if (mapImage == null) {
+		if (_mapImage == null) {
 			return false;
 		}
 
-		return getCheckedImage(mapImage) != null;
+		return getCheckedImage(_mapImage) != null;
 	}
 
 	/**
 	 * @return Returns <code>true</code> when the tile image is currently being loaded
 	 */
 	public boolean isLoading() {
-		return isLoading;
+		return _isLoading;
 	}
 
 	/**
 	 * @return Returns <code>true</code> when loading of the tile image failed
 	 */
 	public boolean isLoadingError() {
-		return fLoadingError != null && fLoadingError.length() > 0;
+		return _loadingError != null && _loadingError.length() > 0;
 	}
 
 	/**
@@ -591,15 +588,15 @@ public class Tile extends Observable {
 	 */
 	public boolean isOfflimeImageAvailable() {
 
-		if (fIsOfflineError) {
+		if (_isOfflineError) {
 			return false;
 		}
 
-		return fIsOfflineImageAvailable;
+		return _isOfflineImageAvailable;
 	}
 
 	public boolean isOfflineError() {
-		return fIsOfflineError;
+		return _isOfflineError;
 	}
 
 	/**
@@ -616,10 +613,10 @@ public class Tile extends Observable {
 	 */
 	public void resetOverlay() {
 
-		fOverlayTourState = OverlayTourState.TILE_IS_NOT_CHECKED;
-		fOverlayImageState = OverlayImageState.NOT_SET;
+		_overlayTourState = OverlayTourState.TILE_IS_NOT_CHECKED;
+		_overlayImageState = OverlayImageState.NOT_SET;
 
-		fOverlayContent = 0;
+		_overlayContent = 0;
 	}
 
 	/**
@@ -629,20 +626,20 @@ public class Tile extends Observable {
 	 * @param projection
 	 */
 	public void setBoundingBoxEPSG4326() {
-		fBoundingBox = BoundingBoxEPSG4326.tile2boundingBox(x, y, zoom);
+		_boundingBox = BoundingBoxEPSG4326.tile2boundingBox(_x, _y, _zoom);
 	}
 
 	public void setChildLoadingError(final Tile childTile) {
 
-		if (fChildrenWithErrors == null) {
+		if (_childrenWithErrors == null) {
 
 			PARENT_LOCK.lock();
 			try {
 
 				// check again
-				if (fChildrenWithErrors == null) {
+				if (_childrenWithErrors == null) {
 
-					fChildrenWithErrors = new ConcurrentHashMap<String, Tile>();
+					_childrenWithErrors = new ConcurrentHashMap<String, Tile>();
 				}
 
 			} finally {
@@ -650,7 +647,7 @@ public class Tile extends Observable {
 			}
 		}
 
-		fChildrenWithErrors.put(childTile.getTileKey(), childTile);
+		_childrenWithErrors.put(childTile.getTileKey(), childTile);
 	}
 
 	/**
@@ -659,15 +656,15 @@ public class Tile extends Observable {
 	 * @param customData
 	 */
 	public void setData(final Object customData) {
-		fCustomData = customData;
+		_customData = customData;
 	}
 
 	public void setFuture(final Future<?> future) {
-		fFuture = future;
+		_future = future;
 	}
 
 	public void setIsOfflineImageAvailable(final boolean isOfflineImageAvailable) {
-		fIsOfflineImageAvailable = isOfflineImageAvailable;
+		_isOfflineImageAvailable = isOfflineImageAvailable;
 	}
 
 	/**
@@ -676,7 +673,7 @@ public class Tile extends Observable {
 	 * @param loading
 	 */
 	public void setLoading(final boolean loading) {
-		isLoading = loading;
+		_isLoading = loading;
 	}
 
 	/**
@@ -686,24 +683,24 @@ public class Tile extends Observable {
 	 */
 	public void setLoadingError(final String loadingError) {
 
-		fLoadingError = loadingError;
+		_loadingError = loadingError;
 
-		if (mapImage != null && !mapImage.isDisposed()) {
+		if (_mapImage != null && !_mapImage.isDisposed()) {
 
 			try {
-				mapImage.dispose();
+				_mapImage.dispose();
 			} catch (final Exception e) {
 				// ignore, this case happened that image was already disposed by another thread
 			}
 
-			mapImage = null;
+			_mapImage = null;
 		}
 
-		if (fParentTile != null) {
+		if (_parentTile != null) {
 
 			// this is a child tile, set error into the parent tile
 
-			fParentTile.setChildLoadingError(this);
+			_parentTile.setChildLoadingError(this);
 		}
 
 	}
@@ -722,13 +719,13 @@ public class Tile extends Observable {
 //			a++;
 //		}
 
-		mapImage = getCheckedImage(newImage);
+		_mapImage = getCheckedImage(newImage);
 
-		return mapImage != null;
+		return _mapImage != null;
 	}
 
 	public void setOfflineError(final boolean isOfflineError) {
-		fIsOfflineError = isOfflineError;
+		_isOfflineError = isOfflineError;
 	}
 
 	/**
@@ -737,66 +734,66 @@ public class Tile extends Observable {
 	 * @param osTilePath
 	 */
 	public void setOfflinePath(final String osTilePath) {
-		fOfflinePath = osTilePath;
+		_offlinePath = osTilePath;
 	}
 
 	public void setOverlayImage(final Image partImage) {
-		fOverlayImage = partImage;
+		_overlayImage = partImage;
 	}
 
 	public void setOverlayImageState(final OverlayImageState overlayImageState) {
-		fOverlayImageState = overlayImageState;
+		_overlayImageState = overlayImageState;
 	}
 
 	public void setOverlayTourStatus(final OverlayTourState overlayTourStatus) {
-		fOverlayTourState = overlayTourStatus;
+		_overlayTourState = overlayTourStatus;
 	}
 
 	public void setParentTile(final Tile parentTile) {
-		fParentTile = parentTile;
-		fIsChild = true;
+		_parentTile = parentTile;
+		_isChild = true;
 	}
 
 	public void setTileCustomPath(final String tileCustomPath) {
-		fTileCustomPath = tileCustomPath;
+		_tileCustomPath = tileCustomPath;
 	}
 
 	public void setTimeEndLoading(final long nanoTime) {
-		fTimeEndLoading = nanoTime;
+		_timeEndLoading = nanoTime;
 	}
 
 	public void setTimeIsQueued(final long nanoTime) {
-		fTimeIsQueued = nanoTime;
-		fTimeStartLoading = 0;
-		fTimeEndLoading = 0;
+		_timeIsQueued = nanoTime;
+		_timeStartLoading = 0;
+		_timeEndLoading = 0;
 	}
 
 	public void setTimeStartLoading(final long nanoTime) {
-		fTimeStartLoading = nanoTime;
+		_timeStartLoading = nanoTime;
 	}
 
 	public void setUrl(final String tileUrl) {
-		fUrl = tileUrl;
+		_url = tileUrl;
 	}
 
 	@Override
 	public String toString() {
 
-		final boolean isImageOK = mapImage == null ? //
+		final boolean isImageOK = _mapImage == null ? //
 				false
-				: mapImage.isDisposed() ? //
+				: _mapImage.isDisposed() ? //
 						false
 						: true;
 
-		return (" z=" + Integer.toString(zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
-				+ (" x=" + Integer.toString(x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-				+ (" y=" + Integer.toString(y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-				+ (isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
+		return (" z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
+				+ (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
 				+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
 				//
 				//                        0123456789012345678901234567890123456789		
-				+ (" " + fTileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 		;
 	}

@@ -43,14 +43,14 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	/**
 	 * this list contains wrappers for all none profile map providers
 	 */
-	private ArrayList<MPWrapper>	fMpWrappers;
+	private ArrayList<MPWrapper>	_mpWrappers;
 
 	/**
 	 * background color for the profile image, this color is displayed in the transparent areas
 	 */
-	private int						fBackgroundColor		= 0xFFFFFF;
+	private int						_backgroundColor		= 0xFFFFFF;
 
-	private boolean					fIsSaveImage			= true;
+	private boolean					_isSaveImage			= true;
 
 	/**
 	 * Sort map provider wrapper by position (by name when position is not available)
@@ -95,7 +95,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	 * 
 	 * @param allMpWrapper
 	 */
-	static void updateWrapperTileFactory(final ArrayList<MPWrapper> allMpWrapper) {
+	static void updateWrapperFromMP(final ArrayList<MPWrapper> allMpWrapper) {
 
 		for (final MPWrapper mpWrapper : allMpWrapper) {
 
@@ -116,7 +116,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	public MPProfile() {}
 
 	public MPProfile(final ArrayList<MPWrapper> mpWrappers) {
-		fMpWrappers = mpWrappers;
+		_mpWrappers = mpWrappers;
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 		final ArrayList<MPWrapper> clonedMpWrapperList = new ArrayList<MPWrapper>();
 
-		for (final MPWrapper mpWrapper : fMpWrappers) {
+		for (final MPWrapper mpWrapper : _mpWrappers) {
 
 			final MPWrapper clonedMpWrapper = (MPWrapper) mpWrapper.clone();
 
@@ -148,7 +148,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			clonedMpWrapperList.add(clonedMpWrapper);
 		}
 
-		clonedMpProfile.fMpWrappers = clonedMpWrapperList;
+		clonedMpProfile._mpWrappers = clonedMpWrapperList;
 
 		return clonedMpProfile;
 	}
@@ -167,7 +167,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		final TileCache tileCache = getTileCache();
 		final TileCache errorTiles = getErrorTiles();
 
-		for (final MPWrapper mpWrapper : fMpWrappers) {
+		for (final MPWrapper mpWrapper : _mpWrappers) {
 
 			final int parentZoom = parentTile.getZoom();
 			final MP wrapperMP = mpWrapper.getMP();
@@ -188,9 +188,9 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 				final String childTileKey = Tile.getTileKey(
 						childMp,
+						parentZoom,
 						parentTile.getX(),
 						parentTile.getY(),
-						parentZoom,
 						childMp.getId(),
 						null,
 						childMp.getProjection().getId());
@@ -281,11 +281,11 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	 * @return Returns a list which contains wrappers for all none profile map providers
 	 */
 	public ArrayList<MPWrapper> getAllWrappers() {
-		return fMpWrappers;
+		return _mpWrappers;
 	}
 
 	public int getBackgroundColor() {
-		return fBackgroundColor;
+		return _backgroundColor;
 	}
 
 
@@ -298,7 +298,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 		final ProfileTileImage parentImage = new ProfileTileImage();
 
-		parentImage.setBackgroundColor(fBackgroundColor);
+		parentImage.setBackgroundColor(_backgroundColor);
 
 		boolean isFinal = true;
 
@@ -350,7 +350,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		return new ParentImageStatus(//
 				parentImage.getImageData(),
 				isFinal,
-				fIsSaveImage && isChildError == false);
+				_isSaveImage && isChildError == false);
 	}
 
 	@Override
@@ -367,16 +367,16 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	}
 
 	public void setBackgroundColor(final int backgroundColor) {
-		fBackgroundColor = backgroundColor;
+		_backgroundColor = backgroundColor;
 	}
 
 
 	public void setBackgroundColor(final RGB rgb) {
-		fBackgroundColor = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
+		_backgroundColor = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
 	}
 
 	public void setIsSaveImage(final boolean isSaveImage) {
-		fIsSaveImage = isSaveImage;
+		_isSaveImage = isSaveImage;
 		setUseOfflineImage(isSaveImage);
 	}
 
@@ -433,16 +433,16 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 		final ArrayList<MP> allMPsWithoutProfile = MapProviderManager.getInstance().getAllMapProviders(false);
 
-		if (fMpWrappers == null) {
+		if (_mpWrappers == null) {
 
 			/*
 			 * this case happens when a profile map provider is created, add all map providers
 			 */
 
-			fMpWrappers = new ArrayList<MPWrapper>();
+			_mpWrappers = new ArrayList<MPWrapper>();
 
 			for (final MP mapProvider : allMPsWithoutProfile) {
-				fMpWrappers.add(createWrapper(mapProvider));
+				_mpWrappers.add(createWrapper(mapProvider));
 			}
 
 		} else {
@@ -451,10 +451,10 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			 * synchronize profile mp wrapper with the available map providers
 			 */
 
-			final ArrayList<MPWrapper> currentMpWrappers = fMpWrappers;
-			final ArrayList<MPWrapper> remainingMpWrappers = new ArrayList<MPWrapper>(fMpWrappers);
+			final ArrayList<MPWrapper> currentMpWrappers = _mpWrappers;
+			final ArrayList<MPWrapper> remainingMpWrappers = new ArrayList<MPWrapper>(_mpWrappers);
 
-			fMpWrappers = new ArrayList<MPWrapper>();
+			_mpWrappers = new ArrayList<MPWrapper>();
 
 			// loop: all available map providers
 			for (final MP validMapProvider : allMPsWithoutProfile) {
@@ -473,7 +473,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 							break;
 						}
 
-						fMpWrappers.add(mpWrapper);
+						_mpWrappers.add(mpWrapper);
 						remainingMpWrappers.remove(mpWrapper);
 
 						isMpValid = true;
@@ -489,7 +489,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				// valid map provider is not yet in the profile, append it now
 				final MPWrapper mpWrapperClone = createWrapper(validMapProvider);
 
-				fMpWrappers.add(mpWrapperClone);
+				_mpWrappers.add(mpWrapperClone);
 			}
 
 			if (remainingMpWrappers.size() > 0) {
@@ -511,7 +511,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			}
 		}
 
-		sortMpWrapper(fMpWrappers);
-		updateWrapperTileFactory(fMpWrappers);
+		sortMpWrapper(_mpWrappers);
+		updateWrapperFromMP(_mpWrappers);
 	}
 }

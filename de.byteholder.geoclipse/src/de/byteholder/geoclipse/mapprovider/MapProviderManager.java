@@ -223,24 +223,24 @@ public class MapProviderManager {
 			"1024", //$NON-NLS-1$
 																							};
 
-	private static MapProviderManager		instance;
+	private static final ReentrantLock		WMS_LOCK										= new ReentrantLock();
 
-	private static final DateTimeFormatter	fDateTimeFormatter								= ISODateTimeFormat
-																									.basicDateTimeNoMillis();
+	private static MapProviderManager		_instance;
 
 	/**
 	 * contains all available map providers, including empty map provider and map profiles
 	 */
-	private static ArrayList<MP>			fAllMapProviders;
+	private static ArrayList<MP>			_allMapProviders;
 
-	private static final ReentrantLock		WMS_LOCK										= new ReentrantLock();
+	private MPPlugin						_mpDefault;
 
-	private MPPlugin						fDefaultTileFactory;
+	private ArrayList<String>				_errorLog										= new ArrayList<String>();
 
-	private ArrayList<String>				fErrorLog										= new ArrayList<String>();
-
-	private static final ListenerList		fMapProviderListeners							= new ListenerList(
+	private static final ListenerList		_mapProviderListeners							= new ListenerList(
 																									ListenerList.IDENTITY);
+
+	private static final DateTimeFormatter	_dtFormatter									= ISODateTimeFormat
+																									.basicDateTimeNoMillis();
 
 	/**
 	 * Checks if the WMS is initialized, if not it will be done (it is loading the WMS layers). It
@@ -262,10 +262,7 @@ public class MapProviderManager {
 			WMS_LOCK.lock();
 			try {
 
-				/*
-				 * check again, it's possible that when blocked by the lock, another thread could
-				 * have loaded the caps
-				 */
+				// recheck again, it's possible tha another thread could have loaded the caps
 				if (mpWms == null || mpWms.getWmsCaps() == null) {
 					checkWmsRunnable(mpWms, capsUrl, returnMpWms);
 				}
@@ -309,7 +306,7 @@ public class MapProviderManager {
 					 * disable this wms map provider, it is possible that
 					 * the server is currently not available
 					 */
-					for (final MP mapProvider : fAllMapProviders) {
+					for (final MP mapProvider : _allMapProviders) {
 
 						if (mapProvider instanceof MPWms) {
 
@@ -356,7 +353,7 @@ public class MapProviderManager {
 
 	private static void fireChangeEvent() {
 
-		final Object[] allListeners = fMapProviderListeners.getListeners();
+		final Object[] allListeners = _mapProviderListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((IMapProviderListener) listener).mapProviderListChanged();
 		}
@@ -446,11 +443,11 @@ public class MapProviderManager {
 
 	public static MapProviderManager getInstance() {
 
-		if (instance == null) {
-			instance = new MapProviderManager();
+		if (_instance == null) {
+			_instance = new MapProviderManager();
 		}
 
-		return instance;
+		return _instance;
 	}
 
 	private static String getMapProviderType(final MP mapProvider) {
@@ -665,14 +662,14 @@ public class MapProviderManager {
 		/*
 		 * replace map provider in the model
 		 */
-		for (final MP mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : _allMapProviders) {
 
 			if (replaceMapProviderId.equals(mapProvider.getId())) {
 
 				isMapProviderReplaced = true;
 
 				// replace map provider
-				fAllMapProviders.set(mpIndex, mapProviderReplacement);
+				_allMapProviders.set(mpIndex, mapProviderReplacement);
 
 				// a map provider exists only once
 				break;
@@ -696,7 +693,7 @@ public class MapProviderManager {
 			 */
 
 			// loop: all profiles
-			for (final MP mapProvider : fAllMapProviders) {
+			for (final MP mapProvider : _allMapProviders) {
 				if (mapProvider instanceof MPProfile) {
 
 					final MPProfile mapProfile = (MPProfile) mapProvider;
@@ -726,16 +723,16 @@ public class MapProviderManager {
 	private MapProviderManager() {}
 
 	public void addMapProvider(final MP mapProvider) {
-		fAllMapProviders.add(mapProvider);
+		_allMapProviders.add(mapProvider);
 	}
 
 	public void addMapProviderListener(final IMapProviderListener listener) {
-		fMapProviderListeners.add(listener);
+		_mapProviderListeners.add(listener);
 	}
 
 	private void checkMapProviders() {
 
-		if (fAllMapProviders != null) {
+		if (_allMapProviders != null) {
 			return;
 		}
 
@@ -747,12 +744,12 @@ public class MapProviderManager {
 	 */
 	private void createMapProviders() {
 
-		fAllMapProviders = new ArrayList<MP>();
+		_allMapProviders = new ArrayList<MP>();
 
 		// create default tile factories
-		fDefaultTileFactory = new OSMMapProvider();
+		_mpDefault = new OSMMapProvider();
 
-		fAllMapProviders.add(fDefaultTileFactory);
+		_allMapProviders.add(_mpDefault);
 
 		/*
 		 * add plugin map providers
@@ -764,7 +761,7 @@ public class MapProviderManager {
 
 			boolean isValid = true;
 
-			for (final MP checkedMapProvider : fAllMapProviders) {
+			for (final MP checkedMapProvider : _allMapProviders) {
 
 				// check factory id
 				if (checkedMapProvider.getId().equalsIgnoreCase(pluginFactoryId)) {
@@ -801,7 +798,7 @@ public class MapProviderManager {
 
 				// add valid map providers
 
-				fAllMapProviders.add(mpPlugin);
+				_allMapProviders.add(mpPlugin);
 			}
 		}
 
@@ -819,7 +816,7 @@ public class MapProviderManager {
 			 * import file as a map profile wrapper
 			 */
 			if ((mp instanceof MPPlugin) == false) {
-				fAllMapProviders.add(mp);
+				_allMapProviders.add(mp);
 			}
 		}
 
@@ -827,14 +824,14 @@ public class MapProviderManager {
 		 * initialize map profiles, this MUST be done AFTER all external map providers are read from
 		 * the xml file because they are referenced in the profile map provider
 		 */
-		for (final MP mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : _allMapProviders) {
 			if (mapProvider instanceof MPProfile) {
 				((MPProfile) mapProvider).synchronizeMPWrapper();
 			}
 		}
 
 		// sort by name
-		Collections.sort(fAllMapProviders);
+		Collections.sort(_allMapProviders);
 	}
 
 	private XMLMemento createXmlRoot(final boolean isManualExport) {
@@ -851,7 +848,7 @@ public class MapProviderManager {
 			final XMLMemento tagRoot = new XMLMemento(document, rootElement);
 
 			// date/time
-			tagRoot.putString(ATTR_ROOT_DATETIME, fDateTimeFormatter.print(new Date().getTime()));
+			tagRoot.putString(ATTR_ROOT_DATETIME, _dtFormatter.print(new Date().getTime()));
 
 			// plugin version
 			final Version version = Activator.getDefault().getVersion();
@@ -874,7 +871,7 @@ public class MapProviderManager {
 
 	private void displayError(final String filename) {
 
-		if (fErrorLog.size() == 0) {
+		if (_errorLog.size() == 0) {
 			return;
 		}
 
@@ -888,7 +885,7 @@ public class MapProviderManager {
 		sb.append(filename);
 		sb.append(UI.NEW_LINE);
 		sb.append(UI.NEW_LINE);
-		for (final String log : fErrorLog) {
+		for (final String log : _errorLog) {
 			sb.append(log);
 			sb.append(UI.NEW_LINE);
 		}
@@ -949,7 +946,7 @@ public class MapProviderManager {
 
 		checkMapProviders();
 
-		return fAllMapProviders;
+		return _allMapProviders;
 	}
 
 	/**
@@ -963,7 +960,7 @@ public class MapProviderManager {
 
 		final ArrayList<MP> mapProviders = new ArrayList<MP>();
 
-		for (final MP mapProvider : fAllMapProviders) {
+		for (final MP mapProvider : _allMapProviders) {
 
 			boolean isValid = true;
 
@@ -983,7 +980,7 @@ public class MapProviderManager {
 	 * @return Return the default map provider which is currently OpenstreetMap
 	 */
 	public MPPlugin getDefaultMapProvider() {
-		return fDefaultTileFactory;
+		return _mpDefault;
 	}
 
 	/**
@@ -1066,10 +1063,6 @@ public class MapProviderManager {
 		return null;
 	}
 
-	public ReentrantLock getWmsLock() {
-		return WMS_LOCK;
-	}
-
 	/**
 	 * @param importFilePath
 	 * @return Returns the imported map provider or <code>null</code> when an import
@@ -1092,7 +1085,7 @@ public class MapProviderManager {
 
 	private void logError(final String errorText, final Exception exception) {
 		StatusUtil.log(errorText, exception);
-		fErrorLog.add(errorText);
+		_errorLog.add(errorText);
 	}
 
 	/**
@@ -1109,7 +1102,7 @@ public class MapProviderManager {
 
 		final ArrayList<MP> validMapProviders = new ArrayList<MP>();
 		InputStreamReader reader = null;
-		fErrorLog.clear();
+		_errorLog.clear();
 
 		try {
 
@@ -1681,12 +1674,12 @@ public class MapProviderManager {
 	}
 
 	public void remove(final MP mapProvider) {
-		fAllMapProviders.remove(mapProvider);
+		_allMapProviders.remove(mapProvider);
 	}
 
 	public void removeMapProviderListener(final IMapProviderListener listener) {
 		if (listener != null) {
-			fMapProviderListeners.remove(listener);
+			_mapProviderListeners.remove(listener);
 		}
 	}
 
@@ -1734,7 +1727,7 @@ public class MapProviderManager {
 		}
 
 		// update model with the imported MP
-		fAllMapProviders.add(importedMP);
+		_allMapProviders.add(importedMP);
 
 		/*
 		 * the imported map provider will be the first in the list, imported wrapped mp's come
@@ -1924,7 +1917,7 @@ public class MapProviderManager {
 				newMPs.add(wrappedMP);
 
 				// update model with the wrapped map provider
-				fAllMapProviders.add(wrappedMP);
+				_allMapProviders.add(wrappedMP);
 			}
 		}
 
@@ -1944,7 +1937,7 @@ public class MapProviderManager {
 
 			final XMLMemento xmlMemento = createXmlRoot(false);
 
-			for (final MP mapProvider : fAllMapProviders) {
+			for (final MP mapProvider : _allMapProviders) {
 
 				if (mapProvider instanceof MPWms || mapProvider instanceof MPCustom || mapProvider instanceof MPProfile) {
 

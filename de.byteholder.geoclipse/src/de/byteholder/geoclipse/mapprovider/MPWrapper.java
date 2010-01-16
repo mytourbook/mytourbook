@@ -25,59 +25,58 @@ public class MPWrapper implements Cloneable {
 	/**
 	 * unique id which identifies the map provider, this is a copy from the map provider
 	 */
-	private String						fMapProviderId;
+	private String						_mapProviderId;
 
-	private MP							fMp;
+	private MP							_mp;
 
 	/**
 	 * position index is the sorting position within the map profile viewer
 	 */
-	private int							fPositionIndex			= -1;
+	private int							_positionIndex			= -1;
 
 	/**
 	 * is <code>true</code> when this map provider is displayed in a map profile
 	 */
-	private boolean						fIsDisplayedInMap;
+	private boolean						_isDisplayedInMap;
 
-	private ArrayList<LayerOfflineData>	fWmsOfflineLayerList;
+	private ArrayList<LayerOfflineData>	_wmsOfflineLayerList;
 
 	/**
 	 * Contains the type of the map provider which is defined in
 	 * {@link MapProviderManager#MAP_PROVIDER_TYPE_xxx}
 	 */
-	private String						fType;
+	private String						_type;
 
-	private boolean						fIsEnabled				= true;
-
+	private boolean						_isEnabled				= true;
 
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
-	private int							fAlpha					= 100;
+	private int							_alpha					= 100;
 
-	private boolean						fIsTransparentColors	= false;
-	private int[]						fTransparentColor		= null;
+	private boolean						_isTransparentColors	= false;
+	private int[]						_transparentColor		= null;
 
 	/**
 	 * when <code>true</code> the color black is transparent
 	 */
-	private boolean						fIsBlackTransparent;
+	private boolean						_isBlackTransparent;
 
-	private boolean						fIsBrightness;
-	private int							fBrightnessValue;
+	private boolean						_isBrightness;
+	private int							_brightnessValue;
 
-	@SuppressWarnings("unused")
-	private MPWrapper() {}
+//	@SuppressWarnings("unused")
+//	private MPWrapper() {}
 
 	MPWrapper(final MP mapProvider) {
 
-		fMapProviderId = mapProvider.getId();
+		_mapProviderId = mapProvider.getId();
 
 		setMP(mapProvider);
 	}
 
 	MPWrapper(final String mapProviderId) {
-		fMapProviderId = mapProviderId;
+		_mapProviderId = mapProviderId;
 	}
 
 	@Override
@@ -87,9 +86,9 @@ public class MPWrapper implements Cloneable {
 		final MPWrapper clonedMpWrapper = (MPWrapper) super.clone();
 
 		// clone map provider
-		final MP clonedMP = (MP) fMp.clone();
+		final MP clonedMP = (MP) _mp.clone();
 
-		clonedMpWrapper.fMp = clonedMP;
+		clonedMpWrapper._mp = clonedMP;
 
 		return clonedMpWrapper;
 	}
@@ -106,26 +105,26 @@ public class MPWrapper implements Cloneable {
 			return false;
 		}
 		final MPWrapper other = (MPWrapper) obj;
-		if (fMapProviderId == null) {
-			if (other.fMapProviderId != null) {
+		if (_mapProviderId == null) {
+			if (other._mapProviderId != null) {
 				return false;
 			}
-		} else if (!fMapProviderId.equals(other.fMapProviderId)) {
+		} else if (!_mapProviderId.equals(other._mapProviderId)) {
 			return false;
 		}
 		return true;
 	}
 
 	int getAlpha() {
-		return fAlpha;
+		return _alpha;
 	}
 
 	int getBrightness() {
-		return fBrightnessValue;
+		return _brightnessValue;
 	}
 
 	public String getMapProviderId() {
-		return fMapProviderId;
+		return _mapProviderId;
 	}
 
 	public MP getMP() {
@@ -135,42 +134,35 @@ public class MPWrapper implements Cloneable {
 //			StatusUtil.showStatus("map provider is not set", new Exception());//$NON-NLS-1$
 //		}
 
-		return fMp;
+		return _mp;
 	}
 
 	int getPositionIndex() {
-		return fPositionIndex;
+		return _positionIndex;
 	}
 
 	int[] getTransparentColors() {
-		return fTransparentColor;
+		return _transparentColor;
 	}
 
 	String getType() {
-		return fType;
+		return _type;
 	}
-
-//	/**
-//	 * @return Returns layers which have been saved in the xml file
-//	 */
-//	public ArrayList<LayerOfflineData> getWmsOfflineLayerList() {
-//		return fWmsOfflineLayerList;
-//	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fMapProviderId == null) ? 0 : fMapProviderId.hashCode());
+		result = prime * result + ((_mapProviderId == null) ? 0 : _mapProviderId.hashCode());
 		return result;
 	}
 
 	boolean isBrightness() {
-		return fIsBrightness;
+		return _isBrightness;
 	}
 
 	boolean isDisplayedInMap() {
-		return fIsDisplayedInMap;
+		return _isDisplayedInMap;
 	}
 
 	/**
@@ -178,43 +170,43 @@ public class MPWrapper implements Cloneable {
 	 *         a wms server is not available
 	 */
 	boolean isEnabled() {
-		return fIsEnabled;
+		return _isEnabled;
 	}
 
 	boolean isTransparentBlack() {
-		return fIsBlackTransparent;
+		return _isBlackTransparent;
 	}
 
 	boolean isTransparentColors() {
-		return fIsTransparentColors;
+		return _isTransparentColors;
 	}
 
 	void setAlpha(final int alpha) {
-		fAlpha = alpha;
+		_alpha = alpha;
 	}
 
 	void setBrightness(final int brightnessValue) {
-		fBrightnessValue = brightnessValue;
+		_brightnessValue = brightnessValue;
 	}
 
 	void setEnabled(final boolean isEnabled) {
-		fIsEnabled = isEnabled;
+		_isEnabled = isEnabled;
 	}
 
 	void setIsBrightness(final boolean isBrightness) {
-		fIsBrightness = isBrightness;
+		_isBrightness = isBrightness;
 	}
 
 	void setIsDisplayedInMap(final boolean isDisplayed) {
-		fIsDisplayedInMap = isDisplayed;
+		_isDisplayedInMap = isDisplayed;
 	}
 
 	void setIsTransparentBlack(final boolean isBlackTransparent) {
-		fIsBlackTransparent = isBlackTransparent;
+		_isBlackTransparent = isBlackTransparent;
 	}
 
 	void setIsTransparentColors(final boolean isTransColors) {
-		fIsTransparentColors = isTransColors;
+		_isTransparentColors = isTransColors;
 	}
 
 	/**
@@ -223,14 +215,19 @@ public class MPWrapper implements Cloneable {
 	 * @param newFactoryId
 	 */
 	public void setMapProviderId(final String newFactoryId) {
-		fMapProviderId = newFactoryId;
-		fMp.setId(newFactoryId);
+		_mapProviderId = newFactoryId;
+		_mp.setId(newFactoryId);
 	}
 
+	/**
+	 * Sets a map provider into the wrapper
+	 * 
+	 * @param newMP
+	 */
 	void setMP(final MP newMP) {
 
-		final MP oldMapProvider = fMp;
-		fMp = newMP;
+		final MP oldMapProvider = _mp;
+		_mp = newMP;
 
 		if (newMP instanceof MPWms) {
 
@@ -278,7 +275,7 @@ public class MPWrapper implements Cloneable {
 					}
 				}
 
-			} else if (fWmsOfflineLayerList != null) {
+			} else if (_wmsOfflineLayerList != null) {
 
 				/*
 				 * set layer state from offline data
@@ -289,7 +286,7 @@ public class MPWrapper implements Cloneable {
 					final String newName = newMtLayer.getGeoLayer().getName();
 
 					// search new layer within the offline layers
-					for (final LayerOfflineData offlineLayer : fWmsOfflineLayerList) {
+					for (final LayerOfflineData offlineLayer : _wmsOfflineLayerList) {
 
 						final String offlineName = offlineLayer.name;
 						if (offlineName.equalsIgnoreCase(newName)) {
@@ -319,24 +316,24 @@ public class MPWrapper implements Cloneable {
 	}
 
 	void setPositionIndex(final int positionIndex) {
-		fPositionIndex = positionIndex;
+		_positionIndex = positionIndex;
 	}
 
 	void setTransparentColors(final int[] transColors) {
-		fTransparentColor = transColors;
+		_transparentColor = transColors;
 	}
 
 	void setType(final String type) {
-		fType = type;
+		_type = type;
 	}
 
 	void setWmsOfflineLayerList(final ArrayList<LayerOfflineData> wmsOfflineLayerList) {
-		fWmsOfflineLayerList = wmsOfflineLayerList;
+		_wmsOfflineLayerList = wmsOfflineLayerList;
 	}
 
 	@Override
 	public String toString() {
-		return fMapProviderId + " pos:" + fPositionIndex; //$NON-NLS-1$
+		return _mapProviderId + " pos:" + _positionIndex; //$NON-NLS-1$
 	}
 
 }

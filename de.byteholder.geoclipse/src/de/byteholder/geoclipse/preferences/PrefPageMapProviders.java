@@ -2055,7 +2055,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			// clone mapprovider
 			final MPProfile dialogMapProfile = (MPProfile) mpProfile.clone();
 
-			// it is likely that map images are downloaded
+			// it is likely that map images will be downloaded
 			dialogMapProfile.setStateToReloadOfflineCounter();
 
 			final DialogMPProfile dialog = new DialogMPProfile(

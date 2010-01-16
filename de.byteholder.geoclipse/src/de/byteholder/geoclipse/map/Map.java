@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapEvent;
@@ -82,7 +83,7 @@ public class Map extends Canvas {
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
-	private int									_mapZoomLevel				= 1;
+	private int									_mapZoomLevel				= 0;
 
 	/**
 	 * Image which contains the map
@@ -870,6 +871,10 @@ public class Map extends Canvas {
 						tileSize,
 						tileSize);
 
+				if (_devVisibleViewport == null) {
+					int a = 0;
+					a++;
+				}
 				// check if current tile is within the painting area
 				if (devTilePosition.intersects(_devVisibleViewport)) {
 
@@ -941,7 +946,7 @@ public class Map extends Canvas {
 			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
 			gc.fillRectangle(devTilePosition.x, devTilePosition.y, imageBounds.width, imageBounds.height);
 
-			drawTileInfoError(gc, devTilePosition, tile); //$NON-NLS-1$
+			drawTileInfoError(gc, devTilePosition, tile);
 
 			return;
 		}
@@ -952,7 +957,7 @@ public class Map extends Canvas {
 
 			gc.drawImage(_MP.getErrorImage(), devTilePosition.x, devTilePosition.y);
 
-			drawTileInfoError(gc, devTilePosition, tile); //$NON-NLS-1$
+			drawTileInfoError(gc, devTilePosition, tile);
 
 			return;
 		}
@@ -1104,7 +1109,7 @@ public class Map extends Canvas {
 		sb.setLength(0);
 
 		// lat - bottom
-		sb.append("Lat: "); //$NON-NLS-1$
+		sb.append(Messages.TileInfo_Position_Latitude);
 		sb.append(_NfLatLon.format(bbox.bottom));
 		gc.drawString(sb.toString(), //
 				devTilePosition.x + leftMargin,
@@ -1118,7 +1123,7 @@ public class Map extends Canvas {
 		sb.setLength(0);
 
 		// lon - left
-		sb.append("Lon: "); //$NON-NLS-1$
+		sb.append(Messages.TileInfo_Position_Longitude);
 		sb.append(_NfLatLon.format(bbox.left));
 		gc.drawString(sb.toString(), //
 				devTilePosition.x + leftMargin,
@@ -1167,12 +1172,12 @@ public class Map extends Canvas {
 										final int leftMargin) {
 
 		final StringBuilder text = new StringBuilder()//
-				.append("x:") //$NON-NLS-1$
+				.append(Messages.TileInfo_Position_Zoom)
+				.append(tile.getZoom() + 1)
+				.append(Messages.TileInfo_Position_X)
 				.append(tile.getX())
-				.append(" y:") //$NON-NLS-1$
-				.append(tile.getY())
-				.append(" zoom:") //$NON-NLS-1$
-				.append(tile.getZoom() + 1);
+				.append(Messages.TileInfo_Position_Y)
+				.append(tile.getY());
 
 		gc.drawString(text.toString(), devTilePosition.x + leftMargin, devTilePosition.y + topMargin);
 	}
@@ -1430,7 +1435,7 @@ public class Map extends Canvas {
 	 * 
 	 * @return Returns the bounds in <em>pixels</em> of the "view" of this map
 	 */
-	private Rectangle getWorldPixelTopLeftViewport(final Point2D center) {
+	private Rectangle getWorldPixelTopLeftViewport(final Point2D mapPixelCenter) {
 
 		if (_clientArea == null) {
 			_clientArea = getClientArea();
@@ -1440,8 +1445,8 @@ public class Map extends Canvas {
 		final int devWidth = _clientArea.width;
 		final int devHeight = _clientArea.height;
 
-		final int worldX = (int) (center.getX() - devWidth / 2d);
-		final int worldY = (int) (center.getY() - devHeight / 2d);
+		final int worldX = (int) (mapPixelCenter.getX() - devWidth / 2d);
+		final int worldY = (int) (mapPixelCenter.getY() - devHeight / 2d);
 
 		final Rectangle viewPort = new Rectangle(worldX, worldY, devWidth, devHeight);
 
@@ -1896,6 +1901,7 @@ public class Map extends Canvas {
 
 							gcCenterImage.drawImage(partImage, 0, 0);
 						}
+						gcCenterImage.dispose();
 
 						tile.setOverlayImage(centerImage);
 						_overlayImageCache.add(partKey, centerImage);
@@ -1933,8 +1939,12 @@ public class Map extends Canvas {
 			return;
 		}
 
-		_redrawMapCounter++;
+		if (_devVisibleViewport == null) {
+			// viewport is not yet initialized, this happens only the first time when a map is displayed
+			updateViewPortData();
+		}
 
+		_redrawMapCounter++;
 		_requestedRedrawTime = System.currentTimeMillis();
 
 		if (_requestedRedrawTime - _drawTime > 50) {
@@ -2253,10 +2263,10 @@ public class Map extends Canvas {
 		 */
 
 		final int viewportPixelHeight = getMapPixelViewport().height;
-		final Rectangle newPixelVP = getWorldPixelTopLeftViewport(centerInWorldPixel);
+		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(centerInWorldPixel);
 
 		// don't let the user pan over the top edge
-		if (newPixelVP.y < 0) {
+		if (newTopLeftPixelVP.y < 0) {
 			final double centerY = viewportPixelHeight / 2d;
 			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
 		}
@@ -2265,13 +2275,13 @@ public class Map extends Canvas {
 		final Dimension mapTileSize = _MP.getMapTileSize(_mapZoomLevel);
 		final int mapHeight = (int) mapTileSize.getHeight() * _MP.getTileSize();
 
-		if (newPixelVP.y + newPixelVP.height > mapHeight) {
+		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
 			final double centerY = mapHeight - viewportPixelHeight / 2;
 			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
 		}
 
 		// if map is too small then just center it
-		if (mapHeight < newPixelVP.height) {
+		if (mapHeight < newTopLeftPixelVP.height) {
 			final double centerY = mapHeight / 2d;
 			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
 		}
@@ -2477,6 +2487,8 @@ public class Map extends Canvas {
 
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in {@link #drawMapTiles(GC)}
+	 * 
+	 * @return
 	 */
 	private void updateViewPortData() {
 

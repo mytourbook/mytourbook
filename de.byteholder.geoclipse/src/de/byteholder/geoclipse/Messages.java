@@ -19,18 +19,6 @@ public class Messages extends NLS {
 
 	public static String		tileInfo_action_clearStatistics;
 
-	public static String		tileInfo_control_defaultTitle;
-	public static String		tileInfo_control_statistics_downloadData;
-	public static String		tileInfo_control_statistics_downloadDataFile;
-	public static String		tileInfo_control_statistics_downloadDataInit;
-	public static String		tileInfo_control_statisticsAll;
-	public static String		tileInfo_control_tooltip_line1;
-	public static String		tileInfo_control_tooltip_line2;
-	public static String		tileInfo_control_tooltip_line3;
-	public static String		tileInfo_control_tooltip_line4;
-	public static String		tileInfo_control_tooltip_line5;
-	public static String		tileInfo_control_tooltip_title;
-
 	public static String		App_Dlg_ConfirmFileOverwrite_Message;
 	public static String		App_Dlg_ConfirmFileOverwrite_Title;
 
@@ -117,7 +105,6 @@ public class Messages extends NLS {
 	public static String		Dialog_WmsConfig_Label_ImageFormat;
 	public static String		Dialog_WmsConfig_Label_ImageSize;
 	public static String		Dialog_WmsConfig_Label_Layers;
-	public static String		Dialog_WmsConfig_Label_MapUrl;
 
 	public static String		Image__Placeholder16;
 	public static String		Image__Visibility;
@@ -176,7 +163,6 @@ public class Messages extends NLS {
 	public static String		DBG041_Error_InvalidUrlNull;
 	public static String		DBG042_Error_InvalidUrl;
 	public static String		DBG043_Wms_Server_Error_CannotConnectToServer;
-	public static String		DBG044_Wms_Error_WmsIsLocked;
 	public static String		DBG045_Loading_Error_PaintingError;
 	public static String		DBG046_Loading_Error_InvalidPaintingImage;
 	public static String		DBG047_Loading_Error_InvalidPaintingData;
@@ -191,9 +177,27 @@ public class Messages extends NLS {
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
 	public static String		DBG057_MapProfile_NoParentTile;
 
-	public static String		Tile_Error_NoMapProvider;
+	public static String		TileInfo_Control_DefaultTitle;
+	public static String		TileInfo_Control_Pattern;
 
-	public static String		Tile_Factory_Name_Hidden;
+	public static String		TileInfo_Control_Statistics_DownloadData;
+	public static String		TileInfo_Control_Statistics_DownloadDataFile;
+	public static String		TileInfo_Control_Statistics_DownloadDataInit;
+	public static String		TileInfo_Control_Tooltip_Line1;
+	public static String		TileInfo_Control_Tooltip_Line2;
+	public static String		TileInfo_Control_Tooltip_Line3;
+	public static String		TileInfo_Control_Tooltip_Line4;
+	public static String		TileInfo_Control_Tooltip_Line5;
+	public static String		TileInfo_Control_Tooltip_StatisticsAll;
+	public static String		TileInfo_Control_Tooltip_Title;
+
+	public static String		TileInfo_Error_NoMapProvider;
+
+	public static String		TileInfo_Position_Latitude;
+	public static String		TileInfo_Position_Longitude;
+	public static String		TileInfo_Position_X;
+	public static String		TileInfo_Position_Y;
+	public static String		TileInfo_Position_Zoom;
 
 	public static String		Url_Parameter_Random;
 	public static String		Url_Parameter_Random_Abbr;
