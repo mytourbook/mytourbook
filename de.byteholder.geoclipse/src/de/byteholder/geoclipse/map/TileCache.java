@@ -67,8 +67,14 @@ public class TileCache {
 	 */
 	public synchronized void removeAll() {
 
+		Tile checkedTile = null;
+
 		final Collection<Tile> tiles = tileCache.values();
 		for (final Tile tile : tiles) {
+
+			if (checkedTile == null) {
+				checkedTile = tile;
+			}
 
 			// remove children to prevent memory leaks
 			final ArrayList<Tile> tileChildren = tile.getChildren();
@@ -84,6 +90,10 @@ public class TileCache {
 
 		tileCache.clear();
 		tileCacheFifo.clear();
+
+		if (checkedTile != null) {
+			checkedTile = null;
+		}
 	}
 
 	/**

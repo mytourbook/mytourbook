@@ -1258,6 +1258,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public void setDimLevel(final int dimLevel, final RGB dimColor) {
 
+		// check if dimming value is modified
 		if (fDimmingAlphaValue == dimLevel && fDimmingColor == dimColor) {
 			// dimming value is not modified
 			return;

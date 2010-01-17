@@ -137,51 +137,51 @@ public class TourMapView extends ViewPart {
 	final static String								PREF_SHOW_TILE_INFO					= "map.debug.show.tile-info";				//$NON-NLS-1$
 	final static String								PREF_DEBUG_MAP_DIM_LEVEL			= "map.debug.dim-map";						//$NON-NLS-1$
 
-	private Map										fMap;
+	private Map										_map;
 
-	private ISelectionListener						fPostSelectionListener;
-	private IPropertyChangeListener					fPrefChangeListener;
-	private IPropertyChangeListener					fTourbookPrefChangeListener;
-	private IPropertyChangeListener					fMapPrefChangeListener;
-	private IPartListener2							fPartListener;
-	private ITourEventListener						fTourEventListener;
+	private ISelectionListener						_postSelectionListener;
+	private IPropertyChangeListener					_prefChangeListener;
+	private IPropertyChangeListener					_tourbookPrefChangeListener;
+	private IPropertyChangeListener					_mapPrefChangeListener;
+	private IPartListener2							_partListener;
+	private ITourEventListener						_tourEventListener;
 
 	/**
 	 * contains the tours which are displayed in the map
 	 */
-	private ArrayList<TourData>						fTourDataList						= new ArrayList<TourData>();
-	private TourData								fPreviousTourData;
+	private ArrayList<TourData>						_tourDataList						= new ArrayList<TourData>();
+	private TourData								_previousTourData;
 
-	private ActionDimMap							fActionDimMap;
-	private ActionReloadFailedMapImages				fActionReloadFailedMapImages;
-	private ActionSelectMapProvider					fActionSelectMapProvider;
-	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
-	private ActionSetDefaultPosition				fActionSetDefaultPosition;
-	private ActionShowTourInMap						fActionShowTourInMap;
-	private ActionShowLegendInMap					fActionShowLegendInMap;
-	private ActionShowScaleInMap					fActionShowScaleInMap;
-	private ActionShowSliderInMap					fActionShowSliderInMap;
-	private ActionShowSliderInLegend				fActionShowSliderInLegend;
-	private ActionShowStartEndInMap					fActionShowStartEndInMap;
-	private ActionShowTourMarker					fActionShowTourMarker;
-	private ActionSynchWithTour						fActionSynchWithTour;
-	private ActionSynchWithSlider					fActionSynchWithSlider;
-	private ActionSynchTourZoomLevel				fActionSynchTourZoomLevel;
-	private ActionTourColor							fActionTourColorAltitude;
-	private ActionTourColor							fActionTourColorGradient;
-	private ActionTourColor							fActionTourColorPulse;
-	private ActionTourColor							fActionTourColorSpeed;
-	private ActionTourColor							fActionTourColorPace;
-//	private ActionTourColor							fActionTourColorTourType;
-	private ActionZoomIn							fActionZoomIn;
-	private ActionZoomOut							fActionZoomOut;
-	private ActionZoomCentered						fActionZoomCentered;
-	private ActionZoomShowAll						fActionZoomShowAll;
-	private ActionZoomShowEntireTour				fActionZoomShowEntireTour;
+	private ActionDimMap							_actionDimMap;
+	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
+	private ActionSelectMapProvider					_actionSelectMapProvider;
+	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
+	private ActionSetDefaultPosition				_actionSetDefaultPosition;
+	private ActionShowTourInMap						_actionShowTourInMap;
+	private ActionShowLegendInMap					_actionShowLegendInMap;
+	private ActionShowScaleInMap					_actionShowScaleInMap;
+	private ActionShowSliderInMap					_actionShowSliderInMap;
+	private ActionShowSliderInLegend				_actionShowSliderInLegend;
+	private ActionShowStartEndInMap					_actionShowStartEndInMap;
+	private ActionShowTourMarker					_actionShowTourMarker;
+	private ActionSynchWithTour						_actionSynchWithTour;
+	private ActionSynchWithSlider					_actionSynchWithSlider;
+	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
+	private ActionTourColor							_actionTourColorAltitude;
+	private ActionTourColor							_actionTourColorGradient;
+	private ActionTourColor							_actionTourColorPulse;
+	private ActionTourColor							_actionTourColorSpeed;
+	private ActionTourColor							_actionTourColorPace;
+//	private ActionTourColor							_actionTourColorTourType;
+	private ActionZoomIn							_actionZoomIn;
+	private ActionZoomOut							_actionZoomOut;
+	private ActionZoomCentered						_actionZoomCentered;
+	private ActionZoomShowAll						_actionZoomShowAll;
+	private ActionZoomShowEntireTour				_actionZoomShowEntireTour;
 
-	private boolean									fIsMapSynchedWithTour;
-	private boolean									fIsMapSynchedWithSlider;
-	private boolean									fIsPositionCentered;
+	private boolean									_isMapSynchedWithTour;
+	private boolean									_isMapSynchedWithSlider;
+	private boolean									_isPositionCentered;
 
 	private int										fDefaultZoom;
 	private GeoPosition								fDefaultPosition					= null;
@@ -189,42 +189,42 @@ public class TourMapView extends ViewPart {
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
 	 */
-	private boolean									fIsTour;
+	private boolean									_isTour;
 
 	/**
 	 * Position for the current point of interest
 	 */
-	private GeoPosition								fPOIPosition;
+	private GeoPosition								_poiPosition;
 
-	private final DirectMappingPainter				fDirectMappingPainter				= new DirectMappingPainter();
+	private final DirectMappingPainter				_directMappingPainter				= new DirectMappingPainter();
 
 	/*
 	 * current position for the x-sliders
 	 */
-	private int										fCurrentLeftSliderValueIndex;
-	private int										fCurrentRightSliderValueIndex;
-	private int										fCurrentSelectedSliderValueIndex;
+	private int										_currentLeftSliderValueIndex;
+	private int										_currentRightSliderValueIndex;
+	private int										_currentSelectedSliderValueIndex;
 
-	private MapLegend								fMapLegend;
-	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
+	private MapLegend								_mapLegend;
+	private final HashMap<Integer, ILegendProvider>	_legendProviders					= new HashMap<Integer, ILegendProvider>();
 
-	private long									fPreviousOverlayKey;
+	private long									_previousOverlayKey;
 
-	private int										fMapDimLevel						= -1;
-	private RGB										fMapDimColor;
+	private int										_mapDimLevel						= -1;
+	private RGB										_mapDimColor;
 
-	private int										fSelectedProfileKey					= 0;
+	private int										_selectedProfileKey					= 0;
 
-	private MapInfoManager							fMapInfoManager						= MapInfoManager.getInstance();
+	private MapInfoManager							_mapInfoManager						= MapInfoManager.getInstance();
 
 	public TourMapView() {}
 
 	void actionDimMap(final int dimLevel) {
 
 		// check if the dim level/color was changed 
-		if (fMapDimLevel != dimLevel) {
+		if (_mapDimLevel != dimLevel) {
 
-			fMapDimLevel = dimLevel;
+			_mapDimLevel = dimLevel;
 
 			/*
 			 * dim color is stored in the pref store and not in the memento
@@ -232,17 +232,17 @@ public class TourMapView extends ViewPart {
 			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 			final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 
-			fMap.dimMap(dimLevel, dimColor);
+			_map.dimMap(dimLevel, dimColor);
 		}
 	}
 
 	private void actionDimMap(final RGB dimColor) {
 
-		if (fMapDimColor != dimColor) {
+		if (_mapDimColor != dimColor) {
 
-			fMapDimColor = dimColor;
+			_mapDimColor = dimColor;
 
-			fMap.dimMap(fMapDimLevel, dimColor);
+			_map.dimMap(_mapDimLevel, dimColor);
 		}
 	}
 
@@ -251,61 +251,61 @@ public class TourMapView extends ViewPart {
 		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
 
 		if (dialog.open() == Window.OK) {
-			fActionSelectMapProvider.updateMapProviders();
+			_actionSelectMapProvider.updateMapProviders();
 		}
 	}
 
 	void actionReloadFailedMapImages() {
-		fMap.resetAll();
+		_map.resetAll();
  	}
 
 	void actionSaveDefaultPosition() {
-		fDefaultZoom = fMap.getZoom();
-		fDefaultPosition = fMap.getGeoCenter();
+		fDefaultZoom = _map.getZoom();
+		fDefaultPosition = _map.getGeoCenter();
 	}
 
 	void actionSetDefaultPosition() {
 		if (fDefaultPosition == null) {
-			fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
-			fMap.setGeoCenterPosition(new GeoPosition(0, 0));
+			_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
+			_map.setGeoCenterPosition(new GeoPosition(0, 0));
 		} else {
-			fMap.setZoom(fDefaultZoom);
-			fMap.setGeoCenterPosition(fDefaultPosition);
+			_map.setZoom(fDefaultZoom);
+			_map.setGeoCenterPosition(fDefaultPosition);
 		}
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	void actionSetShowLegendInMap() {
 
-		final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
+		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
 
-		fMap.setShowLegend(isLegendVisible);
+		_map.setShowLegend(isLegendVisible);
 
-		fActionShowSliderInLegend.setEnabled(isLegendVisible);
+		_actionShowSliderInLegend.setEnabled(isLegendVisible);
 		if (isLegendVisible == false) {
-			fActionShowSliderInLegend.setChecked(false);
+			_actionShowSliderInLegend.setChecked(false);
 		}
 
 		// update legend
 		actionShowSlider();
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	void actionSetShowScaleInMap() {
 
-		final boolean isScaleVisible = fActionShowScaleInMap.isChecked();
+		final boolean isScaleVisible = _actionShowScaleInMap.isChecked();
 
-		fMap.setShowScale(isScaleVisible);
-		fMap.queueMapRedraw();
+		_map.setShowScale(isScaleVisible);
+		_map.queueMapRedraw();
 	}
 
 	void actionSetShowStartEndInMap() {
 
-		PaintManager.getInstance().setShowStartEnd(fActionShowStartEndInMap.isChecked());
+		PaintManager.getInstance().setShowStartEnd(_actionShowStartEndInMap.isChecked());
 
-		fMap.disposeOverlayImageCache();
-		fMap.queueMapRedraw();
+		_map.disposeOverlayImageCache();
+		_map.queueMapRedraw();
 	}
 
 	void actionSetShowTourInMap() {
@@ -314,10 +314,10 @@ public class TourMapView extends ViewPart {
 
 	void actionSetShowTourMarkerInMap() {
 
-		PaintManager.getInstance().setShowTourMarker(fActionShowTourMarker.isChecked());
+		PaintManager.getInstance().setShowTourMarker(_actionShowTourMarker.isChecked());
 
-		fMap.disposeOverlayImageCache();
-		fMap.queueMapRedraw();
+		_map.disposeOverlayImageCache();
+		_map.queueMapRedraw();
 	}
 
 	void actionSetTourColor(final int colorId) {
@@ -326,54 +326,54 @@ public class TourMapView extends ViewPart {
 
 		PaintManager.getInstance().setLegendProvider(legendProvider);
 
-		fMap.disposeOverlayImageCache();
-		fMap.queueMapRedraw();
+		_map.disposeOverlayImageCache();
+		_map.queueMapRedraw();
 
 		createLegendImage(legendProvider);
 	}
 
 	void actionSetZoomCentered() {
-		fIsPositionCentered = fActionZoomCentered.isChecked();
+		_isPositionCentered = _actionZoomCentered.isChecked();
 	}
 
 	void actionShowSlider() {
 
-		if (fTourDataList == null || fTourDataList.size() == 0) {
+		if (_tourDataList == null || _tourDataList.size() == 0) {
 			return;
 		}
 
 		// repaint map
-		fDirectMappingPainter.setPaintContext(
-				fMap,
-				fActionShowTourInMap.isChecked(),
-				fTourDataList.get(0),
-				fCurrentLeftSliderValueIndex,
-				fCurrentRightSliderValueIndex,
-				fActionShowSliderInMap.isChecked(),
-				fActionShowSliderInLegend.isChecked());
+		_directMappingPainter.setPaintContext(
+				_map,
+				_actionShowTourInMap.isChecked(),
+				_tourDataList.get(0),
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
 
-		fMap.redraw();
+		_map.redraw();
 	}
 
 	void actionSynchWithSlider() {
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 			return;
 		}
 
-		fIsMapSynchedWithSlider = fActionSynchWithSlider.isChecked();
+		_isMapSynchedWithSlider = _actionSynchWithSlider.isChecked();
 
-		if (fIsMapSynchedWithSlider) {
+		if (_isMapSynchedWithSlider) {
 
-			fActionShowTourInMap.setChecked(true);
+			_actionShowTourInMap.setChecked(true);
 
 			// map must be synched with selected tour
-			fActionSynchWithTour.setChecked(true);
-			fIsMapSynchedWithTour = true;
+			_actionSynchWithTour.setChecked(true);
+			_isMapSynchedWithTour = true;
 
-			fMap.setShowOverlays(true);
+			_map.setShowOverlays(true);
 
-			final TourData firstTourData = fTourDataList.get(0);
+			final TourData firstTourData = _tourDataList.get(0);
 
 			paintOneTour(firstTourData, false, true);
 			setMapToSliderBounds(firstTourData);
@@ -382,48 +382,48 @@ public class TourMapView extends ViewPart {
 
 	void actionSynchWithTour() {
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 			return;
 		}
 
-		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
+		_isMapSynchedWithTour = _actionSynchWithTour.isChecked();
 
-		if (fIsMapSynchedWithTour) {
+		if (_isMapSynchedWithTour) {
 
-			fActionShowTourInMap.setChecked(true);
-			fMap.setShowOverlays(true);
+			_actionShowTourInMap.setChecked(true);
+			_map.setShowOverlays(true);
 
-			paintOneTour(fTourDataList.get(0), true, true);
+			paintOneTour(_tourDataList.get(0), true, true);
 
 		} else {
 
 			// disable synch with slider
-			fIsMapSynchedWithSlider = false;
-			fActionSynchWithSlider.setChecked(false);
+			_isMapSynchedWithSlider = false;
+			_actionSynchWithSlider.setChecked(false);
 		}
 	}
 
 	void actionZoomIn() {
-		fMap.setZoom(fMap.getZoom() + 1);
+		_map.setZoom(_map.getZoom() + 1);
 		centerTour();
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	void actionZoomOut() {
-		fMap.setZoom(fMap.getZoom() - 1);
+		_map.setZoom(_map.getZoom() - 1);
 		centerTour();
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	void actionZoomShowEntireMap() {
-		fMap.setZoom(fMap.getMapProvider().getMinimumZoomLevel());
-		fMap.queueMapRedraw();
+		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
+		_map.queueMapRedraw();
 	}
 
 	void actionZoomShowEntireTour() {
 
-		fActionShowTourInMap.setChecked(true);
-		fMap.setShowOverlays(true);
+		_actionShowTourInMap.setChecked(true);
+		_map.setShowOverlays(true);
 
 		paintEntireTour();
 	}
@@ -433,7 +433,7 @@ public class TourMapView extends ViewPart {
 		/*
 		 * observe map preferences
 		 */
-		fMapPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_mapPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -442,34 +442,34 @@ public class TourMapView extends ViewPart {
 					final String newValue = event.getNewValue().toString();
 					final Integer prefProfileKey = Integer.parseInt(newValue);
 
-					if (prefProfileKey != fSelectedProfileKey) {
+					if (prefProfileKey != _selectedProfileKey) {
 
-						fSelectedProfileKey = prefProfileKey;
+						_selectedProfileKey = prefProfileKey;
 
-						fMap.disposeTiles();
-						fMap.queueMapRedraw();
+						_map.disposeTiles();
+						_map.queueMapRedraw();
 					}
 				}
 			}
 		};
-		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(fMapPrefChangeListener);
+		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(_mapPrefChangeListener);
 
-		fMap.addZoomListener(new IZoomListener() {
+		_map.addZoomListener(new IZoomListener() {
 			public void zoomChanged(final ZoomEvent event) {
-				fMapInfoManager.setZoom(event.getZoom());
+				_mapInfoManager.setZoom(event.getZoom());
 			}
 		});
 
-		fMap.addMapListener(new IMapListener() {
+		_map.addMapListener(new IMapListener() {
 			public void mapInfo(final MapEvent event) {
-				fMapInfoManager.setMapCenter(event.mapCenter);
+				_mapInfoManager.setMapCenter(event.mapCenter);
 			}
 		});
 	}
 
 	private void addPartListener() {
 
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -477,7 +477,7 @@ public class TourMapView extends ViewPart {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMapView.this) {
 					saveState();
-					fMapInfoManager.resetInfo();
+					_mapInfoManager.resetInfo();
 				}
 			}
 
@@ -491,12 +491,12 @@ public class TourMapView extends ViewPart {
 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -508,8 +508,8 @@ public class TourMapView extends ViewPart {
 
 					final boolean isShowTileInfo = store.getBoolean(PREF_SHOW_TILE_INFO);
 
-					fMap.setShowDebugInfo(isShowTileInfo);
-					fMap.queueMapRedraw();
+					_map.setShowDebugInfo(isShowTileInfo);
+					_map.queueMapRedraw();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
@@ -518,7 +518,7 @@ public class TourMapView extends ViewPart {
 					prefDimLevel -= 255;
 
 					final int dimLevel = (int) Math.abs(prefDimLevel);
-					fActionDimMap.setDimLevel(dimLevel);
+					_actionDimMap.setDimLevel(dimLevel);
 					actionDimMap(dimLevel);
 
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_DIM_COLOR)) {
@@ -528,8 +528,8 @@ public class TourMapView extends ViewPart {
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					UI.updateUnits();
-					fMap.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-					fMap.queueMapRedraw();
+					_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+					_map.queueMapRedraw();
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
@@ -537,12 +537,12 @@ public class TourMapView extends ViewPart {
 
 					createLegendImage(PaintManager.getInstance().getLegendProvider());
 
-					fMap.disposeOverlayImageCache();
-					fMap.queueMapRedraw();
+					_map.disposeOverlayImageCache();
+					_map.queueMapRedraw();
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 
 	}
 
@@ -551,17 +551,17 @@ public class TourMapView extends ViewPart {
 	 */
 	private void addSelectionListener() {
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourbookPrefListener() {
 
-		fTourbookPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_tourbookPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -574,18 +574,18 @@ public class TourMapView extends ViewPart {
 
 					createLegendImage(PaintManager.getInstance().getLegendProvider());
 
-					fMap.queueMapRedraw();
+					_map.queueMapRedraw();
 				}
 			}
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fTourbookPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_tourbookPrefChangeListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourMapView.this) {
@@ -601,8 +601,8 @@ public class TourMapView extends ViewPart {
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null && modifiedTours.size() > 0) {
 
-						fTourDataList.clear();
-						fTourDataList.addAll(modifiedTours);
+						_tourDataList.clear();
+						_tourDataList.addAll(modifiedTours);
 
 						resetMap();
 					}
@@ -617,7 +617,7 @@ public class TourMapView extends ViewPart {
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	/**
@@ -625,22 +625,22 @@ public class TourMapView extends ViewPart {
 	 */
 	private void centerTour() {
 
-		if (fIsPositionCentered) {
+		if (_isPositionCentered) {
 
-			final int zoom = fMap.getZoom();
+			final int zoom = _map.getZoom();
 
 			Set<GeoPosition> positionBounds = null;
-			if (fIsTour) {
+			if (_isTour) {
 				positionBounds = PaintManager.getInstance().getTourBounds();
 				if (positionBounds == null) {
 					return;
 				}
 			} else {
-				if (fPOIPosition == null) {
+				if (_poiPosition == null) {
 					return;
 				}
 				positionBounds = new HashSet<GeoPosition>();
-				positionBounds.add(fPOIPosition);
+				positionBounds.add(_poiPosition);
 			}
 
 			final Rectangle2D positionRect = getPositionRect(positionBounds, zoom);
@@ -649,17 +649,17 @@ public class TourMapView extends ViewPart {
 					positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 
-			final GeoPosition geoPosition = fMap.getMapProvider().pixelToGeo(center, zoom);
+			final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
 
-			fMap.setGeoCenterPosition(geoPosition);
+			_map.setGeoCenterPosition(geoPosition);
 		}
 	}
 
 	private void clearView() {
 
 		// disable tour data
-		fTourDataList.clear();
-		fPreviousTourData = null;
+		_tourDataList.clear();
+		_previousTourData = null;
 
 		PaintManager.getInstance().setTourData(new ArrayList<TourData>());
 
@@ -668,112 +668,112 @@ public class TourMapView extends ViewPart {
 
 	private void createActions() {
 
-		fActionTourColorAltitude = new ActionTourColor(
+		_actionTourColorAltitude = new ActionTourColor(
 				this,
 				TOUR_COLOR_ALTITUDE,
 				Messages.map_action_tour_color_altitude_tooltip,
 				Messages.image_action_tour_color_altitude,
 				Messages.image_action_tour_color_altitude_disabled);
 
-		fActionTourColorGradient = new ActionTourColor(
+		_actionTourColorGradient = new ActionTourColor(
 				this,
 				TOUR_COLOR_GRADIENT,
 				Messages.map_action_tour_color_gradient_tooltip,
 				Messages.image_action_tour_color_gradient,
 				Messages.image_action_tour_color_gradient_disabled);
 
-		fActionTourColorPulse = new ActionTourColor(
+		_actionTourColorPulse = new ActionTourColor(
 				this,
 				TOUR_COLOR_PULSE,
 				Messages.map_action_tour_color_pulse_tooltip,
 				Messages.image_action_tour_color_pulse,
 				Messages.image_action_tour_color_pulse_disabled);
 
-		fActionTourColorSpeed = new ActionTourColor(
+		_actionTourColorSpeed = new ActionTourColor(
 				this,
 				TOUR_COLOR_SPEED,
 				Messages.map_action_tour_color_speed_tooltip,
 				Messages.image_action_tour_color_speed,
 				Messages.image_action_tour_color_speed_disabled);
 
-		fActionTourColorPace = new ActionTourColor(
+		_actionTourColorPace = new ActionTourColor(
 				this,
 				TOUR_COLOR_PACE,
 				Messages.map_action_tour_color_pase_tooltip,
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
-//		fActionTourColorTourType = new ActionTourColor(this,
+//		_actionTourColorTourType = new ActionTourColor(this,
 //				TOUR_COLOR_TOURTYPE,
 //				Messages.map_action_tour_color_tourType_tooltip,
 //				Messages.image_action_tour_color_tourType,
 //				Messages.image_action_tour_color_tourType_disabled);
 
-		fActionZoomIn = new ActionZoomIn(this);
-		fActionZoomOut = new ActionZoomOut(this);
-		fActionZoomCentered = new ActionZoomCentered(this);
-		fActionZoomShowAll = new ActionZoomShowAll(this);
-		fActionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
-		fActionSynchWithTour = new ActionSynchWithTour(this);
-		fActionSynchWithSlider = new ActionSynchWithSlider(this);
-		fActionShowTourInMap = new ActionShowTourInMap(this);
-		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
-		fActionSelectMapProvider = new ActionSelectMapProvider(this);
-		fActionSetDefaultPosition = new ActionSetDefaultPosition(this);
-		fActionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
-		fActionShowSliderInMap = new ActionShowSliderInMap(this);
-		fActionShowSliderInLegend = new ActionShowSliderInLegend(this);
-		fActionShowLegendInMap = new ActionShowLegendInMap(this);
-		fActionShowScaleInMap = new ActionShowScaleInMap(this);
-		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
-		fActionShowTourMarker = new ActionShowTourMarker(this);
-		fActionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
-//		fActionResetTileOverlays = new ActionResetTileOverlays(this);
-		fActionDimMap = new ActionDimMap(this);
+		_actionZoomIn = new ActionZoomIn(this);
+		_actionZoomOut = new ActionZoomOut(this);
+		_actionZoomCentered = new ActionZoomCentered(this);
+		_actionZoomShowAll = new ActionZoomShowAll(this);
+		_actionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
+		_actionSynchWithTour = new ActionSynchWithTour(this);
+		_actionSynchWithSlider = new ActionSynchWithSlider(this);
+		_actionShowTourInMap = new ActionShowTourInMap(this);
+		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
+		_actionSelectMapProvider = new ActionSelectMapProvider(this);
+		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
+		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
+		_actionShowSliderInMap = new ActionShowSliderInMap(this);
+		_actionShowSliderInLegend = new ActionShowSliderInLegend(this);
+		_actionShowLegendInMap = new ActionShowLegendInMap(this);
+		_actionShowScaleInMap = new ActionShowScaleInMap(this);
+		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
+		_actionShowTourMarker = new ActionShowTourMarker(this);
+		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
+//		_actionResetTileOverlays = new ActionResetTileOverlays(this);
+		_actionDimMap = new ActionDimMap(this);
 
 		/*
 		 * fill view toolbar
 		 */
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(fActionTourColorAltitude);
-		viewTbm.add(fActionTourColorPulse);
-		viewTbm.add(fActionTourColorSpeed);
-		viewTbm.add(fActionTourColorPace);
-		viewTbm.add(fActionTourColorGradient);
-//		viewTbm.add(fActionTourColorTourType);
+		viewTbm.add(_actionTourColorAltitude);
+		viewTbm.add(_actionTourColorPulse);
+		viewTbm.add(_actionTourColorSpeed);
+		viewTbm.add(_actionTourColorPace);
+		viewTbm.add(_actionTourColorGradient);
+//		viewTbm.add(_actionTourColorTourType);
 		viewTbm.add(new Separator());
-		viewTbm.add(fActionShowTourInMap);
-		viewTbm.add(fActionZoomShowEntireTour);
-		viewTbm.add(fActionSynchWithTour);
-		viewTbm.add(fActionSynchWithSlider);
+		viewTbm.add(_actionShowTourInMap);
+		viewTbm.add(_actionZoomShowEntireTour);
+		viewTbm.add(_actionSynchWithTour);
+		viewTbm.add(_actionSynchWithSlider);
 		viewTbm.add(new Separator());
-		viewTbm.add(fActionSelectMapProvider);
+		viewTbm.add(_actionSelectMapProvider);
 		viewTbm.add(new Separator());
-		viewTbm.add(fActionZoomCentered);
-		viewTbm.add(fActionZoomIn);
-		viewTbm.add(fActionZoomOut);
-		viewTbm.add(fActionZoomShowAll);
+		viewTbm.add(_actionZoomCentered);
+		viewTbm.add(_actionZoomIn);
+		viewTbm.add(_actionZoomOut);
+		viewTbm.add(_actionZoomShowAll);
 
 		/*
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(fActionShowStartEndInMap);
-		menuMgr.add(fActionShowTourMarker);
-		menuMgr.add(fActionShowLegendInMap);
-		menuMgr.add(fActionShowScaleInMap);
-		menuMgr.add(fActionShowSliderInMap);
-		menuMgr.add(fActionShowSliderInLegend);
-		menuMgr.add(fActionDimMap);
+		menuMgr.add(_actionShowStartEndInMap);
+		menuMgr.add(_actionShowTourMarker);
+		menuMgr.add(_actionShowLegendInMap);
+		menuMgr.add(_actionShowScaleInMap);
+		menuMgr.add(_actionShowSliderInMap);
+		menuMgr.add(_actionShowSliderInLegend);
+		menuMgr.add(_actionDimMap);
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetDefaultPosition);
-		menuMgr.add(fActionSaveDefaultPosition);
+		menuMgr.add(_actionSetDefaultPosition);
+		menuMgr.add(_actionSaveDefaultPosition);
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSynchTourZoomLevel);
-		menuMgr.add(fActionReloadFailedMapImages);
-//		menuMgr.add(fActionResetTileOverlays);
+		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(_actionReloadFailedMapImages);
+//		menuMgr.add(_actionResetTileOverlays);
 
 	}
 
@@ -784,7 +784,7 @@ public class TourMapView extends ViewPart {
 	 */
 	private void createLegendImage(final ILegendProvider legendProvider) {
 
-		Image legendImage = fMapLegend.getImage();
+		Image legendImage = _mapLegend.getImage();
 
 		// legend requires a tour with coordinates
 		if (legendProvider == null /* || isPaintDataValid(fTourData) == false */) {
@@ -799,7 +799,7 @@ public class TourMapView extends ViewPart {
 		final int legendWidth = DEFAULT_LEGEND_WIDTH;
 		int legendHeight = DEFAULT_LEGEND_HEIGHT;
 
-		final Rectangle mapBounds = fMap.getBounds();
+		final Rectangle mapBounds = _map.getBounds();
 		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height));
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
@@ -828,28 +828,28 @@ public class TourMapView extends ViewPart {
 		gc.dispose();
 		transparentColor.dispose();
 
-		fMapLegend.setImage(legendImage);
+		_mapLegend.setImage(legendImage);
 	}
 
 	private void createLegendProviders() {
 
-		fLegendProviders.put(//
+		_legendProviders.put(//
 				TourMapView.TOUR_COLOR_PULSE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PULSE));
 
-		fLegendProviders.put(//
+		_legendProviders.put(//
 				TourMapView.TOUR_COLOR_ALTITUDE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_ALTITUDE));
 
-		fLegendProviders.put(//
+		_legendProviders.put(//
 				TourMapView.TOUR_COLOR_SPEED, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_SPEED));
 
-		fLegendProviders.put(//
+		_legendProviders.put(//
 				TourMapView.TOUR_COLOR_PACE, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_PACE));
 
-		fLegendProviders.put(//
+		_legendProviders.put(//
 				TourMapView.TOUR_COLOR_GRADIENT, //
 				new LegendProvider(new LegendConfig(), new LegendColor(), TourMapView.TOUR_COLOR_GRADIENT));
 
@@ -861,36 +861,36 @@ public class TourMapView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		fMap = new Map(parent, SWT.NONE);
-		fMap.setDirectPainter(fDirectMappingPainter);
+		_map = new Map(parent, SWT.NONE);
+		_map.setDirectPainter(_directMappingPainter);
 
-		fMapLegend = new MapLegend();
-		fMap.setLegend(fMapLegend);
-		fMap.setShowLegend(true);
-		fMap.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+		_mapLegend = new MapLegend();
+		_map.setLegend(_mapLegend);
+		_map.setShowLegend(true);
+		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
-		fMap.addControlListener(new ControlAdapter() {
+		_map.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
 
 				/*
 				 * check if the legend size must be adjusted
 				 */
-				final Image legendImage = fMapLegend.getImage();
+				final Image legendImage = _mapLegend.getImage();
 				if (legendImage == null || legendImage.isDisposed()) {
 					return;
 				}
 
-				final boolean showTour = fActionShowTourInMap.isChecked();
-				final boolean showLegend = fActionShowLegendInMap.isChecked();
-				if (fIsTour == false || showTour == false || showLegend == false) {
+				final boolean showTour = _actionShowTourInMap.isChecked();
+				final boolean showLegend = _actionShowLegendInMap.isChecked();
+				if (_isTour == false || showTour == false || showLegend == false) {
 					return;
 				}
 
 				/*
 				 * check height
 				 */
-				final Rectangle mapBounds = fMap.getBounds();
+				final Rectangle mapBounds = _map.getBounds();
 				final Rectangle legendBounds = legendImage.getBounds();
 
 				if (mapBounds.height < DEFAULT_LEGEND_HEIGHT //
@@ -913,7 +913,7 @@ public class TourMapView extends ViewPart {
 		addMapListener();
 
 		// register overlays which draw the tour
-		GeoclipseExtensions.registerOverlays(fMap);
+		GeoclipseExtensions.registerOverlays(_map);
 
 		// initialize map when part is created and the map size is > 0
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -921,14 +921,14 @@ public class TourMapView extends ViewPart {
 
 				restoreState();
 
-				if (fTourDataList.size() == 0) {
+				if (_tourDataList.size() == 0) {
 					// a tour is not displayed, find a tour provider which provides a tour
 					showToursFromTourProvider();
 				} else {
-					fMap.queueMapRedraw();
+					_map.queueMapRedraw();
 				}
 
-				if (fMapDimLevel < 30) {
+				if (_mapDimLevel < 30) {
 					showDimWarning();
 				}
 			}
@@ -938,7 +938,7 @@ public class TourMapView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		fTourDataList.clear();
+		_tourDataList.clear();
 
 		// dispose tilefactory resources
 
@@ -947,16 +947,16 @@ public class TourMapView extends ViewPart {
 			mp.disposeAllImages();
  		}
 
-		fMap.disposeOverlayImageCache();
+		_map.disposeOverlayImageCache();
 
-		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		getViewSite().getPage().removePartListener(fPartListener);
+		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
-		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fTourbookPrefChangeListener);
+		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(_tourbookPrefChangeListener);
 
 		super.dispose();
 	}
@@ -968,90 +968,90 @@ public class TourMapView extends ViewPart {
 	private void enableActions(final boolean isForceTourColor) {
 
 		// update legend action
-		if (fIsTour) {
+		if (_isTour) {
 
-			final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
+			final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
 
-			fMap.setShowLegend(isLegendVisible);
+			_map.setShowLegend(isLegendVisible);
 
-			fActionShowSliderInLegend.setEnabled(isLegendVisible);
+			_actionShowSliderInLegend.setEnabled(isLegendVisible);
 			if (isLegendVisible == false) {
-				fActionShowSliderInLegend.setChecked(false);
+				_actionShowSliderInLegend.setChecked(false);
 			}
 		}
 
-		final boolean isMultipleTours = fTourDataList.size() > 1;
-		final boolean isOneTour = fIsTour && isMultipleTours == false;
+		final boolean isMultipleTours = _tourDataList.size() > 1;
+		final boolean isOneTour = _isTour && isMultipleTours == false;
 
 		/*
 		 * enable/disable tour actions
 		 */
-		fActionZoomShowEntireTour.setEnabled(isOneTour);
-		fActionSynchTourZoomLevel.setEnabled(isOneTour);
-		fActionShowTourInMap.setEnabled(fIsTour);
-		fActionSynchWithTour.setEnabled(isOneTour);
-		fActionSynchWithSlider.setEnabled(isOneTour);
+		_actionZoomShowEntireTour.setEnabled(isOneTour);
+		_actionSynchTourZoomLevel.setEnabled(isOneTour);
+		_actionShowTourInMap.setEnabled(_isTour);
+		_actionSynchWithTour.setEnabled(isOneTour);
+		_actionSynchWithSlider.setEnabled(isOneTour);
 
-		fActionShowStartEndInMap.setEnabled(isOneTour);
-		fActionShowTourMarker.setEnabled(isOneTour);
-		fActionShowLegendInMap.setEnabled(fIsTour);
-		fActionShowSliderInMap.setEnabled(isOneTour);
-		fActionShowSliderInLegend.setEnabled(isOneTour);
+		_actionShowStartEndInMap.setEnabled(isOneTour);
+		_actionShowTourMarker.setEnabled(_isTour);
+		_actionShowLegendInMap.setEnabled(_isTour);
+		_actionShowSliderInMap.setEnabled(_isTour);
+		_actionShowSliderInLegend.setEnabled(isOneTour);
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 
-			fActionTourColorAltitude.setEnabled(false);
-			fActionTourColorGradient.setEnabled(false);
-			fActionTourColorPulse.setEnabled(false);
-			fActionTourColorSpeed.setEnabled(false);
-			fActionTourColorPace.setEnabled(false);
-//			fActionTourColorTourType.setEnabled(false);
+			_actionTourColorAltitude.setEnabled(false);
+			_actionTourColorGradient.setEnabled(false);
+			_actionTourColorPulse.setEnabled(false);
+			_actionTourColorSpeed.setEnabled(false);
+			_actionTourColorPace.setEnabled(false);
+//			_actionTourColorTourType.setEnabled(false);
 
 		} else if (isForceTourColor) {
 
-			fActionTourColorAltitude.setEnabled(true);
-			fActionTourColorGradient.setEnabled(true);
-			fActionTourColorPulse.setEnabled(true);
-			fActionTourColorSpeed.setEnabled(true);
-			fActionTourColorPace.setEnabled(true);
-//			fActionTourColorTourType.setEnabled(true);
+			_actionTourColorAltitude.setEnabled(true);
+			_actionTourColorGradient.setEnabled(true);
+			_actionTourColorPulse.setEnabled(true);
+			_actionTourColorSpeed.setEnabled(true);
+			_actionTourColorPace.setEnabled(true);
+//			_actionTourColorTourType.setEnabled(true);
 
 		} else if (isOneTour) {
 
-			final TourData oneTourData = fTourDataList.get(0);
-			fActionTourColorAltitude.setEnabled(true);
-			fActionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
-			fActionTourColorPulse.setEnabled(oneTourData.pulseSerie != null);
-			fActionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
-			fActionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
-//			fActionTourColorTourType.setEnabled(true);
+			final TourData oneTourData = _tourDataList.get(0);
+			_actionTourColorAltitude.setEnabled(true);
+			_actionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
+			_actionTourColorPulse.setEnabled(oneTourData.pulseSerie != null);
+			_actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
+			_actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
+//			_actionTourColorTourType.setEnabled(true);
 
 		} else {
 
-			fActionTourColorAltitude.setEnabled(false);
-			fActionTourColorGradient.setEnabled(false);
-			fActionTourColorPulse.setEnabled(false);
-			fActionTourColorSpeed.setEnabled(false);
-			fActionTourColorPace.setEnabled(false);
-//			fActionTourColorTourType.setEnabled(false);
+			_actionTourColorAltitude.setEnabled(false);
+			_actionTourColorGradient.setEnabled(false);
+			_actionTourColorPulse.setEnabled(false);
+			_actionTourColorSpeed.setEnabled(false);
+			_actionTourColorPace.setEnabled(false);
+//			_actionTourColorTourType.setEnabled(false);
 		}
 	}
 
 	private ILegendProvider getLegendProvider(final int colorId) {
-		return fLegendProviders.get(colorId);
+		return _legendProviders.get(colorId);
 	}
 
 	public Map getMap() {
-		return fMap;
+		return _map;
 	}
 
 	public int getMapDimLevel() {
-		return fMapDimLevel;
+		return _mapDimLevel;
 	}
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
-		final MP mp = fMap.getMapProvider();
+		final MP mp = _map.getMapProvider();
 		final Point2D point1 = mp.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
 
@@ -1265,16 +1265,16 @@ public class TourMapView extends ViewPart {
 
 		} else if (selection instanceof PointOfInterest) {
 
-			fIsTour = false;
+			_isTour = false;
 
 			clearView();
 
 			final PointOfInterest poi = (PointOfInterest) selection;
-			fPOIPosition = poi.getPosition();
+			_poiPosition = poi.getPosition();
 
-			fMap.setZoom(poi.getRecommendedZoom());
-			fMap.setGeoCenterPosition(fPOIPosition);
-			fMap.queueMapRedraw();
+			_map.setZoom(poi.getRecommendedZoom());
+			_map.setGeoCenterPosition(_poiPosition);
+			_map.queueMapRedraw();
 
 			enableActions();
 
@@ -1320,14 +1320,14 @@ public class TourMapView extends ViewPart {
 
 	private void paintAllTours() {
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 			return;
 		}
 
 		// show/hide legend
-		fMap.setShowLegend(fActionShowTourInMap.isChecked());
+		_map.setShowLegend(_actionShowTourInMap.isChecked());
 
-		if (fTourDataList.size() > 1) {
+		if (_tourDataList.size() > 1) {
 
 			// multiple tours are displayed
 
@@ -1335,42 +1335,42 @@ public class TourMapView extends ViewPart {
 			enableActions(true);
 
 		} else {
-			paintOneTour(fTourDataList.get(0), true, false);
+			paintOneTour(_tourDataList.get(0), true, false);
 			enableActions();
 		}
 	}
 
 	private void paintEntireTour() {
 
-		if (fTourDataList.size() == 0 || isPaintDataValid(fTourDataList.get(0)) == false) {
+		if (_tourDataList.size() == 0 || isPaintDataValid(_tourDataList.get(0)) == false) {
 			showDefaultMap();
 			return;
 		}
 
 		final PaintManager paintManager = PaintManager.getInstance();
 
-		paintManager.setTourData(fTourDataList);
+		paintManager.setTourData(_tourDataList);
 
-		final TourData firstTourData = fTourDataList.get(0);
+		final TourData firstTourData = _tourDataList.get(0);
 
 		// set slider position
-		fDirectMappingPainter.setPaintContext(
-				fMap,
-				fActionShowTourInMap.isChecked(),
+		_directMappingPainter.setPaintContext(
+				_map,
+				_actionShowTourInMap.isChecked(),
 				firstTourData,
-				fCurrentLeftSliderValueIndex,
-				fCurrentRightSliderValueIndex,
-				fActionShowSliderInMap.isChecked(),
-				fActionShowSliderInLegend.isChecked());
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
 
 		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
 		paintManager.setTourBounds(tourBounds);
 
-		fMap.setShowOverlays(fActionShowTourInMap.isChecked());
+		_map.setShowOverlays(_actionShowTourInMap.isChecked());
 
 		setTourZoomLevel(tourBounds, false);
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	/**
@@ -1388,23 +1388,23 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		fIsTour = true;
-		final boolean isShowTour = fActionShowTourInMap.isChecked();
+		_isTour = true;
+		final boolean isShowTour = _actionShowTourInMap.isChecked();
 
 		// prevent loading the same tour
 		if (forceRedraw == false) {
 
-			if (fTourDataList.size() == 1 && fTourDataList.get(0) == tourData) {
+			if (_tourDataList.size() == 1 && _tourDataList.get(0) == tourData) {
 				return;
 			}
 		}
 
 		// force multiple tours to be repainted
-		fPreviousOverlayKey = -1;
+		_previousOverlayKey = -1;
 
 		// check if this is a new tour
 		boolean isNewTour = true;
-		if (fPreviousTourData != null && fPreviousTourData.getTourId().longValue() == tourData.getTourId().longValue()) {
+		if (_previousTourData != null && _previousTourData.getTourId().longValue() == tourData.getTourId().longValue()) {
 			isNewTour = false;
 		}
 
@@ -1416,39 +1416,39 @@ public class TourMapView extends ViewPart {
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
 		 * to figure out if multiple tours are selected
 		 */
-		fTourDataList.clear();
-		fTourDataList.add(tourData);
+		_tourDataList.clear();
+		_tourDataList.add(tourData);
 
 		// set the paint context (slider position) for the direct mapping painter
-		fDirectMappingPainter.setPaintContext(
-				fMap,
+		_directMappingPainter.setPaintContext(
+				_map,
 				isShowTour,
 				tourData,
-				fCurrentLeftSliderValueIndex,
-				fCurrentRightSliderValueIndex,
-				fActionShowSliderInMap.isChecked(),
-				fActionShowSliderInLegend.isChecked());
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
 
 		// set the tour bounds
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		paintManager.setTourBounds(tourBounds);
 
-		fMap.setShowOverlays(isShowTour);
-		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
 
 		// set position and zoom level for the tour
-		if (fIsMapSynchedWithTour && isSynchronized) {
+		if (_isMapSynchedWithTour && isSynchronized) {
 
-			if (forceRedraw == false && fPreviousTourData != null || tourData == fPreviousTourData) {
+			if (forceRedraw == false && _previousTourData != null || tourData == _previousTourData) {
 
 				/*
 				 * keep map configuration for the previous tour
 				 */
-				fPreviousTourData.mapZoomLevel = fMap.getZoom();
+				_previousTourData.mapZoomLevel = _map.getZoom();
 
-				final GeoPosition centerPosition = fMap.getGeoCenter();
-				fPreviousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
-				fPreviousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
+				final GeoPosition centerPosition = _map.getGeoCenter();
+				_previousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
+				_previousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
 			}
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
@@ -1459,68 +1459,68 @@ public class TourMapView extends ViewPart {
 			} else {
 
 				// position tour to the previous position
-				fMap.setZoom(tourData.mapZoomLevel);
-				fMap.setGeoCenterPosition(new GeoPosition(
+				_map.setZoom(tourData.mapZoomLevel);
+				_map.setGeoCenterPosition(new GeoPosition(
 						tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
 			}
 		}
 
 		// keep tour data
-		fPreviousTourData = tourData;
+		_previousTourData = tourData;
 
 		if (isNewTour || forceRedraw) {
 
 			// adjust legend values for the new or changed tour
 			createLegendImage(PaintManager.getInstance().getLegendProvider());
 
-			fMap.setOverlayKey(tourData.getTourId().toString());
-			fMap.resetOverlays();
-			fMap.disposeOverlayImageCache();
+			_map.setOverlayKey(tourData.getTourId().toString());
+			_map.resetOverlays();
+			_map.disposeOverlayImageCache();
 
 		}
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	/**
-	 * paints the tours which are set in {@link #fTourDataList}
+	 * paints the tours which are set in {@link #_tourDataList}
 	 */
 	private void paintTours() {
 
-		fIsTour = true;
+		_isTour = true;
 
 		// force single tour to be repainted
-		fPreviousTourData = null;
+		_previousTourData = null;
 
-		PaintManager.getInstance().setTourData(fTourDataList);
+		PaintManager.getInstance().setTourData(_tourDataList);
 
-		fDirectMappingPainter.disablePaintContext();
+		_directMappingPainter.disablePaintContext();
 
-		final boolean isShowTour = fActionShowTourInMap.isChecked();
-		fMap.setShowOverlays(isShowTour);
-		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+		final boolean isShowTour = _actionShowTourInMap.isChecked();
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
 
 		// get overlay key for all tours which have valid tour data
 		long newOverlayKey = -1;
-		for (final TourData tourData : fTourDataList) {
+		for (final TourData tourData : _tourDataList) {
 
 			if (isPaintDataValid(tourData)) {
 				newOverlayKey += tourData.getTourId();
 			}
 		}
 
-		if (fPreviousOverlayKey != newOverlayKey) {
+		if (_previousOverlayKey != newOverlayKey) {
 
-			fPreviousOverlayKey = newOverlayKey;
+			_previousOverlayKey = newOverlayKey;
 
-			fMap.setOverlayKey(Long.toString(newOverlayKey));
-			fMap.resetOverlays();
-			fMap.disposeOverlayImageCache();
+			_map.setOverlayKey(Long.toString(newOverlayKey));
+			_map.resetOverlays();
+			_map.disposeOverlayImageCache();
 		}
 
 		createLegendImage(PaintManager.getInstance().getLegendProvider());
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -1528,43 +1528,44 @@ public class TourMapView extends ViewPart {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
-				fIsTour = true;
+				_isTour = true;
 
 				// force single tour to be repainted
-				fPreviousTourData = null;
+				_previousTourData = null;
 
-				fDirectMappingPainter.disablePaintContext();
+				_directMappingPainter.disablePaintContext();
 
-				final boolean isShowTour = fActionShowTourInMap.isChecked();
-				fMap.setShowOverlays(isShowTour);
-				fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+				final boolean isShowTour = _actionShowTourInMap.isChecked();
+				_map.setShowOverlays(isShowTour);
+				_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
 
 				/*
 				 * create a unique overlay key for the selected tours
 				 */
 				long newOverlayKey = 0;
-				fTourDataList.clear();
+				_tourDataList.clear();
 				for (final Long tourId : tourIdList) {
 
 					final TourData tourData = TourManager.getInstance().getTourData(tourId);
 					if (isPaintDataValid(tourData)) {
 						// keep tour data for each tour id
-						fTourDataList.add(tourData);
+						_tourDataList.add(tourData);
 						newOverlayKey += tourData.getTourId();
 					}
 				}
-				PaintManager.getInstance().setTourData(fTourDataList);
+				PaintManager.getInstance().setTourData(_tourDataList);
 
-				if (fPreviousOverlayKey != newOverlayKey) {
+				if (_previousOverlayKey != newOverlayKey) {
 
-					fPreviousOverlayKey = newOverlayKey;
+					_previousOverlayKey = newOverlayKey;
 
-					fMap.setOverlayKey(Long.toString(newOverlayKey));
-					fMap.resetOverlays();
+					_map.setOverlayKey(Long.toString(newOverlayKey));
+					_map.resetOverlays();
+					_map.disposeOverlayImageCache();
 				}
 
 				createLegendImage(PaintManager.getInstance().getLegendProvider());
-				fMap.queueMapRedraw();
+				_map.queueMapRedraw();
 			}
 		});
 	}
@@ -1579,43 +1580,43 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		fIsTour = true;
-		fCurrentLeftSliderValueIndex = leftSliderValuesIndex;
-		fCurrentRightSliderValueIndex = rightSliderValuesIndex;
-		fCurrentSelectedSliderValueIndex = selectedSliderIndex;
+		_isTour = true;
+		_currentLeftSliderValueIndex = leftSliderValuesIndex;
+		_currentRightSliderValueIndex = rightSliderValuesIndex;
+		_currentSelectedSliderValueIndex = selectedSliderIndex;
 
-		fDirectMappingPainter.setPaintContext(
-				fMap,
-				fActionShowTourInMap.isChecked(),
+		_directMappingPainter.setPaintContext(
+				_map,
+				_actionShowTourInMap.isChecked(),
 				tourData,
 				leftSliderValuesIndex,
 				rightSliderValuesIndex,
-				fActionShowSliderInMap.isChecked(),
-				fActionShowSliderInLegend.isChecked());
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
 
-		if (fIsMapSynchedWithSlider) {
+		if (_isMapSynchedWithSlider) {
 
 			setMapToSliderBounds(tourData);
 
-			fMap.queueMapRedraw();
+			_map.queueMapRedraw();
 
 		} else {
 
-			fMap.redraw();
+			_map.redraw();
 		}
 	}
 
 	private void resetMap() {
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 			return;
 		}
 
-		fMap.disposeOverlayImageCache();
+		_map.disposeOverlayImageCache();
 
 		paintAllTours();
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	private void restoreState() {
@@ -1626,8 +1627,8 @@ public class TourMapView extends ViewPart {
 		try {
 			final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
 
-			fActionZoomCentered.setChecked(isTourCentered);
-			fIsPositionCentered = isTourCentered;
+			_actionZoomCentered.setChecked(isTourCentered);
+			_isPositionCentered = isTourCentered;
 		} catch (final NumberFormatException e) {}
 
 		try {
@@ -1638,15 +1639,15 @@ public class TourMapView extends ViewPart {
 			} else {
 				isSynchTour = settings.getBoolean(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
 			}
-			fActionSynchWithTour.setChecked(isSynchTour);
-			fIsMapSynchedWithTour = isSynchTour;
+			_actionSynchWithTour.setChecked(isSynchTour);
+			_isMapSynchedWithTour = isSynchTour;
 		} catch (final NumberFormatException e) {}
 
 		try {
 			final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
 
-			fActionSynchWithSlider.setChecked(isSynchSlider);
-			fIsMapSynchedWithSlider = isSynchSlider;
+			_actionSynchWithSlider.setChecked(isSynchSlider);
+			_isMapSynchedWithSlider = isSynchSlider;
 		} catch (final NumberFormatException e) {}
 
 		// action: show tour in map
@@ -1659,30 +1660,30 @@ public class TourMapView extends ViewPart {
 				isShowTour = settings.getBoolean(MEMENTO_SHOW_TOUR_IN_MAP);
 			}
 
-			fActionShowTourInMap.setChecked(isShowTour);
-			fMap.setShowOverlays(isShowTour);
-			fMap.setShowLegend(isShowTour);
+			_actionShowTourInMap.setChecked(isShowTour);
+			_map.setShowOverlays(isShowTour);
+			_map.setShowLegend(isShowTour);
 		} catch (final NumberFormatException e) {}
 
 		try {
-			fActionSynchTourZoomLevel.setZoomLevel(settings.getInt(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL));
+			_actionSynchTourZoomLevel.setZoomLevel(settings.getInt(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL));
 		} catch (final NumberFormatException e) {}
 
 		try {
-			fMapDimLevel = settings.getInt(MEMENTO_MAP_DIM_LEVEL);
+			_mapDimLevel = settings.getInt(MEMENTO_MAP_DIM_LEVEL);
 		} catch (final NumberFormatException e) {}
 
 		// action: show start/end in map
 		try {
-			fActionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
+			_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
 		} catch (final NumberFormatException e) {}
-		paintManager.setShowStartEnd(fActionShowStartEndInMap.isChecked());
+		paintManager.setShowStartEnd(_actionShowStartEndInMap.isChecked());
 
 		// action: show tour marker
 		try {
-			fActionShowTourMarker.setChecked(settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
+			_actionShowTourMarker.setChecked(settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
 		} catch (final NumberFormatException e) {}
-		paintManager.setShowTourMarker(fActionShowTourMarker.isChecked());
+		paintManager.setShowTourMarker(_actionShowTourMarker.isChecked());
 
 		// action: show legend in map
 		try {
@@ -1694,7 +1695,7 @@ public class TourMapView extends ViewPart {
 				isShowLegend = settings.getBoolean(MEMENTO_SHOW_LEGEND_IN_MAP);
 			}
 
-			fActionShowLegendInMap.setChecked(isShowLegend);
+			_actionShowLegendInMap.setChecked(isShowLegend);
 		} catch (final NumberFormatException e) {}
 
 		// action: show scale
@@ -1702,15 +1703,15 @@ public class TourMapView extends ViewPart {
 		if (settings.get(MEMENTO_SHOW_SCALE_IN_MAP) != null) {
 			isScaleVisible = settings.getBoolean(MEMENTO_SHOW_SCALE_IN_MAP);
 		}
-		fActionShowScaleInMap.setChecked(isScaleVisible);
-		fMap.setShowScale(isScaleVisible);
+		_actionShowScaleInMap.setChecked(isScaleVisible);
+		_map.setShowScale(isScaleVisible);
 
 		// actions
-		fActionShowSliderInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
-		fActionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
+		_actionShowSliderInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
 		// restore map factory by selecting the last used map factory
-		fActionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
+		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// restore: default position
 		try {
@@ -1730,38 +1731,38 @@ public class TourMapView extends ViewPart {
 
 			switch (colorId) {
 			case TOUR_COLOR_ALTITUDE:
-				fActionTourColorAltitude.setChecked(true);
+				_actionTourColorAltitude.setChecked(true);
 				break;
 
 			case TOUR_COLOR_GRADIENT:
-				fActionTourColorGradient.setChecked(true);
+				_actionTourColorGradient.setChecked(true);
 				break;
 
 			case TOUR_COLOR_PULSE:
-				fActionTourColorPulse.setChecked(true);
+				_actionTourColorPulse.setChecked(true);
 				break;
 
 			case TOUR_COLOR_SPEED:
-				fActionTourColorSpeed.setChecked(true);
+				_actionTourColorSpeed.setChecked(true);
 				break;
 
 			case TOUR_COLOR_PACE:
-				fActionTourColorPace.setChecked(true);
+				_actionTourColorPace.setChecked(true);
 				break;
 
 //			case TOUR_COLOR_TOURTYPE:
-//				fActionTourColorTourType.setChecked(true);
+//				_actionTourColorTourType.setChecked(true);
 //				break;
 
 			default:
-				fActionTourColorAltitude.setChecked(true);
+				_actionTourColorAltitude.setChecked(true);
 				break;
 			}
 
 			paintManager.setLegendProvider(getLegendProvider(colorId));
 
 		} catch (final NumberFormatException e) {
-			fActionTourColorAltitude.setChecked(true);
+			_actionTourColorAltitude.setChecked(true);
 		}
 
 		// draw tour with default color
@@ -1776,20 +1777,20 @@ public class TourMapView extends ViewPart {
 			paintManager.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
 
 			// hide legend
-			fMap.setShowLegend(false);
+			_map.setShowLegend(false);
 		}
 
 		// debug info
 		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
-		fMap.setShowDebugInfo(isShowTileInfo);
+		_map.setShowDebugInfo(isShowTileInfo);
 
 		// set dim level/color after the map providers are set
-		if (fMapDimLevel == -1) {
-			fMapDimLevel = 0xff;
+		if (_mapDimLevel == -1) {
+			_mapDimLevel = 0xff;
 		}
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-		fMap.setDimLevel(fMapDimLevel, dimColor);
-		fMapDimLevel = fActionDimMap.setDimLevel(fMapDimLevel);
+		_map.setDimLevel(_mapDimLevel, dimColor);
+		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
 
 		// display the map with the default position
 		actionSetDefaultPosition();
@@ -1800,25 +1801,25 @@ public class TourMapView extends ViewPart {
 		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
 		// save checked actions
-		settings.put(MEMENTO_ZOOM_CENTERED, fActionZoomCentered.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_IN_MAP, fActionShowTourInMap.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked());
-		settings.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, fActionSynchWithSlider.isChecked());
-		settings.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
+		settings.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_IN_MAP, _actionShowTourInMap.isChecked());
+		settings.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSynchWithTour.isChecked());
+		settings.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSynchWithSlider.isChecked());
+		settings.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSynchTourZoomLevel.getZoomLevel());
 
-		settings.put(MEMENTO_MAP_DIM_LEVEL, fMapDimLevel);
+		settings.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
 
-		settings.put(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_MARKER, fActionShowTourMarker.isChecked());
-		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, fActionShowLegendInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, fActionShowScaleInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked());
-		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked());
+		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
+		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, _actionShowLegendInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
+		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
 
-		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, fActionSelectMapProvider.getSelectedMapProvider().getId());
+		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 
 		if (fDefaultPosition == null) {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getMapProvider().getMinimumZoomLevel());
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _map.getMapProvider().getMinimumZoomLevel());
 			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
@@ -1830,15 +1831,15 @@ public class TourMapView extends ViewPart {
 		// tour color
 		int colorId;
 
-		if (fActionTourColorGradient.isChecked()) {
+		if (_actionTourColorGradient.isChecked()) {
 			colorId = TOUR_COLOR_GRADIENT;
-		} else if (fActionTourColorPulse.isChecked()) {
+		} else if (_actionTourColorPulse.isChecked()) {
 			colorId = TOUR_COLOR_PULSE;
-		} else if (fActionTourColorSpeed.isChecked()) {
+		} else if (_actionTourColorSpeed.isChecked()) {
 			colorId = TOUR_COLOR_SPEED;
-		} else if (fActionTourColorPace.isChecked()) {
+		} else if (_actionTourColorPace.isChecked()) {
 			colorId = TOUR_COLOR_PACE;
-//		} else if (fActionTourColorTourType.isChecked()) {
+//		} else if (_actionTourColorTourType.isChecked()) {
 //			colorId = TOUR_COLOR_TOURTYPE;
 		} else {
 			colorId = TOUR_COLOR_ALTITUDE;
@@ -1848,7 +1849,7 @@ public class TourMapView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		fMap.setFocus();
+		_map.setFocus();
 	}
 
 	/**
@@ -1884,13 +1885,13 @@ public class TourMapView extends ViewPart {
 //		final double sliderLat = minLatitude + latDiff2 - 0;
 //		final double sliderLong = minLongitude + longDiff2 - 0;
 
-//		fMap.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
-//		fMap.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
-//		fMap.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
+//		_map.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
+//		_map.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
+//		_map.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
 
-		final int sliderIndex = Math.max(0, Math.min(fCurrentSelectedSliderValueIndex, latitudeSerie.length - 1));
+		final int sliderIndex = Math.max(0, Math.min(_currentSelectedSliderValueIndex, latitudeSerie.length - 1));
 
-		fMap.setGeoCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+		_map.setGeoCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
 	}
 
@@ -1910,13 +1911,13 @@ public class TourMapView extends ViewPart {
 			return;
 		}
 
-		final MP mp = fMap.getMapProvider();
+		final MP mp = _map.getMapProvider();
 
 		final int maximumZoomLevel = mp.getMaximumZoomLevel();
 		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle2D positionRect = getPositionRect(positions, zoom);
-		java.awt.Rectangle viewport = fMap.getMapPixelViewport();
+		java.awt.Rectangle viewport = _map.getMapPixelViewport();
 
 		// zoom until the tour is visible in the map
 		while (!viewport.contains(positionRect)) {
@@ -1927,16 +1928,16 @@ public class TourMapView extends ViewPart {
 					+ positionRect.getHeight()
 					/ 2);
 			final GeoPosition px = mp.pixelToGeo(center, zoom);
-			fMap.setGeoCenterPosition(px);
+			_map.setGeoCenterPosition(px);
 
 			// check zoom level
 			if (++zoom >= maximumZoomLevel) {
 				break;
 			}
-			fMap.setZoom(zoom);
+			_map.setZoom(zoom);
 
 			positionRect = getPositionRect(positions, zoom);
-			viewport = fMap.getMapPixelViewport();
+			viewport = _map.getMapPixelViewport();
 		}
 
 		// zoom in until the tour is larger than the viewport
@@ -1948,16 +1949,16 @@ public class TourMapView extends ViewPart {
 					+ positionRect.getHeight()
 					/ 2);
 			final GeoPosition px = mp.pixelToGeo(center, zoom);
-			fMap.setGeoCenterPosition(px);
+			_map.setGeoCenterPosition(px);
 
 			// check zoom level
 			if (++zoom >= maximumZoomLevel) {
 				break;
 			}
-			fMap.setZoom(zoom);
+			_map.setZoom(zoom);
 
 			positionRect = getPositionRect(positions, zoom);
-			viewport = fMap.getMapPixelViewport();
+			viewport = _map.getMapPixelViewport();
 		}
 
 		// the algorithm generated a larger zoom level as necessary
@@ -1968,25 +1969,25 @@ public class TourMapView extends ViewPart {
 			adjustedZoomLevel = PaintManager.getInstance().getSynchTourZoomLevel();
 		}
 
-		fMap.setZoom(zoom + adjustedZoomLevel);
+		_map.setZoom(zoom + adjustedZoomLevel);
 	}
 
 	private void showDefaultMap() {
 
 		// disable tour actions in this view
-		fIsTour = false;
+		_isTour = false;
 
 		// disable tour data
-		fTourDataList.clear();
-		fPreviousTourData = null;
+		_tourDataList.clear();
+		_previousTourData = null;
 
 		// update direct painter to draw nothing
-		fDirectMappingPainter.setPaintContext(fMap, false, null, 0, 0, false, false);
+		_directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false);
 
-		fMap.setShowOverlays(false);
-		fMap.setShowLegend(false);
+		_map.setShowOverlays(false);
+		_map.setShowLegend(false);
 
-		fMap.queueMapRedraw();
+		_map.queueMapRedraw();
 	}
 
 	/**
@@ -2024,14 +2025,14 @@ public class TourMapView extends ViewPart {
 			public void run() {
 
 				// validate widget
-				if (fMap.isDisposed()) {
+				if (_map.isDisposed()) {
 					return;
 				}
 
 				/*
 				 * check if tour is set from a selection provider
 				 */
-				if (fTourDataList.size() > 0) {
+				if (_tourDataList.size() > 0) {
 					return;
 				}
 
@@ -2041,8 +2042,8 @@ public class TourMapView extends ViewPart {
 //					final TourData tourData = TourManager.getInstance().getTourData(tourDataList);
 //					if (tourData != null) {
 
-					fTourDataList.clear();
-					fTourDataList.addAll(tourDataList);
+					_tourDataList.clear();
+					_tourDataList.addAll(tourDataList);
 
 					paintAllTours();
 
@@ -2074,7 +2075,7 @@ public class TourMapView extends ViewPart {
 	 */
 	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 
-		if (fTourDataList.size() == 0) {
+		if (_tourDataList.size() == 0) {
 			return false;
 		}
 
@@ -2092,7 +2093,7 @@ public class TourMapView extends ViewPart {
 			int maxValue = Integer.MAX_VALUE;
 			boolean setInitialValue = true;
 
-			for (final TourData tourData : fTourDataList) {
+			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getAltitudeSerie();
 				if (dataSerie == null || dataSerie.length == 0) {
@@ -2132,7 +2133,7 @@ public class TourMapView extends ViewPart {
 			maxValue = Integer.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : fTourDataList) {
+			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.pulseSerie;
 				if (dataSerie == null || dataSerie.length == 0) {
@@ -2172,7 +2173,7 @@ public class TourMapView extends ViewPart {
 			maxValue = Integer.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : fTourDataList) {
+			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getSpeedSerie();
 				if (dataSerie == null || dataSerie.length == 0) {
@@ -2213,7 +2214,7 @@ public class TourMapView extends ViewPart {
 			maxValue = Integer.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : fTourDataList) {
+			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getPaceSerie();
 				if (dataSerie == null || dataSerie.length == 0) {
@@ -2254,7 +2255,7 @@ public class TourMapView extends ViewPart {
 			maxValue = Integer.MAX_VALUE;
 			setInitialValue = true;
 
-			for (final TourData tourData : fTourDataList) {
+			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getGradientSerie();
 				if (dataSerie == null || dataSerie.length == 0) {

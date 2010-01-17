@@ -600,7 +600,7 @@ public class TourData implements Comparable<Object> {
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	public Map<Integer, Point[]>		fWorldPosition					= new HashMap<Integer, Point[]>();
+	private Map<Integer, Point[]>		_worldPosition					= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -646,7 +646,7 @@ public class TourData implements Comparable<Object> {
 	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
-	private TourData					fMergeSourceTourData;
+	private TourData					_mergeSourceTourData;
 
 	public TourData() {}
 
@@ -822,7 +822,7 @@ public class TourData implements Comparable<Object> {
 	 * clears the cached world positions, this is necessary when the data serie have been modified
 	 */
 	public void clearWorldPositions() {
-		fWorldPosition.clear();
+		_worldPosition.clear();
 	}
 
 	public int compareTo(final Object obj) {
@@ -3202,7 +3202,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public TourData getMergeSourceTourData() {
-		return fMergeSourceTourData;
+		return _mergeSourceTourData;
 	}
 
 	/**
@@ -3684,7 +3684,7 @@ public class TourData implements Comparable<Object> {
 	 * @return Returns the world position for the suplied zoom level and projection id
 	 */
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
-		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
+		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
 
 	/**
@@ -3911,7 +3911,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public void setMergeSourceTour(final TourData mergeSourceTour) {
-		fMergeSourceTourData = mergeSourceTour;
+		_mergeSourceTourData = mergeSourceTour;
 	}
 
 	public void setMergeSourceTourId(final Long mergeSourceTourId) {
@@ -4105,7 +4105,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {
-		fWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+		_worldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}
 
 	@Override

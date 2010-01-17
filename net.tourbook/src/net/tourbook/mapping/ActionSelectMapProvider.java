@@ -346,8 +346,6 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		fSelectedMP = mp;
 
-//		final TileFactory_OLD mpTileFactory = mp.getTileFactory(true);
-
 		final Map map = fMappingView.getMap();
 
 		map.setMapProvider(mp);
