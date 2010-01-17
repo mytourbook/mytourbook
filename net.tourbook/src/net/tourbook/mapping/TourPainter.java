@@ -27,11 +27,13 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
+import net.tourbook.ui.ColorCacheInt;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -52,27 +54,29 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class TourPainter extends MapPainter {
 
-	private static int			LINE_WIDTH			= 7;
-	private int					LINE_WIDTH2			= LINE_WIDTH / 2;
+	private static int					LINE_WIDTH			= 7;
+	private int							LINE_WIDTH2			= LINE_WIDTH / 2;
 
-	private static final int	MARGIN				= 2;
-	private static final int	MARKER_POLE			= 16;
+	private static final int			MARGIN				= 2;
+	private static final int			MARKER_POLE			= 16;
 
-	private static final String	SPACER				= " ";						//$NON-NLS-1$
-	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
-	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
-	private static final String	IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
+	private static final String			SPACER				= " ";						//$NON-NLS-1$
+	private static final String			IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
+	private static final String			IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
+	private static final String			IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
 
-	private static TourPainter	_instance;
+	private static TourPainter			_instance;
 
-	private final Image			_imageStartMarker;
-	private final Image			_imageEndMarker;
-	private final Image			_imageTourMarker;
-	private final Image			_positionImage;
-	private final Image			_markerImage;
+	private final Image					_imageStartMarker;
+	private final Image					_imageEndMarker;
+	private final Image					_imageTourMarker;
+	private final Image					_positionImage;
+	private final Image					_markerImage;
 
-	private int[]				_dataSerie;
-	private ILegendProvider		_legendProvider;
+	private int[]						_dataSerie;
+	private ILegendProvider				_legendProvider;
+
+	private final static ColorCacheInt	_colorCache			= new ColorCacheInt();
 
 	/**
 	 * Draw legend colors into the legend bounds
@@ -94,6 +98,7 @@ public class TourPainter extends MapPainter {
 			return;
 		}
 
+		final Device display = gc.getDevice();
 		final LegendConfig config = legendProvider.getLegendConfig();
 
 		// ensure units are available
@@ -152,23 +157,18 @@ public class TourPainter extends MapPainter {
 		final float pixelValue = (float) legendDiffValue / availableLegendPixels;
 
 		// draw border around the colors
-		final Color borderColor = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
-//		final Color borderColor = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+		final Color borderColor = display.getSystemColor(SWT.COLOR_GRAY);
 		gc.setForeground(borderColor);
 		gc.drawRectangle(legendBorder);
 
-		final Color legendTextColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-		final Color legendTextBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+		final Color legendTextColor = display.getSystemColor(SWT.COLOR_BLACK);
+		final Color legendTextBackgroundColor = display.getSystemColor(SWT.COLOR_WHITE);
 
-		Color lineColor = null;
 		int legendValue = 0;
 
 		int unitLabelIndex = 0;
-//		final Font dialogFont = JFaceResources.getFontRegistry().get(JFaceResources.DEFAULT_FONT);
-//		gc.setFont(dialogFont);
-//		gc.setTextAntialias(SWT.ON);
 
-		final Color textBorderColor = new Color(Display.getCurrent(), 0xF1, 0xEE, 0xE8);
+		final Color textBorderColor = new Color(display, 0xF1, 0xEE, 0xE8);
 
 		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
 
@@ -248,11 +248,11 @@ public class TourPainter extends MapPainter {
 			 * draw legend color line
 			 */
 
-			lineColor = legendProvider.getValueColor(legendValue);
+			final int lineColorValue = legendProvider.getColorValue(legendValue);
 
-			if (lineColor != null) {
-				gc.setForeground(lineColor);
-			}
+			final Color lineColor = _colorCache.get(lineColorValue);
+
+			gc.setForeground(lineColor);
 
 			if (isVertical) {
 
@@ -267,11 +267,9 @@ public class TourPainter extends MapPainter {
 				gc.drawLine(valuePosition, legendPositionY, valuePosition, legendHeight);
 			}
 
-			if (lineColor != null) {
-				lineColor.dispose();
-			}
 		}
 
+		_colorCache.dispose();
 		textBorderColor.dispose();
 	}
 
@@ -288,9 +286,10 @@ public class TourPainter extends MapPainter {
 	 * @param legendConfig
 	 * @param legendColor
 	 * @param legendValue
+	 * @param device
 	 * @return Returns a {@link Color} which corresponst to the legend value
 	 */
-	static Color getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final int legendValue) {
+	static int getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final int legendValue) {
 
 		int red = 0;
 		int green = 0;
@@ -408,7 +407,9 @@ public class TourPainter extends MapPainter {
 		green = (255 <= maxGreen) ? 255 : maxGreen;
 		blue = (255 <= maxBlue) ? 255 : maxBlue;
 
-		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+		final int colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+
+		return colorValue;
 	}
 
 	public TourPainter() {
@@ -418,6 +419,7 @@ public class TourPainter extends MapPainter {
 		_instance = this;
 
 		final Display display = Display.getCurrent();
+
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
 		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
 		_positionImage = createPositionImage(systemColorBlue);
@@ -439,14 +441,13 @@ public class TourPainter extends MapPainter {
 		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
 
 		final GC gc = new GC(positionImage);
+		{
+			gc.setBackground(colorTransparent);
+			gc.fillRectangle(0, 0, width, height);
 
-//		gc.setAntialias(SWT.ON);
-
-		gc.setBackground(colorTransparent);
-		gc.fillRectangle(0, 0, width, height);
-
-		gc.setBackground(positionColor);
-		gc.fillOval(1, 1, width - 2, height - 2);
+			gc.setBackground(positionColor);
+			gc.fillOval(1, 1, width - 2, height - 2);
+		}
 
 		/*
 		 * set transparency
@@ -454,8 +455,6 @@ public class TourPainter extends MapPainter {
 		final ImageData imageData = positionImage.getImageData();
 		imageData.transparentPixel = imageData.getPixel(0, 0);
 		final Image transparentImage = new Image(display, imageData);
-
-//		gc.setAntialias(SWT.OFF);
 
 		gc.dispose();
 		positionImage.dispose();
@@ -615,6 +614,8 @@ public class TourPainter extends MapPainter {
 			}
 		});
 
+		_colorCache.dispose();
+
 		return isInTile[0];
 	}
 
@@ -638,7 +639,7 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 
 		// convert lat/long into world pixels
-		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
@@ -673,13 +674,13 @@ public class TourPainter extends MapPainter {
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get viewport for the current tile
-		final int worldTileX = tile.getX() * tileSize;
-		final int worldTileY = tile.getY() * tileSize;
-		final Rectangle tileViewport = new Rectangle(worldTileX, worldTileY, tileSize, tileSize);
+		final int tileWorldPixelX = tile.getX() * tileSize;
+		final int tileWorldPixelY = tile.getY() * tileSize;
+		final Rectangle tileViewport = new Rectangle(tileWorldPixelX, tileWorldPixelY, tileSize, tileSize);
 
-		java.awt.Point tileWorldPos;
-		java.awt.Point devPosition;
-		java.awt.Point devPreviousPosition = null;
+		Point tourWorldPixel;
+		int devPrevX = 0;
+		int devPrevY = 0;
 
 		boolean isFirstPosition = true;
 
@@ -690,23 +691,22 @@ public class TourPainter extends MapPainter {
 		 * world positions are cached to optimize performance when multiple tours are selected
 		 */
 		final String projectionId = mp.getProjection().getId();
-		java.awt.Point worldPositions[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
-		final boolean createWorldPosition = worldPositions == null;
+		Point tourWorldPixelPosAll[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
+		final boolean createWorldPosition = tourWorldPixelPosAll == null;
 		if (createWorldPosition) {
 
-			worldPositions = new java.awt.Point[latitudeSerie.length];
+			tourWorldPixelPosAll = new Point[latitudeSerie.length];
 
-			tourData.setWorldPosition(projectionId, worldPositions, mapZoomLevel);
+			tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
 		}
 
-		final Display display = Display.getCurrent();
-		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+		final Color systemColorBlue = gc.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
 		gc.setForeground(systemColorBlue);
 		gc.setBackground(systemColorBlue);
 
 		int lastInsideIndex = -99;
-		java.awt.Point lastInsidePosition = null;
+		boolean isLastInsidePosition = false;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
@@ -724,24 +724,26 @@ public class TourPainter extends MapPainter {
 
 				// convert lat/long into world pixels which depends on the map projection
 
-				tileWorldPos = mp.geoToPixel(
+				tourWorldPixel = mp.geoToPixel(
 						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
 						mapZoomLevel);
 
-				worldPositions[serieIndex] = tileWorldPos;
+				tourWorldPixelPosAll[serieIndex] = tourWorldPixel;
 
 			} else {
-				tileWorldPos = worldPositions[serieIndex];
+				tourWorldPixel = tourWorldPixelPosAll[serieIndex];
 			}
+
+			int devX = tourWorldPixel.x - tileWorldPixelX;
+			int devY = tourWorldPixel.y - tileWorldPixelY;
 
 			if (isDrawLine) {
 
-				// convert world position into device position
-				devPosition = new java.awt.Point(tileWorldPos.x - worldTileX, tileWorldPos.y - worldTileY);
+				// check if position is in the viewport
 
 				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int x = tileWorldPos.x;
-				final int y = tileWorldPos.y;
+				final int x = tourWorldPixel.x;
+				final int y = tourWorldPixel.y;
 
 				if ((x >= tileViewport.x)
 						&& (y >= tileViewport.y)
@@ -750,8 +752,8 @@ public class TourPainter extends MapPainter {
 
 					// current position is inside the tile
 
-					// check if position is in the viewport or position has changed
-					if (devPreviousPosition != null && devPosition.equals(devPreviousPosition) == false) {
+					// check if position has changed
+					if (devX != devPrevX && devY != devPrevY) {
 
 						isTourInTile = true;
 
@@ -759,47 +761,52 @@ public class TourPainter extends MapPainter {
 
 							isFirstPosition = false;
 
-							devPreviousPosition.x += devPartOffset;
-							devPreviousPosition.y += devPartOffset;
+							devPrevX += devPartOffset;
+							devPrevY += devPartOffset;
 						}
 
 						// adjust positions with the part offset
-						devPosition.x += devPartOffset;
-						devPosition.y += devPartOffset;
+						devX += devPartOffset;
+						devY += devPartOffset;
 
-						drawTour20Line(gc, serieIndex, devPreviousPosition, devPosition);
+						drawTour20Line(gc, serieIndex, devPrevX, devPrevY, devX, devY);
 					}
 
 					lastInsideIndex = serieIndex;
-					lastInsidePosition = devPosition;
+					isLastInsidePosition = true;
 				}
 
 				// current position is outside the tile
 
-				if (serieIndex == lastInsideIndex + 1 && lastInsidePosition != null) {
+				if (serieIndex == lastInsideIndex + 1 && isLastInsidePosition) {
 
 					/*
 					 * this position is the first which is outside of the tile, draw a line from the
 					 * last inside to the first outside position
 					 */
 
-					devPosition.x += devPartOffset;
-					devPosition.y += devPartOffset;
+					// adjust positions with the part offset
+					devX += devPartOffset;
+					devY += devPartOffset;
 
-					drawTour20Line(gc, serieIndex, lastInsidePosition, devPosition);
+					drawTour20Line(gc, serieIndex, devPrevX, devPrevY, devX, devY);
 
 					isFirstPosition = true;
 				}
 
-				devPreviousPosition = devPosition;
+				// set previous pixel
+				devPrevX = devX;
+				devPrevY = devY;
 
 			} else {
 
 				// draw tour with dots/squares
 
 				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int x = tileWorldPos.x;
-				final int y = tileWorldPos.y;
+				final int x = tourWorldPixel.x;
+				final int y = tourWorldPixel.y;
+
+				// check if position is in the viewport
 				if ((x >= tileViewport.x)
 						&& (y >= tileViewport.y)
 						&& x < (tileViewport.x + tileViewport.width)
@@ -807,28 +814,24 @@ public class TourPainter extends MapPainter {
 
 					// current position is inside the tile
 
-					// convert world position into device position
-					devPosition = new java.awt.Point(tileWorldPos.x - worldTileX, tileWorldPos.y - worldTileY);
-
-					// check if position is in the viewport or position has changed
-					if (devPosition.equals(devPreviousPosition) == false) {
+					// optimize drawing: check if position has changed
+					if (devX != devPrevX && devY != devPrevY) {
 
 						isTourInTile = true;
 
 						// adjust positions with the part offset
-						devPosition.x += devPartOffset;
-						devPosition.y += devPartOffset;
+						devX += devPartOffset;
+						devY += devPartOffset;
 
 						if (isDrawSquare) {
-							drawTour30Square(gc, serieIndex, devPosition);
+							drawTour30Square(gc, serieIndex, devX, devY);
 						} else {
-							drawTour40Dot(gc, serieIndex, devPosition);
+							drawTour40Dot(gc, serieIndex, devX, devY);
 						}
 
-						// initialize previous pixel
-						if (devPreviousPosition == null) {
-							devPreviousPosition = devPosition;
-						}
+						// set previous pixel
+						devPrevX = devX;
+						devPrevY = devY;
 					}
 				}
 			}
@@ -839,82 +842,77 @@ public class TourPainter extends MapPainter {
 
 	private void drawTour20Line(final GC gc,
 								final int serieIndex,
-								final java.awt.Point devPositionFrom,
-								final java.awt.Point devPositionTo) {
+								final int devXFrom,
+								final int devYFrom,
+								final int devXTo,
+								final int devYTo) {
 
 		if (_dataSerie == null) {
 
 			// draw default line when data are not available
 
-			gc.drawLine(devPositionFrom.x, devPositionFrom.y, devPositionTo.x, devPositionTo.y);
+			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 
 		} else {
 
 			// draw line with the color from the legend provider
 
-			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
+			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
+			final Color lineColor = _colorCache.get(colorValue);
 
-			{
-				gc.setForeground(lineColor);
-				gc.drawLine(devPositionFrom.x, devPositionFrom.y, devPositionTo.x, devPositionTo.y);
-			}
-
-			lineColor.dispose();
+			gc.setForeground(lineColor);
+			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 		}
 
 	}
 
-	private void drawTour30Square(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
+	private void drawTour30Square(final GC gc, final int serieIndex, final int devX, final int devY) {
 
 		if (_dataSerie == null) {
 
 			// draw default square when data are not available
 
-			gc.fillRectangle(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+			gc.fillRectangle(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
 
 		} else {
 
 			// draw square with the color from the legend provider
 
-			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
+			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
+			final Color lineColor = _colorCache.get(colorValue);
 
-			{
-				gc.setBackground(lineColor);
-				gc.fillRectangle(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
-			}
-
-			lineColor.dispose();
+			gc.setBackground(lineColor);
+			gc.fillRectangle(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
 		}
 	}
 
-	private void drawTour40Dot(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
+	private void drawTour40Dot(final GC gc, final int serieIndex, final int devX, final int devY) {
 
 		if (_dataSerie == null) {
 
 			// draw default dot when data are not available
 
-			gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+			gc.fillOval(devX, devY, LINE_WIDTH, LINE_WIDTH);
 
 		} else {
 
 			// draw dot with the color from the legend provider
 
-			final Color lineColor = _legendProvider.getValueColor(_dataSerie[serieIndex]);
-			{
-				if (LINE_WIDTH == 2) {
-					// oval is not filled by a width of 2
-					gc.setBackground(lineColor);
-					gc.fillRectangle(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
-				} else {
-					gc.setBackground(lineColor);
-					gc.fillOval(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
+			final Color lineColor = _colorCache.get(colorValue);
+
+			if (LINE_WIDTH == 2) {
+				// oval is not filled by a width of 2
+				gc.setBackground(lineColor);
+				gc.fillRectangle(devX, devY, LINE_WIDTH, LINE_WIDTH);
+			} else {
+				gc.setBackground(lineColor);
+				gc.fillOval(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
 
 //					gc.setLineWidth(1);
 //					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 //					gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
-				}
 			}
-			lineColor.dispose();
 		}
 	}
 
@@ -941,7 +939,7 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 
 		// convert lat/long into world pixels
-		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
@@ -956,7 +954,7 @@ public class TourPainter extends MapPainter {
 			final String markerLabel = tourMarker.getLabel();
 			final Point labelExtent = gc.textExtent(markerLabel);
 
-			final Image tourMarkerImage = drawTourMarkerImage(markerLabel, labelExtent);
+			final Image tourMarkerImage = drawTourMarkerImage(markerLabel, labelExtent, gc.getDevice());
 			{
 				final Rectangle markerBounds = tourMarkerImage.getBounds();
 
@@ -980,9 +978,10 @@ public class TourPainter extends MapPainter {
 	 * 
 	 * @param labelExtent
 	 * @param markerLabel
+	 * @param device
 	 * @return
 	 */
-	private Image drawTourMarkerImage(final String markerLabel, final Point labelExtent) {
+	private Image drawTourMarkerImage(final String markerLabel, final Point labelExtent, final Device device) {
 
 		final int bannerWidth = labelExtent.x + 2 * MARGIN;
 		final int bannerHeight = labelExtent.y + 2 * MARGIN;
@@ -1002,13 +1001,12 @@ public class TourPainter extends MapPainter {
 
 		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
 
-		final Display display = Display.getCurrent();
-		final Image markerImage = new Image(display, overlayImageData);
+		final Image markerImage = new Image(device, overlayImageData);
 		final Rectangle markerImageBounds = markerImage.getBounds();
 
-		final Color transparentColor = new Color(display, rgbTransparent);
-		final Color bannerColor = new Color(display, 0x65, 0xF9, 0x1F);
-		final Color bannerBorderColor = new Color(display, 0x69, 0xAF, 0x3D);
+		final Color transparentColor = new Color(device, rgbTransparent);
+		final Color bannerColor = new Color(device, 0x65, 0xF9, 0x1F);
+		final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
 
 		final GC gc = new GC(markerImage);
 

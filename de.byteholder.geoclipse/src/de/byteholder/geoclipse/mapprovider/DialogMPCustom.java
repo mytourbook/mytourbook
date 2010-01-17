@@ -892,7 +892,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 				final GeoPosition mapCenter = event.mapCenter;
 
-				double lon = mapCenter.getLongitude() % 360;
+				double lon = mapCenter.longitude % 360;
 				lon = lon > 180 ? //
 						lon - 360
 						: lon < -180 ? //
@@ -900,7 +900,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 								: lon;
 
 				fLblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						fNfLatLon.format(mapCenter.getLatitude()),
+						fNfLatLon.format(mapCenter.latitude),
 						fNfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}

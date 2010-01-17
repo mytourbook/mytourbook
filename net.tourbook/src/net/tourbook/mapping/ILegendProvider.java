@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,17 +20,19 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public interface ILegendProvider {
 
+	/**
+	 * @param legendValue
+	 * @param device
+	 *            Device for which the color is created
+	 * @return Returns a color for the legend value, this {@link Color} must be disposed
+	 */
+	abstract int getColorValue(int legendValue);
+
 	abstract LegendColor getLegendColor();
 
 	abstract LegendConfig getLegendConfig();
 
 	abstract int getTourColorId();
-
-	/**
-	 * @param legendValue
-	 * @return Returns a color for the legend value, this {@link Color} must be disposed
-	 */
-	abstract Color getValueColor(int legendValue);
 
 	/**
 	 * Set the colors for the legend, the values will not be changed

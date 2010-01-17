@@ -12,8 +12,6 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +38,7 @@ import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.MTRectangle;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -68,6 +67,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -257,7 +257,7 @@ public class TourMapView extends ViewPart {
 
 	void actionReloadFailedMapImages() {
 		_map.resetAll();
- 	}
+	}
 
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = _map.getZoom();
@@ -643,11 +643,11 @@ public class TourMapView extends ViewPart {
 				positionBounds.add(_poiPosition);
 			}
 
-			final Rectangle2D positionRect = getPositionRect(positionBounds, zoom);
+			final Rectangle positionRect = getPositionRect(positionBounds, zoom);
 
-			final Point2D center = new Point2D.Double(//
-					positionRect.getX() + positionRect.getWidth() / 2,
-					positionRect.getY() + positionRect.getHeight() / 2);
+			final Point center = new Point(//
+					positionRect.x + positionRect.width / 2,
+					positionRect.y + positionRect.height / 2);
 
 			final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
 
@@ -945,7 +945,7 @@ public class TourMapView extends ViewPart {
 		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 		for (final MP mp : allMapProviders) {
 			mp.disposeAllImages();
- 		}
+		}
 
 		_map.disposeOverlayImageCache();
 
@@ -1049,18 +1049,18 @@ public class TourMapView extends ViewPart {
 		return _mapDimLevel;
 	}
 
-	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
+	private Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
 		final MP mp = _map.getMapProvider();
-		final Point2D point1 = mp.geoToPixel(positions.iterator().next(), zoom);
-		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
+		final Point point1 = mp.geoToPixel(positions.iterator().next(), zoom);
+		final MTRectangle mtRect = new MTRectangle(point1.x, point1.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
-			final Point2D point = mp.geoToPixel(pos, zoom);
-			rect.add(point);
+			final Point point = mp.geoToPixel(pos, zoom);
+			mtRect.add(point.x, point.y);
 		}
 
-		return rect;
+		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
 	}
 
 	/**
@@ -1447,8 +1447,8 @@ public class TourMapView extends ViewPart {
 				_previousTourData.mapZoomLevel = _map.getZoom();
 
 				final GeoPosition centerPosition = _map.getGeoCenter();
-				_previousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
-				_previousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
+				_previousTourData.mapCenterPositionLatitude = centerPosition.latitude;
+				_previousTourData.mapCenterPositionLongitude = centerPosition.longitude;
 			}
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
@@ -1824,8 +1824,8 @@ public class TourMapView extends ViewPart {
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
 			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fDefaultZoom);
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) fDefaultPosition.getLatitude());
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) fDefaultPosition.getLongitude());
+			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) fDefaultPosition.latitude);
+			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) fDefaultPosition.longitude);
 		}
 
 		// tour color
@@ -1916,43 +1916,45 @@ public class TourMapView extends ViewPart {
 		final int maximumZoomLevel = mp.getMaximumZoomLevel();
 		int zoom = mp.getMinimumZoomLevel();
 
-		Rectangle2D positionRect = getPositionRect(positions, zoom);
-		java.awt.Rectangle viewport = _map.getMapPixelViewport();
+		Rectangle positionRect = getPositionRect(positions, zoom);
+		Rectangle viewport = _map.getMapPixelViewport();
 
-		// zoom until the tour is visible in the map
-		while (!viewport.contains(positionRect)) {
-
-			// center position in the map
-			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect
-					.getY()
-					+ positionRect.getHeight()
-					/ 2);
-			final GeoPosition px = mp.pixelToGeo(center, zoom);
-			_map.setGeoCenterPosition(px);
-
-			// check zoom level
-			if (++zoom >= maximumZoomLevel) {
-				break;
-			}
-			_map.setZoom(zoom);
-
-			positionRect = getPositionRect(positions, zoom);
-			viewport = _map.getMapPixelViewport();
-		}
+//		// zoom until the tour is visible in the map
+//		while (!viewport.contains(positionRect)) {
+//
+//			// center position in the map
+//			final Point center = new Point(//
+//					positionRect.x + positionRect.width / 2,
+//					positionRect.y + positionRect.height / 2);
+//
+//			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
+//
+//			zoom++;
+//
+//			// check zoom level
+//			if (zoom >= maximumZoomLevel) {
+//				break;
+//			}
+//			_map.setZoom(zoom);
+//
+//			positionRect = getPositionRect(positions, zoom);
+//			viewport = _map.getMapPixelViewport();
+//		}
 
 		// zoom in until the tour is larger than the viewport
-		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
+		while (positionRect.width < viewport.width && positionRect.height < viewport.height) {
 
 			// center position in the map
-			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect
-					.getY()
-					+ positionRect.getHeight()
-					/ 2);
-			final GeoPosition px = mp.pixelToGeo(center, zoom);
-			_map.setGeoCenterPosition(px);
+			final Point center = new Point(//
+					positionRect.x + positionRect.width / 2,
+					positionRect.y + positionRect.height / 2);
+
+			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
+
+			zoom++;
 
 			// check zoom level
-			if (++zoom >= maximumZoomLevel) {
+			if (zoom >= maximumZoomLevel) {
 				break;
 			}
 			_map.setZoom(zoom);

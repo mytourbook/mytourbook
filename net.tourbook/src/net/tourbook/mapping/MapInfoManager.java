@@ -78,7 +78,7 @@ public class MapInfoManager {
 			return;
 		}
 
-		double lon = fMapPropertyCenter.getLongitude() % 360;
+		double lon = fMapPropertyCenter.longitude % 360;
 		lon = lon > 180 ? //
 				lon - 360
 				: lon < -180 ? //
@@ -86,7 +86,7 @@ public class MapInfoManager {
 						: lon;
 
 		fInfoWidget.setText(NLS.bind(Messages.statusLine_mapInfo_data, new Object[] {
-				fNf.format(fMapPropertyCenter.getLatitude()),
+				fNf.format(fMapPropertyCenter.latitude),
 				fNf.format(lon),
 				Integer.toString(fMapPropertyZoom + 1) }));
 	}

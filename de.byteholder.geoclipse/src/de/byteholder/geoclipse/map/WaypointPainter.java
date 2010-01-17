@@ -10,12 +10,11 @@
 package de.byteholder.geoclipse.map;
 
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.util.Set;
 
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
@@ -65,38 +64,35 @@ public class WaypointPainter extends MapPainter {
 		final Rectangle viewportBounds = map.getMapPixelViewport();
 		final int zoom = map.getZoom();
 		final Dimension sizeInTiles = map.getMapProvider().getMapTileSize(zoom);
- 		final int tileSize = map.getMapProvider().getTileSize();
-		final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
+		final int tileSize = map.getMapProvider().getTileSize();
+//		final Dimension sizeInPixels = new Dimension(sizeInTiles.width * tileSize, sizeInTiles.height * tileSize);
+		final int sizeInPixels = sizeInTiles.width * tileSize;
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
-		double vpx = viewportBounds.getX();
+		int vpx = viewportBounds.x;
 		// normalize the left edge of the viewport to be positive
 		while (vpx < 0) {
-			vpx += sizeInPixels.getWidth();
+			vpx += sizeInPixels;
 		}
 		// normalize the left edge of the viewport to no wrap around the world
-		while (vpx > sizeInPixels.getWidth()) {
-			vpx -= sizeInPixels.getWidth();
+		while (vpx > sizeInPixels) {
+			vpx -= sizeInPixels;
 		}
 
 		// create two new viewports next to eachother
-		final Rectangle2D vp2 = new Rectangle2D.Double(
-				vpx,
-				viewportBounds.getY(),
-				viewportBounds.getWidth(),
-				viewportBounds.getHeight());
-		final Rectangle2D vp3 = new Rectangle2D.Double(
-				vpx - sizeInPixels.getWidth(),
-				viewportBounds.getY(),
-				viewportBounds.getWidth(),
-				viewportBounds.getHeight());
+		final Rectangle vp2 = new Rectangle(vpx, viewportBounds.y, viewportBounds.width, viewportBounds.height);
+		final Rectangle vp3 = new Rectangle(
+				vpx - sizeInPixels,
+				viewportBounds.y,
+				viewportBounds.width,
+				viewportBounds.height);
 
 		//for each waypoint within these bounds
 		for (final Waypoint w : getWaypoints()) {
 			final Point point = map.getMapProvider().geoToPixel(w.getPosition(), map.getZoom());
 			if (vp2.contains(point)) {
-				final int x = (int) (point.getX() - vp2.getX());
-				final int y = (int) (point.getY() - vp2.getY());
+				final int x = (point.x - vp2.x);
+				final int y = (point.y - vp2.y);
 
 				final Transform t = new Transform(Display.getCurrent());
 
@@ -109,8 +105,8 @@ public class WaypointPainter extends MapPainter {
 				t.dispose();
 			}
 			if (vp3.contains(point)) {
-				final int x = (int) (point.getX() - vp3.getX());
-				final int y = (int) (point.getY() - vp3.getY());
+				final int x = (point.x - vp3.x);
+				final int y = (point.y - vp3.y);
 
 				final Transform t = new Transform(Display.getCurrent());
 

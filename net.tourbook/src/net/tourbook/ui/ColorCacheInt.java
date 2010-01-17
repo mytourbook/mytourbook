@@ -13,63 +13,57 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-public class ColorCache {
+public class ColorCacheInt {
 
 	private Display					_display;
 
-	private HashMap<String, Color>	_colors	= new HashMap<String, Color>();
+	private HashMap<Integer, Color>	_colors	= new HashMap<Integer, Color>();
 
-	public ColorCache() {
+	public ColorCacheInt() {
 		_display = Display.getCurrent();
-	}
-
-	/**
-	 * Creates a color in the color cache
-	 * 
-	 * @param colorKey
-	 * @param rgb
-	 * @return Returns the created color
-	 */
-	public Color createColor(final String colorKey, final RGB rgb) {
-
-		// check if key already exists
-		if (_colors.containsKey(colorKey)) {
-			return _colors.get(colorKey);
-		}
-
-		final Color color = new Color(_display, rgb);
-
-		_colors.put(colorKey, color);
-
-		return color;
 	}
 
 	/**
 	 * Dispose all colors in the color cache
 	 */
 	public void dispose() {
-		for (final Iterator<Color> i = _colors.values().iterator(); i.hasNext();) {
-			(i.next()).dispose();
+
+		for (final Iterator<Color> color = _colors.values().iterator(); color.hasNext();) {
+			(color.next()).dispose();
 		}
+
 		_colors.clear();
 	}
 
 	/**
-	 * @param colorKey
-	 * @return Returns the color for the <code>colorKey</code> from the color cache or
-	 *         <code>null</code> when the color is not available
+	 * @param colorValue
+	 * @return Returns the color for the <code>colorValue</code> from the color cache, color is
+	 *         created when it is not available
 	 */
-	public Color get(final String colorKey) {
-		return _colors.get(colorKey);
+	public Color get(final int colorValue) {
+
+		Color color = _colors.get(colorValue);
+		if (color != null) {
+			return color;
+		}
+
+		final int red = (colorValue & 0xFF) >>> 0;
+		final int green = (colorValue & 0xFF00) >>> 8;
+		final int blue = (colorValue & 0xFF0000) >>> 16;
+
+		color = new Color(_display, red, green, blue);
+
+		_colors.put(colorValue, color);
+
+		return color;
 	}
 
 }

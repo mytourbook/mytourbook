@@ -15,9 +15,6 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +60,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -550,13 +549,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 				final StringBuilder sb = new StringBuilder();
 
-				sb.append(lowerPosition.getLatitude());
+				sb.append(lowerPosition.latitude);
 				sb.append(", "); //$NON-NLS-1$
-				sb.append(lowerPosition.getLongitude());
+				sb.append(lowerPosition.longitude);
 				sb.append(" / "); //$NON-NLS-1$
-				sb.append(upperPosition.getLatitude());
+				sb.append(upperPosition.latitude);
 				sb.append(", "); //$NON-NLS-1$
-				sb.append(upperPosition.getLongitude());
+				sb.append(upperPosition.longitude);
 
 				cell.setText(sb.toString());
 			}
@@ -961,7 +960,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 				final GeoPosition mapCenter = event.mapCenter;
 
-				double lon = mapCenter.getLongitude() % 360;
+				double lon = mapCenter.longitude % 360;
 				lon = lon > 180 ? //
 						lon - 360
 						: lon < -180 ? //
@@ -969,7 +968,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 								: lon;
 
 				fLblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						fNfLatLon.format(mapCenter.getLatitude()),
+						fNfLatLon.format(mapCenter.latitude),
 						fNfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
@@ -1045,13 +1044,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final MP mp = _map.getMapProvider();
 
 		final GeoPosition pos1 = positions.iterator().next();
-		final java.awt.Point point1 = mp.geoToPixel(pos1, zoom);
+		final Point point1 = mp.geoToPixel(pos1, zoom);
 
 		final Rectangle rect = new Rectangle(point1.x, point1.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
 
-			final java.awt.Point point = mp.geoToPixel(pos, zoom);
+			final Point point = mp.geoToPixel(pos, zoom);
 
 			rect.add(new Rectangle(point.x, point.y, 0, 0));
 		}
@@ -1309,7 +1308,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			updateMapZoomLevels(fDefaultMapProvider);
 
 			_map.setMapProviderWithReset(fDefaultMapProvider, true);
- 		}
+		}
 	}
 
 //	private void onSelectPreviousMapProvider() {
@@ -1437,19 +1436,19 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		int zoom = mp.getMinimumZoomLevel();
 
-		Rectangle2D positionRect = getPositionBounds(positions, zoom);
+		Rectangle positionRect = getPositionBounds(positions, zoom);
 
 //		if (positionRect.getY() < 0.0) {
 //			positionRect.setRect(positionRect.getX(), 0.0d, positionRect.getWidth(), positionRect.getHeight());
 //		}
 
-		java.awt.Rectangle viewport = _map.getMapPixelViewport();
+		Rectangle viewport = _map.getMapPixelViewport();
 
 //		System.out.println();
 //		// TODO remove SYSTEM.OUT.PRINTLN
 //
 //		for (final GeoPosition geoPosition : positions) {
-//			System.out.println(geoPosition.getLongitude() + ", " + geoPosition.getLatitude()); //$NON-NLS-1$
+//			System.out.println(geoPosition.longitude + ", " + geoPosition.latitude); //$NON-NLS-1$
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
 //
@@ -1487,7 +1486,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// zoom IN until the tour is larger than the viewport
-		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
+		while (positionRect.width < viewport.width && positionRect.height < viewport.height) {
 
 //			System.out.println();
 //			dump("vp2:", viewport, positionRect);
@@ -1495,9 +1494,9 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// center position in the map
-			final Point2D center = new Point2D.Double(//
-					positionRect.getX() + positionRect.getWidth() / 2,
-					positionRect.getY() + positionRect.getHeight() / 2);
+			final double centerX = positionRect.x + positionRect.width / 2;
+			final double centerY = positionRect.y + positionRect.height / 2;
+			final Point center = new Point((int) centerX, (int) centerY);
 
 			final GeoPosition devCenter = mp.pixelToGeo(center, zoom);
 			_map.setGeoCenterPosition(devCenter);

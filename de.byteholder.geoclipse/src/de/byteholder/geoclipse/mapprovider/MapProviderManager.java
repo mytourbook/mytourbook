@@ -1989,17 +1989,21 @@ public class MapProviderManager {
 
 		// favorite position
 		tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());
-		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition
-				.getLatitude());
-		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition
-				.getLongitude());
+		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE, favoritePosition == null
+				? 0.0f
+				: (float) favoritePosition.latitude);
+		tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE, favoritePosition == null
+				? 0.0f
+				: (float) favoritePosition.longitude);
 
 		// last used position
 		tagMapProvider.putInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL, mp.getLastUsedZoom());
-		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition
-				.getLatitude());
-		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition
-				.getLongitude());
+		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE, lastUsedPosition == null
+				? 0.0f
+				: (float) lastUsedPosition.latitude);
+		tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null
+				? 0.0f
+				: (float) lastUsedPosition.longitude);
 
 		/*
 		 * add special fields for each map provider

@@ -24,7 +24,7 @@ package de.byteholder.gpx;
  */
 public class Latitude {
 
-	private Double	latitude;
+	private double	latitude;
 
 	public Latitude() {}
 
@@ -55,17 +55,13 @@ public class Latitude {
 			return false;
 		}
 		final Latitude other = (Latitude) obj;
-		if (latitude == null) {
-			if (other.latitude != null) {
-				return false;
-			}
-		} else if (!latitude.equals(other.latitude)) {
+		if (Double.doubleToLongBits(latitude) != Double.doubleToLongBits(other.latitude)) {
 			return false;
 		}
 		return true;
 	}
 
-	public Double get() {
+	public double get() {
 		return latitude;
 	}
 
@@ -73,11 +69,13 @@ public class Latitude {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((latitude == null) ? 0 : latitude.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(latitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
 
-	public void set(final Double latitude) {
+	public void set(final double latitude) {
 
 		if (latitude < -90 || latitude > 90) {
 			throw new IllegalArgumentException("Latitude must be between -90 and 90."); //$NON-NLS-1$

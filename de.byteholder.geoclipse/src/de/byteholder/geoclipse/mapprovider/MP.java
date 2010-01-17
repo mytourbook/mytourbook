@@ -16,7 +16,6 @@
 package de.byteholder.geoclipse.mapprovider;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,6 +34,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
@@ -518,7 +518,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *            the current zoom level
 	 * @return a pixel location in the world bitmap
 	 */
-	public Point geoToPixel(final GeoPosition geoPosition, final int zoomLevel) {
+	public org.eclipse.swt.graphics.Point geoToPixel(final GeoPosition geoPosition, final int zoomLevel) {
 		return fProjection.geoToPixel(geoPosition, zoomLevel, this);
 	}
 
@@ -1114,7 +1114,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *            the zoom level of the world bitmap
 	 * @return the converted GeoPosition
 	 */
-	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom) {
+	public GeoPosition pixelToGeo(final Point pixelCoordinate, final int zoom) {
 		return fProjection.pixelToGeo(pixelCoordinate, zoom, this);
 	}
 

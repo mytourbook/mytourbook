@@ -90,12 +90,12 @@ public class DirectMappingPainter implements IDirectPainter {
 
 		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
-		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(
+		final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(
 				latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
 
 		// check if slider is visible
-		final java.awt.Rectangle viewport = painterContext.viewport;
+		final Rectangle viewport = painterContext.viewport;
 		if (viewport.contains(worldMarkerPos)) {
 
 			// convert world position into device position

@@ -19,9 +19,10 @@
 
 package de.byteholder.geoclipse.map;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+
+import org.eclipse.swt.graphics.Point;
 
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
@@ -161,8 +162,8 @@ public final class Mercator extends Projection {
 			geoPosition = new GeoPosition(0.0, 0.0);
 		}
 
-		final double latitude = geoPosition.getLatitude();
-		final double longitude = geoPosition.getLongitude();
+		final double latitude = geoPosition.latitude;
+		final double longitude = geoPosition.longitude;
 
 //		if (latitude < -85.0) {
 //			latitude = -73.333333;
@@ -176,6 +177,7 @@ public final class Mercator extends Projection {
 		final double x = devMapCenter.getX() + (longitude * mp.getLongitudeDegreeWidthInPixels(zoomLevel));
 
 		double e = Math.sin(latitude * (Math.PI / 180.0));
+
 		if (e > 0.9999) {
 			e = 0.9999;
 		}
@@ -212,8 +214,8 @@ public final class Mercator extends Projection {
 											final int zoomLevel,
  final MP mp) {
 
-		final double latitude = geoPosition.getLatitude();
-		final double longitude = geoPosition.getLongitude();
+		final double latitude = geoPosition.latitude;
+		final double longitude = geoPosition.longitude;
 
 		final Point2D mapCenterInPixels = mp.getMapCenterInPixelsAtZoom(zoomLevel);
 
@@ -291,12 +293,12 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final MP mp) {
+	public GeoPosition pixelToGeo(final Point pixelCoordinate, final int zoom, final MP mp) {
 
 		// this reverses geoToPixel
 
-		final double pixelX = pixelCoordinate.getX();
-		final double pixelY = pixelCoordinate.getY();
+		final double pixelX = pixelCoordinate.x;
+		final double pixelY = pixelCoordinate.y;
 
 		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
 

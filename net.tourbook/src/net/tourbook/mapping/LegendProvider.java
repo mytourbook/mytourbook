@@ -20,7 +20,6 @@ import java.util.List;
 
 import net.tourbook.chart.ChartUtil;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class LegendProvider implements ILegendProvider {
@@ -108,7 +107,7 @@ public class LegendProvider implements ILegendProvider {
 		return fColorId;
 	}
 
-	public Color getValueColor(final int legendValue) {
+	public int getColorValue(final int legendValue) {
 		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
 	}
 

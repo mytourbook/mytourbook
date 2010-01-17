@@ -24,8 +24,6 @@
 package de.byteholder.geoclipse.map;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +57,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -205,7 +204,7 @@ public class Map extends Canvas {
 	 * center position. Zooming in/out will cause the center to be recalculated so as to remain in
 	 * the center of the new "map".
 	 */
-	private Point2D								_mapCenterInWorldPixel		= new Point2D.Double(0, 0);
+	private Point								_mapCenterInWorldPixel		= new Point(0, 0);
 
 	/**
 	 * Viewport in the world map where the {@link #_mapImage} is painted<br>
@@ -297,9 +296,14 @@ public class Map extends Canvas {
 			if (delta_x != 0 || delta_y != 0) {
 
 				final Rectangle bounds = getMapPixelViewport();
-				final double x = bounds.getCenterX() + delta_x;
-				final double y = bounds.getCenterY() + delta_y;
-				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
+
+				final int centerX = (int) (bounds.x + bounds.width / 2.0);
+				final int centerY = (int) (bounds.y + bounds.height / 2.0);
+
+				final int x = centerX + delta_x;
+				final int y = centerY + delta_y;
+
+				final Point pixelCenter = new Point(x, y);
 
 				setMapCenterInWoldPixel(pixelCenter);
 
@@ -378,9 +382,9 @@ public class Map extends Canvas {
 
 		private void recenterMap(final int ex, final int ey) {
 			final Rectangle bounds = getMapPixelViewport();
-			final double x = bounds.getX() + ex;
-			final double y = bounds.getY() + ey;
-			final Point2D.Double pixelCenter = new Point2D.Double(x, y);
+			final int x = bounds.x + ex;
+			final int y = bounds.y + ey;
+			final Point pixelCenter = new Point(x, y);
 			setMapCenterInWoldPixel(pixelCenter);
 			queueMapRedraw();
 		}
@@ -747,8 +751,8 @@ public class Map extends Canvas {
 		final float metricWidth = 111.32f / _distanceUnitValue;
 
 		final GeoPosition mapCenter = getGeoCenter();
-		final double latitude = mapCenter.getLatitude();
-		final double longitude = mapCenter.getLongitude();
+		final double latitude = mapCenter.latitude;
+		final double longitude = mapCenter.longitude;
 
 		final double devDistance = _MP.getDistance(new GeoPosition(latitude - 0.5, longitude), new GeoPosition(
 				latitude + 0.5,
@@ -1345,11 +1349,11 @@ public class Map extends Canvas {
 	}
 
 	public Rectangle getBoundingRect(final Set<GeoPosition> positions, final int zoom) {
-		final java.awt.Point point1 = _MP.geoToPixel(positions.iterator().next(), zoom);
+		final Point point1 = _MP.geoToPixel(positions.iterator().next(), zoom);
 		final Rectangle rect = new Rectangle(point1.x, point1.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
-			final java.awt.Point point = _MP.geoToPixel(pos, zoom);
+			final Point point = _MP.geoToPixel(pos, zoom);
 			rect.add(new Rectangle(point.x, point.y, 0, 0));
 		}
 		return rect;
@@ -1435,7 +1439,7 @@ public class Map extends Canvas {
 	 * 
 	 * @return Returns the bounds in <em>pixels</em> of the "view" of this map
 	 */
-	private Rectangle getWorldPixelTopLeftViewport(final Point2D mapPixelCenter) {
+	private Rectangle getWorldPixelTopLeftViewport(final Point mapPixelCenter) {
 
 		if (_clientArea == null) {
 			_clientArea = getClientArea();
@@ -1445,8 +1449,8 @@ public class Map extends Canvas {
 		final int devWidth = _clientArea.width;
 		final int devHeight = _clientArea.height;
 
-		final int worldX = (int) (mapPixelCenter.getX() - devWidth / 2d);
-		final int worldY = (int) (mapPixelCenter.getY() - devHeight / 2d);
+		final int worldX = (int) (mapPixelCenter.x - devWidth / 2d);
+		final int worldY = (int) (mapPixelCenter.y - devHeight / 2d);
 
 		final Rectangle viewPort = new Rectangle(worldX, worldY, devWidth, devHeight);
 
@@ -1613,10 +1617,10 @@ public class Map extends Canvas {
 		 * set new map center
 		 */
 		final Point movePosition = new Point(mouseEvent.x, mouseEvent.y);
-		final double mapPixelCenterX = _mapCenterInWorldPixel.getX();
-		final double mapPixelCenterY = _mapCenterInWorldPixel.getY();
-		final double newCenterX = mapPixelCenterX - (movePosition.x - _mousePanPosition.x);
-		double newCenterY = mapPixelCenterY - (movePosition.y - _mousePanPosition.y);
+		final int mapPixelCenterX = _mapCenterInWorldPixel.x;
+		final int mapPixelCenterY = _mapCenterInWorldPixel.y;
+		final int newCenterX = mapPixelCenterX - (movePosition.x - _mousePanPosition.x);
+		int newCenterY = mapPixelCenterY - (movePosition.y - _mousePanPosition.y);
 
 		if (newCenterY < 0) {
 			newCenterY = 0;
@@ -1627,7 +1631,7 @@ public class Map extends Canvas {
 			newCenterY = maxHeight;
 		}
 
-		final Point2D.Double mapCenter = new Point2D.Double(newCenterX, newCenterY);
+		final Point mapCenter = new Point(newCenterX, newCenterY);
 		setMapCenterInWoldPixel(mapCenter);
 
 		_mousePanPosition = movePosition;
@@ -2256,7 +2260,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param centerInWorldPixel
 	 */
-	private void setMapCenterInWoldPixel(Point2D centerInWorldPixel) {
+	private void setMapCenterInWoldPixel(Point centerInWorldPixel) {
 
 		/*
 		 * check if the center is within the map
@@ -2268,7 +2272,7 @@ public class Map extends Canvas {
 		// don't let the user pan over the top edge
 		if (newTopLeftPixelVP.y < 0) {
 			final double centerY = viewportPixelHeight / 2d;
-			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+			centerInWorldPixel = new Point(centerInWorldPixel.x, (int) centerY);
 		}
 
 		// don't let the user pan over the bottom edge
@@ -2277,13 +2281,13 @@ public class Map extends Canvas {
 
 		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
 			final double centerY = mapHeight - viewportPixelHeight / 2;
-			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+			centerInWorldPixel = new Point(centerInWorldPixel.x, (int) centerY);
 		}
 
 		// if map is too small then just center it
 		if (mapHeight < newTopLeftPixelVP.height) {
 			final double centerY = mapHeight / 2d;
-			centerInWorldPixel = new Point2D.Double(centerInWorldPixel.getX(), centerY);
+			centerInWorldPixel = new Point(centerInWorldPixel.x, (int) centerY);
 		}
 
 		_mapCenterInWorldPixel = centerInWorldPixel;
@@ -2439,16 +2443,16 @@ public class Map extends Canvas {
 		}
 
 		final int oldzoom = _mapZoomLevel;
-		final Point2D oldCenter = _mapCenterInWorldPixel;
+		final Point oldCenter = _mapCenterInWorldPixel;
 		final Dimension oldMapTileSize = _MP.getMapTileSize(oldzoom);
 
 		_mapZoomLevel = newZoomLevel;
 
 		final Dimension mapTileSize = _MP.getMapTileSize(newZoomLevel);
 
-		final Point2D.Double pixelCenter = new Point2D.Double(//
-				oldCenter.getX() * (mapTileSize.getWidth() / oldMapTileSize.getWidth()),
-				oldCenter.getY() * (mapTileSize.getHeight() / oldMapTileSize.getHeight()));
+		final double pixelX = oldCenter.x * (mapTileSize.getWidth() / oldMapTileSize.getWidth());
+		final double pixelY = oldCenter.y * (mapTileSize.getHeight() / oldMapTileSize.getHeight());
+		final Point pixelCenter = new Point((int) pixelX, (int) pixelY);
 
 		setMapCenterInWoldPixel(pixelCenter);
 
@@ -2482,7 +2486,7 @@ public class Map extends Canvas {
 		final int worldMouseX = viewPort.x + _mouseMovePosition.x;
 		final int worldMouseY = viewPort.y + _mouseMovePosition.y;
 
-		fireMapEvent(_MP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel));
+		fireMapEvent(_MP.pixelToGeo(new Point(worldMouseX, worldMouseY), _mapZoomLevel));
 	}
 
 	/**

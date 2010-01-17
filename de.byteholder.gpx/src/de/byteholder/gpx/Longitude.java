@@ -24,7 +24,7 @@ package de.byteholder.gpx;
  */
 public class Longitude {
 
-	private Double	longitude;
+	private double	longitude;
 
 	public Longitude() {}
 
@@ -55,17 +55,13 @@ public class Longitude {
 			return false;
 		}
 		final Longitude other = (Longitude) obj;
-		if (longitude == null) {
-			if (other.longitude != null) {
-				return false;
-			}
-		} else if (!longitude.equals(other.longitude)) {
+		if (Double.doubleToLongBits(longitude) != Double.doubleToLongBits(other.longitude)) {
 			return false;
 		}
 		return true;
 	}
 
-	public Double get() {
+	public double get() {
 		return longitude;
 	}
 
@@ -73,11 +69,13 @@ public class Longitude {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((longitude == null) ? 0 : longitude.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(longitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
 
-	public void set(final Double longitude) {
+	public void set(final double longitude) {
 
 		if (longitude < -180 || longitude > 180) {
 			throw new IllegalArgumentException("Longitude must be between -180 and 180."); //$NON-NLS-1$

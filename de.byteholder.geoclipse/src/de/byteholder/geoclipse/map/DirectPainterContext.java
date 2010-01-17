@@ -1,8 +1,7 @@
 package de.byteholder.geoclipse.map;
 
-import java.awt.Rectangle;
-
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class DirectPainterContext {
 
