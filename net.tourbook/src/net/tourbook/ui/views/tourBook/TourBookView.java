@@ -1054,6 +1054,85 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				setCellColor(cell, element);
 			}
 		});
+		
+		/*
+		 * column: weather 
+		 */
+		colDef = TreeColumnFactory.WIND_SPD.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				float windSpeed = ((TVITourBookItem) element).colWindSpd;
+
+				if (windSpeed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Float.toString(windSpeed));
+				}
+
+				setCellColor(cell, element);
+			}
+		});	
+		
+		colDef = TreeColumnFactory.WIND_DIR.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				float windDir = ((TVITourBookItem) element).colWindDir;
+
+				if (windDir == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Float.toString(windDir));
+				}
+
+				setCellColor(cell, element);
+			}
+		});		
+		
+		colDef = TreeColumnFactory.CLOUDS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				String windClouds = ((TVITourBookItem) element).fClouds;
+
+				if (windClouds == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(windClouds);
+				}
+
+				setCellColor(cell, element);
+			}
+		});	
+		
+		colDef = TreeColumnFactory.RESTPULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				int restPulse = ((TVITourBookItem) element).colRestPulse;
+
+				if (restPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(restPulse));
+				}
+
+				setCellColor(cell, element);
+			}
+		});			
 
 		/*
 		 * column: week

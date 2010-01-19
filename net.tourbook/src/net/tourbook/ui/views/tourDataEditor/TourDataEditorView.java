@@ -297,6 +297,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								fTextDescription;
 	private Text								fTextStartLocation;
 	private Text								fTextEndLocation;
+	
+	private Text                                fTextWindDir;
+	private Text                                fTextWindSpd;
+	private Text                                fTextClouds;
+	private Text								fTextTemp;
+	private Text                                fTextRestPulse;
 
 	private Text								fTextTourDistance;
 	private Label								fLblTourDistanceUnit;
@@ -2372,6 +2378,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTextEndLocation.addModifyListener(fModifyListener);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextEndLocation);
 	}
+	
+	private void createSectionPersonal(final Composite parent, final FormToolkit tk) {
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_personal);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+		
+		// rest pulse
+		tk.createLabel(section, Messages.tour_editor_label_rest_pulse);
+		fTextRestPulse = tk.createText(section, UI.EMPTY_STRING);
+		fTextRestPulse.addModifyListener(fModifyListener);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextRestPulse);			
+	}
+	
+	private void createSectionWeather(final Composite parent, final FormToolkit tk) {
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_weather);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+
+		// wind
+		tk.createLabel(section, Messages.tour_editor_label_wind_direction);
+		fTextWindDir = tk.createText(section, UI.EMPTY_STRING);
+		fTextWindDir.addModifyListener(fModifyListener);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextWindDir);	
+		
+		tk.createLabel(section, Messages.tour_editor_label_wind_speed);
+		fTextWindSpd = tk.createText(section, UI.EMPTY_STRING);
+		fTextWindSpd.addModifyListener(fModifyListener);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextWindSpd);
+		
+		// clouds
+		tk.createLabel(section, Messages.tour_editor_label_clouds);
+		fTextClouds = tk.createText(section, UI.EMPTY_STRING);
+		fTextClouds.addModifyListener(fModifyListener);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextClouds);					
+		
+		// temperature
+		tk.createLabel(section, Messages.tour_editor_label_temperature);
+		fTextTemp = tk.createText(section, UI.EMPTY_STRING);
+		fTextTemp.addModifyListener(fModifyListener);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextTemp);		
+	}
+	
 
 	/**
 	 * @param parent
@@ -2661,6 +2707,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		createSectionTitle(fTourContainer, tk);
 		createUISectionSeparator(fTourContainer, tk);
+		
+		createSectionPersonal(fTourContainer, tk);
+		createUISectionSeparator(fTourContainer, tk);
+		
+		createSectionWeather(fTourContainer, tk);
+		createUISectionSeparator(fTourContainer, tk);		
 
 		createSectionDateTime(fTourContainer, tk);
 		createUISectionSeparator(fTourContainer, tk);
@@ -3211,6 +3263,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fTextStartLocation.setEnabled(canEdit);
 		fTextEndLocation.setEnabled(canEdit);
+		
+		fTextRestPulse.setEnabled(canEdit);
+		
+		fTextWindDir.setEnabled(canEdit);
+		fTextWindSpd.setEnabled(canEdit);
+		fTextClouds.setEnabled(canEdit);
+		fTextTemp.setEnabled(canEdit);
 
 		fDtTourDate.setEnabled(canEdit);
 		fDtStartTime.setEnabled(canEdit);
@@ -3523,6 +3582,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	/**
+	 * Converts a string into a int value
+	 * 
+	 * @param valueText
+	 * @return Returns the float value for the parameter valueText, return <code>0</code>
+	 * @throws IllegalArgumentException
+	 */
+	private int getIntValue(String valueText) throws IllegalArgumentException {
+
+		valueText = valueText.trim();
+		if (valueText.length() == 0) {
+
+			return 0;
+
+		} else {
+
+			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
+			if (convertedValue instanceof Integer) {
+				return ((Integer) convertedValue).intValue();
+			}
+		}
+
+		return 0;
+	}	
+	
 	/**
 	 * Converts a string into a float value
 	 * 
@@ -4966,6 +5050,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			fTourData.setTourStartPlace(fTextStartLocation.getText());
 			fTourData.setTourEndPlace(fTextEndLocation.getText());
+			
+			fTourData.setRestPulse(getIntValue(fTextRestPulse.getText()));
+			
+			fTourData.setWeatherWindDir(getFloatValue(fTextWindDir.getText()));
+			fTourData.setWeatherWindSpd(getFloatValue(fTextWindSpd.getText()));
+			fTourData.setWeatherClouds(fTextClouds.getText());
+			fTourData.setAvgTemperature(getIntValue(fTextTemp.getText()));
 
 			fTourData.setStartYear((short) fDtTourDate.getYear());
 			fTourData.setStartMonth((short) (fDtTourDate.getMonth() + 1));
@@ -5294,6 +5385,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// start/end location
 		fTextStartLocation.setText(fTourData.getTourStartPlace());
 		fTextEndLocation.setText(fTourData.getTourEndPlace());
+		
+		fTextRestPulse.setText(Integer.toString(fTourData.getRestPulse()));
+		
+		// average temperature
+		fTextWindDir.setText(Float.toString(fTourData.getWeatherWindDir()));
+		fTextWindSpd.setText(Float.toString(fTourData.getWeatherWindSpd()));
+		fTextClouds.setText(fTourData.getWeatherClouds() == null ? "" : fTourData.getWeatherClouds());
+		fTextTemp.setText(Integer.toString(fTourData.getAvgTemperature()));
 
 		// tour date
 		fDtTourDate.setDate(tourYear, tourMonth, tourDay);

@@ -77,7 +77,8 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 7;													// 9.01
+	private static final int					TOURBOOK_DB_VERSION							= 8;													// Mod by Kenny
+//	private static final int					TOURBOOK_DB_VERSION							= 7;													// 9.01
 
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
@@ -1509,7 +1510,16 @@ public class TourDatabase {
 				+ "startSecond	 				SMALLINT DEFAULT 0,	\n" //$NON-NLS-1$
 				//				
 				// version 7 end
-
+				
+				// version 8 start
+				//
+				+ "weatherWindDir		FLOAT DEFAULT 0, \n" //$NON-NLS-1$
+				+ "weatherWindSpd		FLOAT DEFAULT 0, \n" //$NON-NLS-1$
+				+ "weatherClouds         VARCHAR(255), \n" //$NON-NLS-1$
+				+ "restPulse            INTEGER DEFAULT 0, \n" //$NON-NLS-1$
+				//
+				// version 8 end
+				
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2118,6 +2128,11 @@ public class TourDatabase {
 			updateDbDesign_6_7(conn);
 			currentDbVersion = newVersion = 7;
 		}
+		
+		if (currentDbVersion == 7) {
+			updateDbDesign_7_8(conn);
+			currentDbVersion = newVersion = 8;
+		}		
 
 		/*
 		 * update version number
@@ -2373,6 +2388,42 @@ public class TourDatabase {
 		System.out.println("database is updated");//$NON-NLS-1$
 		System.out.println();
 	}
+	
+	private void updateDbDesign_7_8(final Connection conn) {
+
+		System.out.println();
+		System.out.println("database update: 8");//$NON-NLS-1$
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindDir		FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindSpd		FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherClouds         VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+			
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN restPulse        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);			
+
+			statement.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		System.out.println("database is updated");//$NON-NLS-1$
+		System.out.println();
+	}	
 
 	private void updateVersionNumber(final Connection conn, final int newVersion) {
 		try {
@@ -2387,3 +2438,4 @@ public class TourDatabase {
 	}
 
 }
+

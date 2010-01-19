@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -50,7 +50,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 		final String sqlString = "" + // //$NON-NLS-1$
 				//
-				"SELECT " //		//$NON-NLS-1$
+				"SELECT " //								//$NON-NLS-1$
 				//
 				+ "startYear," //						1	//$NON-NLS-1$
 				+ "startMonth," //						2	//$NON-NLS-1$
@@ -76,7 +76,13 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ "startHour," //						22	//$NON-NLS-1$
 				+ "startMinute," //						23	//$NON-NLS-1$
 				+ "startWeek," //						24	//$NON-NLS-1$
-				+ "calories" //							25	//$NON-NLS-1$
+
+				+ "weatherWindDir," //                  25  //$NON-NLS-1$
+				+ "weatherWindSpd," //                  26  //$NON-NLS-1$
+				+ "weatherClouds," //                   27  //$NON-NLS-1$
+				+ "restPulse," //                    	28  //$NON-NLS-1$
+
+				+ "calories" //							29	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -175,7 +181,12 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					tourItem.colWeek = result.getInt(24);
 
-					tourItem.colCalories = result.getInt(25);
+					tourItem.colWindDir = result.getFloat(25);
+					tourItem.colWindSpd = result.getFloat(26);
+					tourItem.fClouds = result.getString(27);
+					tourItem.colRestPulse = result.getInt(28);
+
+					tourItem.colCalories = result.getInt(29);
 
 					fCalendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.fTourDate = fCalendar.getTimeInMillis();

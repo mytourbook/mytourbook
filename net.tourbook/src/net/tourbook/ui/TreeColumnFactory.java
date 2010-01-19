@@ -140,6 +140,70 @@ public abstract class TreeColumnFactory {
 		};
 	};
 	
+	public static final TreeColumnFactory WIND_SPD = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindSpd", SWT.TRAIL); //$NON-NLS-1$
+			final String unitLabel = UI.UNIT_LABEL_SPEED;
+
+			colDef.setColumnLabel(Messages.ColumnFactory_wind_speed_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_wind_speed); 
+			colDef.setColumnUnit(unitLabel); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_wind_speed_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+
+			return colDef;
+		};
+	};	
+	
+	public static final TreeColumnFactory WIND_DIR = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindDir", SWT.TRAIL); //$NON-NLS-1$
+			final String unitLabel = UI.UNIT_LABEL_SPEED; // TODO
+
+			colDef.setColumnLabel(Messages.ColumnFactory_wind_dir_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_wind_dir); 
+			colDef.setColumnUnit(unitLabel); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_wind_dir_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+
+			return colDef;
+		};
+	};		
+	
+	public static final TreeColumnFactory CLOUDS = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherCouds", SWT.TRAIL); //$NON-NLS-1$
+
+			colDef.setColumnLabel(Messages.ColumnFactory_clouds_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_clouds); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_clouds_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+
+			return colDef;
+		};
+	};	
+	
+	public static final TreeColumnFactory RESTPULSE = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "restPulse", SWT.TRAIL); //$NON-NLS-1$
+
+			colDef.setColumnLabel(Messages.ColumnFactory_restpulse_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_restpulse); 
+			colDef.setColumnToolTipText(Messages.ColumnFactory_restpulse_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+
+			return colDef;
+		};
+	};		
+	
 	public static final TreeColumnFactory DATE = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

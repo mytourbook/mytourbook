@@ -739,6 +739,15 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_tour_data;
 	public static String		tour_editor_tabLabel_tour_marker;
 	public static String		tour_editor_tour_new_tooltip;
+	
+	public static String        tour_editor_section_weather;
+	public static String        tour_editor_label_wind_direction;
+	public static String        tour_editor_label_wind_speed;
+	public static String        tour_editor_label_clouds;
+	public static String        tour_editor_label_temperature;
+	
+	public static String        tour_editor_section_personal;
+	public static String        tour_editor_label_rest_pulse;
 
 	public static String		tour_merger_btn_reset_adjustment;
 	public static String		tour_merger_btn_reset_adjustment_tooltip;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -41,8 +41,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 													+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
 													+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
 													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-													+ "AVG(AVGTEMPERATURE),"	//	14	//$NON-NLS-1$
-													+ "SUM(CALORIES)";//			15	//$NON-NLS-1$
+													+ "AVG(AVGTEMPERATURE)," //		14	//$NON-NLS-1$
+
+													+ "AVG(WEATHERWINDDIR)," //		15	//$NON-NLS-1$ 
+													+ "AVG(WEATHERWINDSPD)," //		16	//$NON-NLS-1$
+													+ "AVG(RESTPULSE)," //			17	//$NON-NLS-1$
+
+													+ "SUM(CALORIES)";			//	18	//$NON-NLS-1$
 
 	TourBookView			fView;
 
@@ -82,6 +87,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long					colAvgCadence;
 	long					colAvgTemperature;
 
+	float					colWindSpd;
+	float					colWindDir;
+	String					fClouds;
+	int						colRestPulse;
+
 	int						colWeek;
 
 	TVITourBookItem(final TourBookView view) {
@@ -115,8 +125,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colAvgPulse = result.getLong(startIndex + 11);
 		colAvgCadence = result.getLong(startIndex + 12);
 		colAvgTemperature = result.getLong(startIndex + 13);
-		
-		colCalories = result.getLong(startIndex + 14);
+
+		colWindDir = result.getLong(startIndex + 14);
+		colWindSpd = result.getLong(startIndex + 15);
+		colRestPulse = result.getInt(startIndex + 16);
+
+		colCalories = result.getLong(startIndex + 17);
 
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}

@@ -258,6 +258,11 @@ public class TourData implements Comparable<Object> {
 	private int							avgPulse;																	// db-version 4
 	private int							avgCadence;																// db-version 4
 	private int							avgTemperature;															// db-version 4
+	
+	private float                       weatherWindDir; // db-version 8
+	private float                       weatherWindSpd; // db-version 8
+	private String                      weatherClouds;  // db-version 8
+	private int                         restPulse;      // db-version 8
 
 	private String						tourTitle;																	// db-version 4
 	private String						tourDescription;															// db-version 4
@@ -2877,6 +2882,38 @@ public class TourData implements Comparable<Object> {
 
 		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
+	}
+	
+	public float getWeatherWindDir() {
+		return weatherWindDir;
+	}
+
+	public void setWeatherWindDir(float weatherWindDir) {
+		this.weatherWindDir = weatherWindDir;
+	}
+
+	public float getWeatherWindSpd() {
+		return weatherWindSpd;
+	}
+
+	public void setWeatherWindSpd(float weatherWindSpd) {
+		this.weatherWindSpd = weatherWindSpd;
+	}
+
+	public String getWeatherClouds() {
+		return weatherClouds;
+	}
+
+	public void setWeatherClouds(String weatherClouds) {
+		this.weatherClouds = weatherClouds;
+	}	
+	
+	public int getRestPulse() {
+		return restPulse;
+	}
+
+	public void setRestPulse(int restPulse) {
+		this.restPulse = restPulse;
 	}
 
 	@Override
