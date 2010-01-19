@@ -1085,7 +1085,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label = new Label(detailContainer, SWT.NONE);
 			label.setText(Messages.Pref_Map_Label_Url);
 
-			// text: map provider type
+			// text: url
 			fTxtUrl = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(fTxtUrl);
 		}

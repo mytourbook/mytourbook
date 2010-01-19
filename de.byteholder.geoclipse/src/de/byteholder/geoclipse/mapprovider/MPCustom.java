@@ -25,9 +25,9 @@ import de.byteholder.geoclipse.map.UI;
 
 public class MPCustom extends MP {
 
-	private String				fCustomUrl	= UI.EMPTY_STRING;
+	private String				_customUrl	= UI.EMPTY_STRING;
 
-	private ArrayList<UrlPart>	fUrlParts	= new ArrayList<UrlPart>();
+	private ArrayList<UrlPart>	_urlParts	= new ArrayList<UrlPart>();
 
 	public MPCustom() {
 
@@ -38,20 +38,20 @@ public class MPCustom extends MP {
 
 		final MPCustom mapProvider = (MPCustom) super.clone();
 
-		mapProvider.fCustomUrl = new String(fCustomUrl);
+		mapProvider._customUrl = new String(_customUrl);
 
 		// clone url parts
 		final ArrayList<UrlPart> newUrlParts = new ArrayList<UrlPart>();
-		for (final UrlPart urlPart : fUrlParts) {
+		for (final UrlPart urlPart : _urlParts) {
 			newUrlParts.add((UrlPart) urlPart.clone());
 		}
-		mapProvider.fUrlParts = newUrlParts;
+		mapProvider._urlParts = newUrlParts;
 
 		return mapProvider;
 	}
 
 	public String getCustomUrl() {
-		return fCustomUrl;
+		return _customUrl;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class MPCustom extends MP {
 	@Override
 	public String getTileUrl(final Tile tile) {
 
-		if (fUrlParts.size() == 0) {
+		if (_urlParts.size() == 0) {
 
 			// url parts are not set yet, display openstreetmap
 
@@ -83,7 +83,7 @@ public class MPCustom extends MP {
 
 			final StringBuilder sb = new StringBuilder();
 
-			for (final UrlPart urlPart : fUrlParts) {
+			for (final UrlPart urlPart : _urlParts) {
 				switch (urlPart.getPartType()) {
 
 				case HTML:
@@ -141,18 +141,18 @@ public class MPCustom extends MP {
 	}
 
 	public ArrayList<UrlPart> getUrlParts() {
-		return fUrlParts;
+		return _urlParts;
 	}
 
 	public void setCustomUrl(final String customUrl) {
-		fCustomUrl = customUrl;
+		_customUrl = customUrl;
 	}
 
 	public void setUrlParts(final ArrayList<UrlPart> urlParts) {
 
-		fUrlParts.clear();
+		_urlParts.clear();
 
-		fUrlParts = urlParts;
+		_urlParts = urlParts;
 	}
 
 }

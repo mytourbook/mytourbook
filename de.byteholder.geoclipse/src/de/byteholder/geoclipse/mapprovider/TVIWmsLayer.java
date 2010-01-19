@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,20 +19,20 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIWmsLayer extends TVIMapProviderItem {
 
-	private MtLayer	fMtLayer;
+	private MtLayer	_mtLayer;
 
 	public TVIWmsLayer(final TreeViewer treeViewer, final MtLayer mtLayer) {
 
 		super(treeViewer);
 
-		fMtLayer = mtLayer;
+		_mtLayer = mtLayer;
 	}
 
 	@Override
 	protected void fetchChildren() {}
 
 	public MtLayer getMtLayer() {
-		return fMtLayer;
+		return _mtLayer;
 	}
 
 	@Override

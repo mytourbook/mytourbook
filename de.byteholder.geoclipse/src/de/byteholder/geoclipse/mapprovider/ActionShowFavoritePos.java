@@ -22,11 +22,11 @@ import de.byteholder.geoclipse.Messages;
 
 public class ActionShowFavoritePos extends Action {
 
-	private DialogMP	fDlgMapConfig;
+	private DialogMP	_dlgMapConfig;
 
  	public ActionShowFavoritePos(final DialogMP dialogMapConfiguration) {
 
-		fDlgMapConfig = dialogMapConfiguration;
+		_dlgMapConfig = dialogMapConfiguration;
 
 		setToolTipText(Messages.Map_Action_ShowFavoritePosition_Tooltip);
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ShowFavoritePosition));
@@ -36,7 +36,7 @@ public class ActionShowFavoritePos extends Action {
 	@Override
 	public void run() {
 
-		fDlgMapConfig.actionShowFavoritePosition();
+		_dlgMapConfig.actionShowFavoritePosition();
 	}
 
 }

@@ -22,11 +22,11 @@ import de.byteholder.geoclipse.Messages;
 
 public class ActionZoomShowEntireLayer extends Action {
 
-	private DialogMPWms	fDlgWms;
+	private DialogMPWms	_dlgWms;
 
 	public ActionZoomShowEntireLayer(final DialogMPWms dialogWmsConfiguration) {
 
-		fDlgWms = dialogWmsConfiguration;
+		_dlgWms = dialogWmsConfiguration;
 
 		setToolTipText(Messages.Map_Action_ZoomShowEntireLayer_Tooltip);
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ZoomShowEntireLayer));
@@ -34,7 +34,7 @@ public class ActionZoomShowEntireLayer extends Action {
 
 	@Override
 	public void run() {
-		fDlgWms.actionSetZoomToShowEntireLayer();
+		_dlgWms.actionSetZoomToShowEntireLayer();
 	}
 
 }

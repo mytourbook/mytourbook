@@ -86,18 +86,18 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * Cache for tiles which do not have loading errors
 	 */
-	private static final TileCache					fTileCache						= new TileCache(TILE_CACHE_SIZE);
+	private static final TileCache					_tileCache						= new TileCache(TILE_CACHE_SIZE);
 
 	/**
 	 * Contains tiles which has loading errors, they are kept in this map that they are not loaded
 	 * again
 	 */
-	private static final TileCache					fErrorTiles						= new TileCache(ERROR_CACHE_SIZE);
+	private static final TileCache					_errorTiles						= new TileCache(ERROR_CACHE_SIZE);
 
 	/**
 	 * Cache for tile images
 	 */
-	private static final TileImageCache				fTileImageCache					= new TileImageCache(
+	private static final TileImageCache				_tileImageCache					= new TileImageCache(
 																							IMAGE_CACHE_SIZE);
 
 	/**
@@ -107,114 +107,114 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * <br>
 	 * TODO !!!!! THIS IS JDK 1.6 !!!!!!!
 	 */
-	private static final LinkedBlockingDeque<Tile>	fTileWaitingQueue				= new LinkedBlockingDeque<Tile>();
+	private static final LinkedBlockingDeque<Tile>	_tileWaitingQueue				= new LinkedBlockingDeque<Tile>();
 
 	/**
 	 * Listener which throws {@link ITileListener} events
 	 */
-	private final static ListenerList				fTileListeners					= new ListenerList(
+	private final static ListenerList				_tileListeners					= new ListenerList(
 																							ListenerList.IDENTITY);
 
-	private int										fDimmingAlphaValue				= 0xFF;
-	private RGB										fDimmingColor;
+	private int										_dimmingAlphaValue				= 0xFF;
+	private RGB										_dimmingColor;
 
-	private Projection								fProjection;
+	private Projection								_projection;
 
 	/**
 	 * image size in pixel for a square image
 	 */
-	private int										fTileSize						= Integer
+	private int										_tileSize						= Integer
 																							.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
 	// map min/max zoom level
-	private int										fMinZoomLevel					= 0;
-	private int										fMaxZoomLevel					= UI_MAX_ZOOM_LEVEL
+	private int										_minZoomLevel					= 0;
+	private int										_maxZoomLevel					= UI_MAX_ZOOM_LEVEL
 																							- UI_MIN_ZOOM_LEVEL;
 
-	private int										fDefaultZoomLevel				= 0;
+	private int										_defaultZoomLevel				= 0;
 
 	/**
 	 * The number of tiles wide at each zoom level
 	 */
-	private int[]									fMapWidthInTilesAtZoom;
+	private int[]									_mapWidthInTilesAtZoom;
 
 	/**
 	 * An array of coordinates in <em>pixels</em> that indicates the center in the world map for the
 	 * given zoom level.
 	 */
-	private Point2D[]								fMapCenterInPixelsAtZoom;
+	private Point2D[]								_mapCenterInPixelsAtZoom;
 
 	/**
 	 * An array of doubles that contain the number of pixels per degree of longitude at a give zoom
 	 * level.
 	 */
-	private double[]								fLongitudeDegreeWidthInPixels;
+	private double[]								_longitudeDegreeWidthInPixels;
 
 	/**
 	 * An array of doubles that contain the number of radians per degree of longitude at a given
 	 * zoom level (where longitudeRadianWidthInPixels[0] is the most zoomed out)
 	 */
-	private double[]								fLongitudeRadianWidthInPixels;
+	private double[]								_longitudeRadianWidthInPixels;
 
-	private boolean									fUseOfflineImage				= true;
+	private boolean									_useOfflineImage				= true;
 
 	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
 	 */
-	private Image									fLoadingImage;
+	private Image									_loadingImage;
 
 	/**
 	 * This is the image displayed when the real tile image could not be loaded.
 	 */
-	private Image									fErrorImage;
+	private Image									_errorImage;
 
 	/**
 	 * unique id to identify a map provider
 	 */
-	private String									fMapProviderId;
+	private String									_mapProviderId;
 
 	/**
 	 * mime image format which is currently used
 	 */
-	private String									fImageFormat					= MapProviderManager.DEFAULT_IMAGE_FORMAT;
+	private String									_imageFormat					= MapProviderManager.DEFAULT_IMAGE_FORMAT;
 
-	private int										fFavoriteZoom					= 0;
-	private GeoPosition								fFavoritePosition				= new GeoPosition(0.0, 0.0);
+	private int										_favoriteZoom					= 0;
+	private GeoPosition								_favoritePosition				= new GeoPosition(0.0, 0.0);
 
-	private int										fLastUsedZoom					= 0;
-	private GeoPosition								fLastUsedPosition				= new GeoPosition(0.0, 0.0);
+	private int										_lastUsedZoom					= 0;
+	private GeoPosition								_lastUsedPosition				= new GeoPosition(0.0, 0.0);
 
 	/**
 	 * name of the map provider which is displayed in the UI
 	 */
-	private String									fMapProviderName;
+	private String									_mapProviderName;
 
 	/**
 	 * map provider description
 	 */
-	private String									fDescription					= UI.EMPTY_STRING;
+	private String									_description					= UI.EMPTY_STRING;
 
 	/**
 	 * OS folder to save offline images
 	 */
-	private String									fOfflineFolder;
+	private String									_offlineFolder;
 
 	/**
 	 * number of files in the offline cache
 	 */
-	private int										fOfflineFileCounter				= -1;
+	private int										_offlineFileCounter				= -1;
 
 	/**
 	 * size in Bytes for the offline images
 	 */
-	private long									fOfflineFileSize				= -1;
+	private long									_offlineFileSize				= -1;
 
-	private static final ListenerList				fOfflineReloadEventListeners	= new ListenerList(
+	private static final ListenerList				_offlineReloadEventListeners	= new ListenerList(
 																							ListenerList.IDENTITY);
 
 	/**
 	 * State if the map provider can be toggled in the map
 	 */
-	private boolean									fCanBeToggled;
+	private boolean									_canBeToggled;
 
 	//
 	// Profile map provider values
@@ -223,60 +223,60 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
-	private int										fProfileAlpha					= 100;
+	private int										_profileAlpha					= 100;
 
-	private boolean									fIsProfileTransparentColors		= false;
-	private int[]									fProfileTransparentColor		= null;
+	private boolean									_isProfileTransparentColors		= false;
+	private int[]									_profileTransparentColor		= null;
 
 	/**
 	 * when <code>true</code> the color black is transparent
 	 */
-	private boolean									fIsProfileBlackTransparent;
+	private boolean									_isProfileBlackTransparent;
 
-	private boolean									fIsProfileBrightness;
-	private int										fProfileBrightnessValue;
-	private MapViewPortData							fMapViewPort;
+	private boolean									_isProfileBrightness;
+	private int										_profileBrightnessValue;
+	private MapViewPortData							_mapViewPort;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
-		fOfflineReloadEventListeners.add(listener);
+		_offlineReloadEventListeners.add(listener);
 	}
 
 	public static void addTileListener(final ITileListener tileListener) {
-		fTileListeners.add(tileListener);
+		_tileListeners.add(tileListener);
 	}
 
 	public static void fireTileEvent(final TileEventId tileEventId, final Tile tile) {
-		for (final Object listener : fTileListeners.getListeners()) {
+		for (final Object listener : _tileListeners.getListeners()) {
 			final ITileListener tileListener = (ITileListener) listener;
 			tileListener.tileEvent(tileEventId, tile);
 		}
 	}
 
 	public static TileCache getErrorTiles() {
-		return fErrorTiles;
+		return _errorTiles;
 	}
 
 	public static TileCache getTileCache() {
-		return fTileCache;
+		return _tileCache;
 	}
 
 	public static ListenerList getTileListeners() {
-		return fTileListeners;
+		return _tileListeners;
 	}
 
 	public static LinkedBlockingDeque<Tile> getTileWaitingQueue() {
-		return fTileWaitingQueue;
+		return _tileWaitingQueue;
 	}
 
 	public static void removeOfflineInfoListener(final IOfflineInfoListener listener) {
 		if (listener != null) {
-			fOfflineReloadEventListeners.remove(listener);
+			_offlineReloadEventListeners.remove(listener);
 		}
 	}
 
 	public static void removeTileListener(final ITileListener tileListener) {
 		if (tileListener != null) {
-			fTileListeners.remove(tileListener);
+			_tileListeners.remove(tileListener);
 		}
 	}
 
@@ -296,14 +296,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public MP() {
 
-		fProjection = new Mercator();
+		_projection = new Mercator();
 
-		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
+		initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
 
 	}
 
 	public boolean canBeToggled() {
-		return fCanBeToggled;
+		return _canBeToggled;
 	}
 
 	/**
@@ -316,7 +316,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public boolean checkViewPort(final Tile tile) {
 
 		// check zoom level
-		if (tile.getZoom() != fMapViewPort.mapZoomLevel) {
+		if (tile.getZoom() != _mapViewPort.mapZoomLevel) {
 			return false;
 		}
 
@@ -324,10 +324,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		final int tileX = tile.getX();
 		final int tileY = tile.getY();
 
-		if (tileX >= fMapViewPort.tilePosMinX
-				&& tileX <= fMapViewPort.tilePosMaxX
-				&& tileY >= fMapViewPort.tilePosMinY
-				&& tileY <= fMapViewPort.tilePosMaxY) {
+		if (tileX >= _mapViewPort.tilePosMinX
+				&& tileX <= _mapViewPort.tilePosMaxX
+				&& tileY >= _mapViewPort.tilePosMinY
+				&& tileY <= _mapViewPort.tilePosMaxY) {
 
 			return true;
 		}
@@ -349,15 +349,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		} else {
 
-			mapProvider.fImageFormat = new String(fImageFormat);
+			mapProvider._imageFormat = new String(_imageFormat);
 
-			mapProvider.fFavoritePosition = new GeoPosition(fFavoritePosition == null
+			mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
 					? new GeoPosition(0.0, 0.0)
-					: fFavoritePosition);
+					: _favoritePosition);
 
-			mapProvider.fLastUsedPosition = new GeoPosition(fLastUsedPosition == null
+			mapProvider._lastUsedPosition = new GeoPosition(_lastUsedPosition == null
 					? new GeoPosition(0.0, 0.0)
-					: fLastUsedPosition);
+					: _lastUsedPosition);
 		}
 
 		return mapProvider;
@@ -369,7 +369,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		if (this instanceof MPPlugin && otherMapProvider instanceof MPPlugin) {
 
-			return fMapProviderName.compareTo(otherMapProvider.getName());
+			return _mapProviderName.compareTo(otherMapProvider.getName());
 
 		} else {
 
@@ -380,7 +380,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 				return 1;
 			}
 
-			return fMapProviderName.compareTo(otherMapProvider.getName());
+			return _mapProviderName.compareTo(otherMapProvider.getName());
 		}
 	}
 
@@ -393,7 +393,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				final int tileSize = getTileSize();
 
-				fErrorImage = new Image(display, tileSize, tileSize);
+				_errorImage = new Image(display, tileSize, tileSize);
 
 				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
 				final GC gc = new GC(getErrorImage());
@@ -419,7 +419,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				final int tileSize = getTileSize();
 
-				fLoadingImage = new Image(display, tileSize, tileSize);
+				_loadingImage = new Image(display, tileSize, tileSize);
 
 				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
 				final GC gc = new GC(getLoadingImage());
@@ -442,27 +442,27 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public void disposeAllImages() {
 
-		if (fTileImageCache != null) {
-			fTileImageCache.dispose();
+		if (_tileImageCache != null) {
+			_tileImageCache.dispose();
 		}
 
-		if (fLoadingImage != null) {
-			fLoadingImage.dispose();
+		if (_loadingImage != null) {
+			_loadingImage.dispose();
 		}
 
-		if (fErrorImage != null) {
-			fErrorImage.dispose();
+		if (_errorImage != null) {
+			_errorImage.dispose();
 		}
 	}
 
 	public void disposeTileImages() {
-		fTileImageCache.dispose();
+		_tileImageCache.dispose();
 	}
 
 	public void disposeTiles() {
-		fTileCache.removeAll();
-		fErrorTiles.removeAll();
-		fTileImageCache.dispose();
+		_tileCache.removeAll();
+		_errorTiles.removeAll();
+		_tileImageCache.dispose();
 	}
 
 	/**
@@ -490,11 +490,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 
 		final MP other = (MP) obj;
-		if (fMapProviderId == null) {
-			if (other.fMapProviderId != null) {
+		if (_mapProviderId == null) {
+			if (other._mapProviderId != null) {
 				return false;
 			}
-		} else if (!fMapProviderId.equals(other.fMapProviderId)) {
+		} else if (!_mapProviderId.equals(other._mapProviderId)) {
 			return false;
 		}
 
@@ -503,7 +503,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private void fireOfflineReloadEvent(final MP mapProvider) {
 
-		final Object[] allListeners = fOfflineReloadEventListeners.getListeners();
+		final Object[] allListeners = _offlineReloadEventListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((IOfflineInfoListener) listener).offlineInfoIsDirty(mapProvider);
 		}
@@ -519,7 +519,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return a pixel location in the world bitmap
 	 */
 	public org.eclipse.swt.graphics.Point geoToPixel(final GeoPosition geoPosition, final int zoomLevel) {
-		return fProjection.geoToPixel(geoPosition, zoomLevel, this);
+		return _projection.geoToPixel(geoPosition, zoomLevel, this);
 	}
 
 	/**
@@ -530,18 +530,18 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public int getDefaultZoomLevel() {
-		return fDefaultZoomLevel;
+		return _defaultZoomLevel;
 	}
 
 	public String getDescription() {
-		return fDescription;
+		return _description;
 	}
 
 	/**
 	 * @return Returns the color which is used to dim the map images
 	 */
 	public RGB getDimColor() {
-		return fDimmingColor;
+		return _dimmingColor;
 	}
 
 	/**
@@ -549,20 +549,20 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *         dim the map.
 	 */
 	public int getDimLevel() {
-		return fDimmingAlphaValue;
+		return _dimmingAlphaValue;
 	}
 
 	public double getDistance(final GeoPosition position1, final GeoPosition position2, final int zoom) {
-		return fProjection.getHorizontalDistance(position1, position2, zoom, this);
+		return _projection.getHorizontalDistance(position1, position2, zoom, this);
 	}
 
 	public Image getErrorImage() {
 
-		if (fErrorImage == null || fErrorImage.isDisposed()) {
+		if (_errorImage == null || _errorImage.isDisposed()) {
 			createErrorImage();
 		}
 
-		return fErrorImage;
+		return _errorImage;
 	}
 
 	/**
@@ -615,39 +615,39 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public GeoPosition getFavoritePosition() {
-		return fFavoritePosition;
+		return _favoritePosition;
 	}
 
 	public int getFavoriteZoom() {
-		return fFavoriteZoom;
+		return _favoriteZoom;
 	}
 
 	/**
 	 * @return Returns a unique id for the map provider
 	 */
 	public String getId() {
-		return fMapProviderId;
+		return _mapProviderId;
 	}
 
 	public String getImageFormat() {
-		return fImageFormat;
+		return _imageFormat;
 	}
 
 	public GeoPosition getLastUsedPosition() {
-		return fLastUsedPosition;
+		return _lastUsedPosition;
 	}
 
 	public int getLastUsedZoom() {
-		return fLastUsedZoom;
+		return _lastUsedZoom;
 	}
 
 	public Image getLoadingImage() {
 
-		if (fLoadingImage == null || fLoadingImage.isDisposed()) {
+		if (_loadingImage == null || _loadingImage.isDisposed()) {
 			createLoadingImage();
 		}
 
-		return fLoadingImage;
+		return _loadingImage;
 	}
 
 	/**
@@ -655,7 +655,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public double getLongitudeDegreeWidthInPixels(final int zoom) {
-		return fLongitudeDegreeWidthInPixels[zoom];
+		return _longitudeDegreeWidthInPixels[zoom];
 	}
 
 	/**
@@ -663,7 +663,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public double getLongitudeRadianWidthInPixels(final int zoom) {
-		return fLongitudeRadianWidthInPixels[zoom];
+		return _longitudeRadianWidthInPixels[zoom];
 	}
 
 	/**
@@ -671,7 +671,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public Point2D getMapCenterInPixelsAtZoom(final int zoom) {
-		return fMapCenterInPixelsAtZoom[zoom];
+		return _mapCenterInPixelsAtZoom[zoom];
 	}
 
 	/**
@@ -681,10 +681,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	private int getMapSizeInTiles(int zoom) {
 
 		// ensure array bounds, this is Math.min() inline
-		final int b = fMapWidthInTilesAtZoom.length - 1;
+		final int b = _mapWidthInTilesAtZoom.length - 1;
 		zoom = (zoom <= b) ? zoom : b;
 
-		return fMapWidthInTilesAtZoom[zoom];
+		return _mapWidthInTilesAtZoom[zoom];
 	}
 
 	/**
@@ -700,37 +700,37 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return
 	 */
 	public int getMaximumZoomLevel() {
-		return fMaxZoomLevel;
+		return _maxZoomLevel;
 	}
 
 	public int getMaxZoomLevel() {
-		return fMaxZoomLevel;
+		return _maxZoomLevel;
 	}
 
 	/**
 	 * @return
 	 */
 	public int getMinimumZoomLevel() {
-		return fMinZoomLevel;
+		return _minZoomLevel;
 	}
 
 	public int getMinZoomLevel() {
-		return fMinZoomLevel;
+		return _minZoomLevel;
 	}
 
 	/**
 	 * @return Returns the name of the map provider which is displayed in the UI
 	 */
 	public String getName() {
-		return fMapProviderName;
+		return _mapProviderName;
 	}
 
 	public int getOfflineFileCounter() {
-		return fOfflineFileCounter;
+		return _offlineFileCounter;
 	}
 
 	public long getOfflineFileSize() {
-		return fOfflineFileSize;
+		return _offlineFileSize;
 	}
 
 	/**
@@ -738,23 +738,23 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *         image path
 	 */
 	public String getOfflineFolder() {
-		return fOfflineFolder;
+		return _offlineFolder;
 	}
 
 	int getProfileAlpha() {
-		return fProfileAlpha;
+		return _profileAlpha;
 	}
 
 	int getProfileBrightness() {
-		return fProfileBrightnessValue;
+		return _profileBrightnessValue;
 	}
 
 	int[] getProfileTransparentColors() {
-		return fProfileTransparentColor;
+		return _profileTransparentColor;
 	}
 
 	public Projection getProjection() {
-		return fProjection;
+		return _projection;
 	}
 
 	/**
@@ -790,12 +790,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 				tilePositionY,
 				null,
 				getCustomTileKey(),
-				fProjection.getId());
+				_projection.getId());
 
 		/*
 		 * check if tile is available in the tile cache and the tile image is available
 		 */
-		Tile tile = fTileCache.get(tileKey);
+		Tile tile = _tileCache.get(tileKey);
 
 		if (tile != null) {
 
@@ -830,7 +830,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		/*
 		 * check if the tile has a loading error
 		 */
-		final Tile errorTile = fErrorTiles.get(tileKey);
+		final Tile errorTile = _errorTiles.get(tileKey);
 		if (errorTile != null) {
 
 			// tiles with an error do not have an image
@@ -860,7 +860,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 			 * keep tiles in the cache, tiles with loading errors will be transferred to the tile
 			 * cache with loading errors, this is done in the TileImageLoader
 			 */
-			fTileCache.add(tileKey, tile);
+			_tileCache.add(tileKey, tile);
 		}
 
 		/*
@@ -870,7 +870,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		final boolean useOfflineImage = isUseOfflineImage();
 		if (useOfflineImage) {
-			cachedTileImage = fTileImageCache.getTileImage(tile);
+			cachedTileImage = _tileImageCache.getTileImage(tile);
 		}
 
 		if (cachedTileImage == null) {
@@ -881,7 +881,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				// set state if an offline image for the current tile is available
 				if (useOfflineImage) {
-					fTileImageCache.setOfflineImageAvailability(tile);
+					_tileImageCache.setOfflineImageAvailability(tile);
 				}
 
 				// LOAD/CREATE image
@@ -899,7 +899,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public TileImageCache getTileImageCache() {
-		return fTileImageCache;
+		return _tileImageCache;
 	}
 
 	/**
@@ -929,7 +929,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *         example, means that each tile will be 256 pixels wide and tall
 	 */
 	public int getTileSize() {
-		return fTileSize;
+		return _tileSize;
 	}
 
 	/**
@@ -1004,42 +1004,42 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fMapProviderId == null) ? 0 : fMapProviderId.hashCode());
+		result = prime * result + ((_mapProviderId == null) ? 0 : _mapProviderId.hashCode());
 		return result;
 	}
 
 	public void initializeMapSize(final int tileSize) {
-		initializeMapWithZoomAndSize(fMaxZoomLevel, tileSize);
+		initializeMapWithZoomAndSize(_maxZoomLevel, tileSize);
 	}
 
 	private void initializeMapWithZoomAndSize(final int maxZoom, final int tileSize) {
 
-		fTileSize = tileSize;
+		_tileSize = tileSize;
 
 		// map width (in pixel) is one tile at zoomlevel 0
 		int devMapSize = tileSize;
 
 		final int mapArrayLength = maxZoom + 1;
 
-		fLongitudeDegreeWidthInPixels = new double[mapArrayLength];
-		fLongitudeRadianWidthInPixels = new double[mapArrayLength];
+		_longitudeDegreeWidthInPixels = new double[mapArrayLength];
+		_longitudeRadianWidthInPixels = new double[mapArrayLength];
 
-		fMapCenterInPixelsAtZoom = new Point2D.Double[mapArrayLength];
-		fMapWidthInTilesAtZoom = new int[mapArrayLength];
+		_mapCenterInPixelsAtZoom = new Point2D.Double[mapArrayLength];
+		_mapWidthInTilesAtZoom = new int[mapArrayLength];
 
 		// get map values for each zoom level
 		for (int z = 0; z <= maxZoom; ++z) {
 
 			// how wide is each degree of longitude in pixels
-			fLongitudeDegreeWidthInPixels[z] = (double) devMapSize / 360;
+			_longitudeDegreeWidthInPixels[z] = (double) devMapSize / 360;
 
 			// how wide is each radian of longitude in pixels
-			fLongitudeRadianWidthInPixels[z] = devMapSize / (2.0 * Math.PI);
+			_longitudeRadianWidthInPixels[z] = devMapSize / (2.0 * Math.PI);
 
 			final int devMapSize2 = devMapSize / 2;
 
-			fMapCenterInPixelsAtZoom[z] = new Point2D.Double(devMapSize2, devMapSize2);
-			fMapWidthInTilesAtZoom[z] = devMapSize / tileSize;
+			_mapCenterInPixelsAtZoom[z] = new Point2D.Double(devMapSize2, devMapSize2);
+			_mapWidthInTilesAtZoom[z] = devMapSize / tileSize;
 
 			devMapSize *= 2;
 		}
@@ -1047,10 +1047,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private void initializeZoomLevel(final int minZoom, final int maxZoom) {
 
-		fMinZoomLevel = minZoom;
-		fMaxZoomLevel = maxZoom;
+		_minZoomLevel = minZoom;
+		_maxZoomLevel = maxZoom;
 
-		initializeMapWithZoomAndSize(fMaxZoomLevel, fTileSize);
+		initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
 	}
 
 //	/**
@@ -1060,15 +1060,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 //	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
 	boolean isProfileBrightness() {
-		return fIsProfileBrightness;
+		return _isProfileBrightness;
 	}
 
 	boolean isProfileTransparentBlack() {
-		return fIsProfileBlackTransparent;
+		return _isProfileBlackTransparent;
 	}
 
 	boolean isProfileTransparentColors() {
-		return fIsProfileTransparentColors;
+		return _isProfileTransparentColors;
 	}
 
 	/**
@@ -1084,12 +1084,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 
 		// check if off the map to the right
-		if (getMapCenterInPixelsAtZoom(zoomLevel).getX() * 2 <= x * fTileSize) {
+		if (getMapCenterInPixelsAtZoom(zoomLevel).getX() * 2 <= x * _tileSize) {
 			return false;
 		}
 
 		// check if off the map to the bottom
-		if (getMapCenterInPixelsAtZoom(zoomLevel).getY() * 2 <= y * fTileSize) {
+		if (getMapCenterInPixelsAtZoom(zoomLevel).getY() * 2 <= y * _tileSize) {
 			return false;
 		}
 
@@ -1102,7 +1102,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public boolean isUseOfflineImage() {
-		return fUseOfflineImage;
+		return _useOfflineImage;
 	}
 
 	/**
@@ -1115,7 +1115,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @return the converted GeoPosition
 	 */
 	public GeoPosition pixelToGeo(final Point pixelCoordinate, final int zoom) {
-		return fProjection.pixelToGeo(pixelCoordinate, zoom, this);
+		return _projection.pixelToGeo(pixelCoordinate, zoom, this);
 	}
 
 	/**
@@ -1128,7 +1128,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		tile.setLoading(true);
 
-		fTileWaitingQueue.add(tile);
+		_tileWaitingQueue.add(tile);
 
 		// create loading task
 		final Future<?> future = getExecutor().submit(new TileImageLoader());
@@ -1191,15 +1191,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		{
 			try {
 
-				fTileWaitingQueue.clear();
-				fTileCache.stopLoadingTiles();
+				_tileWaitingQueue.clear();
+				_tileCache.stopLoadingTiles();
 
 				if (keepTilesWithLoadingError == false) {
-					fErrorTiles.removeAll();
+					_errorTiles.removeAll();
 				}
 
-				fTileCache.removeAll();
-				fTileImageCache.dispose();
+				_tileCache.removeAll();
+				_tileImageCache.dispose();
 
 			} finally {
 				RESET_LOCK.unlock();
@@ -1211,11 +1211,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public synchronized void resetOverlays() {
 
-		fTileWaitingQueue.clear();
-		fTileCache.stopLoadingTiles();
+		_tileWaitingQueue.clear();
+		_tileCache.stopLoadingTiles();
 
-		fTileCache.resetOverlays();
-		fErrorTiles.resetOverlays();
+		_tileCache.resetOverlays();
+		_errorTiles.resetOverlays();
 
 		fireTileEvent(TileEventId.TILE_RESET_QUEUES, null);
 	}
@@ -1226,13 +1226,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		{
 			try {
 
-				fTileWaitingQueue.clear();
-				fTileCache.stopLoadingTiles();
+				_tileWaitingQueue.clear();
+				_tileCache.stopLoadingTiles();
 
-				fErrorTiles.removeParentTiles();
+				_errorTiles.removeParentTiles();
 
-				fTileCache.removeAll();
-				fTileImageCache.dispose();
+				_tileCache.removeAll();
+				_tileImageCache.dispose();
 
 			} finally {
 				RESET_LOCK.unlock();
@@ -1241,48 +1241,48 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void resetTileImageAvailability() {
-		fTileCache.resetTileImageAvailability();
+		_tileCache.resetTileImageAvailability();
 	}
 
 	public void setCanBeToggled(final boolean canBeToggled) {
-		fCanBeToggled = canBeToggled;
+		_canBeToggled = canBeToggled;
 	}
 
 	public void setDefaultZoomLevel(final int defaultZoomLevel) {
-		fDefaultZoomLevel = defaultZoomLevel;
+		_defaultZoomLevel = defaultZoomLevel;
 	}
 
 	public void setDescription(final String fDescription) {
-		this.fDescription = fDescription;
+		this._description = fDescription;
 	}
 
 	public void setDimLevel(final int dimLevel, final RGB dimColor) {
 
 		// check if dimming value is modified
-		if (fDimmingAlphaValue == dimLevel && fDimmingColor == dimColor) {
+		if (_dimmingAlphaValue == dimLevel && _dimmingColor == dimColor) {
 			// dimming value is not modified
 			return;
 		}
 
 		// set new dim level/color
-		fDimmingAlphaValue = dimLevel;
-		fDimmingColor = dimColor;
+		_dimmingAlphaValue = dimLevel;
+		_dimmingColor = dimColor;
 
 		// dispose all cached images
 		disposeTileImages();
 	}
 
 	public void setFavoritePosition(final GeoPosition fFavoritePosition) {
-		this.fFavoritePosition = fFavoritePosition;
+		this._favoritePosition = fFavoritePosition;
 	}
 
 	public void setFavoriteZoom(final int favoriteZoom) {
-		fFavoriteZoom = favoriteZoom;
+		_favoriteZoom = favoriteZoom;
 	}
 
 	public void setId(final String mapProviderId) {
 
-		fMapProviderId = mapProviderId;
+		_mapProviderId = mapProviderId;
 
 		/*
 		 * !!! very importand !!!
@@ -1294,43 +1294,43 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void setImageFormat(final String imageFormat) {
-		fImageFormat = imageFormat;
+		_imageFormat = imageFormat;
 	}
 
 	void setIsProfileBrightness(final boolean isBrightness) {
-		fIsProfileBrightness = isBrightness;
+		_isProfileBrightness = isBrightness;
 	}
 
 	void setIsProfileTransparentBlack(final boolean isBlackTransparent) {
-		fIsProfileBlackTransparent = isBlackTransparent;
+		_isProfileBlackTransparent = isBlackTransparent;
 	}
 
 	void setIsProfileTransparentColors(final boolean isTransColors) {
-		fIsProfileTransparentColors = isTransColors;
+		_isProfileTransparentColors = isTransColors;
 	}
 
 	public void setLastUsedPosition(final GeoPosition position) {
-		fLastUsedPosition = position;
+		_lastUsedPosition = position;
 	}
 
 	public void setLastUsedZoom(final int zoom) {
-		fLastUsedZoom = zoom;
+		_lastUsedZoom = zoom;
 	}
 
 	public void setMapViewPort(final MapViewPortData mapViewPort) {
-		fMapViewPort = mapViewPort;
+		_mapViewPort = mapViewPort;
 	}
 
 	public void setName(final String mapProviderName) {
-		fMapProviderName = mapProviderName;
+		_mapProviderName = mapProviderName;
 	}
 
 	public void setOfflineFileCounter(final int offlineFileCounter) {
-		fOfflineFileCounter = offlineFileCounter;
+		_offlineFileCounter = offlineFileCounter;
 	}
 
 	public void setOfflineFileSize(final long offlineFileSize) {
-		fOfflineFileSize = offlineFileSize;
+		_offlineFileSize = offlineFileSize;
 	}
 
 	/**
@@ -1340,27 +1340,27 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @param offlineFolder
 	 */
 	public void setOfflineFolder(final String offlineFolder) {
-		fOfflineFolder = offlineFolder;
+		_offlineFolder = offlineFolder;
 	}
 
 	void setProfileAlpha(final int alpha) {
-		fProfileAlpha = alpha;
+		_profileAlpha = alpha;
 	}
 
 	void setProfileBrightness(final int brightnessValue) {
-		fProfileBrightnessValue = brightnessValue;
+		_profileBrightnessValue = brightnessValue;
 	}
 
 	void setProfileTransparentColors(final int[] transColors) {
-		fProfileTransparentColor = transColors;
+		_profileTransparentColor = transColors;
 	}
 
 	public void setStateToReloadOfflineCounter() {
 
-		if (fOfflineFileCounter != OFFLINE_INFO_NOT_READ) {
+		if (_offlineFileCounter != OFFLINE_INFO_NOT_READ) {
 
-			fOfflineFileCounter = OFFLINE_INFO_NOT_READ;
-			fOfflineFileSize = OFFLINE_INFO_NOT_READ;
+			_offlineFileCounter = OFFLINE_INFO_NOT_READ;
+			_offlineFileSize = OFFLINE_INFO_NOT_READ;
 
 			fireOfflineReloadEvent(this);
 		}
@@ -1376,7 +1376,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void setUseOfflineImage(final boolean useOfflineImage) {
-		fUseOfflineImage = useOfflineImage;
+		_useOfflineImage = useOfflineImage;
 	}
 
 	/**
@@ -1392,6 +1392,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	@Override
 	public String toString() {
-		return fMapProviderName + "(" + fMapProviderId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return _mapProviderName + "(" + _mapProviderId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

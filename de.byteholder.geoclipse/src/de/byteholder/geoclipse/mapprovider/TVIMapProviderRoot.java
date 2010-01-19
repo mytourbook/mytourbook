@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -21,21 +21,21 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 public class TVIMapProviderRoot extends TVIMapProviderItem {
 
-	private ArrayList<MPWrapper>	fMpWrapperList;
+	private ArrayList<MPWrapper>	_mpWrapperList;
 
 	public TVIMapProviderRoot(	final ContainerCheckedTreeViewer mapProviderViewer,
 								final ArrayList<MPWrapper> mpWrapperList) {
 
 		super(mapProviderViewer);
 
-		fMpWrapperList = mpWrapperList;
+		_mpWrapperList = mpWrapperList;
 	}
 
 	@Override
 	protected void fetchChildren() {
 
 		// create map provider
-		for (final MPWrapper mpWrapper : fMpWrapperList) {
+		for (final MPWrapper mpWrapper : _mpWrapperList) {
 			addChild(new TVIMapProvider(getTreeViewer(), mpWrapper));
 		}
 	}

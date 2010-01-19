@@ -106,82 +106,82 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	/*
 	 * UI components
 	 */
-	private Display							fDisplay;
-	private Composite						fLeftContainer;
-	private ViewerDetailForm				fDetailForm;
+	private Display							_display;
+	private Composite						_leftContainer;
+	private ViewerDetailForm				_detailForm;
 
-	private CheckboxTableViewer				fLayerViewer;
-	private Composite						fViewerContainer;
+	private CheckboxTableViewer				_layerViewer;
+	private Composite						_viewerContainer;
 
-	private Combo							fComboImageSize;
-	private Label							fLblMapInfo;
-	private Label							fLblTileInfo;
+	private Combo							_comboImageSize;
+	private Label							_lblMapInfo;
+	private Label							_lblTileInfo;
 
-	private Combo							fComboImageFormat;
-	private Button							fBtnOk;
+	private Combo							_cboImageFormat;
+	private Button							_btnOk;
 
 	/*
 	 * next/prev buttons are disabled because the offline folder is wront
 	 */
 //	private Button							fBtnPrevMapProvider;
 //	private Button							fBtnNextMapProvider;
-	private Image							fUpImage;
-	private Image							fDownImage;
+	private Image							_upImage;
+	private Image							_downImage;
 
-	private ToolBar							fToolbar;
-	private Button							fBtnShowMap;
-	private Button							fBtnShowOsmMap;
+	private ToolBar							_toolbar;
+	private Button							_btnShowMap;
+	private Button							_btnShowOsmMap;
 
-	private Button							fChkLoadTransparentImages;
-	private Button							fChkShowTileInfo;
-	private Button							fChkShowTileImageLog;
+	private Button							_chkLoadTransparentImages;
+	private Button							_chkShowTileInfo;
+	private Button							_chkShowTileImageLog;
 
-	private Combo							fCboTileImageLog;
-	private Text							fTxtLogDetail;
+	private Combo							_cboTileImageLog;
+	private Text							_txtLogDetail;
 
-	private FormToolkit						fFormTk									= new FormToolkit(Display
+	private FormToolkit						_formTk									= new FormToolkit(Display
 																							.getCurrent());
-	private ExpandableComposite				fLogContainer;
+	private ExpandableComposite				_logContainer;
 
 	/*
 	 * none UI fields
 	 */
-	private final IDialogSettings			fDialogSettings;
+	private final IDialogSettings			_dialogSettings;
 
-	private PrefPageMapProviders			fPrefPageMapFactory;
+	private PrefPageMapProviders			_prefPageMapFactory;
 
 	/**
 	 * all visible {@link MtLayer}'s
 	 */
-	private ArrayList<MtLayer>				fAllMtLayers							= new ArrayList<MtLayer>();
-	private ArrayList<MtLayer>				fDisplayedLayers						= new ArrayList<MtLayer>();
+	private ArrayList<MtLayer>				_allMtLayers							= new ArrayList<MtLayer>();
+	private ArrayList<MtLayer>				_displayedLayers						= new ArrayList<MtLayer>();
 
-	private int								fStatIsQueued;
-	private int								fStatStartLoading;
-	private int								fStatEndLoading;
-	private int								fStatErrorLoading;
+	private int								_statIsQueued;
+	private int								_statStartLoading;
+	private int								_statEndLoading;
+	private int								_statErrorLoading;
 
-	private String							fDefaultMessage;
+	private String							_defaultMessage;
 
-	private String							fTileUrl;
-	private long							fDragStartViewerLeft;
+	private String							_tileUrl;
+	private long							_dragStartViewerLeft;
 
-	private NumberFormat					fNfLatLon								= NumberFormat.getNumberInstance();
+	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 	{
 		// initialize lat/lon formatter
-		fNfLatLon.setMinimumFractionDigits(6);
-		fNfLatLon.setMaximumFractionDigits(6);
+		_nfLatLon.setMinimumFractionDigits(6);
+		_nfLatLon.setMaximumFractionDigits(6);
 	}
 
-	private int								fStatUpdateCounter						= 0;
+	private int								_statUpdateCounter						= 0;
 
-	private MPWms							fMpWms;
+	private MPWms							_mpWms;
 
-	private MPPlugin						fDefaultMapProvider;
+	private MPPlugin						_defaultMapProvider;
 
 	// load tile image logging
-	private boolean							fIsTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	fLogEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private boolean							_isTileImageLogging;
+	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
 	public DialogMPWms(final Shell parentShell, final PrefPageMapProviders mapFactory, final MPWms wmsMapProvider) {
 
@@ -190,23 +190,23 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
-		fDialogSettings = Activator.getDefault().getDialogSettingsSection("DialogWmsConfiguration");//$NON-NLS-1$
+		_dialogSettings = Activator.getDefault().getDialogSettingsSection("DialogWmsConfiguration");//$NON-NLS-1$
 
-		fPrefPageMapFactory = mapFactory;
-		fMpWms = wmsMapProvider;
+		_prefPageMapFactory = mapFactory;
+		_mpWms = wmsMapProvider;
 
-		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
+		_defaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
 	void actionSetZoomToShowEntireLayer() {
 
 		// get rectangle from first layer
 
-		if (fDisplayedLayers.size() == 0) {
+		if (_displayedLayers.size() == 0) {
 			return;
 		}
 
-		final MtLayer mtLayer = fDisplayedLayers.get(0);
+		final MtLayer mtLayer = _displayedLayers.get(0);
 
 		final HashSet<GeoPosition> layerBounds = new HashSet<GeoPosition>();
 		layerBounds.add(mtLayer.getUpperGeoPosition());
@@ -273,7 +273,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	public boolean close() {
 
 		// clear loading queue
-		fMpWms.resetAll(false);
+		_mpWms.resetAll(false);
 
 		saveState();
 
@@ -287,8 +287,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		shell.setText(Messages.Dialog_WmsConfig_DialogTitle);
 
-		fDownImage = Activator.getImageDescriptor(Messages.App_Image_Up).createImage();
-		fUpImage = Activator.getImageDescriptor(Messages.App_Image_Down).createImage();
+		_downImage = Activator.getImageDescriptor(Messages.App_Image_Up).createImage();
+		_upImage = Activator.getImageDescriptor(Messages.App_Image_Down).createImage();
 
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
@@ -302,7 +302,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		super.create();
 
-		fDisplay = Display.getCurrent();
+		_display = Display.getCurrent();
 
 		setTitle(Messages.Dialog_WmsConfig_DialogArea_Title);
 
@@ -311,17 +311,17 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		restoreState();
 
 		// initialize after the shell size is set
-		initializeUIFromModel(fMpWms);
+		initializeUIFromModel(_mpWms);
 
 		// force the viewer to do the layout to remove horizontal scollbar
-		fViewerContainer.layout();
+		_viewerContainer.layout();
 
 		enableControls();
 	}
 
 	private void createActions() {
 
-		final ToolBarManager tbm = new ToolBarManager(fToolbar);
+		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
 		tbm.add(new ActionZoomIn(this));
 		tbm.add(new ActionZoomOut(this));
@@ -342,8 +342,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		super.createButtonsForButtonBar(parent);
 
 		// set text for the OK button
-		fBtnOk = getButton(IDialogConstants.OK_ID);
-		fBtnOk.setText(Messages.Dialog_MapConfig_Button_Save);
+		_btnOk = getButton(IDialogConstants.OK_ID);
+		_btnOk.setText(Messages.Dialog_MapConfig_Button_Save);
 	}
 
 	@Override
@@ -386,9 +386,9 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		// dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			// left part (layer selection)
-			fLeftContainer = new Composite(container, SWT.NONE);
-			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(fLeftContainer);
-			createUILayer(fLeftContainer, pixelConverter);
+			_leftContainer = new Composite(container, SWT.NONE);
+			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
+			createUILayer(_leftContainer, pixelConverter);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -399,7 +399,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
 			createUIMap(mapContainer, pixelConverter);
 
-			fDetailForm = new ViewerDetailForm(container, fLeftContainer, sash, mapContainer, 30);
+			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
@@ -483,20 +483,20 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void createUILayer20Viewer(final Composite parent, final PixelConverter pixelConverter) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
-		fViewerContainer = new Composite(parent, SWT.NONE);
-		fViewerContainer.setLayout(tableLayout);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fViewerContainer);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		_viewerContainer.setLayout(tableLayout);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
 
 		/*
 		 * create table
 		 */
-		final Table table = new Table(fViewerContainer, SWT.CHECK | SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER);
+		final Table table = new Table(_viewerContainer, SWT.CHECK | SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		fLayerViewer = new CheckboxTableViewer(table);
+		_layerViewer = new CheckboxTableViewer(table);
 
 		/*
 		 * create columns
@@ -505,7 +505,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		TableColumn tvcColumn;
 
 		// column: layer title
-		tvc = new TableViewerColumn(fLayerViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_layerViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvcColumn.setText(Messages.Dialog_WmsConfig_Column_LayerName);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -520,7 +520,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(20, true));
 
 		// column: layer id
-		tvc = new TableViewerColumn(fLayerViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_layerViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvcColumn.setText(Messages.Dialog_WmsConfig_Column_LayerId);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -535,7 +535,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(10, true));
 
 		// column: bbox
-		tvc = new TableViewerColumn(fLayerViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_layerViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvcColumn.setText(Messages.Dialog_WmsConfig_Column_Bbox);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -562,26 +562,26 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(20, true));
 
-		fLayerViewer.setContentProvider(new IStructuredContentProvider() {
+		_layerViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				final int mtLayerSize = fAllMtLayers.size();
+				final int mtLayerSize = _allMtLayers.size();
 				if (mtLayerSize == 0) {
 					return null;
 				} else {
-					return fAllMtLayers.toArray(new MtLayer[mtLayerSize]);
+					return _allMtLayers.toArray(new MtLayer[mtLayerSize]);
 				}
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
-		fLayerViewer.addCheckStateListener(new ICheckStateListener() {
+		_layerViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// select the checked item
-				fLayerViewer.setSelection(new StructuredSelection(event.getElement()));
+				_layerViewer.setSelection(new StructuredSelection(event.getElement()));
 
 				// set focus to selected layer
 				table.setSelection(table.getSelectionIndex());
@@ -590,7 +590,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			}
 		});
 
-		fLayerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_layerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectLayer();
 			}
@@ -599,7 +599,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * set drag adapter
 		 */
-		fLayerViewer.addDragSupport(
+		_layerViewer.addDragSupport(
 				DND.DROP_MOVE,
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new DragSourceListener() {
@@ -623,10 +623,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 					public void dragStart(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-						final ISelection selection = fLayerViewer.getSelection();
+						final ISelection selection = _layerViewer.getSelection();
 
 						transfer.setSelection(selection);
-						transfer.setSelectionSetTime(fDragStartViewerLeft = event.time & 0xFFFFFFFFL);
+						transfer.setSelectionSetTime(_dragStartViewerLeft = event.time & 0xFFFFFFFFL);
 
 						event.doit = !selection.isEmpty();
 					}
@@ -635,7 +635,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * set drop adapter
 		 */
-		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(fLayerViewer) {
+		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_layerViewer) {
 
 			private Widget	fTableItem;
 
@@ -659,21 +659,21 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 						final MtLayer mtLayer = (MtLayer) firstElement;
 
 						final int location = getCurrentLocation();
-						final Table layerTable = fLayerViewer.getTable();
+						final Table layerTable = _layerViewer.getTable();
 
 						/*
 						 * check if drag was startet from this filter, remove the filter item before
 						 * the new filter is inserted
 						 */
-						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == fDragStartViewerLeft) {
-							fLayerViewer.remove(mtLayer);
+						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
+							_layerViewer.remove(mtLayer);
 						}
 
 						int tableIndex;
 
 						if (fTableItem == null) {
 
-							fLayerViewer.add(mtLayer);
+							_layerViewer.add(mtLayer);
 							tableIndex = layerTable.getItemCount() - 1;
 
 						} else {
@@ -685,17 +685,17 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 							}
 
 							if (location == LOCATION_BEFORE) {
-								fLayerViewer.insert(mtLayer, tableIndex);
+								_layerViewer.insert(mtLayer, tableIndex);
 							} else if (location == LOCATION_AFTER) {
-								fLayerViewer.insert(mtLayer, ++tableIndex);
+								_layerViewer.insert(mtLayer, ++tableIndex);
 							}
 						}
 
 						// set check state
-						fLayerViewer.setChecked(mtLayer, mtLayer.isDisplayedInMap());
+						_layerViewer.setChecked(mtLayer, mtLayer.isDisplayedInMap());
 
 						// reselect filter item
-						fLayerViewer.setSelection(new StructuredSelection(mtLayer));
+						_layerViewer.setSelection(new StructuredSelection(mtLayer));
 
 						// set focus to selection
 						layerTable.setSelection(tableIndex);
@@ -737,7 +737,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		};
 
-		fLayerViewer.addDropSupport(
+		_layerViewer.addDropSupport(
 				DND.DROP_MOVE,
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				viewerDropAdapter);
@@ -761,8 +761,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				label.setText(Messages.Dialog_WmsConfig_Label_ImageSize);
 
 				// combo: image size
-				fComboImageSize = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
-				fComboImageSize.addSelectionListener(new SelectionAdapter() {
+				_comboImageSize = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
+				_comboImageSize.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelectImageSize();
@@ -770,7 +770,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				});
 				// set content
 				for (final String imageSize : MapProviderManager.IMAGE_SIZE) {
-					fComboImageSize.add(imageSize);
+					_comboImageSize.add(imageSize);
 				}
 
 				// ############################################################
@@ -781,12 +781,12 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				label.setText(Messages.Dialog_WmsConfig_Label_ImageFormat);
 
 				// combo: image format
-				fComboImageFormat = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
+				_cboImageFormat = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
 				GridDataFactory
 						.fillDefaults()
 						.hint(pixelConverter.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-						.applyTo(fComboImageFormat);
-				fComboImageFormat.addSelectionListener(new SelectionAdapter() {
+						.applyTo(_cboImageFormat);
+				_cboImageFormat.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelectImageFormat();
@@ -801,10 +801,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			GridLayoutFactory.fillDefaults().applyTo(rightContainer);
 			{
 				// check: get transparent tiles
-				fChkLoadTransparentImages = new Button(rightContainer, SWT.CHECK);
-				GridDataFactory.fillDefaults().applyTo(fChkLoadTransparentImages);
-				fChkLoadTransparentImages.setText(Messages.Dialog_WmsConfig_Button_GetTransparentMap);
-				fChkLoadTransparentImages.addSelectionListener(new SelectionAdapter() {
+				_chkLoadTransparentImages = new Button(rightContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults().applyTo(_chkLoadTransparentImages);
+				_chkLoadTransparentImages.setText(Messages.Dialog_WmsConfig_Button_GetTransparentMap);
+				_chkLoadTransparentImages.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelectTransparentImage();
@@ -814,26 +814,26 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				// ############################################################
 
 				// check: show tile info
-				fChkShowTileInfo = new Button(rightContainer, SWT.CHECK);
-				GridDataFactory.fillDefaults().applyTo(fChkShowTileInfo);
-				fChkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
-				fChkShowTileInfo.addSelectionListener(new SelectionAdapter() {
+				_chkShowTileInfo = new Button(rightContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults().applyTo(_chkShowTileInfo);
+				_chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
+				_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						_map.setShowDebugInfo(fChkShowTileInfo.getSelection());
+						_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
 					}
 				});
 
 				// ############################################################
 
 				// check: show tile image loading log
-				fChkShowTileImageLog = new Button(rightContainer, SWT.CHECK);
+				_chkShowTileImageLog = new Button(rightContainer, SWT.CHECK);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
-						.applyTo(fChkShowTileImageLog);
-				fChkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
-				fChkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-				fChkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
+						.applyTo(_chkShowTileImageLog);
+				_chkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
+				_chkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+				_chkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						enableControls();
@@ -848,26 +848,26 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final Font monoFont = getMonoFont();
 		final Color parentBackground = parent.getBackground();
 
-		fLogContainer = fFormTk.createExpandableComposite(parent, ExpandableComposite.TWISTIE);
+		_logContainer = _formTk.createExpandableComposite(parent, ExpandableComposite.TWISTIE);
 
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fLogContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fLogContainer);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_logContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_logContainer);
 
-		fLogContainer.setBackground(parentBackground);
-		fLogContainer.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
-		fLogContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-		fLogContainer.addExpansionListener(new IExpansionListener() {
+		_logContainer.setBackground(parentBackground);
+		_logContainer.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
+		_logContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+		_logContainer.addExpansionListener(new IExpansionListener() {
 
 			public void expansionStateChanged(final ExpansionEvent e) {
-				fLogContainer.getParent().layout(true);
+				_logContainer.getParent().layout(true);
 			}
 
 			public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
 		{
-			final Composite clientContainer = fFormTk.createComposite(fLogContainer);
-			fLogContainer.setClient(clientContainer);
+			final Composite clientContainer = _formTk.createComposite(_logContainer);
+			_logContainer.setClient(clientContainer);
 
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(clientContainer);
 			GridLayoutFactory.fillDefaults().applyTo(clientContainer);
@@ -876,34 +876,34 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			{
 				// combo: url log
-				fCboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(fCboTileImageLog);
-				fCboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-				fCboTileImageLog.setVisibleItemCount(40);
-				fFormTk.adapt(fCboTileImageLog, true, true);
-				fCboTileImageLog.setFont(monoFont);
+				_cboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_cboTileImageLog);
+				_cboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+				_cboTileImageLog.setVisibleItemCount(40);
+				_formTk.adapt(_cboTileImageLog, true, true);
+				_cboTileImageLog.setFont(monoFont);
 
-				fCboTileImageLog.addSelectionListener(new SelectionAdapter() {
+				_cboTileImageLog.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						// display selected item in the text field below
-						final int selectionIndex = fCboTileImageLog.getSelectionIndex();
+						final int selectionIndex = _cboTileImageLog.getSelectionIndex();
 						if (selectionIndex != -1) {
-							fTxtLogDetail.setText(fCboTileImageLog.getItem(selectionIndex));
+							_txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
 						}
 					}
 				});
 
 				// label: selected log entry
-				fTxtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
+				_txtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
 						.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(5))
-						.applyTo(fTxtLogDetail);
-				fFormTk.adapt(fTxtLogDetail, false, false);
-				fTxtLogDetail.setFont(monoFont);
-				fTxtLogDetail.setBackground(parentBackground);
+						.applyTo(_txtLogDetail);
+				_formTk.adapt(_txtLogDetail, false, false);
+				_txtLogDetail.setFont(monoFont);
+				_txtLogDetail.setBackground(parentBackground);
 			}
 		}
 	}
@@ -915,10 +915,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(toolbarContainer);
 		{
 			// button: update map
-			fBtnShowMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowMap.setText(Messages.Dialog_WmsConfig_Button_UpdateMap);
-			fBtnShowMap.setToolTipText(Messages.Dialog_WmsConfig_Button_UpdateMap_Tooltip);
-			fBtnShowMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowMap.setText(Messages.Dialog_WmsConfig_Button_UpdateMap);
+			_btnShowMap.setToolTipText(Messages.Dialog_WmsConfig_Button_UpdateMap_Tooltip);
+			_btnShowMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectWmsMap();
@@ -928,10 +928,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			// ############################################################
 
 			// button: osm map
-			fBtnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
-			fBtnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-			fBtnShowOsmMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
+			_btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
+			_btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectOsmMap();
@@ -940,11 +940,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			// ############################################################
 
-			fToolbar = new ToolBar(toolbarContainer, SWT.FLAT);
+			_toolbar = new ToolBar(toolbarContainer, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.align(SWT.END, SWT.FILL)
-					.applyTo(fToolbar);
+					.applyTo(_toolbar);
 		}
 
 		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
@@ -967,9 +967,9 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 								lon + 360
 								: lon;
 
-				fLblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						fNfLatLon.format(mapCenter.latitude),
-						fNfLatLon.format(lon),
+				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
+						_nfLatLon.format(mapCenter.latitude),
+						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
@@ -982,15 +982,15 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(infoContainer);
 		{
 			// label: map info
-			fLblMapInfo = new Label(infoContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblMapInfo);
+			_lblMapInfo = new Label(infoContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblMapInfo);
 
 			// label: tile info
-			fLblTileInfo = new Label(infoContainer, SWT.TRAIL);
+			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
 			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					fLblTileInfo);
+					_lblTileInfo);
 
-			fLblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
+			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
 
@@ -1003,29 +1003,29 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void enableControls() {
 
-		fBtnShowOsmMap.setEnabled(fMpWms.getTileSize() == MapProviderManager.OSM_IMAGE_SIZE);
+		_btnShowOsmMap.setEnabled(_mpWms.getTileSize() == MapProviderManager.OSM_IMAGE_SIZE);
 
-		fIsTileImageLogging = fChkShowTileImageLog.getSelection();
+		_isTileImageLogging = _chkShowTileImageLog.getSelection();
 
-		if (fIsTileImageLogging == false) {
+		if (_isTileImageLogging == false) {
 			// remove old log entries
-			fStatUpdateCounter = 0;
-			fCboTileImageLog.removeAll();
-			fTxtLogDetail.setText(UI.EMPTY_STRING);
+			_statUpdateCounter = 0;
+			_cboTileImageLog.removeAll();
+			_txtLogDetail.setText(UI.EMPTY_STRING);
 		}
 
-		fCboTileImageLog.setEnabled(fIsTileImageLogging);
-		fTxtLogDetail.setEnabled(fIsTileImageLogging);
+		_cboTileImageLog.setEnabled(_isTileImageLogging);
+		_txtLogDetail.setEnabled(_isTileImageLogging);
 
 		// check if the container must be expanded/collapsed
-		final boolean isLogExpanded = fLogContainer.isExpanded();
+		final boolean isLogExpanded = _logContainer.isExpanded();
 
-		if ((isLogExpanded == true && fIsTileImageLogging == false)
-				|| (isLogExpanded == false && fIsTileImageLogging == true)) {
+		if ((isLogExpanded == true && _isTileImageLogging == false)
+				|| (isLogExpanded == false && _isTileImageLogging == true)) {
 
 			// show/hide log section
-			fLogContainer.setExpanded(fIsTileImageLogging);
-			fLogContainer.getParent().layout(true);
+			_logContainer.setExpanded(_isTileImageLogging);
+			_logContainer.getParent().layout(true);
 		}
 	}
 
@@ -1033,7 +1033,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return fDialogSettings;
+		return _dialogSettings;
 
 		// disable bounds
 		// return null;
@@ -1059,42 +1059,42 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void initializeUIFromModel(final MPWms mapProvider) {
 
-		fMpWms = mapProvider;
+		_mpWms = mapProvider;
 
 		/*
 		 * get layers
 		 */
-		fAllMtLayers.clear();
-		final ArrayList<MtLayer> allMtLayers = fMpWms.getMtLayers();
-		fAllMtLayers.addAll(allMtLayers);
+		_allMtLayers.clear();
+		final ArrayList<MtLayer> allMtLayers = _mpWms.getMtLayers();
+		_allMtLayers.addAll(allMtLayers);
 
 		// check layers
-		if (fAllMtLayers.size() == 0) {
+		if (_allMtLayers.size() == 0) {
 			StatusUtil.showStatus(
-					NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, fMpWms.getName()),
+					NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, _mpWms.getName()),
 					new Exception());
 			return;
 		}
 
 		// sort layers by position or name
-		Collections.sort(fAllMtLayers);
+		Collections.sort(_allMtLayers);
 
 		/*
 		 * set fields
 		 */
-		fChkLoadTransparentImages.setSelection(fMpWms.isTransparent());
+		_chkLoadTransparentImages.setSelection(_mpWms.isTransparent());
 
 		/*
 		 * url: set initially the caps url, this will be overwritten from the tile url when a tile
 		 * is loaded
 		 */
-		fTileUrl = fMpWms.getCapabilitiesUrl();
-		fCboTileImageLog.add(fTileUrl);
+		_tileUrl = _mpWms.getCapabilitiesUrl();
+		_cboTileImageLog.add(_tileUrl);
 
 		/*
 		 * image size
 		 */
-		final String imageSize = Integer.toString(fMpWms.getTileSize());
+		final String imageSize = Integer.toString(_mpWms.getTileSize());
 		int listIndex = 0;
 		int sizeIndex = -1;
 		for (final String listImageSize : MapProviderManager.IMAGE_SIZE) {
@@ -1109,20 +1109,20 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			sizeIndex = 0;
 
 			// update map provider value
-			fMpWms.setTileSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
+			_mpWms.setTileSize(Integer.parseInt(MapProviderManager.IMAGE_SIZE[0]));
 		}
-		fComboImageSize.select(sizeIndex);
+		_comboImageSize.select(sizeIndex);
 
 		/*
 		 * set image format
 		 */
-		final String currentImageFormat = fMpWms.getImageFormat();
+		final String currentImageFormat = _mpWms.getImageFormat();
 		int formatIndex = 0;
 		int selectedFormatIndex = -1;
-		fComboImageFormat.removeAll();
-		for (final String imageFormat : fMpWms.getImageFormats()) {
+		_cboImageFormat.removeAll();
+		for (final String imageFormat : _mpWms.getImageFormats()) {
 
-			fComboImageFormat.add(imageFormat);
+			_cboImageFormat.add(imageFormat);
 
 			if (currentImageFormat.equalsIgnoreCase(imageFormat)) {
 				selectedFormatIndex = formatIndex;
@@ -1132,17 +1132,17 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 		// select current format
 		if (selectedFormatIndex == -1) {
-			fComboImageFormat.select(0);
+			_cboImageFormat.select(0);
 		} else {
-			fComboImageFormat.select(selectedFormatIndex);
+			_cboImageFormat.select(selectedFormatIndex);
 		}
 
 		// show map provider in the message area
-		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpWms.getName());
-		setMessage(fDefaultMessage);
+		_defaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, _mpWms.getName());
+		setMessage(_defaultMessage);
 
 		// show layers into the viewer
-		fLayerViewer.setInput(this);
+		_layerViewer.setInput(this);
 
 		/*
 		 * check layers
@@ -1154,7 +1154,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			}
 		}
 		if (checkedLayers.size() > 0) {
-			fLayerViewer.setCheckedElements(checkedLayers.toArray());
+			_layerViewer.setCheckedElements(checkedLayers.toArray());
 		}
 
 		enableControls();
@@ -1183,7 +1183,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		/*
 		 * check if a layer is checked, if not, check currently unchecked layer
 		 */
-		final TableItem[] tableItems = fLayerViewer.getTable().getItems();
+		final TableItem[] tableItems = _layerViewer.getTable().getItems();
 		int checkedLayers = 0;
 
 		for (final TableItem tableItem : tableItems) {
@@ -1196,7 +1196,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			// recheck current layer when no layer is checked
 
-			fLayerViewer.setChecked(checkedLayer, true);
+			_layerViewer.setChecked(checkedLayer, true);
 		}
 
 		updateMap(false);
@@ -1205,14 +1205,14 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void onDispose() {
 
 		// dispose images
-		if (fUpImage != null && fUpImage.isDisposed() == false) {
-			fUpImage.dispose();
+		if (_upImage != null && _upImage.isDisposed() == false) {
+			_upImage.dispose();
 		}
-		if (fDownImage != null && fDownImage.isDisposed() == false) {
-			fDownImage.dispose();
+		if (_downImage != null && _downImage.isDisposed() == false) {
+			_downImage.dispose();
 		}
-		if (fFormTk != null) {
-			fFormTk.dispose();
+		if (_formTk != null) {
+			_formTk.dispose();
 		}
 
 		MP.removeTileListener(this);
@@ -1220,8 +1220,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectImageFormat() {
 
-		final String oldValue = fMpWms.getImageFormat();
-		final String newValue = fComboImageFormat.getItem(fComboImageFormat.getSelectionIndex());
+		final String oldValue = _mpWms.getImageFormat();
+		final String newValue = _cboImageFormat.getItem(_cboImageFormat.getSelectionIndex());
 
 		if (oldValue.equals(newValue)) {
 			return;
@@ -1232,15 +1232,15 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int zoom = _map.getZoom();
 
 		// set image format
-		fMpWms.setImageFormat(newValue);
+		_mpWms.setImageFormat(newValue);
 
 		resetMap(center, zoom);
 	}
 
 	private void onSelectImageSize() {
 
-		final int oldValue = fMpWms.getTileSize();
-		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
+		final int oldValue = _mpWms.getTileSize();
+		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[_comboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
 			return;
@@ -1251,7 +1251,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		final int zoom = _map.getZoom();
 
 		// set image size and initialize tile factory
-		fMpWms.setTileSize(newValue);
+		_mpWms.setTileSize(newValue);
 
 		enableControls();
 
@@ -1260,15 +1260,15 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectLayer() {
 
-		final int oldValue = fMpWms.getTileSize();
-		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[fComboImageSize.getSelectionIndex()]);
+		final int oldValue = _mpWms.getTileSize();
+		final int newValue = Integer.parseInt(MapProviderManager.IMAGE_SIZE[_comboImageSize.getSelectionIndex()]);
 
 		if (oldValue == newValue) {
 			return;
 		}
 
 		// set image size and initialize tile factory
-		fMpWms.setTileSize(newValue);
+		_mpWms.setTileSize(newValue);
 	}
 
 //	private void onSelectNextMapProvider() {
@@ -1292,7 +1292,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectOsmMap() {
 
-		if (_map.getMapProvider() == fDefaultMapProvider) {
+		if (_map.getMapProvider() == _defaultMapProvider) {
 
 			// toggle map, display wms
 
@@ -1302,12 +1302,12 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 			// display OSM
 
-			fDefaultMapProvider.setStateToReloadOfflineCounter();
+			_defaultMapProvider.setStateToReloadOfflineCounter();
 
 			// ensure the map is using the correct zoom levels
-			updateMapZoomLevels(fDefaultMapProvider);
+			updateMapZoomLevels(_defaultMapProvider);
 
-			_map.setMapProviderWithReset(fDefaultMapProvider, true);
+			_map.setMapProviderWithReset(_defaultMapProvider, true);
 		}
 	}
 
@@ -1332,13 +1332,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onSelectTransparentImage() {
 
-		fMpWms.setTransparent(fChkLoadTransparentImages.getSelection());
+		_mpWms.setTransparent(_chkLoadTransparentImages.getSelection());
 
 		// reset all images
-		fMpWms.resetAll(true);
+		_mpWms.resetAll(true);
 
 		// delete offline images because they are invalid for the new image size
-		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
+		_prefPageMapFactory.deleteOfflineMap(_mpWms);
 
 		// display map with new image size
 		_map.queueMapRedraw();
@@ -1347,7 +1347,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private void onSelectWmsMap() {
 
 		// check if the tile factory has changed
-		if (_map.getMapProvider() != fMpWms) {
+		if (_map.getMapProvider() != _mpWms) {
 
 			/*
 			 * select wms map provider
@@ -1357,7 +1357,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		updateModelFromUI();
 
 		// reset all images
-		fMpWms.resetAll(false);
+		_mpWms.resetAll(false);
 
 		/**
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1366,18 +1366,18 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		 * <br>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 		 */
-		updateMapZoomLevels(fMpWms);
+		updateMapZoomLevels(_mpWms);
 
-		_map.setMapProviderWithReset(fMpWms, true);
+		_map.setMapProviderWithReset(_mpWms, true);
 	}
 
 	private void resetMap(final GeoPosition center, final int zoom) {
 
 		// reset all images
-		fMpWms.resetAll(false);
+		_mpWms.resetAll(false);
 
 		// delete offline images because they are invalid for the new image size
-		fPrefPageMapFactory.deleteOfflineMap(fMpWms);
+		_prefPageMapFactory.deleteOfflineMap(_mpWms);
 
 		_map.setZoom(zoom);
 		_map.setGeoCenterPosition(center);
@@ -1390,26 +1390,26 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		// restore width for the marker list when the width is available
 		try {
-			fDetailForm.setViewerWidth(fDialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
+			_detailForm.setViewerWidth(_dialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
 		} catch (final NumberFormatException e) {
 			// ignore
 		}
 
 		// debug tile info
-		final boolean isShowDebugInfo = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
-		fChkShowTileInfo.setSelection(isShowDebugInfo);
+		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
+		_chkShowTileInfo.setSelection(isShowDebugInfo);
 		_map.setShowDebugInfo(isShowDebugInfo);
 
 		// tile image logging
-		final boolean isShowImageLogging = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
-		fChkShowTileImageLog.setSelection(isShowImageLogging);
+		final boolean isShowImageLogging = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
+		_chkShowTileImageLog.setSelection(isShowImageLogging);
 	}
 
 	private void saveState() {
 
-		fDialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, fLeftContainer.getSize().x);
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, fChkShowTileInfo.getSelection());
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, fChkShowTileImageLog.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, _leftContainer.getSize().x);
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, _chkShowTileInfo.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, _chkShowTileImageLog.getSelection());
 
 		updateModelFromUI();
 	}
@@ -1521,45 +1521,45 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
-		if (fIsTileImageLogging == false) {
+		if (_isTileImageLogging == false) {
 			return;
 		}
 
 		final long nanoTime = System.nanoTime();
-		fStatUpdateCounter++;
+		_statUpdateCounter++;
 
 		// update statistics
 		if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
-			fStatIsQueued = 0;
-			fStatStartLoading = 0;
-			fStatEndLoading = 0;
+			_statIsQueued = 0;
+			_statStartLoading = 0;
+			_statEndLoading = 0;
 		} else if (tileEventId == TileEventId.TILE_IS_QUEUED) {
-			fStatIsQueued++;
+			_statIsQueued++;
 			tile.setTimeIsQueued(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_START_LOADING) {
-			fStatStartLoading++;
+			_statStartLoading++;
 			tile.setTimeStartLoading(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_END_LOADING) {
-			fStatEndLoading++;
-			fStatIsQueued--;
+			_statEndLoading++;
+			_statIsQueued--;
 			tile.setTimeEndLoading(nanoTime);
 		} else if (tileEventId == TileEventId.TILE_ERROR_LOADING) {
-			fStatErrorLoading++;
-			fStatIsQueued--;
+			_statErrorLoading++;
+			_statIsQueued--;
 		}
 
 		// when stat is cleared, que can get negative, prevent this
-		if (fStatIsQueued < 0) {
-			fStatIsQueued = 0;
+		if (_statIsQueued < 0) {
+			_statIsQueued = 0;
 		}
 
 		// create log entry
-		fLogEntries.add(new LogEntry(//
+		_logEntries.add(new LogEntry(//
 				tileEventId,
 				tile,
 				nanoTime,
 				Thread.currentThread().getName(),
-				fStatUpdateCounter));
+				_statUpdateCounter));
 
 		/*
 		 * create runnable which displays the log
@@ -1567,40 +1567,40 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		final Runnable infoRunnable = new Runnable() {
 
-			final int	fRunnableCounter	= fStatUpdateCounter;
+			final int	fRunnableCounter	= _statUpdateCounter;
 
 			public void run() {
 
 				// check if this is the last created runnable
-				if (fRunnableCounter != fStatUpdateCounter) {
+				if (fRunnableCounter != _statUpdateCounter) {
 					// a new update event occured
 					return;
 				}
 
-				if (fLblTileInfo.isDisposed()) {
+				if (_lblTileInfo.isDisposed()) {
 					// widgets are disposed
 					return;
 				}
 
 				// show at most 3 decimals
-				fLblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-						Integer.toString(fStatIsQueued % 1000),
-						Integer.toString(fStatEndLoading % 1000),
-						Integer.toString(fStatStartLoading % 1000),
-						Integer.toString(fStatErrorLoading % 1000), //
+				_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
+						Integer.toString(_statIsQueued % 1000),
+						Integer.toString(_statEndLoading % 1000),
+						Integer.toString(_statStartLoading % 1000),
+						Integer.toString(_statErrorLoading % 1000), //
 				}));
 
-				final String logEntry = displayLogEntries(fLogEntries, fCboTileImageLog);
+				final String logEntry = displayLogEntries(_logEntries, _cboTileImageLog);
 
 				// select new entry
-				fCboTileImageLog.select(fCboTileImageLog.getItemCount() - 1);
+				_cboTileImageLog.select(_cboTileImageLog.getItemCount() - 1);
 
 				// display last log in the detail field
-				fTxtLogDetail.setText(logEntry);
+				_txtLogDetail.setText(logEntry);
 			}
 		};
 
-		fDisplay.asyncExec(infoRunnable);
+		_display.asyncExec(infoRunnable);
 	}
 
 	/**
@@ -1610,11 +1610,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 	private int updateLayerState() {
 
-		fDisplayedLayers.clear();
+		_displayedLayers.clear();
 
 		int itemIndex = 0;
 		int visibleLayers = 0;
-		for (final TableItem tableItem : fLayerViewer.getTable().getItems()) {
+		for (final TableItem tableItem : _layerViewer.getTable().getItems()) {
 
 			final MtLayer mtLayer = (MtLayer) tableItem.getData();
 			final boolean isChecked = tableItem.getChecked();
@@ -1623,7 +1623,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			mtLayer.setPositionIndex(itemIndex++);
 
 			if (isChecked) {
-				fDisplayedLayers.add(mtLayer);
+				_displayedLayers.add(mtLayer);
 				visibleLayers++;
 			}
 		}
@@ -1644,15 +1644,15 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		}
 
 		// update layers BEFORE the tile factory is set
-		fMpWms.initializeLayers();
+		_mpWms.initializeLayers();
 
 		// set factory and display map
-		_map.setMapProviderWithReset(fMpWms, true);
+		_map.setMapProviderWithReset(_mpWms, true);
 
 		if (isUpdatePosition) {
 			// set position to previous position
-			_map.setZoom(fMpWms.getLastUsedZoom());
-			_map.setGeoCenterPosition(fMpWms.getLastUsedPosition());
+			_map.setZoom(_mpWms.getLastUsedZoom());
+			_map.setGeoCenterPosition(_mpWms.getLastUsedPosition());
 		}
 	}
 
@@ -1660,8 +1660,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 * keep zoom+position
 	 */
 	private void updateMapPosition() {
-		fMpWms.setLastUsedZoom(_map.getZoom());
-		fMpWms.setLastUsedPosition(_map.getGeoCenter());
+		_mpWms.setLastUsedZoom(_map.getZoom());
+		_mpWms.setLastUsedPosition(_map.getGeoCenter());
 	}
 
 	/**

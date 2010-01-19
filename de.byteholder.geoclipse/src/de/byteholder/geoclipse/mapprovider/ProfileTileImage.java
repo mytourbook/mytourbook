@@ -30,10 +30,10 @@ import de.byteholder.geoclipse.map.Tile;
  */
 final class ProfileTileImage {
 
-	private ImageData	fTileImageData;
+	private ImageData	_tileImageData;
 
 	ProfileTileImage() {
-		fTileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		_tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
 	}
 
 	/**
@@ -127,7 +127,7 @@ final class ProfileTileImage {
 			}
 		}
 
-		final ImageData dst = fTileImageData;
+		final ImageData dst = _tileImageData;
 
 		// brightness data
 		byte[] brtData = null;
@@ -465,10 +465,10 @@ final class ProfileTileImage {
 	public ImageData getImageData() {
 
 		// no transparency 
-		fTileImageData.alphaData = null;
-		fTileImageData.transparentPixel = -1;
+		_tileImageData.alphaData = null;
+		_tileImageData.transparentPixel = -1;
 
-		return fTileImageData;
+		return _tileImageData;
 	}
 
 	public void setBackgroundColor(final int backgroundColor) {
@@ -477,7 +477,7 @@ final class ProfileTileImage {
 		final byte green = (byte) ((backgroundColor & 0xFF00) >> 8);
 		final byte red = (byte) ((backgroundColor & 0xFF) >> 0);
 
-		final ImageData dst = fTileImageData;
+		final ImageData dst = _tileImageData;
 
 		final byte[] dstData = dst.data;
 		final int dstWidth = dst.width;

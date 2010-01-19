@@ -42,25 +42,25 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 	private static final String					TOGGLE_MARKER	= " (x)";											//$NON-NLS-1$
 
-	private static IPreferenceStore				fPrefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final TourMapView					fMappingView;
+	private final TourMapView					_mappingView;
 
-	private Menu								fMenu;
-	private final ActionSetDefaultMapProviders	fActionSetDefaultMapProvider;
-	private final ActionManageMapProviders		fActionModifyMapProvider;
+	private Menu								_menu;
+	private final ActionSetDefaultMapProviders	_actionSetDefaultMapProvider;
+	private final ActionManageMapProviders		_actionModifyMapProvider;
 
-	private final HashMap<String, MPAction>		fMPActions		= new HashMap<String, MPAction>();
+	private final HashMap<String, MPAction>		_mpActions		= new HashMap<String, MPAction>();
 
 	/**
 	 * tile factory which is currently selected
 	 */
-	private MP									fSelectedMP;
+	private MP									_selectedMP;
 
-	private ArrayList<MP>						fSortedMapProviders;
-	private ArrayList<MPAction>					fSortedMapProviderActions;
+	private ArrayList<MP>						_sortedMapProviders;
+	private ArrayList<MPAction>					_sortedMapProviderActions;
 
-	private int									fMapProviderToggleCounter;
+	private int									_mpToggleCounter;
 
 	/**
 	 * Action for a map provider
@@ -100,15 +100,15 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		super(null, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fMappingView = mapView;
+		_mappingView = mapView;
 
 		setToolTipText(Messages.map_action_change_tile_factory_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
 
 		MapProviderManager.getInstance().addMapProviderListener(this);
 
-		fActionSetDefaultMapProvider = new ActionSetDefaultMapProviders(mapView);
-		fActionModifyMapProvider = new ActionManageMapProviders();
+		_actionSetDefaultMapProvider = new ActionSetDefaultMapProviders(mapView);
+		_actionModifyMapProvider = new ActionManageMapProviders(_mappingView);
 
 		createMapProviderActions();
 		updateMapProviders();
@@ -116,7 +116,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 	private void addActionToMenu(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		final String selectedMpId = selectedMp.getId();
 
-		for (final MPAction mapProviderAction : fSortedMapProviderActions) {
+		for (final MPAction mapProviderAction : _sortedMapProviderActions) {
 			if (mapProviderAction.mp.getId().equals(selectedMpId)) {
 				mapProviderAction.setChecked(true);
 			} else {
@@ -142,20 +142,20 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 */
 	private void createMapProviderActions() {
 
-		fMPActions.clear();
+		_mpActions.clear();
 
 		final ArrayList<MP> allMapProviders = MapProviderManager.getInstance().getAllMapProviders(true);
 
 		for (final MP mp : allMapProviders) {
-			fMPActions.put(mp.getId(), new MPAction(mp, mp.getName()));
+			_mpActions.put(mp.getId(), new MPAction(mp, mp.getName()));
 		}
 	}
 
 	public void dispose() {
 
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 
 		MapProviderManager.getInstance().removeMapProviderListener(this);
@@ -164,27 +164,28 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	public Menu getMenu(final Control parent) {
 
 		// recreate menu each time
-		if (fMenu != null) {
-			fMenu.dispose();
+		if (_menu != null) {
+			_menu.dispose();
 		}
 
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
+
+		addActionToMenu(_actionSetDefaultMapProvider);
+		addActionToMenu(_actionModifyMapProvider);
+
+		(new Separator()).fill(_menu, -1);
 
 		// add all map providers
-		for (final MP mp : fSortedMapProviders) {
+		for (final MP mp : _sortedMapProviders) {
 
-			final MPAction mpAction = fMPActions.get(mp.getId());
+			final MPAction mpAction = _mpActions.get(mp.getId());
 
 			updateActionToggleState(mp, mpAction);
 
 			addActionToMenu(mpAction);
 		}
 
-		(new Separator()).fill(fMenu, -1);
-		addActionToMenu(fActionSetDefaultMapProvider);
-		addActionToMenu(fActionModifyMapProvider);
-
-		return fMenu;
+		return _menu;
 	}
 
 	public Menu getMenu(final Menu parent) {
@@ -197,24 +198,24 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 *         no selected map provider
 	 */
 	public MP getSelectedMapProvider() {
-		if (fSelectedMP == null) {
-			return fMPActions.get(0).mp;
+		if (_selectedMP == null) {
+			return _mpActions.get(0).mp;
 		}
-		return fSelectedMP;
+		return _selectedMP;
 	}
 
 	public void mapProviderListChanged() {
 
-		if (fSelectedMP != null) {
+		if (_selectedMP != null) {
 
 			// map profile tile offline images are deleted, reset state  
-			fSelectedMP.resetTileImageAvailability();
+			_selectedMP.resetTileImageAvailability();
 		}
 
 		createMapProviderActions();
 		updateMapProviders();
 
-		selectMapProvider(fSelectedMP == null ? null : fSelectedMP.getId());
+		selectMapProvider(_selectedMP == null ? null : _selectedMP.getId());
 	}
 
 	@Override
@@ -227,7 +228,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		final ArrayList<MPAction> sortedToggleMapProviderActions = new ArrayList<MPAction>();
 
 		// get all map provider actions which can be toggled
-		for (final MPAction mapProviderAction : fSortedMapProviderActions) {
+		for (final MPAction mapProviderAction : _sortedMapProviderActions) {
 			if (mapProviderAction.isCanBeToggled()) {
 				sortedToggleMapProviderActions.add(mapProviderAction);
 			}
@@ -248,7 +249,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 			int actionCounter = 0;
 
 			for (final MPAction mpAction : sortedToggleMapProviderActions) {
-				if (fSelectedMP == mpAction.mp) {
+				if (_selectedMP == mpAction.mp) {
 					toggleCounter = actionCounter;
 					break;
 				}
@@ -279,7 +280,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 			// toggle all available map factories
 
 			// get next factory
-			newMp = fSortedMapProviders.get(++fMapProviderToggleCounter % fSortedMapProviders.size());
+			newMp = _sortedMapProviders.get(++_mpToggleCounter % _sortedMapProviders.size());
 		}
 
 		checkSelectedMP(newMp);
@@ -298,7 +299,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		if (selectedMpId != null) {
 
-			for (final MPAction mapProviderAction : fMPActions.values()) {
+			for (final MPAction mapProviderAction : _mpActions.values()) {
 
 				final MP mp = mapProviderAction.mp;
 
@@ -317,7 +318,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		/*
 		 * if map provider is not set, get default map provider
 		 */
-		for (final MPAction mapProviderAction : fMPActions.values()) {
+		for (final MPAction mapProviderAction : _mpActions.values()) {
 			final MP mp = mapProviderAction.mp;
 			if (mp.getId().equals(MapProviderManager.DEFAULT_MAP_PROVIDER_ID)) {
 				mapProviderAction.setChecked(true);
@@ -329,7 +330,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		/*
 		 * if map provider is not set, get first one
 		 */
-		final MPAction mpAction = fMPActions.values().iterator().next();
+		final MPAction mpAction = _mpActions.values().iterator().next();
 		if (mpAction != null) {
 
 			mpAction.setChecked(true);
@@ -340,13 +341,13 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	private void selectMapProviderInTheMap(final MP mp) {
 
 		// check if a new map provider is selected
-		if (fSelectedMP != null && fSelectedMP == mp) {
+		if (_selectedMP != null && _selectedMP == mp) {
 			return;
 		}
 
-		fSelectedMP = mp;
+		_selectedMP = mp;
 
-		final Map map = fMappingView.getMap();
+		final Map map = _mappingView.getMap();
 
 		map.setMapProvider(mp);
  
@@ -356,7 +357,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		// set map dim level
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-		map.setDimLevel(fMappingView.getMapDimLevel(), dimColor);
+		map.setDimLevel(_mappingView.getMapDimLevel(), dimColor);
 
 		// update tooltip, show selected map provider
 		setToolTipText(mp.getName());
@@ -392,7 +393,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		// get sorted map providers from the pref store
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
-				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
+				_prefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
 
 		final ArrayList<MP> mapProviders = new ArrayList<MP>();
 
@@ -419,7 +420,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		 * set status if the map provider can be toggled with the map provider button
 		 */
 		final String[] toggleIds = StringToArrayConverter.convertStringToArray(//
-				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
+				_prefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
 
 		for (final MP mp : allMapProviders) {
 
@@ -433,7 +434,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 			}
 		}
 
-		fSortedMapProviders = mapProviders;
+		_sortedMapProviders = mapProviders;
 
 		/*
 		 * sort map provider actions
@@ -441,15 +442,15 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		final ArrayList<MPAction> sortedMapProviderActions = new ArrayList<MPAction>();
 
 		// add all map providers
-		for (final MP mp : fSortedMapProviders) {
+		for (final MP mp : _sortedMapProviders) {
 
-			final MPAction mapProviderAction = fMPActions.get(mp.getId());
+			final MPAction mapProviderAction = _mpActions.get(mp.getId());
 
 			updateActionToggleState(mp, mapProviderAction);
 
 			sortedMapProviderActions.add(mapProviderAction);
 		}
 
-		fSortedMapProviderActions = sortedMapProviderActions;
+		_sortedMapProviderActions = sortedMapProviderActions;
 	}
 }

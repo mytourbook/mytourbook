@@ -23,13 +23,13 @@ import de.byteholder.geoclipse.Messages;
 
 public class ActionZoomOutToMinZoom extends Action {
 
-	private IMapDefaultActions	fMapActionProvider;
+	private IMapDefaultActions	_mapActionProvider;
 
 	public ActionZoomOutToMinZoom(final IMapDefaultActions mapActionProvider) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fMapActionProvider = mapActionProvider;
+		_mapActionProvider = mapActionProvider;
 
 		setToolTipText(Messages.Map_Action_ZoomOutToMinZoom_Tooltip);
 
@@ -39,7 +39,7 @@ public class ActionZoomOutToMinZoom extends Action {
 
 	@Override
 	public void run() {
-		fMapActionProvider.actionZoomOutToMinZoom();
+		_mapActionProvider.actionZoomOutToMinZoom();
 	}
 
 }

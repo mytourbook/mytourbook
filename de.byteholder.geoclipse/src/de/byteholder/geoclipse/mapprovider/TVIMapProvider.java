@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,25 +19,25 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIMapProvider extends TVIMapProviderItem {
 
-	private MPWrapper	fMpWrapper;
+	private MPWrapper	_mpWrapper;
 
 	public TVIMapProvider(final TreeViewer treeViewer, final MPWrapper mpWrapper) {
 
 		super(treeViewer);
 
-		fMpWrapper = mpWrapper;
+		_mpWrapper = mpWrapper;
 	}
 
 	@Override
 	protected void fetchChildren() {
 
 		// only WMS has children
-		if ((fMpWrapper.getMP() instanceof MPWms) == false) {
+		if ((_mpWrapper.getMP() instanceof MPWms) == false) {
 			return;
 		}
 
 		// check if wms is loaded
-		final MPWms wmsMapProvider = (MPWms) fMpWrapper.getMP();
+		final MPWms wmsMapProvider = (MPWms) _mpWrapper.getMP();
  
 		if (MapProviderManager.checkWms(wmsMapProvider, null) == null) {
 			return;
@@ -50,13 +50,13 @@ public class TVIMapProvider extends TVIMapProviderItem {
 	}
 
 	public MPWrapper getMapProviderWrapper() {
-		return fMpWrapper;
+		return _mpWrapper;
 	}
 
 	@Override
 	public boolean hasChildren() {
 
-		if (fMpWrapper.getMP() instanceof MPWms) {
+		if (_mpWrapper.getMP() instanceof MPWms) {
 			// wms has children
 			return true;
 		} else {

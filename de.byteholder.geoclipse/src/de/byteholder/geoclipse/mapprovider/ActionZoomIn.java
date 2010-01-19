@@ -23,13 +23,13 @@ import de.byteholder.geoclipse.Messages;
 
 public class ActionZoomIn extends Action {
 
-	private IMapDefaultActions	fMapActionProvider;
+	private IMapDefaultActions	_mapActionProvider;
 
 	public ActionZoomIn(final IMapDefaultActions mapActionProvider) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fMapActionProvider = mapActionProvider;
+		_mapActionProvider = mapActionProvider;
 
 		setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
@@ -39,7 +39,7 @@ public class ActionZoomIn extends Action {
 
 	@Override
 	public void run() {
-		fMapActionProvider.actionZoomIn();
+		_mapActionProvider.actionZoomIn();
 	}
 
 }

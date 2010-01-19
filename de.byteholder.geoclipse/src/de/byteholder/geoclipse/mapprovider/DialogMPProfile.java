@@ -155,6 +155,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private Label							_lblMapInfo;
 	private Label							_lblTileInfo;
+	private Text							_txtMpUrl;
 	private Button							_chkLiveView;
 	private Button							_chkShowTileInfo;
 
@@ -234,6 +235,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private boolean							_isLiveView;
 
 	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+
 	{
 		// initialize lat/lon formatter
 		_nfLatLon.setMinimumFractionDigits(6);
@@ -1110,6 +1112,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ################################################
 
 			createUI122ColorSelector1(group);
+
+			// ################################################
+
+			// text: map provider url
+			_txtMpUrl = new Text(group, SWT.READ_ONLY | SWT.BORDER);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_txtMpUrl);
 		}
 	}
 
@@ -1763,6 +1771,33 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		return _mpProfile;
 	}
 
+	private String getMpUrl(final MP mp) {
+
+		if (mp instanceof MPWms) {
+
+			// wms map provider
+
+			return ((MPWms) mp).getCapabilitiesUrl();
+
+		} else if (mp instanceof MPCustom) {
+
+			// custom map provider
+
+			return ((MPCustom) mp).getCustomUrl();
+
+		} else if (mp instanceof MPPlugin) {
+
+			// plugin map provider
+
+			final MPPlugin pluginMapProvider = (MPPlugin) mp;
+
+			final String baseURL = pluginMapProvider.getBaseURL();
+			return baseURL == null ? UI.EMPTY_STRING : baseURL;
+		}
+
+		return UI.EMPTY_STRING;
+	}
+
 	private RGB getRGB(final int colorValue) {
 
 		final int red = (colorValue & 0xFF) >>> 0;
@@ -1958,18 +1993,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		updateLiveView();
 	}
 
-	private void onModifyZoomSpinnerMin() {
-
-		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-
-		if (mapMinValue > mapMaxValue) {
-			_spinMinZoom.setSelection(mapMaxValue + 1);
-		}
-
-		updateLiveView();
-	}
-
 //	private void onModifyBbox() {
 //
 //		fBboxTop = (float) fSpinnerBboxTop.getSelection() / 100000;
@@ -1991,6 +2014,18 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 //
 ////		displayProfileMap(false);
 //	}
+
+	private void onModifyZoomSpinnerMin() {
+
+		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+
+		if (mapMinValue > mapMaxValue) {
+			_spinMinZoom.setSelection(mapMaxValue + 1);
+		}
+
+		updateLiveView();
+	}
 
 	private void onScaleDoubleClick(final Widget widget) {
 
@@ -2075,10 +2110,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			{
 				final int alpha = selectedMpWrapper.getAlpha();
 				final int brightness = selectedMpWrapper.getBrightness();
+				final String mpUrl = getMpUrl(selectedMpWrapper.getMP());
 
 				_spinAlpha.setSelection(alpha);
 				_scaleAlpha.setSelection(alpha);
 
+				_txtMpUrl.setText(mpUrl);
+				_txtMpUrl.setToolTipText(mpUrl);
 				_chkBrightness.setSelection(selectedMpWrapper.isBrightness());
 				_spinBright.setSelection(brightness);
 				_scaleBright.setSelection(brightness);
@@ -2146,7 +2184,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// property container
 		final boolean isPropExpanded = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED);
 		_propContainer.setExpanded(isPropExpanded);
-//		fPropInnerContainer.layout(true);
 		_innerContainer.layout(true);
 
 	}

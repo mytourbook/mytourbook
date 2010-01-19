@@ -62,8 +62,8 @@ public class MPWrapper implements Cloneable {
 	 */
 	private boolean						_isBlackTransparent;
 
-	private boolean						_isBrightness;
-	private int							_brightnessValue;
+	private boolean						_isBrightness			= false;
+	private int							_brightnessValue		= 50;
 
 //	@SuppressWarnings("unused")
 //	private MPWrapper() {}

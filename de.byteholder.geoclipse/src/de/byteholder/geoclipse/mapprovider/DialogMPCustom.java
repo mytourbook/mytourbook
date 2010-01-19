@@ -97,35 +97,41 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/*
 	 * UI controls
 	 */
-	private Display							fDisplay;
+	private Display							_display;
 
-	private Button							fBtnOk;
-	private Composite						fLeftContainer;
+	private Button							_btnOk;
+	private Composite						_leftContainer;
 
-	private ViewerDetailForm				fDetailForm;
-	private ToolBar							fToolbar;
+	private ViewerDetailForm				_detailForm;
+	private ToolBar							_toolbar;
 
-	private Label							fLblMapInfo;
+	private Label							_lblMapInfo;
 
-	private Label							fLblTileInfo;
-	private Button							fChkShowTileInfo;
-	private Text							fTxtExampleUrl;
-	private Text							fTxtCustomUrl;
-	private Combo							fCboTileImageLog;
-	private Button							fBtnShowMap;
+	private Label							_lblTileInfo;
+	private Button							_chkShowTileInfo;
+	private Text							_txtExampleUrl;
+	private Text							_txtCustomUrl;
+	private Combo							_cboTileImageLog;
+	private Button							_btnShowMap;
 
-	private Spinner							fSpinMinZoom;
-	private Spinner							fSpinMaxZoom;
-	private Button							fBtnShowOsmMap;
-	private Composite						fPartContainer;
-	private Button							fChkShowTileImageLog;
+	private Spinner							_spinMinZoom;
+	private Spinner							_spinMaxZoom;
+	private Button							_btnShowOsmMap;
+	private Composite						_partContainer;
+	private Button							_chkShowTileImageLog;
 
-	private NumberFormat					fNfLatLon								= NumberFormat.getNumberInstance();
+	private Label							_lblLog;
+	private Text							_txtImageFormat;
+
+	/*
+	 * NON-UI fields
+	 */
+	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 
 	{
 		// initialize lat/lon formatter
-		fNfLatLon.setMinimumFractionDigits(6);
-		fNfLatLon.setMaximumFractionDigits(6);
+		_nfLatLon.setMinimumFractionDigits(6);
+		_nfLatLon.setMaximumFractionDigits(6);
 	}
 
 	/**
@@ -176,37 +182,34 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	 */
 	private ArrayList<PartRow>				PART_ROWS								= new ArrayList<PartRow>();
 
-	private IDialogSettings					fDialogSettings;
+	private IDialogSettings					_dialogSettings;
 
-	private PrefPageMapProviders			fPrefPageMapFactory;
+	private PrefPageMapProviders			_prefPageMapFactory;
 
-	private String							fDefaultMessage;
+	private String							_defaultMessage;
 
 	/**
 	 * contains the custom url with all url parts which are converted to a string
 	 */
-	private String							fCustomUrl;
-	private String							fPreviousCustomUrl;
+	private String							_customUrl;
+	private String							_previousCustomUrl;
 
-	private MPCustom						fMpCustom;
-	private MP								fDefaultMapProvider;
+	private MPCustom						_mpCustom;
+	private MP								_defaultMapProvider;
 
-	private boolean							fIsInitUI								= false;
+	private boolean							_isInitUI								= false;
 
-	private boolean							fIsEnableTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	fLogEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private boolean							_isEnableTileImageLogging;
+	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
-	private int								fStatUpdateCounter						= 0;
-	private int								fStatIsQueued;
-	private int								fStatStartLoading;
-	private int								fStatEndLoading;
-	private int								fStatErrorLoading;
+	private int								_statUpdateCounter						= 0;
+	private int								_statIsQueued;
+	private int								_statStartLoading;
+	private int								_statEndLoading;
+	private int								_statErrorLoading;
 
-	private int								fPreviousMinZoom;
-	private int								fPreviousMaxZoom;
-
-	private Label							fLblLog;
-	private Text							fTxtImageFormat;
+	private int								_previousMinZoom;
+	private int								_previousMaxZoom;
 
 	private static final ReentrantLock		LOG_LOCK								= new ReentrantLock();
 
@@ -297,12 +300,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
-		fDialogSettings = Activator.getDefault().getDialogSettingsSection("DialogCustomConfiguration");//$NON-NLS-1$
+		_dialogSettings = Activator.getDefault().getDialogSettingsSection("DialogCustomConfiguration");//$NON-NLS-1$
 
-		fPrefPageMapFactory = mapFactory;
-		fMpCustom = customMapProvider;
+		_prefPageMapFactory = mapFactory;
+		_mpCustom = customMapProvider;
 
-		fDefaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
+		_defaultMapProvider = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
 	public void actionZoomIn() {
@@ -348,7 +351,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		super.create();
 
-		fDisplay = Display.getCurrent();
+		_display = Display.getCurrent();
 
 		setTitle(Messages.Dialog_CustomConfig_DialogArea_Title);
 
@@ -357,14 +360,14 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		restoreState();
 
 		// initialize after the shell size is set
-		initializeUIFromModel(fMpCustom);
+		initializeUIFromModel(_mpCustom);
 
 		enableControls();
 	}
 
 	private void createActions() {
 
-		final ToolBarManager tbm = new ToolBarManager(fToolbar);
+		final ToolBarManager tbm = new ToolBarManager(_toolbar);
 
 		tbm.add(new ActionZoomIn(this));
 		tbm.add(new ActionZoomOut(this));
@@ -384,8 +387,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		super.createButtonsForButtonBar(parent);
 
 		// set text for the OK button
-		fBtnOk = getButton(IDialogConstants.OK_ID);
-		fBtnOk.setText(Messages.Dialog_MapConfig_Button_Save);
+		_btnOk = getButton(IDialogConstants.OK_ID);
+		_btnOk.setText(Messages.Dialog_MapConfig_Button_Save);
 	}
 
 	@Override
@@ -429,9 +432,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		{
 			// left part (layer selection)
-			fLeftContainer = new Composite(container, SWT.NONE);
-			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(fLeftContainer);
-			createUI200LeftPart(fLeftContainer, pixelConverter);
+			_leftContainer = new Composite(container, SWT.NONE);
+			GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
+			createUI200LeftPart(_leftContainer, pixelConverter);
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -442,7 +445,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
 			createUI300Map(mapContainer, pixelConverter);
 
-			fDetailForm = new ViewerDetailForm(container, fLeftContainer, sash, mapContainer, 30);
+			_detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
 		}
 	}
 
@@ -460,22 +463,22 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			label.setText(Messages.Dialog_CustomConfig_Label_UrlParts);
 
 			// url parts
-			fPartContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(fPartContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(fPartContainer);
+			_partContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).span(1, 1).applyTo(_partContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_partContainer);
 			{
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 0, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 1, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 2, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 3, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 4, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 5, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 6, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 7, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 8, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 9, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 10, pixelConverter));
-				PART_ROWS.add(createUI210PartRow(fPartContainer, 11, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 0, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 1, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 2, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 3, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 4, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 5, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 6, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 7, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 8, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 9, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 10, pixelConverter));
+				PART_ROWS.add(createUI210PartRow(_partContainer, 11, pixelConverter));
 			}
 
 			createUI220Detail(container, pixelConverter);
@@ -492,7 +495,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				if (fIsInitUI) {
+				if (_isInitUI) {
 					return;
 				}
 
@@ -633,7 +636,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				fromSpinner.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectRandomSpinnerMin(paraWidgets);
@@ -641,7 +644,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				});
 				fromSpinner.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectRandomSpinnerMin(paraWidgets);
@@ -662,7 +665,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				toSpinner.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectRandomSpinnerMax(paraWidgets);
@@ -707,7 +710,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				Util.adjustSpinnerValueOnMouseScroll(event);
 
 				// validate values
-				if (event.widget == fSpinMinZoom) {
+				if (event.widget == _spinMinZoom) {
 					onSelectZoomSpinnerMin();
 				} else {
 					onSelectZoomSpinnerMax();
@@ -725,9 +728,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			label.setText(Messages.Dialog_CustomConfig_Label_ImageFormat);
 
 			// label: image format value
-			fTxtImageFormat = new Text(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtImageFormat);
-			fTxtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
+			_txtImageFormat = new Text(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImageFormat);
+			_txtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
 
 			// ################################################
 
@@ -740,24 +743,24 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(zoomContainer);
 			{
 				// spinner: min zoom level
-				fSpinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMinZoom);
-				fSpinMinZoom.setMinimum(UI_MIN_ZOOM_LEVEL);
-				fSpinMinZoom.setMaximum(UI_MAX_ZOOM_LEVEL);
-				fSpinMinZoom.setSelection(1);
-				fSpinMinZoom.addMouseWheelListener(mouseWheelListener);
-				fSpinMinZoom.addSelectionListener(new SelectionAdapter() {
+				_spinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMinZoom);
+				_spinMinZoom.setMinimum(UI_MIN_ZOOM_LEVEL);
+				_spinMinZoom.setMaximum(UI_MAX_ZOOM_LEVEL);
+				_spinMinZoom.setSelection(1);
+				_spinMinZoom.addMouseWheelListener(mouseWheelListener);
+				_spinMinZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectZoomSpinnerMin();
 					}
 				});
-				fSpinMinZoom.addModifyListener(new ModifyListener() {
+				_spinMinZoom.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectZoomSpinnerMin();
@@ -772,24 +775,24 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				// ################################################
 
 				// spinner: min zoom level
-				fSpinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(fSpinMaxZoom);
-				fSpinMaxZoom.setMinimum(UI_MIN_ZOOM_LEVEL);
-				fSpinMaxZoom.setMaximum(UI_MAX_ZOOM_LEVEL);
-				fSpinMaxZoom.setSelection(1);
-				fSpinMaxZoom.addMouseWheelListener(mouseWheelListener);
-				fSpinMaxZoom.addSelectionListener(new SelectionAdapter() {
+				_spinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMaxZoom);
+				_spinMaxZoom.setMinimum(UI_MIN_ZOOM_LEVEL);
+				_spinMaxZoom.setMaximum(UI_MAX_ZOOM_LEVEL);
+				_spinMaxZoom.setSelection(1);
+				_spinMaxZoom.addMouseWheelListener(mouseWheelListener);
+				_spinMaxZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectZoomSpinnerMax();
 					}
 				});
-				fSpinMaxZoom.addModifyListener(new ModifyListener() {
+				_spinMaxZoom.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
-						if (fIsInitUI) {
+						if (_isInitUI) {
 							return;
 						}
 						onSelectZoomSpinnerMax();
@@ -807,31 +810,31 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		{
 
 			// check: show tile info
-			fChkShowTileInfo = new Button(container, SWT.CHECK);
+			_chkShowTileInfo = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 
 					// display at the bottom of the dialog
 					.grab(false, true)
 					.align(SWT.FILL, SWT.END)
-					.applyTo(fChkShowTileInfo);
+					.applyTo(_chkShowTileInfo);
 
-			fChkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
-			fChkShowTileInfo.addSelectionListener(new SelectionAdapter() {
+			_chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
+			_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					_map.setShowDebugInfo(fChkShowTileInfo.getSelection());
+					_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
 				}
 			});
 
 			// ############################################################
 
 			// check: show tile image loading log
-			fChkShowTileImageLog = new Button(container, SWT.CHECK);
+			_chkShowTileImageLog = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
-					.applyTo(fChkShowTileImageLog);
-			fChkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
-			fChkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-			fChkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_chkShowTileImageLog);
+			_chkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
+			_chkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+			_chkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					enableControls();
@@ -847,10 +850,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(toolbarContainer);
 		{
 			// button: update map
-			fBtnShowMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowMap.setText(Messages.Dialog_CustomConfig_Button_UpdateMap);
-			fBtnShowMap.setToolTipText(Messages.Dialog_CustomConfig_Button_UpdateMap_Tooltip);
-			fBtnShowMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowMap.setText(Messages.Dialog_CustomConfig_Button_UpdateMap);
+			_btnShowMap.setToolTipText(Messages.Dialog_CustomConfig_Button_UpdateMap_Tooltip);
+			_btnShowMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectCustomMap();
@@ -860,10 +863,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			// ############################################################
 
 			// button: osm map
-			fBtnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
-			fBtnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
-			fBtnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-			fBtnShowOsmMap.addSelectionListener(new SelectionAdapter() {
+			_btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
+			_btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
+			_btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
+			_btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectOsmMap();
@@ -872,11 +875,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			// ############################################################
 
-			fToolbar = new ToolBar(toolbarContainer, SWT.FLAT);
+			_toolbar = new ToolBar(toolbarContainer, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.align(SWT.END, SWT.FILL)
-					.applyTo(fToolbar);
+					.applyTo(_toolbar);
 		}
 
 		_map = new Map(parent, SWT.BORDER | SWT.FLAT);
@@ -899,9 +902,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 								lon + 360
 								: lon;
 
-				fLblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						fNfLatLon.format(mapCenter.latitude),
-						fNfLatLon.format(lon),
+				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
+						_nfLatLon.format(mapCenter.latitude),
+						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
@@ -914,14 +917,14 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(infoContainer);
 		{
 			// label: map info
-			fLblMapInfo = new Label(infoContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblMapInfo);
+			_lblMapInfo = new Label(infoContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblMapInfo);
 
 			// label: tile info
-			fLblTileInfo = new Label(infoContainer, SWT.TRAIL);
+			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
 			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					fLblTileInfo);
-			fLblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
+					_lblTileInfo);
+			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
 		}
@@ -949,9 +952,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			label.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
 
 			// text: custom url
-			fTxtCustomUrl = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtCustomUrl);
-			fTxtCustomUrl.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+			_txtCustomUrl = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomUrl);
+			_txtCustomUrl.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
 
 			// ############################################################
 
@@ -962,46 +965,46 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			label.setToolTipText(Messages.Dialog_MapConfig_Label_ExampleUrl_Tooltip);
 
 			// text: custom url
-			fTxtExampleUrl = new Text(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fTxtExampleUrl);
-			fTxtExampleUrl.setToolTipText(Messages.Dialog_MapConfig_Label_ExampleUrl_Tooltip);
+			_txtExampleUrl = new Text(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtExampleUrl);
+			_txtExampleUrl.setToolTipText(Messages.Dialog_MapConfig_Label_ExampleUrl_Tooltip);
 
 			// ############################################################
 
 			// label: url log
-			fLblLog = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(fLblLog);
-			fLblLog.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
-			fLblLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+			_lblLog = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblLog);
+			_lblLog.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
+			_lblLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
 
 			// combo: url log
-			fCboTileImageLog = new Combo(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fCboTileImageLog);
-			fCboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-			fCboTileImageLog.setVisibleItemCount(40);
-			fCboTileImageLog.setFont(getMonoFont());
+			_cboTileImageLog = new Combo(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_cboTileImageLog);
+			_cboTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
+			_cboTileImageLog.setVisibleItemCount(40);
+			_cboTileImageLog.setFont(getMonoFont());
 		}
 	}
 
 	private void enableControls() {
 
-		fIsEnableTileImageLogging = fChkShowTileImageLog.getSelection();
+		_isEnableTileImageLogging = _chkShowTileImageLog.getSelection();
 
-		if (fIsEnableTileImageLogging == false) {
+		if (_isEnableTileImageLogging == false) {
 			// remove old log entries
-			fStatUpdateCounter = 0;
-			fCboTileImageLog.removeAll();
+			_statUpdateCounter = 0;
+			_cboTileImageLog.removeAll();
 		}
 
-		fLblLog.setEnabled(fIsEnableTileImageLogging);
-		fCboTileImageLog.setEnabled(fIsEnableTileImageLogging);
+		_lblLog.setEnabled(_isEnableTileImageLogging);
+		_cboTileImageLog.setEnabled(_isEnableTileImageLogging);
 	}
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return fDialogSettings;
+		return _dialogSettings;
 
 		// disable bounds
 //		return null;
@@ -1009,9 +1012,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private void initializeUIFromModel(final MPCustom mp) {
 
-		fMpCustom = mp;
+		_mpCustom = mp;
 
-		fIsInitUI = true;
+		_isInitUI = true;
 		{
 			updateUIUrlParts();
 			updateUICustomUrl();
@@ -1019,29 +1022,29 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			/*
 			 * set zoom level
 			 */
-			final int minZoomLevel = fMpCustom.getMinZoomLevel();
-			final int maxZoomLevel = fMpCustom.getMaxZoomLevel();
-			fSpinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
-			fSpinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
+			final int minZoomLevel = _mpCustom.getMinZoomLevel();
+			final int maxZoomLevel = _mpCustom.getMaxZoomLevel();
+			_spinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
 
-			fPreviousCustomUrl = mp.getCustomUrl();
-			fPreviousMinZoom = minZoomLevel;
-			fPreviousMaxZoom = maxZoomLevel;
+			_previousCustomUrl = mp.getCustomUrl();
+			_previousMinZoom = minZoomLevel;
+			_previousMaxZoom = maxZoomLevel;
 
-			fTxtImageFormat.setText(fMpCustom.getImageFormat());
+			_txtImageFormat.setText(_mpCustom.getImageFormat());
 		}
-		fIsInitUI = false;
+		_isInitUI = false;
 
 		// show map provider in the message area
-		fDefaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, fMpCustom.getName());
-		setMessage(fDefaultMessage);
+		_defaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, _mpCustom.getName());
+		setMessage(_defaultMessage);
 
 		// set factory and display map
 		_map.setMapProviderWithReset(mp, true);
  
 		// set position to previous position
-		_map.setZoom(fMpCustom.getLastUsedZoom());
-		_map.setGeoCenterPosition(fMpCustom.getLastUsedPosition());
+		_map.setZoom(_mpCustom.getLastUsedZoom());
+		_map.setGeoCenterPosition(_mpCustom.getLastUsedPosition());
 	}
 
 	@Override
@@ -1055,27 +1058,27 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private void onSelectCustomMap() {
 
-		final int minZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-		final int maxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int minZoom = _spinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int maxZoom = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		// check if the custom url or zoom level has changed
-		if (fCustomUrl.equals(fPreviousCustomUrl) && fPreviousMinZoom == minZoom && fPreviousMaxZoom == maxZoom) {
+		if (_customUrl.equals(_previousCustomUrl) && _previousMinZoom == minZoom && _previousMaxZoom == maxZoom) {
 			// do nothing to optimize performace
 			return;
 		}
 
 		// keep values for the next check
-		fPreviousCustomUrl = fCustomUrl;
-		fPreviousMinZoom = minZoom;
-		fPreviousMaxZoom = maxZoom;
+		_previousCustomUrl = _customUrl;
+		_previousMinZoom = minZoom;
+		_previousMaxZoom = maxZoom;
 
 		updateModelFromUI();
 
 		// reset all images
-		fMpCustom.resetAll(false);
+		_mpCustom.resetAll(false);
 
 		// delete offline images to force the reload and to test the modified url
-		fPrefPageMapFactory.deleteOfflineMap(fMpCustom);
+		_prefPageMapFactory.deleteOfflineMap(_mpCustom);
 
 		/**
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -1084,34 +1087,34 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 * <br>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
 		 */
-		updateMapZoomLevel(fMpCustom);
+		updateMapZoomLevel(_mpCustom);
 
-		_map.setMapProviderWithReset(fMpCustom, true);
+		_map.setMapProviderWithReset(_mpCustom, true);
 	}
 
 	private void onSelectOsmMap() {
 
-		if (_map.getMapProvider() == fDefaultMapProvider) {
+		if (_map.getMapProvider() == _defaultMapProvider) {
 
 			// toggle map
 
 			// update layers BEFORE the tile factory is set in the map
 			updateModelFromUI();
 
-			updateMapZoomLevel(fMpCustom);
+			updateMapZoomLevel(_mpCustom);
 
-			_map.setMapProviderWithReset(fMpCustom, true);
+			_map.setMapProviderWithReset(_mpCustom, true);
 
 		} else {
 
 			// display OSM
 
 			// ensure the map is using the correct zoom levels
-			updateMapZoomLevel(fDefaultMapProvider);
+			updateMapZoomLevel(_defaultMapProvider);
 
-			fDefaultMapProvider.setStateToReloadOfflineCounter();
+			_defaultMapProvider.setStateToReloadOfflineCounter();
 
-			_map.setMapProviderWithReset(fDefaultMapProvider, true);
+			_map.setMapProviderWithReset(_defaultMapProvider, true);
 		}
 	}
 
@@ -1130,7 +1133,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		pagebook.showPage((Control) page);
 
-		fPartContainer.layout();
+		_partContainer.layout();
 
 		updateUICustomUrl();
 	}
@@ -1184,25 +1187,25 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private void onSelectZoomSpinnerMax() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			fSpinMaxZoom.setSelection(UI_MAX_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(UI_MAX_ZOOM_LEVEL);
 		}
 
 		if (mapMaxValue < mapMinValue) {
-			fSpinMinZoom.setSelection(mapMinValue + 1);
+			_spinMinZoom.setSelection(mapMinValue + 1);
 		}
 	}
 
 	private void onSelectZoomSpinnerMin() {
 
-		final int mapMinValue = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		if (mapMinValue > mapMaxValue) {
-			fSpinMinZoom.setSelection(mapMaxValue + 1);
+			_spinMinZoom.setSelection(mapMaxValue + 1);
 		}
 	}
 
@@ -1210,37 +1213,37 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		// restore width for the marker list when the width is available
 		try {
-			fDetailForm.setViewerWidth(fDialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
+			_detailForm.setViewerWidth(_dialogSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
 		} catch (final NumberFormatException e) {
 			// ignore
 		}
 
-		final String exampleUrl = fDialogSettings.get(DIALOG_SETTINGS_EXAMPLE_URL);
+		final String exampleUrl = _dialogSettings.get(DIALOG_SETTINGS_EXAMPLE_URL);
 		if (exampleUrl == null) {
-			fTxtExampleUrl.setText(DEFAULT_EXAMPLE);
+			_txtExampleUrl.setText(DEFAULT_EXAMPLE);
 		} else {
-			fTxtExampleUrl.setText(exampleUrl);
+			_txtExampleUrl.setText(exampleUrl);
 		}
 
 		// debug tile info
-		final boolean isShowDebugInfo = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
-		fChkShowTileInfo.setSelection(isShowDebugInfo);
+		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
+		_chkShowTileInfo.setSelection(isShowDebugInfo);
 		_map.setShowDebugInfo(isShowDebugInfo);
 
 		// tile image loading
-		final boolean isShowImageLogging = fDialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
-		fChkShowTileImageLog.setSelection(isShowImageLogging);
+		final boolean isShowImageLogging = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
+		_chkShowTileImageLog.setSelection(isShowImageLogging);
 	}
 
 	private void saveState() {
 
-		fDialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, fLeftContainer.getSize().x);
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, fChkShowTileInfo.getSelection());
-		fDialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, fChkShowTileImageLog.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, _leftContainer.getSize().x);
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_INFO, _chkShowTileInfo.getSelection());
+		_dialogSettings.put(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG, _chkShowTileImageLog.getSelection());
 
-		final String exampleUrl = fTxtExampleUrl.getText();
+		final String exampleUrl = _txtExampleUrl.getText();
 		if (exampleUrl.length() > 0) {
-			fDialogSettings.put(DIALOG_SETTINGS_EXAMPLE_URL, exampleUrl);
+			_dialogSettings.put(DIALOG_SETTINGS_EXAMPLE_URL, exampleUrl);
 		}
 	}
 
@@ -1268,7 +1271,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
-		if (fIsEnableTileImageLogging == false) {
+		if (_isEnableTileImageLogging == false) {
 			return;
 		}
 
@@ -1278,40 +1281,40 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		try {
 
 			final long nanoTime = System.nanoTime();
-			fStatUpdateCounter++;
+			_statUpdateCounter++;
 
 			// update statistics
 			if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
-				fStatIsQueued = 0;
-				fStatStartLoading = 0;
-				fStatEndLoading = 0;
+				_statIsQueued = 0;
+				_statStartLoading = 0;
+				_statEndLoading = 0;
 			} else if (tileEventId == TileEventId.TILE_IS_QUEUED) {
-				fStatIsQueued++;
+				_statIsQueued++;
 				tile.setTimeIsQueued(nanoTime);
 			} else if (tileEventId == TileEventId.TILE_START_LOADING) {
-				fStatStartLoading++;
+				_statStartLoading++;
 				tile.setTimeStartLoading(nanoTime);
 			} else if (tileEventId == TileEventId.TILE_END_LOADING) {
-				fStatEndLoading++;
-				fStatIsQueued--;
+				_statEndLoading++;
+				_statIsQueued--;
 				tile.setTimeEndLoading(nanoTime);
 			} else if (tileEventId == TileEventId.TILE_ERROR_LOADING) {
-				fStatErrorLoading++;
-				fStatIsQueued--;
+				_statErrorLoading++;
+				_statIsQueued--;
 			}
 
 			// when stat is cleared, que can get negative, prevent this
-			if (fStatIsQueued < 0) {
-				fStatIsQueued = 0;
+			if (_statIsQueued < 0) {
+				_statIsQueued = 0;
 			}
 
 			// create log entry
-			fLogEntries.add(new LogEntry(//
+			_logEntries.add(new LogEntry(//
 					tileEventId,
 					tile,
 					nanoTime,
 					Thread.currentThread().getName(),
-					fStatUpdateCounter));
+					_statUpdateCounter));
 
 			/*
 			 * create runnable which displays the log
@@ -1319,40 +1322,40 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			infoRunnable = new Runnable() {
 
-				final int	fRunnableCounter	= fStatUpdateCounter;
+				final int	fRunnableCounter	= _statUpdateCounter;
 
 				public void run() {
 
 					// check if this is the last created runnable
-					if (fRunnableCounter != fStatUpdateCounter) {
+					if (fRunnableCounter != _statUpdateCounter) {
 						// a new update event occured
 						return;
 					}
 
-					if (fLblTileInfo.isDisposed()) {
+					if (_lblTileInfo.isDisposed()) {
 						// widgets are disposed
 						return;
 					}
 
 					// show at most 3 decimals
-					fLblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-							Integer.toString(fStatIsQueued % 1000),
-							Integer.toString(fStatEndLoading % 1000),
-							Integer.toString(fStatStartLoading % 1000),
-							Integer.toString(fStatErrorLoading % 1000), //
+					_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
+							Integer.toString(_statIsQueued % 1000),
+							Integer.toString(_statEndLoading % 1000),
+							Integer.toString(_statStartLoading % 1000),
+							Integer.toString(_statErrorLoading % 1000), //
 					}));
 
-					displayLogEntries(fLogEntries, fCboTileImageLog);
+					displayLogEntries(_logEntries, _cboTileImageLog);
 
 					// select new entry
-					fCboTileImageLog.select(fCboTileImageLog.getItemCount() - 1);
+					_cboTileImageLog.select(_cboTileImageLog.getItemCount() - 1);
 				}
 			};
 		} finally {
 			LOG_LOCK.unlock();
 		}
 
-		fDisplay.asyncExec(infoRunnable);
+		_display.asyncExec(infoRunnable);
 	}
 
 	/**
@@ -1388,11 +1391,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		final int oldZoomLevel = _map.getZoom();
 		final GeoPosition mapCenter = _map.getGeoCenter();
 
-		final int newFactoryMinZoom = fSpinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
-		final int newFactoryMaxZoom = fSpinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMinZoom = _spinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
-		fMpCustom.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
+		_mpCustom.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
 
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
@@ -1408,15 +1411,15 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		/*
 		 * keep position
 		 */
-		fMpCustom.setLastUsedZoom(_map.getZoom());
-		fMpCustom.setLastUsedPosition(_map.getGeoCenter());
+		_mpCustom.setLastUsedZoom(_map.getZoom());
+		_mpCustom.setLastUsedPosition(_map.getGeoCenter());
 
-		if (fCustomUrl != null) {
-			fMpCustom.setCustomUrl(fCustomUrl);
+		if (_customUrl != null) {
+			_mpCustom.setCustomUrl(_customUrl);
 		}
 
 		// update image format from the mp, the image format is set in the mp when images are loaded
-		fTxtImageFormat.setText(fMpCustom.getImageFormat());
+		_txtImageFormat.setText(_mpCustom.getImageFormat());
 	}
 
 	/**
@@ -1503,7 +1506,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			rowIndex++;
 		}
 
-		fMpCustom.setUrlParts(urlParts);
+		_mpCustom.setUrlParts(urlParts);
 	}
 
 	/**
@@ -1560,10 +1563,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			}
 		}
 
-		fBtnShowMap.setEnabled(sb.length() > 5);
-		fCustomUrl = sb.toString();
+		_btnShowMap.setEnabled(sb.length() > 5);
+		_customUrl = sb.toString();
 
-		fTxtCustomUrl.setText(fCustomUrl);
+		_txtCustomUrl.setText(_customUrl);
 	}
 
 	/**
@@ -1572,7 +1575,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private void updateUIUrlParts() {
 
 		int rowIndex = 0;
-		final ArrayList<UrlPart> urlParts = fMpCustom.getUrlParts();
+		final ArrayList<UrlPart> urlParts = _mpCustom.getUrlParts();
 
 		for (final UrlPart urlPart : urlParts) {
 

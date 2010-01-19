@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,21 +20,21 @@ import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 
 public class UrlPart implements Cloneable {
 
-	private PART_TYPE	fPartType;
+	private PART_TYPE	_partType;
 
 	/**
 	 * position of the part within the whole url
 	 */
-	private int			fPosition;
+	private int			_position;
 
-	private String		fHtml;
+	private String		_html;
 
-	private int			fRandomIntegerStart;
-	private int			fRandomIntegerEnd;
+	private int			_randomIntegerStart;
+	private int			_randomIntegerEnd;
 
 	// alphanumeric random a...z
-	private String		fRandomAlphaStart;
-	private String		fRandomAlphaEnd;
+	private String		_randomAlphaStart;
+	private String		_randomAlphaEnd;
 
 	private int			fOffsetX;
 
@@ -45,44 +45,48 @@ public class UrlPart implements Cloneable {
 
 		final UrlPart urlPart = (UrlPart) super.clone();
 
-		urlPart.fHtml = fHtml == null ? null : new String(fHtml);
+		urlPart._html = _html == null ? null : new String(_html);
 
-		urlPart.fRandomAlphaStart = fRandomAlphaStart == null ? null : new String(fRandomAlphaStart);
-		urlPart.fRandomAlphaEnd = fRandomAlphaEnd == null ? null : new String(fRandomAlphaEnd);
+		urlPart._randomAlphaStart = _randomAlphaStart == null ? null : new String(_randomAlphaStart);
+		urlPart._randomAlphaEnd = _randomAlphaEnd == null ? null : new String(_randomAlphaEnd);
 
 		return urlPart;
 	}
 
 	public String getHtml() {
-		return fHtml;
+		return _html;
+	}
+
+	public int getOffsetX() {
+		return fOffsetX;
 	}
 
 	public PART_TYPE getPartType() {
-		return fPartType;
+		return _partType;
 	}
 
 	public int getPosition() {
-		return fPosition;
+		return _position;
 	}
 
 	public String getRandomAlphaEnd() {
-		return fRandomAlphaEnd;
+		return _randomAlphaEnd;
 	}
 
 	public String getRandomAlphaStart() {
-		return fRandomAlphaStart;
+		return _randomAlphaStart;
 	}
 
 	public int getRandomIntegerEnd() {
-		return fRandomIntegerEnd;
+		return _randomIntegerEnd;
 	}
 
 	public int getRandomIntegerStart() {
-		return fRandomIntegerStart;
+		return _randomIntegerStart;
 	}
 
 	public void setHtml(final String html) {
-		fHtml = html;
+		_html = html;
 	}
 
 	public void setOffsetX(final int offsetX) {
@@ -90,36 +94,32 @@ public class UrlPart implements Cloneable {
 	}
 
 	public void setPartType(final PART_TYPE partType) {
-		fPartType = partType;
+		_partType = partType;
 	}
 
 	public void setPosition(final int position) {
-		fPosition = position;
+		_position = position;
 	}
 
 	public void setRandomAlphaEnd(final String randomEnd) {
-		fRandomAlphaEnd = randomEnd;
+		_randomAlphaEnd = randomEnd;
 	}
 
 	public void setRandomAlphaStart(final String randomStart) {
-		fRandomAlphaStart = randomStart;
+		_randomAlphaStart = randomStart;
 	}
 
 	public void setRandomIntegerEnd(final int randomEnd) {
-		fRandomIntegerEnd = randomEnd;
+		_randomIntegerEnd = randomEnd;
 	}
 
 	public void setRandomIntegerStart(final int randomStart) {
-		fRandomIntegerStart = randomStart;
+		_randomIntegerStart = randomStart;
 	}
 
 	@Override
 	public String toString() {
-		return fPartType + " pos:" + fPosition + " html:" + fHtml; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	public int getOffsetX() {
-		return fOffsetX;
+		return _partType + " pos:" + _position + " html:" + _html; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

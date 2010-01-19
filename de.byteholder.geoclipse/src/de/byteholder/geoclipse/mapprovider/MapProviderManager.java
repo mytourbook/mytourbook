@@ -1505,7 +1505,7 @@ public class MapProviderManager {
 			mpWrapper.setIsTransparentBlack(isTransBlack == null ? false : isTransBlack);
 			mpWrapper.setTransparentColors(transColors.length == 0 ? new int[] { OSM_BACKGROUND_COLOR } : transColors);
 			mpWrapper.setIsBrightness(isBrightness == null ? false : isBrightness);
-			mpWrapper.setBrightness(brightness == null ? 0 : brightness);
+			mpWrapper.setBrightness(brightness == null ? 50 : brightness);
 
 			mpWrapperList.add(mpWrapper);
 
