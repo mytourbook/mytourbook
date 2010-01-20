@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -145,11 +145,10 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindSpd", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.UNIT_LABEL_SPEED;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_wind_speed_label);
-			colDef.setColumnHeader(Messages.ColumnFactory_wind_speed); 
-			colDef.setColumnUnit(unitLabel); 
+			colDef.setColumnHeader(UI.SYMBOL_WIND_WITH_SPACE + UI.UNIT_LABEL_SPEED); 
+			colDef.setColumnUnit(UI.UNIT_LABEL_SPEED); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_wind_speed_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 
@@ -162,7 +161,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindDir", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.UNIT_LABEL_SPEED; // TODO
+			final String unitLabel = UI.UNIT_LABEL_DIRECTION;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_wind_dir_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_wind_dir); 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -26,8 +26,8 @@ import net.tourbook.plugin.TourbookPlugin;
  */
 public abstract class TreeViewerItem {
 
-	private TreeViewerItem				fParentItem	= null;
-	private ArrayList<TreeViewerItem>	fChildren	= null;
+	private TreeViewerItem				_parentItem	= null;
+	private ArrayList<TreeViewerItem>	_children	= null;
 
 	/**
 	 * Adds a new child to this tree item
@@ -46,9 +46,9 @@ public abstract class TreeViewerItem {
 	 * clear children so they will be fetched again the next time when they are displayed
 	 */
 	public void clearChildren() {
-		if (fChildren != null) {
-			fChildren.clear();
-			fChildren = null;
+		if (_children != null) {
+			_children.clear();
+			_children = null;
 		}
 	}
 
@@ -60,7 +60,7 @@ public abstract class TreeViewerItem {
 
 	private void fetchChildrenInternal() {
 
-		fChildren = new ArrayList<TreeViewerItem>();
+		_children = new ArrayList<TreeViewerItem>();
 
 		fetchChildren();
 	}
@@ -70,10 +70,10 @@ public abstract class TreeViewerItem {
 	 *         an empty list will be returned.
 	 */
 	public ArrayList<TreeViewerItem> getChildren() {
-		if (fChildren == null) {
+		if (_children == null) {
 			return new ArrayList<TreeViewerItem>();
 		}
-		return fChildren;
+		return _children;
 	}
 
 	/**
@@ -82,17 +82,17 @@ public abstract class TreeViewerItem {
 	 */
 	public ArrayList<TreeViewerItem> getFetchedChildren() {
 
-		if (fChildren != null) {
-			return fChildren;
+		if (_children != null) {
+			return _children;
 		}
 
 		fetchChildrenInternal();
 
-		if (fChildren == null) {
-			fChildren = new ArrayList<TreeViewerItem>();
+		if (_children == null) {
+			_children = new ArrayList<TreeViewerItem>();
 		}
 
-		return fChildren;
+		return _children;
 	}
 
 	/**
@@ -100,19 +100,19 @@ public abstract class TreeViewerItem {
 	 */
 	public Object[] getFetchedChildrenAsArray() {
 
-		if (fChildren == null) {
+		if (_children == null) {
 			fetchChildrenInternal();
 		}
 
-		if (fChildren == null || fChildren.size() == 0) {
+		if (_children == null || _children.size() == 0) {
 			return new Object[0];
 		}
 
-		return fChildren.toArray();
+		return _children.toArray();
 	}
 
 	public TreeViewerItem getParentItem() {
-		return fParentItem;
+		return _parentItem;
 	}
 
 	/**
@@ -120,17 +120,17 @@ public abstract class TreeViewerItem {
 	 */
 	public String getSQlTourPersonId() {
 
-		final TourPerson fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-		final StringBuilder sqlString = new StringBuilder();
+		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
+		final StringBuilder sb = new StringBuilder();
 
-		final long personId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
+		final long personId = activePerson == null ? -1 : activePerson.getPersonId();
 		if (personId == -1) {
 			// select all people
 		} else {
 			// select only one person
-			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
+			sb.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
 		}
-		return sqlString.toString();
+		return sb.toString();
 	}
 
 	/**
@@ -138,19 +138,19 @@ public abstract class TreeViewerItem {
 	 *         <code>null</code> when childrens are not yet fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
-		return fChildren;
+		return _children;
 	}
 
 	public boolean hasChildren() {
 
-		if (fChildren == null) {
+		if (_children == null) {
 			/*
 			 * if fChildren have not yet been retrieved we assume that fChildren can be available to
 			 * make the tree node expandable
 			 */
 			return true;
 		} else {
-			return fChildren.size() > 0;
+			return _children.size() > 0;
 		}
 	}
 
@@ -180,10 +180,10 @@ public abstract class TreeViewerItem {
 	 * @param children
 	 */
 	public void setChildren(final ArrayList<TreeViewerItem> children) {
-		if (fChildren != null) {
-			fChildren.clear();
+		if (_children != null) {
+			_children.clear();
 		}
-		fChildren = children;
+		_children = children;
 	}
 
 	/**
@@ -192,6 +192,6 @@ public abstract class TreeViewerItem {
 	 * @param parentItem
 	 */
 	public void setParentItem(final TreeViewerItem parentItem) {
-		fParentItem = parentItem;
+		_parentItem = parentItem;
 	}
 }

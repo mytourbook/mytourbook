@@ -153,10 +153,9 @@ public class Messages extends NLS {
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
 
-	public static String	app_error_title;
+	public static String		app_error_title;
 
 	public static String		app_unit_minutes;
-
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
@@ -289,6 +288,8 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
+	public static String	Image___Empty16;
+
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
 	public static String		Image__chart_analyzer;
@@ -365,6 +366,13 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
+	public static String		Image__weather_sunny;
+	public static String		Image__weather_cloudy;
+	public static String		Image__weather_clouds;
+	public static String		Image__weather_lightning;
+	public static String		Image__weather_rain;
+	public static String		Image__weather_snow;
+
 	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;
@@ -385,15 +393,11 @@ public class Messages extends NLS {
 	public static String		import_data_dlg_reimport_title;
 	public static String		import_data_dlg_save_tour_msg;
 	public static String		import_data_dlg_save_tour_title;
-	public static String	import_data_importTours_subTask;
-
-	public static String	import_data_importTours_task;
-
+	public static String		import_data_importTours_subTask;
+	public static String		import_data_importTours_task;
 	public static String		import_data_label_unknown_device;
-
-	public static String	import_data_updateDataFromDatabase_subTask;
-
-	public static String	import_data_updateDataFromDatabase_task;
+	public static String		import_data_updateDataFromDatabase_subTask;
+	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -739,15 +743,22 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_tour_data;
 	public static String		tour_editor_tabLabel_tour_marker;
 	public static String		tour_editor_tour_new_tooltip;
-	
-	public static String        tour_editor_section_weather;
-	public static String        tour_editor_label_wind_direction;
-	public static String        tour_editor_label_wind_speed;
-	public static String        tour_editor_label_clouds;
-	public static String        tour_editor_label_temperature;
-	
-	public static String        tour_editor_section_personal;
-	public static String        tour_editor_label_rest_pulse;
+
+	public static String		tour_editor_section_weather;
+	public static String		tour_editor_label_wind_direction;
+	public static String		tour_editor_label_wind_speed;
+	public static String		tour_editor_label_clouds;
+	public static String		tour_editor_label_temperature;
+
+	public static String		weather_sunny;
+	public static String		weather_cloudy;
+	public static String		weather_clouds;
+	public static String		weather_lightning;
+	public static String		weather_rain;
+	public static String		weather_snow;
+
+	public static String		tour_editor_section_personal;
+	public static String		tour_editor_label_rest_pulse;
 
 	public static String		tour_merger_btn_reset_adjustment;
 	public static String		tour_merger_btn_reset_adjustment_tooltip;

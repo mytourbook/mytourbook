@@ -26,7 +26,6 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.export.ActionExport;
@@ -45,7 +44,6 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
@@ -112,71 +110,68 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID								= "net.tourbook.views.tourListView";			//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
-	private final IDialogSettings			fState							= TourbookPlugin.getDefault()
+	private final IDialogSettings			_state							= TourbookPlugin
+																					.getDefault()
 																					.getDialogSettingsSection(
-																							"ViewTourBook");				//$NON-NLS-1$
+																							"ViewTourBook");			//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_YEAR				= "selectedYear";								//$NON-NLS-1$
-	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";								//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOURS			= "selectedTours";								//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR				= "selectedYear";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOURS			= "selectedTours";							//$NON-NLS-1$
 
-	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";					//$NON-NLS-1$
+	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";				//$NON-NLS-1$
 
-	private TreeViewer						fTourViewer;
+	private Composite						_viewerContainer;
+	private TreeViewer						_tourViewer;
 
-	private ColumnManager					fColumnManager;
-	private PostSelectionProvider			fPostSelectionProvider;
+	private ColumnManager					_columnManager;
 
-	private ISelectionListener				fPostSelectionListener;
-	private IPartListener2					fPartListener;
-	private ITourEventListener				fTourPropertyListener;
-	private IPropertyChangeListener			fPrefChangeListener;
+	private PostSelectionProvider			_postSelectionProvider;
+	private ISelectionListener				_postSelectionListener;
+	private IPartListener2					_partListener;
+	private ITourEventListener				_tourPropertyListener;
+	private IPropertyChangeListener			_prefChangeListener;
 
-	TVITourBookRoot							fRootItem;
+	private TVITourBookRoot					_rootItem;
 
-	TourPerson								fActivePerson;
-	TourTypeFilter							fActiveTourTypeFilter;
+	private NumberFormat					_nf								= NumberFormat.getNumberInstance();
+	private Calendar						_calendar						= GregorianCalendar.getInstance();
+	private DateFormat						_timeFormatter					= DateFormat
+																					.getTimeInstance(DateFormat.SHORT);
 
-	private NumberFormat					fNF								= NumberFormat.getNumberInstance();
-	private Calendar						fCalendar						= GregorianCalendar.getInstance();
-	private DateFormat						fTimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private ActionEditQuick					_actionEditQuick;
 
-	private ActionEditQuick					fActionEditQuick;
+	private ActionCollapseAll				_actionCollapseAll;
+	private ActionCollapseOthers			_actionCollapseOthers;
+	private ActionExpandSelection			_actionExpandSelection;
 
-	private ActionCollapseAll				fActionCollapseAll;
-	private ActionCollapseOthers			fActionCollapseOthers;
-	private ActionExpandSelection			fActionExpandSelection;
+	private ActionDeleteTour				_actionDeleteTour;
+	private ActionEditTour					_actionEditTour;
+	private ActionOpenTour					_actionOpenTour;
+	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
+	private ActionMergeTour					_actionMergeTour;
 
-	private ActionDeleteTour				fActionDeleteTour;
-	private ActionEditTour					fActionEditTour;
-	private ActionOpenTour					fActionOpenTour;
-	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionMergeTour					fActionMergeTour;
+	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionSetTourTag				_actionAddTag;
+	private ActionSetTourTag				_actionRemoveTag;
+	private ActionRemoveAllTags				_actionRemoveAllTags;
+	private ActionOpenPrefDialog			_actionOpenTagPrefs;
 
-	private ActionSetTourTypeMenu			fActionSetTourType;
-	private ActionSetTourTag				fActionAddTag;
-	private ActionSetTourTag				fActionRemoveTag;
-	private ActionRemoveAllTags				fActionRemoveAllTags;
-	private ActionOpenPrefDialog			fActionOpenTagPrefs;
+	private ActionSelectAllTours			_actionSelectAllTours;
+	private ActionModifyColumns				_actionModifyColumns;
+	private ActionRefreshView				_actionRefreshView;
 
-	private ActionSelectAllTours			fActionSelectAllTours;
-	private ActionModifyColumns				fActionModifyColumns;
-	private ActionRefreshView				fActionRefreshView;
+	private ActionExport					_actionExportTour;
 
-	private ActionExport					fActionExportTour;
+	private int								_selectedYear					= -1;
+	private int								_selectedMonth					= -1;
+	private ArrayList<Long>					_selectedTourIds				= new ArrayList<Long>();
 
-	private int								fSelectedYear					= -1;
-	private int								fSelectedMonth					= -1;
-//	private long							fSelectedTourId;
-	private ArrayList<Long>					fSelectedTourIds				= new ArrayList<Long>();						;
-
-	private Composite						fViewerContainer;
-
-	private boolean							fIsRecTimeFormat_hhmmss;
-	private boolean							fIsDriveTimeFormat_hhmmss;
+	private boolean							_isRecTimeFormat_hhmmss;
+	private boolean							_isDriveTimeFormat_hhmmss;
 
 	private class ItemComparer implements IElementComparer {
 
@@ -224,7 +219,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return fRootItem.getFetchedChildrenAsArray();
+			return _rootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(final Object element) {
@@ -240,15 +235,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	void actionSelectYearMonthTours() {
 
-		if (fActionSelectAllTours.isChecked()) {
+		if (_actionSelectAllTours.isChecked()) {
 			// reselect selection
-			fTourViewer.setSelection(fTourViewer.getSelection());
+			_tourViewer.setSelection(_tourViewer.getSelection());
 		}
 	}
 
 	private void addPartListener() {
 
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -272,32 +267,32 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
+//					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
+//					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
 					reloadViewer();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tourbook viewer
-					fTourViewer.refresh();
+					_tourViewer.refresh();
 
 					// redraw must be done to see modified tour type image colors
-					fTourViewer.getTree().redraw();
+					_tourViewer.getTree().redraw();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -305,37 +300,37 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fState);
-					fColumnManager.clearColumns();
-					defineViewerColumns(fViewerContainer);
+					_columnManager.saveState(_state);
+					_columnManager.clearColumns();
+					defineViewerColumns(_viewerContainer);
 
-					fTourViewer = (TreeViewer) recreateViewer(fTourViewer);
+					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					readDisplayFormats();
 
-					fTourViewer.getTree().setLinesVisible(
+					_tourViewer.getTree().setLinesVisible(
 							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-					fTourViewer.refresh();
+					_tourViewer.refresh();
 
 					/*
 					 * the tree must be redrawn because the styled text does not show with the new
 					 * color
 					 */
-					fTourViewer.getTree().redraw();
+					_tourViewer.getTree().redraw();
 				}
 			}
 		};
 
 		// register the listener
-		prefStore.addPropertyChangeListener(fPrefChangeListener);
+		prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
 		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
@@ -346,12 +341,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
+		_tourPropertyListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
@@ -369,37 +364,38 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 			}
 		};
-		TourManager.getInstance().addTourEventListener(fTourPropertyListener);
+		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
 	}
 
 	private void createActions() {
 
-		fActionEditQuick = new ActionEditQuick(this);
-		fActionEditTour = new ActionEditTour(this);
-		fActionOpenTour = new ActionOpenTour(this);
-		fActionDeleteTour = new ActionDeleteTour(this);
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionEditTour = new ActionEditTour(this);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionDeleteTour = new ActionDeleteTour(this);
 
-		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-		fActionMergeTour = new ActionMergeTour(this);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionMergeTour = new ActionMergeTour(this);
 
-		fActionSetTourType = new ActionSetTourTypeMenu(this);
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
+		_actionAddTag = new ActionSetTourTag(this, true);
+		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionModifyColumns = new ActionModifyColumns(this);
-		fActionSelectAllTours = new ActionSelectAllTours(this);
-		fActionRefreshView = new ActionRefreshView(this);
+		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionSelectAllTours = new ActionSelectAllTours(this);
+		_actionRefreshView = new ActionRefreshView(this);
 
-		fActionExpandSelection = new ActionExpandSelection(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
-		fActionCollapseOthers = new ActionCollapseOthers(this);
+		_actionExpandSelection = new ActionExpandSelection(this);
+		_actionCollapseAll = new ActionCollapseAll(this);
+		_actionCollapseOthers = new ActionCollapseOthers(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
-		fActionExportTour = new ActionExport(this);
+		_actionExportTour = new ActionExport(this);
 
 		fillActions();
 	}
@@ -418,7 +414,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 
 		// add the context menu to the table viewer
-		final Control tourViewer = fTourViewer.getControl();
+		final Control tourViewer = _tourViewer.getControl();
 		final Menu menu = menuMgr.createContextMenu(tourViewer);
 		tourViewer.setMenu(menu);
 	}
@@ -427,34 +423,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	public void createPartControl(final Composite parent) {
 
 		// define all columns for the viewer
-		fColumnManager = new ColumnManager(this, fState);
+		_columnManager = new ColumnManager(this, _state);
 		defineViewerColumns(parent);
 
-		fViewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
-		createTourViewer(fViewerContainer);
+		createTourViewer(_viewerContainer);
 
 		createActions();
 
 		// set selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
 
-		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
-		fActivePerson = tourbookPlugin.getActivePerson();
-		fActiveTourTypeFilter = tourbookPlugin.getActiveTourTypeFilter();
-
 		readDisplayFormats();
 		restoreState();
 
 		// update the viewer
-		fRootItem = new TVITourBookRoot(this);
-		fTourViewer.setInput(this);
+		_rootItem = new TVITourBookRoot(this);
+		_tourViewer.setInput(this);
 
 		reselectTourViewer();
 	}
@@ -470,24 +462,24 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setLinesVisible(TourbookPlugin.getDefault().getPluginPreferences().getBoolean(
 				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		fTourViewer = new TreeViewer(tree);
-		fColumnManager.createColumns(fTourViewer);
+		_tourViewer = new TreeViewer(tree);
+		_columnManager.createColumns(_tourViewer);
 
-		fTourViewer.setContentProvider(new TourBookContentProvider());
-		fTourViewer.setComparer(new ItemComparer());
-		fTourViewer.setUseHashlookup(true);
+		_tourViewer.setContentProvider(new TourBookContentProvider());
+		_tourViewer.setComparer(new ItemComparer());
+		_tourViewer.setUseHashlookup(true);
 
-		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectTreeItem(event);
 			}
 		});
 
-		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			public void doubleClick(final DoubleClickEvent event) {
 
-				final Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
 				if (selection instanceof TVITourBookTour) {
 
@@ -502,10 +494,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					final TreeViewerItem tourItem = (TreeViewerItem) selection;
 
-					if (fTourViewer.getExpandedState(tourItem)) {
-						fTourViewer.collapseToLevel(tourItem, 1);
+					if (_tourViewer.getExpandedState(tourItem)) {
+						_tourViewer.collapseToLevel(tourItem, 1);
 					} else {
-						fTourViewer.expandToLevel(tourItem, 1);
+						_tourViewer.expandToLevel(tourItem, 1);
 					}
 				}
 			}
@@ -533,7 +525,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * tree column: date
 		 */
-		colDef = TreeColumnFactory.DATE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DATE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
@@ -571,7 +563,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: time
 		 */
-		colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -580,9 +572,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (element instanceof TVITourBookTour) {
 
 					final long tourDate = ((TVITourBookTour) element).fTourDate;
-					fCalendar.setTimeInMillis(tourDate);
+					_calendar.setTimeInMillis(tourDate);
 
-					cell.setText(fTimeFormatter.format(fCalendar.getTime()));
+					cell.setText(_timeFormatter.format(_calendar.getTime()));
 					setCellColor(cell, element);
 				}
 			}
@@ -591,7 +583,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: tour type
 		 */
-		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -621,7 +613,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: title
 		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -638,7 +630,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: tags
 		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -655,7 +647,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: markers
 		 */
-		colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -679,7 +671,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * column: calories
 		 */
 
-		colDef = TreeColumnFactory.CALORIES.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, pixelConverter);
 		//colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -694,11 +686,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 
-
 		/*
 		 * column: recording time (h)
 		 */
-		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -708,7 +699,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
 
 				if (element instanceof TVITourBookTour) {
-					if (fIsRecTimeFormat_hhmmss) {
+					if (_isRecTimeFormat_hhmmss) {
 						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
 					} else {
 						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
@@ -724,7 +715,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: driving time (h)
 		 */
-		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -733,7 +724,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
 
 				if (element instanceof TVITourBookTour) {
-					if (fIsDriveTimeFormat_hhmmss) {
+					if (_isDriveTimeFormat_hhmmss) {
 						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
 					} else {
 						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
@@ -749,7 +740,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: paused time (h)
 		 */
-		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -766,7 +757,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					if (fIsDriveTimeFormat_hhmmss) {
+					if (_isDriveTimeFormat_hhmmss) {
 						cell.setText(UI.format_hh_mm_ss(dbPausedTime).toString());
 					} else {
 						cell.setText(UI.format_hh_mm(dbPausedTime + 30).toString());
@@ -780,7 +771,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: relative paused time %
 		 */
-		colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -799,9 +790,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						/ dbRecordingTime
 						* 100;
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(relativePausedTime));
+				_nf.setMinimumFractionDigits(1);
+				_nf.setMaximumFractionDigits(1);
+				cell.setText(_nf.format(relativePausedTime));
 
 				setCellColor(cell, element);
 			}
@@ -810,7 +801,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: distance (km/miles)
 		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -823,9 +814,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
-					cell.setText(fNF.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+					cell.setText(_nf.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -835,7 +826,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: altitude up (m)
 		 */
-		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -857,7 +848,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: altitude down (m)
 		 */
-		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -878,7 +869,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: max altitude
 		 */
-		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -899,7 +890,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: max speed
 		 */
-		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -911,10 +902,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
 
-					cell.setText(fNF.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -924,7 +915,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: max pulse
 		 */
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -944,7 +935,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: avg speed km/h - mph
 		 */
-		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -955,10 +946,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (speed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
 
-					cell.setText(fNF.format(speed));
+					cell.setText(_nf.format(speed));
 				}
 
 				setCellColor(cell, element);
@@ -968,7 +959,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: avg pace min/km - min/mi
 		 */
-		colDef = TreeColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -989,7 +980,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: avg pulse
 		 */
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1010,7 +1001,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: avg cadence
 		 */
-		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1031,7 +1022,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: avg temperature
 		 */
-		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1054,37 +1045,40 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				setCellColor(cell, element);
 			}
 		});
-		
+
 		/*
-		 * column: weather 
+		 * column: weather
 		 */
-		colDef = TreeColumnFactory.WIND_SPD.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.WIND_SPD.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				float windSpeed = ((TVITourBookItem) element).colWindSpd;
+				final float windSpeed = ((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE;
 
 				if (windSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Float.toString(windSpeed));
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					cell.setText(_nf.format(windSpeed));
 				}
 
 				setCellColor(cell, element);
 			}
-		});	
-		
-		colDef = TreeColumnFactory.WIND_DIR.createColumn(fColumnManager, pixelConverter);
+		});
+
+		colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				float windDir = ((TVITourBookItem) element).colWindDir;
+				final float windDir = ((TVITourBookItem) element).colWindDir;
 
 				if (windDir == 0) {
 					cell.setText(UI.EMPTY_STRING);
@@ -1094,35 +1088,41 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				setCellColor(cell, element);
 			}
-		});		
-		
-		colDef = TreeColumnFactory.CLOUDS.createColumn(fColumnManager, pixelConverter);
+		});
+
+		colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				String windClouds = ((TVITourBookItem) element).fClouds;
+				final String windClouds = ((TVITourBookItem) element).fClouds;
 
 				if (windClouds == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(windClouds);
+					//cell.setText(windClouds);
+					final Image img = UI.IMAGE_REGISTRY.get(windClouds);
+					if (img != null) {
+						cell.setImage(img);
+					} else {
+						cell.setText(windClouds);
+					}
 				}
 
 				setCellColor(cell, element);
 			}
-		});	
-		
-		colDef = TreeColumnFactory.RESTPULSE.createColumn(fColumnManager, pixelConverter);
+		});
+
+		colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				int restPulse = ((TVITourBookItem) element).colRestPulse;
+				final int restPulse = ((TVITourBookItem) element).colRestPulse;
 
 				if (restPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
@@ -1132,12 +1132,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				setCellColor(cell, element);
 			}
-		});			
+		});
 
 		/*
 		 * column: week
 		 */
-		colDef = TreeColumnFactory.WEEK.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.WEEK.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1159,7 +1159,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: timeinterval
 		 */
-		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1181,7 +1181,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * column: device distance
 		 */
-		colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1222,18 +1222,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		getViewSite().getPage().removePartListener(fPartListener);
-		TourManager.getInstance().removeTourEventListener(fTourPropertyListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
+		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
 
 	private void enableActions() {
 
-		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
+		final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
 
 		/*
 		 * count number of selected items
@@ -1274,27 +1274,27 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * enable actions
 		 */
-		fActionEditTour.setEnabled(isOneTour);
-		fActionOpenTour.setEnabled(isOneTour);
-		fActionEditQuick.setEnabled(isOneTour);
-		fActionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
-		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-		fActionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
+		_actionEditTour.setEnabled(isOneTour);
+		_actionOpenTour.setEnabled(isOneTour);
+		_actionEditQuick.setEnabled(isOneTour);
+		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
-			fActionDeleteTour.setEnabled(true);
+			_actionDeleteTour.setEnabled(true);
 		} else {
-			fActionDeleteTour.setEnabled(false);
+			_actionDeleteTour.setEnabled(false);
 		}
 
-		fActionExportTour.setEnabled(isTourSelected);
+		_actionExportTour.setEnabled(isTourSelected);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// add tag
-		fActionAddTag.setEnabled(isTourSelected);
+		_actionAddTag.setEnabled(isTourSelected);
 
 		// remove tags
 		if (isOneTour) {
@@ -1306,28 +1306,28 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// at least one tag is within the tour
 
-				fActionRemoveAllTags.setEnabled(true);
-				fActionRemoveTag.setEnabled(true);
+				_actionRemoveAllTags.setEnabled(true);
+				_actionRemoveTag.setEnabled(true);
 			} else {
 				// tags are not available
-				fActionRemoveAllTags.setEnabled(false);
-				fActionRemoveTag.setEnabled(false);
+				_actionRemoveAllTags.setEnabled(false);
+				_actionRemoveTag.setEnabled(false);
 			}
 		} else {
 
 			// multiple tours are selected
 
-			fActionRemoveTag.setEnabled(isTourSelected);
-			fActionRemoveAllTags.setEnabled(isTourSelected);
+			_actionRemoveTag.setEnabled(isTourSelected);
+			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
-		fActionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
+		_actionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
 
-		fActionExpandSelection.setEnabled(firstElement == null ? false : //
+		_actionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElementHasChildren : //
 						true);
 
-		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
 		// enable/disable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSelected);
@@ -1339,53 +1339,53 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(fActionSelectAllTours);
+		menuMgr.add(_actionSelectAllTours);
 		menuMgr.add(new Separator());
 
-		menuMgr.add(fActionModifyColumns);
+		menuMgr.add(_actionModifyColumns);
 
 		/*
 		 * fill view toolbar
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(fActionExpandSelection);
-		tbm.add(fActionCollapseAll);
+		tbm.add(_actionExpandSelection);
+		tbm.add(_actionCollapseAll);
 
-		tbm.add(fActionRefreshView);
+		tbm.add(_actionRefreshView);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(fActionCollapseOthers);
-		menuMgr.add(fActionExpandSelection);
-		menuMgr.add(fActionCollapseAll);
+		menuMgr.add(_actionCollapseOthers);
+		menuMgr.add(_actionExpandSelection);
+		menuMgr.add(_actionCollapseAll);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionOpenMarkerDialog);
-		menuMgr.add(fActionOpenAdjustAltitudeDialog);
-		menuMgr.add(fActionMergeTour);
-		menuMgr.add(fActionOpenTour);
-		menuMgr.add(fActionExportTour);
+		menuMgr.add(_actionEditQuick);
+		menuMgr.add(_actionEditTour);
+		menuMgr.add(_actionOpenMarkerDialog);
+		menuMgr.add(_actionOpenAdjustAltitudeDialog);
+		menuMgr.add(_actionMergeTour);
+		menuMgr.add(_actionOpenTour);
+		menuMgr.add(_actionExportTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionAddTag);
-		menuMgr.add(fActionRemoveTag);
-		menuMgr.add(fActionRemoveAllTags);
+		menuMgr.add(_actionSetTourType);
+		menuMgr.add(_actionAddTag);
+		menuMgr.add(_actionRemoveTag);
+		menuMgr.add(_actionRemoveAllTags);
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(_actionOpenTagPrefs);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionDeleteTour);
+		menuMgr.add(_actionDeleteTour);
 
 		enableActions();
 	}
 
 	void firePostSelection(final ISelection selection) {
-		fPostSelectionProvider.setSelection(selection);
+		_postSelectionProvider.setSelection(selection);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1393,14 +1393,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	public Object getAdapter(final Class adapter) {
 
 		if (adapter == ColumnViewer.class) {
-			return fTourViewer;
+			return _tourViewer;
 		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
 	public ColumnManager getColumnManager() {
-		return fColumnManager;
+		return _columnManager;
 	}
 
 	/**
@@ -1421,7 +1421,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	PostSelectionProvider getPostSelectionProvider() {
-		return fPostSelectionProvider;
+		return _postSelectionProvider;
 	}
 
 	private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final Set<Long> tourIdSet) {
@@ -1434,7 +1434,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// get selected tours
 
-		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
 
@@ -1447,7 +1447,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one year is selected
 
-				if (fActionSelectAllTours.isChecked()) {
+				if (_actionSelectAllTours.isChecked()) {
 
 					// loop: all months
 					for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
@@ -1461,7 +1461,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one month is selected
 
-				if (fActionSelectAllTours.isChecked()) {
+				if (_actionSelectAllTours.isChecked()) {
 					getMonthTourIds((TVITourBookMonth) selectedItem, tourIds);
 				}
 
@@ -1503,12 +1503,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	public ColumnViewer getViewer() {
-		return fTourViewer;
+		return _tourViewer;
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
 
-		final boolean isSelectAllChildren = fActionSelectAllTours.isChecked();
+		final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
 
 		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
 
@@ -1534,7 +1534,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstYear) {
 						// keep selected year
 						isFirstYear = false;
-						fSelectedYear = yearItem.fTourYear;
+						_selectedYear = yearItem.fTourYear;
 					}
 
 					// get all tours for the selected year
@@ -1552,8 +1552,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstMonth) {
 						// keep selected year/month
 						isFirstMonth = false;
-						fSelectedYear = monthItem.fTourYear;
-						fSelectedMonth = monthItem.fTourMonth;
+						_selectedYear = monthItem.fTourYear;
+						_selectedMonth = monthItem.fTourMonth;
 					}
 
 					// get all tours for the selected month
@@ -1567,8 +1567,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstTour) {
 						// keep selected tour
 						isFirstTour = false;
-						fSelectedYear = tourItem.fTourYear;
-						fSelectedMonth = tourItem.fTourMonth;
+						_selectedYear = tourItem.fTourYear;
+						_selectedMonth = tourItem.fTourMonth;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1585,8 +1585,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstTour) {
 						// keep selected tour
 						isFirstTour = false;
-						fSelectedYear = tourItem.fTourYear;
-						fSelectedMonth = tourItem.fTourMonth;
+						_selectedYear = tourItem.fTourYear;
+						_selectedMonth = tourItem.fTourMonth;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1597,14 +1597,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		if (tourIds.size() > 0) {
 
 			// keep selected tour id's
-			fSelectedTourIds.clear();
-			fSelectedTourIds.addAll(tourIds.keySet());
+			_selectedTourIds.clear();
+			_selectedTourIds.addAll(tourIds.keySet());
 
 			final ISelection selection = tourIds.size() == 1
-					? new SelectionTourId(fSelectedTourIds.get(0))
-					: new SelectionTourIds(fSelectedTourIds);
+					? new SelectionTourId(_selectedTourIds.get(0))
+					: new SelectionTourIds(_selectedTourIds);
 
-			fPostSelectionProvider.setSelection(selection);
+			_postSelectionProvider.setSelection(selection);
 		}
 
 		enableActions();
@@ -1614,47 +1614,47 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+		_isRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+		_isDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		fViewerContainer.setRedraw(false);
+		_viewerContainer.setRedraw(false);
 		{
-			final Object[] expandedElements = fTourViewer.getExpandedElements();
-			final ISelection selection = fTourViewer.getSelection();
+			final Object[] expandedElements = _tourViewer.getExpandedElements();
+			final ISelection selection = _tourViewer.getSelection();
 
-			fTourViewer.getTree().dispose();
+			_tourViewer.getTree().dispose();
 
-			createTourViewer(fViewerContainer);
-			fViewerContainer.layout();
+			createTourViewer(_viewerContainer);
+			_viewerContainer.layout();
 
-			fTourViewer.setInput(fRootItem = new TVITourBookRoot(this));
+			_tourViewer.setInput(_rootItem = new TVITourBookRoot(this));
 
-			fTourViewer.setExpandedElements(expandedElements);
-			fTourViewer.setSelection(selection);
+			_tourViewer.setExpandedElements(expandedElements);
+			_tourViewer.setSelection(selection);
 		}
-		fViewerContainer.setRedraw(true);
+		_viewerContainer.setRedraw(true);
 
-		return fTourViewer;
+		return _tourViewer;
 	}
 
 	public void reloadViewer() {
 
-		final Tree tree = fTourViewer.getTree();
+		final Tree tree = _tourViewer.getTree();
 		tree.setRedraw(false);
 		{
-			final Object[] expandedElements = fTourViewer.getExpandedElements();
-			final ISelection selection = fTourViewer.getSelection();
+			final Object[] expandedElements = _tourViewer.getExpandedElements();
+			final ISelection selection = _tourViewer.getSelection();
 
-			fTourViewer.setInput(fRootItem = new TVITourBookRoot(this));
+			_tourViewer.setInput(_rootItem = new TVITourBookRoot(this));
 
-			fTourViewer.setExpandedElements(expandedElements);
-			fTourViewer.setSelection(selection, true);
+			_tourViewer.setExpandedElements(expandedElements);
+			_tourViewer.setSelection(selection, true);
 		}
 		tree.setRedraw(true);
 	}
@@ -1669,11 +1669,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * get the year/month/tour item in the data model
 		 */
-		final ArrayList<TreeViewerItem> yearItems = fRootItem.getChildren();
+		final ArrayList<TreeViewerItem> yearItems = _rootItem.getChildren();
 		for (final TreeViewerItem yearItem : yearItems) {
 
 			final TVITourBookYear tourBookYear = ((TVITourBookYear) yearItem);
-			if (tourBookYear.fTourYear == fSelectedYear) {
+			if (tourBookYear.fTourYear == _selectedYear) {
 
 				reselectYearItem = yearItem;
 
@@ -1681,7 +1681,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				for (final Object monthItem : monthItems) {
 
 					final TVITourBookMonth tourBookMonth = ((TVITourBookMonth) monthItem);
-					if (tourBookMonth.fTourMonth == fSelectedMonth) {
+					if (tourBookMonth.fTourMonth == _selectedMonth) {
 
 						reselectMonthItem = tourBookMonth;
 
@@ -1691,7 +1691,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 							final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
 							final long treeTourId = tourBookTour.fTourId;
 
-							for (final Long tourId : fSelectedTourIds) {
+							for (final Long tourId : _selectedTourIds) {
 								if (treeTourId == tourId) {
 									reselectTourItems.add(tourBookTour);
 									break;
@@ -1708,15 +1708,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		// select year/month/tour in the viewer
 		if (reselectTourItems.size() > 0) {
 
-			fTourViewer.setSelection(new StructuredSelection(reselectTourItems) {}, false);
+			_tourViewer.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
 		} else if (reselectMonthItem != null) {
 
-			fTourViewer.setSelection(new StructuredSelection(reselectMonthItem) {}, false);
+			_tourViewer.setSelection(new StructuredSelection(reselectMonthItem) {}, false);
 
 		} else if (reselectYearItem != null) {
 
-			fTourViewer.setSelection(new StructuredSelection(reselectYearItem) {}, false);
+			_tourViewer.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
 		} else if (yearItems.size() > 0) {
 
@@ -1724,11 +1724,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			final TreeViewerItem yearItem = yearItems.get(yearItems.size() - 1);
 
-			fTourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
+			_tourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
 		}
 
 		// move the horizontal scrollbar to the left border
-		final ScrollBar horizontalBar = fTourViewer.getTree().getHorizontalBar();
+		final ScrollBar horizontalBar = _tourViewer.getTree().getHorizontalBar();
 		if (horizontalBar != null) {
 			horizontalBar.setSelection(0);
 		}
@@ -1738,55 +1738,55 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// set tour viewer reselection data
 		try {
-			fSelectedYear = fState.getInt(STATE_SELECTED_YEAR);
+			_selectedYear = _state.getInt(STATE_SELECTED_YEAR);
 		} catch (final NumberFormatException e) {
-			fSelectedYear = -1;
+			_selectedYear = -1;
 		}
 
 		try {
-			fSelectedMonth = fState.getInt(STATE_SELECTED_MONTH);
+			_selectedMonth = _state.getInt(STATE_SELECTED_MONTH);
 		} catch (final NumberFormatException e) {
-			fSelectedMonth = -1;
+			_selectedMonth = -1;
 		}
 
-		final String[] selectedTourIds = fState.getArray(STATE_SELECTED_TOURS);
-		fSelectedTourIds.clear();
+		final String[] selectedTourIds = _state.getArray(STATE_SELECTED_TOURS);
+		_selectedTourIds.clear();
 
 		if (selectedTourIds != null) {
 			for (final String tourId : selectedTourIds) {
 				try {
-					fSelectedTourIds.add(Long.parseLong(tourId));
+					_selectedTourIds.add(Long.parseLong(tourId));
 				} catch (final NumberFormatException e) {
 					// ignore
 				}
 			}
 		}
 
-		fActionSelectAllTours.setChecked(fState.getBoolean(STATE_SELECT_YEAR_MONTH_TOURS));
+		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_SELECT_YEAR_MONTH_TOURS));
 
 	}
 
 	private void saveState() {
 
 		// save selection in the tour viewer
-		fState.put(STATE_SELECTED_YEAR, fSelectedYear);
-		fState.put(STATE_SELECTED_MONTH, fSelectedMonth);
+		_state.put(STATE_SELECTED_YEAR, _selectedYear);
+		_state.put(STATE_SELECTED_MONTH, _selectedMonth);
 
 		// convert tour id's into string
 		final ArrayList<String> selectedTourIds = new ArrayList<String>();
-		for (final Long tourId : fSelectedTourIds) {
+		for (final Long tourId : _selectedTourIds) {
 			selectedTourIds.add(tourId.toString());
 		}
-		fState.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
+		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
 		// action: select tours for year/month
-		fState.put(STATE_SELECT_YEAR_MONTH_TOURS, fActionSelectAllTours.isChecked());
+		_state.put(STATE_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
 
-		fColumnManager.saveState(fState);
+		_columnManager.saveState(_state);
 	}
 
 	public void setActiveYear(final int activeYear) {
-		fSelectedYear = activeYear;
+		_selectedYear = activeYear;
 	}
 
 	private void setCellColor(final ViewerCell cell, final Object element) {
@@ -1802,7 +1802,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	@Override
 	public void setFocus() {
-		fTourViewer.getControl().setFocus();
+		_tourViewer.getControl().setFocus();
 	}
 
 }

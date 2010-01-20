@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -87,63 +87,65 @@ public class UI {
 //	long endTime = System.currentTimeMillis();
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
-	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
-	public static final String						SPACE							= " ";											//$NON-NLS-1$
-	public static final String						COLON_SPACE						= ": ";										//$NON-NLS-1$
-	public static final String						UNDERSCORE						= "_";											//$NON-NLS-1$
-	public static final String						DASH							= "-";											//$NON-NLS-1$
-	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
-	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";									//$NON-NLS-1$
-	public static final String						SLASH_WITH_SPACE				= " / ";										//$NON-NLS-1$
-	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
-	public static final char						TAB								= '\t';										//$NON-NLS-1$
-	public static final char						DOT								= '.';											//$NON-NLS-1$
+	public static final String						EMPTY_STRING					= "";										//$NON-NLS-1$
+	public static final String						SPACE							= " ";										//$NON-NLS-1$
+	public static final String						COLON_SPACE						= ": ";									//$NON-NLS-1$
+	public static final String						UNDERSCORE						= "_";										//$NON-NLS-1$
+	public static final String						DASH							= "-";										//$NON-NLS-1$
+	public static final String						DASH_WITH_SPACE					= " - ";									//$NON-NLS-1$
+	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";								//$NON-NLS-1$
+	public static final String						SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
+	public static final String						EMPTY_STRING_FORMAT				= "%s";									//$NON-NLS-1$
+	public static final char						TAB								= '\t';									//$NON-NLS-1$
+	public static final char						DOT								= '.';										//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
 	 */
-	public static final String						NEW_LINE						= "\n";										//$NON-NLS-1$
-	public static final String						NEW_LINE2						= "\n\n";										//$NON-NLS-1$
+	public static final String						NEW_LINE						= "\n";									//$NON-NLS-1$
+	public static final String						NEW_LINE2						= "\n\n";									//$NON-NLS-1$
 
-	public static final String						SYSTEM_NEW_LINE					= System.getProperty("line.separator");		//$NON-NLS-1$
+	public static final String						SYSTEM_NEW_LINE					= System
+																							.getProperty("line.separator");	//$NON-NLS-1$
 
-	public static final String						IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
+	public static final String						IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";					//$NON-NLS-1$
 
-	public static final String						VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
-	public static final String						VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
-	public static final String						VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
-	public static final String						VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
-	public static final String						VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
-	public static final String						VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
-	public static final String						VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
+	public static final String						VIEW_COLOR_CATEGORY				= "view.color.category";					//$NON-NLS-1$
+	public static final String						VIEW_COLOR_TITLE				= "view.color.title";						//$NON-NLS-1$
+	public static final String						VIEW_COLOR_SUB					= "view.color.sub";						//$NON-NLS-1$
+	public static final String						VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";					//$NON-NLS-1$
+	public static final String						VIEW_COLOR_TOUR					= "view.color.tour";						//$NON-NLS-1$
+	public static final String						VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";				//$NON-NLS-1$
+	public static final String						VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";			//$NON-NLS-1$
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
-	public static final String						UTF_8							= "UTF-8";										//$NON-NLS-1$
+	public static final String						UTF_8							= "UTF-8";									//$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
 	 */
-	private static final String						UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
-	public static final String						UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
-	private static final String						UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
-	private static final String						UNIT_FAHRENHEIT_C				= "\u00B0C";									//$NON-NLS-1$
-	private static final String						UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
-	private static final String						UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
+	private static final String						UNIT_ALTITUDE_M					= "m";										//$NON-NLS-1$
+	public static final String						UNIT_DISTANCE_KM				= "km";									//$NON-NLS-1$
+	private static final String						UNIT_SPEED_KM_H					= "km/h";									//$NON-NLS-1$
+	private static final String						UNIT_FAHRENHEIT_C				= "\u00B0C";								//$NON-NLS-1$
+	private static final String						UNIT_ALTIMETER_M_H				= "m/h";									//$NON-NLS-1$
+	private static final String						UNIT_PACE_MIN_P_KM				= "min/km";								//$NON-NLS-1$
 
-	private static final String						UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
-	public static final String						UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
-	private static final String						UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
-	private static final String						UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
-	private static final String						UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
-	private static final String						UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
+	private static final String						UNIT_ALTITUDE_FT				= "ft";									//$NON-NLS-1$
+	public static final String						UNIT_DISTANCE_MI				= "mi";									//$NON-NLS-1$
+	private static final String						UNIT_SPEED_MPH					= "mph";									//$NON-NLS-1$
+	private static final String						UNIT_FAHRENHEIT_F				= "\u00B0F";								//$NON-NLS-1$
+	private static final String						UNIT_ALTIMETER_FT_H				= "ft/h";									//$NON-NLS-1$
+	private static final String						UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
 
-	public static final String						SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
-	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
-	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
-	public static final String						SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
-	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
-	public static final String						SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE					= "\u00D8";								//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";								//$NON-NLS-1$
+	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
+	public static final String						SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
+	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
+	public static final String						SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
+	public static final String						SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
 
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
@@ -170,7 +172,7 @@ public class UI {
 	public static final float						UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float						UNIT_FAHRENHEIT_ADD				= 32;
 
-	public static final String						UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
+	public static final String						UNIT_LABEL_TIME					= "h";										//$NON-NLS-1$
 
 	/**
 	 * contains the unit label in the currenty measurement system for the distance values
@@ -181,25 +183,43 @@ public class UI {
 	public static String							UNIT_LABEL_TEMPERATURE;
 	public static String							UNIT_LABEL_SPEED;
 	public static String							UNIT_LABEL_PACE;
+	public static String							UNIT_LABEL_DIRECTION			= "\u00B0";								//$NON-NLS-1$
 
-	private static final String						TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
+	private static final String						TOUR_TYPE_PREFIX				= "tourType";								//$NON-NLS-1$
+//	private static final String						WEATHER_CLOUDS_PREFIX			= "weatherClouds-";						//$NON-NLS-1$
 
 	public final static ImageRegistry				IMAGE_REGISTRY;
 
-	public static final String						IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
-	public static final String						IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
+	/*
+	 * image keys for images which are stored in the image registry
+	 */
+	public static final String						IMAGE_EMPTY_16					= "_empty16";								//$NON-NLS-1$
+
+	public static final String						IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";						//$NON-NLS-1$
+	public static final String						IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";				//$NON-NLS-1$
+
+	public static final String						IMAGE_WEATHER_SUNNY				= "weather-sunny";							//$NON-NLS-1$
+	public static final String						IMAGE_WEATHER_CLOUDY			= "weather-cloudy";						//$NON-NLS-1$
+	public static final String						IMAGE_WEATHER_CLOUDS			= "weather-clouds";						//$NON-NLS-1$
+	public static final String						IMAGE_WEATHER_LIGHTNING			= "weather-lightning";						//$NON-NLS-1$
+	public static final String						IMAGE_WEATHER_RAIN				= "weather-rain";							//$NON-NLS-1$
+	public static final String						IMAGE_WEATHER_SNOW				= "weather-snow";							//$NON-NLS-1$
 
 	private static final int						TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int						TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
 	private static UI								instance;
 
-	public static final DateFormat					TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
-	public static final DateFormat					DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
-	public static final DateFormat					DateFormatterLong				= DateFormat.getDateInstance(DateFormat.LONG);
-	public static final DateFormat					DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
-	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");					//$NON-NLS-1$
-	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");				//$NON-NLS-1$
+	public static final DateFormat					TimeFormatterShort				= DateFormat
+																							.getTimeInstance(DateFormat.SHORT);
+	public static final DateFormat					DateFormatterShort				= DateFormat
+																							.getDateInstance(DateFormat.SHORT);
+	public static final DateFormat					DateFormatterLong				= DateFormat
+																							.getDateInstance(DateFormat.LONG);
+	public static final DateFormat					DateFormatterFull				= DateFormat
+																							.getDateInstance(DateFormat.FULL);
+	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");				//$NON-NLS-1$
+	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");			//$NON-NLS-1$
 
 	private static DateFormat						fDateFormatterShort;
 	private static DateFormat						fTimeFormatterShort;
@@ -211,8 +231,8 @@ public class UI {
 	public static Styler							TAG_CATEGORY_STYLER;
 	public static Styler							TAG_SUB_STYLER;
 
-	private final static HashMap<String, Image>		fImageCache						= new HashMap<String, Image>();
-	private final static HashMap<String, Boolean>	fDirtyImages					= new HashMap<String, Boolean>();
+	private final static HashMap<String, Image>		_imageCache						= new HashMap<String, Image>();
+	private final static HashMap<String, Boolean>	_dirtyImages					= new HashMap<String, Boolean>();
 
 	static {
 
@@ -224,12 +244,20 @@ public class UI {
 		 */
 		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
-		IMAGE_REGISTRY.put(
-				IMAGE_TOUR_TYPE_FILTER,
-				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-		IMAGE_REGISTRY.put(
-				IMAGE_TOUR_TYPE_FILTER_SYSTEM,
-				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, TourbookPlugin.getImageDescriptor(Messages.Image___Empty16));
+
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin
+				.getImageDescriptor(Messages.Image__undo_tour_type_filter));
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin
+				.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_SUNNY, TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDY, TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDS, TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_LIGHTNING, TourbookPlugin
+				.getImageDescriptor(Messages.Image__weather_lightning));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_RAIN, TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_SNOW, TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
 
 		/*
 		 * set styler
@@ -304,7 +332,7 @@ public class UI {
 		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
 
 			final StringBuilder sb = new StringBuilder()//
-			.append("ERROR: ") //$NON-NLS-1$
+					.append("ERROR: ") //$NON-NLS-1$
 					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("You can solve the problem by:") //$NON-NLS-1$
@@ -347,7 +375,8 @@ public class UI {
 	public static boolean confirmOverwrite(final File file) {
 
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		final MessageDialog dialog = new MessageDialog(shell,
+		final MessageDialog dialog = new MessageDialog(
+				shell,
 				Messages.app_dlg_confirmFileOverwrite_title,
 				null,
 				NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
@@ -378,7 +407,8 @@ public class UI {
 				public void run() {
 
 					final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-					final MessageDialog dialog = new MessageDialog(shell,
+					final MessageDialog dialog = new MessageDialog(
+							shell,
 							Messages.app_dlg_confirmFileOverwrite_title,
 							null,
 							NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
@@ -739,7 +769,7 @@ public class UI {
 	private static String getSQLExceptionText(final SQLException e) {
 
 		final StringBuilder sb = new StringBuilder()//
-		.append("SQLException") //$NON-NLS-1$
+				.append("SQLException") //$NON-NLS-1$
 				.append(UI.NEW_LINE2)
 				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
 				.append(UI.NEW_LINE)
@@ -1171,7 +1201,7 @@ public class UI {
 		final Image transparentImage = new Image(display, imageData);
 
 		// keep image in cache
-		fImageCache.put(colorId, transparentImage);
+		_imageCache.put(colorId, transparentImage);
 
 		return transparentImage;
 	}
@@ -1186,10 +1216,10 @@ public class UI {
 	private void disposeImages() {
 
 //		System.out.println("disposeImages:\t");
-		for (final Image image : fImageCache.values()) {
+		for (final Image image : _imageCache.values()) {
 			image.dispose();
 		}
-		fImageCache.clear();
+		_imageCache.clear();
 	}
 
 	private void drawTourTypeImage(final long typeId, final GC gcImage) {
@@ -1263,13 +1293,13 @@ public class UI {
 	public Image getTourTypeImage(final long typeId) {
 
 		final String keyColorId = TOUR_TYPE_PREFIX + typeId;
-		final Image existingImage = fImageCache.get(keyColorId);
+		final Image existingImage = _imageCache.get(keyColorId);
 
 		// check if image is available
 		if (existingImage != null && existingImage.isDisposed() == false) {
 
 			// check if the image is dirty
-			if (fDirtyImages.size() == 0 || fDirtyImages.containsKey(keyColorId) == false) {
+			if (_dirtyImages.size() == 0 || _dirtyImages.containsKey(keyColorId) == false) {
 
 				// image is available and not dirty
 				return existingImage;
@@ -1308,12 +1338,12 @@ public class UI {
 	 */
 	public void setTourTypeImagesDirty() {
 
-		for (final Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
+		for (final Iterator<String> iterator = _imageCache.keySet().iterator(); iterator.hasNext();) {
 
 			final String imageId = iterator.next();
 
 			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
-				fDirtyImages.put(imageId, true);
+				_dirtyImages.put(imageId, true);
 			}
 		}
 	}
@@ -1354,7 +1384,7 @@ public class UI {
 		gc.dispose();
 		transparentImage.dispose();
 
-		fDirtyImages.remove(keyColorId);
+		_dirtyImages.remove(keyColorId);
 
 		return existingImage;
 	}
