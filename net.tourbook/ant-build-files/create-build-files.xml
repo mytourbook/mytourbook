@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-build-files" default="create-build-files" basedir="..">
+
+	<!--
+		copies all files from net.tourbook.* and de.byteholder.* into the build folders
+	-->
+
+	<property name="mt-trunk" value=".." />
+	
+	<property name="mt-build" value="../../mytourbook-BUILD" />
+	
+	<property name="build-core" value="${mt-build}/core" />
+	<property name="build-language" value="${mt-build}/language" />
+
+	<!--
+		DEFAULT target
+	-->
+	<target name="create-build-files">
+
+		<!-- copy core files -->
+		<antcall target="copy-core-files" />
+
+
+		<!-- copy language files: DE -->
+		<antcall target="copy-language-files">
+			<param name="language" value="de" />
+		</antcall>
+
+
+	</target>
+
+	<target name="copy-core-files">
+
+		<echo message="copy core files to ${build-core}" />
+		
+		<copy todir="${build-core}" preservelastmodified="true">
+			
+			<fileset dir="${mt-trunk}">
+				
+			    <depend targetdir="**/"/>
+				
+				<include name="**/" />
+				<exclude name="**/plugin_*.properties" />
+				<exclude name="**/feature_*.properties" />
+				<exclude name="**/messages_*.properties" />
+				<exclude name="**/bin/**" />
+				
+			</fileset>
+			
+		</copy>
+
+	</target>
+	
+	<target name="copy-language-files">
+
+		<echo message="copy language files ${language} to ${build-language}" />
+		
+		<copy todir="${build-language}/${language}" preservelastmodified="true">
+			
+			<fileset dir="${mt-trunk}">
+				
+			    <depend targetdir="**/"/>
+				
+				<include name="**/plugin_${language}.properties" />
+				<include name="**/feature_${language}.properties" />
+				<include name="**/messages_${language}.properties" />
+
+				<exclude name="**/bin/**" />
+				
+			</fileset>
+			
+		</copy>
+
+	</target>
+
+</project>

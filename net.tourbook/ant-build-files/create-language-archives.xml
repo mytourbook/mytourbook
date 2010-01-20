@@ -15,7 +15,7 @@
 	<property name="temp-dir" value="${mt-trunk}/../ant-temp" />
 	<property name="empty-files-dir" value="${temp-dir}/empty-files" />
 	<property name="language-files-dir" value="${temp-dir}/language-files" />
-
+ 
 	<!--
 		DEFAULT target
 	-->
