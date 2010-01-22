@@ -31,6 +31,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -51,7 +53,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
-
+ 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.StatusUtil;
@@ -968,6 +970,15 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			_txtExampleUrl = new Text(container, SWT.BORDER);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtExampleUrl);
 			_txtExampleUrl.setToolTipText(Messages.Dialog_MapConfig_Label_ExampleUrl_Tooltip);
+			_txtExampleUrl.addFocusListener(new FocusListener() {
+				public void focusGained(final FocusEvent e) {
+					if (e.widget instanceof Text) {
+						((Text) e.widget).selectAll();
+					}
+				}
+
+				public void focusLost(final FocusEvent e) {}
+			});
 
 			// ############################################################
 
@@ -1041,7 +1052,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		// set factory and display map
 		_map.setMapProviderWithReset(mp, true);
- 
+
 		// set position to previous position
 		_map.setZoom(_mpCustom.getLastUsedZoom());
 		_map.setGeoCenterPosition(_mpCustom.getLastUsedPosition());
