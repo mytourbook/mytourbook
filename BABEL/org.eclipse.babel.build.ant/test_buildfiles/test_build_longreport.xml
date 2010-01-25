@@ -1,0 +1,22 @@
+<project name="test" default="main">
+	<taskdef name="nlsbuild" classname="org.eclipse.babel.build.ant.BuildTask" />
+
+	<target name="main">
+		<nlsbuild
+			eclipse="/work/nls/testing/eclipse-SDK-3.4M5-win32.zip"
+			translations="/Users/aaron/Desktop/nls/IES_3.3/piiDocTransDir"
+			workingDirectory="/work/nls/w"
+			locales="fr,ar"
+			longReport="true"
+			includeXmlReport="true">
+			
+			<coverageReport>
+				<ignore pattern="^META-INF.*" />
+			</coverageReport>
+			
+			<excludes>
+				<exclude filetype=".java" />
+			</excludes>
+		</nlsbuild>
+	</target>
+</project>
