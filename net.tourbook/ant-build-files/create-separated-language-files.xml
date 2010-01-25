@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-build-files" default="create-build-files" basedir="..">
+
+	<taskdef name="nlsbuild" classname="org.eclipse.babel.build.ant.BuildTask" />
+
+	<!--
+		copies all files from net.tourbook.* and de.byteholder.* into the build folders
+	-->
+
+	<property name="path-mt-trunk" value=".." />
+
+	<property name="path-mt-build" value="../../mytourbook-BUILD" />
+
+	<property name="path-build-core" value="${path-mt-build}/core" />
+	<property name="path-build-language" value="${path-mt-build}/translations" />
+
+	<!--
+		DEFAULT target
+	-->
+	<target name="create-build-files">
+
+		<!-- copy core files 
+		<antcall target="copy-core-files" />
+		-->
+
+		<!-- copy language files: EN 
+		-->
+		<antcall target="copy-en-files" />
+
+		<!-- copy language files: DE -->
+		<antcall target="copy-language-files">
+			<param name="language" value="de" />
+		</antcall>
+
+		<!-- copy language files: FR -->
+		<antcall target="copy-language-files">
+			<param name="language" value="fr" />
+		</antcall>
+
+		<!-- copy language files: NL -->
+		<antcall target="copy-language-files">
+			<param name="language" value="nl" />
+		</antcall>
+
+
+	</target>
+
+	<target name="copy-core-files">
+
+		<echo message="copy core files to ${path-build-core}" />
+
+		<copy todir="${path-build-core}" preservelastmodified="true">
+
+			<fileset dir="${path-mt-trunk}">
+
+				<depend targetdir="**/" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+				<include name="**/" />
+				<exclude name="**/plugin_*.properties" />
+				<exclude name="**/feature_*.properties" />
+				<exclude name="**/messages_*.properties" />
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+			</fileset>
+
+		</copy>
+
+	</target>
+
+	<target name="copy-language-files">
+
+		<echo message="copy language files ${language} to ${path-build-language}" />
+
+		<copy todir="${path-build-language}/${language}" preservelastmodified="true">
+
+			<fileset dir="${path-mt-trunk}">
+
+				<depend targetdir="**/" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+				<include name="**/plugin_${language}.properties" />
+				<include name="**/feature_${language}.properties" />
+				<include name="**/messages_${language}.properties" />
+
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+			</fileset>
+ 
+			<!--
+				remove locale from the property file and the src folder,
+				this is the way how the babel tool works 
+			-->
+			<mapper>
+
+				<regexpmapper from="^([^\\]*)(\\.*plugin)_\w\w(\.properties)$$" to="eclipse\\plugins\\\1\2\3" />
+				<regexpmapper from="^([^\\]*)(\\.*feature)_\w\w(\.properties)$$" to="eclipse\\features\\\1\2\3" />
+
+				<regexpmapper from="^([^\\]*)\\src(\\.*messages)_\w\w(\.properties)$$" to="eclipse\\plugins\\\1\2\3" />
+
+			</mapper>
+
+		</copy>
+
+
+		<!-- 
+			<nlsbuild eclipse="/tmp/eclipse.zip" translations="/tmp/translations" locales="de,fr,nl" />
+		
+				<nlsbuild
+					eclipse="/work/nls/testing/eclipse-SDK-3.4M5-win32.zip"
+					translations="/work/nls/piiDocTransDir/gr1"
+					workingDirectory="/work/nls/w" >
+
+		<nlsbuild eclipse="${path-build-language}" translations="${path-build-language}" locales="${language}" />
+		-->
+
+			<!-- 
+			eclipse="M:\mytourbook-BUILD\translations\en"
+			-->
+		<nlsbuild
+
+			eclipse="${path-build-language}/en"
+
+			translations="M:\mytourbook-BUILD\translations\"
+			workingDirectory="M:\mytourbook-BUILD\working"
+			locales="de,fr,nl"
+
+			longReport="true"
+			includeXmlReport="true">
+			
+			<coverageReport>
+				<ignore pattern="^META-INF.*" />
+			</coverageReport>
+			
+			<excludes>
+				<exclude filetype=".java" />
+			</excludes>
+		</nlsbuild>
+
+	</target>
+
+	<target name="copy-en-files">
+
+		<echo message="copy language en files to en" />
+
+		<copy todir="${path-build-language}/en" preservelastmodified="true">
+
+			<fileset dir="${path-mt-trunk}">
+
+				<depend targetdir="**/" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+				<include name="**/plugin.properties" />
+				<include name="**/feature.properties" />
+				<include name="**/messages.properties" />
+
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+			</fileset>
+
+			<!--
+				remove locale from the property file and the src folder,
+				this is the way how the babel tool works 
+			-->
+			<mapper>
+
+				<regexpmapper from="^([^\\]*)(\\.*plugin\.properties)$$" to="eclipse\\plugins\\\1\2" />
+				<regexpmapper from="^([^\\]*)(\\.*feature\.properties)$$" to="eclipse\\features\\\1\2" />
+
+				<regexpmapper from="^([^\\]*)\\src(\\.*\\messages\.properties)$$" to="eclipse\\plugins\\\1\2" />
+
+			</mapper>
+		</copy>
+	</target>
+
+
+
+</project>
