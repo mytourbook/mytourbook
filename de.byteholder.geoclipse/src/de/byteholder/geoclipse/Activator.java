@@ -21,6 +21,7 @@ package de.byteholder.geoclipse;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.framework.internal.core.AbstractBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
@@ -34,12 +35,20 @@ import org.osgi.framework.Version;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String	PLUGIN_ID	= "de.byteholder.geoclipse";	//$NON-NLS-1$
+	public static final String	PLUGIN_ID		= "de.byteholder.geoclipse";	//$NON-NLS-1$
 
 	// The shared instance
 	private static Activator	plugin;
 
 	private Version				fVersion;
+
+	public static final String	IMG_KEY_ANCHOR	= "anchor";					//$NON-NLS-1$
+	public static final String	IMG_KEY_CAR		= "car";						//$NON-NLS-1$
+	public static final String	IMG_KEY_CART	= "cart";						//$NON-NLS-1$
+	public static final String	IMG_KEY_FLAG	= "flag";						//$NON-NLS-1$
+	public static final String	IMG_KEY_HOUSE	= "house";						//$NON-NLS-1$
+	public static final String	IMG_KEY_SOCCER	= "soccer";					//$NON-NLS-1$
+	public static final String	IMG_KEY_STAR	= "star";						//$NON-NLS-1$
 
 	/**
 	 * Returns the shared instance
@@ -98,6 +107,16 @@ public class Activator extends AbstractUIPlugin {
 			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
 			fVersion = abstractBundle.getVersion();
 		}
+
+		final ImageRegistry imageRegistry = getImageRegistry();
+
+		imageRegistry.put(IMG_KEY_ANCHOR, getImageDescriptor(Messages.Image_POI_Anchor));
+		imageRegistry.put(IMG_KEY_CAR, getImageDescriptor(Messages.Image_POI_Car));
+		imageRegistry.put(IMG_KEY_CART, getImageDescriptor(Messages.Image_POI_Cart));
+		imageRegistry.put(IMG_KEY_FLAG, getImageDescriptor(Messages.Image_POI_Flag));
+		imageRegistry.put(IMG_KEY_HOUSE, getImageDescriptor(Messages.Image_POI_House));
+		imageRegistry.put(IMG_KEY_SOCCER, getImageDescriptor(Messages.Image_POI_Soccer));
+		imageRegistry.put(IMG_KEY_STAR, getImageDescriptor(Messages.Image_POI_Star));
 
 		super.start(context);
 	}

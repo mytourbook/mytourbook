@@ -12,7 +12,6 @@ Eclipse-RegisterBuddy: de.byteholder.geoclipse.ext.geotools
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- de.byteholder.gpx,
  de.byteholder.geoclipse.ext.geotools,
  org.eclipse.ui.forms;bundle-version="3.4.1"
 Export-Package: de.byteholder.geoclipse,
@@ -21,6 +20,7 @@ Export-Package: de.byteholder.geoclipse,
  de.byteholder.geoclipse.mapprovider,
  de.byteholder.geoclipse.preferences,
  de.byteholder.geoclipse.tileinfo,
- de.byteholder.geoclipse.util
+ de.byteholder.geoclipse.util,
+ de.byteholder.gpx
 Import-Package: org.eclipse.core.expressions,
  org.joda.time.format

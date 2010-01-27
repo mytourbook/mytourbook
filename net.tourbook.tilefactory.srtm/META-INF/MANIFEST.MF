@@ -6,7 +6,6 @@ Bundle-Version: 9.08.0.v2009-08-17
 Bundle-Vendor: %PLUGIN_PROVIDER
 Bundle-Localization: plugin
 Require-Bundle: de.byteholder.geoclipse,
- de.byteholder.gpx,
  org.eclipse.core.runtime,
  org.eclipse.swt,
  net.tourbook,

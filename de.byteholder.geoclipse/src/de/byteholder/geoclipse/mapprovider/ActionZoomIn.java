@@ -33,8 +33,8 @@ public class ActionZoomIn extends Action {
 
 		setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.App_Image_ZoomIn));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.App_Image_ZoomIn_Disabled));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ZoomIn));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ZoomIn_Disabled));
 	}
 
 	@Override

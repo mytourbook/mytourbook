@@ -33,8 +33,8 @@ public class ActionZoomOutToMinZoom extends Action {
 
 		setToolTipText(Messages.Map_Action_ZoomOutToMinZoom_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.App_Image_ZoomOutToMinZoom));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.App_Image_ZoomOutToMinZoom_Disabled));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ZoomOutToMinZoom));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_Action_ZoomOutToMinZoom_Disabled));
 	}
 
 	@Override

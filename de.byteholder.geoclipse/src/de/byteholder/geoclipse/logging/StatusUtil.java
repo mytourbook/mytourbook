@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.byteholder.gpx.Activator;
+import de.byteholder.geoclipse.Activator;
 
 /*
  * this class is copied from org.eclipse.ui.internal.misc.StatusUtil and modified

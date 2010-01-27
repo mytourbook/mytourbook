@@ -9,10 +9,6 @@ public class Messages extends NLS {
 	public static String		geoclipse_extensions_loading;
 	public static String		geoclipse_extensions_loading_failed;
 
-	public static String		Image_Action_SetFavoritePosition;
-	public static String		Image_Action_ShowFavoritePosition;
-	public static String		Image_Action_ZoomShowEntireLayer;
-
 	public static String		Map_Action_SetFavoritePosition_Tooltip;
 	public static String		Map_Action_ShowFavoritePosition_Tooltip;
 	public static String		Map_Action_ZoomShowEntireLayer_Tooltip;
@@ -23,15 +19,6 @@ public class Messages extends NLS {
 	public static String		App_Dlg_ConfirmFileOverwrite_Title;
 
 	public static String		App_Error_TooManyWords;
-
-	public static String		App_Image_Down;
-	public static String		App_Image_Up;
-	public static String		App_Image_ZoomIn;
-	public static String		App_Image_ZoomIn_Disabled;
-	public static String		App_Image_ZoomOut;
-	public static String		App_Image_ZoomOut_Disabled;
-	public static String		App_Image_ZoomOutToMinZoom;
-	public static String		App_Image_ZoomOutToMinZoom_Disabled;
 
 	public static String		Dialog_CustomConfig_Button_UpdateMap;
 	public static String		Dialog_CustomConfig_Button_UpdateMap_Tooltip;
@@ -92,8 +79,6 @@ public class Messages extends NLS {
 	public static String		Dialog_MapProfile_Scale_Brightness_Tooltip;
 
 	public static String		Dialog_WmsConfig_Button_GetTransparentMap;
-	public static String		Dialog_WmsConfig_Button_NextMapProvider_tooltip;
-	public static String		Dialog_WmsConfig_Button_PreviousMapProvider_tooltip;
 	public static String		Dialog_WmsConfig_Button_UpdateMap;
 	public static String		Dialog_WmsConfig_Button_UpdateMap_Tooltip;
 	public static String		Dialog_WmsConfig_Column_Bbox;
@@ -106,8 +91,26 @@ public class Messages extends NLS {
 	public static String		Dialog_WmsConfig_Label_ImageSize;
 	public static String		Dialog_WmsConfig_Label_Layers;
 
-	public static String		Image__Placeholder16;
-	public static String		Image__Visibility;
+	public static String		Image_Action_SetFavoritePosition;
+	public static String		Image_Action_ShowFavoritePosition;
+	public static String		Image_Action_ZoomIn;
+	public static String		Image_Action_ZoomIn_Disabled;
+	public static String		Image_Action_ZoomOut;
+	public static String		Image_Action_ZoomOut_Disabled;
+	public static String		Image_Action_ZoomOutToMinZoom;
+	public static String		Image_Action_ZoomOutToMinZoom_Disabled;
+	public static String		Image_Action_ZoomShowEntireLayer;
+
+	public static String		Image_POI_Anchor;
+	public static String		Image_POI_Car;
+	public static String		Image_POI_Cart;
+	public static String		Image_POI_Flag;
+	public static String		Image_POI_House;
+	public static String		Image_POI_Soccer;
+	public static String		Image_POI_Star;
+
+	public static String		Image_ViewIcon_Map;
+	public static String		Image_ViewIcon_Placeholder16;
 
 	public static String		Import_Error_Dialog_Title;
 
@@ -164,8 +167,6 @@ public class Messages extends NLS {
 	public static String		DBG042_Error_InvalidUrl;
 	public static String		DBG043_Wms_Server_Error_CannotConnectToServer;
 	public static String		DBG045_Loading_Error_PaintingError;
-	public static String		DBG046_Loading_Error_InvalidPaintingImage;
-	public static String		DBG047_Loading_Error_InvalidPaintingData;
 	public static String		DBG048_Loading_Error_DefaultException;
 	public static String		DBG049_Loading_Error_ImageIsInvalid;
 	public static String		DBG050_Loading_Error_CannotCreateParent;

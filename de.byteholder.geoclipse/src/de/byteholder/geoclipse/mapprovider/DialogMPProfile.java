@@ -452,8 +452,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void createResources() {
 
-		_imageMap = Activator.getImageDescriptor(Messages.Image__Visibility).createImage();
-		_imagePlaceholder = Activator.getImageDescriptor(Messages.Image__Placeholder16).createImage();
+		_imageMap = Activator.getImageDescriptor(Messages.Image_ViewIcon_Map).createImage();
+		_imagePlaceholder = Activator.getImageDescriptor(Messages.Image_ViewIcon_Placeholder16).createImage();
 		_imageLayer = Activator.getImageDescriptor(Messages.Image_Action_ZoomShowEntireLayer).createImage();
 	}
 

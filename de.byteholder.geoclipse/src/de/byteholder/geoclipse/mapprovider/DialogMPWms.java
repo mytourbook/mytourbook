@@ -59,7 +59,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -125,8 +124,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 //	private Button							fBtnPrevMapProvider;
 //	private Button							fBtnNextMapProvider;
-	private Image							_upImage;
-	private Image							_downImage;
 
 	private ToolBar							_toolbar;
 	private Button							_btnShowMap;
@@ -286,9 +283,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		super.configureShell(shell);
 
 		shell.setText(Messages.Dialog_WmsConfig_DialogTitle);
-
-		_downImage = Activator.getImageDescriptor(Messages.App_Image_Up).createImage();
-		_upImage = Activator.getImageDescriptor(Messages.App_Image_Down).createImage();
 
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
@@ -1204,13 +1198,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private void onDispose() {
 
-		// dispose images
-		if (_upImage != null && _upImage.isDisposed() == false) {
-			_upImage.dispose();
-		}
-		if (_downImage != null && _downImage.isDisposed() == false) {
-			_downImage.dispose();
-		}
 		if (_formTk != null) {
 			_formTk.dispose();
 		}
