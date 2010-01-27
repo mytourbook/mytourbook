@@ -89,7 +89,7 @@ import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.GeoPosition;
-import de.byteholder.gpx.ext.PointOfInterest;
+import de.byteholder.gpx.PointOfInterest;
 
 /**
  * @author Wolfgang Schramm

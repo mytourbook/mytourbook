@@ -246,18 +246,23 @@ public class UI {
 
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, TourbookPlugin.getImageDescriptor(Messages.Image___Empty16));
 
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin
-				.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin
-				.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SUNNY, TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDY, TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDS, TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_LIGHTNING, TourbookPlugin
-				.getImageDescriptor(Messages.Image__weather_lightning));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_RAIN, TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SNOW, TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_SUNNY, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDY, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDS, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_LIGHTNING,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_lightning));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_RAIN,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
+		IMAGE_REGISTRY.put(IMAGE_WEATHER_SNOW,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
 
 		/*
 		 * set styler

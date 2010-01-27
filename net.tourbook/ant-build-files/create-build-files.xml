@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-build-files" default="create-build-files" basedir="..">
+
+	<!--
+		copies all files from net.tourbook.* and de.byteholder.* into the build folders
+	-->
+
+	<property name="path-mt-trunk" value=".." />
+	<property name="path-mt-build" value="../../mytourbook-BUILD" />
+
+	<property name="path-build-core" value="${path-mt-build}/core" />
+	<property name="path-build-translations" value="${path-mt-build}/translations" />
+
+	<!--
+		DEFAULT target
+	-->
+	<target name="create-build-files">
+
+		<!-- delete files -->
+		<antcall target="delete-files" />
+
+		<!-- 
+			copy core files 
+		-->
+		<antcall target="copy-core-files" />
+
+		<!-- 
+			copy language files 
+		-->
+		<antcall target="copy-language-files" />
+
+	</target>
+
+	<target name="delete-files">
+
+		<!-- delete all core files in: ${path-build-core} -->
+		<echo message="delete all core files in: ${path-build-core}" />
+
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${path-build-core}" includes="**/*" />
+		</delete>
+
+		<!-- delete all properties files but keep the MANIFEST.MF file -->
+		<echo message="delete all files in  ${path-build-translations} but keep MANIFEST.MF" />
+
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${path-build-translations}">
+				<include name="**/*" />
+				<exclude name="**/MANIFEST.MF" />
+			</fileset>
+		</delete>
+
+	</target>
+
+	<target name="copy-core-files">
+
+		<echo message="copy core files to ${path-build-core}" />
+
+		<copy todir="${path-build-core}" preservelastmodified="true" includeemptydirs="false">
+
+			<fileset dir="${path-mt-trunk}">
+
+				<include name="net.tourbook*/**/*" />
+				<include name="de.byteholder*/**/*" />
+				<include name="feature*/**/*" />
+				<!-- 
+				-->
+
+				<exclude name="**/plugin_*.properties" />
+				<exclude name="**/feature_*.properties" />
+				<exclude name="**/messages_*.properties" />
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+				<!-- select only modified files 
+				<depend targetdir="**/" />
+				-->
+
+				<!-- ignore empty files 
+				-->
+				<size value="0" when="more" />
+
+			</fileset>
+
+		</copy>
+
+	</target>
+
+	<target name="copy-language-files">
+
+		<echo message="copy language files to ${path-build-translations}" />
+
+		<copy todir="${path-build-translations}/" preservelastmodified="true" includeemptydirs="false">
+
+			<fileset dir="${path-mt-trunk}">
+
+				<include name="**/plugin_*.properties" />
+				<include name="**/feature_*.properties" />
+				<include name="**/messages_*.properties" />
+
+				<exclude name="**/bin/**" />
+				<exclude name="**/classes/**" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+			</fileset>
+
+		</copy>
+
+	</target>
+
+
+</project>
