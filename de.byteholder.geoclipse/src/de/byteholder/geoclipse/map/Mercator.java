@@ -19,11 +19,10 @@
 
 package de.byteholder.geoclipse.map;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
-
-import org.eclipse.swt.graphics.Point;
-
+ 
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
@@ -210,9 +209,7 @@ public final class Mercator extends Projection {
 		return new Point((int) x, (int) y);
 	}
 
-	private Point2D.Double geoToPixelDouble(final GeoPosition geoPosition,
-											final int zoomLevel,
- final MP mp) {
+	private Point2D.Double geoToPixelDouble(final GeoPosition geoPosition, final int zoomLevel, final MP mp) {
 
 		final double latitude = geoPosition.latitude;
 		final double longitude = geoPosition.longitude;
@@ -293,12 +290,12 @@ public final class Mercator extends Projection {
 //	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point pixelCoordinate, final int zoom, final MP mp) {
+	public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom, final MP mp) {
 
 		// this reverses geoToPixel
 
-		final double pixelX = pixelCoordinate.x;
-		final double pixelY = pixelCoordinate.y;
+		final double pixelX = pixelCoordinate.getX();
+		final double pixelY = pixelCoordinate.getY();
 
 		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
 
@@ -318,17 +315,14 @@ public final class Mercator extends Projection {
 
 		// this reverses geoToPixel
 
-		
 		final double devX = pixelCoordinate.getX();
 		final double devY = pixelCoordinate.getY();
 		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
-		
+
 //		function y2lat(a) { return 180/Math.PI * (2 * Math.atan(Math.exp(a*Math.PI/180)) - Math.PI/2); }
 
 		final double a = 0;
-		final double lat = 180/Math.PI * (2 * Math.atan(Math.exp(a*Math.PI/180)) - Math.PI/2); 
-
-
+		final double lat = 180 / Math.PI * (2 * Math.atan(Math.exp(a * Math.PI / 180)) - Math.PI / 2);
 
 		final double longitude = (devX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 

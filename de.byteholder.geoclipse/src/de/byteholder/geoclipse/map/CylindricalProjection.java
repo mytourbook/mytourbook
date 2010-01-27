@@ -1,11 +1,10 @@
 package de.byteholder.geoclipse.map;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
-
-import org.eclipse.swt.graphics.Point;
-
+  
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
@@ -72,7 +71,7 @@ public class CylindricalProjection extends Projection {
 	}
 
 	@Override
-	public GeoPosition pixelToGeo(final Point pixel, final int zoom, final MP mp) {
+	public GeoPosition pixelToGeo(final Point2D pixel, final int zoom, final MP mp) {
 
 		final int tileSize = mp.getTileSize();
 
@@ -85,8 +84,8 @@ public class CylindricalProjection extends Projection {
 		final double centerX = tileSize * mapSizeInTiles.getWidth() / 2;
 		final double centerY = tileSize * mapSizeInTiles.getHeight() / 2;
 
-		final double lon = (pixel.x - centerX) / ppd;
-		final double lat = -(pixel.y - centerY) / ppd;
+		final double lon = (pixel.getX() - centerX) / ppd;
+		final double lat = -(pixel.getY() - centerY) / ppd;
 
 		return new GeoPosition(lat, lon);
 	}

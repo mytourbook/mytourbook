@@ -18,8 +18,9 @@
  *******************************************************************************/
 
 package de.byteholder.geoclipse.map;
-
-import org.eclipse.swt.graphics.Point;
+ 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
@@ -58,6 +59,6 @@ public abstract class Projection {
 	/**
 	 * convert an on screen pixel coordinate and a zoom level to a geo position
 	 */
-	public abstract GeoPosition pixelToGeo(Point pixelCoordinate, int zoom, MP mp);
+	public abstract GeoPosition pixelToGeo(Point2D pixelCoordinate, int zoom, MP mp);
 
 }

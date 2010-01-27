@@ -12,11 +12,12 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
+ 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
@@ -67,7 +68,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -1917,7 +1917,7 @@ public class TourMapView extends ViewPart {
 		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle positionRect = getPositionRect(positions, zoom);
-		Rectangle viewport = _map.getMapPixelViewport();
+		java.awt.Rectangle viewport = _map.getMapPixelViewport();
 
 //		// zoom until the tour is visible in the map
 //		while (!viewport.contains(positionRect)) {

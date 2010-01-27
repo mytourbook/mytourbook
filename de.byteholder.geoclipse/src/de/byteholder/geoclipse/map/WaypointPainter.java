@@ -10,11 +10,11 @@
 package de.byteholder.geoclipse.map;
 
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Set;
-
+ 
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
@@ -61,7 +61,7 @@ public class WaypointPainter extends MapPainter {
 		}
 
 		// figure out which waypoints are within this map viewport
-		final Rectangle viewportBounds = map.getMapPixelViewport();
+		final java.awt.Rectangle viewportBounds = map.getMapPixelViewport();
 		final int zoom = map.getZoom();
 		final Dimension sizeInTiles = map.getMapProvider().getMapTileSize(zoom);
 		final int tileSize = map.getMapProvider().getTileSize();

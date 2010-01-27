@@ -16,12 +16,13 @@
 
 package net.tourbook.mapping;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-
+ 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
@@ -38,7 +39,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -204,7 +204,7 @@ public class TourPainter extends MapPainter {
 							// when unitLabels are available, they will overwrite the default labeling
 							valueText = unitLabels.get(unitLabelIndex++);
 						}
-						final Point valueTextExtent = gc.textExtent(valueText);
+						final org.eclipse.swt.graphics.Point valueTextExtent = gc.textExtent(valueText);
 
 						gc.setForeground(legendTextColor);
 						gc.setBackground(legendTextBackgroundColor);
@@ -639,7 +639,7 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 
 		// convert lat/long into world pixels
-		final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
@@ -678,7 +678,7 @@ public class TourPainter extends MapPainter {
 		final int tileWorldPixelY = tile.getY() * tileSize;
 		final Rectangle tileViewport = new Rectangle(tileWorldPixelX, tileWorldPixelY, tileSize, tileSize);
 
-		Point tourWorldPixel;
+		java.awt.Point tourWorldPixel;
 		int devPrevX = 0;
 		int devPrevY = 0;
 
@@ -952,7 +952,7 @@ public class TourPainter extends MapPainter {
 		if (isMarkerInTile) {
 
 			final String markerLabel = tourMarker.getLabel();
-			final Point labelExtent = gc.textExtent(markerLabel);
+			final org.eclipse.swt.graphics.Point labelExtent = gc.textExtent(markerLabel);
 
 			final Image tourMarkerImage = drawTourMarkerImage(markerLabel, labelExtent, gc.getDevice());
 			{
@@ -981,7 +981,9 @@ public class TourPainter extends MapPainter {
 	 * @param device
 	 * @return
 	 */
-	private Image drawTourMarkerImage(final String markerLabel, final Point labelExtent, final Device device) {
+	private Image drawTourMarkerImage(	final String markerLabel,
+										final org.eclipse.swt.graphics.Point labelExtent,
+										final Device device) {
 
 		final int bannerWidth = labelExtent.x + 2 * MARGIN;
 		final int bannerHeight = labelExtent.y + 2 * MARGIN;

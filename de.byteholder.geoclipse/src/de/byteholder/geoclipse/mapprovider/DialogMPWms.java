@@ -15,13 +15,15 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+ 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -59,8 +61,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -1429,7 +1429,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			positionRect.setRect(positionRect.getX(), 0.0d, positionRect.getWidth(), positionRect.getHeight());
 //		}
 
-		Rectangle viewport = _map.getMapPixelViewport();
+		java.awt.Rectangle viewport = _map.getMapPixelViewport();
 
 //		System.out.println();
 //		// TODO remove SYSTEM.OUT.PRINTLN
