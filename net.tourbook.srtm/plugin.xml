@@ -7,13 +7,13 @@
 
                
       <page
-            class="net.tourbook.ext.srtm.PrefPageSRTM"
+            class="net.tourbook.srtm.PrefPageSRTM"
             id="net.tourbook.ext.srtm.PrefPageSRTM"
             name="%pref_page_srtm">
       </page>
       <page
             category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.ext.srtm.PrefPageSRTMColors"
+            class="net.tourbook.srtm.PrefPageSRTMColors"
             id="net.tourbook.ext.srtm.PrefPageSRTMColors"
             name="%pref_page_srtm_colors">
       </page>
@@ -23,7 +23,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="net.tourbook.ext.srtm.PreferenceInitializer">
+            class="net.tourbook.srtm.PreferenceInitializer">
       </initializer>
    </extension>
 
