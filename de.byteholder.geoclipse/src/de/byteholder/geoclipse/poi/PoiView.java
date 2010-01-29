@@ -56,7 +56,6 @@ import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.Activator;
-import de.byteholder.geoclipse.ui.AutoComplete;
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
@@ -279,7 +278,8 @@ public class PoiView extends ViewPart implements Observer {
 			_queryViewer.setComparator(new ViewerComparator());
 
 			// add autocomplete feature to the combo viewer
-			new AutoComplete(_queryViewer);
+			// this feature is disable because it's not working very well
+//			new AutoComplete(_queryViewer);
 
 			// ----------------------------------
 
@@ -287,10 +287,7 @@ public class PoiView extends ViewPart implements Observer {
 			 * table viewer: poi items
 			 */
 			final Table poiTable = new Table(container, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-			GridDataFactory.fillDefaults()//
-//					.span(2, 1)
-					.grab(true, true)
-					.applyTo(poiTable);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
 			poiTable.setLinesVisible(true);
 			poiTable.setHeaderVisible(true);
 

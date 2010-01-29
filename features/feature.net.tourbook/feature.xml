@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook"
       label="%Feature_Name"
-      version="9.08.0.v2009-08-17"
+      version="10.02.0.v2010-02-10"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -11,7 +11,7 @@
    </description>
 
    <copyright>
-      (c) Copyright Wolfgang Schramm and Contributors 2005, 2009. 
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2010. 
 All rights reserved.
    </copyright>
 
@@ -302,18 +302,6 @@ END OF TERMS AND CONDITIONS
       <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
    </url>
 
-   <includes
-         id="feature.net.tourbook.geoclipse"
-         version="0.0.0"/>
-
-   <includes
-         id="feature.net.tourbook.ext.eclipse.nl_nl"
-         version="0.0.0"/>
-
-   <includes
-         id="feature.net.tourbook.ext.jars"
-         version="0.0.0"/>
-
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
@@ -326,7 +314,6 @@ END OF TERMS AND CONDITIONS
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="net.tourbook.rxtx"/>
       <import plugin="de.byteholder.geoclipse"/>
-      <import plugin="de.byteholder.gpx"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="net.tourbook.ext.jars.importExport"/>
       <import plugin="org.eclipse.swt"/>
@@ -459,21 +446,28 @@ END OF TERMS AND CONDITIONS
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext.srtm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.tilefactory.srtm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.garmin.fit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.byteholder.geoclipse"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.srtm"
          download-size="0"
          install-size="0"
          version="0.0.0"
