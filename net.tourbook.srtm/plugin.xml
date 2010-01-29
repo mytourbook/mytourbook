@@ -27,4 +27,11 @@
       </initializer>
    </extension>
 
+   <extension
+         point="de.byteholder.geoclipse.tilefactory">
+      <tilefactory
+            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
+            name="SRTM Map Provider"/>
+   </extension>
+
 </plugin>

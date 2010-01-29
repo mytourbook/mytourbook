@@ -7,8 +7,7 @@ Bundle-Activator: net.tourbook.srtm.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- de.byteholder.geoclipse,
- net.tourbook.util
+ de.byteholder.geoclipse
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
@@ -20,3 +19,4 @@ Bundle-ClassPath: .,
  edtftpj.jar
 Bundle-Localization: plugin
 Bundle-Vendor: MyTourbook
+Import-Package: net.tourbook.util

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.ext.srtm.messages";		//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.srtm.messages";			//$NON-NLS-1$
 
 	public static String		app_ui_N;
 	public static String		app_ui_Y;
