@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %bundle_name
 Bundle-SymbolicName: net.tourbook.ext.srtm;singleton:=true
-Bundle-Version: 9.08.0.v2009-08-17
+Bundle-Version: 10.02.0.v2010-02-10
 Bundle-Activator: net.tourbook.ext.srtm.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
