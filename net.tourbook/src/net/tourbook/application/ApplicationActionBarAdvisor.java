@@ -154,6 +154,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		viewMenu.add(new Separator());
 		addPerspectiveActions(viewMenu);
 
+		viewMenu.add(new Separator("adminViews")); //$NON-NLS-1$
+
 		return viewMenu;
 	}
 

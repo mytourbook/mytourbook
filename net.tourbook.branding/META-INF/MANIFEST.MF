@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.tourbook.branding
-Bundle-Version: 9.08.0.v2009-08-17
+Bundle-Version: 10.02.0.v2010-02-10
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy

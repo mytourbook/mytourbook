@@ -508,6 +508,12 @@
          </command>
       </menuContribution>
 
+
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+      </menuContribution>
+
+
       <menuContribution
             locationURI="menu:views?before=defaultViews">
          <command
@@ -543,6 +549,21 @@
                mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                style="push"
                tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
+         </command>
+      </menuContribution>
+      
+      <menuContribution
+            locationURI="menu:views?after=adminViews">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               icon="icons/error_log.gif"
+               label="%command_error_view"
+               mnemonic="%command_error_view_mnemonic"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="org.eclipse.pde.runtime.LogView">
+            </parameter>
          </command>
       </menuContribution>
       
@@ -881,5 +902,8 @@
             name="net.tourbook.chart.context.isTourChart">
       </context>
    </extension>
+
+
+
 
 </plugin>

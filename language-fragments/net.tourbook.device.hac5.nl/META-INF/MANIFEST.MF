@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Language support
+Bundle-SymbolicName: net.tourbook.device.hac5.nl
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: net.tourbook.device.hac5;bundle-version="9.8.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: MyTourbook

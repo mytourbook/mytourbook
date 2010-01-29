@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
- 
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,13 +43,13 @@ import javax.persistence.Transient;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
-import net.tourbook.ext.srtm.ElevationSRTM3;
-import net.tourbook.ext.srtm.GeoLat;
-import net.tourbook.ext.srtm.GeoLon;
-import net.tourbook.ext.srtm.NumberForm;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
+import net.tourbook.srtm.ElevationSRTM3;
+import net.tourbook.srtm.GeoLat;
+import net.tourbook.srtm.GeoLon;
+import net.tourbook.srtm.NumberForm;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -2884,38 +2884,6 @@ public class TourData implements Comparable<Object> {
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
 	}
 	
-	public float getWeatherWindDir() {
-		return weatherWindDir;
-	}
-
-	public void setWeatherWindDir(float weatherWindDir) {
-		this.weatherWindDir = weatherWindDir;
-	}
-
-	public float getWeatherWindSpd() {
-		return weatherWindSpd;
-	}
-
-	public void setWeatherWindSpd(float weatherWindSpd) {
-		this.weatherWindSpd = weatherWindSpd;
-	}
-
-	public String getWeatherClouds() {
-		return weatherClouds;
-	}
-
-	public void setWeatherClouds(String weatherClouds) {
-		this.weatherClouds = weatherClouds;
-	}	
-	
-	public int getRestPulse() {
-		return restPulse;
-	}
-
-	public void setRestPulse(int restPulse) {
-		this.restPulse = restPulse;
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -3006,8 +2974,8 @@ public class TourData implements Comparable<Object> {
 	 */
 	public int getAvgTemperature() {
 		return avgTemperature;
-	}
-
+	}	
+	
 	/**
 	 * @return the bikerWeight
 	 */
@@ -3083,11 +3051,6 @@ public class TourData implements Comparable<Object> {
 		return ignoreTimeCounter;
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
-
 	/**
 	 * @return the calories
 	 */
@@ -3120,15 +3083,6 @@ public class TourData implements Comparable<Object> {
 		}
 	}
 
-// not used 5.10.2008 
-//	public int getDeviceTotalDown() {
-//		return deviceTotalDown;
-//	}
-
-//	public int getDeviceTotalUp() {
-//		return deviceTotalUp;
-//	}
-
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
 	 *         slices are unequally
@@ -3144,6 +3098,11 @@ public class TourData implements Comparable<Object> {
 	public long getDeviceTravelTime() {
 		return deviceTravelTime;
 	}
+
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
 
 	public int getDeviceWeight() {
 		return deviceWeight;
@@ -3208,6 +3167,15 @@ public class TourData implements Comparable<Object> {
 
 		return gradientSerie;
 	}
+
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
+
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
 
 	/**
 	 * @return the maxAltitude
@@ -3384,6 +3352,10 @@ public class TourData implements Comparable<Object> {
 		}
 
 		return powerSerie;
+	}
+
+	public int getRestPulse() {
+		return restPulse;
 	}
 
 	public SerieData getSerieData() {
@@ -3634,6 +3606,47 @@ public class TourData implements Comparable<Object> {
 		return tourPerson;
 	}
 
+	public int getTourRecordingTime() {
+		return tourRecordingTime;
+	}
+
+	public Collection<TourReference> getTourReferences() {
+		return tourReferences;
+	}
+
+	/**
+	 * @return the tourStartPlace
+	 */
+	public String getTourStartPlace() {
+		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
+	}
+
+	/**
+	 * @return Returns the tags {@link #tourTags} which are defined for this tour
+	 */
+	public Set<TourTag> getTourTags() {
+		return tourTags;
+	}
+
+	/**
+	 * @return the tourTitle
+	 */
+	public String getTourTitle() {
+		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
+	}
+
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
+	}
+
+	public String getWeatherClouds() {
+		return weatherClouds;
+	}
+
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3674,46 +3687,12 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
-	public int getTourRecordingTime() {
-		return tourRecordingTime;
+	public float getWeatherWindDir() {
+		return weatherWindDir;
 	}
 
-	public Collection<TourReference> getTourReferences() {
-		return tourReferences;
-	}
-
-	/**
-	 * @return the tourStartPlace
-	 */
-	public String getTourStartPlace() {
-		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
-	}
-
-	/**
-	 * @return Returns the tags {@link #tourTags} which are defined for this tour
-	 */
-	public Set<TourTag> getTourTags() {
-		return tourTags;
-	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
-
-	/**
-	 * @return the tourTitle
-	 */
-	public String getTourTitle() {
-		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
-	}
-
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
+	public float getWeatherWindSpd() {
+		return weatherWindSpd;
 	}
 
 	/**
@@ -3741,6 +3720,11 @@ public class TourData implements Comparable<Object> {
 
 		return result;
 	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	/**
 	 * @return <code>true</code> when the tour is manually created and not imported from a file or
@@ -3959,6 +3943,10 @@ public class TourData implements Comparable<Object> {
 		this.mergeTargetTourId = mergeTargetTourId;
 	}
 
+	public void setRestPulse(final int restPulse) {
+		this.restPulse = restPulse;
+	}
+
 	private void setSpeed(	final int serieIndex,
 							final int speedMetric,
 							final int speedImperial,
@@ -4139,6 +4127,18 @@ public class TourData implements Comparable<Object> {
 
 	public void setTourType(final TourType tourType) {
 		this.tourType = tourType;
+	}
+
+	public void setWeatherClouds(final String weatherClouds) {
+		this.weatherClouds = weatherClouds;
+	}
+
+	public void setWeatherWindDir(final float weatherWindDir) {
+		this.weatherWindDir = weatherWindDir;
+	}
+
+	public void setWeatherWindSpd(final float weatherWindSpd) {
+		this.weatherWindSpd = weatherWindSpd;
 	}
 
 	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {

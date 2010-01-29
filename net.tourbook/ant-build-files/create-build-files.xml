@@ -6,24 +6,32 @@
 		copies all files from net.tourbook.* and de.byteholder.* into the build folders
 	-->
 
-	<property name="path-mt-trunk" value=".." />
+	<property name="path-mt-trunk" value="../../mytourbook-TRUNK" />
+	<property name="path-mt-trunk.nl" value="../../mytourbook-TRUNK.nl" />
 	<property name="path-mt-build" value="../../mytourbook-BUILD" />
 
 	<property name="path-build-core" value="${path-mt-build}/core" />
-	<property name="path-build-translations" value="${path-mt-build}/translations" />
+	<property name="path-build-translation" value="${path-mt-build}/translation" />
 
 	<!--
 		DEFAULT target
 	-->
 	<target name="create-build-files">
 
-		<!-- delete files -->
-		<antcall target="delete-files" />
+		<!-- 
+			delete all build files
+		 -->
+		<antcall target="delete-all-build-files" />
 
 		<!-- 
 			copy core files 
 		-->
 		<antcall target="copy-core-files" />
+
+		<!-- 
+			copy language fragments 
+		-->
+		<antcall target="copy-language-fragments" />
 
 		<!-- 
 			copy language files 
@@ -32,30 +40,20 @@
 
 	</target>
 
-	<target name="delete-files">
+	<target name="delete-all-build-files">
 
-		<!-- delete all core files in: ${path-build-core} -->
-		<echo message="delete all core files in: ${path-build-core}" />
-
-		<delete includeemptydirs="true" quiet="true">
-			<fileset dir="${path-build-core}" includes="**/*" />
-		</delete>
-
-		<!-- delete all properties files but keep the MANIFEST.MF file -->
-		<echo message="delete all files in  ${path-build-translations} but keep MANIFEST.MF" />
+		<!-- delete all build files: ${path-mt-build} -->
+		<echo message="delete all build files: ${path-mt-build}" />
 
 		<delete includeemptydirs="true" quiet="true">
-			<fileset dir="${path-build-translations}">
-				<include name="**/*" />
-				<exclude name="**/MANIFEST.MF" />
-			</fileset>
+			<fileset dir="${path-mt-build}" includes="**/*" />
 		</delete>
 
 	</target>
 
 	<target name="copy-core-files">
 
-		<echo message="copy core files to ${path-build-core}" />
+		<echo message="copy core files into ${path-build-core}" />
 
 		<copy todir="${path-build-core}" preservelastmodified="true" includeemptydirs="false">
 
@@ -64,21 +62,15 @@
 				<include name="net.tourbook*/**/*" />
 				<include name="de.byteholder*/**/*" />
 				<include name="feature*/**/*" />
-				<!-- 
-				-->
 
 				<exclude name="**/plugin_*.properties" />
 				<exclude name="**/feature_*.properties" />
 				<exclude name="**/messages_*.properties" />
+
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
 
-				<!-- select only modified files 
-				<depend targetdir="**/" />
-				-->
-
-				<!-- ignore empty files 
-				-->
+				<!-- ignore empty files -->
 				<size value="0" when="more" />
 
 			</fileset>
@@ -87,16 +79,25 @@
 
 	</target>
 
+	<target name="copy-language-fragments">
+
+		<echo message="copy language fragments into ${path-build-translation}" />
+
+		<copy todir="${path-build-translation}" preservelastmodified="true" includeemptydirs="false">
+			<fileset dir="${path-mt-trunk.nl}" />
+		</copy>
+
+	</target>
+
 	<target name="copy-language-files">
 
-		<echo message="copy language files to ${path-build-translations}" />
+		<echo message="copy language property files into ${path-build-translation}" />
 
-		<copy todir="${path-build-translations}/" preservelastmodified="true" includeemptydirs="false">
+		<copy todir="${path-build-translation}/" preservelastmodified="true" includeemptydirs="false">
 
 			<fileset dir="${path-mt-trunk}">
 
 				<include name="**/plugin_*.properties" />
-				<include name="**/feature_*.properties" />
 				<include name="**/messages_*.properties" />
 
 				<exclude name="**/bin/**" />
@@ -106,6 +107,12 @@
 				<size value="0" when="more" />
 
 			</fileset>
+
+			<mapper>
+				<regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1\.nl\2" />
+				<regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1\.nl\2" />
+			</mapper>
+
 
 		</copy>
 
