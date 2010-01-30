@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook"
       label="%Feature_Name"
-      version="10.02.0.v2010-02-10"
+      version="10.02.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -313,10 +313,11 @@ END OF TERMS AND CONDITIONS
       <import plugin="net.tourbook.ext.jars"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="net.tourbook.rxtx"/>
-      <import plugin="de.byteholder.geoclipse"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="net.tourbook.ext.jars.importExport"/>
-      <import plugin="org.eclipse.swt"/>
+      <import plugin="net.tourbook.ext.ejb3" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="de.byteholder.geoclipse.ext.geotools"/>
+      <import plugin="org.eclipse.ui.forms" version="3.4.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin

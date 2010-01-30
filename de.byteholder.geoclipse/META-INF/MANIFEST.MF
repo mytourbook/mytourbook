@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %PLUGIN_NAME
 Bundle-SymbolicName: de.byteholder.geoclipse;singleton:=true
-Bundle-Version: 10.01.0.v2010-01-10
+Bundle-Version: 10.02.0.qualifier
 Bundle-Vendor: %PLUGIN_PROVIDER
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy

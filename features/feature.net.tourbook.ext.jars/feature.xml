@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="feature.net.tourbook.ext.jars"
-      label="Feature for various jars"
-      version="9.08.0.v2009-08-17"
+      label="Feature for external jar files"
+      version="10.02.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jars for data import and export
 Bundle-SymbolicName: net.tourbook.ext.jars.importExport;singleton:=true
-Bundle-Version: 9.08.0.v2009-08-17
+Bundle-Version: 10.02.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: commons-collections-3.2.jar,

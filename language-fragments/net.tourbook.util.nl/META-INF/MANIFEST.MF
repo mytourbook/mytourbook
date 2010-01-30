@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Language support
 Bundle-SymbolicName: net.tourbook.util.nl
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 10.02.0.qualifier
 Bundle-Vendor: MyTourbook
-Fragment-Host: net.tourbook.util;bundle-version="9.8.0"
+Fragment-Host: net.tourbook.util;bundle-version="10.02.0.qualifier"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
