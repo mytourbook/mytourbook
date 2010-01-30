@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cq:componentQuery xmlns:cq="http://www.eclipse.org/buckminster/CQuery-1.0" properties="file:/M:/mytourbook-BUILD-ws/build.feature.net.tourbook.product.buckminster/buckminster.properties">
+    <cq:rootRequest name="feature.net.tourbook.product.buckminster" componentType="eclipse.feature"/>
+</cq:componentQuery>
