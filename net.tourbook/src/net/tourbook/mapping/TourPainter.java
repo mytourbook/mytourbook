@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
- 
+
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
@@ -679,10 +679,10 @@ public class TourPainter extends MapPainter {
 		final Rectangle tileViewport = new Rectangle(tileWorldPixelX, tileWorldPixelY, tileSize, tileSize);
 
 		java.awt.Point tourWorldPixel;
-		int devPrevX = 0;
-		int devPrevY = 0;
+		int devFromWithOffsetX = 0;
+		int devFromWithOffsetY = 0;
 
-		boolean isFirstPosition = true;
+		final boolean isFirstPosInside = true;
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
@@ -706,7 +706,7 @@ public class TourPainter extends MapPainter {
 		gc.setBackground(systemColorBlue);
 
 		int lastInsideIndex = -99;
-		boolean isLastInsidePosition = false;
+//		boolean isLastInsidePosition = false;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
@@ -741,10 +741,27 @@ public class TourPainter extends MapPainter {
 
 				// check if position is in the viewport
 
-				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				// get positions with the part offset
+				final int devToWithOffsetX = devX + devPartOffset;
+				final int devToWithOffsetY = devY + devPartOffset;
+
+				if (serieIndex == 0) {
+
+					// keep position
+					devFromWithOffsetX = devToWithOffsetX;
+					devFromWithOffsetY = devToWithOffsetY;
+
+					continue;
+				}
+
+//				if (serieIndex == 255) {
+//					serieIndex = serieIndex;
+//				}
+				/*
+				 * this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+				 */
 				final int x = tourWorldPixel.x;
 				final int y = tourWorldPixel.y;
-
 				if ((x >= tileViewport.x)
 						&& (y >= tileViewport.y)
 						&& x < (tileViewport.x + tileViewport.width)
@@ -753,50 +770,39 @@ public class TourPainter extends MapPainter {
 					// current position is inside the tile
 
 					// check if position has changed
-					if (devX != devPrevX && devY != devPrevY) {
+					if (devToWithOffsetX != devFromWithOffsetX || devToWithOffsetY != devFromWithOffsetY) {
 
 						isTourInTile = true;
 
-						if (isFirstPosition) {
-
-							isFirstPosition = false;
-
-							devPrevX += devPartOffset;
-							devPrevY += devPartOffset;
-						}
-
-						// adjust positions with the part offset
-						devX += devPartOffset;
-						devY += devPartOffset;
-
-						drawTour20Line(gc, serieIndex, devPrevX, devPrevY, devX, devY);
+						drawTour20Line(gc, serieIndex, //
+								devFromWithOffsetX,
+								devFromWithOffsetY,
+								devToWithOffsetX,
+								devToWithOffsetY);
 					}
 
 					lastInsideIndex = serieIndex;
-					isLastInsidePosition = true;
 				}
 
 				// current position is outside the tile
 
-				if (serieIndex == lastInsideIndex + 1 && isLastInsidePosition) {
+				if (serieIndex == lastInsideIndex + 1) {
 
 					/*
 					 * this position is the first which is outside of the tile, draw a line from the
 					 * last inside to the first outside position
 					 */
 
-					// adjust positions with the part offset
-					devX += devPartOffset;
-					devY += devPartOffset;
-
-					drawTour20Line(gc, serieIndex, devPrevX, devPrevY, devX, devY);
-
-					isFirstPosition = true;
+					drawTour20Line(gc, serieIndex, //
+							devFromWithOffsetX,
+							devFromWithOffsetY,
+							devToWithOffsetX,
+							devToWithOffsetY);
 				}
 
-				// set previous pixel
-				devPrevX = devX;
-				devPrevY = devY;
+				// keep position
+				devFromWithOffsetX = devToWithOffsetX;
+				devFromWithOffsetY = devToWithOffsetY;
 
 			} else {
 
@@ -815,7 +821,7 @@ public class TourPainter extends MapPainter {
 					// current position is inside the tile
 
 					// optimize drawing: check if position has changed
-					if (devX != devPrevX && devY != devPrevY) {
+					if (devX != devFromWithOffsetX && devY != devFromWithOffsetY) {
 
 						isTourInTile = true;
 
@@ -830,8 +836,8 @@ public class TourPainter extends MapPainter {
 						}
 
 						// set previous pixel
-						devPrevX = devX;
-						devPrevY = devY;
+						devFromWithOffsetX = devX;
+						devFromWithOffsetY = devY;
 					}
 				}
 			}
@@ -855,11 +861,17 @@ public class TourPainter extends MapPainter {
 
 		} else {
 
-			// draw line with the color from the legend provider
 
 			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
 			final Color lineColor = _colorCache.get(colorValue);
 
+			// draw line border 
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+			gc.setLineWidth(LINE_WIDTH + 2);
+			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
+
+			// draw line with the color from the legend provider
+			gc.setLineWidth(LINE_WIDTH);
 			gc.setForeground(lineColor);
 			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 		}
