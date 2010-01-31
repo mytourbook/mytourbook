@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse.p2"
       label="RCP P2 Feature"
-      version="10.02.0.qualifier"
+      version="3.5.2.qualifier"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">
@@ -27,5 +27,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
 </feature>
