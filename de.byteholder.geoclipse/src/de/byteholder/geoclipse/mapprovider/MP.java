@@ -27,7 +27,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
- 
+
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
@@ -39,7 +41,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Map;

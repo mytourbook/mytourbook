@@ -2,6 +2,8 @@ package de.byteholder.geoclipse.map;
 
 import java.io.File;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -16,7 +18,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.logging.StatusUtil;
 
 public class UI {
 

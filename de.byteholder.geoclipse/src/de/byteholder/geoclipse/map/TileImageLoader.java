@@ -22,6 +22,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -29,7 +31,6 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.mapprovider.MP;
 

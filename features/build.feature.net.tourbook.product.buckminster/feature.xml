@@ -2,7 +2,7 @@
 <feature
       id="build.feature.net.tourbook.product.buckminster"
       label="Create MyTourbook product with buckminster"
-      version="10.02.0.v2010-02-10"
+      version="10.2.1.qualifier"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">

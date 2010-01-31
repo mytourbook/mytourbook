@@ -16,12 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 /**

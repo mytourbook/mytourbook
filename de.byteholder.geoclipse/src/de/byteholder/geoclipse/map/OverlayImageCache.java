@@ -4,9 +4,10 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.swt.graphics.Image;
 
-import de.byteholder.geoclipse.logging.StatusUtil;
 
 /**
  * cache for overlay images

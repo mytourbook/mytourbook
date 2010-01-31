@@ -29,6 +29,8 @@ import java.net.UnknownHostException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -102,7 +104,6 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
 
 import de.byteholder.geoclipse.Activator;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;

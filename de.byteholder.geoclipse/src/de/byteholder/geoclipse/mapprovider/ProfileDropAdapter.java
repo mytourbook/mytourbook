@@ -17,6 +17,8 @@ package de.byteholder.geoclipse.mapprovider;
 
 import java.util.ArrayList;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -27,8 +29,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
-
-import de.byteholder.geoclipse.logging.StatusUtil;
 
 class ProfileDropAdapter extends ViewerDropAdapter {
 
@@ -130,7 +130,7 @@ class ProfileDropAdapter extends ViewerDropAdapter {
 
 		return true;
 	}
- 
+
 	private boolean reorderWmsLayer(final TVIWmsLayer droppedTviWmsLayer) {
 
 		if (fTargetTreeItem == null) {

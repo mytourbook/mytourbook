@@ -52,11 +52,13 @@ import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -77,15 +79,16 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 8;													// Mod by Kenny
-//	private static final int					TOURBOOK_DB_VERSION							= 7;													// 9.01
+	private static final int					TOURBOOK_DB_VERSION							= 8;													// 10.2.1 Mod by Kenny
 
+//	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
 
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
+
 	/*
 	 * database tables
 	 */
@@ -94,7 +97,6 @@ public class TourDatabase {
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
 	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
-
 	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_DATA								= "TourData";											//$NON-NLS-1$
@@ -104,8 +106,8 @@ public class TourDatabase {
 	public static final String					TABLE_TOUR_TAG								= "TourTag";											//$NON-NLS-1$
 	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";									//$NON-NLS-1$
 	public static final String					TABLE_TOUR_TYPE								= "TourType";											//$NON-NLS-1$
-	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 
+	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);			//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
@@ -136,9 +138,11 @@ public class TourDatabase {
 	private boolean								fIsTableChecked;
 	private boolean								fIsVersionChecked;
 
-	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList					fPropertyListeners							= new ListenerList(
+																									ListenerList.IDENTITY);
 
-	private String								fDatabasePath								= (Platform.getInstanceLocation()
+	private String								fDatabasePath								= (Platform
+																									.getInstanceLocation()
 																									.getURL()
 																									.getPath() + "derby-database");				//$NON-NLS-1$
 
@@ -291,9 +295,8 @@ public class TourDatabase {
 			// create result text
 			final StringBuilder sb = new StringBuilder();
 			{
-				sb.append(NLS.bind(
-						Messages.tour_database_computeComputedValues_resultMessage,
-						Integer.toString(tourCounter[0])));
+				sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage, Integer
+						.toString(tourCounter[0])));
 
 				final String runnerResultText = runner.getResultText();
 				if (runnerResultText != null) {
@@ -302,10 +305,8 @@ public class TourDatabase {
 				}
 			}
 
-			MessageDialog.openInformation(
-					shell,
-					Messages.tour_database_computeComputedValues_resultTitle,
-					sb.toString());
+			MessageDialog.openInformation(shell, Messages.tour_database_computeComputedValues_resultTitle, sb
+					.toString());
 		}
 	}
 
@@ -1108,27 +1109,107 @@ public class TourDatabase {
 			return;
 		}
 
-		final IRunnableWithProgress runnableStartServer = createStartServerRunnable();
-		if (runnableStartServer != null) {
+		Class<?> derbyClientDriver;
 
-			try {
+		// check if the derby driver can be loaded
+		try {
+			derbyClientDriver = Class.forName(DERBY_CLIENT_DRIVER);
+		} catch (final ClassNotFoundException e) {
+			StatusUtil.showStatus(e.getMessage(), e);
+			return;
+		}
 
-				final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
+		try {
 
-				if (splashHandler == null) {
-					throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
-				} else {
-					final IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
 
-					runnableStartServer.run(splashProgressMonitor);
+			if (splashHandler == null) {
+				throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
+			} else {
+				final IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
+
+				checkServerCreateRunnable().run(splashProgressMonitor);
+			}
+
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Checks if the database server is running, if not it will start the server. startServerJob has
+	 * a job when the server is not yet started
+	 */
+	private IRunnableWithProgress checkServerCreateRunnable() {
+
+		// create runnable for stating the derby server
+
+		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(final IProgressMonitor monitor) {
+
+				monitor.subTask(Messages.Database_Monitor_db_service_task);
+
+				try {
+					server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
+				} catch (final UnknownHostException e2) {
+					e2.printStackTrace();
+				} catch (final Exception e2) {
+					e2.printStackTrace();
 				}
 
-			} catch (final InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				try {
+
+					/*
+					 * check if another derby server is already running (this can happen during
+					 * development)
+					 */
+					server.ping();
+
+				} catch (final Exception e) {
+
+					try {
+						server.start(null);
+						// monitor.worked(1);
+					} catch (final Exception e2) {
+						e2.printStackTrace();
+					}
+
+					int pingCounter = 0;
+
+					// wait until the server is started
+					while (true) {
+
+						try {
+							server.ping();
+							break;
+						} catch (final Exception e1) {
+							StatusUtil.log(NLS.bind("Starting derby server: {0}", ++pingCounter), e); //$NON-NLS-1$
+							try {
+								Thread.sleep(1);
+							} catch (final InterruptedException e2) {
+								StatusUtil.log(e2);
+							}
+						}
+					}
+
+					// make the first connection, this takes longer as the subsequent ones
+					try {
+						final Connection connection = getPooledConnection();
+						connection.close();
+
+						// log database path
+						StatusUtil.handleStatus("Database path: " + fDatabasePath, Status.INFO); //$NON-NLS-1$
+
+					} catch (final SQLException e1) {
+						UI.showSQLException(e1);
+					}
+				}
 			}
-		}
+		};
+
+		return runnable;
 	}
 
 	/**
@@ -1234,7 +1315,11 @@ public class TourDatabase {
 					MessageDialog.openInformation(
 							Display.getCurrent().getActiveShell(),
 							Messages.tour_database_version_info_title,
-							NLS.bind(Messages.tour_database_version_info_message, currentDbVersion, TOURBOOK_DB_VERSION));
+							NLS
+									.bind(
+											Messages.tour_database_version_info_message,
+											currentDbVersion,
+											TOURBOOK_DB_VERSION));
 				}
 
 			} else {
@@ -1298,32 +1383,6 @@ public class TourDatabase {
 
 		stmt.execute(sb.toString());
 		System.out.println(sb.toString());
-	}
-
-	/**
-	 * Checks if the database server is running, if not it will start the server. startServerJob has
-	 * a job when the server is not yet started
-	 */
-	private IRunnableWithProgress createStartServerRunnable() {
-
-		IRunnableWithProgress startServerRunnable = null;
-
-		// load derby driver
-		try {
-			Class.forName(DERBY_CLIENT_DRIVER);
-		} catch (final ClassNotFoundException e) {
-			e.printStackTrace();
-			return startServerRunnable;
-		}
-
-		// start derby server
-		startServerRunnable = new IRunnableWithProgress() {
-			public void run(final IProgressMonitor monitor) {
-				runStartServer(monitor);
-			}
-		};
-
-		return startServerRunnable;
 	}
 
 	/**
@@ -1510,7 +1569,7 @@ public class TourDatabase {
 				+ "startSecond	 				SMALLINT DEFAULT 0,	\n" //$NON-NLS-1$
 				//				
 				// version 7 end
-				
+
 				// version 8 start
 				//
 				+ "weatherWindDir		FLOAT DEFAULT 0, \n" //$NON-NLS-1$
@@ -1519,7 +1578,7 @@ public class TourDatabase {
 				+ "restPulse            INTEGER DEFAULT 0, \n" //$NON-NLS-1$
 				//
 				// version 8 end
-				
+
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -1974,7 +2033,7 @@ public class TourDatabase {
 		}
 	}
 
-	private Connection getPooledConnection() {
+	private Connection getPooledConnection() throws SQLException {
 
 		if (fPooledDataSource == null) {
 			try {
@@ -2001,6 +2060,7 @@ public class TourDatabase {
 			conn = fPooledDataSource.getConnection();
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
+//			throw e;
 		}
 
 		return conn;
@@ -2008,61 +2068,6 @@ public class TourDatabase {
 
 	public void removePropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.remove(listener);
-	}
-
-	private void runStartServer(final IProgressMonitor monitor) {
-
-		monitor.subTask(Messages.Database_Monitor_db_service_task);
-
-		try {
-			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-		} catch (final UnknownHostException e2) {
-			e2.printStackTrace();
-		} catch (final Exception e2) {
-			e2.printStackTrace();
-		}
-
-		try {
-			/*
-			 * check if another derby server is already running (this can happen during development)
-			 */
-			server.ping();
-
-		} catch (final Exception e) {
-
-			try {
-				server.start(null);
-				// monitor.worked(1);
-			} catch (final Exception e2) {
-				e2.printStackTrace();
-			}
-
-			// wait until the server is started
-			while (true) {
-
-				try {
-					server.ping();
-					break;
-				} catch (final Exception e1) {
-					try {
-						Thread.sleep(1);
-					} catch (final InterruptedException e2) {
-						e2.printStackTrace();
-					}
-				}
-			}
-
-			// make the first connection, this takes longer as the subsequent ones
-			try {
-				final Connection connection = getPooledConnection();
-				connection.close();
-
-				System.out.println("Database path: " + fDatabasePath); //$NON-NLS-1$
-
-			} catch (final SQLException e1) {
-				UI.showSQLException(e1);
-			}
-		}
 	}
 
 	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
@@ -2079,7 +2084,8 @@ public class TourDatabase {
 				TOURBOOK_DB_VERSION,
 				fDatabasePath });
 
-		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+		final MessageDialog dialog = new MessageDialog(
+				Display.getCurrent().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
 				message,
@@ -2128,11 +2134,11 @@ public class TourDatabase {
 			updateDbDesign_6_7(conn);
 			currentDbVersion = newVersion = 7;
 		}
-		
+
 		if (currentDbVersion == 7) {
 			updateDbDesign_7_8(conn);
 			currentDbVersion = newVersion = 8;
-		}		
+		}
 
 		/*
 		 * update version number
@@ -2388,7 +2394,7 @@ public class TourDatabase {
 		System.out.println("database is updated");//$NON-NLS-1$
 		System.out.println();
 	}
-	
+
 	private void updateDbDesign_7_8(final Connection conn) {
 
 		System.out.println();
@@ -2410,10 +2416,10 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherClouds         VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
-			
+
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN restPulse        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
-			statement.execute(sql);			
+			statement.execute(sql);
 
 			statement.close();
 
@@ -2423,7 +2429,7 @@ public class TourDatabase {
 
 		System.out.println("database is updated");//$NON-NLS-1$
 		System.out.println();
-	}	
+	}
 
 	private void updateVersionNumber(final Connection conn, final int newVersion) {
 		try {
@@ -2438,4 +2444,3 @@ public class TourDatabase {
 	}
 
 }
-

@@ -24,6 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
@@ -35,7 +37,6 @@ import org.geotools.ows.ServiceException;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.Tile;

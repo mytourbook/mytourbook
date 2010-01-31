@@ -8,7 +8,7 @@
  * IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package de.byteholder.geoclipse.logging;
+package net.tourbook.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.byteholder.geoclipse.Activator;
 
 /*
  * this class is copied from org.eclipse.ui.internal.misc.StatusUtil and modified
@@ -100,7 +99,7 @@ public class StatusUtil {
 		 * create an exception to see in the log the location where the logging occured
 		 */
 		if (exception == null) {
-			exception = new GeoException();
+			exception = new Exception();
 		}
 
 		handleStatus(message, exception, StatusManager.LOG);

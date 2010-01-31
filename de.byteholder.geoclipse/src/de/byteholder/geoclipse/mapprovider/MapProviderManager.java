@@ -36,6 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.tourbook.util.StatusUtil;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -65,7 +67,6 @@ import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
-import de.byteholder.geoclipse.logging.StatusUtil;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 import de.byteholder.gpx.GeoPosition;

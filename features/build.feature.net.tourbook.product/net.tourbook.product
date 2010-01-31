@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="MyTourbook" uid="net.tourbook" id="net.tourbook.product" application="net.tourbook.application" version="10.02.0.v2010-02-10" useFeatures="true" includeLaunchers="true">
+<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
@@ -338,8 +338,11 @@ END OF TERMS AND CONDITIONS
    </plugins>
 
    <features>
-      <feature id="build.feature.net.tourbook.product" version="10.02.0.v2010-02-10"/>
+      <feature id="build.feature.net.tourbook.product" version="10.2.1.qualifier"/>
    </features>
 
+   <configurations>
+      <plugin id="org.eclipse.equinox.app" autoStart="true" startLevel="4" />
+   </configurations>
 
 </product>
