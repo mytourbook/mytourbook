@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="feature.net.tourbook"
+      id="feature.net.tourbook.app"
       label="%Feature_Name"
       version="10.02.0.qualifier"
       provider-name="MyTourbook"

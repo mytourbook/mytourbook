@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="feature.net.tourbook.nl"
+      id="feature.net.tourbook.app.nl"
       label="MyTourbook Language support"
       version="10.02.0.qualifier"
       provider-name="MyTourbook">
