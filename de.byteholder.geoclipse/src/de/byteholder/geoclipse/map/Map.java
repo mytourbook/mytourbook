@@ -34,7 +34,7 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
- 
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -655,10 +655,14 @@ public class Map extends Canvas {
 	 */
 	public synchronized void disposeOverlayImageCache() {
 
-		_overlayImageCache.dispose();
-		_partOverlayImageCache.dispose();
+		if (_MP != null) {
+			_MP.resetOverlays();
+		}
 
 		_tileOverlayPaintQueue.clear();
+ 
+		_overlayImageCache.dispose();
+ 		_partOverlayImageCache.dispose();
 	}
 
 	private void disposeResource(final Resource resource) {
@@ -2071,15 +2075,15 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	/**
-	 * Reset overlay information for the current map provider by setting the overlay status to
-	 * {@link OverlayTourState#OVERLAY_NOT_CHECKED} in all tiles
-	 */
-	public synchronized void resetOverlays() {
-		if (_MP != null) {
-			_MP.resetOverlays();
-		}
-	}
+//	/**
+//	 * Reset overlay information for the current map provider by setting the overlay status to
+//	 * {@link OverlayTourState#OVERLAY_NOT_CHECKED} in all tiles
+//	 */
+//	public synchronized void resetOverlays() {
+//		if (_MP != null) {
+//			_MP.resetOverlays();
+//		}
+//	}
 
 	/**
 	 * Gets the current address location of the map

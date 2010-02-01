@@ -150,13 +150,15 @@ public interface ITourbookPreferences {
 
 	public static final String	VIEW_LAYOUT_RECORDING_TIME_FORMAT			= "view.layout.recording-time-format";						//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_DRIVING_TIME_FORMAT				= "view.layout.driving-time-format";						//$NON-NLS-1$
-
+ 
 	/*
 	 * layout for maps
 	 */
 	public static final String	MAP_LAYOUT_SYMBOL							= "map.layout.symbol";										//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol-width";								//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_DIM_COLOR						= "map.layout.dim-color";									//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_PAINT_WITH_BORDER				= "map.layout.paintWithBorder";							//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_BORDER_WIDTH						= "map.layout.borderWidth";								//$NON-NLS-1$
 
 	/*
 	 * id's for preference pages

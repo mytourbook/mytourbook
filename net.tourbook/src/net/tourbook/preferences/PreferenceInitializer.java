@@ -86,23 +86,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 			final String graphPrefName = graphDefinition.getGraphPrefName();
 
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
-					graphDefinition.getDefaultGradientBright());
+			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT, graphDefinition
+					.getDefaultGradientBright());
 
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
-					graphDefinition.getDefaultGradientDark());
+			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_DARK, graphDefinition
+					.getDefaultGradientDark());
 
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
-					graphDefinition.getDefaultLineColor());
+			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_LINE, graphDefinition
+					.getDefaultLineColor());
 
 		}
-
+ 
 		/*
 		 * graph preferences
 		 */
@@ -177,10 +171,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
 
 		/*
-		 * map appearance
+		 * appearance of the painted tour in map
 		 */
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageAppearanceMap.MAP_TOUR_SYMBOL_DOT);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 4);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 

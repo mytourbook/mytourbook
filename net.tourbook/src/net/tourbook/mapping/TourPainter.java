@@ -54,9 +54,6 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class TourPainter extends MapPainter {
 
-	private static int					LINE_WIDTH			= 7;
-	private int							LINE_WIDTH2			= LINE_WIDTH / 2;
-
 	private static final int			MARGIN				= 2;
 	private static final int			MARKER_POLE			= 16;
 
@@ -75,6 +72,10 @@ public class TourPainter extends MapPainter {
 
 	private int[]						_dataSerie;
 	private ILegendProvider				_legendProvider;
+ 
+	// painting parameter
+	private int							_lineWidth;
+	private int							_lineWidth2;
 
 	private final static ColorCacheInt	_colorCache			= new ColorCacheInt();
 
@@ -678,11 +679,8 @@ public class TourPainter extends MapPainter {
 		final int tileWorldPixelY = tile.getY() * tileSize;
 		final Rectangle tileViewport = new Rectangle(tileWorldPixelX, tileWorldPixelY, tileSize, tileSize);
 
-		java.awt.Point tourWorldPixel;
 		int devFromWithOffsetX = 0;
 		int devFromWithOffsetY = 0;
-
-		final boolean isFirstPosInside = true;
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
@@ -698,6 +696,15 @@ public class TourPainter extends MapPainter {
 			tourWorldPixelPosAll = new Point[latitudeSerie.length];
 
 			tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
+
+			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+
+				// convert lat/long into world pixels which depends on the map projection
+
+				tourWorldPixelPosAll[serieIndex] = mp.geoToPixel(//
+						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
+						mapZoomLevel);
+			}
 		}
 
 		final Color systemColorBlue = gc.getDevice().getSystemColor(SWT.COLOR_BLUE);
@@ -706,7 +713,7 @@ public class TourPainter extends MapPainter {
 		gc.setBackground(systemColorBlue);
 
 		int lastInsideIndex = -99;
-//		boolean isLastInsidePosition = false;
+		boolean isBorder;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
@@ -714,130 +721,158 @@ public class TourPainter extends MapPainter {
 		final boolean isDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
 
 		// get line width from pref store
-		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
-		LINE_WIDTH2 = LINE_WIDTH / 2;
-		gc.setLineWidth(LINE_WIDTH);
+		final int prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+		final boolean prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
+		final int prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
 
-		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+		// index == 0: paint border
+		// index == 1: paint tour symbol
+		for (int lineIndex = 0; lineIndex < 2; lineIndex++) {
 
-			if (createWorldPosition) {
+			if (lineIndex == 0) {
 
-				// convert lat/long into world pixels which depends on the map projection
+				if (prefWithBorder == false) {
+					// skip border
+					continue;
+				}
 
-				tourWorldPixel = mp.geoToPixel(
-						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
-						mapZoomLevel);
+				isBorder = true;
 
-				tourWorldPixelPosAll[serieIndex] = tourWorldPixel;
+				// draw line border
+				_lineWidth = prefLineWidth + (prefBorderWidth * 2);
+
+			} else if (lineIndex == 1) {
+
+				isBorder = false;
+
+				// draw within the border
+				_lineWidth = prefLineWidth;
 
 			} else {
-				tourWorldPixel = tourWorldPixelPosAll[serieIndex];
+				break;
 			}
 
-			int devX = tourWorldPixel.x - tileWorldPixelX;
-			int devY = tourWorldPixel.y - tileWorldPixelY;
+			_lineWidth2 = _lineWidth / 2;
 
-			if (isDrawLine) {
+			gc.setLineWidth(_lineWidth);
 
-				// check if position is in the viewport
+			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
-				// get positions with the part offset
-				final int devToWithOffsetX = devX + devPartOffset;
-				final int devToWithOffsetY = devY + devPartOffset;
+				final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
 
-				if (serieIndex == 0) {
+				int devX = tourWorldPixel.x - tileWorldPixelX;
+				int devY = tourWorldPixel.y - tileWorldPixelY;
+
+				if (isDrawLine) {
+
+					// check if position is in the viewport
+
+					// get positions with the part offset
+					final int devToWithOffsetX = devX + devPartOffset;
+					final int devToWithOffsetY = devY + devPartOffset;
+
+					if (serieIndex == 0) {
+
+						// keep position
+						devFromWithOffsetX = devToWithOffsetX;
+						devFromWithOffsetY = devToWithOffsetY;
+
+						continue;
+					}
+
+					Color color = null;
+
+					/*
+					 * this condition is an inline for: tileViewport.contains(tileWorldPos.x,
+					 * tileWorldPos.y)
+					 */
+					final int x = tourWorldPixel.x;
+					final int y = tourWorldPixel.y;
+
+					if ((x >= tileViewport.x)
+							&& (y >= tileViewport.y)
+							&& x < (tileViewport.x + tileViewport.width)
+							&& y < (tileViewport.y + tileViewport.height)) {
+
+						// current position is inside the tile
+
+						// check if position has changed
+						if (devToWithOffsetX != devFromWithOffsetX || devToWithOffsetY != devFromWithOffsetY) {
+
+							isTourInTile = true;
+
+							color = getTourColor(isBorder, serieIndex);
+
+							drawTour20Line(gc, //
+									devFromWithOffsetX,
+									devFromWithOffsetY,
+									devToWithOffsetX,
+									devToWithOffsetY,
+									color);
+						}
+
+						lastInsideIndex = serieIndex;
+					}
+
+					// current position is outside the tile
+
+					if (serieIndex == lastInsideIndex + 1) {
+
+						/*
+						 * this position is the first which is outside of the tile, draw a line from
+						 * the
+						 * last inside to the first outside position
+						 */
+
+						drawTour20Line(gc, //
+								devFromWithOffsetX,
+								devFromWithOffsetY,
+								devToWithOffsetX,
+								devToWithOffsetY,
+								color);
+					}
 
 					// keep position
 					devFromWithOffsetX = devToWithOffsetX;
 					devFromWithOffsetY = devToWithOffsetY;
 
-					continue;
-				}
+				} else {
 
-//				if (serieIndex == 255) {
-//					serieIndex = serieIndex;
-//				}
-				/*
-				 * this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				 */
-				final int x = tourWorldPixel.x;
-				final int y = tourWorldPixel.y;
-				if ((x >= tileViewport.x)
-						&& (y >= tileViewport.y)
-						&& x < (tileViewport.x + tileViewport.width)
-						&& y < (tileViewport.y + tileViewport.height)) {
+					// draw tour with dots/squares
 
-					// current position is inside the tile
+					// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+					final int x = tourWorldPixel.x;
+					final int y = tourWorldPixel.y;
 
-					// check if position has changed
-					if (devToWithOffsetX != devFromWithOffsetX || devToWithOffsetY != devFromWithOffsetY) {
+					// check if position is in the viewport
+					if ((x >= tileViewport.x)
+							&& (y >= tileViewport.y)
+							&& x < (tileViewport.x + tileViewport.width)
+							&& y < (tileViewport.y + tileViewport.height)) {
 
-						isTourInTile = true;
+						// current position is inside the tile
 
-						drawTour20Line(gc, serieIndex, //
-								devFromWithOffsetX,
-								devFromWithOffsetY,
-								devToWithOffsetX,
-								devToWithOffsetY);
-					}
+						// optimize drawing: check if position has changed
+						if (devX != devFromWithOffsetX && devY != devFromWithOffsetY) {
 
-					lastInsideIndex = serieIndex;
-				}
+							isTourInTile = true;
 
-				// current position is outside the tile
+							// adjust positions with the part offset
+							devX += devPartOffset;
+							devY += devPartOffset;
 
-				if (serieIndex == lastInsideIndex + 1) {
+							final Color color = getTourColor(isBorder, serieIndex);
 
-					/*
-					 * this position is the first which is outside of the tile, draw a line from the
-					 * last inside to the first outside position
-					 */
+							if (isDrawSquare) {
+								drawTour30Square(gc, devX, devY, color);
+							} else {
+								drawTour40Dot(gc, devX, devY, color);
+							}
 
-					drawTour20Line(gc, serieIndex, //
-							devFromWithOffsetX,
-							devFromWithOffsetY,
-							devToWithOffsetX,
-							devToWithOffsetY);
-				}
-
-				// keep position
-				devFromWithOffsetX = devToWithOffsetX;
-				devFromWithOffsetY = devToWithOffsetY;
-
-			} else {
-
-				// draw tour with dots/squares
-
-				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int x = tourWorldPixel.x;
-				final int y = tourWorldPixel.y;
-
-				// check if position is in the viewport
-				if ((x >= tileViewport.x)
-						&& (y >= tileViewport.y)
-						&& x < (tileViewport.x + tileViewport.width)
-						&& y < (tileViewport.y + tileViewport.height)) {
-
-					// current position is inside the tile
-
-					// optimize drawing: check if position has changed
-					if (devX != devFromWithOffsetX && devY != devFromWithOffsetY) {
-
-						isTourInTile = true;
-
-						// adjust positions with the part offset
-						devX += devPartOffset;
-						devY += devPartOffset;
-
-						if (isDrawSquare) {
-							drawTour30Square(gc, serieIndex, devX, devY);
-						} else {
-							drawTour40Dot(gc, serieIndex, devX, devY);
+							// set previous pixel
+							devFromWithOffsetX = devX;
+							devFromWithOffsetY = devY;
 						}
-
-						// set previous pixel
-						devFromWithOffsetX = devX;
-						devFromWithOffsetY = devY;
 					}
 				}
 			}
@@ -847,84 +882,43 @@ public class TourPainter extends MapPainter {
 	}
 
 	private void drawTour20Line(final GC gc,
-								final int serieIndex,
 								final int devXFrom,
 								final int devYFrom,
 								final int devXTo,
-								final int devYTo) {
+								final int devYTo,
+								final Color color) {
 
-		if (_dataSerie == null) {
-
-			// draw default line when data are not available
-
-			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
-
-		} else {
-
-
-			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
-			final Color lineColor = _colorCache.get(colorValue);
-
-			// draw line border 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.setLineWidth(LINE_WIDTH + 2);
-			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
-
-			// draw line with the color from the legend provider
-			gc.setLineWidth(LINE_WIDTH);
-			gc.setForeground(lineColor);
-			gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
+		if (color != null) {
+			gc.setForeground(color);
 		}
+
+		drawTour40Dot(gc, devXTo, devYTo, color);
+
+		// draw line with the color from the legend provider
+		gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 
 	}
 
-	private void drawTour30Square(final GC gc, final int serieIndex, final int devX, final int devY) {
+	private void drawTour30Square(final GC gc, final int devX, final int devY, final Color color) {
 
-		if (_dataSerie == null) {
-
-			// draw default square when data are not available
-
-			gc.fillRectangle(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
-
-		} else {
-
-			// draw square with the color from the legend provider
-
-			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
-			final Color lineColor = _colorCache.get(colorValue);
-
-			gc.setBackground(lineColor);
-			gc.fillRectangle(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+		if (color != null) {
+			gc.setBackground(color);
 		}
+
+		gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
 	}
 
-	private void drawTour40Dot(final GC gc, final int serieIndex, final int devX, final int devY) {
+	private void drawTour40Dot(final GC gc, final int devX, final int devY, final Color color) {
 
-		if (_dataSerie == null) {
+		if (color != null) {
+			gc.setBackground(color);
+		}
 
-			// draw default dot when data are not available
-
-			gc.fillOval(devX, devY, LINE_WIDTH, LINE_WIDTH);
-
+		if (_lineWidth == 2) {
+			// oval is not filled by a width of 2
+			gc.fillRectangle(devX, devY, _lineWidth, _lineWidth);
 		} else {
-
-			// draw dot with the color from the legend provider
-
-			final int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
-			final Color lineColor = _colorCache.get(colorValue);
-
-			if (LINE_WIDTH == 2) {
-				// oval is not filled by a width of 2
-				gc.setBackground(lineColor);
-				gc.fillRectangle(devX, devY, LINE_WIDTH, LINE_WIDTH);
-			} else {
-				gc.setBackground(lineColor);
-				gc.fillOval(devX - LINE_WIDTH2, devY - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
-
-//					gc.setLineWidth(1);
-//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-//					gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
-			}
+			gc.fillOval(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
 		}
 	}
 
@@ -1122,6 +1116,29 @@ public class TourPainter extends MapPainter {
 		}
 
 		return valuePosition;
+	}
+
+	private Color getTourColor(final boolean isBorder, final int serieIndex) {
+
+		if (_dataSerie == null) {
+			return null;
+		}
+
+		int colorValue = _legendProvider.getColorValue(_dataSerie[serieIndex]);
+		if (isBorder) {
+
+			// paint the border in a darker color
+
+			final float brightness = 0.8f;
+
+			final int red = (int) (((colorValue & 0xFF) >>> 0) * brightness);
+			final int green = (int) (((colorValue & 0xFF00) >>> 8) * brightness);
+			final int blue = (int) (((colorValue & 0xFF0000) >>> 16) * brightness);
+
+			colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+		}
+
+		return _colorCache.get(colorValue);
 	}
 
 	/**

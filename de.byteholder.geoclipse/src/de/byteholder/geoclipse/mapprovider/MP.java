@@ -46,6 +46,7 @@ import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapViewPortData;
 import de.byteholder.geoclipse.map.Mercator;
+import de.byteholder.geoclipse.map.OverlayTourState;
 import de.byteholder.geoclipse.map.Projection;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileCache;
@@ -56,7 +57,7 @@ import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
-
+ 
 /**
  * This is the base class for map providers (MP) which provides all data which are necessary to draw
  * a map.<br>
@@ -1210,6 +1211,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		fireTileEvent(TileEventId.TILE_RESET_QUEUES, null);
 	}
 
+	/**
+	 * Reset overlay information by setting the overlay status to
+	 * {@link OverlayTourState#OVERLAY_NOT_CHECKED} in all tiles
+	 */
 	public synchronized void resetOverlays() {
 
 		_tileWaitingQueue.clear();

@@ -1475,9 +1475,8 @@ public class TourMapView extends ViewPart {
 			createLegendImage(PaintManager.getInstance().getLegendProvider());
 
 			_map.setOverlayKey(tourData.getTourId().toString());
-			_map.resetOverlays();
 			_map.disposeOverlayImageCache();
-
+ 
 		}
 
 		_map.queueMapRedraw();
@@ -1515,7 +1514,6 @@ public class TourMapView extends ViewPart {
 			_previousOverlayKey = newOverlayKey;
 
 			_map.setOverlayKey(Long.toString(newOverlayKey));
-			_map.resetOverlays();
 			_map.disposeOverlayImageCache();
 		}
 
@@ -1560,7 +1558,6 @@ public class TourMapView extends ViewPart {
 					_previousOverlayKey = newOverlayKey;
 
 					_map.setOverlayKey(Long.toString(newOverlayKey));
-					_map.resetOverlays();
 					_map.disposeOverlayImageCache();
 				}
 
