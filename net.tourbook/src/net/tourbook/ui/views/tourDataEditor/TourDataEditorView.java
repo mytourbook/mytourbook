@@ -491,6 +491,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean								_isDistManuallyModified;
 	private boolean								_isWindSpdManuallyModified;
+	private boolean                             _isTemperatureManuallyModified;
 
 	/*
 	 * measurement unit values
@@ -2498,6 +2499,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tk.createLabel(section, Messages.tour_editor_label_temperature);
 		_txtTemp = tk.createText(section, UI.EMPTY_STRING);
 		_txtTemp.addModifyListener(_modifyListener);
+		_txtTemp.addKeyListener(new KeyListener() {
+			public void keyPressed(final KeyEvent e) {
+				_isTemperatureManuallyModified = true;
+			}
+
+			public void keyReleased(final KeyEvent e) {}
+		});
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTemp);
 	}
 
@@ -4967,6 +4975,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_isTourDirty = false;
 		_isDistManuallyModified = false;
 		_isWindSpdManuallyModified = false;
+		_isTemperatureManuallyModified = false;
 
 		enableActions();
 		enableControls();
@@ -5082,7 +5091,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setWeatherClouds(_comboCloudsDBValues[fComboCloudsIndex]);
 			}
 
-			_tourData.setAvgTemperature(getIntValue(_txtTemp.getText()));
+			if (_isTemperatureManuallyModified) {
+				int temperature = getIntValue(_txtTemp.getText());
+				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+					temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+				}
+				_tourData.setAvgTemperature(temperature);
+			}
 
 			_tourData.setStartYear((short) _dtTourDate.getYear());
 			_tourData.setStartMonth((short) (_dtTourDate.getMonth() + 1));
@@ -5524,7 +5539,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// icon must be displayed after the combobox entry is selected
 		displayCloudIcon();
 
-		_txtTemp.setText(Integer.toString(_tourData.getAvgTemperature()));
+		int temperature = _tourData.getAvgTemperature();
+		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+		}
+		
+		_txtTemp.setText(Integer.toString(temperature));
 
 		// tour date
 		_dtTourDate.setDate(tourYear, tourMonth, tourDay);
