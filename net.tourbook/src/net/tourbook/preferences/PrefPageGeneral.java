@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -36,8 +36,10 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private boolean				fShowMeasurementSystemInUI;
-	private BooleanFieldEditor	fEditShowMeasurementInUI;
+	public static final String	ID	= "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
+
+	private boolean				_showMeasurementSystemInUI;
+	private BooleanFieldEditor	_editShowMeasurementInUI;
 
 	@Override
 	protected void createFieldEditors() {
@@ -57,12 +59,14 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 
 		// checkbox: confirm undo in tour editor
-		addField(new BooleanFieldEditor(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
+		addField(new BooleanFieldEditor(
+				ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
 				Messages.pref_general_hide_confirmation + Messages.tour_editor_dlg_revert_tour_message,
 				group));
 
 		// checkbox: confirm undo in tour editor
-		addField(new BooleanFieldEditor(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+		addField(new BooleanFieldEditor(
+				ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
 				Messages.pref_general_hide_warning
 				/*
 				 * the externalize string wizard has problems when the messages are from 2 different
@@ -85,7 +89,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(measurementGroup);
 
 		// radio: distance
-		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+		addField(new RadioGroupFieldEditor(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
 				Messages.Pref_general_system_distance,
 				2,
 				new String[][] {
@@ -99,7 +104,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				true));
 
 		// radio: altitude
-		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+		addField(new RadioGroupFieldEditor(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
 				Messages.Pref_general_system_altitude,
 				2,
 				new String[][] {
@@ -113,7 +119,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				true));
 
 		// radio: temperature
-		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+		addField(new RadioGroupFieldEditor(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
 				Messages.Pref_general_system_temperature,
 				2,
 				new String[][] {
@@ -127,7 +134,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				true));
 
 		// checkbox: show in UI
-		addField(fEditShowMeasurementInUI = new BooleanFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
+		addField(_editShowMeasurementInUI = new BooleanFieldEditor(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
 				Messages.Pref_general_show_system_in_ui,
 				measurementGroup));
 
@@ -141,7 +149,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		setPreferenceStore(prefStore);
 
-		fShowMeasurementSystemInUI = prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+		_showMeasurementSystemInUI = prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
 	}
 
 	@Override
@@ -153,11 +161,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			// fire one event for all modified measurement values
 			getPreferenceStore().setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
 
-			if (fEditShowMeasurementInUI.getBooleanValue() != fShowMeasurementSystemInUI) {
+			if (_editShowMeasurementInUI.getBooleanValue() != _showMeasurementSystemInUI) {
 
 				// field was modified, ask for restart
 
-				if (MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
+				if (MessageDialog.openQuestion(
+						Display.getDefault().getActiveShell(),
 						Messages.pref_general_restart_app_title,
 						Messages.pref_general_restart_app_message)) {
 

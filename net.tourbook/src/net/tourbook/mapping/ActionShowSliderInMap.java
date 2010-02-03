@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,21 +19,18 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowSliderInMap extends Action {
 
-	private TourMapView	fMapView;
+	private TourMapView	_mapView;
 
 	public ActionShowSliderInMap(final TourMapView mapView) {
 
 		super(Messages.map_action_show_slider_in_map, AS_CHECK_BOX);
 
-		fMapView = mapView;
-
-		// set default value
-		setChecked(true);
+		_mapView = mapView;
 	}
 
 	@Override
 	public void run() {
-		fMapView.actionShowSlider();
+		_mapView.actionShowSlider();
 	}
 
 }

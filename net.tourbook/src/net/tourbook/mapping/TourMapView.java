@@ -46,6 +46,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -183,8 +184,8 @@ public class TourMapView extends ViewPart {
 	private boolean									_isMapSynchedWithSlider;
 	private boolean									_isPositionCentered;
 
-	private int										fDefaultZoom;
-	private GeoPosition								fDefaultPosition					= null;
+	private int										_defaultZoom;
+	private GeoPosition								_defaultPosition					= null;
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
@@ -260,17 +261,17 @@ public class TourMapView extends ViewPart {
 	}
 
 	void actionSaveDefaultPosition() {
-		fDefaultZoom = _map.getZoom();
-		fDefaultPosition = _map.getGeoCenter();
+		_defaultZoom = _map.getZoom();
+		_defaultPosition = _map.getGeoCenter();
 	}
 
 	void actionSetDefaultPosition() {
-		if (fDefaultPosition == null) {
+		if (_defaultPosition == null) {
 			_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
 			_map.setGeoCenterPosition(new GeoPosition(0, 0));
 		} else {
-			_map.setZoom(fDefaultZoom);
-			_map.setGeoCenterPosition(fDefaultPosition);
+			_map.setZoom(_defaultZoom);
+			_map.setGeoCenterPosition(_defaultPosition);
 		}
 		_map.queueMapRedraw();
 	}
@@ -457,6 +458,7 @@ public class TourMapView extends ViewPart {
 		_map.addZoomListener(new IZoomListener() {
 			public void zoomChanged(final ZoomEvent event) {
 				_mapInfoManager.setZoom(event.getZoom());
+				centerTour();
 			}
 		});
 
@@ -954,9 +956,9 @@ public class TourMapView extends ViewPart {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
-		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
-		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(_tourbookPrefChangeListener);
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+		prefStore.removePropertyChangeListener(_prefChangeListener);
+		prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
 
 		super.dispose();
 	}
@@ -1476,7 +1478,7 @@ public class TourMapView extends ViewPart {
 
 			_map.setOverlayKey(tourData.getTourId().toString());
 			_map.disposeOverlayImageCache();
- 
+
 		}
 
 		_map.queueMapRedraw();
@@ -1620,107 +1622,64 @@ public class TourMapView extends ViewPart {
 
 		final PaintManager paintManager = PaintManager.getInstance();
 		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+		String state = null;
 
-		try {
-			final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
+		// checkbox: is tour centered
+		final boolean isTourCentered = settings.getBoolean(MEMENTO_ZOOM_CENTERED);
+		_actionZoomCentered.setChecked(isTourCentered);
+		_isPositionCentered = isTourCentered;
 
-			_actionZoomCentered.setChecked(isTourCentered);
-			_isPositionCentered = isTourCentered;
-		} catch (final NumberFormatException e) {}
+		// checkbox: synch map with tour
+		final boolean isSynchTour = Util.getStateBoolean(settings, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
+		_actionSynchWithTour.setChecked(isSynchTour);
+		_isMapSynchedWithTour = isSynchTour;
 
-		try {
-			boolean isSynchTour;
-			if (settings.get(MEMENTO_SYNCH_WITH_SELECTED_TOUR) == null) {
-				// set default value
-				isSynchTour = true;
-			} else {
-				isSynchTour = settings.getBoolean(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
-			}
-			_actionSynchWithTour.setChecked(isSynchTour);
-			_isMapSynchedWithTour = isSynchTour;
-		} catch (final NumberFormatException e) {}
+		// ckeckbox: synch with tour chart slider
+		final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+		_actionSynchWithSlider.setChecked(isSynchSlider);
+		_isMapSynchedWithSlider = isSynchSlider;
 
-		try {
-			final boolean isSynchSlider = settings.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+		// checkbox: show tour in map
+		final boolean isShowTour = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_IN_MAP, true);
+		_actionShowTourInMap.setChecked(isShowTour);
+		_map.setShowOverlays(isShowTour);
+		_map.setShowLegend(isShowTour);
 
-			_actionSynchWithSlider.setChecked(isSynchSlider);
-			_isMapSynchedWithSlider = isSynchSlider;
-		} catch (final NumberFormatException e) {}
+		//
+		_actionSynchTourZoomLevel.setZoomLevel(Util.getStateInt(settings, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
+		_mapDimLevel = Util.getStateInt(settings, MEMENTO_MAP_DIM_LEVEL, -1);
 
-		// action: show tour in map
-		try {
-			boolean isShowTour;
-			if (settings.get(MEMENTO_SHOW_TOUR_IN_MAP) == null) {
-				// set default value
-				isShowTour = true;
-			} else {
-				isShowTour = settings.getBoolean(MEMENTO_SHOW_TOUR_IN_MAP);
-			}
-
-			_actionShowTourInMap.setChecked(isShowTour);
-			_map.setShowOverlays(isShowTour);
-			_map.setShowLegend(isShowTour);
-		} catch (final NumberFormatException e) {}
-
-		try {
-			_actionSynchTourZoomLevel.setZoomLevel(settings.getInt(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL));
-		} catch (final NumberFormatException e) {}
-
-		try {
-			_mapDimLevel = settings.getInt(MEMENTO_MAP_DIM_LEVEL);
-		} catch (final NumberFormatException e) {}
-
-		// action: show start/end in map
-		try {
-			_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
-		} catch (final NumberFormatException e) {}
+		// checkbox: show start/end in map
+		_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
 		paintManager.setShowStartEnd(_actionShowStartEndInMap.isChecked());
 
-		// action: show tour marker
-		try {
-			_actionShowTourMarker.setChecked(settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		} catch (final NumberFormatException e) {}
+		// checkbox: show tour marker
+		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
+		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
 		paintManager.setShowTourMarker(_actionShowTourMarker.isChecked());
 
-		// action: show legend in map
-		try {
-			boolean isShowLegend;
-			if (settings.get(MEMENTO_SHOW_LEGEND_IN_MAP) == null) {
-				// set default value
-				isShowLegend = true;
-			} else {
-				isShowLegend = settings.getBoolean(MEMENTO_SHOW_LEGEND_IN_MAP);
-			}
+		// checkbox: show legend in map
+		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
 
-			_actionShowLegendInMap.setChecked(isShowLegend);
-		} catch (final NumberFormatException e) {}
-
-		// action: show scale
-		boolean isScaleVisible = true;
-		if (settings.get(MEMENTO_SHOW_SCALE_IN_MAP) != null) {
-			isScaleVisible = settings.getBoolean(MEMENTO_SHOW_SCALE_IN_MAP);
-		}
+		// checkbox: show scale
+		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);
 		_actionShowScaleInMap.setChecked(isScaleVisible);
 		_map.setShowScale(isScaleVisible);
 
-		// actions
-		_actionShowSliderInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+		// other actions
+		state = settings.get(MEMENTO_SHOW_SLIDER_IN_MAP);
+		_actionShowSliderInMap.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_MAP));
+
 		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
 		// restore map factory by selecting the last used map factory
 		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// restore: default position
-		try {
-			fDefaultZoom = settings.getInt(MEMENTO_DEFAULT_POSITION_ZOOM);
-		} catch (final NumberFormatException e) {}
-
-		try {
-			fDefaultPosition = new GeoPosition(settings.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE), settings
-					.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE));
-		} catch (final NumberFormatException e) {
-			fDefaultPosition = new GeoPosition(0, 0);
-		}
+		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 0);
+		_defaultPosition = new GeoPosition(//
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0),
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0));
 
 		// tour color
 		try {
@@ -1815,14 +1774,14 @@ public class TourMapView extends ViewPart {
 
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 
-		if (fDefaultPosition == null) {
+		if (_defaultPosition == null) {
 			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _map.getMapProvider().getMinimumZoomLevel());
 			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
 			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
 		} else {
-			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, fDefaultZoom);
-			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) fDefaultPosition.latitude);
-			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) fDefaultPosition.longitude);
+			settings.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
+			settings.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
+			settings.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
 		}
 
 		// tour color

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,12 +24,12 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 
-	private Menu			fMenu;
+	private Menu			_menu;
 
-	private ActionZoomLevel	fActionZoomLevel_0;
-	private ActionZoomLevel	fActionZoomLevel_1;
-	private ActionZoomLevel	fActionZoomLevel_2;
-	private ActionZoomLevel	fActionZoomLevel_3;
+	private ActionZoomLevel	_actionZoomLevel_0;
+	private ActionZoomLevel	_actionZoomLevel_1;
+	private ActionZoomLevel	_actionZoomLevel_2;
+	private ActionZoomLevel	_actionZoomLevel_3;
 
 	private int				fZoomLevel	= 0;
 
@@ -58,24 +58,24 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		super(Messages.map_action_zoom_level_centered_tour, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fActionZoomLevel_0 = new ActionZoomLevel(0, Messages.map_action_zoom_level_default);
-		fActionZoomLevel_1 = new ActionZoomLevel(-1, Messages.map_action_zoom_level_x_value);
-		fActionZoomLevel_2 = new ActionZoomLevel(-2, Messages.map_action_zoom_level_x_value);
-		fActionZoomLevel_3 = new ActionZoomLevel(-3, Messages.map_action_zoom_level_x_value);
+		_actionZoomLevel_0 = new ActionZoomLevel(0, Messages.map_action_zoom_level_default);
+		_actionZoomLevel_1 = new ActionZoomLevel(-1, Messages.map_action_zoom_level_x_value);
+		_actionZoomLevel_2 = new ActionZoomLevel(-2, Messages.map_action_zoom_level_x_value);
+		_actionZoomLevel_3 = new ActionZoomLevel(-3, Messages.map_action_zoom_level_x_value);
 
 		// set current year as default
-		fActionZoomLevel_0.setChecked(true);
+		_actionZoomLevel_0.setChecked(true);
 	}
 
 	private void addActionToMenu(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -85,44 +85,44 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 
 	public Menu getMenu(final Menu parent) {
 
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
-		addActionToMenu(fActionZoomLevel_0);
-		addActionToMenu(fActionZoomLevel_1);
-		addActionToMenu(fActionZoomLevel_2);
-		addActionToMenu(fActionZoomLevel_3);
+		addActionToMenu(_actionZoomLevel_0);
+		addActionToMenu(_actionZoomLevel_1);
+		addActionToMenu(_actionZoomLevel_2);
+		addActionToMenu(_actionZoomLevel_3);
 
-		return fMenu;
+		return _menu;
 	}
 
 	public int getZoomLevel() {
 		return fZoomLevel;
 	}
 
-	public void setZoomLevel(final Integer zoomLevel) {
+	public void setZoomLevel(final int zoomLevel) {
 
 		fZoomLevel = zoomLevel;
 		PaintManager.getInstance().setSynchTourZoomLevel(zoomLevel);
 
-		fActionZoomLevel_0.setChecked(false);
-		fActionZoomLevel_1.setChecked(false);
-		fActionZoomLevel_2.setChecked(false);
-		fActionZoomLevel_3.setChecked(false);
+		_actionZoomLevel_0.setChecked(false);
+		_actionZoomLevel_1.setChecked(false);
+		_actionZoomLevel_2.setChecked(false);
+		_actionZoomLevel_3.setChecked(false);
 
 		switch (zoomLevel) {
 		case -1:
-			fActionZoomLevel_1.setChecked(true);
+			_actionZoomLevel_1.setChecked(true);
 			break;
 		case -2:
-			fActionZoomLevel_2.setChecked(true);
+			_actionZoomLevel_2.setChecked(true);
 			break;
 		case -3:
-			fActionZoomLevel_3.setChecked(true);
+			_actionZoomLevel_3.setChecked(true);
 			break;
 
 		case 0:
 		default:
-			fActionZoomLevel_0.setChecked(true);
+			_actionZoomLevel_0.setChecked(true);
 			break;
 		}
 	}

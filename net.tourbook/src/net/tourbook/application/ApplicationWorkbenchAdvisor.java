@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.preferences.PrefPageGeneral;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.ui.application.IWorkbenchConfigurer;
@@ -31,12 +32,14 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public String getInitialWindowPerspectiveId() {
+		// set default perspective
 		return PerspectiveFactoryTourBook.PERSPECTIVE_ID;
 	}
 
 	@Override
 	public String getMainPreferencePageId() {
-		return "net.tourbook.preferences.PrefPageGeneral"; //$NON-NLS-1$
+		// set default pref page
+		return PrefPageGeneral.ID;
 	}
 
 	@Override

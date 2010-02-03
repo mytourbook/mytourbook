@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,6 +24,7 @@ import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.tag.TagManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -61,17 +62,16 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
+@SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-	private static final String					PREF_PAGE_ID_USER	= "net.tourbook.preferences.PrefPageClients"; //$NON-NLS-1$
+	private ApplicationActionBarAdvisor			_applicationActionBarAdvisor;
 
-	private ApplicationActionBarAdvisor			fApplicationActionBarAdvisor;
+	private IPerspectiveDescriptor				_lastPerspective;
+	private IWorkbenchPage						_lastActivePage;
 
-	private IPerspectiveDescriptor				lastPerspective;
-	private IWorkbenchPage						lastActivePage;
-
-	private IWorkbenchPart						lastActivePart;
-	private String								lastPartTitle		= "";											//$NON-NLS-1$
+	private IWorkbenchPart						_lastActivePart;
+	private String								_lastPartTitle	= UI.EMPTY_STRING;
 
 	private final ApplicationWorkbenchAdvisor	wbAdvisor;
 
@@ -107,10 +107,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			final String shellTitle = Messages.App_Window_Title;
 
 			if (activePart != null) {
-				lastPartTitle = activePart.getTitleToolTip();
-				if (lastPartTitle != null) {
-					if (lastPartTitle.length() > 0) {
-						title = NLS.bind(shellTitle, lastPartTitle, title);
+				_lastPartTitle = activePart.getTitleToolTip();
+				if (_lastPartTitle != null) {
+					if (_lastPartTitle.length() > 0) {
+						title = NLS.bind(shellTitle, _lastPartTitle, title);
 					}
 				}
 			}
@@ -137,8 +137,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer) {
-		fApplicationActionBarAdvisor = new ApplicationActionBarAdvisor(configurer);
-		return fApplicationActionBarAdvisor;
+		_applicationActionBarAdvisor = new ApplicationActionBarAdvisor(configurer);
+		return _applicationActionBarAdvisor;
 	}
 
 	@Override
@@ -221,9 +221,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void propertyChanged(final Object source, final int propId) {
 
 				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
-					if (lastActivePart != null) {
-						final String newTitle = lastActivePart.getTitle();
-						if (!lastPartTitle.equals(newTitle)) {
+					if (_lastActivePart != null) {
+						final String newTitle = _lastActivePart.getTitle();
+						if (!_lastPartTitle.equals(newTitle)) {
 							recomputeTitle();
 						}
 					}
@@ -250,20 +250,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				final Shell activeShell = Display.getCurrent().getActiveShell();
 
-				MessageDialog.openInformation(activeShell,
+				MessageDialog.openInformation(
+						activeShell,
 						Messages.App_Dlg_first_startup_title,
 						Messages.App_Dlg_first_startup_msg);
 
-				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(activeShell,
-						PREF_PAGE_ID_USER, //$NON-NLS-1$
-						new String[] { PREF_PAGE_ID_USER },
+				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(//
+						activeShell,
+						PrefPagePeople.ID,
+						new String[] { PrefPagePeople.ID },
 						null);
 
 				dialog.open();
 
 				// open raw data view
 				try {
-					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID,
+					getWindowConfigurer().getWindow().getActivePage().showView(
+							RawDataView.ID,
 							null,
 							IWorkbenchPage.VIEW_ACTIVATE);
 				} catch (final PartInitException e) {
@@ -274,7 +277,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			conn.close();
 
 			// select person/tour type which was selected in the last session
-			fApplicationActionBarAdvisor.fPersonSelector.fireEventNewPersonIsSelected();
+			_applicationActionBarAdvisor.fPersonSelector.fireEventNewPersonIsSelected();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -306,9 +309,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-		configurer.setInitialSize(new Point(900, 700));
-		configurer.setShowPerspectiveBar(true);
+		configurer.setInitialSize(new Point(950, 700));
 
+		configurer.setShowPerspectiveBar(true);
 		configurer.setShowCoolBar(true);
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowStatusLine(false);
@@ -322,7 +325,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		// show memory monitor
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final boolean isMemoryMonitorVisible = prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
+		final boolean isMemoryMonitorVisible = prefStore
+				.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
 		uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
 
 		hookTitleUpdateListeners(configurer);
@@ -375,17 +379,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 
 		// Nothing to do if the part hasn't changed
-		if (activePart == lastActivePart && currentPage == lastActivePage && persp == lastPerspective) {
+		if (activePart == _lastActivePart && currentPage == _lastActivePage && persp == _lastPerspective) {
 			return;
 		}
 
-		if (lastActivePart != null) {
-			lastActivePart.removePropertyListener(partPropertyListener);
+		if (_lastActivePart != null) {
+			_lastActivePart.removePropertyListener(partPropertyListener);
 		}
 
-		lastActivePart = activePart;
-		lastActivePage = currentPage;
-		lastPerspective = persp;
+		_lastActivePart = activePart;
+		_lastActivePage = currentPage;
+		_lastPerspective = persp;
 
 		if (activePart != null) {
 			activePart.addPropertyListener(partPropertyListener);

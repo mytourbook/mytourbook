@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.util;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Resource;
 
 public class Util {
@@ -43,5 +44,46 @@ public class Util {
 			resource.dispose();
 		}
 		return null;
+	}
+
+	/**
+	 * @param settings
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a boolean value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static boolean getStateBoolean(final IDialogSettings settings, final String key, final boolean defaultValue) {
+		return settings.get(key) == null ? defaultValue : settings.getBoolean(key);
+	}
+
+	/**
+	 * @param settings
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static double getStateDouble(final IDialogSettings settings, final String key, final double defaultValue) {
+		try {
+			return settings.get(key) == null ? defaultValue : settings.getDouble(key);
+		} catch (final NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @param settings
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static int getStateInt(final IDialogSettings settings, final String key, final int defaultValue) {
+		try {
+			return settings.get(key) == null ? defaultValue : settings.getInt(key);
+		} catch (final NumberFormatException e) {
+			return defaultValue;
+		}
 	}
 }

@@ -82,7 +82,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             class="net.tourbook.preferences.PrefPageGeneral"
-            id="net.tourbook.preferences.PrefPageGeneral"
+            id="net.tourbook.preferences.PrefPageGeneralId"
             name="%preference_page_general">
       </page>
       <page
@@ -101,7 +101,7 @@
             name="%preference_page_Bikes"/>
       <page
             class="net.tourbook.preferences.PrefPagePeople"
-            id="net.tourbook.preferences.PrefPageClients"
+            id="net.tourbook.preferences.PrefPagePeopleId"
             name="%preference_page_People"/>
 
       <page

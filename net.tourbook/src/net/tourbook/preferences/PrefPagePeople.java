@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -80,6 +80,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
+
+	public static final String			ID						= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
 
 	private static final int			COLUMN_IS_MODIFIED		= 0;
 	private static final int			COLUMN_FIRSTNAME		= 1;
@@ -432,7 +434,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldHeight(final int floatInputWidth) {
 
-		final InputFieldFloat floatInput = new InputFieldFloat(fPersonDetailContainer,
+		final InputFieldFloat floatInput = new InputFieldFloat(
+				fPersonDetailContainer,
 				Messages.Pref_People_Label_height,
 				floatInputWidth);
 
@@ -496,7 +499,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldWeight(final int floatInputWidth) {
 
-		final InputFieldFloat floatInput = new InputFieldFloat(fPersonDetailContainer,
+		final InputFieldFloat floatInput = new InputFieldFloat(
+				fPersonDetailContainer,
 				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
@@ -533,7 +537,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		gridData.widthHint = convertWidthInCharsToPixels(30);
 		layouter.setLayoutData(gridData);
 
-		final Table table = new Table(layouter,
+		final Table table = new Table(
+				layouter,
 				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -673,7 +678,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		/**
 		 * field: path to save raw tour data
 		 */
-		fRawDataPathEditor = new DirectoryFieldEditor(ITourbookPreferences.DUMMY_FIELD,
+		fRawDataPathEditor = new DirectoryFieldEditor(
+				ITourbookPreferences.DUMMY_FIELD,
 				Messages.Pref_People_Label_rawdata_path,
 				fPersonDetailContainer);
 		fRawDataPathEditor.setEmptyStringAllowed(true);
@@ -824,7 +830,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// ask for the reference tour name
 		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
-		final MessageDialog dialog = new MessageDialog(getShell(),
+		final MessageDialog dialog = new MessageDialog(
+				getShell(),
 				Messages.Pref_People_Dlg_del_person_title,
 				null,
 				Messages.Pref_People_Dlg_del_person_message,
