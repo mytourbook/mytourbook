@@ -764,6 +764,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_section_personal;
 	public static String		tour_editor_label_rest_pulse;
 
+	public static String	tour_editor_label_rest_pulse_Tooltip;
+
 	public static String		tour_merger_btn_reset_adjustment;
 	public static String		tour_merger_btn_reset_adjustment_tooltip;
 	public static String		tour_merger_btn_reset_values;

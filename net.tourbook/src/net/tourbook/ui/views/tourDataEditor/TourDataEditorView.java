@@ -142,6 +142,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -156,6 +158,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
@@ -172,6 +175,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import de.byteholder.geoclipse.util.Util;
+
 // author: Wolfgang Schramm
 // create: 24.08.2007
 
@@ -182,7 +187,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
-	private static final String					CSV_FILE_EXTENSION				= "csv";
+	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
 	private final IDialogSettings				_viewState						= TourbookPlugin
 																						.getDefault()
@@ -329,7 +334,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			UI.IMAGE_WEATHER_SNOW												};
 
 	private Text								_txtTemp;
-	private Text								_txtRestPulse;
+//	private Text								_txtRestPulse;
 
 	private Text								_txtTourDistance;
 	private Label								_lblTourDistanceUnit;
@@ -491,7 +496,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean								_isDistManuallyModified;
 	private boolean								_isWindSpdManuallyModified;
-	private boolean                             _isTemperatureManuallyModified;
+	private boolean								_isTemperatureManuallyModified;
 
 	/*
 	 * measurement unit values
@@ -499,6 +504,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private float								_unitValueDistance;
 	private float								_unitValueAltitude;
 	private float								_unitValueTemperature;
+
+	private Spinner								_spinRestPuls;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -2133,382 +2140,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sectionContainer;
 	}
 
-	private void createSectionCharacteristics(final Composite parent, final FormToolkit tk) {
-
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_characteristics);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(section);
-
-		/*
-		 * tags
-		 */
-		_linkTag = new Link(section, SWT.NONE);
-		_linkTag.setText(Messages.tour_editor_label_tour_tag);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_linkTag);
-		_linkTag.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_linkTag);
-			}
-		});
-		tk.adapt(_linkTag, true, true);
-
-		_lblTourTags = tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				// hint is necessary that the width is not expanded when the text is long
-				.hint(_textColumnWidth, SWT.DEFAULT)
-				.span(3, 1)
-				.applyTo(_lblTourTags);
-
-		/*
-		 * tour type
-		 */
-		_linkTourType = new Link(section, SWT.NONE);
-		_linkTourType.setText(Messages.tour_editor_label_tour_type);
-		_linkTourType.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_linkTourType);
-			}
-		});
-		tk.adapt(_linkTourType, true, true);
-
-		_lblTourType = new CLabel(section, SWT.NONE);
-		GridDataFactory.swtDefaults()//
-				.grab(true, false)
-				.span(3, 1)
-				.applyTo(_lblTourType);
-	}
-
-	private void createSectionDateTime(final Composite parent, final FormToolkit tk) {
-
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_date_time);
-		GridLayoutFactory.fillDefaults().numColumns(2).spacing(20, 5).applyTo(section);
-
-		/*
-		 * container: 1. column
-		 */
-		final Composite tourDtContainer = tk.createComposite(section);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(tourDtContainer);
-		GridDataFactory.fillDefaults().applyTo(tourDtContainer);
-
-		/*
-		 * date
-		 */
-		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_date);
-
-		_dtTourDate = new DateTime(tourDtContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
-		tk.adapt(_dtTourDate, true, false);
-		_dtTourDate.addSelectionListener(_dateTimeListener);
-
-		//////////////////////////////////////
-		createUISeparator(tourDtContainer, tk);
-
-		/*
-		 * start time
-		 */
-		tk.createLabel(tourDtContainer, Messages.tour_editor_label_start_time);
-
-		_dtStartTime = new DateTime(tourDtContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtStartTime);
-		tk.adapt(_dtStartTime, true, false);
-		_dtStartTime.addSelectionListener(_dateTimeListener);
-
-		//////////////////////////////////////
-		createUISeparator(tourDtContainer, tk);
-
-		/*
-		 * tour distance
-		 */
-		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_distance);
-
-		_txtTourDistance = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
-		GridDataFactory.fillDefaults().applyTo(_txtTourDistance);
-		_txtTourDistance.addModifyListener(_verifyFloatValue);
-		_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
-		_txtTourDistance.addKeyListener(new KeyListener() {
-			public void keyPressed(final KeyEvent e) {
-				_isDistManuallyModified = true;
-			}
-
-			public void keyReleased(final KeyEvent e) {}
-		});
-
-		_lblTourDistanceUnit = tk.createLabel(tourDtContainer, UI.UNIT_LABEL_DISTANCE);
-
-		/*
-		 * calories
-		 */
-
-		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_calories);
-
-		_calTourCalories = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
-		GridDataFactory.fillDefaults().applyTo(_calTourCalories);
-		_calTourCalories.addModifyListener(_verifyIntValue);
-		_calTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);
-
-		tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_calories_unit);
-
-		/*
-		 * container: 2. column
-		 */
-		final Composite timeContainer = tk.createComposite(section);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
-		GridDataFactory.fillDefaults().applyTo(timeContainer);
-
-		/*
-		 * recording time
-		 */
-		tk.createLabel(timeContainer, Messages.tour_editor_label_recording_time);
-
-		_dtRecordingTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-		_dtRecordingTime.addSelectionListener(_tourTimeListener);
-		tk.adapt(_dtRecordingTime, true, true);
-
-		/*
-		 * paused time
-		 */
-		tk.createLabel(timeContainer, Messages.tour_editor_label_paused_time);
-
-		_dtPausedTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-		tk.adapt(_dtPausedTime, true, true);
-		_dtPausedTime.addSelectionListener(_tourTimeListener);
-
-		/*
-		 * driving time
-		 */
-		tk.createLabel(timeContainer, Messages.tour_editor_label_driving_time);
-
-		_dtDrivingTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-		tk.adapt(_dtDrivingTime, true, true);
-		_dtDrivingTime.addSelectionListener(_tourTimeListener);
-	}
-
-	private void createSectionInfo(final Composite parent, final FormToolkit tk) {
-
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_info);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
-
-		// keep border style
-		final int defaultBorderStyle = tk.getBorderStyle();
-		tk.setBorderStyle(SWT.NULL);
-
-		/*
-		 * reference tours
-		 */
-		Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
-		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-
-		_txtRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
-
-		/*
-		 * number of time slices
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_datapoints);
-
-		_txtTimeSlicesCount = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
-
-		/*
-		 * device name
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_device_name);
-
-		_txtDeviceName = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
-
-		/*
-		 * import file path
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_import_file_path);
-
-//		fTextImportFilePath = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		_txtImportFilePath = new ImageComboLabel(section, SWT.NONE);
-		tk.adapt(_txtImportFilePath);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.FILL).applyTo(_txtImportFilePath);
-
-		/*
-		 * person
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_person);
-
-		_txtPerson = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
-
-		/*
-		 * tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
-
-		_txtTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
-
-		/*
-		 * merged from tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
-
-		_txtMergeFromTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
-
-		/*
-		 * merged into tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
-
-		_txtMergeIntoTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
-
-		/*
-		 * reset border style
-		 */
-		tk.setBorderStyle(defaultBorderStyle);
-	}
-
-	private void createSectionPersonal(final Composite parent, final FormToolkit tk) {
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_personal);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
-
-		// rest pulse
-		tk.createLabel(section, Messages.tour_editor_label_rest_pulse);
-		_txtRestPulse = tk.createText(section, UI.EMPTY_STRING);
-		_txtRestPulse.addModifyListener(_modifyListener);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtRestPulse);
-	}
-
-	private void createSectionTitle(final Composite parent, final FormToolkit tk) {
-
-		Label label;
-
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_tour);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
-
-		/*
-		 * title
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_tour_title);
-
-		_txtTitle = tk.createText(section, UI.EMPTY_STRING);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(_txtTitle);
-		_txtTitle.addKeyListener(_keyListener);
-		_txtTitle.addModifyListener(_modifyListener);
-
-		/*
-		 * description
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_description);
-		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-
-		_txtDescription = tk.createText(section, UI.EMPTY_STRING, SWT.BORDER //
-				| SWT.WRAP
-				| SWT.V_SCROLL
-				| SWT.H_SCROLL//
-		);
-
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-		int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-		descLines = descLines == 0 ? 5 : descLines;
-
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				//
-				// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
-				//
-				.hint(_textColumnWidth, _pixelConverter.convertHeightInCharsToPixels(descLines))
-				.applyTo(_txtDescription);
-
-		_txtDescription.addModifyListener(_modifyListener);
-
-		/*
-		 * start location
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_start_location);
-
-		_txtStartLocation = tk.createText(section, UI.EMPTY_STRING);
-		_txtStartLocation.addModifyListener(_modifyListener);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtStartLocation);
-
-		/*
-		 * end location
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_end_location);
-
-		_txtEndLocation = tk.createText(section, UI.EMPTY_STRING);
-		_txtEndLocation.addModifyListener(_modifyListener);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtEndLocation);
-	}
-
-	private void createSectionWeather(final Composite parent, final FormToolkit tk) {
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_weather);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
-
-		// wind
-		tk.createLabel(section, Messages.tour_editor_label_wind_direction);
-		_txtWindDir = tk.createText(section, UI.EMPTY_STRING);
-		_txtWindDir.addModifyListener(_modifyListener);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindDir);
-
-		tk.createLabel(section, Messages.tour_editor_label_wind_speed);
-		_txtWindSpd = tk.createText(section, UI.EMPTY_STRING);
-		_txtWindSpd.addModifyListener(_modifyListener);
-		_txtWindSpd.addKeyListener(new KeyListener() {
-			public void keyPressed(final KeyEvent e) {
-				_isWindSpdManuallyModified = true;
-			}
-
-			public void keyReleased(final KeyEvent e) {}
-		});
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindSpd);
-
-		// clouds
-		tk.createLabel(section, Messages.tour_editor_label_clouds);
-
-		final Composite cloudContainer = new Composite(section, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(cloudContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
-		{
-			_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-
-			_comboClouds = new Combo(cloudContainer, SWT.READ_ONLY | SWT.MEDIUM | SWT.BORDER);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboClouds);
-			tk.adapt(_comboClouds, true, false);
-			_comboClouds.addModifyListener(_modifyListener);
-			_comboClouds.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					displayCloudIcon();
-				}
-			});
-
-			// fill combobox
-			for (final String fComboCloudsUIValue : _comboCloudsUIValues) {
-				_comboClouds.add(fComboCloudsUIValue);
-			}
-		}
-
-		// temperature
-		tk.createLabel(section, Messages.tour_editor_label_temperature);
-		_txtTemp = tk.createText(section, UI.EMPTY_STRING);
-		_txtTemp.addModifyListener(_modifyListener);
-		_txtTemp.addKeyListener(new KeyListener() {
-			public void keyPressed(final KeyEvent e) {
-				_isTemperatureManuallyModified = true;
-			}
-
-			public void keyReleased(final KeyEvent e) {}
-		});
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTemp);
-	}
-
 	/**
 	 * @param parent
 	 */
@@ -2675,20 +2306,508 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_tabTour = new CTabItem(_tabFolder, SWT.FLAT);
 		_tabTour.setText(Messages.tour_editor_tabLabel_tour);
-		_tabTour.setControl(createUITabTour(_tabFolder, _tk));
+		_tabTour.setControl(createUITab10Tour(_tabFolder, _tk));
 
 		_tabMarker = new CTabItem(_tabFolder, SWT.FLAT);
 		_tabMarker.setText(Messages.tour_editor_tabLabel_tour_marker);
-		_tabMarker.setControl(createUITabMarker(_tabFolder));
+		_tabMarker.setControl(createUITab20Marker(_tabFolder));
 
 		_tabSlices = new CTabItem(_tabFolder, SWT.FLAT);
 		_tabSlices.setText(Messages.tour_editor_tabLabel_tour_data);
-		_tabSlices.setControl(createUITabSlices(_tabFolder));
+		_tabSlices.setControl(createUITab30Slices(_tabFolder));
 
 		_tabInfo = new CTabItem(_tabFolder, SWT.FLAT);
 		_tabInfo.setText(Messages.tour_editor_tabLabel_info);
-		_tabInfo.setControl(createUITabInfo(_tabFolder, _tk));
+		_tabInfo.setControl(createUITab40Info(_tabFolder, _tk));
 
+	}
+
+	private void createUISection110Title(final Composite parent, final FormToolkit tk) {
+
+		Label label;
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_tour);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+		{
+			/*
+			 * title
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_tour_title);
+
+			_txtTitle = tk.createText(section, UI.EMPTY_STRING);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.applyTo(_txtTitle);
+			_txtTitle.addKeyListener(_keyListener);
+			_txtTitle.addModifyListener(_modifyListener);
+
+			/*
+			 * description
+			 */
+			label = tk.createLabel(section, Messages.tour_editor_label_description);
+			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+
+			_txtDescription = tk.createText(section, UI.EMPTY_STRING, SWT.BORDER //
+					| SWT.WRAP
+					| SWT.V_SCROLL
+					| SWT.H_SCROLL//
+			);
+
+			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
+			descLines = descLines == 0 ? 5 : descLines;
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					//
+					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+					//
+					.hint(_textColumnWidth, _pixelConverter.convertHeightInCharsToPixels(descLines))
+					.applyTo(_txtDescription);
+
+			_txtDescription.addModifyListener(_modifyListener);
+
+			/*
+			 * start location
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_start_location);
+
+			_txtStartLocation = tk.createText(section, UI.EMPTY_STRING);
+			_txtStartLocation.addModifyListener(_modifyListener);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtStartLocation);
+
+			/*
+			 * end location
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_end_location);
+
+			_txtEndLocation = tk.createText(section, UI.EMPTY_STRING);
+			_txtEndLocation.addModifyListener(_modifyListener);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtEndLocation);
+		}
+	}
+
+	private void createUISection120DateTime(final Composite parent, final FormToolkit tk) {
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_date_time);
+		GridLayoutFactory.fillDefaults().equalWidth(true).numColumns(2).spacing(20, 5).applyTo(section);
+		{
+			createUISection122Column1(tk, section);
+			createUISection124Column2(tk, section);
+		}
+	}
+
+	/**
+	 * 1. column
+	 */
+	private void createUISection122Column1(final FormToolkit tk, final Composite section) {
+
+		final Composite tourDtContainer = tk.createComposite(section);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(tourDtContainer);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(tourDtContainer);
+		{
+			/*
+			 * date
+			 */
+			tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_date);
+
+			_dtTourDate = new DateTime(tourDtContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
+			tk.adapt(_dtTourDate, true, false);
+			_dtTourDate.addSelectionListener(_dateTimeListener);
+
+			//////////////////////////////////////
+			createUISeparator(tourDtContainer, tk);
+
+			/*
+			 * start time
+			 */
+			tk.createLabel(tourDtContainer, Messages.tour_editor_label_start_time);
+
+			_dtStartTime = new DateTime(tourDtContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtStartTime);
+			tk.adapt(_dtStartTime, true, false);
+			_dtStartTime.addSelectionListener(_dateTimeListener);
+
+			//////////////////////////////////////
+			createUISeparator(tourDtContainer, tk);
+
+			/*
+			 * tour distance
+			 */
+			tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_distance);
+
+			_txtTourDistance = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
+			GridDataFactory.fillDefaults().applyTo(_txtTourDistance);
+			_txtTourDistance.addModifyListener(_verifyFloatValue);
+			_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
+			_txtTourDistance.addKeyListener(new KeyListener() {
+				public void keyPressed(final KeyEvent e) {
+					_isDistManuallyModified = true;
+				}
+
+				public void keyReleased(final KeyEvent e) {}
+			});
+
+			_lblTourDistanceUnit = tk.createLabel(tourDtContainer, UI.UNIT_LABEL_DISTANCE);
+		}
+	}
+
+	/**
+	 * 2. column
+	 */
+	private void createUISection124Column2(final FormToolkit tk, final Composite section) {
+
+		final Composite timeContainer = tk.createComposite(section);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
+		{
+			/*
+			 * recording time
+			 */
+			tk.createLabel(timeContainer, Messages.tour_editor_label_recording_time);
+
+			_dtRecordingTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+			_dtRecordingTime.addSelectionListener(_tourTimeListener);
+			tk.adapt(_dtRecordingTime, true, true);
+
+			/*
+			 * paused time
+			 */
+			tk.createLabel(timeContainer, Messages.tour_editor_label_paused_time);
+
+			_dtPausedTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+			tk.adapt(_dtPausedTime, true, true);
+			_dtPausedTime.addSelectionListener(_tourTimeListener);
+
+			/*
+			 * driving time
+			 */
+			tk.createLabel(timeContainer, Messages.tour_editor_label_driving_time);
+
+			_dtDrivingTime = new DateTime(timeContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+			tk.adapt(_dtDrivingTime, true, true);
+			_dtDrivingTime.addSelectionListener(_tourTimeListener);
+		}
+	}
+
+	private void createUISection130Personal(final Composite parent, final FormToolkit tk) {
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_personal);
+		GridLayoutFactory.fillDefaults().equalWidth(true).numColumns(2).spacing(20, 5).applyTo(section);
+		{
+			createUISection132Column1(tk, section);
+			createUISection134Column2(tk, section);
+		}
+	}
+
+	/**
+	 * 1. column
+	 */
+	private void createUISection132Column1(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * rest pulse
+			 */
+
+			// label: Rest pulse
+			tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+
+			// spinner
+			_spinRestPuls = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinRestPuls);
+			_spinRestPuls.setMinimum(0);
+			_spinRestPuls.setMaximum(250);
+			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+
+			_spinRestPuls.addModifyListener(_modifyListener);
+			_spinRestPuls.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					setTourDirty();
+				}
+			});
+
+			_spinRestPuls.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					setTourDirty();
+				}
+			});
+
+			// label: bpm
+			tk.createLabel(container, Messages.Graph_Label_Heartbeat_unit);
+		}
+	}
+
+	/**
+	 * 2. column
+	 */
+	private void createUISection134Column2(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * calories
+			 */
+
+			// label
+			tk.createLabel(container, Messages.tour_editor_label_tour_calories);
+
+			_calTourCalories = tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+			GridDataFactory.fillDefaults().applyTo(_calTourCalories);
+			_calTourCalories.addModifyListener(_verifyIntValue);
+			_calTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);
+
+			tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+
+		}
+	}
+
+	private void createUISection140Weather(final Composite parent, final FormToolkit tk) {
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_weather);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(20, 5).applyTo(section);
+		{
+			createUISection142Column1(tk, section);
+			createUISection144Column2(tk, section);
+		}
+	}
+
+	/**
+	 * 1. column
+	 */
+	private void createUISection142Column1(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * spinner: wind direction
+			 */
+			tk.createLabel(container, Messages.tour_editor_label_wind_direction);
+			_txtWindDir = tk.createText(container, UI.EMPTY_STRING);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindDir);
+			_txtWindDir.addModifyListener(_modifyListener);
+
+			/*
+			 * spinner: wind speed
+			 */
+			tk.createLabel(container, Messages.tour_editor_label_wind_speed);
+			_txtWindSpd = tk.createText(container, UI.EMPTY_STRING);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindSpd);
+			_txtWindSpd.addModifyListener(_modifyListener);
+			_txtWindSpd.addKeyListener(new KeyListener() {
+				public void keyPressed(final KeyEvent e) {
+					_isWindSpdManuallyModified = true;
+				}
+
+				public void keyReleased(final KeyEvent e) {}
+			});
+		}
+	}
+
+	/**
+	 * 2. column
+	 */
+	private void createUISection144Column2(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * clouds
+			 */
+			tk.createLabel(container, Messages.tour_editor_label_clouds);
+
+			final Composite cloudContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(cloudContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
+			{
+				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+
+				_comboClouds = new Combo(cloudContainer, SWT.READ_ONLY | SWT.MEDIUM | SWT.BORDER);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboClouds);
+				tk.adapt(_comboClouds, true, false);
+				_comboClouds.setVisibleItemCount(10);
+				_comboClouds.addModifyListener(_modifyListener);
+				_comboClouds.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						displayCloudIcon();
+					}
+				});
+
+				// fill combobox
+				for (final String fComboCloudsUIValue : _comboCloudsUIValues) {
+					_comboClouds.add(fComboCloudsUIValue);
+				}
+			}
+
+			/*
+			 * temperature
+			 */
+			tk.createLabel(container, Messages.tour_editor_label_temperature);
+			_txtTemp = tk.createText(container, UI.EMPTY_STRING);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTemp);
+			_txtTemp.addModifyListener(_modifyListener);
+			_txtTemp.addKeyListener(new KeyListener() {
+				public void keyPressed(final KeyEvent e) {
+					_isTemperatureManuallyModified = true;
+				}
+
+				public void keyReleased(final KeyEvent e) {}
+			});
+
+		}
+	}
+
+	private void createUISection150Characteristics(final Composite parent, final FormToolkit tk) {
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_characteristics);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(section);
+
+		/*
+		 * tags
+		 */
+		_linkTag = new Link(section, SWT.NONE);
+		_linkTag.setText(Messages.tour_editor_label_tour_tag);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_linkTag);
+		_linkTag.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_linkTag);
+			}
+		});
+		tk.adapt(_linkTag, true, true);
+
+		_lblTourTags = tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				// hint is necessary that the width is not expanded when the text is long
+				.hint(_textColumnWidth, SWT.DEFAULT)
+				.span(3, 1)
+				.applyTo(_lblTourTags);
+
+		/*
+		 * tour type
+		 */
+		_linkTourType = new Link(section, SWT.NONE);
+		_linkTourType.setText(Messages.tour_editor_label_tour_type);
+		_linkTourType.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_linkTourType);
+			}
+		});
+		tk.adapt(_linkTourType, true, true);
+
+		_lblTourType = new CLabel(section, SWT.NONE);
+		GridDataFactory.swtDefaults()//
+				.grab(true, false)
+				.span(3, 1)
+				.applyTo(_lblTourType);
+	}
+
+	private void createUISection410Info(final Composite parent, final FormToolkit tk) {
+
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_info);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+
+		// keep border style
+		final int defaultBorderStyle = tk.getBorderStyle();
+		tk.setBorderStyle(SWT.NULL);
+
+		/*
+		 * reference tours
+		 */
+		Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
+		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+
+		_txtRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
+
+		/*
+		 * number of time slices
+		 */
+		tk.createLabel(section, Messages.tour_editor_label_datapoints);
+
+		_txtTimeSlicesCount = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
+
+		/*
+		 * device name
+		 */
+		tk.createLabel(section, Messages.tour_editor_label_device_name);
+
+		_txtDeviceName = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
+
+		/*
+		 * import file path
+		 */
+		tk.createLabel(section, Messages.tour_editor_label_import_file_path);
+
+//		fTextImportFilePath = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		_txtImportFilePath = new ImageComboLabel(section, SWT.NONE);
+		tk.adapt(_txtImportFilePath);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.FILL).applyTo(_txtImportFilePath);
+
+		/*
+		 * person
+		 */
+		tk.createLabel(section, Messages.tour_editor_label_person);
+
+		_txtPerson = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
+
+		/*
+		 * tour id
+		 */
+		label = tk.createLabel(section, Messages.tour_editor_label_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
+
+		_txtTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
+
+		/*
+		 * merged from tour id
+		 */
+		label = tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
+
+		_txtMergeFromTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
+
+		/*
+		 * merged into tour id
+		 */
+		label = tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
+		label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
+
+		_txtMergeIntoTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
+
+		/*
+		 * reset border style
+		 */
+		tk.setBorderStyle(defaultBorderStyle);
 	}
 
 	private void createUISectionSeparator(final Composite parent, final FormToolkit tk) {
@@ -2700,79 +2819,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tk.createLabel(parent, UI.EMPTY_STRING);
 	}
 
-	private Composite createUITabInfo(final Composite parent, final FormToolkit tk) {
-
-		/*
-		 * scrolled container
-		 */
-		_scrolledTabInfo = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		_scrolledTabInfo.setExpandVertical(true);
-		_scrolledTabInfo.setExpandHorizontal(true);
-		_scrolledTabInfo.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResizeTabInfo();
-			}
-		});
-
-		_infoContainer = new Composite(_scrolledTabInfo, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
-		tk.adapt(_infoContainer);
-		GridLayoutFactory.swtDefaults().applyTo(_infoContainer);
-
-		// set content for scrolled composite
-		_scrolledTabInfo.setContent(_infoContainer);
-
-		createSectionInfo(_infoContainer, tk);
-
-		return _scrolledTabInfo;
-	}
-
-	/**
-	 * @param parent
-	 * @return returns the controls for the tab
-	 */
-	private Control createUITabMarker(final Composite parent) {
-
-		final Composite markerContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(markerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(markerContainer);
-
-		_markerViewerContainer = new Composite(markerContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_markerViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_markerViewerContainer);
-
-		createMarkerViewer(_markerViewerContainer);
-
-		return markerContainer;
-	}
-
-	/**
-	 * @param parent
-	 * @return returns the controls for the tab
-	 */
-	private Control createUITabSlices(final Composite parent) {
-
-		_sliceContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceContainer);
-
-		_sliceViewerContainer = new Composite(_sliceContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
-
-		createSliceViewer(_sliceViewerContainer);
-
-		_timeSliceLabel = new Label(_sliceContainer, SWT.WRAP);
-		_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		_timeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-		_timeSliceLabel.setVisible(false);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_timeSliceLabel);
-
-		return _sliceContainer;
-	}
-
-	private Composite createUITabTour(final Composite parent, final FormToolkit tk) {
+	private Composite createUITab10Tour(final Composite parent, final FormToolkit tk) {
 
 		// scrolled container
 		final ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
@@ -2795,21 +2842,93 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		tk.setBorderStyle(SWT.BORDER);
 
-		createSectionTitle(_tourContainer, tk);
+		createUISection110Title(_tourContainer, tk);
 		createUISectionSeparator(_tourContainer, tk);
 
-		createSectionPersonal(_tourContainer, tk);
+		createUISection120DateTime(_tourContainer, tk);
 		createUISectionSeparator(_tourContainer, tk);
 
-		createSectionWeather(_tourContainer, tk);
+		createUISection130Personal(_tourContainer, tk);
 		createUISectionSeparator(_tourContainer, tk);
 
-		createSectionDateTime(_tourContainer, tk);
+		createUISection140Weather(_tourContainer, tk);
 		createUISectionSeparator(_tourContainer, tk);
 
-		createSectionCharacteristics(_tourContainer, tk);
+		createUISection150Characteristics(_tourContainer, tk);
 
 		return sc;
+	}
+
+	/**
+	 * @param parent
+	 * @return returns the controls for the tab
+	 */
+	private Control createUITab20Marker(final Composite parent) {
+
+		final Composite markerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(markerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(markerContainer);
+
+		_markerViewerContainer = new Composite(markerContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_markerViewerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_markerViewerContainer);
+
+		createMarkerViewer(_markerViewerContainer);
+
+		return markerContainer;
+	}
+
+	/**
+	 * @param parent
+	 * @return returns the controls for the tab
+	 */
+	private Control createUITab30Slices(final Composite parent) {
+
+		_sliceContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceContainer);
+
+		_sliceViewerContainer = new Composite(_sliceContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
+
+		createSliceViewer(_sliceViewerContainer);
+
+		_timeSliceLabel = new Label(_sliceContainer, SWT.WRAP);
+		_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		_timeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		_timeSliceLabel.setVisible(false);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_timeSliceLabel);
+
+		return _sliceContainer;
+	}
+
+	private Composite createUITab40Info(final Composite parent, final FormToolkit tk) {
+
+		/*
+		 * scrolled container
+		 */
+		_scrolledTabInfo = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		_scrolledTabInfo.setExpandVertical(true);
+		_scrolledTabInfo.setExpandHorizontal(true);
+		_scrolledTabInfo.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResizeTabInfo();
+			}
+		});
+
+		_infoContainer = new Composite(_scrolledTabInfo, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
+		tk.adapt(_infoContainer);
+		GridLayoutFactory.swtDefaults().applyTo(_infoContainer);
+
+		// set content for scrolled composite
+		_scrolledTabInfo.setContent(_infoContainer);
+
+		createUISection410Info(_infoContainer, tk);
+
+		return _scrolledTabInfo;
 	}
 
 	private void defineMarkerViewerColumns(final Composite parent) {
@@ -3362,7 +3481,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtStartLocation.setEnabled(canEdit);
 		_txtEndLocation.setEnabled(canEdit);
 
-		_txtRestPulse.setEnabled(canEdit);
+		_spinRestPuls.setEnabled(canEdit);
 
 		_txtWindDir.setEnabled(canEdit);
 		_txtWindSpd.setEnabled(canEdit);
@@ -5072,7 +5191,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setTourStartPlace(_txtStartLocation.getText());
 			_tourData.setTourEndPlace(_txtEndLocation.getText());
 
-			_tourData.setRestPulse(getIntValue(_txtRestPulse.getText()));
+			_tourData.setRestPulse(_spinRestPuls.getSelection());
 
 			_tourData.setWeatherWindDir(getIntValue(_txtWindDir.getText()));
 			if (_isWindSpdManuallyModified) {
@@ -5081,7 +5200,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * changed when the tour is being modified then the computation of the speed
 				 * value can cause rounding errors
 				 */
-				_tourData.setWeatherWindSpd((int)(getIntValue(_txtWindSpd.getText()) * _unitValueDistance));
+				_tourData.setWeatherWindSpd((int) (getIntValue(_txtWindSpd.getText()) * _unitValueDistance));
 			}
 
 			final int fComboCloudsIndex = _comboClouds.getSelectionIndex();
@@ -5273,8 +5392,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @param isDirtyDisabled
 	 */
 	private void updateUIFromModel(	final TourData tourData,
-										final boolean forceTimeSliceReload,
-										final boolean isDirtyDisabled) {
+									final boolean forceTimeSliceReload,
+									final boolean isDirtyDisabled) {
 
 		if (tourData == null) {
 			_pageBook.showPage(_pageNoTour);
@@ -5503,7 +5622,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtStartLocation.setText(_tourData.getTourStartPlace());
 		_txtEndLocation.setText(_tourData.getTourEndPlace());
 
-		_txtRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
+		_spinRestPuls.setSelection(_tourData.getRestPulse());
 
 		// wind properties
 		_txtWindDir.setText(Integer.toString(_tourData.getWeatherWindDir()));
@@ -5513,7 +5632,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtWindSpd.setText(Integer.toString(windSpeed));
 		} else {
 
-			final int speed = (int)(windSpeed / _unitValueDistance);
+			final int speed = (int) (windSpeed / _unitValueDistance);
 			_txtWindSpd.setText(Integer.toString(speed));
 		}
 
@@ -5543,7 +5662,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
 			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
 		}
-		
+
 		_txtTemp.setText(Integer.toString(temperature));
 
 		// tour date
@@ -5655,15 +5774,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void writeCSVHeader(final Writer exportWriter, final StringBuilder sb) throws IOException {
 
 		// no.
-		sb.append("#");
+		sb.append("#"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// time hh:mm:ss
-		sb.append("hh:mm:ss");
+		sb.append("hh:mm:ss"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// time in seconds
-		sb.append("sec");
+		sb.append("sec"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// distance
@@ -5675,15 +5794,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		sb.append(UI.TAB);
 
 		// gradient
-		sb.append("%");
+		sb.append("%"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// pulse
-		sb.append("bpm");
+		sb.append("bpm"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// marker
-		sb.append("marker");
+		sb.append("marker"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// temperature
@@ -5691,7 +5810,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		sb.append(UI.TAB);
 
 		// cadence
-		sb.append("rpm");
+		sb.append("rpm"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// speed
@@ -5703,15 +5822,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		sb.append(UI.TAB);
 
 		// power
-		sb.append("W");
+		sb.append("W"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// longitude
-		sb.append("longitude");
+		sb.append("longitude"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// latitude
-		sb.append("latitude");
+		sb.append("latitude"); //$NON-NLS-1$
 		sb.append(UI.TAB);
 
 		// end of line
