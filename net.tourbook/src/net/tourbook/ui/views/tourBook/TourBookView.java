@@ -185,21 +185,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				final TVITourBookYear item1 = (TVITourBookYear) a;
 				final TVITourBookYear item2 = (TVITourBookYear) b;
-				return item1.fTourYear == item2.fTourYear;
+				return item1.tourYear == item2.tourYear;
 			}
 
 			if (a instanceof TVITourBookMonth && b instanceof TVITourBookMonth) {
 
 				final TVITourBookMonth item1 = (TVITourBookMonth) a;
 				final TVITourBookMonth item2 = (TVITourBookMonth) b;
-				return item1.fTourYear == item2.fTourYear && item1.fTourMonth == item2.fTourMonth;
+				return item1.tourYear == item2.tourYear && item1.tourMonth == item2.tourMonth;
 			}
 
 			if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
 
 				final TVITourBookTour item1 = (TVITourBookTour) a;
 				final TVITourBookTour item2 = (TVITourBookTour) b;
-				return item1.fTourId == item2.fTourId;
+				return item1.tourId == item2.tourId;
 			}
 
 			return false;
@@ -302,7 +302,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
@@ -424,7 +424,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllColumns(parent);
 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -517,15 +517,257 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * 
 	 * @param parent
 	 */
-	private void defineViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TreeColumnDefinition colDef;
 
-		/*
-		 * tree column: date
-		 */
-		colDef = TreeColumnFactory.DATE.createColumn(_columnManager, pixelConverter);
+		defineColumnDate(pixelConverter);
+		defineColumnTime(pixelConverter);
+		defineColumnTourType(pixelConverter);
+		defineColumnDistance(pixelConverter);
+		defineColumnTimeDriving(pixelConverter);
+		defineColumnWeatherClouds(pixelConverter);
+
+		defineColumnTitle(pixelConverter);
+		defineColumnTags(pixelConverter);
+		defineColumnAltitudeUp(pixelConverter);
+
+		defineColumnMarker(pixelConverter);
+		defineColumnCalories(pixelConverter);
+		defineColumnRestPulse(pixelConverter);
+
+		defineColumnTimeRecording(pixelConverter);
+		defineColumnTimeBreak(pixelConverter);
+		defineColumnTimeBreakRelative(pixelConverter);
+
+		defineColumnAltitudeDown(pixelConverter);
+
+		defineColumnMaxAltitude(pixelConverter);
+		defineColumnMaxSpeed(pixelConverter);
+		defineColumnMaxPulse(pixelConverter);
+
+		defineColumnAvgSpeed(pixelConverter);
+		defineColumnAvgPace(pixelConverter);
+		defineColumnAvgPulse(pixelConverter);
+		defineColumnAvgCadence(pixelConverter);
+		defineColumnAvgTemperature(pixelConverter);
+
+		defineColumnWeatherWindSpeed(pixelConverter);
+		defineColumnWeatherWindDirection(pixelConverter);
+
+		defineColumnWeek(pixelConverter);
+		defineColumnTimeInterval(pixelConverter);
+		defineColumnDeviceDistance(pixelConverter);
+	}
+
+	/**
+	 * column: altitude down (m)
+	 */
+	private void defineColumnAltitudeDown(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN
+				.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
+
+				if (dbAltitudeDown == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (-dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: altitude up (m)
+	 */
+	private void defineColumnAltitudeUp(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
+
+				if (dbAltitudeUp == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg cadence
+	 */
+	private void defineColumnAvgCadence(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
+
+				if (dbAvgCadence == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbAvgCadence));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg pace min/km - min/mi
+	 */
+	private void defineColumnAvgPace(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+				if (pace == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg pulse
+	 */
+	private void defineColumnAvgPulse(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
+
+				if (dbAvgPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbAvgPulse));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg speed km/h - mph
+	 */
+	private void defineColumnAvgSpeed(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				final float speed = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+				if (speed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					cell.setText(_nf.format(speed));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg temperature
+	 */
+	private void defineColumnAvgTemperature(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(
+				_columnManager,
+				pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				long temperature = ((TVITourBookItem) element).colAvgTemperature;
+
+				if (temperature == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+					}
+
+					cell.setText(Long.toString(temperature));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: calories
+	 */
+	private void defineColumnCalories(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, pixelConverter);
+		//colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long caloriesSum = ((TVITourBookItem) element).colCalories;
+
+				cell.setText(Long.toString(caloriesSum));
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * tree column: date
+	 */
+	private void defineColumnDate(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
@@ -559,95 +801,70 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: time
-		 */
-		colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
+	/**
+	 * column: device distance
+	 */
+	private void defineColumnDeviceDistance(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(
+				_columnManager,
+				pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final long tourDate = ((TVITourBookTour) element).fTourDate;
-					_calendar.setTimeInMillis(tourDate);
+					final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
 
-					cell.setText(_timeFormatter.format(_calendar.getTime()));
+					if (dbStartDistance == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(Long.toString((long) (dbStartDistance / UI.UNIT_VALUE_DISTANCE)));
+					}
+
 					setCellColor(cell, element);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: tour type
-		 */
-		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: distance (km/miles)
+	 */
+	private void defineColumnDistance(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
+				final float dbDistance = ((TVITourBookItem) element).colDistance;
 
-					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+				if (dbDistance == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
 
-					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
-					/*
-					 * when a tour type image is modified, it will keep the same image resource only
-					 * the content is modified but in the rawDataView the modified image is not
-					 * displayed compared with the tourBookView which displays the correct image
-					 */
-//					final byte[] imageData = tourTypeImage.getImageData().data;
-//					final StringBuilder sb = new StringBuilder();
-//					for (final byte b : imageData) {
-//						sb.append(b);
-//					}
-					cell.setImage(tourTypeImage);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+					cell.setText(_nf.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
+
+				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: title
-		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
+	/**
+	 * column: markers
+	 */
+	private void defineColumnMarker(final PixelConverter pixelConverter) {
 
-					cell.setText(((TVITourBookTour) element).fTourTitle);
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: tags
-		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
-
-					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).getTagIds()));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: markers
-		 */
-		colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -666,81 +883,159 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: calories
-		 */
+	/**
+	 * column: max altitude
+	 */
+	private void defineColumnMaxAltitude(final PixelConverter pixelConverter) {
 
-		colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, pixelConverter);
-		//colDef.setIsDefaultColumn();
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long caloriesSum = ((TVITourBookItem) element).colCalories;
+				final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
 
-				cell.setText(Long.toString(caloriesSum));
+				if (dbMaxAltitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString((long) (dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
+				}
 
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: recording time (h)
-		 */
-		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: max pulse
+	 */
+	private void defineColumnMaxPulse(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbMaxPulse = ((TVITourBookItem) element).colMaxPulse;
+
+				if (dbMaxPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Long.toString(dbMaxPulse));
+				}
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: max speed
+	 */
+	private void defineColumnMaxSpeed(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbMaxSpeed = ((TVITourBookItem) element).colMaxSpeed;
+
+				if (dbMaxSpeed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					cell.setText(_nf.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: rest pulse
+	 */
+	private void defineColumnRestPulse(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int restPulse = ((TVITourBookItem) element).colRestPulse;
+
+				if (restPulse == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(restPulse));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: tags
+	 */
+	private void defineColumnTags(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-
 				final Object element = cell.getElement();
-				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
-
 				if (element instanceof TVITourBookTour) {
-					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-				}
 
-				setCellColor(cell, element);
+					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).getTagIds()));
+					setCellColor(cell, element);
+				}
 			}
 		});
+	}
 
-		/*
-		 * column: driving time (h)
-		 */
-		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: time
+	 */
+	private void defineColumnTime(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(
+				_columnManager,
+				pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-
 				final Object element = cell.getElement();
-				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
-
 				if (element instanceof TVITourBookTour) {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-				}
 
-				setCellColor(cell, element);
+					final long tourDate = ((TVITourBookTour) element).colTourDate;
+					_calendar.setTimeInMillis(tourDate);
+
+					cell.setText(_timeFormatter.format(_calendar.getTime()));
+					setCellColor(cell, element);
+				}
 			}
 		});
+	}
 
-		/*
-		 * column: paused time (h)
-		 */
-		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: paused time (h)
+	 */
+	private void defineColumnTimeBreak(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -767,11 +1062,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: relative paused time %
-		 */
-		colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: relative paused time %
+	 */
+	private void defineColumnTimeBreakRelative(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(
+				_columnManager,
+				pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -797,366 +1097,45 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: distance (km/miles)
-		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: driving time (h)
+	 */
+	private void defineColumnTimeDriving(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbDistance = ((TVITourBookItem) element).colDistance;
+				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
 
-				if (dbDistance == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: altitude up (m)
-		 */
-		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
-
-				if (dbAltitudeUp == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString((long) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: altitude down (m)
-		 */
-		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
-
-				if (dbAltitudeDown == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString((long) (-dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: max altitude
-		 */
-		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
-
-				if (dbMaxAltitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString((long) (dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: max speed
-		 */
-		colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final float dbMaxSpeed = ((TVITourBookItem) element).colMaxSpeed;
-
-				if (dbMaxSpeed == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: max pulse
-		 */
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbMaxPulse = ((TVITourBookItem) element).colMaxPulse;
-
-				if (dbMaxPulse == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString(dbMaxPulse));
-				}
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: avg speed km/h - mph
-		 */
-		colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				final float speed = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
-				if (speed == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(speed));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: avg pace min/km - min/mi
-		 */
-		colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final float pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
-
-				if (pace == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: avg pulse
-		 */
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
-
-				if (dbAvgPulse == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString(dbAvgPulse));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: avg cadence
-		 */
-		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final long dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
-
-				if (dbAvgCadence == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Long.toString(dbAvgCadence));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: avg temperature
-		 */
-		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				long temperature = ((TVITourBookItem) element).colAvgTemperature;
-
-				if (temperature == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-					}
-
-					cell.setText(Long.toString(temperature));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: weather
-		 */
-		colDef = TreeColumnFactory.WIND_SPD.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final int windSpeed = (int)(((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
-
-				if (windSpeed == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString(windSpeed));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final int windDir = ((TVITourBookItem) element).colWindDir;
-
-				if (windDir == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString(windDir));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final String windClouds = ((TVITourBookItem) element).fClouds;
-
-				if (windClouds == null) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					//cell.setText(windClouds);
-					final Image img = UI.IMAGE_REGISTRY.get(windClouds);
-					if (img != null) {
-						cell.setImage(img);
+				if (element instanceof TVITourBookTour) {
+					if (_isDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
 					} else {
-						cell.setText(windClouds);
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 					}
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final int restPulse = ((TVITourBookItem) element).colRestPulse;
-
-				if (restPulse == 0) {
-					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(restPulse));
+					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: week
-		 */
-		colDef = TreeColumnFactory.WEEK.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
+	/**
+	 * column: timeinterval
+	 */
 
-			@Override
-			public void update(final ViewerCell cell) {
+	private void defineColumnTimeInterval(final PixelConverter pixelConverter) {
 
-				final Object element = cell.getElement();
-				final int week = ((TVITourBookItem) element).colWeek;
-
-				if (week == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString(week));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: timeinterval
-		 */
-		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL
+				.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1174,46 +1153,196 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: device distance
-		 */
-		colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: recording time (h)
+	 */
+	private void defineColumnTimeRecording(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(
+				_columnManager,
+				pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
+
+				if (element instanceof TVITourBookTour) {
+					if (_isRecTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: title
+	 */
+	private void defineColumnTitle(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
-
-					if (dbStartDistance == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(Long.toString((long) (dbStartDistance / UI.UNIT_VALUE_DISTANCE)));
-					}
-
+					cell.setText(((TVITourBookTour) element).colTourTitle);
 					setCellColor(cell, element);
 				}
 			}
 		});
+	}
 
-//		/*
-//		 * column: device name
-//		 */
-//		colDef = TreeColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//				final Object element = cell.getElement();
-//				if (element instanceof TVITourBookTour) {
-//
-//					cell.setText(((TVITourBookTour) cell.getElement()).getDeviceName());
-//					setCellColor(cell, element);
-//				}
-//			}
-//		});
+	/**
+	 * column: tour type
+	 */
+	private void defineColumnTourType(final PixelConverter pixelConverter) {
 
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+
+					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+
+					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
+					/*
+					 * when a tour type image is modified, it will keep the same image resource only
+					 * the content is modified but in the rawDataView the modified image is not
+					 * displayed compared with the tourBookView which displays the correct image
+					 */
+//					final byte[] imageData = tourTypeImage.getImageData().data;
+//					final StringBuilder sb = new StringBuilder();
+//					for (final byte b : imageData) {
+//						sb.append(b);
+//					}
+					cell.setImage(tourTypeImage);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: clouds
+	 */
+	private void defineColumnWeatherClouds(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final String windClouds = ((TVITourBookItem) element).colClouds;
+
+				if (windClouds == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					//cell.setText(windClouds);
+					final Image img = UI.IMAGE_REGISTRY.get(windClouds);
+					if (img != null) {
+						cell.setImage(img);
+					} else {
+						cell.setText(windClouds);
+					}
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: wind direction
+	 */
+	private void defineColumnWeatherWindDirection(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int windDir = ((TVITourBookItem) element).colWindDir;
+
+				if (windDir == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(windDir));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: weather
+	 */
+	private void defineColumnWeatherWindSpeed(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPD.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+
+				if (windSpeed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(windSpeed));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: week
+	 */
+	private void defineColumnWeek(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int week = ((TVITourBookItem) element).colWeek;
+
+				if (week == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(week));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
 	}
 
 	@Override
@@ -1531,7 +1660,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstYear) {
 						// keep selected year
 						isFirstYear = false;
-						_selectedYear = yearItem.fTourYear;
+						_selectedYear = yearItem.tourYear;
 					}
 
 					// get all tours for the selected year
@@ -1549,8 +1678,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstMonth) {
 						// keep selected year/month
 						isFirstMonth = false;
-						_selectedYear = monthItem.fTourYear;
-						_selectedMonth = monthItem.fTourMonth;
+						_selectedYear = monthItem.tourYear;
+						_selectedMonth = monthItem.tourMonth;
 					}
 
 					// get all tours for the selected month
@@ -1564,8 +1693,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstTour) {
 						// keep selected tour
 						isFirstTour = false;
-						_selectedYear = tourItem.fTourYear;
-						_selectedMonth = tourItem.fTourMonth;
+						_selectedYear = tourItem.tourYear;
+						_selectedMonth = tourItem.tourMonth;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1582,8 +1711,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (isFirstTour) {
 						// keep selected tour
 						isFirstTour = false;
-						_selectedYear = tourItem.fTourYear;
-						_selectedMonth = tourItem.fTourMonth;
+						_selectedYear = tourItem.tourYear;
+						_selectedMonth = tourItem.tourMonth;
 					}
 
 					tourIds.put(tourItem.getTourId(), null);
@@ -1670,7 +1799,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		for (final TreeViewerItem yearItem : yearItems) {
 
 			final TVITourBookYear tourBookYear = ((TVITourBookYear) yearItem);
-			if (tourBookYear.fTourYear == _selectedYear) {
+			if (tourBookYear.tourYear == _selectedYear) {
 
 				reselectYearItem = yearItem;
 
@@ -1678,7 +1807,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				for (final Object monthItem : monthItems) {
 
 					final TVITourBookMonth tourBookMonth = ((TVITourBookMonth) monthItem);
-					if (tourBookMonth.fTourMonth == _selectedMonth) {
+					if (tourBookMonth.tourMonth == _selectedMonth) {
 
 						reselectMonthItem = tourBookMonth;
 
@@ -1686,7 +1815,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						for (final Object tourItem : tourItems) {
 
 							final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
-							final long treeTourId = tourBookTour.fTourId;
+							final long treeTourId = tourBookTour.tourId;
 
 							for (final Long tourId : _selectedTourIds) {
 								if (treeTourId == tourId) {

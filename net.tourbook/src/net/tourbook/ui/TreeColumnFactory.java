@@ -258,7 +258,7 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_distance_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 			return colDef;
 		};
@@ -511,7 +511,7 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_marker_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_tour_marker_header);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_marker_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 			
 			return colDef;
 		};
@@ -528,8 +528,7 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnLabel(Messages.ColumnFactory_time_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_time_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 			return colDef;
 		};

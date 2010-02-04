@@ -63,24 +63,24 @@ public class TVITourBookYear extends TVITourBookItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setInt(1, fTourYear);
+			statement.setInt(1, tourYear);
 			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITourBookItem tourItem = new TVITourBookMonth(fView, this);
+				final TVITourBookItem tourItem = new TVITourBookMonth(tourBookView, this);
 				children.add(tourItem);
 
 				final int dbYear = result.getInt(1);
 				final int dbMonth = result.getInt(2);
-				fCalendar.set(dbYear, dbMonth - 1, 1);
+				calendar.set(dbYear, dbMonth - 1, 1);
 
-				tourItem.treeColumn = UI.MonthFormatter.format(fCalendar.getTime());
+				tourItem.treeColumn = UI.MonthFormatter.format(calendar.getTime());
 
-				tourItem.fTourYear = dbYear;
-				tourItem.fTourMonth = dbMonth;
-				tourItem.fTourDate = fCalendar.getTimeInMillis();
+				tourItem.tourYear = dbYear;
+				tourItem.tourMonth = dbMonth;
+				tourItem.colTourDate = calendar.getTimeInMillis();
 
 				tourItem.addSumColumns(result, 3);
 			}

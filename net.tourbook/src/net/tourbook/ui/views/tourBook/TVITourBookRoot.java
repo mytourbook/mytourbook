@@ -73,14 +73,14 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 				final int dbYear = result.getInt(1);
 
-				final TVITourBookYear yearItem = new TVITourBookYear(fView, this);
+				final TVITourBookYear yearItem = new TVITourBookYear(tourBookView, this);
 				children.add(yearItem);
 
 				yearItem.treeColumn = Integer.toString(dbYear);
-				yearItem.fTourYear = dbYear;
+				yearItem.tourYear = dbYear;
 
-				fCalendar.set(dbYear, 0, 1);
-				yearItem.fTourDate = fCalendar.getTimeInMillis();
+				calendar.set(dbYear, 0, 1);
+				yearItem.colTourDate = calendar.getTimeInMillis();
 
 				yearItem.addSumColumns(result, 2);
 			}

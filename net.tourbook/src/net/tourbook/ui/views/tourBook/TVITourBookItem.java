@@ -25,7 +25,7 @@ import net.tourbook.ui.TreeViewerItem;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-	static final Calendar	fCalendar		= GregorianCalendar.getInstance();
+	static final Calendar	calendar		= GregorianCalendar.getInstance();
 
 	static final String		SQL_SUM_COLUMNS	= "" // //$NON-NLS-1$
 													+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
@@ -49,25 +49,23 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 													+ "SUM(CALORIES)";			//	18	//$NON-NLS-1$
 
-	TourBookView			fView;
+	TourBookView			tourBookView;
 
 	String					treeColumn;
 
-	int						fTourYear;
+	int						tourYear;
 
 	/**
 	 * month starts with 1 for january
 	 */
-	int						fTourMonth;
-	int						fTourDay;
+	int						tourMonth;
+	int						tourDay;
 
-	long					fTourDate;
-	String					fTourTitle;
+	long					colTourDate;
+	String					colTourTitle;
 
 	long					colCounter;
-
 	long					colCalories;
-
 	long					colDistance;
 
 	long					colRecordingTime;
@@ -87,15 +85,15 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long					colAvgCadence;
 	long					colAvgTemperature;
 
-	int					colWindSpd;
-	int					colWindDir;
-	String					fClouds;
+	int						colWindSpd;
+	int						colWindDir;
+	String					colClouds;
 	int						colRestPulse;
 
 	int						colWeek;
 
 	TVITourBookItem(final TourBookView view) {
-		fView = view;
+		tourBookView = view;
 	}
 
 	public void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -22,14 +22,14 @@ import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-	long					fTourId;
-	long					fTourTypeId;
+	long					tourId;
+	long					tourTypeId;
 
-	long					fColumnStartDistance;
-	short					fColumnTimeInterval;
+	long					colStartDistance;
+	short					colTimeInterval;
 
-	HashSet<Long>			fSQLTagIds;
-	HashSet<Long>			fSQLMarkerIds;
+	HashSet<Long>			sqlTagIds;
+	HashSet<Long>			sqlMarkerIds;
 
 	/**
 	 * id's for the tags or <code>null</code> when tags are not available
@@ -39,7 +39,7 @@ public class TVITourBookTour extends TVITourBookItem {
 	/**
 	 * id's for the markers or <code>null</code> when markers are not available
 	 */
-	private ArrayList<Long>	fMarkerIds;
+	private ArrayList<Long>	_markerIds;
 
 	public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
@@ -52,34 +52,34 @@ public class TVITourBookTour extends TVITourBookItem {
 	protected void fetchChildren() {}
 
 	public long getColumnStartDistance() {
-		return fColumnStartDistance;
+		return colStartDistance;
 	}
 
 	public short getColumnTimeInterval() {
-		return fColumnTimeInterval;
+		return colTimeInterval;
 	}
 
 	public ArrayList<Long> getMarkerIds() {
-		if (fSQLMarkerIds != null && fMarkerIds == null) {
-			fMarkerIds = new ArrayList<Long>(fSQLMarkerIds);
+		if (sqlMarkerIds != null && _markerIds == null) {
+			_markerIds = new ArrayList<Long>(sqlMarkerIds);
 		}
-		return fMarkerIds;
+		return _markerIds;
 	}
 
 	public ArrayList<Long> getTagIds() {
-		if (fSQLTagIds != null && fTagIds == null) {
-			fTagIds = new ArrayList<Long>(fSQLTagIds);
+		if (sqlTagIds != null && fTagIds == null) {
+			fTagIds = new ArrayList<Long>(sqlTagIds);
 		}
 		return fTagIds;
 	}
 
 	@Override
 	public Long getTourId() {
-		return fTourId;
+		return tourId;
 	}
 
 	public long getTourTypeId() {
-		return fTourTypeId;
+		return tourTypeId;
 	}
 
 	/**
@@ -94,11 +94,11 @@ public class TVITourBookTour extends TVITourBookItem {
 	protected void remove() {}
 
 	public void setMarkerIds(final HashSet<Long> markerIds) {
-		fSQLMarkerIds = markerIds;
+		sqlMarkerIds = markerIds;
 	}
 
 	public void setTagIds(final HashSet<Long> tagIds) {
-		fSQLTagIds = tagIds;
+		sqlTagIds = tagIds;
 	}
 
 }

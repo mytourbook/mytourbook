@@ -48,7 +48,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "" + // //$NON-NLS-1$
+		final String sqlString = UI.EMPTY_STRING + // 
 				//
 				"SELECT " //								//$NON-NLS-1$
 				//
@@ -109,8 +109,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 //			TourDatabase.enableRuntimeStatistics(conn);
 
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			statement.setInt(1, yearItem.fTourYear);
-			statement.setInt(2, fTourMonth);
+			statement.setInt(1, yearItem.tourYear);
+			statement.setInt(2, tourMonth);
 			sqlFilter.setParameters(statement, 3);
 
 			long prevTourId = -1;
@@ -143,10 +143,10 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					// first resultset for a new tour
 
-					final TVITourBookTour tourItem = new TVITourBookTour(fView, this);
+					final TVITourBookTour tourItem = new TVITourBookTour(tourBookView, this);
 					children.add(tourItem);
 
-					tourItem.fTourId = resultTourId;
+					tourItem.tourId = resultTourId;
 
 					final int dbYear = result.getInt(1);
 					final int dbMonth = result.getInt(2);
@@ -154,9 +154,9 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					tourItem.treeColumn = Integer.toString(dbDay);
 
-					tourItem.fTourYear = dbYear;
-					tourItem.fTourMonth = dbMonth;
-					tourItem.fTourDay = dbDay;
+					tourItem.tourYear = dbYear;
+					tourItem.tourMonth = dbMonth;
+					tourItem.tourDay = dbDay;
 
 					final long dbDistance = tourItem.colDistance = result.getLong(4);
 					tourItem.colRecordingTime = result.getLong(5);
@@ -164,10 +164,10 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.colAltitudeUp = result.getLong(7);
 					tourItem.colAltitudeDown = result.getLong(8);
 
-					tourItem.fColumnStartDistance = result.getLong(9);
+					tourItem.colStartDistance = result.getLong(9);
 					final Object tourTypeId = result.getObject(11);
-					tourItem.fTourTitle = result.getString(12);
-					tourItem.fColumnTimeInterval = result.getShort(13);
+					tourItem.colTourTitle = result.getString(12);
+					tourItem.colTimeInterval = result.getShort(13);
 
 					tourItem.colMaxSpeed = result.getFloat(14);
 					tourItem.colMaxAltitude = result.getLong(15);
@@ -183,15 +183,15 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					tourItem.colWindDir = result.getInt(25);
 					tourItem.colWindSpd = result.getInt(26);
-					tourItem.fClouds = result.getString(27);
+					tourItem.colClouds = result.getString(27);
 					tourItem.colRestPulse = result.getInt(28);
 
 					tourItem.colCalories = result.getInt(29);
 
-					fCalendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
-					tourItem.fTourDate = fCalendar.getTimeInMillis();
+					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
+					tourItem.colTourDate = calendar.getTimeInMillis();
 
-					tourItem.fTourTypeId = (tourTypeId == null ? //
+					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);
 

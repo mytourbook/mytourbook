@@ -658,9 +658,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	/**
-	 * @param tourDataDay
-	 * @param tourId
-	 *            tour id which was selected before the update
 	 */
 	abstract ChartDataModel updateChart();
 
