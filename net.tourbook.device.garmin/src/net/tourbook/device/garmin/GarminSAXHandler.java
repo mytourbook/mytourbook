@@ -62,14 +62,17 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String				TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
 	private static final String				TAG_TIME					= "Time";														//$NON-NLS-1$
 	private static final String				TAG_VALUE					= "Value";														//$NON-NLS-1$
+	private static final String				TAG_SENSOR_STATE			= "SensorState";												//$NON-NLS-1$
+	private static final String				SENSOR_STATE_PRESENT		= "Present";													//$NON-NLS-1$
 
 	private static final Calendar			fCalendar					= GregorianCalendar.getInstance();
-//	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
 
 	private static final DateTimeFormatter	fDateTimeParser				= ISODateTimeFormat.dateTimeParser();
 
-	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");		//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat(
+																				"yyyy-MM-dd'T'HH:mm:ss'Z'");							//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat(
+																				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");						//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_RFC822			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");				//$NON-NLS-1$
 
 	private int								fDataVersion				= -1;
@@ -86,6 +89,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean							fIsInAltitude				= false;
 	private boolean							fIsInDistance				= false;
 	private boolean							fIsInCadence				= false;
+	private boolean							fIsInSensorState			= false;
 
 	private boolean							fIsInHeartRate				= false;
 	private boolean							fIsInHeartRateValue			= false;
@@ -108,6 +112,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private String							fActivitySport				= null;
 	//private String					fId			 				= null;
 	private int								fCalories;
+	private boolean							_isDistanceFromSensor		= false;
 
 	private StringBuilder					fCharacters					= new StringBuilder();
 	private boolean							fIsInNotes;
@@ -140,6 +145,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| fIsInAltitude
 				|| fIsInDistance
 				|| fIsInCadence
+				|| fIsInSensorState
 				|| fIsInHeartRate
 				|| fIsInHeartRateValue
 				|| fIsInNotes
@@ -212,7 +218,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					/* every lab has a calorie value */
 					fCalories += Integer.parseInt(fCharacters.toString());
 					fCharacters.delete(0, fCharacters.length());
-				} catch (NumberFormatException e) {}
+				} catch (final NumberFormatException e) {}
 			}
 			/*
 			 * else if (name.equals(TAG_ID)) { fIsInId = false; fId = fCharacters.toString();
@@ -327,6 +333,11 @@ public class GarminSAXHandler extends DefaultHandler {
 			cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
 			fTimeData.cadence = cadence;
 
+		} else if (name.equals(TAG_SENSOR_STATE)) {
+
+			fIsInSensorState = false;
+			_isDistanceFromSensor = SENSOR_STATE_PRESENT.equalsIgnoreCase(fCharacters.toString());
+
 		} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 
 			fIsInLatitude = false;
@@ -389,6 +400,10 @@ public class GarminSAXHandler extends DefaultHandler {
 			fIsInCadence = true;
 			fCharacters.delete(0, fCharacters.length());
 
+		} else if (name.equals(TAG_SENSOR_STATE)) {
+			fIsInSensorState = true;
+			fCharacters.delete(0, fCharacters.length());
+
 		} else if (name.equals(TAG_TIME)) {
 			fIsInTime = true;
 			fCharacters.delete(0, fCharacters.length());
@@ -432,6 +447,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
+
+		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
 
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
 		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));

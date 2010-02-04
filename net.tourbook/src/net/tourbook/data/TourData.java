@@ -157,6 +157,14 @@ public class TourData implements Comparable<Object> {
 	private int							distance;
 
 	/**
+	 * A flag indicating that the distance of this series is defined by a distance sensor and not
+	 * from the GPS device.<br>
+	 * <br>
+	 * 0 == false, 1 == true
+	 */
+	private short						isDistanceFromSensor			= 0;
+
+	/**
 	 * aaaa (h) initial altitude (m)
 	 */
 	private short						startAltitude;
@@ -258,11 +266,11 @@ public class TourData implements Comparable<Object> {
 	private int							avgPulse;																	// db-version 4
 	private int							avgCadence;																// db-version 4
 	private int							avgTemperature;															// db-version 4
-	
-	private float                       weatherWindDir; // db-version 8
-	private float                       weatherWindSpd; // db-version 8
-	private String                      weatherClouds;  // db-version 8
-	private int                         restPulse;      // db-version 8
+
+	private int							weatherWindDir;															// db-version 8
+	private int							weatherWindSpd;															// db-version 8
+	private String						weatherClouds;																// db-version 8
+	private int							restPulse;																	// db-version 8
 
 	private String						tourTitle;																	// db-version 4
 	private String						tourDescription;															// db-version 4
@@ -1837,7 +1845,10 @@ public class TourData implements Comparable<Object> {
 		paceSerieMinuteImperial = new int[serieLength];
 		paceSerieSecondsImperial = new int[serieLength];
 
-		final boolean isCheckPosition = latitudeSerie != null && longitudeSerie != null;
+		final boolean isCheckPosition = latitudeSerie != null && //
+				longitudeSerie != null
+				&& (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
+
 		boolean isLatLongEqual = false;
 		int equalStartIndex = 0;
 
@@ -1863,9 +1874,7 @@ public class TourData implements Comparable<Object> {
 						isLatLongEqual = true;
 					}
 
-//					if (distDiff == 0) {
 					continue;
-//					}
 
 				} else if (isLatLongEqual) {
 
@@ -2883,7 +2892,7 @@ public class TourData implements Comparable<Object> {
 		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -2974,8 +2983,8 @@ public class TourData implements Comparable<Object> {
 	 */
 	public int getAvgTemperature() {
 		return avgTemperature;
-	}	
-	
+	}
+
 	/**
 	 * @return the bikerWeight
 	 */
@@ -3687,11 +3696,11 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
-	public float getWeatherWindDir() {
+	public int getWeatherWindDir() {
 		return weatherWindDir;
 	}
 
-	public float getWeatherWindSpd() {
+	public int getWeatherWindSpd() {
 		return weatherWindSpd;
 	}
 
@@ -3923,6 +3932,10 @@ public class TourData implements Comparable<Object> {
 		this.dpTolerance = dpTolerance;
 	}
 
+	public void setIsDistanceFromSensor(final boolean isDistanceFromSensor) {
+		this.isDistanceFromSensor = (short) (isDistanceFromSensor ? 1 : 0);
+	}
+
 	public void setMergedAltitudeOffset(final int altitudeDiff) {
 		mergedAltitudeOffset = altitudeDiff;
 	}
@@ -4133,11 +4146,11 @@ public class TourData implements Comparable<Object> {
 		this.weatherClouds = weatherClouds;
 	}
 
-	public void setWeatherWindDir(final float weatherWindDir) {
+	public void setWeatherWindDir(final int weatherWindDir) {
 		this.weatherWindDir = weatherWindDir;
 	}
 
-	public void setWeatherWindSpd(final float weatherWindSpd) {
+	public void setWeatherWindSpd(final int weatherWindSpd) {
 		this.weatherWindSpd = weatherWindSpd;
 	}
 

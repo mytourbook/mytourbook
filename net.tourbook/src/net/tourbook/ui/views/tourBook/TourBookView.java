@@ -1056,15 +1056,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float windSpeed = ((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE;
+				final int windSpeed = (int)(((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
 
 				if (windSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(windSpeed));
+					cell.setText(Integer.toString(windSpeed));
 				}
 
 				setCellColor(cell, element);
@@ -1078,12 +1075,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float windDir = ((TVITourBookItem) element).colWindDir;
+				final int windDir = ((TVITourBookItem) element).colWindDir;
 
 				if (windDir == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Float.toString(windDir));
+					cell.setText(Integer.toString(windDir));
 				}
 
 				setCellColor(cell, element);

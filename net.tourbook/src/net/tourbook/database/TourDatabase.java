@@ -79,7 +79,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 8;													// 10.2.1 Mod by Kenny
+	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
 
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
@@ -1572,13 +1572,14 @@ public class TourDatabase {
 
 				// version 8 start
 				//
-				+ "weatherWindDir		FLOAT DEFAULT 0, \n" //$NON-NLS-1$
-				+ "weatherWindSpd		FLOAT DEFAULT 0, \n" //$NON-NLS-1$
-				+ "weatherClouds         VARCHAR(255), \n" //$NON-NLS-1$
+				+ "weatherWindDir		INTEGER DEFAULT 0, \n" //$NON-NLS-1$
+				+ "weatherWindSpd		INTEGER DEFAULT 0, \n" //$NON-NLS-1$
+				+ "weatherClouds        VARCHAR(255), \n" //$NON-NLS-1$
 				+ "restPulse            INTEGER DEFAULT 0, \n" //$NON-NLS-1$
+				+ "isDistanceFromSensor SMALLINT DEFAULT 0, \n" //$NON-NLS-1$
 				//
 				// version 8 end
-
+				
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2405,14 +2406,18 @@ public class TourDatabase {
 
 			String sql;
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindDir		FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindDir		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindSpd		FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindSpd		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
-
+			
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN isDistanceFromSensor  SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);			
+			
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherClouds         VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);

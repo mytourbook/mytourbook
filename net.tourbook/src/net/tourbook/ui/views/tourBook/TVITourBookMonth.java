@@ -181,8 +181,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 					tourItem.colWeek = result.getInt(24);
 
-					tourItem.colWindDir = result.getFloat(25);
-					tourItem.colWindSpd = result.getFloat(26);
+					tourItem.colWindDir = result.getInt(25);
+					tourItem.colWindSpd = result.getInt(26);
 					tourItem.fClouds = result.getString(27);
 					tourItem.colRestPulse = result.getInt(28);
 

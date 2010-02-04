@@ -5074,14 +5074,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_tourData.setRestPulse(getIntValue(_txtRestPulse.getText()));
 
-			_tourData.setWeatherWindDir(getFloatValue(_txtWindDir.getText()));
+			_tourData.setWeatherWindDir(getIntValue(_txtWindDir.getText()));
 			if (_isWindSpdManuallyModified) {
 				/*
 				 * update the speed only when it was modified because when the measurement is
 				 * changed when the tour is being modified then the computation of the speed
 				 * value can cause rounding errors
 				 */
-				_tourData.setWeatherWindSpd(getFloatValue(_txtWindSpd.getText()) * _unitValueDistance);
+				_tourData.setWeatherWindSpd((int)(getIntValue(_txtWindSpd.getText()) * _unitValueDistance));
 			}
 
 			final int fComboCloudsIndex = _comboClouds.getSelectionIndex();
@@ -5505,16 +5505,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_txtRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
 
-		// average temperature
-		_txtWindDir.setText(Float.toString(_tourData.getWeatherWindDir()));
+		// wind properties
+		_txtWindDir.setText(Integer.toString(_tourData.getWeatherWindDir()));
 
-		final float windSpeed = _tourData.getWeatherWindSpd();
-		if (windSpeed == 0.0) {
-			_txtWindSpd.setText(Float.toString(windSpeed));
+		final int windSpeed = _tourData.getWeatherWindSpd();
+		if (windSpeed == 0) {
+			_txtWindSpd.setText(Integer.toString(windSpeed));
 		} else {
 
-			final float speed = windSpeed / _unitValueDistance;
-			_txtWindSpd.setText(_nf1NoGroup.format(speed));
+			final int speed = (int)(windSpeed / _unitValueDistance);
+			_txtWindSpd.setText(Integer.toString(speed));
 		}
 
 		// weather icon

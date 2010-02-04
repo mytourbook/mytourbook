@@ -87,8 +87,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long					colAvgCadence;
 	long					colAvgTemperature;
 
-	float					colWindSpd;
-	float					colWindDir;
+	int					colWindSpd;
+	int					colWindDir;
 	String					fClouds;
 	int						colRestPulse;
 
@@ -126,8 +126,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colAvgCadence = result.getLong(startIndex + 12);
 		colAvgTemperature = result.getLong(startIndex + 13);
 
-		colWindDir = result.getLong(startIndex + 14);
-		colWindSpd = result.getLong(startIndex + 15);
+		colWindDir = result.getInt(startIndex + 14);
+		colWindSpd = result.getInt(startIndex + 15);
 		colRestPulse = result.getInt(startIndex + 16);
 
 		colCalories = result.getLong(startIndex + 17);
