@@ -645,8 +645,16 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_update_tour;
 
+	public static String	Tour_Editor_Label_DistanceSensor_No;
+
+	public static String	Tour_Editor_Label_DistanceSensor_Tooltip;
+
+	public static String	Tour_Editor_Label_DistanceSensor_Yes;
+
+	public static String	Tour_Editor_Label_WindDirection_Unit;
+
 	public static String		Tour_Marker_Column_horizontal_offset;
-	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
+ 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
@@ -752,14 +760,9 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_wind_direction;
 	public static String		tour_editor_label_wind_speed;
 	public static String		tour_editor_label_clouds;
-	public static String		tour_editor_label_temperature;
 
-	public static String		weather_sunny;
-	public static String		weather_cloudy;
-	public static String		weather_clouds;
-	public static String		weather_lightning;
-	public static String		weather_rain;
-	public static String		weather_snow;
+	public static String	tour_editor_label_DistanceSensor;
+	public static String		tour_editor_label_temperature;
 
 	public static String		tour_editor_section_personal;
 	public static String		tour_editor_label_rest_pulse;
@@ -888,6 +891,20 @@ public class Messages extends NLS {
 	public static String		UI_Label_no_chart_is_selected;
 
 	public static String		ui_tour_not_defined;
+
+	public static String	Weather_Clounds_Clouds;
+
+	public static String	Weather_Clounds_Clouny;
+
+	public static String	Weather_Clounds_IsNotDefined;
+
+	public static String	Weather_Clounds_Lightning;
+
+	public static String	Weather_Clounds_Rain;
+
+	public static String	Weather_Clounds_Snow;
+
+	public static String	Weather_Clounds_Sunny;
 
 	static {
 		// initialize resource bundle

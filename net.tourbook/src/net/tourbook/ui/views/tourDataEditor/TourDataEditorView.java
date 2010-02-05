@@ -203,10 +203,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
-	private static final String					WIDGET_KEY_TOURCALORIES			= "tourCalories";							//$NON-NLS-1$
+//	private static final String					WIDGET_KEY_TOURCALORIES			= "tourCalories";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
-
+ 
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
@@ -282,6 +282,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private CTabItem							_tabSlices;
 	private CTabItem							_tabInfo;
 
+	/**
+	 * contains the controls which are displayed in the first column, these controls are used to get
+	 * the maximum width and set the first column the differenct section to the same width
+	 */
+	private ArrayList<Control>					_firstColumnControls			= new ArrayList<Control>();
+
 	private TourChart							_tourChart;
 	private TourData							_tourData;
 	private Composite							_tourContainer;
@@ -312,20 +318,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtStartLocation;
 	private Text								_txtEndLocation;
 
-	private Text								_txtWindDir;
-	private Text								_txtWindSpd;
+	private Spinner								_spinWindDirection;
+	private Spinner								_spinWindSpeed;
+
+	private Spinner								_spinRestPuls;
+	private Spinner								_spinTourCalories;
+
+	private Spinner								_spinTemperature;
 
 	private CLabel								_lblCloudIcon;
 	private Combo								_comboClouds;
 
 	private static final String[]				_comboCloudsUIValues			= new String[] {
-			Messages.weather_sunny,
-			Messages.weather_cloudy,
-			Messages.weather_clouds,
-			Messages.weather_lightning,
-			Messages.weather_rain,
-			Messages.weather_snow												};
+			Messages.Weather_Clounds_IsNotDefined,
+			Messages.Weather_Clounds_Sunny,
+			Messages.Weather_Clounds_Clouny,
+			Messages.Weather_Clounds_Clouds,
+			Messages.Weather_Clounds_Lightning,
+			Messages.Weather_Clounds_Rain,
+			Messages.Weather_Clounds_Snow										};
+
 	private static final String[]				_comboCloudsDBValues			= new String[] {
+			UI.IMAGE_EMPTY_16,
 			UI.IMAGE_WEATHER_SUNNY,
 			UI.IMAGE_WEATHER_CLOUDY,
 			UI.IMAGE_WEATHER_CLOUDS,
@@ -333,7 +347,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			UI.IMAGE_WEATHER_RAIN,
 			UI.IMAGE_WEATHER_SNOW												};
 
-	private Text								_txtTemp;
+//	private Text								_txtTemp;
 //	private Text								_txtRestPulse;
 
 	private Text								_txtTourDistance;
@@ -350,7 +364,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private DateTime							_dtDrivingTime;
 	private DateTime							_dtPausedTime;
 
-	private Text								_calTourCalories;
+//	private Text								_calTourCalories;
 
 	/*
 	 * tab: info
@@ -358,6 +372,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtRefTour;
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtDeviceName;
+	private Text								_txtDistanceSensor;
 	private ImageComboLabel						_txtImportFilePath;
 	private Text								_txtPerson;
 	private Text								_txtTourId;
@@ -424,10 +439,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private KeyAdapter							_keyListener;
 	private ModifyListener						_modifyListener;
+	private MouseWheelListener					_mouseWheelListener;
+	private SelectionAdapter					_selectionListener;
 	private ModifyListener						_verifyFloatValue;
-	private ModifyListener						_verifyIntValue;
+//	private ModifyListener						_verifyIntValue;
 	private SelectionAdapter					_tourTimeListener;
 	private SelectionAdapter					_dateTimeListener;
+
 	private PixelConverter						_pixelConverter;
 
 	/**
@@ -505,7 +523,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private float								_unitValueAltitude;
 	private float								_unitValueTemperature;
 
-	private Spinner								_spinRestPuls;
+	private int									_defaultSpinnerWidth;
+
+	private Label								_lblSpeedUnit;
+
+	private Label								_lblTemperatureUnit;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -1724,6 +1746,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 
+		_mouseWheelListener = new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				Util.adjustSpinnerValueOnMouseScroll(event);
+				if (_isDirtyDisabled || _isSavingInProgress) {
+					return;
+				}
+				setTourDirty();
+			}
+		};
+
+		_selectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				if (_isDirtyDisabled || _isSavingInProgress) {
+					return;
+				}
+				setTourDirty();
+			}
+		};
 		_keyListener = new KeyAdapter() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
@@ -1872,52 +1913,52 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 
-		_verifyIntValue = new ModifyListener() {
-
-			public void modifyText(final ModifyEvent event) {
-
-				if (_isDirtyDisabled || _isSavingInProgress) {
-					return;
-				}
-
-				final Text widget = (Text) event.widget;
-				final String valueText = widget.getText().trim();
-
-				if (valueText.length() > 0) {
-					try {
-
-						Integer.parseInt(valueText);
-
-						_messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
-
-					} catch (final IllegalArgumentException e) {
-
-						// wrong characters are entered, display an error message
-
-						_messageManager.addMessage(
-								widget.getData(WIDGET_KEY),
-								e.getLocalizedMessage(),
-								null,
-								IMessageProvider.ERROR,
-								widget);
-					}
-				}
-
-				/*
-				 * set tour dirty must be set after validation because an error can occur which
-				 * enables actions
-				 */
-				if (_isTourDirty) {
-					/*
-					 * when an error occured previously and is now solved, the save action must be
-					 * enabled
-					 */
-					enableActions();
-				} else {
-					setTourDirty();
-				}
-			}
-		};
+//		_verifyIntValue = new ModifyListener() {
+//
+//			public void modifyText(final ModifyEvent event) {
+//
+//				if (_isDirtyDisabled || _isSavingInProgress) {
+//					return;
+//				}
+//
+//				final Text widget = (Text) event.widget;
+//				final String valueText = widget.getText().trim();
+//
+//				if (valueText.length() > 0) {
+//					try {
+//
+//						Integer.parseInt(valueText);
+//
+//						_messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
+//
+//					} catch (final IllegalArgumentException e) {
+//
+//						// wrong characters are entered, display an error message
+//
+//						_messageManager.addMessage(
+//								widget.getData(WIDGET_KEY),
+//								e.getLocalizedMessage(),
+//								null,
+//								IMessageProvider.ERROR,
+//								widget);
+//					}
+//				}
+//
+//				/*
+//				 * set tour dirty must be set after validation because an error can occur which
+//				 * enables actions
+//				 */
+//				if (_isTourDirty) {
+//					/*
+//					 * when an error occured previously and is now solved, the save action must be
+//					 * enabled
+//					 */
+//					enableActions();
+//				} else {
+//					setTourDirty();
+//				}
+//			}
+//		};
 	}
 
 	/**
@@ -2267,6 +2308,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUI(final Composite parent) {
 
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+		_defaultSpinnerWidth = pixelConverter.convertWidthInCharsToPixels(5);
+
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -2332,7 +2376,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * title
 			 */
-			tk.createLabel(section, Messages.tour_editor_label_tour_title);
+			label = tk.createLabel(section, Messages.tour_editor_label_tour_title);
+			_firstColumnControls.add(label);
 
 			_txtTitle = tk.createText(section, UI.EMPTY_STRING);
 			GridDataFactory.fillDefaults()//
@@ -2346,6 +2391,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			 */
 			label = tk.createLabel(section, Messages.tour_editor_label_description);
 			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
 
 			_txtDescription = tk.createText(section, UI.EMPTY_STRING, SWT.BORDER //
 					| SWT.WRAP
@@ -2371,7 +2417,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * start location
 			 */
-			tk.createLabel(section, Messages.tour_editor_label_start_location);
+			label = tk.createLabel(section, Messages.tour_editor_label_start_location);
+			_firstColumnControls.add(label);
 
 			_txtStartLocation = tk.createText(section, UI.EMPTY_STRING);
 			_txtStartLocation.addModifyListener(_modifyListener);
@@ -2380,7 +2427,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * end location
 			 */
-			tk.createLabel(section, Messages.tour_editor_label_end_location);
+			label = tk.createLabel(section, Messages.tour_editor_label_end_location);
+			_firstColumnControls.add(label);
 
 			_txtEndLocation = tk.createText(section, UI.EMPTY_STRING);
 			_txtEndLocation.addModifyListener(_modifyListener);
@@ -2393,15 +2441,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite section = createSection(parent, tk, Messages.tour_editor_section_date_time);
 		GridLayoutFactory.fillDefaults().equalWidth(true).numColumns(2).spacing(20, 5).applyTo(section);
 		{
-			createUISection122Column1(tk, section);
-			createUISection124Column2(tk, section);
+			createUISection122DateTimeCol1(tk, section);
+			createUISection124DateTimeCol2(tk, section);
 		}
 	}
 
 	/**
 	 * 1. column
 	 */
-	private void createUISection122Column1(final FormToolkit tk, final Composite section) {
+	private void createUISection122DateTimeCol1(final FormToolkit tk, final Composite section) {
 
 		final Composite tourDtContainer = tk.createComposite(section);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(tourDtContainer);
@@ -2410,7 +2458,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * date
 			 */
-			tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_date);
+			Label label = tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_date);
+			_firstColumnControls.add(label);
 
 			_dtTourDate = new DateTime(tourDtContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
@@ -2423,7 +2472,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * start time
 			 */
-			tk.createLabel(tourDtContainer, Messages.tour_editor_label_start_time);
+			label = tk.createLabel(tourDtContainer, Messages.tour_editor_label_start_time);
+			_firstColumnControls.add(label);
 
 			_dtStartTime = new DateTime(tourDtContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtStartTime);
@@ -2436,7 +2486,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * tour distance
 			 */
-			tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_distance);
+			label = tk.createLabel(tourDtContainer, Messages.tour_editor_label_tour_distance);
+			_firstColumnControls.add(label);
 
 			_txtTourDistance = tk.createText(tourDtContainer, UI.EMPTY_STRING, SWT.TRAIL);
 			GridDataFactory.fillDefaults().applyTo(_txtTourDistance);
@@ -2457,7 +2508,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * 2. column
 	 */
-	private void createUISection124Column2(final FormToolkit tk, final Composite section) {
+	private void createUISection124DateTimeCol2(final FormToolkit tk, final Composite section) {
 
 		final Composite timeContainer = tk.createComposite(section);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
@@ -2497,15 +2548,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite section = createSection(parent, tk, Messages.tour_editor_section_personal);
 		GridLayoutFactory.fillDefaults().equalWidth(true).numColumns(2).spacing(20, 5).applyTo(section);
 		{
-			createUISection132Column1(tk, section);
-			createUISection134Column2(tk, section);
+			createUISection132PersonalCol1(tk, section);
+			createUISection134PersonalCol2(tk, section);
 		}
 	}
 
 	/**
 	 * 1. column
 	 */
-	private void createUISection132Column1(final FormToolkit tk, final Composite section) {
+	private void createUISection132PersonalCol1(final FormToolkit tk, final Composite section) {
 
 		final Composite container = tk.createComposite(section);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -2516,35 +2567,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			 */
 
 			// label: Rest pulse
-			tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+			final Label label = tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+			_firstColumnControls.add(label);
 
 			// spinner
 			_spinRestPuls = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinRestPuls);
-			_spinRestPuls.setMinimum(0);
-			_spinRestPuls.setMaximum(250);
+			GridDataFactory.fillDefaults()//
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_spinRestPuls);
+			_spinRestPuls.setMinimum(20);
+			_spinRestPuls.setMaximum(200);
 			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
 
 			_spinRestPuls.addModifyListener(_modifyListener);
-			_spinRestPuls.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled || _isSavingInProgress) {
-						return;
-					}
-					setTourDirty();
-				}
-			});
-
-			_spinRestPuls.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
-						return;
-					}
-					setTourDirty();
-				}
-			});
+			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+			_spinRestPuls.addSelectionListener(_selectionListener);
 
 			// label: bpm
 			tk.createLabel(container, Messages.Graph_Label_Heartbeat_unit);
@@ -2554,7 +2592,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * 2. column
 	 */
-	private void createUISection134Column2(final FormToolkit tk, final Composite section) {
+	private void createUISection134PersonalCol2(final FormToolkit tk, final Composite section) {
 
 		final Composite container = tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -2567,13 +2605,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// label
 			tk.createLabel(container, Messages.tour_editor_label_tour_calories);
 
-			_calTourCalories = tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-			GridDataFactory.fillDefaults().applyTo(_calTourCalories);
-			_calTourCalories.addModifyListener(_verifyIntValue);
-			_calTourCalories.setData(WIDGET_KEY, WIDGET_KEY_TOURCALORIES);
+			// spinner
+			_spinTourCalories = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
+			_spinTourCalories.setMinimum(0);
+			_spinTourCalories.setMaximum(1000000);
+//			_spinTourCalories.setToolTipText();
 
+			_spinTourCalories.addModifyListener(_modifyListener);
+			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
+			_spinTourCalories.addSelectionListener(_selectionListener);
+
+			// label: cal
 			tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
-
 		}
 	}
 
@@ -2582,98 +2626,198 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite section = createSection(parent, tk, Messages.tour_editor_section_weather);
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(20, 5).applyTo(section);
 		{
-			createUISection142Column1(tk, section);
-			createUISection144Column2(tk, section);
+			createUISection142WeatherCol1(tk, section);
+			createUISection144WeatherCol2(tk, section);
 		}
 	}
 
 	/**
-	 * 1. column
+	 * weather: 1. column
 	 */
-	private void createUISection142Column1(final FormToolkit tk, final Composite section) {
+	private void createUISection142WeatherCol1(final FormToolkit tk, final Composite section) {
 
 		final Composite container = tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-			/*
-			 * spinner: wind direction
-			 */
-			tk.createLabel(container, Messages.tour_editor_label_wind_direction);
-			_txtWindDir = tk.createText(container, UI.EMPTY_STRING);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindDir);
-			_txtWindDir.addModifyListener(_modifyListener);
-
-			/*
-			 * spinner: wind speed
-			 */
-			tk.createLabel(container, Messages.tour_editor_label_wind_speed);
-			_txtWindSpd = tk.createText(container, UI.EMPTY_STRING);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtWindSpd);
-			_txtWindSpd.addModifyListener(_modifyListener);
-			_txtWindSpd.addKeyListener(new KeyListener() {
-				public void keyPressed(final KeyEvent e) {
-					_isWindSpdManuallyModified = true;
-				}
-
-				public void keyReleased(final KeyEvent e) {}
-			});
-		}
-	}
-
-	/**
-	 * 2. column
-	 */
-	private void createUISection144Column2(final FormToolkit tk, final Composite section) {
-
-		final Composite container = tk.createComposite(section);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			/*
-			 * clouds
-			 */
-			tk.createLabel(container, Messages.tour_editor_label_clouds);
-
-			final Composite cloudContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(cloudContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
-			{
-				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-
-				_comboClouds = new Combo(cloudContainer, SWT.READ_ONLY | SWT.MEDIUM | SWT.BORDER);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboClouds);
-				tk.adapt(_comboClouds, true, false);
-				_comboClouds.setVisibleItemCount(10);
-				_comboClouds.addModifyListener(_modifyListener);
-				_comboClouds.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						displayCloudIcon();
-					}
-				});
-
-				// fill combobox
-				for (final String fComboCloudsUIValue : _comboCloudsUIValues) {
-					_comboClouds.add(fComboCloudsUIValue);
-				}
-			}
-
 			/*
 			 * temperature
 			 */
-			tk.createLabel(container, Messages.tour_editor_label_temperature);
-			_txtTemp = tk.createText(container, UI.EMPTY_STRING);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTemp);
-			_txtTemp.addModifyListener(_modifyListener);
-			_txtTemp.addKeyListener(new KeyListener() {
-				public void keyPressed(final KeyEvent e) {
-					_isTemperatureManuallyModified = true;
-				}
 
-				public void keyReleased(final KeyEvent e) {}
+			// label
+			final Label label = tk.createLabel(container, Messages.tour_editor_label_temperature);
+			_firstColumnControls.add(label);
+
+			// spinner
+			_spinTemperature = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinTemperature);
+
+			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
+			_spinTemperature.setMinimum(-60);
+			_spinTemperature.setMaximum(150);
+
+			_spinTemperature.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinTemperature.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
 			});
 
+			// label: celcius, fahrenheit
+			_lblTemperatureUnit = tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+			/*
+			 * clouds
+			 */
+
+			final Composite cloudContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults() //
+					.grab(true, false)
+					.applyTo(cloudContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
+			{
+				// label: clouds
+				tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
+
+				// icon: clouds
+				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.FILL)
+						.grab(true, false)
+						.applyTo(_lblCloudIcon);
+
+			}
+			_firstColumnControls.add(cloudContainer);
+
+			// combo: clouds
+			_comboClouds = new Combo(container, SWT.READ_ONLY | SWT.MEDIUM | SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.grab(true, false)
+					.applyTo(_comboClouds);
+			tk.adapt(_comboClouds, true, false);
+			_comboClouds.setVisibleItemCount(10);
+			_comboClouds.addModifyListener(_modifyListener);
+			_comboClouds.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					displayCloudIcon();
+				}
+			});
+
+			// fill combobox
+			for (final String fComboCloudsUIValue : _comboCloudsUIValues) {
+				_comboClouds.add(fComboCloudsUIValue);
+			}
+		}
+	}
+
+	/**
+	 * weather: 2. column
+	 */
+	private void createUISection144WeatherCol2(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * wind direction
+			 */
+
+			// label
+			tk.createLabel(container, Messages.tour_editor_label_wind_direction);
+
+			// spinner
+			_spinWindDirection = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_spinWindDirection);
+			_spinWindDirection.setMinimum(0);
+			_spinWindDirection.setMaximum(359);
+
+			_spinWindDirection.addModifyListener(_modifyListener);
+			_spinWindDirection.addSelectionListener(_selectionListener);
+			_spinWindDirection.addMouseWheelListener(_mouseWheelListener);
+
+			// label: degree
+			tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
+
+			/*
+			 * wind speed
+			 */
+
+			// label
+			tk.createLabel(container, Messages.tour_editor_label_wind_speed);
+
+			// spinner
+			_spinWindSpeed = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_spinWindSpeed);
+			_spinWindSpeed.setMinimum(0);
+			_spinWindSpeed.setMaximum(100);
+
+			_spinWindSpeed.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isWindSpdManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinWindSpeed.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isWindSpdManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinWindSpeed.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isWindSpdManuallyModified = true;
+					setTourDirty();
+				}
+			});
+
+			// label: km/h, mi/h
+			_lblSpeedUnit = tk.createLabel(container, UI.UNIT_LABEL_SPEED);
 		}
 	}
 
@@ -2681,128 +2825,147 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final Composite section = createSection(parent, tk, Messages.tour_editor_section_characteristics);
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(section);
+		{
+			/*
+			 * tags
+			 */
+			_linkTag = new Link(section, SWT.NONE);
+			_linkTag.setText(Messages.tour_editor_label_tour_tag);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_linkTag);
+			_linkTag.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					UI.openControlMenu(_linkTag);
+				}
+			});
+			tk.adapt(_linkTag, true, true);
+			_firstColumnControls.add(_linkTag);
 
-		/*
-		 * tags
-		 */
-		_linkTag = new Link(section, SWT.NONE);
-		_linkTag.setText(Messages.tour_editor_label_tour_tag);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_linkTag);
-		_linkTag.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_linkTag);
-			}
-		});
-		tk.adapt(_linkTag, true, true);
+			_lblTourTags = tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					// hint is necessary that the width is not expanded when the text is long
+					.hint(_textColumnWidth, SWT.DEFAULT)
+					.span(3, 1)
+					.applyTo(_lblTourTags);
 
-		_lblTourTags = tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				// hint is necessary that the width is not expanded when the text is long
-				.hint(_textColumnWidth, SWT.DEFAULT)
-				.span(3, 1)
-				.applyTo(_lblTourTags);
+			/*
+			 * tour type
+			 */
+			_linkTourType = new Link(section, SWT.NONE);
+			_linkTourType.setText(Messages.tour_editor_label_tour_type);
+			_linkTourType.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					UI.openControlMenu(_linkTourType);
+				}
+			});
+			tk.adapt(_linkTourType, true, true);
+			_firstColumnControls.add(_linkTourType);
 
-		/*
-		 * tour type
-		 */
-		_linkTourType = new Link(section, SWT.NONE);
-		_linkTourType.setText(Messages.tour_editor_label_tour_type);
-		_linkTourType.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_linkTourType);
-			}
-		});
-		tk.adapt(_linkTourType, true, true);
-
-		_lblTourType = new CLabel(section, SWT.NONE);
-		GridDataFactory.swtDefaults()//
-				.grab(true, false)
-				.span(3, 1)
-				.applyTo(_lblTourType);
+			_lblTourType = new CLabel(section, SWT.NONE);
+			GridDataFactory.swtDefaults()//
+					.grab(true, false)
+					.span(3, 1)
+					.applyTo(_lblTourType);
+		}
 	}
 
 	private void createUISection410Info(final Composite parent, final FormToolkit tk) {
-
-		final Composite section = createSection(parent, tk, Messages.tour_editor_section_info);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
 
 		// keep border style
 		final int defaultBorderStyle = tk.getBorderStyle();
 		tk.setBorderStyle(SWT.NULL);
 
-		/*
-		 * reference tours
-		 */
-		Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
-		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+		final Composite section = createSection(parent, tk, Messages.tour_editor_section_info);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+		{
+			/*
+			 * reference tours
+			 */
+			Label label = tk.createLabel(section, Messages.tour_editor_label_ref_tour);
+			GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
-		_txtRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
+			_txtRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
 
-		/*
-		 * number of time slices
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_datapoints);
+			/*
+			 * number of time slices
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_datapoints);
 
-		_txtTimeSlicesCount = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
+			_txtTimeSlicesCount = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
 
-		/*
-		 * device name
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_device_name);
+			/*
+			 * device name
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_device_name);
 
-		_txtDeviceName = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
+			_txtDeviceName = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
 
-		/*
-		 * import file path
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_import_file_path);
+			/*
+			 * distance sensor
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_DistanceSensor);
 
-//		fTextImportFilePath = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		_txtImportFilePath = new ImageComboLabel(section, SWT.NONE);
-		tk.adapt(_txtImportFilePath);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.FILL).applyTo(_txtImportFilePath);
+			_txtDistanceSensor = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDistanceSensor);
 
-		/*
-		 * person
-		 */
-		tk.createLabel(section, Messages.tour_editor_label_person);
+			/*
+			 * import file path
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_import_file_path);
 
-		_txtPerson = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
+			_txtImportFilePath = new ImageComboLabel(section, SWT.NONE);
+			tk.adapt(_txtImportFilePath);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					//
+					// adjust to the label controls
+					.indent(2, 0)
+					//
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_txtImportFilePath);
 
-		/*
-		 * tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
+			/*
+			 * person
+			 */
+			tk.createLabel(section, Messages.tour_editor_label_person);
 
-		_txtTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
+			_txtPerson = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
 
-		/*
-		 * merged from tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
+			/*
+			 * tour id
+			 */
+			label = tk.createLabel(section, Messages.tour_editor_label_tour_id);
+			label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
 
-		_txtMergeFromTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
+			_txtTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
 
-		/*
-		 * merged into tour id
-		 */
-		label = tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
-		label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
+			/*
+			 * merged from tour id
+			 */
+			label = tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
+			label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
 
-		_txtMergeIntoTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
+			_txtMergeFromTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
+
+			/*
+			 * merged into tour id
+			 */
+			label = tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
+			label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
+
+			_txtMergeIntoTourId = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
+		}
 
 		/*
 		 * reset border style
@@ -2855,6 +3018,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		createUISectionSeparator(_tourContainer, tk);
 
 		createUISection150Characteristics(_tourContainer, tk);
+
+		setFirstColumWidth(sc, _firstColumnControls);
 
 		return sc;
 	}
@@ -3339,14 +3504,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final int selectionIndex = _comboClouds.getSelectionIndex();
 
-		if (selectionIndex < 0 || selectionIndex >= _comboCloudsDBValues.length) {
-			// display placeholder
-			_lblCloudIcon.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_EMPTY_16));
-			return;
-		}
-
 		final String cloudKey = _comboCloudsDBValues[selectionIndex];
 		final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
+
 		_lblCloudIcon.setImage(cloundIcon);
 	}
 
@@ -3435,6 +3595,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.dispose();
 		}
 
+		_firstColumnControls.clear();
+
 		super.dispose();
 	}
 
@@ -3483,10 +3645,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_spinRestPuls.setEnabled(canEdit);
 
-		_txtWindDir.setEnabled(canEdit);
-		_txtWindSpd.setEnabled(canEdit);
+		_spinTemperature.setEnabled(canEdit);
 		_comboClouds.setEnabled(canEdit);
-		_txtTemp.setEnabled(canEdit);
+		_spinWindDirection.setEnabled(canEdit);
+		_spinWindSpeed.setEnabled(canEdit);
 
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
@@ -3497,7 +3659,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_txtTourDistance.setEnabled(canEdit && _isManualTour);
 
-		_calTourCalories.setEnabled(canEdit && _isManualTour);
+		_spinTourCalories.setEnabled(canEdit && _isManualTour);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
@@ -5076,6 +5238,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
+	/**
+	 * set width for the first column controls to the max width value
+	 */
+	private void setFirstColumWidth(final Composite container, final ArrayList<Control> firstColumnControls) {
+
+		// conpute width for all controls
+		container.layout(true, true);
+
+		int maxWidth = 0;
+
+		// get max width from all first columns controls
+		for (final Control control : firstColumnControls) {
+			final int width = control.getSize().x;
+			maxWidth = width > maxWidth ? width : maxWidth;
+		}
+
+		// set width for all first column controls
+		for (final Control control : firstColumnControls) {
+			((GridData) control.getLayoutData()).widthHint = maxWidth;
+		}
+//		container.layout(true, true);
+	}
+
 	@Override
 	public void setFocus() {
 
@@ -5193,26 +5378,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
 
-			_tourData.setWeatherWindDir(getIntValue(_txtWindDir.getText()));
+			_tourData.setWeatherWindDir(_spinWindDirection.getSelection());
 			if (_isWindSpdManuallyModified) {
 				/*
 				 * update the speed only when it was modified because when the measurement is
 				 * changed when the tour is being modified then the computation of the speed
 				 * value can cause rounding errors
 				 */
-				_tourData.setWeatherWindSpd((int) (getIntValue(_txtWindSpd.getText()) * _unitValueDistance));
+				_tourData.setWeatherWindSpd((int) (_spinWindSpeed.getSelection() * _unitValueDistance));
 			}
 
-			final int fComboCloudsIndex = _comboClouds.getSelectionIndex();
-			if (fComboCloudsIndex < 0 || fComboCloudsIndex > _comboCloudsDBValues.length) {
-				_tourData.setWeatherClouds(UI.EMPTY_STRING);
-			} else {
-				_tourData.setWeatherClouds(_comboCloudsDBValues[fComboCloudsIndex]);
+			final int cloudIndex = _comboClouds.getSelectionIndex();
+			String cloudValue = _comboCloudsDBValues[cloudIndex];
+			if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
+				// replace invalid cloud key
+				cloudValue = UI.EMPTY_STRING;
 			}
+			_tourData.setWeatherClouds(cloudValue);
 
 			if (_isTemperatureManuallyModified) {
-				int temperature = getIntValue(_txtTemp.getText());
-				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+				int temperature = _spinTemperature.getSelection();
+				if (_unitValueTemperature != 1) {
 					temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
 				}
 				_tourData.setAvgTemperature(temperature);
@@ -5229,6 +5415,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// set week of year
 			_calendar.set(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
 			_tourData.setStartWeek((short) _calendar.get(Calendar.WEEK_OF_YEAR));
+
+			_tourData.setCalories(_spinTourCalories.getSelection());
 
 			if (_isDistManuallyModified) {
 				/*
@@ -5249,25 +5437,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setTourDrivingTime((_dtDrivingTime.getHours() * 3600)
 						+ (_dtDrivingTime.getMinutes() * 60)
 						+ _dtDrivingTime.getSeconds());
-			}
-
-			try {
-				final String tempStr = _calTourCalories.getText().trim();
-
-				if (tempStr.length() == 0) {
-					_tourData.setCalories(0);
-				} else {
-					final int cal = Integer.parseInt(tempStr);
-					_tourData.setCalories(cal);
-				}
-			} catch (final NumberFormatException e) {
-				// wrong characters are entered, display an error message, should not happen
-
-				MessageDialog.openError(
-						Display.getCurrent().getActiveShell(),
-						"Error in calories field", e.getLocalizedMessage());//$NON-NLS-1$
-
-				e.printStackTrace();
 			}
 
 		} catch (final IllegalArgumentException e) {
@@ -5514,6 +5683,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtDeviceName.setText(_tourData.getDeviceName());
 		_txtDeviceName.pack(true);
 
+		// distance sensor
+		_txtDistanceSensor.setText(_tourData.getIsDistanceFromSensor()
+				? Messages.Tour_Editor_Label_DistanceSensor_Yes
+				: Messages.Tour_Editor_Label_DistanceSensor_No);
+		_txtDistanceSensor.pack(true);
+
 		// import file path
 		final String tourImportFilePath = _tourData.getTourImportFilePath();
 		_txtImportFilePath.setText(tourImportFilePath == null ? UI.EMPTY_STRING : tourImportFilePath);
@@ -5573,7 +5748,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * layout container to resize the labels
 		 */
-//		fInfoContainer.layout(true);
 		onResizeTabInfo();
 	}
 
@@ -5625,45 +5799,41 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinRestPuls.setSelection(_tourData.getRestPulse());
 
 		// wind properties
-		_txtWindDir.setText(Integer.toString(_tourData.getWeatherWindDir()));
+		_spinWindDirection.setSelection(_tourData.getWeatherWindDir());
 
 		final int windSpeed = _tourData.getWeatherWindSpd();
-		if (windSpeed == 0) {
-			_txtWindSpd.setText(Integer.toString(windSpeed));
-		} else {
+		final int speed = (int) (windSpeed / _unitValueDistance);
+		_spinWindSpeed.setSelection(speed);
 
-			final int speed = (int) (windSpeed / _unitValueDistance);
-			_txtWindSpd.setText(Integer.toString(speed));
-		}
-
-		// weather icon
-		final String weatherClouds = _tourData.getWeatherClouds();
-
+		/*
+		 * weather icon
+		 */
 		int weatherCloudsIndex = -1;
-		if (weatherClouds != null) {
+		final String cloudValue = _tourData.getWeatherClouds();
+		if (cloudValue != null) {
 			// we cannot use a binary search as that requires sorting which we cannot...
-			for (int i = 0; i < _comboCloudsDBValues.length; ++i) {
-				if (_comboCloudsDBValues[i].equalsIgnoreCase(weatherClouds)) {
-					weatherCloudsIndex = i;
+			for (int cloudIndex = 0; cloudIndex < _comboCloudsDBValues.length; ++cloudIndex) {
+				if (_comboCloudsDBValues[cloudIndex].equalsIgnoreCase(cloudValue)) {
+					weatherCloudsIndex = cloudIndex;
 					break;
 				}
 			}
 		}
-
 		if (weatherCloudsIndex < 0) {
-			_comboClouds.deselect(_comboClouds.getSelectionIndex());
+			// select first entry which is the default value
+			_comboClouds.select(0);
 		} else {
 			_comboClouds.select(weatherCloudsIndex);
 		}
 		// icon must be displayed after the combobox entry is selected
 		displayCloudIcon();
 
+		// temperature
 		int temperature = _tourData.getAvgTemperature();
-		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+		if (_unitValueTemperature != 1) {
 			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
 		}
-
-		_txtTemp.setText(Integer.toString(temperature));
+		_spinTemperature.setSelection(temperature);
 
 		// tour date
 		_dtTourDate.setDate(tourYear, tourMonth, tourDay);
@@ -5681,7 +5851,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtTourDistance.setText(_nf3NoGroup.format(distance));
 
 		}
-		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
 		// recording time
 		final int recordingTime = _tourData.getTourRecordingTime();
@@ -5696,11 +5865,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
 		// calories
-		final int cal = _tourData.getCalories();
-		_calTourCalories.setText(Integer.toString(cal));
+		_spinTourCalories.setSelection(_tourData.getCalories());
 
 		UI.updateUITourType(_tourData.getTourType(), _lblTourType);
 		UI.updateUITags(_tourData, _lblTourTags);
+
+		// measurement system
+		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+		_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+		_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		/*
 		 * layout container to resize labels

@@ -3186,8 +3186,12 @@ public class TourData implements Comparable<Object> {
 //		return deviceTotalUp;
 //	}
 
+	public boolean getIsDistanceFromSensor() {
+		return isDistanceFromSensor == 1;
+	}
+
 	/**
-	 * @return the maxAltitude
+ 	 * @return the maxAltitude
 	 */
 	public int getMaxAltitude() {
 		return maxAltitude;
@@ -3652,10 +3656,6 @@ public class TourData implements Comparable<Object> {
 		return tourType;
 	}
 
-	public String getWeatherClouds() {
-		return weatherClouds;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3696,6 +3696,10 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	public String getWeatherClouds() {
+		return weatherClouds;
+	}
+
 	public int getWeatherWindDir() {
 		return weatherWindDir;
 	}
@@ -3711,6 +3715,11 @@ public class TourData implements Comparable<Object> {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -3729,11 +3738,6 @@ public class TourData implements Comparable<Object> {
 
 		return result;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @return <code>true</code> when the tour is manually created and not imported from a file or

@@ -513,9 +513,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
-	 * Defines all columns for the table viewer in the column manager
+	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
+	 * default columns
 	 * 
-	 * @param parent
+ 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
 
