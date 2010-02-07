@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -27,71 +27,71 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * visible name in the modify dialog
 	 */
-	private String				fLabel;
+	private String				_label;
 
 	/**
 	 * every column in a table must have a unique id
 	 */
-	protected String			fColumnId;
+	protected String			_columnId;
 
 	/**
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean				fIsCheckedInDialog;
+	private boolean				_isCheckedInDialog;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
 	 */
-	private boolean				fCanModifyVisibility	= true;
+	private boolean				_canModifyVisibility	= true;
 
-	protected int				fStyle;
+	protected int				_style;
 
-	private CellLabelProvider	fCellLabelProvider;
-	private ControlListener		fColumnControlListener;
+	private CellLabelProvider	_cellLabelProvider;
+	private ControlListener		_columnControlListener;
 
-	private String				fColumnText;
+	private String				_columnText;
 
-	private String				fColumnToolTipText;
-	private int					fColumnWidth;
-	private String				fColumnUnit;
-	private boolean				fIsColumnResizable	= true;
-	private boolean				fIsColumnMoveable	= true;
+	private String				_oolumnToolTipText;
+	private int					_columnWidth;
+	private String				_columnUnit;
+	private boolean				_isColumnResizable		= true;
+	private boolean				_isColumnMoveable		= true;
 
-	private SelectionAdapter	fColumnSelectionListener;
-	private int					fCreateIndex;
+	private SelectionAdapter	_columnSelectionListener;
+	private int					_createIndex;
 
 	/**
 	 * when <code>true</code> this column will be checked in the modify dialog when the default
 	 * button is selected
 	 */
-	private boolean				fIsDefaultColumn	= false;
+	private boolean				_isDefaultColumn		= false;
 
-	private int					fDefaultColumnWidth;
+	private int					_defaultColumnWidth;
 
 	/**
 	 * column will have the width 0 to be hidden, this is necessary that the first visible column
 	 * can be right aligned
 	 */
-	private boolean				fIsColumnHidden		= false;
+	private boolean				_isColumnHidden			= false;
 
-	private EditingSupport		fEditingSupport;
+	private EditingSupport		_editingSupport;
 
-	private ColumnLayoutData	fColumnLayoutData;
+	private ColumnLayoutData	_columnLayoutData;
 
 	public void addControlListener(final ControlListener controlListener) {
-		fColumnControlListener = controlListener;
+		_columnControlListener = controlListener;
 	}
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
-		fColumnSelectionListener = selectionAdapter;
+		_columnSelectionListener = selectionAdapter;
 	}
 
 	/**
 	 * @return Returns <code>true</code> when the visibility of this column can be modified
 	 */
 	public boolean canModifyVisibility() {
-		return fCanModifyVisibility;
+		return _canModifyVisibility;
 	}
 
 	@Override
@@ -99,24 +99,24 @@ public class ColumnDefinition implements Cloneable {
 
 		final ColumnDefinition clone = (ColumnDefinition) super.clone();
 
-		clone.fLabel = fLabel;
-		clone.fColumnId = fColumnId;
-		clone.fIsCheckedInDialog = fIsCheckedInDialog;
-		clone.fCanModifyVisibility = fCanModifyVisibility;
+		clone._label = _label;
+		clone._columnId = _columnId;
+		clone._isCheckedInDialog = _isCheckedInDialog;
+		clone._canModifyVisibility = _canModifyVisibility;
 
-		clone.fStyle = fStyle;
+		clone._style = _style;
 
-		clone.fCellLabelProvider = fCellLabelProvider;
-		clone.fColumnText = fColumnText;
-		clone.fColumnToolTipText = fColumnToolTipText;
-		clone.fColumnWidth = fColumnWidth;
-		clone.fDefaultColumnWidth = fDefaultColumnWidth;
-		clone.fIsColumnResizable = fIsColumnResizable;
+		clone._cellLabelProvider = _cellLabelProvider;
+		clone._columnText = _columnText;
+		clone._oolumnToolTipText = _oolumnToolTipText;
+		clone._columnWidth = _columnWidth;
+		clone._defaultColumnWidth = _defaultColumnWidth;
+		clone._isColumnResizable = _isColumnResizable;
 
-		clone.fIsColumnMoveable = fIsColumnMoveable;
-		clone.fColumnSelectionListener = fColumnSelectionListener;
+		clone._isColumnMoveable = _isColumnMoveable;
+		clone._columnSelectionListener = _columnSelectionListener;
 
-		clone.fCreateIndex = fCreateIndex;
+		clone._createIndex = _createIndex;
 
 		return clone;
 	}
@@ -133,101 +133,101 @@ public class ColumnDefinition implements Cloneable {
 			return false;
 		}
 		final ColumnDefinition other = (ColumnDefinition) obj;
-		if (fColumnId == null) {
-			if (other.fColumnId != null) {
+		if (_columnId == null) {
+			if (other._columnId != null) {
 				return false;
 			}
-		} else if (!fColumnId.equals(other.fColumnId)) {
+		} else if (!_columnId.equals(other._columnId)) {
 			return false;
 		}
 		return true;
 	}
 
 	public CellLabelProvider getCellLabelProvider() {
-		return fCellLabelProvider;
+		return _cellLabelProvider;
 	}
 
 	public ControlListener getColumnControlListener() {
-		return fColumnControlListener;
+		return _columnControlListener;
 	}
 
 	public String getColumnId() {
-		return fColumnId;
+		return _columnId;
 	}
 
 	public String getColumnLabel() {
-		return fLabel;
+		return _label;
 	}
 
 	public SelectionAdapter getColumnSelectionListener() {
-		return fColumnSelectionListener;
+		return _columnSelectionListener;
 	}
 
 	public int getColumnStyle() {
-		return fStyle;
+		return _style;
 	}
 
 	public String getColumnText() {
-		return fColumnText;
+		return _columnText;
 	}
 
 	public String getColumnToolTipText() {
-		return fColumnToolTipText;
+		return _oolumnToolTipText;
 	}
 
 	public String getColumnUnit() {
-		return fColumnUnit;
+		return _columnUnit;
 	}
 
 	public ColumnLayoutData getColumnWeightData() {
-		return fColumnLayoutData;
+		return _columnLayoutData;
 	}
 
 	public int getColumnWidth() {
-		return fColumnWidth;
+		return _columnWidth;
 	}
 
 	public int getCreateIndex() {
-		return fCreateIndex;
+		return _createIndex;
 	}
 
 	public int getDefaultColumnWidth() {
-		return fDefaultColumnWidth;
+		return _defaultColumnWidth;
 	}
 
 	public EditingSupport getEditingSupport() {
-		return fEditingSupport;
+		return _editingSupport;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fColumnId == null) ? 0 : fColumnId.hashCode());
+		result = prime * result + ((_columnId == null) ? 0 : _columnId.hashCode());
 		return result;
 	}
 
 	public boolean isCheckedInDialog() {
-		return fIsCheckedInDialog;
+		return _isCheckedInDialog;
 	}
 
 	public boolean isColumnHidden() {
-		return fIsColumnHidden;
+		return _isColumnHidden;
 	}
 
 	public boolean isColumnMoveable() {
-		return fIsColumnMoveable;
+		return _isColumnMoveable;
 	}
 
 	public boolean isColumnResizable() {
-		return fIsColumnResizable;
+		return _isColumnResizable;
 	}
 
 	/**
 	 * @return Returns <code>true</code> when this is a default column
 	 */
 	public boolean isDefaultColumn() {
-		return fIsDefaultColumn;
+		return _isDefaultColumn;
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class ColumnDefinition implements Cloneable {
 	 * @param canModifyVisibility
 	 */
 	public void setCanModifyVisibility(final boolean canModifyVisibility) {
-		fCanModifyVisibility = canModifyVisibility;
+		_canModifyVisibility = canModifyVisibility;
 	}
 
 	/**
@@ -246,15 +246,15 @@ public class ColumnDefinition implements Cloneable {
 	 * @param text
 	 */
 	public void setColumnHeader(final String text) {
-		fColumnText = text;
+		_columnText = text;
 	}
 
 	/**
 	 * @param label
-	 *            contains the label which is displayed in the column modify dialog
+	 *            This test is displayed in the column modification dialog
 	 */
 	public void setColumnLabel(final String label) {
-		fLabel = label;
+		_label = label;
 	}
 
 	/**
@@ -263,34 +263,37 @@ public class ColumnDefinition implements Cloneable {
 	 * @param isResizable
 	 */
 	public void setColumnResizable(final boolean isResizable) {
-		fIsColumnResizable = isResizable;
+		_isColumnResizable = isResizable;
 	}
 
 	/**
-	 * Set the text which is displayed as tooltip in the column header
-	 * 
 	 * @param toolTipText
+	 *            This text is displayed as tooltip in the column header
 	 */
 	public void setColumnToolTipText(final String toolTipText) {
-		fColumnToolTipText = toolTipText;
+		_oolumnToolTipText = toolTipText;
 	}
 
+	/**
+	 * @param columnUnit
+	 *            This text is displayed the in the column modification dialog
+	 */
 	public void setColumnUnit(final String columnUnit) {
-		fColumnUnit = columnUnit;
+		_columnUnit = columnUnit;
 	}
 
 	public void setColumnWeightData(final ColumnLayoutData layoutData) {
 
-		fColumnLayoutData = layoutData;
+		_columnLayoutData = layoutData;
 
 		if (layoutData instanceof ColumnPixelData) {
 			// keep the default width
-			fDefaultColumnWidth = ((ColumnPixelData) layoutData).width;
+			_defaultColumnWidth = ((ColumnPixelData) layoutData).width;
 		}
 	}
 
 	public void setColumnWidth(final int columnWidth) {
-		fColumnWidth = columnWidth;
+		_columnWidth = columnWidth;
 	}
 
 	/**
@@ -299,43 +302,43 @@ public class ColumnDefinition implements Cloneable {
 	 * @param createIndex
 	 */
 	public void setCreateIndex(final int createIndex) {
-		fCreateIndex = createIndex;
+		_createIndex = createIndex;
 	}
 
 	public void setDefaultColumnWidth(final int defaultColumnWidth) {
 		// set the default width
-		fDefaultColumnWidth = defaultColumnWidth;
+		_defaultColumnWidth = defaultColumnWidth;
 	}
 
 	public void setEditingSupport(final EditingSupport editingSupport) {
-		fEditingSupport = editingSupport;
+		_editingSupport = editingSupport;
 	}
 
 	/**
 	 * Hidden columns will be displayed with the width 0
 	 */
 	public void setHideColumn() {
-		fIsColumnHidden = true;
+		_isColumnHidden = true;
 	}
 
 	public void setIsCheckedInDialog(final boolean isCheckedInDialog) {
-		fIsCheckedInDialog = isCheckedInDialog;
+		_isCheckedInDialog = isCheckedInDialog;
 	}
 
 	public void setIsColumnMoveable(final boolean isColumnMovablee) {
-		fIsColumnMoveable = isColumnMovablee;
+		_isColumnMoveable = isColumnMovablee;
 	}
 
 	public void setIsDefaultColumn() {
-		this.fIsDefaultColumn = true;
+		this._isDefaultColumn = true;
 	}
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
-		fCellLabelProvider = cellLabelProvider;
+		_cellLabelProvider = cellLabelProvider;
 	}
 
 	@Override
 	public String toString() {
-		return fColumnId + ":" + fColumnWidth + " (" + fDefaultColumnWidth + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return _columnId + ":" + _columnWidth + " (" + _defaultColumnWidth + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

@@ -758,16 +758,26 @@ public class Messages extends NLS {
 
 	public static String		tour_editor_section_weather;
 	public static String		tour_editor_label_wind_direction;
+
+	public static String	tour_editor_label_wind_direction_Tooltip;
 	public static String		tour_editor_label_wind_speed;
+
+	public static String	tour_editor_label_wind_speed_Tooltip;
 	public static String		tour_editor_label_clouds;
+
+	public static String	tour_editor_label_clouds_Tooltip;
 
 	public static String	tour_editor_label_DistanceSensor;
 	public static String		tour_editor_label_temperature;
+
+	public static String	tour_editor_label_temperature_Tooltip;
 
 	public static String		tour_editor_section_personal;
 	public static String		tour_editor_label_rest_pulse;
 
 	public static String	tour_editor_label_rest_pulse_Tooltip;
+
+	public static String	tour_editor_label_WindDirectionNESW_Tooltip;
 
 	public static String		tour_merger_btn_reset_adjustment;
 	public static String		tour_merger_btn_reset_adjustment_tooltip;
@@ -905,6 +915,30 @@ public class Messages extends NLS {
 	public static String	Weather_Clounds_Snow;
 
 	public static String	Weather_Clounds_Sunny;
+
+	public static String	Weather_WindDirection_E;
+
+	public static String	Weather_WindDirection_N;
+
+	public static String	Weather_WindDirection_NE;
+
+	public static String	Weather_WindDirection_NW;
+
+	public static String	Weather_WindDirection_S;
+
+	public static String	Weather_WindDirection_SE;
+
+	public static String	Weather_WindDirection_SW;
+
+	public static String	Weather_WindDirection_W;
+
+	public static String	Weather_WindSpeed_Bft0;
+
+	public static String	Weather_WindSpeed_Bft1;
+
+	public static String	Weather_WindSpeed_Bft2;
+
+	public static String	Weather_WindSpeed_Bft3;
 
 	static {
 		// initialize resource bundle

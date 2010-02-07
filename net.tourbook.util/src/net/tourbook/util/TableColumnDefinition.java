@@ -35,8 +35,8 @@ public class TableColumnDefinition extends ColumnDefinition {
 	 */
 	public TableColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
 
-		fColumnId = columnId;
-		fStyle = style;
+		_columnId = columnId;
+		_style = style;
 
 		columnManager.addColumn(this);
 	}
@@ -59,7 +59,7 @@ public class TableColumnDefinition extends ColumnDefinition {
 
 	@Override
 	public String toString() {
-		return fColumnId;
+		return _columnId;
 	}
 
 }

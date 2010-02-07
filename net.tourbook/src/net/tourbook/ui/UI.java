@@ -139,8 +139,8 @@ public class UI {
 	private static final String						UNIT_ALTIMETER_FT_H				= "ft/h";									//$NON-NLS-1$
 	private static final String						UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
 
-	public static final String						SYMBOL_AVERAGE					= "\u00D8";								//$NON-NLS-1$
-	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";								//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE					= "\u00f8";								//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
 	public static final String						SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$
 	public static final String						SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
 	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$

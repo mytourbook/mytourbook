@@ -525,13 +525,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumnDate(pixelConverter);
 		defineColumnTime(pixelConverter);
 		defineColumnTourType(pixelConverter);
-		defineColumnDistance(pixelConverter);
-		defineColumnTimeDriving(pixelConverter);
-		defineColumnWeatherClouds(pixelConverter);
 
+		defineColumnDistance(pixelConverter);
+		defineColumnAltitudeUp(pixelConverter);
+		defineColumnTimeDriving(pixelConverter);
+
+		defineColumnWeatherClouds(pixelConverter);
 		defineColumnTitle(pixelConverter);
 		defineColumnTags(pixelConverter);
-		defineColumnAltitudeUp(pixelConverter);
 
 		defineColumnMarker(pixelConverter);
 		defineColumnCalories(pixelConverter);

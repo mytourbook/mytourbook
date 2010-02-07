@@ -476,7 +476,7 @@ public class ColumnManager {
 				colDef.setIsCheckedInDialog(true);
 
 				// set column width
-				colDef.setColumnWidth(getColumnWidth(colDef.fColumnId));
+				colDef.setColumnWidth(getColumnWidth(colDef._columnId));
 
 				// keep the column
 				allDialogColumns.add(colDef);
