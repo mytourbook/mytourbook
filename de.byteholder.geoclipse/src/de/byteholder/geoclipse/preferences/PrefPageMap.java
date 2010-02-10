@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
+ 
 package de.byteholder.geoclipse.preferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,8 +36,8 @@ import de.byteholder.geoclipse.Activator;
  */
 public class PrefPageMap extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private BooleanFieldEditor	fChkShowTileInfo;
-	private FontFieldEditor		fMonoFontEditor;
+	private BooleanFieldEditor	_chkShowTileInfo;
+	private FontFieldEditor		_monoFontEditor;
 
 	public PrefPageMap() {
 		noDefaultAndApplyButton();
@@ -65,13 +65,13 @@ public class PrefPageMap extends PreferencePage implements IWorkbenchPreferenceP
 			{
 
 				// checkbox: show tile info
-				fChkShowTileInfo = new BooleanFieldEditor(
+				_chkShowTileInfo = new BooleanFieldEditor(
 						IMappingPreferences.SHOW_MAP_TILE_INFO,
 						Messages.pref_map_show_tile_info,
 						infoContainer);
-				fChkShowTileInfo.setPreferenceStore(prefStore);
-				fChkShowTileInfo.setPage(this);
-				fChkShowTileInfo.load();
+				_chkShowTileInfo.setPreferenceStore(prefStore);
+				_chkShowTileInfo.setPage(this);
+				_chkShowTileInfo.load();
 			}
 
 			final Composite fontContainer = new Composite(container, SWT.NONE);
@@ -79,14 +79,14 @@ public class PrefPageMap extends PreferencePage implements IWorkbenchPreferenceP
 			GridLayoutFactory.fillDefaults().applyTo(fontContainer);
 			{
 				// font: mono space
-				fMonoFontEditor = new FontFieldEditor(
+				_monoFontEditor = new FontFieldEditor(
 						IMappingPreferences.THEME_FONT_LOGGING,
 						Messages.Theme_Font_Logging,
 						Messages.Theme_Font_Logging_PREVIEW_TEXT,
 						fontContainer);
-				fMonoFontEditor.setPreferenceStore(prefStore);
-				fMonoFontEditor.setPage(this);
-				fMonoFontEditor.load();
+				_monoFontEditor.setPreferenceStore(prefStore);
+				_monoFontEditor.setPage(this);
+				_monoFontEditor.load();
 			}
 			// force 2 columns
 			final GridLayout gl = (GridLayout) fontContainer.getLayout();
@@ -112,8 +112,8 @@ public class PrefPageMap extends PreferencePage implements IWorkbenchPreferenceP
 	@Override
 	public boolean performOk() {
 
-		fChkShowTileInfo.store();
-		fMonoFontEditor.store();
+		_chkShowTileInfo.store();
+		_monoFontEditor.store();
 
 		return true;
 	}

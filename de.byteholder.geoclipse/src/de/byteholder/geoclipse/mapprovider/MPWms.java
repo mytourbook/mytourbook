@@ -96,18 +96,18 @@ public class MPWms extends MP implements ITileLoader {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 
-		final MPWms mapProvider = (MPWms) super.clone();
-
-		mapProvider._mtLayers = cloneMtLayer(mapProvider, _mtLayers);
-		mapProvider._mtLayersReverse = cloneMtLayer(mapProvider, _mtLayersReverse);
+		final MPWms clonedMp = (MPWms) super.clone();
+ 
+		clonedMp._mtLayers = cloneMtLayer(clonedMp, _mtLayers);
+		clonedMp._mtLayersReverse = cloneMtLayer(clonedMp, _mtLayersReverse);
 
 //		if (fMtLayers != null) {
 //			mapProvider.initializeLayers();
 //		}
 
-		mapProvider._offlineLayers = cloneOfflineLayer(mapProvider, _offlineLayers);
+		clonedMp._offlineLayers = cloneOfflineLayer(clonedMp, _offlineLayers);
 
-		return mapProvider;
+		return clonedMp;
 	}
 
 	private ArrayList<MtLayer> cloneMtLayer(final MPWms mapProvider, final ArrayList<MtLayer> allMtLayers)

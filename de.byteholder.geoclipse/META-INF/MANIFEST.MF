@@ -24,4 +24,5 @@ Export-Package: de.byteholder.geoclipse,
  de.byteholder.gpx
 Import-Package: net.tourbook.util,
  org.eclipse.core.expressions,
+ org.joda.time,
  org.joda.time.format

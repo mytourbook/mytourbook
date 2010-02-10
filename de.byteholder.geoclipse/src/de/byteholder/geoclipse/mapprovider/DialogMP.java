@@ -111,8 +111,8 @@ public class DialogMP extends TitleAreaDialog {
 		}
 
 		if (_fontMono == null) {
-			_fontMono = new Font(display, DEFAULT_MONO_FONT, 8, SWT.NORMAL);
-		}
+			_fontMono = new Font(display, DEFAULT_MONO_FONT, 9, SWT.NORMAL);
+ 		}
 	}
 
 	/**

@@ -102,7 +102,8 @@ import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
-
+import org.joda.time.DateTime;
+ 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
@@ -121,8 +122,10 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
 import de.byteholder.geoclipse.util.PixelConverter;
- 
+
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
+
+	private static final String					CHARACTER_0					= "0";
 
 	public static final String					PREF_PAGE_MAP_PROVIDER_ID	= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
 
@@ -1856,7 +1859,21 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_AllFiles,
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles });
 
-		dialog.setFileName(fSelectedMapProvider.getId() + XML_EXTENSION);//$NON-NLS-1$
+		final DateTime today = new DateTime();
+
+		// add leading 0 when necessary
+		final String month = CHARACTER_0 + Integer.toString(today.getMonthOfYear());
+		final String day = CHARACTER_0 + Integer.toString(today.getDayOfMonth());
+
+		final String currentDate = //
+		UI.DASH
+				+ Integer.toString(today.getYear())
+				+ UI.DASH
+				+ month.substring(month.length() - 2, month.length())
+				+ UI.DASH
+				+ day.substring(day.length() - 2, day.length());
+
+		dialog.setFileName(fSelectedMapProvider.getId() + currentDate + XML_EXTENSION);//$NON-NLS-1$
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {

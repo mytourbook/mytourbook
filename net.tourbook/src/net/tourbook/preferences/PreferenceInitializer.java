@@ -163,16 +163,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
-
+ 
 		/*
-		 * appearance of the painted tour in map
+		 * map
 		 */
+		// appearance of the painted tour in map
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
+
+		// map providers which can be toggled, osm is the default map provider
+		store.setDefault(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST, "osm");
 
 		/*
 		 * tour data editor

@@ -1016,8 +1016,22 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return _dialogSettings;
 
+		try {
+
+			// Get the stored width
+			_dialogSettings.getInt(UI.DIALOG_WIDTH);
+
+		} catch (final NumberFormatException e) {
+
+			// dialog width is not yet set, set default size
+
+			_dialogSettings.put(UI.DIALOG_WIDTH, 800);
+			_dialogSettings.put(UI.DIALOG_HEIGHT, 700);
+		}
+
+		return _dialogSettings;
+ 
 		// disable bounds
 //		return null;
 	}

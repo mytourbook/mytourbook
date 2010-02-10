@@ -3191,7 +3191,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
- 	 * @return the maxAltitude
+	 * @return the maxAltitude
 	 */
 	public int getMaxAltitude() {
 		return maxAltitude;
@@ -4024,8 +4024,11 @@ public class TourData implements Comparable<Object> {
 		this.startMinute = startMinute;
 	}
 
+	/**
+	 * Sets the month for the tour start in the range 1...12
+	 */
 	public void setStartMonth(final short startMonth) {
-		this.startMonth = startMonth;
+ 		this.startMonth = startMonth;
 	}
 
 	public void setStartPulse(final short startPulse) {

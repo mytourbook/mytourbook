@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -14,11 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
+ 
 import net.tourbook.Messages;
 import net.tourbook.importdata.RawDataManager;
 
@@ -27,21 +23,24 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.joda.time.DateTime;
 
 public class ActionAdjustYear extends Action implements IMenuCreator {
 
-	public Calendar		fCalendar	= GregorianCalendar.getInstance();
+	private Menu		_menu;
 
-	private Menu		fMenu;
-
-	private ActionYear	fActionYear_5;
-	private ActionYear	fActionYear_4;
-	private ActionYear	fActionYear_3;
-	private ActionYear	fActionYear_2;
-	private ActionYear	fActionYearLast;
-	private ActionYear	fActionYearThis;
-	private ActionYear	fActionYearNext;
-
+	private ActionYear	_actionYear_10;
+	private ActionYear	_actionYear_9;
+	private ActionYear	_actionYear_8;
+	private ActionYear	_actionYear_7;
+	private ActionYear	_actionYear_6;
+	private ActionYear	_actionYear_5;
+	private ActionYear	_actionYear_4;
+	private ActionYear	_actionYear_3;
+	private ActionYear	_actionYear_2;
+	private ActionYear	_actionYearLast;
+	private ActionYear	_actionYearThis;
+	private ActionYear	_actionYearNext;
 
 	private class ActionYear extends Action {
 
@@ -65,30 +64,34 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 		super(Messages.import_data_action_adjust_imported_year, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fCalendar.setTime(new Date());
-		final int thisYear = fCalendar.get(Calendar.YEAR);
+		final int thisYear = new DateTime().getYear();
 
-		fActionYear_5 = new ActionYear(thisYear - 5);
-		fActionYear_4 = new ActionYear(thisYear - 4);
-		fActionYear_3 = new ActionYear(thisYear - 3);
-		fActionYear_2 = new ActionYear(thisYear - 2);
-		fActionYearLast = new ActionYear(thisYear - 1);
-		fActionYearThis = new ActionYear(thisYear);
-		fActionYearNext = new ActionYear(thisYear + 1);
+		_actionYear_10 = new ActionYear(thisYear - 10);
+		_actionYear_9 = new ActionYear(thisYear - 9);
+		_actionYear_8 = new ActionYear(thisYear - 8);
+		_actionYear_7 = new ActionYear(thisYear - 7);
+		_actionYear_6 = new ActionYear(thisYear - 6);
+		_actionYear_5 = new ActionYear(thisYear - 5);
+		_actionYear_4 = new ActionYear(thisYear - 4);
+		_actionYear_3 = new ActionYear(thisYear - 3);
+		_actionYear_2 = new ActionYear(thisYear - 2);
+		_actionYearLast = new ActionYear(thisYear - 1);
+		_actionYearThis = new ActionYear(thisYear);
+		_actionYearNext = new ActionYear(thisYear + 1);
 
 		// set current year as default
-		fActionYearThis.setChecked(true);
+		_actionYearThis.setChecked(true);
 	}
 
 	private void addActionToMenu(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -98,17 +101,22 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	public Menu getMenu(final Menu parent) {
 
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
-		addActionToMenu(fActionYear_5);
-		addActionToMenu(fActionYear_4);
-		addActionToMenu(fActionYear_3);
-		addActionToMenu(fActionYear_2);
-		addActionToMenu(fActionYearLast);
-		addActionToMenu(fActionYearThis);
-		addActionToMenu(fActionYearNext);
+		addActionToMenu(_actionYear_10);
+		addActionToMenu(_actionYear_9);
+		addActionToMenu(_actionYear_8);
+		addActionToMenu(_actionYear_7);
+		addActionToMenu(_actionYear_6);
+		addActionToMenu(_actionYear_5);
+		addActionToMenu(_actionYear_4);
+		addActionToMenu(_actionYear_3);
+		addActionToMenu(_actionYear_2);
+		addActionToMenu(_actionYearLast);
+		addActionToMenu(_actionYearThis);
+		addActionToMenu(_actionYearNext);
 
-		return fMenu;
+		return _menu;
 	}
 
 }

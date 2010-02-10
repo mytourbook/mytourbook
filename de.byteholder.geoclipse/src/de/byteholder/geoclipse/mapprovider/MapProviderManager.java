@@ -701,10 +701,10 @@ public class MapProviderManager {
 					final MPProfile mapProfile = (MPProfile) mapProvider;
 					final ArrayList<MPWrapper> mpWrapperList = mapProfile.getAllWrappers();
 
-					// loop: all map provider within a profile
-					for (final MPWrapper mpWrapper : mpWrapperList) {
+					// loop: all map providers which are set within the profiles
+ 					for (final MPWrapper mpWrapper : mpWrapperList) {
 
-						final MP profileMapProvider = mpWrapper.getMP(true);
+						final MP profileMapProvider = mpWrapper.getMP(false);
 
 						if (profileMapProvider != null && profileMapProvider.getId().equals(replaceMapProviderId)) {
 

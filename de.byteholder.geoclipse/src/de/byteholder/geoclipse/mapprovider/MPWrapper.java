@@ -132,8 +132,8 @@ public class MPWrapper implements Cloneable {
 	/**
 	 * @param isCheckNull
 	 *            When <code>true</code> the mp will be checked if it's value is null
-	 * @return
-	 */
+	 * @return Returns the map provider for the wrapper or <code>null</code> when it's not yet set
+ 	 */
 	public MP getMP(final boolean isCheckNull) {
 
 		// check map provider
@@ -315,8 +315,8 @@ public class MPWrapper implements Cloneable {
 				 */
 
 				for (final MtLayer newMtLayer : newMtLayers) {
-					newMtLayer.setIsDisplayedInMap(false);
-					newMtLayer.setPositionIndex(-1);
+//					newMtLayer.setIsDisplayedInMap(false);
+//					newMtLayer.setPositionIndex(-1);
 				}
 			}
 		}

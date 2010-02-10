@@ -133,6 +133,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
 	private static final String				DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED	= "IsPropertiesExpanded";					//$NON-NLS-1$
 
+
 	/*
 	 * UI controls
 	 */
@@ -1691,12 +1692,27 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		return colorValue == 0 ? -1 : colorValue;
 	}
 
+
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return _dialogSettings;
 
+		try {
+
+			// Get the stored width
+			_dialogSettings.getInt(UI.DIALOG_WIDTH);
+
+		} catch (final NumberFormatException e) {
+
+			// dialog width is not yet set, set default size
+
+			_dialogSettings.put(UI.DIALOG_WIDTH, 850);
+			_dialogSettings.put(UI.DIALOG_HEIGHT, 700);
+		}
+
+		return _dialogSettings;
+ 
 		// disable bounds
 //		return null;
 	}

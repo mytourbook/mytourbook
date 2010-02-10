@@ -931,14 +931,32 @@ public class Messages extends NLS {
 	public static String	Weather_WindDirection_SW;
 
 	public static String	Weather_WindDirection_W;
+ 
+	public static String	Weather_WindSpeed_Bft00;
 
-	public static String	Weather_WindSpeed_Bft0;
+	public static String	Weather_WindSpeed_Bft01;
 
-	public static String	Weather_WindSpeed_Bft1;
+	public static String	Weather_WindSpeed_Bft02;
 
-	public static String	Weather_WindSpeed_Bft2;
+	public static String	Weather_WindSpeed_Bft03;
 
-	public static String	Weather_WindSpeed_Bft3;
+	public static String	Weather_WindSpeed_Bft04;
+
+	public static String	Weather_WindSpeed_Bft05;
+
+	public static String	Weather_WindSpeed_Bft06;
+
+	public static String	Weather_WindSpeed_Bft07;
+
+	public static String	Weather_WindSpeed_Bft08;
+
+	public static String	Weather_WindSpeed_Bft09;
+
+	public static String	Weather_WindSpeed_Bft10;
+
+	public static String	Weather_WindSpeed_Bft11;
+
+	public static String	Weather_WindSpeed_Bft12;
 
 	static {
 		// initialize resource bundle

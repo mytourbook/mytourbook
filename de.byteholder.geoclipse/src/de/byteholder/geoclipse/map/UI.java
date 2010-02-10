@@ -21,16 +21,32 @@ import de.byteholder.geoclipse.Messages;
 
 public class UI {
 
-	public static final String	EMPTY_STRING	= "";		//$NON-NLS-1$
-	public static final String	SPACE			= " ";		//$NON-NLS-1$
+	public static final String	EMPTY_STRING	= "";				//$NON-NLS-1$
+	public static final String	SPACE			= " ";				//$NON-NLS-1$
 	public static final char	DASH			= '-';
-	public static final String	DASH_WITH_SPACE	= " - ";	//$NON-NLS-1$
-	public static final String	NEW_LINE		= "\n";	//$NON-NLS-1$
-	public static final String	DOTS			= "...";	//$NON-NLS-1$
-	public static final String	MBYTES			= "MByte";	//$NON-NLS-1$
+	public static final String	DASH_WITH_SPACE	= " - ";			//$NON-NLS-1$
+	public static final String	NEW_LINE		= "\n";			//$NON-NLS-1$
+	public static final String	DOTS			= "...";			//$NON-NLS-1$
+	public static final String	MBYTES			= "MByte";			//$NON-NLS-1$
 
-//	private static final int	MAX_ID_LENGTH	= 150;
+	/**
+	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
+	 * <br>
+	 * The dialog settings key name for stored dialog width.
+	 * 
+	 * @since 3.2
+	 */
+	public static final String	DIALOG_WIDTH	= "DIALOG_WIDTH";	//$NON-NLS-1$
 
+	/**
+	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
+	 * <br>
+	 * The dialog settings key name for stored dialog height.
+	 * 
+	 * @since 3.2
+	 */
+	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
+ 
 	public static void addSashColorHandler(final Sash sash) {
 
 		sash.addMouseTrackListener(new MouseTrackListener() {
