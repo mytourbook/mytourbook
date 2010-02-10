@@ -322,8 +322,9 @@ public class MapProviderManager {
 							final MPProfile mpProfile = (MPProfile) mapProvider;
 
 							for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
-								if (mpWrapper.getMP() instanceof MPWms) {
-									final MPWms wmsMp = (MPWms) mpWrapper.getMP();
+								final MP mp = mpWrapper.getMP(true);
+								if (mp instanceof MPWms) {
+									final MPWms wmsMp = (MPWms) mp;
 									if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
 										wmsMp.setWmsEnabled(false);
 									}
@@ -703,7 +704,7 @@ public class MapProviderManager {
 					// loop: all map provider within a profile
 					for (final MPWrapper mpWrapper : mpWrapperList) {
 
-						final MP profileMapProvider = mpWrapper.getMP();
+						final MP profileMapProvider = mpWrapper.getMP(true);
 
 						if (profileMapProvider != null && profileMapProvider.getId().equals(replaceMapProviderId)) {
 
@@ -918,7 +919,7 @@ public class MapProviderManager {
 					if (mpWrapper.isDisplayedInMap()) {
 
 						writeXml(//
-								mpWrapper.getMP(),
+								mpWrapper.getMP(true),
 								xmlMemento.createChild(ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER));
 					}
 				}
@@ -2083,7 +2084,7 @@ public class MapProviderManager {
 
 		for (final MPWrapper mpWrapper : mapProfile.getAllWrappers()) {
 
-			final MP mp = mpWrapper.getMP();
+			final MP mp = mpWrapper.getMP(true);
 
 			final String mpType = getMapProviderType(mp);
 			if (mpType == null) {

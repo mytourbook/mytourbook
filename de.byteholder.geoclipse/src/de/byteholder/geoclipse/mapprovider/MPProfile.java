@@ -85,14 +85,14 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				} else {
 
 					// sort by name when position is not set
-					return mp1.getMP().getName().compareTo(mp2.getMP().getName());
+					return mp1.getMP(true).getName().compareTo(mp2.getMP(true).getName());
 				}
 			}
 		});
 	}
 
 	/**
-	 * Updates values from the wrapper into the tile factory
+	 * Updates values from the wrapper into the map provider
 	 * 
 	 * @param allMpWrapper
 	 */
@@ -102,7 +102,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 			if (mpWrapper.isDisplayedInMap()) {
 
-				final MP wrappedMp = mpWrapper.getMP();
+				final MP wrappedMp = mpWrapper.getMP(true);
 
 				wrappedMp.setIsProfileTransparentColors(mpWrapper.isTransparentColors());
 				wrappedMp.setIsProfileTransparentBlack(mpWrapper.isTransparentBlack());
@@ -134,7 +134,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			final MPWrapper clonedMpWrapper = (MPWrapper) mpWrapper.clone();
 
 			// set wms properties
-			final MP clonedMP = clonedMpWrapper.getMP();
+			final MP clonedMP = clonedMpWrapper.getMP(true);
 			if (clonedMP instanceof MPWms) {
 
 				final MPWms clonedWmsMp = (MPWms) clonedMP;
@@ -171,7 +171,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		for (final MPWrapper mpWrapper : _mpWrappers) {
 
 			final int parentZoom = parentTile.getZoom();
-			final MP wrapperMP = mpWrapper.getMP();
+			final MP wrapperMP = mpWrapper.getMP(true);
 
 			if (parentZoom < wrapperMP.getMinZoomLevel() || parentZoom > wrapperMP.getMaxZoomLevel()) {
 
@@ -390,11 +390,11 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	 */
 	private boolean synchMpWrapper(final MPWrapper mpWrapper, final MP validMapProvider) {
 
-		final MP wrapperMapProvider = mpWrapper.getMP();
+		final MP wrapperMapProvider = mpWrapper.getMP(false);
 		if (wrapperMapProvider == null) {
 
 			/*
-			 * wms map provider was not yet created, make a clone
+			 * map provider was not yet created, create a clone
 			 */
 
 			try {

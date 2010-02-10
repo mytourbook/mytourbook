@@ -17,6 +17,8 @@ package de.byteholder.geoclipse.mapprovider;
 
 import java.util.ArrayList;
 
+import net.tourbook.util.StatusUtil;
+
 /**
  * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
  */
@@ -127,12 +129,17 @@ public class MPWrapper implements Cloneable {
 		return _mapProviderId;
 	}
 
-	public MP getMP() {
+	/**
+	 * @param isCheckNull
+	 *            When <code>true</code> the mp will be checked if it's value is null
+	 * @return
+	 */
+	public MP getMP(final boolean isCheckNull) {
 
 		// check map provider
-//		if (fMapProvider == null) {
-//			StatusUtil.showStatus("map provider is not set", new Exception());//$NON-NLS-1$
-//		}
+		if (_mp == null && isCheckNull) {
+			StatusUtil.showStatus("map provider is not set", new Exception());//$NON-NLS-1$
+		}
 
 		return _mp;
 	}

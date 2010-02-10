@@ -32,19 +32,19 @@ public class TVIMapProvider extends TVIMapProviderItem {
 	protected void fetchChildren() {
 
 		// only WMS has children
-		if ((_mpWrapper.getMP() instanceof MPWms) == false) {
+		if ((_mpWrapper.getMP(true) instanceof MPWms) == false) {
 			return;
 		}
 
 		// check if wms is loaded
-		final MPWms wmsMapProvider = (MPWms) _mpWrapper.getMP();
+		final MPWms mpWms = (MPWms) _mpWrapper.getMP(false);
  
-		if (MapProviderManager.checkWms(wmsMapProvider, null) == null) {
+		if (MapProviderManager.checkWms(mpWms, null) == null) {
 			return;
 		}
 
 		// create children, wms layer
-		for (final MtLayer mtLayer : wmsMapProvider.getMtLayers()) {
+		for (final MtLayer mtLayer : mpWms.getMtLayers()) {
 			addChild(new TVIWmsLayer(getTreeViewer(), mtLayer));
 		}
 	}
@@ -56,7 +56,7 @@ public class TVIMapProvider extends TVIMapProviderItem {
 	@Override
 	public boolean hasChildren() {
 
-		if (_mpWrapper.getMP() instanceof MPWms) {
+		if (_mpWrapper.getMP(true) instanceof MPWms) {
 			// wms has children
 			return true;
 		} else {

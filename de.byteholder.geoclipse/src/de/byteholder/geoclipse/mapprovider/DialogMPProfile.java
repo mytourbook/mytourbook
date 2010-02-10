@@ -579,7 +579,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 							// expand/collapse current item
 
-							final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP();
+							final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP(true);
 
 							if ((mapProvider instanceof MPWms) == false) {
 
@@ -728,7 +728,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-					final MP mapProvider = mpWrapper.getMP();
+					final MP mapProvider = mpWrapper.getMP(true);
 
 					styledString.append(mapProvider.getName());
 
@@ -797,7 +797,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final TVIMapProvider tvi = (TVIMapProvider) element;
-					final MP mapProvider = tvi.getMapProviderWrapper().getMP();
+					final MP mapProvider = tvi.getMapProviderWrapper().getMP(true);
 
 					if (mapProvider instanceof MPWms) {
 
@@ -2110,7 +2110,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			{
 				final int alpha = selectedMpWrapper.getAlpha();
 				final int brightness = selectedMpWrapper.getBrightness();
-				final String mpUrl = getMpUrl(selectedMpWrapper.getMP());
+				final String mpUrl = getMpUrl(selectedMpWrapper.getMP(true));
 
 				_spinAlpha.setSelection(alpha);
 				_scaleAlpha.setSelection(alpha);
@@ -2334,7 +2334,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				final MPWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
 				boolean isWmsDisplayed = mpWrapper.isDisplayedInMap();
 
-				final MP mapProvider = mpWrapper.getMP();
+				final MP mapProvider = mpWrapper.getMP(true);
 				if (mapProvider instanceof MPWms) {
 
 					// visibility for a wms map provider can be toggled only a layer
@@ -2429,7 +2429,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			mpWrapper.setPositionIndex(tblItemIndex++);
 
 			// update wms layer
-			final MP mapProvider = mpWrapper.getMP();
+			final MP mapProvider = mpWrapper.getMP(true);
 			if (mapProvider instanceof MPWms) {
 
 				final MPWms mpWms = (MPWms) mapProvider;
@@ -2560,7 +2560,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		if (tviParent instanceof TVIMapProvider) {
 
 			final MPWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
-			final MP mapProvider = parentMpWrapper.getMP();
+			final MP mapProvider = parentMpWrapper.getMP(true);
 
 			if (mapProvider instanceof MPWms) {
 

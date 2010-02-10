@@ -2108,8 +2108,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					final MPProfile mpProfile = (MPProfile) mapProvider;
 
 					for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
-						if (mpWrapper.getMP() instanceof MPWms) {
-							((MPWms) mpWrapper.getMP()).setWmsEnabled(true);
+						if (mpWrapper.getMP(true) instanceof MPWms) {
+							((MPWms) mpWrapper.getMP(true)).setWmsEnabled(true);
 						}
 					}
 				}
