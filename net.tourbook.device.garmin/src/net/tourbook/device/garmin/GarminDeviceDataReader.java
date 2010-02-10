@@ -28,6 +28,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.util.StatusUtil;
 
 public class GarminDeviceDataReader extends TourbookDevice {
 
@@ -92,7 +93,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 					fileReader.close();
 				}
 			} catch (final IOException e) {
-				e.printStackTrace();
+				StatusUtil.showStatus(e);
 			}
 		}
 
@@ -116,8 +117,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
 		} catch (final Exception e) {
-			System.err.println("Error parsing file: " + importFilePath); //$NON-NLS-1$ 
-			e.printStackTrace();
+			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
 			return false;
 		} finally {
 			saxHandler.dispose();

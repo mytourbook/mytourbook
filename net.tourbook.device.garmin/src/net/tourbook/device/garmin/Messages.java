@@ -25,6 +25,10 @@ public class Messages extends NLS {
 	public static String		Garmin_data_transfer_error;
 	public static String		Garmin_error_receiving_data;
 	public static String		Garmin_no_connection;
+
+	public static String	Garmin_SAXHandler_ImportError_DlgTitle;
+
+	public static String	Garmin_SAXHandler_InvalidDate_2007_04_01;
 	public static String		Garmin_Transfer_msg;
 	public static String		Garmin_unknown_device;
 

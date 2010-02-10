@@ -20,5 +20,6 @@ Bundle-ClassPath: .,
  dinopolis-util-0.5.4mt.jar,
  gpsinput-0.5.4mt.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.joda.time,
+Import-Package: net.tourbook.util,
+ org.joda.time,
  org.joda.time.format
