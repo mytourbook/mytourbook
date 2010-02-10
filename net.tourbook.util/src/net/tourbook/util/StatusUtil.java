@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-
 /*
  * this class is copied from org.eclipse.ui.internal.misc.StatusUtil and modified
  */
@@ -135,8 +134,16 @@ public class StatusUtil {
 		return new Status(IStatus.ERROR, pluginId, IStatus.OK, message, getCause(exception));
 	}
 
+	public static void showStatus(final String message) {
+		handleStatus(message, null, StatusManager.SHOW);
+	}
+
 	public static void showStatus(final String message, final Throwable exception) {
 		handleStatus(message, exception, StatusManager.SHOW);
+	}
+
+	public static void showStatus(final Throwable exception) {
+		handleStatus(exception.getMessage(), exception, StatusManager.SHOW);
 	}
 
 }
