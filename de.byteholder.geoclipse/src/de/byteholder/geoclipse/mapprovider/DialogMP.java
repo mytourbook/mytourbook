@@ -42,7 +42,7 @@ public class DialogMP extends TitleAreaDialog {
 	private static final String				TIME_SPACER				= "       ";									//$NON-NLS-1$
 	private static final String				COLUMN_SPACER			= "  ";										//$NON-NLS-1$
 
-	private static final String				DEFAULT_MONO_FONT		= "Courier";
+	private static final String				DEFAULT_MONO_FONT		= "Courier"; //$NON-NLS-1$
 
 	protected static final int				MAX_VISIBLE_LOG_ENTRIES	= 500;
 
@@ -161,7 +161,7 @@ public class DialogMP extends TitleAreaDialog {
 				int length = time.length();
 				sb.append(time.substring(length - 7, length));
 
-				sb.append(" ");
+				sb.append(" "); //$NON-NLS-1$
 
 				// column: time how long the tile image is being loaded
 				time = TIME_SPACER;

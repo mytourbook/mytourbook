@@ -1302,7 +1302,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineColumnWeatherWindSpeed(final PixelConverter pixelConverter) {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPD.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPEED.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override

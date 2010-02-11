@@ -159,25 +159,20 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_title_tooltip;
 	public static String		ColumnFactory_tour_type_label;
 	public static String		ColumnFactory_tour_type_tooltip;
-	
-	public static String        ColumnFactory_wind_speed_label;
-	public static String        ColumnFactory_wind_speed;
-	public static String        ColumnFactory_wind_speed_tooltip;
-	public static String        ColumnFactory_wind_dir_label;
-	public static String        ColumnFactory_wind_dir;
-	public static String        ColumnFactory_wind_dir_tooltip;
-	public static String        ColumnFactory_clouds_label;
-	public static String        ColumnFactory_clouds;
-	public static String        ColumnFactory_clouds_tooltip;	
-	public static String        ColumnFactory_restpulse_label;
-	public static String        ColumnFactory_restpulse;
-	public static String        ColumnFactory_restpulse_tooltip;		
-
-	public static String	ColumnFactory_tour_week_header;
-
-	public static String	ColumnFactory_tour_week_label;
-
-	public static String	ColumnFactory_tour_week_tooltip;
+	public static String		ColumnFactory_wind_speed_label;
+	public static String		ColumnFactory_wind_speed_tooltip;
+	public static String		ColumnFactory_wind_dir_label;
+	public static String		ColumnFactory_wind_dir;
+	public static String		ColumnFactory_wind_dir_tooltip;
+	public static String		ColumnFactory_clouds_label;
+	public static String		ColumnFactory_clouds;
+	public static String		ColumnFactory_clouds_tooltip;
+	public static String		ColumnFactory_restpulse_label;
+	public static String		ColumnFactory_restpulse;
+	public static String		ColumnFactory_restpulse_tooltip;
+	public static String		ColumnFactory_tour_week_header;
+	public static String		ColumnFactory_tour_week_label;
+	public static String		ColumnFactory_tour_week_tooltip;
 
 	public static String		Image_configure_columns;
 
@@ -195,4 +190,3 @@ public class Messages extends NLS {
 
 	private Messages() {}
 }
-

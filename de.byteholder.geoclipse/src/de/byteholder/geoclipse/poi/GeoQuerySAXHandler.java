@@ -30,13 +30,13 @@ public class GeoQuerySAXHandler extends DefaultHandler {
 	private static final String			TAG_NAMED			= "named";			//$NON-NLS-1$
 	private static final String			TAG_NEAREST_PLACES	= "nearestplaces";	//$NON-NLS-1$
 
-	private static final String			ATTR_LAT			= "lat";
-	private static final String			ATTR_LON			= "lon";
-	private static final String			ATTR_NAME			= "name";
-	private static final String			ATTR_CATEGORY		= "category";
-	private static final String			ATTR_INFO			= "info";
-	private static final String			ATTR_TYPE			= "type";
-	private static final String			ATTR_ZOOM			= "zoom";
+	private static final String			ATTR_LAT			= "lat"; //$NON-NLS-1$
+	private static final String			ATTR_LON			= "lon"; //$NON-NLS-1$
+	private static final String			ATTR_NAME			= "name"; //$NON-NLS-1$
+	private static final String			ATTR_CATEGORY		= "category"; //$NON-NLS-1$
+	private static final String			ATTR_INFO			= "info"; //$NON-NLS-1$
+	private static final String			ATTR_TYPE			= "type"; //$NON-NLS-1$
+	private static final String			ATTR_ZOOM			= "zoom"; //$NON-NLS-1$
 
 	private ArrayList<PointOfInterest>	_searchResult;
 

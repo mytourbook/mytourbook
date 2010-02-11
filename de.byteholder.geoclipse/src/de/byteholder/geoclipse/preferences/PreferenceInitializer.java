@@ -39,6 +39,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(IMappingPreferences.SHOW_MAP_TILE_INFO, true);
 
-		store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|");
+		store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|"); //$NON-NLS-1$
 	}
 }

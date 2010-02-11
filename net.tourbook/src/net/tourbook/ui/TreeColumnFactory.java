@@ -140,11 +140,11 @@ public abstract class TreeColumnFactory {
 		};
 	};
 	
-	public static final TreeColumnFactory WIND_SPD = new TreeColumnFactory() {
+	public static final TreeColumnFactory WIND_SPEED = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindSpd", SWT.TRAIL); //$NON-NLS-1$
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "weatherWindSpeed", SWT.TRAIL); //$NON-NLS-1$
 
 			colDef.setColumnLabel(Messages.ColumnFactory_wind_speed_label);
 			colDef.setColumnHeader(UI.SYMBOL_WIND_WITH_SPACE + UI.UNIT_LABEL_SPEED); 
@@ -225,7 +225,7 @@ public abstract class TreeColumnFactory {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "deviceDistance", SWT.TRAIL); //$NON-NLS-1$
 			
-			String unit = UI.UNIT_LABEL_DISTANCE +" * 1000";
+			String unit = UI.UNIT_LABEL_DISTANCE +" * 1000"; //$NON-NLS-1$
 			colDef.setColumnLabel(Messages.ColumnFactory_device_start_distance_label);
 			colDef.setColumnHeader(unit);
 			colDef.setColumnUnit(unit);

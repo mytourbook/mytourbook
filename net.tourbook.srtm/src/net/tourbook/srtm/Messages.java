@@ -120,7 +120,6 @@ public class Messages extends NLS {
 	public static String		color_chooser_brightness;
 
 	public static String		error_message_cannotConnectToServer;
-	public static String		error_message_fileNotFoundException;
 	public static String		error_message_timeoutWhenConnectingToServer;
 
 	public static String		job_name_downloadMonitor;

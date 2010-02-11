@@ -468,7 +468,7 @@ public class TileImageCache {
 		final IPath tileImageFilePath = getTileImagePath(tile);
 
 		if (tileImageFilePath == null) {
-			StatusUtil.log("a tile path is not available in the tile factory: " // $NON-NLS-1$
+			StatusUtil.log("a tile path is not available in the map provider: " // $NON-NLS-1$ //$NON-NLS-1$
 					+ mp.getName(), new Exception());
 			return;
 		}

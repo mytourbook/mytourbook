@@ -41,10 +41,10 @@ public class LogEntry {
 		this.time = nanoTime / 1000000;
 
 		// force same width           					 012345		
-		this.counter = Integer.toString(counter).concat("      ").substring(0, COLUMN_WIDTH_COUNTER);
+		this.counter = Integer.toString(counter).concat("      ").substring(0, COLUMN_WIDTH_COUNTER); //$NON-NLS-1$
 
 		// force same width                  0123456789012		
-		this.threadName = threadName.concat("             ").substring(0, COLUMN_WIDTH_THREAD_NAME);
+		this.threadName = threadName.concat("             ").substring(0, COLUMN_WIDTH_THREAD_NAME); //$NON-NLS-1$
 
 	}
 }

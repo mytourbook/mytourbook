@@ -93,6 +93,6 @@ public enum TileEventId {
 		// create text string which has the same length
 
 		//                              01234567890123456789		
-		return super.toString().concat("                    ").substring(0, COLUMN_WIDTH_EVENT_ID);
+		return super.toString().concat("                    ").substring(0, COLUMN_WIDTH_EVENT_ID); //$NON-NLS-1$
 	}
 }

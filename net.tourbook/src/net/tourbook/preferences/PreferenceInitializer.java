@@ -176,7 +176,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 
 		// map providers which can be toggled, osm is the default map provider
-		store.setDefault(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST, "osm");
+		store.setDefault(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST, "osm"); //$NON-NLS-1$
 
 		/*
 		 * tour data editor

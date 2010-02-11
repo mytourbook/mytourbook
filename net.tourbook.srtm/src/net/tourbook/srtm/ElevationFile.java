@@ -161,7 +161,7 @@ public class ElevationFile {
 				final File localFile = new File(localZipName);
 				if (localFile.exists() && localFile.length() == 0) {
 					fIsLocalFileError = true;
-					throw new Exception("local file is empty");
+					throw new Exception("local file is empty"); //$NON-NLS-1$
 				}
 
 				final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);

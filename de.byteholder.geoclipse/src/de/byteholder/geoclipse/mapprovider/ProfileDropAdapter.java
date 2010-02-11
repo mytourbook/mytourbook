@@ -165,7 +165,7 @@ class ProfileDropAdapter extends ViewerDropAdapter {
 			}
 
 			if (fromIndex == -1 || toIndex == -1) {
-				StatusUtil.showStatus("invalid index", new Exception());
+				StatusUtil.showStatus("invalid index", new Exception()); //$NON-NLS-1$
 				return false;
 			}
 		}

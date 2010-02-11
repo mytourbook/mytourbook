@@ -67,7 +67,7 @@ public class PoiView extends ViewPart implements Observer {
 
 	public final static String		ID						= "de.byteholder.geoclipse.poi.poiView";		//$NON-NLS-1$
 
-	private static final String		STATE_SEARCHED_QUERIES	= "searched.queries";
+	private static final String		STATE_SEARCHED_QUERIES	= "searched.queries"; //$NON-NLS-1$
 
 	private IDialogSettings			_state					= Activator
 																	.getDefault()
@@ -236,8 +236,8 @@ public class PoiView extends ViewPart implements Observer {
 				 * label: POI
 				 */
 				final Label label = new Label(queryContainer, SWT.NONE);
-				label.setText("&POI:");
-				label.setToolTipText("Enter the name for the point of interrest");
+				label.setText(Messages.Poi_View_Label_POI);
+				label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
 
 				/*
 				 * combo: search
@@ -261,7 +261,7 @@ public class PoiView extends ViewPart implements Observer {
 				 * button: search
 				 */
 				_btnSearch = new Button(queryContainer, SWT.PUSH);
-				_btnSearch.setText("&Search");
+				_btnSearch.setText(Messages.Poi_View_Button_Search);
 
 				_btnSearch.addSelectionListener(new SelectionAdapter() {
 					@Override

@@ -125,7 +125,7 @@ import de.byteholder.geoclipse.util.PixelConverter;
 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private static final String					CHARACTER_0					= "0";
+	private static final String					CHARACTER_0					= "0"; //$NON-NLS-1$
 
 	public static final String					PREF_PAGE_MAP_PROVIDER_ID	= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
 

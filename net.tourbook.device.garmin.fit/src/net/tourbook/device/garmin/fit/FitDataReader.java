@@ -313,7 +313,7 @@ public class FitDataReader extends TourbookDevice {
 				a[i] = 0;
 
 			final FileInputStream fileInputStream = new FileInputStream(importFileName);
-			final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "ISO-8859-1");
+			final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "ISO-8859-1"); //$NON-NLS-1$
 			bufferedReader = new BufferedReader(inputStreamReader);
 
 			TimeData timeData = null;
@@ -456,11 +456,11 @@ public class FitDataReader extends TourbookDevice {
 			if (nChar < 12)
 				return false;
 
-			final String fileType = "" + buf[9] + buf[10] + buf[11];
+			final String fileType = "" + buf[9] + buf[10] + buf[11]; //$NON-NLS-1$
 
-			System.out.println("FitDataReader: fileType = " + fileType);
+			System.out.println("FitDataReader: fileType = " + fileType); //$NON-NLS-1$
 
-			if (!fileType.equals("FIT")) {
+			if (!fileType.equals("FIT")) { //$NON-NLS-1$
 				return false;
 			}
 

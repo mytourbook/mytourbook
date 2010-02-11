@@ -58,7 +58,7 @@ public class GeoQuery extends Observable implements Runnable {
 			_searchResult.clear();
 
 			SAXParserFactory.newInstance().newSAXParser().parse(//
-					SEARCH_URL + URLEncoder.encode(_query, "utf8"), //
+					SEARCH_URL + URLEncoder.encode(_query, "utf8"), // //$NON-NLS-1$
 					new GeoQuerySAXHandler(_searchResult));//$NON-NLS-1$
 
 		} catch (final Exception e) {

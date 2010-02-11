@@ -1208,7 +1208,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				if (lapNotes == null) {
 					tourLap.setNotes(notes);
 				} else {
-					tourLap.setNotes(lapNotes + "\n" + notes);
+					tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
 				}
 			}
 		}

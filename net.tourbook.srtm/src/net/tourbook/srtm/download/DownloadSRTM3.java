@@ -31,7 +31,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DownloadSRTM3 {
 
-	public static final String		URL_SEPARATOR		= "/";
+	public static final String		URL_SEPARATOR		= "/"; //$NON-NLS-1$
 
 	private final static int		DirEurasia			= 0;
 	private final static int		DirNorth_America	= 1;
