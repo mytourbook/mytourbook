@@ -74,8 +74,8 @@ public class PrefPageMap extends PreferencePage implements IWorkbenchPreferenceP
 				_chkShowTileInfo.load();
 			}
 
-			final Composite fontContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
+ 			final Composite fontContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).applyTo(fontContainer);
 			GridLayoutFactory.fillDefaults().applyTo(fontContainer);
 			{
 				// font: mono space

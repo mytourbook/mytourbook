@@ -191,9 +191,9 @@ public class MapProviderManager {
 	private static final String				ATTR_PMP_ALPHA									= "Alpha";							//$NON-NLS-1$
 	private static final String				ATTR_PMP_IS_TRANSPARENT							= "IsTransparent";					//$NON-NLS-1$
 	private static final String				ATTR_PMP_IS_BLACK_TRANSPARENT					= "IsBlackTransparent";			//$NON-NLS-1$
-	private static final String				ATTR_PMP_IS_BRIGHTNESS							= "IsBrightness";					//$NON-NLS-1$
-	private static final String				ATTR_PMP_BRIGHTNESS								= "Brightness";					//$NON-NLS-1$
-
+	private static final String				ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP				= "IsBrightnessForNextMP";			//$NON-NLS-1$
+	private static final String				ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP					= "BrightnessForNextMP";			//$NON-NLS-1$
+ 
 	// transparent pixel
 	private static final String				TAG_TRANSPARENT_COLOR							= "TransparentColor";				//$NON-NLS-1$
 	private static final String				ATTR_TRANSPARENT_COLOR_VALUE					= "Value";							//$NON-NLS-1$
@@ -322,7 +322,7 @@ public class MapProviderManager {
 							final MPProfile mpProfile = (MPProfile) mapProvider;
 
 							for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
-								final MP mp = mpWrapper.getMP(true);
+								final MP mp = mpWrapper.getMP();
 								if (mp instanceof MPWms) {
 									final MPWms wmsMp = (MPWms) mp;
 									if (wmsMp.getCapabilitiesUrl().equalsIgnoreCase(capsUrlFinal)) {
@@ -702,9 +702,9 @@ public class MapProviderManager {
 					final ArrayList<MPWrapper> mpWrapperList = mapProfile.getAllWrappers();
 
 					// loop: all map providers which are set within the profiles
- 					for (final MPWrapper mpWrapper : mpWrapperList) {
+					for (final MPWrapper mpWrapper : mpWrapperList) {
 
-						final MP profileMapProvider = mpWrapper.getMP(false);
+						final MP profileMapProvider = mpWrapper.getMP();
 
 						if (profileMapProvider != null && profileMapProvider.getId().equals(replaceMapProviderId)) {
 
@@ -738,13 +738,14 @@ public class MapProviderManager {
 			return;
 		}
 
-		createMapProviders();
+		createAllMapProviders();
 	}
 
 	/**
-	 * create map providers
+	 * Create all map providers, osm as internal mp, all plugin mp's and the imported mp's from an
+	 * xml file
 	 */
-	private void createMapProviders() {
+	private void createAllMapProviders() {
 
 		_allMapProviders = new ArrayList<MP>();
 
@@ -756,10 +757,10 @@ public class MapProviderManager {
 		/*
 		 * add plugin map providers
 		 */
-		final List<MPPlugin> allMapFactories = GeoclipseExtensions.getInstance().readFactories();
-		for (final MPPlugin mpPlugin : allMapFactories) {
+		final List<MPPlugin> allPluginMp = GeoclipseExtensions.getInstance().readFactories();
+		for (final MPPlugin pluginMp : allPluginMp) {
 
-			final String pluginFactoryId = mpPlugin.getId();
+			final String pluginFactoryId = pluginMp.getId();
 
 			boolean isValid = true;
 
@@ -770,7 +771,7 @@ public class MapProviderManager {
 
 					StatusUtil.showStatus(NLS.bind(Messages.DBG003_Error_InvalidFactoryId, new Object[] {
 							pluginFactoryId,
-							mpPlugin.getName(),
+							pluginMp.getName(),
 							checkedMapProvider.getName() //
 							}), new Exception());
 
@@ -779,7 +780,7 @@ public class MapProviderManager {
 				}
 
 				// check offline folder
-				final String pluginOfflineFolder = mpPlugin.getOfflineFolder();
+				final String pluginOfflineFolder = pluginMp.getOfflineFolder();
 				final String checkedOfflineFolder = checkedMapProvider.getOfflineFolder();
 				if (pluginOfflineFolder != null
 						&& checkedOfflineFolder != null
@@ -787,7 +788,7 @@ public class MapProviderManager {
 
 					StatusUtil.showStatus(NLS.bind(Messages.DBG004_Error_InvalidOfflineFolder, new Object[] {
 							pluginOfflineFolder,
-							mpPlugin.getName(),
+							pluginMp.getName(),
 							checkedMapProvider.getName() //
 							}), new Exception());
 
@@ -800,7 +801,7 @@ public class MapProviderManager {
 
 				// add valid map providers
 
-				_allMapProviders.add(mpPlugin);
+				_allMapProviders.add(pluginMp);
 			}
 		}
 
@@ -810,7 +811,7 @@ public class MapProviderManager {
 		final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 		final String filename = stateLocation.append(CUSTOM_MAP_PROVIDER_FILE).toFile().getAbsolutePath();
 
-		final ArrayList<MP> importedMapProviders = readXml(filename, false, false);
+		final ArrayList<MP> importedMapProviders = readXml1(filename, false, false);
 		for (final MP mp : importedMapProviders) {
 
 			/*
@@ -919,7 +920,7 @@ public class MapProviderManager {
 					if (mpWrapper.isDisplayedInMap()) {
 
 						writeXml(//
-								mpWrapper.getMP(true),
+								mpWrapper.getMP(),
 								xmlMemento.createChild(ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER));
 					}
 				}
@@ -1075,7 +1076,7 @@ public class MapProviderManager {
 	 */
 	public ArrayList<MP> importMapProvider(final String importFilePath) {
 
-		final ArrayList<MP> importedMPList = readXml(importFilePath, true, true);
+		final ArrayList<MP> importedMPList = readXml1(importFilePath, true, true);
 		if (importedMPList.size() > 0) {
 
 			// validate map provider
@@ -1100,7 +1101,7 @@ public class MapProviderManager {
 	 * @return Returns a list with all map providers from a xml file including wrapped plugin map
 	 *         provider
 	 */
-	private ArrayList<MP> readXml(final String filename, final boolean isShowExistError, final boolean isMpImport) {
+	private ArrayList<MP> readXml1(final String filename, final boolean isShowExistError, final boolean isMpImport) {
 
 		final ArrayList<MP> validMapProviders = new ArrayList<MP>();
 		InputStreamReader reader = null;
@@ -1448,8 +1449,8 @@ public class MapProviderManager {
 
 			final Boolean isTransparent = tagProfileMapProvider.getBoolean(ATTR_PMP_IS_TRANSPARENT);
 			final Boolean isTransBlack = tagProfileMapProvider.getBoolean(ATTR_PMP_IS_BLACK_TRANSPARENT);
-			final Boolean isBrightness = tagProfileMapProvider.getBoolean(ATTR_PMP_IS_BRIGHTNESS);
-			final Integer brightness = tagProfileMapProvider.getInteger(ATTR_PMP_BRIGHTNESS);
+			final Boolean isBrightnessForNextMp = tagProfileMapProvider.getBoolean(ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP);
+			final Integer brightnessForNextMp = tagProfileMapProvider.getInteger(ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP);
 
 			// transparent colors
 			final IMemento[] tagTransColor = tagProfileMapProvider.getChildren(TAG_TRANSPARENT_COLOR);
@@ -1506,8 +1507,8 @@ public class MapProviderManager {
 			mpWrapper.setIsTransparentColors(isTransparent == null ? false : isTransparent);
 			mpWrapper.setIsTransparentBlack(isTransBlack == null ? false : isTransBlack);
 			mpWrapper.setTransparentColors(transColors.length == 0 ? new int[] { OSM_BACKGROUND_COLOR } : transColors);
-			mpWrapper.setIsBrightness(isBrightness == null ? false : isBrightness);
-			mpWrapper.setBrightness(brightness == null ? 50 : brightness);
+			mpWrapper.setIsBrightnessForNextMp(isBrightnessForNextMp == null ? false : isBrightnessForNextMp);
+			mpWrapper.setBrightnessForNextMp(brightnessForNextMp == null ? 88 : brightnessForNextMp);
 
 			mpWrapperList.add(mpWrapper);
 
@@ -2084,7 +2085,7 @@ public class MapProviderManager {
 
 		for (final MPWrapper mpWrapper : mapProfile.getAllWrappers()) {
 
-			final MP mp = mpWrapper.getMP(true);
+			final MP mp = mpWrapper.getMP();
 
 			final String mpType = getMapProviderType(mp);
 			if (mpType == null) {
@@ -2106,8 +2107,8 @@ public class MapProviderManager {
 			tagProfileMapProvider.putInteger(ATTR_PMP_ALPHA, mpWrapper.getAlpha());
 			tagProfileMapProvider.putBoolean(ATTR_PMP_IS_TRANSPARENT, mpWrapper.isTransparentColors());
 			tagProfileMapProvider.putBoolean(ATTR_PMP_IS_BLACK_TRANSPARENT, mpWrapper.isTransparentBlack());
-			tagProfileMapProvider.putBoolean(ATTR_PMP_IS_BRIGHTNESS, mpWrapper.isBrightness());
-			tagProfileMapProvider.putInteger(ATTR_PMP_BRIGHTNESS, mpWrapper.getBrightness());
+			tagProfileMapProvider.putBoolean(ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP, mpWrapper.isBrightnessForNextMp());
+			tagProfileMapProvider.putInteger(ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP, mpWrapper.getBrightnessValueForNextMp());
 
 			// transparent colors
 			final int[] transparentColors = mpWrapper.getTransparentColors();

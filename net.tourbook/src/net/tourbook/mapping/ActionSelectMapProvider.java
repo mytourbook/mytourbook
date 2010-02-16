@@ -40,17 +40,15 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator, IMapProviderListener {
 
-	private static final String					TOGGLE_MARKER	= " (x)";											//$NON-NLS-1$
-
-	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
-
-	private final TourMapView					_mappingView;
+	private static IPreferenceStore				_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+ 
+	private final TourMapView					_mapView;
 
 	private Menu								_menu;
 	private final ActionSetDefaultMapProviders	_actionSetDefaultMapProvider;
 	private final ActionManageMapProviders		_actionModifyMapProvider;
 
-	private final HashMap<String, MPAction>		_mpActions		= new HashMap<String, MPAction>();
+	private final HashMap<String, MPAction>		_mpActions	= new HashMap<String, MPAction>();
 
 	/**
 	 * tile factory which is currently selected
@@ -67,31 +65,32 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 */
 	private class MPAction extends Action {
 
-		private final MP		mp;
-		private final String	actionLabel;
-		private boolean			fCanBeToggled;
+		private final MP		_mp;
+
+		private final String	_actionLabel;
+		private boolean			_canBeToggled;
 
 		public MPAction(final MP mp, final String label) {
 
 			super(label, AS_RADIO_BUTTON);
 
-			this.mp = mp;
-			actionLabel = label;
+			_mp = mp;
+			_actionLabel = label;
 		}
 
 		boolean isCanBeToggled() {
-			return fCanBeToggled;
+			return _canBeToggled;
 		}
 
 		@Override
 		public void run() {
 
 			// select this map provider
-			selectMapProviderInTheMap(mp);
+			selectMapProviderInTheMap(_mp);
 		}
 
 		void setCanBeToggled(final boolean canBeToggled) {
-			this.fCanBeToggled = canBeToggled;
+			_canBeToggled = canBeToggled;
 		}
 	}
 
@@ -100,7 +99,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		super(null, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		_mappingView = mapView;
+		_mapView = mapView;
 
 		setToolTipText(Messages.map_action_change_tile_factory_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
@@ -108,7 +107,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		MapProviderManager.getInstance().addMapProviderListener(this);
 
 		_actionSetDefaultMapProvider = new ActionSetDefaultMapProviders(mapView);
-		_actionModifyMapProvider = new ActionManageMapProviders(_mappingView);
+		_actionModifyMapProvider = new ActionManageMapProviders(_mapView);
 
 		createMapProviderActions();
 		updateMapProviders();
@@ -129,7 +128,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		final String selectedMpId = selectedMp.getId();
 
 		for (final MPAction mapProviderAction : _sortedMapProviderActions) {
-			if (mapProviderAction.mp.getId().equals(selectedMpId)) {
+			if (mapProviderAction._mp.getId().equals(selectedMpId)) {
 				mapProviderAction.setChecked(true);
 			} else {
 				mapProviderAction.setChecked(false);
@@ -199,7 +198,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 	 */
 	public MP getSelectedMapProvider() {
 		if (_selectedMP == null) {
-			return _mpActions.get(0).mp;
+			return _mpActions.get(0)._mp;
 		}
 		return _selectedMP;
 	}
@@ -236,7 +235,15 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		MP newMp;
 
-		if (sortedToggleMapProviderActions.size() > 0) {
+		if (sortedToggleMapProviderActions.size() == 1) {
+
+			// open dialog to set default map provider
+
+			_mapView.actionOpenMapProviderDialog();
+
+			return;
+
+		} else if (sortedToggleMapProviderActions.size() > 0) {
 
 			// use custom toggle mechanism
 
@@ -249,7 +256,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 			int actionCounter = 0;
 
 			for (final MPAction mpAction : sortedToggleMapProviderActions) {
-				if (_selectedMP == mpAction.mp) {
+				if (_selectedMP == mpAction._mp) {
 					toggleCounter = actionCounter;
 					break;
 				}
@@ -263,16 +270,16 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 				if (toggleCounter == sortedToggleMapProviderActions.size() - 1) {
 
 					// last map provider was selected, get first map provider
-					newMp = sortedToggleMapProviderActions.get(0).mp;
+					newMp = sortedToggleMapProviderActions.get(0)._mp;
 
 				} else {
 					// get next map provider
-					newMp = sortedToggleMapProviderActions.get(toggleCounter + 1).mp;
+					newMp = sortedToggleMapProviderActions.get(toggleCounter + 1)._mp;
 				}
 			} else {
 
 				// get first map provider
-				newMp = sortedToggleMapProviderActions.get(0).mp;
+				newMp = sortedToggleMapProviderActions.get(0)._mp;
 			}
 
 		} else {
@@ -301,7 +308,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 			for (final MPAction mapProviderAction : _mpActions.values()) {
 
-				final MP mp = mapProviderAction.mp;
+				final MP mp = mapProviderAction._mp;
 
 				// check mp ID
 				if (mp.getId().equals(selectedMpId)) {
@@ -319,7 +326,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		 * if map provider is not set, get default map provider
 		 */
 		for (final MPAction mapProviderAction : _mpActions.values()) {
-			final MP mp = mapProviderAction.mp;
+			final MP mp = mapProviderAction._mp;
 			if (mp.getId().equals(MapProviderManager.DEFAULT_MAP_PROVIDER_ID)) {
 				mapProviderAction.setChecked(true);
 				selectMapProviderInTheMap(mp);
@@ -334,7 +341,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		if (mpAction != null) {
 
 			mpAction.setChecked(true);
-			selectMapProviderInTheMap(mpAction.mp);
+			selectMapProviderInTheMap(mpAction._mp);
 		}
 	}
 
@@ -347,17 +354,17 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		_selectedMP = mp;
 
-		final Map map = _mappingView.getMap();
+		final Map map = _mapView.getMap();
 
 		map.setMapProvider(mp);
- 
+
 		// reset overlays must be done after the new map provider is set
 //		map.resetOverlays();
 
 		// set map dim level
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-		map.setDimLevel(_mappingView.getMapDimLevel(), dimColor);
+		map.setDimLevel(_mapView.getMapDimLevel(), dimColor);
 
 		// update tooltip, show selected map provider
 		setToolTipText(mp.getName());
@@ -375,9 +382,9 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		// update action label
 		if (canBeToggled) {
-			mpAction.setText(mpAction.actionLabel + TOGGLE_MARKER);
+			mpAction.setText(mpAction._actionLabel + Messages.Map_Action_ToggleMarker);
 		} else {
-			mpAction.setText(mpAction.actionLabel);
+			mpAction.setText(mpAction._actionLabel);
 		}
 
 		mpAction.setCanBeToggled(canBeToggled);

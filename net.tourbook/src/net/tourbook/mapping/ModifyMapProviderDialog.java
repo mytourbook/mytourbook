@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -45,7 +46,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-
+ 
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
@@ -188,11 +189,14 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 	private void createUIMapProviderList(final Composite parent) {
 
+		final PixelConverter pc = new PixelConverter(parent);
+
 		fCheckboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP | SWT.BORDER);
 
 		final Table table = fCheckboxList.getTable();
 		GridDataFactory.swtDefaults()//
 				.grab(true, true)
+				.hint(SWT.DEFAULT, pc.convertHeightInCharsToPixels(10))
 				.align(SWT.FILL, SWT.FILL)
 				.applyTo(table);
 

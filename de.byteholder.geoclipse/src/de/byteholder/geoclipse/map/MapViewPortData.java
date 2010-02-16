@@ -14,12 +14,14 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
-
+ 
 public class MapViewPortData {
 
 	public int	mapZoomLevel;
+
 	public int	tilePosMinX;
 	public int	tilePosMaxX;
+
 	public int	tilePosMinY;
 	public int	tilePosMaxY;
 
@@ -30,8 +32,10 @@ public class MapViewPortData {
 						final int tilePosMaxY) {
 
 		this.mapZoomLevel = mapZoomLevel;
+
 		this.tilePosMinX = tilePosMinX;
 		this.tilePosMaxX = tilePosMaxX;
+
 		this.tilePosMinY = tilePosMinY;
 		this.tilePosMaxY = tilePosMaxY;
 	}

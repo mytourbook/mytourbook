@@ -8,8 +8,10 @@ public class Messages extends NLS {
 
 	public static String		SRTM_MapProvider_Description;
 	public static String		SRTM_MapProvider_Log_PaintingTile;
+
+	public static String	SRTM_MapProvider_Name;
 	static {
-		// initialize resource bundle
+ 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 

@@ -85,33 +85,54 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				} else {
 
 					// sort by name when position is not set
-					return mp1.getMP(true).getName().compareTo(mp2.getMP(true).getName());
-				}
+					return mp1.getMP().getName().compareTo(mp2.getMP().getName());
+ 				}
 			}
 		});
 	}
 
 	/**
-	 * Updates values from the wrapper into the map provider
+	 * Set data from the wrapper into the map provider
 	 * 
 	 * @param allMpWrapper
 	 */
-	static void updateWrapperFromMP(final ArrayList<MPWrapper> allMpWrapper) {
+	static void updateMpFromWrapper(final ArrayList<MPWrapper> allMpWrapper) {
 
-		for (final MPWrapper mpWrapper : allMpWrapper) {
-
-			if (mpWrapper.isDisplayedInMap()) {
-
-				final MP wrappedMp = mpWrapper.getMP(true);
-
-				wrappedMp.setIsProfileTransparentColors(mpWrapper.isTransparentColors());
-				wrappedMp.setIsProfileTransparentBlack(mpWrapper.isTransparentBlack());
-				wrappedMp.setProfileTransparentColors(mpWrapper.getTransparentColors());
-				wrappedMp.setProfileAlpha(mpWrapper.getAlpha());
-				wrappedMp.setIsProfileBrightness(mpWrapper.isBrightness());
-				wrappedMp.setProfileBrightness(mpWrapper.getBrightness());
+		for (final MPWrapper wrapper : allMpWrapper) {
+			if (wrapper.isDisplayedInMap()) {
+				updateMpFromWrapper(wrapper.getMP(), wrapper);
 			}
 		}
+	}
+
+	static void updateMpFromWrapper(final MP mp, final MPWrapper wrapper) {
+
+		mp.setIsProfileBrightnessForNextMp(wrapper.isBrightnessForNextMp());
+		mp.setProfileBrightnessForNextMp(wrapper.getBrightnessValueForNextMp());
+
+		mp.setIsProfileTransparentColors(wrapper.isTransparentColors());
+		mp.setProfileTransparentColors(wrapper.getTransparentColors());
+
+		mp.setProfileAlpha(wrapper.getAlpha());
+		mp.setIsProfileTransparentBlack(wrapper.isTransparentBlack());
+	}
+
+	/**
+	 * Set data from the map provider into the wrapper
+	 * 
+	 * @param wrapper
+	 * @param mp
+	 */
+	static void updateWrapperFromMp(final MPWrapper wrapper, final MP mp) {
+
+		wrapper.setIsBrightnessForNextMp(mp.isProfileBrightnessForNextMp());
+		wrapper.setBrightnessForNextMp(mp.getProfileBrightnessForNextMp());
+
+		wrapper.setIsTransparentColors(mp.isProfileTransparentColors());
+		wrapper.setTransparentColors(mp.getProfileTransparentColors());
+
+		wrapper.setAlpha(mp.getProfileAlpha());
+		wrapper.setIsTransparentBlack(mp.isProfileTransparentBlack());
 	}
 
 	public MPProfile() {}
@@ -134,7 +155,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 			final MPWrapper clonedMpWrapper = (MPWrapper) mpWrapper.clone();
 
 			// set wms properties
-			final MP clonedMP = clonedMpWrapper.getMP(true);
+			final MP clonedMP = clonedMpWrapper.getMP();
 			if (clonedMP instanceof MPWms) {
 
 				final MPWms clonedWmsMp = (MPWms) clonedMP;
@@ -171,7 +192,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		for (final MPWrapper mpWrapper : _mpWrappers) {
 
 			final int parentZoom = parentTile.getZoom();
-			final MP wrapperMP = mpWrapper.getMP(true);
+			final MP wrapperMP = mpWrapper.getMP();
 
 			if (parentZoom < wrapperMP.getMinZoomLevel() || parentZoom > wrapperMP.getMaxZoomLevel()) {
 
@@ -289,7 +310,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		return _backgroundColor;
 	}
 
-
 	public ParentImageStatus getParentImage(final Tile parentTile) {
 
 		final ArrayList<Tile> tileChildren = parentTile.getChildren();
@@ -331,7 +351,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 				continue;
 			}
 
-			if (childTile.getMP().isProfileBrightness()) {
+			if (childTile.getMP().isProfileBrightnessForNextMp()) {
 
 				// use the brightness of the current tile for the next tile
 
@@ -371,7 +391,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		_backgroundColor = backgroundColor;
 	}
 
-
 	public void setBackgroundColor(final RGB rgb) {
 		_backgroundColor = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
 	}
@@ -390,7 +409,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 	 */
 	private boolean synchMpWrapper(final MPWrapper mpWrapper, final MP validMapProvider) {
 
-		final MP wrapperMapProvider = mpWrapper.getMP(false);
+		final MP wrapperMapProvider = mpWrapper.getMP();
 		if (wrapperMapProvider == null) {
 
 			/*
@@ -513,6 +532,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		}
 
 		sortMpWrapper(_mpWrappers);
-		updateWrapperFromMP(_mpWrappers);
+		updateMpFromWrapper(_mpWrappers);
 	}
 }

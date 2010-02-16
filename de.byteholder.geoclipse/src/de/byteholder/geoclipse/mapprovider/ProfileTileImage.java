@@ -159,9 +159,9 @@ final class ProfileTileImage {
 //			brtAlpha = brtTileFactory.getProfileAlpha();
 
 			// adjust brightness to 0.0 ... 1.0
-			selectedBrightness = brtMp.getProfileBrightness() / 100f;
+			selectedBrightness = brtMp.getProfileBrightnessForNextMp() / 100f;
 		}
-
+ 
 		// source data
 		final byte[] srcData = src.data;
 		final PaletteData srcPalette = src.palette;

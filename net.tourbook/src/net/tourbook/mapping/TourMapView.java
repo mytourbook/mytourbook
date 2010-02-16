@@ -1675,11 +1675,11 @@ public class TourMapView extends ViewPart {
 		// restore map factory by selecting the last used map factory
 		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
-		// restore: default position
-		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 0);
+		// default position
+ 		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
 		_defaultPosition = new GeoPosition(//
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0),
-				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0));
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
+				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
 		// tour color
 		try {

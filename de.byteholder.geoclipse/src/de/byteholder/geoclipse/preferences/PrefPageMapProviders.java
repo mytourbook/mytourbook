@@ -90,6 +90,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -122,10 +123,11 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
 import de.byteholder.geoclipse.util.PixelConverter;
+import de.byteholder.geoclipse.util.Util;
 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private static final String					CHARACTER_0					= "0"; //$NON-NLS-1$
+	private static final String					CHARACTER_0					= "0";															//$NON-NLS-1$
 
 	public static final String					PREF_PAGE_MAP_PROVIDER_ID	= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
 
@@ -214,7 +216,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private boolean								fForceUpdateMapProviderList	= false;
 	private boolean								fIsValid					= true;
 
-	private final SelectionAdapter				fSelectionListener;
 	private final ModifyListener				fModifyListener;
 
 	private boolean								fIsModifiedOfflineFolder;
@@ -259,15 +260,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		fModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fIsDisableModifyListener == false) {
-					setMapProviderModified();
-				}
-			}
-		};
-
-		fSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
 				if (fIsDisableModifyListener == false) {
 					setMapProviderModified();
 				}
@@ -761,6 +753,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				onSelectMapProvider(event);
 			}
 		});
+
 		fMapProviderViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
@@ -918,6 +911,24 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 							runnableDropMapProvider(event);
 						}
 					});
+				}
+			});
+
+			/*
+			 * link: map provider support
+			 */
+			final Link link = new Link(btnContainer, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.FILL)
+					.grab(true, false)
+					.applyTo(link);
+			link.setText(Messages.Pref_Map_Link_MapProvider);
+			link.setToolTipText(Messages.Pref_Map_Link_MapProvider_Tooltip);
+			link.setEnabled(true);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_MapProviders);
 				}
 			});
 
@@ -1416,6 +1427,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		fMapProviderViewer.getTable().setFocus();
+
+		if (importedMPs != null) {
+			// show the imported map provider in the config dialog
+			openConfigDialog();
+		}
 	}
 
 	private void enableControls() {
@@ -2125,8 +2141,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					final MPProfile mpProfile = (MPProfile) mapProvider;
 
 					for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
-						if (mpWrapper.getMP(true) instanceof MPWms) {
-							((MPWms) mpWrapper.getMP(true)).setWmsEnabled(true);
+						if (mpWrapper.getMP() instanceof MPWms) {
+							((MPWms) mpWrapper.getMP()).setWmsEnabled(true);
 						}
 					}
 				}

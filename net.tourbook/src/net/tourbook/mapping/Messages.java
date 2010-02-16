@@ -86,6 +86,8 @@ public class Messages extends NLS {
 	public static String	Map_Action_ManageMapProviders;
 
 	public static String	Map_Action_SetDefaultMapProviders;
+ 
+	public static String	Map_Action_ToggleMarker;
 	public static String		map_action_show_legend_in_map;
 	public static String		map_action_show_scale_in_map;
 	public static String		map_action_show_slider_in_legend;

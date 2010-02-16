@@ -41,13 +41,14 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 	private static ElevationColor	elevationColor;
 
 	private static final String		FACTORY_ID		= "srtm";									//$NON-NLS-1$
-	private static final String		FACTORY_NAME	= "SRTM";									//$NON-NLS-1$
 	private static final String		OFFLINE_FOLDER	= "srtm";									//$NON-NLS-1$
+ 
+	private static final String		FACTORY_NAME	= Messages.SRTM_MapProvider_Name;
+	private static final String		DESCRIPTION		= Messages.SRTM_MapProvider_Description;
 
 	private static final int		MIN_ZOOM		= 0;
 	private static final int		MAX_ZOOM		= 17;
 
-	private static final String		DESCRIPTION		= Messages.SRTM_MapProvider_Description;
 
 	// initialize SRTM loading
 	public final NumberForm			numberForm		= new NumberForm();

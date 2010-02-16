@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "de.byteholder.geoclipse.preferences.messages";	//$NON-NLS-1$
-
+ 
 	public static String		App_Image_Cancel;
 	public static String		App_Image_Cancel_Disabled;
 	public static String		App_Image_RefreshAll;
@@ -27,6 +27,8 @@ public class Messages extends NLS {
 	public static String		App_Image_RefreshNotAssessed_Disabled;
 	public static String		App_Image_RefreshSelected;
 	public static String		App_Image_RefreshSelected_Disabled;
+
+	public static String		External_Link_MapProviders;
 
 	public static String		pref_cache_clear_cache;
 	public static String		pref_cache_location;
@@ -86,6 +88,9 @@ public class Messages extends NLS {
 	public static String		Pref_Map_Lable_NotAvailable;
 	public static String		Pref_Map_Lable_NotRetrieved;
 	public static String		Pref_Map_Lable_OfflineFolder;
+
+	public static String		Pref_Map_Link_MapProvider;
+	public static String		Pref_Map_Link_MapProvider_Tooltip;
 
 	public static String		Pref_Map_ProviderType_Custom;
 	public static String		Pref_Map_ProviderType_MapProfile;

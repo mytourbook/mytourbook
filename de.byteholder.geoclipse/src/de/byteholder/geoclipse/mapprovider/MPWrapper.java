@@ -19,11 +19,13 @@ import java.util.ArrayList;
 
 import net.tourbook.util.StatusUtil;
 
+import org.eclipse.osgi.util.NLS;
+
 /**
  * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
  */
 public class MPWrapper implements Cloneable {
-
+ 
 	/**
 	 * unique id which identifies the map provider, this is a copy from the map provider
 	 */
@@ -34,7 +36,7 @@ public class MPWrapper implements Cloneable {
 	/**
 	 * position index is the sorting position within the map profile viewer
 	 */
-	private int							_positionIndex			= -1;
+	private int							_positionIndex				= -1;
 
 	/**
 	 * is <code>true</code> when this map provider is displayed in a map profile
@@ -49,23 +51,23 @@ public class MPWrapper implements Cloneable {
 	 */
 	private String						_type;
 
-	private boolean						_isEnabled				= true;
+	private boolean						_isEnabled					= true;
 
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
-	private int							_alpha					= 100;
+	private int							_alpha						= 100;
 
-	private boolean						_isTransparentColors	= false;
-	private int[]						_transparentColor		= null;
+	private boolean						_isTransparentColors		= false;
+	private int[]						_transparentColor			= null;
 
 	/**
 	 * when <code>true</code> the color black is transparent
 	 */
 	private boolean						_isBlackTransparent;
 
-	private boolean						_isBrightness			= false;
-	private int							_brightnessValue		= 50;
+	private boolean						_isBrightnessForNextMp		= false;
+	private int							_brightnessValueForNextMp	= 82;
 
 //	@SuppressWarnings("unused")
 //	private MPWrapper() {}
@@ -121,8 +123,8 @@ public class MPWrapper implements Cloneable {
 		return _alpha;
 	}
 
-	int getBrightness() {
-		return _brightnessValue;
+	int getBrightnessValueForNextMp() {
+		return _brightnessValueForNextMp;
 	}
 
 	public String getMapProviderId() {
@@ -130,15 +132,37 @@ public class MPWrapper implements Cloneable {
 	}
 
 	/**
-	 * @param isCheckNull
-	 *            When <code>true</code> the mp will be checked if it's value is null
 	 * @return Returns the map provider for the wrapper or <code>null</code> when it's not yet set
- 	 */
-	public MP getMP(final boolean isCheckNull) {
+	 */
+	public MP getMP() {
 
-		// check map provider
-		if (_mp == null && isCheckNull) {
-			StatusUtil.showStatus("map provider is not set", new Exception());//$NON-NLS-1$
+		if (_mp == null) {
+
+			// create map provider
+
+			final ArrayList<MP> allMp = MapProviderManager.getInstance().getAllMapProviders(false);
+
+			for (final MP mp : allMp) {
+				if (mp.getId().equalsIgnoreCase(_mapProviderId)) {
+					try {
+
+						_mp = (MP) mp.clone();
+
+						MPProfile.updateMpFromWrapper(_mp, this);
+
+						break;
+
+					} catch (final CloneNotSupportedException e) {
+						StatusUtil.showStatus(e);
+					}
+				}
+			}
+
+			// check map provider
+			if (_mp == null) {
+				StatusUtil.showStatus(NLS.bind("A map provider cannot be created in the wrapper \"{0}\"",//$NON-NLS-1$
+						_mapProviderId), new Exception());
+			}
 		}
 
 		return _mp;
@@ -164,8 +188,8 @@ public class MPWrapper implements Cloneable {
 		return result;
 	}
 
-	boolean isBrightness() {
-		return _isBrightness;
+	boolean isBrightnessForNextMp() {
+		return _isBrightnessForNextMp;
 	}
 
 	boolean isDisplayedInMap() {
@@ -192,16 +216,20 @@ public class MPWrapper implements Cloneable {
 		_alpha = alpha;
 	}
 
-	void setBrightness(final int brightnessValue) {
-		_brightnessValue = brightnessValue;
+	void setBrightnessForNextMp(final int brightnessValue) {
+		_brightnessValueForNextMp = brightnessValue;
 	}
 
 	void setEnabled(final boolean isEnabled) {
 		_isEnabled = isEnabled;
 	}
 
-	void setIsBrightness(final boolean isBrightness) {
-		_isBrightness = isBrightness;
+	void setIsBrightnessForNextMp(final boolean isBrightness) {
+
+//		System.out.println("MPWrapper:setIsBrightnessForNextMp\t" + _mapProviderId + "\t" + isBrightness);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		_isBrightnessForNextMp = isBrightness;
 	}
 
 	void setIsDisplayedInMap(final boolean isDisplayed) {
@@ -314,12 +342,14 @@ public class MPWrapper implements Cloneable {
 				 * set all layers to be not displayed
 				 */
 
-				for (final MtLayer newMtLayer : newMtLayers) {
+//				for (final MtLayer newMtLayer : newMtLayers) {
 //					newMtLayer.setIsDisplayedInMap(false);
 //					newMtLayer.setPositionIndex(-1);
-				}
+//				}
 			}
 		}
+
+		MPProfile.updateWrapperFromMp(this, _mp);
 	}
 
 	void setPositionIndex(final int positionIndex) {

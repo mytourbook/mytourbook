@@ -57,7 +57,7 @@ import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
- 
+
 /**
  * This is the base class for map providers (MP) which provides all data which are necessary to draw
  * a map.<br>
@@ -66,41 +66,42 @@ import de.byteholder.gpx.GeoPosition;
  */
 public abstract class MP implements Cloneable, Comparable<Object> {
 
-	private static final int						TILE_CACHE_SIZE					= 2000;													//2000;
-	private static final int						ERROR_CACHE_SIZE				= 10000;													//10000;
-	private static final int						IMAGE_CACHE_SIZE				= 200;
+	private static final int						TILE_CACHE_SIZE						= 2000;													//2000;
+	private static final int						ERROR_CACHE_SIZE					= 10000;													//10000;
+	private static final int						IMAGE_CACHE_SIZE					= 200;
 
-	public static final int							OFFLINE_INFO_NOT_READ			= -1;
+	public static final int							OFFLINE_INFO_NOT_READ				= -1;
 
 	/**
 	 * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
 	 */
-	public static final int							UI_MIN_ZOOM_LEVEL				= 1;
-	public static final int							UI_MAX_ZOOM_LEVEL				= 18;
+	public static final int							UI_MIN_ZOOM_LEVEL					= 1;
+	public static final int							UI_MAX_ZOOM_LEVEL					= 18;
 
 	// loading tiles pool
-	private static final int						THREAD_POOL_SIZE				= 20;
+	private static final int						THREAD_POOL_SIZE					= 20;
 	private static ExecutorService					fExecutorService;
 
-	private static final ReentrantLock				EXECUTOR_LOCK					= new ReentrantLock();
-	private static final ReentrantLock				RESET_LOCK						= new ReentrantLock();
+	private static final ReentrantLock				EXECUTOR_LOCK						= new ReentrantLock();
+	private static final ReentrantLock				RESET_LOCK							= new ReentrantLock();
 
 	/**
 	 * Cache for tiles which do not have loading errors
 	 */
-	private static final TileCache					_tileCache						= new TileCache(TILE_CACHE_SIZE);
-
+	private static final TileCache					_tileCache							= new TileCache(TILE_CACHE_SIZE);
+ 
 	/**
 	 * Contains tiles which has loading errors, they are kept in this map that they are not loaded
 	 * again
 	 */
-	private static final TileCache					_errorTiles						= new TileCache(ERROR_CACHE_SIZE);
+	private static final TileCache					_errorTiles							= new TileCache(
+																								ERROR_CACHE_SIZE);
 
 	/**
 	 * Cache for tile images
 	 */
-	private static final TileImageCache				_tileImageCache					= new TileImageCache(
-																							IMAGE_CACHE_SIZE);
+	private static final TileImageCache				_tileImageCache						= new TileImageCache(
+																								IMAGE_CACHE_SIZE);
 
 	/**
 	 * This queue contains tiles which needs to be loaded, only the number of
@@ -109,15 +110,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * <br>
 	 * TODO !!!!! THIS IS JDK 1.6 !!!!!!!
 	 */
-	private static final LinkedBlockingDeque<Tile>	_tileWaitingQueue				= new LinkedBlockingDeque<Tile>();
+	private static final LinkedBlockingDeque<Tile>	_tileWaitingQueue					= new LinkedBlockingDeque<Tile>();
 
 	/**
 	 * Listener which throws {@link ITileListener} events
 	 */
-	private final static ListenerList				_tileListeners					= new ListenerList(
-																							ListenerList.IDENTITY);
+	private final static ListenerList				_tileListeners						= new ListenerList(
+																								ListenerList.IDENTITY);
 
-	private int										_dimmingAlphaValue				= 0xFF;
+	private int										_dimmingAlphaValue					= 0xFF;
 	private RGB										_dimmingColor;
 
 	private Projection								_projection;
@@ -125,14 +126,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * image size in pixel for a square image
 	 */
-	private int										_tileSize						= Integer
-																							.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+	private int										_tileSize							= Integer
+																								.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
 	// map min/max zoom level
-	private int										_minZoomLevel					= 0;
-	private int										_maxZoomLevel					= UI_MAX_ZOOM_LEVEL
-																							- UI_MIN_ZOOM_LEVEL;
+	private int										_minZoomLevel						= 0;
+	private int										_maxZoomLevel						= UI_MAX_ZOOM_LEVEL
+																								- UI_MIN_ZOOM_LEVEL;
 
-	private int										_defaultZoomLevel				= 0;
+	private int										_defaultZoomLevel					= 0;
 
 	/**
 	 * The number of tiles wide at each zoom level
@@ -157,7 +158,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private double[]								_longitudeRadianWidthInPixels;
 
-	private boolean									_useOfflineImage				= true;
+	private boolean									_useOfflineImage					= true;
 
 	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
@@ -177,13 +178,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * mime image format which is currently used
 	 */
-	private String									_imageFormat					= MapProviderManager.DEFAULT_IMAGE_FORMAT;
+	private String									_imageFormat						= MapProviderManager.DEFAULT_IMAGE_FORMAT;
 
-	private int										_favoriteZoom					= 0;
-	private GeoPosition								_favoritePosition				= new GeoPosition(0.0, 0.0);
+	private int										_favoriteZoom						= 0;
+	private GeoPosition								_favoritePosition					= new GeoPosition(0.0, 0.0);
 
-	private int										_lastUsedZoom					= 0;
-	private GeoPosition								_lastUsedPosition				= new GeoPosition(0.0, 0.0);
+	private int										_lastUsedZoom						= 0;
+	private GeoPosition								_lastUsedPosition					= new GeoPosition(0.0, 0.0);
 
 	/**
 	 * name of the map provider which is displayed in the UI
@@ -193,7 +194,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * map provider description
 	 */
-	private String									_description					= UI.EMPTY_STRING;
+	private String									_description						= UI.EMPTY_STRING;
 
 	/**
 	 * OS folder to save offline images
@@ -203,15 +204,15 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * number of files in the offline cache
 	 */
-	private int										_offlineFileCounter				= -1;
+	private int										_offlineFileCounter					= -1;
 
 	/**
 	 * size in Bytes for the offline images
 	 */
-	private long									_offlineFileSize				= -1;
+	private long									_offlineFileSize					= -1;
 
-	private static final ListenerList				_offlineReloadEventListeners	= new ListenerList(
-																							ListenerList.IDENTITY);
+	private static final ListenerList				_offlineReloadEventListeners		= new ListenerList(
+																								ListenerList.IDENTITY);
 
 	/**
 	 * State if the map provider can be toggled in the map
@@ -225,18 +226,19 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * alpha values for the map provider, 100 is opaque, 0 is transparent
 	 */
-	private int										_profileAlpha					= 100;
+	private int										_profileAlpha						= 100;
 
-	private boolean									_isProfileTransparentColors		= false;
-	private int[]									_profileTransparentColor		= null;
+	private boolean									_isProfileTransparentColors			= false;
+	private int[]									_profileTransparentColor			= null;
 
 	/**
 	 * when <code>true</code> the color black is transparent
 	 */
 	private boolean									_isProfileBlackTransparent;
 
-	private boolean									_isProfileBrightness;
-	private int										_profileBrightnessValue;
+	private boolean									_isProfileBrightnessForNextMp		= false;
+	private int										_profileBrightnessValueForNextMp	= 77;
+
 	private MapViewPortData							_mapViewPort;
 
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
@@ -747,8 +749,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return _profileAlpha;
 	}
 
-	int getProfileBrightness() {
-		return _profileBrightnessValue;
+	int getProfileBrightnessForNextMp() {
+		return _profileBrightnessValueForNextMp;
 	}
 
 	int[] getProfileTransparentColors() {
@@ -1061,8 +1063,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 //	 */
 //	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
-	boolean isProfileBrightness() {
-		return _isProfileBrightness;
+	boolean isProfileBrightnessForNextMp() {
+		return _isProfileBrightnessForNextMp;
 	}
 
 	boolean isProfileTransparentBlack() {
@@ -1303,8 +1305,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		_imageFormat = imageFormat;
 	}
 
-	void setIsProfileBrightness(final boolean isBrightness) {
-		_isProfileBrightness = isBrightness;
+	void setIsProfileBrightnessForNextMp(final boolean isBrightness) {
+
+//		System.out.println("MP:setIsProfileBrightnessForNextMp\t" + _mapProviderId + "\t" + isBrightness);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		_isProfileBrightnessForNextMp = isBrightness;
 	}
 
 	void setIsProfileTransparentBlack(final boolean isBlackTransparent) {
@@ -1353,8 +1359,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		_profileAlpha = alpha;
 	}
 
-	void setProfileBrightness(final int brightnessValue) {
-		_profileBrightnessValue = brightnessValue;
+	void setProfileBrightnessForNextMp(final int brightnessValue) {
+		_profileBrightnessValueForNextMp = brightnessValue;
 	}
 
 	void setProfileTransparentColors(final int[] transColors) {

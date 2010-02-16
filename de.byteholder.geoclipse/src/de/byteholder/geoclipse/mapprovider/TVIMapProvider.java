@@ -30,14 +30,14 @@ public class TVIMapProvider extends TVIMapProviderItem {
 
 	@Override
 	protected void fetchChildren() {
-
+ 
 		// only WMS has children
-		if ((_mpWrapper.getMP(true) instanceof MPWms) == false) {
+		if ((_mpWrapper.getMP() instanceof MPWms) == false) {
 			return;
 		}
 
 		// check if wms is loaded
-		final MPWms mpWms = (MPWms) _mpWrapper.getMP(false);
+		final MPWms mpWms = (MPWms) _mpWrapper.getMP();
  
 		if (MapProviderManager.checkWms(mpWms, null) == null) {
 			return;
@@ -56,7 +56,7 @@ public class TVIMapProvider extends TVIMapProviderItem {
 	@Override
 	public boolean hasChildren() {
 
-		if (_mpWrapper.getMP(true) instanceof MPWms) {
+		if (_mpWrapper.getMP() instanceof MPWms) {
 			// wms has children
 			return true;
 		} else {

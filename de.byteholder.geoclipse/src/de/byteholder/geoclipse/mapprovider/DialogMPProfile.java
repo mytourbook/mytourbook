@@ -564,7 +564,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			/*
 			 * tree viewer
-			 */
+	 		 */
 			_treeViewer = new ContainerCheckedTreeViewer(tree);
 
 			_treeViewer.setContentProvider(new MapContentProvider());
@@ -580,7 +580,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 							// expand/collapse current item
 
-							final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP(true);
+							final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP();
 
 							if ((mapProvider instanceof MPWms) == false) {
 
@@ -729,7 +729,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-					final MP mapProvider = mpWrapper.getMP(true);
+					final MP mapProvider = mpWrapper.getMP();
 
 					styledString.append(mapProvider.getName());
 
@@ -798,7 +798,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				if (element instanceof TVIMapProvider) {
 
 					final TVIMapProvider tvi = (TVIMapProvider) element;
-					final MP mapProvider = tvi.getMapProviderWrapper().getMP(true);
+					final MP mapProvider = tvi.getMapProviderWrapper().getMP();
 
 					if (mapProvider instanceof MPWms) {
 
@@ -919,8 +919,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
-					cell.setText(mpWrapper.isBrightness()
-							? Integer.toString(mpWrapper.getBrightness())
+					cell.setText(mpWrapper.isBrightnessForNextMp()
+							? Integer.toString(mpWrapper.getBrightnessValueForNextMp())
 							: UI.EMPTY_STRING);
 
 				} else {
@@ -2125,15 +2125,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_isInitUI = true;
 			{
 				final int alpha = selectedMpWrapper.getAlpha();
-				final int brightness = selectedMpWrapper.getBrightness();
-				final String mpUrl = getMpUrl(selectedMpWrapper.getMP(true));
+				final int brightness = selectedMpWrapper.getBrightnessValueForNextMp();
+				final String mpUrl = getMpUrl(selectedMpWrapper.getMP());
 
 				_spinAlpha.setSelection(alpha);
 				_scaleAlpha.setSelection(alpha);
 
 				_txtMpUrl.setText(mpUrl);
 				_txtMpUrl.setToolTipText(mpUrl);
-				_chkBrightness.setSelection(selectedMpWrapper.isBrightness());
+				_chkBrightness.setSelection(selectedMpWrapper.isBrightnessForNextMp());
 				_spinBright.setSelection(brightness);
 				_scaleBright.setSelection(brightness);
 
@@ -2350,7 +2350,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				final MPWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
 				boolean isWmsDisplayed = mpWrapper.isDisplayedInMap();
 
-				final MP mapProvider = mpWrapper.getMP(true);
+				final MP mapProvider = mpWrapper.getMP();
 				if (mapProvider instanceof MPWms) {
 
 					// visibility for a wms map provider can be toggled only a layer
@@ -2445,7 +2445,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			mpWrapper.setPositionIndex(tblItemIndex++);
 
 			// update wms layer
-			final MP mapProvider = mpWrapper.getMP(true);
+			final MP mapProvider = mpWrapper.getMP();
 			if (mapProvider instanceof MPWms) {
 
 				final MPWms mpWms = (MPWms) mapProvider;
@@ -2500,7 +2500,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 
 		MPProfile.sortMpWrapper(_mpProfile.getAllWrappers());
-		MPProfile.updateWrapperFromMP(_mpProfile.getAllWrappers());
+		MPProfile.updateMpFromWrapper(_mpProfile.getAllWrappers());
 	}
 
 	private void updateMVAlpha() {
@@ -2554,8 +2554,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
-			mpWrapper.setIsBrightness(_chkBrightness.getSelection());
-			mpWrapper.setBrightness(_scaleBright.getSelection());
+			mpWrapper.setIsBrightnessForNextMp(_chkBrightness.getSelection());
+			mpWrapper.setBrightnessForNextMp(_scaleBright.getSelection());
 
 			// update viewer
 			_treeViewer.update(tviMapProvider, null);
@@ -2576,7 +2576,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		if (tviParent instanceof TVIMapProvider) {
 
 			final MPWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
-			final MP mapProvider = parentMpWrapper.getMP(true);
+			final MP mapProvider = parentMpWrapper.getMP();
 
 			if (mapProvider instanceof MPWms) {
 
@@ -2624,7 +2624,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final ArrayList<MPWrapper> allMpWrappers = _mpProfile.getAllWrappers();
 
 		MPProfile.sortMpWrapper(allMpWrappers);
-		MPProfile.updateWrapperFromMP(allMpWrappers);
+		MPProfile.updateMpFromWrapper(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
 		_map.setMapProviderWithReset(_mpProfile, true);
