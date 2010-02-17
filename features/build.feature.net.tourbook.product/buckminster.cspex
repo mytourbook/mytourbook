@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cspecExtension
+
 	xmlns:com="http://www.eclipse.org/buckminster/Common-1.0"
 	xmlns="http://www.eclipse.org/buckminster/CSpec-1.0">
 
@@ -18,7 +19,7 @@
 				<attribute name="site.p2"/>
 			</prerequisites>
             <products alias="destination" base="${buckminster.output}">
-            	<path path="MyTourbookApp/"/>
+            	<path path="mytourbook_10.2.1_${target.ws}.${target.os}.${target.arch}/"/>
             </products>
 		</public>
 		
@@ -31,7 +32,7 @@
 				<attribute name="create.product"/>
 			</prerequisites>
             <products alias="action.output" base="${buckminster.output}">
-            	<path path="MyTourbookApp.zip"/>
+            	<path path="mytourbook_10.2.1_${target.ws}.${target.os}.${target.arch}.zip"/>
             </products>
 		</public>
 	</actions>
