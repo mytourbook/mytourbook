@@ -249,7 +249,7 @@ public class TourMapView extends ViewPart {
 
 	void actionOpenMapProviderDialog() {
 
-		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
+		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell());
 
 		if (dialog.open() == Window.OK) {
 			_actionSelectMapProvider.updateMapProviders();

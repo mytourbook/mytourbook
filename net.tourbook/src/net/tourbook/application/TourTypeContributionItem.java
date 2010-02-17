@@ -89,14 +89,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	protected double					fPropertyValue;
 
-	public TourTypeContributionItem() {
-		this(ID);
-	}
-
-	protected TourTypeContributionItem(final String id) {
-		super(id);
-	}
-
 	/**
 	 * @return Returns a list with all tour type filters
 	 */
@@ -375,6 +367,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		}
 	}
 
+	public TourTypeContributionItem() {
+		this(ID);
+	}
+
+	protected TourTypeContributionItem(final String id) {
+		super(id);
+	}
+
 	/**
 	 * listen for changes in the person list
 	 */
@@ -426,7 +426,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		fComboTourType = new TourTypeCombo(parent, SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
 
-		fComboTourType.setVisibleItemCount(20);
+		fComboTourType.setVisibleItemCount(50);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
 
 		fComboTourType.addDisposeListener(new DisposeListener() {

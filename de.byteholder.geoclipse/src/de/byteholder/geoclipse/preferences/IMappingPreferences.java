@@ -18,17 +18,21 @@ package de.byteholder.geoclipse.preferences;
 
 public interface IMappingPreferences {
 
-	final String	OFFLINE_CACHE_USE_OFFLINE				= "offLineCache.isUsed";				//$NON-NLS-1$
-	final String	OFFLINE_CACHE_USE_DEFAULT_LOCATION		= "offLineCache.useSelectedLocation";	//$NON-NLS-1$
-	final String	OFFLINE_CACHE_PATH						= "offLineCache.path";					//$NON-NLS-1$
+	final String				OFFLINE_CACHE_USE_OFFLINE				= "OffLineCache_IsUsed";				//$NON-NLS-1$
+	final String				OFFLINE_CACHE_USE_DEFAULT_LOCATION		= "OffLineCache_UseSelectedLocation";	//$NON-NLS-1$
+	final String				OFFLINE_CACHE_PATH						= "OffLineCache_Path";					//$NON-NLS-1$
 
-	final String	OFFLINE_CACHE_PERIOD_OF_VALIDITY		= "offLineCache.periodOfValidity";		//$NON-NLS-1$
-	final String	OFFLINE_CACHE_MAX_SIZE					= "offLineCache.maxCacheSize";			//$NON-NLS-1$
+	final String				OFFLINE_CACHE_PERIOD_OF_VALIDITY		= "OffLineCache_PeriodOfValidity";		//$NON-NLS-1$
+	final String				OFFLINE_CACHE_MAX_SIZE					= "OffLineCache_MaxCacheSize";			//$NON-NLS-1$
 
-	final String	SHOW_MAP_TILE_INFO						= "mapTileInfo.isShowInfo";			//$NON-NLS-1$
+	final String				SHOW_MAP_TILE_INFO						= "MapTileInfo_IsShowInfo";			//$NON-NLS-1$
 
-	final String	MAP_FACTORY_IS_READ_TILE_SIZE			= "mapFactory.isReadTileSize";			//$NON-NLS-1$
-	final String	MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER	= "mapFactory.lastSelectedMapProvider"; //$NON-NLS-1$
+	final String				MAP_FACTORY_IS_READ_TILE_SIZE			= "MapFactory_IsReadTileSize";			//$NON-NLS-1$
+	final String				MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER	= "MapFactory_LastSelectedMapProvider"; //$NON-NLS-1$
 
-	final String	THEME_FONT_LOGGING						= "Theme_Font_Logging";				//$NON-NLS-1$
+	final String				THEME_FONT_LOGGING						= "Theme_Font_Logging";				//$NON-NLS-1$
+
+	public static final String	MAP_PROVIDER_SORT_ORDER					= "MapProvider_SortOrder";				//$NON-NLS-1$
+	public static final String	MAP_PROVIDER_TOGGLE_LIST				= "MapProvider_ToggleList";			//$NON-NLS-1$
+
 }

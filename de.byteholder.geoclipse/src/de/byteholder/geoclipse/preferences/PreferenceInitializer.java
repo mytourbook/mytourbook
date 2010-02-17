@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
- 
+
 package de.byteholder.geoclipse.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -40,5 +40,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(IMappingPreferences.SHOW_MAP_TILE_INFO, true);
 
 		store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|"); //$NON-NLS-1$
+
+		// map providers which can be toggled, osm is the default map provider
+		store.setDefault(IMappingPreferences.MAP_PROVIDER_TOGGLE_LIST, "osm"); //$NON-NLS-1$
+
 	}
 }

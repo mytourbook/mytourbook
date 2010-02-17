@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="build.feature.net.tourbook.product"
+      id="net.tourbook.product.feature"
       label="MyTourbook Product Feature"
       version="10.2.1.qualifier"
       provider-name="MyTourbook">
@@ -314,10 +314,6 @@ END OF TERMS AND CONDITIONS
          version="0.0.0"/>
 
    <includes
-         id="feature.net.tourbook.ext.eclipse.p2"
-         version="0.0.0"/>
-
-   <includes
          id="feature.net.tourbook.ext.eclipse.nl"
          version="0.0.0"/>
 
@@ -339,6 +335,10 @@ END OF TERMS AND CONDITIONS
 
    <includes
          id="feature.net.tourbook.app"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.app.nl"
          version="0.0.0"/>
 
 </feature>

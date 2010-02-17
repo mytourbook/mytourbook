@@ -18,7 +18,6 @@ package net.tourbook.mapping;
 import java.util.ArrayList;
 
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -46,31 +45,31 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
- 
+
+import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class ModifyMapProviderDialog extends TitleAreaDialog {
 
-	private final IDialogSettings	fDialogSettings;
-	private final IPreferenceStore	fPrefStore;
+	private final IDialogSettings	_state;
+	private final IPreferenceStore	_geoPrefStore;
 
-	private TourMapView				fMappingView;
-	private ArrayList<MP>			fMapProviders;
-	private Button					fBtnUp;
-	private Button					fBtnDown;
-	private CheckboxTableViewer		fCheckboxList;
+	private ArrayList<MP>			_allMp;
+
+	private Button					_btnUp;
+	private Button					_btnDown;
+	private CheckboxTableViewer		_checkboxList;
 
 	{
-		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
-		fPrefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+		_geoPrefStore = Activator.getDefault().getPreferenceStore();
 	}
 
-	public ModifyMapProviderDialog(final Shell parentShell, final TourMapView mappingView) {
+	public ModifyMapProviderDialog(final Shell parentShell) {
 
 		super(parentShell);
-
-		fMappingView = mappingView;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -109,9 +108,9 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final ArrayList<MP> allMapProvider = MapProviderManager.getInstance().getAllMapProviders(true);
 
 		final String[] storedMpIds = StringToArrayConverter.convertStringToArray(//
-				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
+				_geoPrefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
 
-		fMapProviders = new ArrayList<MP>();
+		_allMp = new ArrayList<MP>();
 
 		// put all map providers into the viewer which are defined in the pref store
 		for (final String storeMpId : storedMpIds) {
@@ -119,7 +118,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			// find the stored map provider in the available map providers
 			for (final MP mp : allMapProvider) {
 				if (mp.getId().equals(storeMpId)) {
-					fMapProviders.add(mp);
+					_allMp.add(mp);
 					break;
 				}
 			}
@@ -127,8 +126,8 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		// make sure that all available map providers are in the viewer
 		for (final MP mp : allMapProvider) {
-			if (!fMapProviders.contains(mp)) {
-				fMapProviders.add(mp);
+			if (!_allMp.contains(mp)) {
+				_allMp.add(mp);
 			}
 		}
 	}
@@ -163,10 +162,10 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 //		buttonContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		// button: up
-		fBtnUp = new Button(buttonContainer, SWT.NONE);
-		fBtnUp.setText(Messages.modify_mapprovider_btn_up);
-		setButtonLayoutData(fBtnUp);
-		fBtnUp.addSelectionListener(new SelectionAdapter() {
+		_btnUp = new Button(buttonContainer, SWT.NONE);
+		_btnUp.setText(Messages.modify_mapprovider_btn_up);
+		setButtonLayoutData(_btnUp);
+		_btnUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionUp();
@@ -175,10 +174,10 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		});
 
 		// button: down
-		fBtnDown = new Button(buttonContainer, SWT.NONE);
-		fBtnDown.setText(Messages.modify_mapprovider_btn_down);
-		setButtonLayoutData(fBtnDown);
-		fBtnDown.addSelectionListener(new SelectionAdapter() {
+		_btnDown = new Button(buttonContainer, SWT.NONE);
+		_btnDown.setText(Messages.modify_mapprovider_btn_down);
+		setButtonLayoutData(_btnDown);
+		_btnDown.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionDown();
@@ -191,33 +190,33 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		final PixelConverter pc = new PixelConverter(parent);
 
-		fCheckboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP | SWT.BORDER);
+		_checkboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP | SWT.BORDER);
 
-		final Table table = fCheckboxList.getTable();
+		final Table table = _checkboxList.getTable();
 		GridDataFactory.swtDefaults()//
 				.grab(true, true)
 				.hint(SWT.DEFAULT, pc.convertHeightInCharsToPixels(10))
 				.align(SWT.FILL, SWT.FILL)
 				.applyTo(table);
 
-		fCheckboxList.setContentProvider(new IStructuredContentProvider() {
+		_checkboxList.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				return fMapProviders.toArray();
+				return _allMp.toArray();
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
-		fCheckboxList.setLabelProvider(new LabelProvider() {
+		_checkboxList.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(final Object element) {
 				return ((MP) element).getName();
 			}
 		});
 
-		fCheckboxList.addCheckStateListener(new ICheckStateListener() {
+		_checkboxList.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// keep the checked status
@@ -225,13 +224,13 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 				item.setCanBeToggled(event.getChecked());
 
 				// select the checked item
-				fCheckboxList.setSelection(new StructuredSelection(item));
+				_checkboxList.setSelection(new StructuredSelection(item));
 //
 //				validateTab();
 			}
 		});
 
-		fCheckboxList.addSelectionChangedListener(new ISelectionChangedListener() {
+		_checkboxList.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableUpDownButtons();
 			}
@@ -239,17 +238,17 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		// first create the input, then check the map providers
 		createMapProviderList();
-		fCheckboxList.setInput(this);
+		_checkboxList.setInput(this);
 
 		/*
 		 * check all map providers which are defined in the pref store
 		 */
 		final String[] storeProviderIds = StringToArrayConverter.convertStringToArray(//
-				fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
+				_geoPrefStore.getString(IMappingPreferences.MAP_PROVIDER_TOGGLE_LIST));
 
 		final ArrayList<MP> checkedProviders = new ArrayList<MP>();
 
-		for (final MP mapProvider : fMapProviders) {
+		for (final MP mapProvider : _allMp) {
 			final String mpId = mapProvider.getId();
 			for (final String storedProviderId : storeProviderIds) {
 				if (mpId.equals(storedProviderId)) {
@@ -260,7 +259,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			}
 		}
 
-		fCheckboxList.setCheckedElements(checkedProviders.toArray());
+		_checkboxList.setCheckedElements(checkedProviders.toArray());
 	}
 
 	/**
@@ -268,7 +267,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void enableUpDownButtons() {
 
-		final Table table = fCheckboxList.getTable();
+		final Table table = _checkboxList.getTable();
 		final TableItem[] items = table.getSelection();
 
 		final boolean validSelection = items != null && items.length > 0;
@@ -282,15 +281,15 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			enableDown = indices[indices.length - 1] < max - 1;
 		}
 
-		fBtnUp.setEnabled(enableUp);
-		fBtnDown.setEnabled(enableDown);
+		_btnUp.setEnabled(enableUp);
+		_btnDown.setEnabled(enableDown);
 	}
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return fDialogSettings;
+		return _state;
 	}
 
 	/**
@@ -301,15 +300,15 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		final MP tileFactory = (MP) item.getData();
 		item.dispose();
 
-		fCheckboxList.insert(tileFactory, index);
-		fCheckboxList.setChecked(tileFactory, tileFactory.canBeToggled());
+		_checkboxList.insert(tileFactory, index);
+		_checkboxList.setChecked(tileFactory, tileFactory.canBeToggled());
 	}
 
 	/**
 	 * Move the current selection in the build list down.
 	 */
 	private void moveSelectionDown() {
-		final Table table = fCheckboxList.getTable();
+		final Table table = _checkboxList.getTable();
 		final int indices[] = table.getSelectionIndices();
 		if (indices.length < 1) {
 			return;
@@ -330,7 +329,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 * Move the current selection in the build list up.
 	 */
 	private void moveSelectionUp() {
-		final Table table = fCheckboxList.getTable();
+		final Table table = _checkboxList.getTable();
 		final int indices[] = table.getSelectionIndices();
 		final int newSelection[] = new int[indices.length];
 		for (int i = 0; i < indices.length; i++) {
@@ -359,7 +358,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		/*
 		 * save all checked map providers
 		 */
-		final Object[] mapProviders = fCheckboxList.getCheckedElements();
+		final Object[] mapProviders = _checkboxList.getCheckedElements();
 		final String[] prefGraphsChecked = new String[mapProviders.length];
 
 		for (int graphIndex = 0; graphIndex < mapProviders.length; graphIndex++) {
@@ -367,20 +366,20 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 			prefGraphsChecked[graphIndex] = mp.getId();
 		}
 
-		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST, StringToArrayConverter
-				.convertArrayToString(prefGraphsChecked));
+		_geoPrefStore.setValue(IMappingPreferences.MAP_PROVIDER_TOGGLE_LIST, //
+				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
 
 		/*
 		 * save order of all map providers
 		 */
-		final TableItem[] items = fCheckboxList.getTable().getItems();
+		final TableItem[] items = _checkboxList.getTable().getItems();
 		final String[] mapProviderIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			mapProviderIds[itemIndex] = ((MP) items[itemIndex].getData()).getId();
 		}
 
-		fPrefStore.setValue(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER, StringToArrayConverter
-				.convertArrayToString(mapProviderIds));
+		_geoPrefStore.setValue(IMappingPreferences.MAP_PROVIDER_SORT_ORDER, //
+				StringToArrayConverter.convertArrayToString(mapProviderIds));
 	}
 }

@@ -22,8 +22,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.srtm,
  net.tourbook.chart,
  net.tourbook.rxtx,
- net.tourbook.util,
- de.byteholder.geoclipse
+ net.tourbook.util
 Export-Package: net.tourbook,
  net.tourbook.colors,
  net.tourbook.data,
@@ -38,4 +37,11 @@ Export-Package: net.tourbook,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.action
+Import-Package: de.byteholder.geoclipse,
+ de.byteholder.geoclipse.map,
+ de.byteholder.geoclipse.map.event,
+ de.byteholder.geoclipse.mapprovider,
+ de.byteholder.geoclipse.preferences,
+ de.byteholder.geoclipse.util,
+ de.byteholder.gpx
 

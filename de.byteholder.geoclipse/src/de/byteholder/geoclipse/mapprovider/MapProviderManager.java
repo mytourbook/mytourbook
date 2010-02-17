@@ -37,6 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,6 +46,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -69,12 +71,19 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.gpx.GeoPosition;
 
 /**
  * this will manage all map providers
  */
 public class MapProviderManager {
+
+	/**
+	 * This prefix is used to sort the map providers at the end when the map provider is not a map
+	 * profile
+	 */
+	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_";
 
 	private static final String				UTF_8											= "UTF-8";							//$NON-NLS-1$
 
@@ -193,7 +202,7 @@ public class MapProviderManager {
 	private static final String				ATTR_PMP_IS_BLACK_TRANSPARENT					= "IsBlackTransparent";			//$NON-NLS-1$
 	private static final String				ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP				= "IsBrightnessForNextMP";			//$NON-NLS-1$
 	private static final String				ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP					= "BrightnessForNextMP";			//$NON-NLS-1$
- 
+
 	// transparent pixel
 	private static final String				TAG_TRANSPARENT_COLOR							= "TransparentColor";				//$NON-NLS-1$
 	private static final String				ATTR_TRANSPARENT_COLOR_VALUE					= "Value";							//$NON-NLS-1$
@@ -236,6 +245,10 @@ public class MapProviderManager {
 	private MPPlugin						_mpDefault;
 
 	private ArrayList<String>				_errorLog										= new ArrayList<String>();
+
+	private IPreferenceStore				_prefStore										= Activator
+																									.getDefault()
+																									.getPreferenceStore();
 
 	private static final ListenerList		_mapProviderListeners							= new ListenerList(
 																									ListenerList.IDENTITY);
@@ -724,8 +737,9 @@ public class MapProviderManager {
 
 	private MapProviderManager() {}
 
-	public void addMapProvider(final MP mapProvider) {
-		_allMapProviders.add(mapProvider);
+	public void addMapProvider(final MP mp) {
+		_allMapProviders.add(mp);
+		updateMpSorting(mp);
 	}
 
 	public void addMapProviderListener(final IMapProviderListener listener) {
@@ -1686,6 +1700,41 @@ public class MapProviderManager {
 		}
 	}
 
+	private void updateMpSorting(final MP newMP) {
+
+		final String[] storedMpIds = StringToArrayConverter.convertStringToArray(//
+				_prefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
+
+		// check if the new mp is already in the list
+		for (final String storedMpId : storedMpIds) {
+			if (storedMpId.equals(newMP)) {
+				// new mp is already in the list, this case should not happen
+				return;
+			}
+		}
+
+		final String[] newMpIds = new String[storedMpIds.length + 1];
+		final String newMpName = newMP.getName();
+
+		if (newMpName.startsWith(SINGLE_MAP_PROVIDER_NAME_PREFIX)) {
+
+			// append at the end
+
+			System.arraycopy(storedMpIds, 0, newMpIds, 0, storedMpIds.length);
+			newMpIds[newMpIds.length - 1] = newMP.getId();
+
+		} else {
+
+			// append at the start
+
+			newMpIds[0] = newMP.getId();
+			System.arraycopy(storedMpIds, 0, newMpIds, 1, storedMpIds.length);
+		}
+
+		_prefStore.setValue(IMappingPreferences.MAP_PROVIDER_SORT_ORDER, StringToArrayConverter
+				.convertArrayToString(newMpIds));
+	}
+
 	/**
 	 * Validates an imported map provider
 	 * 
@@ -1731,6 +1780,8 @@ public class MapProviderManager {
 
 		// update model with the imported MP
 		_allMapProviders.add(importedMP);
+
+		updateMpSorting(importedMP);
 
 		/*
 		 * the imported map provider will be the first in the list, imported wrapped mp's come
@@ -1921,6 +1972,8 @@ public class MapProviderManager {
 
 				// update model with the wrapped map provider
 				_allMapProviders.add(wrappedMP);
+
+				updateMpSorting(wrappedMP);
 			}
 		}
 

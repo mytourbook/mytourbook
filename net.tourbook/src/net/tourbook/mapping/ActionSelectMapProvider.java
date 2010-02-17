@@ -33,22 +33,24 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
+import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator, IMapProviderListener {
 
-	private static IPreferenceStore				_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
- 
+	private static IPreferenceStore				_geoPrefStore	= Activator.getDefault().getPreferenceStore();
+
 	private final TourMapView					_mapView;
 
 	private Menu								_menu;
 	private final ActionSetDefaultMapProviders	_actionSetDefaultMapProvider;
 	private final ActionManageMapProviders		_actionModifyMapProvider;
 
-	private final HashMap<String, MPAction>		_mpActions	= new HashMap<String, MPAction>();
+	private final HashMap<String, MPAction>		_mpActions		= new HashMap<String, MPAction>();
 
 	/**
 	 * tile factory which is currently selected
@@ -400,7 +402,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		// get sorted map providers from the pref store
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
-				_prefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
+				_geoPrefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
 
 		final ArrayList<MP> mapProviders = new ArrayList<MP>();
 
@@ -427,7 +429,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 		 * set status if the map provider can be toggled with the map provider button
 		 */
 		final String[] toggleIds = StringToArrayConverter.convertStringToArray(//
-				_prefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
+				_geoPrefStore.getString(IMappingPreferences.MAP_PROVIDER_TOGGLE_LIST));
 
 		for (final MP mp : allMapProviders) {
 

@@ -317,7 +317,6 @@ END OF TERMS AND CONDITIONS
       <import plugin="net.tourbook.ext.jars.importExport"/>
       <import plugin="net.tourbook.ext.ejb3" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
-      <import plugin="org.eclipse.ui.forms" version="3.4.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
