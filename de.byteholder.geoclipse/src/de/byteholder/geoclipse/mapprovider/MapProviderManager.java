@@ -83,7 +83,7 @@ public class MapProviderManager {
 	 * This prefix is used to sort the map providers at the end when the map provider is not a map
 	 * profile
 	 */
-	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_";
+	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_"; //$NON-NLS-1$
 
 	private static final String				UTF_8											= "UTF-8";							//$NON-NLS-1$
 
