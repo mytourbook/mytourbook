@@ -730,10 +730,14 @@ public class TourData implements Comparable<Object> {
 					longitudeSerie[serieIndex] = lastValidLongitude = longitude;
 				}
 
-				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
-				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
-				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
-				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
+				// optimized performance for Math.min/max
+ 				final double lastValidLatAdjusted = lastValidLatitude + 90;
+				final double lastValidLonAdjusted = lastValidLongitude + 180;
+
+				mapMinLatitude = mapMinLatitude < lastValidLatAdjusted ? mapMinLatitude : lastValidLatAdjusted;
+				mapMaxLatitude = mapMaxLatitude > lastValidLatAdjusted ? mapMaxLatitude : lastValidLatAdjusted;
+				mapMinLongitude = mapMinLongitude < lastValidLonAdjusted ? mapMinLongitude : lastValidLonAdjusted;
+				mapMaxLongitude = mapMaxLongitude > lastValidLonAdjusted ? mapMaxLongitude : lastValidLonAdjusted;
 
 				/*
 				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
@@ -4028,7 +4032,7 @@ public class TourData implements Comparable<Object> {
 	 * Sets the month for the tour start in the range 1...12
 	 */
 	public void setStartMonth(final short startMonth) {
- 		this.startMonth = startMonth;
+		this.startMonth = startMonth;
 	}
 
 	public void setStartPulse(final short startPulse) {

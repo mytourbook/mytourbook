@@ -1092,11 +1092,17 @@ public class TourMapView extends ViewPart {
 			final double latitude = latitudeSerie[serieIndex];
 			final double longitude = longitudeSerie[serieIndex];
 
-			minLatitude = Math.min(minLatitude, latitude);
-			maxLatitude = Math.max(maxLatitude, latitude);
+//			minLatitude = Math.min(minLatitude, latitude);
+//			maxLatitude = Math.max(maxLatitude, latitude);
+//			
+//			minLongitude = Math.min(minLongitude, longitude);
+//			maxLongitude = Math.max(maxLongitude, longitude);
+ 
+			minLatitude = latitude < minLatitude ? latitude : minLatitude;
+			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
 
-			minLongitude = Math.min(minLongitude, longitude);
-			maxLongitude = Math.max(maxLongitude, longitude);
+			minLongitude = longitude < minLongitude ? longitude : minLongitude;
+			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
 
 			if (minLatitude == 0) {
 				minLatitude = -180D;
@@ -1676,7 +1682,7 @@ public class TourMapView extends ViewPart {
 		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// default position
- 		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
+		_defaultZoom = Util.getStateInt(settings, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
 		_defaultPosition = new GeoPosition(//
 				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
 				Util.getStateDouble(settings, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));

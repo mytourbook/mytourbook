@@ -3,7 +3,7 @@ package de.byteholder.geoclipse.map;
 import org.eclipse.swt.graphics.GC;
 
 public abstract class AbstractPainter<T> implements Painter<T> {
- 
+
 	protected T	fMap;
 
 	/**
@@ -11,8 +11,13 @@ public abstract class AbstractPainter<T> implements Painter<T> {
 	 */
 	protected abstract void dispose();
 
-	protected abstract void doPaint(GC gc, T map);
+	/**
+	 * Dispose resources which are used temporarily
+	 */
+	protected void disposeTempResources() {}
 
+	protected abstract void doPaint(GC gc, T map);
+ 
 	/**
 	 * @param gc
 	 * @param map

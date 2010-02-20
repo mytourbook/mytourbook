@@ -49,7 +49,8 @@ public class ColorCacheInt {
 	 *         created when it is not available
 	 */
 	public Color get(final int colorValue) {
-
+ 
+//		Color color = _colors.get(new Integer(colorValue));
 		Color color = _colors.get(colorValue);
 		if (color != null) {
 			return color;

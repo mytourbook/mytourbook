@@ -30,9 +30,10 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
@@ -48,36 +49,78 @@ import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
-
+ 
 /**
  * Paints the tour into the map
  */
 public class TourPainter extends MapPainter {
 
-	private static final int			MARGIN				= 2;
-	private static final int			MARKER_POLE			= 16;
+	private static final int				MARGIN				= 2;
+	private static final int				MARKER_POLE			= 16;
 
-	private static final String			SPACER				= " ";						//$NON-NLS-1$
-	private static final String			IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
-	private static final String			IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
-	private static final String			IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
+	private static final String				SPACER				= " ";						//$NON-NLS-1$
+	private static final String				IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
+	private static final String				IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
+	private static final String				IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
 
-	private static TourPainter			_instance;
+	private static TourPainter				_instance;
+	private static IPropertyChangeListener	_prefChangeListener;
 
-	private final Image					_imageStartMarker;
-	private final Image					_imageEndMarker;
-	private final Image					_imageTourMarker;
-	private final Image					_positionImage;
-	private final Image					_markerImage;
+	private final Image						_imageStartMarker;
+	private final Image						_imageEndMarker;
+	private final Image						_imageTourMarker;
+	private final Image						_positionImage;
+	private final Image						_markerImage;
 
-	private int[]						_dataSerie;
-	private ILegendProvider				_legendProvider;
- 
+	private int[]							_dataSerie;
+	private ILegendProvider					_legendProvider;
+
 	// painting parameter
-	private int							_lineWidth;
-	private int							_lineWidth2;
+	private int								_lineWidth;
+	private int								_lineWidth2;
 
-	private final static ColorCacheInt	_colorCache			= new ColorCacheInt();
+	private static boolean					_prefIsDrawLine;
+	private static boolean					_prefIsDrawSquare;
+	private static int						_prefLineWidth;
+	private static boolean					_prefWithBorder;
+	private static int						_prefBorderWidth;
+
+	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
+
+	static {
+
+		/**
+		 * this code optimizes the performance the reading from the pref store which is not very
+		 * efficient
+		 */
+		getTourPainterSettings();
+
+		// create pref listener
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// test if the color or statistic data have changed
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+					getTourPainterSettings();
+				}
+			}
+		};
+
+		// add pref listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+
+		// remove pre listener
+		/*
+		 * this listener is never removed
+		 */
+
+//		container.addDisposeListener(new DisposeListener() {
+//			public void widgetDisposed(final DisposeEvent e) {
+//				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+//			}
+//		});
+	}
 
 	/**
 	 * Draw legend colors into the legend bounds
@@ -413,6 +456,19 @@ public class TourPainter extends MapPainter {
 		return colorValue;
 	}
 
+	private static void getTourPainterSettings() {
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
+		_prefIsDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
+		_prefIsDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
+
+		_prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+		_prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
+		_prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+	}
+
 	public TourPainter() {
 
 		super();
@@ -482,6 +538,11 @@ public class TourPainter extends MapPainter {
 	}
 
 	@Override
+	protected void disposeTempResources() {
+		_colorCache.dispose();
+	}
+
+	@Override
 	protected void doPaint(final GC gc, final Map map) {}
 
 	@Override
@@ -494,130 +555,120 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		final boolean[] isInTile = new boolean[1];
+		boolean isTourInTile = false;
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-				boolean isTourInTile = false;
+		// draw tour below the marker
+		for (final TourData tourData : tourDataList) {
 
-				// draw tour below the marker
-				for (final TourData tourData : tourDataList) {
-
-					if (tourData == null) {
-						continue;
-					}
-
-					// check if position is available
-					final double[] latitudeSerie = tourData.latitudeSerie;
-					final double[] longitudeSerie = tourData.longitudeSerie;
-					if (latitudeSerie == null || longitudeSerie == null) {
-						continue;
-					}
-
-					setDataSerie(tourData);
-
-					final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
-
-					isTourInTile = isTourInTile || isDrawTourInTile;
-
-					// status if a marker is drawn
-					boolean isMarkerInTile = false;
-
-					// draw start/end marker
-					if (paintManager.isShowStartEndInMap()) {
-
-						// draw end marker
-						isMarkerInTile = drawMarker(
-								gc,
-								map,
-								tile,
-								latitudeSerie[latitudeSerie.length - 1],
-								longitudeSerie[longitudeSerie.length - 1],
-								_imageEndMarker);
-
-						isTourInTile = isTourInTile || isMarkerInTile;
-
-						// draw start marker
-						isMarkerInTile = drawMarker(gc,//
-								map,
-								tile,
-								latitudeSerie[0],
-								longitudeSerie[0],
-								_imageStartMarker);
-					}
-
-					isTourInTile = isTourInTile || isMarkerInTile;
-				}
-
-				if (paintManager.isShowTourMarker()) {
-
-					// draw marker above the tour
-
-					for (final TourData tourData : tourDataList) {
-
-						if (tourData == null) {
-							continue;
-						}
-
-						// check if geo position is available
-						final double[] latitudeSerie = tourData.latitudeSerie;
-						final double[] longitudeSerie = tourData.longitudeSerie;
-						if (latitudeSerie == null || longitudeSerie == null) {
-							continue;
-						}
-
-						setDataSerie(tourData);
-
-						boolean isTourMarkerInTile = false;
-
-						// draw tour marker
-
-						boolean isTourMarkerInTile2 = false;
-
-						// sort markers by time
-						final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-
-						final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-						Collections.sort(sortedMarkers, new Comparator<TourMarker>() {
-							public int compare(final TourMarker marker1, final TourMarker marker2) {
-								return marker1.getTime() - marker2.getTime();
-							}
-						});
-
-						for (final TourMarker tourMarker : sortedMarkers) {
-
-							if (tourMarker.getLabel().length() == 0) {
-								// skip empty marker
-								continue;
-							}
-
-							final int serieIndex = tourMarker.getSerieIndex();
-
-							// draw tour marker
-							isTourMarkerInTile2 = drawTourMarker(
-									gc,
-									map,
-									tile,
-									latitudeSerie[serieIndex],
-									longitudeSerie[serieIndex],
-									_imageTourMarker,
-									tourMarker,
-									parts);
-
-							isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
-						}
-
-						isTourInTile = isTourInTile || isTourMarkerInTile;
-					}
-				}
-
-				isInTile[0] = isTourInTile;
+			if (tourData == null) {
+				continue;
 			}
-		});
 
-		_colorCache.dispose();
+			// check if position is available
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+			if (latitudeSerie == null || longitudeSerie == null) {
+				continue;
+			}
 
-		return isInTile[0];
+			setDataSerie(tourData);
+
+			final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
+
+			isTourInTile = isTourInTile || isDrawTourInTile;
+
+			// status if a marker is drawn
+			boolean isMarkerInTile = false;
+
+			// draw start/end marker
+			if (paintManager.isShowStartEndInMap()) {
+
+				// draw end marker
+				isMarkerInTile = drawMarker(
+						gc,
+						map,
+						tile,
+						latitudeSerie[latitudeSerie.length - 1],
+						longitudeSerie[longitudeSerie.length - 1],
+						_imageEndMarker);
+
+				isTourInTile = isTourInTile || isMarkerInTile;
+
+				// draw start marker
+				isMarkerInTile = drawMarker(gc,//
+						map,
+						tile,
+						latitudeSerie[0],
+						longitudeSerie[0],
+						_imageStartMarker);
+			}
+
+			isTourInTile = isTourInTile || isMarkerInTile;
+		}
+
+		if (paintManager.isShowTourMarker()) {
+
+			// draw marker above the tour
+
+			for (final TourData tourData : tourDataList) {
+
+				if (tourData == null) {
+					continue;
+				}
+
+				// check if geo position is available
+				final double[] latitudeSerie = tourData.latitudeSerie;
+				final double[] longitudeSerie = tourData.longitudeSerie;
+				if (latitudeSerie == null || longitudeSerie == null) {
+					continue;
+				}
+
+				setDataSerie(tourData);
+
+				boolean isTourMarkerInTile = false;
+
+				// draw tour marker
+
+				boolean isTourMarkerInTile2 = false;
+
+				// sort markers by time
+				final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+
+				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+				Collections.sort(sortedMarkers, new Comparator<TourMarker>() {
+					public int compare(final TourMarker marker1, final TourMarker marker2) {
+						return marker1.getTime() - marker2.getTime();
+					}
+				});
+
+				for (final TourMarker tourMarker : sortedMarkers) {
+
+					if (tourMarker.getLabel().length() == 0) {
+						// skip empty marker
+						continue;
+					}
+
+					final int serieIndex = tourMarker.getSerieIndex();
+
+					// draw tour marker
+					isTourMarkerInTile2 = drawTourMarker(
+							gc,
+							map,
+							tile,
+							latitudeSerie[serieIndex],
+							longitudeSerie[serieIndex],
+							_imageTourMarker,
+							tourMarker,
+							parts);
+
+					isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+				}
+
+				isTourInTile = isTourInTile || isTourMarkerInTile;
+			}
+		}
+
+		return isTourInTile;
 	}
 
 	private boolean drawMarker(	final GC gc,
@@ -690,12 +741,12 @@ public class TourPainter extends MapPainter {
 		 */
 		final String projectionId = mp.getProjection().getId();
 		Point tourWorldPixelPosAll[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
-		final boolean createWorldPosition = tourWorldPixelPosAll == null;
-		if (createWorldPosition) {
+
+		if ((tourWorldPixelPosAll == null)) {
+
+			// world pixels are not yet cached, create them now
 
 			tourWorldPixelPosAll = new Point[latitudeSerie.length];
-
-			tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
 
 			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
@@ -705,6 +756,8 @@ public class TourPainter extends MapPainter {
 						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
 						mapZoomLevel);
 			}
+
+			tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
 		}
 
 		final Color systemColorBlue = gc.getDevice().getSystemColor(SWT.COLOR_BLUE);
@@ -715,23 +768,13 @@ public class TourPainter extends MapPainter {
 		int lastInsideIndex = -99;
 		boolean isBorder;
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
-		final boolean isDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
-		final boolean isDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
-
-		// get line width from pref store
-		final int prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
-		final boolean prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
-		final int prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
-
 		// index == 0: paint border
 		// index == 1: paint tour symbol
 		for (int lineIndex = 0; lineIndex < 2; lineIndex++) {
 
 			if (lineIndex == 0) {
 
-				if (prefWithBorder == false) {
+				if (_prefWithBorder == false) {
 					// skip border
 					continue;
 				}
@@ -739,14 +782,14 @@ public class TourPainter extends MapPainter {
 				isBorder = true;
 
 				// draw line border
-				_lineWidth = prefLineWidth + (prefBorderWidth * 2);
+				_lineWidth = _prefLineWidth + (_prefBorderWidth * 2);
 
 			} else if (lineIndex == 1) {
 
 				isBorder = false;
 
 				// draw within the border
-				_lineWidth = prefLineWidth;
+				_lineWidth = _prefLineWidth;
 
 			} else {
 				break;
@@ -763,7 +806,7 @@ public class TourPainter extends MapPainter {
 				int devX = tourWorldPixel.x - tileWorldPixelX;
 				int devY = tourWorldPixel.y - tileWorldPixelY;
 
-				if (isDrawLine) {
+				if (_prefIsDrawLine) {
 
 					// check if position is in the viewport
 
@@ -863,7 +906,7 @@ public class TourPainter extends MapPainter {
 
 							final Color color = getTourColor(isBorder, serieIndex);
 
-							if (isDrawSquare) {
+							if (_prefIsDrawSquare) {
 								drawTour30Square(gc, devX, devY, color);
 							} else {
 								drawTour40Dot(gc, devX, devY, color);
