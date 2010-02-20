@@ -272,7 +272,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			btnComputValues.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-//					onComputeWeekValues();
+					onComputeWeekValues();
 				}
 			});
 		}
@@ -442,8 +442,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		}
 	}
 
-//	private void onComputeWeekValues() {
-//
+	private void onComputeWeekValues() {
+
 //		if (MessageDialog.openConfirm(
 //				Display.getCurrent().getActiveShell(),
 //				Messages.compute_tourValueWeek_dlg_title,
@@ -473,7 +473,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 //
 //			fireModifyEvent();
 //		}
-//	}
+	}
 
 	@Override
 	public boolean performCancel() {

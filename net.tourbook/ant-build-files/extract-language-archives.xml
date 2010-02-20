@@ -3,7 +3,7 @@
 <project name="create-translation-file" default="unzip-all-archives" basedir="..">
 
 	<!--
-		create archive files with translatable property files
+		extract language files from the archive
 	-->
 
 	<property name="mt-trunk" value=".." />
