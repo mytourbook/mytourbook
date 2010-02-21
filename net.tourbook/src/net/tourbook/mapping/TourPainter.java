@@ -342,11 +342,11 @@ public class TourPainter extends MapPainter {
 		final ValueColor[] valueColors = legendColor.valueColors;
 		final float minBrightnessFactor = legendColor.minBrightnessFactor / (float) 100;
 		final float maxBrightnessFactor = legendColor.maxBrightnessFactor / (float) 100;
-		ValueColor valueColor;
 
 		/*
 		 * find the valueColor for the current value
 		 */
+		ValueColor valueColor;
 		ValueColor minValueColor = null;
 		ValueColor maxValueColor = null;
 

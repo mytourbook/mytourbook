@@ -272,13 +272,6 @@ public class Map extends Canvas {
 
 	private Thread								_displayThread;
 
-// debug fields	
-//	private int									_imageModAll;
-//	private int									_imageModTop;
-//	private int									_imageModBot;
-//	private int									_imageModLeft;
-//	private int									_imageModRight;
-
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
 
@@ -1606,9 +1599,6 @@ public class Map extends Canvas {
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
 				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
-
-//					_imageModTop++;
-
 					return true;
 				}
 			}
@@ -1627,9 +1617,6 @@ public class Map extends Canvas {
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
 				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
-
-//					_imageModBot++;
-
 					return true;
 				}
 			}
@@ -1648,12 +1635,6 @@ public class Map extends Canvas {
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
 				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
-
-//					_imageModLeft++;
-
-//					System.out.println("left  x:" + srcX + "\ty:" + srcY);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
 					return true;
 				}
 			}
@@ -1672,12 +1653,6 @@ public class Map extends Canvas {
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
 				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
-
-//					_imageModRight++;
-
-//					System.out.println("right x:" + srcX + "\ty:" + srcY);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
 					return true;
 				}
 			}
@@ -1697,9 +1672,6 @@ public class Map extends Canvas {
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
 				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
-
-//					_imageModAll++;
-
 					return true;
 				}
 			}
@@ -1707,10 +1679,6 @@ public class Map extends Canvas {
 
 		return false;
 	}
-
-//	public boolean isRestrictOutsidePanning() {
-//		return _restrictOutsidePanning;
-//	}
 
 	/**
 	 * Indicates if the map should recenter itself on mouse clicks.
@@ -1928,12 +1896,6 @@ public class Map extends Canvas {
 				checkImageTemplatePartedOverlayImage();
 				checkImageTemplatePartOverlayImage();
 
-//				_imageModAll = 0;
-//				_imageModTop = 0;
-//				_imageModBot = 0;
-//				_imageModLeft = 0;
-//				_imageModRight = 0;
-
 				while ((tile = _tileOverlayPaintQueue.poll()) != null) {
 
 					// skip tiles from another zoom level
@@ -1950,15 +1912,6 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
 					}
 				}
-
-//				System.out.println(("all:" + _imageModAll) //
-//						+ ("\tt:" + _imageModTop)
-//						+ ("\tb:" + _imageModBot)
-//						+ ("\tl:" + _imageModLeft)
-//						+ ("\tr:" + _imageModRight)
-//						+ "");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 			}
 		});
 	}
