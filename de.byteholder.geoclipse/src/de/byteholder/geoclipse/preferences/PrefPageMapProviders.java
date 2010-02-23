@@ -104,7 +104,7 @@ import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
 import org.joda.time.DateTime;
- 
+
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
@@ -127,120 +127,116 @@ import de.byteholder.geoclipse.util.Util;
 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private static final String					CHARACTER_0					= "0";															//$NON-NLS-1$
+	private static final String					CHARACTER_0						= "0";															//$NON-NLS-1$
 
-	public static final String					PREF_PAGE_MAP_PROVIDER_ID	= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
+	public static final String					PREF_PAGE_MAP_PROVIDER_ID		= "de.byteholder.geoclipse.preferences.PrefPageMapProvider";	//$NON-NLS-1$
 
-	private static final String					XML_EXTENSION				= ".xml";														//$NON-NLS-1$
+	private static final String					XML_EXTENSION					= ".xml";														//$NON-NLS-1$
 
 	/**
 	 * max lenghth for map provider id and offline folder
 	 */
-	private static final int					MAX_ID_LENGTH				= 24;
+	private static final int					MAX_ID_LENGTH					= 24;
 
-	private static final String					IMPORT_FILE_PATH			= "MapProvider_ImportFilePath";								//$NON-NLS-1$
-	private static final String					EXPORT_FILE_PATH			= "MapProvider_ExportFilePath";								//$NON-NLS-1$
+	private static final String					IMPORT_FILE_PATH				= "MapProvider_ImportFilePath";								//$NON-NLS-1$
+	private static final String					EXPORT_FILE_PATH				= "MapProvider_ExportFilePath";								//$NON-NLS-1$
 
-	private MapProviderManager					fMapProviderMgr				= MapProviderManager.getInstance();
+	private MapProviderManager					_mpMgr							= MapProviderManager.getInstance();
 
 	/**
 	 * contains all visible map providers
 	 */
-	private ArrayList<MP>						fMapProviders;
+	private ArrayList<MP>						_visibleMp;
 
 	/**
 	 * map provider's which are used when getting offline info
 	 */
-	private ArrayList<MP>						fOfflineJobMapProviders		= new ArrayList<MP>();
+	private ArrayList<MP>						_offlineJobMapProviders			= new ArrayList<MP>();
 
-	private IOfflineInfoListener				fOfflineJobInfoListener;
+	private IOfflineInfoListener				_offlineJobInfoListener;
 
-	private Job									fOfflineJobGetInfo;
-	private MP									fOfflineJobMapProvider;
-	private int									fOfflineJobFileCounter;
-	private int									fOfflineJobFileSize;
-	private int									fOfflineJobFileCounterUIUpdate;
+	private Job									_offlineJobGetInfo;
+	private MP									_offlineJobMp;
+	private int									_offlineJobFileCounter;
+	private int									_offlineJobFileSize;
+	private int									_offlineJobFileCounterUIUpdate;
 
 	/**
 	 * is <code>true</code> when the job is canceled
 	 */
-	private boolean								fIsOfflineJobCanceled		= true;
+	private boolean								_isOfflineJobCanceled			= true;
 
-	private boolean								fIsOfflineJobRunning		= false;
+	private boolean								_isOfflineJobRunning			= false;
 
-	private boolean								fIsDisableModifyListener	= false;
+	private boolean								_isDisableModifyListener		= false;
 
-	private IPreferenceStore					fPrefStore					= Activator
-																					.getDefault()
-																					.getPreferenceStore();
+	private IPreferenceStore					_prefStore						= Activator
+																						.getDefault()
+																						.getPreferenceStore();
 
 	/**
 	 * map provider which is currently selected in the list
 	 */
-	private MP									fSelectedMapProvider;
+	private MP									_selectedMapProvider;
 
-	private MP									fNewMapProvider;
+	private MP									_newMapProvider;
 
 	/*
 	 * UI controls
 	 */
-	private TableViewer							fMapProviderViewer;
+	private TableViewer							_mpViewer;
+	private Group								_groupDetails;
 
-	private Text								fTxtOfflineInfoTotal;
-	private Text								fTxtMapProviderName;
-	private Text								fTxtMapProviderId;
-	private Text								fTxtMapProviderType;
-	private Label								fLblDescription;
-	private Text								fTxtDescription;
-	private Composite							fOfflineContainer;
-	private Text								fTxtOfflineFolder;
-	private Label								fLblOfflineFolderInfo;
-	private Text								fTxtUrl;
+	private Text								_txtOfflineInfoTotal;
+	private Text								_txtMapProviderName;
+	private Text								_txtMapProviderId;
+	private Text								_txtMapProviderType;
+	private Label								_lblDescription;
+	private Text								_txtDescription;
+	private Composite							_offlineContainer;
+	private Text								_txtOfflineFolder;
+	private Label								_lblOfflineFolderInfo;
+	private Text								_txtUrl;
 
-	private Label								fLblDropTarget;
-	private DropTarget							fWmsDropTarget;
-	private DropTarget							fMpDropTarget;
+	private Label								_lblDropTarget;
+	private Label								_lblMpDropTarget;
+	private DropTarget							_wmsDropTarget;
+	private DropTarget							_mpDropTarget;
 
-	private Button								fBtnAddMapProviderCustom;
-	private Button								fBtnAddMapProviderWms;
-	private Button								fBtnAddMapProviderMapProfile;
-	private Button								fBtnDeleteMapProvider;
-	private Button								fBtnDeleteOfflineMap;
-	private Button								fBtnUpdate;
-	private Button								fBtnCancel;
-	private Button								fBtnEdit;
+	private Button								_btnAddMapProviderCustom;
+	private Button								_btnAddMapProviderWms;
+	private Button								_btnAddMapProviderMapProfile;
+	private Button								_btnDeleteMapProvider;
+	private Button								_btnDeleteOfflineMap;
+	private Button								_btnUpdate;
+	private Button								_btnCancel;
+	private Button								_btnEdit;
+	private Button								_btnImport;
+	private Button								_btnExport;
 
-	private boolean								fIsNewMapProvider			= false;
-	private boolean								fIsModifiedMapProvider		= false;
-	private boolean								fIsModifiedMapProviderList	= false;
-	private boolean								fForceUpdateMapProviderList	= false;
-	private boolean								fIsValid					= true;
+	private boolean								_isNewMapProvider				= false;
+	private boolean								_isModifiedMapProvider			= false;
+	private boolean								_isModifiedMapProviderList		= false;
+	private boolean								_isForceUpdateMapProviderList	= false;
+	private boolean								_isValid						= true;
 
-	private final ModifyListener				fModifyListener;
+	private final ModifyListener				_modifyListener;
 
-	private boolean								fIsModifiedOfflineFolder;
-	private boolean								fIsModifiedMapProviderId;
-	private boolean								fIsDeleteError;
+	private boolean								_isModifiedOfflineFolder;
+	private boolean								_isModifiedMapProviderId;
+	private boolean								_isDeleteError;
 
-	private ActionRefreshOfflineInfoSelected	fActionRefreshSelected;
-	private ActionRefreshOfflineInfoAll			fActionRefreshAll;
-	private ActionCancelRefreshOfflineInfo		fActionCancelRefresh;
-	private ActionRefreshOfflineInfoNotAssessed	fActionRefreshNotAssessed;
+	private ActionRefreshOfflineInfoSelected	_actionRefreshSelected;
+	private ActionRefreshOfflineInfoAll			_actionRefreshAll;
+	private ActionCancelRefreshOfflineInfo		_actionCancelRefresh;
+	private ActionRefreshOfflineInfoNotAssessed	_actionRefreshNotAssessed;
 
-	private Group								fGroupDetails;
-
-	private Button								fBtnImport;
-
-	private Button								fBtnExport;
-
-	private Label								fLblMpDropTarget;
-
-	final static NumberFormat					fNf							= NumberFormat.getNumberInstance();
+	final static NumberFormat					_nf								= NumberFormat.getNumberInstance();
 
 	{
-		fNf.setMinimumFractionDigits(2);
-		fNf.setMaximumFractionDigits(2);
-		fNf.setMinimumIntegerDigits(1);
+		_nf.setMinimumFractionDigits(2);
+		_nf.setMaximumFractionDigits(2);
+		_nf.setMinimumIntegerDigits(1);
 	}
 
 	private class MapContentProvider implements IStructuredContentProvider {
@@ -248,7 +244,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return fMapProviders.toArray();
+			return _visibleMp.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -258,9 +254,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		noDefaultAndApplyButton();
 
-		fModifyListener = new ModifyListener() {
+		_modifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fIsDisableModifyListener == false) {
+				if (_isDisableModifyListener == false) {
 					setMapProviderModified();
 				}
 			}
@@ -281,7 +277,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * refresh selected map provider
 			 */
 
-			updateMapProvider = fSelectedMapProvider;
+			updateMapProvider = _selectedMapProvider;
 
 		} else {
 
@@ -289,11 +285,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * refresh all map providers
 			 */
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 				mapProvider.setStateToReloadOfflineCounter();
 			}
 
-			fMapProviderViewer.update(fMapProviders.toArray(), null);
+			_mpViewer.update(_visibleMp.toArray(), null);
 		}
 
 		startJobOfflineInfo(updateMapProvider);
@@ -305,18 +301,18 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void addListener() {
 
-		fOfflineJobInfoListener = new IOfflineInfoListener() {
+		_offlineJobInfoListener = new IOfflineInfoListener() {
 
 			public void offlineInfoIsDirty(final MP mapProvider) {
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 
-						if (fMapProviderViewer == null || fMapProviderViewer.getTable().isDisposed()) {
+						if (_mpViewer == null || _mpViewer.getTable().isDisposed()) {
 							return;
 						}
 
-						fMapProviderViewer.update(mapProvider, null);
+						_mpViewer.update(mapProvider, null);
 
 						updateUIOfflineInfoTotal();
 					}
@@ -324,7 +320,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		};
 
-		MP.addOfflineInfoListener(fOfflineJobInfoListener);
+		MP.addOfflineInfoListener(_offlineJobInfoListener);
 	}
 
 //	private String checkBaseUrl(final String baseUrl) {
@@ -352,11 +348,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// check if the id is already used
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 
 				final String otherFactoryId = mapProvider.getId();
 
-				if (fIsNewMapProvider) {
+				if (_isNewMapProvider) {
 
 					// new map provider: another id with the same name is not allowed
 
@@ -369,7 +365,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					// check existing map providers
 
-					if (fSelectedMapProvider.equals(mapProvider) == false) {
+					if (_selectedMapProvider.equals(mapProvider) == false) {
 
 						// check other map providers but not the same which is selected
 
@@ -401,9 +397,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// check if the offline folder is already used
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 
-				if (fIsNewMapProvider) {
+				if (_isNewMapProvider) {
 
 					// new map provider: folder with the same name is not allowed
 
@@ -416,7 +412,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					// existing map provider
 
-					if (fSelectedMapProvider.equals(mapProvider) == false) {
+					if (_selectedMapProvider.equals(mapProvider) == false) {
 
 						// check other map providers but not the same which is selected
 
@@ -465,34 +461,34 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 */
 	private void createAutoText() {
 
-		if (fIsNewMapProvider == false) {
+		if (_isNewMapProvider == false) {
 			return;
 		}
 
-		if (fIsModifiedMapProviderId && fIsModifiedOfflineFolder) {
+		if (_isModifiedMapProviderId && _isModifiedOfflineFolder) {
 			return;
 		}
 
-		final String name = fTxtMapProviderName.getText().trim().toLowerCase();
+		final String name = _txtMapProviderName.getText().trim().toLowerCase();
 		final String validText = UI.createIdFromName(name, MAX_ID_LENGTH);
 
-		fIsDisableModifyListener = true;
+		_isDisableModifyListener = true;
 		{
-			if (fIsModifiedMapProviderId == false) {
-				fTxtMapProviderId.setText(validText);
+			if (_isModifiedMapProviderId == false) {
+				_txtMapProviderId.setText(validText);
 			}
 
-			if (fIsModifiedOfflineFolder == false) {
-				fTxtOfflineFolder.setText(validText);
+			if (_isModifiedOfflineFolder == false) {
+				_txtOfflineFolder.setText(validText);
 			}
 		}
-		fIsDisableModifyListener = false;
+		_isDisableModifyListener = false;
 	}
 
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		fMapProviders = fMapProviderMgr.getAllMapProviders(true);
+		_visibleMp = _mpMgr.getAllMapProviders(true);
 
 		addListener();
 
@@ -500,13 +496,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final Composite container = createUI(parent);
 
 		// load viewer
-		fMapProviderViewer.setInput(new Object());
+		_mpViewer.setInput(new Object());
 
 		restoreState();
 
 		updateUIOfflineInfoTotal();
 
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.getTable().setFocus();
 
 		return container;
 	}
@@ -557,15 +553,15 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			final ToolBar toolbar = new ToolBar(headerContainer, SWT.FLAT);
 			final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-			fActionRefreshNotAssessed = new ActionRefreshOfflineInfoNotAssessed(this);
-			fActionRefreshSelected = new ActionRefreshOfflineInfoSelected(this);
-			fActionRefreshAll = new ActionRefreshOfflineInfoAll(this);
-			fActionCancelRefresh = new ActionCancelRefreshOfflineInfo(this);
+			_actionRefreshNotAssessed = new ActionRefreshOfflineInfoNotAssessed(this);
+			_actionRefreshSelected = new ActionRefreshOfflineInfoSelected(this);
+			_actionRefreshAll = new ActionRefreshOfflineInfoAll(this);
+			_actionCancelRefresh = new ActionCancelRefreshOfflineInfo(this);
 
-			tbm.add(fActionRefreshNotAssessed);
-			tbm.add(fActionRefreshSelected);
-			tbm.add(fActionRefreshAll);
-			tbm.add(fActionCancelRefresh);
+			tbm.add(_actionRefreshNotAssessed);
+			tbm.add(_actionRefreshSelected);
+			tbm.add(_actionRefreshAll);
+			tbm.add(_actionCancelRefresh);
 
 			tbm.update(true);
 		}
@@ -593,8 +589,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
 
-		fMapProviderViewer = new TableViewer(table);
-		fMapProviderViewer.setUseHashlookup(true);
+		_mpViewer = new TableViewer(table);
+		_mpViewer.setUseHashlookup(true);
 
 		/*
 		 * create columns
@@ -603,7 +599,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		TableColumn tc;
 
 		// column: server type
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -628,7 +624,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(4)));
 
 		// column: map provider
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -643,7 +639,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(20));
 
 		// column: offline path
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -658,7 +654,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
 
 		// column: layer
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.TRAIL);
+		tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Layer);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -683,7 +679,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
 
 		// column: offline file counter
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.TRAIL);
+		tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -703,7 +699,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10)));
 
 		// column: offline file size
-		tvc = new TableViewerColumn(fMapProviderViewer, SWT.TRAIL);
+		tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
 		tc = tvc.getColumn();
 		tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -714,7 +710,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
 					cell.setText(Messages.pref_map_lable_NA);
 				} else if (offlineTileSize > 0) {
-					cell.setText(fNf.format((float) offlineTileSize / 1024 / 1024));
+					cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
 				} else {
 					cell.setText(UI.DASH_WITH_SPACE);
 				}
@@ -725,8 +721,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * create table viewer
 		 */
-		fMapProviderViewer.setContentProvider(new MapContentProvider());
-		fMapProviderViewer.setComparator(new ViewerComparator() {
+		_mpViewer.setContentProvider(new MapContentProvider());
+		_mpViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
@@ -748,32 +744,32 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		});
 
-		fMapProviderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectMapProvider(event);
 			}
 		});
 
-		fMapProviderViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_mpViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
-				if (fSelectedMapProvider instanceof MPWms) {
+				if (_selectedMapProvider instanceof MPWms) {
 
 					openConfigDialogWms();
 
-				} else if (fSelectedMapProvider instanceof MPCustom) {
+				} else if (_selectedMapProvider instanceof MPCustom) {
 
 					openConfigDialogCustom();
 
-				} else if (fSelectedMapProvider instanceof MPProfile) {
+				} else if (_selectedMapProvider instanceof MPProfile) {
 
 					openConfigDialogMapProfile();
 
 				} else {
 
 					// select name
-					fTxtMapProviderName.setFocus();
-					fTxtMapProviderName.selectAll();
+					_txtMapProviderName.setFocus();
+					_txtMapProviderName.selectAll();
 				}
 			}
 		});
@@ -786,49 +782,49 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		GridLayoutFactory.fillDefaults().applyTo(btnContainer);
 		{
 			// button: edit
-			fBtnEdit = new Button(btnContainer, SWT.NONE);
+			_btnEdit = new Button(btnContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.align(SWT.END, SWT.FILL)
-					.applyTo(fBtnEdit);
-			fBtnEdit.setText(Messages.Pref_Map_Button_Edit);
-			fBtnEdit.addSelectionListener(new SelectionAdapter() {
+					.applyTo(_btnEdit);
+			_btnEdit.setText(Messages.Pref_Map_Button_Edit);
+			_btnEdit.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					openConfigDialog();
 				}
 			});
-			setButtonLayoutData(fBtnEdit);
+			setButtonLayoutData(_btnEdit);
 
 			// button: add custom map provider
-			fBtnAddMapProviderCustom = new Button(btnContainer, SWT.NONE);
-			fBtnAddMapProviderCustom.setText(Messages.Pref_Map_Button_AddMapProviderCustom);
-			fBtnAddMapProviderCustom.setToolTipText(Messages.Pref_Map_Button_AddMapProviderCustom_Tooltip);
-			fBtnAddMapProviderCustom.addSelectionListener(new SelectionAdapter() {
+			_btnAddMapProviderCustom = new Button(btnContainer, SWT.NONE);
+			_btnAddMapProviderCustom.setText(Messages.Pref_Map_Button_AddMapProviderCustom);
+			_btnAddMapProviderCustom.setToolTipText(Messages.Pref_Map_Button_AddMapProviderCustom_Tooltip);
+			_btnAddMapProviderCustom.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					setEmptyMapProviderUI(new MPCustom());
 				}
 			});
-			setButtonLayoutData(fBtnAddMapProviderCustom);
+			setButtonLayoutData(_btnAddMapProviderCustom);
 
 			// button: add wms map provider
-			fBtnAddMapProviderWms = new Button(btnContainer, SWT.NONE);
-			fBtnAddMapProviderWms.setText(Messages.Pref_Map_Button_AddMapProviderWms);
-			fBtnAddMapProviderWms.setToolTipText(Messages.Pref_Map_Button_AddMapProviderWms_Tooltip);
-			fBtnAddMapProviderWms.addSelectionListener(new SelectionAdapter() {
+			_btnAddMapProviderWms = new Button(btnContainer, SWT.NONE);
+			_btnAddMapProviderWms.setText(Messages.Pref_Map_Button_AddMapProviderWms);
+			_btnAddMapProviderWms.setToolTipText(Messages.Pref_Map_Button_AddMapProviderWms_Tooltip);
+			_btnAddMapProviderWms.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onAddWmsMapProvider();
 				}
 			});
-			setButtonLayoutData(fBtnAddMapProviderWms);
+			setButtonLayoutData(_btnAddMapProviderWms);
 
 			// button: add profile map provider
-			fBtnAddMapProviderMapProfile = new Button(btnContainer, SWT.NONE);
-			fBtnAddMapProviderMapProfile.setText(Messages.Pref_Map_Button_AddMapProfile);
-			fBtnAddMapProviderMapProfile.setToolTipText(Messages.Pref_Map_Button_AddMapProfile_Tooltip);
-			fBtnAddMapProviderMapProfile.addSelectionListener(new SelectionAdapter() {
+			_btnAddMapProviderMapProfile = new Button(btnContainer, SWT.NONE);
+			_btnAddMapProviderMapProfile.setText(Messages.Pref_Map_Button_AddMapProfile);
+			_btnAddMapProviderMapProfile.setToolTipText(Messages.Pref_Map_Button_AddMapProfile_Tooltip);
+			_btnAddMapProviderMapProfile.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
@@ -838,62 +834,62 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					setEmptyMapProviderUI(mapProfile);
 				}
 			});
-			setButtonLayoutData(fBtnAddMapProviderMapProfile);
+			setButtonLayoutData(_btnAddMapProviderMapProfile);
 
 			// wms drag&drop target
-			fLblDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
-			GridDataFactory.fillDefaults().applyTo(fLblDropTarget);
-			fLblDropTarget.setText(Messages.Pref_Map_Label_WmsDropTarget);
-			fLblDropTarget.setToolTipText(Messages.Pref_Map_Label_WmsDropTarget_Tooltip);
-			setWmsDropTarget(fLblDropTarget);
+			_lblDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
+			GridDataFactory.fillDefaults().applyTo(_lblDropTarget);
+			_lblDropTarget.setText(Messages.Pref_Map_Label_WmsDropTarget);
+			_lblDropTarget.setToolTipText(Messages.Pref_Map_Label_WmsDropTarget_Tooltip);
+			setWmsDropTarget(_lblDropTarget);
 
 			// button: delete offline map
-			fBtnDeleteOfflineMap = new Button(btnContainer, SWT.NONE);
-			fBtnDeleteOfflineMap.setText(Messages.Pref_Map_Button_DeleteOfflineMap);
-			fBtnDeleteOfflineMap.addSelectionListener(new SelectionAdapter() {
+			_btnDeleteOfflineMap = new Button(btnContainer, SWT.NONE);
+			_btnDeleteOfflineMap.setText(Messages.Pref_Map_Button_DeleteOfflineMap);
+			_btnDeleteOfflineMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					deleteOfflineMap(fSelectedMapProvider);
+					deleteOfflineMap(_selectedMapProvider);
 				}
 			});
-			setButtonLayoutData(fBtnDeleteOfflineMap);
+			setButtonLayoutData(_btnDeleteOfflineMap);
 
 			// button: import
-			fBtnImport = new Button(btnContainer, SWT.NONE);
-			fBtnImport.setText(Messages.Pref_Map_Button_ImportMP);
-			fBtnImport.addSelectionListener(new SelectionAdapter() {
+			_btnImport = new Button(btnContainer, SWT.NONE);
+			_btnImport.setText(Messages.Pref_Map_Button_ImportMP);
+			_btnImport.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onImportMP();
 				}
 			});
-			setButtonLayoutData(fBtnImport);
-			GridData gd = setButtonLayoutData(fBtnImport);
+			setButtonLayoutData(_btnImport);
+			GridData gd = setButtonLayoutData(_btnImport);
 			gd.verticalIndent = 20;
 
 			// button: export
-			fBtnExport = new Button(btnContainer, SWT.NONE);
-			fBtnExport.setText(Messages.Pref_Map_Button_ExportMP);
-			fBtnExport.addSelectionListener(new SelectionAdapter() {
+			_btnExport = new Button(btnContainer, SWT.NONE);
+			_btnExport.setText(Messages.Pref_Map_Button_ExportMP);
+			_btnExport.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onExportMP();
 				}
 			});
-			setButtonLayoutData(fBtnExport);
+			setButtonLayoutData(_btnExport);
 
 			/*
 			 * drop target: map provider
 			 */
-			fLblMpDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
-			GridDataFactory.fillDefaults().applyTo(fLblMpDropTarget);
-			fLblMpDropTarget.setText(Messages.Pref_Map_Label_MapProviderDropTarget);
-			fLblMpDropTarget.setToolTipText(Messages.Pref_Map_Label_MapProviderDropTarget_Tooltip);
-			fMpDropTarget = new DropTarget(fLblMpDropTarget, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
+			_lblMpDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
+			GridDataFactory.fillDefaults().applyTo(_lblMpDropTarget);
+			_lblMpDropTarget.setText(Messages.Pref_Map_Label_MapProviderDropTarget);
+			_lblMpDropTarget.setToolTipText(Messages.Pref_Map_Label_MapProviderDropTarget_Tooltip);
+			_mpDropTarget = new DropTarget(_lblMpDropTarget, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
 
-			fMpDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), FileTransfer.getInstance() });
+			_mpDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), FileTransfer.getInstance() });
 
-			fMpDropTarget.addDropListener(new DropTargetAdapter() {
+			_mpDropTarget.addDropListener(new DropTargetAdapter() {
 
 				@Override
 				public void drop(final DropTargetEvent event) {
@@ -935,15 +931,15 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			/*
 			 * button: delete map provider
 			 */
-			fBtnDeleteMapProvider = new Button(btnContainer, SWT.NONE);
-			fBtnDeleteMapProvider.setText(Messages.Pref_Map_Button_DeleteMapProvider);
-			fBtnDeleteMapProvider.addSelectionListener(new SelectionAdapter() {
+			_btnDeleteMapProvider = new Button(btnContainer, SWT.NONE);
+			_btnDeleteMapProvider.setText(Messages.Pref_Map_Button_DeleteMapProvider);
+			_btnDeleteMapProvider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onDeleteMapProvider();
 				}
 			});
-			gd = setButtonLayoutData(fBtnDeleteMapProvider);
+			gd = setButtonLayoutData(_btnDeleteMapProvider);
 			gd.grabExcessVerticalSpace = true;
 			gd.verticalAlignment = SWT.END;
 			gd.verticalIndent = 20;
@@ -956,19 +952,19 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * text: offline info
 		 */
-		fTxtOfflineInfoTotal = new Text(parent, SWT.READ_ONLY | SWT.TRAIL);
-		GridDataFactory.fillDefaults().applyTo(fTxtOfflineInfoTotal);
+		_txtOfflineInfoTotal = new Text(parent, SWT.READ_ONLY | SWT.TRAIL);
+		GridDataFactory.fillDefaults().applyTo(_txtOfflineInfoTotal);
 	}
 
 	private void createUI50Details(final Composite parent) {
 
-		fGroupDetails = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(fGroupDetails);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(fGroupDetails);
-		fGroupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
+		_groupDetails = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(_groupDetails);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupDetails);
+		_groupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
 		{
-			createUI52DetailsDetails(fGroupDetails);
-			createUI54DetailsButtons(fGroupDetails);
+			createUI52DetailsDetails(_groupDetails);
+			createUI54DetailsButtons(_groupDetails);
 		}
 	}
 
@@ -993,11 +989,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label.setText(Messages.Pref_Map_Lable_MapProvider);
 
 			// text: map provider 
-			fTxtMapProviderName = new Text(detailContainer, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(fTxtMapProviderName);
-			fTxtMapProviderName.addModifyListener(new ModifyListener() {
+			_txtMapProviderName = new Text(detailContainer, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_txtMapProviderName);
+			_txtMapProviderName.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (fIsDisableModifyListener) {
+					if (_isDisableModifyListener) {
 						return;
 					}
 					createAutoText();
@@ -1009,17 +1005,17 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * description
 			 */
 			// label: description
-			fLblDescription = new Label(detailContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(fLblDescription);
-			fLblDescription.setText(Messages.Pref_Map_Label_Description);
+			_lblDescription = new Label(detailContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(_lblDescription);
+			_lblDescription.setText(Messages.Pref_Map_Label_Description);
 
 			// text: description
-			fTxtDescription = new Text(detailContainer, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+			_txtDescription = new Text(detailContainer, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
 					.hint(pixCon.convertWidthInCharsToPixels(20), pixCon.convertHeightInCharsToPixels(5))
 					.grab(true, false)
-					.applyTo(fTxtDescription);
-			fTxtDescription.addModifyListener(fModifyListener);
+					.applyTo(_txtDescription);
+			_txtDescription.addModifyListener(_modifyListener);
 
 			/*
 			 * offline folder
@@ -1028,37 +1024,37 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label = new Label(detailContainer, SWT.NONE);
 			label.setText(Messages.Pref_Map_Lable_OfflineFolder);
 
-			fOfflineContainer = new Composite(detailContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fOfflineContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).equalWidth(true).applyTo(fOfflineContainer);
+			_offlineContainer = new Composite(detailContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_offlineContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).equalWidth(true).applyTo(_offlineContainer);
 			{
 				// text: offline folder
-				fTxtOfflineFolder = new Text(fOfflineContainer, SWT.BORDER);
+				_txtOfflineFolder = new Text(_offlineContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
 						.hint(pixCon.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-						.applyTo(fTxtOfflineFolder);
-				fTxtOfflineFolder.setTextLimit(MAX_ID_LENGTH);
-				fTxtOfflineFolder.addVerifyListener(verifyListener);
+						.applyTo(_txtOfflineFolder);
+				_txtOfflineFolder.setTextLimit(MAX_ID_LENGTH);
+				_txtOfflineFolder.addVerifyListener(verifyListener);
 
-				fTxtOfflineFolder.addModifyListener(new ModifyListener() {
+				_txtOfflineFolder.addModifyListener(new ModifyListener() {
 					public void modifyText(final ModifyEvent e) {
 
-						if (fIsDisableModifyListener) {
+						if (_isDisableModifyListener) {
 							return;
 						}
 
-						fIsModifiedOfflineFolder = true;
+						_isModifiedOfflineFolder = true;
 						setMapProviderModified();
 
 						// force offline folder to be reloaded
-						fSelectedMapProvider.setStateToReloadOfflineCounter();
+						_selectedMapProvider.setStateToReloadOfflineCounter();
 					}
 				});
 
 				// label: offline info
-				fLblOfflineFolderInfo = new Label(fOfflineContainer, SWT.TRAIL);
+				_lblOfflineFolderInfo = new Label(_offlineContainer, SWT.TRAIL);
 				GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(
-						fLblOfflineFolderInfo);
+						_lblOfflineFolderInfo);
 			}
 
 			/*
@@ -1068,18 +1064,18 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label.setText(Messages.Pref_Map_Lable_MapProviderId);
 
 			// text: map provider id
-			fTxtMapProviderId = new Text(detailContainer, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(fTxtMapProviderId);
-			fTxtMapProviderId.setTextLimit(MAX_ID_LENGTH);
-			fTxtMapProviderId.addVerifyListener(verifyListener);
+			_txtMapProviderId = new Text(detailContainer, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_txtMapProviderId);
+			_txtMapProviderId.setTextLimit(MAX_ID_LENGTH);
+			_txtMapProviderId.addVerifyListener(verifyListener);
 
-			fTxtMapProviderId.addModifyListener(new ModifyListener() {
+			_txtMapProviderId.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (fIsDisableModifyListener) {
+					if (_isDisableModifyListener) {
 						return;
 					}
 
-					fIsModifiedMapProviderId = true;
+					_isModifiedMapProviderId = true;
 					setMapProviderModified();
 				}
 			});
@@ -1091,8 +1087,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label.setText(Messages.Pref_Map_Lable_MapProviderType);
 
 			// text: map provider type
-			fTxtMapProviderType = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().applyTo(fTxtMapProviderType);
+			_txtMapProviderType = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().applyTo(_txtMapProviderType);
 
 			/*
 			 * url
@@ -1101,8 +1097,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			label.setText(Messages.Pref_Map_Label_Url);
 
 			// text: url
-			fTxtUrl = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(fTxtUrl);
+			_txtUrl = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(_txtUrl);
 		}
 	}
 
@@ -1113,26 +1109,26 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		GridLayoutFactory.fillDefaults().applyTo(btnContainer);
 		{
 			// button: update
-			fBtnUpdate = new Button(btnContainer, SWT.NONE);
-			fBtnUpdate.setText(Messages.Pref_Map_Button_UpdateMapProvider);
-			fBtnUpdate.addSelectionListener(new SelectionAdapter() {
+			_btnUpdate = new Button(btnContainer, SWT.NONE);
+			_btnUpdate.setText(Messages.Pref_Map_Button_UpdateMapProvider);
+			_btnUpdate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onUpdateMapProvider();
 				}
 			});
-			setButtonLayoutData(fBtnUpdate);
+			setButtonLayoutData(_btnUpdate);
 
 			// button: cancel
-			fBtnCancel = new Button(btnContainer, SWT.NONE);
-			fBtnCancel.setText(Messages.Pref_Map_Button_CancelMapProvider);
-			fBtnCancel.addSelectionListener(new SelectionAdapter() {
+			_btnCancel = new Button(btnContainer, SWT.NONE);
+			_btnCancel.setText(Messages.Pref_Map_Button_CancelMapProvider);
+			_btnCancel.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onCancelMapProvider();
 				}
 			});
-			setButtonLayoutData(fBtnCancel);
+			setButtonLayoutData(_btnCancel);
 		}
 	}
 
@@ -1206,11 +1202,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * data are valid
 			 */
 
-			fIsNewMapProvider = false;
+			_isNewMapProvider = false;
 
-			fIsModifiedMapProvider = false;
-			fIsModifiedMapProviderId = false;
-			fIsModifiedOfflineFolder = false;
+			_isModifiedMapProvider = false;
+			_isModifiedMapProviderId = false;
+			_isModifiedOfflineFolder = false;
 
 			// update model
 			wmsMapProvider.setId(uniqueId);
@@ -1221,18 +1217,18 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			wmsMapProvider.setGetMapUrl(getMapUrl);
 			wmsMapProvider.setCapabilitiesUrl(capsUrl);
 
-			fMapProviderMgr.addMapProvider(wmsMapProvider);
+			_mpMgr.addMapProvider(wmsMapProvider);
 
-			fMapProviders.add(wmsMapProvider);
-			fIsModifiedMapProviderList = true;
+			_visibleMp.add(wmsMapProvider);
+			_isModifiedMapProviderList = true;
 
 			// update viewer
-			fMapProviderViewer.add(wmsMapProvider);
+			_mpViewer.add(wmsMapProvider);
 
 			// select map provider in the viewer this will display the wms server in the UI
-			fMapProviderViewer.setSelection(new StructuredSelection(wmsMapProvider), true);
+			_mpViewer.setSelection(new StructuredSelection(wmsMapProvider), true);
 
-			fMapProviderViewer.getTable().setFocus();
+			_mpViewer.getTable().setFocus();
 
 		} else {
 
@@ -1242,29 +1238,29 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			 * enters the values
 			 */
 
-			fIsNewMapProvider = true;
-			fNewMapProvider = wmsMapProvider;
+			_isNewMapProvider = true;
+			_newMapProvider = wmsMapProvider;
 
-			fIsModifiedMapProvider = true;
-			fIsModifiedMapProviderId = false;
-			fIsModifiedOfflineFolder = false;
+			_isModifiedMapProvider = true;
+			_isModifiedMapProviderId = false;
+			_isModifiedOfflineFolder = false;
 
-			fIsDisableModifyListener = true;
+			_isDisableModifyListener = true;
 			{
 				/*
 				 * set map provider fields
 				 */
 
-				fTxtMapProviderName.setText(providerName);
-				fTxtMapProviderId.setText(uniqueId);
-				fTxtOfflineFolder.setText(uniqueId);
-				fTxtDescription.setText(wmsAbstract);
-				fTxtUrl.setText(capsUrl);
+				_txtMapProviderName.setText(providerName);
+				_txtMapProviderId.setText(uniqueId);
+				_txtOfflineFolder.setText(uniqueId);
+				_txtDescription.setText(wmsAbstract);
+				_txtUrl.setText(capsUrl);
 
-				fLblOfflineFolderInfo.setText(UI.EMPTY_STRING);
-				fOfflineContainer.layout(true);
+				_lblOfflineFolderInfo.setText(UI.EMPTY_STRING);
+				_offlineContainer.layout(true);
 			}
-			fIsDisableModifyListener = false;
+			_isDisableModifyListener = false;
 
 			enableControls();
 
@@ -1295,7 +1291,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			for (int i = 0; i < children.length; i++) {
 				final boolean success = deleteDir(new File(directory, children[i]));
 				if (success == false) {
-					fIsDeleteError = true;
+					_isDeleteError = true;
 				}
 			}
 		}
@@ -1321,8 +1317,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		enableControls();
 
 		// reselect map provider, set focus to map provider
-		fMapProviderViewer.setSelection(fMapProviderViewer.getSelection());
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.setSelection(_mpViewer.getSelection());
+		_mpViewer.getTable().setFocus();
 	}
 
 	private void deleteOfflineMapFiles(final MP mp) {
@@ -1365,7 +1361,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			mp.setStateToReloadOfflineCounter();
 
 			// update viewer
-			fMapProviderViewer.update(mp, null);
+			_mpViewer.update(mp, null);
 
 			updateUIOfflineInfoTotal();
 
@@ -1376,7 +1372,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void deleteOfflineMapFilesDir(final File tileCacheDir) {
 
-		fIsDeleteError = false;
+		_isDeleteError = false;
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
@@ -1384,7 +1380,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		});
 
-		if (fIsDeleteError) {
+		if (_isDeleteError) {
 			StatusUtil.log(NLS.bind(Messages.pref_map_error_deleteTiles_message, tileCacheDir), new Exception());
 		}
 	}
@@ -1394,14 +1390,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		stopJobOfflineInfo();
 
-		if (fWmsDropTarget != null) {
-			fWmsDropTarget.dispose();
+		if (_wmsDropTarget != null) {
+			_wmsDropTarget.dispose();
 		}
-		if (fMpDropTarget != null) {
-			fMpDropTarget.dispose();
+		if (_mpDropTarget != null) {
+			_mpDropTarget.dispose();
 		}
 
-		MP.removeOfflineInfoListener(fOfflineJobInfoListener);
+		MP.removeOfflineInfoListener(_offlineJobInfoListener);
 
 		super.dispose();
 	}
@@ -1414,19 +1410,19 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		// select imported map provider
 		if (importedMPs != null) {
 
-			fForceUpdateMapProviderList = true;
+			_isForceUpdateMapProviderList = true;
 
 			// update model
-			fMapProviders.addAll(importedMPs);
+			_visibleMp.addAll(importedMPs);
 
 			// update viewer
-			fMapProviderViewer.add(importedMPs.toArray(new MP[importedMPs.size()]));
+			_mpViewer.add(importedMPs.toArray(new MP[importedMPs.size()]));
 
 			// select map provider in the viewer
-			fMapProviderViewer.setSelection(new StructuredSelection(importedMPs.get(0)), true);
+			_mpViewer.setSelection(new StructuredSelection(importedMPs.get(0)), true);
 		}
 
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.getTable().setFocus();
 
 		if (importedMPs != null) {
 			// show the imported map provider in the config dialog
@@ -1442,67 +1438,67 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * validate UI data
 		 */
-		validateMapProvider(fTxtMapProviderName.getText().trim(), fTxtMapProviderId.getText().trim(), fTxtOfflineFolder
+		validateMapProvider(_txtMapProviderName.getText().trim(), _txtMapProviderId.getText().trim(), _txtOfflineFolder
 				.getText()
 				.trim());
 
-		final boolean isMapProvider = fSelectedMapProvider != null;
+		final boolean isMapProvider = _selectedMapProvider != null;
 
 		final boolean isExistingMapProvider = isMapProvider
-				&& fIsNewMapProvider == false
-				&& fIsModifiedMapProvider == false;
+				&& _isNewMapProvider == false
+				&& _isModifiedMapProvider == false;
 
-		final boolean isOfflineJobStopped = fIsOfflineJobRunning == false;
+		final boolean isOfflineJobStopped = _isOfflineJobRunning == false;
 
 		final boolean canDeleteOfflineMap = isMapProvider
-				&& fSelectedMapProvider.getOfflineFileCounter() > 0
+				&& _selectedMapProvider.getOfflineFileCounter() > 0
 				&& isOfflineJobStopped;
 
 		final boolean isOfflinePath = getTileCachePath() != null;
 
-		final boolean isCustomMapProvider = fSelectedMapProvider instanceof MPCustom;
-		final boolean isMapProfile = fSelectedMapProvider instanceof MPProfile;
-		final boolean isWmsMapProvider = fSelectedMapProvider instanceof MPWms;
+		final boolean isCustomMapProvider = _selectedMapProvider instanceof MPCustom;
+		final boolean isMapProfile = _selectedMapProvider instanceof MPProfile;
+		final boolean isWmsMapProvider = _selectedMapProvider instanceof MPWms;
 
 		final boolean isNonePluginMapProvider = isCustomMapProvider || isWmsMapProvider || isMapProfile;
-		final boolean canEditFields = fIsNewMapProvider || isNonePluginMapProvider;
+		final boolean canEditFields = _isNewMapProvider || isNonePluginMapProvider;
 
-		fMapProviderViewer.getTable().setEnabled(isExistingMapProvider);
+		_mpViewer.getTable().setEnabled(isExistingMapProvider);
 
-		fTxtMapProviderName.setEnabled(canEditFields);
-		fTxtMapProviderId.setEnabled(canEditFields);
-		fTxtOfflineFolder.setEnabled(canEditFields);
-		fTxtDescription.setEnabled(canEditFields);
+		_txtMapProviderName.setEnabled(canEditFields);
+		_txtMapProviderId.setEnabled(canEditFields);
+		_txtOfflineFolder.setEnabled(canEditFields);
+		_txtDescription.setEnabled(canEditFields);
 
 		// map provider list actions
-		fBtnAddMapProviderCustom.setEnabled(isExistingMapProvider);
-		fBtnAddMapProviderWms.setEnabled(isExistingMapProvider);
-		fBtnAddMapProviderMapProfile.setEnabled(isExistingMapProvider);
-		fBtnEdit.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-		fBtnDeleteMapProvider.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-		fBtnDeleteOfflineMap.setEnabled(isExistingMapProvider && canDeleteOfflineMap);
-		fBtnImport.setEnabled(isExistingMapProvider);
-		fBtnExport.setEnabled(isExistingMapProvider & isNonePluginMapProvider);
+		_btnAddMapProviderCustom.setEnabled(isExistingMapProvider);
+		_btnAddMapProviderWms.setEnabled(isExistingMapProvider);
+		_btnAddMapProviderMapProfile.setEnabled(isExistingMapProvider);
+		_btnEdit.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+		_btnDeleteMapProvider.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+		_btnDeleteOfflineMap.setEnabled(isExistingMapProvider && canDeleteOfflineMap);
+		_btnImport.setEnabled(isExistingMapProvider);
+		_btnExport.setEnabled(isExistingMapProvider & isNonePluginMapProvider);
 
-		fLblDropTarget.setEnabled(fIsModifiedMapProvider == false && fIsNewMapProvider == false);
-		fLblMpDropTarget.setEnabled(fIsModifiedMapProvider == false && fIsNewMapProvider == false);
+		_lblDropTarget.setEnabled(_isModifiedMapProvider == false && _isNewMapProvider == false);
+		_lblMpDropTarget.setEnabled(_isModifiedMapProvider == false && _isNewMapProvider == false);
 
 		// map provider detail actions
-		fBtnUpdate.setEnabled(fIsValid && fIsModifiedMapProvider);
-		fBtnCancel.setEnabled(fIsNewMapProvider || fIsModifiedMapProvider);
+		_btnUpdate.setEnabled(_isValid && _isModifiedMapProvider);
+		_btnCancel.setEnabled(_isNewMapProvider || _isModifiedMapProvider);
 
-		fActionRefreshAll.setEnabled(isOfflinePath && isOfflineJobStopped);
-		fActionRefreshSelected.setEnabled(isOfflinePath && isOfflineJobStopped);
-		fActionRefreshNotAssessed.setEnabled(isOfflinePath && isOfflineJobStopped);
-		fActionCancelRefresh.setEnabled(isOfflinePath && !isOfflineJobStopped);
+		_actionRefreshAll.setEnabled(isOfflinePath && isOfflineJobStopped);
+		_actionRefreshSelected.setEnabled(isOfflinePath && isOfflineJobStopped);
+		_actionRefreshNotAssessed.setEnabled(isOfflinePath && isOfflineJobStopped);
+		_actionCancelRefresh.setEnabled(isOfflinePath && !isOfflineJobStopped);
 
-		if (fIsNewMapProvider) {
-			fGroupDetails.setText(Messages.Pref_Map_Group_Detail_NewMapProvider);
+		if (_isNewMapProvider) {
+			_groupDetails.setText(Messages.Pref_Map_Group_Detail_NewMapProvider);
 		} else {
-			if (fIsModifiedMapProvider) {
-				fGroupDetails.setText(Messages.Pref_Map_Group_Detail_ModifiedMapProvider);
+			if (_isModifiedMapProvider) {
+				_groupDetails.setText(Messages.Pref_Map_Group_Detail_ModifiedMapProvider);
 			} else {
-				fGroupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
+				_groupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
 			}
 		}
 
@@ -1518,13 +1514,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 */
 	private void getFilesInfo(final File[] listOfFiles) {
 
-		if (fIsOfflineJobCanceled) {
+		if (_isOfflineJobCanceled) {
 			return;
 		}
 
 		// update UI
-		if (fOfflineJobFileCounter > fOfflineJobFileCounterUIUpdate + 1000) {
-			fOfflineJobFileCounterUIUpdate = fOfflineJobFileCounter;
+		if (_offlineJobFileCounter > _offlineJobFileCounterUIUpdate + 1000) {
+			_offlineJobFileCounterUIUpdate = _offlineJobFileCounter;
 			updateUIOfflineInfo();
 		}
 
@@ -1534,8 +1530,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				// file
 
-				fOfflineJobFileCounter++;
-				fOfflineJobFileSize += file.length();
+				_offlineJobFileCounter++;
+				_offlineJobFileSize += file.length();
 
 			} else if (file.isDirectory()) {
 
@@ -1543,7 +1539,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				getFilesInfo(file.listFiles());
 
-				if (fIsOfflineJobCanceled) {
+				if (_isOfflineJobCanceled) {
 					return;
 				}
 			}
@@ -1558,14 +1554,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		MPWms nextMapProvider = null;
 
-		final Table table = fMapProviderViewer.getTable();
+		final Table table = _mpViewer.getTable();
 		final int selectionIndex = table.getSelectionIndex();
 		final int itemCount = table.getItemCount();
 		int isNextNext = -1;
 
 		for (int itemIndex = selectionIndex + 1; itemIndex < itemCount; itemIndex++) {
 
-			final Object mapProvider = fMapProviderViewer.getElementAt(itemIndex);
+			final Object mapProvider = _mpViewer.getElementAt(itemIndex);
 			if (mapProvider instanceof MPWms) {
 
 				final MPWms wmsMapProvider = (MPWms) mapProvider;
@@ -1595,7 +1591,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// select next map provider
-		fMapProviderViewer.setSelection(new StructuredSelection(nextMapProvider));
+		_mpViewer.setSelection(new StructuredSelection(nextMapProvider));
 
 		// set focus to selected item
 		table.setSelection(table.getSelectionIndex());
@@ -1611,13 +1607,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		MPWms prevMapProvider = null;
 
-		final Table table = fMapProviderViewer.getTable();
+		final Table table = _mpViewer.getTable();
 		final int selectionIndex = table.getSelectionIndex();
 		int isNextNext = -1;
 
 		for (int itemIndex = selectionIndex - 1; itemIndex > -1; itemIndex--) {
 
-			final Object tableItem = fMapProviderViewer.getElementAt(itemIndex);
+			final Object tableItem = _mpViewer.getElementAt(itemIndex);
 			if (tableItem instanceof MPWms) {
 
 				final MPWms wmsMapProvider = (MPWms) tableItem;
@@ -1646,7 +1642,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// select prev map provider
-		fMapProviderViewer.setSelection(new StructuredSelection(prevMapProvider));
+		_mpViewer.setSelection(new StructuredSelection(prevMapProvider));
 
 		// set focus to selected item
 		table.setSelection(table.getSelectionIndex());
@@ -1702,7 +1698,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	@Override
 	public boolean isValid() {
-		return fIsValid;
+		return _isValid;
 	}
 
 	private boolean isXmlFile(final String importFilePath) {
@@ -1812,19 +1808,19 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 */
 	private void onCancelMapProvider() {
 
-		fIsNewMapProvider = false;
-		fIsModifiedMapProvider = false;
-		fIsModifiedMapProviderId = false;
-		fIsModifiedOfflineFolder = false;
+		_isNewMapProvider = false;
+		_isModifiedMapProvider = false;
+		_isModifiedMapProviderId = false;
+		_isModifiedOfflineFolder = false;
 
 		setErrorMessage(null);
 
 		// reselect map provider
-		fMapProviderViewer.setSelection(fMapProviderViewer.getSelection());
+		_mpViewer.setSelection(_mpViewer.getSelection());
 
 		enableControls();
 
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.getTable().setFocus();
 	}
 
 	private void onDeleteMapProvider() {
@@ -1832,35 +1828,35 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
 				Messages.pref_map_dlg_confirmDeleteMapProvider_title,
-				NLS.bind(Messages.pref_map_dlg_confirmDeleteMapProvider_message, fSelectedMapProvider.getName())) == false) {
+				NLS.bind(Messages.pref_map_dlg_confirmDeleteMapProvider_message, _selectedMapProvider.getName())) == false) {
 			return;
 		}
 
 		// get map provider which will be selected when the current will be removed 
-		final int selectionIndex = fMapProviderViewer.getTable().getSelectionIndex();
-		Object nextSelectedMapProvider = fMapProviderViewer.getElementAt(selectionIndex + 1);
+		final int selectionIndex = _mpViewer.getTable().getSelectionIndex();
+		Object nextSelectedMapProvider = _mpViewer.getElementAt(selectionIndex + 1);
 		if (nextSelectedMapProvider == null) {
-			nextSelectedMapProvider = fMapProviderViewer.getElementAt(selectionIndex - 1);
+			nextSelectedMapProvider = _mpViewer.getElementAt(selectionIndex - 1);
 		}
 
 		// delete offline files
-		deleteOfflineMapFiles(fSelectedMapProvider);
+		deleteOfflineMapFiles(_selectedMapProvider);
 
 		// remove from viewer
-		fMapProviderViewer.remove(fSelectedMapProvider);
+		_mpViewer.remove(_selectedMapProvider);
 
 		// remove from model
-		fMapProviderMgr.remove(fSelectedMapProvider);
-		fMapProviders.remove(fSelectedMapProvider);
+		_mpMgr.remove(_selectedMapProvider);
+		_visibleMp.remove(_selectedMapProvider);
 
 		// select another map provider at the same position
 		if (nextSelectedMapProvider != null) {
-			fMapProviderViewer.setSelection(new StructuredSelection(nextSelectedMapProvider));
-			fMapProviderViewer.getTable().setFocus();
+			_mpViewer.setSelection(new StructuredSelection(nextSelectedMapProvider));
+			_mpViewer.getTable().setFocus();
 		}
 
 		// custom map provider list must be updated
-		fForceUpdateMapProviderList = true;
+		_isForceUpdateMapProviderList = true;
 	}
 
 	private void onExportMP() {
@@ -1868,7 +1864,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
 		dialog.setText(Messages.Pref_Map_Dialog_Export_Title);
 
-		dialog.setFilterPath(fPrefStore.getString(EXPORT_FILE_PATH));
+		dialog.setFilterPath(_prefStore.getString(EXPORT_FILE_PATH));
 
 		dialog.setFilterExtensions(new String[] { "*.*", "xml" });//$NON-NLS-1$ //$NON-NLS-2$
 		dialog.setFilterNames(new String[] {
@@ -1889,7 +1885,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				+ UI.DASH
 				+ day.substring(day.length() - 2, day.length());
 
-		dialog.setFileName(fSelectedMapProvider.getId() + currentDate + XML_EXTENSION);//$NON-NLS-1$
+		dialog.setFileName(_selectedMapProvider.getId() + currentDate + XML_EXTENSION);//$NON-NLS-1$
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {
@@ -1900,7 +1896,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final File exportFilePath = new Path(selectedFilePath).toFile();
 
 		// keep path
-		fPrefStore.setValue(EXPORT_FILE_PATH, exportFilePath.getPath());
+		_prefStore.setValue(EXPORT_FILE_PATH, exportFilePath.getPath());
 
 		if (exportFilePath.exists()) {
 			if (UI.confirmOverwrite(exportFilePath) == false) {
@@ -1909,9 +1905,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		}
 
-		MapProviderManager.getInstance().exportMapProvider(fSelectedMapProvider, exportFilePath);
+		MapProviderManager.getInstance().exportMapProvider(_selectedMapProvider, exportFilePath);
 
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.getTable().setFocus();
 	}
 
 	private void onImportMP() {
@@ -1919,14 +1915,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 
 		dialog.setText(Messages.Pref_Map_Dialog_Import_Title);
-		dialog.setFilterPath(fPrefStore.getString(IMPORT_FILE_PATH));
+		dialog.setFilterPath(_prefStore.getString(IMPORT_FILE_PATH));
 
 		dialog.setFilterExtensions(new String[] { "*.*", "xml" });//$NON-NLS-1$ //$NON-NLS-2$
 		dialog.setFilterNames(new String[] {
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_AllFiles,
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles });
 
-		dialog.setFileName(fSelectedMapProvider.getId() + XML_EXTENSION);//$NON-NLS-1$
+		dialog.setFileName(_selectedMapProvider.getId() + XML_EXTENSION);//$NON-NLS-1$
 
 		final String selectedFilePath = dialog.open();
 
@@ -1936,7 +1932,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// keep path
-		fPrefStore.setValue(IMPORT_FILE_PATH, selectedFilePath);
+		_prefStore.setValue(IMPORT_FILE_PATH, selectedFilePath);
 
 		doImportMP(selectedFilePath);
 	}
@@ -1948,22 +1944,22 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			final MP mapProvider = (MP) firstElement;
 
-			fSelectedMapProvider = mapProvider;
+			_selectedMapProvider = mapProvider;
 
-			fIsDisableModifyListener = true;
+			_isDisableModifyListener = true;
 			{
 
 				// update UI
-				fTxtMapProviderName.setText(mapProvider.getName());
-				fTxtMapProviderId.setText(mapProvider.getId());
-				fTxtDescription.setText(mapProvider.getDescription());
+				_txtMapProviderName.setText(mapProvider.getName());
+				_txtMapProviderId.setText(mapProvider.getId());
+				_txtDescription.setText(mapProvider.getDescription());
 
 				// offline folder
 				final String tileOSFolder = mapProvider.getOfflineFolder();
 				if (tileOSFolder == null) {
-					fTxtOfflineFolder.setText(UI.EMPTY_STRING);
+					_txtOfflineFolder.setText(UI.EMPTY_STRING);
 				} else {
-					fTxtOfflineFolder.setText(tileOSFolder);
+					_txtOfflineFolder.setText(tileOSFolder);
 				}
 
 				if (mapProvider instanceof MPWms) {
@@ -1972,8 +1968,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					final MPWms wmsMapProvider = (MPWms) mapProvider;
 
-					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
-					fTxtUrl.setText(wmsMapProvider.getCapabilitiesUrl());
+					_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
+					_txtUrl.setText(wmsMapProvider.getCapabilitiesUrl());
 
 				} else if (mapProvider instanceof MPCustom) {
 
@@ -1981,15 +1977,15 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 					final MPCustom customMapProvider = (MPCustom) mapProvider;
 
-					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
-					fTxtUrl.setText(customMapProvider.getCustomUrl());
+					_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
+					_txtUrl.setText(customMapProvider.getCustomUrl());
 
 				} else if (mapProvider instanceof MPProfile) {
 
 					// map profile
 
-					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
-					fTxtUrl.setText(UI.EMPTY_STRING);
+					_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
+					_txtUrl.setText(UI.EMPTY_STRING);
 
 				} else if (mapProvider instanceof MPPlugin) {
 
@@ -1998,13 +1994,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
 					final String baseURL = pluginMapProvider.getBaseURL();
 
-					fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
-					fTxtUrl.setText(baseURL == null ? UI.EMPTY_STRING : baseURL);
+					_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
+					_txtUrl.setText(baseURL == null ? UI.EMPTY_STRING : baseURL);
 				}
 
 				updateUIOfflineInfoDetail(mapProvider);
 			}
-			fIsDisableModifyListener = false;
+			_isDisableModifyListener = false;
 
 			enableControls();
 		}
@@ -2017,28 +2013,28 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void openConfigDialog() {
 
-		if (fIsModifiedMapProvider) {
+		if (_isModifiedMapProvider) {
 			// update is necessary when the map provider is modified
 			if (updateModelFromUI() == false) {
 				return;
 			}
 		}
 
-		if (fSelectedMapProvider instanceof MPWms) {
+		if (_selectedMapProvider instanceof MPWms) {
 
 			openConfigDialogWms();
 
-		} else if (fSelectedMapProvider instanceof MPCustom) {
+		} else if (_selectedMapProvider instanceof MPCustom) {
 
 			openConfigDialogCustom();
 
-		} else if (fSelectedMapProvider instanceof MPProfile) {
+		} else if (_selectedMapProvider instanceof MPProfile) {
 
 			openConfigDialogMapProfile();
 		}
 
 		// set focus back to table
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.getTable().setFocus();
 	}
 
 	private void openConfigDialogCustom() {
@@ -2046,7 +2042,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		try {
 
 			// clone mapprovider
-			final MPCustom dialogMapProvider = (MPCustom) ((MPCustom) fSelectedMapProvider).clone();
+			final MPCustom dialogMapProvider = (MPCustom) ((MPCustom) _selectedMapProvider).clone();
 
 			// map images are likely to be downloaded
 			dialogMapProvider.setStateToReloadOfflineCounter();
@@ -2058,13 +2054,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			if (dialog.open() == Window.OK) {
 
-				fIsModifiedMapProvider = true;
+				_isModifiedMapProvider = true;
 
-				fSelectedMapProvider = dialogMapProvider;
+				_selectedMapProvider = dialogMapProvider;
 
 				// update model's
 				MapProviderManager.replaceMapProvider(dialogMapProvider);
-				fMapProviders = fMapProviderMgr.getAllMapProviders(true);
+				_visibleMp = _mpMgr.getAllMapProviders(true);
 
 				updateModelFromUI();
 			}
@@ -2078,7 +2074,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		try {
 
-			final MPProfile mpProfile = (MPProfile) fSelectedMapProvider;
+			final MPProfile mpProfile = (MPProfile) _selectedMapProvider;
 
 			/*
 			 * update map providers in the profile to reflect renaming, adding/deleting of map
@@ -2099,16 +2095,16 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			if (dialog.open() == Window.OK) {
 
-				fIsModifiedMapProvider = true;
+				_isModifiedMapProvider = true;
 
-				fSelectedMapProvider = dialogMapProfile;
+				_selectedMapProvider = dialogMapProfile;
 
 				// delete profile offline images, not the child images
 				deleteOfflineMapFiles(dialogMapProfile);
 
 				// update model's
 				MapProviderManager.replaceMapProvider(dialogMapProfile);
-				fMapProviders = fMapProviderMgr.getAllMapProviders(true);
+				_visibleMp = _mpMgr.getAllMapProviders(true);
 
 				updateModelFromUI();
 			}
@@ -2122,7 +2118,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		try {
 
-			final MPWms wmsMapProvider = (MPWms) fSelectedMapProvider;
+			final MPWms wmsMapProvider = (MPWms) _selectedMapProvider;
 
 			// load WMS caps
 			if (MapProviderManager.checkWms(wmsMapProvider, null) == null) {
@@ -2130,7 +2126,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 
 			// enable all wms map providers that they can be selected with next/previous
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 
 				if (mapProvider instanceof MPWms) {
 					((MPWms) mapProvider).setWmsEnabled(true);
@@ -2155,13 +2151,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			if (dialog.open() == Window.OK) {
 
-				fIsModifiedMapProvider = true;
+				_isModifiedMapProvider = true;
 
-				fSelectedMapProvider = dialogMapProvider;
+				_selectedMapProvider = dialogMapProvider;
 
 				// update model
 				MapProviderManager.replaceMapProvider(dialogMapProvider);
-				fMapProviders = fMapProviderMgr.getAllMapProviders(true);
+				_visibleMp = _mpMgr.getAllMapProviders(true);
 
 				updateModelFromUI();
 			}
@@ -2174,18 +2170,18 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	@Override
 	public boolean performCancel() {
 
-		if (fForceUpdateMapProviderList == false) {
+		if (_isForceUpdateMapProviderList == false) {
 
 			/*
 			 * check if the map provider list is modified and ask the user to save it
 			 */
-			if (fIsModifiedMapProviderList || fIsModifiedMapProvider) {
+			if (_isModifiedMapProviderList || _isModifiedMapProvider) {
 				if (MessageDialogNoClose.openConfirm(
 						Display.getCurrent().getActiveShell(),
 						Messages.pref_map_dlg_cancelModifiedMapProvider_title,
 						Messages.pref_map_dlg_cancelModifiedMapProvider_message)) {
 
-					if (fIsModifiedMapProvider) {
+					if (_isModifiedMapProvider) {
 
 						// current map provider is modified
 
@@ -2194,12 +2190,12 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 						}
 					}
 
-					fForceUpdateMapProviderList = true;
+					_isForceUpdateMapProviderList = true;
 				}
 			}
 		}
 
-		if (fForceUpdateMapProviderList) {
+		if (_isForceUpdateMapProviderList) {
 			saveMapProviders(true);
 		}
 
@@ -2215,7 +2211,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		if (isOK) {
 
-			final boolean wasModified = fIsModifiedMapProvider;
+			final boolean wasModified = _isModifiedMapProvider;
 
 			if (updateModelFromUI() == false) {
 				/*
@@ -2246,7 +2242,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * offline info
 		 */
-		final boolean isReadTileInfo = fPrefStore.getBoolean(IMappingPreferences.MAP_FACTORY_IS_READ_TILE_SIZE);
+		final boolean isReadTileInfo = _prefStore.getBoolean(IMappingPreferences.MAP_FACTORY_IS_READ_TILE_SIZE);
 //		fChkReadTileSize.setSelection(isReadTileInfo);
 
 		if (isReadTileInfo) {
@@ -2256,23 +2252,23 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * select last selected map provider
 		 */
-		final String lastMapProviderId = fPrefStore
+		final String lastMapProviderId = _prefStore
 				.getString(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER);
 		MP lastMapProvider = null;
-		for (final MP mapProvider : fMapProviders) {
+		for (final MP mapProvider : _visibleMp) {
 			if (mapProvider.getId().equals(lastMapProviderId)) {
 				lastMapProvider = mapProvider;
 				break;
 			}
 		}
 		if (lastMapProvider == null) {
-			fMapProviderViewer.setSelection(new StructuredSelection(fMapProviders.get(0)));
+			_mpViewer.setSelection(new StructuredSelection(_visibleMp.get(0)));
 		} else {
-			fMapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
+			_mpViewer.setSelection(new StructuredSelection(lastMapProvider));
 		}
 
 		// set focus to selected map provider
-		final Table table = fMapProviderViewer.getTable();
+		final Table table = _mpViewer.getTable();
 		table.setSelection(table.getSelectionIndex());
 	}
 
@@ -2328,10 +2324,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		if (isForceSave) {
 			// check if save is needed
-			isSaveNeeded = fIsModifiedMapProvider || fIsModifiedMapProviderList;
+			isSaveNeeded = _isModifiedMapProvider || _isModifiedMapProviderList;
 		} else {
 
-			if (fIsModifiedMapProvider) {
+			if (_isModifiedMapProvider) {
 
 				isSaveMapProvider = MessageDialogNoClose.openQuestion(
 						Display.getCurrent().getActiveShell(),
@@ -2344,7 +2340,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				}
 			}
 
-			if (fIsModifiedMapProviderList && isSaveMapProvider == false) {
+			if (_isModifiedMapProviderList && isSaveMapProvider == false) {
 
 				isSaveOtherMapProviders = MessageDialogNoClose.openQuestion(
 						Display.getCurrent().getActiveShell(),
@@ -2353,12 +2349,12 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		}
 
-		if (fForceUpdateMapProviderList || isSaveNeeded || isSaveMapProvider || isSaveOtherMapProviders) {
+		if (_isForceUpdateMapProviderList || isSaveNeeded || isSaveMapProvider || isSaveOtherMapProviders) {
 
 			MapProviderManager.getInstance().writeMapProviderXml();
 
-			fIsModifiedMapProviderList = false;
-			fForceUpdateMapProviderList = false;
+			_isModifiedMapProviderList = false;
+			_isForceUpdateMapProviderList = false;
 
 			return true;
 		}
@@ -2372,61 +2368,61 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 //		fPrefStore.setValue(IMappingPreferences.MAP_FACTORY_IS_READ_TILE_SIZE, fChkReadTileSize.getSelection());
 
 		// selected map provider
-		if (fSelectedMapProvider != null) {
-			fPrefStore.setValue(//
+		if (_selectedMapProvider != null) {
+			_prefStore.setValue(//
 					IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER,
-					fSelectedMapProvider.getId());
+					_selectedMapProvider.getId());
 		}
 	}
 
 	private void setEmptyMapProviderUI(final MP mapProvider) {
 
-		fIsNewMapProvider = true;
-		fNewMapProvider = mapProvider;
+		_isNewMapProvider = true;
+		_newMapProvider = mapProvider;
 
-		fIsDisableModifyListener = true;
+		_isDisableModifyListener = true;
 		{
 			/*
 			 * set map provider fields empty
 			 */
-			fTxtMapProviderName.setText(UI.EMPTY_STRING);
-			fTxtMapProviderId.setText(UI.EMPTY_STRING);
-			fTxtOfflineFolder.setText(UI.EMPTY_STRING);
-			fTxtDescription.setText(UI.EMPTY_STRING);
-			fTxtUrl.setText(UI.EMPTY_STRING);
+			_txtMapProviderName.setText(UI.EMPTY_STRING);
+			_txtMapProviderId.setText(UI.EMPTY_STRING);
+			_txtOfflineFolder.setText(UI.EMPTY_STRING);
+			_txtDescription.setText(UI.EMPTY_STRING);
+			_txtUrl.setText(UI.EMPTY_STRING);
 
 			// map provider type
 			if (mapProvider instanceof MPCustom) {
-				fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
+				_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
 			} else if (mapProvider instanceof MPWms) {
-				fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
+				_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
 			} else if (mapProvider instanceof MPProfile) {
-				fTxtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
+				_txtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
 			}
 
-			fLblOfflineFolderInfo.setText(UI.EMPTY_STRING);
-			fOfflineContainer.layout(true);
+			_lblOfflineFolderInfo.setText(UI.EMPTY_STRING);
+			_offlineContainer.layout(true);
 		}
-		fIsDisableModifyListener = false;
+		_isDisableModifyListener = false;
 
 		enableControls();
 
-		fTxtMapProviderName.setFocus();
+		_txtMapProviderName.setFocus();
 	}
 
 	private void setMapProviderModified() {
 
-		fIsModifiedMapProvider = true;
+		_isModifiedMapProvider = true;
 
 		enableControls();
 	}
 
 	private void setWmsDropTarget(final Label label) {
 
-		fWmsDropTarget = new DropTarget(label, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
-		fWmsDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), TextTransfer.getInstance() });
+		_wmsDropTarget = new DropTarget(label, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
+		_wmsDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), TextTransfer.getInstance() });
 
-		fWmsDropTarget.addDropListener(new DropTargetAdapter() {
+		_wmsDropTarget.addDropListener(new DropTargetAdapter() {
 			@Override
 			public void dragEnter(final DropTargetEvent e) {
 				if (e.detail == DND.DROP_NONE) {
@@ -2482,22 +2478,22 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		stopJobOfflineInfo();
 
-		fOfflineJobMapProviders.clear();
+		_offlineJobMapProviders.clear();
 
 		if (updateMapProvider == null) {
 
 			// check if offline info is already read
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 				if (mapProvider.getOfflineFileCounter() == MP.OFFLINE_INFO_NOT_READ) {
-					fOfflineJobMapProviders.add(mapProvider);
+					_offlineJobMapProviders.add(mapProvider);
 				}
 			}
 		} else {
 
-			fOfflineJobMapProviders.add(updateMapProvider);
+			_offlineJobMapProviders.add(updateMapProvider);
 		}
 
-		if (fOfflineJobMapProviders.size() == 0) {
+		if (_offlineJobMapProviders.size() == 0) {
 			// nothing to do
 			return;
 		}
@@ -2509,30 +2505,30 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// disable delete offline button
-		fIsOfflineJobRunning = true;
+		_isOfflineJobRunning = true;
 		enableControls();
 
 		// remove total tile info
 		updateUIOfflineInfoTotal();
 
-		fOfflineJobGetInfo = new Job(Messages.Pref_Map_JobName_ReadMapFactoryOfflineInfo) {
+		_offlineJobGetInfo = new Job(Messages.Pref_Map_JobName_ReadMapFactoryOfflineInfo) {
 
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
-				fIsOfflineJobCanceled = false;
+				_isOfflineJobCanceled = false;
 
-				for (final MP mapProvider : fOfflineJobMapProviders) {
+				for (final MP mapProvider : _offlineJobMapProviders) {
 
 					final String tileOSFolder = mapProvider.getOfflineFolder();
 					if (tileOSFolder == null) {
 						continue;
 					}
 
-					fOfflineJobMapProvider = mapProvider;
-					fOfflineJobFileCounter = 0;
-					fOfflineJobFileSize = 0;
-					fOfflineJobFileCounterUIUpdate = 0;
+					_offlineJobMp = mapProvider;
+					_offlineJobFileCounter = 0;
+					_offlineJobFileSize = 0;
+					_offlineJobFileCounterUIUpdate = 0;
 
 					final IPath basePath = tileCacheBasePath.addTrailingSeparator();
 					boolean skipReading = false;
@@ -2545,7 +2541,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					}
 
 					tileCacheDir = basePath.append(MPProfile.WMS_CUSTOM_TILE_PATH).append(tileOSFolder).toFile();
-					if (tileCacheDir.exists() && fIsOfflineJobCanceled == false) {
+					if (tileCacheDir.exists() && _isOfflineJobCanceled == false) {
 						getFilesInfo(tileCacheDir.listFiles());
 					} else {
 						skipReading = true;
@@ -2559,20 +2555,20 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 						continue;
 					}
 
-					if (fIsOfflineJobCanceled) {
+					if (_isOfflineJobCanceled) {
 						// set result invalid
-						fOfflineJobFileCounter = MP.OFFLINE_INFO_NOT_READ;
-						fOfflineJobFileSize = MP.OFFLINE_INFO_NOT_READ;
+						_offlineJobFileCounter = MP.OFFLINE_INFO_NOT_READ;
+						_offlineJobFileSize = MP.OFFLINE_INFO_NOT_READ;
 					}
 
 					updateUIOfflineInfo();
 
-					if (fIsOfflineJobCanceled) {
+					if (_isOfflineJobCanceled) {
 						break;
 					}
 				}
 
-				fIsOfflineJobRunning = false;
+				_isOfflineJobRunning = false;
 
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
@@ -2589,20 +2585,20 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			}
 		};
 
-		fOfflineJobGetInfo.schedule();
+		_offlineJobGetInfo.schedule();
 	}
 
 	private void stopJobOfflineInfo() {
 
-		if (fOfflineJobGetInfo == null) {
+		if (_offlineJobGetInfo == null) {
 			return;
 		}
 
-		fOfflineJobGetInfo.cancel();
-		fIsOfflineJobCanceled = true;
+		_offlineJobGetInfo.cancel();
+		_isOfflineJobCanceled = true;
 
 		try {
-			fOfflineJobGetInfo.join();
+			_offlineJobGetInfo.join();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -2615,7 +2611,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 */
 	private boolean updateModelFromUI() {
 
-		if (fIsModifiedMapProvider == false) {
+		if (_isModifiedMapProvider == false) {
 			// nothing to do
 			return true;
 		}
@@ -2623,11 +2619,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		/*
 		 * validate map provider fields
 		 */
-		final String factoryId = fTxtMapProviderId.getText().trim();
-		final String factoryName = fTxtMapProviderName.getText().trim();
-		final String offlineFolder = fTxtOfflineFolder.getText().trim();
+		final String mpId = _txtMapProviderId.getText().trim();
+		final String mpName = _txtMapProviderName.getText().trim();
+		final String offlineFolder = _txtOfflineFolder.getText().trim();
 
-		final Control errorControl = validateMapProvider(factoryName, factoryId, offlineFolder);
+		final Control errorControl = validateMapProvider(mpName, mpId, offlineFolder);
 		if (errorControl != null) {
 			return false;
 		}
@@ -2639,19 +2635,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		String oldFactoryId = null;
 		String oldOfflineFolder = null;
 
-		if (fIsNewMapProvider) {
-
-			fIsNewMapProvider = false;
+		if (_isNewMapProvider) {
 
 			// get new map provider
-			mapProvider = fNewMapProvider;
-
-			// update model
-			fMapProviders.add(mapProvider);
-			fMapProviderMgr.addMapProvider(mapProvider);
+			mapProvider = _newMapProvider;
 
 		} else {
-			mapProvider = fSelectedMapProvider;
+			mapProvider = _selectedMapProvider;
 			oldFactoryId = mapProvider.getId();
 			oldOfflineFolder = mapProvider.getOfflineFolder();
 		}
@@ -2665,9 +2655,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// check if id is modified
-		if (oldFactoryId != null && oldFactoryId.equals(factoryId) == false) {
+		if (oldFactoryId != null && oldFactoryId.equals(mpId) == false) {
 
-			// id is modified, update all profiles with the new id
+			// id is modified 
+			// update all profiles with the new id
 
 			for (final MP mp : MapProviderManager.getInstance().getAllMapProviders()) {
 
@@ -2675,7 +2666,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					for (final MPWrapper mpWrapper : ((MPProfile) mp).getAllWrappers()) {
 
 						if (mpWrapper.getMapProviderId().equals(oldFactoryId)) {
-							mpWrapper.setMapProviderId(factoryId);
+							mpWrapper.setMapProviderId(mpId);
 						}
 					}
 				}
@@ -2683,35 +2674,41 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// update fields
-		mapProvider.setId(factoryId);
-		mapProvider.setName(factoryName);
-		mapProvider.setDescription(fTxtDescription.getText().trim());
+		mapProvider.setId(mpId);
+		mapProvider.setName(mpName);
+		mapProvider.setDescription(_txtDescription.getText().trim());
 		mapProvider.setOfflineFolder(offlineFolder);
 
-		// update viewer
-		if (fIsNewMapProvider) {
+		if (_isNewMapProvider) {
 
-			fMapProviderViewer.add(mapProvider);
+			_isNewMapProvider = false;
+
+			// update model
+			_visibleMp.add(mapProvider);
+			_mpMgr.addMapProvider(mapProvider);
+
+			// update viewer
+			_mpViewer.add(mapProvider);
 
 		} else {
 			/*
 			 * !!! update must be done when a map provider was cloned !!!
 			 */
-			fMapProviderViewer.update(mapProvider, null);
+			_mpViewer.update(mapProvider, null);
 
 			// do a resort because the name could be modified, this can be optimized
-			fMapProviderViewer.refresh();
+			_mpViewer.refresh();
 		}
 
-		fIsModifiedMapProviderList = true;
+		_isModifiedMapProviderList = true;
 
-		fIsModifiedMapProvider = false;
-		fIsModifiedMapProviderId = false;
-		fIsModifiedOfflineFolder = false;
+		_isModifiedMapProvider = false;
+		_isModifiedMapProviderId = false;
+		_isModifiedOfflineFolder = false;
 
 		// select map provider in the viewer
-		fMapProviderViewer.setSelection(new StructuredSelection(mapProvider), true);
-		fMapProviderViewer.getTable().setFocus();
+		_mpViewer.setSelection(new StructuredSelection(mapProvider), true);
+		_mpViewer.getTable().setFocus();
 
 		return true;
 	}
@@ -2721,20 +2718,20 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			public void run() {
 
 				// check if UI is available
-				if (fMapProviderViewer.getTable().isDisposed() || fOfflineJobMapProvider == null) {
+				if (_mpViewer.getTable().isDisposed() || _offlineJobMp == null) {
 					return;
 				}
 
 				// update model
-				fOfflineJobMapProvider.setOfflineFileCounter(fOfflineJobFileCounter);
-				fOfflineJobMapProvider.setOfflineFileSize(fOfflineJobFileSize);
+				_offlineJobMp.setOfflineFileCounter(_offlineJobFileCounter);
+				_offlineJobMp.setOfflineFileSize(_offlineJobFileSize);
 
 				// update viewer
-				fMapProviderViewer.update(fOfflineJobMapProvider, null);
+				_mpViewer.update(_offlineJobMp, null);
 
 				// update info detail when the selected map provider is currently in the job
-				if (fSelectedMapProvider != null && fSelectedMapProvider.equals(fOfflineJobMapProvider)) {
-					updateUIOfflineInfoDetail(fSelectedMapProvider);
+				if (_selectedMapProvider != null && _selectedMapProvider.equals(_offlineJobMp)) {
+					updateUIOfflineInfoDetail(_selectedMapProvider);
 				}
 			}
 		});
@@ -2760,7 +2757,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			sb.append(UI.SPACE);
 			sb.append(Messages.Pref_Map_Lable_Files);
 			sb.append(UI.DASH_WITH_SPACE);
-			sb.append(fNf.format((float) offlineTileSize / 1024 / 1024));
+			sb.append(_nf.format((float) offlineTileSize / 1024 / 1024));
 			sb.append(UI.SPACE);
 			sb.append(UI.MBYTES);
 
@@ -2769,25 +2766,25 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			sb.append(Messages.Pref_Map_Lable_NotAvailable);
 		}
 
-		fLblOfflineFolderInfo.setText(sb.toString());
-		fOfflineContainer.layout(true);
+		_lblOfflineFolderInfo.setText(sb.toString());
+		_offlineContainer.layout(true);
 	}
 
 	private void updateUIOfflineInfoTotal() {
 
-		if (fTxtOfflineInfoTotal == null || fTxtOfflineInfoTotal.isDisposed()) {
+		if (_txtOfflineInfoTotal == null || _txtOfflineInfoTotal.isDisposed()) {
 			return;
 		}
 
 		final StringBuilder sbTotal = new StringBuilder();
 
-		if (fMapProviders.size() > 0) {
+		if (_visibleMp.size() > 0) {
 
 			int tileCounter = 0;
 			long tileSize = 0;
 			boolean isNA = false;
 
-			for (final MP mapProvider : fMapProviders) {
+			for (final MP mapProvider : _visibleMp) {
 				final int offlineFileCounter = mapProvider.getOfflineFileCounter();
 				if (offlineFileCounter > 0) {
 					tileCounter += offlineFileCounter;
@@ -2815,13 +2812,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				sbTotal.append(UI.SPACE);
 				sbTotal.append(Messages.Pref_Map_Lable_Files);
 				sbTotal.append(UI.DASH_WITH_SPACE);
-				sbTotal.append(fNf.format((float) tileSize / 1024 / 1024));
+				sbTotal.append(_nf.format((float) tileSize / 1024 / 1024));
 				sbTotal.append(UI.SPACE);
 				sbTotal.append(UI.MBYTES);
 			}
 		}
 
-		fTxtOfflineInfoTotal.setText(sbTotal.toString());
+		_txtOfflineInfoTotal.setText(sbTotal.toString());
 	}
 
 	/**
@@ -2840,14 +2837,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		// check name
 		if (mapProviderName == null || mapProviderName.length() == 0) {
 			error = Messages.Pref_Map_ValidationError_NameIsRequired;
-			errorControl = fTxtMapProviderName;
+			errorControl = _txtMapProviderName;
 		}
 
 		// check offline folder
 		if (error == null) {
 			error = checkOfflineFolder(offlineFolder);
 			if (error != null) {
-				errorControl = fTxtOfflineFolder;
+				errorControl = _txtOfflineFolder;
 			}
 		}
 
@@ -2855,7 +2852,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		if (error == null) {
 			error = checkMapProviderId(mapProviderId);
 			if (error != null) {
-				errorControl = fTxtMapProviderId;
+				errorControl = _txtMapProviderId;
 			}
 		}
 
@@ -2863,7 +2860,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		// set validation state
 		final boolean isValid = error == null;
-		fIsValid = isValid;
+		_isValid = isValid;
 		setValid(isValid);
 
 		return errorControl;
