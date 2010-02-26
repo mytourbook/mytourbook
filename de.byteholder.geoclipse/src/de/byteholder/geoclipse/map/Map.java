@@ -91,8 +91,11 @@ public class Map extends Canvas {
 	 */
 	private Image								_mapImage;
 
-	private Image								_imageTemplatePartOverlayImage;
-	private Image								_imageTemplatePartedOverlayImage;
+	private Image								_imageTemplate1Part;
+	private Image								_imageTemplate9Parts;
+
+	private Image								_image9Parts;
+	private GC									_gc9Parts;
 
 	/**
 	 * Indicates whether or not to draw the borders between tiles. Defaults to false.
@@ -157,13 +160,13 @@ public class Map extends Canvas {
 	private final Thread						_overlayThread;
 	private long								_nextOverlayRedrawTime;
 
-	private NumberFormat						_Nf							= NumberFormat.getNumberInstance();
-	private NumberFormat						_NfLatLon					= NumberFormat.getNumberInstance();
+	private final NumberFormat					_Nf							= NumberFormat.getNumberInstance();
+	private final NumberFormat					_NfLatLon					= NumberFormat.getNumberInstance();
 	{
 		_NfLatLon.setMaximumFractionDigits(4);
 	}
 
-	private TextWrapPainter						_textWrapper				= new TextWrapPainter();
+	private final TextWrapPainter				_textWrapper				= new TextWrapPainter();
 
 	/**
 	 * cache for overlay images
@@ -235,7 +238,7 @@ public class Map extends Canvas {
 	 */
 	private org.eclipse.swt.graphics.Rectangle	_clientArea;
 
-	private List<IZoomListener>					_zoomListeners;
+	private final List<IZoomListener>			_zoomListeners;
 	private final ListenerList					_mapListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	// measurement system
@@ -245,8 +248,8 @@ public class Map extends Canvas {
 	private boolean								_isScaleVisible				= false;
 
 	private static final RGB					_transparentRGB				= new RGB(0xff, 0xff, 0xfe);
-	private Color								_transparentColor;
-	private Color								_defaultBackgroundColor;
+	private final Color							_transparentColor;
+	private final Color							_defaultBackgroundColor;
 
 	/**
 	 * when <code>true</code> the loading... image is not displayed
@@ -270,7 +273,7 @@ public class Map extends Canvas {
 	private int									_worldViewportX;
 	private int									_worldViewportY;
 
-	private Thread								_displayThread;
+	private final Thread						_displayThread;
 
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
@@ -461,8 +464,8 @@ public class Map extends Canvas {
 	 * @return returns a new created image
 	 */
 	public static Image createImage(final Display display,
-									final Image image,
-									final org.eclipse.swt.graphics.Rectangle clientArea) {
+	                                final Image image,
+	                                final org.eclipse.swt.graphics.Rectangle clientArea) {
 
 		if (image != null && !image.isDisposed()) {
 			image.dispose();
@@ -508,7 +511,7 @@ public class Map extends Canvas {
 		addControlListener(new ControlListener() {
 
 			public void controlMoved(final ControlEvent e) {
-			// just do nothing, it's not necessary
+				// just do nothing, it's not necessary
 			}
 
 			public void controlResized(final ControlEvent e) {
@@ -604,7 +607,7 @@ public class Map extends Canvas {
 //	 * Calculates (and sets) the greatest zoom level, so that all positions are visible on screen.
 //	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
 //	 * so that the entire city and it's points are visible without panning.
-//	 * 
+//	 *
 //	 * @param positions
 //	 *            A set of GeoPositions to calculate the new zoom from
 //	 */
@@ -637,46 +640,55 @@ public class Map extends Canvas {
 		final int tileSize = _MP.getTileSize();
 		final int partedTileSize = tileSize * parts;
 
-		if (_imageTemplatePartedOverlayImage != null && _imageTemplatePartedOverlayImage.isDisposed() == false) {
-			if (_imageTemplatePartedOverlayImage.getBounds().width == partedTileSize) {
+		if (_imageTemplate9Parts != null && _imageTemplate9Parts.isDisposed() == false) {
+			if (_imageTemplate9Parts.getBounds().width == partedTileSize) {
 				// image is OK
 				return;
 			}
 		}
 
-		if (_imageTemplatePartedOverlayImage != null) {
-			_imageTemplatePartedOverlayImage.dispose();
+		if (_imageTemplate9Parts != null) {
+			_imageTemplate9Parts.dispose();
+		}
+		if (_image9Parts != null) {
+			_image9Parts.dispose();
+		}
+		if (_gc9Parts != null) {
+			_gc9Parts.dispose();
 		}
 
-		_imageTemplatePartedOverlayImage = new Image(getDisplay(), createTransparentImage(partedTileSize));
-		final GC gc = new GC(_imageTemplatePartedOverlayImage);
+		_imageTemplate9Parts = new Image(getDisplay(), createTransparentImage(partedTileSize));
+		final GC gc = new GC(_imageTemplate9Parts);
 		{
 			gc.setBackground(_transparentColor);
-			gc.fillRectangle(_imageTemplatePartedOverlayImage.getBounds());
+			gc.fillRectangle(_imageTemplate9Parts.getBounds());
 		}
 		gc.dispose();
+
+		_image9Parts = new Image(getDisplay(), _imageTemplate9Parts, SWT.IMAGE_COPY);
+		_gc9Parts = new GC(_image9Parts);
 	}
 
 	private void checkImageTemplatePartOverlayImage() {
 
 		final int tileSize = _MP.getTileSize();
 
-		if (_imageTemplatePartOverlayImage != null && _imageTemplatePartOverlayImage.isDisposed() == false) {
-			if (_imageTemplatePartOverlayImage.getBounds().width == tileSize) {
+		if (_imageTemplate1Part != null && _imageTemplate1Part.isDisposed() == false) {
+			if (_imageTemplate1Part.getBounds().width == tileSize) {
 				// image is OK
 				return;
 			}
 		}
 
-		if (_imageTemplatePartOverlayImage != null) {
-			_imageTemplatePartOverlayImage.dispose();
+		if (_imageTemplate1Part != null) {
+			_imageTemplate1Part.dispose();
 		}
 
-		_imageTemplatePartOverlayImage = new Image(getDisplay(), createTransparentImage(tileSize));
-		final GC gc = new GC(_imageTemplatePartOverlayImage);
+		_imageTemplate1Part = new Image(getDisplay(), createTransparentImage(tileSize));
+		final GC gc = new GC(_imageTemplate1Part);
 		{
 			gc.setBackground(_transparentColor);
-			gc.fillRectangle(_imageTemplatePartOverlayImage.getBounds());
+			gc.fillRectangle(_imageTemplate1Part.getBounds());
 		}
 		gc.dispose();
 	}
@@ -899,12 +911,12 @@ public class Map extends Canvas {
 	}
 
 	private void drawMapScaleLine(	final GC gc,
-									final int devX1,
-									final int devX2,
-									final int devY,
-									final int segmentWidth,
-									final Color firstColor,
-									final Color secondColor) {
+	                              	final int devX1,
+	                              	final int devX2,
+	                              	final int devY,
+	                              	final int segmentWidth,
+	                              	final Color firstColor,
+	                              	final Color secondColor) {
 
 		final Display display = getDisplay();
 
@@ -981,9 +993,9 @@ public class Map extends Canvas {
 	}
 
 	private void drawTile(	final GC gc,
-							final int tilePositionX,
-							final int tilePositionY,
-							final Rectangle devTileRectangle) {
+	                      	final int tilePositionX,
+	                      	final int tilePositionY,
+	                      	final Rectangle devTileRectangle) {
 
 		// get tile from the map provider, this also starts the loading of the tile image
 		final Tile tile = _MP.getTile(tilePositionX, tilePositionY, _mapZoomLevel);
@@ -1173,10 +1185,10 @@ public class Map extends Canvas {
 	}
 
 	private void drawTileInfoLatLon(final GC gc,
-									final Tile tile,
-									final Rectangle devTilePosition,
-									final int topMargin,
-									final int leftMargin) {
+	                                final Tile tile,
+	                                final Rectangle devTilePosition,
+	                                final int topMargin,
+	                                final int leftMargin) {
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -1245,18 +1257,18 @@ public class Map extends Canvas {
 	}
 
 	private void drawTileInfoPosition(	final GC gc,
-										final Rectangle devTilePosition,
-										final Tile tile,
-										final int topMargin,
-										final int leftMargin) {
+	                                  	final Rectangle devTilePosition,
+	                                  	final Tile tile,
+	                                  	final int topMargin,
+	                                  	final int leftMargin) {
 
 		final StringBuilder text = new StringBuilder()//
-				.append(Messages.TileInfo_Position_Zoom)
-				.append(tile.getZoom() + 1)
-				.append(Messages.TileInfo_Position_X)
-				.append(tile.getX())
-				.append(Messages.TileInfo_Position_Y)
-				.append(tile.getY());
+		.append(Messages.TileInfo_Position_Zoom)
+		.append(tile.getZoom() + 1)
+		.append(Messages.TileInfo_Position_X)
+		.append(tile.getX())
+		.append(Messages.TileInfo_Position_Y)
+		.append(tile.getY());
 
 		gc.drawString(text.toString(), devTilePosition.x + leftMargin, devTilePosition.y + topMargin);
 	}
@@ -1496,7 +1508,7 @@ public class Map extends Canvas {
 //	/**
 //	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
 //	 * system, not as lat/longs.
-//	 * 
+//	 *
 //	 * @return Returns the current center of the map in as a world pixel value
 //	 */
 //	public Point2D getCenterInWorldPixel() {
@@ -1571,9 +1583,9 @@ public class Map extends Canvas {
 	 * @return Returns <code>true</code> when a part is modified
 	 */
 	private boolean isPartImageModified(final ImageData overlayImageData,
-										final int srcXStart,
-										final int srcYStart,
-										final int tileSize) {
+	                                    final int srcXStart,
+	                                    final int srcYStart,
+	                                    final int tileSize) {
 
 		final int transRed = _transparentRGB.red;
 		final int transGreen = _transparentRGB.green;
@@ -1725,8 +1737,12 @@ public class Map extends Canvas {
 		}
 
 		disposeResource(_mapImage);
-		disposeResource(_imageTemplatePartOverlayImage);
-		disposeResource(_imageTemplatePartedOverlayImage);
+
+		disposeResource(_imageTemplate1Part);
+		disposeResource(_imageTemplate9Parts);
+
+		disposeResource(_image9Parts);
+		disposeResource(_gc9Parts);
 
 		disposeResource(_cursorPan);
 		disposeResource(_cursorDefault);
@@ -1868,11 +1884,6 @@ public class Map extends Canvas {
 
 					paintOverlay20Tiles();
 
-					// dispose resources which were used to draw the overlays
-					for (final MapPainter overlay : getOverlays()) {
-						overlay.disposeTempResources();
-					}
-
 				} catch (final Exception e) {
 					e.printStackTrace();
 				} finally {
@@ -1912,6 +1923,11 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
 					}
 				}
+
+				// dispose resources which were used to draw the overlays
+				for (final MapPainter overlay : getOverlays()) {
+					overlay.disposeTempResources();
+				}
 			}
 		});
 	}
@@ -1931,13 +1947,14 @@ public class Map extends Canvas {
 		boolean isOverlayPainted = false;
 		final Display display = getDisplay();
 
-		final Image partedOverlayImage = new Image(display, _imageTemplatePartedOverlayImage, SWT.IMAGE_COPY);
-		final GC gc = new GC(partedOverlayImage);
 		{
+			_gc9Parts.setBackground(_transparentColor);
+			_gc9Parts.fillRectangle(_imageTemplate9Parts.getBounds());
+
 			// paint all overlays for the current tile
 			for (final MapPainter overlay : getOverlays()) {
 
-				final boolean isPainted = overlay.paint(gc, Map.this, tile, parts);
+				final boolean isPainted = overlay.paint(_gc9Parts, Map.this, tile, parts);
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}
@@ -1949,7 +1966,7 @@ public class Map extends Canvas {
 				 * center
 				 * image is the requested tile image
 				 */
-				paintOverlay40SplitParts(tile, partedOverlayImage, display, tileSize);
+				paintOverlay40SplitParts(tile, _image9Parts, display, tileSize);
 
 			} else {
 
@@ -1960,8 +1977,6 @@ public class Map extends Canvas {
 				}
 			}
 		}
-		gc.dispose();
-		partedOverlayImage.dispose();
 	}
 
 	/**
@@ -1978,18 +1993,18 @@ public class Map extends Canvas {
 	 * </pre>
 	 * 
 	 * @param tile
-	 * @param overlayImage
+	 * @param image9Parts
 	 * @param display
 	 * @param tileSize
 	 */
 	private void paintOverlay40SplitParts(	final Tile tile,
-											final Image overlayImage,
-											final Device display,
-											final int tileSize) {
+	                                      	final Image image9Parts,
+	                                      	final Device display,
+	                                      	final int tileSize) {
 
 		final TileCache tileCache = MP.getTileCache();
 		final String projectionId = _MP.getProjection().getId();
-		final ImageData overlayImageData = overlayImage.getImageData();
+		final ImageData overlayImageData = image9Parts.getImageData();
 		Tile partTile = null;
 
 		final int tileZoom = tile.getZoom();
@@ -2020,8 +2035,8 @@ public class Map extends Canvas {
 				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
 
 				// draw into part image
-				final Image partImage = new Image(display, _imageTemplatePartOverlayImage, SWT.IMAGE_COPY);
-				final GC gcPartImage = new GC(partImage);
+				final Image image1Part = new Image(display, _imageTemplate1Part, SWT.IMAGE_COPY);
+				final GC gc1Part = new GC(image1Part);
 				{
 					// draw existing part tile image into the new part image
 					if (isCenterPart == false) {
@@ -2031,7 +2046,7 @@ public class Map extends Canvas {
 
 							final Image partTileImage = partTile.getOverlayImage();
 							if (partTileImage != null && partTileImage.isDisposed() == false) {
-								gcPartImage.drawImage(partTileImage, 0, 0);
+								gc1Part.drawImage(partTileImage, 0, 0);
 							}
 						}
 					}
@@ -2039,11 +2054,17 @@ public class Map extends Canvas {
 					// draw existing part overlay image into the part image
 					final Image cachedImage = _partOverlayImageCache.get(partKey);
 					if (cachedImage != null && cachedImage.isDisposed() == false) {
-						gcPartImage.drawImage(cachedImage, 0, 0);
+						gc1Part.drawImage(cachedImage, 0, 0);
 					}
 
-					// draw overlay image part into the part image
-					gcPartImage.drawImage(overlayImage, srcX, srcY, tileSize, tileSize, 0, 0, tileSize, tileSize);
+					/*
+					 * Linux experience: this improves performance 3 times when painting a part into
+					 * an image but painting the whole image is 10 times slower
+					 */
+//					gcPartImage.setAdvanced(true);
+
+					// draw 9 part image into the 1 part image
+					gc1Part.drawImage(image9Parts, srcX, srcY, tileSize, tileSize, 0, 0, tileSize, tileSize);
 
 					// update state & image
 					if (isCenterPart) {
@@ -2052,10 +2073,10 @@ public class Map extends Canvas {
 						tile.incrementOverlayContent();
 
 						// create a copy of the center image
-						final Image centerImage = new Image(display, _imageTemplatePartOverlayImage, SWT.IMAGE_COPY);
+						final Image centerImage = new Image(display, _imageTemplate1Part, SWT.IMAGE_COPY);
 						final GC gcCenterImage = new GC(centerImage);
 						{
-							gcCenterImage.drawImage(partImage, 0, 0);
+							gcCenterImage.drawImage(image1Part, 0, 0);
 						}
 						gcCenterImage.dispose();
 
@@ -2078,10 +2099,10 @@ public class Map extends Canvas {
 						}
 					}
 
-					_partOverlayImageCache.add(partKey, partImage);
+					_partOverlayImageCache.add(partKey, image1Part);
 
 				}
-				gcPartImage.dispose();
+				gc1Part.dispose();
 			}
 		}
 	}
@@ -2313,7 +2334,7 @@ public class Map extends Canvas {
 
 //	/**
 //	 * Sets the center of the map in pixel coordinates.
-//	 * 
+//	 *
 //	 * @param fMapPixelCenter
 //	 *            the new center of the map in pixel coordinates
 //	 */
@@ -2356,7 +2377,7 @@ public class Map extends Canvas {
 //
 //	/**
 //	 * Sets the center of the map in pixel coordinates.
-//	 * 
+//	 *
 //	 * @param fMapPixelCenter
 //	 *            the new center of the map in pixel coordinates
 //	 */
