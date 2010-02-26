@@ -288,7 +288,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ArrayList<Control>					_firstColumnControls			= new ArrayList<Control>();
 	private ArrayList<Control>					_firstColumnContainerControls	= new ArrayList<Control>();
 	private ArrayList<Control>					_secondColumnControls			= new ArrayList<Control>();
- 
+
 	private TourChart							_tourChart;
 	private TourData							_tourData;
 	private Composite							_tourContainer;
@@ -349,17 +349,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * 
 	 * Bft	Description				km/h 		mph 
 	 * 0	Calm 					< 1 		< 1 
-	 * 1	Light air			 	1.1 – 5.5 	1 – 3 
-	 * 2	Light breeze 			5.6 – 11 	4 – 7 
-	 * 3	Gentle breeze 			12 – 19 	8 – 12 
-	 * 4	Moderate breeze 		20 – 28 	13 – 17 
-	 * 5	Fresh breeze 			29 – 38 	18 – 24 
-	 * 6	Strong breeze 			39 – 49 	25 – 30 
-	 * 7	High wind, ...		 	50 – 61 	31 – 38 
-	 * 8	Gale, Fresh gale 		62 – 74 	39 – 46 
-	 * 9	Strong gale 			75 – 88 	47 – 54 
-	 * 10	Storm[6], Whole gale 	89 – 102 	55 – 63 
-	 * 11	Violent storm 			103 – 117 	64 – 72 
+	 * 1	Light air			 	1.1 ï¿½ 5.5 	1 ï¿½ 3 
+	 * 2	Light breeze 			5.6 ï¿½ 11 	4 ï¿½ 7 
+	 * 3	Gentle breeze 			12 ï¿½ 19 	8 ï¿½ 12 
+	 * 4	Moderate breeze 		20 ï¿½ 28 	13 ï¿½ 17 
+	 * 5	Fresh breeze 			29 ï¿½ 38 	18 ï¿½ 24 
+	 * 6	Strong breeze 			39 ï¿½ 49 	25 ï¿½ 30 
+	 * 7	High wind, ...		 	50 ï¿½ 61 	31 ï¿½ 38 
+	 * 8	Gale, Fresh gale 		62 ï¿½ 74 	39 ï¿½ 46 
+	 * 9	Strong gale 			75 ï¿½ 88 	47 ï¿½ 54 
+	 * 10	Storm[6], Whole gale 	89 ï¿½ 102 	55 ï¿½ 63 
+	 * 11	Violent storm 			103 ï¿½ 117 	64 ï¿½ 72 
 	 * 12	Hurricane-force 	 	>= 118 		>= 73
 	 * 
 	 * </pre>
@@ -2720,130 +2720,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.spacing(20, 5)
 				.applyTo(section);
 		{
-			createUISection142WeatherCol1(tk, section);
-			createUISection142WeatherCol2(tk, section);
-			createUISection146Weather(tk, section);
+			createUISection142Weather(tk, section);
+			createUISection144WeatherCol1(tk, section);
 		}
 	}
 
-	/**
-	 * weather: 1. column
-	 */
-	private void createUISection142WeatherCol1(final FormToolkit tk, final Composite section) {
-
-		final Composite container = tk.createComposite(section);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		_firstColumnContainerControls.add(container);
-		{
-			/*
-			 * temperature
-			 */
-
-			// label
-			final Label label = tk.createLabel(container, Messages.tour_editor_label_temperature);
-			label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
-			_firstColumnControls.add(label);
-
-			// spinner
-			_spinTemperature = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinTemperature);
-			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
-
-			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
-			_spinTemperature.setMinimum(-60);
-			_spinTemperature.setMaximum(150);
-
-			_spinTemperature.addModifyListener(new ModifyListener() {
-				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
-						return;
-					}
-					_isTemperatureManuallyModified = true;
-					setTourDirty();
-				}
-			});
-			_spinTemperature.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
-						return;
-					}
-					_isTemperatureManuallyModified = true;
-					setTourDirty();
-				}
-			});
-			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled || _isSavingInProgress) {
-						return;
-					}
-					_isTemperatureManuallyModified = true;
-					setTourDirty();
-				}
-			});
-
-			// label: celcius, fahrenheit
-			_lblTemperatureUnit = tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-
-		}
-	}
-
-	/**
-	 * weather: 2. column
-	 */
-	private void createUISection142WeatherCol2(final FormToolkit tk, final Composite section) {
-
-		final Composite container = tk.createComposite(section);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			/*
-			 * clouds
-			 */
-			final Composite cloudContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(cloudContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
-			{
-				// label: clouds
-				final Label label = tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
-				label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-
-				// icon: clouds
-				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.END, SWT.FILL)
-						.grab(true, false)
-						.applyTo(_lblCloudIcon);
-			}
-			_secondColumnControls.add(cloudContainer);
-
-			// combo: clouds
-			_comboClouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-			GridDataFactory.fillDefaults().span(1, 1).applyTo(_comboClouds);
-			tk.adapt(_comboClouds, true, false);
-			_comboClouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-			_comboClouds.setVisibleItemCount(10);
-			_comboClouds.addModifyListener(_modifyListener);
-			_comboClouds.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					displayCloudIcon();
-				}
-			});
-
-			// fill combobox
-			for (final String cloudText : _cloudText) {
-				_comboClouds.add(cloudText);
-			}
-		}
-	}
-
-	private void createUISection146Weather(final FormToolkit tk, final Composite section) {
+	private void createUISection142Weather(final FormToolkit tk, final Composite section) {
 
 		final Composite container = tk.createComposite(section);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -3011,6 +2893,120 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_comboWindDirectionText.add(fComboCloudsUIValue);
 			}
 
+		}
+	}
+
+
+	/**
+	 * weather: 1. column
+	 */
+	private void createUISection144WeatherCol1(final FormToolkit tk, final Composite section) {
+
+		final Composite container = tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		_firstColumnContainerControls.add(container);
+		{
+			/*
+			 * temperature
+			 */
+
+			// label
+			Label label = tk.createLabel(container, Messages.tour_editor_label_temperature);
+			label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+			_firstColumnControls.add(label);
+
+			// spinner
+			_spinTemperature = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.applyTo(_spinTemperature);
+			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+
+			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
+			_spinTemperature.setMinimum(-60);
+			_spinTemperature.setMaximum(150);
+
+			_spinTemperature.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinTemperature.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
+			});
+			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					if (_isDirtyDisabled || _isSavingInProgress) {
+						return;
+					}
+					_isTemperatureManuallyModified = true;
+					setTourDirty();
+				}
+			});
+
+			// label: celcius, fahrenheit
+			_lblTemperatureUnit = tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+			/*
+			 * clouds
+			 */
+			final Composite cloudContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(cloudContainer);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(cloudContainer);
+			{
+				// label: clouds
+				label = tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
+				label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+
+				// icon: clouds
+				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.FILL)
+						.grab(true, false)
+						.applyTo(_lblCloudIcon);
+			}
+			_firstColumnControls.add(cloudContainer);
+
+			// combo: clouds
+			_comboClouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboClouds);
+			tk.adapt(_comboClouds, true, false);
+			_comboClouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+			_comboClouds.setVisibleItemCount(10);
+			_comboClouds.addModifyListener(_modifyListener);
+			_comboClouds.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					displayCloudIcon();
+				}
+			});
+ 
+			// fill combobox
+			for (final String cloudText : _cloudText) {
+				_comboClouds.add(cloudText);
+			}
+
+			// force the icon to be displayed to ensure the width is correctly set when the size is computed
+			_isDirtyDisabled = true;
+			{
+				_comboClouds.select(0);
+				displayCloudIcon();
+			}
+			_isDirtyDisabled = false;
 		}
 	}
 
