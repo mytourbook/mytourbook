@@ -79,7 +79,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
+	private static final int					TOURBOOK_DB_VERSION							= 8;													// 10.2.1 Mod by Kenny
 
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
@@ -210,8 +210,10 @@ public class TourDatabase {
 		int tourCounter = 1;
 		for (final Long tourId : tourList) {
 
-			monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
-					new Object[] { tourCounter++, tourList.size() }));
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
+						new Object[] { tourCounter++, tourList.size() }));
+			}
 
 			final TourData tourData = getTourFromDb(tourId);
 			if (tourData != null) {
@@ -1124,11 +1126,10 @@ public class TourDatabase {
 			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
 
 			if (splashHandler == null) {
-				throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
+				checkServerCreateRunnable().run(null);
+//				throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
 			} else {
-				final IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
-
-				checkServerCreateRunnable().run(splashProgressMonitor);
+				checkServerCreateRunnable().run(splashHandler.getBundleProgressMonitor());
 			}
 
 		} catch (final InvocationTargetException e) {
@@ -1149,7 +1150,9 @@ public class TourDatabase {
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) {
 
-				monitor.subTask(Messages.Database_Monitor_db_service_task);
+				if (monitor != null) {
+					monitor.subTask(Messages.Database_Monitor_db_service_task);
+				}
 
 				try {
 					server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
@@ -1579,7 +1582,7 @@ public class TourDatabase {
 				+ "isDistanceFromSensor SMALLINT DEFAULT 0, \n" //$NON-NLS-1$
 				//
 				// version 8 end
-				
+
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2002,6 +2005,78 @@ public class TourDatabase {
 
 					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
+					monitor.setTaskName(UI.EMPTY_STRING);
+				}
+			};
+
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
+
+			if (splashHandler == null) {
+				try {
+					checkServer();
+				} catch (final MyTourbookException e) {
+					StatusUtil.showStatus(e);
+					return null;
+				}
+				checkTable();
+				checkVersion(null);
+
+				emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+
+			} else {
+				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
+			}
+
+//		} catch (MyTourbookException e) {
+//			e.printStackTrace();
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		if (emFactory == null) {
+			try {
+				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		} else {
+			final EntityManager em = emFactory.createEntityManager();
+
+			return em;
+		}
+	}
+
+	/**
+	 * Creates an entity manager which is used to persist entities
+	 * 
+	 * @return
+	 */
+	public EntityManager getEntityManagerOLD() {
+
+		if (emFactory != null) {
+			return emFactory.createEntityManager();
+		}
+
+		try {
+			final IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					try {
+						checkServer();
+					} catch (final MyTourbookException e) {
+						e.printStackTrace();
+						return;
+					}
+					checkTable();
+					checkVersion(monitor);
+
+					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+
+					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+
 					monitor.setTaskName(""); //$NON-NLS-1$
 				}
 			};
@@ -2121,7 +2196,7 @@ public class TourDatabase {
 
 		boolean isPostUpdate5 = false;
 		if (currentDbVersion == 4) {
-			updateDbDesign_4_5(conn, monitor);
+			updateDbDesign_4_5(conn);
 			currentDbVersion = newVersion = 5;
 			isPostUpdate5 = true;
 		}
@@ -2276,12 +2351,16 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
-
+ 
 		// Create a EntityManagerFactory here, so we can access TourData with EJB
-		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+		if (monitor != null) {
+			monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+		}
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-		monitor.subTask(Messages.Tour_Database_load_all_tours);
+		if (monitor != null) {
+			monitor.subTask(Messages.Tour_Database_load_all_tours);
+		}
 		final ArrayList<Long> tourList = getAllTourIds();
 
 		// loop over all tours and calculate and set new columns
@@ -2311,7 +2390,7 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-	private void updateDbDesign_4_5(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_4_5(final Connection conn) {
 
 		System.out.println("Database update: 5");//$NON-NLS-1$
 		System.out.println();
@@ -2413,11 +2492,11 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherWindSpd		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
-			
+
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN isDistanceFromSensor  SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
-			statement.execute(sql);			
-			
+			statement.execute(sql);
+
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN weatherClouds         VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
