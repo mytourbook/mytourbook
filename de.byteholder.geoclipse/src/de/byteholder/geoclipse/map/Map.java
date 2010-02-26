@@ -53,7 +53,6 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -273,6 +272,7 @@ public class Map extends Canvas {
 	private int									_worldViewportX;
 	private int									_worldViewportY;
 
+	private final Display						_display;
 	private final Thread						_displayThread;
 
 	// used to pan using the arrow keys
@@ -485,7 +485,8 @@ public class Map extends Canvas {
 
 		super(parent, style | SWT.DOUBLE_BUFFERED);
 
-		_displayThread = getDisplay().getThread();
+		_display = getDisplay();
+		_displayThread = _display.getThread();
 
 		_zoomListeners = new ArrayList<IZoomListener>();
 
@@ -528,14 +529,13 @@ public class Map extends Canvas {
 			}
 		});
 
-		final Display display = getDisplay();
 
-		_cursorPan = new Cursor(display, SWT.CURSOR_SIZEALL);
-		_cursorDefault = new Cursor(display, SWT.CURSOR_ARROW);
+		_cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
+		_cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
 
-		_defaultBackgroundColor = new Color(display, DEFAULT_BACKGROUND_RGB);
+		_defaultBackgroundColor = new Color(_display, DEFAULT_BACKGROUND_RGB);
 
-		_transparentColor = new Color(display, _transparentRGB);
+		_transparentColor = new Color(_display, _transparentRGB);
 
 		_overlayImageCache = new OverlayImageCache();
 		_partOverlayImageCache = new OverlayImageCache();
@@ -657,7 +657,7 @@ public class Map extends Canvas {
 			_gc9Parts.dispose();
 		}
 
-		_imageTemplate9Parts = new Image(getDisplay(), createTransparentImage(partedTileSize));
+		_imageTemplate9Parts = new Image(_display, createTransparentImage(partedTileSize));
 		final GC gc = new GC(_imageTemplate9Parts);
 		{
 			gc.setBackground(_transparentColor);
@@ -665,7 +665,7 @@ public class Map extends Canvas {
 		}
 		gc.dispose();
 
-		_image9Parts = new Image(getDisplay(), _imageTemplate9Parts, SWT.IMAGE_COPY);
+		_image9Parts = new Image(_display, _imageTemplate9Parts, SWT.IMAGE_COPY);
 		_gc9Parts = new GC(_image9Parts);
 	}
 
@@ -684,7 +684,7 @@ public class Map extends Canvas {
 			_imageTemplate1Part.dispose();
 		}
 
-		_imageTemplate1Part = new Image(getDisplay(), createTransparentImage(tileSize));
+		_imageTemplate1Part = new Image(_display, createTransparentImage(tileSize));
 		final GC gc = new GC(_imageTemplate1Part);
 		{
 			gc.setBackground(_transparentColor);
@@ -770,7 +770,7 @@ public class Map extends Canvas {
 			// check or create map image
 			Image image = _mapImage;
 			if (image == null || image.isDisposed() || canReuseImage(image, _clientArea) == false) {
-				image = createImage(getDisplay(), image, _clientArea);
+				image = createImage(_display, image, _clientArea);
 			}
 			_mapImage = image;
 
@@ -882,10 +882,9 @@ public class Map extends Canvas {
 
 		final int devYScaleLines = devY;
 
-		final Display display = getDisplay();
-		final Color white = display.getSystemColor(SWT.COLOR_WHITE);
-		final Color black = display.getSystemColor(SWT.COLOR_BLACK);
-		final Color gray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+		final Color white = _display.getSystemColor(SWT.COLOR_WHITE);
+		final Color black = _display.getSystemColor(SWT.COLOR_BLACK);
+		final Color gray = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
 		drawMapScaleLine(gc, devX1, devX2, devY++, segmentWidth, gray, gray);
 		drawMapScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
@@ -896,7 +895,7 @@ public class Map extends Canvas {
 		final int devYText = devYScaleLines - textExtent.y;
 		final int devXText = devX1 + devScaleWidth - textExtent.x;
 
-		final Color borderColor = new Color(display, 0xF1, 0xEE, 0xE8);
+		final Color borderColor = new Color(_display, 0xF1, 0xEE, 0xE8);
 		{
 			gc.setForeground(borderColor);
 			gc.drawText(scaleText, devXText - 1, devYText, true);
@@ -906,7 +905,7 @@ public class Map extends Canvas {
 		}
 		borderColor.dispose();
 
-		gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
 		gc.drawText(scaleText, devXText, devYText, true);
 	}
 
@@ -918,9 +917,8 @@ public class Map extends Canvas {
 	                              	final Color firstColor,
 	                              	final Color secondColor) {
 
-		final Display display = getDisplay();
 
-		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.drawPoint(devX1, devY);
 
 		gc.setForeground(firstColor);
@@ -935,7 +933,7 @@ public class Map extends Canvas {
 		gc.setForeground(secondColor);
 		gc.drawLine(devX1 + 3 * segmentWidth, devY, devX2, devY);
 
-		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.drawPoint(devX2, devY);
 	}
 
@@ -946,7 +944,6 @@ public class Map extends Canvas {
 	 */
 	private void drawMapTiles(final GC gc) {
 
-		final Display display = getDisplay();
 		final int tileSize = _MP.getTileSize();
 
 		/*
@@ -984,7 +981,7 @@ public class Map extends Canvas {
 						 * if tile is off the map to the north or south, draw map background
 						 */
 
-						gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+						gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
 						gc.fillRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
 					}
 				}
@@ -1034,7 +1031,7 @@ public class Map extends Canvas {
 			final Image errorImage = _MP.getErrorImage();
 			final org.eclipse.swt.graphics.Rectangle imageBounds = errorImage.getBounds();
 
-			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
+			gc.setBackground(_display.getSystemColor(SWT.COLOR_GRAY));
 			gc.fillRectangle(devTilePosition.x, devTilePosition.y, imageBounds.width, imageBounds.height);
 
 			drawTileInfoError(gc, devTilePosition, tile);
@@ -1099,16 +1096,15 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final Display display = getDisplay();
 		final int tileSize = _MP.getTileSize();
 
 		// draw tile border
-		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.drawRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
 
 		// draw tile info
-		gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_BLUE));
 
 		final int leftMargin = 10;
 
@@ -1131,16 +1127,15 @@ public class Map extends Canvas {
 
 	private void drawTileInfoError(final GC gc, final Rectangle devTilePosition, final Tile tile) {
 
-		final Display display = getDisplay();
 
 		final int tileSize = _MP.getTileSize();
 
 		// draw tile border
-		gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.drawRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
 
-		gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		gc.setBackground(display.getSystemColor(SWT.COLOR_DARK_MAGENTA));
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		final int leftMargin = 10;
 
@@ -1894,12 +1889,12 @@ public class Map extends Canvas {
 			}
 		};
 
-		getDisplay().asyncExec(overlayRunnable);
+		_display.asyncExec(overlayRunnable);
 	}
 
 	private void paintOverlay20Tiles() {
 
-		BusyIndicator.showWhile(getDisplay(), new Runnable() {
+		BusyIndicator.showWhile(_display, new Runnable() {
 			public void run() {
 
 				Tile tile;
@@ -1945,9 +1940,9 @@ public class Map extends Canvas {
 		final int tileSize = _MP.getTileSize();
 
 		boolean isOverlayPainted = false;
-		final Display display = getDisplay();
 
 		{
+			// clear 9 part image
 			_gc9Parts.setBackground(_transparentColor);
 			_gc9Parts.fillRectangle(_imageTemplate9Parts.getBounds());
 
@@ -1966,7 +1961,7 @@ public class Map extends Canvas {
 				 * center
 				 * image is the requested tile image
 				 */
-				paintOverlay40SplitParts(tile, _image9Parts, display, tileSize);
+				paintOverlay40SplitParts(tile, _image9Parts, tileSize);
 
 			} else {
 
@@ -1994,12 +1989,10 @@ public class Map extends Canvas {
 	 * 
 	 * @param tile
 	 * @param image9Parts
-	 * @param display
 	 * @param tileSize
 	 */
 	private void paintOverlay40SplitParts(	final Tile tile,
 	                                      	final Image image9Parts,
-	                                      	final Device display,
 	                                      	final int tileSize) {
 
 		final TileCache tileCache = MP.getTileCache();
@@ -2035,7 +2028,7 @@ public class Map extends Canvas {
 				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
 
 				// draw into part image
-				final Image image1Part = new Image(display, _imageTemplate1Part, SWT.IMAGE_COPY);
+				final Image image1Part = new Image(_display, _imageTemplate1Part, SWT.IMAGE_COPY);
 				final GC gc1Part = new GC(image1Part);
 				{
 					// draw existing part tile image into the new part image
@@ -2073,7 +2066,7 @@ public class Map extends Canvas {
 						tile.incrementOverlayContent();
 
 						// create a copy of the center image
-						final Image centerImage = new Image(display, _imageTemplate1Part, SWT.IMAGE_COPY);
+						final Image centerImage = new Image(_display, _imageTemplate1Part, SWT.IMAGE_COPY);
 						final GC gcCenterImage = new GC(centerImage);
 						{
 							gcCenterImage.drawImage(image1Part, 0, 0);
@@ -2148,13 +2141,13 @@ public class Map extends Canvas {
 				}
 			};
 
-			getDisplay().syncExec(synchImageRunnable);
+			_display.syncExec(synchImageRunnable);
 
 			/*
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-			getDisplay().asyncExec(synchImageRunnable);
+			_display.asyncExec(synchImageRunnable);
 
 		} else {
 
@@ -2178,7 +2171,7 @@ public class Map extends Canvas {
 				}
 			};
 
-			getDisplay().asyncExec(asynchImageRunnable);
+			_display.asyncExec(asynchImageRunnable);
 		}
 
 		// tell the overlay thread to draw the overlay images
@@ -2298,7 +2291,7 @@ public class Map extends Canvas {
 
 			// current thread is not the display thread
 
-			getDisplay().syncExec(new Runnable() {
+			_display.syncExec(new Runnable() {
 				public void run() {
 					if (!isDisposed()) {
 						setMapCenterInWoldPixel(_MP.geoToPixel(geoPosition, _mapZoomLevel));
