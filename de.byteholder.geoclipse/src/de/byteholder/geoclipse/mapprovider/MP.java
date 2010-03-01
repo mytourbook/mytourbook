@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -68,7 +68,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private static final int						TILE_CACHE_SIZE						= 2000;													//2000;
 	private static final int						ERROR_CACHE_SIZE					= 10000;													//10000;
-	private static final int						IMAGE_CACHE_SIZE					= 200;
+	private static final int						IMAGE_CACHE_SIZE					= 100;
 
 	public static final int							OFFLINE_INFO_NOT_READ				= -1;
 
@@ -77,7 +77,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public static final int							UI_MIN_ZOOM_LEVEL					= 1;
 	public static final int							UI_MAX_ZOOM_LEVEL					= 18;
-
+ 
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;
 	private static ExecutorService					fExecutorService;
@@ -89,19 +89,19 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * Cache for tiles which do not have loading errors
 	 */
 	private static final TileCache					_tileCache							= new TileCache(TILE_CACHE_SIZE);
- 
+
 	/**
 	 * Contains tiles which has loading errors, they are kept in this map that they are not loaded
 	 * again
 	 */
 	private static final TileCache					_errorTiles							= new TileCache(
-																								ERROR_CACHE_SIZE);
+			ERROR_CACHE_SIZE);
 
 	/**
 	 * Cache for tile images
 	 */
 	private static final TileImageCache				_tileImageCache						= new TileImageCache(
-																								IMAGE_CACHE_SIZE);
+			IMAGE_CACHE_SIZE);
 
 	/**
 	 * This queue contains tiles which needs to be loaded, only the number of
@@ -116,22 +116,22 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * Listener which throws {@link ITileListener} events
 	 */
 	private final static ListenerList				_tileListeners						= new ListenerList(
-																								ListenerList.IDENTITY);
+			ListenerList.IDENTITY);
 
 	private int										_dimmingAlphaValue					= 0xFF;
 	private RGB										_dimmingColor;
 
-	private Projection								_projection;
+	private final Projection								_projection;
 
 	/**
 	 * image size in pixel for a square image
 	 */
 	private int										_tileSize							= Integer
-																								.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+	.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
 	// map min/max zoom level
 	private int										_minZoomLevel						= 0;
 	private int										_maxZoomLevel						= UI_MAX_ZOOM_LEVEL
-																								- UI_MIN_ZOOM_LEVEL;
+	- UI_MIN_ZOOM_LEVEL;
 
 	private int										_defaultZoomLevel					= 0;
 
@@ -212,7 +212,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	private long									_offlineFileSize					= -1;
 
 	private static final ListenerList				_offlineReloadEventListeners		= new ListenerList(
-																								ListenerList.IDENTITY);
+			ListenerList.IDENTITY);
 
 	/**
 	 * State if the map provider can be toggled in the map
@@ -357,11 +357,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
 					? new GeoPosition(0.0, 0.0)
-					: _favoritePosition);
+			: _favoritePosition);
 
 			mapProvider._lastUsedPosition = new GeoPosition(_lastUsedPosition == null
 					? new GeoPosition(0.0, 0.0)
-					: _lastUsedPosition);
+			: _lastUsedPosition);
 		}
 
 		return mapProvider;
@@ -478,7 +478,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @param tile
 	 */
 	public void doPostCreation(final Tile tile) {
-	// default does nothing
+		// default does nothing
 	}
 
 	@Override
@@ -853,7 +853,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		 */
 		if (tile == null) {
 
-			// tile is not being loaded, create a new tile 
+			// tile is not being loaded, create a new tile
 
 			tile = new Tile(this, zoom, tilePositionX, tilePositionY, null);
 			tile.setBoundingBoxEPSG4326();
@@ -941,10 +941,10 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * generate a tile url using the base url and parameters specified in the constructor. Thus if
 	 * 
 	 * <PRE>
-	 * baseURl = http://www.myserver.com/maps?version=0.1 
-	 * xparam = x 
-	 * yparam = y 
-	 * zparam = z 
+	 * baseURl = http://www.myserver.com/maps?version=0.1
+	 * xparam = x
+	 * yparam = y
+	 * zparam = z
 	 * tilepoint = [1,2]
 	 * zoom level = 3
 	 * </PRE>

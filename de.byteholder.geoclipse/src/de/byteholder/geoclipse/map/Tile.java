@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
@@ -33,7 +34,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
  * @author Michael Kanis
  * @author Wolfgang
  */
-
+ 
 public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
@@ -61,22 +62,22 @@ public class Tile extends Observable {
 	/**
 	 * Map zoom level
 	 */
-	private int								_zoom;
+	private final int						_zoom;
 
 	/**
 	 * Horizontal tile position within the map
 	 */
-	private int								_x;
+	private final int						_x;
 
 	/**
 	 * Vertical tile position within the map
 	 */
-	private int								_y;
+	private final int						_y;
 
 	/**
 	 * Map provider which provides the tile image
 	 */
-	private MP								_mp;
+	private final MP						_mp;
 
 	/**
 	 * Map image for this tile
@@ -88,8 +89,13 @@ public class Tile extends Observable {
 	 */
 	private Image							_overlayImage;
 
-	private String							_tileKey;
-	private String							_tileKeyCreatorId;
+	/**
+	 * contains overlay the image data for this tile
+	 */
+	private ImageDataResources				_overlayImageDataResources;
+
+	private final String					_tileKey;
+	private final String					_tileKeyCreatorId;
 
 	private Object							_customData;
 
@@ -170,12 +176,12 @@ public class Tile extends Observable {
 	 * @return
 	 */
 	public static String getTileKey(final MP mp,
-									final int zoom,
-									final int x,
-									final int y,
-									final String tileCreatorId,
-									final String customTileKey,
-									final String projectionId) {
+	                                final int zoom,
+	                                final int x,
+	                                final int y,
+	                                final String tileCreatorId,
+	                                final String customTileKey,
+	                                final String projectionId) {
 
 		final StringBuilder sb = new StringBuilder(100);
 
@@ -302,7 +308,7 @@ public class Tile extends Observable {
 						if (parentMp instanceof ITileChildrenCreator) {
 
 							final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-									.getParentImage(_parentTile);
+							.getParentImage(_parentTile);
 
 							// prevent memory leaks: remove image data in the chilren tiles
 							for (final Tile childTile : tileChildren) {
@@ -435,6 +441,10 @@ public class Tile extends Observable {
 		return _future;
 	}
 
+	public ImageDataResources getImageDataResources() {
+		return _overlayImageDataResources;
+	}
+
 	/**
 	 * @return Returns the loading error when loading fails or <code>null</code> when an error is
 	 *         not set
@@ -537,19 +547,19 @@ public class Tile extends Observable {
 		return result;
 	}
 
-	/**
-	 * Increments the overlay content counter
-	 */
-	public void incrementOverlayContent() {
-		_overlayContent++;
-	}
-
 //	/**
 //	 * @return Returns <code>true</code> when this tile is a child of another tile
 //	 */
 //	public boolean isChildTile() {
 //		return fParentTile != null;
 //	}
+
+	/**
+	 * Increments the overlay content counter
+	 */
+	public void incrementOverlayContent() {
+		_overlayContent++;
+	}
 
 	/**
 	 * @return Returns <code>true</code> when this is is a child tile, it is possible that the
@@ -618,6 +628,8 @@ public class Tile extends Observable {
 		_overlayImageState = OverlayImageState.NOT_SET;
 
 		_overlayContent = 0;
+
+		_overlayImageDataResources = null;
 	}
 
 	/**
@@ -662,6 +674,10 @@ public class Tile extends Observable {
 
 	public void setFuture(final Future<?> future) {
 		_future = future;
+	}
+
+	public void setImageDataResources(final ImageDataResources tidResources) {
+		_overlayImageDataResources = tidResources;
 	}
 
 	public void setIsOfflineImageAvailable(final boolean isOfflineImageAvailable) {
@@ -787,14 +803,14 @@ public class Tile extends Observable {
 						: true;
 
 		return (" z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
-				+ (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-				+ (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-				+ (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
-				+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
-				+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
-				//
-				//                        0123456789012345678901234567890123456789		
-				+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
+		+ (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+		+ (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+		+ (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
+		+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
+		+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
+		//
+		//                        0123456789012345678901234567890123456789
+		+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 		;
 	}

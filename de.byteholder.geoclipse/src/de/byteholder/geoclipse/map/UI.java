@@ -12,13 +12,16 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.byteholder.geoclipse.Messages;
-
+ 
 public class UI {
 
 	public static final String	EMPTY_STRING	= "";				//$NON-NLS-1$
@@ -46,7 +49,7 @@ public class UI {
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
- 
+
 	public static void addSashColorHandler(final Sash sash) {
 
 		sash.addMouseTrackListener(new MouseTrackListener() {
@@ -127,11 +130,11 @@ public class UI {
 				addedChars++;
 
 			} else if (nameChar == ' '
-					|| nameChar == DASH
-					|| nameChar == '_'
+				|| nameChar == DASH
+				|| nameChar == '_'
 					|| nameChar == '.'
-					|| nameChar == '/'
-					|| nameChar == ':') {
+						|| nameChar == '/'
+							|| nameChar == ':') {
 
 				// don't repeat dashes
 
@@ -242,5 +245,53 @@ public class UI {
 		}
 
 		return sbId.toString();
+	}
+
+	/**
+	 * Create a transparent image
+	 * 
+	 * @param imageSize
+	 * @param transparentRGB
+	 * @return
+	 */
+	public static ImageData createTransparentImageData(final int imageSize, final RGB transparentRGB) {
+
+		final ImageData transparentImageData = new ImageData(//
+				imageSize,
+				imageSize,
+				24,
+				new PaletteData(0xff, 0xff00, 0xff0000));
+
+		transparentImageData.transparentPixel = transparentImageData.palette.getPixel(transparentRGB);
+
+		setBackgroundColor(transparentRGB, transparentImageData);
+
+		return transparentImageData;
+	}
+
+	public static void setBackgroundColor(final RGB bgRGB, final ImageData imageData) {
+
+		final byte blue = (byte) bgRGB.blue;
+		final byte green = (byte) bgRGB.green;
+		final byte red = (byte) bgRGB.red;
+
+		final byte[] dstData = imageData.data;
+		final int dstWidth = imageData.width;
+		final int dstHeight = imageData.height;
+		final int dstBytesPerLine = imageData.bytesPerLine;
+
+		for (int dstY = 0; dstY < dstHeight; dstY++) {
+
+			final int dstYBytesPerLine = dstY * dstBytesPerLine;
+
+			for (int dstX = 0; dstX < dstWidth; dstX++) {
+
+				final int dataIndex = dstYBytesPerLine + (dstX * 3);
+
+				dstData[dataIndex] = blue;
+				dstData[dataIndex + 1] = green;
+				dstData[dataIndex + 2] = red;
+			}
+		}
 	}
 }

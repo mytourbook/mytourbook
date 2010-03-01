@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.mapping;
@@ -49,7 +49,7 @@ import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
- 
+
 /**
  * Paints the tour into the map
  */
@@ -134,9 +134,9 @@ public class TourPainter extends MapPainter {
 	 * @return
 	 */
 	public static void drawLegendColors(final GC gc,
-										final Rectangle legendBounds,
-										final ILegendProvider legendProvider,
-										final boolean isVertical) {
+	                                    final Rectangle legendBounds,
+	                                    final ILegendProvider legendProvider,
+	                                    final boolean isVertical) {
 
 		if (legendProvider == null) {
 			return;
@@ -150,7 +150,7 @@ public class TourPainter extends MapPainter {
 			return;
 		}
 
-		// get configuration for the legend 
+		// get configuration for the legend
 		final ArrayList<Integer> legendUnits = new ArrayList<Integer>(config.units);
 		final Integer unitFactor = config.unitFactor;
 		final int legendMaxValue = config.legendMaxValue;
@@ -253,7 +253,7 @@ public class TourPainter extends MapPainter {
 						gc.setForeground(legendTextColor);
 						gc.setBackground(legendTextBackgroundColor);
 
-						gc.drawLine(legendWidth, // 
+						gc.drawLine(legendWidth, //
 								valuePosition, //
 								legendWidth + 5,
 								valuePosition);
@@ -539,7 +539,7 @@ public class TourPainter extends MapPainter {
 
 	@Override
 	protected void disposeTempResources() {
-		_colorCache.dispose();
+//		_colorCache.dispose();
 	}
 
 	@Override
@@ -547,7 +547,7 @@ public class TourPainter extends MapPainter {
 
 	@Override
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile, final int parts) {
-
+ 
 		final PaintManager paintManager = PaintManager.getInstance();
 
 		final ArrayList<TourData> tourDataList = paintManager.getTourData();
@@ -672,11 +672,11 @@ public class TourPainter extends MapPainter {
 	}
 
 	private boolean drawMarker(	final GC gc,
-								final Map map,
-								final Tile tile,
-								final double latitude,
-								final double longitude,
-								final Image markerImage) {
+	                           	final Map map,
+	                           	final Tile tile,
+	                           	final double latitude,
+	                           	final double longitude,
+	                           	final Image markerImage) {
 
 		if (markerImage == null) {
 			return false;
@@ -713,10 +713,10 @@ public class TourPainter extends MapPainter {
 	}
 
 	private boolean drawTour10InTile(	final GC gc,
-										final Map map,
-										final Tile tile,
-										final TourData tourData,
-										final int parts) {
+	                                 	final Map map,
+	                                 	final Tile tile,
+	                                 	final TourData tourData,
+	                                 	final int parts) {
 
 		boolean isTourInTile = false;
 
@@ -921,15 +921,32 @@ public class TourPainter extends MapPainter {
 			}
 		}
 
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+//
+//		for (int xIndex = 0; xIndex < parts; xIndex++) {
+//			for (int yIndex = 0; yIndex < parts; yIndex++) {
+//
+//				final int devX = xIndex * tileSize;
+//				final int devY = yIndex * tileSize;
+//
+//				final String text = "x:" + xIndex + " y:" + yIndex + " tx:" + tile.getX() + " ty:" + tile.getY();
+//				gc.drawText(text, devX + 0, devY + 20);
+//
+//			}
+//		}
+
+		_colorCache.dispose();
+
 		return isTourInTile;
 	}
 
 	private void drawTour20Line(final GC gc,
-								final int devXFrom,
-								final int devYFrom,
-								final int devXTo,
-								final int devYTo,
-								final Color color) {
+	                            final int devXFrom,
+	                            final int devYFrom,
+	                            final int devXTo,
+	                            final int devYTo,
+	                            final Color color) {
 
 		if (color != null) {
 			gc.setForeground(color);
@@ -966,13 +983,13 @@ public class TourPainter extends MapPainter {
 	}
 
 	private boolean drawTourMarker(	final GC gc,
-									final Map map,
-									final Tile tile,
-									final double latitude,
-									final double longitude,
-									final Image markerImage,
-									final TourMarker tourMarker,
-									final int parts) {
+	                               	final Map map,
+	                               	final Tile tile,
+	                               	final double latitude,
+	                               	final double longitude,
+	                               	final Image markerImage,
+	                               	final TourMarker tourMarker,
+	                               	final int parts) {
 
 		if (markerImage == null) {
 			return false;
@@ -1031,8 +1048,8 @@ public class TourPainter extends MapPainter {
 	 * @return
 	 */
 	private Image drawTourMarkerImage(	final String markerLabel,
-										final org.eclipse.swt.graphics.Point labelExtent,
-										final Device device) {
+	                                  	final org.eclipse.swt.graphics.Point labelExtent,
+	                                  	final Device device) {
 
 		final int bannerWidth = labelExtent.x + 2 * MARGIN;
 		final int bannerHeight = labelExtent.y + 2 * MARGIN;
@@ -1199,9 +1216,9 @@ public class TourPainter extends MapPainter {
 	 * @return Returns <code>true</code> when the marker is visible in the tile
 	 */
 	private boolean isMarkerInTile(	final Rectangle markerBounds,
-									final int devMarkerPosX,
-									final int devMarkerPosY,
-									final int tileSize) {
+	                               	final int devMarkerPosX,
+	                               	final int devMarkerPosY,
+	                               	final int tileSize) {
 
 		// get marker size
 		final int markerWidth = markerBounds.width;
