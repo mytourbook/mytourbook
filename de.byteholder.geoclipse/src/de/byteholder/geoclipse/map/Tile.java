@@ -19,13 +19,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
-
+ 
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
  * zoom level.
@@ -34,7 +35,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
  * @author Michael Kanis
  * @author Wolfgang
  */
- 
+
 public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
@@ -157,6 +158,8 @@ public class Tile extends Observable {
 	private long							_timeStartLoading;
 	private long							_timeEndLoading;
 
+	private static final ReentrantLock		TILE_LOCK			= new ReentrantLock();
+
 	/**
 	 * contains children which contains loading errors
 	 */
@@ -176,12 +179,12 @@ public class Tile extends Observable {
 	 * @return
 	 */
 	public static String getTileKey(final MP mp,
-	                                final int zoom,
-	                                final int x,
-	                                final int y,
-	                                final String tileCreatorId,
-	                                final String customTileKey,
-	                                final String projectionId) {
+									final int zoom,
+									final int x,
+									final int y,
+									final String tileCreatorId,
+									final String customTileKey,
+									final String projectionId) {
 
 		final StringBuilder sb = new StringBuilder(100);
 
@@ -268,6 +271,39 @@ public class Tile extends Observable {
 		return true;
 	}
 
+	public synchronized Image createOverlayImage(final Device display) {
+
+		if (_overlayImageDataResources == null) {
+			return null;
+		}
+
+		final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
+		final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
+
+		if (tileImageData == null && neighborImageData == null) {
+			return null;
+		}
+
+		final int tileSize = _mp.getTileSize();
+		final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
+
+		// draw neighbor first
+		if (neighborImageData != null) {
+			_overlayImageDataResources.drawImageData(finalImageData, neighborImageData, 0, 0, tileSize, tileSize);
+		}
+
+		// draw tile last to overwrite neighbor image data
+		if (tileImageData != null) {
+			_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
+		}
+
+
+		// create image from image data
+		_overlayImage = new Image(display, finalImageData);
+
+		return _overlayImage;
+	}
+
 	/**
 	 * Set child image data into the parent tile and create the parent image when all child images
 	 * are available
@@ -308,7 +344,7 @@ public class Tile extends Observable {
 						if (parentMp instanceof ITileChildrenCreator) {
 
 							final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-							.getParentImage(_parentTile);
+									.getParentImage(_parentTile);
 
 							// prevent memory leaks: remove image data in the chilren tiles
 							for (final Tile childTile : tileChildren) {
@@ -441,10 +477,6 @@ public class Tile extends Observable {
 		return _future;
 	}
 
-	public ImageDataResources getImageDataResources() {
-		return _overlayImageDataResources;
-	}
-
 	/**
 	 * @return Returns the loading error when loading fails or <code>null</code> when an error is
 	 *         not set
@@ -473,6 +505,31 @@ public class Tile extends Observable {
 
 	public Image getOverlayImage() {
 		return _overlayImage;
+	}
+
+	public ImageDataResources getOverlayImageDataResources() {
+
+		if (_overlayImageDataResources != null) {
+			return _overlayImageDataResources;
+		}
+
+		TILE_LOCK.lock();
+		{
+			try {
+
+				// check again
+				if (_overlayImageDataResources != null) {
+					return _overlayImageDataResources;
+				}
+
+				_overlayImageDataResources = new ImageDataResources(_mp.getTileSize());
+
+			} finally {
+				TILE_LOCK.unlock();
+			}
+		}
+
+		return _overlayImageDataResources;
 	}
 
 	public OverlayImageState getOverlayImageState() {
@@ -539,6 +596,13 @@ public class Tile extends Observable {
 		return _zoom;
 	}
 
+//	/**
+//	 * @return Returns <code>true</code> when this tile is a child of another tile
+//	 */
+//	public boolean isChildTile() {
+//		return fParentTile != null;
+//	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -546,13 +610,6 @@ public class Tile extends Observable {
 		result = prime * result + ((_tileKey == null) ? 0 : _tileKey.hashCode());
 		return result;
 	}
-
-//	/**
-//	 * @return Returns <code>true</code> when this tile is a child of another tile
-//	 */
-//	public boolean isChildTile() {
-//		return fParentTile != null;
-//	}
 
 	/**
 	 * Increments the overlay content counter
@@ -676,10 +733,6 @@ public class Tile extends Observable {
 		_future = future;
 	}
 
-	public void setImageDataResources(final ImageDataResources tidResources) {
-		_overlayImageDataResources = tidResources;
-	}
-
 	public void setIsOfflineImageAvailable(final boolean isOfflineImageAvailable) {
 		_isOfflineImageAvailable = isOfflineImageAvailable;
 	}
@@ -754,9 +807,6 @@ public class Tile extends Observable {
 		_offlinePath = osTilePath;
 	}
 
-	public void setOverlayImage(final Image partImage) {
-		_overlayImage = partImage;
-	}
 
 	public void setOverlayImageState(final OverlayImageState overlayImageState) {
 		_overlayImageState = overlayImageState;
@@ -803,14 +853,14 @@ public class Tile extends Observable {
 						: true;
 
 		return (" z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2)) // //$NON-NLS-1$
-		+ (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-		+ (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
-		+ (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
-		+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
-		+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
-		//
-		//                        0123456789012345678901234567890123456789
-		+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (" y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5)) //$NON-NLS-1$
+				+ (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
+				+ (" img=" + (isImageOK ? "OK" : COLUMN_2)) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
+				//
+				//                        0123456789012345678901234567890123456789
+				+ (" " + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 		;
 	}

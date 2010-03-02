@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -28,7 +29,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-
+ 
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.Assert;
@@ -43,9 +44,11 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -66,7 +69,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
@@ -1374,11 +1376,22 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		_isDeleteError = false;
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-				deleteDir(tileCacheDir);
-			}
-		});
+		try {
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(
+					false,
+					false,
+					new IRunnableWithProgress() {
+						@Override
+						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+								InterruptedException {
+							deleteDir(tileCacheDir);
+						}
+					});
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		if (_isDeleteError) {
 			StatusUtil.log(NLS.bind(Messages.pref_map_error_deleteTiles_message, tileCacheDir), new Exception());

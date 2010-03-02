@@ -20,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.UI;
@@ -29,6 +28,7 @@ import de.byteholder.geoclipse.map.UI;
  */
 public class ImageDataResources {
  
+	private static final ReentrantLock	TILE_LOCK			= new ReentrantLock();
 	private static final ReentrantLock	NEIGHBOR_LOCK		= new ReentrantLock();
 
 	/**
@@ -46,71 +46,30 @@ public class ImageDataResources {
 	public ImageDataResources(final int tileSize) {
 
 		_tileSize = tileSize;
-
-		_tileImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
 	}
 
 	/**
-	 * Draws image data from src into the tile- or neighbor image data
+	 * this is sysnchonized because multiple threads can call this method
 	 * 
+	 * @param dst
 	 * @param src
-	 *            the source image data
 	 * @param srcXStart
 	 * @param srcYStart
 	 * @param width
 	 * @param height
-	 * @param isTileImage
-	 *            when <code>true</code> the image data is drawn into the tile image otherwise it's
-	 *            drawn into the neighbor image, the neighbor image data is created when not
-	 *            available
 	 */
-	public void drawImageData(	final ImageData src,
-	                          	final int srcXStart,
-	                          	final int srcYStart,
-	                          	final int width,
-	                          	final int height,
-	                          	final boolean isTileImage) {
-		if (isTileImage) {
-
-			drawImageData(src, srcXStart, srcYStart, width, height, _tileImageData);
-
-		} else {
-
-			if (_neighborImageData == null) {
-
-				NEIGHBOR_LOCK.lock();
-				{
-					try {
-
-						// check again
-						if (_neighborImageData == null) {
-							_neighborImageData = UI.createTransparentImageData(_tileSize, Map.getTransparentRGB());
-						}
-
-					} finally {
-						NEIGHBOR_LOCK.unlock();
-					}
-				}
-			}
-
-			drawImageData(src, srcXStart, srcYStart, width, height, _neighborImageData);
-		}
-	}
-
-	private void drawImageData(	final ImageData src,
-	                           	final int srcXStart,
-	                           	final int srcYStart,
-	                           	final int width,
-	                           	final int height,
-	                           	final ImageData dst) {
+	public synchronized void drawImageData(	final ImageData dst,
+											final ImageData src,
+											final int srcXStart,
+											final int srcYStart,
+											final int width,
+											final int height) {
 
 		// source data
 		final byte[] srcData = src.data;
 		final PaletteData srcPalette = src.palette;
-		final RGB[] srcColors = srcPalette.colors;
 		final byte[] srcAlphaData = src.alphaData;
 		final int srcBytesPerLine = src.bytesPerLine;
-		final int srcDepth = src.depth;
 		int srcIndex;
 		int srcPixel = 0;
 
@@ -118,9 +77,6 @@ public class ImageDataResources {
 		final byte[] dstData = dst.data;
 		byte[] dstAlphaData = dst.alphaData;
 		final int dstBytesPerLine = dst.bytesPerLine;
-
-		final int theByte;
-		final int mask;
 
 		int srcRed, srcGreen, srcBlue;
 
@@ -150,8 +106,8 @@ public class ImageDataResources {
 				// get pixel value
 				srcIndex = srcYBytesPerLine + (srcX * 3);
 				srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
-				+ ((srcData[srcIndex + 1] & 0xFF) << 8)
-				+ (srcData[srcIndex + 2] & 0xFF);
+						+ ((srcData[srcIndex + 1] & 0xFF) << 8)
+						+ (srcData[srcIndex + 2] & 0xFF);
 
 				int srcAlpha = 255;
 
@@ -222,7 +178,79 @@ public class ImageDataResources {
 	}
 
 	/**
-	 * @return Returns neighbor image data or <code>null</code> when there is no image data for the
+	 * Draws image data from src into the neighbor image data
+	 * 
+	 * @param src
+	 *            the source image data
+	 * @param srcXStart
+	 * @param srcYStart
+	 * @param width
+	 * @param height
+	 */
+	public void drawNeighborImageData(	final ImageData src,
+										final int srcXStart,
+										final int srcYStart,
+										final int width,
+										final int height) {
+		if (_neighborImageData == null) {
+
+			NEIGHBOR_LOCK.lock();
+			{
+				try {
+
+					// check again
+					if (_neighborImageData == null) {
+						_neighborImageData = UI.createTransparentImageData(_tileSize, Map.getTransparentRGB());
+					}
+
+				} finally {
+					NEIGHBOR_LOCK.unlock();
+				}
+			}
+		}
+
+		drawImageData(_neighborImageData, src, srcXStart, srcYStart, width, height);
+	}
+
+	/**
+	 * Draws image data from src into the tile image data
+	 * 
+	 * @param src
+	 *            the source image data
+	 * @param srcXStart
+	 * @param srcYStart
+	 * @param width
+	 * @param height
+	 */
+	public void drawTileImageData(	final ImageData src,
+									final int srcXStart,
+									final int srcYStart,
+									final int width,
+									final int height) {
+
+		if (_tileImageData == null) {
+
+			TILE_LOCK.lock();
+			{
+				try {
+
+					// check again
+					if (_tileImageData == null) {
+						_tileImageData = UI.createTransparentImageData(_tileSize, Map.getTransparentRGB());
+					}
+
+				} finally {
+					TILE_LOCK.unlock();
+				}
+			}
+		}
+
+		drawImageData(_tileImageData, src, srcXStart, srcYStart, width, height);
+	}
+
+	/**
+	 * @return Returns the neighbor image data or <code>null</code> when there is no image data for
+	 *         the
 	 *         neighbor tiles
 	 */
 	public ImageData getNeighborImageData() {
@@ -230,7 +258,8 @@ public class ImageDataResources {
 	}
 
 	/**
-	 * @return Returns the image data for the tile
+	 * @return Returns the tile image data or <code>null</code> when there is no image data for the
+	 *         tile
 	 */
 	public ImageData getTileImageData() {
 		return _tileImageData;
