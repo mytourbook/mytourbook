@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
+ 
 package de.byteholder.geoclipse.mapprovider;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,19 +27,19 @@ import de.byteholder.geoclipse.map.UI;
 /**
  */
 public class ImageDataResources {
- 
-	private static final ReentrantLock	TILE_LOCK			= new ReentrantLock();
-	private static final ReentrantLock	NEIGHBOR_LOCK		= new ReentrantLock();
+
+	private static final ReentrantLock	TILE_LOCK				= new ReentrantLock();
+	private static final ReentrantLock	NEIGHBOR_LOCK			= new ReentrantLock();
 
 	/**
 	 * contains image data which are drawn into this tile
 	 */
-	private ImageData					_tileImageData		= null;
+	private ImageData					_tileImageData			= null;
 
 	/**
 	 * contains image data which are drawn from neighbor tiles
 	 */
-	private ImageData					_neighborImageData	= null;
+	private ImageData					_neighborImageData		= null;
 
 	private final int					_tileSize;
 
@@ -264,5 +264,6 @@ public class ImageDataResources {
 	public ImageData getTileImageData() {
 		return _tileImageData;
 	}
+
 
 }

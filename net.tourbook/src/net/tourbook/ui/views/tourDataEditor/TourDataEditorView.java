@@ -349,17 +349,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * 
 	 * Bft	Description				km/h 		mph 
 	 * 0	Calm 					< 1 		< 1 
-	 * 1	Light air			 	1.1 � 5.5 	1 � 3 
-	 * 2	Light breeze 			5.6 � 11 	4 � 7 
-	 * 3	Gentle breeze 			12 � 19 	8 � 12 
-	 * 4	Moderate breeze 		20 � 28 	13 � 17 
-	 * 5	Fresh breeze 			29 � 38 	18 � 24 
-	 * 6	Strong breeze 			39 � 49 	25 � 30 
-	 * 7	High wind, ...		 	50 � 61 	31 � 38 
-	 * 8	Gale, Fresh gale 		62 � 74 	39 � 46 
-	 * 9	Strong gale 			75 � 88 	47 � 54 
-	 * 10	Storm[6], Whole gale 	89 � 102 	55 � 63 
-	 * 11	Violent storm 			103 � 117 	64 � 72 
+	 * 1	Light air			 	1.1 - 5.5 	1 - 3 
+	 * 2	Light breeze 			5.6 - 11 	4 - 7 
+	 * 3	Gentle breeze 			12 - 19 	8 - 12 
+	 * 4	Moderate breeze 		20 - 28 	13 - 17 
+	 * 5	Fresh breeze 			29 - 38 	18 - 24 
+	 * 6	Strong breeze 			39 - 49 	25 - 30 
+	 * 7	High wind, ...		 	50 - 61 	31 - 38 
+	 * 8	Gale, Fresh gale 		62 - 74 	39 - 46 
+	 * 9	Strong gale 			75 - 88 	47 - 54 
+	 * 10	Storm[6], Whole gale 	89 - 102 	55 - 63 
+	 * 11	Violent storm 			103 - 117 	64 - 72 
 	 * 12	Hurricane-force 	 	>= 118 		>= 73
 	 * 
 	 * </pre>
@@ -378,7 +378,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			Messages.Weather_WindSpeed_Bft10,
 			Messages.Weather_WindSpeed_Bft11,
 			Messages.Weather_WindSpeed_Bft12									};
-
+ 
 	/**
 	 * Wind speed in km/h
 	 */
@@ -2994,7 +2994,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					displayCloudIcon();
 				}
 			});
- 
+
 			// fill combobox
 			for (final String cloudText : _cloudText) {
 				_comboClouds.add(cloudText);

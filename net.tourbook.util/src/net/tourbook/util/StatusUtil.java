@@ -87,6 +87,16 @@ public class StatusUtil {
 	}
 
 	/**
+	 * Log message into the status log
+	 * 
+	 * @param message
+	 * @param exception
+	 */
+	public static void log(final String message) {
+		handleStatus(message, null, StatusManager.LOG);
+	}
+
+	/**
 	 * Log exception into the status log
 	 * 
 	 * @param message
@@ -102,7 +112,7 @@ public class StatusUtil {
 		}
 
 		handleStatus(message, exception, StatusManager.LOG);
-	}
+	} 
 
 	/**
 	 * Log into log

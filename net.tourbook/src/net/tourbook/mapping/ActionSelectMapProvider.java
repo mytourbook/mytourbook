@@ -405,16 +405,33 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 				_geoPrefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
 
 		final ArrayList<MP> mapProviders = new ArrayList<MP>();
+		final ArrayList<String> validMpIds = new ArrayList<String>();
 
 		// set all map provider which are in the pref store
 		for (final String storeMpId : storedProviderIds) {
 
-			// find the stored map provider in the available map providers
-			for (final MP mp : allMapProviders) {
-				if (mp.getId().equals(storeMpId)) {
-					mapProviders.add(mp);
+			/*
+			 * ensure that a map provider is unique and not duplicated, this happend during
+			 * debugging
+			 */
+			boolean ignoreMP = false;
+			for (final MP mp : mapProviders) {
+				if (mp.getId().equalsIgnoreCase(storeMpId)) {
+					ignoreMP = true;
 					break;
 				}
+			}
+			if (ignoreMP) {
+				continue;
+			}
+
+			// find the stored map provider in the available map providers
+			for (final MP mp : allMapProviders) {
+				if (mp.getId().equalsIgnoreCase(storeMpId)) {
+					mapProviders.add(mp);
+					validMpIds.add(mp.getId());
+					break;
+	 			}
 			}
 		}
 
@@ -424,6 +441,13 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 				mapProviders.add(mp);
 			}
 		}
+
+		/*
+		 * save valid mp id's
+		 */
+		_geoPrefStore.setValue(IMappingPreferences.MAP_PROVIDER_SORT_ORDER, //
+				StringToArrayConverter.convertArrayToString(//
+						validMpIds.toArray(new String[validMpIds.size()])));
 
 		/*
 		 * set status if the map provider can be toggled with the map provider button

@@ -1912,15 +1912,10 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
 					}
 				}
-
-				// dispose resources which were used to draw the overlays
-//				for (final MapPainter overlay : getOverlays()) {
-//					overlay.disposeTempResources();
-//				}
 			}
 		});
 	}
-
+ 
 	/**
 	 * Paints the overlay into the overlay image which is bigger than the tile image so that the
 	 * drawings are not clipped at the tile border. The overlay image is afterwards splitted into
@@ -1938,25 +1933,6 @@ public class Map extends Canvas {
 			// clear 9 part image
 			_gc9Parts.setBackground(_transparentColor);
 			_gc9Parts.fillRectangle(_image9Parts.getBounds());
-
-//			_gc9Parts.setLineWidth(1);
-//
-//			for (int xIndex = 0; xIndex < parts; xIndex++) {
-//				for (int yIndex = 0; yIndex < parts; yIndex++) {
-//
-//					final int devX = xIndex * tileSize;
-//					final int devY = yIndex * tileSize;
-//
-//					_gc9Parts.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-//					_gc9Parts.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-//
-//					final String text = "x:" + xIndex + " y:" + yIndex + " tx:" + tile.getX() + " ty:" + tile.getY();
-//					_gc9Parts.drawText(text, devX + 1, devY + 1);
-//
-//					_gc9Parts.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//					_gc9Parts.drawRectangle(devX, devY, tileSize - 1, tileSize - 1);
-//				}
-//			}
 
 			// paint all overlays for the current tile
 			for (final MapPainter overlay : getOverlays()) {

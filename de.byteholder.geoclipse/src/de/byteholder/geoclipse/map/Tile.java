@@ -8,7 +8,7 @@
  */
 
 package de.byteholder.geoclipse.map;
-
+  
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.ImageData;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
- 
+
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
  * zoom level.
@@ -296,7 +296,6 @@ public class Tile extends Observable {
 		if (tileImageData != null) {
 			_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
 		}
-
 
 		// create image from image data
 		_overlayImage = new Image(display, finalImageData);
@@ -806,7 +805,6 @@ public class Tile extends Observable {
 	public void setOfflinePath(final String osTilePath) {
 		_offlinePath = osTilePath;
 	}
-
 
 	public void setOverlayImageState(final OverlayImageState overlayImageState) {
 		_overlayImageState = overlayImageState;
