@@ -82,9 +82,9 @@ import de.byteholder.gpx.GeoPosition;
 public class Map extends Canvas {
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
+	public final static RGB		DEFAULT_BACKGROUND_RGB	= new RGB(181, 208, 208);
 
-	private static final RGB					_transparentRGB				= new RGB(0xfe, 0xfe, 0xfe);
+	private static final RGB	_transparentRGB			= new RGB(0xfe, 0xfe, 0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
@@ -97,6 +97,7 @@ public class Map extends Canvas {
 	private Image								_mapImage;
 
 	private Image								_image9Parts;
+
 	private GC									_gc9Parts;
 
 	/**
@@ -170,7 +171,7 @@ public class Map extends Canvas {
 	}
 
 	private final TextWrapPainter				_textWrapper				= new TextWrapPainter();
- 
+
 	/**
 	 * cache for overlay images
 	 */
@@ -275,6 +276,8 @@ public class Map extends Canvas {
 
 	private int									_jobCounterSplitImages		= 0;
 
+	protected long								_startTime;
+
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
 
@@ -331,6 +334,7 @@ public class Map extends Canvas {
 	// used to pan using press and drag mouse gestures
 	private class PanMouseListener implements MouseListener, MouseMoveListener, Listener {
 
+		@Override
 		public void handleEvent(final Event event) {
 			if (event.type == SWT.MouseWheel) {
 
@@ -345,6 +349,7 @@ public class Map extends Canvas {
 			}
 		}
 
+		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
 
 			if (e.button == 1) {
@@ -358,6 +363,7 @@ public class Map extends Canvas {
 			}
 		}
 
+		@Override
 		public void mouseDown(final MouseEvent e) {
 
 			if (e.button == 1) {
@@ -371,10 +377,12 @@ public class Map extends Canvas {
 			}
 		}
 
+		@Override
 		public void mouseMove(final MouseEvent e) {
 			onMouseMove(e);
 		}
 
+		@Override
 		public void mouseUp(final MouseEvent e) {
 
 			if (e.button == 1) {
@@ -409,6 +417,7 @@ public class Map extends Canvas {
 	 */
 	private final class TileLoadObserver implements Observer {
 
+		@Override
 		public void update(final Observable observable, final Object arg) {
 
 			if (observable instanceof Tile) {
@@ -495,12 +504,14 @@ public class Map extends Canvas {
 		_zoomListeners = new ArrayList<IZoomListener>();
 
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(final PaintEvent e) {
 				onPaint(e);
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose(e);
 			}
@@ -515,10 +526,12 @@ public class Map extends Canvas {
 
 		addControlListener(new ControlListener() {
 
+			@Override
 			public void controlMoved(final ControlEvent e) {
 			// just do nothing, it's not necessary
 			}
 
+			@Override
 			public void controlResized(final ControlEvent e) {
 				onResize();
 			}
@@ -528,6 +541,7 @@ public class Map extends Canvas {
 		 * enable travers keys
 		 */
 		addTraverseListener(new TraverseListener() {
+			@Override
 			public void keyTraversed(final TraverseEvent e) {
 				e.doit = true;
 			}
@@ -1859,6 +1873,7 @@ public class Map extends Canvas {
 
 			final int	runnableCounter	= _overlayRunnableCounter;
 
+			@Override
 			public void run() {
 
 				if (isDisposed()) {
@@ -1890,11 +1905,14 @@ public class Map extends Canvas {
 	private void paintOverlay20Tiles() {
 
 		BusyIndicator.showWhile(_display, new Runnable() {
+			@Override
 			public void run() {
 
 				Tile tile;
 
 				checkImageTemplate9Parts();
+
+				_startTime = System.currentTimeMillis();
 
 				while ((tile = _tileOverlayPaintQueue.poll()) != null) {
 
@@ -1912,10 +1930,20 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
 					}
 				}
+
+//				System.out.println(_startTime);
+//				System.out.println(_startTime);
+//				System.out.println(_startTime
+//						+ "\t"
+//						+ (System.currentTimeMillis() - _startTime)
+//						+ "\tms"
+//						+ "\tpaint overlays\t");
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
 			}
 		});
 	}
- 
+
 	/**
 	 * Paints the overlay into the overlay image which is bigger than the tile image so that the
 	 * drawings are not clipped at the tile border. The overlay image is afterwards splitted into
@@ -1997,6 +2025,8 @@ public class Map extends Canvas {
 	 * @param imageData9Parts
 	 */
 	private void paintOverlay40SplitParts(final Tile tile, final ImageData imageData9Parts) {
+
+		final long startTime = System.currentTimeMillis();
 
 		final TileCache tileCache = MP.getTileCache();
 
@@ -2126,6 +2156,17 @@ public class Map extends Canvas {
 				}
 			}
 		}
+//
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//		final long endTime = System.currentTimeMillis();
+//		System.out.println(endTime
+//				+ "\t"
+//				+ (endTime - _startTime)
+//				+ "\tms\tsplit parts:\t"
+//				+ (endTime - startTime)
+//				+ "\tms\t"
+//				+ tile);
+
 	}
 
 //	/**
@@ -2277,6 +2318,7 @@ public class Map extends Canvas {
 
 				final int	fSynchRunnableCounter	= _redrawMapCounter;
 
+				@Override
 				public void run() {
 
 					if (isDisposed()) {
@@ -2307,6 +2349,7 @@ public class Map extends Canvas {
 
 				final int	fAsynchRunnableCounter	= _redrawMapCounter;
 
+				@Override
 				public void run() {
 
 					if (isDisposed()) {
@@ -2444,6 +2487,7 @@ public class Map extends Canvas {
 			// current thread is not the display thread
 
 			_display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!isDisposed()) {
 						setMapCenterInWoldPixel(_MP.geoToPixel(geoPosition, _mapZoomLevel));
