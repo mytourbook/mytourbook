@@ -806,8 +806,12 @@ public class Tile extends Observable {
 		_offlinePath = osTilePath;
 	}
 
+	public void setOverlayImage(final Image overlayImage) {
+		_overlayImage = overlayImage;
+	}
+
 	public void setOverlayImageState(final OverlayImageState overlayImageState) {
-		_overlayImageState = overlayImageState;
+ 		_overlayImageState = overlayImageState;
 	}
 
 	public void setOverlayTourStatus(final OverlayTourState overlayTourStatus) {

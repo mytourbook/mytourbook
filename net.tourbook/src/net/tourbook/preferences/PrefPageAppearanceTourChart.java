@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,7 +24,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;
-
+ 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -61,8 +61,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
-
-	private static final int		COLUMN_INDENT		= 20;
 
 	private static final int		DEFAULT_FIELD_WIDTH	= 40;
 
@@ -207,7 +205,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void createGraphList() {
 
 		final String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
-		getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
+				getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
 
 		fViewerGraphs = new ArrayList<Graph>();
 
@@ -306,7 +304,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		/*
 		 * editor: grid vertical distance
 		 */
-		fEditGridVerticalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
+		fEditGridVerticalDistance = new IntegerFieldEditor(
+				ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
 				Messages.Pref_Graphs_grid_vertical_distance,
 				groupGrid);
 		fEditGridVerticalDistance.setPreferenceStore(getPreferenceStore());
@@ -318,7 +317,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		/*
 		 * editor: grid horizontal distance
 		 */
-		fEditGridHorizontalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
+		fEditGridHorizontalDistance = new IntegerFieldEditor(
+				ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
 				Messages.Pref_Graphs_grid_horizontal_distance,
 				groupGrid);
 		fEditGridHorizontalDistance.setPreferenceStore(getPreferenceStore());
@@ -347,7 +347,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * checkbox: pace min/max value
 			 */
-			fEditPaceMinMaxCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
+			fEditPaceMinMaxCheckbox = new BooleanFieldEditor(
+					ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
 					Messages.Pref_Graphs_Check_force_minmax_for_pace,
 					groupMinValue);
 			fEditPaceMinMaxCheckbox.setPreferenceStore(prefStore);
@@ -368,7 +369,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * editor: pace min value
 			 */
-			fEditPaceMin = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+			fEditPaceMin = new IntegerFieldEditor(
+					ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
 					Messages.Pref_Graphs_Text_min_value,
 					groupMinValue);
 			fEditPaceMin.setPreferenceStore(prefStore);
@@ -378,7 +380,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			fEditPaceMin.load();
 			UI.setFieldWidth(groupMinValue, fEditPaceMin, DEFAULT_FIELD_WIDTH);
 			gd = new GridData();
-			gd.horizontalIndent = COLUMN_INDENT;
+			gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
 			fEditPaceMin.getLabelControl(groupMinValue).setLayoutData(gd);
 
 			fEditPaceMin.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
@@ -390,7 +392,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * editor: pace max value
 			 */
-			fEditPaceMax = new IntegerFieldEditor(ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+			fEditPaceMax = new IntegerFieldEditor(
+					ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
 					Messages.Pref_Graphs_Text_max_value,
 					groupMinValue);
 			fEditPaceMax.setPreferenceStore(prefStore);
@@ -400,7 +403,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			fEditPaceMax.load();
 			UI.setFieldWidth(groupMinValue, fEditPaceMax, DEFAULT_FIELD_WIDTH);
 			gd = new GridData();
-			gd.horizontalIndent = COLUMN_INDENT;
+			gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
 			fEditPaceMax.getLabelControl(groupMinValue).setLayoutData(gd);
 
 			fEditPaceMax.setEnabled(fEditPaceMinMaxCheckbox.getBooleanValue(), groupMinValue);
@@ -412,7 +415,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * checkbox: altimeter min value
 			 */
-			fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
+			fEditAltimeterMinCheckbox = new BooleanFieldEditor(
+					ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
 					Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
 					groupMinValue);
 			fEditAltimeterMinCheckbox.setPreferenceStore(prefStore);
@@ -432,7 +436,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * editor: altimeter min value
 			 */
-			fEditAltimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+			fEditAltimeterMinEditor = new IntegerFieldEditor(
+					ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 					Messages.Pref_Graphs_Text_min_value,
 					groupMinValue);
 			fEditAltimeterMinEditor.setPreferenceStore(prefStore);
@@ -442,7 +447,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			fEditAltimeterMinEditor.load();
 			UI.setFieldWidth(groupMinValue, fEditAltimeterMinEditor, DEFAULT_FIELD_WIDTH);
 			gd = new GridData();
-			gd.horizontalIndent = COLUMN_INDENT;
+			gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
 			fEditAltimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
 
 			fEditAltimeterMinEditor.setEnabled(fEditAltimeterMinCheckbox.getBooleanValue(), groupMinValue);
@@ -453,7 +458,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * checkbox: gradient min value
 			 */
-			fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
+			fEditGradientMinCheckbox = new BooleanFieldEditor(
+					ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
 					Messages.Pref_Graphs_Check_force_minimum_for_gradient,
 					groupMinValue);
 			fEditGradientMinCheckbox.setPreferenceStore(prefStore);
@@ -473,7 +479,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			/*
 			 * editor: gradient min value
 			 */
-			fEditGradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+			fEditGradientMinEditor = new IntegerFieldEditor(
+					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 					Messages.Pref_Graphs_Text_min_value,
 					groupMinValue);
 			fEditGradientMinEditor.setPreferenceStore(prefStore);
@@ -483,7 +490,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			fEditGradientMinEditor.load();
 			UI.setFieldWidth(groupMinValue, fEditGradientMinEditor, DEFAULT_FIELD_WIDTH);
 			gd = new GridData();
-			gd.horizontalIndent = COLUMN_INDENT;
+			gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
 			fEditGradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
 			fEditGradientMinEditor.setEnabled(fEditGradientMinCheckbox.getBooleanValue(), groupMinValue);
 
@@ -583,7 +590,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		fChkShowStartTime = new Button(group, SWT.CHECK);
 		fChkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
 		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
+		gd.horizontalIndent = UI.FORM_FIRST_COLUMN_INDENT;
 		fChkShowStartTime.setLayoutData(gd);
 
 		// initialize the radio button
@@ -617,7 +624,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		// checkbox: move sliders to border when zoomed
 		fChkMoveSlidersWhenZoomed = new Button(groupZoomOptions, SWT.CHECK);
 		fChkMoveSlidersWhenZoomed.setText(Messages.Pref_Graphs_move_sliders_when_zoomed);
-		fChkMoveSlidersWhenZoomed.setSelection(prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
+		fChkMoveSlidersWhenZoomed.setSelection(prefStore
+				.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
 	}
 
 	private void enableActions() {
@@ -772,9 +780,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
 				fChkZoomToSlider.getSelection());
 
-		prefStore.setValue(
-				ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
-				fChkMoveSlidersWhenZoomed.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, fChkMoveSlidersWhenZoomed
+				.getSelection());
 
 		fEditPaceMinMaxCheckbox.store();
 		fEditPaceMin.store();
@@ -805,9 +812,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			final Graph graph = (Graph) graphs[graphIndex];
 			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
 		}
-		prefstore.setValue(
-				ITourbookPreferences.GRAPH_VISIBLE,
-				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
+		prefstore.setValue(ITourbookPreferences.GRAPH_VISIBLE, StringToArrayConverter
+				.convertArrayToString(prefGraphsChecked));
 
 		// convert the array of all table items into a string which is store in
 		// the prefs

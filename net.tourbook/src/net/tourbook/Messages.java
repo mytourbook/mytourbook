@@ -288,7 +288,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
-	public static String	Image___Empty16;
+	public static String		Image___Empty16;
 
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
@@ -481,8 +481,18 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
+	public static String	Pref_MapLayout_Group_TourInMapProperties;
+
+	public static String		Pref_MapLayout_Label_TourPaintMethod;
+	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex;
+
+	public static String	Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
+	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple;
+
+	public static String	Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
+
 	public static String		Pref_People_Action_add_person;
-	public static String		Pref_People_Column_device;
+ 	public static String		Pref_People_Column_device;
 	public static String		Pref_People_Column_first_name;
 	public static String		Pref_People_Column_height;
 	public static String		Pref_People_Column_last_name;
@@ -514,11 +524,9 @@ public class Messages extends NLS {
 	public static String		pref_general_restart_app_message;
 	public static String		pref_general_restart_app_title;
 
-	public static String	pref_map_layout_BorderWidth;
-
+	public static String		pref_map_layout_BorderWidth;
 	public static String		pref_map_layout_dim_color;
-
-	public static String	pref_map_layout_PaintBorder;
+	public static String		pref_map_layout_PaintBorder;
 	public static String		pref_map_layout_symbol;
 	public static String		pref_map_layout_symbol_dot;
 	public static String		pref_map_layout_symbol_line;
@@ -565,9 +573,7 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_format_hh_mm_ss;
 	public static String		pref_view_layout_label_recording_time_format;
 	public static String		pref_view_layout_label_segmenter_down;
-
 	public static String		pref_view_layout_label_segmenter_up;
-
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
@@ -645,16 +651,16 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_update_tour;
 
-	public static String	Tour_Editor_Label_DistanceSensor_No;
+	public static String		Tour_Editor_Label_DistanceSensor_No;
 
-	public static String	Tour_Editor_Label_DistanceSensor_Tooltip;
+	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
 
-	public static String	Tour_Editor_Label_DistanceSensor_Yes;
+	public static String		Tour_Editor_Label_DistanceSensor_Yes;
 
-	public static String	Tour_Editor_Label_WindDirection_Unit;
+	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
- 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
+	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
@@ -759,25 +765,25 @@ public class Messages extends NLS {
 	public static String		tour_editor_section_weather;
 	public static String		tour_editor_label_wind_direction;
 
-	public static String	tour_editor_label_wind_direction_Tooltip;
+	public static String		tour_editor_label_wind_direction_Tooltip;
 	public static String		tour_editor_label_wind_speed;
 
-	public static String	tour_editor_label_wind_speed_Tooltip;
+	public static String		tour_editor_label_wind_speed_Tooltip;
 	public static String		tour_editor_label_clouds;
 
-	public static String	tour_editor_label_clouds_Tooltip;
+	public static String		tour_editor_label_clouds_Tooltip;
 
-	public static String	tour_editor_label_DistanceSensor;
+	public static String		tour_editor_label_DistanceSensor;
 	public static String		tour_editor_label_temperature;
 
-	public static String	tour_editor_label_temperature_Tooltip;
+	public static String		tour_editor_label_temperature_Tooltip;
 
 	public static String		tour_editor_section_personal;
 	public static String		tour_editor_label_rest_pulse;
 
-	public static String	tour_editor_label_rest_pulse_Tooltip;
+	public static String		tour_editor_label_rest_pulse_Tooltip;
 
-	public static String	tour_editor_label_WindDirectionNESW_Tooltip;
+	public static String		tour_editor_label_WindDirectionNESW_Tooltip;
 
 	public static String		tour_merger_btn_reset_adjustment;
 	public static String		tour_merger_btn_reset_adjustment_tooltip;
@@ -902,61 +908,61 @@ public class Messages extends NLS {
 
 	public static String		ui_tour_not_defined;
 
-	public static String	Weather_Clounds_Clouds;
+	public static String		Weather_Clounds_Clouds;
 
-	public static String	Weather_Clounds_Clouny;
+	public static String		Weather_Clounds_Clouny;
 
-	public static String	Weather_Clounds_IsNotDefined;
+	public static String		Weather_Clounds_IsNotDefined;
 
-	public static String	Weather_Clounds_Lightning;
+	public static String		Weather_Clounds_Lightning;
 
-	public static String	Weather_Clounds_Rain;
+	public static String		Weather_Clounds_Rain;
 
-	public static String	Weather_Clounds_Snow;
+	public static String		Weather_Clounds_Snow;
 
-	public static String	Weather_Clounds_Sunny;
+	public static String		Weather_Clounds_Sunny;
 
-	public static String	Weather_WindDirection_E;
+	public static String		Weather_WindDirection_E;
 
-	public static String	Weather_WindDirection_N;
+	public static String		Weather_WindDirection_N;
 
-	public static String	Weather_WindDirection_NE;
+	public static String		Weather_WindDirection_NE;
 
-	public static String	Weather_WindDirection_NW;
+	public static String		Weather_WindDirection_NW;
 
-	public static String	Weather_WindDirection_S;
+	public static String		Weather_WindDirection_S;
 
-	public static String	Weather_WindDirection_SE;
+	public static String		Weather_WindDirection_SE;
 
-	public static String	Weather_WindDirection_SW;
+	public static String		Weather_WindDirection_SW;
 
-	public static String	Weather_WindDirection_W;
- 
-	public static String	Weather_WindSpeed_Bft00;
+	public static String		Weather_WindDirection_W;
 
-	public static String	Weather_WindSpeed_Bft01;
+	public static String		Weather_WindSpeed_Bft00;
 
-	public static String	Weather_WindSpeed_Bft02;
+	public static String		Weather_WindSpeed_Bft01;
 
-	public static String	Weather_WindSpeed_Bft03;
+	public static String		Weather_WindSpeed_Bft02;
 
-	public static String	Weather_WindSpeed_Bft04;
+	public static String		Weather_WindSpeed_Bft03;
 
-	public static String	Weather_WindSpeed_Bft05;
+	public static String		Weather_WindSpeed_Bft04;
 
-	public static String	Weather_WindSpeed_Bft06;
+	public static String		Weather_WindSpeed_Bft05;
 
-	public static String	Weather_WindSpeed_Bft07;
+	public static String		Weather_WindSpeed_Bft06;
 
-	public static String	Weather_WindSpeed_Bft08;
+	public static String		Weather_WindSpeed_Bft07;
 
-	public static String	Weather_WindSpeed_Bft09;
+	public static String		Weather_WindSpeed_Bft08;
 
-	public static String	Weather_WindSpeed_Bft10;
+	public static String		Weather_WindSpeed_Bft09;
 
-	public static String	Weather_WindSpeed_Bft11;
+	public static String		Weather_WindSpeed_Bft10;
 
-	public static String	Weather_WindSpeed_Bft12;
+	public static String		Weather_WindSpeed_Bft11;
+
+	public static String		Weather_WindSpeed_Bft12;
 
 	static {
 		// initialize resource bundle

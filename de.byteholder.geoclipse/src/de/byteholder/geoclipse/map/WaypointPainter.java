@@ -13,7 +13,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Set;
- 
+
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
@@ -38,9 +38,9 @@ public class WaypointPainter extends MapPainter {
 	@Override
 	protected void dispose() {}
 
-	@Override
-	protected void doPaint(final GC gc, final Map map) {}
-
+//	@Override
+//	protected void doPaint(final GC gc, final Map map) {}
+ 
 	/**
 	 * {@inheritDoc}
 	 * 

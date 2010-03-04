@@ -119,6 +119,7 @@ public class UI {
 	public static final String						VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";			//$NON-NLS-1$
 
 	public static final int							DEFAULT_FIELD_WIDTH				= 40;
+	public static final int							FORM_FIRST_COLUMN_INDENT		= 16;
 
 	public static final String						UTF_8							= "UTF-8";									//$NON-NLS-1$
 
@@ -146,7 +147,7 @@ public class UI {
 	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String						SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
 	public static final String						SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
-
+ 
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
 

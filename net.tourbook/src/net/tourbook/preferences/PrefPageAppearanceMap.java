@@ -18,11 +18,13 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
- 
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -34,22 +36,31 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+ 
+	public static final String		MAP_TOUR_SYMBOL_LINE		= "line";											//$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_DOT			= "dot";											//$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_SQUARE		= "square";										//$NON-NLS-1$
 
-	public static final String		MAP_TOUR_SYMBOL_LINE	= "line";											//$NON-NLS-1$
-	public static final String		MAP_TOUR_SYMBOL_DOT		= "dot";											//$NON-NLS-1$
-	public static final String		MAP_TOUR_SYMBOL_SQUARE	= "square";										//$NON-NLS-1$
+	public static final String		TOUR_PAINT_METHOD_SIMPLE	= "simple";										//$NON-NLS-1$
+	public static final String		TOUR_PAINT_METHOD_COMPLEX	= "complex";										//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 	private boolean					_isModified;
 
+	private Label					_lblBorderWidth;
 	private Spinner					_spinnerLineWidth;
-	private Spinner					_borderWidth;
+	private Spinner					_spinnerBorderWidth;
+	private Text					_txtTourPaintMethod;
+	private BooleanFieldEditor		_editorTourWithBorder;
+	private RadioGroupFieldEditor	_editorTourPaintMethod;
 
 	@Override
 	protected void createFieldEditors() {
@@ -58,88 +69,14 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			/*
-			 * checkbox: plot symbol
-			 */
-			final RadioGroupFieldEditor groupEditor = new RadioGroupFieldEditor(
-					ITourbookPreferences.MAP_LAYOUT_SYMBOL,
-					Messages.pref_map_layout_symbol,
-					1,
-					new String[][] {
-							{ Messages.pref_map_layout_symbol_line, MAP_TOUR_SYMBOL_LINE },
-							{ Messages.pref_map_layout_symbol_dot, MAP_TOUR_SYMBOL_DOT },
-							{ Messages.pref_map_layout_symbol_square, MAP_TOUR_SYMBOL_SQUARE } },
-					container,
-					true);
-			addField(groupEditor);
-//			groupEditor.getRadioBoxControl(container);
+			createUITourInMap(container);
 
 			// spacer
-			Label label = new Label(container, NONE);
-
-			// label: line width
-			label = new Label(container, NONE);
-			label.setText(Messages.pref_map_layout_symbol_width);
-
-			// spinner: line width
-			_spinnerLineWidth = new Spinner(container, SWT.BORDER);
-			_spinnerLineWidth.setMinimum(1);
-			_spinnerLineWidth.setMaximum(50);
-			_spinnerLineWidth.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangeProperty();
-				}
-			});
-			_spinnerLineWidth.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeProperty();
-				}
-			});
-
-			/*
-			 * checkbox: paint with border
-			 */
-			addField(new BooleanFieldEditor(
-					ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,
-					Messages.pref_map_layout_PaintBorder,
-					container));
-
-			// spacer
-			label = new Label(container, NONE);
-
-			/*
-			 * border width
-			 */
-
-			// label: border width
-			label = new Label(container, NONE);
-			label.setText(Messages.pref_map_layout_BorderWidth);
-
-			// spinner: border width
-			_borderWidth = new Spinner(container, SWT.BORDER);
-			_borderWidth.setMinimum(1);
-			_borderWidth.setMaximum(10);
-			_borderWidth.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangeProperty();
-				}
-			});
-			_borderWidth.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeProperty();
-				}
-			});
-
-			// spacer
-			label = new Label(container, NONE);
-			label = new Label(container, NONE);
+			new Label(container, NONE);
+			new Label(container, NONE);
 
 			/*
 			 * dimming color
@@ -157,6 +94,132 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		restoreState();
 	}
 
+	private void createUITourInMap(final Composite parent) {
+
+		final Group groupContainer = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(groupContainer);
+		groupContainer.setText(Messages.Pref_MapLayout_Group_TourInMapProperties);
+		{
+			final PixelConverter pc = new PixelConverter(groupContainer);
+
+			/*
+			 * checkbox: plot symbol
+			 */
+			{
+				addField(new RadioGroupFieldEditor(
+						ITourbookPreferences.MAP_LAYOUT_SYMBOL,
+						Messages.pref_map_layout_symbol,
+						3,
+						new String[][] {
+								{ Messages.pref_map_layout_symbol_line, MAP_TOUR_SYMBOL_LINE },
+								{ Messages.pref_map_layout_symbol_dot, MAP_TOUR_SYMBOL_DOT },
+								{ Messages.pref_map_layout_symbol_square, MAP_TOUR_SYMBOL_SQUARE } },
+						groupContainer,
+						false));
+
+				// label: line width
+				final Label label = new Label(groupContainer, NONE);
+				label.setText(Messages.pref_map_layout_symbol_width);
+
+				// spinner: line width
+				_spinnerLineWidth = new Spinner(groupContainer, SWT.BORDER);
+				_spinnerLineWidth.setMinimum(1);
+				_spinnerLineWidth.setMaximum(50);
+				_spinnerLineWidth.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onChangeProperty();
+					}
+				});
+				_spinnerLineWidth.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeProperty();
+					}
+				});
+			}
+
+			/*
+			 * checkbox: paint with border
+			 */
+			{
+				_editorTourWithBorder = new BooleanFieldEditor(
+						ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,
+						Messages.pref_map_layout_PaintBorder,
+						groupContainer);
+				addField(_editorTourWithBorder);
+
+				// spacer
+				new Label(groupContainer, NONE);
+
+				/*
+				 * border width
+				 */
+
+				// label: border width
+				_lblBorderWidth = new Label(groupContainer, NONE);
+				GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblBorderWidth);
+				_lblBorderWidth.setText(Messages.pref_map_layout_BorderWidth);
+
+				// spinner: border width
+				_spinnerBorderWidth = new Spinner(groupContainer, SWT.BORDER);
+				_spinnerBorderWidth.setMinimum(1);
+				_spinnerBorderWidth.setMaximum(30);
+				_spinnerBorderWidth.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onChangeProperty();
+					}
+				});
+				_spinnerBorderWidth.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeProperty();
+					}
+				});
+			}
+
+			/*
+			 * checkbox: paint tour method
+			 */
+
+			final Group groupMethod = new Group(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(groupMethod);
+			groupMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
+			{
+				_editorTourPaintMethod = new RadioGroupFieldEditor(
+						ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+						UI.EMPTY_STRING,
+						2,
+						new String[][] {
+								{ Messages.Pref_MapLayout_Label_TourPaintMethod_Simple, TOUR_PAINT_METHOD_SIMPLE },
+								{ Messages.Pref_MapLayout_Label_TourPaintMethod_Complex, TOUR_PAINT_METHOD_COMPLEX } },
+						groupMethod);
+
+				addField(_editorTourPaintMethod);
+
+				_txtTourPaintMethod = new Text(groupMethod, SWT.WRAP | SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.grab(true, true)
+						.span(2, 1)
+						.hint(pc.convertWidthInCharsToPixels(40), pc.convertHeightInCharsToPixels(12))
+						.applyTo(_txtTourPaintMethod);
+			}
+			// set group margin after the fields are created
+			GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMethod);
+		}
+
+		// force layout after the fields are set !!!
+		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupContainer);
+
+	}
+
+	private void enableControls(final boolean isWithBorder) {
+
+		_lblBorderWidth.setEnabled(isWithBorder);
+		_spinnerBorderWidth.setEnabled(isWithBorder);
+	}
+
 	/**
 	 * fire one event for all modifications
 	 */
@@ -172,11 +235,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 	 * Property was changed, fire a property change event
 	 */
 	private void onChangeProperty() {
-
 		_isModified = true;
-
-//		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, _spinnerLineWidth.getSelection());
-//		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, _borderWidth.getSelection());
 	}
 
 	@Override
@@ -195,9 +254,12 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		_isModified = true;
 
 		_spinnerLineWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH));
-		_borderWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
+		_spinnerBorderWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
 
 		super.performDefaults();
+
+		// display info for the selected paint method 
+		setUIPaintMethodInfo(_prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
 
 		// this do not work, I have no idea why, but with the apply button it works :-(
 //		fireModificationEvent();
@@ -221,20 +283,46 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		_isModified = true;
+
+		if (event.getProperty().equals(FieldEditor.VALUE)) {
+
+			_isModified = true;
+
+			if (event.getSource() == _editorTourPaintMethod) {
+
+				// display info for the selected paint method 
+				setUIPaintMethodInfo((String) event.getNewValue());
+			}
+
+			enableControls(_editorTourWithBorder.getBooleanValue());
+		}
+
 		super.propertyChange(event);
 	}
 
 	private void restoreState() {
 
 		_spinnerLineWidth.setSelection(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH));
-		_borderWidth.setSelection(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
+		_spinnerBorderWidth.setSelection(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
 
+		// display info for the selected paint method 
+		setUIPaintMethodInfo(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+
+		enableControls(_prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));
 	}
 
 	private void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, _spinnerLineWidth.getSelection());
-		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, _borderWidth.getSelection());
+		_prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, _spinnerBorderWidth.getSelection());
+	}
+
+	private void setUIPaintMethodInfo(final String value) {
+
+		if (value.equals(TOUR_PAINT_METHOD_SIMPLE)) {
+			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
+		} else {
+			_txtTourPaintMethod.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
+		}
 	}
 }

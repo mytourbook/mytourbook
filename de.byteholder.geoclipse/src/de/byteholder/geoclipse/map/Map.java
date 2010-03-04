@@ -82,9 +82,9 @@ import de.byteholder.gpx.GeoPosition;
 public class Map extends Canvas {
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB		DEFAULT_BACKGROUND_RGB	= new RGB(181, 208, 208);
+	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
 
-	private static final RGB	_transparentRGB			= new RGB(0xfe, 0xfe, 0xfe);
+	private static final RGB					_transparentRGB				= new RGB(0xfe, 0xfe, 0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
@@ -276,7 +276,11 @@ public class Map extends Canvas {
 
 	private int									_jobCounterSplitImages		= 0;
 
-	protected long								_startTime;
+	/**
+	 * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
+ 	 * simple mode
+	 */
+	private boolean								_isTourPaintMethodEnhanced	= false;
 
 	// used to pan using the arrow keys
 	private class PanKeyListener extends KeyAdapter {
@@ -598,10 +602,6 @@ public class Map extends Canvas {
 		_mapListeners.add(mapListener);
 	}
 
-//	public void addTileListener(final ITileListener tileListener) {
-//		fTileListeners.add(tileListener);
-//	}
-
 	/**
 	 * Adds a map overlay. This is a Painter which will paint on top of the map. It can be used to
 	 * draw waypoints, lines, or static overlays like text messages.
@@ -687,6 +687,7 @@ public class Map extends Canvas {
 			_gc9Parts.dispose();
 		}
 
+		// create 9 part image/gc
 		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize, _transparentRGB);
 
 		_image9Parts = new Image(_display, transparentImageData);
@@ -1912,8 +1913,6 @@ public class Map extends Canvas {
 
 				checkImageTemplate9Parts();
 
-				_startTime = System.currentTimeMillis();
-
 				while ((tile = _tileOverlayPaintQueue.poll()) != null) {
 
 					// skip tiles from another zoom level
@@ -1922,7 +1921,11 @@ public class Map extends Canvas {
 						// set state that this tile is checked that it contains tours
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
-						paintOverlay30PaintTile(tile);
+						if (_isTourPaintMethodEnhanced) {
+							paintOverlay30PaintTile(tile);
+						} else {
+							paintOverlay80PaintTile(tile);
+						}
 
 					} else {
 
@@ -1930,16 +1933,6 @@ public class Map extends Canvas {
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
 					}
 				}
-
-//				System.out.println(_startTime);
-//				System.out.println(_startTime);
-//				System.out.println(_startTime
-//						+ "\t"
-//						+ (System.currentTimeMillis() - _startTime)
-//						+ "\tms"
-//						+ "\tpaint overlays\t");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 			}
 		});
 	}
@@ -1965,7 +1958,7 @@ public class Map extends Canvas {
 			// paint all overlays for the current tile
 			for (final MapPainter overlay : getOverlays()) {
 
-				final boolean isPainted = overlay.paint(_gc9Parts, Map.this, tile, parts);
+				final boolean isPainted = overlay.doPaint(_gc9Parts, Map.this, tile, parts);
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}
@@ -2025,8 +2018,6 @@ public class Map extends Canvas {
 	 * @param imageData9Parts
 	 */
 	private void paintOverlay40SplitParts(final Tile tile, final ImageData imageData9Parts) {
-
-		final long startTime = System.currentTimeMillis();
 
 		final TileCache tileCache = MP.getTileCache();
 
@@ -2156,142 +2147,63 @@ public class Map extends Canvas {
 				}
 			}
 		}
-//
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//		final long endTime = System.currentTimeMillis();
-//		System.out.println(endTime
-//				+ "\t"
-//				+ (endTime - _startTime)
-//				+ "\tms\tsplit parts:\t"
-//				+ (endTime - startTime)
-//				+ "\tms\t"
-//				+ tile);
-
 	}
 
-//	/**
-//	 * Splits the overlay tile image into 3*3 parts, the center image is the tile overlay image
-//	 *
-//	 * <pre>
-//	 *
-//	 * y,x
-//	 *
-//	 * 0,0		0,1		0,2
-//	 * 1,0		1,1		1,2
-//	 * 2,0		2,1		2,2
-//	 *
-//	 * </pre>
-//	 *
-//	 * @param tile
-//	 * @param imageData9Parts
-//	 * @param tileSize
-//	 */
-//	private void paintOverlay40SplitParts_OLD(final Tile tile, final ImageData imageData9Parts, final int tileSize) {
-//
-//		final TileCache tileCache = MP.getTileCache();
-//		final String projectionId = _MP.getProjection().getId();
-//		Tile partTile = null;
-//
-//		final int tileZoom = tile.getZoom();
-//		final int tileX = tile.getX();
-//		final int tileY = tile.getY();
-//		final int maxTiles = (int) Math.pow(2, tileZoom);
-//
-//		for (int yIndex = 0; yIndex < 3; yIndex++) {
-//			for (int xIndex = 0; xIndex < 3; xIndex++) {
-//
-//				// check if the tile is within the map border
-//				if ((tileX - xIndex < 0 || tileX + xIndex > maxTiles)
-//						|| (tileY - yIndex < 0 || tileY + yIndex > maxTiles)) {
-//					continue;
-//				}
-//
-//				final int srcX = tileSize * xIndex;
-//				final int srcY = tileSize * yIndex;
-//
-//				// check if there are any drawings in the current part
-//				if (isPartImageModified(imageData9Parts, srcX, srcY, tileSize) == false) {
-//
-//					// there are no drawings within the current part
-//					continue;
-//				}
-//
-//				final String imageKey = getOverlayKey(tile, xIndex - 1, yIndex - 1, projectionId);
-//				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
-//
-//				// create part image
-//				final Image image1Part = new Image(_display, _imageTemplate1Part, SWT.IMAGE_COPY);
-//				final GC gc1Part = new GC(image1Part);
-//
-//				// draw into the part image
-//				{
-//					// draw existing part tile image into the new part image
-//					if (isCenterPart == false) {
-//
-//						partTile = tileCache.get(tile.getTileKey(xIndex - 1, yIndex - 1, projectionId));
-//						if (partTile != null) {
-//
-//							final Image partTileImage = partTile.getOverlayImage();
-//							if (partTileImage != null && partTileImage.isDisposed() == false) {
-//								gc1Part.drawImage(partTileImage, 0, 0);
-//							}
-//						}
-//					}
-//
-//					// draw existing part overlay image into the part image
-//					final Image cachedPartImage = _partOverlayImageCache.get(imageKey);
-//					if (cachedPartImage != null && cachedPartImage.isDisposed() == false) {
-//						gc1Part.drawImage(cachedPartImage, 0, 0);
-//					}
-//
-//					// draw 9 part image into the 1 part image
-////					gc1Part.drawImage(imageData9Parts, srcX, srcY, tileSize, tileSize, 0, 0, tileSize, tileSize);
-//
-//					// update state & image
-//					if (isCenterPart) {
-//
-//						tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
-//						tile.incrementOverlayContent();
-//
-//						// create a copy of the center image
-//						final Image centerImage = new Image(_display, _imageTemplate1Part, SWT.IMAGE_COPY);
-//						final GC gcCenterImage = new GC(centerImage);
-//						{
-//							gcCenterImage.drawImage(image1Part, 0, 0);
-//						}
-//						gcCenterImage.dispose();
-//
-//						tile.setOverlayImage(centerImage);
-//
-//						/*
-//						 * keep image in the cache that not too much image resources are created and
-//						 * that all images are disposed
-//						 */
-//						_overlayImageCache.add(imageKey, centerImage);
-//
-//					} else {
-//
-//						// update state in the part tile, set a flag that the tile has overlay content
-//
-//						if (partTile != null) {
-//
-//							partTile.incrementOverlayContent();
-//
-//							final OverlayImageState partImageState = partTile.getOverlayImageState();
-//							if (partImageState == OverlayImageState.NOT_SET
-//									|| partImageState == OverlayImageState.NO_IMAGE) {
-//								partTile.setOverlayImageState(OverlayImageState.TILE_HAS_PART_CONTENT);
-//							}
-//						}
-//					}
-//
-//					_partOverlayImageCache.add(imageKey, image1Part);
-//
-//				}
-//				gc1Part.dispose();
-//			}
-//		}
-//	}
+	/**
+	 * Paint the tour in basic mode
+	 * 
+	 * @param tile
+	 */
+	private void paintOverlay80PaintTile(final Tile tile) {
+
+		boolean isOverlayPainted = false;
+
+		{
+			// create 1 part image/gc
+			final ImageData transparentImageData = UI.createTransparentImageData(_MP.getTileSize(), _transparentRGB);
+
+			final Image overlayImage = new Image(_display, transparentImageData);
+			final GC gc1Part = new GC(overlayImage);
+			{
+				// paint all overlays for the current tile
+				for (final MapPainter overlay : getOverlays()) {
+
+					final boolean isPainted = overlay.doPaint(gc1Part, Map.this, tile, 1);
+
+					isOverlayPainted = isOverlayPainted || isPainted;
+				}
+			}
+			gc1Part.dispose();
+
+			if (isOverlayPainted) {
+
+				// overlay is painted
+
+				final String overlayKey = getOverlayKey(tile, 0, 0, _MP.getProjection().getId());
+
+				tile.setOverlayImage(overlayImage);
+				_overlayImageCache.add(overlayKey, overlayImage);
+
+				// set tile state
+				tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
+				tile.incrementOverlayContent();
+
+				queueMapRedraw();
+
+			} else {
+
+				// image is not needed
+				overlayImage.dispose();
+
+				// set tile state
+				tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+
+//				System.out.println("overlay disposed");
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+			}
+		}
+	}
 
 	/**
 	 * Put a map redraw into a queue, the last entry in the queue will be executed
@@ -2415,16 +2327,6 @@ public class Map extends Canvas {
 	public void removeZoomListener(final IZoomListener listner) {
 		_zoomListeners.remove(listner);
 	}
-
-//	/**
-//	 * Reset overlay information for the current map provider by setting the overlay status to
-//	 * {@link OverlayTourState#OVERLAY_NOT_CHECKED} in all tiles
-//	 */
-//	public synchronized void resetOverlays() {
-//		if (_MP != null) {
-//			_MP.resetOverlays();
-//		}
-//	}
 
 	/**
 	 * Reload the map by discarding all cached tiles and entries in the loading queue
@@ -2780,6 +2682,13 @@ public class Map extends Canvas {
 
 	public void setShowScale(final boolean isScaleVisible) {
 		_isScaleVisible = isScaleVisible;
+	}
+
+	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+
+		_isTourPaintMethodEnhanced = isEnhanced;
+
+		disposeOverlayImageCache();
 	}
 
 	/**

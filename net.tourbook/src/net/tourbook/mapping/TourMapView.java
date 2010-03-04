@@ -28,6 +28,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.Activator;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -47,7 +48,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.Util;
-
+ 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -137,6 +138,10 @@ public class TourMapView extends ViewPart {
 
 	final static String								PREF_SHOW_TILE_INFO					= "map.debug.show.tile-info";				//$NON-NLS-1$
 	final static String								PREF_DEBUG_MAP_DIM_LEVEL			= "map.debug.dim-map";						//$NON-NLS-1$
+
+	private final IPreferenceStore					_prefStore							= TourbookPlugin
+																								.getDefault()
+																								.getPreferenceStore();
 
 	private Map										_map;
 
@@ -230,8 +235,7 @@ public class TourMapView extends ViewPart {
 			/*
 			 * dim color is stored in the pref store and not in the memento
 			 */
-			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-			final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+			final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 
 			_map.dimMap(dimLevel, dimColor);
 		}
@@ -453,6 +457,7 @@ public class TourMapView extends ViewPart {
 				}
 			}
 		};
+		// !!! SRTM pref store !!!
 		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(_mapPrefChangeListener);
 
 		_map.addZoomListener(new IZoomListener() {
@@ -502,20 +507,19 @@ public class TourMapView extends ViewPart {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
-				final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 				if (property.equals(PREF_SHOW_TILE_INFO)) {
 
 					// map properties has changed
 
-					final boolean isShowTileInfo = store.getBoolean(PREF_SHOW_TILE_INFO);
+					final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
 
 					_map.setShowDebugInfo(isShowTileInfo);
 					_map.queueMapRedraw();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
-					float prefDimLevel = store.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL);
+					float prefDimLevel = _prefStore.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL);
 					prefDimLevel *= 2.55;
 					prefDimLevel -= 255;
 
@@ -525,13 +529,18 @@ public class TourMapView extends ViewPart {
 
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_DIM_COLOR)) {
 
-					actionDimMap(PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR));
+					actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR));
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					UI.updateUnits();
 					_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 					_map.queueMapRedraw();
+
+				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)) {
+
+					_map.setTourPaintMethodEnhanced(//
+							event.getNewValue().equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
@@ -544,8 +553,8 @@ public class TourMapView extends ViewPart {
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -871,6 +880,9 @@ public class TourMapView extends ViewPart {
 		_map.setShowLegend(true);
 		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
+		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
+
 		_map.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
@@ -956,9 +968,9 @@ public class TourMapView extends ViewPart {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-		prefStore.removePropertyChangeListener(_prefChangeListener);
-		prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
+		final Preferences pluginPreferences = TourbookPlugin.getDefault().getPluginPreferences();
+		pluginPreferences.removePropertyChangeListener(_prefChangeListener);
+		pluginPreferences.removePropertyChangeListener(_tourbookPrefChangeListener);
 
 		super.dispose();
 	}
@@ -1097,7 +1109,7 @@ public class TourMapView extends ViewPart {
 //			
 //			minLongitude = Math.min(minLongitude, longitude);
 //			maxLongitude = Math.max(maxLongitude, longitude);
- 
+
 			minLatitude = latitude < minLatitude ? latitude : minLatitude;
 			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
 
@@ -1729,8 +1741,6 @@ public class TourMapView extends ViewPart {
 
 		// draw tour with default color
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
 		// check legend provider
 		final ILegendProvider legendProvider = paintManager.getLegendProvider();
 		if (legendProvider == null) {
@@ -1743,14 +1753,14 @@ public class TourMapView extends ViewPart {
 		}
 
 		// debug info
-		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
+		final boolean isShowTileInfo = _prefStore.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
 		_map.setShowDebugInfo(isShowTileInfo);
 
 		// set dim level/color after the map providers are set
 		if (_mapDimLevel == -1) {
 			_mapDimLevel = 0xff;
 		}
-		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+		final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 		_map.setDimLevel(_mapDimLevel, dimColor);
 		_mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
 
@@ -1959,8 +1969,7 @@ public class TourMapView extends ViewPart {
 	 */
 	private void showDimWarning() {
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-		if (store.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
+		if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
 
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
@@ -1975,9 +1984,8 @@ public class TourMapView extends ViewPart {
 							null,
 							null);
 
-					store
-							.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog
-									.getToggleState());
+					_prefStore.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog
+							.getToggleState());
 				}
 			});
 		}

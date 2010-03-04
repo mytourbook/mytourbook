@@ -90,7 +90,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 					.getDefaultLineColor());
 
 		}
- 
+
 		/*
 		 * graph preferences
 		 */
@@ -163,7 +163,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
- 
+
 		/*
 		 * map
 		 */
@@ -172,9 +172,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
+		store.setDefault(
+				ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+				PrefPageAppearanceMap.TOUR_PAINT_METHOD_SIMPLE);
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
-
+ 
 		/*
 		 * tour data editor
 		 */
