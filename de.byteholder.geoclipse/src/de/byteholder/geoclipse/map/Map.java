@@ -82,9 +82,9 @@ import de.byteholder.gpx.GeoPosition;
 public class Map extends Canvas {
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
+	public final static RGB		DEFAULT_BACKGROUND_RGB	= new RGB(181, 208, 208);
 
-	private static final RGB					_transparentRGB				= new RGB(0xfe, 0xfe, 0xfe);
+	private static final RGB	_transparentRGB			= new RGB(0xfe, 0xfe, 0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
@@ -278,7 +278,7 @@ public class Map extends Canvas {
 
 	/**
 	 * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
- 	 * simple mode
+	 * simple mode
 	 */
 	private boolean								_isTourPaintMethodEnhanced	= false;
 
@@ -953,6 +953,10 @@ public class Map extends Canvas {
 	 * @param gc
 	 */
 	private void drawMapTiles(final GC gc) {
+
+//		System.out.println();
+//		System.out.println();
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int tileSize = _MP.getTileSize();
 
@@ -1921,6 +1925,27 @@ public class Map extends Canvas {
 						// set state that this tile is checked that it contains tours
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
+						/*
+						 * check if the tour is within the tile
+						 */
+						boolean isPaintingNeeded = false;
+						for (final MapPainter overlayPainter : getOverlays()) {
+
+							isPaintingNeeded = overlayPainter.isPaintingNeeded(Map.this, tile);
+
+							if (isPaintingNeeded) {
+								break;
+							}
+						}
+
+						if (isPaintingNeeded == false) {
+
+							// set tile state
+							tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+
+							continue;
+						}
+
 						if (_isTourPaintMethodEnhanced) {
 							paintOverlay30PaintTile(tile);
 						} else {
@@ -2158,50 +2183,44 @@ public class Map extends Canvas {
 
 		boolean isOverlayPainted = false;
 
+		// create 1 part image/gc
+		final ImageData transparentImageData = UI.createTransparentImageData(_MP.getTileSize(), _transparentRGB);
+
+		final Image overlayImage = new Image(_display, transparentImageData);
+		final GC gc1Part = new GC(overlayImage);
 		{
-			// create 1 part image/gc
-			final ImageData transparentImageData = UI.createTransparentImageData(_MP.getTileSize(), _transparentRGB);
+			// paint all overlays for the current tile
+			for (final MapPainter mapPainter : getOverlays()) {
 
-			final Image overlayImage = new Image(_display, transparentImageData);
-			final GC gc1Part = new GC(overlayImage);
-			{
-				// paint all overlays for the current tile
-				for (final MapPainter overlay : getOverlays()) {
+				final boolean isPainted = mapPainter.doPaint(gc1Part, Map.this, tile, 1);
 
-					final boolean isPainted = overlay.doPaint(gc1Part, Map.this, tile, 1);
-
-					isOverlayPainted = isOverlayPainted || isPainted;
-				}
+				isOverlayPainted = isOverlayPainted || isPainted;
 			}
-			gc1Part.dispose();
+		} 
+		gc1Part.dispose();
 
-			if (isOverlayPainted) {
+		if (isOverlayPainted) {
 
-				// overlay is painted
+			// overlay is painted
 
-				final String overlayKey = getOverlayKey(tile, 0, 0, _MP.getProjection().getId());
+			final String overlayKey = getOverlayKey(tile, 0, 0, _MP.getProjection().getId());
 
-				tile.setOverlayImage(overlayImage);
-				_overlayImageCache.add(overlayKey, overlayImage);
+			tile.setOverlayImage(overlayImage);
+			_overlayImageCache.add(overlayKey, overlayImage);
 
-				// set tile state
-				tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
-				tile.incrementOverlayContent();
+			// set tile state
+			tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
+			tile.incrementOverlayContent();
 
-				queueMapRedraw();
+			queueMapRedraw();
 
-			} else {
+		} else {
 
-				// image is not needed
-				overlayImage.dispose();
+			// image is not needed
+			overlayImage.dispose();
 
-				// set tile state
-				tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
-
-//				System.out.println("overlay disposed");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-			}
+			// set tile state
+			tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
 		}
 	}
 

@@ -131,6 +131,12 @@ public class WaypointPainter extends MapPainter {
 	public Set<Waypoint> getWaypoints() {
 		return waypoints;
 	}
+ 
+	@Override
+	protected boolean isPaintingNeeded(final Map map, final Tile tile) {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 	/**
 	 * <p>

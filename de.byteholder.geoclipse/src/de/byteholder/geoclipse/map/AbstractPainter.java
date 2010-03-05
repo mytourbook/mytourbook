@@ -3,7 +3,7 @@ package de.byteholder.geoclipse.map;
 import org.eclipse.swt.graphics.GC;
 
 public abstract class AbstractPainter<T> {
- 
+
 	/**
 	 * Dispose resources in the {@link Painter}
 	 */
@@ -13,7 +13,7 @@ public abstract class AbstractPainter<T> {
 	 * Dispose resources which are used temporarily
 	 */
 	protected void disposeTempResources() {}
-
+ 
 	/**
 	 * @param gc
 	 * @param map
@@ -25,4 +25,12 @@ public abstract class AbstractPainter<T> {
 	 * @return
 	 */
 	protected abstract boolean doPaint(final GC gc, final T map, final Tile tile, final int parts);
+
+	/**
+	 * @param map
+	 * @param tile
+	 * @return Returns <code>true</code> when the tile needs to be painted in the map
+	 */
+	protected abstract boolean isPaintingNeeded(Map map, Tile tile);
+
 }
