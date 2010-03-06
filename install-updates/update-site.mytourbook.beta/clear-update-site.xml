@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-translation-file" default="clear-update-site" basedir=".">
+
+	<target name="clear-update-site">
+
+		<delete>
+			<fileset dir="plugins" includes="**/*" />
+		</delete>
+
+		<delete>
+			<fileset dir="features" includes="**/*" />
+		</delete>
+
+		<delete file="content.jar" />
+		<delete file="artifacts.jar" />
+
+	</target>
+
+</project>
