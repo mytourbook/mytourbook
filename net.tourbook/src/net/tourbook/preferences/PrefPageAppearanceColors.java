@@ -24,15 +24,15 @@ import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorItem;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.mapping.DialogMappingColor;
 import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.mapping.LegendColor;
-import net.tourbook.mapping.LegendColorDialog;
 import net.tourbook.mapping.LegendConfig;
 import net.tourbook.mapping.LegendProvider;
 import net.tourbook.mapping.ValueColor;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.TreeColumnLayout;
-
+ 
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -96,7 +96,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	private GraphColorLabelProvider		fColorLabelProvider;
 
 	private LegendProvider				fLegendProvider;
-	private LegendColorDialog			fLegendColorDialog;
+	private DialogMappingColor			_dialogMappingColor;
 
 	/**
 	 * the color content provider has the following structure<br>
@@ -151,6 +151,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	}
 
+	public void actionApplyColors() {
+
+		updateColorsFromDialog(fSelectedColor.getColorDefinition());
+		updateAndSaveColors();
+	}
+
 	/**
 	 * Create the color selection control.
 	 * 
@@ -183,7 +189,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		});
 
 		/*
-		 * button: legend selector
+		 * button: mapping color
 		 */
 		fBtnLegend = new Button(container, SWT.NONE);
 		fBtnLegend.setText(Messages.Pref_ChartColors_btn_legend);
@@ -192,7 +198,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		fBtnLegend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				modifyLegendColor();
+				onSelectMappingColor();
 			}
 		});
 		fBtnLegend.setEnabled(false);
@@ -324,7 +330,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 						// legend color is selected
 
-						modifyLegendColor();
+						onSelectMappingColor();
 
 					} else {
 						// open color selection dialog
@@ -415,46 +421,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		legendColor.valueColors = fValueColors;
 
 		fLegendProvider = new LegendProvider(legendConfig, legendColor, 0);
-		fLegendColorDialog = new LegendColorDialog(Display.getCurrent().getActiveShell(), fLegendProvider);
-	}
-
-	/**
-	 * modify the colors of the legend
-	 */
-	private void modifyLegendColor() {
-
-		final ColorDefinition selectedColorDefinition = fSelectedColor.getColorDefinition();
-
-		// set the color which should be modified in the dialog
-		fLegendColorDialog.setLegendColor(selectedColorDefinition);
-
-		final int returnValue = fLegendColorDialog.open();
-
-		if (returnValue != Window.OK) {
-			return;
-		}
-
-		// set new legend color
-		selectedColorDefinition.setNewLegendColor(fLegendColorDialog.getLegendColor());
-
-		/*
-		 * show java code for the selected color, this code can copy/pasted into GraphColorProvider
-		 */
-//		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructorString());
-//
-//
-		/*
-		 * dispose old color and image for the graph
-		 */
-		fColorLabelProvider.disposeResources(fSelectedColor.getColorId(), selectedColorDefinition.getImageId());
-
-		/*
-		 * update the tree viewer, the color images will be recreated
-		 */
-		fColorViewer.update(fSelectedColor, null);
-		fColorViewer.update(selectedColorDefinition, null);
-
-		fIsColorChanged = true;
+		_dialogMappingColor = new DialogMappingColor(Display.getCurrent().getActiveShell(), fLegendProvider,this);
 	}
 
 	/**
@@ -531,6 +498,25 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 	}
 
+	/**
+	 * modify the colors of the legend
+	 */
+	private void onSelectMappingColor() {
+
+		final ColorDefinition selectedColorDefinition = fSelectedColor.getColorDefinition();
+
+		// set the color which should be modified in the dialog
+		_dialogMappingColor.setLegendColor(selectedColorDefinition);
+
+		final int returnValue = _dialogMappingColor.open();
+
+		if (returnValue != Window.OK) {
+			return;
+		}
+
+		updateColorsFromDialog(selectedColorDefinition);
+	}
+
 	@Override
 	public boolean performCancel() {
 		resetColors();
@@ -567,21 +553,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	public boolean performOk() {
 
 		if (fIsColorChanged) {
-
-			saveGraphColors();
-
-			// update current colors
-			for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
-
-				graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
-				graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
-				graphDefinition.setLineColor(graphDefinition.getNewLineColor());
-
-				graphDefinition.setLegendColor(graphDefinition.getNewLegendColor());
-			}
-
-			// force to change the status
-			getPreferenceStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+			updateAndSaveColors();
 		}
 
 		return super.performOk();
@@ -610,20 +582,62 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 			final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
 
-			PreferenceConverter.setValue(prefStore,
+			PreferenceConverter.setValue(
+					prefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT,
 					graphDefinition.getNewGradientBright());
 
-			PreferenceConverter.setValue(prefStore,
-					prefGraphName + GraphColorProvider.PREF_COLOR_DARK,
-					graphDefinition.getNewGradientDark());
+			PreferenceConverter.setValue(prefStore, prefGraphName + GraphColorProvider.PREF_COLOR_DARK, graphDefinition
+					.getNewGradientDark());
 
-			PreferenceConverter.setValue(prefStore,
-					prefGraphName + GraphColorProvider.PREF_COLOR_LINE,
-					graphDefinition.getNewLineColor());
+			PreferenceConverter.setValue(prefStore, prefGraphName + GraphColorProvider.PREF_COLOR_LINE, graphDefinition
+					.getNewLineColor());
 		}
 
 		GraphColorProvider.saveLegendData();
+	}
+
+	private void updateAndSaveColors() {
+
+		saveGraphColors();
+
+		// update current colors
+		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+
+			graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
+			graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
+			graphDefinition.setLineColor(graphDefinition.getNewLineColor());
+
+			graphDefinition.setLegendColor(graphDefinition.getNewLegendColor());
+		}
+
+		// force to change the status
+		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+	}
+
+	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition) {
+		
+		// set new legend color
+		selectedColorDefinition.setNewLegendColor(_dialogMappingColor.getLegendColor());
+
+		/*
+		 * show java code for the selected color, this code can copy/pasted into GraphColorProvider
+		 */
+//		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructorString());
+//
+//
+		/*
+		 * dispose old color and image for the graph
+		 */
+		fColorLabelProvider.disposeResources(fSelectedColor.getColorId(), selectedColorDefinition.getImageId());
+
+		/*
+		 * update the tree viewer, the color images will be recreated
+		 */
+		fColorViewer.update(fSelectedColor, null);
+		fColorViewer.update(selectedColorDefinition, null);
+
+		fIsColorChanged = true;
 	}
 
 }

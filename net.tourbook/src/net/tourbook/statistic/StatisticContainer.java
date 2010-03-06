@@ -63,6 +63,7 @@ import org.eclipse.ui.part.PageBook;
 public class StatisticContainer extends Composite {
 
 	private static final String					MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
+	private static final String					MEMENTO_SELECTED_YEAR		= "statistic.container.selected-year";		//$NON-NLS-1$
 	private static final String					MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
 
 	private static ArrayList<TourbookStatistic>	fStatisticExtensionPoints;
@@ -70,8 +71,8 @@ public class StatisticContainer extends Composite {
 	private Calendar							fCalendar					= GregorianCalendar.getInstance();
 
 	private TourbookStatistic					fActiveStatistic;
-	private int									fActiveYear					= -1;
-
+	private int									_selectedYear				= -1;
+ 
 	private TourPerson							fActivePerson;
 	private TourTypeFilter						fActiveTourTypeFilter;
 
@@ -85,7 +86,10 @@ public class StatisticContainer extends Composite {
 	private ToolBarManager						fTBM;
 	private ToolBar								fToolBar;
 
-	private ArrayList<Integer>					fTourYears;
+	/**
+	 * contains all years which have tours for the selected tour type and person
+	 */
+	private ArrayList<Integer>					_availableYears;
 
 	/**
 	 * contains the statistics in the same sort order as the statistic combo box
@@ -94,10 +98,6 @@ public class StatisticContainer extends Composite {
 
 	private ActionSynchChartScale				fActionSynchChartScale;
 	private boolean								fIsSynchScaleEnabled;
-
-	private long								fSelectedDate				= -1;
-	private long								fSelectedMonth				= -1;
-	private long								fSelectedTourId				= -1;
 
 	private IPostSelectionProvider				fPostSelectionProvider;
 
@@ -112,7 +112,8 @@ public class StatisticContainer extends Composite {
 
 		fStatisticExtensionPoints = new ArrayList<TourbookStatistic>();
 
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
+				TourbookPlugin.PLUGIN_ID,
 				TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
 
 		if (extPoint != null) {
@@ -155,9 +156,8 @@ public class StatisticContainer extends Composite {
 		final ArrayList<TourbookStatistic> visibleStatistics = new ArrayList<TourbookStatistic>();
 
 		final String[] prefStoreStatisticIds = StringToArrayConverter.//
-		convertStringToArray(TourbookPlugin.getDefault()
-				.getPreferenceStore()
-				.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS));
+				convertStringToArray(TourbookPlugin.getDefault().getPreferenceStore().getString(
+						ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS));
 
 		// get all statistics which are saved in the pref store
 		for (final String statisticId : prefStoreStatisticIds) {
@@ -213,9 +213,10 @@ public class StatisticContainer extends Composite {
 		fActiveStatistic.setSynchScale(fIsSynchScaleEnabled);
 
 		if (fActiveStatistic instanceof IYearStatistic) {
-			((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
+			((IYearStatistic) fActiveStatistic).refreshStatistic(
+					fActivePerson,
 					fActiveTourTypeFilter,
-					fActiveYear,
+					_selectedYear,
 					getNumberOfYears(),
 					false);
 		}
@@ -341,20 +342,42 @@ public class StatisticContainer extends Composite {
 	}
 
 	/**
+	 * @param defaultYear
 	 * @return Returns the index for the active year or <code>-1</code> when there are no years
 	 *         available
 	 */
-	private int getActiveYearComboboxIndex() {
+	private int getActiveYearComboboxIndex(final int defaultYear) {
 
 		int selectedYearIndex = -1;
 
-		if (fTourYears == null) {
+		if (_availableYears == null) {
 			return selectedYearIndex;
 		}
 
+		/*
+		 * try to get the year index for the default year
+		 */
+		if (defaultYear != -1) {
+
+			int yearIndex = 0;
+			for (final Integer year : _availableYears) {
+
+				if (year == defaultYear) {
+
+					_selectedYear = defaultYear;
+
+					return yearIndex;
+				}
+				yearIndex++;
+			}
+		}
+
+		/*
+		 * try to get year index of the selected year
+		 */
 		int yearIndex = 0;
-		for (final Integer year : fTourYears) {
-			if (year == fActiveYear) {
+		for (final Integer year : _availableYears) {
+			if (year == _selectedYear) {
 				selectedYearIndex = yearIndex;
 				break;
 			}
@@ -437,7 +460,7 @@ public class StatisticContainer extends Composite {
 			return;
 		}
 
-		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fActiveYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, _selectedYear, false);
 
 		if (fActiveStatistic.canSelectTour()) {
 //			selectTour(fSelectedTourId);
@@ -470,9 +493,9 @@ public class StatisticContainer extends Composite {
 
 		if (selectedItem != -1) {
 
-			fActiveYear = Integer.parseInt(fComboYear.getItem(selectedItem));
+			_selectedYear = Integer.parseInt(fComboYear.getItem(selectedItem));
 
-			refreshStatistic(fActivePerson, fActiveTourTypeFilter, fActiveYear, false);
+			refreshStatistic(fActivePerson, fActiveTourTypeFilter, _selectedYear, false);
 		}
 	}
 
@@ -492,7 +515,7 @@ public class StatisticContainer extends Composite {
 		fActiveTourTypeFilter = tourTypeFilter;
 
 		refreshYearCombobox();
-		selectYear();
+		selectYear(-1);
 
 		// tell all existing statistics the data have changed
 		for (final TourbookStatistic statistic : getComboStatistics()) {
@@ -507,9 +530,10 @@ public class StatisticContainer extends Composite {
 		}
 
 		// refresh current statistic
-		((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
+		((IYearStatistic) fActiveStatistic).refreshStatistic(
+				fActivePerson,
 				fActiveTourTypeFilter,
-				fActiveYear,
+				_selectedYear,
 				getNumberOfYears(),
 				true);
 
@@ -542,18 +566,19 @@ public class StatisticContainer extends Composite {
 		if (selectedYear == -1) {
 			return;
 		}
-		fActiveYear = selectedYear;
+		_selectedYear = selectedYear;
 
 		fActiveStatistic = getStatistic();
 		if (fActiveStatistic == null || fActiveStatistic.getControl().isDisposed()) {
 			return;
 		}
 
-		selectYear();
+		selectYear(-1);
 		fActiveStatistic.setSynchScale(fIsSynchScaleEnabled);
 
 		if (fActiveStatistic instanceof IYearStatistic) {
-			((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
+			((IYearStatistic) fActiveStatistic).refreshStatistic(
+					fActivePerson,
 					fActiveTourTypeFilter,
 					selectedYear,
 					getNumberOfYears(),
@@ -608,7 +633,7 @@ public class StatisticContainer extends Composite {
 
 				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //$NON-NLS-1$
 
-		fTourYears = new ArrayList<Integer>();
+		_availableYears = new ArrayList<Integer>();
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -618,7 +643,7 @@ public class StatisticContainer extends Composite {
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				fTourYears.add(result.getInt(1));
+				_availableYears.add(result.getInt(1));
 			}
 
 			conn.close();
@@ -637,7 +662,7 @@ public class StatisticContainer extends Composite {
 
 		boolean isThisYearSet = false;
 
-		for (final Integer year : fTourYears) {
+		for (final Integer year : _availableYears) {
 
 			if (year.intValue() == thisYear) {
 				isThisYearSet = true;
@@ -648,7 +673,7 @@ public class StatisticContainer extends Composite {
 
 		// add currenty year if not set
 		if (isThisYearSet == false) {
-			fTourYears.add(thisYear);
+			_availableYears.add(thisYear);
 			fComboYear.add(Integer.toString(thisYear));
 		}
 	}
@@ -691,8 +716,14 @@ public class StatisticContainer extends Composite {
 		}
 
 		// select year
+		int defaultYear;
+		try {
+			defaultYear = viewState.getInt(MEMENTO_SELECTED_YEAR);
+		} catch (final NumberFormatException e) {
+			defaultYear = -1;
+		}
 		refreshYearCombobox();
-		selectYear();
+		selectYear(defaultYear);
 
 		// select statistic item
 		fComboStatistics.select(prevStatIndex);
@@ -707,58 +738,27 @@ public class StatisticContainer extends Composite {
 	/**
 	 * save statistic
 	 */
-	public void saveState(final IDialogSettings viewState) {
+	public void saveState(final IDialogSettings state) {
 
 		final ArrayList<TourbookStatistic> comboStatistics = getComboStatistics();
 
 		// keep statistic id for the selected statistic
 		final int selectionIndex = fComboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-			viewState.put(MEMENTO_SELECTED_STATISTIC, comboStatistics.get(selectionIndex).fStatisticId);
+			state.put(MEMENTO_SELECTED_STATISTIC, comboStatistics.get(selectionIndex).fStatisticId);
 		}
 
 		for (final TourbookStatistic tourbookStatistic : comboStatistics) {
-			tourbookStatistic.saveState(viewState);
+			tourbookStatistic.saveState(state);
 		}
 
-		viewState.put(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());
+		state.put(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());
+		state.put(MEMENTO_SELECTED_YEAR, _selectedYear);
 	}
 
-	/**
-	 * @param date
-	 */
-	private void selectDay(final long date) {
+	private void selectYear(final int defaultYear) {
 
-//		fLastSelectionType = SELECTION_TYPE_DAY;
-
-		fSelectedDate = date;
-		fActiveStatistic.selectDay(date);
-	}
-
-	/**
-	 * @param date
-	 *            contains the date value in milliseconds
-	 */
-	private void selectMonth(final long date) {
-
-		fSelectedMonth = date;
-		fActiveStatistic.selectMonth(date);
-	}
-
-	private boolean selectTour(final Long tourId) {
-
-		final boolean isTourSelected = fActiveStatistic.selectTour(tourId);
-
-		if (isTourSelected) {
-			fSelectedTourId = tourId;
-		}
-
-		return isTourSelected;
-	}
-
-	private void selectYear() {
-
-		int selectedYearIndex = getActiveYearComboboxIndex();
+		int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
 
 		if (selectedYearIndex == -1) {
 			/*
@@ -766,7 +766,7 @@ public class StatisticContainer extends Composite {
 			 * needs to be update
 			 */
 			refreshYearCombobox();
-			selectedYearIndex = getActiveYearComboboxIndex();
+			selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
 
 			if (selectedYearIndex == -1) {
 
@@ -776,7 +776,7 @@ public class StatisticContainer extends Composite {
 				// reselect the youngest year if years are available
 				if (yearCount > 0) {
 					selectedYearIndex = yearCount - 1;
-					fActiveYear = Integer.parseInt(fComboYear.getItem(yearCount - 1));
+					_selectedYear = Integer.parseInt(fComboYear.getItem(yearCount - 1));
 				}
 			}
 		}

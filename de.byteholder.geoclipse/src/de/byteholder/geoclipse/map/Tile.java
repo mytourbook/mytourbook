@@ -8,7 +8,7 @@
  */
 
 package de.byteholder.geoclipse.map;
-  
+
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -277,28 +277,32 @@ public class Tile extends Observable {
 			return null;
 		}
 
-		final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
-		final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
+		// it is synchronized because this object can be set to null in another thread
+		synchronized (_overlayImageDataResources) {
 
-		if (tileImageData == null && neighborImageData == null) {
-			return null;
+			final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
+			final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
+
+			if (tileImageData == null && neighborImageData == null) {
+				return null;
+			}
+
+			final int tileSize = _mp.getTileSize();
+			final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
+
+			// draw neighbor first
+			if (neighborImageData != null) {
+				_overlayImageDataResources.drawImageData(finalImageData, neighborImageData, 0, 0, tileSize, tileSize);
+			}
+ 
+			// draw tile last to overwrite neighbor image data
+			if (tileImageData != null) {
+				_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
+			}
+
+			// create image from image data
+			_overlayImage = new Image(display, finalImageData);
 		}
-
-		final int tileSize = _mp.getTileSize();
-		final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
-
-		// draw neighbor first
-		if (neighborImageData != null) {
-			_overlayImageDataResources.drawImageData(finalImageData, neighborImageData, 0, 0, tileSize, tileSize);
-		}
-
-		// draw tile last to overwrite neighbor image data
-		if (tileImageData != null) {
-			_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
-		}
-
-		// create image from image data
-		_overlayImage = new Image(display, finalImageData);
 
 		return _overlayImage;
 	}
@@ -811,7 +815,7 @@ public class Tile extends Observable {
 	}
 
 	public void setOverlayImageState(final OverlayImageState overlayImageState) {
- 		_overlayImageState = overlayImageState;
+		_overlayImageState = overlayImageState;
 	}
 
 	public void setOverlayTourStatus(final OverlayTourState overlayTourStatus) {

@@ -22,9 +22,11 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.mapping.messages";	//$NON-NLS-1$
 
+	public static String		App_Action_Apply;
+
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
-
+ 
 	public static String		image_action_change_tile_factory;
 	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
@@ -56,6 +58,10 @@ public class Messages extends NLS {
 	public static String		legend_color_keep_color;
 	public static String		legend_color_lighten_color;
 
+	public static String	LegendColor_Dialog_Check_LiveUpdate;
+
+	public static String	LegendColor_Dialog_Check_LiveUpdate_Tooltip;
+
 	public static String		legendcolor_dialog_chk_max_value_text;
 	public static String		legendcolor_dialog_chk_max_value_tooltip;
 	public static String		legendcolor_dialog_chk_min_value_text;
@@ -83,11 +89,10 @@ public class Messages extends NLS {
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 
-	public static String	Map_Action_ManageMapProviders;
+	public static String		Map_Action_ManageMapProviders;
+	public static String		Map_Action_SetDefaultMapProviders;
+	public static String		Map_Action_ToggleMarker;
 
-	public static String	Map_Action_SetDefaultMapProviders;
- 
-	public static String	Map_Action_ToggleMarker;
 	public static String		map_action_show_legend_in_map;
 	public static String		map_action_show_scale_in_map;
 	public static String		map_action_show_slider_in_legend;
