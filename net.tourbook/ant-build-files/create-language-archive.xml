@@ -48,16 +48,17 @@
 		</delete>
 
 	</target>
+	
 	<target name="delete-all-translation-temp-files">
 
 		<!-- delete all translation temp files: ${path-mt-translations-temp} -->
 		<echo message="delete all files in : ${path-mt-translations-temp}" />
 
 		<!-- 
+		-->
 			<delete includeemptydirs="true" quiet="true">
 				<fileset dir="${path-mt-translations-temp}" includes="**/*" />
 			</delete>
-		-->
 
 	</target>
 
@@ -66,7 +67,7 @@
 		<!-- copy language fragments into ${path-build-translation} -->
 		<echo message="copy language fragments into ${path-build-translation}" />
 
-		<copy todir="${path-mt-translations-temp}" preservelastmodified="true" includeemptydirs="false">
+		<copy todir="${path-mt-translations-temp}" preservelastmodified="true" includeemptydirs="true">
 			<fileset dir="${path-mt-trunk.nl}" />
 		</copy>
 
@@ -76,7 +77,7 @@
 
 		<echo message="copy language property files into ${path-mt-translations-temp}" />
 
-		<copy todir="${path-mt-translations-temp}/" preservelastmodified="true" includeemptydirs="false">
+		<copy todir="${path-mt-translations-temp}/" preservelastmodified="true" includeemptydirs="true">
 
 			<fileset dir="${path-mt-trunk}">
 

@@ -5,4 +5,5 @@ Bundle-SymbolicName: de.byteholder.geoclipse.nl;singleton:=true
 Bundle-Version: 10.2.1.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: de.byteholder.geoclipse
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 

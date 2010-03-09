@@ -3,13 +3,13 @@
 <project name="create-build-files" default="create-build-files" basedir="..">
 
 	<!--
-		copies all files from net.tourbook.* and de.byteholder.* into the build folders
+		copy all project files from "mytourbook-TRUNK" into the build folder "mytourbook-BUILD-temp"
 	-->
 
 	<property name="path-mt-trunk" value="../../mytourbook-TRUNK" />
 	<property name="path-mt-trunk.nl" value="../../mytourbook-TRUNK.nl" />
-	
-	<property name="path-mt-build" value="../../mytourbook-BUILD-auto-created" />
+
+	<property name="path-mt-build" value="../../mytourbook-BUILD-autocreated" />
 
 	<property name="path-build-core" value="${path-mt-build}/core" />
 	<property name="path-build-translation" value="${path-mt-build}/translation" />
@@ -43,8 +43,8 @@
 
 	<target name="delete-all-build-files">
 
-		<!-- delete all build files: ${path-mt-build} -->
-		<echo message="delete all build files: ${path-mt-build}" />
+		<!-- delete old build files: ${path-mt-build} -->
+		<echo message="delete old build files: ${path-mt-build}" />
 
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="${path-mt-build}" includes="**/*" />
@@ -85,7 +85,10 @@
 		<echo message="copy language fragments into ${path-build-translation}" />
 
 		<copy todir="${path-build-translation}" preservelastmodified="true" includeemptydirs="false">
-			<fileset dir="${path-mt-trunk.nl}" />
+			<fileset dir="${path-mt-trunk.nl}" >
+				<include name="**/*" />
+				<exclude name="**/z-DUMMY-HOST*/**" />
+			</fileset>
 		</copy>
 
 	</target>
@@ -113,7 +116,6 @@
 				<regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1\.nl\2" />
 				<regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1\.nl\2" />
 			</mapper>
-
 
 		</copy>
 

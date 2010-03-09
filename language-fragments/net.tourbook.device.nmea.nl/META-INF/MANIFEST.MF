@@ -5,3 +5,4 @@ Bundle-SymbolicName: net.tourbook.device.nmea.nl;singleton:=true
 Bundle-Version: 10.2.1.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.device.nmea
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

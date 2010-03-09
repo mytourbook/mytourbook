@@ -5,3 +5,4 @@ Bundle-SymbolicName: net.tourbook.device.cm4xxm.nl;singleton:=true
 Bundle-Version: 10.2.1.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.device.cm4xxm
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

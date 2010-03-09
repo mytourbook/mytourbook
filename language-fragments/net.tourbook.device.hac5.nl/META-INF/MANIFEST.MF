@@ -5,3 +5,4 @@ Bundle-SymbolicName: net.tourbook.device.hac5.nl;singleton:=true
 Bundle-Version: 10.2.1.qualifier
 Fragment-Host: net.tourbook.device.hac5
 Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

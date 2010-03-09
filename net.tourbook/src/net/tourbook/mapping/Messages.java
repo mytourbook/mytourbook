@@ -26,7 +26,7 @@ public class Messages extends NLS {
 
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
- 
+
 	public static String		image_action_change_tile_factory;
 	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
@@ -58,17 +58,14 @@ public class Messages extends NLS {
 	public static String		legend_color_keep_color;
 	public static String		legend_color_lighten_color;
 
-	public static String	LegendColor_Dialog_Check_LiveUpdate;
-
-	public static String	LegendColor_Dialog_Check_LiveUpdate_Tooltip;
+	public static String		LegendColor_Dialog_Check_LiveUpdate;
+	public static String		LegendColor_Dialog_Check_LiveUpdate_Tooltip;
 
 	public static String		legendcolor_dialog_chk_max_value_text;
 	public static String		legendcolor_dialog_chk_max_value_tooltip;
 	public static String		legendcolor_dialog_chk_min_value_text;
 	public static String		legendcolor_dialog_chk_min_value_tooltip;
 	public static String		legendcolor_dialog_error_max_greater_min;
-	public static String		legendcolor_dialog_error_max_value_is_required;
-	public static String		legendcolor_dialog_error_min_value_is_required;
 	public static String		legendcolor_dialog_group_minmax_brightness;
 	public static String		legendcolor_dialog_group_minmax_value;
 	public static String		legendcolor_dialog_max_brightness_label;
