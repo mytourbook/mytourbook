@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,8 +24,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -44,8 +42,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 	private static final String	DAUM_ERGO_BIKE_CSV_ID	= "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;";	//$NON-NLS-1$
 
 	private static final String	CSV_STRING_TOKEN		= ";";																														//$NON-NLS-1$
-
-	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	private DecimalFormat		fDecimalFormat			= (DecimalFormat) DecimalFormat.getInstance();
 
@@ -276,9 +272,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
 
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 			returnValue = true;

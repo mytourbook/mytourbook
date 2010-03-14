@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
@@ -257,27 +256,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private void createUIWeek(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-		group.setText(Messages.compute_tourValueWeek_group_week);
-		{
-			// button: compute computed values
-			final Button btnComputValues = new Button(group, SWT.NONE);
-			GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
-			btnComputValues.setText(Messages.compute_tourValueWeek_button_computeWeekValues);
-			btnComputValues.setToolTipText(Messages.compute_tourValueWeek_button_computeWeekValues_tooltip);
-			btnComputValues.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onComputeWeekValues();
-				}
-			});
-		}
-	}
-
 	private void fireModifyEvent() {
 
 		TourManager.getInstance().removeAllToursFromCache();
@@ -319,10 +297,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
 				Messages.compute_tourValueElevation_dlg_computeValues_title,
-				NLS.bind(
-						Messages.compute_tourValueElevation_dlg_computeValues_message,
-						Integer.toString((int) (altiMin / UI.UNIT_VALUE_ALTITUDE)),
-						UI.UNIT_LABEL_ALTITUDE))) {
+				NLS.bind(Messages.compute_tourValueElevation_dlg_computeValues_message, Integer
+						.toString((int) (altiMin / UI.UNIT_VALUE_ALTITUDE)), UI.UNIT_LABEL_ALTITUDE))) {
 
 			saveState();
 
@@ -388,7 +364,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						Messages.compute_tourValueSpeed_dlg_computeValues_message,
 						fSpinnerMinTime.getSelection(),
 						Messages.app_unit_seconds//
-				))) {
+						))) {
 
 			saveState();
 
@@ -440,39 +416,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			fireModifyEvent();
 		}
-	}
-
-	private void onComputeWeekValues() {
-
-//		if (MessageDialog.openConfirm(
-//				Display.getCurrent().getActiveShell(),
-//				Messages.compute_tourValueWeek_dlg_title,
-//				Messages.compute_tourValueWeek_dlg_message)) {
-//
-//			saveState();
-//
-//			TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
-//
-//				public boolean computeTourValues(final TourData tourData) {
-//
-//					final DateTime dtTour = new DateTime(tourData.getStartYear(),
-//							tourData.getStartMonth(),
-//							tourData.getStartDay(),
-//							tourData.getStartHour(),
-//							tourData.getStartMinute(),
-//							tourData.getStartSecond(),
-//							0);
-//
-//					tourData.setStartWeek((short) dtTour.getWeekOfWeekyear());
-////					dtTour.getWeekyear()
-//
-//					return true;
-//				}
-//
-//			});
-//
-//			fireModifyEvent();
-//		}
 	}
 
 	@Override

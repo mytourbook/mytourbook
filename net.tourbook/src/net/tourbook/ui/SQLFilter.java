@@ -94,4 +94,9 @@ public class SQLFilter {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return fWhereClause;
+	}
 }

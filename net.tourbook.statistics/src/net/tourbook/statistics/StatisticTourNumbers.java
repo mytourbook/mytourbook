@@ -244,14 +244,14 @@ public class StatisticTourNumbers extends YearStatistic {
 		fStatTimeSumColorIndex = new int[colorLength][timeLength];
 
 		// loop: all tours
-		for (int tourIndex = 0; tourIndex < tourDayData.fDistanceHigh.length; tourIndex++) {
+		for (int tourIndex = 0; tourIndex < tourDayData.distanceHigh.length; tourIndex++) {
 
-			final int typeColorIndex = tourDayData.fTypeColorIndex[tourIndex];
+			final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
 			int unitIndex;
 
-			final int diffDistance = (tourDayData.fDistanceHigh[tourIndex] - tourDayData.fDistanceLow[tourIndex] + 500) / 1000;
-			final int diffAltitude = tourDayData.fAltitudeHigh[tourIndex] - tourDayData.fAltitudeLow[tourIndex];
-			final int diffTime = tourDayData.fTimeHigh[tourIndex] - tourDayData.fTimeLow[tourIndex];
+			final int diffDistance = (tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000;
+			final int diffAltitude = tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex];
+			final int diffTime = tourDayData.timeHigh[tourIndex] - tourDayData.timeLow[tourIndex];
 
 			unitIndex = createTourStatData(diffDistance,
 					fStatDistanceUnits,

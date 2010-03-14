@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -122,7 +122,8 @@ public class NmeaDataReader extends TourbookDevice {
 			// first time data
 			timeData.absoluteDistance = 0;
 		} else {
-			fAbsoluteDistance += DeviceReaderTools.computeDistance(fPrevTimeData.latitude,
+			fAbsoluteDistance += DeviceReaderTools.computeDistance(
+					fPrevTimeData.latitude,
 					fPrevTimeData.longitude,
 					latitude,
 					longitude);
@@ -232,9 +233,14 @@ public class NmeaDataReader extends TourbookDevice {
 
 //	Begin of O. Budischewski, 2008.03.20		
 		if (fNullCoordinates == true) {
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-					Messages.NMEA_Null_Coords_title,
-					NLS.bind(Messages.NMEA_Null_Coords_message, fImportFilePath));
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openInformation(
+							Display.getCurrent().getActiveShell(),
+							Messages.NMEA_Null_Coords_title,
+							NLS.bind(Messages.NMEA_Null_Coords_message, fImportFilePath));
+				}
+			});
 		}
 //	End	  of O. Budischewski, 2008.03.20		
 
@@ -262,8 +268,7 @@ public class NmeaDataReader extends TourbookDevice {
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-
-		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.importRawDataFile = fImportFilePath;

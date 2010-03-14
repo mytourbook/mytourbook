@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.util.Calendar;
+
 import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
@@ -177,7 +179,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				PrefPageAppearanceMap.TOUR_PAINT_METHOD_SIMPLE);
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
- 
+
 		/*
 		 * tour data editor
 		 */
@@ -219,5 +221,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// speed minimum time slice value in seconds
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
+
+		/*
+		 * calendar week
+		 */
+		store.setDefault(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, Calendar.MONDAY);
+		store.setDefault(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, 4);
 	}
 }

@@ -29,9 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Formatter;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
@@ -55,8 +53,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	private static final int	CM4XXM_DATA_SIZE	= 81930;
 
 	private static final int	HARDWARE_ID_CM4XXM	= 0xb723;
-
-	private Calendar			fCalendar			= GregorianCalendar.getInstance();
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -468,9 +464,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					tourData.setDeviceMode(profileId);
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
-					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				/*

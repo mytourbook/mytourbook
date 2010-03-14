@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,35 +20,38 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.data.TourPerson;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class DataProvider {
 
-	TourPerson		fActivePerson;
-	TourTypeFilter	fActiveTourTypeFilter;
+	TourPerson						_activePerson;
+	TourTypeFilter					_activeTourTypeFilter;
 
-	int				fLastYear;
-	int				fNumberOfYears;
+	int								_lastYear;
+	int								_numberOfYears;
 
 	/**
 	 * all years
 	 */
-	int[]			fYears;
+	int[]							_years;
 
 	/**
 	 * number of days in a year
 	 */
-	int[]			fYearDays;
+	int[]							_yearDays;
 
 	/**
 	 * number of weeks in a year
 	 */
-	int[]			fYearWeeks;
+	int[]							_yearWeeks;
 
-	Calendar		fCalendar	= GregorianCalendar.getInstance();
+	Calendar						_calendar	= GregorianCalendar.getInstance();
+
+	private static IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	/**
 	 * @param finalYear
@@ -74,20 +77,20 @@ public abstract class DataProvider {
 	/**
 	 * @param selectedYear
 	 * @param numberOfYears
-	 * @return Returns the number of days between {@link #fLastYear} and selectedYear
+	 * @return Returns the number of days between {@link #_lastYear} and selectedYear
 	 */
 	int getYearDOYs(final int selectedYear) {
 
 		int yearDOYs = 0;
 		int yearIndex = 0;
 
-		for (int currentYear = fLastYear - fNumberOfYears + 1; currentYear < selectedYear; currentYear++) {
+		for (int currentYear = _lastYear - _numberOfYears + 1; currentYear < selectedYear; currentYear++) {
 
 			if (currentYear == selectedYear) {
 				return yearDOYs;
 			}
 
-			yearDOYs += fYearDays[yearIndex];
+			yearDOYs += _yearDays[yearIndex];
 
 			yearIndex++;
 		}
@@ -98,30 +101,34 @@ public abstract class DataProvider {
 	/**
 	 * get numbers for each year <br>
 	 * <br>
-	 * all years into {@link #fYears} <br>
-	 * number of day's into {@link #fYearDays} <br>
-	 * number of week's into {@link #fYearWeeks}
+	 * all years into {@link #_years} <br>
+	 * number of day's into {@link #_yearDays} <br>
+	 * number of week's into {@link #_yearWeeks}
 	 */
 	void initYearNumbers() {
 
-		fYears = new int[fNumberOfYears];
-		fYearDays = new int[fNumberOfYears];
-		fYearWeeks = new int[fNumberOfYears];
+		_calendar.setFirstDayOfWeek(_prefStore//
+				.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
+		_calendar.setMinimalDaysInFirstWeek(_prefStore
+				.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 
-		final int firstYear = fLastYear - fNumberOfYears + 1;
+		_years = new int[_numberOfYears];
+		_yearDays = new int[_numberOfYears];
+		_yearWeeks = new int[_numberOfYears];
 
-		DateTime dt = (new DateTime()).withYear(firstYear)
-				.withWeekOfWeekyear(1)
-				.withDayOfWeek(DateTimeConstants.MONDAY);
-
+		final int firstYear = _lastYear - _numberOfYears + 1;
 		int yearIndex = 0;
-		for (int currentYear = firstYear; currentYear <= fLastYear; currentYear++) {
 
-			dt = dt.withYear(currentYear);
+		for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
-			fYears[yearIndex] = currentYear;
-			fYearDays[yearIndex] = dt.dayOfYear().getMaximumValue();
-			fYearWeeks[yearIndex] = dt.weekOfWeekyear().getMaximumValue();
+			_calendar.set(currentYear, 0, 1);
+
+			final int weekOfYear = _calendar.getActualMaximum(Calendar.WEEK_OF_YEAR);
+			final int dayOfYear = _calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+
+			_years[yearIndex] = currentYear;
+			_yearDays[yearIndex] = dayOfYear;
+			_yearWeeks[yearIndex] = weekOfYear;
 
 			yearIndex++;
 		}

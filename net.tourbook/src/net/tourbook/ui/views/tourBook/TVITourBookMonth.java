@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 
 import net.tourbook.database.TourDatabase;
@@ -76,13 +77,14 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ "startHour," //						22	//$NON-NLS-1$
 				+ "startMinute," //						23	//$NON-NLS-1$
 				+ "startWeek," //						24	//$NON-NLS-1$
+				+ "startWeekYear," //					25	//$NON-NLS-1$
 
-				+ "weatherWindDir," //                  25  //$NON-NLS-1$
-				+ "weatherWindSpd," //                  26  //$NON-NLS-1$
-				+ "weatherClouds," //                   27  //$NON-NLS-1$
-				+ "restPulse," //                    	28  //$NON-NLS-1$
+				+ "weatherWindDir," //                  26  //$NON-NLS-1$
+				+ "weatherWindSpd," //                  27  //$NON-NLS-1$
+				+ "weatherClouds," //                   28  //$NON-NLS-1$
+				+ "restPulse," //                    	29  //$NON-NLS-1$
 
-				+ "calories" //							29	//$NON-NLS-1$
+				+ "calories" //							30	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -179,17 +181,19 @@ public class TVITourBookMonth extends TVITourBookItem {
 					final int dbHour = result.getInt(22);
 					final int dbMinute = result.getInt(23);
 
-					tourItem.colWeek = result.getInt(24);
+					tourItem.colWeekNo = result.getInt(24);
+					tourItem.colWeekYear = result.getInt(25);
 
-					tourItem.colWindDir = result.getInt(25);
-					tourItem.colWindSpd = result.getInt(26);
-					tourItem.colClouds = result.getString(27);
-					tourItem.colRestPulse = result.getInt(28);
+					tourItem.colWindDir = result.getInt(26);
+					tourItem.colWindSpd = result.getInt(27);
+					tourItem.colClouds = result.getString(28);
+					tourItem.colRestPulse = result.getInt(29);
 
-					tourItem.colCalories = result.getInt(29);
+					tourItem.colCalories = result.getInt(30);
 
 					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.colTourDate = calendar.getTimeInMillis();
+					tourItem.colWeekDay = calendar.get(Calendar.DAY_OF_WEEK);
 
 					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED

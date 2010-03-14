@@ -39,8 +39,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
 
-	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";					//$NON-NLS-1$
-	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";					//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
 
 	// namespace for extensions used by Garmin
 //	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
@@ -48,27 +48,28 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final int				GPX_VERSION_1_0			= 10;
 	private static final int				GPX_VERSION_1_1			= 11;
 
-	private static final String				TAG_GPX					= "gpx";												//$NON-NLS-1$
+	private static final String				TAG_GPX					= "gpx";											//$NON-NLS-1$
 
-	private static final String				TAG_TRK					= "trk";												//$NON-NLS-1$
-	private static final String				TAG_TRKPT				= "trkpt";												//$NON-NLS-1$
+	private static final String				TAG_TRK					= "trk";											//$NON-NLS-1$
+	private static final String				TAG_TRKPT				= "trkpt";											//$NON-NLS-1$
 
-	private static final String				TAG_TIME				= "time";												//$NON-NLS-1$
-	private static final String				TAG_ELE					= "ele";												//$NON-NLS-1$
+	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
+	private static final String				TAG_ELE					= "ele";											//$NON-NLS-1$
 
 	// Extension element for temperature, heart rate, cadence
-	private static final String				TAG_EXT_CAD				= "gpxtpx:cad";										//$NON-NLS-1$
-	private static final String				TAG_EXT_HR				= "gpxtpx:hr";											//$NON-NLS-1$
-	private static final String				TAG_EXT_TEMP			= "gpxtpx:atemp";										//$NON-NLS-1$
+	private static final String				TAG_EXT_CAD				= "gpxtpx:cad";									//$NON-NLS-1$
+	private static final String				TAG_EXT_HR				= "gpxtpx:hr";										//$NON-NLS-1$
+	private static final String				TAG_EXT_TEMP			= "gpxtpx:atemp";									//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat";												//$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE			= "lon";												//$NON-NLS-1$
+	private static final String				ATTR_LATITUDE			= "lat";											//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE			= "lon";											//$NON-NLS-1$
 
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
-	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");	//$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");		//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat(
+																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
 
 	private static final DateTimeFormatter	fDateTimeParser			= ISODateTimeFormat.dateTimeParser();
 
@@ -168,19 +169,27 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
 						} catch (final ParseException e1) {
 							try {
-								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ.parse(timeString)
+								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ
+										.parse(timeString)
 										.getTime();
 							} catch (final ParseException e2) {
 								try {
-									fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString)
+									fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822
+											.parse(timeString)
 											.getTime();
 								} catch (final ParseException e3) {
 
 									fIsError = true;
 
-									final String message = e3.getMessage();
-									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-									System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
+									Display.getDefault().syncExec(new Runnable() {
+										public void run() {
+											final String message = e3.getMessage();
+											MessageDialog.openError(
+													Display.getCurrent().getActiveShell(),
+													"Error", message); //$NON-NLS-1$
+											System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
+										}
+									});
 								}
 							}
 						}
@@ -385,8 +394,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
-
-		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.importRawDataFile = fImportFilePath;

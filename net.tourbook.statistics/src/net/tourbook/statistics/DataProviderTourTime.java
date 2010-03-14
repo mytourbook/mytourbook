@@ -71,19 +71,19 @@ public class DataProviderTourTime extends DataProvider {
 									final boolean refreshData) {
 
 		// dont reload data which are already here
-		if (fActivePerson == person
-				&& fActiveTourTypeFilter == tourTypeFilter
-				&& fLastYear == lastYear
-				&& fNumberOfYears == numberOfYears
+		if (_activePerson == person
+				&& _activeTourTypeFilter == tourTypeFilter
+				&& _lastYear == lastYear
+				&& _numberOfYears == numberOfYears
 				&& refreshData == false) {
 			return fTourDataTime;
 		}
 
-		fActivePerson = person;
-		fActiveTourTypeFilter = tourTypeFilter;
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
 
-		fLastYear = lastYear;
-		fNumberOfYears = numberOfYears;
+		_lastYear = lastYear;
+		_numberOfYears = numberOfYears;
 
 		initYearNumbers();
 
@@ -185,8 +185,8 @@ public class DataProviderTourTime extends DataProvider {
 					final int startTime = startHour * 3600 + startMinute * 60;
 
 					final int recordingTime = result.getInt(9);
-					fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
-					final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
+					_calendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
+					final int tourDOY = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
 					dbTourYear.add(tourYear);
 					dbTourMonths.add(tourMonth);
@@ -240,7 +240,7 @@ public class DataProviderTourTime extends DataProvider {
 
 			// get number of days for all years
 			int yearDays = 0;
-			for (final int doy : fYearDays) {
+			for (final int doy : _yearDays) {
 				yearDays += doy;
 			}
 
@@ -257,8 +257,8 @@ public class DataProviderTourTime extends DataProvider {
 			fTourDataTime.fTagIds = dbTagIds;
 
 			fTourDataTime.allDaysInAllYears = yearDays;
-			fTourDataTime.yearDays = fYearDays;
-			fTourDataTime.years = fYears;
+			fTourDataTime.yearDays = _yearDays;
+			fTourDataTime.years = _years;
 
 			fTourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
 			fTourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);

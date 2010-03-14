@@ -210,8 +210,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		}
 
 		// force layout after the fields are set !!!
-		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupContainer);
-
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupContainer);
 	}
 
 	private void enableControls(final boolean isWithBorder) {

@@ -35,24 +35,6 @@ public class DeviceImportSorter extends ViewerSorter {
 	private int					column;
 	private int					direction;
 
-	/**
-	 * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
-	 * it's the same column as the last sort, toggle the sort direction.
-	 * 
-	 * @param column
-	 */
-	public void doSort(final int column) {
-
-		if (column == this.column) {
-			// Same column as last sort; toggle the direction
-			direction = 1 - direction;
-		} else {
-			// New column; do an ascending sort
-			this.column = column;
-			direction = ASCENDING;
-		}
-	}
-
 	@Override
 	public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
@@ -77,6 +59,10 @@ public class DeviceImportSorter extends ViewerSorter {
 		case RawDataView.COLUMN_FILE_NAME:
 
 			// sort by file name
+			if (tourData1.importRawDataFile == null||tourData2.importRawDataFile==null) {
+				break;
+			}
+			
 			result = tourData1.importRawDataFile.compareTo(tourData2.importRawDataFile);
 
 			if (result == 0) {
@@ -117,5 +103,23 @@ public class DeviceImportSorter extends ViewerSorter {
 					- (tourData2.getStartHour() * 100 + tourData2.getStartMinute());
 		}
 		return result;
+	}
+
+	/**
+	 * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
+	 * it's the same column as the last sort, toggle the sort direction.
+	 * 
+	 * @param column
+	 */
+	public void doSort(final int column) {
+
+		if (column == this.column) {
+			// Same column as last sort; toggle the direction
+			direction = 1 - direction;
+		} else {
+			// New column; do an ascending sort
+			this.column = column;
+			direction = ASCENDING;
+		}
 	}
 }

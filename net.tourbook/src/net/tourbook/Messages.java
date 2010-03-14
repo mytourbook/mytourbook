@@ -170,6 +170,8 @@ public class Messages extends NLS {
 	public static String		App_Dlg_first_startup_msg;
 	public static String		App_Dlg_first_startup_title;
 
+	public static String	App_Label_ISO8601;
+
 	public static String		App_Title;
 
 	public static String		App_Tour_type_item_all_types;
@@ -418,6 +420,8 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Monitor_wait_for_data;
 	public static String		Import_Wizard_Thread_name_read_device_data;
 
+	public static String	map_dlg_dim_warning_message;
+
 	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
@@ -451,6 +455,22 @@ public class Messages extends NLS {
 	public static String		Pref_general_system_distance;
 	public static String		Pref_general_system_measurement;
 	public static String		Pref_general_system_temperature;
+
+	public static String	Pref_General_Button_ComputeCalendarWeek;
+
+	public static String	Pref_General_CalendarWeek;
+
+	public static String	Pref_General_Dialog_CalendarWeekIsModified_Message;
+
+	public static String	Pref_General_Dialog_CalendarWeekIsModified_Title;
+
+	public static String	Pref_General_Label_FirstDayOfWeek;
+
+	public static String	Pref_General_Label_FirstDayOfWeek_Tooltip;
+
+	public static String	Pref_General_Label_MinimalDaysInFirstWeek;
+
+	public static String	Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
 
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;
@@ -650,6 +670,14 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_update_tour;
+
+	public static String	Tour_Database_Update_8;
+
+	public static String	Tour_Database_Update_9;
+
+	public static String	Tour_Database_Update_TourWeek;
+
+	public static String	Tour_Database_Update_TourWeek_Info;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 

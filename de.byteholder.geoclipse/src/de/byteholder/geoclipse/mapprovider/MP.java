@@ -77,7 +77,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	public static final int							UI_MIN_ZOOM_LEVEL					= 1;
 	public static final int							UI_MAX_ZOOM_LEVEL					= 18;
- 
+
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;
 	private static ExecutorService					fExecutorService;
@@ -95,13 +95,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * again
 	 */
 	private static final TileCache					_errorTiles							= new TileCache(
-			ERROR_CACHE_SIZE);
+																								ERROR_CACHE_SIZE);
 
 	/**
 	 * Cache for tile images
 	 */
 	private static final TileImageCache				_tileImageCache						= new TileImageCache(
-			IMAGE_CACHE_SIZE);
+																								IMAGE_CACHE_SIZE);
 
 	/**
 	 * This queue contains tiles which needs to be loaded, only the number of
@@ -116,22 +116,22 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * Listener which throws {@link ITileListener} events
 	 */
 	private final static ListenerList				_tileListeners						= new ListenerList(
-			ListenerList.IDENTITY);
+																								ListenerList.IDENTITY);
 
 	private int										_dimmingAlphaValue					= 0xFF;
 	private RGB										_dimmingColor;
 
-	private final Projection								_projection;
+	private final Projection						_projection;
 
 	/**
 	 * image size in pixel for a square image
 	 */
 	private int										_tileSize							= Integer
-	.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+																								.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
 	// map min/max zoom level
 	private int										_minZoomLevel						= 0;
 	private int										_maxZoomLevel						= UI_MAX_ZOOM_LEVEL
-	- UI_MIN_ZOOM_LEVEL;
+																								- UI_MIN_ZOOM_LEVEL;
 
 	private int										_defaultZoomLevel					= 0;
 
@@ -212,7 +212,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	private long									_offlineFileSize					= -1;
 
 	private static final ListenerList				_offlineReloadEventListeners		= new ListenerList(
-			ListenerList.IDENTITY);
+																								ListenerList.IDENTITY);
 
 	/**
 	 * State if the map provider can be toggled in the map
@@ -357,11 +357,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
 					? new GeoPosition(0.0, 0.0)
-			: _favoritePosition);
+					: _favoritePosition);
 
 			mapProvider._lastUsedPosition = new GeoPosition(_lastUsedPosition == null
 					? new GeoPosition(0.0, 0.0)
-			: _lastUsedPosition);
+					: _lastUsedPosition);
 		}
 
 		return mapProvider;
@@ -478,7 +478,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @param tile
 	 */
 	public void doPostCreation(final Tile tile) {
-		// default does nothing
+	// default does nothing
 	}
 
 	@Override
@@ -779,7 +779,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		 * create tile key, wrap the tiles horizontally --> mod the x with the max width and use
 		 * that
 		 */
-//		final int numTilesWidth = (int) getMapSize(zoom).getWidth();
 		final int numTilesWidth = getMapSizeInTiles(zoom);
 
 		if (tilePositionX < 0) {
@@ -823,8 +822,13 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			// check if the old implementation was not correctly transfered to the cache with error tiles
 			if (tile.isLoadingError()) {
-				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
-						+ tile.getTileKey(), null);
+				StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
+						+ tile.getTileKey());
+
+				// ensure the error do not occure again for this tile
+				_tileCache.remove(tileKey);
+				_errorTiles.add(tileKey, tile);
+
 				return tile;
 			}
 
@@ -841,9 +845,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			// check if the old implementation was not correctly transfered to the cache with error tiles
 			if (tile != null) {
-				StatusUtil.showStatus("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
-						+ tile.getTileKey(), null);
+				StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
+						+ tile.getTileKey());
 			}
+
+			// ensure the error do not occure again for this tile
+			_tileCache.remove(tileKey);
 
 			return errorTile;
 		}
@@ -1306,10 +1313,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	void setIsProfileBrightnessForNextMp(final boolean isBrightness) {
-
-//		System.out.println("MP:setIsProfileBrightnessForNextMp\t" + _mapProviderId + "\t" + isBrightness);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		_isProfileBrightnessForNextMp = isBrightness;
 	}
 

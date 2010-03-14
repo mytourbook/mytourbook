@@ -174,6 +174,18 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
 
+	public static String	ColumnFactory_Tour_WeekDay_Header;
+
+	public static String	ColumnFactory_Tour_WeekDay_Label;
+
+	public static String	ColumnFactory_Tour_WeekDay_Tooltip;
+
+	public static String	ColumnFactory_TourWeekYear_Header;
+
+	public static String	ColumnFactory_TourWeekYear_Label;
+
+	public static String	ColumnFactory_TourWeekYear_Tooltip;
+
 	public static String		Image_configure_columns;
 
 	public static String		message_manager_pErrorSummary;

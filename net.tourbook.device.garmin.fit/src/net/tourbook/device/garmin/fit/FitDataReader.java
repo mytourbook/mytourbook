@@ -424,9 +424,7 @@ public class FitDataReader extends TourbookDevice {
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
 
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 			returnValue = true;

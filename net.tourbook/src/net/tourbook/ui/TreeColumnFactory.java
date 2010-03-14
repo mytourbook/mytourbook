@@ -225,7 +225,7 @@ public abstract class TreeColumnFactory {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "deviceDistance", SWT.TRAIL); //$NON-NLS-1$
 			
-			String unit = UI.UNIT_LABEL_DISTANCE +" * 1000"; //$NON-NLS-1$
+			final String unit = UI.UNIT_LABEL_DISTANCE +" * 1000"; //$NON-NLS-1$
 			colDef.setColumnLabel(Messages.ColumnFactory_device_start_distance_label);
 			colDef.setColumnHeader(unit);
 			colDef.setColumnUnit(unit);
@@ -552,8 +552,22 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		};
 	};
 
-	
-	public static final TreeColumnFactory WEEK = new TreeColumnFactory() {
+	public static final TreeColumnFactory WEEK_DAY = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourWeekDay", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnHeader(Messages.ColumnFactory_Tour_WeekDay_Header);
+			colDef.setColumnLabel(Messages.ColumnFactory_Tour_WeekDay_Label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Tour_WeekDay_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+			return colDef;
+		};
+	};
+
+	public static final TreeColumnFactory WEEK_NO = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
@@ -564,6 +578,21 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_week_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 			
+			return colDef;
+		};
+	};
+
+	public static final TreeColumnFactory WEEKYEAR = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourWeekYear", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnHeader(Messages.ColumnFactory_TourWeekYear_Header);
+			colDef.setColumnLabel(Messages.ColumnFactory_TourWeekYear_Label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourWeekYear_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+
 			return colDef;
 		};
 	};

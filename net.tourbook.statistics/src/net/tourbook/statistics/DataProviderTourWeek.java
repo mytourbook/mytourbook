@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -30,15 +30,15 @@ import net.tourbook.ui.UI;
 
 public class DataProviderTourWeek extends DataProvider {
 
-	private static DataProviderTourWeek	fInstance;
+	private static DataProviderTourWeek	_instance;
 
-	private TourDataWeek				fTourWeekData;
+	private TourDataWeek				_tourWeekData;
 
 	public static DataProviderTourWeek getInstance() {
-		if (fInstance == null) {
-			fInstance = new DataProviderTourWeek();
+		if (_instance == null) {
+			_instance = new DataProviderTourWeek();
 		}
-		return fInstance;
+		return _instance;
 	}
 
 	private DataProviderTourWeek() {}
@@ -50,30 +50,30 @@ public class DataProviderTourWeek extends DataProvider {
 								final boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
-		if (fActivePerson == person
-				&& fActiveTourTypeFilter == tourTypeFilter
-				&& lastYear == fLastYear
-				&& numberOfYears == fNumberOfYears
+		if (_activePerson == person
+				&& _activeTourTypeFilter == tourTypeFilter
+				&& lastYear == _lastYear
+				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
-			return fTourWeekData;
+			return _tourWeekData;
 		}
 
-		fActivePerson = person;
-		fActiveTourTypeFilter = tourTypeFilter;
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
 
-		fLastYear = lastYear;
-		fNumberOfYears = numberOfYears;
+		_lastYear = lastYear;
+		_numberOfYears = numberOfYears;
 
 		initYearNumbers();
 
-		fTourWeekData = new TourDataWeek();
+		_tourWeekData = new TourDataWeek();
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		int weekCounter = 0;
-		for (final int weeks : fYearWeeks) {
+		for (final int weeks : _yearWeeks) {
 			weekCounter += weeks;
 		}
 
@@ -88,23 +88,23 @@ public class DataProviderTourWeek extends DataProvider {
 		final int valueLength = weekCounter;
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " //$NON-NLS-1$
-				+ "StartYear				, " // 1 //$NON-NLS-1$
-				+ "StartWeek				, " // 2 //$NON-NLS-1$
-				+ "SUM(TourDistance)		, " // 3 //$NON-NLS-1$
-				+ "SUM(TourAltUp)			, " // 4 //$NON-NLS-1$
-				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," // 5 //$NON-NLS-1$
-				+ "SUM(TourRecordingTime)	, " // 6 //$NON-NLS-1$
-				+ "SUM(TourDrivingTime)		, " // 7 //$NON-NLS-1$
-				+ "TourType_TypeId 			  " // 8 //$NON-NLS-1$
+		final String sqlString = "SELECT \n" //$NON-NLS-1$
+				+ " StartWeekYear,			\n" // 1 //$NON-NLS-1$
+				+ " StartWeek,				\n" // 2 //$NON-NLS-1$
+				+ " SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
+				+ " SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
+				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
+				+ " SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
+				+ " SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
+				+ " TourType_TypeId 		\n" // 8 //$NON-NLS-1$
 				//
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
-				+ (" GROUP BY StartYear, StartWeek, tourType_typeId") //$NON-NLS-1$
-				+ (" ORDER BY StartYear, StartWeek"); //$NON-NLS-1$
+				+ (" GROUP BY StartWeekYear, StartWeek, tourType_typeId \n") //$NON-NLS-1$
+				+ (" ORDER BY StartWeekYear, StartWeek"); //$NON-NLS-1$
 
 		try {
 
@@ -132,7 +132,7 @@ public class DataProviderTourWeek extends DataProvider {
 				int allWeeks = 0;
 				for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
 					if (yearIndex > 0) {
-						allWeeks += fYearWeeks[yearIndex - 1];
+						allWeeks += _yearWeeks[yearIndex - 1];
 					}
 				}
 
@@ -172,29 +172,29 @@ public class DataProviderTourWeek extends DataProvider {
 
 			conn.close();
 
-			fTourWeekData.fTypeIds = dbTypeIds;
+			_tourWeekData.typeIds = dbTypeIds;
 
-			fTourWeekData.fYears = fYears;
-			fTourWeekData.fYearWeeks = fYearWeeks;
-			fTourWeekData.fYearDays = fYearDays;
+			_tourWeekData.years = _years;
+			_tourWeekData.yearWeeks = _yearWeeks;
+			_tourWeekData.yearDays = _yearDays;
 
-			fTourWeekData.fTimeLow = new int[serieLength][valueLength];
-			fTourWeekData.fTimeHigh = dbDurationTime;
+			_tourWeekData.timeLow = new int[serieLength][valueLength];
+			_tourWeekData.timeHigh = dbDurationTime;
 
-			fTourWeekData.fDistanceLow = new int[serieLength][valueLength];
-			fTourWeekData.fDistanceHigh = dbDistance;
+			_tourWeekData.distanceLow = new int[serieLength][valueLength];
+			_tourWeekData.distanceHigh = dbDistance;
 
-			fTourWeekData.fAltitudeLow = new int[serieLength][valueLength];
-			fTourWeekData.fAltitudeHigh = dbAltitude;
+			_tourWeekData.altitudeLow = new int[serieLength][valueLength];
+			_tourWeekData.altitudeHigh = dbAltitude;
 
-			fTourWeekData.fRecordingTime = dbRecordingTime;
-			fTourWeekData.fDrivingTime = dbDrivingTime;
-			fTourWeekData.fBreakTime = dbBreakTime;
+			_tourWeekData.recordingTime = dbRecordingTime;
+			_tourWeekData.drivingTime = dbDrivingTime;
+			_tourWeekData.breakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return fTourWeekData;
+		return _tourWeekData;
 	}
 }

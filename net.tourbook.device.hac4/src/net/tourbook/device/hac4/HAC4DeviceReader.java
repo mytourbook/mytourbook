@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -25,9 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Formatter;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
@@ -53,7 +51,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	private static final int	HAC4_DATA_SIZE			= 81930;
 
-	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -484,9 +481,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.setDeviceMode(profileId);
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
-					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
 
 				// tourData.dumpTourTotal();

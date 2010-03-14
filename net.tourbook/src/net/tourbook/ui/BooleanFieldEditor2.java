@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class BooleanFieldEditor2 extends BooleanFieldEditor {
 	
-	private  Button fChangeControl;
+	private Button	_changeControl;
 
 	public BooleanFieldEditor2(	final String name,
 								final String labelText,
@@ -42,10 +42,10 @@ public class BooleanFieldEditor2 extends BooleanFieldEditor {
 	 */
 	@Override
 	public Button getChangeControl(final Composite parent) {
-		if (fChangeControl == null) {
-			fChangeControl = super.getChangeControl(parent);
+		if (_changeControl == null) {
+			_changeControl = super.getChangeControl(parent);
 		} 
-		return fChangeControl;
+		return _changeControl;
 	}
 }
 

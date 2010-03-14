@@ -1026,8 +1026,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
-
-		tourData.setStartWeek((short) _calendar.get(Calendar.WEEK_OF_YEAR));
+		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		// create tour id
 		final String uniqueKey = Long.toString(System.currentTimeMillis());
@@ -5691,14 +5690,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setStartYear((short) _dtTourDate.getYear());
 			_tourData.setStartMonth((short) (_dtTourDate.getMonth() + 1));
 			_tourData.setStartDay((short) _dtTourDate.getDay());
+			_tourData.setWeek(_tourData.getStartYear(), _tourData.getStartMonth(), _tourData.getStartDay());
 
 			_tourData.setStartHour((short) _dtStartTime.getHours());
 			_tourData.setStartMinute((short) _dtStartTime.getMinutes());
 			_tourData.setStartSecond((short) _dtStartTime.getSeconds());
-
-			// set week of year
-			_calendar.set(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
-			_tourData.setStartWeek((short) _calendar.get(Calendar.WEEK_OF_YEAR));
 
 			_tourData.setCalories(_spinTourCalories.getSelection());
 

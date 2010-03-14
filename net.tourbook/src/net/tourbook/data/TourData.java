@@ -21,7 +21,9 @@ import static javax.persistence.FetchType.EAGER;
 import java.awt.Point;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,12 +55,14 @@ import net.tourbook.srtm.NumberForm;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
+import org.joda.time.DateTime;
 
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
@@ -97,9 +101,12 @@ public class TourData implements Comparable<Object> {
 	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
 
 	@Transient
-	private static IPreferenceStore		fPrefStore						= TourbookPlugin
+	private static IPreferenceStore		_prefStore						= TourbookPlugin
 																				.getDefault()
 																				.getPreferenceStore();
+
+	@Transient
+	private final Calendar				_calendar						= GregorianCalendar.getInstance();
 
 	/**
 	 * entity id which identifies the tour
@@ -138,9 +145,20 @@ public class TourData implements Comparable<Object> {
 	private short						startDay;
 
 	/**
-	 * week of the tour, 0 is the first week
+	 * THIS IS NOT UNUSED !!!<br>
+	 * <br>
+	 * week of the tour provided by {@link Calendar#get(int)}
 	 */
+	@SuppressWarnings("unused")
 	private short						startWeek;
+
+	/**
+	 * THIS IS NOT UNUSED !!!<br>
+	 * <br>
+	 * year for startWeek
+	 */
+	@SuppressWarnings("unused")
+	private short						startWeekYear;
 
 	/**
 	 * total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
@@ -731,7 +749,7 @@ public class TourData implements Comparable<Object> {
 				}
 
 				// optimized performance for Math.min/max
- 				final double lastValidLatAdjusted = lastValidLatitude + 90;
+				final double lastValidLatAdjusted = lastValidLatitude + 90;
 				final double lastValidLonAdjusted = lastValidLongitude + 180;
 
 				mapMinLatitude = mapMinLatitude < lastValidLatAdjusted ? mapMinLatitude : lastValidLatAdjusted;
@@ -1005,7 +1023,7 @@ public class TourData implements Comparable<Object> {
 		final int dataSerieGradient[] = new int[serieLength];
 
 		// get minimum time/distance differences
-		final int minTimeDiff = fPrefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
+		final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
 
 //		if (isCustomProperty) {
 //			// use custom settings to compute altimeter and gradient
@@ -3505,9 +3523,16 @@ public class TourData implements Comparable<Object> {
 		return startSecond;
 	}
 
-	public short getStartWeek() {
-		return startWeek;
-	}
+//	public short getStartWeek() {
+//		return startWeek;
+//	}
+//
+//	/**
+//	 * @return the startWeekYear
+//	 */
+//	public short getStartWeekYear() {
+//		return startWeekYear;
+//	}
 
 	public short getStartYear() {
 		return startYear;
@@ -3652,14 +3677,6 @@ public class TourData implements Comparable<Object> {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3700,6 +3717,14 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
+	}
+
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3712,6 +3737,11 @@ public class TourData implements Comparable<Object> {
 		return weatherWindSpd;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param zoomLevel
 	 * @return Returns the world position for the suplied zoom level and projection id
@@ -3719,11 +3749,6 @@ public class TourData implements Comparable<Object> {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -4043,14 +4068,20 @@ public class TourData implements Comparable<Object> {
 		this.startSecond = startSecond;
 	}
 
-	/**
-	 * Set the week of the tour, 0 is the first week in the year
-	 * 
-	 * @param startWeek
-	 */
-	public void setStartWeek(final short startWeek) {
-		this.startWeek = startWeek;
-	}
+//	/**
+//	 * Set the week of the tour, 0 is the first week in the year
+//	 * 
+//	 * @param startWeek
+//	 */
+//	public void setStartWeek(final short startWeek) {
+//		this.startWeek = startWeek;
+//	}
+//	/**
+//	 * @param startWeekYear the startWeekYear to set
+//	 */
+//	public void setStartWeekYear(final short startWeekYear) {
+//		this.startWeekYear = startWeekYear;
+//	}
 
 	public void setStartYear(final short startYear) {
 		this.startYear = startYear;
@@ -4163,6 +4194,40 @@ public class TourData implements Comparable<Object> {
 
 	public void setWeatherWindSpd(final int weatherWindSpd) {
 		this.weatherWindSpd = weatherWindSpd;
+	}
+
+	public void setWeek(final DateTime dt) {
+
+		final int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		final int minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+
+		_calendar.setFirstDayOfWeek(firstDayOfWeek);
+		_calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
+
+		_calendar.set(dt.getYear(), dt.getMonthOfYear() - 1, dt.getDayOfMonth());
+
+		startWeek = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
+		startWeekYear = (short) Util.getYearForWeek(_calendar);
+	}
+
+	/**
+	 * @param year
+	 * @param month
+	 *            month starts with 1
+	 * @param tourDay
+	 */
+	public void setWeek(final short year, final short month, final short tourDay) {
+
+		final int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		final int minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+
+		_calendar.setFirstDayOfWeek(firstDayOfWeek);
+		_calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
+
+		_calendar.set(year, month - 1, tourDay);
+
+		startWeek = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
+		startWeekYear = (short) Util.getYearForWeek(_calendar);
 	}
 
 	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {

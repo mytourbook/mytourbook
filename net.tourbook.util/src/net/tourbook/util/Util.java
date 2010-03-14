@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.util;
 
+import java.util.Calendar;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Resource;
 
@@ -85,5 +87,26 @@ public class Util {
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
+	}
+
+	/**
+	 * found here: http://www.odi.ch/prog/design/datetime.php
+	 * 
+	 * @param cal
+	 * @return
+	 */
+	public static int getYearForWeek(final Calendar cal) {
+
+		final int year = cal.get(Calendar.YEAR);
+		final int week = cal.get(Calendar.WEEK_OF_YEAR);
+		final int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+
+		if (week == 1 && dayOfMonth > 20)
+			return year + 1;
+
+		if (week >= 52 && dayOfMonth < 10)
+			return year - 1;
+
+		return year;
 	}
 }

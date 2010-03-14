@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,8 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -34,8 +32,6 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 public class CRPDataReader extends TourbookDevice {
-
-	private Calendar	fCalendar	= GregorianCalendar.getInstance();
 
 	// plugin constructor
 	public CRPDataReader() {
@@ -150,13 +146,13 @@ public class CRPDataReader extends TourbookDevice {
 			 */
 			tokenLine = new StringTokenizer(fileReader.readLine());
 
-			// start date
+			// tour start date
 			final String tourStartDate = tokenLine.nextToken();
 			final int tourYear = Integer.parseInt(tourStartDate.substring(6));
 			final int tourMonth = Integer.parseInt(tourStartDate.substring(3, 5));
 			final int tourDay = Integer.parseInt(tourStartDate.substring(0, 2));
 
-			// start time
+			// tour start time
 			final String tourStartTime = tokenLine.nextToken();
 			final int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
 			final int tourMin = tourStartTime.length() > 5
@@ -386,9 +382,7 @@ public class CRPDataReader extends TourbookDevice {
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
 
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 			}
 
 			returnValue = true;

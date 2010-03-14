@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,8 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -57,8 +55,6 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
-
-	private Calendar			fCalendar			= GregorianCalendar.getInstance();
 
 	// plugin constructor
 	public CSVTourDataReader() {
@@ -150,7 +146,8 @@ public class CSVTourDataReader extends TourbookDevice {
 					tourTag.setRoot(true);
 
 					// persist tag
-					final TourTag savedTag = TourDatabase.saveEntity(tourTag,
+					final TourTag savedTag = TourDatabase.saveEntity(
+							tourTag,
 							TourDatabase.ENTITY_IS_NOT_SAVED,
 							TourTag.class);
 
@@ -217,9 +214,8 @@ public class CSVTourDataReader extends TourbookDevice {
 
 			final TourType newTourType = new TourType(parsedTourTypeLabel);
 
-			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
-					Long.toString(newTourType.getTypeId()),
-					newTourType.getName());
+			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType, Long
+					.toString(newTourType.getTypeId()), newTourType.getName());
 
 			newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
 			newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
@@ -312,9 +308,7 @@ public class CSVTourDataReader extends TourbookDevice {
 						tourData.setDeviceId(deviceId);
 						tourData.setDeviceName(visibleName);
 
-						// set week of year
-						fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-						tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+						tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 						returnValue = true;
 					}
@@ -330,8 +324,10 @@ public class CSVTourDataReader extends TourbookDevice {
 					fileReader.close();
 				}
 
+				final Display display = Display.getDefault();
+
 				if (isNewTag) {
-					Display.getCurrent().asyncExec(new Runnable() {
+					display.syncExec(new Runnable() {
 						public void run() {
 							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
 						}
@@ -343,12 +339,12 @@ public class CSVTourDataReader extends TourbookDevice {
 					TourDatabase.clearTourTypes();
 					TourManager.getInstance().clearTourDataCache();
 
-					Display.getCurrent().asyncExec(new Runnable() {
+					display.syncExec(new Runnable() {
 						public void run() {
 							// fire modify event
-							TourbookPlugin.getDefault()
-									.getPreferenceStore()
-									.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+							TourbookPlugin.getDefault().getPreferenceStore().setValue(
+									ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+									Math.random());
 						}
 					});
 

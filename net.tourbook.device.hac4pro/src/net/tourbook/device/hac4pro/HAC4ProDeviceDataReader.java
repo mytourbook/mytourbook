@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -54,7 +54,6 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	private static final int	OFFSET_TOUR_DATA_START	= 0x0140;
 	private static final int	OFFSET_TOUR_DATA_END	= 0x10000;
 
-	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 	private GregorianCalendar	fFileDate;
 
 	/**
@@ -532,10 +531,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
 
-					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+					tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 				}
+
 				// dump DD block
 				// dumpBlock(file, recordBuffer);
 				//

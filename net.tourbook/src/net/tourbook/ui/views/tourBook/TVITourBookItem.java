@@ -90,7 +90,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	String					colClouds;
 	int						colRestPulse;
 
-	int						colWeek;
+	int						colWeekNo;
+	int						colWeekDay;
+	int						colWeekYear;
 
 	TVITourBookItem(final TourBookView view) {
 		tourBookView = view;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -28,7 +28,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +55,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -79,8 +82,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 8;													// 10.2.1 Mod by Kenny
+	private static final int					TOURBOOK_DB_VERSION							= 9;													// 10.3
 
+//	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
@@ -1076,6 +1080,91 @@ public class TourDatabase {
 		fActiveTourTypes = new ArrayList<TourType>();
 	}
 
+	/**
+	 * Update calendar week for all tours
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @param firstDayOfWeek
+	 * @param minimalDaysInFirstWeek
+	 * @return Returns <code>true</code> when the week is computed
+	 */
+	public static boolean updateTourWeek(	final Connection conn,
+											final IProgressMonitor monitor,
+											final int firstDayOfWeek,
+											final int minimalDaysInFirstWeek) {
+
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		boolean isUpdated = false;
+
+		try {
+
+			final PreparedStatement stmtSelect = conn.prepareStatement(//
+					"SELECT" //							//$NON-NLS-1$
+							+ " StartYear," // 				// 1 //$NON-NLS-1$
+							+ " StartMonth," // 			// 2 //$NON-NLS-1$
+							+ " StartDay" // 				// 3 //$NON-NLS-1$
+							+ (" FROM " + TABLE_TOUR_DATA) //	$NON-NLS-1$ //$NON-NLS-1$
+							+ " WHERE TourId=?"); //			$NON-NLS-1$ //$NON-NLS-1$
+
+			final PreparedStatement stmtUpdate = conn.prepareStatement(//
+					"UPDATE " + TABLE_TOUR_DATA//  //$NON-NLS-1$
+							+ " SET" //$NON-NLS-1$
+							+ " startWeek=?, " //$NON-NLS-1$
+							+ " startWeekYear=? " //$NON-NLS-1$
+							+ " WHERE tourId=?"); //$NON-NLS-1$
+
+			int tourIdx = 1;
+			final Calendar calendar = GregorianCalendar.getInstance();
+
+			// set ISO 8601 week date
+			calendar.setFirstDayOfWeek(firstDayOfWeek);
+			calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
+
+			// loop over all tours and calculate and set new columns
+			for (final Long tourId : tourList) {
+
+				if (monitor != null) {
+					final String msg = NLS.bind(Messages.Tour_Database_Update_TourWeek, new Object[] {
+							tourIdx++,
+							tourList.size() });
+					monitor.subTask(msg);
+				}
+
+				// get tour date
+				stmtSelect.setLong(1, tourId);
+				stmtSelect.execute();
+
+				final ResultSet result = stmtSelect.executeQuery();
+				while (result.next()) {
+
+					// get date from database
+					final short dbYear = result.getShort(1);
+					final short dbMonth = result.getShort(2);
+					final short dbDay = result.getShort(3);
+
+					calendar.set(dbYear, dbMonth - 1, dbDay);
+
+					final short weekNo = (short) calendar.get(Calendar.WEEK_OF_YEAR);
+					final short weekYear = (short) Util.getYearForWeek(calendar);
+
+					// update week number/week year in the database
+					stmtUpdate.setShort(1, weekNo);
+					stmtUpdate.setShort(2, weekYear);
+					stmtUpdate.setLong(3, tourId);
+					stmtUpdate.executeUpdate();
+
+					isUpdated = true;
+				}
+			}
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return isUpdated;
+	}
+
 	private TourDatabase() {}
 
 	public void addPropertyListener(final IPropertyListener listener) {
@@ -1111,6 +1200,7 @@ public class TourDatabase {
 			return;
 		}
 
+		@SuppressWarnings("unused")
 		Class<?> derbyClientDriver;
 
 		// check if the derby driver can be loaded
@@ -1285,6 +1375,11 @@ public class TourDatabase {
 		}
 	}
 
+	/**
+	 * @param monitor
+	 *            Progress monitor or <code>null</code> when the monitor is not available
+	 * @return
+	 */
 	private boolean checkVersion(final IProgressMonitor monitor) {
 
 		if (fIsVersionChecked) {
@@ -1554,36 +1649,42 @@ public class TourDatabase {
 				//
 				// version 5 end
 				//
-				+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
-				+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
+				+ "tourType_typeId 			BIGINT,					\n" //$NON-NLS-1$
+				+ "tourPerson_personId 		BIGINT,					\n" //$NON-NLS-1$
 
 				// version 6 start
 				//				
-				+ "tourImportFilePath	VARCHAR(255),		\n" //$NON-NLS-1$
+				+ "tourImportFilePath		VARCHAR(255),			\n" //$NON-NLS-1$
 				//				
 				// version 6 end
 
 				// version 7 start
 				//				
-				+ "mergeSourceTourId			BIGINT,				\n" //$NON-NLS-1$
-				+ "mergeTargetTourId			BIGINT,				\n" //$NON-NLS-1$
-				+ "mergedTourTimeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
-				+ "mergedAltitudeOffset			INTEGER DEFAULT 0,	\n" //$NON-NLS-1$
-				+ "startSecond	 				SMALLINT DEFAULT 0,	\n" //$NON-NLS-1$
+				+ "mergeSourceTourId		BIGINT,					\n" //$NON-NLS-1$
+				+ "mergeTargetTourId		BIGINT,					\n" //$NON-NLS-1$
+				+ "mergedTourTimeOffset		INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
+				+ "mergedAltitudeOffset		INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
+				+ "startSecond	 			SMALLINT DEFAULT 0,		\n" //$NON-NLS-1$
 				//				
 				// version 7 end
 
 				// version 8 start
 				//
-				+ "weatherWindDir		INTEGER DEFAULT 0, \n" //$NON-NLS-1$
-				+ "weatherWindSpd		INTEGER DEFAULT 0, \n" //$NON-NLS-1$
-				+ "weatherClouds        VARCHAR(255), \n" //$NON-NLS-1$
-				+ "restPulse            INTEGER DEFAULT 0, \n" //$NON-NLS-1$
-				+ "isDistanceFromSensor SMALLINT DEFAULT 0, \n" //$NON-NLS-1$
+				+ "weatherWindDir			INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
+				+ "weatherWindSpd			INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
+				+ "weatherClouds    	    VARCHAR(255), 			\n" //$NON-NLS-1$
+				+ "restPulse        	    INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
+				+ "isDistanceFromSensor 	SMALLINT DEFAULT 0, 	\n" //$NON-NLS-1$
 				//
 				// version 8 end
 
-				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
+				// version 9 start
+				//				
+				+ "startWeekYear			SMALLINT,				\n" //$NON-NLS-1$
+				//				
+				// version 9 end
+
+				+ "serieData 				BLOB NOT NULL			\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
 
@@ -2161,7 +2262,7 @@ public class TourDatabase {
 				fDatabasePath });
 
 		final MessageDialog dialog = new MessageDialog(
-				Display.getCurrent().getActiveShell(),
+				Display.getDefault().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
 				message,
@@ -2212,26 +2313,32 @@ public class TourDatabase {
 		}
 
 		if (currentDbVersion == 7) {
-			updateDbDesign_7_8(conn);
+			updateDbDesign_7_8(conn, monitor);
 			currentDbVersion = newVersion = 8;
+		}
+
+		boolean isPostUpdate8 = false;
+		if (currentDbVersion == 8) {
+			updateDbDesign_8_9(conn, monitor);
+			currentDbVersion = newVersion = 9;
+			isPostUpdate8 = true;
 		}
 
 		/*
 		 * update version number
 		 */
-		updateVersionNumber(conn, newVersion);
+		updateDbVersionNumber(conn, newVersion);
 
 		/*
-		 * post updates
+		 * do the post update after the version number is updated because the post update uses
+		 * connections and this will check the version number
 		 */
 		if (isPostUpdate5) {
-
-			/*
-			 * do the post update after the version number is updated because the post update uses
-			 * connections and this will check the version number
-			 */
 			TourDatabase.computeComputedValuesForAllTours(monitor);
 			TourManager.getInstance().removeAllToursFromCache();
+		}
+		if (isPostUpdate8) {
+			updateDbDesign_8_9_PostUpdate(conn, monitor);
 		}
 
 		return true;
@@ -2351,7 +2458,7 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
- 
+
 		// Create a EntityManagerFactory here, so we can access TourData with EJB
 		if (monitor != null) {
 			monitor.subTask(Messages.Database_Monitor_persistent_service_task);
@@ -2475,10 +2582,14 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_7_8(final Connection conn) {
+	private void updateDbDesign_7_8(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(Messages.Tour_Database_Update_8);
+		}
 
 		System.out.println();
-		System.out.println("database update: 8");//$NON-NLS-1$
+		System.out.println(Messages.Tour_Database_Update_8);
 
 		try {
 			final Statement statement = conn.createStatement();
@@ -2515,7 +2626,49 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateVersionNumber(final Connection conn, final int newVersion) {
+	private void updateDbDesign_8_9(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(Messages.Tour_Database_Update_9);
+		}
+
+		System.out.println();
+		System.out.println(Messages.Tour_Database_Update_9);
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startWeekYear		SMALLINT "; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			statement.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		System.out.println("database is updated");//$NON-NLS-1$
+		System.out.println();
+	}
+
+	private void updateDbDesign_8_9_PostUpdate(final Connection conn, final IProgressMonitor monitor) {
+
+		// set ISO 8601 week number
+		final int firstDayOfWeek = Calendar.MONDAY;
+		final int minimalDaysInFirstWeek = 4;
+
+		if (updateTourWeek(conn, monitor, firstDayOfWeek, minimalDaysInFirstWeek)) {
+			MessageDialog.openInformation(
+					Display.getDefault().getActiveShell(),
+					Messages.Database_Confirm_update_title,
+					Messages.Tour_Database_Update_TourWeek_Info);
+		}
+	}
+
+	private void updateDbVersionNumber(final Connection conn, final int newVersion) {
 		try {
 			final String sqlString = "" //$NON-NLS-1$
 					+ ("update " + TABLE_DB_VERSION) //$NON-NLS-1$

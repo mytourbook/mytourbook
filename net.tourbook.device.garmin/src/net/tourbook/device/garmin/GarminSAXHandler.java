@@ -18,7 +18,10 @@ package net.tourbook.device.garmin;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import net.tourbook.data.TimeData;
@@ -26,12 +29,15 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
@@ -120,6 +126,137 @@ public class GarminSAXHandler extends DefaultHandler {
 		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+	}
+
+	static DateTimeFormatter				_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy");
+	static SimpleDateFormat					_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy");
+
+	private static void formatDT(	final DateTimeFormatter jodaFormatter,
+									final SimpleDateFormat jdkFormatter,
+									final StringBuilder sbJdk,
+									final StringBuilder sbJoda,
+									final DateTime dt,
+									final Calendar jdkCalendar) {
+
+		sbJoda.append(jodaFormatter.print(dt));
+		sbJoda.append(" | ");
+
+		jdkCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+		jdkCalendar.setMinimalDaysInFirstWeek(4);
+
+		jdkCalendar.setTime(dt.toDate());
+		final int weekYear = Util.getYearForWeek(jdkCalendar);
+
+		sbJdk.append(jdkFormatter.format(dt.toDate()));
+		sbJdk.append(" " + weekYear + " | ");
+	}
+
+//	public static int getWeekOfDate(Date date) {
+//		Calendar cal = date.toCalendar();
+//		cal.setFirstDayOfWeek(Calendar.MONDAY);
+//		cal.setMinimalDaysInFirstWeek(4); // Conforming to ISO 8601
+//		return cal.get(Calendar.WEEK_OF_YEAR);
+//	}
+
+	public static void main(final String[] args) {
+
+//		final String pattern = "w dd.MM.yyyy";
+		final String jodPattern = "ww xx     ";
+		final String jdkPattern = "ww yy";
+
+		final DateTimeFormatter jodaFormatter = DateTimeFormat.forPattern(jodPattern);
+		final StringBuilder sbJdk = new StringBuilder();
+		final StringBuilder sbJoda = new StringBuilder();
+
+		final Locale[] locales = Locale.getAvailableLocales();
+		for (int i = 0; i < locales.length; i++) {
+
+			final Locale locale = locales[i];
+			final String language = locale.getLanguage();
+			final String country = locale.getCountry();
+			final String locale_name = locale.getDisplayName();
+
+			if ((i == 120 || i == 132) == false) {
+				continue;
+			}
+
+			final SimpleDateFormat jdkFormatter = new SimpleDateFormat(jdkPattern, locale);
+			final Calendar calendar = GregorianCalendar.getInstance(locale);
+
+			System.out.println();
+			System.out.println(i + ": " + language + ", " + country + ", " + locale_name);
+
+			for (int year = 2005; year < 2011; year++) {
+
+				sbJoda.append(year + ": ");
+				sbJdk.append(year + ": ");
+
+				int days = 0;
+				final DateTime dt = new DateTime(year, 12, 22, 8, 0, 0, 0);
+
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				sbJoda.append("    ");
+				sbJdk.append("    ");
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+
+				System.out.println(sbJoda.toString());
+				System.out.println(sbJdk.toString());
+				System.out.println();
+
+				sbJoda.setLength(0);
+				sbJdk.setLength(0);
+			}
+		}
+	}
+
+	private static void weekCheck() {
+
+		final DateTime dt = new DateTime(//
+				2009, /* year */
+				12, /* monthOfYear */
+				6, /* dayOfMonth */
+				23, /* hourOfDay */
+				0, /* minuteOfHour */
+				0, /* secondOfMinute */
+				0 /* millisOfSecond */
+		);
+
+		final StringBuilder buffer = new StringBuilder()//
+				//
+				.append("Testing date ")
+				.append(dt.toString())
+				.append("\n")
+				//
+				.append("Joda-Time timezone is ")
+				.append(DateTimeZone.getDefault())
+				.append(" yet joda wrongly thinks week is ")
+				.append(_jodaWeekFormatter.print(dt))
+				.append("\n")
+				//
+				.append("JDK timezone is ")
+				.append(TimeZone.getDefault().getID())
+				.append(" yet jdk rightfully thinks week is ")
+				.append(_jdkWeekFormatter.format(dt.toDate()))
+				.append(" (jdk got it right ?!?!)");
+
+		System.out.println(buffer.toString());
 	}
 
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
@@ -366,9 +503,13 @@ public class GarminSAXHandler extends DefaultHandler {
 							_currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
 						} catch (final ParseException e3) {
 
-							final String message = e3.getMessage();
-							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-							System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
+							Display.getDefault().syncExec(new Runnable() {
+								public void run() {
+									final String message = e3.getMessage();
+									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+									System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
+								}
+							});
 						}
 					}
 				}
@@ -523,10 +664,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setStartMonth((short) dt.getMonthOfYear());
 		tourData.setStartDay((short) dt.getDayOfMonth());
 
-		tourData.setStartWeek((short) dt.getWeekOfWeekyear());
-
-// this is not yet supported but is necessary to have the correct week/year values !!!
-//		tourData.setStartWeekYear((short) dt.getWeekyear());
+		tourData.setWeek(dt);
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.importRawDataFile = _importFilePath;

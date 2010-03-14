@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourBook;
 
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -140,6 +141,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private Calendar						_calendar						= GregorianCalendar.getInstance();
 	private DateFormat						_timeFormatter					= DateFormat
 																					.getTimeInstance(DateFormat.SHORT);
+
+	private final String[]					_weekDays						= DateFormatSymbols
+																					.getInstance()
+																					.getShortWeekdays();
 
 	private ActionEditQuick					_actionEditQuick;
 
@@ -516,13 +521,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
 	 * 
- 	 * @param parent
+	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
 		defineColumnDate(pixelConverter);
+		defineColumnWeekDay(pixelConverter);
 		defineColumnTime(pixelConverter);
 		defineColumnTourType(pixelConverter);
 
@@ -557,7 +563,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumnWeatherWindSpeed(pixelConverter);
 		defineColumnWeatherWindDirection(pixelConverter);
 
-		defineColumnWeek(pixelConverter);
+		defineColumnWeekNo(pixelConverter);
+		defineColumnWeekYear(pixelConverter);
 		defineColumnTimeInterval(pixelConverter);
 		defineColumnDeviceDistance(pixelConverter);
 	}
@@ -1323,18 +1330,67 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
+	 * column: week day
+	 */
+	private void defineColumnWeekDay(final PixelConverter pixelConverter) {
+		
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(
+				_columnManager,
+				pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					
+					final int weekDay = ((TVITourBookTour) element).colWeekDay;
+					
+					cell.setText(_weekDays[weekDay]);
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: week
 	 */
-	private void defineColumnWeek(final PixelConverter pixelConverter) {
+	private void defineColumnWeekNo(final PixelConverter pixelConverter) {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_NO.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int week = ((TVITourBookItem) element).colWeek;
+				final int week = ((TVITourBookItem) element).colWeekNo;
+
+				if (week == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(week));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: week year
+	 */
+	private void defineColumnWeekYear(final PixelConverter pixelConverter) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEKYEAR.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int week = ((TVITourBookItem) element).colWeekYear;
 
 				if (week == 0) {
 					cell.setText(UI.EMPTY_STRING);

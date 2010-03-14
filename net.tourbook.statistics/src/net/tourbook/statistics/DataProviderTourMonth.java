@@ -53,18 +53,18 @@ public class DataProviderTourMonth extends DataProvider {
 		/*
 		 * check if the required data are already loaded
 		 */
-		if (fActivePerson == person
-				&& fActiveTourTypeFilter == tourTypeFilter
-				&& lastYear == fLastYear
-				&& numberOfYears == fNumberOfYears
+		if (_activePerson == person
+				&& _activeTourTypeFilter == tourTypeFilter
+				&& lastYear == _lastYear
+				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
 			return fTourMonthData;
 		}
 
-		fActivePerson = person;
-		fActiveTourTypeFilter = tourTypeFilter;
-		fLastYear = lastYear;
-		fNumberOfYears = numberOfYears;
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
+		_lastYear = lastYear;
+		_numberOfYears = numberOfYears;
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();

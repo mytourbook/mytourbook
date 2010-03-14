@@ -53,19 +53,19 @@ public class DataProviderTourYear extends DataProvider {
 		/*
 		 * check if the required data are already loaded
 		 */
-		if (fActivePerson == person
-				&& fActiveTourTypeFilter == tourTypeFilter
-				&& lastYear == fLastYear
-				&& numberOfYears == fNumberOfYears
+		if (_activePerson == person
+				&& _activeTourTypeFilter == tourTypeFilter
+				&& lastYear == _lastYear
+				&& numberOfYears == _numberOfYears
 				&& refreshData == false) {
 
 			return fTourDataYear;
 		}
 
-		fActivePerson = person;
-		fActiveTourTypeFilter = tourTypeFilter;
-		fLastYear = lastYear;
-		fNumberOfYears = numberOfYears;
+		_activePerson = person;
+		_activeTourTypeFilter = tourTypeFilter;
+		_lastYear = lastYear;
+		_numberOfYears = numberOfYears;
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
@@ -159,9 +159,9 @@ public class DataProviderTourYear extends DataProvider {
 
 			conn.close();
 
-			final int[] years = new int[fNumberOfYears];
+			final int[] years = new int[_numberOfYears];
 			int yearIndex = 0;
-			for (int currentYear = fLastYear - fNumberOfYears + 1; currentYear <= fLastYear; currentYear++) {
+			for (int currentYear = _lastYear - _numberOfYears + 1; currentYear <= _lastYear; currentYear++) {
 				years[yearIndex++] = currentYear;
 			}
 

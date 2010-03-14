@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -17,22 +17,22 @@ package net.tourbook.statistics;
 
 public class TourDataWeek {
 
-	long[][]	fTypeIds;
+	long[][]	typeIds;
 
-	int[][]		fDistanceLow;
-	int[][]		fAltitudeLow;
-	int[][]		fTimeLow;
+	int[][]		distanceLow;
+	int[][]		altitudeLow;
+	int[][]		timeLow;
 
-	int[][]		fDistanceHigh;
-	int[][]		fAltitudeHigh;
-	int[][]		fTimeHigh;
+	int[][]		distanceHigh;
+	int[][]		altitudeHigh;
+	int[][]		timeHigh;
 
-	int[]		fYears;
-	int[]		fYearWeeks;
-	int[]		fYearDays;
+	int[]		years;
+	int[]		yearWeeks;
+	int[]		yearDays;
 
-	int[][]		fRecordingTime;
-	int[][]		fDrivingTime;
-	int[][]		fBreakTime;
+	int[][]		recordingTime;
+	int[][]		drivingTime;
+	int[][]		breakTime;
 
 }
