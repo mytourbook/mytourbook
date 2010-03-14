@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -20,34 +20,35 @@ import java.util.HashMap;
 
 public class TourTimeData {
 
-	long[]				fTourIds;
-	long[]				fTypeIds;
+	long[]							fTourIds;
+	long[]							fTypeIds;
 
-	int[]				fTypeColorIndex;
+	int[]							fTypeColorIndex;
 
 	/**
 	 * number for all days in each year
 	 */
-	int[]				yearDays;
+	int[]							yearDays;
 
-	int[]				years;
-	int					allDaysInAllYears;
+	int[]							years;
+	int								allDaysInAllYears;
 
-	int[]				fTourYearValues;
-	int[]				fTourMonthValues;
-	int[]				fTourDOYValues;
+	int[]							fTourYearValues;
+	int[]							fTourMonthValues;
+	int[]							fTourDOYValues;
+	int[]							weekValues;
 
-	int[]				fTourTimeStartValues;
-	int[]				fTourTimeEndValues;
+	int[]							fTourTimeStartValues;
+	int[]							fTourTimeEndValues;
 
-	int[]				fTourAltitudeValues;
-	int[]				fTourDistanceValues;
+	int[]							fTourAltitudeValues;
+	int[]							fTourDistanceValues;
 
-	ArrayList<Integer>	fTourRecordingTimeValues;
-	ArrayList<Integer>	fTourDrivingTimeValues;
+	ArrayList<Integer>				fTourRecordingTimeValues;
+	ArrayList<Integer>				fTourDrivingTimeValues;
 
-	ArrayList<String>	fTourTitle;
-	ArrayList<String>	tourDescription;
+	ArrayList<String>				fTourTitle;
+	ArrayList<String>				tourDescription;
 
 	/**
 	 * hashmap contains the tags for the tour where the key is the tour ID

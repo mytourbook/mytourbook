@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -34,25 +34,25 @@ import net.tourbook.util.ArrayListToArray;
 
 public class DataProviderTourTime extends DataProvider {
 
-	private static DataProviderTourTime	fInstance;
+	private static DataProviderTourTime	_instance;
 
-	private ArrayList<Long>				fTourIds;
+	private ArrayList<Long>				_tourIds;
 
-	private Long						fSelectedTourId;
+	private Long						_selectedTourId;
 
-	private TourTimeData				fTourDataTime;
+	private TourTimeData				_tourDataTime;
 
 	public static DataProviderTourTime getInstance() {
-		if (fInstance == null) {
-			fInstance = new DataProviderTourTime();
+		if (_instance == null) {
+			_instance = new DataProviderTourTime();
 		}
-		return fInstance;
+		return _instance;
 	}
 
 	private DataProviderTourTime() {}
 
 	public Long getSelectedTourId() {
-		return fSelectedTourId;
+		return _selectedTourId;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class DataProviderTourTime extends DataProvider {
 				&& _lastYear == lastYear
 				&& _numberOfYears == numberOfYears
 				&& refreshData == false) {
-			return fTourDataTime;
+			return _tourDataTime;
 		}
 
 		_activePerson = person;
@@ -110,8 +110,9 @@ public class DataProviderTourTime extends DataProvider {
 				+ "TourTitle," //				11 //$NON-NLS-1$
 				+ "TourType_typeId,"//			12 //$NON-NLS-1$
 				+ "TourDescription," // 		13 //$NON-NLS-1$
+				+ "startWeek," //				14 //$NON-NLS-1$ 
 
-				+ "jTdataTtag.TourTag_tagId"//	14 //$NON-NLS-1$ 
+				+ "jTdataTtag.TourTag_tagId"//	15 //$NON-NLS-1$ 
 
 				+ UI.NEW_LINE
 
@@ -137,6 +138,7 @@ public class DataProviderTourTime extends DataProvider {
 
 			final ArrayList<Integer> dbTourStartTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourEndTime = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourStartWeek = new ArrayList<Integer>();
 
 			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
 			final ArrayList<Integer> dbAltitude = new ArrayList<Integer>();
@@ -146,7 +148,7 @@ public class DataProviderTourTime extends DataProvider {
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
 
-			fTourIds = new ArrayList<Long>();
+			_tourIds = new ArrayList<Long>();
 
 			final HashMap<Long, ArrayList<Long>> dbTagIds = new HashMap<Long, ArrayList<Long>>();
 
@@ -162,7 +164,7 @@ public class DataProviderTourTime extends DataProvider {
 			while (result.next()) {
 
 				final long tourId = result.getLong(1);
-				final Object dbTagId = result.getObject(14);
+				final Object dbTagId = result.getObject(15);
 
 				if (tourId == lastTourId) {
 
@@ -176,7 +178,7 @@ public class DataProviderTourTime extends DataProvider {
 
 					// get first record for a tour
 
-					fTourIds.add(tourId);
+					_tourIds.add(tourId);
 
 					final int tourYear = result.getShort(2);
 					final int tourMonth = result.getShort(3) - 1;
@@ -205,6 +207,8 @@ public class DataProviderTourTime extends DataProvider {
 
 					final String description = result.getString(13);
 					dbTourDescription.add(description == null ? UI.EMPTY_STRING : description);
+
+					dbTourStartWeek.add(result.getInt(14));
 
 					if (dbTagId instanceof Long) {
 						tagIds = new ArrayList<Long>();
@@ -247,44 +251,45 @@ public class DataProviderTourTime extends DataProvider {
 			/*
 			 * create data
 			 */
-			fTourDataTime = new TourTimeData();
+			_tourDataTime = new TourTimeData();
 
-			fTourDataTime.fTourIds = ArrayListToArray.toLong(fTourIds);
+			_tourDataTime.fTourIds = ArrayListToArray.toLong(_tourIds);
 
-			fTourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
-			fTourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			_tourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
+			_tourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			fTourDataTime.fTagIds = dbTagIds;
+			_tourDataTime.fTagIds = dbTagIds;
 
-			fTourDataTime.allDaysInAllYears = yearDays;
-			fTourDataTime.yearDays = _yearDays;
-			fTourDataTime.years = _years;
+			_tourDataTime.allDaysInAllYears = yearDays;
+			_tourDataTime.yearDays = _yearDays;
+			_tourDataTime.years = _years;
 
-			fTourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
-			fTourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);
-			fTourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
+			_tourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
+			_tourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);
+			_tourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
+			_tourDataTime.weekValues = ArrayListToArray.toInt(dbTourStartWeek);
 
-			fTourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
-			fTourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
+			_tourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
+			_tourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
 
-			fTourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
-			fTourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			_tourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
+			_tourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
 
-			fTourDataTime.fTourRecordingTimeValues = dbTourRecordingTime;
-			fTourDataTime.fTourDrivingTimeValues = dbTourDrivingTime;
+			_tourDataTime.fTourRecordingTimeValues = dbTourRecordingTime;
+			_tourDataTime.fTourDrivingTimeValues = dbTourDrivingTime;
 
-			fTourDataTime.fTourTitle = dbTourTitle;
-			fTourDataTime.tourDescription = dbTourDescription;
+			_tourDataTime.fTourTitle = dbTourTitle;
+			_tourDataTime.tourDescription = dbTourDescription;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return fTourDataTime;
+		return _tourDataTime;
 	}
 
 	void setSelectedTourId(final Long selectedTourId) {
-		fSelectedTourId = selectedTourId;
+		_selectedTourId = selectedTourId;
 	}
 
 }
