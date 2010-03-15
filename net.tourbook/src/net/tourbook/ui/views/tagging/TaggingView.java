@@ -1392,8 +1392,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
 		} else if (element instanceof TVITagViewMonth) {
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
-		} else if (element instanceof TVITagViewTour) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//		} else if (element instanceof TVITagViewTour) {
+//			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
 		}
 	}
 
@@ -1401,7 +1401,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void setFocus() {
 
 	}
-
+ 
 	private void setTagViewTitle(final Object newInput) {
 
 		String description = UI.EMPTY_STRING;

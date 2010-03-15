@@ -1960,7 +1960,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final ArrayList<String> selectedTourIds = new ArrayList<String>();
 		for (final Long tourId : _selectedTourIds) {
 			selectedTourIds.add(tourId.toString());
-		}
+		} 
 		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
 		// action: select tours for year/month
@@ -1979,8 +1979,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
 		} else if (element instanceof TVITourBookMonth) {
 			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
-		} else if (element instanceof TVITourBookTour) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//		} else if (element instanceof TVITourBookTour) {
+//			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
 		}
 	}
 
