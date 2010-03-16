@@ -40,6 +40,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlEvent;
@@ -68,7 +71,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-
+ 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IMapListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
@@ -82,9 +85,9 @@ import de.byteholder.gpx.GeoPosition;
 public class Map extends Canvas {
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB		DEFAULT_BACKGROUND_RGB	= new RGB(181, 208, 208);
+	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
 
-	private static final RGB	_transparentRGB			= new RGB(0xfe, 0xfe, 0xfe);
+	private static final RGB					_transparentRGB				= new RGB(0xfe, 0xfe, 0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
@@ -150,6 +153,7 @@ public class Map extends Canvas {
 
 	private final Cursor						_cursorPan;
 	private final Cursor						_cursorDefault;
+	private final Cursor						_cursorCross;
 
 	private int									_redrawMapCounter			= 0;
 	private int									_overlayRunnableCounter		= 0;
@@ -159,6 +163,7 @@ public class Map extends Canvas {
 	private Point								_mouseMovePosition;
 	private Point								_mousePanPosition;
 	private boolean								_isMapPanned;
+	private MouseEvent							_mouseDownEvent;
 
 	private final Thread						_overlayThread;
 	private long								_nextOverlayRedrawTime;
@@ -282,8 +287,12 @@ public class Map extends Canvas {
 	 */
 	private boolean								_isTourPaintMethodEnhanced	= false;
 
+	private boolean								_isPaintOfflineArea			= false;
+
+	private Rectangle							_offlineAreaDevTilePosition;
+
 	// used to pan using the arrow keys
-	private class PanKeyListener extends KeyAdapter {
+	private class KeyMapListener extends KeyAdapter {
 
 		@Override
 		public void keyPressed(final KeyEvent e) {
@@ -336,7 +345,7 @@ public class Map extends Canvas {
 	}
 
 	// used to pan using press and drag mouse gestures
-	private class PanMouseListener implements MouseListener, MouseMoveListener, Listener {
+	private class MouseMapListener implements MouseListener, MouseMoveListener, Listener {
 
 		@Override
 		public void handleEvent(final Event event) {
@@ -369,6 +378,8 @@ public class Map extends Canvas {
 
 		@Override
 		public void mouseDown(final MouseEvent e) {
+
+			_mouseDownEvent = e;
 
 			if (e.button == 1) {
 				// if the left mb is clicked remember this point (for panning)
@@ -521,12 +532,13 @@ public class Map extends Canvas {
 			}
 		});
 
-		final PanMouseListener mouseListener = new PanMouseListener();
+		final MouseMapListener mouseListener = new MouseMapListener();
 		addMouseListener(mouseListener);
 		addMouseMoveListener(mouseListener);
 		addListener(SWT.MouseWheel, mouseListener);
 
-		addKeyListener(new PanKeyListener());
+		addKeyListener(new KeyMapListener());
+		addContextMenu();
 
 		addControlListener(new ControlListener() {
 
@@ -552,6 +564,7 @@ public class Map extends Canvas {
 		});
 
 		_cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
+		_cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
 		_cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
 
 		_defaultBackgroundColor = new Color(_display, DEFAULT_BACKGROUND_RGB);
@@ -598,21 +611,78 @@ public class Map extends Canvas {
 
 	}
 
-	public void addMapListener(final IMapListener mapListener) {
-		_mapListeners.add(mapListener);
+	void actionLoadOfflineImages() {
+
+		if (_mouseDownEvent == null) {
+			return;
+		}
+
+		final Rectangle viewPort = getMapPixelViewport();
+		final int worldMouseX = viewPort.x + _mouseDownEvent.x;
+		final int worldMouseY = viewPort.y + _mouseDownEvent.y;
+
+		final int tileSize = _MP.getTileSize();
+		int tilePosX = (int) Math.floor((double) worldMouseX / (double) tileSize);
+		int tilePosY = (int) Math.floor((double) worldMouseY / (double) tileSize);
+
+		final int mapTiles = _mapTileSize.width;
+
+		/*
+		 * adjust tile position to the map border
+		 */
+		tilePosX = tilePosX % mapTiles;
+		if (tilePosX < -mapTiles) {
+			tilePosX += mapTiles;
+			if (tilePosX == mapTiles) {
+				tilePosX = 0;
+			}
+		}
+
+		if (tilePosY < 0) {
+			tilePosY = 0;
+		} else if (tilePosY >= mapTiles && mapTiles > 0) {
+			tilePosY = mapTiles - 1;
+		}
+
+		// get device rectangle for this tile
+		_offlineAreaDevTilePosition = new Rectangle(//
+				tilePosX * tileSize - _worldViewportX,
+				tilePosY * tileSize - _worldViewportY,
+				tileSize,
+				tileSize);
+
+		_isPaintOfflineArea = true;
+
+		System.out.println(tilePosX + "/" + tilePosY);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	/**
-	 * Adds a map overlay. This is a Painter which will paint on top of the map. It can be used to
-	 * draw waypoints, lines, or static overlays like text messages.
-	 * 
-	 * @param overlay
-	 *            the map overlay to use
-	 * @see org.jdesktop.swingx.painters.Painter
+	 * create the context menu
 	 */
-	public void addOverlayPainter(final MapPainter overlay) {
-		_overlays.add(overlay);
-		queueMapRedraw();
+	private void addContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				if (_MP == null) {
+					return;
+				}
+
+				menuMgr.add(new ActionLoadOfflineImages(Map.this));
+			}
+		});
+
+		setMenu(menuMgr.createContextMenu(this));
+	}
+
+	public void addMapListener(final IMapListener mapListener) {
+		_mapListeners.add(mapListener);
 	}
 
 //	/**
@@ -643,8 +713,17 @@ public class Map extends Canvas {
 //		queueMapRedraw();
 //	}
 
-	public void addZoomListener(final IZoomListener listener) {
-		_zoomListeners.add(listener);
+	/**
+	 * Adds a map overlay. This is a Painter which will paint on top of the map. It can be used to
+	 * draw waypoints, lines, or static overlays like text messages.
+	 * 
+	 * @param overlay
+	 *            the map overlay to use
+	 * @see org.jdesktop.swingx.painters.Painter
+	 */
+	public void addOverlayPainter(final MapPainter overlay) {
+		_overlays.add(overlay);
+		queueMapRedraw();
 	}
 
 //	private void checkImageTemplate1Part() {
@@ -664,6 +743,10 @@ public class Map extends Canvas {
 //
 //		_imageTemplate1Part = new Image(_display, UI.createTransparentImageData(tileSize, _transparentRGB));
 //	}
+
+	public void addZoomListener(final IZoomListener listener) {
+		_zoomListeners.add(listener);
+	}
 
 	/**
 	 * make sure that the parted overlay image has the correct size
@@ -695,11 +778,6 @@ public class Map extends Canvas {
 		_gc9Parts = new GC(_image9Parts);
 	}
 
-	@Override
-	public org.eclipse.swt.graphics.Point computeSize(final int wHint, final int hHint, final boolean changed) {
-		return getParent().getSize();
-	}
-
 //	private void createOverlayImage(final Tile tile, final ImageDataResources idResources, final String partImageKey) {
 //
 //		final ImageData neighborImageData = idResources.getNeighborImageData();
@@ -728,6 +806,11 @@ public class Map extends Canvas {
 //		 */
 //		_overlayImageCache.add(partImageKey, tileOverlayImage);
 //	}
+
+	@Override
+	public org.eclipse.swt.graphics.Point computeSize(final int wHint, final int hHint, final boolean changed) {
+		return getParent().getSize();
+	}
 
 	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
 
@@ -954,10 +1037,6 @@ public class Map extends Canvas {
 	 */
 	private void drawMapTiles(final GC gc) {
 
-//		System.out.println();
-//		System.out.println();
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final int tileSize = _MP.getTileSize();
 
 		/*
@@ -973,10 +1052,6 @@ public class Map extends Canvas {
 						tileSize,
 						tileSize);
 
-				if (_devVisibleViewport == null) {
-					int a = 0;
-					a++;
-				}
 				// check if current tile is within the painting area
 				if (devTilePosition.intersects(_devVisibleViewport)) {
 
@@ -1483,15 +1558,6 @@ public class Map extends Canvas {
 		return _mapLegend;
 	}
 
-	/**
-	 * @return Returns the map viewport<br>
-	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
-	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
-	 */
-	public Rectangle getMapPixelViewport() {
-		return getWorldPixelTopLeftViewport(_mapCenterInWorldPixel);
-	}
-
 //	/**
 //	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
 //	 * system, not as lat/longs.
@@ -1501,6 +1567,15 @@ public class Map extends Canvas {
 //	public Point2D getCenterInWorldPixel() {
 //		return _mapCenterInWorldPixel;
 //	}
+
+	/**
+	 * @return Returns the map viewport<br>
+	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
+	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
+	 */
+	public Rectangle getMapPixelViewport() {
+		return getWorldPixelTopLeftViewport(_mapCenterInWorldPixel);
+	}
 
 	/**
 	 * Get the current map provider
@@ -1756,8 +1831,9 @@ public class Map extends Canvas {
 		disposeResource(_image9Parts);
 		disposeResource(_gc9Parts);
 
-		disposeResource(_cursorPan);
 		disposeResource(_cursorDefault);
+		disposeResource(_cursorPan);
+		disposeResource(_cursorCross);
 
 		disposeResource(_defaultBackgroundColor);
 		disposeResource(_transparentColor);
@@ -1783,6 +1859,8 @@ public class Map extends Canvas {
 	}
 
 	private void onMouseMove(final MouseEvent mouseEvent) {
+
+		actionLoadOfflineImages();
 
 		_mouseMovePosition = new Point(mouseEvent.x, mouseEvent.y);
 
@@ -1849,6 +1927,10 @@ public class Map extends Canvas {
 				_directMapPainterContext.viewport = _mapPixelViewport;
 				_directMapPainter.paint(_directMapPainterContext);
 			}
+
+			if (_isPaintOfflineArea) {
+				paintOfflineArea(gc);
+			}
 		}
 	}
 
@@ -1864,6 +1946,26 @@ public class Map extends Canvas {
 		updateViewPortData();
 
 		queueMapRedraw();
+	}
+
+	private void paintOfflineArea(final GC gc) {
+
+		if (_offlineAreaDevTilePosition == null) {
+			return;
+		}
+
+		final int tileSize = _MP.getTileSize();
+
+		// draw tile border
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
+		gc.drawRectangle(_offlineAreaDevTilePosition.x, _offlineAreaDevTilePosition.y, tileSize, tileSize);
+
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
+		gc.drawRectangle(
+				_offlineAreaDevTilePosition.x + 1,
+				_offlineAreaDevTilePosition.y + 1,
+				tileSize - 2,
+				tileSize - 2);
 	}
 
 	private void paintOverlay10() {
@@ -2196,7 +2298,7 @@ public class Map extends Canvas {
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}
-		} 
+		}
 		gc1Part.dispose();
 
 		if (isOverlayPainted) {
@@ -2422,22 +2524,6 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	/**
-	 * Set the legend for the map, the legend image will be disposed when the map is disposed,
-	 * 
-	 * @param legend
-	 *            Legend for the map or <code>null</code> to disable the legend
-	 */
-	public void setLegend(final MapLegend legend) {
-
-		if (legend == null && _mapLegend != null) {
-			// dispose legend image
-			disposeResource(_mapLegend.getImage());
-		}
-
-		_mapLegend = legend;
-	}
-
 //	/**
 //	 * Sets the center of the map in pixel coordinates.
 //	 *
@@ -2533,6 +2619,22 @@ public class Map extends Canvas {
 //
 //		queueMapRedraw();
 //	}
+
+	/**
+	 * Set the legend for the map, the legend image will be disposed when the map is disposed,
+	 * 
+	 * @param legend
+	 *            Legend for the map or <code>null</code> to disable the legend
+	 */
+	public void setLegend(final MapLegend legend) {
+
+		if (legend == null && _mapLegend != null) {
+			// dispose legend image
+			disposeResource(_mapLegend.getImage());
+		}
+
+		_mapLegend = legend;
+	}
 
 	public void setLiveView(final boolean isLiveView) {
 		_isLiveView = isLiveView;
@@ -2644,6 +2746,10 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
+
 	/**
 	 * A property indicating if the map should be pannable by the user using the mouse.
 	 * 
@@ -2653,10 +2759,6 @@ public class Map extends Canvas {
 	public void setPanEnabled(final boolean panEnabled) {
 		this._panEnabled = panEnabled;
 	}
-
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
 
 	/**
 	 * Sets whether the map should recenter itself on mouse clicks (middle mouse clicks?)
@@ -2810,8 +2912,8 @@ public class Map extends Canvas {
 		final int numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) tileSize);
 
 		/*
-		 * tpx and tpy are the x- and y-values for the offset of the visible screen to the Map's
-		 * origin.
+		 * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen
+		 * to the Map's origin.
 		 */
 		final int tileOffsetX = (int) Math.floor((double) _worldViewportX / (double) tileSize);
 		final int tileOffsetY = (int) Math.floor((double) _worldViewportY / (double) tileSize);

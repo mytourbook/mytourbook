@@ -15,9 +15,11 @@ public class Messages extends NLS {
 
 	public static String		tileInfo_action_clearStatistics;
 
+	public static String	Action_Map_LoadOfflineImages;
+
 	public static String		App_Dlg_ConfirmFileOverwrite_Message;
 	public static String		App_Dlg_ConfirmFileOverwrite_Title;
-
+ 
 	public static String		App_Error_TooManyWords;
 
 	public static String		Dialog_CustomConfig_Button_UpdateMap;
