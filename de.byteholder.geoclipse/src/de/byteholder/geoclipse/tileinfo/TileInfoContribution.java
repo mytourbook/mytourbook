@@ -41,15 +41,15 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	private Display				fDisplay;
 	private TileInfoControl		fInfoWidget;
 
-	private static int			fStatIsQueued;
+	private int					fStatIsQueued;
 
-	private static int			fStatErrorLoading;
-	private static int			fStatStartLoading;
-	private static int			fStatEndLoading;
+	private int					fStatErrorLoading;
+	private int					fStatStartLoading;
+	private int					fStatEndLoading;
 
-	private static int			fStatErrorPaintingSRTM;
-	private static int			fStatEndPaintingSRTM;
-	private static int			fStatStartPaintingSRTM;
+	private int					fStatErrorPaintingSRTM;
+	private int					fStatEndPaintingSRTM;
+	private int					fStatStartPaintingSRTM;
 
 	private int					fStatStartSRTM;
 	private int					fStatEndSRTM;
@@ -57,7 +57,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 	private String				fSRTMRemoteName;
 	private long				fSRTMReceivedBytes;
-
+ 
 	private final Runnable		fUpdateRunnable	= new Runnable() {
 													public void run() {
 
@@ -145,7 +145,7 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 		menuMgr.add(new ActionClearStatistics(this));
 	}
 
-	void updateInfo(final TileEventId tileEventId) {
+	public void updateInfo(final TileEventId tileEventId) {
 
 		if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
 			fStatIsQueued = 0;
@@ -268,12 +268,12 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 			fInfoWidget.updateInfo(Messages.TileInfo_Control_DefaultTitle);
 		} else {
 
-			// show maximum with 3 or 2 decimals
-			fInfoWidget.updateInfo(
-					Integer.toString(fStatIsQueued % 1000),
-					Integer.toString(fStatErrorLoading % 1000),
-					Integer.toString(fStatEndLoading % 1000),
-					Integer.toString(fStatStartLoading % 1000),
+			// show only truncated decimals
+			fInfoWidget.updateInfo(//
+					Integer.toString(fStatIsQueued % 100000),
+					Integer.toString(fStatErrorLoading % 10000),
+					Integer.toString(fStatEndLoading % 100000),
+					Integer.toString(fStatStartLoading % 100000),
 					Integer.toString(fStatErrorPaintingSRTM % 1000),
 					Integer.toString(fStatEndPaintingSRTM % 1000),
 					Integer.toString(fStatStartPaintingSRTM % 1000),

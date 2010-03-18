@@ -916,9 +916,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	/**
 	 * @param fullPath
 	 *            File system path on the local file system where the tile path is appended
-	 * @param zoomLevel
-	 * @param y
-	 * @param x
 	 * @param tile
 	 * @return Returns the path for a tile when it's saved in the file system or <code>null</code>
 	 *         when this features is not supported
@@ -932,7 +929,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public ITilePainter getTilePainter() {
 		return null;
 	}
-
+ 
 	/**
 	 * The size of tiles for this factory. Tiles must be square.
 	 * 
@@ -1155,7 +1152,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * 
 	 * @param tile
 	 */
-	private void putTileInWaitingQueue(final Tile tile) {
+	public void putTileInWaitingQueue(final Tile tile) {
 
 		// prevent to load it more than once
 		if (tile.isLoading()) {
@@ -1196,6 +1193,12 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 	}
 
+	/**
+	 * Reset all caches
+	 * 
+	 * @param keepTilesWithLoadingError
+	 *            when <code>true</code> tiles with loading error are not removed
+	 */
 	public void resetAll(final boolean keepTilesWithLoadingError) {
 
 		RESET_LOCK.lock();

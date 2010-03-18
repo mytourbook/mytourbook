@@ -55,34 +55,29 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 public class TileImageCache {
 
 	/**
-	 * max. number of images in the image cache
-	 */
-//	private static int										MAX_CACHE_ENTRIES			= 200;
-
-	/**
 	 * relative OS path for storing offline map image files
 	 */
 	public static final String								TILE_OFFLINE_CACHE_OS_PATH	= "offline-map";							//$NON-NLS-1$
 
-	private static final ConcurrentHashMap<String, Image>	fImageCache					= new ConcurrentHashMap<String, Image>();
-	private static final ConcurrentLinkedQueue<String>		fImageCacheFifo				= new ConcurrentLinkedQueue<String>();
+	private static final ConcurrentHashMap<String, Image>	_imageCache					= new ConcurrentHashMap<String, Image>();
+	private static final ConcurrentLinkedQueue<String>		_imageCacheFifo				= new ConcurrentLinkedQueue<String>();
 
 	/**
 	 * Path from user preferences where tile images are stored
 	 */
-	private static String									fOSTileCachePath;
+	private static String									_osTileCachePath;
 
-	private static boolean									fUseOffLineCache;
+	private static boolean									_useOffLineCache;
 
 	private static final ReentrantLock						CREATE_DIR_LOCK				= new ReentrantLock();
-
+ 
 	/**
 	 * This display is used because {@link Display#getDefault()} is synchronized which propably
 	 * causes the UI to be not smooth when images are loaded and the map is dragged at the same time
 	 */
-	private Display											fDisplay;
+	private Display											_display;
 
-	private int												fMaxCacheSize				= 10;
+	private int												_maxCacheSize				= 10;
 
 	/**
 	 * @return OS path for the tile cache or <code>null</code> when offline cache is not used or
@@ -92,7 +87,7 @@ public class TileImageCache {
 
 		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
 		if (prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE)) {
-			return fOSTileCachePath;
+			return _osTileCachePath;
 		}
 
 		return null;
@@ -102,9 +97,9 @@ public class TileImageCache {
 
 		// get status if the tile is offline cache is activated
 		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
-		fUseOffLineCache = prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE);
+		_useOffLineCache = prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE);
 
-		if (fUseOffLineCache) {
+		if (_useOffLineCache) {
 
 			/*
 			 * check and create tile cache path
@@ -121,7 +116,7 @@ public class TileImageCache {
 
 			if (new File(workingDirectory).exists() == false) {
 				System.err.println("working directory is not available: " + workingDirectory); //$NON-NLS-1$
-				fUseOffLineCache = false;
+				_useOffLineCache = false;
 				return;
 			}
 
@@ -131,7 +126,7 @@ public class TileImageCache {
 				tileCachePath.toFile().mkdirs();
 			}
 
-			fOSTileCachePath = tileCachePath.toOSString();
+			_osTileCachePath = tileCachePath.toOSString();
 		}
 	}
 
@@ -141,15 +136,15 @@ public class TileImageCache {
 	 */
 	public TileImageCache(final int maxCacheSize) {
 
-		fMaxCacheSize = maxCacheSize;
+		_maxCacheSize = maxCacheSize;
 
-		fDisplay = Display.getDefault();
+		_display = Display.getDefault();
 
 		setTileCachePath();
 	}
 
 	public boolean contains(final URI uri) {
-		return fImageCache.containsKey(uri);
+		return _imageCache.containsKey(uri);
 	}
 
 	/**
@@ -167,7 +162,7 @@ public class TileImageCache {
 								final String tileKey,
 								final boolean isSaveImage) {
 
-		if (isSaveImage && fUseOffLineCache) {
+		if (isSaveImage && _useOffLineCache) {
 			saveOfflineImage(tile, loadedImageData);
 		}
 
@@ -193,7 +188,7 @@ public class TileImageCache {
 
 			// tile image is not dimmed
 
-			final Image loadedImage = new Image(fDisplay, loadedImageData);
+			final Image loadedImage = new Image(_display, loadedImageData);
 
 			putIntoImageCache(tileKey, loadedImage);
 
@@ -203,21 +198,21 @@ public class TileImageCache {
 
 			// tile image is dimmed
 
-			final Image loadedImage = new Image(fDisplay, loadedImageData);
+			final Image loadedImage = new Image(_display, loadedImageData);
 			final Rectangle imageBounds = loadedImage.getBounds();
 
-			final Image tileImage = new Image(fDisplay, imageBounds);
+			final Image tileImage = new Image(_display, imageBounds);
 
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			//
 			// run in the UI thread
 			//			
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			fDisplay.syncExec(new Runnable() {
+			_display.syncExec(new Runnable() {
 				public void run() {
 
 					final GC gcTileImage = new GC(tileImage);
-					final Color dimColor = new Color(fDisplay, mp.getDimColor());
+					final Color dimColor = new Color(_display, mp.getDimColor());
 					{
 						gcTileImage.setBackground(dimColor);
 						gcTileImage.fillRectangle(imageBounds);
@@ -246,7 +241,7 @@ public class TileImageCache {
 	 */
 	public synchronized void dispose() {
 
-		final Collection<Image> images = fImageCache.values();
+		final Collection<Image> images = _imageCache.values();
 		for (final Image image : images) {
 			if (image != null) {
 				try {
@@ -257,8 +252,8 @@ public class TileImageCache {
 			}
 		}
 
-		fImageCache.clear();
-		fImageCacheFifo.clear();
+		_imageCache.clear();
+		_imageCacheFifo.clear();
 	}
 
 	/**
@@ -269,7 +264,7 @@ public class TileImageCache {
 	 */
 	public ImageData getOfflineTileImageData(final Tile tile) {
 
-		if (fUseOffLineCache == false) {
+		if (_useOffLineCache == false) {
 			return null;
 		}
 
@@ -335,7 +330,7 @@ public class TileImageCache {
 
 		// get image from the cache
 
-		final Image cachedImage = fImageCache.get(tile.getTileKey());
+		final Image cachedImage = _imageCache.get(tile.getTileKey());
 
 		if (cachedImage != null && cachedImage.isDisposed() == false) {
 			return cachedImage;
@@ -358,7 +353,7 @@ public class TileImageCache {
 	private IPath getTileImagePath(final Tile tile) {
 
 		// get tile image cache path
-		IPath tileCachePath = new Path(fOSTileCachePath);
+		IPath tileCachePath = new Path(_osTileCachePath);
 
 		// append tile custom path 
 		final String tileCustomPath = tile.getTileCustomPath();
@@ -383,16 +378,16 @@ public class TileImageCache {
 		/*
 		 * check if the max number of images is reached, remove oldest image from the cache
 		 */
-		final int cacheSize = fImageCacheFifo.size();
-		if (cacheSize >= fMaxCacheSize) {
+		final int cacheSize = _imageCacheFifo.size();
+		if (cacheSize >= _maxCacheSize) {
 
 			// remove cache items 
-			for (int cacheIndex = fMaxCacheSize; cacheIndex < cacheSize; cacheIndex++) {
+			for (int cacheIndex = _maxCacheSize; cacheIndex < cacheSize; cacheIndex++) {
 
 				// remove and dispose oldest image
 
-				final String headTileKey = fImageCacheFifo.poll();
-				final Image oldestImage = fImageCache.remove(headTileKey);
+				final String headTileKey = _imageCacheFifo.poll();
+				final Image oldestImage = _imageCache.remove(headTileKey);
 
 				if (oldestImage != null) {
 					try {
@@ -409,13 +404,13 @@ public class TileImageCache {
 			/*
 			 * check if the image is already in the cache
 			 */
-			final Image cachedImage = fImageCache.get(tileKey);
+			final Image cachedImage = _imageCache.get(tileKey);
 			if (cachedImage == null) {
 
 				// put a new image into the cache
 
-				fImageCache.put(tileKey, tileImage);
-				fImageCacheFifo.add(tileKey);
+				_imageCache.put(tileKey, tileImage);
+				_imageCacheFifo.add(tileKey);
 
 				return;
 
@@ -442,7 +437,7 @@ public class TileImageCache {
 					}
 
 					// replace existing image, the image must be already in the fifo queue
-					fImageCache.put(tileKey, tileImage);
+					_imageCache.put(tileKey, tileImage);
 
 					return;
 				}
@@ -460,7 +455,7 @@ public class TileImageCache {
 	 */
 	void saveOfflineImage(final Tile tile, final ImageData tileImageData) {
 
-		if (fUseOffLineCache == false) {
+		if (_useOffLineCache == false) {
 			return;
 		}
 
@@ -558,7 +553,7 @@ public class TileImageCache {
 	 */
 	public void setOfflineImageAvailability(final Tile tile) {
 
-		if (fUseOffLineCache == false) {
+		if (_useOffLineCache == false) {
 			return;
 		}
 
@@ -572,7 +567,7 @@ public class TileImageCache {
 		 */
 		try {
 
-			final IPath tilePath = tile.getMP().getTileOSPath(fOSTileCachePath, tile);
+			final IPath tilePath = tile.getMP().getTileOSPath(_osTileCachePath, tile);
 
 			if (tilePath == null) {
 				return;

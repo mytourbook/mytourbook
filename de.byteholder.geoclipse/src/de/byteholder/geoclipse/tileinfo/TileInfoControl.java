@@ -16,14 +16,17 @@
 package de.byteholder.geoclipse.tileinfo;
 
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 import de.byteholder.geoclipse.Messages;
-
+ 
 public class TileInfoControl extends CLabel {
+
+	private static final int	CLABEL_INDENT	= 3;
 
 	public TileInfoControl(final Composite parent, final int style) {
 
@@ -45,7 +48,18 @@ public class TileInfoControl extends CLabel {
 		final Point p = gc.textExtent(Messages.TileInfo_Control_Pattern);
 		gc.dispose();
 
+		if (wHint == SWT.DEFAULT) {
+			p.x += 2 * CLABEL_INDENT;
+		} else {
+			p.x = wHint;
+		}
+		if (hHint == SWT.DEFAULT) {
+			p.y += 2 * CLABEL_INDENT;
+		} else {
+			p.y = hHint;
+		}
 		return p;
+
 	}
 
 	public void updateInfo(final String text) {

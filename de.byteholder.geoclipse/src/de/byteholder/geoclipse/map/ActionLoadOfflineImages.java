@@ -16,9 +16,9 @@
 package de.byteholder.geoclipse.map;
 
 import org.eclipse.jface.action.Action;
-
-import de.byteholder.geoclipse.Messages;
  
+import de.byteholder.geoclipse.Messages;
+
 public class ActionLoadOfflineImages extends Action {
 
 	private Map	_map;
@@ -27,8 +27,7 @@ public class ActionLoadOfflineImages extends Action {
 
 		_map = map;
 
-
-		setText(Messages.Action_Map_LoadOfflineImages);
+		setText(Messages.Map_Action_LoadOfflineImages);
 	}
 
 	@Override
