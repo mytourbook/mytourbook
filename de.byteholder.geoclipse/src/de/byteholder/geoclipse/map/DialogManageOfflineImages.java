@@ -14,13 +14,15 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
- 
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -38,9 +40,10 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MPProfile;
 import de.byteholder.geoclipse.tileinfo.TileInfoContribution;
 
-public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileListener {
+public class DialogManageOfflineImages extends TitleAreaDialog implements ITileListener {
 
 	private IDialogSettings		_state;
 
@@ -54,15 +57,16 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 
 	private Combo				_comboMaxZoom;
 	private Text				_txtAvailImages;
-	private Text				_txtLoadingImages;
+	private Text				_txtMissingImages;
 	private Text				_txtQueue;
-	private Button				_btnStartDownload;
-	private Button				_btnStopDownload;
+	private Button				_btnStartLoading;
+	private Button				_btnStartDeleting;
+	private Button				_btnStop;
 
 	private TileInfo			_tileInfo;
 
 	private int					_availImages;
-	private int					_loadingImages;
+	private int					_missingImages;
 
 	private int[]				_availZoomLevels;
 
@@ -72,7 +76,7 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 		}
 	}
 
-	public DialogDownloadOfflineArea(	final Shell parentShell,
+	public DialogManageOfflineImages(	final Shell parentShell,
 										final MP mp,
 										final Point offlineWorldStart,
 										final Point offlineWorldEnd,
@@ -89,7 +93,7 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		_state = Activator.getDefault().getDialogSettingsSection("DialogDownloadOfflineArea"); //$NON-NLS-1$
+		_state = Activator.getDefault().getDialogSettingsSection("DialogManageOfflineImages"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -109,7 +113,7 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 
 		super.configureShell(shell);
 
-//		shell.setText(Messages.dialog_quick_edit_dialog_title);
+		shell.setText(Messages.Dialog_OfflineArea_Title);
 	}
 
 	@Override
@@ -120,15 +124,18 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 		super.create();
 
 		setTitle(Messages.Dialog_OfflineArea_Title);
-//		setMessage();
+		setMessage(NLS.bind(Messages.Dialog_OfflineArea_Message, _mp.getName()));
 
 		MP.addTileListener(this);
+
+		restoreState();
 
 		if (_offlineManager.initialize(_mp)) {
 
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
-					loadOfflineImages(_mapZoomLevel);
+					getOfflineImageState();
+					_comboMaxZoom.setFocus();
 				}
 			});
 
@@ -138,16 +145,14 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			final Button okButton = getButton(IDialogConstants.OK_ID);
 			okButton.setEnabled(false);
 		}
+
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(final Composite parent) {
 
-		// display close button
+		// create close button
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CLOSE_LABEL, false);
-
-		// hide OK buttons
-//		super.createButtonsForButtonBar(parent);
 	}
 
 	private void createData() {
@@ -211,7 +216,7 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			 * max zoom level
 			 */
 			label = new Label(container, SWT.NONE);
-			label.setText("&Zoom level for downloaded images:");
+			label.setText(Messages.Dialog_OfflineArea_Label_ZoomLevel);
 
 			// combo: zoom level
 			_comboMaxZoom = new Combo(container, SWT.READ_ONLY);
@@ -219,7 +224,11 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			_comboMaxZoom.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectZoom();
+
+					getOfflineImageState();
+
+					// focus was disabled, reset focus
+					_comboMaxZoom.setFocus();
 				}
 			});
 
@@ -229,13 +238,13 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			}
 
 			// set download as default button
-			parent.getShell().setDefaultButton(_btnStartDownload);
+			parent.getShell().setDefaultButton(_btnStartLoading);
 
 			/*
 			 * available images
 			 */
 			label = new Label(container, SWT.NONE);
-			label.setText("Available images:");
+			label.setText(Messages.Dialog_OfflineArea_Label_AvailableImages);
 
 			_txtAvailImages = new Text(container, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtAvailImages);
@@ -244,16 +253,16 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			 * loading images
 			 */
 			label = new Label(container, SWT.NONE);
-			label.setText("Required images:");
+			label.setText(Messages.Dialog_OfflineArea_Label_RequiredImages);
 
-			_txtLoadingImages = new Text(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtLoadingImages);
+			_txtMissingImages = new Text(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMissingImages);
 
 			/*
 			 * loading images
 			 */
 			label = new Label(container, SWT.NONE);
-			label.setText("Queue:");
+			label.setText(Messages.Dialog_OfflineArea_Label_Queue);
 
 			_txtQueue = new Text(container, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtQueue);
@@ -268,163 +277,64 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
-			 * button: start downloading
+			 * button: start loading
 			 */
-			_btnStartDownload = new Button(container, SWT.NONE);
-			_btnStartDownload.setText("Start &Downloading");
-			_btnStartDownload.addSelectionListener(new SelectionAdapter() {
+			_btnStartLoading = new Button(container, SWT.NONE);
+			_btnStartLoading.setText(Messages.Dialog_OfflineArea_Button_StartDownloading);
+			_btnStartLoading.setToolTipText(Messages.Dialog_OfflineArea_Button_StartDownloading_Tooltip);
+			_btnStartLoading.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetDefaultSelected(final SelectionEvent e) {
-					onSelectDownload();
+					onSelectStart(true);
 				}
 
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectDownload();
+					onSelectStart(true);
 				}
 			});
-			setButtonLayoutData(_btnStartDownload);
+			setButtonLayoutData(_btnStartLoading);
 
 			/*
-			 * button: stop downloading
+			 * button: start deleting
 			 */
-			_btnStopDownload = new Button(container, SWT.NONE);
-			_btnStopDownload.setText("Sto&p &Downloading");
-			_btnStopDownload.addSelectionListener(new SelectionAdapter() {
+			_btnStartDeleting = new Button(container, SWT.NONE);
+			_btnStartDeleting.setText(Messages.Dialog_OfflineArea_Button_StartDeleting);
+			_btnStartDeleting.setToolTipText(Messages.Dialog_OfflineArea_Button_StartDeleting_Tooltip);
+			_btnStartDeleting.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectStart(false);
+				}
+			});
+			setButtonLayoutData(_btnStartLoading);
+
+			/*
+			 * button: stop
+			 */
+			_btnStop = new Button(container, SWT.NONE);
+			_btnStop.setText(Messages.Dialog_OfflineArea_Button_StopDownloading);
+			_btnStop.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					_offlineManager.stopLoading();
-					enableControls();
+					enableControls(true);
 				}
 			});
-			setButtonLayoutData(_btnStopDownload);
+			setButtonLayoutData(_btnStop);
 		}
 	}
 
-	private void enableControls() {
-
-		final boolean isLoading = OfflineLoadManager.isLoading();
-
-		_comboMaxZoom.setEnabled(isLoading == false);
-
-		_btnStartDownload.setEnabled(isLoading == false);
-		_btnStopDownload.setEnabled(isLoading);
-	}
-
-	@Override
-	protected IDialogSettings getDialogBoundsSettings() {
-
-		// keep window size and position
-//		return _state;
-		return null;
-	}
-
-	private void loadOfflineImages(final int maxZoomLevel) {
+	private void deleteOfflineImages() {
 
 		if (OfflineLoadManager.isLoading()) {
 			return;
 		}
 
-		// reset statistics
-		_availImages = 0;
-		_loadingImages = 0;
-
-		_txtLoadingImages.setText(Integer.toString(_loadingImages));
-		_txtAvailImages.setText(Integer.toString(_availImages));
-
-		final int tileSize = _mp.getTileSize();
-
-		final int worldStartX = _offlineWorldStart.x;
-		final int worldStartY = _offlineWorldStart.y;
-		final int worldEndX = _offlineWorldEnd.x;
-		final int worldEndY = _offlineWorldEnd.y;
-
-		double worldX1 = Math.min(worldStartX, worldEndX);
-		double worldX2 = Math.max(worldStartX, worldEndX);
-		double worldY1 = Math.min(worldStartY, worldEndY);
-		double worldY2 = Math.max(worldStartY, worldEndY);
-
-		for (int zoomLevel = _mapZoomLevel; zoomLevel <= maxZoomLevel; zoomLevel++) {
-
-			final int maxMapTileSize = _mp.getMapTileSize(zoomLevel).width;
-
-			final int areaPixelWidth = (int) (worldX2 - worldX1);
-			final int areaPixelHeight = (int) (worldY2 - worldY1);
-
-			final int numTileWidth = (int) Math.ceil((double) areaPixelWidth / (double) tileSize);
-			final int numTileHeight = (int) Math.ceil((double) areaPixelHeight / (double) tileSize);
-
-			int tilePosMinX = (int) Math.floor(worldX1 / tileSize);
-			int tilePosMinY = (int) Math.floor(worldY1 / tileSize);
-			int tilePosMaxX = tilePosMinX + numTileWidth;
-			int tilePosMaxY = tilePosMinY + numTileHeight;
-
-			// ensure tiles are within the map
-			tilePosMinX = Math.max(0, tilePosMinX);
-			tilePosMinY = Math.max(0, tilePosMinY);
-			tilePosMaxX = Math.min(tilePosMaxX, maxMapTileSize);
-			tilePosMaxY = Math.min(tilePosMaxY, maxMapTileSize);
-
-			for (int tilePosX = tilePosMinX; tilePosX <= tilePosMaxX; tilePosX++) {
-				for (int tilePosY = tilePosMinY; tilePosY <= tilePosMaxY; tilePosY++) {
-
-					// create offline tile
-					final Tile offlineTile = new Tile(_mp, zoomLevel, tilePosX, tilePosY, null);
-					offlineTile.setBoundingBoxEPSG4326();
-					_mp.doPostCreation(offlineTile);
-
-					final boolean isLoading = _offlineManager.addOfflineTile(offlineTile);
-
-					if (isLoading) {
-						_loadingImages++;
-						_txtLoadingImages.setText(Integer.toString(_loadingImages));
-					} else {
-						_availImages++;
-						_txtAvailImages.setText(Integer.toString(_availImages));
-					}
-				}
-			}
-
-			// set next zoom level, zoom into the map
-			worldX1 *= 2;
-			worldX2 *= 2;
-			worldY1 *= 2;
-			worldY2 *= 2;
-		}
-	}
-
-	@Override
-	protected void okPressed() {
-
-		super.okPressed();
-	}
-
-	private void onSelectDownload() {
-
-		final int selectedIndex = _comboMaxZoom.getSelectionIndex();
-
-		loadOfflineImages(_availZoomLevels[selectedIndex]);
-
-		enableControls();
-	}
-
-	private void onSelectZoom() {
-
-		if (OfflineLoadManager.isLoading()) {
-			return;
-		}
-
-		// reset statistics
-		_availImages = 0;
-		_loadingImages = 0;
-
-		_txtLoadingImages.setText(Integer.toString(_loadingImages));
-		_txtAvailImages.setText(Integer.toString(_availImages));
-
-		final int selectedIndex = _comboMaxZoom.getSelectionIndex();
-		final int selectedZoomLevel = _availZoomLevels[selectedIndex];
+		final int selectedZoomLevel = _availZoomLevels[_comboMaxZoom.getSelectionIndex()];
 
 		final int tileSize = _mp.getTileSize();
 
@@ -465,14 +375,187 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 					// create offline tile
 					final Tile offlineTile = new Tile(_mp, zoomLevel, tilePosX, tilePosY, null);
 
-					final boolean isAvailable = _offlineManager.isOfflineImageAvailable(offlineTile);
+					_offlineManager.deleteOfflineImage(offlineTile);
+				}
+			}
 
-					if (isAvailable) {
+			// set next zoom level, zoom into the map
+			worldX1 *= 2;
+			worldX2 *= 2;
+			worldY1 *= 2;
+			worldY2 *= 2;
+		}
+
+		getOfflineImageState();
+	}
+
+	private void enableControls(final boolean canBeEnabled) {
+
+		final boolean isLoading = OfflineLoadManager.isLoading();
+		final boolean isMpProfile = _mp instanceof MPProfile;
+
+		_comboMaxZoom.setEnabled(canBeEnabled && isLoading == false);
+
+		_btnStartLoading.setEnabled(canBeEnabled && isLoading == false);
+		_btnStartDeleting.setEnabled(canBeEnabled && isLoading == false && isMpProfile == false);
+		_btnStop.setEnabled(canBeEnabled && isLoading);
+	}
+
+	@Override
+	protected IDialogSettings getDialogBoundsSettings() {
+
+		// keep window size and position
+//		return _state;
+		return null;
+	}
+
+	private void getOfflineImageState() {
+
+		if (OfflineLoadManager.isLoading()) {
+			return;
+		}
+
+		enableControls(false);
+
+		// reset statistics
+		_availImages = 0;
+		_missingImages = 0;
+
+		_txtMissingImages.setText(Integer.toString(_missingImages));
+		_txtAvailImages.setText(Integer.toString(_availImages));
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
+
+				final int selectedZoomLevel = _availZoomLevels[_comboMaxZoom.getSelectionIndex()];
+
+				final int tileSize = _mp.getTileSize();
+
+				final int worldStartX = _offlineWorldStart.x;
+				final int worldStartY = _offlineWorldStart.y;
+				final int worldEndX = _offlineWorldEnd.x;
+				final int worldEndY = _offlineWorldEnd.y;
+
+				double worldX1 = Math.min(worldStartX, worldEndX);
+				double worldX2 = Math.max(worldStartX, worldEndX);
+				double worldY1 = Math.min(worldStartY, worldEndY);
+				double worldY2 = Math.max(worldStartY, worldEndY);
+
+				for (int zoomLevel = _mapZoomLevel; zoomLevel <= selectedZoomLevel; zoomLevel++) {
+
+					final int maxMapTileSize = _mp.getMapTileSize(zoomLevel).width;
+
+					final int areaPixelWidth = (int) (worldX2 - worldX1);
+					final int areaPixelHeight = (int) (worldY2 - worldY1);
+
+					final int numTileWidth = (int) Math.ceil((double) areaPixelWidth / (double) tileSize);
+					final int numTileHeight = (int) Math.ceil((double) areaPixelHeight / (double) tileSize);
+
+					int tilePosMinX = (int) Math.floor(worldX1 / tileSize);
+					int tilePosMinY = (int) Math.floor(worldY1 / tileSize);
+					int tilePosMaxX = tilePosMinX + numTileWidth;
+					int tilePosMaxY = tilePosMinY + numTileHeight;
+
+					// ensure tiles are within the map
+					tilePosMinX = Math.max(0, tilePosMinX);
+					tilePosMinY = Math.max(0, tilePosMinY);
+					tilePosMaxX = Math.min(tilePosMaxX, maxMapTileSize);
+					tilePosMaxY = Math.min(tilePosMaxY, maxMapTileSize);
+
+					for (int tilePosX = tilePosMinX; tilePosX <= tilePosMaxX; tilePosX++) {
+						for (int tilePosY = tilePosMinY; tilePosY <= tilePosMaxY; tilePosY++) {
+
+							// create offline tile
+							final Tile offlineTile = new Tile(_mp, zoomLevel, tilePosX, tilePosY, null);
+
+							final boolean isAvailable = _offlineManager.isOfflineImageAvailable(offlineTile);
+
+							if (isAvailable) {
+								_availImages++;
+								_txtAvailImages.setText(Integer.toString(_availImages));
+							} else {
+								_missingImages++;
+								_txtMissingImages.setText(Integer.toString(_missingImages));
+							}
+						}
+					}
+
+					// set next zoom level, zoom into the map
+					worldX1 *= 2;
+					worldX2 *= 2;
+					worldY1 *= 2;
+					worldY2 *= 2;
+				}
+			}
+		});
+
+		enableControls(true);
+	}
+
+	private void loadOfflineImages() {
+
+		if (OfflineLoadManager.isLoading()) {
+			return;
+		}
+
+		// reset statistics
+		_availImages = 0;
+		_missingImages = 0;
+
+		_txtMissingImages.setText(Integer.toString(_missingImages));
+		_txtAvailImages.setText(Integer.toString(_availImages));
+
+		final int selectedZoomLevel = _availZoomLevels[_comboMaxZoom.getSelectionIndex()];
+
+		final int tileSize = _mp.getTileSize();
+
+		final int worldStartX = _offlineWorldStart.x;
+		final int worldStartY = _offlineWorldStart.y;
+		final int worldEndX = _offlineWorldEnd.x;
+		final int worldEndY = _offlineWorldEnd.y;
+
+		double worldX1 = Math.min(worldStartX, worldEndX);
+		double worldX2 = Math.max(worldStartX, worldEndX);
+		double worldY1 = Math.min(worldStartY, worldEndY);
+		double worldY2 = Math.max(worldStartY, worldEndY);
+
+		for (int zoomLevel = _mapZoomLevel; zoomLevel <= selectedZoomLevel; zoomLevel++) {
+
+			final int maxMapTileSize = _mp.getMapTileSize(zoomLevel).width;
+
+			final int areaPixelWidth = (int) (worldX2 - worldX1);
+			final int areaPixelHeight = (int) (worldY2 - worldY1);
+
+			final int numTileWidth = (int) Math.ceil((double) areaPixelWidth / (double) tileSize);
+			final int numTileHeight = (int) Math.ceil((double) areaPixelHeight / (double) tileSize);
+
+			int tilePosMinX = (int) Math.floor(worldX1 / tileSize);
+			int tilePosMinY = (int) Math.floor(worldY1 / tileSize);
+			int tilePosMaxX = tilePosMinX + numTileWidth;
+			int tilePosMaxY = tilePosMinY + numTileHeight;
+
+			// ensure tiles are within the map
+			tilePosMinX = Math.max(0, tilePosMinX);
+			tilePosMinY = Math.max(0, tilePosMinY);
+			tilePosMaxX = Math.min(tilePosMaxX, maxMapTileSize);
+			tilePosMaxY = Math.min(tilePosMaxY, maxMapTileSize);
+
+			for (int tilePosX = tilePosMinX; tilePosX <= tilePosMaxX; tilePosX++) {
+				for (int tilePosY = tilePosMinY; tilePosY <= tilePosMaxY; tilePosY++) {
+
+					// create offline tile
+					final Tile offlineTile = new Tile(_mp, zoomLevel, tilePosX, tilePosY, null);
+					offlineTile.setBoundingBoxEPSG4326();
+					_mp.doPostCreation(offlineTile);
+
+					final boolean isLoading = _offlineManager.addOfflineTile(offlineTile);
+
+					if (isLoading) {
+						_missingImages++;
+						_txtMissingImages.setText(Integer.toString(_missingImages));
+					} else {
 						_availImages++;
 						_txtAvailImages.setText(Integer.toString(_availImages));
-					} else {
-						_loadingImages++;
-						_txtLoadingImages.setText(Integer.toString(_loadingImages));
 					}
 				}
 			}
@@ -483,6 +566,27 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 			worldY1 *= 2;
 			worldY2 *= 2;
 		}
+	}
+
+	@Override
+	protected void okPressed() {
+
+		super.okPressed();
+	}
+
+	private void onSelectStart(final boolean isLoading) {
+
+		if (isLoading) {
+			loadOfflineImages();
+		} else {
+			deleteOfflineImages();
+		}
+
+		enableControls(true);
+	}
+
+	private void restoreState() {
+
 	}
 
 	@Override
@@ -499,7 +603,7 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 				}
 
 				updateUI();
-				enableControls();
+				enableControls(true);
 			}
 		});
 	}
@@ -512,14 +616,14 @@ public class DialogDownloadOfflineArea extends TitleAreaDialog implements ITileL
 	private void updateUIInitial() {
 
 		_availImages = 0;
-		_loadingImages = 0;
+		_missingImages = 0;
 
-		_txtLoadingImages.setText(Integer.toString(_loadingImages));
+		_txtMissingImages.setText(Integer.toString(_missingImages));
 		_txtAvailImages.setText(Integer.toString(_availImages));
 
 		// select first zoom level which is the minimum zoom
 		_comboMaxZoom.select(0);
 
-		enableControls();
-	}
+		enableControls(true);
+ 	}
 }

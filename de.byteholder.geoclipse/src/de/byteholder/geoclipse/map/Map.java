@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -73,7 +74,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
- 
+
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IMapListener;
@@ -171,11 +172,12 @@ public class Map extends Canvas {
 	private final Thread						_overlayThread;
 	private long								_nextOverlayRedrawTime;
 
-	private final NumberFormat					_Nf							= NumberFormat.getNumberInstance();
-	private final NumberFormat					_NfLatLon					= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf							= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nfLatLon					= NumberFormat.getNumberInstance();
 
 	{
-		_NfLatLon.setMaximumFractionDigits(4);
+		_nfLatLon.setMinimumFractionDigits(4);
+		_nfLatLon.setMaximumFractionDigits(4);
 	}
 
 	private final TextWrapPainter				_textWrapper				= new TextWrapPainter();
@@ -296,6 +298,7 @@ public class Map extends Canvas {
 	private boolean								_isTourPaintMethodEnhanced	= false;
 
 	private boolean								_isSelectOfflineArea;
+	private boolean								_isOfflineSelectionStarted	= false;
 	private boolean								_isPaintOfflineArea			= false;
 
 	private Point								_offlineDevAreaStart;
@@ -304,9 +307,14 @@ public class Map extends Canvas {
 	private Point								_offlineDevTileEnd;
 	private Point								_offlineWorldStart;
 	private Point								_offlineWorldEnd;
+	private Point								_offlineWorldMouseMove;
 
 	private org.eclipse.swt.graphics.Rectangle	_currentOfflineArea;
 	private org.eclipse.swt.graphics.Rectangle	_previousOfflineArea;
+
+	private IMapContextProvider					_mapContextProvider;
+
+	private boolean								_disableContextMenu			= false;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -316,15 +324,7 @@ public class Map extends Canvas {
 
 			if (_isSelectOfflineArea) {
 
-				// disable offline area selection
-
-				// hide offline area
-				_isPaintOfflineArea = false;
-				_isSelectOfflineArea = false;
-
-				setCursor(_cursorDefault);
-
-				redraw();
+				disableOfflineAreaSelection();
 
 				return;
 			}
@@ -535,7 +535,7 @@ public class Map extends Canvas {
 		addListener(SWT.MouseWheel, mouseListener);
 
 		addKeyListener(new KeyMapListener());
-		addContextMenu();
+		createContextMenu();
 
 		addControlListener(new ControlListener() {
 
@@ -608,7 +608,7 @@ public class Map extends Canvas {
 
 	}
 
-	void actionLoadOfflineImages() {
+	void actionManageOfflineImages() {
 
 		// check if offline image is active
 		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
@@ -646,29 +646,6 @@ public class Map extends Canvas {
 
 	}
 
-	/**
-	 * create the context menu
-	 */
-	private void addContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-
-				if (_MP == null) {
-					return;
-				}
-
-				menuMgr.add(new ActionLoadOfflineImages(Map.this));
-			}
-		});
-
-		setMenu(menuMgr.createContextMenu(this));
-	}
-
 	public void addMapListener(final IMapListener mapListener) {
 		_mapListeners.add(mapListener);
 	}
@@ -684,6 +661,10 @@ public class Map extends Canvas {
 	public void addOverlayPainter(final MapPainter overlay) {
 		_overlays.add(overlay);
 		queueMapRedraw();
+	}
+
+	public void addZoomListener(final IZoomListener listener) {
+		_zoomListeners.add(listener);
 	}
 
 //	/**
@@ -712,28 +693,6 @@ public class Map extends Canvas {
 //		setZoom(zoom);
 //
 //		queueMapRedraw();
-//	}
-
-	public void addZoomListener(final IZoomListener listener) {
-		_zoomListeners.add(listener);
-	}
-
-//	private void checkImageTemplate1Part() {
-//
-//		final int tileSize = _MP.getTileSize();
-//
-//		if (_imageTemplate1Part != null && _imageTemplate1Part.isDisposed() == false) {
-//			if (_imageTemplate1Part.getBounds().width == tileSize) {
-//				// image is OK
-//				return;
-//			}
-//		}
-//
-//		if (_imageTemplate1Part != null) {
-//			_imageTemplate1Part.dispose();
-//		}
-//
-//		_imageTemplate1Part = new Image(_display, UI.createTransparentImageData(tileSize, _transparentRGB));
 //	}
 
 	/**
@@ -771,34 +730,33 @@ public class Map extends Canvas {
 		return getParent().getSize();
 	}
 
-//	private void createOverlayImage(final Tile tile, final ImageDataResources idResources, final String partImageKey) {
-//
-//		final ImageData neighborImageData = idResources.getNeighborImageData();
-//		if (neighborImageData != null) {
-//
-//			// there are neighbor image data available, draw these data into the center part
-//
-//			idResources.drawImageData(//
-//					neighborImageData,
-//					0,
-//					0,
-//					tileSize,
-//					tileSize,
-//					true);
-//		}
-//
-//		// create image from image data
-//		final Image tileOverlayImage = new Image(_display, idResources.getTileImageData());
-//
-//		// set image into the tile
-//		tile.setOverlayImage(tileOverlayImage);
-//
-//		/*
-//		 * keep image in the cache that not too much image resources are created and
-//		 * that all images are disposed
-//		 */
-//		_overlayImageCache.add(partImageKey, tileOverlayImage);
-//	}
+	/**
+	 * create the context menu
+	 */
+	private void createContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				if (_MP == null || _disableContextMenu) {
+					return;
+				}
+
+				menuMgr.add(new ActionManageOfflineImages(Map.this));
+				menuMgr.add(new Separator());
+
+				if (_mapContextProvider != null) {
+					_mapContextProvider.fillContextMenu(menuMgr);
+				}
+			}
+		});
+
+		setMenu(menuMgr.createContextMenu(this));
+	}
 
 	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
 
@@ -808,6 +766,21 @@ public class Map extends Canvas {
 		_MP.disposeTileImages();
 
 		resetAll();
+	}
+
+	/**
+	 * hide offline area and all states
+	 */
+	private void disableOfflineAreaSelection() {
+
+		_isSelectOfflineArea = false;
+		_isPaintOfflineArea = false;
+		_disableContextMenu = false;
+		_isOfflineSelectionStarted = false;
+
+		setCursor(_cursorDefault);
+
+		redraw();
 	}
 
 	/**
@@ -939,17 +912,17 @@ public class Map extends Canvas {
 		if (scaleLat >= 100f) {
 			scaleUI = Integer.toString((int) scaleLat);
 		} else if (scaleLat >= 10f) {
-			_Nf.setMinimumFractionDigits(1);
-			_Nf.setMaximumFractionDigits(1);
-			scaleUI = _Nf.format(scaleLat);
+			_nf.setMinimumFractionDigits(1);
+			_nf.setMaximumFractionDigits(1);
+			scaleUI = _nf.format(scaleLat);
 		} else if (scaleLat >= 1f) {
-			_Nf.setMinimumFractionDigits(2);
-			_Nf.setMaximumFractionDigits(2);
-			scaleUI = _Nf.format(scaleLat);
+			_nf.setMinimumFractionDigits(2);
+			_nf.setMaximumFractionDigits(2);
+			scaleUI = _nf.format(scaleLat);
 		} else {
-			_Nf.setMinimumFractionDigits(3);
-			_Nf.setMaximumFractionDigits(3);
-			scaleUI = _Nf.format(scaleLat);
+			_nf.setMinimumFractionDigits(3);
+			_nf.setMaximumFractionDigits(3);
+			scaleUI = _nf.format(scaleLat);
 		}
 		final String scaleText = scaleUI + UI.SPACE + _distanceUnitLabel;
 		final Point textExtent = gc.textExtent(scaleText);
@@ -1267,13 +1240,13 @@ public class Map extends Canvas {
 
 		// lat - bottom
 		sb.append(Messages.TileInfo_Position_Latitude);
-		sb.append(_NfLatLon.format(bbox.bottom));
+		sb.append(_nfLatLon.format(bbox.bottom));
 		gc.drawString(sb.toString(), //
 				devTilePosition.x + leftMargin,
 				devTilePosition.y + topMargin);
 
 		// lat - top
-		gc.drawString(_NfLatLon.format(bbox.top), //
+		gc.drawString(_nfLatLon.format(bbox.top), //
 				devTilePosition.x + leftMargin + dev2ndColumn,
 				devTilePosition.y + topMargin);
 
@@ -1281,13 +1254,13 @@ public class Map extends Canvas {
 
 		// lon - left
 		sb.append(Messages.TileInfo_Position_Longitude);
-		sb.append(_NfLatLon.format(bbox.left));
+		sb.append(_nfLatLon.format(bbox.left));
 		gc.drawString(sb.toString(), //
 				devTilePosition.x + leftMargin,
 				devTilePosition.y + topMargin + devLineHeight);
 
 		// lon - right
-		gc.drawString(_NfLatLon.format(bbox.right), //
+		gc.drawString(_nfLatLon.format(bbox.right), //
 				devTilePosition.x + leftMargin + dev2ndColumn,
 				devTilePosition.y + topMargin + devLineHeight);
 	}
@@ -1546,15 +1519,6 @@ public class Map extends Canvas {
 		return _mapLegend;
 	}
 
-	/**
-	 * @return Returns the map viewport<br>
-	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
-	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
-	 */
-	public Rectangle getMapPixelViewport() {
-		return getWorldPixelTopLeftViewport(_mapCenterInWorldPixel);
-	}
-
 //	/**
 //	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
 //	 * system, not as lat/longs.
@@ -1564,6 +1528,15 @@ public class Map extends Canvas {
 //	public Point2D getCenterInWorldPixel() {
 //		return _mapCenterInWorldPixel;
 //	}
+
+	/**
+	 * @return Returns the map viewport<br>
+	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
+	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
+	 */
+	public Rectangle getMapPixelViewport() {
+		return getWorldPixelTopLeftViewport(_mapCenterInWorldPixel);
+	}
 
 	/**
 	 * Get the current map provider
@@ -1883,6 +1856,8 @@ public class Map extends Canvas {
 
 			if (_isSelectOfflineArea) {
 
+				_isOfflineSelectionStarted = true;
+
 				final Rectangle viewPort = _mapPixelViewport;
 				final int worldMouseX = viewPort.x + e.x;
 				final int worldMouseY = viewPort.y + e.y;
@@ -1907,13 +1882,16 @@ public class Map extends Canvas {
 		}
 	}
 
-	private void onMouseMove(final MouseEvent mouseEvent) {
+	private void onMouseMove(final MouseEvent e) {
 
-		_mouseMovePosition = new Point(mouseEvent.x, mouseEvent.y);
+		_mouseMovePosition = new Point(e.x, e.y);
 
 		if (_isSelectOfflineArea) {
 
-			updateOfflineAreaEndPosition(mouseEvent);
+			final Rectangle viewPort = _mapPixelViewport;
+			_offlineWorldMouseMove = new Point(viewPort.x + e.x, viewPort.y + e.y);
+
+			updateOfflineAreaEndPosition(e);
 
 			queueMapRedraw();
 
@@ -1925,32 +1903,44 @@ public class Map extends Canvas {
 			return;
 		}
 
-		panMap(mouseEvent);
+		panMap(e);
 	}
 
 	private void onMouseUp(final MouseEvent e) {
 
 		if (_isSelectOfflineArea) {
 
+			_disableContextMenu = true;
+
+			if (_isOfflineSelectionStarted == false) {
+				/*
+				 * offline selection is not started, this can happen when the right mouse button is
+				 * clicked
+				 */
+				disableOfflineAreaSelection();
+
+				return;
+			}
+
 			updateOfflineAreaEndPosition(e);
 
 			_isSelectOfflineArea = false;
+
+			// hide previous area
+			_previousOfflineArea = null;
 
 			setCursor(_cursorDefault);
 			redraw();
 			queueMapRedraw();
 
-			new DialogDownloadOfflineArea(
+			new DialogManageOfflineImages(
 					Display.getCurrent().getActiveShell(),
 					_MP,
 					_offlineWorldStart,
 					_offlineWorldEnd,
 					_mapZoomLevel).open();
 
-			// hide offline area
-			_isPaintOfflineArea = false;
-
-			redraw();
+			disableOfflineAreaSelection();
 
 		} else {
 
@@ -2020,51 +2010,70 @@ public class Map extends Canvas {
 		gc.setLineWidth(1);
 
 		/*
+		 * draw previous area box
+		 */
+		if (_previousOfflineArea != null) {
+
+			gc.setLineStyle(SWT.LINE_SOLID);
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+			gc.drawRectangle(_previousOfflineArea);
+
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
+			gc.drawRectangle(
+					_previousOfflineArea.x + 1,
+					_previousOfflineArea.y + 1,
+					_previousOfflineArea.width - 2,
+					_previousOfflineArea.height - 2);
+		}
+
+		/*
 		 * show info in the top/right corner that selection for the offline area is activ
 		 */
 		if (_isSelectOfflineArea) {
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append(Messages.Offline_Area_Label_SelectInfo);
 
 			if (_offlineDevAreaStart != null) {
-				sb.append("  "); //$NON-NLS-1$
-				sb.append(_offlineDevAreaStart.x);
-				sb.append("/"); //$NON-NLS-1$
-				sb.append(_offlineDevAreaStart.y);
+
+				// display offline area geo position
+
+				final GeoPosition geoStart = _MP.pixelToGeo(new Point2D.Double(
+						_offlineWorldStart.x,
+						_offlineWorldStart.y), _mapZoomLevel);
+
 				sb.append("   "); //$NON-NLS-1$
-				sb.append(_offlineDevAreaEnd.x);
+				sb.append(_nfLatLon.format(geoStart.latitude));
+				sb.append(" / "); //$NON-NLS-1$
+				sb.append(_nfLatLon.format(geoStart.longitude));
+
+				final GeoPosition geoEnd = _MP.pixelToGeo(new Point2D.Double(//
+						_offlineWorldEnd.x,
+						_offlineWorldEnd.y), _mapZoomLevel);
+
+				sb.append(" - "); //$NON-NLS-1$
+				sb.append(_nfLatLon.format(geoEnd.latitude));
+				sb.append(" / "); //$NON-NLS-1$
+				sb.append(_nfLatLon.format(geoEnd.longitude));
+
+			} else {
+
+				// display mouse move geo position
+
+				final GeoPosition mouseGeo = _MP.pixelToGeo(new Point2D.Double(
+						_offlineWorldMouseMove.x,
+						_offlineWorldMouseMove.y), _mapZoomLevel);
+
+				sb.append("   "); //$NON-NLS-1$
+				sb.append(_nfLatLon.format(mouseGeo.latitude));
 				sb.append("/"); //$NON-NLS-1$
-				sb.append(_offlineDevAreaEnd.y);
+				sb.append(_nfLatLon.format(mouseGeo.longitude));
 			}
 
 			gc.drawText(sb.toString(), 0, 0);
-
-			/*
-			 * draw previous area box
-			 */
-			if (_previousOfflineArea != null) {
-
-				gc.setLineStyle(SWT.LINE_SOLID);
-				gc.setForeground(_display.getSystemColor(SWT.COLOR_BLUE));
-				gc.drawRectangle(_previousOfflineArea);
-				gc.drawRectangle(
-						_previousOfflineArea.x + 1,
-						_previousOfflineArea.y + 1,
-						_previousOfflineArea.width - 2,
-						_previousOfflineArea.height - 2);
-
-				gc.setLineStyle(SWT.LINE_DOT);
-				gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
-				gc.drawRectangle(_previousOfflineArea);
-				gc.drawRectangle(
-						_previousOfflineArea.x + 1,
-						_previousOfflineArea.y + 1,
-						_previousOfflineArea.width - 2,
-						_previousOfflineArea.height - 2);
-			}
 		}
 
 		// check if mouse button is hit which sets the start position
@@ -2128,10 +2137,12 @@ public class Map extends Canvas {
 
 		_currentOfflineArea = new org.eclipse.swt.graphics.Rectangle(devX, devY, devWidth, devHeight);
 
-		gc.setLineStyle(SWT.LINE_DOT);
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
-
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
 		gc.drawRectangle(devX, devY, devWidth, devHeight);
+
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
 		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 	}
 
@@ -2697,107 +2708,6 @@ public class Map extends Canvas {
 		}
 	}
 
-//	/**
-//	 * Sets the center of the map in pixel coordinates.
-//	 *
-//	 * @param fMapPixelCenter
-//	 *            the new center of the map in pixel coordinates
-//	 */
-//	private void setMapPixelCenterNEW(final GeoPosition mapGeoCenter, Point2D mapPixelCenter) {
-//
-////		if (isRestrictOutsidePanning()) {
-//
-//			/*
-//			 * check if the center is within the map
-//			 */
-//
-//			final int viewportHeight = getViewport().height;
-//			final Rectangle newVP = getViewport(mapPixelCenter);
-//
-//			// don't let the user pan over the top edge
-//			if (newVP.y < 0) {
-//				final double centerY = viewportHeight / 2d;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-//
-//			// don't let the user pan over the bottom edge
-//			final Dimension mapSize = _MP.getMapTileSize(_mapZoomLevel);
-//			final int mapHeight = (int) mapSize.getHeight() * _MP.getTileSize();
-//			if (newVP.y + newVP.height > mapHeight) {
-//				final double centerY = mapHeight - viewportHeight / 2;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-//
-//			// if map is too small then just center it
-//			if (mapHeight < newVP.height) {
-//				final double centerY = mapHeight / 2d;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-////		}
-//
-//		_mapPixelCenter = mapPixelCenter;
-//
-//		updateMouseMapPosition();
-//	}
-//
-//	/**
-//	 * Sets the center of the map in pixel coordinates.
-//	 *
-//	 * @param fMapPixelCenter
-//	 *            the new center of the map in pixel coordinates
-//	 */
-//	private void setMapPixelCenterOLD(final GeoPosition mapGeoCenter, Point2D mapPixelCenter) {
-//
-//		if (isRestrictOutsidePanning()) {
-//
-//			/*
-//			 * check if the center is within the map
-//			 */
-//
-//			final int viewportHeight = getViewport().height;
-//			final Rectangle newVP = getViewport(mapPixelCenter);
-//
-//			// don't let the user pan over the top edge
-//			if (newVP.y < 0) {
-//				final double centerY = viewportHeight / 2d;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-//
-//			// don't let the user pan over the bottom edge
-//			final Dimension mapSize = fTileFactory.getMapSize(getZoom());
-//			final int mapHeight = (int) mapSize.getHeight() * fTileFactory.getTileSize();
-//			if (newVP.y + newVP.height > mapHeight) {
-//				final double centerY = mapHeight - viewportHeight / 2;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-//
-//			// if map is too small then just center it
-//			if (mapHeight < newVP.height) {
-//				final double centerY = mapHeight / 2d;
-//				mapPixelCenter = new Point2D.Double(mapPixelCenter.getX(), centerY);
-//			}
-//		}
-//
-//		fMapPixelCenter = mapPixelCenter;
-//
-////		fireMapEvent(mapGeoCenter);
-//		updateMouseMapPosition();
-//	}
-
-//	public synchronized void setMapProviderWithReset() {
-//
-//		if (fMP != null) {
-//			fMP.resetAll(false);
-//		}
-//
-//		queueMapRedraw();
-//	}
-
-	/*
-	 * (non-Javadoc)
-	 * @seede.byteholder.geoclipse.swt.IDirectPainter#setDirectPainter(net.tourbook.mapping.
-	 * DirectMappingPainter)
-	 */
 	public void setDirectPainter(final IDirectPainter directPainter) {
 		_directMapPainter = directPainter;
 	}
@@ -2891,6 +2801,21 @@ public class Map extends Canvas {
 		_mapCenterInWorldPixel = centerInWorldPixel;
 
 		updateMouseMapPosition();
+
+		/*
+		 * hide previous offline area when map position has changed because the area has no absolute
+		 * position
+		 */
+//		_currentOfflineArea = null;
+	}
+
+	/**
+	 * Set map context menu provider
+	 * 
+	 * @param mapContextProvider
+	 */
+	public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
+		_mapContextProvider = mapContextProvider;
 	}
 
 	/**
@@ -2928,6 +2853,10 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
+
 	/**
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
 	 * position as the previous tile factory
@@ -2949,10 +2878,6 @@ public class Map extends Canvas {
 			queueMapRedraw();
 		}
 	}
-
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
 
 	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
 		_distanceUnitValue = distanceUnitValue;
@@ -3170,4 +3095,5 @@ public class Map extends Canvas {
 		setZoom(_mapZoomLevel - 1);
 		queueMapRedraw();
 	}
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,24 +15,18 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+
+/**
+ * this interface will fill the context menus in the map
+ */
+public interface IMapContextProvider {
+
+	/**
+	 * Fills context menu for the map
+	 * 
+	 * @param menuMgr
+	 */
+	public void fillContextMenu(IMenuManager menuMgr);
  
-import de.byteholder.geoclipse.Messages;
-
-public class ActionLoadOfflineImages extends Action {
-
-	private Map	_map;
-
-	public ActionLoadOfflineImages(final Map map) {
-
-		_map = map;
-
-		setText(Messages.Map_Action_LoadOfflineImages);
-	}
-
-	@Override
-	public void run() {
-		_map.actionLoadOfflineImages();
-	}
-
 }

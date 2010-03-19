@@ -9,17 +9,17 @@ public class Messages extends NLS {
 	public static String		geoclipse_extensions_loading;
 	public static String		geoclipse_extensions_loading_failed;
 
-	public static String	Map_Action_LoadOfflineImages;
-
+	public static String	Map_Action_ManageOfflineImages;
+ 
 	public static String		Map_Action_SetFavoritePosition_Tooltip;
 	public static String		Map_Action_ShowFavoritePosition_Tooltip;
 	public static String		Map_Action_ZoomShowEntireLayer_Tooltip;
 
 	public static String		tileInfo_action_clearStatistics;
- 
+
 	public static String		App_Dlg_ConfirmFileOverwrite_Message;
 	public static String		App_Dlg_ConfirmFileOverwrite_Title;
- 
+
 	public static String		App_Error_TooManyWords;
 
 	public static String		Dialog_CustomConfig_Button_UpdateMap;
@@ -80,13 +80,23 @@ public class Messages extends NLS {
 	public static String		Dialog_MapProfile_DialogTitle;
 	public static String		Dialog_MapProfile_Scale_Brightness_Tooltip;
 
-	public static String	Dialog_OfflineArea_Error;
+	public static String		Dialog_OfflineArea_Action_DeleteImages;
+	public static String		Dialog_OfflineArea_Action_LoadImages;
+	public static String		Dialog_OfflineArea_Button_StartDeleting;
+	public static String		Dialog_OfflineArea_Button_StartDeleting_Tooltip;
+	public static String		Dialog_OfflineArea_Button_StartDownloading;
+	public static String		Dialog_OfflineArea_Button_StartDownloading_Tooltip;
+	public static String		Dialog_OfflineArea_Button_StopDownloading;
+	public static String		Dialog_OfflineArea_Error;
+	public static String		Dialog_OfflineArea_Error_IsLoading;
+	public static String		Dialog_OfflineArea_Error_NoOffline;
+	public static String		Dialog_OfflineArea_Label_AvailableImages;
+	public static String		Dialog_OfflineArea_Label_Queue;
+	public static String		Dialog_OfflineArea_Label_RequiredImages;
+	public static String		Dialog_OfflineArea_Label_ZoomLevel;
 
-	public static String	Dialog_OfflineArea_Error_IsLoading;
-
-	public static String	Dialog_OfflineArea_Error_NoOffline;
-
-	public static String	Dialog_OfflineArea_Title;
+	public static String	Dialog_OfflineArea_Message;
+	public static String		Dialog_OfflineArea_Title;
 
 	public static String		Dialog_WmsConfig_Button_GetTransparentMap;
 	public static String		Dialog_WmsConfig_Button_UpdateMap;
@@ -188,11 +198,10 @@ public class Messages extends NLS {
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
 	public static String		DBG057_MapProfile_NoParentTile;
 
-	public static String	Offline_Area_Label_SelectInfo;
+	public static String		Offline_Area_Label_SelectInfo;
 
 	public static String		TileInfo_Control_DefaultTitle;
 	public static String		TileInfo_Control_Pattern;
-
 	public static String		TileInfo_Control_Statistics_DownloadData;
 	public static String		TileInfo_Control_Statistics_DownloadDataFile;
 	public static String		TileInfo_Control_Statistics_DownloadDataInit;

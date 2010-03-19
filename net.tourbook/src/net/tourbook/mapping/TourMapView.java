@@ -48,7 +48,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.Util;
- 
+
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -82,6 +82,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.event.IMapListener;
@@ -92,12 +93,12 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.PointOfInterest;
-
+ 
 /**
  * @author Wolfgang Schramm
  * @since 1.3.0
  */
-public class TourMapView extends ViewPart {
+public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
@@ -472,6 +473,8 @@ public class TourMapView extends ViewPart {
 				_mapInfoManager.setMapCenter(event.mapCenter);
 			}
 		});
+
+		_map.setMapContextProvider(this);
 	}
 
 	private void addPartListener() {
@@ -739,7 +742,6 @@ public class TourMapView extends ViewPart {
 		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		_actionShowTourMarker = new ActionShowTourMarker(this);
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
-//		_actionResetTileOverlays = new ActionResetTileOverlays(this);
 		_actionDimMap = new ActionDimMap(this);
 
 		/*
@@ -771,21 +773,7 @@ public class TourMapView extends ViewPart {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(_actionShowStartEndInMap);
-		menuMgr.add(_actionShowTourMarker);
-		menuMgr.add(_actionShowLegendInMap);
-		menuMgr.add(_actionShowScaleInMap);
-		menuMgr.add(_actionShowSliderInMap);
-		menuMgr.add(_actionShowSliderInLegend);
-		menuMgr.add(_actionDimMap);
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetDefaultPosition);
-		menuMgr.add(_actionSaveDefaultPosition);
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSynchTourZoomLevel);
-		menuMgr.add(_actionReloadFailedMapImages);
-//		menuMgr.add(_actionResetTileOverlays);
-
+		fillMapMenu(menuMgr);
 	}
 
 	/**
@@ -1049,6 +1037,28 @@ public class TourMapView extends ViewPart {
 			_actionTourColorPace.setEnabled(false);
 //			_actionTourColorTourType.setEnabled(false);
 		}
+	}
+
+	@Override
+	public void fillContextMenu(final IMenuManager menuMgr) {
+		fillMapMenu(menuMgr);
+	}
+
+	private void fillMapMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(_actionShowStartEndInMap);
+		menuMgr.add(_actionShowTourMarker);
+		menuMgr.add(_actionShowLegendInMap);
+		menuMgr.add(_actionShowScaleInMap);
+		menuMgr.add(_actionShowSliderInMap);
+		menuMgr.add(_actionShowSliderInLegend);
+		menuMgr.add(_actionDimMap);
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionSetDefaultPosition);
+		menuMgr.add(_actionSaveDefaultPosition);
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(_actionReloadFailedMapImages);
 	}
 
 	private ILegendProvider getLegendProvider(final int colorId) {

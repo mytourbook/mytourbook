@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
- 
+
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -149,8 +149,33 @@ public class OfflineLoadManager {
 		return true;
 	}
 
-	boolean initialize(final MP mp) {
+	public boolean deleteOfflineImage(final Tile offlineTile) {
 
+		final IPath tilePath = _mp.getTileOSPath(_osTileCachePath, offlineTile);
+
+		try {
+
+			if (tilePath == null) {
+				return false;
+			}
+
+			final File tileFile = tilePath.toFile();
+			if (tileFile.exists()) {
+
+				// offline image is available
+
+				return tileFile.delete();
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus("error occured when deleding offline image: " + tilePath.toOSString(), e);
+		}
+		
+		return false;
+	}
+
+	boolean initialize(final MP mp) {
+ 
 		if (_isLoading) {
 			return false;
 		}
