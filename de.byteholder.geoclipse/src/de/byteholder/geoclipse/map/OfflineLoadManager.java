@@ -94,14 +94,14 @@ public class OfflineLoadManager {
 
 	/**
 	 * @param offlineTile
-	 * @return Return <code>true</code> when the offline image need to be loaded, <code>false</code>
-	 *         when the image is already available
+	 * @return Return <code>true</code> when the offline image needs to be loaded,
+ 	 *         <code>false</code> when the image is already available
 	 */
 	boolean addOfflineTile(final Tile offlineTile) {
 
-		if (isOfflineImageAvailable(offlineTile)) {
-			return false;
-		}
+//		if (isOfflineImageAvailable(offlineTile)) {
+//			return false;
+//		}
 
 		_isLoading = true;
 
@@ -149,9 +149,9 @@ public class OfflineLoadManager {
 		return true;
 	}
 
-	public boolean deleteOfflineImage(final Tile offlineTile) {
+	public boolean deleteOfflineImage(final MP offlineMp, final Tile offlineTile) {
 
-		final IPath tilePath = _mp.getTileOSPath(_osTileCachePath, offlineTile);
+		final IPath tilePath = offlineMp.getTileOSPath(_osTileCachePath, offlineTile);
 
 		try {
 
@@ -170,12 +170,12 @@ public class OfflineLoadManager {
 		} catch (final Exception e) {
 			StatusUtil.showStatus("error occured when deleding offline image: " + tilePath.toOSString(), e);
 		}
-		
+
 		return false;
 	}
 
 	boolean initialize(final MP mp) {
- 
+
 		if (_isLoading) {
 			return false;
 		}
@@ -187,13 +187,14 @@ public class OfflineLoadManager {
 
 	/**
 	 * check if the image is available as offline image
+	 * 
+	 * @param offlineMp
 	 */
-	boolean isOfflineImageAvailable(final Tile offlineTile) {
+	boolean isOfflineImageAvailable(final MP offlineMp, final Tile offlineTile) {
 
 		try {
 
-			final IPath tilePath = _mp.getTileOSPath(_osTileCachePath, offlineTile);
-
+			final IPath tilePath = offlineMp.getTileOSPath(_osTileCachePath, offlineTile);
 			if (tilePath == null) {
 				return false;
 			}
@@ -202,8 +203,6 @@ public class OfflineLoadManager {
 			if (tileFile.exists()) {
 
 				// offline image is available
-
-				offlineTile.setIsOfflineImageAvailable(true);
 
 				return true;
 			}

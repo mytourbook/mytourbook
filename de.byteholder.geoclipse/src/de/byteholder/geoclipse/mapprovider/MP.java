@@ -864,7 +864,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 			tile = new Tile(this, zoom, tilePositionX, tilePositionY, null);
 			tile.setBoundingBoxEPSG4326();
-
 			doPostCreation(tile);
 
 			/*

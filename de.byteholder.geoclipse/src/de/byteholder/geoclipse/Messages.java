@@ -82,15 +82,41 @@ public class Messages extends NLS {
 
 	public static String		Dialog_OfflineArea_Action_DeleteImages;
 	public static String		Dialog_OfflineArea_Action_LoadImages;
-	public static String		Dialog_OfflineArea_Button_StartDeleting;
-	public static String		Dialog_OfflineArea_Button_StartDeleting_Tooltip;
+	public static String	Dialog_OfflineArea_Button_DeleteAll;
+
+	public static String	Dialog_OfflineArea_Button_DeleteAll_Tooltip;
+
+	public static String	Dialog_OfflineArea_Button_DeletePart;
+
+	public static String	Dialog_OfflineArea_Button_DeletePart_Tooltip;
+ 
 	public static String		Dialog_OfflineArea_Button_StartDownloading;
 	public static String		Dialog_OfflineArea_Button_StartDownloading_Tooltip;
 	public static String		Dialog_OfflineArea_Button_StopDownloading;
+	public static String	Dialog_OfflineArea_Column_ExistingImages;
+
+	public static String	Dialog_OfflineArea_Column_ExistingImages_Tooltip;
+
+	public static String	Dialog_OfflineArea_Column_MapProvider;
+
+	public static String	Dialog_OfflineArea_Column_MissingImages;
+
+	public static String	Dialog_OfflineArea_Column_MissingImages_Tooltip;
+
+	public static String	Dialog_OfflineArea_ConfirmDelete_Title;
+
+	public static String	Dialog_OfflineArea_ConfirmDeleteAll_Message;
+
+	public static String	Dialog_OfflineArea_ConfirmDeletePart_Message;
+
 	public static String		Dialog_OfflineArea_Error;
 	public static String		Dialog_OfflineArea_Error_IsLoading;
 	public static String		Dialog_OfflineArea_Error_NoOffline;
 	public static String		Dialog_OfflineArea_Label_AvailableImages;
+
+	public static String	Dialog_OfflineArea_Label_MapProvider;
+
+	public static String	Dialog_OfflineArea_Label_ProfileParts;
 	public static String		Dialog_OfflineArea_Label_Queue;
 	public static String		Dialog_OfflineArea_Label_RequiredImages;
 	public static String		Dialog_OfflineArea_Label_ZoomLevel;
@@ -197,6 +223,8 @@ public class Messages extends NLS {
 	public static String		DBG055_MapProfile_InvalidMapProvider;
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
 	public static String		DBG057_MapProfile_NoParentTile;
+
+	public static String	Offline_Area_Label_AreaMarker;
 
 	public static String		Offline_Area_Label_SelectInfo;
 

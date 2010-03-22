@@ -746,12 +746,12 @@ public class Map extends Canvas {
 					return;
 				}
 
-				menuMgr.add(new ActionManageOfflineImages(Map.this));
-				menuMgr.add(new Separator());
-
 				if (_mapContextProvider != null) {
-					_mapContextProvider.fillContextMenu(menuMgr);
+ 					_mapContextProvider.fillContextMenu(menuMgr);
 				}
+
+				menuMgr.add(new Separator());
+				menuMgr.add(new ActionManageOfflineImages(Map.this));
 			}
 		});
 
@@ -2144,6 +2144,16 @@ public class Map extends Canvas {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
 		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+
+		/*
+		 * draw text marker
+		 */
+		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+		gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
+		final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
+		int devYMarker = devY - textExtend.y;
+		devYMarker = devYMarker < 0 ? 0 : devYMarker;
+		gc.drawText(Messages.Offline_Area_Label_AreaMarker, devX, devYMarker);
 	}
 
 	private void paintOverlay10() {
@@ -2408,8 +2418,8 @@ public class Map extends Canvas {
 								null);
 
 						neighborTile.setBoundingBoxEPSG4326();
-
 						mp.doPostCreation(neighborTile);
+
 						tileCache.add(neighborTileCacheKey, neighborTile);
 					}
 
@@ -3017,11 +3027,16 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final Rectangle viewPort = _mapPixelViewport;
+		/*
+		 * !!! DON'T OPTIMIZE THE NEXT LINE OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
+		 */
+		final Rectangle viewPort = getMapPixelViewport();
 		final int worldMouseX = viewPort.x + _mouseMovePosition.x;
 		final int worldMouseY = viewPort.y + _mouseMovePosition.y;
 
-		fireMapEvent(_MP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel));
+		final GeoPosition geoPosition = _MP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
+
+		fireMapEvent(geoPosition);
 	}
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {

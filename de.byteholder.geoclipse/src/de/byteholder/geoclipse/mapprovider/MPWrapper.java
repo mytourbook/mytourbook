@@ -192,10 +192,10 @@ public class MPWrapper implements Cloneable {
 		return _isBrightnessForNextMp;
 	}
 
-	boolean isDisplayedInMap() {
+	public boolean isDisplayedInMap() {
 		return _isDisplayedInMap;
 	}
-
+ 
 	/**
 	 * @return Returns <code>true</code> when this map provider can be used, <code>false</code> when
 	 *         a wms server is not available
