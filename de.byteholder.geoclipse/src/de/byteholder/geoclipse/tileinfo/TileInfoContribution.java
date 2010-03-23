@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.tileinfo;
-
+ 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -28,72 +28,70 @@ import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.TileEventId;
 
-/**
- */
 public class TileInfoContribution extends WorkbenchWindowControlContribution {
 
 	private static final int	UPDATE_INTERVAL	= 500;	// ms
 
-	private TileInfoManager		fTileInfoManager;
+	private TileInfoManager		_tileInfoManager;
 
-	protected boolean			fIsUpdateUI;
+	private boolean				_isUpdateUI;
 
-	private Display				fDisplay;
-	private TileInfoControl		fInfoWidget;
+	private Display				_display;
+	private TileInfoControl		_infoWidget;
 
-	private int					fStatIsQueued;
+	private int					_statIsQueued;
 
-	private int					fStatErrorLoading;
-	private int					fStatStartLoading;
-	private int					fStatEndLoading;
+	private int					_statErrorLoading;
+	private int					_statStartLoading;
+	private int					_statEndLoading;
 
-	private int					fStatErrorPaintingSRTM;
-	private int					fStatEndPaintingSRTM;
-	private int					fStatStartPaintingSRTM;
+	private int					_statErrorPaintingSRTM;
+	private int					_statEndPaintingSRTM;
+	private int					_statStartPaintingSRTM;
 
-	private int					fStatStartSRTM;
-	private int					fStatEndSRTM;
-	private int					fStatErrorSRTM;
+	private int					_statStartSRTM;
+	private int					_statEndSRTM;
+	private int					_statErrorSRTM;
 
-	private String				fSRTMRemoteName;
-	private long				fSRTMReceivedBytes;
- 
-	private final Runnable		fUpdateRunnable	= new Runnable() {
+	private String				_srtmRemoteName;
+	private long				_srtmReceivedBytes;
+
+	private final Runnable		_updateRunnable	= new Runnable() {
 													public void run() {
 
-														if (fInfoWidget == null && fInfoWidget.isDisposed()) {
+														if (_infoWidget == null && _infoWidget.isDisposed()) {
 															return;
 														}
 
-														if (fIsUpdateUI) {
-															fIsUpdateUI = false;
+														if (_isUpdateUI) {
+															_isUpdateUI = false;
 															updateUIInUIThread();
 														}
 
-														fDisplay.timerExec(UPDATE_INTERVAL, this);
+														_display.timerExec(UPDATE_INTERVAL, this);
 													}
 												};
 
 	void actionClearStatistics() {
 
-		fStatIsQueued = 0;
+		_statIsQueued = 0;
 
-		fStatStartLoading = 0;
-		fStatEndLoading = 0;
-		fStatErrorLoading = 0;
+		_statStartLoading = 0;
+		_statEndLoading = 0;
+		_statErrorLoading = 0;
 
-		fStatEndPaintingSRTM = 0;
-		fStatStartPaintingSRTM = 0;
-		fStatErrorPaintingSRTM = 0;
+		_statEndPaintingSRTM = 0;
+		_statStartPaintingSRTM = 0;
+		_statErrorPaintingSRTM = 0;
 
-		fStatStartSRTM = 0;
-		fStatEndSRTM = 0;
-		fStatErrorSRTM = 0;
+		_statStartSRTM = 0;
+		_statEndSRTM = 0;
+		_statErrorSRTM = 0;
 
-		fSRTMRemoteName = null;
-		fSRTMReceivedBytes = 0;
+		_srtmRemoteName = null;
+		_srtmReceivedBytes = 0;
 
-		fIsUpdateUI = true;
+		_isUpdateUI = true;
 	}
 
 	/**
@@ -109,36 +107,36 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 			}
 		});
 
-		final Menu menu = menuMgr.createContextMenu(fInfoWidget);
-		fInfoWidget.setMenu(menu);
+		final Menu menu = menuMgr.createContextMenu(_infoWidget);
+		_infoWidget.setMenu(menu);
 	}
 
 	@Override
 	protected Control createControl(final Composite parent) {
 
-		if (fTileInfoManager == null) {
-			fTileInfoManager = TileInfoManager.getInstance();
-			fTileInfoManager.setTileInfoContribution(this);
+		if (_tileInfoManager == null) {
+			_tileInfoManager = TileInfoManager.getInstance();
+			_tileInfoManager.setTileInfoContribution(this);
 		}
 
-		fDisplay = parent.getDisplay();
-		fDisplay.asyncExec(new Runnable() {
+		_display = parent.getDisplay();
+		_display.asyncExec(new Runnable() {
 			public void run() {
-				if (fInfoWidget != null && fInfoWidget.isDisposed() == false) {
-					fDisplay.timerExec(UPDATE_INTERVAL, fUpdateRunnable);
+				if (_infoWidget != null && _infoWidget.isDisposed() == false) {
+					_display.timerExec(UPDATE_INTERVAL, _updateRunnable);
 				}
 			}
 		});
 
-		fInfoWidget = new TileInfoControl(parent, getOrientation());
+		_infoWidget = new TileInfoControl(parent, getOrientation());
 		createContextMenu();
 
 		// force painting after the control is recreated when the bar was move with the mouse
-		fIsUpdateUI = true;
+		_isUpdateUI = true;
 
 		updateUIInUIThread();
 
-		return fInfoWidget;
+		return _infoWidget;
 	}
 
 	private void fillMenu(final IMenuManager menuMgr) {
@@ -148,138 +146,141 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	public void updateInfo(final TileEventId tileEventId) {
 
 		if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
-			fStatIsQueued = 0;
-			fStatStartLoading = 0;
-			fStatEndLoading = 0;
+			_statIsQueued = 0;
+			_statStartLoading = 0;
+			_statEndLoading = 0;
 		} else if (tileEventId == TileEventId.TILE_IS_QUEUED) {
-			fStatIsQueued++;
+			_statIsQueued++;
 		} else if (tileEventId == TileEventId.TILE_START_LOADING) {
-			fStatStartLoading++;
+			_statStartLoading++;
+			System.out.println(tileEventId + "\t_statStartLoading:" + _statStartLoading);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 		} else if (tileEventId == TileEventId.TILE_END_LOADING) {
-			fStatEndLoading++;
-			fStatIsQueued--;
+			_statEndLoading++;
+			_statIsQueued--;
 		} else if (tileEventId == TileEventId.TILE_ERROR_LOADING) {
-			fStatErrorLoading++;
-			fStatIsQueued--;
+			_statErrorLoading++;
+			_statIsQueued--;
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_ERROR) {
-			fStatErrorPaintingSRTM++;
-			fStatIsQueued--;
+			_statErrorPaintingSRTM++;
+			_statIsQueued--;
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_START) {
-			fStatStartPaintingSRTM++;
+			_statStartPaintingSRTM++;
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_END) {
-			fStatEndPaintingSRTM++;
-			fStatIsQueued--;
+			_statEndPaintingSRTM++;
+			_statIsQueued--;
 		} else if (tileEventId == TileEventId.SRTM_DATA_START_LOADING) {
-			fStatStartSRTM++;
+			_statStartSRTM++;
 		} else if (tileEventId == TileEventId.SRTM_DATA_END_LOADING) {
-			fStatEndSRTM++;
+			_statEndSRTM++;
 		}
 
 		/*
 		 * when stat is cleared, que can get negative, prevent this
 		 */
-		if (fStatIsQueued < 0) {
-			fStatIsQueued = 0;
+		if (_statIsQueued < 0) {
+			_statIsQueued = 0;
 		}
 
 		/*
 		 * adjust start value, the end value can be higher when an error occured but can confuse the
 		 * user
 		 */
-		if (fStatEndLoading > fStatStartLoading) {
-			fStatStartLoading = fStatEndLoading;
+		if (_statEndLoading > _statStartLoading) {
+			_statStartLoading = _statEndLoading;
 		}
-		if (fStatEndPaintingSRTM > fStatStartPaintingSRTM) {
-			fStatStartPaintingSRTM = fStatEndPaintingSRTM;
+		if (_statEndPaintingSRTM > _statStartPaintingSRTM) {
+			_statStartPaintingSRTM = _statEndPaintingSRTM;
 		}
 
-		fIsUpdateUI = true;
+		_isUpdateUI = true;
 	}
 
 	public void updateSRTMInfo(final TileEventId tileEvent, final String remoteName, final long receivedBytes) {
 
-		fSRTMRemoteName = remoteName;
-		fSRTMReceivedBytes = receivedBytes < 0 ? receivedBytes : receivedBytes / 1024;
+		_srtmRemoteName = remoteName;
+		_srtmReceivedBytes = receivedBytes < 0 ? receivedBytes : receivedBytes / 1024;
 
 		if (tileEvent == TileEventId.SRTM_DATA_START_LOADING) {
-			fStatStartSRTM++;
+			_statStartSRTM++;
 		} else if (tileEvent == TileEventId.SRTM_DATA_END_LOADING) {
-			fSRTMRemoteName = null;
-			fStatEndSRTM++;
+			_srtmRemoteName = null;
+			_statEndSRTM++;
 		} else if (tileEvent == TileEventId.SRTM_DATA_ERROR_LOADING) {
-			fStatErrorSRTM++;
+			_statErrorSRTM++;
 		}
 
 		if (Display.getCurrent() != null) {
 			updateUIInUIThread();
 		} else {
-			fIsUpdateUI = true;
+			_isUpdateUI = true;
 		}
 	}
 
 	private void updateUIInUIThread() {
 
-		if (fSRTMRemoteName != null) {
+		if (_srtmRemoteName != null) {
 
 			// update remote loading file
 
-			if (fSRTMReceivedBytes <= 0) {
+			if (_srtmReceivedBytes <= 0) {
 
 				// negative values show that the ftp download gets initialized
 
-				if (fSRTMReceivedBytes == -99) {
+				if (_srtmReceivedBytes == -99) {
 
-					fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataFile, //
-							new Object[] { Integer.toString(fStatIsQueued % 1000), fSRTMRemoteName }));
+					_infoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataFile, //
+							new Object[] { Integer.toString(_statIsQueued % 1000), _srtmRemoteName }));
 
 				} else {
 
 					final StringBuffer sb = new StringBuffer();
-					for (int index = 0; index < -fSRTMReceivedBytes; index++) {
+					for (int index = 0; index < -_srtmReceivedBytes; index++) {
 						sb.append('.');
 					}
-					fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataInit, //
-							new Object[] { Integer.toString(fStatIsQueued % 1000), fSRTMRemoteName, sb.toString() }));
+					_infoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadDataInit, //
+							new Object[] { Integer.toString(_statIsQueued % 1000), _srtmRemoteName, sb.toString() }));
 				}
 
 			} else {
 
-				fInfoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadData, new Object[] {
-						Integer.toString(fStatIsQueued % 1000),
-						fSRTMRemoteName,
-						Long.toString(fSRTMReceivedBytes) }));
+				_infoWidget.updateInfo(NLS.bind(Messages.TileInfo_Control_Statistics_DownloadData, new Object[] {
+						Integer.toString(_statIsQueued % 1000),
+						_srtmRemoteName,
+						Long.toString(_srtmReceivedBytes) }));
 			}
 
 			return;
 		}
 
-		final long statSum = fStatIsQueued
-				+ fStatErrorLoading
-				+ fStatStartLoading
-				+ fStatEndLoading
-				+ fStatErrorPaintingSRTM
-				+ fStatStartPaintingSRTM
-				+ fStatEndPaintingSRTM
-				+ fStatStartSRTM
-				+ fStatEndSRTM
-				+ fStatErrorSRTM;
+		final long statSum = _statIsQueued
+				+ _statErrorLoading
+				+ _statStartLoading
+				+ _statEndLoading
+				+ _statErrorPaintingSRTM
+				+ _statStartPaintingSRTM
+				+ _statEndPaintingSRTM
+				+ _statStartSRTM
+				+ _statEndSRTM
+				+ _statErrorSRTM;
 
 		if (statSum == 0) {
-			fInfoWidget.updateInfo(Messages.TileInfo_Control_DefaultTitle);
+			_infoWidget.updateInfo(Messages.TileInfo_Control_DefaultTitle);
 		} else {
 
 			// show only truncated decimals
-			fInfoWidget.updateInfo(//
-					Integer.toString(fStatIsQueued % 100000),
-					Integer.toString(fStatErrorLoading % 10000),
-					Integer.toString(fStatEndLoading % 100000),
-					Integer.toString(fStatStartLoading % 100000),
-					Integer.toString(fStatErrorPaintingSRTM % 1000),
-					Integer.toString(fStatEndPaintingSRTM % 1000),
-					Integer.toString(fStatStartPaintingSRTM % 1000),
-					Integer.toString(fStatEndSRTM % 100),
-					Integer.toString(fStatStartSRTM % 100),
-					Integer.toString(fStatErrorSRTM % 100));
+			_infoWidget.updateInfo(//
+					Integer.toString(_statIsQueued % 100000),
+					Integer.toString(_statErrorLoading % 10000),
+					Integer.toString(_statEndLoading % 100000),
+					Integer.toString(_statStartLoading % 100000),
+					Integer.toString(_statErrorPaintingSRTM % 1000),
+					Integer.toString(_statEndPaintingSRTM % 1000),
+					Integer.toString(_statStartPaintingSRTM % 1000),
+					Integer.toString(_statEndSRTM % 100),
+					Integer.toString(_statStartSRTM % 100),
+					Integer.toString(_statErrorSRTM % 100));
 		}
 	}
 }

@@ -33,7 +33,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -50,7 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-
+ 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String	ID	= "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
@@ -90,7 +89,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
 		createUI10MeasurementSystem(parent);
-		createUI20Confirmations(parent);
+//		createUI20Confirmations(parent);
 		createUI30WeekNumber(parent);
 
 		restoreState();
@@ -162,36 +161,39 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 	}
 
-	private void createUI20Confirmations(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.pref_general_confirmation);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		{
-			// checkbox: confirm undo in tour editor
-			addField(new BooleanFieldEditor(
-					ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
-					Messages.pref_general_hide_confirmation + Messages.tour_editor_dlg_revert_tour_message,
-					group));
-
-			// checkbox: confirm undo in tour editor
-			addField(new BooleanFieldEditor(
-					ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
-					Messages.pref_general_hide_warning
-					/*
-					 * the externalize string wizard has problems when the messages are from 2
-					 * different
-					 * packages, Eclipse 3.4
-					 */
-					+ Messages.map_dlg_dim_warning_message//
-					//The map is dimmed, this can be the reason when the map is not visible.
-					,
-					group));
-		}
-
-		// set margins after the editors are added
-		GridLayoutFactory.swtDefaults().applyTo(group);
-	}
+	/*
+	 * this seems not to work correctly and is disabled since version 10.3
+	 */
+//	private void createUI20Confirmations(final Composite parent) {
+//
+//		final Group group = new Group(parent, SWT.NONE);
+//		group.setText(Messages.pref_general_confirmation);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+//		{
+//			// checkbox: confirm undo in tour editor
+//			addField(new BooleanFieldEditor(
+//					ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
+//					Messages.pref_general_hide_confirmation + Messages.tour_editor_dlg_revert_tour_message,
+//					group));
+//
+//			// checkbox: confirm undo in tour editor
+//			addField(new BooleanFieldEditor(
+//					ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+//					Messages.pref_general_hide_warning
+//					/*
+//					 * the externalize string wizard has problems when the messages are from 2
+//					 * different
+//					 * packages, Eclipse 3.4
+//					 */
+//					+ Messages.map_dlg_dim_warning_message//
+//					//The map is dimmed, this can be the reason when the map is not visible.
+//					,
+//					group));
+//		}
+//
+//		// set margins after the editors are added
+//		GridLayoutFactory.swtDefaults().applyTo(group);
+//	}
 
 	private void createUI30WeekNumber(final Composite parent) {
 

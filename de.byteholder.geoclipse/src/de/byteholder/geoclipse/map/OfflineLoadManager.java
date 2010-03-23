@@ -93,15 +93,16 @@ public class OfflineLoadManager {
 	}
 
 	/**
+	 * @param offlineMp
 	 * @param offlineTile
-	 * @return Return <code>true</code> when the offline image needs to be loaded,
- 	 *         <code>false</code> when the image is already available
+ 	 * @return Return <code>true</code> when the offline image needs to be loaded,
+	 *         <code>false</code> when the image is already available
 	 */
-	boolean addOfflineTile(final Tile offlineTile) {
+	boolean addOfflineTile(final MP offlineMp, final Tile offlineTile) {
 
-//		if (isOfflineImageAvailable(offlineTile)) {
-//			return false;
-//		}
+		if (isOfflineImageAvailable(offlineMp, offlineTile)) {
+			return false;
+		}
 
 		_isLoading = true;
 

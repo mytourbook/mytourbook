@@ -740,14 +740,15 @@ public class Map extends Canvas {
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
-
+ 
 				if (_MP == null || _disableContextMenu) {
 					return;
 				}
 
 				if (_mapContextProvider != null) {
- 					_mapContextProvider.fillContextMenu(menuMgr);
+					_mapContextProvider.fillContextMenu(menuMgr);
 				}
 
 				menuMgr.add(new Separator());
@@ -2062,6 +2063,10 @@ public class Map extends Canvas {
 			} else {
 
 				// display mouse move geo position
+
+				if (_offlineWorldMouseMove == null) {
+					return;
+				}
 
 				final GeoPosition mouseGeo = _MP.pixelToGeo(new Point2D.Double(
 						_offlineWorldMouseMove.x,

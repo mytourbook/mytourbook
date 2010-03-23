@@ -399,26 +399,7 @@ public class TileImageLoader implements Runnable {
 		}
 
 		final MP mp = tile.getMP();
-
-		final boolean isParentTile = mp instanceof ITileChildrenCreator;
-
-////		System.out.println("tileWaitingQueue: " + tileWaitingQueue.size());
-////		// TODO remove SYSTEM.OUT.PRINTLN
-//
-//		// check parent tiles and tiles which are not a child
-//		// (isParentTile || tile.isChild() == false) && 
-//		if (tile.isChild() == false && mp.checkViewPort(tile) == false) {
-//
-//			// optimize speed, load only those tile images which are currently displayed in the map viewport
-//
-////			System.out.println("skipped: " + tile.getTileKey());
-////			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			// remove tile from cache, so that the next time the tile is loaded again
-//			MP.getTileCache().remove(tile.getTileKey());
-//
-//		} else {
-
+ 		final boolean isParentTile = mp instanceof ITileChildrenCreator;
 		{
 			// current tile is in the viewport of the map
 

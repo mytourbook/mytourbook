@@ -93,7 +93,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.PointOfInterest;
- 
+
 /**
  * @author Wolfgang Schramm
  * @since 1.3.0
@@ -156,10 +156,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	/**
 	 * contains the tours which are displayed in the map
 	 */
-	private ArrayList<TourData>						_tourDataList						= new ArrayList<TourData>();
+	private final ArrayList<TourData>				_tourDataList						= new ArrayList<TourData>();
 	private TourData								_previousTourData;
-
+ 
 	private ActionDimMap							_actionDimMap;
+	private ActionManageMapProviders				_actionManageProvider;
 	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
 	private ActionSelectMapProvider					_actionSelectMapProvider;
 	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
@@ -222,7 +223,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private int										_selectedProfileKey					= 0;
 
-	private MapInfoManager							_mapInfoManager						= MapInfoManager.getInstance();
+	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
 
 	public TourMapView() {}
 
@@ -440,6 +441,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		 * observe map preferences
 		 */
 		_mapPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -462,6 +464,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(_mapPrefChangeListener);
 
 		_map.addZoomListener(new IZoomListener() {
+			@Override
 			public void zoomChanged(final ZoomEvent event) {
 				_mapInfoManager.setZoom(event.getZoom());
 				centerTour();
@@ -469,6 +472,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		});
 
 		_map.addMapListener(new IMapListener() {
+			@Override
 			public void mapInfo(final MapEvent event) {
 				_mapInfoManager.setMapCenter(event.mapCenter);
 			}
@@ -480,10 +484,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMapView.this) {
 					saveState();
@@ -491,14 +498,19 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -507,6 +519,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void addPrefListener() {
 
 		_prefChangeListener = new Preferences.IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -566,6 +579,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(selection);
 			}
@@ -576,6 +590,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void addTourbookPrefListener() {
 
 		_tourbookPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -600,6 +615,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourMapView.this) {
@@ -743,6 +759,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionShowTourMarker = new ActionShowTourMarker(this);
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		_actionDimMap = new ActionDimMap(this);
+		_actionManageProvider = new ActionManageMapProviders(this);
 
 		/*
 		 * fill view toolbar
@@ -919,6 +936,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// initialize map when part is created and the map size is > 0
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				restoreState();
@@ -1053,11 +1071,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		menuMgr.add(_actionShowSliderInMap);
 		menuMgr.add(_actionShowSliderInLegend);
 		menuMgr.add(_actionDimMap);
+		menuMgr.add(_actionSynchTourZoomLevel);
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetDefaultPosition);
 		menuMgr.add(_actionSaveDefaultPosition);
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(_actionManageProvider);
 		menuMgr.add(_actionReloadFailedMapImages);
 	}
 
@@ -1554,6 +1573,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				_isTour = true;
@@ -1982,6 +2002,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
 
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display
@@ -2004,6 +2025,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void showToursFromTourProvider() {
 
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget

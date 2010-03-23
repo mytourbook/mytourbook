@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
- 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +44,11 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -68,37 +71,41 @@ import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.tileinfo.TileInfoContribution;
-
+ 
 public class DialogManageOfflineImages extends TitleAreaDialog implements ITileListener {
 
-	private IPreferenceStore	_prefStore			= Activator.getDefault().getPreferenceStore();
-	private IDialogSettings		_state				= Activator.getDefault().getDialogSettingsSection(
-															"DialogManageOfflineImages");			//$NON-NLS-1$
+	private final IPreferenceStore		_prefStore			= Activator.getDefault().getPreferenceStore();
 
-	private OfflineLoadManager	_offlineManager		= OfflineLoadManager.getInstance();
+	private final IDialogSettings		_state				= Activator.getDefault().getDialogSettingsSection(
+																	"DialogManageOfflineImages");			//$NON-NLS-1$
 
-	private MP					_selectedMp;
-	private int					_mapZoomLevel;
+	private final OfflineLoadManager	_offlineManager		= OfflineLoadManager.getInstance();
 
-	private Point				_offlineWorldStart;
-	private Point				_offlineWorldEnd;
+	private MP							_selectedMp;
+	private final int					_mapZoomLevel;
 
-	private Combo				_comboMapProvider;
-	private Combo				_comboTargetZoom;
-	private Text				_txtQueue;
-	private Button				_btnStartLoading;
-	private Button				_btnDeleteAll;
-	private Button				_btnDeletePart;
-	private Button				_btnStop;
+	private final Point					_offlineWorldStart;
+	private final Point					_offlineWorldEnd;
 
-	private TileInfo			_tileInfo;
+	private Combo						_comboMapProvider;
+	private Combo						_comboTargetZoom;
+	private Text						_txtQueue;
+	private Button						_btnDownload;
+	private Button						_btnRefreshParts;
+	private Button						_btnStop;
+	private Button						_btnDeleteAll;
+	private Button						_btnDeletePart;
 
-	private int[]				_targetZoomLevels;
-	private ArrayList<MP>		_allMapProviders;
+	private TileInfo					_tileInfo;
 
-	private TableViewer			_partViewer;
-	private ArrayList<PartMP>	_partMapProvider	= new ArrayList<PartMP>();
-	private int					_validMapZoomLevel;
+	private int[]						_targetZoomLevels;
+	private ArrayList<MP>				_allMapProviders;
+
+	private TableViewer					_partViewer;
+	private final ArrayList<PartMP>		_partMapProvider	= new ArrayList<PartMP>();
+	private int							_validMapZoomLevel;
+
+	private Image						_imageRefresh;
 
 	class PartMP {
 
@@ -113,12 +120,15 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 	class PartViewerContentProvicer implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _partMapProvider.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -182,6 +192,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		enableControls(false);
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				initOfflineManager();
 				_comboTargetZoom.setFocus();
@@ -201,10 +212,19 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		final Composite container = (Composite) super.createDialogArea(parent);
 
+		_imageRefresh = Activator.getImageDescriptor(Messages.Image__Refresh).createImage();
+
 		// create ui
 		createUI(container);
 
 		initUI();
+
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				_imageRefresh.dispose();
+			}
+		});
 
 		return container;
 	}
@@ -233,7 +253,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		}
 
 		// set download as default button
-		parent.getShell().setDefaultButton(_btnStartLoading);
+		parent.getShell().setDefaultButton(_btnDownload);
 	}
 
 	private void createUI10LeftPart(final Composite parent) {
@@ -298,6 +318,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 			_txtQueue = new Text(container, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtQueue);
+			_txtQueue.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		}
 	}
 
@@ -332,7 +353,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		TableColumn tvcColumn;
 
 		// column: map provider
-		tvc = new TableViewerColumn(_partViewer, SWT.TRAIL);
+		tvc = new TableViewerColumn(_partViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
 		tvcColumn.setText(Messages.Dialog_OfflineArea_Column_MapProvider);
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -379,6 +400,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		_partViewer.setContentProvider(new PartViewerContentProvicer());
 
 		_partViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
@@ -398,11 +420,11 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			/*
 			 * button: start loading
 			 */
-			_btnStartLoading = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnStartLoading);
-			_btnStartLoading.setText(Messages.Dialog_OfflineArea_Button_StartDownloading);
-			_btnStartLoading.setToolTipText(Messages.Dialog_OfflineArea_Button_StartDownloading_Tooltip);
-			_btnStartLoading.addSelectionListener(new SelectionAdapter() {
+			_btnDownload = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDownload);
+			_btnDownload.setText(Messages.Dialog_OfflineArea_Button_Download);
+			_btnDownload.setToolTipText(Messages.Dialog_OfflineArea_Button_Download_Tooltip);
+			_btnDownload.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetDefaultSelected(final SelectionEvent e) {
@@ -412,6 +434,36 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectDownload();
+				}
+			});
+
+			/*
+			 * button: refresh parts
+			 */
+			_btnRefreshParts = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnRefreshParts);
+			_btnRefreshParts.setText(Messages.Dialog_OfflineArea_Button_RefreshParts);
+			_btnRefreshParts.setToolTipText(Messages.Dialog_OfflineArea_Button_RefreshParts_Tooltip);
+			_btnRefreshParts.setImage(_imageRefresh);
+			_btnRefreshParts.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					getOfflineImageState();
+				}
+			});
+
+			/*
+			 * button: stop
+			 */
+			_btnStop = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, true).applyTo(_btnStop);
+			_btnStop.setText(Messages.Dialog_OfflineArea_Button_StopDownloading);
+			_btnStop.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					_offlineManager.stopLoading();
+					getOfflineImageState();
 				}
 			});
 
@@ -444,21 +496,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 					onSelectDelete(((StructuredSelection) _partViewer.getSelection()).getFirstElement());
 				}
 			});
-
-			/*
-			 * button: stop
-			 */
-			_btnStop = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnStop);
-			_btnStop.setText(Messages.Dialog_OfflineArea_Button_StopDownloading);
-			_btnStop.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_offlineManager.stopLoading();
-					enableControls(true);
-				}
-			});
 		}
 	}
 
@@ -467,6 +504,8 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		if (OfflineLoadManager.isLoading()) {
 			return;
 		}
+
+		enableControls(false);
 
 		final int selectedZoomLevel = _targetZoomLevels[_comboTargetZoom.getSelectionIndex()];
 
@@ -536,6 +575,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		}
 
 		getOfflineImageState();
+
+		// reset states
+		tileEvent(TileEventId.TILE_RESET_QUEUES, null);
 	}
 
 	private void enableControls(final boolean canBeEnabled) {
@@ -545,9 +587,10 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		_comboTargetZoom.setEnabled(canBeEnabled && isLoading == false);
 
-		_btnStartLoading.setEnabled(canBeEnabled && isLoading == false);
+		_btnDownload.setEnabled(canBeEnabled && isLoading == false);
 		_btnStop.setEnabled(canBeEnabled && isLoading);
 
+		_btnRefreshParts.setEnabled(canBeEnabled && isLoading == false);
 		_btnDeleteAll.setEnabled(canBeEnabled && isLoading == false);
 		_btnDeletePart.setEnabled(canBeEnabled && isLoading == false && isPartSelected);
 
@@ -650,6 +693,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		getOfflineMapProviders();
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				final int selectedZoomLevel = _targetZoomLevels[_comboTargetZoom.getSelectionIndex()];
@@ -841,15 +885,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 					offlineTile.setBoundingBoxEPSG4326();
 					_selectedMp.doPostCreation(offlineTile);
 
-//					final boolean isLoading = _offlineManager.addOfflineTile(offlineMp, offlineTile);
-//
-//					if (isLoading) {
-//						_missingImages++;
-//						_txtMissingImages.setText(Integer.toString(_missingImages));
-//					} else {
-//						_availImages++;
-//						_txtAvailImages.setText(Integer.toString(_availImages));
-//					}
+					_offlineManager.addOfflineTile(_selectedMp, offlineTile);
 				}
 			}
 
@@ -912,9 +948,13 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	@Override
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
+		System.out.println(tileEventId + "\t" + tile);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_tileInfo.updateInfo(tileEventId);
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// check if UI is still available
