@@ -1119,6 +1119,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// text: map provider url
 			_txtMpUrl = new Text(group, SWT.READ_ONLY | SWT.BORDER);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_txtMpUrl);
+			_txtMpUrl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		}
 	}
 

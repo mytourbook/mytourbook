@@ -3,107 +3,70 @@
 <project name="create-translation-file" default="unzip-all-archives" basedir="..">
 
 	<!--
-		extract language files from the archive
+		extract language files from the archive into the trunk projects
 	-->
 
-	<property name="mt-trunk" value=".." />
-	<property name="language-fragments" value="${mt-trunk}/language-fragments" />
+	<property name="path-mt-trunk" value=".." />
 
-	<property name="dir-with-language-archive" value="${mt-trunk}/../mytourbook-LANGUAGE-archives" />
-	<property name="temp-unzip-dir" value="${mt-trunk}/../ant-temp-unzip" />
+	<!-- debug target
+	<property name="path-language-target" value="../../mytourbook-LANGUAGE-TEMP-trunk" />
+	-->
+	<property name="path-language-target" value="${path-mt-trunk}" />
+	<property name="path-language-target-temp" value="../../mytourbook-LANGUAGE-TEMP" />
+	<property name="path-language-archive" value="${path-mt-trunk}/../mytourbook-LANGUAGE-archives" />
 
 	<!--
 		DEFAULT target
 	-->
 	<target name="unzip-all-archives">
 
-		<!-- create temp dir 
-		<echo message="create temp dir: ${temp-unzip-dir}" />
-		-->
-		<mkdir dir="${temp-unzip-dir}" />
+		<!-- delete temp dir -->
+		<echo message="delete temp dir: ${path-language-target-temp}" />
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${path-language-target-temp}" includes="**/*" />
+		</delete>
 
-
-		<!-- unzip archive: FR -->
+		<!-- unzip archive: mt-de.zip -->
 		<antcall target="unzip-archive-for-one-language">
-			<param name="archive-language" value="fr" />
+			<param name="archive-language" value="de" />
 		</antcall>
 
-		<!-- unzip archive: NL -->
-		<antcall target="unzip-archive-for-one-language">
-			<param name="archive-language" value="nl" />
-		</antcall>
-
-
-		<!-- delete temp dir 
-		<echo message="delete temp dir: ${temp-unzip-dir}" />
-		-->
-		<delete dir="${temp-unzip-dir}" />
-
-	</target>
-
-	<!--
-		DEBUG target
-	-->
-	<target name="debug">
-
+		<!-- delete temp dir -->
+		<echo message="delete temp dir: ${path-language-target-temp}" />
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${path-language-target-temp}" includes="**/*" />
+		</delete>
 
 	</target>
 
 
 	<target name="unzip-archive-for-one-language">
 
-		<!-- delete temp dir content -->
-		<echo message="delete temp dir content: ${temp-unzip-dir}" />
-		<delete includeemptydirs="true">
-			<fileset dir="${temp-unzip-dir}" includes="**/*" />
-		</delete>
-
-
 		<!--
-		<echo message="expand archive into ${temp-unzip-dir}" />
+		<echo message="expand archive into ${path-language-target}" />
 		-->
-		<unzip dest="${temp-unzip-dir}">
+		<unzip src="${path-language-archive}/mt-${archive-language}.zip" dest="${path-language-target-temp}">
 
-			<patternset includes="**/*${archive-language}.properties" />
+			<patternset>
+				<include name="**/*${archive-language}.properties" /> 
+				<exclude name="**/bin/**/*" /> 
+			</patternset>
 
-			<!-- using fileset to ignore missing archives -->
-			<fileset dir="${dir-with-language-archive}/import">
-				<include name="mt-${archive-language}.zip" />
-				<exclude name="exclude" />
-			</fileset>
 		</unzip>
 
-		<!--
-		<echo message="copy archive into the project plugins />
-		-->
-		<copy todir="${mt-trunk}" overwrite="true" verbose="false">
 
-			<fileset dir="${temp-unzip-dir}" includes="**/*">
+		<!--
+		<echo message="copy language files into the TRUNK projects  />
+		-->
+		<copy todir="${path-language-target}" overwrite="true" verbose="true" includeemptydirs="false">
+
+			<fileset dir="${path-language-target-temp}" includes="**/*">
 				<!-- ignore empty files -->
 				<size value="0" when="more" />
 			</fileset>
 
 			<mapper>
-				<regexpmapper from="^(.*)\\src\\de\.byteholder(.*)$$" to="\\de\.byteholder\2" />
-				<regexpmapper from="^(.*)\\src\\net\.tourbook(.*)$$" to="\\net\.tourbook\2" />
-			</mapper>
-
-		</copy>
-
-		<!--
-		<echo message="copy archive into language fragments  />
-		-->
-		<copy todir="${language-fragments}" overwrite="true" verbose="false" includeemptydirs="false">
-
-			<fileset dir="${temp-unzip-dir}" includes="**/*">
-
-				<!-- ignore empty files -->
-				<size value="0" when="more" />
-			</fileset>
-
-			<mapper>
-				<regexpmapper from="^(.*)\\src\\(de\.byteholder[^\\]*)(.*)$$" to="\\\2\.nl_${archive-language}\3" />
-				<regexpmapper from="^(.*)\\src\\(net\.tourbook[^\\]*)(.*)$$" to="\\\2\.nl_${archive-language}\3" />
+				<regexpmapper from="^(.*)\.nl\\(.*)$$" to="\1\\\2" />
 			</mapper>
 
 		</copy>

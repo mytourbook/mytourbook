@@ -146,33 +146,49 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	public void updateInfo(final TileEventId tileEventId) {
 
 		if (tileEventId == TileEventId.TILE_RESET_QUEUES) {
+
 			_statIsQueued = 0;
 			_statStartLoading = 0;
 			_statEndLoading = 0;
+
 		} else if (tileEventId == TileEventId.TILE_IS_QUEUED) {
+
 			_statIsQueued++;
+
 		} else if (tileEventId == TileEventId.TILE_START_LOADING) {
+
 			_statStartLoading++;
-			System.out.println(tileEventId + "\t_statStartLoading:" + _statStartLoading);
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} else if (tileEventId == TileEventId.TILE_END_LOADING) {
+
 			_statEndLoading++;
 			_statIsQueued--;
+
 		} else if (tileEventId == TileEventId.TILE_ERROR_LOADING) {
+
 			_statErrorLoading++;
 			_statIsQueued--;
+
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_ERROR) {
+
 			_statErrorPaintingSRTM++;
 			_statIsQueued--;
+
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_START) {
+
 			_statStartPaintingSRTM++;
+
 		} else if (tileEventId == TileEventId.SRTM_PAINTING_END) {
+
 			_statEndPaintingSRTM++;
 			_statIsQueued--;
+
 		} else if (tileEventId == TileEventId.SRTM_DATA_START_LOADING) {
+
 			_statStartSRTM++;
+
 		} else if (tileEventId == TileEventId.SRTM_DATA_END_LOADING) {
+
 			_statEndSRTM++;
 		}
 

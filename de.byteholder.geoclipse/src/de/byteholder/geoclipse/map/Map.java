@@ -608,7 +608,7 @@ public class Map extends Canvas {
 
 	}
 
-	void actionManageOfflineImages() {
+	void actionManageOfflineImages(final Event event) {
 
 		// check if offline image is active
 		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
@@ -633,6 +633,33 @@ public class Map extends Canvas {
 			return;
 		}
 
+		if (_offlineDevAreaStart != null //
+				&& _currentOfflineArea != null
+				&& (event.stateMask & SWT.CONTROL) != 0) {
+
+			/*
+			 * use old offline area when the ctrl-key is pressed
+			 */
+
+			_previousOfflineArea = null;
+
+			_isPaintOfflineArea = true;
+
+			redraw();
+			queueMapRedraw();
+
+			new DialogManageOfflineImages(
+					Display.getCurrent().getActiveShell(),
+					_MP,
+					_offlineWorldStart,
+					_offlineWorldEnd,
+					_mapZoomLevel).open();
+
+			disableOfflineAreaSelection();
+
+			return;
+		}
+
 		_previousOfflineArea = _currentOfflineArea;
 
 		_offlineDevAreaStart = _offlineDevAreaEnd = null;
@@ -643,7 +670,6 @@ public class Map extends Canvas {
 		setCursor(_cursorCross);
 
 		redraw();
-
 	}
 
 	public void addMapListener(final IMapListener mapListener) {
@@ -742,7 +768,7 @@ public class Map extends Canvas {
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
- 
+
 				if (_MP == null || _disableContextMenu) {
 					return;
 				}

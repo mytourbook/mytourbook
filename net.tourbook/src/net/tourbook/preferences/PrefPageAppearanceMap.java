@@ -36,6 +36,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -204,6 +205,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 						.span(2, 1)
 						.hint(pc.convertWidthInCharsToPixels(40), pc.convertHeightInCharsToPixels(12))
 						.applyTo(_txtTourPaintMethod);
+				_txtTourPaintMethod.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 			}
 			// set group margin after the fields are created
 			GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMethod);

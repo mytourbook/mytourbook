@@ -16,7 +16,8 @@
 package de.byteholder.geoclipse.map;
 
 import org.eclipse.jface.action.Action;
- 
+import org.eclipse.swt.widgets.Event;
+
 import de.byteholder.geoclipse.Messages;
 
 public class ActionManageOfflineImages extends Action {
@@ -31,7 +32,7 @@ public class ActionManageOfflineImages extends Action {
 	}
 
 	@Override
-	public void run() {
-		_map.actionManageOfflineImages();
+	public void runWithEvent(final Event event) {
+		_map.actionManageOfflineImages(event);
 	}
 }

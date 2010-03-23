@@ -596,6 +596,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			fTxtFilePath = new Text(group, /* SWT.BORDER | */SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(fTxtFilePath);
 			fTxtFilePath.setToolTipText(Messages.dialog_export_txt_filePath_tooltip);
+			fTxtFilePath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 			// spacer
 //			new Label(group, SWT.NONE);
@@ -668,17 +669,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 	}
 
-	private void createUIOptionExportNotes(final Composite parent) {
-
-		/*
-		 * checkbox: export notes
-		 */
-		fChkExportNotes = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkExportNotes);
-		fChkExportNotes.setText(Messages.dialog_export_chk_exportNotes);
-		fChkExportNotes.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);	
-	}
-
 	private void createUIOptionExportMarkers(final Composite parent) {
 
 		/*
@@ -688,6 +678,17 @@ public class DialogExportTour extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkExportMarkers);
 		fChkExportMarkers.setText(Messages.dialog_export_chk_exportMarkers);
 		fChkExportMarkers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
+	}
+
+	private void createUIOptionExportNotes(final Composite parent) {
+
+		/*
+		 * checkbox: export notes
+		 */
+		fChkExportNotes = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(fChkExportNotes);
+		fChkExportNotes.setText(Messages.dialog_export_chk_exportNotes);
+		fChkExportNotes.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);	
 	}
 
 	private void createUIOptionMergeTours(final Composite parent) {
@@ -1077,6 +1078,20 @@ public class DialogExportTour extends TitleAreaDialog {
 		return fComboPath.getText().trim();
 	}
 
+	private GarminLap getLap(final TourData tourData, final boolean addNotes) {
+
+		final GarminLap lap = new GarminLap();
+
+		lap.setCalories(tourData.getCalories());
+
+		if (addNotes) {
+			final String notes = tourData.getTourDescription();
+			if (notes != null && notes.length() > 0)
+				lap.setNotes(notes);
+		}
+		return lap;
+	}
+
 	private GarminTrack getTrack(	final TourData tourData,
 									final DateTime trackDateTime,
 									final boolean isCamouflageSpeed,
@@ -1180,41 +1195,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		return track;
 	}
 
-	private GarminLap getLap(final TourData tourData, boolean addNotes) {
-
-		final GarminLap lap = new GarminLap();
-
-		lap.setCalories(tourData.getCalories());
-
-		if (addNotes) {
-			final String notes = tourData.getTourDescription();
-			if (notes != null && notes.length() > 0)
-				lap.setNotes(notes);
-		}
-		return lap;
-	}
-
-	private void mergeLap(GarminLap tourLap, TourData tourData, boolean mergeNotes) {
-
-		int calories = tourLap.getCalories();
-		calories += tourData.getCalories();
-		tourLap.setCalories(calories);
-
-		if (mergeNotes) {
-			final String notes = tourData.getTourDescription();
-			if (notes != null && notes.length() > 0) {
-				String lapNotes = tourLap.getNotes();
-
-				if (lapNotes == null) {
-					tourLap.setNotes(notes);
-				} else {
-					tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
-				}
-			}
-		}
-
-	}
-
 	private String[] getUniqueItems(final String[] pathItems, final String currentItem) {
 
 		final ArrayList<String> pathList = new ArrayList<String>();
@@ -1305,6 +1285,27 @@ public class DialogExportTour extends TitleAreaDialog {
 		});
 
 		return result[0];
+	}
+
+	private void mergeLap(final GarminLap tourLap, final TourData tourData, final boolean mergeNotes) {
+
+		int calories = tourLap.getCalories();
+		calories += tourData.getCalories();
+		tourLap.setCalories(calories);
+
+		if (mergeNotes) {
+			final String notes = tourData.getTourDescription();
+			if (notes != null && notes.length() > 0) {
+				final String lapNotes = tourLap.getNotes();
+
+				if (lapNotes == null) {
+					tourLap.setNotes(notes);
+				} else {
+					tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
+				}
+			}
+		}
+
 	}
 
 	@Override

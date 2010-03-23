@@ -22,59 +22,38 @@ import de.byteholder.geoclipse.mapprovider.MP;
 
 public class TileInfoManager implements ITileListener {
 
-	private static TileInfoManager	fInstance;
+	private static TileInfoManager	_instance;
 
-//	private ArrayList<TileFactory>	fTileFactories;
-
-	private TileInfoContribution	fTileInfo;
+	private TileInfoContribution	_tileInfo;
 
 	public static TileInfoManager getInstance() {
 
-		if (fInstance == null) {
-			fInstance = new TileInfoManager();
+		if (_instance == null) {
+			_instance = new TileInfoManager();
 		}
 
-		return fInstance;
+		return _instance;
 	}
 
 	/**
 	 * The constructor.
 	 */
 	public TileInfoManager() {
-//		getMapProviders();
 		MP.addTileListener(this);
 	}
 
-//	private void getMapProviders() {
-//
-//		final List<TileFactory> allPluginTileFactories = GeoclipseExtensions.getInstance().readFactories();
-//		fTileFactories = new ArrayList<TileFactory>();
-//
-//		// get visible map providers
-//		for (final TileFactory tileFactory : allPluginTileFactories) {
-//
-//			if (tileFactory.getInfo().isMapEmpty()) {
-//				// ignore maps which does not display anything
-//				continue;
-//			}
-//
-//			fTileFactories.add(tileFactory);
-//
-//		}
-//	}
-
 	public void setTileInfoContribution(final TileInfoContribution tileInfoContribution) {
-		fTileInfo = tileInfoContribution;
+		_tileInfo = tileInfoContribution;
 	}
 
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check widget, can be null when it's hidden
-		if (fTileInfo == null) {
+		if (_tileInfo == null) {
 			return;
 		}
 
-		fTileInfo.updateInfo(tileEventId);
+		_tileInfo.updateInfo(tileEventId);
 	}
 
 	/**
@@ -87,11 +66,11 @@ public class TileInfoManager implements ITileListener {
 	public void updateSRTMTileInfo(final TileEventId tileEvent, final String remoteName, final long receivedBytes) {
 
 		// check widget, can be null when it's hidden
-		if (fTileInfo == null) {
+		if (_tileInfo == null) {
 			return;
 		}
 
-		fTileInfo.updateSRTMInfo(tileEvent, remoteName, receivedBytes);
+		_tileInfo.updateSRTMInfo(tileEvent, remoteName, receivedBytes);
 	}
 
 }

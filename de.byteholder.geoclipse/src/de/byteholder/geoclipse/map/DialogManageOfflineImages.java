@@ -20,6 +20,9 @@ import java.util.List;
 
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -60,6 +63,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.progress.UIJob;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
@@ -70,8 +74,7 @@ import de.byteholder.geoclipse.mapprovider.MPProfile;
 import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.geoclipse.tileinfo.TileInfoContribution;
- 
+
 public class DialogManageOfflineImages extends TitleAreaDialog implements ITileListener {
 
 	private final IPreferenceStore		_prefStore			= Activator.getDefault().getPreferenceStore();
@@ -96,7 +99,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	private Button						_btnDeleteAll;
 	private Button						_btnDeletePart;
 
-	private TileInfo					_tileInfo;
+//	private TileInfo					_tileInfo;
 
 	private int[]						_targetZoomLevels;
 	private ArrayList<MP>				_allMapProviders;
@@ -106,6 +109,10 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	private int							_validMapZoomLevel;
 
 	private Image						_imageRefresh;
+
+	private int[]						_updateCounter		= new int[] { 0 };
+
+	private Display						_display;
 
 	class PartMP {
 
@@ -132,12 +139,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	class TileInfo extends TileInfoContribution {
-		Control createUI(final Composite parent) {
-			return createControl(parent);
-		}
-	}
-
 	public DialogManageOfflineImages(	final Shell parentShell,
 										final MP mp,
 										final Point offlineWorldStart,
@@ -151,6 +152,8 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		_offlineWorldStart = offlineWorldStart;
 		_offlineWorldEnd = offlineWorldEnd;
+
+		_display = Display.getCurrent();
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -191,7 +194,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		// disable all controls
 		enableControls(false);
 
-		Display.getDefault().asyncExec(new Runnable() {
+		_display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				initOfflineManager();
@@ -244,12 +247,12 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				createUI30Actions(innerContainer);
 			}
 
-			/*
-			 * tile info
-			 */
-			_tileInfo = new TileInfo();
-			final Control tileInfoControl = _tileInfo.createUI(container);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(tileInfoControl);
+//			/*
+//			 * tile info
+//			 */
+//			_tileInfo = new TileInfo();
+//			final Control tileInfoControl = _tileInfo.createUI(container);
+//			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(tileInfoControl);
 		}
 
 		// set download as default button
@@ -265,6 +268,26 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
+			/*
+			 * target zoom level
+			 */
+			label = new Label(container, SWT.NONE);
+			label.setText(Messages.Dialog_OfflineArea_Label_ZoomLevel);
+
+			// combo: zoom level
+			_comboTargetZoom = new Combo(container, SWT.READ_ONLY);
+			_comboTargetZoom.setVisibleItemCount(20);
+			_comboTargetZoom.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					getOfflineImageState();
+
+					// focus was disabled, reset focus
+					_comboTargetZoom.setFocus();
+				}
+			});
+
 			/*
 			 * map provider
 			 */
@@ -291,26 +314,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			createUI20PartViewer(container);
 
 			/*
-			 * max zoom level
-			 */
-			label = new Label(container, SWT.NONE);
-			label.setText(Messages.Dialog_OfflineArea_Label_ZoomLevel);
-
-			// combo: zoom level
-			_comboTargetZoom = new Combo(container, SWT.READ_ONLY);
-			_comboTargetZoom.setVisibleItemCount(20);
-			_comboTargetZoom.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					getOfflineImageState();
-
-					// focus was disabled, reset focus
-					_comboTargetZoom.setFocus();
-				}
-			});
-
-			/*
 			 * queue
 			 */
 			label = new Label(container, SWT.NONE);
@@ -318,7 +321,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 			_txtQueue = new Text(container, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtQueue);
-			_txtQueue.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			_txtQueue.setBackground(_display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		}
 	}
 
@@ -456,7 +459,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			 * button: stop
 			 */
 			_btnStop = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, true).applyTo(_btnStop);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnStop);
 			_btnStop.setText(Messages.Dialog_OfflineArea_Button_StopDownloading);
 			_btnStop.addSelectionListener(new SelectionAdapter() {
 
@@ -586,6 +589,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		final boolean isPartSelected = _partViewer.getSelection().isEmpty() == false;
 
 		_comboTargetZoom.setEnabled(canBeEnabled && isLoading == false);
+		_comboMapProvider.setEnabled(canBeEnabled);
 
 		_btnDownload.setEnabled(canBeEnabled && isLoading == false);
 		_btnStop.setEnabled(canBeEnabled && isLoading);
@@ -692,7 +696,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		getOfflineMapProviders();
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+		BusyIndicator.showWhile(_display, new Runnable() {
 			@Override
 			public void run() {
 
@@ -910,7 +914,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			final MP selectedPartMp = ((PartMP) selectedPart).partMp;
 
 			if (MessageDialog.openConfirm(
-					Display.getCurrent().getActiveShell(),
+					_display.getActiveShell(),
 					Messages.Dialog_OfflineArea_ConfirmDelete_Title,
 					NLS.bind(Messages.Dialog_OfflineArea_ConfirmDeletePart_Message, selectedPartMp.getName()))) {
 
@@ -920,7 +924,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		} else {
 
 			if (MessageDialog.openConfirm(
-					Display.getCurrent().getActiveShell(),
+					_display.getActiveShell(),
 					Messages.Dialog_OfflineArea_ConfirmDelete_Title,
 					Messages.Dialog_OfflineArea_ConfirmDeleteAll_Message)) {
 
@@ -930,6 +934,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	}
 
 	private void onSelectDownload() {
+
 		loadOfflineImages();
 		enableControls(true);
 	}
@@ -948,29 +953,61 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	@Override
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
-		System.out.println(tileEventId + "\t" + tile);
-		// TODO remove SYSTEM.OUT.PRINTLN
+		final int tileWaitingQueueSize = MP.getTileWaitingQueue().size();
 
-		_tileInfo.updateInfo(tileEventId);
+		_updateCounter[0]++;
 
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
+		_display.asyncExec(new Runnable() {
+
+			final int	_runnableUpdateCounter	= _updateCounter[0];
+
 			public void run() {
 
-				// check if UI is still available
-				if (_comboTargetZoom.isDisposed()) {
+				// check if a new runnable was created
+				if (_runnableUpdateCounter != _updateCounter[0]) {
+					// a new runnable was created
 					return;
 				}
 
-				updateUI();
-				enableControls(true);
+				// check if widgets are disposed
+				if (_comboMapProvider.isDisposed()) {
+					return;
+				}
+
+				_txtQueue.setText(Integer.toString(tileWaitingQueueSize));
+
+				/*
+				 * update state when all images are downloaded, it's possible that not all images
+				 * are downloaded when queue size is 0
+				 */
+				if (tileWaitingQueueSize == 0) {
+
+					final UIJob uiJob = new UIJob(_display, "update offline state") { //$NON-NLS-1$ 
+
+						final int	_uiJobUpdateCounter	= _updateCounter[0];
+
+						@Override
+						public IStatus runInUIThread(final IProgressMonitor monitor) {
+
+							// check if a new runnable was created
+							if (_uiJobUpdateCounter != _updateCounter[0]) {
+								// a new runnable was created
+								return Status.OK_STATUS;
+							}
+
+							getOfflineImageState();
+							enableControls(true);
+
+							_comboTargetZoom.setFocus();
+
+							return Status.OK_STATUS;
+						}
+					};
+					uiJob.setSystem(true);
+					uiJob.schedule(200);
+				}
 			}
 		});
-	}
-
-	private void updateUI() {
-
-		_txtQueue.setText(Integer.toString(MP.getTileWaitingQueue().size()));
 	}
 
 	/**

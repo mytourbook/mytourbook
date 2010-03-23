@@ -1680,7 +1680,7 @@ public class TourDatabase {
 
 				// version 9 start
 				//				
-				+ "startWeekYear			SMALLINT,				\n" //$NON-NLS-1$
+				+ "startWeekYear			SMALLINT DEFAULT 1977,	\n" //$NON-NLS-1$
 				//				
 				// version 9 end
 
@@ -2297,18 +2297,18 @@ public class TourDatabase {
 
 		boolean isPostUpdate5 = false;
 		if (currentDbVersion == 4) {
-			updateDbDesign_4_5(conn);
+			updateDbDesign_4_5(conn, monitor);
 			currentDbVersion = newVersion = 5;
 			isPostUpdate5 = true;
 		}
 
 		if (currentDbVersion == 5) {
-			updateDbDesign_5_6(conn);
+			updateDbDesign_5_6(conn, monitor);
 			currentDbVersion = newVersion = 6;
 		}
 
 		if (currentDbVersion == 6) {
-			updateDbDesign_6_7(conn);
+			updateDbDesign_6_7(conn, monitor);
 			currentDbVersion = newVersion = 7;
 		}
 
@@ -2497,7 +2497,11 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-	private void updateDbDesign_4_5(final Connection conn) {
+	private void updateDbDesign_4_5(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 5));
+		}
 
 		System.out.println("Database update: 5");//$NON-NLS-1$
 		System.out.println();
@@ -2517,7 +2521,11 @@ public class TourDatabase {
 		}
 	}
 
-	private void updateDbDesign_5_6(final Connection conn) {
+	private void updateDbDesign_5_6(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 6));
+		}
 
 		System.out.println();
 		System.out.println("Database update: 6");//$NON-NLS-1$
@@ -2542,7 +2550,11 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_6_7(final Connection conn) {
+	private void updateDbDesign_6_7(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 7));
+		}
 
 		System.out.println();
 		System.out.println("database update: 7");//$NON-NLS-1$
@@ -2585,11 +2597,11 @@ public class TourDatabase {
 	private void updateDbDesign_7_8(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
-			monitor.subTask(Messages.Tour_Database_Update_8);
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 8));
 		}
 
 		System.out.println();
-		System.out.println(Messages.Tour_Database_Update_8);
+		System.out.println(NLS.bind(Messages.Tour_Database_Update, 8));
 
 		try {
 			final Statement statement = conn.createStatement();
@@ -2629,18 +2641,18 @@ public class TourDatabase {
 	private void updateDbDesign_8_9(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
-			monitor.subTask(Messages.Tour_Database_Update_9);
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 9));
 		}
 
 		System.out.println();
-		System.out.println(Messages.Tour_Database_Update_9);
+		System.out.println(NLS.bind(Messages.Tour_Database_Update, 9));
 
 		try {
 			final Statement statement = conn.createStatement();
 
 			String sql;
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startWeekYear		SMALLINT "; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startWeekYear		SMALLINT DEFAULT 1977 "; //$NON-NLS-1$ //$NON-NLS-2$
 			System.out.println(sql);
 			statement.execute(sql);
 

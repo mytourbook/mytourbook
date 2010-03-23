@@ -29,7 +29,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
- 
+
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.Assert;
@@ -956,6 +956,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		 */
 		_txtOfflineInfoTotal = new Text(parent, SWT.READ_ONLY | SWT.TRAIL);
 		GridDataFactory.fillDefaults().applyTo(_txtOfflineInfoTotal);
+		_txtOfflineInfoTotal.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 	}
 
 	private void createUI50Details(final Composite parent) {
@@ -1091,6 +1092,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			// text: map provider type
 			_txtMapProviderType = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().applyTo(_txtMapProviderType);
+			_txtMapProviderType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 			/*
 			 * url
@@ -1101,6 +1103,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			// text: url
 			_txtUrl = new Text(detailContainer, SWT.BORDER | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(_txtUrl);
+			_txtUrl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		}
 	}
 

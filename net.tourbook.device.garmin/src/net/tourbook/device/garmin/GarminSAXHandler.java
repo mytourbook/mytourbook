@@ -128,8 +128,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
-	static DateTimeFormatter				_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy");
-	static SimpleDateFormat					_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy");
+	static DateTimeFormatter				_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy"); //$NON-NLS-1$
+	static SimpleDateFormat					_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy"); //$NON-NLS-1$
 
 	private static void formatDT(	final DateTimeFormatter jodaFormatter,
 									final SimpleDateFormat jdkFormatter,
@@ -139,7 +139,7 @@ public class GarminSAXHandler extends DefaultHandler {
 									final Calendar jdkCalendar) {
 
 		sbJoda.append(jodaFormatter.print(dt));
-		sbJoda.append(" | ");
+		sbJoda.append(" | "); //$NON-NLS-1$
 
 		jdkCalendar.setFirstDayOfWeek(Calendar.MONDAY);
 		jdkCalendar.setMinimalDaysInFirstWeek(4);
@@ -148,7 +148,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int weekYear = Util.getYearForWeek(jdkCalendar);
 
 		sbJdk.append(jdkFormatter.format(dt.toDate()));
-		sbJdk.append(" " + weekYear + " | ");
+		sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 //	public static int getWeekOfDate(Date date) {
@@ -161,8 +161,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	public static void main(final String[] args) {
 
 //		final String pattern = "w dd.MM.yyyy";
-		final String jodPattern = "ww xx     ";
-		final String jdkPattern = "ww yy";
+		final String jodPattern = "ww xx     "; //$NON-NLS-1$
+		final String jdkPattern = "ww yy"; //$NON-NLS-1$
 
 		final DateTimeFormatter jodaFormatter = DateTimeFormat.forPattern(jodPattern);
 		final StringBuilder sbJdk = new StringBuilder();
@@ -184,12 +184,12 @@ public class GarminSAXHandler extends DefaultHandler {
 			final Calendar calendar = GregorianCalendar.getInstance(locale);
 
 			System.out.println();
-			System.out.println(i + ": " + language + ", " + country + ", " + locale_name);
+			System.out.println(i + ": " + language + ", " + country + ", " + locale_name); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			for (int year = 2005; year < 2011; year++) {
 
-				sbJoda.append(year + ": ");
-				sbJdk.append(year + ": ");
+				sbJoda.append(year + ": "); //$NON-NLS-1$
+				sbJdk.append(year + ": "); //$NON-NLS-1$
 
 				int days = 0;
 				final DateTime dt = new DateTime(year, 12, 22, 8, 0, 0, 0);
@@ -204,8 +204,8 @@ public class GarminSAXHandler extends DefaultHandler {
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				sbJoda.append("    ");
-				sbJdk.append("    ");
+				sbJoda.append("    "); //$NON-NLS-1$
+				sbJdk.append("    "); //$NON-NLS-1$
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -240,21 +240,21 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		final StringBuilder buffer = new StringBuilder()//
 				//
-				.append("Testing date ")
+				.append("Testing date ") //$NON-NLS-1$
 				.append(dt.toString())
-				.append("\n")
+				.append("\n") //$NON-NLS-1$
 				//
-				.append("Joda-Time timezone is ")
+				.append("Joda-Time timezone is ") //$NON-NLS-1$
 				.append(DateTimeZone.getDefault())
-				.append(" yet joda wrongly thinks week is ")
+				.append(" yet joda wrongly thinks week is ") //$NON-NLS-1$
 				.append(_jodaWeekFormatter.print(dt))
-				.append("\n")
+				.append("\n") //$NON-NLS-1$
 				//
-				.append("JDK timezone is ")
+				.append("JDK timezone is ") //$NON-NLS-1$
 				.append(TimeZone.getDefault().getID())
-				.append(" yet jdk rightfully thinks week is ")
+				.append(" yet jdk rightfully thinks week is ") //$NON-NLS-1$
 				.append(_jdkWeekFormatter.format(dt.toDate()))
-				.append(" (jdk got it right ?!?!)");
+				.append(" (jdk got it right ?!?!)"); //$NON-NLS-1$
 
 		System.out.println(buffer.toString());
 	}

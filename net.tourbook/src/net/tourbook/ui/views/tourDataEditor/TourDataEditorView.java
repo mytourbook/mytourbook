@@ -3078,6 +3078,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtRefTour = tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
 
+
 			/*
 			 * number of time slices
 			 */

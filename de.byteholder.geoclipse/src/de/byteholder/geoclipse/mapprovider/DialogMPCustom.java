@@ -734,6 +734,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			_txtImageFormat = new Text(container, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImageFormat);
 			_txtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
+			_txtImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			_txtImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 			// ################################################
 
@@ -958,6 +960,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			_txtCustomUrl = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtCustomUrl);
 			_txtCustomUrl.setToolTipText(Messages.Dialog_MapConfig_Label_CustomUrl_Tooltip);
+			_txtCustomUrl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 			// ############################################################
 
@@ -1031,7 +1034,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		}
 
 		return _dialogSettings;
- 
+
 		// disable bounds
 //		return null;
 	}
