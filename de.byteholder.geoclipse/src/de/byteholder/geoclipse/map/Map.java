@@ -670,6 +670,7 @@ public class Map extends Canvas {
 		setCursor(_cursorCross);
 
 		redraw();
+		queueMapRedraw();
 	}
 
 	public void addMapListener(final IMapListener mapListener) {
@@ -2046,11 +2047,23 @@ public class Map extends Canvas {
 			gc.drawRectangle(_previousOfflineArea);
 
 			gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
-			gc.drawRectangle(
-					_previousOfflineArea.x + 1,
-					_previousOfflineArea.y + 1,
+			final int devX = _previousOfflineArea.x;
+			final int devY = _previousOfflineArea.y;
+			gc.drawRectangle(//
+					devX + 1,
+					devY + 1,
 					_previousOfflineArea.width - 2,
 					_previousOfflineArea.height - 2);
+
+			/*
+			 * draw text marker
+			 */
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+			gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
+			final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_OldAreaMarker);
+			int devYMarker = devY - textExtend.y;
+			devYMarker = devYMarker < 0 ? 0 : devYMarker;
+			gc.drawText(Messages.Offline_Area_Label_OldAreaMarker, devX, devYMarker);
 		}
 
 		/*
@@ -2090,25 +2103,25 @@ public class Map extends Canvas {
 
 				// display mouse move geo position
 
-				if (_offlineWorldMouseMove == null) {
-					return;
+				if (_offlineWorldMouseMove != null) {
+
+					final GeoPosition mouseGeo = _MP.pixelToGeo(new Point2D.Double(
+							_offlineWorldMouseMove.x,
+							_offlineWorldMouseMove.y), _mapZoomLevel);
+
+					sb.append("   "); //$NON-NLS-1$
+					sb.append(_nfLatLon.format(mouseGeo.latitude));
+					sb.append("/"); //$NON-NLS-1$
+					sb.append(_nfLatLon.format(mouseGeo.longitude));
+
 				}
-
-				final GeoPosition mouseGeo = _MP.pixelToGeo(new Point2D.Double(
-						_offlineWorldMouseMove.x,
-						_offlineWorldMouseMove.y), _mapZoomLevel);
-
-				sb.append("   "); //$NON-NLS-1$
-				sb.append(_nfLatLon.format(mouseGeo.latitude));
-				sb.append("/"); //$NON-NLS-1$
-				sb.append(_nfLatLon.format(mouseGeo.longitude));
 			}
 
 			gc.drawText(sb.toString(), 0, 0);
 		}
 
 		// check if mouse button is hit which sets the start position
-		if (_offlineDevAreaStart == null) {
+		if (_offlineDevAreaStart == null || _offlineWorldMouseMove == null) {
 			return;
 		}
 

@@ -210,6 +210,8 @@ public class Messages extends NLS {
 	public static String		DBG057_MapProfile_NoParentTile;
 
 	public static String		Offline_Area_Label_AreaMarker;
+
+	public static String	Offline_Area_Label_OldAreaMarker;
 	public static String		Offline_Area_Label_SelectInfo;
 
 	public static String		TileInfo_Control_DefaultTitle;
