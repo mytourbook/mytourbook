@@ -26,9 +26,18 @@
 			<fileset dir="${path-language-target-temp}" includes="**/*" />
 		</delete>
 
-		<!-- unzip archive: mt-de.zip -->
+		<!-- 
+			unzip archive: mt-de.zip 
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="de" />
+		</antcall>
+		-->
+
+		<!-- 
+			unzip archive: mt-fr.zip 
+		-->
+		<antcall target="unzip-archive-for-one-language">
+			<param name="archive-language" value="fr" />
 		</antcall>
 
 		<!-- delete temp dir -->
