@@ -145,7 +145,7 @@ public class TourDatabase {
 	private final ListenerList					fPropertyListeners							= new ListenerList(
 																									ListenerList.IDENTITY);
 
-	private String								fDatabasePath								= (Platform
+	private final String						fDatabasePath								= (Platform
 																									.getInstanceLocation()
 																									.getURL()
 																									.getPath() + "derby-database");				//$NON-NLS-1$
@@ -242,11 +242,12 @@ public class TourDatabase {
 		final int[] tourCounter = new int[] { 0 };
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				final ArrayList<Long> tourList = getAllTourIds();
 
-				monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, tourList.size());
+				monitor.subTask(Messages.tour_database_computeComputeValues_mainTask);
 
 				// loop over all tours and calculate and set new columns
 				for (final Long tourId : tourList) {
@@ -272,8 +273,6 @@ public class TourDatabase {
 					}
 
 					monitor.subTask(sb.toString());
-
-					monitor.worked(1);
 
 					// check if canceled
 					if (monitor.isCanceled()) {
@@ -591,7 +590,7 @@ public class TourDatabase {
 				tagList.add(tag.getTagName());
 			} else {
 				try {
-					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
 				} catch (final MyTourbookException e) {
 					e.printStackTrace();
 				}
@@ -1238,6 +1237,7 @@ public class TourDatabase {
 		// create runnable for stating the derby server
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(final IProgressMonitor monitor) {
 
 				if (monitor != null) {
@@ -1264,7 +1264,6 @@ public class TourDatabase {
 
 					try {
 						server.start(null);
-						// monitor.worked(1);
 					} catch (final Exception e2) {
 						e2.printStackTrace();
 					}
@@ -1572,7 +1571,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 *create table {@link #TABLE_TOUR_DATA}
+	 * create table {@link #TABLE_TOUR_DATA}
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2091,6 +2090,7 @@ public class TourDatabase {
 
 		try {
 			final IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
+				@Override
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 					try {
@@ -2105,8 +2105,6 @@ public class TourDatabase {
 					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 
 					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
-
-					monitor.setTaskName(UI.EMPTY_STRING);
 				}
 			};
 
@@ -2125,66 +2123,6 @@ public class TourDatabase {
 				emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
 			} else {
-				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
-			}
-
-//		} catch (MyTourbookException e) {
-//			e.printStackTrace();
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		if (emFactory == null) {
-			try {
-				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			return null;
-		} else {
-			final EntityManager em = emFactory.createEntityManager();
-
-			return em;
-		}
-	}
-
-	/**
-	 * Creates an entity manager which is used to persist entities
-	 * 
-	 * @return
-	 */
-	public EntityManager getEntityManagerOLD() {
-
-		if (emFactory != null) {
-			return emFactory.createEntityManager();
-		}
-
-		try {
-			final IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					try {
-						checkServer();
-					} catch (final MyTourbookException e) {
-						e.printStackTrace();
-						return;
-					}
-					checkTable();
-					checkVersion(monitor);
-
-					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
-
-					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
-
-					monitor.setTaskName(""); //$NON-NLS-1$
-				}
-			};
-
-			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
-
-			if (splashHandler != null) {
 				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
 			}
 
