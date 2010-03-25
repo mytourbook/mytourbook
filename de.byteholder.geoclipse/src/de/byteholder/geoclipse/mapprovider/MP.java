@@ -895,7 +895,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 				}
 
 				// LOAD/CREATE image
-				putTileInWaitingQueue(tile);
+				putTileInWaitingQueue(tile, true);
 			}
 
 		} else {
@@ -907,7 +907,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		return tile;
 	}
-
+ 
 	public TileImageCache getTileImageCache() {
 		return _tileImageCache;
 	}
@@ -928,7 +928,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	public ITilePainter getTilePainter() {
 		return null;
 	}
- 
+
 	/**
 	 * The size of tiles for this factory. Tiles must be square.
 	 * 
@@ -1129,13 +1129,18 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * Put one tile into the tile image waiting queue
 	 * 
 	 * @param tile
+	 * @param isFiFo
 	 * @throws InterruptedException
 	 */
-	private void putOneTileInWaitingQueue(final Tile tile) throws InterruptedException {
+	private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) throws InterruptedException {
 
 		tile.setLoading(true);
 
-		_tileWaitingQueue.add(tile);
+		if (isFiFo) {
+			_tileWaitingQueue.addFirst(tile);
+		} else {
+			_tileWaitingQueue.addLast(tile);
+		}
 
 		// create loading task
 		final Future<?> future = getExecutor().submit(new TileImageLoader());
@@ -1150,8 +1155,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * Put all tiles into a queue to load/create the tile image
 	 * 
 	 * @param tile
+	 * @param isFiFo
+	 *            when <code>true</code> the waiting queue is working as FIFO, when
+	 *            <code>false</code> it is a LIFO
 	 */
-	public void putTileInWaitingQueue(final Tile tile) {
+	public void putTileInWaitingQueue(final Tile tile, final boolean isFiFo) {
 
 		// prevent to load it more than once
 		if (tile.isLoading()) {
@@ -1160,7 +1168,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		try {
 
-			putOneTileInWaitingQueue(tile);
+			putOneTileInWaitingQueue(tile, isFiFo);
 
 			if (tile.isOfflimeImageAvailable() == false) {
 
@@ -1182,7 +1190,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 					}
 
 					for (final Tile tileChild : tileChildren) {
-						putOneTileInWaitingQueue(tileChild);
+						putOneTileInWaitingQueue(tileChild, isFiFo);
 					}
 				}
 			}

@@ -95,7 +95,7 @@ public class OfflineLoadManager {
 	/**
 	 * @param offlineMp
 	 * @param offlineTile
- 	 * @return Return <code>true</code> when the offline image needs to be loaded,
+	 * @return Return <code>true</code> when the offline image needs to be loaded,
 	 *         <code>false</code> when the image is already available
 	 */
 	boolean addOfflineTile(final MP offlineMp, final Tile offlineTile) {
@@ -108,10 +108,10 @@ public class OfflineLoadManager {
 
 		_offlineTiles.add(offlineTile);
 
-		_mp.putTileInWaitingQueue(offlineTile);
+		_mp.putTileInWaitingQueue(offlineTile, false);
 
 		offlineTile.addObserver(_tileLoadObserver);
-
+ 
 		return true;
 	}
 

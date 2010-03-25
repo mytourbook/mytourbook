@@ -391,13 +391,13 @@ public class TileImageLoader implements Runnable {
 		// get tile from queue
 		final LinkedBlockingDeque<Tile> tileWaitingQueue = MP.getTileWaitingQueue();
 
-		final Tile tile = tileWaitingQueue.pollLast();
+		final Tile tile = tileWaitingQueue.pollFirst();
 
 		if (tile == null) {
 			// it's possible that the waiting queue was reset
 			return;
 		}
-
+ 
 		final MP mp = tile.getMP();
  		final boolean isParentTile = mp instanceof ITileChildrenCreator;
 		{
