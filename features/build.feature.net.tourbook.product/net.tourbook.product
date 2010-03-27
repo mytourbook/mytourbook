@@ -37,11 +37,13 @@
       <macosx icon="/net.tourbook/icons/mac/tourbook128.icns"/>
       <solaris/>
       <win useIco="false">
-         <ico path="/net.tourbook/icons/windows/tourbook128.ico"/>
          <bmp
             winSmallHigh="/net.tourbook/icons/application/tourbook16-32.bmp"
+            winSmallLow="/net.tourbook/icons/application/tourbook16-8.bmp"
             winMediumHigh="/net.tourbook/icons/application/tourbook32-32.bmp"
-            winLargeHigh="/net.tourbook/icons/application/tourbook48-32.bmp"/>
+            winMediumLow="/net.tourbook/icons/application/tourbook32-8.bmp"
+            winLargeHigh="/net.tourbook/icons/application/tourbook48-32.bmp"
+            winLargeLow="/net.tourbook/icons/application/tourbook48-8.bmp"/>
       </win>
    </launcher>
 
