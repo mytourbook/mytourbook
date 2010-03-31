@@ -147,7 +147,7 @@ public class UI {
 	public static final String						SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";								//$NON-NLS-1$
 	public static final String						SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
 	public static final String						SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
- 
+
 	public static final float						UNIT_MILE						= 1.609344f;
 	public static final float						UNIT_FOOT						= 0.3048f;
 
@@ -983,11 +983,31 @@ public class UI {
 		control.setBackground(null);
 	}
 
+	/**
+	 * set width for the first column controls to the max width value
+	 */
+	public static void setEqualizeColumWidths(final ArrayList<Control> firstColumnControls) {
+
+		int maxWidth = 0;
+
+		// get max width from all first columns controls
+		for (final Control control : firstColumnControls) {
+			final int width = control.getSize().x;
+
+			maxWidth = width > maxWidth ? width : maxWidth;
+		}
+
+		// set width for all first column controls
+		for (final Control control : firstColumnControls) {
+			((GridData) control.getLayoutData()).widthHint = maxWidth;
+		}
+	}
+
 	public static void setErrorColor(final Text control) {
 		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 	}
-
+ 
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
