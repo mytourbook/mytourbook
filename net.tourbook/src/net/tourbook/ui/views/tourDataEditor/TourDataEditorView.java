@@ -307,7 +307,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private TableViewer							_markerViewer;
 	private ColumnManager						_markerColumnManager;
- 
+
 	private FormToolkit							_tk;
 
 	/*
@@ -5531,6 +5531,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setTourEndPlace(_txtEndLocation.getText());
 
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
+			_tourData.setCalories(_spinTourCalories.getSelection());
 
 			_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 			if (_isWindSpeedManuallyModified) {
@@ -5540,7 +5541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * value can cause rounding errors
 				 */
 				_tourData.setWeatherWindSpd((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
-			}
+			} 
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
 			String cloudValue = IWeather._cloudDBValue[cloudIndex];
@@ -5566,8 +5567,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setStartHour((short) _dtStartTime.getHours());
 			_tourData.setStartMinute((short) _dtStartTime.getMinutes());
 			_tourData.setStartSecond((short) _dtStartTime.getSeconds());
-
-			_tourData.setCalories(_spinTourCalories.getSelection());
 
 			if (_isDistManuallyModified) {
 				/*
@@ -5824,6 +5823,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int tourMonth = _tourData.getStartMonth() - 1;
 		final short tourDay = _tourData.getStartDay();
 
+		/*
+		 * tour/event
+		 */
 		// title/description
 		_txtTitle.setText(_tourData.getTourTitle());
 		_txtDescription.setText(_tourData.getTourDescription());
@@ -5832,7 +5834,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtStartLocation.setText(_tourData.getTourStartPlace());
 		_txtEndLocation.setText(_tourData.getTourEndPlace());
 
+		/*
+		 * personal details
+		 */
 		_spinRestPuls.setSelection(_tourData.getRestPulse());
+		_spinTourCalories.setSelection(_tourData.getCalories());
 
 		/*
 		 * wind properties
@@ -5906,9 +5912,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// paused time
 		final int pausedTime = recordingTime - drivingTime;
 		_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
-
-		// calories
-		_spinTourCalories.setSelection(_tourData.getCalories());
 
 		UI.updateUITourType(_tourData.getTourType(), _lblTourType);
 		UI.updateUITags(_tourData, _lblTourTags);

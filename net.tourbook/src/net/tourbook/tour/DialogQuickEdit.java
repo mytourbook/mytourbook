@@ -16,7 +16,7 @@
 package net.tourbook.tour;
 
 import java.text.DateFormat;
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -68,12 +68,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private final TourData				_tourData;
 
 	private final IDialogSettings		_state;
+	private PixelConverter				_pc;
+
 	private FormToolkit					_tk;
 	private Form						_formContainer;
 
 	private Text						_txtTitle;
 	private Text						_txtDescription;
-
+ 
 	private Spinner						_spinWindSpeedValue;
 	private Combo						_comboWindSpeedText;
 	private Combo						_comboWindDirectionText;
@@ -92,11 +94,28 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private int							_defaultSpinnerWidth;
 
-	private boolean						_isDirtyDisabled				= false;
+	private boolean						_isUpdateUI						= false;
 	private boolean						_isTemperatureManuallyModified	= false;
 	private boolean						_isWindSpeedManuallyModified	= false;
 	private int[]						_unitValueWindSpeed;
-	private PixelConverter				_pc;
+	private float						_unitValueDistance;
+	private float						_unitValueTemperature;
+	private Spinner						_spinRestPuls;
+	private Spinner						_spinTourCalories;
+
+	/**
+	 * When <code>true</code> the tour is created with the tour editor
+	 */
+	private final boolean				_isManualTour;
+
+	private MouseWheelListener			_mouseWheelListener;
+	{
+		_mouseWheelListener = new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				Util.adjustSpinnerValueOnMouseScroll(event);
+			}
+		};
+	}
 
 	public DialogQuickEdit(final Shell parentShell, final TourData tourData) {
 
@@ -108,6 +127,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage());
 
 		_tourData = tourData;
+		_isManualTour = _tourData.isManualTour();
+
 		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
@@ -169,11 +190,18 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		// create ui
 		createUI(dlgAreaContainer);
 
-		updateUI();
+		updateUIFromModel();
+		enableControls();
 
 		return dlgAreaContainer;
 	}
 
+	/**
+	 * @param parent
+	 * @param title
+	 * @param isGrabVertical
+	 * @return
+	 */
 	private Composite createSection(final Composite parent, final String title, final boolean isGrabVertical) {
 
 		final Section section = _tk.createSection(parent,//
@@ -205,6 +233,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_pc = new PixelConverter(parent);
 		_defaultSpinnerWidth = _pc.convertWidthInCharsToPixels(5);
 
+		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
+		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
 		_unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather._windSpeedKmh : IWeather._windSpeedMph;
 
 		_tk = new FormToolkit(parent.getDisplay());
@@ -220,20 +250,22 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			createUISection110Title(tourContainer);
 			createUISectionSeparator(tourContainer);
 
+			createUISection130Personal(tourContainer);
+			createUISectionSeparator(tourContainer);
+
 			createUISection140Weather(tourContainer);
 		}
 
 		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
-//
-//		// compute width for all controls and equalize column width for the different sections
-//		sc.layout(true, true);
-//		UI.setEqualizeColumWidths(_firstColumnControls);
-//		UI.setEqualizeColumWidths(_secondColumnControls);
-//
-//		sc.layout(true, true);
-//		UI.setEqualizeColumWidths(_firstColumnContainerControls);
+		// compute width for all controls and equalize column width for the different sections
+		tourContainer.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnControls);
+		UI.setEqualizeColumWidths(_secondColumnControls);
+
+		tourContainer.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnContainerControls);
 	}
 
 	private void createUISection110Title(final Composite parent) {
@@ -281,6 +313,86 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		}
 	}
 
+	private void createUISection130Personal(final Composite parent) {
+
+		final Composite section = createSection(parent, Messages.tour_editor_section_personal, false);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(20, 5)
+				.applyTo(section);
+		{
+			createUISection132PersonalCol1(section);
+			createUISection134PersonalCol2(section);
+		}
+	}
+
+	/**
+	 * 1. column
+	 */
+	private void createUISection132PersonalCol1(final Composite section) {
+
+		final Composite container = _tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		_firstColumnContainerControls.add(container);
+		{
+			/*
+			 * rest pulse
+			 */
+
+			// label: Rest pulse
+			final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+			label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+			_firstColumnControls.add(label);
+
+			// spinner
+			_spinRestPuls = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_spinRestPuls);
+			_spinRestPuls.setMinimum(0);
+			_spinRestPuls.setMaximum(200);
+			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+
+			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+
+			// label: bpm
+			_tk.createLabel(container, Messages.Graph_Label_Heartbeat_unit);
+		}
+	}
+
+	/**
+	 * 2. column
+	 */
+	private void createUISection134PersonalCol2(final Composite section) {
+
+		final Composite container = _tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * calories
+			 */
+
+			// label
+			final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
+			_secondColumnControls.add(label);
+
+			// spinner
+			_spinTourCalories = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
+			_spinTourCalories.setMinimum(0);
+			_spinTourCalories.setMaximum(1000000);
+//			_spinTourCalories.setToolTipText();
+
+			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
+
+			// label: cal
+			_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+		}
+	}
+
 	private void createUISection140Weather(final Composite parent) {
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_weather, false);
@@ -322,7 +434,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			_spinWindSpeedValue.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -331,7 +443,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindSpeedValue.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -340,7 +452,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindSpeedValue.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -364,7 +476,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindSpeedText();
@@ -398,7 +510,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindDirectionText();
@@ -421,7 +533,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			_spinWindDirectionValue.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -430,7 +542,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindDirectionValue.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -439,7 +551,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindDirectionValue.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -490,7 +602,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -499,7 +611,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -508,7 +620,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled) {
+					if (_isUpdateUI) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -557,12 +669,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			}
 
 			// force the icon to be displayed to ensure the width is correctly set when the size is computed
-			_isDirtyDisabled = true;
+			_isUpdateUI = true;
 			{
 				_comboClouds.select(0);
 				displayCloudIcon();
 			}
-			_isDirtyDisabled = false;
+			_isUpdateUI = false;
 		}
 	}
 
@@ -581,12 +693,19 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_lblCloudIcon.setImage(cloundIcon);
 	}
 
+	private void enableControls() {
+
+		_spinTourCalories.setEnabled(_isManualTour);
+
+		_spinTemperature.setEnabled(_tourData.temperatureSerie == null);
+	}
+
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-//		return _state;
-		return null;
+		return _state;
+//		return null;
 	}
 
 	private int getWindDirectionTextIndex(final int degreeDirection) {
@@ -619,11 +738,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	@Override
 	protected void okPressed() {
 
-		/*
-		 * update tourdata from the fields
-		 */
-		_tourData.setTourTitle(_txtTitle.getText().trim());
-		_tourData.setTourDescription(_txtDescription.getText().trim());
+		updateModelFromUI();
 
 		super.okPressed();
 	}
@@ -675,12 +790,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		final int selectedIndex = _comboWindSpeedText.getSelectionIndex();
 		final int speed = _unitValueWindSpeed[selectedIndex];
 
-		final boolean isBackup = _isDirtyDisabled;
-		_isDirtyDisabled = true;
+		final boolean isBackup = _isUpdateUI;
+		_isUpdateUI = true;
 		{
 			_spinWindSpeedValue.setSelection(speed);
 		}
-		_isDirtyDisabled = isBackup;
+		_isUpdateUI = isBackup;
 	}
 
 	private void onSelectWindSpeedValue() {
@@ -689,25 +804,115 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		final int windSpeed = _spinWindSpeedValue.getSelection();
 
-		final boolean isBackup = _isDirtyDisabled;
-		_isDirtyDisabled = true;
+		final boolean isBackup = _isUpdateUI;
+		_isUpdateUI = true;
 		{
 			_comboWindSpeedText.select(getWindSpeedTextIndex(windSpeed));
 		}
-		_isDirtyDisabled = isBackup;
+		_isUpdateUI = isBackup;
 	}
 
-	private void updateUI() {
+	/**
+	 * update tourdata from the fields
+	 */
+	private void updateModelFromUI() {
 
-		_isDirtyDisabled = true;
+		_tourData.setTourTitle(_txtTitle.getText().trim());
+		_tourData.setTourDescription(_txtDescription.getText().trim());
+
+		_tourData.setRestPulse(_spinRestPuls.getSelection());
+		_tourData.setCalories(_spinTourCalories.getSelection());
+
+		_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
+		if (_isWindSpeedManuallyModified) {
+			/*
+			 * update the speed only when it was modified because when the measurement is
+			 * changed when the tour is being modified then the computation of the speed
+			 * value can cause rounding errors
+			 */
+			_tourData.setWeatherWindSpd((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
+		}
+
+		final int cloudIndex = _comboClouds.getSelectionIndex();
+		String cloudValue = IWeather._cloudDBValue[cloudIndex];
+		if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
+			// replace invalid cloud key
+			cloudValue = UI.EMPTY_STRING;
+		}
+		_tourData.setWeatherClouds(cloudValue);
+
+		if (_isTemperatureManuallyModified) {
+			int temperature = _spinTemperature.getSelection();
+			if (_unitValueTemperature != 1) {
+				temperature = (int) ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+			}
+			_tourData.setAvgTemperature(temperature);
+		}
+
+	}
+
+	private void updateUIFromModel() {
+
+		_isUpdateUI = true;
 		{
+			/*
+			 * tour/event
+			 */
 			// set field content
 			_txtTitle.setText(_tourData.getTourTitle());
 			_txtDescription.setText(_tourData.getTourDescription());
 
-			_comboWindDirectionText.select(0);
-			_comboWindSpeedText.select(0);
+			/*
+			 * personal details
+			 */
+			_spinRestPuls.setSelection(_tourData.getRestPulse());
+			_spinTourCalories.setSelection(_tourData.getCalories());
+
+			/*
+			 * wind properties
+			 */
+			// wind direction
+			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
+			_spinWindDirectionValue.setSelection(weatherWindDirDegree);
+			_comboWindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
+
+			// wind speed
+			final int windSpeed = _tourData.getWeatherWindSpd();
+			final int speed = (int) (windSpeed / _unitValueDistance);
+			_spinWindSpeedValue.setSelection(speed);
+			_comboWindSpeedText.select(getWindSpeedTextIndex(speed));
+
+			/*
+			 * weather icon
+			 */
+			int weatherCloudsIndex = -1;
+			final String cloudValue = _tourData.getWeatherClouds();
+			if (cloudValue != null) {
+				// we cannot use a binary search as that requires sorting which we cannot...
+				for (int cloudIndex = 0; cloudIndex < IWeather._cloudDBValue.length; ++cloudIndex) {
+					if (IWeather._cloudDBValue[cloudIndex].equalsIgnoreCase(cloudValue)) {
+						weatherCloudsIndex = cloudIndex;
+						break;
+					}
+				}
+			}
+			if (weatherCloudsIndex < 0) {
+				// select first entry which is the default value
+				_comboClouds.select(0);
+			} else {
+				_comboClouds.select(weatherCloudsIndex);
+			}
+			// icon must be displayed after the combobox entry is selected
+			displayCloudIcon();
+
+			// temperature
+			int temperature = _tourData.getAvgTemperature();
+			if (_unitValueTemperature != 1) {
+				temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+			}
+			_spinTemperature.setSelection(temperature);
+
 		}
-		_isDirtyDisabled = false;
+		_isUpdateUI = false;
 	}
 }
