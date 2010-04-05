@@ -33,6 +33,12 @@ public class Messages extends NLS {
 	public static String		Dialog_CustomConfig_Label_ZoomLevel;
 	public static String		Dialog_CustomConfig_Text_ImageFormat_Tooltip;
 
+	public static String	Dialog_DropNoPOI_InvalidData;
+
+	public static String	Dialog_DropNoPOI_Message;
+
+	public static String	Dialog_DropNoPOI_Title;
+
 	public static String		Dialog_MapConfig_Button_LiveView;
 	public static String		Dialog_MapConfig_Button_LiveView_Tooltip;
 	public static String		Dialog_MapConfig_Button_Save;
@@ -137,6 +143,7 @@ public class Messages extends NLS {
 	public static String		Image_POI_Cart;
 	public static String		Image_POI_Flag;
 	public static String		Image_POI_House;
+	public static String		Image_POI_InMap;
 	public static String		Image_POI_Soccer;
 	public static String		Image_POI_Star;
 
@@ -211,7 +218,7 @@ public class Messages extends NLS {
 
 	public static String		Offline_Area_Label_AreaMarker;
 
-	public static String	Offline_Area_Label_OldAreaMarker;
+	public static String		Offline_Area_Label_OldAreaMarker;
 	public static String		Offline_Area_Label_SelectInfo;
 
 	public static String		TileInfo_Control_DefaultTitle;

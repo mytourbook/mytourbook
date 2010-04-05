@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -88,9 +88,9 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
@@ -137,7 +137,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private Combo							_cboTileImageLog;
 	private Text							_txtLogDetail;
 
-	private FormToolkit						_formTk									= new FormToolkit(Display
+	private final FormToolkit						_formTk									= new FormToolkit(Display
 																							.getCurrent());
 	private ExpandableComposite				_logContainer;
 
@@ -146,13 +146,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 	private final IDialogSettings			_dialogSettings;
 
-	private PrefPageMapProviders			_prefPageMapFactory;
+	private final PrefPageMapProviders			_prefPageMapFactory;
 
 	/**
 	 * all visible {@link MtLayer}'s
 	 */
-	private ArrayList<MtLayer>				_allMtLayers							= new ArrayList<MtLayer>();
-	private ArrayList<MtLayer>				_displayedLayers						= new ArrayList<MtLayer>();
+	private final ArrayList<MtLayer>				_allMtLayers							= new ArrayList<MtLayer>();
+	private final ArrayList<MtLayer>				_displayedLayers						= new ArrayList<MtLayer>();
 
 	private int								_statIsQueued;
 	private int								_statStartLoading;
@@ -164,7 +164,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	private String							_tileUrl;
 	private long							_dragStartViewerLeft;
 
-	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 	{
 		// initialize lat/lon formatter
 		_nfLatLon.setMinimumFractionDigits(6);
@@ -175,11 +175,11 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private MPWms							_mpWms;
 
-	private MPPlugin						_defaultMapProvider;
+	private final MPPlugin						_defaultMapProvider;
 
 	// load tile image logging
 	private boolean							_isTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
 	public DialogMPWms(final Shell parentShell, final PrefPageMapProviders mapFactory, final MPWms wmsMapProvider) {
 
@@ -723,7 +723,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 				// check drop location
 				final int location = getCurrentLocation();
-				if ((location == LOCATION_AFTER || location == LOCATION_BEFORE) == false) {
+				if (((location == LOCATION_AFTER) || (location == LOCATION_BEFORE)) == false) {
 					return false;
 				}
 
@@ -949,13 +949,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		_map.setShowScale(true);
 
-		_map.addMapListener(new IMapListener() {
+		_map.addMousePositionListener(new IPositionListener() {
 
-			public void mapInfo(final MapEvent event) {
+			public void setPosition(final MapPositionEvent event) {
 
-				final GeoPosition mapCenter = event.mapCenter;
+				final GeoPosition mousePosition = event.mapGeoPosition;
 
-				double lon = mapCenter.longitude % 360;
+				double lon = mousePosition.longitude % 360;
 				lon = lon > 180 ? //
 						lon - 360
 						: lon < -180 ? //
@@ -963,7 +963,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 								: lon;
 
 				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mapCenter.latitude),
+						_nfLatLon.format(mousePosition.latitude),
 						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
@@ -1015,8 +1015,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		// check if the container must be expanded/collapsed
 		final boolean isLogExpanded = _logContainer.isExpanded();
 
-		if ((isLogExpanded == true && _isTileImageLogging == false)
-				|| (isLogExpanded == false && _isTileImageLogging == true)) {
+		if (((isLogExpanded == true) && (_isTileImageLogging == false))
+				|| ((isLogExpanded == false) && (_isTileImageLogging == true))) {
 
 			// show/hide log section
 			_logContainer.setExpanded(_isTileImageLogging);
@@ -1384,7 +1384,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_map.setZoom(zoom);
 		_map.setGeoCenterPosition(center);
 
-		// display map 
+		// display map
 		_map.queueMapRedraw();
 	}
 
@@ -1428,7 +1428,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 	private void setZoomFromBounds(final Set<GeoPosition> positions) {
 
-		if (positions == null || positions.size() < 2) {
+		if ((positions == null) || (positions.size() < 2)) {
 			return;
 		}
 
@@ -1488,7 +1488,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// zoom IN until the tour is larger than the viewport
-		while (positionRect.width < viewport.width && positionRect.height < viewport.height) {
+		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
 
 //			System.out.println();
 //			dump("vp2:", viewport, positionRect);

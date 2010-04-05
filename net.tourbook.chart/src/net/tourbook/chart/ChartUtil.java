@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -30,12 +30,13 @@ public class ChartUtil {
 	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
 
+	private static final String			FORMAT_0F		= "0f";
 	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
 
-	private final static NumberFormat	fNf				= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf				= NumberFormat.getNumberInstance();
 
-	private static StringBuilder		fFormatterSB	= new StringBuilder();
-	private static Formatter			fFormatter		= new Formatter(fFormatterSB);
+	private static StringBuilder		_sbFormatter	= new StringBuilder();
+	private static Formatter			_formatter		= new Formatter(_sbFormatter);
 
 	/**
 	 * Checks if an image can be reused, this is true if the image exists and has the same size
@@ -48,13 +49,13 @@ public class ChartUtil {
 
 		// check if we could reuse the existing image
 
-		if (image == null || image.isDisposed()) {
+		if ((image == null) || image.isDisposed()) {
 			return false;
 		} else {
 			// image exist, check for the bounds
 			final Rectangle oldBounds = image.getBounds();
 
-			if (!(oldBounds.width == rect.width && oldBounds.height == rect.height)) {
+			if (!((oldBounds.width == rect.width) && (oldBounds.height == rect.height))) {
 				return false;
 			}
 		}
@@ -72,7 +73,7 @@ public class ChartUtil {
 	 */
 	public static Image createImage(final Display display, final Image image, final Rectangle rect) {
 
-		if (image != null && !image.isDisposed()) {
+		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
 		}
 
@@ -80,14 +81,14 @@ public class ChartUtil {
 	}
 
 	public static Color disposeResource(final Color resource) {
-		if (resource != null && !resource.isDisposed()) {
+		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
 		}
 		return null;
 	}
 
 	public static Cursor disposeResource(final Cursor resource) {
-		if (resource != null && !resource.isDisposed()) {
+		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
 		}
 		return null;
@@ -100,7 +101,7 @@ public class ChartUtil {
 	 * @return
 	 */
 	public static Image disposeResource(final Image resource) {
-		if (resource != null && !resource.isDisposed()) {
+		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
 		}
 		return null;
@@ -108,15 +109,15 @@ public class ChartUtil {
 
 	public static String format_mm_ss(final long time) {
 
-		fFormatterSB.setLength(0);
+		_sbFormatter.setLength(0);
 
 		if (time < 0) {
-			fFormatterSB.append(SYMBOL_DASH);
+			_sbFormatter.append(SYMBOL_DASH);
 		}
 
 		final long timeAbs = time < 0 ? 0 - time : time;
 
-		return fFormatter.format(FORMAT_MM_SS, (timeAbs / 60), (timeAbs % 60)).toString();
+		return _formatter.format(FORMAT_MM_SS, (timeAbs / 60), (timeAbs % 60)).toString();
 	}
 
 	/**
@@ -139,8 +140,7 @@ public class ChartUtil {
 
 		String format = Messages.Format_number_float;
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer //$NON-NLS-1$
-		.toString(precision) + 'f';
+		format += (removeDecimalZero && (divValue % 1 == 0)) ? FORMAT_0F : Integer.toString(precision) + 'f';
 
 		return new Formatter().format(format, divValue).toString();
 	}
@@ -165,11 +165,11 @@ public class ChartUtil {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			final float divValue = value / divisor;
 			if (divValue % 1 == 0) {
-				fNf.setMinimumFractionDigits(0);
+				_nf.setMinimumFractionDigits(0);
 			} else {
-				fNf.setMinimumFractionDigits(1);
+				_nf.setMinimumFractionDigits(1);
 			}
-			valueText = fNf.format(divValue);
+			valueText = _nf.format(divValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
@@ -201,8 +201,8 @@ public class ChartUtil {
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_DAY:
-			fNf.setMinimumFractionDigits(1);
-			valueText = fNf.format(value);
+			_nf.setMinimumFractionDigits(1);
+			valueText = _nf.format(value);
 			break;
 
 		default:

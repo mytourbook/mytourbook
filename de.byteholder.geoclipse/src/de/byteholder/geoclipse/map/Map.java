@@ -34,6 +34,8 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -46,8 +48,18 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.window.ToolTip;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -73,13 +85,14 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
-import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -89,36 +102,65 @@ import de.byteholder.gpx.GeoPosition;
 
 public class Map extends Canvas {
 
-	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						DEFAULT_BACKGROUND_RGB		= new RGB(181, 208, 208);
+	private static final int							INVALID_POI_POSITION						= -33333;
 
-	private static final RGB					_transparentRGB				= new RGB(0xfe, 0xfe, 0xfe);
+	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
+	private static final String							WIKI_PARAMETER_TYPE							= "type";																	//$NON-NLS-1$
+
+//	http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
+//	http://toolserver.org/~geohack/geohack.php?pagename=Pinatubo&language=de&params=15.133333333333_N_120.35_E_dim:5000_region:PH_type:mountain(1486)_&title=Pinatubo
+//	http://toolserver.org/~geohack/geohack.php?pagename=Mount_Evans&language=de&params=39.588611111111_N_105.64277777778_W_dim:5000_region:US-CO_type:mountain(4350)
+
+	private static final String							PATTERN_WIKI_URL							= ".*pagename=([^&]*).*params=(.*)";										//$NON-NLS-1$
+	private static final String							PATTERN_WIKI_POSITION						= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
+	private static final String							PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR	= ":";																		//$NON-NLS-1$
+	private static final String							PATTERN_WIKI_PARAMETER_SEPARATOR			= "_";																		//$NON-NLS-1$
+
+	private static final Pattern						_patternWikiUrl								= Pattern
+																											.compile(PATTERN_WIKI_URL);
+	private static final Pattern						_patternWikiPosition						= Pattern
+																											.compile(PATTERN_WIKI_POSITION);
+	private static final Pattern						_patternWikiParamter						= Pattern
+																											.compile(PATTERN_WIKI_PARAMETER_SEPARATOR);
+	private static final Pattern						_patternWikiKeyValue						= Pattern
+																											.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+
+	// [181,208,208] is the color of water in the standard OSM material
+	public final static RGB								DEFAULT_BACKGROUND_RGB						= new RGB(
+																											181,
+																											208,
+																											208);
+
+	private static final RGB							_transparentRGB								= new RGB(
+																											0xfe,
+																											0xfe,
+																											0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
-	private int									_mapZoomLevel				= 0;
+	private int											_mapZoomLevel								= 0;
 
 	/**
 	 * Image which contains the map
 	 */
-	private Image								_mapImage;
+	private Image										_mapImage;
 
-	private Image								_image9Parts;
+	private Image										_image9Parts;
 
-	private GC									_gc9Parts;
+	private GC											_gc9Parts;
 
 	/**
 	 * Indicates whether or not to draw the borders between tiles. Defaults to false.
 	 * not very nice looking, very much a product of testing Consider whether this should really be
 	 * a property or not.
 	 */
-	private boolean								_isShowTileInfo				= false;
+	private boolean										_isShowTileInfo								= false;
 
 	/**
 	 * Factory used by this component to grab the tiles necessary for painting the map.
 	 */
-	private MP									_MP;
+	private MP											_MP;
 
 	/**
 	 * The position in latitude/longitude of the "address" being mapped. This is a special
@@ -127,93 +169,95 @@ public class Map extends Canvas {
 	 * will not change when panning or zooming. Whenever the addressLocation is changed, however,
 	 * the map will be repositioned.
 	 */
-	private GeoPosition							_addressLocation;
+	private GeoPosition									_addressLocation;
 
 	/**
 	 * Specifies whether panning is enabled. Panning is being able to click and drag the map around
 	 * to cause it to move
 	 */
-	private boolean								_panEnabled					= true;
+	private boolean										_panEnabled									= true;
 
 	/**
 	 * Specifies whether zooming is enabled (the mouse wheel, for example, zooms)
 	 */
-	private boolean								_zoomEnabled				= true;
+	private boolean										_zoomEnabled								= true;
 
 	/**
 	 * Indicates whether the component should re-center the map when the "middle" mouse button is
 	 * pressed
 	 */
-	private boolean								_recenterOnClickEnabled		= true;
+	private boolean										_recenterOnClickEnabled						= true;
 
-	private boolean								_zoomOnDoubleClickEnabled	= true;
+	private boolean										_zoomOnDoubleClickEnabled					= true;
 
 	/**
 	 * The overlay to delegate to for painting the "foreground" of the map component. This would
 	 * include painting waypoints, day/night, etc. Also receives mouse events.
 	 */
-	private final List<MapPainter>				_overlays					= new ArrayList<MapPainter>();
+	private final List<MapPainter>						_overlays									= new ArrayList<MapPainter>();
 
-	private final TileLoadObserver				_tileLoadObserver			= new TileLoadObserver();
+	private final TileLoadObserver						_tileLoadObserver							= new TileLoadObserver();
 
-	private final Cursor						_cursorPan;
-	private final Cursor						_cursorDefault;
-	private final Cursor						_cursorCross;
+	private final Cursor								_cursorPan;
+	private final Cursor								_cursorDefault;
+	private final Cursor								_cursorCross;
 
-	private int									_redrawMapCounter			= 0;
-	private int									_overlayRunnableCounter		= 0;
+	private int											_redrawMapCounter							= 0;
+	private int											_overlayRunnableCounter						= 0;
 
-	private boolean								_isLeftMouseButtonPressed	= false;
+	private boolean										_isLeftMouseButtonPressed					= false;
 
-	private Point								_mouseMovePosition;
-	private Point								_mousePanPosition;
-	private boolean								_isMapPanned;
+	private Point										_mouseMovePosition;
+	private Point										_mousePanPosition;
+	private boolean										_isMapPanned;
 
-	private final Thread						_overlayThread;
-	private long								_nextOverlayRedrawTime;
+	private final Thread								_overlayThread;
+	private long										_nextOverlayRedrawTime;
 
-	private final NumberFormat					_nf							= NumberFormat.getNumberInstance();
-	private final NumberFormat					_nfLatLon					= NumberFormat.getNumberInstance();
+	private final NumberFormat							_nf											= NumberFormat
+																											.getNumberInstance();
+	private final NumberFormat							_nfLatLon									= NumberFormat
+																											.getNumberInstance();
 
 	{
 		_nfLatLon.setMinimumFractionDigits(4);
 		_nfLatLon.setMaximumFractionDigits(4);
 	}
 
-	private final TextWrapPainter				_textWrapper				= new TextWrapPainter();
+	private final TextWrapPainter						_textWrapper								= new TextWrapPainter();
 
 	/**
 	 * cache for overlay images
 	 */
-	private final OverlayImageCache				_overlayImageCache;
+	private final OverlayImageCache						_overlayImageCache;
 
 	/**
 	 * This queue contains tiles which overlay image must be painted
 	 */
-	private final ConcurrentLinkedQueue<Tile>	_tileOverlayPaintQueue		= new ConcurrentLinkedQueue<Tile>();
+	private final ConcurrentLinkedQueue<Tile>			_tileOverlayPaintQueue						= new ConcurrentLinkedQueue<Tile>();
 
-	private boolean								_isDrawOverlayRunning		= false;
+	private boolean										_isDrawOverlayRunning						= false;
 
-	private String								_overlayKey;
+	private String										_overlayKey;
 
 	/**
 	 * this painter is called when the map is painted in the onPaint event
 	 */
-	private IDirectPainter						_directMapPainter;
+	private IDirectPainter								_directMapPainter;
 
-	private final DirectPainterContext			_directMapPainterContext	= new DirectPainterContext();
+	private final DirectPainterContext					_directMapPainterContext					= new DirectPainterContext();
 
 	/**
 	 * when <code>true</code> the overlays are painted
 	 */
-	private boolean								_isDrawOverlays				= false;
+	private boolean										_isDrawOverlays								= false;
 
 	/**
 	 * contains a legend which is painted in the map
 	 */
-	private MapLegend							_mapLegend;
+	private MapLegend									_mapLegend;
 
-	private boolean								_isLegendVisible;
+	private boolean										_isLegendVisible;
 
 	/**
 	 * The position, in <I>map coordinates</I> of the center point. This is defined as the distance
@@ -231,90 +275,108 @@ public class Map extends Canvas {
 	 * <br>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
 	 */
-	private Point2D								_mapCenterInWorldPixel		= new Point2D.Double(0, 0);
+	private Point2D										_mapCenterInWorldPixel						= new Point2D.Double(
+																											0,
+																											0);
 
 	/**
 	 * Viewport in the world map where the {@link #_mapImage} is painted <br>
 	 * <br>
 	 * <b>x</b> and <b>y</b> contains the position in world pixel, which is the <b>top/left
-	 * corder</b>, <br>
+	 * corner</b>, <br>
 	 * <b>width</b> and <b>height</b> contains the visible area in device pixel
 	 */
-	private Rectangle							_mapPixelViewport;
+	private Rectangle									_mapPixelViewport;
 
 	/**
 	 * Contains the client area of the map without trimmings, this rectangle has the width and
 	 * height of the map image
 	 */
-	private org.eclipse.swt.graphics.Rectangle	_clientArea;
+	private org.eclipse.swt.graphics.Rectangle			_clientArea;
 
-	private final List<IZoomListener>			_zoomListeners;
-	private final ListenerList					_mapListeners				= new ListenerList(ListenerList.IDENTITY);
+	private final List<IZoomListener>					_zoomListeners;
+
+	private final ListenerList							_mousePositionListeners						= new ListenerList(
+																											ListenerList.IDENTITY);
+	private final ListenerList							_poiListeners								= new ListenerList(
+																											ListenerList.IDENTITY);
 
 	// measurement system
-	private float								_distanceUnitValue			= 1;
-	private String								_distanceUnitLabel			= UI.EMPTY_STRING;
+	private float										_distanceUnitValue							= 1;
+	private String										_distanceUnitLabel							= UI.EMPTY_STRING;
 
-	private boolean								_isScaleVisible				= false;
+	private boolean										_isScaleVisible								= false;
 
-	private final Color							_transparentColor;
+	private final Color									_transparentColor;
+	private final Color									_defaultBackgroundColor;
 
-	private final Color							_defaultBackgroundColor;
+	private boolean										_isShowPOI;
+	private final Image									_poiImage;
+	private GeoPosition									_poiPosition;
+	private String										_poiText;
+	private final org.eclipse.swt.graphics.Rectangle	_poiImageBounds;
+
 	/**
 	 * when <code>true</code> the loading... image is not displayed
 	 */
-	private boolean								_isLiveView;
+	private boolean										_isLiveView;
 
-	private long								_requestedRedrawTime;
-	private long								_drawTime;
+	private long										_requestedRedrawTime;
+	private long										_drawTime;
 
 	/*
 	 * these 4 tile positions correspond to the tiles which are needed to draw the map
 	 */
-	private int									_tilePosMinX;
-	private int									_tilePosMaxX;
-	private int									_tilePosMinY;
-	private int									_tilePosMaxY;
+	private int											_tilePosMinX;
+	private int											_tilePosMaxX;
+	private int											_tilePosMinY;
+	private int											_tilePosMaxY;
 
 	// viewport data which are changed when map is resized or zoomed
-	private Rectangle							_devVisibleViewport;
+	private Rectangle									_devVisibleViewport;
 
 	/**
 	 * contains the size of the map at the given zoom in tiles (num tiles tall by num tiles wide)
 	 */
-	private Dimension							_mapTileSize;
-	private int									_worldViewportX;
-	private int									_worldViewportY;
+	private Dimension									_mapTileSize;
+	private int											_worldViewportX;
+	private int											_worldViewportY;
 
-	private final Display						_display;
-	private final Thread						_displayThread;
+	private final Display								_display;
+	private final Thread								_displayThread;
 
-	private int									_jobCounterSplitImages		= 0;
+	private int											_jobCounterSplitImages						= 0;
 
 	/**
 	 * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
 	 * simple mode
 	 */
-	private boolean								_isTourPaintMethodEnhanced	= false;
+	private boolean										_isTourPaintMethodEnhanced					= false;
 
-	private boolean								_isSelectOfflineArea;
-	private boolean								_isOfflineSelectionStarted	= false;
-	private boolean								_isPaintOfflineArea			= false;
+	private boolean										_isSelectOfflineArea;
+	private boolean										_isOfflineSelectionStarted					= false;
+	private boolean										_isPaintOfflineArea							= false;
 
-	private Point								_offlineDevAreaStart;
-	private Point								_offlineDevAreaEnd;
-	private Point								_offlineDevTileStart;
-	private Point								_offlineDevTileEnd;
-	private Point								_offlineWorldStart;
-	private Point								_offlineWorldEnd;
-	private Point								_offlineWorldMouseMove;
+	private Point										_offlineDevAreaStart;
+	private Point										_offlineDevAreaEnd;
+	private Point										_offlineDevTileStart;
+	private Point										_offlineDevTileEnd;
+	private Point										_offlineWorldStart;
+	private Point										_offlineWorldEnd;
+	private Point										_offlineWorldMouseMove;
 
-	private org.eclipse.swt.graphics.Rectangle	_currentOfflineArea;
-	private org.eclipse.swt.graphics.Rectangle	_previousOfflineArea;
+	private org.eclipse.swt.graphics.Rectangle			_currentOfflineArea;
+	private org.eclipse.swt.graphics.Rectangle			_previousOfflineArea;
 
-	private IMapContextProvider					_mapContextProvider;
+	private IMapContextProvider							_mapContextProvider;
 
-	private boolean								_disableContextMenu			= false;
+	private boolean										_disableContextMenu							= false;
+
+	private DropTarget									_dropTarget;
+	private int											_devPoiPosX;
+	private int											_devPoiPosY;
+
+	private final ToolTip								_toolTip;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -360,7 +422,7 @@ public class Map extends Canvas {
 				break;
 			}
 
-			if (delta_x != 0 || delta_y != 0) {
+			if ((delta_x != 0) || (delta_y != 0)) {
 
 				final Rectangle bounds = _mapPixelViewport;
 				final double x = bounds.getCenterX() + delta_x;
@@ -451,59 +513,6 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Checks if an image can be reused, this is true if the image exists and has the same size
-	 * 
-	 * @param newWidth
-	 * @param newHeight
-	 * @return
-	 */
-	public static boolean canReuseImage(final Image image, final org.eclipse.swt.graphics.Rectangle clientArea) {
-
-		// check if we could reuse the existing image
-
-		if (image == null || image.isDisposed()) {
-			return false;
-		} else {
-			// image exist, check for the bounds
-			final org.eclipse.swt.graphics.Rectangle oldBounds = image.getBounds();
-
-			if (!(oldBounds.width == clientArea.width && oldBounds.height == clientArea.height)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * creates a new image
-	 * 
-	 * @param display
-	 * @param image
-	 *            image which will be disposed if the image is not null
-	 * @param clientArea
-	 * @return returns a new created image
-	 */
-	public static Image createImage(final Display display,
-									final Image image,
-									final org.eclipse.swt.graphics.Rectangle clientArea) {
-
-		if (image != null && !image.isDisposed()) {
-			image.dispose();
-		}
-
-		// ensure the image has a width/height of 1, otherwise this causes troubles
-		final int width = Math.max(1, clientArea.width);
-		final int height = Math.max(1, clientArea.height);
-
-		return new Image(display, width, height);
-	}
-
-	public static RGB getTransparentRGB() {
-		return _transparentRGB;
-	}
-
-	/**
 	 * Create a new Map
 	 */
 	public Map(final Composite parent, final int style) {
@@ -560,6 +569,8 @@ public class Map extends Canvas {
 			}
 		});
 
+		addDropTarget(this);
+
 		_cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 		_cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
 		_cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
@@ -567,6 +578,9 @@ public class Map extends Canvas {
 		_defaultBackgroundColor = new Color(_display, DEFAULT_BACKGROUND_RGB);
 
 		_transparentColor = new Color(_display, _transparentRGB);
+
+		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
+		_poiImageBounds = _poiImage.getBounds();
 
 		_overlayImageCache = new OverlayImageCache();
 
@@ -606,6 +620,67 @@ public class Map extends Canvas {
 		_overlayThread.setDaemon(true);
 		_overlayThread.start();
 
+		_toolTip = new ToolTip(this) {
+			@Override
+			protected Composite createToolTipContentArea(final Event event, final Composite parent) {
+				return onCreateToolTip(event, parent);
+			}
+		};
+//		_toolTip.setHideDelay(0);
+
+	}
+
+	/**
+	 * Checks if an image can be reused, this is true if the image exists and has the same size
+	 * 
+	 * @param newWidth
+	 * @param newHeight
+	 * @return
+	 */
+	public static boolean canReuseImage(final Image image, final org.eclipse.swt.graphics.Rectangle clientArea) {
+
+		// check if we could reuse the existing image
+
+		if ((image == null) || image.isDisposed()) {
+			return false;
+		} else {
+			// image exist, check for the bounds
+			final org.eclipse.swt.graphics.Rectangle oldBounds = image.getBounds();
+
+			if (!((oldBounds.width == clientArea.width) && (oldBounds.height == clientArea.height))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * creates a new image
+	 * 
+	 * @param display
+	 * @param image
+	 *            image which will be disposed if the image is not null
+	 * @param clientArea
+	 * @return returns a new created image
+	 */
+	public static Image createImage(final Display display,
+									final Image image,
+									final org.eclipse.swt.graphics.Rectangle clientArea) {
+
+		if ((image != null) && !image.isDisposed()) {
+			image.dispose();
+		}
+
+		// ensure the image has a width/height of 1, otherwise this causes troubles
+		final int width = Math.max(1, clientArea.width);
+		final int height = Math.max(1, clientArea.height);
+
+		return new Image(display, width, height);
+	}
+
+	public static RGB getTransparentRGB() {
+		return _transparentRGB;
 	}
 
 	void actionManageOfflineImages(final Event event) {
@@ -633,9 +708,10 @@ public class Map extends Canvas {
 			return;
 		}
 
-		if (_offlineDevAreaStart != null //
-				&& _currentOfflineArea != null
-				&& (event.stateMask & SWT.CONTROL) != 0) {
+		if ((_offlineDevAreaStart != null //
+				)
+				&& (_currentOfflineArea != null)
+				&& ((event.stateMask & SWT.CONTROL) != 0)) {
 
 			/*
 			 * use old offline area when the ctrl-key is pressed
@@ -673,8 +749,53 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	public void addMapListener(final IMapListener mapListener) {
-		_mapListeners.add(mapListener);
+	private void addDropTarget(final Canvas canvas) {
+
+		_dropTarget = new DropTarget(canvas, DND.DROP_MOVE | DND.DROP_COPY);
+		_dropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), TextTransfer.getInstance() });
+
+		_dropTarget.addDropListener(new DropTargetAdapter() {
+			@Override
+			public void dragEnter(final DropTargetEvent event) {
+				if ((event.detail == DND.DROP_DEFAULT) || (event.detail == DND.DROP_MOVE)) {
+					event.detail = DND.DROP_COPY;
+				}
+			}
+
+			@Override
+			public void dragLeave(final DropTargetEvent event) {
+
+			}
+
+			@Override
+			public void dragOver(final DropTargetEvent event) {
+				if ((event.detail == DND.DROP_DEFAULT) || (event.detail == DND.DROP_MOVE)) {
+					event.detail = DND.DROP_COPY;
+				}
+			}
+
+			@Override
+			public void drop(final DropTargetEvent event) {
+
+				if (event.data == null) {
+					event.detail = DND.DROP_NONE;
+					return;
+				}
+
+				/*
+				 * run async to free the mouse cursor from the drop operation
+				 */
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						onDropRunnable(event);
+					}
+				});
+			}
+		});
+	}
+
+	public void addMousePositionListener(final IPositionListener mapListener) {
+		_mousePositionListeners.add(mapListener);
 	}
 
 	/**
@@ -690,37 +811,13 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
+	public void addPOIListener(final IPositionListener poiListener) {
+		_poiListeners.add(poiListener);
+	}
+
 	public void addZoomListener(final IZoomListener listener) {
 		_zoomListeners.add(listener);
 	}
-
-//	/**
-//	 * Calculates (and sets) the greatest zoom level, so that all positions are visible on screen.
-//	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
-//	 * so that the entire city and it's points are visible without panning.
-//	 *
-//	 * @param positions
-//	 *            A set of GeoPositions to calculate the new zoom from
-//	 */
-//	public void calculateZoomFrom(final Set<GeoPosition> positions) {
-//		if (positions.size() < 2) {
-//			return;
-//		}
-//
-//		int zoom = _MP.getMinimumZoomLevel();
-//		Rectangle rect = getBoundingRect(positions, zoom);
-//
-//		while (getViewport().contains(rect) && zoom < _MP.getMaximumZoomLevel()) {
-//			zoom++;
-//			rect = getBoundingRect(positions, zoom);
-//		}
-//		final Point2D center = new Point2D.Double(rect.getCenterX(), rect.getCenterY());
-//
-//		setMapPixelCenter(_MP.pixelToGeo(center, zoom), center);
-//		setZoom(zoom);
-//
-//		queueMapRedraw();
-//	}
 
 	/**
 	 * make sure that the parted overlay image has the correct size
@@ -731,7 +828,7 @@ public class Map extends Canvas {
 		final int tileSize = _MP.getTileSize();
 		final int partedTileSize = tileSize * parts;
 
-		if (_image9Parts != null && _image9Parts.isDisposed() == false) {
+		if ((_image9Parts != null) && (_image9Parts.isDisposed() == false)) {
 			if (_image9Parts.getBounds().width == partedTileSize) {
 				// image is OK
 				return;
@@ -770,7 +867,7 @@ public class Map extends Canvas {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				if (_MP == null || _disableContextMenu) {
+				if ((_MP == null) || _disableContextMenu) {
 					return;
 				}
 
@@ -811,6 +908,34 @@ public class Map extends Canvas {
 		redraw();
 	}
 
+//	/**
+//	 * Calculates (and sets) the greatest zoom level, so that all positions are visible on screen.
+//	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
+//	 * so that the entire city and it's points are visible without panning.
+//	 *
+//	 * @param positions
+//	 *            A set of GeoPositions to calculate the new zoom from
+//	 */
+//	public void calculateZoomFrom(final Set<GeoPosition> positions) {
+//		if (positions.size() < 2) {
+//			return;
+//		}
+//
+//		int zoom = _MP.getMinimumZoomLevel();
+//		Rectangle rect = getBoundingRect(positions, zoom);
+//
+//		while (getViewport().contains(rect) && zoom < _MP.getMaximumZoomLevel()) {
+//			zoom++;
+//			rect = getBoundingRect(positions, zoom);
+//		}
+//		final Point2D center = new Point2D.Double(rect.getCenterX(), rect.getCenterY());
+//
+//		setMapPixelCenter(_MP.pixelToGeo(center, zoom), center);
+//		setZoom(zoom);
+//
+//		queueMapRedraw();
+//	}
+
 	/**
 	 * Disposes all overlay image cache and the overlay painting queue
 	 */
@@ -826,7 +951,7 @@ public class Map extends Canvas {
 	}
 
 	private void disposeResource(final Resource resource) {
-		if (resource != null && !resource.isDisposed()) {
+		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
 		}
 	}
@@ -852,7 +977,7 @@ public class Map extends Canvas {
 
 			// check or create map image
 			Image image = _mapImage;
-			if (image == null || image.isDisposed() || canReuseImage(image, _clientArea) == false) {
+			if ((image == null) || image.isDisposed() || (canReuseImage(image, _clientArea) == false)) {
 				image = createImage(_display, image, _clientArea);
 			}
 			_mapImage = image;
@@ -897,7 +1022,7 @@ public class Map extends Canvas {
 
 		// get legend image from the legend
 		final Image legendImage = _mapLegend.getImage();
-		if (legendImage == null || legendImage.isDisposed()) {
+		if ((legendImage == null) || legendImage.isDisposed()) {
 			return;
 		}
 
@@ -1162,7 +1287,7 @@ public class Map extends Canvas {
 
 		if (tile.isLoadingError()
 				|| tile.isOfflineError()
-				|| (childrenWithErrors != null && childrenWithErrors.size() > 0)) {
+				|| ((childrenWithErrors != null) && (childrenWithErrors.size() > 0))) {
 
 			drawTileInfoError(gc, devTilePosition, tile);
 
@@ -1225,7 +1350,7 @@ public class Map extends Canvas {
 		}
 
 		final ConcurrentHashMap<String, Tile> childrenLoadingError = tile.getChildrenWithErrors();
-		if (childrenLoadingError != null && childrenLoadingError.size() > 0) {
+		if ((childrenLoadingError != null) && (childrenLoadingError.size() > 0)) {
 
 			for (final Tile childTile : childrenLoadingError.values()) {
 				sb.append(childTile.getLoadingError());
@@ -1356,8 +1481,8 @@ public class Map extends Canvas {
 		final OverlayImageState imageState = tile.getOverlayImageState();
 		final int overlayContent = tile.getOverlayContent();
 
-		if (imageState == OverlayImageState.IMAGE_IS_CREATED
-				|| (imageState == OverlayImageState.NO_IMAGE && overlayContent == 0)) {
+		if ((imageState == OverlayImageState.IMAGE_IS_CREATED)
+				|| ((imageState == OverlayImageState.NO_IMAGE) && (overlayContent == 0))) {
 			// there is no image for the tile overlay or the image is currently created
 			return;
 		}
@@ -1382,14 +1507,14 @@ public class Map extends Canvas {
 				 * tile image is still available
 				 */
 				tileOverlayImage = tile.getOverlayImage();
-				if (tileOverlayImage != null && tileOverlayImage.isDisposed() == false) {
+				if ((tileOverlayImage != null) && (tileOverlayImage.isDisposed() == false)) {
 					drawingImage = tileOverlayImage;
 				}
 			}
 		}
 
 		// draw overlay image
-		if (drawingImage != null && drawingImage.isDisposed() == false) {
+		if ((drawingImage != null) && (drawingImage.isDisposed() == false)) {
 			try {
 				gc.drawImage(drawingImage, devTileRectangle.x, devTileRectangle.y);
 			} catch (final Exception e) {
@@ -1419,7 +1544,7 @@ public class Map extends Canvas {
 				tileOverlayImage = tile.getOverlayImage();
 			}
 
-			if (tileOverlayImage == null || tileOverlayImage.isDisposed()) {
+			if ((tileOverlayImage == null) || tileOverlayImage.isDisposed()) {
 
 				// overlay image is NOT available
 
@@ -1486,13 +1611,23 @@ public class Map extends Canvas {
 		queueOverlayPainting(tile);
 	}
 
-	private void fireMapEvent(final GeoPosition geoPosition) {
+	private void fireMousePositionEvent(final GeoPosition geoPosition) {
 
-		final MapEvent event = new MapEvent(geoPosition, _mapZoomLevel);
+		final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
 
-		final Object[] listeners = _mapListeners.getListeners();
+		final Object[] listeners = _mousePositionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
-			((IMapListener) listeners[i]).mapInfo(event);
+			((IPositionListener) listeners[i]).setPosition(event);
+		}
+	}
+
+	private void firePOIEvent(final GeoPosition geoPosition) {
+
+		final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
+
+		final Object[] listeners = _poiListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			((IPositionListener) listeners[i]).setPosition(event);
 		}
 	}
 
@@ -1547,16 +1682,6 @@ public class Map extends Canvas {
 		return _mapLegend;
 	}
 
-//	/**
-//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
-//	 * system, not as lat/longs.
-//	 *
-//	 * @return Returns the current center of the map in as a world pixel value
-//	 */
-//	public Point2D getCenterInWorldPixel() {
-//		return _mapCenterInWorldPixel;
-//	}
-
 	/**
 	 * @return Returns the map viewport<br>
 	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
@@ -1596,7 +1721,7 @@ public class Map extends Canvas {
 
 		if (tilePosY < 0) {
 			tilePosY = 0;
-		} else if (tilePosY >= mapTiles && mapTiles > 0) {
+		} else if ((tilePosY >= mapTiles) && (mapTiles > 0)) {
 			tilePosY = mapTiles - 1;
 		}
 
@@ -1624,6 +1749,16 @@ public class Map extends Canvas {
 	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
 		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
 	}
+
+//	/**
+//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
+//	 * system, not as lat/longs.
+//	 *
+//	 * @return Returns the current center of the map in as a world pixel value
+//	 */
+//	public Point2D getCenterInWorldPixel() {
+//		return _mapCenterInWorldPixel;
+//	}
 
 	public List<MapPainter> getOverlays() {
 		return _overlays;
@@ -1720,7 +1855,7 @@ public class Map extends Canvas {
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
-				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+				if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
 					return true;
 				}
 			}
@@ -1738,7 +1873,7 @@ public class Map extends Canvas {
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
-				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+				if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
 					return true;
 				}
 			}
@@ -1756,7 +1891,7 @@ public class Map extends Canvas {
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
-				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+				if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
 					return true;
 				}
 			}
@@ -1774,7 +1909,7 @@ public class Map extends Canvas {
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
-				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+				if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
 					return true;
 				}
 			}
@@ -1793,7 +1928,7 @@ public class Map extends Canvas {
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
 				srcRed = srcData[srcIndex + 2] & 0xFF;
 
-				if (srcRed != transRed || srcGreen != transGreen || srcBlue != transBlue) {
+				if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
 					return true;
 				}
 			}
@@ -1835,6 +1970,18 @@ public class Map extends Canvas {
 		return _zoomOnDoubleClickEnabled;
 	}
 
+	private Composite onCreateToolTip(final Event event, final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		{
+			final Label label = new Label(parent, SWT.NONE);
+
+			label.setText(_poiText);
+		}
+
+		return container;
+	}
+
 	/**
 	 * onDispose is called when the map is disposed
 	 * 
@@ -1845,8 +1992,12 @@ public class Map extends Canvas {
 		if (_MP != null) {
 			_MP.resetAll(false);
 		}
+		if (_dropTarget != null) {
+			_dropTarget.dispose();
+		}
 
 		disposeResource(_mapImage);
+		disposeResource(_poiImage);
 
 		disposeResource(_image9Parts);
 		disposeResource(_gc9Parts);
@@ -1878,60 +2029,113 @@ public class Map extends Canvas {
 		_overlayThread.interrupt();
 	}
 
+	private void onDropRunnable(final DropTargetEvent event) {
+
+		final TransferData transferDataType = event.currentDataType;
+
+		boolean isPOI = false;
+
+		if (TextTransfer.getInstance().isSupportedType(transferDataType)) {
+
+			if (event.data instanceof String) {
+				isPOI = parsePOIText((String) event.data);
+			}
+
+		} else if (URLTransfer.getInstance().isSupportedType(transferDataType)) {
+			isPOI = parsePOIText((String) event.data);
+		}
+
+		if (isPOI == false) {
+
+			String poiText = Messages.Dialog_DropNoPOI_InvalidData;
+
+			if (event.data instanceof String) {
+
+				poiText = (String) event.data;
+
+				final int maxLength = 1000;
+				if (poiText.length() > maxLength) {
+					poiText = poiText.substring(0, maxLength) + "..."; //$NON-NLS-1$
+				}
+			}
+
+			MessageDialog.openInformation(getShell(), //
+					Messages.Dialog_DropNoPOI_Title,
+					NLS.bind(Messages.Dialog_DropNoPOI_Message, poiText));
+		}
+	}
+
 	private void onMouseDown(final MouseEvent e) {
 
-		if (e.button == 1) {
+		if (e.button != 1) {
+			return;
+		}
 
-			if (_isSelectOfflineArea) {
+		if (_isSelectOfflineArea) {
 
-				_isOfflineSelectionStarted = true;
+			_isOfflineSelectionStarted = true;
 
-				final Rectangle viewPort = _mapPixelViewport;
-				final int worldMouseX = viewPort.x + e.x;
-				final int worldMouseY = viewPort.y + e.y;
+			final Rectangle viewPort = _mapPixelViewport;
+			final int worldMouseX = viewPort.x + e.x;
+			final int worldMouseY = viewPort.y + e.y;
 
-				_offlineDevAreaStart = _offlineDevAreaEnd = new Point(e.x, e.y);
-				_offlineWorldStart = _offlineWorldEnd = new Point(worldMouseX, worldMouseY);
+			_offlineDevAreaStart = _offlineDevAreaEnd = new Point(e.x, e.y);
+			_offlineWorldStart = _offlineWorldEnd = new Point(worldMouseX, worldMouseY);
 
-				_offlineDevTileStart = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
+			_offlineDevTileStart = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
 
-				redraw();
+			redraw();
 
-			} else {
+		} else {
 
-				// if the left mb is clicked remember this point (for panning)
-				_mousePanPosition = new Point(e.x, e.y);
-				_isLeftMouseButtonPressed = true;
+			// if the left mb is clicked remember this point (for panning)
+			_mousePanPosition = new Point(e.x, e.y);
+			_isLeftMouseButtonPressed = true;
 
-				if (isPanEnabled()) {
-					setCursor(_cursorPan);
-				}
+			if (isPanEnabled()) {
+				setCursor(_cursorPan);
 			}
 		}
 	}
 
-	private void onMouseMove(final MouseEvent e) {
+	private void onMouseMove(final MouseEvent event) {
 
-		_mouseMovePosition = new Point(e.x, e.y);
+		final int devMouseX = event.x;
+		final int devMouseY = event.y;
+
+		_mouseMovePosition = new Point(devMouseX, devMouseY);
 
 		if (_isSelectOfflineArea) {
 
 			final Rectangle viewPort = _mapPixelViewport;
-			_offlineWorldMouseMove = new Point(viewPort.x + e.x, viewPort.y + e.y);
+			_offlineWorldMouseMove = new Point(viewPort.x + devMouseX, viewPort.y + devMouseY);
 
-			updateOfflineAreaEndPosition(e);
+			updateOfflineAreaEndPosition(event);
 
 			queueMapRedraw();
 
 			return;
 		}
 
-		if ((_isLeftMouseButtonPressed && _panEnabled) == false) {
-			updateMouseMapPosition();
+		if (_isLeftMouseButtonPressed && _panEnabled) {
+			panMap(event);
 			return;
 		}
 
-		panMap(e);
+		if ((_poiPosition != null) && (_devPoiPosX != INVALID_POI_POSITION)) {
+
+			// display poi info
+
+			if ((devMouseX > _devPoiPosX - 10)
+					&& (devMouseX < _devPoiPosX + 10)
+					&& (devMouseY > _devPoiPosY)
+					&& (devMouseY < _devPoiPosY + 20)) {
+
+				_toolTip.show(new Point(_devPoiPosX, _devPoiPosY));
+			}
+		}
+
+		updateMouseMapPosition();
 	}
 
 	private void onMouseUp(final MouseEvent e) {
@@ -2002,7 +2206,7 @@ public class Map extends Canvas {
 
 		// draw map image to the screen
 
-		if (_mapImage != null && !_mapImage.isDisposed()) {
+		if ((_mapImage != null) && !_mapImage.isDisposed()) {
 
 			final GC gc = event.gc;
 			gc.drawImage(_mapImage, 0, 0);
@@ -2011,6 +2215,10 @@ public class Map extends Canvas {
 				_directMapPainterContext.gc = gc;
 				_directMapPainterContext.viewport = _mapPixelViewport;
 				_directMapPainter.paint(_directMapPainterContext);
+			}
+
+			if (_isShowPOI) {
+				paintPOI(gc);
 			}
 
 			if (_isPaintOfflineArea) {
@@ -2121,7 +2329,7 @@ public class Map extends Canvas {
 		}
 
 		// check if mouse button is hit which sets the start position
-		if (_offlineDevAreaStart == null || _offlineWorldMouseMove == null) {
+		if ((_offlineDevAreaStart == null) || (_offlineWorldMouseMove == null)) {
 			return;
 		}
 
@@ -2187,7 +2395,12 @@ public class Map extends Canvas {
 
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
-		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+//		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+
+		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW));
+		gc.setAlpha(0x30);
+		gc.fillRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
+		gc.setAlpha(0xff);
 
 		/*
 		 * draw text marker
@@ -2392,8 +2605,8 @@ public class Map extends Canvas {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
 
 				// check if the tile is within the map border
-				if ((tileX - xIndex < 0 || tileX + xIndex > maxTiles)
-						|| (tileY - yIndex < 0 || tileY + yIndex > maxTiles)) {
+				if (((tileX - xIndex < 0) || (tileX + xIndex > maxTiles))
+						|| ((tileY - yIndex < 0) || (tileY + yIndex > maxTiles))) {
 					continue;
 				}
 
@@ -2415,7 +2628,7 @@ public class Map extends Canvas {
 				final int yOffset = yIndex - 1;
 
 				final String partImageKey = getOverlayKey(tile, xOffset, yOffset, projectionId);
-				final boolean isCenterPart = xIndex == 1 && yIndex == 1;
+				final boolean isCenterPart = (xIndex == 1) && (yIndex == 1);
 				Image tileOverlayImage = null;
 
 				if (isCenterPart) {
@@ -2558,6 +2771,36 @@ public class Map extends Canvas {
 		}
 	}
 
+	private void paintPOI(final GC gc) {
+
+		if (_poiPosition == null) {
+			return;
+		}
+
+		// get world position for the poi coordinates
+		final java.awt.Point worldPoiPos = _MP.geoToPixel(_poiPosition, _mapZoomLevel);
+
+		// check if slider is visible
+		final java.awt.Rectangle viewport = _mapPixelViewport;
+		if (viewport.contains(worldPoiPos)) {
+
+			// convert world position into device position
+			final int devPoiPosX = worldPoiPos.x - viewport.x;
+			final int devPoiPosY = worldPoiPos.y - viewport.y;
+
+			// get poi size
+			final int poiWidth = _poiImageBounds.width;
+			final int poiHeight = _poiImageBounds.height;
+
+			_devPoiPosX = devPoiPosX - (poiWidth / 2);
+			_devPoiPosY = devPoiPosY - poiHeight;
+
+			gc.drawImage(_poiImage, _devPoiPosX, _devPoiPosY);
+		} else {
+			_devPoiPosX = INVALID_POI_POSITION;
+		}
+	}
+
 	/**
 	 * pan the map
 	 */
@@ -2595,12 +2838,143 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
+	private boolean parsePOIText(final String text) {
+
+		// parse wiki url
+		final Matcher wikiUrlMatcher = _patternWikiUrl.matcher(text);
+		if (wikiUrlMatcher.matches()) {
+
+			// osm url was found
+
+			final String pageName = wikiUrlMatcher.group(1);
+			final String position = wikiUrlMatcher.group(2);
+
+			if (position != null) {
+
+				final Matcher wikiPosMatcher = _patternWikiPosition.matcher(position);
+				if (wikiPosMatcher.matches()) {
+
+					final String latPosition = wikiPosMatcher.group(1);
+					final String latDirection = wikiPosMatcher.group(2);
+					final String lonPosition = wikiPosMatcher.group(3);
+					final String lonDirection = wikiPosMatcher.group(4);
+					final String otherParams = wikiPosMatcher.group(5);
+
+					if (lonDirection != null) {
+
+						try {
+
+							final double lat = Double.parseDouble(latPosition) * (latDirection.equals("N") ? 1 : -1); //$NON-NLS-1$
+							final double lon = Double.parseDouble(lonPosition) * (lonDirection.equals("E") ? 1 : -1); //$NON-NLS-1$
+
+							// set default zoom level
+							int zoom = 10;
+
+							// get zoom level from parameter values
+							if (otherParams != null) {
+
+								String dim = null;
+								String type = null;
+
+								final String[] allKeyValues = _patternWikiParamter.split(otherParams);
+
+								for (final String keyValue : allKeyValues) {
+
+									final String[] splittedKeyValue = _patternWikiKeyValue.split(keyValue);
+
+									if (splittedKeyValue.length > 1) {
+
+										if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_TYPE)) {
+											type = splittedKeyValue[1];
+										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
+											dim = splittedKeyValue[1];
+										}
+									}
+								}
+
+								/*
+								 * !!! disabled because the zoom level is not correct !!!
+								 */
+//								if (dim != null) {
+//									final int scale = Integer.parseInt(dim);
+//									zoom = (int) (18 - (Math.round(Math.log(scale) - Math.log(1693)))) - 1;//, [2, 18];
+//								} else
+
+								if (type != null) {
+
+// source: https://wiki.toolserver.org/view/GeoHack
+//
+// type: 	 										ratio 	 		m / pixel	{scale} 	{mmscale}	{span}	{altitude}	{zoom}	{osmzoom}
+//
+// country, satellite 								1 : 10,000,000 	3528 		10000000 	10000000 	10.0 	1430 		1 		5
+// state 											1 : 3,000,000 	1058 		3000000 	4000000 	3.0 	429 		3 		7
+// adm1st 											1 : 1,000,000 	353 		1000000 	1000000 	1.0 	143 		4 		9
+// adm2nd (default) 								1 : 300,000 	106 		300000 		200000 		0.3 	42 			5 		11
+// adm3rd, city, mountain, isle, river, waterbody 	1 : 100,000 	35.3 		100000 		100000 		0.1 	14 			6 		12
+// event, forest, glacier 							1 : 50,000 		17.6 		50000 		50000 		0.05 	7 			7 		13
+// airport 											1 : 30,000 		10.6 		30000 		25000 		0.03 	4 			7 		14
+// edu, pass, landmark, railwaystation 				1 : 10,000 		3.53 		10000 		10000 		0.01 	1 			8 		15
+
+									if (type.equals("country") // 				//$NON-NLS-1$
+											|| type.equals("satellite")) { //	//$NON-NLS-1$
+										zoom = 5 - 1;
+									} else if (type.equals("state")) { //		//$NON-NLS-1$
+										zoom = 7 - 1;
+									} else if (type.equals("adm1st")) { //		//$NON-NLS-1$
+										zoom = 9 - 1;
+									} else if (type.equals("adm2nd")) { //		//$NON-NLS-1$
+										zoom = 11 - 1;
+									} else if (type.equals("adm3rd") //			//$NON-NLS-1$
+											|| type.equals("city") //			//$NON-NLS-1$
+											|| type.equals("mountain") //		//$NON-NLS-1$
+											|| type.equals("isle") //			//$NON-NLS-1$
+											|| type.equals("river") //			//$NON-NLS-1$
+											|| type.equals("waterbody")) { //	//$NON-NLS-1$
+										zoom = 12 - 1;
+									} else if (type.equals("event")//			//$NON-NLS-1$
+											|| type.equals("forest") // 		//$NON-NLS-1$
+											|| type.equals("glacier")) { //		//$NON-NLS-1$
+										zoom = 13 - 1;
+									} else if (type.equals("airport")) { //		//$NON-NLS-1$
+										zoom = 14 - 1;
+									} else if (type.equals("edu") //			//$NON-NLS-1$
+											|| type.equals("pass") //			//$NON-NLS-1$
+											|| type.equals("landmark") //		//$NON-NLS-1$
+											|| type.equals("railwaystation")) { //$NON-NLS-1$
+										zoom = 15 - 1;
+									}
+								}
+							}
+
+							_poiPosition = new GeoPosition(lat, lon);
+							_poiText = pageName.replace('_', ' ');
+
+							setZoom(zoom);
+							setGeoCenterPosition(_poiPosition);
+
+							_isShowPOI = true;
+
+							firePOIEvent(_poiPosition);
+
+							return true;
+
+						} catch (final NumberFormatException e) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Put a map redraw into a queue, the last entry in the queue will be executed
 	 */
 	public void queueMapRedraw() {
 
-		if (isDisposed() || _MP == null) {
+		if (isDisposed() || (_MP == null)) {
 			return;
 		}
 
@@ -2709,8 +3083,8 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	public void removeMapListener(final IMapListener listner) {
-		_mapListeners.remove(listner);
+	public void removeMousePositionListener(final IPositionListener listner) {
+		_mousePositionListeners.remove(listner);
 	}
 
 	/**
@@ -2805,7 +3179,7 @@ public class Map extends Canvas {
 	 */
 	public void setLegend(final MapLegend legend) {
 
-		if (legend == null && _mapLegend != null) {
+		if ((legend == null) && (_mapLegend != null)) {
 			// dispose legend image
 			disposeResource(_mapLegend.getImage());
 		}
@@ -2957,6 +3331,17 @@ public class Map extends Canvas {
 		this._panEnabled = panEnabled;
 	}
 
+	public void setPOI(final GeoPosition poiPosition, final int zoomLevel) {
+
+		_isShowPOI = true;
+		_poiPosition = poiPosition;
+
+		setZoom(zoomLevel);
+		setGeoCenterPosition(poiPosition);
+
+		queueMapRedraw();
+	}
+
 	/**
 	 * Sets whether the map should recenter itself on mouse clicks (middle mouse clicks?)
 	 * 
@@ -2998,6 +3383,13 @@ public class Map extends Canvas {
 		_isDrawOverlays = showOverlays;
 	}
 
+	public void setShowPOI(final boolean isShowPOI) {
+
+		_isShowPOI = isShowPOI;
+
+		queueMapRedraw();
+	}
+
 	public void setShowScale(final boolean isScaleVisible) {
 		_isScaleVisible = isScaleVisible;
 	}
@@ -3025,7 +3417,7 @@ public class Map extends Canvas {
 		// check if the requested zoom level is within the bounds of the map provider
 		final int mpMinimumZoomLevel = _MP.getMinimumZoomLevel();
 		final int mpMaximumZoomLevel = _MP.getMaximumZoomLevel();
-		if ((newZoomLevel < mpMinimumZoomLevel || newZoomLevel > mpMaximumZoomLevel)) {
+		if (((newZoomLevel < mpMinimumZoomLevel) || (newZoomLevel > mpMaximumZoomLevel))) {
 			// adjust zoom level
 			newZoomLevel = Math.max(newZoomLevel, mpMinimumZoomLevel);
 			newZoomLevel = Math.min(newZoomLevel, mpMaximumZoomLevel);
@@ -3067,20 +3459,21 @@ public class Map extends Canvas {
 	private void updateMouseMapPosition() {
 
 		// check position, can be initially be null
-		if (_mouseMovePosition == null || _MP == null) {
+		if ((_mouseMovePosition == null) || (_MP == null)) {
 			return;
 		}
 
 		/*
-		 * !!! DON'T OPTIMIZE THE NEXT LINE OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
+		 * !!! DON'T OPTIMIZE THE NEXT LINE, OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
 		 */
-		final Rectangle viewPort = getMapPixelViewport();
-		final int worldMouseX = viewPort.x + _mouseMovePosition.x;
-		final int worldMouseY = viewPort.y + _mouseMovePosition.y;
+		final Rectangle topLeftViewPort = getMapPixelViewport();
+
+		final int worldMouseX = topLeftViewPort.x + _mouseMovePosition.x;
+		final int worldMouseY = topLeftViewPort.y + _mouseMovePosition.y;
 
 		final GeoPosition geoPosition = _MP.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
 
-		fireMapEvent(geoPosition);
+		fireMousePositionEvent(geoPosition);
 	}
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {

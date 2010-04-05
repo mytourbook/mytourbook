@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -61,9 +61,9 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
@@ -129,7 +129,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/*
 	 * NON-UI fields
 	 */
-	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 
 	{
 		// initialize lat/lon formatter
@@ -140,7 +140,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * url parameter items which can be selected in the combobox for each parameter
 	 */
-	private ArrayList<PartUIItem>			PART_ITEMS								= new ArrayList<PartUIItem>();
+	private final ArrayList<PartUIItem>			PART_ITEMS								= new ArrayList<PartUIItem>();
 
 	{
 		PART_ITEMS.add(new PartUIItem(//
@@ -183,11 +183,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * contains all rows with url parts which are displayed in the UI
 	 */
-	private ArrayList<PartRow>				PART_ROWS								= new ArrayList<PartRow>();
+	private final ArrayList<PartRow>				PART_ROWS								= new ArrayList<PartRow>();
 
-	private IDialogSettings					_dialogSettings;
+	private final IDialogSettings					_dialogSettings;
 
-	private PrefPageMapProviders			_prefPageMapFactory;
+	private final PrefPageMapProviders			_prefPageMapFactory;
 
 	private String							_defaultMessage;
 
@@ -198,12 +198,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	private String							_previousCustomUrl;
 
 	private MPCustom						_mpCustom;
-	private MP								_defaultMapProvider;
+	private final MP								_defaultMapProvider;
 
 	private boolean							_isInitUI								= false;
 
 	private boolean							_isEnableTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
 	private int								_statUpdateCounter						= 0;
 	private int								_statIsQueued;
@@ -231,12 +231,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private class PartRow {
 
-		private Combo						rowCombo;
+		private final Combo						rowCombo;
 
 		/**
 		 * The hashmap contains all widgets for one row
 		 */
-		private HashMap<WIDGET_KEY, Widget>	rowWidgets;
+		private final HashMap<WIDGET_KEY, Widget>	rowWidgets;
 
 		public PartRow(final Combo combo, final HashMap<WIDGET_KEY, Widget> widgets) {
 			rowCombo = combo;
@@ -695,7 +695,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		for (final PartUIItem paraItem : PART_ITEMS) {
 			if (paraItem.partKey == itemKey) {
-				return PARAMETER_LEADING_CHAR + paraItem.abbreviation + PARAMETER_TRAILING_CHAR; //$NON-NLS-1$ //$NON-NLS-2$
+				return PARAMETER_LEADING_CHAR + paraItem.abbreviation + PARAMETER_TRAILING_CHAR;
 			}
 		}
 
@@ -894,13 +894,13 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		_map.setShowScale(true);
 
-		_map.addMapListener(new IMapListener() {
+		_map.addMousePositionListener(new IPositionListener() {
 
-			public void mapInfo(final MapEvent event) {
+			public void setPosition(final MapPositionEvent event) {
 
-				final GeoPosition mapCenter = event.mapCenter;
+				final GeoPosition mousePosition = event.mapGeoPosition;
 
-				double lon = mapCenter.longitude % 360;
+				double lon = mousePosition.longitude % 360;
 				lon = lon > 180 ? //
 						lon - 360
 						: lon < -180 ? //
@@ -908,7 +908,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 								: lon;
 
 				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mapCenter.latitude),
+						_nfLatLon.format(mousePosition.latitude),
 						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
@@ -1091,7 +1091,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		final int maxZoom = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
 		// check if the custom url or zoom level has changed
-		if (_customUrl.equals(_previousCustomUrl) && _previousMinZoom == minZoom && _previousMaxZoom == maxZoom) {
+		if (_customUrl.equals(_previousCustomUrl) && (_previousMinZoom == minZoom) && (_previousMaxZoom == maxZoom)) {
 			// do nothing to optimize performace
 			return;
 		}
@@ -1569,7 +1569,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 				sb.append(PARAMETER_LEADING_CHAR);
 				sb.append(Integer.toString(fromValue));
-				sb.append("..."); //$NON-NLS-1$ 
+				sb.append("..."); //$NON-NLS-1$
 				sb.append(Integer.toString(toValue));
 				sb.append(PARAMETER_TRAILING_CHAR);
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -108,10 +108,10 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
-import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
@@ -197,7 +197,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private ColorSelector					_colorImageBackground;
 
-	private FormToolkit						_formTk									= new FormToolkit(Display
+	private final FormToolkit						_formTk									= new FormToolkit(Display
 																							.getCurrent());
 	private ExpandableComposite				_logContainer;
 	private Button							_chkShowTileImageLog;
@@ -212,16 +212,16 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	 * none UI items
 	 */
 
-	private IDialogSettings					_dialogSettings;
+	private final IDialogSettings					_dialogSettings;
 
-	private MPPlugin						_mpDefault;
+	private final MPPlugin						_mpDefault;
 	private MPProfile						_mpProfile;
 
 	private String							_defaultMessage;
 
 	// image logging
 	private boolean							_isTileImageLogging;
-	private ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
+	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
 	private int								_statUpdateCounter						= 0;
 
@@ -235,7 +235,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private boolean							_isInitUI								= false;
 	private boolean							_isLiveView;
 
-	private NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
 
 	{
 		// initialize lat/lon formatter
@@ -643,8 +643,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 							// only ONE map provider/layer is allowed to be dragged
 							final Object firstElement = selection.getFirstElement();
-							event.doit = selection.size() == 1
-									&& (firstElement instanceof TVIMapProvider || firstElement instanceof TVIWmsLayer);
+							event.doit = (selection.size() == 1)
+									&& ((firstElement instanceof TVIMapProvider) || (firstElement instanceof TVIWmsLayer));
 						}
 					});
 
@@ -680,10 +680,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 				@Override
 				protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
-					return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-							|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
-							|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.F2)
-							|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+					return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
+							|| (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
+							|| ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) && (event.keyCode == SWT.F2))
+							|| (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
 				}
 			};
 
@@ -790,7 +790,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		tvc.setEditingSupport(new EditingSupport(_treeViewer) {
 
-			private CheckboxCellEditor	fCellEditor	= new CheckboxCellEditor(_treeViewer.getTree());
+			private final CheckboxCellEditor	fCellEditor	= new CheckboxCellEditor(_treeViewer.getTree());
 
 			@Override
 			protected boolean canEdit(final Object element) {
@@ -1098,7 +1098,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					}
 				});
 
-				// check: is black transparent 
+				// check: is black transparent
 				_chkTransparentBlack = new Button(containerOptions, SWT.CHECK);
 				_chkTransparentBlack.setText(Messages.Dialog_MapConfig_Button_TransparentBlack);
 				_chkTransparentBlack.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentBlack_Tooltip);
@@ -1437,19 +1437,19 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		_map.addZoomListener(new IZoomListener() {
 			public void zoomChanged(final ZoomEvent event) {
-			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG 
+			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
 //				resetMapProfile();
-			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG 
+			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
 			}
 		});
 
-		_map.addMapListener(new IMapListener() {
+		_map.addMousePositionListener(new IPositionListener() {
 
-			public void mapInfo(final MapEvent event) {
+			public void setPosition(final MapPositionEvent event) {
 
-				final GeoPosition mapCenter = event.mapCenter;
+				final GeoPosition mousePosition = event.mapGeoPosition;
 
-				double lon = mapCenter.longitude % 360;
+				double lon = mousePosition.longitude % 360;
 				lon = lon > 180 ? //
 						lon - 360
 						: lon < -180 ? //
@@ -1457,7 +1457,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 								: lon;
 
 				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mapCenter.latitude),
+						_nfLatLon.format(mousePosition.latitude),
 						_nfLatLon.format(lon),
 						Integer.toString(event.mapZoomLevel + 1) }));
 			}
@@ -1624,8 +1624,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// check if the container must be expanded/collapsed
 		final boolean isTransExpanded = _transparentContainer.isExpanded();
 
-		if ((isTransExpanded == true && isTransparent == false) || //
-				(isTransExpanded == false && isTransparent == true)) {
+		if (((isTransExpanded == true) && (isTransparent == false)) || //
+				((isTransExpanded == false) && (isTransparent == true))) {
 
 			// show/hide transparent color section
 			_transparentContainer.setExpanded(isTransparent);
@@ -1651,8 +1651,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// check if the container must be expanded/collapsed
 		final boolean isLogExpanded = _logContainer.isExpanded();
 
-		if ((isLogExpanded == true && _isTileImageLogging == false)
-				|| (isLogExpanded == false && _isTileImageLogging == true)) {
+		if (((isLogExpanded == true) && (_isTileImageLogging == false))
+				|| ((isLogExpanded == false) && (_isTileImageLogging == true))) {
 
 			// show/hide log section
 			_logContainer.setExpanded(_isTileImageLogging);
@@ -1947,7 +1947,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final TVIMapProvider tviMapProvider = (TVIMapProvider) firstElement;
 
-			// update alpha in the map provider 
+			// update alpha in the map provider
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 			final boolean isBlack = _chkTransparentBlack.getSelection();
@@ -2437,7 +2437,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_mpProfile.setLastUsedZoom(_map.getZoom());
 		_mpProfile.setLastUsedPosition(_map.getGeoCenter());
 
-		// set positions of map provider 
+		// set positions of map provider
 		int tblItemIndex = 0;
 		for (final TreeItem treeItem : _treeViewer.getTree().getItems()) {
 
@@ -2529,7 +2529,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		if (tviMapProvider != null) {
 
-			// update alpha in the map provider 
+			// update alpha in the map provider
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
@@ -2551,7 +2551,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final TVIMapProvider tviMapProvider = (TVIMapProvider) firstElement;
 
-			// update brightness in the map provider 
+			// update brightness in the map provider
 
 			final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
