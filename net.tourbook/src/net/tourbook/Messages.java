@@ -228,6 +228,8 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
+	public static String	Dialog_SelectGraphs_Title;
+
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;

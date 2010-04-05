@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
 
@@ -93,8 +93,8 @@ public class TourData implements Comparable<Object> {
 	@Transient
 	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
 
-	// initialize SRTM 
-	@SuppressWarnings("unused")//$NON-NLS-1$
+	// initialize SRTM
+	@SuppressWarnings("unused")
 	@Transient
 	private static final NumberForm		srtmNumberForm					= new NumberForm();
 	@Transient
@@ -171,7 +171,7 @@ public class TourData implements Comparable<Object> {
 	 * <p>
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
-	@SuppressWarnings("unused")//$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int							distance;
 
 	/**
@@ -341,13 +341,13 @@ public class TourData implements Comparable<Object> {
 	@Basic(optional = false)
 	private SerieData					serieData;
 
-	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)//$NON-NLS-1$
+	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")//$NON-NLS-1$
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>			tourReferences					= new HashSet<TourReference>();
+	private final Set<TourReference>			tourReferences					= new HashSet<TourReference>();
 
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
@@ -631,7 +631,7 @@ public class TourData implements Comparable<Object> {
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	private Map<Integer, Point[]>		_worldPosition					= new HashMap<Integer, Point[]>();
+	private final Map<Integer, Point[]>		_worldPosition					= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -695,10 +695,10 @@ public class TourData implements Comparable<Object> {
 		int sumSpeed = 0;
 
 		// get first valid latitude/longitude
-		if (latitudeSerie != null && longitudeSerie != null) {
+		if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
 			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
-				if (latitudeSerie[timeIndex] != Double.MIN_VALUE && longitudeSerie[timeIndex] != Double.MIN_VALUE) {
+				if ((latitudeSerie[timeIndex] != Double.MIN_VALUE) && (longitudeSerie[timeIndex] != Double.MIN_VALUE)) {
 					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
 					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
 					break;
@@ -735,12 +735,12 @@ public class TourData implements Comparable<Object> {
 				sumSpeed += speedSerie[serieIndex];
 			}
 
-			if (latitudeSerie != null && longitudeSerie != null) {
+			if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
 				final double latitude = latitudeSerie[serieIndex];
 				final double longitude = longitudeSerie[serieIndex];
 
-				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+				if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
 					latitudeSerie[serieIndex] = lastValidLatitude;
 					longitudeSerie[serieIndex] = lastValidLongitude;
 				} else {
@@ -761,7 +761,7 @@ public class TourData implements Comparable<Object> {
 				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
 				 * and longitude has been saved with 0 values
 				 */
-				if (isLatitudeValid == false && lastValidLatitude != 0) {
+				if ((isLatitudeValid == false) && (lastValidLatitude != 0)) {
 					isLatitudeValid = true;
 				}
 			}
@@ -893,7 +893,7 @@ public class TourData implements Comparable<Object> {
 	public void computeAltimeterGradientSerie() {
 
 		// optimization: don't recreate the data series when they are available
-		if (altimeterSerie != null && altimeterSerieImperial != null && gradientSerie != null) {
+		if ((altimeterSerie != null) && (altimeterSerieImperial != null) && (gradientSerie != null)) {
 			return;
 		}
 
@@ -909,7 +909,7 @@ public class TourData implements Comparable<Object> {
 	 */
 	private void computeAltimeterGradientSerieWithFixedInterval() {
 
-		if (distanceSerie == null || altitudeSerie == null) {
+		if ((distanceSerie == null) || (altitudeSerie == null)) {
 			return;
 		}
 
@@ -1010,7 +1010,7 @@ public class TourData implements Comparable<Object> {
 	 */
 	private void computeAltimeterGradientSerieWithVariableInterval() {
 
-		if (distanceSerie == null || altitudeSerie == null) {
+		if ((distanceSerie == null) || (altitudeSerie == null)) {
 			return;
 		}
 
@@ -1035,7 +1035,7 @@ public class TourData implements Comparable<Object> {
 
 		final int minDistanceDiff = minTimeDiff;
 
-		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
+		final boolean checkPosition = (latitudeSerie != null) && (longitudeSerie != null);
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -1048,12 +1048,12 @@ public class TourData implements Comparable<Object> {
 			final int sliceTimeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
 
 			// check if a lat and long diff is available
-			if (checkPosition && serieIndex > 0 && serieIndex < serieLengthLast - 1) {
+			if (checkPosition && (serieIndex > 0) && (serieIndex < serieLengthLast - 1)) {
 
 				if (sliceTimeDiff > 10) {
 
-					if (latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1]
-							&& longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1]) {
+					if ((latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1])
+							&& (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1])) {
 //						dataSerieAltimeter[serieIndex] = 100;
 						continue;
 					}
@@ -1081,7 +1081,7 @@ public class TourData implements Comparable<Object> {
 
 			boolean toggleIndex = true;
 
-			while (timeDiff < minTimeDiff || distanceDiff < minDistanceDiff) {
+			while ((timeDiff < minTimeDiff) || (distanceDiff < minDistanceDiff)) {
 
 				// toggle between low and high index
 				if (toggleIndex) {
@@ -1092,7 +1092,7 @@ public class TourData implements Comparable<Object> {
 				toggleIndex = !toggleIndex;
 
 				// check array scope
-				if (lowIndex < 0 || highIndex >= serieLength) {
+				if ((lowIndex < 0) || (highIndex >= serieLength)) {
 					break;
 				}
 
@@ -1128,24 +1128,24 @@ public class TourData implements Comparable<Object> {
 				}
 
 				// check if lat and long diff is available
-				if (checkPosition && lowIndex > 0 && highIndex < serieLengthLast - 1) {
+				if (checkPosition && (lowIndex > 0) && (highIndex < serieLengthLast - 1)) {
 
 					if (sliceTimeDiff > 10) {
 
-						if (latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1]
-								&& longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1]) {
+						if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
+								&& (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
 //							dataSerieAltimeter[serieIndex] = 210;
 							continue;
 						}
-						if (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]
-								&& longitudeSerie[highIndex] == longitudeSerie[highIndex + 1]) {
+						if ((latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])
+								&& (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])) {
 //							dataSerieAltimeter[serieIndex] = 220;
 							continue;
 						}
 					}
 				}
 
-				// compute altimeter 
+				// compute altimeter
 				if (timeDiff > 0) {
 					final int altimeter = (int) (3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE);
 					dataSerieAltimeter[serieIndex] = altimeter;
@@ -1153,7 +1153,7 @@ public class TourData implements Comparable<Object> {
 //					dataSerieAltimeter[serieIndex] = -100;
 				}
 
-				// compute gradient 
+				// compute gradient
 				if (distanceDiff > 0) {
 					final int gradient = altitudeDiff * 1000 / distanceDiff;
 					dataSerieGradient[serieIndex] = gradient;
@@ -1223,7 +1223,7 @@ public class TourData implements Comparable<Object> {
 															final int altitudeMinDiff) {
 
 		// check if data are available
-		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
+		if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
 			return null;
 		}
 
@@ -1464,7 +1464,7 @@ public class TourData implements Comparable<Object> {
 
 	private void computeAvgPulse() {
 
-		if (pulseSerie == null || pulseSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
 			return;
 		}
 
@@ -1474,7 +1474,7 @@ public class TourData implements Comparable<Object> {
 	private int computeAvgPulseSegment(final int firstIndex, final int lastIndex) {
 
 		// check if data are available
-		if (pulseSerie == null || pulseSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
 			return 0;
 		}
 
@@ -1565,7 +1565,7 @@ public class TourData implements Comparable<Object> {
 			final int timeDiff = currentTime - lastMovingTime;
 			final int distDiff = currentDistance - lastMovingDistance;
 
-			if (distDiff == 0 || (timeDiff > minStopTime && distDiff < 10)) {
+			if ((distDiff == 0) || ((timeDiff > minStopTime) && (distDiff < 10))) {
 
 				// distance has not changed, check if a longer stop is done
 				// speed must be greater than 1.8 km/h (10m in 20 sec)
@@ -1653,10 +1653,10 @@ public class TourData implements Comparable<Object> {
 	 */
 	public void computeSpeedSerie() {
 
-		if (speedSerie != null
-				&& speedSerieImperial != null
-				&& paceSerieMinute != null
-				&& paceSerieMinuteImperial != null) {
+		if ((speedSerie != null)
+				&& (speedSerieImperial != null)
+				&& (paceSerieMinute != null)
+				&& (paceSerieMinuteImperial != null)) {
 			return;
 		}
 
@@ -1818,7 +1818,7 @@ public class TourData implements Comparable<Object> {
 			int paceMetricMinute = 0;
 			int paceImperialMinute = 0;
 
-			if (speedMetric != 0 && distDiff != 0) {
+			if ((speedMetric != 0) && (distDiff != 0)) {
 
 //				final float pace = timeDiff * 166.66f / distDiff;
 //				final float pace = 10 * (((float) timeDiff / 60) / ((float) distDiff / 1000));
@@ -1867,8 +1867,8 @@ public class TourData implements Comparable<Object> {
 		paceSerieMinuteImperial = new int[serieLength];
 		paceSerieSecondsImperial = new int[serieLength];
 
-		final boolean isCheckPosition = latitudeSerie != null && //
-				longitudeSerie != null
+		final boolean isCheckPosition = (latitudeSerie != null) && //
+				(longitudeSerie != null)
 				&& (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
 
 		boolean isLatLongEqual = false;
@@ -1886,10 +1886,10 @@ public class TourData implements Comparable<Object> {
 			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
 			// check if a lat and long diff is available
-			if (isCheckPosition && serieIndex > 0 && serieIndex < lastSerieIndex - 1) {
+			if (isCheckPosition && (serieIndex > 0) && (serieIndex < lastSerieIndex - 1)) {
 
-				if (latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex]
-						&& longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex]) {
+				if ((latitudeSerie[serieIndex] == latitudeSerie[prevSerieIndex])
+						&& (longitudeSerie[serieIndex] == longitudeSerie[prevSerieIndex])) {
 
 					if (isLatLongEqual == false) {
 						equalStartIndex = prevSerieIndex;
@@ -1913,7 +1913,7 @@ public class TourData implements Comparable<Object> {
 					int speedMetric = 0;
 					int speedImperial = 0;
 
-					if (equalTimeDiff > 20 && equalDistDiff < 10) {
+					if ((equalTimeDiff > 20) && (equalDistDiff < 10)) {
 						// speed must be greater than 1.8 km/h
 					} else {
 
@@ -1928,7 +1928,7 @@ public class TourData implements Comparable<Object> {
 							distanceSerie[equalSerieIndex] = distanceSerie[equalSerieIndex - 1] + equalSegmentDistDiff;
 
 							// compute speed for this segment
-							if (equalSegmentTimeDiff == 0 || equalSegmentDistDiff == 0) {
+							if ((equalSegmentTimeDiff == 0) || (equalSegmentDistDiff == 0)) {
 								speedMetric = 0;
 							} else {
 								speedMetric = (int) ((equalSegmentDistDiff * 36f) / equalSegmentTimeDiff);
@@ -1962,7 +1962,7 @@ public class TourData implements Comparable<Object> {
 				swapIndexDirection = !swapIndexDirection;
 
 				// check array scope
-				if (lowIndex < 0 || highIndex >= serieLength) {
+				if ((lowIndex < 0) || (highIndex >= serieLength)) {
 					break;
 				}
 
@@ -1995,28 +1995,28 @@ public class TourData implements Comparable<Object> {
 				prevTime = currentTime;
 			}
 
-			if (isTimeValid && serieIndex > 0 && timeDiff != 0) {
+			if (isTimeValid && (serieIndex > 0) && (timeDiff != 0)) {
 
 				// check if a lat and long diff is available
-				if (isCheckPosition && lowIndex > 0 && highIndex < lastSerieIndex - 1) {
+				if (isCheckPosition && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
 
-					if (latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1]
-							&& longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1]) {
+					if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
+							&& (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
 
 						if (distDiff == 0) {
 							continue;
 						}
 					}
 
-					if (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1]
-							&& latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]) {
+					if ((longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])
+							&& (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])) {
 						if (distDiff == 0) {
 							continue;
 						}
 					}
 				}
 
-				if (timeDiff > 20 && distDiff < 10) {
+				if ((timeDiff > 20) && (distDiff < 10)) {
 					// speed must be greater than 1.8 km/h
 					speedMetric = 0;
 				} else {
@@ -2037,7 +2037,7 @@ public class TourData implements Comparable<Object> {
 	public void computeTourDrivingTime() {
 
 		if (isManualTour() == false) {
-			if (timeSerie == null || timeSerie.length == 0) {
+			if ((timeSerie == null) || (timeSerie.length == 0)) {
 				tourDrivingTime = 0;
 			} else {
 				tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
@@ -2164,7 +2164,7 @@ public class TourData implements Comparable<Object> {
 		/*
 		 * create data series only when data are available
 		 */
-		if (firstTimeDataItem.distance != Integer.MIN_VALUE || isAbsoluteData) {
+		if ((firstTimeDataItem.distance != Integer.MIN_VALUE) || isAbsoluteData) {
 			distanceSerie = new int[serieLength];
 			isDistance = true;
 		}
@@ -2336,11 +2336,11 @@ public class TourData implements Comparable<Object> {
 			 * get first valid altitude
 			 */
 			// set initial min/max latitude/longitude
-			if (firstTimeDataItem.latitude == Double.MIN_VALUE || firstTimeDataItem.longitude == Double.MIN_VALUE) {
+			if ((firstTimeDataItem.latitude == Double.MIN_VALUE) || (firstTimeDataItem.longitude == Double.MIN_VALUE)) {
 
 				// find first valid latitude/longitude
 				for (final TimeData timeData : timeDataList) {
-					if (timeData.latitude != Double.MIN_VALUE && timeData.longitude != Double.MIN_VALUE) {
+					if ((timeData.latitude != Double.MIN_VALUE) && (timeData.longitude != Double.MIN_VALUE)) {
 						mapMinLatitude = timeData.latitude + 90;
 						mapMaxLatitude = timeData.latitude + 90;
 						mapMinLongitude = timeData.longitude + 180;
@@ -2360,7 +2360,7 @@ public class TourData implements Comparable<Object> {
 			// convert data from the tour format into interger[] arrays
 			for (final TimeData timeData : timeDataList) {
 
-				if (altitudeStartIndex == -1 && isAltitude) {
+				if ((altitudeStartIndex == -1) && isAltitude) {
 					altitudeStartIndex = timeIndex;
 					altitudeAbsolute = (int) timeData.absoluteAltitude;
 				}
@@ -2388,7 +2388,7 @@ public class TourData implements Comparable<Object> {
 					 * distance
 					 */
 					final float tdDistance = timeData.absoluteDistance;
-					if (tdDistance == Float.MIN_VALUE || tdDistance >= Integer.MAX_VALUE) {
+					if ((tdDistance == Float.MIN_VALUE) || (tdDistance >= Integer.MAX_VALUE)) {
 						distanceDiff = 0;
 					} else {
 						distanceDiff = (int) tdDistance;
@@ -2420,7 +2420,7 @@ public class TourData implements Comparable<Object> {
 					 * distance
 					 */
 					final float tdDistance = timeData.absoluteDistance;
-					if (tdDistance == Float.MIN_VALUE || tdDistance >= Integer.MAX_VALUE) {
+					if ((tdDistance == Float.MIN_VALUE) || (tdDistance >= Integer.MAX_VALUE)) {
 						// ensure to have correct data
 						distanceDiff = 0;
 					} else {
@@ -2441,7 +2441,7 @@ public class TourData implements Comparable<Object> {
 							altitudeDiff = 0;
 						} else {
 							final float tdAltitude = timeData.absoluteAltitude;
-							if (tdAltitude == Float.MIN_VALUE || tdAltitude >= Integer.MAX_VALUE) {
+							if ((tdAltitude == Float.MIN_VALUE) || (tdAltitude >= Integer.MAX_VALUE)) {
 								altitudeDiff = 0;
 							} else {
 								altitudeDiff = (int) (tdAltitude - altitudeAbsolute);
@@ -2457,9 +2457,9 @@ public class TourData implements Comparable<Object> {
 				final double latitude = timeData.latitude;
 				final double longitude = timeData.longitude;
 
-				if (latitudeSerie != null && longitudeSerie != null) {
+				if ((latitudeSerie != null) && (longitudeSerie != null)) {
 
-					if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+					if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
 						latitudeSerie[timeIndex] = lastValidLatitude;
 						longitudeSerie[timeIndex] = lastValidLongitude;
 					} else {
@@ -2482,7 +2482,7 @@ public class TourData implements Comparable<Object> {
 				 */
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE || tdPulse == Integer.MAX_VALUE ? 0 : tdPulse;
+					pulseSerie[timeIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE) ? 0 : tdPulse;
 				}
 
 				/*
@@ -2490,7 +2490,7 @@ public class TourData implements Comparable<Object> {
 				 */
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE || tdCadence == Integer.MAX_VALUE
+					cadenceSerie[timeIndex] = (tdCadence == Integer.MIN_VALUE) || (tdCadence == Integer.MAX_VALUE)
 							? 0
 							: tdCadence;
 				}
@@ -2509,7 +2509,7 @@ public class TourData implements Comparable<Object> {
 				/*
 				 * marker
 				 */
-				if (isCreateMarker && timeData.marker != 0) {
+				if (isCreateMarker && (timeData.marker != 0)) {
 					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
@@ -2592,7 +2592,7 @@ public class TourData implements Comparable<Object> {
 					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
-				if (isCreateMarker && timeData.marker != 0) {
+				if (isCreateMarker && (timeData.marker != 0)) {
 					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
@@ -2661,17 +2661,17 @@ public class TourData implements Comparable<Object> {
 	 */
 	public Object[] createTourSegments() {
 
-		if (segmentSerieIndex == null || segmentSerieIndex.length < 2) {
+		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 			// at least two points are required to build a segment
 			return new Object[0];
 		}
 
-		final boolean isPulseSerie = pulseSerie != null && pulseSerie.length > 0;
-		final boolean isAltitudeSerie = altitudeSerie != null && altitudeSerie.length > 0;
-		final boolean isDistanceSerie = distanceSerie != null && distanceSerie.length > 0;
+		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
+		final boolean isAltitudeSerie = (altitudeSerie != null) && (altitudeSerie.length > 0);
+		final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
 
 		final int[] localPowerSerie = getPowerSerie();
-		final boolean isPowerSerie = localPowerSerie != null && localPowerSerie.length > 0;
+		final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
 
 		final int segmentSerieLength = segmentSerieIndex.length;
 
@@ -2798,7 +2798,7 @@ public class TourData implements Comparable<Object> {
 					segment.altitudeDownTotal = altitudeDown += altitudeDiff;
 				}
 
-				if (segmentSerieComputedAltitudeDiff != null && segmentIndex < segmentSerieComputedAltitudeDiff.length) {
+				if ((segmentSerieComputedAltitudeDiff != null) && (segmentIndex < segmentSerieComputedAltitudeDiff.length)) {
 					segment.computedAltitudeDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
 				}
 
@@ -2838,7 +2838,7 @@ public class TourData implements Comparable<Object> {
 				altitudeStart = altitudeEnd;
 			}
 
-			if (isDistanceSerie && isAltitudeSerie && segmentDistance != 0.0) {
+			if (isDistanceSerie && isAltitudeSerie && (segmentDistance != 0.0)) {
 
 				// gradient
 				segmentSerieGradient[segmentIndex] = segment.gradient = //
@@ -3105,9 +3105,9 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public String getDeviceName() {
-		if (devicePluginId != null && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
+		if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
-		} else if (devicePluginName == null || devicePluginName.length() == 0) {
+		} else if ((devicePluginName == null) || (devicePluginName.length() == 0)) {
 			return UI.EMPTY_STRING;
 		} else {
 			return devicePluginName;
@@ -3130,7 +3130,7 @@ public class TourData implements Comparable<Object> {
 		return deviceTravelTime;
 	}
 
-// not used 5.10.2008 
+// not used 5.10.2008
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
@@ -3199,7 +3199,7 @@ public class TourData implements Comparable<Object> {
 		return gradientSerie;
 	}
 
-// not used 5.10.2008 
+// not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
 //	}
@@ -3318,7 +3318,7 @@ public class TourData implements Comparable<Object> {
 
 	public int[] getPowerSerie() {
 
-		if (powerSerie != null || isPowerSerieFromDevice) {
+		if ((powerSerie != null) || isPowerSerieFromDevice) {
 			return powerSerie;
 		}
 
@@ -3330,8 +3330,8 @@ public class TourData implements Comparable<Object> {
 			computeAltimeterGradientSerie();
 		}
 
-		// check if required data series are available 
-		if (speedSerie == null || gradientSerie == null) {
+		// check if required data series are available
+		if ((speedSerie == null) || (gradientSerie == null)) {
 			return null;
 		}
 
@@ -3353,6 +3353,9 @@ public class TourData implements Comparable<Object> {
 		final float fRoll = weightTotal * 9.81f * cR;
 		final float fSlope = weightTotal * 9.81f; // * gradient/100
 		final float fAir = 0.5f * p * cD * aP;// * v2;
+
+		int joule = 0;
+		int prefTime = 0;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
@@ -3378,13 +3381,23 @@ public class TourData implements Comparable<Object> {
 
 			final float fTotal = fRoll + fAirTotal + fSlopeTotal;
 
-			final int pTotal = (int) (fTotal * speed);
+			int pTotal = (int) (fTotal * speed);
 
 //			if (pTotal > 600) {
 //				pTotal = pTotal * 1;
 //			}
-			powerSerie[timeIndex] = pTotal < 0 ? 0 : pTotal;
+			pTotal = pTotal < 0 ? 0 : pTotal;
+
+			powerSerie[timeIndex] = pTotal;
+
+			final int currentTime = timeSerie[timeIndex];
+			joule += pTotal * (currentTime - prefTime);
+
+			prefTime = currentTime;
 		}
+
+//		System.out.println("joule: " + joule / 1000);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return powerSerie;
 	}
@@ -3625,7 +3638,7 @@ public class TourData implements Comparable<Object> {
 	}
 
 	public String getTourImportFilePath() {
-		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
 			if (isManualTour()) {
 				return UI.EMPTY_STRING;
 			} else {
@@ -3793,7 +3806,7 @@ public class TourData implements Comparable<Object> {
 		}
 
 		if (srtmSerie == null) {
-			// srtm data can be available but are not yet computed 
+			// srtm data can be available but are not yet computed
 			return true;
 		}
 
@@ -4012,7 +4025,7 @@ public class TourData implements Comparable<Object> {
 		int paceMetricMinute = 0;
 		int paceImperialMinute = 0;
 
-		if (speedMetric != 0 && distDiff != 0) {
+		if ((speedMetric != 0) && (distDiff != 0)) {
 
 			paceMetricSeconds = timeDiff * 10000 / (float) distDiff;
 			paceImperialSeconds = paceMetricSeconds * UI.UNIT_MILE;
@@ -4070,7 +4083,7 @@ public class TourData implements Comparable<Object> {
 
 //	/**
 //	 * Set the week of the tour, 0 is the first week in the year
-//	 * 
+//	 *
 //	 * @param startWeek
 //	 */
 //	public void setStartWeek(final short startWeek) {
@@ -4238,7 +4251,7 @@ public class TourData implements Comparable<Object> {
 	public String toString() {
 
 		return new StringBuilder()//
-				.append("[TourData]") //$NON-NLS-1$ 
+				.append("[TourData]") //$NON-NLS-1$
 				.append(" tourId:") //$NON-NLS-1$
 				.append(tourId)
 				.append(" object:") //$NON-NLS-1$

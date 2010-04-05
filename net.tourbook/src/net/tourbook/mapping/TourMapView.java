@@ -85,9 +85,9 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.event.IMapListener;
+import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
-import de.byteholder.geoclipse.map.event.MapEvent;
+import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
@@ -114,7 +114,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	public static final int							TOUR_COLOR_PULSE					= 30;
 	public static final int							TOUR_COLOR_SPEED					= 40;
 	public static final int							TOUR_COLOR_PACE						= 50;
-//	public static final int							TOUR_COLOR_TOURTYPE					= 100;
 
 	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";				//$NON-NLS-1$
@@ -158,19 +157,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 */
 	private final ArrayList<TourData>				_tourDataList						= new ArrayList<TourData>();
 	private TourData								_previousTourData;
- 
+
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
 	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
 	private ActionSelectMapProvider					_actionSelectMapProvider;
 	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
 	private ActionSetDefaultPosition				_actionSetDefaultPosition;
-	private ActionShowTourInMap						_actionShowTourInMap;
+	private ActionShowPOI							_actionShowPOI;
 	private ActionShowLegendInMap					_actionShowLegendInMap;
 	private ActionShowScaleInMap					_actionShowScaleInMap;
 	private ActionShowSliderInMap					_actionShowSliderInMap;
 	private ActionShowSliderInLegend				_actionShowSliderInLegend;
 	private ActionShowStartEndInMap					_actionShowStartEndInMap;
+	private ActionShowTourInMap						_actionShowTourInMap;
 	private ActionShowTourMarker					_actionShowTourMarker;
 	private ActionSynchWithTour						_actionSynchWithTour;
 	private ActionSynchWithSlider					_actionSynchWithSlider;
@@ -180,7 +180,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private ActionTourColor							_actionTourColorPulse;
 	private ActionTourColor							_actionTourColorSpeed;
 	private ActionTourColor							_actionTourColorPace;
-//	private ActionTourColor							_actionTourColorTourType;
 	private ActionZoomIn							_actionZoomIn;
 	private ActionZoomOut							_actionZoomOut;
 	private ActionZoomCentered						_actionZoomCentered;
@@ -203,6 +202,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 * Position for the current point of interest
 	 */
 	private GeoPosition								_poiPosition;
+	private int										_poiZoomLevel;
 
 	private final DirectMappingPainter				_directMappingPainter				= new DirectMappingPainter();
 
@@ -229,7 +229,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionDimMap(final int dimLevel) {
 
-		// check if the dim level/color was changed 
+		// check if the dim level/color was changed
 		if (_mapDimLevel != dimLevel) {
 
 			_mapDimLevel = dimLevel;
@@ -259,6 +259,17 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		if (dialog.open() == Window.OK) {
 			_actionSelectMapProvider.updateMapProviders();
+		}
+	}
+
+	void actionPOI() {
+
+		final boolean isShowPOI = _actionShowPOI.isChecked();
+
+		_map.setShowPOI(isShowPOI);
+
+		if (isShowPOI) {
+			_map.setPOI(_poiPosition, _map.getZoom());
 		}
 	}
 
@@ -345,7 +356,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionShowSlider() {
 
-		if (_tourDataList == null || _tourDataList.size() == 0) {
+		if ((_tourDataList == null) || (_tourDataList.size() == 0)) {
 			return;
 		}
 
@@ -471,10 +482,22 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			}
 		});
 
-		_map.addMapListener(new IMapListener() {
+		_map.addMousePositionListener(new IPositionListener() {
 			@Override
-			public void mapInfo(final MapEvent event) {
-				_mapInfoManager.setMapCenter(event.mapCenter);
+			public void setPosition(final MapPositionEvent event) {
+				_mapInfoManager.setMousePosition(event.mapGeoPosition);
+			}
+		});
+
+		_map.addPOIListener(new IPositionListener() {
+			@Override
+			public void setPosition(final MapPositionEvent mapPosition) {
+
+				_poiPosition = mapPosition.mapGeoPosition;
+				_poiZoomLevel = mapPosition.mapZoomLevel;
+
+				_actionShowPOI.setEnabled(true);
+				_actionShowPOI.setChecked(true);
 			}
 		});
 
@@ -626,10 +649,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					resetMap();
 
-				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null && modifiedTours.size() > 0) {
+					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
 						_tourDataList.clear();
 						_tourDataList.addAll(modifiedTours);
@@ -746,6 +769,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
 		_actionSynchWithTour = new ActionSynchWithTour(this);
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
+		_actionShowPOI = new ActionShowPOI(this);
 		_actionShowTourInMap = new ActionShowTourInMap(this);
 		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -771,19 +795,22 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		viewTbm.add(_actionTourColorSpeed);
 		viewTbm.add(_actionTourColorPace);
 		viewTbm.add(_actionTourColorGradient);
-//		viewTbm.add(_actionTourColorTourType);
 		viewTbm.add(new Separator());
+
 		viewTbm.add(_actionShowTourInMap);
 		viewTbm.add(_actionZoomShowEntireTour);
 		viewTbm.add(_actionSynchWithTour);
 		viewTbm.add(_actionSynchWithSlider);
 		viewTbm.add(new Separator());
+
 		viewTbm.add(_actionSelectMapProvider);
 		viewTbm.add(new Separator());
+
 		viewTbm.add(_actionZoomCentered);
 		viewTbm.add(_actionZoomIn);
 		viewTbm.add(_actionZoomOut);
 		viewTbm.add(_actionZoomShowAll);
+		viewTbm.add(_actionShowPOI);
 
 		/*
 		 * fill view menu
@@ -809,7 +836,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		// dispose old legend image
-		if (legendImage != null && !legendImage.isDisposed()) {
+		if ((legendImage != null) && !legendImage.isDisposed()) {
 			legendImage.dispose();
 		}
 		final int legendWidth = DEFAULT_LEGEND_WIDTH;
@@ -896,13 +923,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				 * check if the legend size must be adjusted
 				 */
 				final Image legendImage = _mapLegend.getImage();
-				if (legendImage == null || legendImage.isDisposed()) {
+				if ((legendImage == null) || legendImage.isDisposed()) {
 					return;
 				}
 
 				final boolean showTour = _actionShowTourInMap.isChecked();
 				final boolean showLegend = _actionShowLegendInMap.isChecked();
-				if (_isTour == false || showTour == false || showLegend == false) {
+				if ((_isTour == false) || (showTour == false) || (showLegend == false)) {
 					return;
 				}
 
@@ -912,9 +939,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final Rectangle mapBounds = _map.getBounds();
 				final Rectangle legendBounds = legendImage.getBounds();
 
-				if (mapBounds.height < DEFAULT_LEGEND_HEIGHT //
-						|| (mapBounds.height > DEFAULT_LEGEND_HEIGHT //
-						&& legendBounds.height < DEFAULT_LEGEND_HEIGHT)) {
+				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT //
+						)
+						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT //
+						) && (legendBounds.height < DEFAULT_LEGEND_HEIGHT))) {
 
 					createLegendImage(PaintManager.getInstance().getLegendProvider());
 				}
@@ -987,6 +1015,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void enableActions(final boolean isForceTourColor) {
 
+		_actionShowPOI.setEnabled(_poiPosition != null);
+
 		// update legend action
 		if (_isTour) {
 
@@ -1001,7 +1031,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		final boolean isMultipleTours = _tourDataList.size() > 1;
-		final boolean isOneTour = _isTour && isMultipleTours == false;
+		final boolean isOneTour = _isTour && (isMultipleTours == false);
 
 		/*
 		 * enable/disable tour actions
@@ -1070,12 +1100,17 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		menuMgr.add(_actionShowScaleInMap);
 		menuMgr.add(_actionShowSliderInMap);
 		menuMgr.add(_actionShowSliderInLegend);
-		menuMgr.add(_actionDimMap);
-		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(_actionShowPOI);
 		menuMgr.add(new Separator());
+
 		menuMgr.add(_actionSetDefaultPosition);
 		menuMgr.add(_actionSaveDefaultPosition);
 		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionDimMap);
+		menuMgr.add(_actionSynchTourZoomLevel);
+		menuMgr.add(new Separator());
+
 		menuMgr.add(_actionManageProvider);
 		menuMgr.add(_actionReloadFailedMapImages);
 	}
@@ -1117,7 +1152,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		if (latitudeSerie == null || longitudeSerie == null) {
+		if ((latitudeSerie == null) || (longitudeSerie == null)) {
 			return null;
 		}
 
@@ -1135,7 +1170,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 //			minLatitude = Math.min(minLatitude, latitude);
 //			maxLatitude = Math.max(maxLatitude, latitude);
-//			
+//
 //			minLongitude = Math.min(minLongitude, longitude);
 //			maxLongitude = Math.max(maxLongitude, longitude);
 
@@ -1175,7 +1210,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final double[] longitudeSerie = tourData.longitudeSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 
-		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
+		if ((longitudeSerie == null)
+				|| (longitudeSerie.length == 0)
+				|| (latitudeSerie == null)
+				|| (latitudeSerie.length == 0)) {
 			return false;
 		}
 
@@ -1319,11 +1357,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			clearView();
 
 			final PointOfInterest poi = (PointOfInterest) selection;
-			_poiPosition = poi.getPosition();
 
-			_map.setZoom(poi.getRecommendedZoom());
-			_map.setGeoCenterPosition(_poiPosition);
-			_map.queueMapRedraw();
+			_poiPosition = poi.getPosition();
+			_poiZoomLevel = poi.getRecommendedZoom();
+
+			_map.setPOI(_poiPosition, _poiZoomLevel);
+
+			_actionShowPOI.setChecked(true);
 
 			enableActions();
 
@@ -1391,7 +1431,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void paintEntireTour() {
 
-		if (_tourDataList.size() == 0 || isPaintDataValid(_tourDataList.get(0)) == false) {
+		if ((_tourDataList.size() == 0) || (isPaintDataValid(_tourDataList.get(0)) == false)) {
 			showDefaultMap();
 			return;
 		}
@@ -1443,7 +1483,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// prevent loading the same tour
 		if (forceRedraw == false) {
 
-			if (_tourDataList.size() == 1 && _tourDataList.get(0) == tourData) {
+			if ((_tourDataList.size() == 1) && (_tourDataList.get(0) == tourData)) {
 				return;
 			}
 		}
@@ -1453,7 +1493,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// check if this is a new tour
 		boolean isNewTour = true;
-		if (_previousTourData != null && _previousTourData.getTourId().longValue() == tourData.getTourId().longValue()) {
+		if ((_previousTourData != null)
+				&& (_previousTourData.getTourId().longValue() == tourData.getTourId().longValue())) {
 			isNewTour = false;
 		}
 
@@ -1488,7 +1529,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// set position and zoom level for the tour
 		if (_isMapSynchedWithTour && isSynchronized) {
 
-			if (forceRedraw == false && _previousTourData != null || tourData == _previousTourData) {
+			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
 				/*
 				 * keep map configuration for the previous tour
@@ -1909,7 +1950,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 */
 	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
-		if (positions == null || positions.size() < 2) {
+		if ((positions == null) || (positions.size() < 2)) {
 			return;
 		}
 
@@ -1944,7 +1985,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 //		}
 
 		// zoom in until the tour is larger than the viewport
-		while (positionRect.width < viewport.width && positionRect.height < viewport.height) {
+		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
 
 			// center position in the map
 			final Point center = new Point(//
@@ -2100,27 +2141,26 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getAltitudeSerie();
-				if (dataSerie == null || dataSerie.length == 0) {
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
 
 				/*
 				 * get min/max values
 				 */
-				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+				for (final int dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
-						minValue = maxValue = dataSerie[valueIndex];
+						minValue = maxValue = dataValue;
 					}
 
-					final int dataValue = dataSerie[valueIndex];
 					minValue = (minValue <= dataValue) ? minValue : dataValue;
 					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 				}
 			}
 
-			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
+			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
 				return false;
 			}
 
@@ -2140,27 +2180,26 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.pulseSerie;
-				if (dataSerie == null || dataSerie.length == 0) {
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
 
 				/*
 				 * get min/max values
 				 */
-				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+				for (final int dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
-						minValue = maxValue = dataSerie[valueIndex];
+						minValue = maxValue = dataValue;
 					}
 
-					final int dataValue = dataSerie[valueIndex];
 					minValue = (minValue <= dataValue) ? minValue : dataValue;
 					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 				}
 			}
 
-			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
+			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
 				return false;
 			}
 
@@ -2180,27 +2219,26 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getSpeedSerie();
-				if (dataSerie == null || dataSerie.length == 0) {
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
 
 				/*
 				 * get min/max values
 				 */
-				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+				for (final int dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
-						minValue = maxValue = dataSerie[valueIndex];
+						minValue = maxValue = dataValue;
 					}
 
-					final int dataValue = dataSerie[valueIndex];
 					minValue = (minValue <= dataValue) ? minValue : dataValue;
 					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 				}
 			}
 
-			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
+			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
 				return false;
 			}
 
@@ -2221,27 +2259,26 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getPaceSerie();
-				if (dataSerie == null || dataSerie.length == 0) {
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
 
 				/*
 				 * get min/max values
 				 */
-				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+				for (final int dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
-						minValue = maxValue = dataSerie[valueIndex];
+						minValue = maxValue = dataValue;
 					}
 
-					final int dataValue = dataSerie[valueIndex];
 					minValue = (minValue <= dataValue) ? minValue : dataValue;
 					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 				}
 			}
 
-			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
+			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
 				return false;
 			}
 
@@ -2262,27 +2299,26 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			for (final TourData tourData : _tourDataList) {
 
 				final int[] dataSerie = tourData.getGradientSerie();
-				if (dataSerie == null || dataSerie.length == 0) {
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
 					continue;
 				}
 
 				/*
 				 * get min/max values
 				 */
-				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+				for (final int dataValue : dataSerie) {
 
 					if (setInitialValue) {
 						setInitialValue = false;
-						minValue = maxValue = dataSerie[valueIndex];
+						minValue = maxValue = dataValue;
 					}
 
-					final int dataValue = dataSerie[valueIndex];
 					minValue = (minValue <= dataValue) ? minValue : dataValue;
 					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 				}
 			}
 
-			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
+			if ((minValue == Integer.MIN_VALUE) || (maxValue == Integer.MAX_VALUE)) {
 				return false;
 			}
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
 
@@ -34,46 +34,43 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-	private static final String	IMAGE_LEFT_SLIDER	= "map-marker-slider-left.png";	//$NON-NLS-1$
-	private static final String	IMAGE_RIGHT_SLIDER	= "map-marker-slider-right.png";	//$NON-NLS-1$
+	private Map					_map;
+	private TourData			_tourData;
 
-	private Map					fMap;
-	private boolean				fIsTourVisible;
-	private TourData			fTourData;
+	private int					_leftSliderValueIndex;
+	private int					_rightSliderValueIndex;
 
-	private int					fLeftSliderValueIndex;
-	private int					fRightSliderValueIndex;
+	private boolean				_isTourVisible;
+	private boolean				_isShowSliderInMap;
+	private boolean				_isShowSliderInLegend;
 
-	private boolean				fIsShowSliderInMap;
-	private boolean				fIsShowSliderInLegend;
-
-	private final Image			fImageLeftSlider;
-	private final Image			fImageRightSlider;
+	private final Image			_imageLeftSlider;
+	private final Image			_imageRightSlider;
 
 	/**
 	 * 
 	 */
 	public DirectMappingPainter() {
-		fImageLeftSlider = TourbookPlugin.getImageDescriptor(IMAGE_LEFT_SLIDER).createImage();
-		fImageRightSlider = TourbookPlugin.getImageDescriptor(IMAGE_RIGHT_SLIDER).createImage();
+		_imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
+		_imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
 	}
 
 	/**
 	 * set paint context to draw nothing
 	 */
 	public void disablePaintContext() {
-		fMap = null;
-		fTourData = null;
-		fIsTourVisible = false;
+		_map = null;
+		_tourData = null;
+		_isTourVisible = false;
 	}
 
 	public void dispose() {
-		disposeImage(fImageLeftSlider);
-		disposeImage(fImageRightSlider);
+		disposeImage(_imageLeftSlider);
+		disposeImage(_imageRightSlider);
 	}
 
 	private void disposeImage(final Image image) {
-		if (image != null && !image.isDisposed()) {
+		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
 		}
 	}
@@ -82,11 +79,11 @@ public class DirectMappingPainter implements IDirectPainter {
 									int sliderValueIndex,
 									final Image markerImage) {
 
-		final MP mp = fMap.getMapProvider();
-		final int zoomLevel = fMap.getZoom();
+		final MP mp = _map.getMapProvider();
+		final int zoomLevel = _map.getZoom();
 
-		final double[] latitudeSerie = fTourData.latitudeSerie;
-		final double[] longitudeSerie = fTourData.longitudeSerie;
+		final double[] latitudeSerie = _tourData.latitudeSerie;
+		final double[] longitudeSerie = _tourData.longitudeSerie;
 
 		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
@@ -115,27 +112,27 @@ public class DirectMappingPainter implements IDirectPainter {
 
 	private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
 
-		final MapLegend mapLegend = fMap.getLegend();
+		final MapLegend mapLegend = _map.getLegend();
 
 		if (mapLegend == null) {
 			return;
 		}
 
 		final Image legendImage = mapLegend.getImage();
-		if (legendImage == null || legendImage.isDisposed()) {
+		if ((legendImage == null) || legendImage.isDisposed()) {
 			return;
 		}
 
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
 		final int leftValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
-				fLeftSliderValueIndex);
+				_leftSliderValueIndex);
 		if (leftValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
 
 		final int rightValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
-				fRightSliderValueIndex);
+				_rightSliderValueIndex);
 		if (rightValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
@@ -157,16 +154,16 @@ public class DirectMappingPainter implements IDirectPainter {
 
 	public void paint(final DirectPainterContext painterContext) {
 
-		if (fMap == null || fTourData == null || fIsTourVisible == false) {
+		if ((_map == null) || (_tourData == null) || (_isTourVisible == false)) {
 			return;
 		}
 
-		if (fIsShowSliderInMap) {
-			drawSliderMarker(painterContext, fRightSliderValueIndex, fImageRightSlider);
-			drawSliderMarker(painterContext, fLeftSliderValueIndex, fImageLeftSlider);
+		if (_isShowSliderInMap) {
+			drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
+			drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
 		}
 
-		if (fIsShowSliderInLegend) {
+		if (_isShowSliderInLegend) {
 			drawValueMarkerInLegend(painterContext);
 		}
 	}
@@ -189,13 +186,13 @@ public class DirectMappingPainter implements IDirectPainter {
 								final int rightSliderValuesIndex,
 								final boolean isShowSliderInMap,
 								final boolean isShowSliderInLegend) {
-		fMap = map;
-		fIsTourVisible = isTourVisible;
-		fTourData = tourData;
-		fLeftSliderValueIndex = leftSliderValuesIndex;
-		fRightSliderValueIndex = rightSliderValuesIndex;
-		fIsShowSliderInMap = isShowSliderInMap;
-		fIsShowSliderInLegend = isShowSliderInLegend;
+		_map = map;
+		_isTourVisible = isTourVisible;
+		_tourData = tourData;
+		_leftSliderValueIndex = leftSliderValuesIndex;
+		_rightSliderValueIndex = rightSliderValuesIndex;
+		_isShowSliderInMap = isShowSliderInMap;
+		_isShowSliderInLegend = isShowSliderInLegend;
 	}
 
 }

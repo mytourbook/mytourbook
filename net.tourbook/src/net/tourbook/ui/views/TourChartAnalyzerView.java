@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
 
@@ -37,6 +37,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -47,7 +49,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -65,190 +66,68 @@ public class TourChartAnalyzerView extends ViewPart {
 	private static final int			LAYOUT_MEDIUM	= 2;
 	private static final int			LAYOUT_LARGE	= 3;
 
-	private ISelectionListener			fPostSelectionListener;
+	private ISelectionListener			_postSelectionListener;
 
-	private Font						fontBold;
+	private ScrolledComposite			_scrolledContainer;
+	private Composite					_partContainer;
+	private Composite					_innerScContainer;
 
-	private Color						fBgColorData;
-	private Color						fBgColorHeader;
+	private ChartDataModel				_chartDataModel;
 
-	private ScrolledComposite			fScrolledContainer;
-	private Composite					fPartContainer;
-	private Composite					fContainer;
+	private ArrayList<ChartDrawingData>	_drawingData;
+	private final ArrayList<GraphInfo>	_graphInfos		= new ArrayList<GraphInfo>();
 
-	private ChartDataModel				fChartDataModel;
+	private final ColorCache			_colorCache		= new ColorCache();
 
-	private ArrayList<ChartDrawingData>	fDrawingData;
-	private ArrayList<GraphInfo>		fGraphInfos;
+	private Color						_bgColorHeader;
+	private Font						_fontBold;
 
-	private final ColorCache			fColorCache		= new ColorCache();
+	private SelectionChartInfo			_chartInfo;
 
-	private SelectionChartInfo			fChartInfo;
+	private int							_layoutFormat;
 
-	private int							fLayout;
-
-	private int							fValueIndexLeftBackup;
-	private int							fValueIndexRightBackup;
+	private int							_valueIndexLeftBackup;
+	private int							_valueIndexRightBackup;
 
 	/**
-	 * This class generates and contains the labels for one row in the view
+	 * space between columns
 	 */
-	class GraphInfo {
-
-		Label			left;
-		Label			right;
-
-		int				leftValue	= Integer.MIN_VALUE;
-		int				rightValue	= Integer.MIN_VALUE;
-
-		Label			min;
-		Label			max;
-
-		int				minValue	= Integer.MIN_VALUE;
-		int				maxValue	= Integer.MIN_VALUE;
-
-		Label			avg;
-		Label			diff;
-
-		int				avgValue	= Integer.MIN_VALUE;
-		int				diffValue	= Integer.MIN_VALUE;
-
-		ChartDataSerie	fChartData;
-
-		GraphInfo(final ChartDataSerie chartData) {
-			fChartData = chartData;
-		}
-
-		void createInfoAvg() {
-
-			final Color lineColor = getColor(fChartData.getDefaultRGB());
-
-			avg = new Label(fContainer, SWT.TRAIL);
-			avg.setForeground(lineColor);
-			avg.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			avg.setLayoutData(gd);
-		}
-
-		void createInfoDiff() {
-
-			final Color lineColor = getColor(fChartData.getDefaultRGB());
-
-			diff = new Label(fContainer, SWT.TRAIL);
-			diff.setForeground(lineColor);
-			diff.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			diff.setLayoutData(gd);
-		}
-
-		void createInfoLeft() {
-
-			left = new Label(fContainer, SWT.TRAIL);
-			left.setForeground(getColor(fChartData.getDefaultRGB()));
-			left.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			left.setLayoutData(gd);
-		}
-
-		void createInfoMax() {
-
-			max = new Label(fContainer, SWT.TRAIL);
-			max.setForeground(getColor(fChartData.getDefaultRGB()));
-			max.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			max.setLayoutData(gd);
-		}
-
-		void createInfoMin() {
-
-			min = new Label(fContainer, SWT.TRAIL);
-			min.setForeground(getColor(fChartData.getDefaultRGB()));
-			min.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			min.setLayoutData(gd);
-
-		}
-
-		void createInfoRight() {
-
-			right = new Label(fContainer, SWT.TRAIL);
-			right.setForeground(getColor(fChartData.getDefaultRGB()));
-			right.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			right.setLayoutData(gd);
-		}
-
-		private void createValueLabel() {
-
-			final Color lineColor = getColor(fChartData.getDefaultRGB());
-			Label label;
-
-			String labelText;
-			if (fChartData instanceof ChartDataYSerie) {
-				labelText = ((ChartDataYSerie) fChartData).getYTitle();
-			} else {
-				labelText = fChartData.getLabel();
-			}
-			label = new Label(fContainer, SWT.NONE);
-			label.setText(labelText);
-			label.setForeground(lineColor);
-			label.setBackground(fBgColorHeader);
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			label.setLayoutData(gd);
-		}
-
-		void createValueUnit() {
-
-			final Color lineColor = getColor(fChartData.getDefaultRGB());
-			Label label;
-
-			String toolTip;
-			if (fChartData instanceof ChartDataYSerie) {
-				toolTip = ((ChartDataYSerie) fChartData).getYTitle();
-			} else {
-				toolTip = fChartData.getLabel();
-			}
-
-			label = new Label(fContainer, SWT.NONE);
-			label.setText(" " + fChartData.getUnitLabel()); //$NON-NLS-1$
-			label.setToolTipText(toolTip);
-			label.setForeground(lineColor);
-			label.setBackground(fBgColorHeader);
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			label.setLayoutData(gd);
-		}
-	}
+	int									_columnSpacing	= 1;
 
 	public TourChartAnalyzerView() {
 		super();
 	}
 
+	private void addActions() {
+
+//		/*
+//		 * fill view menu
+//		 */
+//		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//		menuMgr.add(_actionSelectAllTours);
+//
+//		/*
+//		 * fill view toolbar
+//		 */
+//		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+//
+//		tbm.add(_actionRefreshView);
+	}
+
 	private void addListeners() {
 
-		fPartContainer.addControlListener(new ControlAdapter() {
+		_partContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent event) {
-				if (fChartDataModel == null) {
+				if (_chartDataModel == null) {
 					return;
 				}
-				createLayout();
-				updateInfo(fChartInfo);
+				createUILayout();
+				updateInfo(_chartInfo);
 			}
 		});
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
@@ -286,350 +165,20 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 		};
 
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
-	}
-
-	private void createHeaderAvg() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_average);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderDiff() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_difference);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderLeft() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_left);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderMax() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_maximum);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderMin() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_minimum);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderRight() {
-
-		final Label label = new Label(fContainer, SWT.TRAIL);
-		label.setText(Messages.TourAnalyzer_Label_right);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderUnitLabel() {
-
-		final Label label = new Label(fContainer, SWT.LEFT);
-		label.setText(""); //$NON-NLS-1$
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	private void createHeaderValueLabel() {
-
-		final Label label = new Label(fContainer, SWT.NONE);
-		label.setText(Messages.TourAnalyzer_Label_value);
-		label.setFont(fontBold);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		label.setBackground(fBgColorHeader);
-	}
-
-	/**
-	 * 
-	 */
-	private void createLayout() {
-
-		// recreate the viewer
-		if (fScrolledContainer != null) {
-			fScrolledContainer.dispose();
-			fScrolledContainer = null;
-		}
-
-		// fPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-		// define the layout which is being used
-		final int clientWidth = fPartContainer.getClientArea().width;
-		fLayout = clientWidth < 110 ? LAYOUT_TINY : clientWidth < 150 ? LAYOUT_SMALL : clientWidth < 370
-				? LAYOUT_MEDIUM
-				: LAYOUT_LARGE;
-
-		// create scrolled container
-		fScrolledContainer = new ScrolledComposite(fPartContainer, SWT.V_SCROLL | SWT.H_SCROLL);
-		fScrolledContainer.setExpandVertical(true);
-		fScrolledContainer.setExpandHorizontal(true);
-		fScrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				fScrolledContainer.setMinSize(fContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
-
-		// create container
-		fContainer = new Composite(fScrolledContainer, SWT.NONE);
-		fContainer.setBackground(fBgColorHeader);
-
-		final GridLayout gl = new GridLayout(fLayout == LAYOUT_TINY ? 2 : fLayout == LAYOUT_SMALL
-				? 3
-				: fLayout == LAYOUT_MEDIUM ? 4 : 8, false);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		gl.verticalSpacing = 0;
-		gl.horizontalSpacing = 0;
-		fContainer.setLayout(gl);
-
-		fScrolledContainer.setContent(fContainer);
-
-		if (fLayout == LAYOUT_TINY) {
-			createLayoutTiny();
-
-		} else if (fLayout == LAYOUT_SMALL) {
-			createLayoutSmall();
-
-		} else if (fLayout == LAYOUT_MEDIUM) {
-			createLayoutMedium();
-
-		} else if (fLayout == LAYOUT_LARGE) {
-			createLayoutLarge();
-		}
-	}
-
-	private void createLayoutLarge() {
-
-		createHeaderValueLabel();
-		createHeaderLeft();
-		createHeaderRight();
-		createHeaderMin();
-		createHeaderMax();
-		createHeaderDiff();
-		createHeaderAvg();
-		createHeaderUnitLabel();
-
-		// add all graphs and the x axis to the layout
-		fGraphInfos = new ArrayList<GraphInfo>();
-		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-
-			final GraphInfo graphInfo = new GraphInfo(xyData);
-
-			graphInfo.createValueLabel();
-
-			graphInfo.createInfoLeft();
-			graphInfo.createInfoRight();
-			graphInfo.createInfoMin();
-			graphInfo.createInfoMax();
-			graphInfo.createInfoDiff();
-			graphInfo.createInfoAvg();
-
-			graphInfo.createValueUnit();
-
-			fGraphInfos.add(graphInfo);
-		}
-	}
-
-	private void createLayoutMedium() {
-
-		createHeaderLeft();
-		createHeaderRight();
-		createHeaderDiff();
-		createHeaderUnitLabel();
-
-		// add all graphs and the x axis to the layout
-		fGraphInfos = new ArrayList<GraphInfo>();
-		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-
-			final GraphInfo graphInfo = new GraphInfo(xyData);
-
-			graphInfo.createInfoLeft();
-			graphInfo.createInfoRight();
-			graphInfo.createInfoDiff();
-			graphInfo.createValueUnit();
-
-			fGraphInfos.add(graphInfo);
-		}
-
-		createVerticalBorder();
-
-		createHeaderMin();
-		createHeaderMax();
-		createHeaderAvg();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoMin();
-			graphInfo.createInfoMax();
-			graphInfo.createInfoAvg();
-			graphInfo.createValueUnit();
-		}
-	}
-
-	private void createLayoutSmall() {
-
-		createHeaderLeft();
-		createHeaderRight();
-		createHeaderUnitLabel();
-
-		// add all graphs and the x axis to the layout
-		fGraphInfos = new ArrayList<GraphInfo>();
-		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-
-			final GraphInfo graphInfo = new GraphInfo(xyData);
-
-			graphInfo.createInfoLeft();
-			graphInfo.createInfoRight();
-			graphInfo.createValueUnit();
-
-			fGraphInfos.add(graphInfo);
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderDiff();
-		createHeaderAvg();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoDiff();
-			graphInfo.createInfoAvg();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderMin();
-		createHeaderMax();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoMin();
-			graphInfo.createInfoMax();
-			graphInfo.createValueUnit();
-		}
-	}
-
-	private void createLayoutTiny() {
-		fGraphInfos = new ArrayList<GraphInfo>();
-
-		// create graph info list
-		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-			fGraphInfos.add(new GraphInfo(xyData));
-		}
-
-		// ----------------------------------------------------------------
-
-		createHeaderLeft();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoLeft();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderRight();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoRight();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderDiff();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoDiff();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderAvg();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoAvg();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderMin();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoMin();
-			graphInfo.createValueUnit();
-		}
-
-		// ----------------------------------------------------------------
-
-		createVerticalBorder();
-
-		createHeaderMax();
-		createHeaderUnitLabel();
-
-		for (final GraphInfo graphInfo : fGraphInfos) {
-			graphInfo.createInfoMax();
-			graphInfo.createValueUnit();
-		}
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		fPartContainer = parent;
+		_partContainer = parent;
 
-		fBgColorData = getColor(new RGB(240, 240, 240));
-		// fBgColorData = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		// fBgColorData = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+		_bgColorHeader = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
-		fBgColorHeader = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		// fBgColorHeader =
-		// Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
-
-		fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+		_fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		addListeners();
+		addActions();
 
 		// show chart info for the current selection
 		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
@@ -638,37 +187,372 @@ public class TourChartAnalyzerView extends ViewPart {
 		}
 	}
 
+	private void createUIHeader10Left() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_left + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeader20Right() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_right + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeader30Min() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_minimum + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeader40Max() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_maximum + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeader50Diff() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_difference + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeader60Avg() {
+
+		final Label label = new Label(_innerScContainer, SWT.TRAIL);
+		label.setText(Messages.TourAnalyzer_Label_average + UI.SPACE);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	private void createUIHeaderUnitLabel() {
+
+		final Label label = new Label(_innerScContainer, SWT.LEFT);
+		label.setText(UI.EMPTY_STRING);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+
+		// spacer
+//		final Canvas canvas = new Canvas(_innerScContainer, SWT.NONE);
+//		GridDataFactory.fillDefaults()//
+//				.align(SWT.BEGINNING, SWT.BEGINNING)
+//				.hint(0, 0)
+//				.applyTo(canvas);
+	}
+
+	private void createUIHeaderValueLabel() {
+
+		final Label label = new Label(_innerScContainer, SWT.NONE);
+		label.setText(UI.SPACE + Messages.TourAnalyzer_Label_value);
+		label.setFont(_fontBold);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		label.setBackground(_bgColorHeader);
+	}
+
+	/**
+	 * 
+	 */
+	private void createUILayout() {
+
+		// recreate the viewer
+		if (_scrolledContainer != null) {
+			_scrolledContainer.dispose();
+			_scrolledContainer = null;
+		}
+
+		final PixelConverter pc = new PixelConverter(_partContainer);
+
+		// define the layout which is being used
+		final int clientWidth = _partContainer.getClientArea().width;
+		_layoutFormat = clientWidth < pc.convertHorizontalDLUsToPixels(100) //
+				? LAYOUT_TINY
+				: clientWidth < pc.convertHorizontalDLUsToPixels(150) //
+						? LAYOUT_SMALL
+						: clientWidth < pc.convertHorizontalDLUsToPixels(300) //
+								? LAYOUT_MEDIUM
+								: LAYOUT_LARGE;
+
+		final int numColumns = _layoutFormat == LAYOUT_TINY //
+				? 2
+				: _layoutFormat == LAYOUT_SMALL //
+						? 3
+						: _layoutFormat == LAYOUT_MEDIUM ? 4 : 8;
+
+		// create scrolled container
+		_scrolledContainer = new ScrolledComposite(_partContainer, SWT.V_SCROLL | SWT.H_SCROLL);
+		_scrolledContainer.setExpandVertical(true);
+		_scrolledContainer.setExpandHorizontal(true);
+		_scrolledContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				_scrolledContainer.setMinSize(_innerScContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
+		});
+
+		// create innter container
+		_innerScContainer = new Composite(_scrolledContainer, SWT.NONE);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(numColumns).applyTo(_innerScContainer);
+		_innerScContainer.setBackground(_bgColorHeader);
+
+		_scrolledContainer.setContent(_innerScContainer);
+
+		_columnSpacing = 1;
+
+		if (_layoutFormat == LAYOUT_TINY) {
+			createUILayout10Tiny();
+		} else if (_layoutFormat == LAYOUT_SMALL) {
+			createUILayout20Small();
+		} else if (_layoutFormat == LAYOUT_MEDIUM) {
+			createUILayout30Medium();
+		} else if (_layoutFormat == LAYOUT_LARGE) {
+			createUILayout40Large();
+		}
+	}
+
+	private void createUILayout10Tiny() {
+
+		_graphInfos.clear();
+
+		// create graph info list
+		for (final ChartDataSerie xyData : _chartDataModel.getXyData()) {
+			_graphInfos.add(new GraphInfo(this, xyData, _innerScContainer));
+		}
+
+		// ----------------------------------------------------------------
+
+		createUIHeader10Left();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo10Left();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader20Right();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo20Right();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader50Diff();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo50Diff();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader60Avg();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo60Avg();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader30Min();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo30Min();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader40Max();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo40Max();
+			graphInfo.createUIValueUnit();
+		}
+	}
+
+	private void createUILayout20Small() {
+
+		createUIHeader10Left();
+		createUIHeader20Right();
+		createUIHeaderUnitLabel();
+
+		// add all graphs and the x axis to the layout
+		_graphInfos.clear();
+		for (final ChartDataSerie xyData : _chartDataModel.getXyData()) {
+
+			final GraphInfo graphInfo = new GraphInfo(this, xyData, _innerScContainer);
+
+			graphInfo.createUIInfo10Left();
+			graphInfo.createUIInfo20Right();
+			graphInfo.createUIValueUnit();
+
+			_graphInfos.add(graphInfo);
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader50Diff();
+		createUIHeader60Avg();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo50Diff();
+			graphInfo.createUIInfo60Avg();
+			graphInfo.createUIValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createUIHeader30Min();
+		createUIHeader40Max();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo30Min();
+			graphInfo.createUIInfo40Max();
+			graphInfo.createUIValueUnit();
+		}
+	}
+
+	private void createUILayout30Medium() {
+
+		createUIHeader10Left();
+		createUIHeader20Right();
+		createUIHeader50Diff();
+		createUIHeaderUnitLabel();
+
+		// add all graphs and the x axis to the layout
+		_graphInfos.clear();
+		for (final ChartDataSerie xyData : _chartDataModel.getXyData()) {
+
+			final GraphInfo graphInfo = new GraphInfo(this, xyData, _innerScContainer);
+
+			graphInfo.createUIInfo10Left();
+			graphInfo.createUIInfo20Right();
+			graphInfo.createUIInfo50Diff();
+			graphInfo.createUIValueUnit();
+
+			_graphInfos.add(graphInfo);
+		}
+
+		createVerticalBorder();
+
+		createUIHeader30Min();
+		createUIHeader40Max();
+		createUIHeader60Avg();
+		createUIHeaderUnitLabel();
+
+		for (final GraphInfo graphInfo : _graphInfos) {
+			graphInfo.createUIInfo30Min();
+			graphInfo.createUIInfo40Max();
+			graphInfo.createUIInfo60Avg();
+			graphInfo.createUIValueUnit();
+		}
+	}
+
+	private void createUILayout40Large() {
+
+		createUIHeaderValueLabel();
+		createUIHeader10Left();
+		createUIHeader20Right();
+		createUIHeader30Min();
+		createUIHeader40Max();
+		createUIHeader50Diff();
+		createUIHeader60Avg();
+		createUIHeaderUnitLabel();
+
+		// add all graphs and the x axis to the layout
+		_graphInfos.clear();
+		for (final ChartDataSerie xyData : _chartDataModel.getXyData()) {
+
+			final GraphInfo graphInfo = new GraphInfo(this, xyData, _innerScContainer);
+
+			graphInfo.createUIValueLabel();
+
+			graphInfo.createUIInfo10Left();
+			graphInfo.createUIInfo20Right();
+			graphInfo.createUIInfo30Min();
+			graphInfo.createUIInfo40Max();
+			graphInfo.createUIInfo50Diff();
+			graphInfo.createUIInfo60Avg();
+
+			graphInfo.createUIValueUnit();
+
+			_graphInfos.add(graphInfo);
+		}
+	}
+
 	private void createVerticalBorder() {
 
 		GridData gd;
 
-		final int columns = fLayout == LAYOUT_TINY ? 1 : fLayout == LAYOUT_SMALL ? 2 : fLayout == LAYOUT_MEDIUM ? 3 : 8;
+		final int columns = _layoutFormat == LAYOUT_TINY //
+				? 1
+				: _layoutFormat == LAYOUT_SMALL //
+						? 2
+						: _layoutFormat == LAYOUT_MEDIUM ? 3 : 7;
 
 		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-		gd.heightHint = 5;
-		// gd.horizontalIndent = 15;
+		gd.heightHint = 3;
 
 		Label label;
 
 		for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
-			label = new Label(fContainer, SWT.NONE);
-			label.setText(" "); //$NON-NLS-1$
-			// label.setBackground(fBgColorData);
+			label = new Label(_innerScContainer, SWT.NONE);
+			label.setText(UI.SPACE);
 			label.setLayoutData(gd);
 		}
 
-		label = new Label(fContainer, SWT.NONE);
-		label.setText(" "); //$NON-NLS-1$
-		// label.setBackground(fBgColorHeader);
+		label = new Label(_innerScContainer, SWT.NONE);
+		label.setText(UI.SPACE);
 		label.setLayoutData(gd);
 	}
 
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 
-		fColorCache.dispose();
+		_colorCache.dispose();
 
 		super.dispose();
 	}
@@ -678,14 +562,14 @@ public class TourChartAnalyzerView extends ViewPart {
 	 * @return Returns the color from the color cache, the color must not be disposed this is done
 	 *         when the cache is disposed
 	 */
-	private Color getColor(final RGB rgb) {
+	Color getColor(final RGB rgb) {
 
 		final String colorKey = rgb.toString();
 
-		final Color color = fColorCache.get(colorKey);
+		final Color color = _colorCache.get(colorKey);
 
 		if (color == null) {
-			return fColorCache.createColor(colorKey, rgb);
+			return _colorCache.createColor(colorKey, rgb);
 		} else {
 			return color;
 		}
@@ -693,8 +577,8 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		if (fScrolledContainer != null) {
-			fScrolledContainer.setFocus();
+		if (_scrolledContainer != null) {
+			_scrolledContainer.setFocus();
 		}
 	}
 
@@ -706,11 +590,11 @@ public class TourChartAnalyzerView extends ViewPart {
 			return;
 		}
 
-		fChartInfo = chartInfo;
+		_chartInfo = chartInfo;
 
 		// check if the layout needs to be recreated
 		boolean isLayoutDirty = false;
-		if (fChartDataModel != chartInfo.chartDataModel) {
+		if (_chartDataModel != chartInfo.chartDataModel) {
 			/*
 			 * data model changed, a new layout needs to be created
 			 */
@@ -718,22 +602,22 @@ public class TourChartAnalyzerView extends ViewPart {
 		}
 
 		// init vars which are used in createLayout()
-		fChartDataModel = chartInfo.chartDataModel;
-		fDrawingData = chartInfo.chartDrawingData;
+		_chartDataModel = chartInfo.chartDataModel;
+		_drawingData = chartInfo.chartDrawingData;
 
-		if (fDrawingData == null || fDrawingData.size() == 0 || fDrawingData.get(0) == null) {
+		if ((_drawingData == null) || (_drawingData.size() == 0) || (_drawingData.get(0) == null)) {
 			// this happened
 			return;
 		}
 
-		if (fGraphInfos == null || isLayoutDirty) {
-			createLayout();
+		if ((_graphInfos == null) || isLayoutDirty) {
+			createUILayout();
 		}
 
 		updateInfoData(chartInfo);
 
 		// refresh the layout after the data has changed
-		fPartContainer.layout();
+		_partContainer.layout();
 
 //		long endTime = System.currentTimeMillis();
 //		System.out.println(++fCounter + "  " + (endTime - startTime) + " ms");
@@ -751,7 +635,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
 
-			if (tourChart == null || tourChart.isDisposed()) {
+			if ((tourChart == null) || tourChart.isDisposed()) {
 				return;
 			} else {
 				chart = tourChart;
@@ -773,29 +657,30 @@ public class TourChartAnalyzerView extends ViewPart {
 
 //		long startTime = System.currentTimeMillis();
 
-		final ChartDataXSerie xData = fDrawingData.get(0).getXData();
+		final ChartDataXSerie xData = _drawingData.get(0).getXData();
 
 		int valuesIndexLeft = chartInfo.leftSliderValuesIndex;
 		int valuesIndexRight = chartInfo.rightSliderValuesIndex;
 
 		if (valuesIndexLeft == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			valuesIndexLeft = fValueIndexLeftBackup;
+			valuesIndexLeft = _valueIndexLeftBackup;
 		} else {
-			fValueIndexLeftBackup = valuesIndexLeft;
+			_valueIndexLeftBackup = valuesIndexLeft;
 		}
 		if (valuesIndexRight == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			valuesIndexRight = fValueIndexRightBackup;
+			valuesIndexRight = _valueIndexRightBackup;
 		} else {
-			fValueIndexRightBackup = valuesIndexRight;
+			_valueIndexRightBackup = valuesIndexRight;
 		}
 
 		int outCounter = 0;
 
-		for (final GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : _graphInfos) {
 
-			final ChartDataSerie serieData = graphInfo.fChartData;
+			final ChartDataSerie serieData = graphInfo._chartData;
 
-			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.CUSTOM_DATA_ANALYZER_INFO);
+			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData
+					.getCustomData(TourManager.CUSTOM_DATA_ANALYZER_INFO);
 			if (analyzerInfo == null) {
 				// create default average object
 				analyzerInfo = new TourChartAnalyzerInfo();
@@ -859,7 +744,7 @@ public class TourChartAnalyzerView extends ViewPart {
 				computeAvg.valueIndexRight = valuesIndexRight;
 				computeAvg.xData = xData;
 				computeAvg.yData = (ChartDataYSerie) serieData;
-				computeAvg.chartModel = fChartDataModel;
+				computeAvg.chartModel = _chartDataModel;
 
 				avg = computeAvg.compute();
 
@@ -874,25 +759,25 @@ public class TourChartAnalyzerView extends ViewPart {
 			 */
 			if (graphInfo.leftValue != leftValue) {
 				graphInfo.leftValue = leftValue;
-				graphInfo.left.setText(ChartUtil.formatValue(leftValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.lblLeft.setText(ChartUtil.formatValue(leftValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.rightValue != rightValue) {
 				graphInfo.rightValue = rightValue;
-				graphInfo.right.setText(ChartUtil.formatValue(rightValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.lblRight.setText(ChartUtil.formatValue(rightValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.minValue != min) {
 				graphInfo.minValue = min;
-				graphInfo.min.setText(ChartUtil.formatValue(min, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.lblMin.setText(ChartUtil.formatValue(min, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.maxValue != max) {
 				graphInfo.maxValue = max;
-				graphInfo.max.setText(ChartUtil.formatValue(max, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.lblMax.setText(ChartUtil.formatValue(max, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
@@ -909,32 +794,30 @@ public class TourChartAnalyzerView extends ViewPart {
 
 					if (graphInfo.avgValue != avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.avg.setText(ChartUtil.formatInteger((int) avgValue,
-								avgDivisor,
-								analyzerInfo.getAvgDecimals(),
-								false)
-								+ " "); //$NON-NLS-1$
+						graphInfo.lblAvg.setText(ChartUtil.formatInteger((int) avgValue, avgDivisor, analyzerInfo
+								.getAvgDecimals(), false)
+								+ UI.SPACE);
 						outCounter++;
 					}
 
 				} else {
 					if (graphInfo.avgValue != avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.avg.setText(ChartUtil.formatValue((int) avgValue, unitType, valueDivisor, true)
-								+ " "); //$NON-NLS-1$
+						graphInfo.lblAvg.setText(ChartUtil.formatValue((int) avgValue, unitType, valueDivisor, true)
+								+ UI.SPACE);
 						outCounter++;
 					}
 				}
 
 			} else {
-				graphInfo.avg.setText(UI.EMPTY_STRING);
+				graphInfo.lblAvg.setText(UI.EMPTY_STRING);
 				outCounter++;
 			}
 
 			final int diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
-				graphInfo.diff.setText(ChartUtil.formatValue(diffValue, unitType, valueDivisor, true) + " "); //$NON-NLS-1$
+				graphInfo.lblDiff.setText(ChartUtil.formatValue(diffValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 		}
