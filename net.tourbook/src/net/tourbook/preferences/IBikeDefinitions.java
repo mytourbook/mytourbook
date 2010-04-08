@@ -1,42 +1,45 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
 public interface IBikeDefinitions {
 
 	/**
-	 * <code>
-	 
-	 Hollandrad													"roadster"
-	 Mountain Bike ungefedert									"mtb"
-	 Tandem mit Rennlenkern										"tandem"
-	 Rennvelo Obenlenker-Haltung								"racetops"
-	 Rennvelo Untenlenker-Haltung								"racedrops"
-	 Triathlon													"tria"
-	 Superman-Haltung (Rennrad-Stundenweltrekord)				"superman"
-	 Langliegerad mit Untenlenker Alltagsausstattung			"lwbuss"
-	 Kurzliegerad mit Untenlenker Alltagsausstattung			"swbuss"
-	 Kurzliegerad mit Obenlenker Rennausstattung				"swbass"
-	 Tiefliegerad mit Obenlenker Kreuzotter race				"ko4"
-	 Tieflieger+Heckflosse Kreuzotter race						"ko4tailbox"
-	 Tieflieger vollverschalt White Hawk (Stundenweltrekord)	"whitehawk"
-	 Velomobil verschalt										"questclosed"
-	 Handbike 3 Räder, Kurbeln mit Kettenschaltung				"handtrike"
-	 
-	 * </code>
+	 * source: http://www.rennradtraining.de/www.kreuzotter.de/deutsch/speed.htm <br>
+	 * <br>
+	 * 
+	 * <pre>
+	 * 
+	 * Hollandrad												"roadster"
+	 * Mountain Bike ungefedert									"mtb"
+	 * Tandem mit Rennlenkern									"tandem"
+	 * Rennvelo Obenlenker-Haltung								"racetops"
+	 * Rennvelo Untenlenker-Haltung								"racedrops"
+	 * Triathlon												"tria"
+	 * Superman-Haltung (Rennrad-Stundenweltrekord)				"superman"
+	 * Langliegerad mit Untenlenker Alltagsausstattung			"lwbuss"
+	 * Kurzliegerad mit Untenlenker Alltagsausstattung			"swbuss"
+	 * Kurzliegerad mit Obenlenker Rennausstattung				"swbass"
+	 * Tiefliegerad mit Obenlenker Kreuzotter race				"ko4"
+	 * Tieflieger+Heckflosse Kreuzotter race					"ko4tailbox"
+	 * Tieflieger vollverschalt White Hawk (Stundenweltrekord)	"whitehawk"
+	 * Velomobil verschalt										"questclosed"
+	 * Handbike 3 Räder, Kurbeln mit Kettenschaltung			"handtrike"
+	 * 
+	 * </pre>
 	 */
 
 	public static String[]	bikeType	= new String[] { "Hollandrad", //$NON-NLS-1$

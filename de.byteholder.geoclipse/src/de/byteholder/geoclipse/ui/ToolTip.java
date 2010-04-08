@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -44,7 +44,7 @@ public abstract class ToolTip {
 
 		final Display display = parent.getDisplay();
 
-		_shell = new Shell(display, SWT.NO_TRIM | SWT.CLOSE | SWT.ON_TOP | SWT.TOOL);
+		_shell = new Shell(display, SWT.ON_TOP | SWT.TOOL);
 
 		_shell.addMouseListener(new MouseAdapter() {});
 

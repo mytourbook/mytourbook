@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -22,7 +22,7 @@ public interface ITourbookPreferences {
 	/*
 	 * dummy field used by field editors so they don't assert
 	 */
-	public static final String	DUMMY_FIELD									= UI.EMPTY_STRING;											//$NON-NLS-1$
+	public static final String	DUMMY_FIELD									= UI.EMPTY_STRING;
 
 	/*
 	 * statistic provider
@@ -118,6 +118,10 @@ public interface ITourbookPreferences {
 	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE				= "system.of.measurement.temperature";						//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE_C			= "metric.celcius";										//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F			= "metric.fahrenheit";										//$NON-NLS-1$
+
+	public static final String	MEASUREMENT_SYSTEM_ENERGY					= "system.of.energy";										//$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_ENERGY_JOULE				= "energy.joule";											//$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_ENERGY_CALORIE			= "energy.calorie";										//$NON-NLS-1$
 
 	/*
 	 * map settings

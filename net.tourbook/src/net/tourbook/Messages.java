@@ -455,6 +455,12 @@ public class Messages extends NLS {
 	public static String		Pref_General_CalendarWeek;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
+
+	public static String	Pref_General_Energy;
+
+	public static String	Pref_General_Energy_Calorie;
+
+	public static String	Pref_General_Energy_Joule;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;

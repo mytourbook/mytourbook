@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
- 
+
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String	ID	= "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
@@ -70,8 +70,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	 */
 	private void checkCalendarWeek() {
 
-		if (_backupFirstDayOfWeek != _currentFirstDayOfWeek
-				| _backupMinimalDaysInFirstWeek != _currentMinimalDaysInFirstWeek) {
+		if ((_backupFirstDayOfWeek != _currentFirstDayOfWeek)
+				| (_backupMinimalDaysInFirstWeek != _currentMinimalDaysInFirstWeek)) {
 
 			if (MessageDialog.openQuestion(
 					Display.getCurrent().getActiveShell(),
@@ -145,6 +145,26 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 									ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F }, },
 					group,
 					false));
+
+			/*
+			 * this is currently disabled because computing the power according to
+			 * http://www.rennradtraining.de/www.kreuzotter.de/deutsch/speed.htm takes a lot of time
+			 * to implement it correctly
+			 */
+//			// radio: energy
+//			addField(new RadioGroupFieldEditor(
+//					ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY,
+//					Messages.Pref_General_Energy,
+//					2,
+//					new String[][] {
+//							new String[] {
+//									Messages.Pref_General_Energy_Joule,
+//									ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY_JOULE },
+//							new String[] {
+//									Messages.Pref_General_Energy_Calorie,
+//									ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY_CALORIE }, },
+//					group,
+//					false));
 
 			// checkbox: show in UI
 			addField(_editShowMeasurementInUI = new BooleanFieldEditor2(
@@ -226,7 +246,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 				if (dayIndex == Calendar.MONDAY) {
 					// add iso marker
-					weekDay = weekDay + " - " + Messages.App_Label_ISO8601;// + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+					weekDay = weekDay + " - " + Messages.App_Label_ISO8601;// + ")"; //$NON-NLS-1$
 				}
 				_comboFirstDay.add(weekDay);
 			}
@@ -252,7 +272,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 				String dayText;
 				if (dayIndex == 4) {
-					dayText = Integer.toString(dayIndex) + " - " + Messages.App_Label_ISO8601;// + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+					dayText = Integer.toString(dayIndex) + " - " + Messages.App_Label_ISO8601;// + ")"; //$NON-NLS-1$
 				} else {
 					dayText = Integer.toString(dayIndex);
 				}
