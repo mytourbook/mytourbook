@@ -26,6 +26,8 @@ package de.byteholder.geoclipse.map;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+ 
+import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -47,8 +51,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -60,10 +64,12 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.dnd.URLTransfer;
+import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
@@ -85,8 +91,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
@@ -98,13 +105,12 @@ import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
+import de.byteholder.geoclipse.ui.ToolTip;
 import de.byteholder.gpx.GeoPosition;
 
 public class Map extends Canvas {
 
-	private static final int							INVALID_POI_POSITION						= -33333;
-
-	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
+//	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
 	private static final String							WIKI_PARAMETER_TYPE							= "type";																	//$NON-NLS-1$
 
 //	http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
@@ -170,12 +176,6 @@ public class Map extends Canvas {
 	 * the map will be repositioned.
 	 */
 	private GeoPosition									_addressLocation;
-
-	/**
-	 * Specifies whether panning is enabled. Panning is being able to click and drag the map around
-	 * to cause it to move
-	 */
-	private boolean										_panEnabled									= true;
 
 	/**
 	 * Specifies whether zooming is enabled (the mouse wheel, for example, zooms)
@@ -286,7 +286,7 @@ public class Map extends Canvas {
 	 * corner</b>, <br>
 	 * <b>width</b> and <b>height</b> contains the visible area in device pixel
 	 */
-	private Rectangle									_mapPixelViewport;
+	private Rectangle									_worldPixelViewport;
 
 	/**
 	 * Contains the client area of the map without trimmings, this rectangle has the width and
@@ -310,11 +310,23 @@ public class Map extends Canvas {
 	private final Color									_transparentColor;
 	private final Color									_defaultBackgroundColor;
 
-	private boolean										_isShowPOI;
+	/*
+	 * POI image
+	 */
+	private boolean										_isPoiVisible;
+	private boolean										_isPoiPositionInViewport;
+	private GeoPosition									_poiGeoPosition;
 	private final Image									_poiImage;
-	private GeoPosition									_poiPosition;
-	private String										_poiText;
 	private final org.eclipse.swt.graphics.Rectangle	_poiImageBounds;
+	private final Point									_poiImageDevPosition						= new Point(0, 0);
+
+	/*
+	 * POI tooltip
+	 */
+	private ToolTip										_poiTT;
+	private String										_poiTTText;
+	private Text										_poiTTLabel;
+	private final int									_poiTTOffsetY								= 5;
 
 	/**
 	 * when <code>true</code> the loading... image is not displayed
@@ -373,10 +385,6 @@ public class Map extends Canvas {
 	private boolean										_disableContextMenu							= false;
 
 	private DropTarget									_dropTarget;
-	private int											_devPoiPosX;
-	private int											_devPoiPosY;
-
-	private final ToolTip								_toolTip;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -424,7 +432,7 @@ public class Map extends Canvas {
 
 			if ((delta_x != 0) || (delta_y != 0)) {
 
-				final Rectangle bounds = _mapPixelViewport;
+				final Rectangle bounds = _worldPixelViewport;
 				final double x = bounds.getCenterX() + delta_x;
 				final double y = bounds.getCenterY() + delta_y;
 				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
@@ -538,38 +546,44 @@ public class Map extends Canvas {
 			}
 		});
 
+		addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(final FocusEvent e) {
+				showHidePoiTooltip();
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+// this is critical because the tool tip get's hidden when there are actions available in the tool tip shell
+//				hidePoiToolTip();
+			}
+		});
+
 		final MouseMapListener mouseListener = new MouseMapListener();
 		addMouseListener(mouseListener);
 		addMouseMoveListener(mouseListener);
 		addListener(SWT.MouseWheel, mouseListener);
 
 		addKeyListener(new KeyMapListener());
-		createContextMenu();
 
-		addControlListener(new ControlListener() {
-
-			@Override
-			public void controlMoved(final ControlEvent e) {
-			// just do nothing, it's not necessary
-			}
-
+		addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
 				onResize();
 			}
 		});
 
-		/*
-		 * enable travers keys
-		 */
 		addTraverseListener(new TraverseListener() {
 			@Override
 			public void keyTraversed(final TraverseEvent e) {
+				// enable travers keys
 				e.doit = true;
 			}
 		});
 
 		addDropTarget(this);
+
+		createContextMenu();
 
 		_cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 		_cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
@@ -619,15 +633,6 @@ public class Map extends Canvas {
 
 		_overlayThread.setDaemon(true);
 		_overlayThread.start();
-
-		_toolTip = new ToolTip(this) {
-			@Override
-			protected Composite createToolTipContentArea(final Event event, final Composite parent) {
-				return onCreateToolTip(event, parent);
-			}
-		};
-//		_toolTip.setHideDelay(0);
-
 	}
 
 	/**
@@ -883,6 +888,23 @@ public class Map extends Canvas {
 		setMenu(menuMgr.createContextMenu(this));
 	}
 
+	private Composite createToolTip(final Shell shell) {
+
+		final Display display = shell.getDisplay();
+		final Color bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+
+		final Composite container = new Composite(shell, SWT.NONE);
+		container.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		container.setBackground(bgColor);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+		{
+			_poiTTLabel = new Text(container, SWT.WRAP | SWT.READ_ONLY);
+			_poiTTLabel.setBackground(bgColor);
+		}
+
+		return container;
+	}
+
 	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
 
 		_MP.setDimLevel(dimLevel, dimColor);
@@ -891,21 +913,6 @@ public class Map extends Canvas {
 		_MP.disposeTileImages();
 
 		resetAll();
-	}
-
-	/**
-	 * hide offline area and all states
-	 */
-	private void disableOfflineAreaSelection() {
-
-		_isSelectOfflineArea = false;
-		_isPaintOfflineArea = false;
-		_disableContextMenu = false;
-		_isOfflineSelectionStarted = false;
-
-		setCursor(_cursorDefault);
-
-		redraw();
 	}
 
 //	/**
@@ -935,6 +942,21 @@ public class Map extends Canvas {
 //
 //		queueMapRedraw();
 //	}
+
+	/**
+	 * hide offline area and all states
+	 */
+	private void disableOfflineAreaSelection() {
+
+		_isSelectOfflineArea = false;
+		_isPaintOfflineArea = false;
+		_disableContextMenu = false;
+		_isOfflineSelectionStarted = false;
+
+		setCursor(_cursorDefault);
+
+		redraw();
+	}
 
 	/**
 	 * Disposes all overlay image cache and the overlay painting queue
@@ -1029,7 +1051,7 @@ public class Map extends Canvas {
 		final org.eclipse.swt.graphics.Rectangle imageBounds = legendImage.getBounds();
 
 		// draw legend on bottom left
-		int yPos = _mapPixelViewport.height - 5 - imageBounds.height;
+		int yPos = _worldPixelViewport.height - 5 - imageBounds.height;
 		yPos = Math.max(5, yPos);
 
 		final Point legendPosition = new Point(5, yPos);
@@ -1040,7 +1062,7 @@ public class Map extends Canvas {
 
 	private void drawMapScale(final GC gc) {
 
-		final int viewPortWidth = _mapPixelViewport.width;
+		final int viewPortWidth = _worldPixelViewport.width;
 
 		final int devScaleWidth = viewPortWidth / 3;
 		final float metricWidth = 111.32f / _distanceUnitValue;
@@ -1081,7 +1103,7 @@ public class Map extends Canvas {
 		final Point textExtent = gc.textExtent(scaleText);
 
 		final int devX1 = viewPortWidth - 5 - devScaleWidth;
-		int devY = _mapPixelViewport.height - 5 - 3;
+		int devY = _worldPixelViewport.height - 5 - 3;
 //		final int x1 = viewPortWidth / 2 - devScaleWidth / 2;
 //		int devY = fMapViewport.height / 2;
 
@@ -1739,6 +1761,16 @@ public class Map extends Canvas {
 		return _overlayKey + tile.getTileKey();
 	}
 
+//	/**
+//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
+//	 * system, not as lat/longs.
+//	 *
+//	 * @return Returns the current center of the map in as a world pixel value
+//	 */
+//	public Point2D getCenterInWorldPixel() {
+//		return _mapCenterInWorldPixel;
+//	}
+
 	/**
 	 * @param tile
 	 * @param xOffset
@@ -1749,16 +1781,6 @@ public class Map extends Canvas {
 	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
 		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
 	}
-
-//	/**
-//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
-//	 * system, not as lat/longs.
-//	 *
-//	 * @return Returns the current center of the map in as a world pixel value
-//	 */
-//	public Point2D getCenterInWorldPixel() {
-//		return _mapCenterInWorldPixel;
-//	}
 
 	public List<MapPainter> getOverlays() {
 		return _overlays;
@@ -1799,6 +1821,12 @@ public class Map extends Canvas {
 		return _mapZoomLevel;
 	}
 
+	private void hidePoiToolTip() {
+		if (_poiTT != null) {
+			_poiTT.hide();
+		}
+	}
+
 	/**
 	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
 	 * 
@@ -1806,15 +1834,6 @@ public class Map extends Canvas {
 	 */
 	public boolean isDrawTileBorders() {
 		return _isShowTileInfo;
-	}
-
-	/**
-	 * A property indicating if the map should be pannable by the user using the mouse.
-	 * 
-	 * @return property value
-	 */
-	public boolean isPanEnabled() {
-		return _panEnabled;
 	}
 
 	/**
@@ -1970,18 +1989,6 @@ public class Map extends Canvas {
 		return _zoomOnDoubleClickEnabled;
 	}
 
-	private Composite onCreateToolTip(final Event event, final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		{
-			final Label label = new Label(parent, SWT.NONE);
-
-			label.setText(_poiText);
-		}
-
-		return container;
-	}
-
 	/**
 	 * onDispose is called when the map is disposed
 	 * 
@@ -2023,6 +2030,10 @@ public class Map extends Canvas {
 		// dispose legend image
 		if (_mapLegend != null) {
 			disposeResource(_mapLegend.getImage());
+		}
+
+		if (_poiTT != null) {
+			_poiTT.dispose();
 		}
 
 		// stop overlay thread
@@ -2067,15 +2078,18 @@ public class Map extends Canvas {
 
 	private void onMouseDown(final MouseEvent e) {
 
+		// check if left mouse button is pressed
 		if (e.button != 1) {
 			return;
 		}
+
+		hidePoiToolTip();
 
 		if (_isSelectOfflineArea) {
 
 			_isOfflineSelectionStarted = true;
 
-			final Rectangle viewPort = _mapPixelViewport;
+			final Rectangle viewPort = _worldPixelViewport;
 			final int worldMouseX = viewPort.x + e.x;
 			final int worldMouseY = viewPort.y + e.y;
 
@@ -2092,9 +2106,7 @@ public class Map extends Canvas {
 			_mousePanPosition = new Point(e.x, e.y);
 			_isLeftMouseButtonPressed = true;
 
-			if (isPanEnabled()) {
-				setCursor(_cursorPan);
-			}
+			setCursor(_cursorPan);
 		}
 	}
 
@@ -2107,7 +2119,7 @@ public class Map extends Canvas {
 
 		if (_isSelectOfflineArea) {
 
-			final Rectangle viewPort = _mapPixelViewport;
+			final Rectangle viewPort = _worldPixelViewport;
 			_offlineWorldMouseMove = new Point(viewPort.x + devMouseX, viewPort.y + devMouseY);
 
 			updateOfflineAreaEndPosition(event);
@@ -2117,28 +2129,36 @@ public class Map extends Canvas {
 			return;
 		}
 
-		if (_isLeftMouseButtonPressed && _panEnabled) {
+		if (_isLeftMouseButtonPressed) {
 			panMap(event);
 			return;
 		}
 
-		if ((_poiPosition != null) && (_devPoiPosX != INVALID_POI_POSITION)) {
+		if ((_poiGeoPosition != null) && (_isPoiPositionInViewport)) {
 
 			// display poi info
 
-			if ((devMouseX > _devPoiPosX - 10)
-					&& (devMouseX < _devPoiPosX + 10)
-					&& (devMouseY > _devPoiPosY)
-					&& (devMouseY < _devPoiPosY + 20)) {
+			// check if mouse is within the poi image
+			if (_isPoiVisible
+					&& (devMouseX > _poiImageDevPosition.x)
+					&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
+					&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+					&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
 
-				_toolTip.show(new Point(_devPoiPosX, _devPoiPosY));
+				showPoiInfo();
+
+			} else {
+				hidePoiToolTip();
 			}
 		}
 
 		updateMouseMapPosition();
 	}
 
-	private void onMouseUp(final MouseEvent e) {
+	private void onMouseUp(final MouseEvent event) {
+
+		final int devMouseX = event.x;
+		final int devMouseY = event.y;
 
 		if (_isSelectOfflineArea) {
 
@@ -2154,7 +2174,7 @@ public class Map extends Canvas {
 				return;
 			}
 
-			updateOfflineAreaEndPosition(e);
+			updateOfflineAreaEndPosition(event);
 
 			_isSelectOfflineArea = false;
 
@@ -2176,7 +2196,7 @@ public class Map extends Canvas {
 
 		} else {
 
-			if (e.button == 1) {
+			if (event.button == 1) {
 				if (_isMapPanned) {
 					_isMapPanned = false;
 					redraw();
@@ -2185,13 +2205,23 @@ public class Map extends Canvas {
 				_isLeftMouseButtonPressed = false;
 				setCursor(_cursorDefault);
 
-			} else if (e.button == 2) {
+			} else if (event.button == 2) {
 				// if the middle mouse button is clicked, recenter the view
 				if (isRecenterOnClickEnabled()) {
-					recenterMap(e.x, e.y);
+					recenterMap(event.x, event.y);
 				}
 			}
 		}
+
+		// show poi info when mouse is within the poi image
+		if ((devMouseX > _poiImageDevPosition.x)
+				&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
+				&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+				&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+			showPoiTooltip();
+		}
+
 	}
 
 	/*
@@ -2213,12 +2243,14 @@ public class Map extends Canvas {
 
 			if (_directMapPainter != null) {
 				_directMapPainterContext.gc = gc;
-				_directMapPainterContext.viewport = _mapPixelViewport;
+				_directMapPainterContext.viewport = _worldPixelViewport;
 				_directMapPainter.paint(_directMapPainterContext);
 			}
 
-			if (_isShowPOI) {
-				paintPOI(gc);
+			if (_isPoiVisible && (_poiGeoPosition != null)) {
+				if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+					gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
+				}
 			}
 
 			if (_isPaintOfflineArea) {
@@ -2771,36 +2803,6 @@ public class Map extends Canvas {
 		}
 	}
 
-	private void paintPOI(final GC gc) {
-
-		if (_poiPosition == null) {
-			return;
-		}
-
-		// get world position for the poi coordinates
-		final java.awt.Point worldPoiPos = _MP.geoToPixel(_poiPosition, _mapZoomLevel);
-
-		// check if slider is visible
-		final java.awt.Rectangle viewport = _mapPixelViewport;
-		if (viewport.contains(worldPoiPos)) {
-
-			// convert world position into device position
-			final int devPoiPosX = worldPoiPos.x - viewport.x;
-			final int devPoiPosY = worldPoiPos.y - viewport.y;
-
-			// get poi size
-			final int poiWidth = _poiImageBounds.width;
-			final int poiHeight = _poiImageBounds.height;
-
-			_devPoiPosX = devPoiPosX - (poiWidth / 2);
-			_devPoiPosY = devPoiPosY - poiHeight;
-
-			gc.drawImage(_poiImage, _devPoiPosX, _devPoiPosY);
-		} else {
-			_devPoiPosX = INVALID_POI_POSITION;
-		}
-	}
-
 	/**
 	 * pan the map
 	 */
@@ -2838,7 +2840,13 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	private boolean parsePOIText(final String text) {
+	private boolean parsePOIText(String text) {
+
+		try {
+			text = URLDecoder.decode(text, "UTF-8"); //$NON-NLS-1$
+		} catch (final UnsupportedEncodingException e) {
+			StatusUtil.log(e);
+		}
 
 		// parse wiki url
 		final Matcher wikiUrlMatcher = _patternWikiUrl.matcher(text);
@@ -2873,7 +2881,7 @@ public class Map extends Canvas {
 							// get zoom level from parameter values
 							if (otherParams != null) {
 
-								String dim = null;
+//								String dim = null;
 								String type = null;
 
 								final String[] allKeyValues = _patternWikiParamter.split(otherParams);
@@ -2886,8 +2894,8 @@ public class Map extends Canvas {
 
 										if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_TYPE)) {
 											type = splittedKeyValue[1];
-										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
-											dim = splittedKeyValue[1];
+//										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
+//											dim = splittedKeyValue[1];
 										}
 									}
 								}
@@ -2946,15 +2954,18 @@ public class Map extends Canvas {
 								}
 							}
 
-							_poiPosition = new GeoPosition(lat, lon);
-							_poiText = pageName.replace('_', ' ');
+							_poiGeoPosition = new GeoPosition(lat, lon);
+							_poiTTText = pageName.replace('_', ' ');
 
 							setZoom(zoom);
-							setGeoCenterPosition(_poiPosition);
+							setGeoCenterPosition(_poiGeoPosition);
 
-							_isShowPOI = true;
+							// hide previous tooltip
+							hidePoiToolTip();
 
-							firePOIEvent(_poiPosition);
+							_isPoiVisible = true;
+
+							firePOIEvent(_poiGeoPosition);
 
 							return true;
 
@@ -3267,7 +3278,7 @@ public class Map extends Canvas {
 		_MP = mp;
 
 		// check if the map is initialized
-		if (_mapPixelViewport == null) {
+		if (_worldPixelViewport == null) {
 			onResize();
 		}
 
@@ -3280,10 +3291,6 @@ public class Map extends Canvas {
 
 		queueMapRedraw();
 	}
-
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
 
 	/**
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
@@ -3312,6 +3319,10 @@ public class Map extends Canvas {
 		_distanceUnitLabel = distanceUnitLabel;
 	}
 
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
+
 	/**
 	 * Set a key to uniquely identify overlays which is used to cache the overlays
 	 * 
@@ -3321,20 +3332,10 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
-	/**
-	 * A property indicating if the map should be pannable by the user using the mouse.
-	 * 
-	 * @param panEnabled
-	 *            new property value
-	 */
-	public void setPanEnabled(final boolean panEnabled) {
-		this._panEnabled = panEnabled;
-	}
-
 	public void setPOI(final GeoPosition poiPosition, final int zoomLevel) {
 
-		_isShowPOI = true;
-		_poiPosition = poiPosition;
+		_isPoiVisible = true;
+		_poiGeoPosition = poiPosition;
 
 		setZoom(zoomLevel);
 		setGeoCenterPosition(poiPosition);
@@ -3385,7 +3386,7 @@ public class Map extends Canvas {
 
 	public void setShowPOI(final boolean isShowPOI) {
 
-		_isShowPOI = isShowPOI;
+		_isPoiVisible = isShowPOI;
 
 		queueMapRedraw();
 	}
@@ -3439,6 +3440,8 @@ public class Map extends Canvas {
 
 		updateViewPortData();
 
+		showHidePoiTooltip();
+
 		fireZoomEvent(newZoomLevel);
 	}
 
@@ -3454,6 +3457,83 @@ public class Map extends Canvas {
 
 	public void setZoomOnDoubleClickEnabled(final boolean zoomOnDoubleClickEnabled) {
 		this._zoomOnDoubleClickEnabled = zoomOnDoubleClickEnabled;
+	}
+
+	private void showHidePoiTooltip() {
+		/*
+		 * show poi info when mouse is within the poi image
+		 */
+		if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+
+			final Display display = Display.getCurrent();
+			final Point displayMouse = display.getCursorLocation();
+			final Point devMouse = this.toControl(displayMouse);
+
+			final int devMouseX = devMouse.x;
+			final int devMouseY = devMouse.y;
+
+			if ((devMouseX > _poiImageDevPosition.x)
+					&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
+					&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+					&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+				showPoiTooltip();
+			} else {
+				hidePoiToolTip();
+			}
+		} else {
+			hidePoiToolTip();
+		}
+	}
+
+	private void showPoiInfo() {
+
+		if ((_poiTT != null) && _poiTT.isVisible()) {
+			return;
+		}
+
+		if (_poiTT == null) {
+
+			// create poi info
+
+			_poiTT = new ToolTip(getShell()) {
+				@Override
+				protected Composite setContent(final Shell shell) {
+					return createToolTip(shell);
+				}
+			};
+		}
+
+		_poiTTLabel.setText(_poiTTText);
+
+		final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
+
+		_poiTT.show(//
+				poiDisplayPosition.x,
+				poiDisplayPosition.y,
+				_poiImageBounds.width,
+				_poiImageBounds.height,
+				_poiTTOffsetY);
+	}
+
+	private void showPoiTooltip() {
+
+		if (_poiTT == null) {
+			return;
+		}
+
+		if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+
+			final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
+
+			_poiTT.show(
+					poiDisplayPosition.x,
+					poiDisplayPosition.y,
+					_poiImageBounds.width,
+					_poiImageBounds.height,
+					_poiTTOffsetY);
+		}
+
 	}
 
 	private void updateMouseMapPosition() {
@@ -3478,7 +3558,7 @@ public class Map extends Canvas {
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
-		final Rectangle viewPort = _mapPixelViewport;
+		final Rectangle viewPort = _worldPixelViewport;
 		final int worldMouseX = viewPort.x + mouseEvent.x;
 		final int worldMouseY = viewPort.y + mouseEvent.y;
 
@@ -3486,6 +3566,52 @@ public class Map extends Canvas {
 		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
 
 		_offlineDevTileEnd = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the POI image is visible and the position is set in
+	 *         {@link #_poiImageDevPosition}
+	 */
+	private boolean updatePoiImageDevPosition() {
+
+		if (_poiGeoPosition == null) {
+			return false;
+		}
+
+		// get world position for the poi coordinates
+		final java.awt.Point worldPoiPos = _MP.geoToPixel(_poiGeoPosition, _mapZoomLevel);
+
+		// adjust view port to contain the poi image
+		final java.awt.Rectangle adjustedViewport = (Rectangle) _worldPixelViewport.clone();
+		adjustedViewport.x -= _poiImageBounds.width;
+		adjustedViewport.y -= _poiImageBounds.height;
+		adjustedViewport.width += _poiImageBounds.width * 2;
+		adjustedViewport.height += _poiImageBounds.height * 2;
+
+		// check if poi is visible
+		if (adjustedViewport.contains(
+				worldPoiPos.x - _poiImageBounds.width / 2,
+				worldPoiPos.y - _poiImageBounds.height,
+				_poiImageBounds.width,
+				_poiImageBounds.height)) {
+
+			// convert world position into device position
+			final int devPoiPosX = worldPoiPos.x - _worldPixelViewport.x;
+			final int devPoiPosY = worldPoiPos.y - _worldPixelViewport.y;
+
+			// get poi size
+			final int poiImageWidth = _poiImageBounds.width;
+			final int poiImageHeight = _poiImageBounds.height;
+
+			_poiImageDevPosition.x = devPoiPosX - (poiImageWidth / 2);
+			_poiImageDevPosition.y = devPoiPosY - poiImageHeight;
+
+			return true;
+
+		} else {
+
+			return false;
+		}
 	}
 
 	/**
@@ -3501,7 +3627,7 @@ public class Map extends Canvas {
 		}
 
 		// optimize performance by keeping the viewport
-		final Rectangle viewport = _mapPixelViewport = getMapPixelViewport();
+		final Rectangle viewport = _worldPixelViewport = getMapPixelViewport();
 
 		_worldViewportX = viewport.x;
 		_worldViewportY = viewport.y;
