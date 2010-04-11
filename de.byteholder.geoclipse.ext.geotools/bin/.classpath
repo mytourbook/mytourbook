@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/geoapi-2.2.0.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
-	<classpathentry kind="lib" path="lib/gt-wms-2.5.6.jar" sourcepath="L:/java-resources/GeoTools/2.5.6/geotools-2.5.6-src/geotools-2.5.6"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
