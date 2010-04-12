@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook;
 
@@ -66,7 +66,6 @@ public class Messages extends NLS {
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_view;
-
 	public static String		App_Action_open_perspective;
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
@@ -228,7 +227,7 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
-	public static String	Dialog_SelectGraphs_Title;
+	public static String		Dialog_SelectGraphs_Title;
 
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
@@ -455,12 +454,9 @@ public class Messages extends NLS {
 	public static String		Pref_General_CalendarWeek;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
-
-	public static String	Pref_General_Energy;
-
-	public static String	Pref_General_Energy_Calorie;
-
-	public static String	Pref_General_Energy_Joule;
+	public static String		Pref_General_Energy;
+	public static String		Pref_General_Energy_Calorie;
+	public static String		Pref_General_Energy_Joule;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
@@ -499,10 +495,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_MapLayout_Label_TourPaintMethod;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex;
-
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple;
-
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
 	public static String		Pref_People_Action_add_person;
