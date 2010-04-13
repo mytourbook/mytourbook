@@ -851,6 +851,7 @@ public class Map extends Canvas {
 				 * run async to free the mouse cursor from the drop operation
 				 */
 				Display.getDefault().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						onDropRunnable(event);
 					}
@@ -2908,8 +2909,14 @@ public class Map extends Canvas {
 			StatusUtil.log(e);
 		}
 
+		// linux has 2 lines: 1: url, 2. text
+		final String[] dndText = text.split(UI.NEW_LINE);
+		if (dndText.length == 0) {
+			return false;
+		}
+
 		// parse wiki url
-		final Matcher wikiUrlMatcher = _patternWikiUrl.matcher(text);
+		final Matcher wikiUrlMatcher = _patternWikiUrl.matcher(dndText[0]);
 		if (wikiUrlMatcher.matches()) {
 
 			// osm url was found

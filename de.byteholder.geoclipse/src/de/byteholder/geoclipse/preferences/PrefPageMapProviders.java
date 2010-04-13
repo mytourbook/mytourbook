@@ -143,7 +143,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private static final String					IMPORT_FILE_PATH				= "MapProvider_ImportFilePath";								//$NON-NLS-1$
 	private static final String					EXPORT_FILE_PATH				= "MapProvider_ExportFilePath";								//$NON-NLS-1$
 
-	private MapProviderManager					_mpMgr							= MapProviderManager.getInstance();
+	private final MapProviderManager			_mpMgr							= MapProviderManager.getInstance();
 
 	/**
 	 * contains all visible map providers
@@ -153,7 +153,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	/**
 	 * map provider's which are used when getting offline info
 	 */
-	private ArrayList<MP>						_offlineJobMapProviders			= new ArrayList<MP>();
+	private final ArrayList<MP>					_offlineJobMapProviders			= new ArrayList<MP>();
 
 	private IOfflineInfoListener				_offlineJobInfoListener;
 
@@ -172,7 +172,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private boolean								_isDisableModifyListener		= false;
 
-	private IPreferenceStore					_prefStore						= Activator
+	private final IPreferenceStore				_prefStore						= Activator
 																						.getDefault()
 																						.getPreferenceStore();
 
@@ -243,12 +243,15 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private class MapContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _visibleMp.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -257,6 +260,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		noDefaultAndApplyButton();
 
 		_modifyListener = new ModifyListener() {
+			@Override
 			public void modifyText(final ModifyEvent e) {
 				if (_isDisableModifyListener == false) {
 					setMapProviderModified();
@@ -305,12 +309,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		_offlineJobInfoListener = new IOfflineInfoListener() {
 
+			@Override
 			public void offlineInfoIsDirty(final MP mapProvider) {
 
 				Display.getDefault().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 
-						if (_mpViewer == null || _mpViewer.getTable().isDisposed()) {
+						if ((_mpViewer == null) || _mpViewer.getTable().isDisposed()) {
 							return;
 						}
 
@@ -344,7 +350,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private String checkMapProviderId(final String factoryId) {
 
 		String error = null;
-		if (factoryId == null || factoryId.length() == 0) {
+		if ((factoryId == null) || (factoryId.length() == 0)) {
 			error = Messages.pref_map_validationError_factoryIdIsRequired;
 		} else {
 
@@ -387,7 +393,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		String error = null;
 
-		if (offlineFolder == null || offlineFolder.length() == 0) {
+		if ((offlineFolder == null) || (offlineFolder.length() == 0)) {
 
 			error = Messages.pref_map_validationError_offlineFolderIsRequired;
 
@@ -747,12 +753,14 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		});
 
 		_mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectMapProvider(event);
 			}
 		});
 
 		_mpViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (_selectedMapProvider instanceof MPWms) {
@@ -905,6 +913,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					 * run async to free the mouse cursor from the drop operation
 					 */
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							runnableDropMapProvider(event);
 						}
@@ -976,6 +985,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final PixelConverter pixCon = new PixelConverter(parent);
 
 		final VerifyListener verifyListener = new VerifyListener() {
+			@Override
 			public void verifyText(final VerifyEvent e) {
 				e.text = UI.createIdFromName(e.text, MAX_ID_LENGTH);
 			}
@@ -995,6 +1005,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			_txtMapProviderName = new Text(detailContainer, SWT.BORDER);
 			GridDataFactory.fillDefaults().applyTo(_txtMapProviderName);
 			_txtMapProviderName.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isDisableModifyListener) {
 						return;
@@ -1040,6 +1051,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				_txtOfflineFolder.addVerifyListener(verifyListener);
 
 				_txtOfflineFolder.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(final ModifyEvent e) {
 
 						if (_isDisableModifyListener) {
@@ -1073,6 +1085,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			_txtMapProviderId.addVerifyListener(verifyListener);
 
 			_txtMapProviderId.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isDisableModifyListener) {
 						return;
@@ -1293,8 +1306,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			final String[] children = directory.list();
 
-			for (int i = 0; i < children.length; i++) {
-				final boolean success = deleteDir(new File(directory, children[i]));
+			for (final String element : children) {
+				final boolean success = deleteDir(new File(directory, element));
 				if (success == false) {
 					_isDeleteError = true;
 				}
@@ -1461,13 +1474,13 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		final boolean isMapProvider = _selectedMapProvider != null;
 
 		final boolean isExistingMapProvider = isMapProvider
-				&& _isNewMapProvider == false
-				&& _isModifiedMapProvider == false;
+				&& (_isNewMapProvider == false)
+				&& (_isModifiedMapProvider == false);
 
 		final boolean isOfflineJobStopped = _isOfflineJobRunning == false;
 
 		final boolean canDeleteOfflineMap = isMapProvider
-				&& _selectedMapProvider.getOfflineFileCounter() > 0
+				&& (_selectedMapProvider.getOfflineFileCounter() > 0)
 				&& isOfflineJobStopped;
 
 		final boolean isOfflinePath = getTileCachePath() != null;
@@ -1496,8 +1509,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		_btnImport.setEnabled(isExistingMapProvider);
 		_btnExport.setEnabled(isExistingMapProvider & isNonePluginMapProvider);
 
-		_lblDropTarget.setEnabled(_isModifiedMapProvider == false && _isNewMapProvider == false);
-		_lblMpDropTarget.setEnabled(_isModifiedMapProvider == false && _isNewMapProvider == false);
+		_lblDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
+		_lblMpDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
 
 		// map provider detail actions
 		_btnUpdate.setEnabled(_isValid && _isModifiedMapProvider);
@@ -1540,8 +1553,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			updateUIOfflineInfo();
 		}
 
-		for (int fileIndex = 0; fileIndex < listOfFiles.length; fileIndex++) {
-			final File file = listOfFiles[fileIndex];
+		for (final File file : listOfFiles) {
 			if (file.isFile()) {
 
 				// file
@@ -1710,6 +1722,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		return null;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	@Override
@@ -1788,6 +1801,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private void onAddWmsMapProvider() {
 
 		final IInputValidator inputValidator = new IInputValidator() {
+			@Override
 			public String isValid(final String newText) {
 				try {
 					// check url
@@ -1901,7 +1915,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				+ UI.DASH
 				+ day.substring(day.length() - 2, day.length());
 
-		dialog.setFileName(_selectedMapProvider.getId() + currentDate + XML_EXTENSION);//$NON-NLS-1$
+		dialog.setFileName(_selectedMapProvider.getId() + currentDate + XML_EXTENSION);
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {
@@ -1938,7 +1952,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_AllFiles,
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles });
 
-		dialog.setFileName(_selectedMapProvider.getId() + XML_EXTENSION);//$NON-NLS-1$
+		dialog.setFileName(_selectedMapProvider.getId() + XML_EXTENSION);
 
 		final String selectedFilePath = dialog.open();
 
@@ -2307,7 +2321,15 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 		} else if (URLTransfer.getInstance().isSupportedType(transferDataType)) {
 
-			final String url = (String) event.data;
+			final String dndData = (String) event.data;
+
+			// linux has 2 lines: 1: url, 2. text
+			final String[] urlSplitted = dndData.split(UI.NEW_LINE);
+			if (urlSplitted.length == 0) {
+				return;
+			}
+
+			final String url = urlSplitted[0];
 
 			if (isXmlFile(url) == false) {
 				return;
@@ -2356,7 +2378,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				}
 			}
 
-			if (_isModifiedMapProviderList && isSaveMapProvider == false) {
+			if (_isModifiedMapProviderList && (isSaveMapProvider == false)) {
 
 				isSaveOtherMapProviders = MessageDialogNoClose.openQuestion(
 						Display.getCurrent().getActiveShell(),
@@ -2557,7 +2579,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 					}
 
 					tileCacheDir = basePath.append(MPProfile.WMS_CUSTOM_TILE_PATH).append(tileOSFolder).toFile();
-					if (tileCacheDir.exists() && _isOfflineJobCanceled == false) {
+					if (tileCacheDir.exists() && (_isOfflineJobCanceled == false)) {
 						getFilesInfo(tileCacheDir.listFiles());
 					} else {
 						skipReading = true;
@@ -2587,6 +2609,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				_isOfflineJobRunning = false;
 
 				Display.getDefault().syncExec(new Runnable() {
+					@Override
 					public void run() {
 
 						// enable offline delete button
@@ -2663,7 +2686,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// check if offline folder has changed
-		if (oldOfflineFolder != null && oldOfflineFolder.equals(offlineFolder) == false) {
+		if ((oldOfflineFolder != null) && (oldOfflineFolder.equals(offlineFolder) == false)) {
 
 			// offline folder has changed, delete files in the old offline folder
 
@@ -2671,7 +2694,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// check if id is modified
-		if (oldFactoryId != null && oldFactoryId.equals(mpId) == false) {
+		if ((oldFactoryId != null) && (oldFactoryId.equals(mpId) == false)) {
 
 			// id is modified 
 			// update all profiles with the new id
@@ -2731,10 +2754,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void updateUIOfflineInfo() {
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// check if UI is available
-				if (_mpViewer.getTable().isDisposed() || _offlineJobMp == null) {
+				if (_mpViewer.getTable().isDisposed() || (_offlineJobMp == null)) {
 					return;
 				}
 
@@ -2746,7 +2770,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				_mpViewer.update(_offlineJobMp, null);
 
 				// update info detail when the selected map provider is currently in the job
-				if (_selectedMapProvider != null && _selectedMapProvider.equals(_offlineJobMp)) {
+				if ((_selectedMapProvider != null) && _selectedMapProvider.equals(_offlineJobMp)) {
 					updateUIOfflineInfoDetail(_selectedMapProvider);
 				}
 			}
@@ -2767,7 +2791,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			sb.append(Messages.Pref_Map_Lable_NotRetrieved);
 
-		} else if (offlineTileCounter > 0 && offlineTileSize > 0) {
+		} else if ((offlineTileCounter > 0) && (offlineTileSize > 0)) {
 
 			sb.append(Integer.toString(offlineTileCounter));
 			sb.append(UI.SPACE);
@@ -2788,7 +2812,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void updateUIOfflineInfoTotal() {
 
-		if (_txtOfflineInfoTotal == null || _txtOfflineInfoTotal.isDisposed()) {
+		if ((_txtOfflineInfoTotal == null) || _txtOfflineInfoTotal.isDisposed()) {
 			return;
 		}
 
@@ -2851,7 +2875,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		Control errorControl = null;
 
 		// check name
-		if (mapProviderName == null || mapProviderName.length() == 0) {
+		if ((mapProviderName == null) || (mapProviderName.length() == 0)) {
 			error = Messages.Pref_Map_ValidationError_NameIsRequired;
 			errorControl = _txtMapProviderName;
 		}
