@@ -3,7 +3,7 @@
    <description url="http://mytourbook.sourceforge.net/updates/">
       MyTourbook Update Site
    </description>
-   <feature url="features/build.feature.net.tourbook.update_site_10.3.1.201004132012.jar" id="build.feature.net.tourbook.update_site" version="10.3.1.201004132012">
+   <feature url="features/build.feature.net.tourbook.update_site_10.3.1.201004132252.jar" id="build.feature.net.tourbook.update_site" version="10.3.1.201004132252">
       <category name="my-tourbook-10.3.1"/>
    </feature>
    <category-def name="my-tourbook-10.3.1" label="MyTourbook 10.3.1"/>
