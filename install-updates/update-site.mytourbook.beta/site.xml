@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/patch.net.tourbook.10.2_10.2.1.201003061148.jar" id="patch.net.tourbook.10.2" version="10.2.1.201003061148" patch="true">
+   <feature url="features/patch.net.tourbook.10.2_10.2.1.201003091733.jar" id="patch.net.tourbook.10.2" version="10.2.1.201003091733" patch="true">
       <category name="MyTourbook 10.2"/>
    </feature>
    <category-def name="MyTourbook 10.2" label="MyTourbook 10.2"/>

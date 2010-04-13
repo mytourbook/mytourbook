@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="build.feature.net.tourbook.update_site"
-      label="MyTourbook Feature Update Site"
+      label="MyTourbook (2010-04-13)"
       version="10.3.1.qualifier"
       provider-name="MyTourbook">
 
@@ -24,5 +24,9 @@
    <includes
          id="feature.net.tourbook.app.nl"
          version="0.0.0"/>
+
+   <requires>
+      <import plugin="net.tourbook" version="10.3.0" match="equivalent"/>
+   </requires>
 
 </feature>
