@@ -85,8 +85,10 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
+import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -198,9 +200,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 */
 	private boolean									_isTour;
 
-	/**
-	 * Position for the current point of interest
+	/*
+	 * POI
 	 */
+	private String									_poiName;
 	private GeoPosition								_poiPosition;
 	private int										_poiZoomLevel;
 
@@ -269,7 +272,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.setShowPOI(isShowPOI);
 
 		if (isShowPOI) {
-			_map.setPOI(_poiPosition, _map.getZoom());
+			_map.setPOI(_poiPosition, _map.getZoom(), _poiName);
 		}
 	}
 
@@ -489,12 +492,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			}
 		});
 
-		_map.addPOIListener(new IPositionListener() {
+		_map.addPOIListener(new IPOIListener() {
 			@Override
-			public void setPosition(final MapPositionEvent mapPosition) {
+			public void setPOI(final MapPOIEvent poiEvent) {
 
-				_poiPosition = mapPosition.mapGeoPosition;
-				_poiZoomLevel = mapPosition.mapZoomLevel;
+				_poiPosition = poiEvent.mapGeoPosition;
+				_poiZoomLevel = poiEvent.mapZoomLevel;
+				_poiName = poiEvent.mapPOIText;
 
 				_actionShowPOI.setEnabled(true);
 				_actionShowPOI.setChecked(true);
@@ -1359,9 +1363,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			final PointOfInterest poi = (PointOfInterest) selection;
 
 			_poiPosition = poi.getPosition();
+			_poiName = poi.getName();
 			_poiZoomLevel = poi.getRecommendedZoom();
 
-			_map.setPOI(_poiPosition, _poiZoomLevel);
+			_map.setPOI(_poiPosition, _poiZoomLevel, _poiName);
 
 			_actionShowPOI.setChecked(true);
 

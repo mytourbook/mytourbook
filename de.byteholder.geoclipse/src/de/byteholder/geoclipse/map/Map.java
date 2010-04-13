@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
- 
+
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -97,8 +97,10 @@ import org.eclipse.swt.widgets.Text;
 
 import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
+import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
@@ -110,24 +112,82 @@ import de.byteholder.gpx.GeoPosition;
 
 public class Map extends Canvas {
 
+	private static final String							DIRECTION_E									= "E";
+	private static final String							DIRECTION_N									= "N";
+
 //	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
-	private static final String							WIKI_PARAMETER_TYPE							= "type";																	//$NON-NLS-1$
+	private static final String							WIKI_PARAMETER_TYPE							= "type";														//$NON-NLS-1$
 
 //	http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
-//	http://toolserver.org/~geohack/geohack.php?pagename=Pinatubo&language=de&params=15.133333333333_N_120.35_E_dim:5000_region:PH_type:mountain(1486)_&title=Pinatubo
-//	http://toolserver.org/~geohack/geohack.php?pagename=Mount_Evans&language=de&params=39.588611111111_N_105.64277777778_W_dim:5000_region:US-CO_type:mountain(4350)
+//	http://toolserver.org/~geohack/geohack.php?pagename=Palm_Island,_Queensland&params=18_44_S_146_35_E_scale:20000_type:city
+//	http://toolserver.org/~geohack/geohack.php?pagename=P%C3%B3voa_de_Varzim&params=41_22_57_N_8_46_45_W_region:PT_type:city//
+//
+//	where D is degrees, M is minutes, S is seconds, and NS/EWO are the directions
+//
+//	D;D
+//	D_N_D_E
+//	D_M_N_D_M_E
+//	D_M_S_N_D_M_S_E
 
-	private static final String							PATTERN_WIKI_URL							= ".*pagename=([^&]*).*params=(.*)";										//$NON-NLS-1$
-	private static final String							PATTERN_WIKI_POSITION						= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
-	private static final String							PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR	= ":";																		//$NON-NLS-1$
-	private static final String							PATTERN_WIKI_PARAMETER_SEPARATOR			= "_";																		//$NON-NLS-1$
+	private static final String							PATTERN_SEPARATOR							= "_";															//$NON-NLS-1$
+	private static final String							PATTERN_END									= "_?(.*)";
+
+	private static final String							PATTERN_WIKI_URL							= ".*pagename=([^&]*).*params=(.*)";							//$NON-NLS-1$
+	private static final String							PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR	= ":";															//$NON-NLS-1$
+
+	private static final String							PATTERN_DOUBLE								= "([-+]?[0-9]*\\.?[0-9]+)";
+	private static final String							PATTERN_DOUBLE_SEP							= PATTERN_DOUBLE
+																											+ PATTERN_SEPARATOR;
+
+	private static final String							PATTERN_DIRECTION_NS						= "([NS])_";
+	private static final String							PATTERN_DIRECTION_WE						= "([WE])";
+
+//	private static final String							PATTERN_WIKI_POSITION_10					= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
+//	private static final String							PATTERN_WIKI_POSITION_20					= "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";									//$NON-NLS-1$
+//	private static final String							PATTERN_WIKI_POSITION_21					= "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";				//$NON-NLS-1$
+//	private static final String							PATTERN_WIKI_POSITION_22					= "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";	//$NON-NLS-1$
+
+	private static final String							PATTERN_WIKI_POSITION_D_D					= PATTERN_DOUBLE
+																											+ ";"
+																											+ PATTERN_DOUBLE
+																											+ PATTERN_END;
+
+	private static final String							PATTERN_WIKI_POSITION_D_N_D_E				= PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_NS
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_WE
+																											+ PATTERN_END;
+
+	private static final String							PATTERN_WIKI_POSITION_D_M_N_D_M_E			= PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_NS
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_WE
+																											+ PATTERN_END;
+
+	private static final String							PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E		= PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_NS
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DOUBLE_SEP
+																											+ PATTERN_DIRECTION_WE
+																											+ PATTERN_END;
 
 	private static final Pattern						_patternWikiUrl								= Pattern
 																											.compile(PATTERN_WIKI_URL);
-	private static final Pattern						_patternWikiPosition						= Pattern
-																											.compile(PATTERN_WIKI_POSITION);
+	private static final Pattern						_patternWikiPosition_D_D					= Pattern
+																											.compile(PATTERN_WIKI_POSITION_D_D);
+	private static final Pattern						_patternWikiPosition_D_N_D_E				= Pattern
+																											.compile(PATTERN_WIKI_POSITION_D_N_D_E);
+	private static final Pattern						_patternWikiPosition_D_M_N_D_M_E			= Pattern
+																											.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
+	private static final Pattern						_patternWikiPosition_D_M_S_N_D_M_S_E		= Pattern
+																											.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
 	private static final Pattern						_patternWikiParamter						= Pattern
-																											.compile(PATTERN_WIKI_PARAMETER_SEPARATOR);
+																											.compile(PATTERN_SEPARATOR);
 	private static final Pattern						_patternWikiKeyValue						= Pattern
 																											.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
 
@@ -816,7 +876,7 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	public void addPOIListener(final IPositionListener poiListener) {
+	public void addPOIListener(final IPOIListener poiListener) {
 		_poiListeners.add(poiListener);
 	}
 
@@ -1643,13 +1703,13 @@ public class Map extends Canvas {
 		}
 	}
 
-	private void firePOIEvent(final GeoPosition geoPosition) {
+	private void firePOIEvent(final GeoPosition geoPosition, final String poiText) {
 
-		final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
+		final MapPOIEvent event = new MapPOIEvent(geoPosition, _mapZoomLevel, poiText);
 
 		final Object[] listeners = _poiListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
-			((IPositionListener) listeners[i]).setPosition(event);
+			((IPOIListener) listeners[i]).setPOI(event);
 		}
 	}
 
@@ -2859,56 +2919,172 @@ public class Map extends Canvas {
 
 			if (position != null) {
 
-				final Matcher wikiPosMatcher = _patternWikiPosition.matcher(position);
-				if (wikiPosMatcher.matches()) {
+				double lat = 0;
+				double lon = 0;
+				String otherParams = null;
 
-					final String latPosition = wikiPosMatcher.group(1);
-					final String latDirection = wikiPosMatcher.group(2);
-					final String lonPosition = wikiPosMatcher.group(3);
-					final String lonDirection = wikiPosMatcher.group(4);
-					final String otherParams = wikiPosMatcher.group(5);
+				//	match D;D
 
-					if (lonDirection != null) {
+				final Matcher wikiPos1Matcher = _patternWikiPosition_D_D.matcher(position);
+				if (wikiPos1Matcher.matches()) {
 
+					final String latPosition = wikiPos1Matcher.group(1);
+					final String lonPosition = wikiPos1Matcher.group(2);
+					otherParams = wikiPos1Matcher.group(3);
+
+					if (lonPosition != null) {
 						try {
 
-							final double lat = Double.parseDouble(latPosition) * (latDirection.equals("N") ? 1 : -1); //$NON-NLS-1$
-							final double lon = Double.parseDouble(lonPosition) * (lonDirection.equals("E") ? 1 : -1); //$NON-NLS-1$
+							lat = Double.parseDouble(latPosition);
+							lon = Double.parseDouble(lonPosition);
 
-							// set default zoom level
-							int zoom = 10;
+						} catch (final NumberFormatException e) {
+							return false;
+						}
+					}
+				} else {
 
-							// get zoom level from parameter values
-							if (otherParams != null) {
+					//	match D_N_D_E
 
-//								String dim = null;
-								String type = null;
+					final Matcher wikiPos20Matcher = _patternWikiPosition_D_N_D_E.matcher(position);
+					if (wikiPos20Matcher.matches()) {
 
-								final String[] allKeyValues = _patternWikiParamter.split(otherParams);
+						final String latDegree = wikiPos20Matcher.group(1);
+						final String latDirection = wikiPos20Matcher.group(2);
 
-								for (final String keyValue : allKeyValues) {
+						final String lonDegree = wikiPos20Matcher.group(3);
+						final String lonDirection = wikiPos20Matcher.group(4);
 
-									final String[] splittedKeyValue = _patternWikiKeyValue.split(keyValue);
+						otherParams = wikiPos20Matcher.group(5);
 
-									if (splittedKeyValue.length > 1) {
+						if (lonDirection != null) {
+							try {
 
-										if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_TYPE)) {
-											type = splittedKeyValue[1];
-//										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
-//											dim = splittedKeyValue[1];
-										}
+								final double latDeg = Double.parseDouble(latDegree);
+								final double lonDeg = Double.parseDouble(lonDegree);
+
+								lat = latDeg * (latDirection.equals(DIRECTION_N) ? 1 : -1);
+								lon = lonDeg * (lonDirection.equals(DIRECTION_E) ? 1 : -1);
+
+							} catch (final NumberFormatException e) {
+								return false;
+							}
+						}
+
+					} else {
+
+						// match D_M_N_D_M_E
+
+						final Matcher wikiPos21Matcher = _patternWikiPosition_D_M_N_D_M_E.matcher(position);
+						if (wikiPos21Matcher.matches()) {
+
+							final String latDegree = wikiPos21Matcher.group(1);
+							final String latMinutes = wikiPos21Matcher.group(2);
+							final String latDirection = wikiPos21Matcher.group(3);
+
+							final String lonDegree = wikiPos21Matcher.group(4);
+							final String lonMinutes = wikiPos21Matcher.group(5);
+							final String lonDirection = wikiPos21Matcher.group(6);
+
+							otherParams = wikiPos21Matcher.group(7);
+
+							if (lonDirection != null) {
+								try {
+
+									final double latDeg = Double.parseDouble(latDegree);
+									final double latMin = Double.parseDouble(latMinutes);
+
+									final double lonDeg = Double.parseDouble(lonDegree);
+									final double lonMin = Double.parseDouble(lonMinutes);
+
+									lat = (latDeg + (latMin / 60f)) * (latDirection.equals(DIRECTION_N) ? 1 : -1);
+									lon = (lonDeg + (lonMin / 60f)) * (lonDirection.equals(DIRECTION_E) ? 1 : -1);
+
+								} catch (final NumberFormatException e) {
+									return false;
+								}
+							}
+						} else {
+
+							// match D_M_S_N_D_M_S_E
+
+							final Matcher wikiPos22Matcher = _patternWikiPosition_D_M_S_N_D_M_S_E.matcher(position);
+							if (wikiPos22Matcher.matches()) {
+
+								final String latDegree = wikiPos22Matcher.group(1);
+								final String latMinutes = wikiPos22Matcher.group(2);
+								final String latSeconds = wikiPos22Matcher.group(3);
+								final String latDirection = wikiPos22Matcher.group(4);
+
+								final String lonDegree = wikiPos22Matcher.group(5);
+								final String lonMinutes = wikiPos22Matcher.group(6);
+								final String lonSeconds = wikiPos22Matcher.group(7);
+								final String lonDirection = wikiPos22Matcher.group(8);
+
+								otherParams = wikiPos22Matcher.group(9);
+
+								if (lonDirection != null) {
+									try {
+
+										final double latDeg = Double.parseDouble(latDegree);
+										final double latMin = Double.parseDouble(latMinutes);
+										final double latSec = Double.parseDouble(latSeconds);
+
+										final double lonDeg = Double.parseDouble(lonDegree);
+										final double lonMin = Double.parseDouble(lonMinutes);
+										final double lonSec = Double.parseDouble(lonSeconds);
+
+										lat = (latDeg + (latMin / 60f) + (latSec / 3600f))
+												* (latDirection.equals(DIRECTION_N) ? 1 : -1);
+
+										lon = (lonDeg + (lonMin / 60f) + (lonSec / 3600f))
+												* (lonDirection.equals(DIRECTION_E) ? 1 : -1);
+
+									} catch (final NumberFormatException e) {
+										return false;
 									}
 								}
+							} else {
+								return false;
+							}
+						}
+					}
+				}
 
-								/*
-								 * !!! disabled because the zoom level is not correct !!!
-								 */
+				// set default zoom level
+				int zoom = 10;
+
+				// get zoom level from parameter values
+				if (otherParams != null) {
+
+//								String dim = null;
+					String type = null;
+
+					final String[] allKeyValues = _patternWikiParamter.split(otherParams);
+
+					for (final String keyValue : allKeyValues) {
+
+						final String[] splittedKeyValue = _patternWikiKeyValue.split(keyValue);
+
+						if (splittedKeyValue.length > 1) {
+
+							if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_TYPE)) {
+								type = splittedKeyValue[1];
+//										} else if (splittedKeyValue[0].startsWith(WIKI_PARAMETER_DIM)) {
+//											dim = splittedKeyValue[1];
+							}
+						}
+					}
+
+					/*
+					 * !!! disabled because the zoom level is not correct !!!
+					 */
 //								if (dim != null) {
 //									final int scale = Integer.parseInt(dim);
 //									zoom = (int) (18 - (Math.round(Math.log(scale) - Math.log(1693)))) - 1;//, [2, 18];
 //								} else
 
-								if (type != null) {
+					if (type != null) {
 
 // source: https://wiki.toolserver.org/view/GeoHack
 //
@@ -2923,56 +3099,50 @@ public class Map extends Canvas {
 // airport 											1 : 30,000 		10.6 		30000 		25000 		0.03 	4 			7 		14
 // edu, pass, landmark, railwaystation 				1 : 10,000 		3.53 		10000 		10000 		0.01 	1 			8 		15
 
-									if (type.equals("country") // 				//$NON-NLS-1$
-											|| type.equals("satellite")) { //	//$NON-NLS-1$
-										zoom = 5 - 1;
-									} else if (type.equals("state")) { //		//$NON-NLS-1$
-										zoom = 7 - 1;
-									} else if (type.equals("adm1st")) { //		//$NON-NLS-1$
-										zoom = 9 - 1;
-									} else if (type.equals("adm2nd")) { //		//$NON-NLS-1$
-										zoom = 11 - 1;
-									} else if (type.equals("adm3rd") //			//$NON-NLS-1$
-											|| type.equals("city") //			//$NON-NLS-1$
-											|| type.equals("mountain") //		//$NON-NLS-1$
-											|| type.equals("isle") //			//$NON-NLS-1$
-											|| type.equals("river") //			//$NON-NLS-1$
-											|| type.equals("waterbody")) { //	//$NON-NLS-1$
-										zoom = 12 - 1;
-									} else if (type.equals("event")//			//$NON-NLS-1$
-											|| type.equals("forest") // 		//$NON-NLS-1$
-											|| type.equals("glacier")) { //		//$NON-NLS-1$
-										zoom = 13 - 1;
-									} else if (type.equals("airport")) { //		//$NON-NLS-1$
-										zoom = 14 - 1;
-									} else if (type.equals("edu") //			//$NON-NLS-1$
-											|| type.equals("pass") //			//$NON-NLS-1$
-											|| type.equals("landmark") //		//$NON-NLS-1$
-											|| type.equals("railwaystation")) { //$NON-NLS-1$
-										zoom = 15 - 1;
-									}
-								}
-							}
-
-							_poiGeoPosition = new GeoPosition(lat, lon);
-							_poiTTText = pageName.replace('_', ' ');
-
-							setZoom(zoom);
-							setGeoCenterPosition(_poiGeoPosition);
-
-							// hide previous tooltip
-							hidePoiToolTip();
-
-							_isPoiVisible = true;
-
-							firePOIEvent(_poiGeoPosition);
-
-							return true;
-
-						} catch (final NumberFormatException e) {
-							return false;
+						if (type.equals("country") // 				//$NON-NLS-1$
+								|| type.equals("satellite")) { //	//$NON-NLS-1$
+							zoom = 5 - 1;
+						} else if (type.equals("state")) { //		//$NON-NLS-1$
+							zoom = 7 - 1;
+						} else if (type.equals("adm1st")) { //		//$NON-NLS-1$
+							zoom = 9 - 1;
+						} else if (type.equals("adm2nd")) { //		//$NON-NLS-1$
+							zoom = 11 - 1;
+						} else if (type.equals("adm3rd") //			//$NON-NLS-1$
+								|| type.equals("city") //			//$NON-NLS-1$
+								|| type.equals("mountain") //		//$NON-NLS-1$
+								|| type.equals("isle") //			//$NON-NLS-1$
+								|| type.equals("river") //			//$NON-NLS-1$
+								|| type.equals("waterbody")) { //	//$NON-NLS-1$
+							zoom = 12 - 1;
+						} else if (type.equals("event")//			//$NON-NLS-1$
+								|| type.equals("forest") // 		//$NON-NLS-1$
+								|| type.equals("glacier")) { //		//$NON-NLS-1$
+							zoom = 13 - 1;
+						} else if (type.equals("airport")) { //		//$NON-NLS-1$
+							zoom = 14 - 1;
+						} else if (type.equals("edu") //			//$NON-NLS-1$
+								|| type.equals("pass") //			//$NON-NLS-1$
+								|| type.equals("landmark") //		//$NON-NLS-1$
+								|| type.equals("railwaystation")) { //$NON-NLS-1$
+							zoom = 15 - 1;
 						}
 					}
+
+					_poiGeoPosition = new GeoPosition(lat, lon);
+					_poiTTText = pageName.replace('_', ' ');
+
+					setZoom(zoom);
+					setGeoCenterPosition(_poiGeoPosition);
+
+					// hide previous tooltip
+					hidePoiToolTip();
+
+					_isPoiVisible = true;
+
+					firePOIEvent(_poiGeoPosition, _poiTTText);
+
+					return true;
 				}
 			}
 		}
@@ -3332,10 +3502,12 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
-	public void setPOI(final GeoPosition poiPosition, final int zoomLevel) {
+	public void setPOI(final GeoPosition poiPosition, final int zoomLevel, final String poiText) {
 
 		_isPoiVisible = true;
+
 		_poiGeoPosition = poiPosition;
+		_poiTTText = poiText;
 
 		setZoom(zoomLevel);
 		setGeoCenterPosition(poiPosition);
@@ -3504,7 +3676,7 @@ public class Map extends Canvas {
 			};
 		}
 
-		_poiTTLabel.setText(_poiTTText);
+		_poiTTLabel.setText(_poiTTText == null ? UI.EMPTY_STRING : _poiTTText);
 
 		final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
 

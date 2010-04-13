@@ -1,0 +1,29 @@
+
+Create Translation Archive
+
+- switch to workspace "ws"
+- set version number in "feature.net.tourbook.app.nl"
+- force version number into the *.nl plugins
+
+
+- switch to workspace "mytourbook-TRUNK.nl-DUMMY-HOST"
+- set version number into the feature "feature.z-Dummy-Host"
+- force version number into dummy host plugins
+
+
+- switch to workspace "ws"
+- run script "create-language-archive.xml"
+
+
+
+Create Build
+
+- run script "create-build-files.xml"
+- switch to workspace "mytourbook-BUILD-ws"
+- refresh all projects with F5
+- run Project/clean... for all projects
+
+Create Update Site
+
+- run script "clear-update-site.xml" in the project "update-site.mytourbook"
+- build the update site in site.xml
