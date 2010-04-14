@@ -349,12 +349,19 @@ public class TourData implements Comparable<Object> {
 	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
 	/**
+	 * Way points
+	 */
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	private final Set<TourWayPoint>		tourWayPoints					= new HashSet<TourWayPoint>();
+
+	/**
 	 * Reference tours
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
-
+ 
 	/**
 	 * Tags
 	 */
@@ -3750,6 +3757,10 @@ public class TourData implements Comparable<Object> {
 		return tourType;
 	}
 
+	public Set<TourWayPoint> getTourWayPoints() {
+		return tourWayPoints;
+	}
+
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3758,14 +3769,14 @@ public class TourData implements Comparable<Object> {
 		return weatherWindDir;
 	}
 
-	public int getWeatherWindSpd() {
-		return weatherWindSpd;
-	}
-
 // not used 5.10.2008
 //	public void setDeviceDistance(final int deviceDistance) {
 //		this.deviceDistance = deviceDistance;
 //	}
+
+	public int getWeatherWindSpd() {
+		return weatherWindSpd;
+	}
 
 	/**
 	 * @param zoomLevel
@@ -4089,10 +4100,6 @@ public class TourData implements Comparable<Object> {
 		this.startPulse = startPulse;
 	}
 
-	public void setStartSecond(final int startSecond) {
-		this.startSecond = startSecond;
-	}
-
 //	/**
 //	 * Set the week of the tour, 0 is the first week in the year
 //	 *
@@ -4107,6 +4114,10 @@ public class TourData implements Comparable<Object> {
 //	public void setStartWeekYear(final short startWeekYear) {
 //		this.startWeekYear = startWeekYear;
 //	}
+
+	public void setStartSecond(final int startSecond) {
+		this.startSecond = startSecond;
+	}
 
 	public void setStartYear(final short startYear) {
 		this.startYear = startYear;

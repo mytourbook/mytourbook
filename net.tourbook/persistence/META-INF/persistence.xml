@@ -18,7 +18,8 @@
 		<class>net.tourbook.data.TourTag</class>
 		<class>net.tourbook.data.TourTagCategory</class>
 		<class>net.tourbook.data.TourType</class>
-
+		<class>net.tourbook.data.TourWayPoint</class>
+ 
 		<properties>
 			<property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/tourbook;create=true"/>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>

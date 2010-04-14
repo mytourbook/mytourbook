@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.database;
 
@@ -82,8 +82,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 9;													// 10.3
+	private static final int					TOURBOOK_DB_VERSION							= 10;													// 10.4
 
+//	private static final int					TOURBOOK_DB_VERSION							= 9;	// 10.3.0
 //	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
 //	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
@@ -96,15 +97,16 @@ public class TourDatabase {
 	/*
 	 * database tables
 	 */
-	private static final String					TABLE_DB_VERSION							= "DbVersion";											//$NON-NLS-1$
-
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
+	private static final String					TABLE_DB_VERSION							= "DbVersion";											//$NON-NLS-1$
+ 
 	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
 	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_DATA								= "TourData";											//$NON-NLS-1$
 	public static final String					TABLE_TOUR_MARKER							= "TourMarker";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_WAYPOINT							= "TourWayPoint";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_PERSON							= "TourPerson";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_REFERENCE						= "TourReference";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_TAG								= "TourTag";											//$NON-NLS-1$
@@ -113,6 +115,7 @@ public class TourDatabase {
 
 	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);			//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
 																									+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
@@ -174,6 +177,8 @@ public class TourDatabase {
 			return super.createDialogArea(parent);
 		}
 	}
+
+	private TourDatabase() {}
 
 	/**
 	 * removes all tour tags which are loaded from the database so the next time they will be
@@ -784,6 +789,18 @@ public class TourDatabase {
 			prepStmt.execute();
 
 			/*
+			 * tour way point
+			 */
+			sqlString = "DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhereTourDataTourId; //$NON-NLS-1$
+			prepStmt = conn.prepareStatement(sqlString);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+			sqlString = "DELETE FROM " + JOINTABLE_TOURDATA__TOURWAYPOINT + sqlWhereTourDataTourId; //$NON-NLS-1$
+			prepStmt = conn.prepareStatement(sqlString);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
 			 * reference tour
 			 */
 			sqlString = "DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhereTourDataTourId; //$NON-NLS-1$
@@ -1164,8 +1181,6 @@ public class TourDatabase {
 		return isUpdated;
 	}
 
-	private TourDatabase() {}
-
 	public void addPropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.add(listener);
 	}
@@ -1348,6 +1363,8 @@ public class TourDatabase {
 
 					createTableTourTagV5(stmt);
 					createTableTourTagCategoryV5(stmt);
+
+					createTableTourWayPointV10(stmt);
 
 					stmt.executeBatch();
 				}
@@ -1534,7 +1551,7 @@ public class TourDatabase {
 
 		// CREATE TABLE TourCategory_TourData
 		stmt.execute("" //$NON-NLS-1$
-				+ ("CREATE TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$ 
+				+ ("CREATE TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
 				+ (TABLE_TOUR_CATEGORY + "_categoryId	BIGINT NOT NULL") //$NON-NLS-1$
@@ -1542,8 +1559,8 @@ public class TourDatabase {
 
 		// ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY KEY (tourCategory_categoryId);
 		stmt.execute("" //$NON-NLS-1$
-				+ ("ALTER TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$ 
-				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ 
+				+ ("ALTER TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -1652,19 +1669,19 @@ public class TourDatabase {
 				+ "tourPerson_personId 		BIGINT,					\n" //$NON-NLS-1$
 
 				// version 6 start
-				//				
+				//
 				+ "tourImportFilePath		VARCHAR(255),			\n" //$NON-NLS-1$
-				//				
+				//
 				// version 6 end
 
 				// version 7 start
-				//				
+				//
 				+ "mergeSourceTourId		BIGINT,					\n" //$NON-NLS-1$
 				+ "mergeTargetTourId		BIGINT,					\n" //$NON-NLS-1$
 				+ "mergedTourTimeOffset		INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
 				+ "mergedAltitudeOffset		INTEGER DEFAULT 0,		\n" //$NON-NLS-1$
 				+ "startSecond	 			SMALLINT DEFAULT 0,		\n" //$NON-NLS-1$
-				//				
+				//
 				// version 7 end
 
 				// version 8 start
@@ -1678,10 +1695,16 @@ public class TourDatabase {
 				// version 8 end
 
 				// version 9 start
-				//				
+				//
 				+ "startWeekYear			SMALLINT DEFAULT 1977,	\n" //$NON-NLS-1$
-				//				
+				//
 				// version 9 end
+
+				// version 10 start
+				//
+				// tourWayPoints is mapped by tourData
+				//
+				// version 10 end
 
 				+ "serieData 				BLOB NOT NULL			\n" //$NON-NLS-1$
 
@@ -1709,22 +1732,22 @@ public class TourDatabase {
 	private void createTableTourMarker(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourMarker
-		stmt.execute("" //$NON-NLS-1$
-				+ ("CREATE TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
-				+ "(" //$NON-NLS-1$
+		stmt.execute("" //													//$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_MARKER) //					//$NON-NLS-1$
+				+ "(" //													//$NON-NLS-1$
 				+ "markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-				+ (TABLE_TOUR_DATA + "_tourId	BIGINT,") //$NON-NLS-1$
-				+ "time 						INTEGER NOT NULL," //$NON-NLS-1$
-				+ "distance 					INTEGER NOT NULL," //$NON-NLS-1$
-				+ "serieIndex 					INTEGER NOT NULL," //$NON-NLS-1$
-				+ "type 						INTEGER NOT NULL," //$NON-NLS-1$
-				+ "visualPosition				INTEGER NOT NULL," //$NON-NLS-1$
-				+ "label 						VARCHAR(255)," //$NON-NLS-1$
-				+ "category 					VARCHAR(100)," //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId	BIGINT,") //				//$NON-NLS-1$
+				+ "time 						INTEGER NOT NULL," //		//$NON-NLS-1$
+				+ "distance 					INTEGER NOT NULL," //		//$NON-NLS-1$
+				+ "serieIndex 					INTEGER NOT NULL," //		//$NON-NLS-1$
+				+ "type 						INTEGER NOT NULL," //		//$NON-NLS-1$
+				+ "visualPosition				INTEGER NOT NULL," //		//$NON-NLS-1$
+				+ "label 						VARCHAR(255)," //			//$NON-NLS-1$
+				+ "category 					VARCHAR(100)," //			//$NON-NLS-1$
 				// Version 2
-				+ "labelXOffset					INTEGER," //$NON-NLS-1$
-				+ "labelYOffset					INTEGER," //$NON-NLS-1$
-				+ "markerType					BIGINT" //$NON-NLS-1$
+				+ "labelXOffset					INTEGER," //				//$NON-NLS-1$
+				+ "labelYOffset					INTEGER," //				//$NON-NLS-1$
+				+ "markerType					BIGINT" //					//$NON-NLS-1$
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourMarker ADD CONSTRAINT TourMarker_pk PRIMARY KEY (markerId);
@@ -1734,7 +1757,7 @@ public class TourDatabase {
 				+ (" PRIMARY KEY (markerId)")); //$NON-NLS-1$
 
 		stmt.execute("" //$NON-NLS-1$
-				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$ 
+				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
 				+ (TABLE_TOUR_MARKER + "_markerId		BIGINT NOT NULL") //$NON-NLS-1$
@@ -1742,8 +1765,8 @@ public class TourDatabase {
 
 		// ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY (TourData_tourId);
 		stmt.execute("" //$NON-NLS-1$
-				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$ 
-				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURMARKER + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ 
+				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURMARKER + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -1804,7 +1827,7 @@ public class TourDatabase {
 		// CREATE TABLE TourData_TourReference
 
 		stmt.execute("" //$NON-NLS-1$
-				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$ 
+				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
 				+ (TABLE_TOUR_REFERENCE + "_refId 		BIGINT NOT NULL") //$NON-NLS-1$
@@ -1812,7 +1835,7 @@ public class TourDatabase {
 
 		// ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
 		stmt.execute("" //$NON-NLS-1$
-				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$ 
+				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURREFERENCE + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -1850,7 +1873,7 @@ public class TourDatabase {
 		 * JOIN TABLE TourTagCategory_TourTag
 		 */
 
-		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ 
+		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG + "_tagId						BIGINT NOT NULL,\n") //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId	BIGINT NOT NULL\n") //$NON-NLS-1$
@@ -1866,7 +1889,7 @@ public class TourDatabase {
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
 		final String field_TourTagCategory_tagCategoryId = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId"; //$NON-NLS-1$
 
-		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ 
+		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$
 				//
 				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1875,7 +1898,7 @@ public class TourDatabase {
 		System.out.println(sql);
 		stmt.execute(sql);
 
-		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ 
+		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$
 				//
 				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTagCategory_tagCategoryId) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId)") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1889,7 +1912,7 @@ public class TourDatabase {
 		 * JOIN TABLE TourTagCategory_TourTagCategory
 		 */
 
-		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY) //$NON-NLS-1$ 
+		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1	BIGINT NOT NULL,\n") //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2	BIGINT NOT NULL\n") //$NON-NLS-1$
@@ -1974,7 +1997,7 @@ public class TourDatabase {
 		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //$NON-NLS-1$
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
 
-		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1993,7 +2016,7 @@ public class TourDatabase {
 //
 //		System.out.println(sql);
 //		stmt.addBatch(sql);
-		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$
 				//
 				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
@@ -2002,7 +2025,7 @@ public class TourDatabase {
 		System.out.println(sql);
 		stmt.execute(sql);
 
-		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$
 				//
 				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId) //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)") //$NON-NLS-1$ //$NON-NLS-2$
@@ -2043,6 +2066,59 @@ public class TourDatabase {
 				+ ("ALTER TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_TYPE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (typeId)")); //$NON-NLS-1$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_WAYPOINT}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourWayPointV10(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourWayPoint
+		String sql = ("CREATE TABLE " + TABLE_TOUR_WAYPOINT + "\n") // 					//$NON-NLS-1$
+				+ "(\n" //																//$NON-NLS-1$
+				+ "   wayPointId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "   " + (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //				//$NON-NLS-1$
+				//
+				+ "   latitude 			DOUBLE,		\n" //								//$NON-NLS-1$
+				+ "   longitude 		DOUBLE		\n" //								//$NON-NLS-1$
+				//
+				+ ")";
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.execute(sql); //
+
+		// ALTER TABLE TourWayPoint ADD CONSTRAINT TourWayPoint_pk PRIMARY KEY (wayPointId);
+		sql = ("ALTER TABLE " + TABLE_TOUR_WAYPOINT) //								//$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_WAYPOINT + "_pk ")) //				//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (wayPointId)");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.execute(sql); //
+
+		// CREATE TABLE	TourData_TourWayPoint
+		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) //								//$NON-NLS-1$
+				+ "(\n" //																			//$NON-NLS-1$
+				+ "   " + (TABLE_TOUR_DATA + "_tourId				BIGINT NOT NULL,	\n") //		//$NON-NLS-1$
+				+ "   " + (TABLE_TOUR_WAYPOINT + "_wayPointId		BIGINT NOT NULL		\n") //		//$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.execute(sql); //
+
+		// ALTER TABLE TourData_TourWayPoint ADD CONSTRAINT TourData_TourWayPoint_pk PRIMARY KEY (TourData_tourId);
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) //				//$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURWAYPOINT + "_pk") //	//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.execute(sql); //
 	}
 
 	/**
@@ -2155,7 +2231,7 @@ public class TourDatabase {
 
 				fPooledDataSource = new ComboPooledDataSource();
 
-				//loads the jdbc driver 
+				//loads the jdbc driver
 				fPooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
 				fPooledDataSource.setJdbcUrl(DERBY_URL);
 				fPooledDataSource.setUser(TABLE_SCHEMA);
@@ -2219,47 +2295,52 @@ public class TourDatabase {
 		 * database update
 		 */
 		if (currentDbVersion == 1) {
-			updateDbDesign_1_2(conn);
+			updateDbDesign_001_002(conn);
 			currentDbVersion = newVersion = 2;
 		}
 
 		if (currentDbVersion == 2) {
-			updateDbDesign_2_3(conn);
+			updateDbDesign_002_003(conn);
 			currentDbVersion = newVersion = 3;
 		}
 
 		if (currentDbVersion == 3) {
-			updateDbDesign_3_4(conn, monitor);
+			updateDbDesign_003_004(conn, monitor);
 			currentDbVersion = newVersion = 4;
 		}
 
 		boolean isPostUpdate5 = false;
 		if (currentDbVersion == 4) {
-			updateDbDesign_4_5(conn, monitor);
+			updateDbDesign_004_005(conn, monitor);
 			currentDbVersion = newVersion = 5;
 			isPostUpdate5 = true;
 		}
 
 		if (currentDbVersion == 5) {
-			updateDbDesign_5_6(conn, monitor);
+			updateDbDesign_005_006(conn, monitor);
 			currentDbVersion = newVersion = 6;
 		}
 
 		if (currentDbVersion == 6) {
-			updateDbDesign_6_7(conn, monitor);
+			updateDbDesign_006_007(conn, monitor);
 			currentDbVersion = newVersion = 7;
 		}
 
 		if (currentDbVersion == 7) {
-			updateDbDesign_7_8(conn, monitor);
+			updateDbDesign_007_008(conn, monitor);
 			currentDbVersion = newVersion = 8;
 		}
 
 		boolean isPostUpdate8 = false;
 		if (currentDbVersion == 8) {
-			updateDbDesign_8_9(conn, monitor);
+			updateDbDesign_008_009(conn, monitor);
 			currentDbVersion = newVersion = 9;
 			isPostUpdate8 = true;
+		}
+
+		if (currentDbVersion == 9) {
+			updateDbDesign_009_010(conn, monitor);
+			currentDbVersion = newVersion = 10;
 		}
 
 		/*
@@ -2276,13 +2357,13 @@ public class TourDatabase {
 			TourManager.getInstance().removeAllToursFromCache();
 		}
 		if (isPostUpdate8) {
-			updateDbDesign_8_9_PostUpdate(conn, monitor);
+			updateDbDesign_008_009_PostUpdate(conn, monitor);
 		}
 
 		return true;
 	}
 
-	private void updateDbDesign_1_2(final Connection conn) {
+	private void updateDbDesign_001_002(final Connection conn) {
 
 		System.out.println("Database update: 2");//$NON-NLS-1$
 		System.out.println();
@@ -2309,7 +2390,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void updateDbDesign_2_3(final Connection conn) {
+	private void updateDbDesign_002_003(final Connection conn) {
 
 		System.out.println("Database update: 3");//$NON-NLS-1$
 		System.out.println();
@@ -2333,7 +2414,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void updateDbDesign_3_4(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_003_004(final Connection conn, final IProgressMonitor monitor) {
 
 		System.out.println("Database update: 4");//$NON-NLS-1$
 		System.out.println();
@@ -2435,7 +2516,7 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-	private void updateDbDesign_4_5(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_004_005(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 5));
@@ -2459,7 +2540,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void updateDbDesign_5_6(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_005_006(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 6));
@@ -2488,7 +2569,7 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_6_7(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_006_007(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 7));
@@ -2532,7 +2613,7 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_7_8(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_007_008(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 8));
@@ -2576,7 +2657,7 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_8_9(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_008_009(final Connection conn, final IProgressMonitor monitor) {
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 9));
@@ -2604,7 +2685,7 @@ public class TourDatabase {
 		System.out.println();
 	}
 
-	private void updateDbDesign_8_9_PostUpdate(final Connection conn, final IProgressMonitor monitor) {
+	private void updateDbDesign_008_009_PostUpdate(final Connection conn, final IProgressMonitor monitor) {
 
 		// set ISO 8601 week number
 		final int firstDayOfWeek = Calendar.MONDAY;
@@ -2615,6 +2696,28 @@ public class TourDatabase {
 					Display.getDefault().getActiveShell(),
 					Messages.Database_Confirm_update_title,
 					Messages.Tour_Database_Update_TourWeek_Info);
+		}
+	}
+
+	private void updateDbDesign_009_010(final Connection conn, final IProgressMonitor monitor) {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 10));
+		}
+
+		System.out.println("Database update: 10");//$NON-NLS-1$
+		System.out.println();
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			createTableTourWayPointV10(statement);
+
+			statement.executeBatch();
+			statement.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 	}
 
