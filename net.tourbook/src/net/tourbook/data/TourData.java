@@ -341,14 +341,23 @@ public class TourData implements Comparable<Object> {
 	@Basic(optional = false)
 	private SerieData					serieData;
 
-	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)
+	/**
+	 * Tour marker
+	 */
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
+	/**
+	 * Reference tours
+	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourReference>			tourReferences					= new HashSet<TourReference>();
+	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
+	/**
+	 * Tags
+	 */
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
 	private Set<TourTag>				tourTags						= new HashSet<TourTag>();
@@ -631,7 +640,7 @@ public class TourData implements Comparable<Object> {
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
-	private final Map<Integer, Point[]>		_worldPosition					= new HashMap<Integer, Point[]>();
+	private final Map<Integer, Point[]>	_worldPosition					= new HashMap<Integer, Point[]>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -2482,7 +2491,9 @@ public class TourData implements Comparable<Object> {
 				 */
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					pulseSerie[timeIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE) ? 0 : tdPulse;
+					pulseSerie[timeIndex] = (tdPulse == Integer.MIN_VALUE) || (tdPulse == Integer.MAX_VALUE)
+							? 0
+							: tdPulse;
 				}
 
 				/*
@@ -2798,7 +2809,8 @@ public class TourData implements Comparable<Object> {
 					segment.altitudeDownTotal = altitudeDown += altitudeDiff;
 				}
 
-				if ((segmentSerieComputedAltitudeDiff != null) && (segmentIndex < segmentSerieComputedAltitudeDiff.length)) {
+				if ((segmentSerieComputedAltitudeDiff != null)
+						&& (segmentIndex < segmentSerieComputedAltitudeDiff.length)) {
 					segment.computedAltitudeDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
 				}
 
