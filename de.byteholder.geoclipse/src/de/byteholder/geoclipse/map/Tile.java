@@ -166,6 +166,29 @@ public class Tile extends Observable {
 	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
 	/**
+	 * Create a new Tile at the specified tile point and zoom level
+	 * 
+	 * @param mp
+	 *            map provider which creates the tile image
+	 * @param zoom
+	 * @param x
+	 * @param y
+	 * @param tileCreatorId
+	 */
+	public Tile(final MP mp, final int zoom, final int x, final int y, final String tileCreatorId) {
+
+		_mp = mp;
+
+		_zoom = zoom;
+		_x = x;
+		_y = y;
+
+		_tileKeyCreatorId = tileCreatorId;
+
+		_tileKey = getTileKey(mp, zoom, x, y, tileCreatorId, null, mp.getProjection().getId());
+	}
+
+	/**
 	 * create a key for a tile
 	 * 
 	 * @param mp
@@ -215,29 +238,6 @@ public class Tile extends Observable {
 		return sb.toString();
 	}
 
-	/**
-	 * Create a new Tile at the specified tile point and zoom level
-	 * 
-	 * @param mp
-	 *            map provider which creates the tile image
-	 * @param zoom
-	 * @param x
-	 * @param y
-	 * @param tileCreatorId
-	 */
-	public Tile(final MP mp, final int zoom, final int x, final int y, final String tileCreatorId) {
-
-		_mp = mp;
-
-		_zoom = zoom;
-		_x = x;
-		_y = y;
-
-		_tileKeyCreatorId = tileCreatorId;
-
-		_tileKey = getTileKey(mp, zoom, x, y, tileCreatorId, null, mp.getProjection().getId());
-	}
-
 	@Override
 	public void addObserver(final Observer o) {
 		super.addObserver(o);
@@ -277,34 +277,49 @@ public class Tile extends Observable {
 			return null;
 		}
 
-		// it is synchronized because this object can be set to null in another thread
-		synchronized (_overlayImageDataResources) {
+		try {
 
-			final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
-			final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
+			// it is synchronized because this object can be set to null in another thread
+			synchronized (_overlayImageDataResources) {
 
-			if (tileImageData == null && neighborImageData == null) {
-				return null;
+				final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
+				final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
+
+				if ((tileImageData == null) && (neighborImageData == null)) {
+					return null;
+				}
+
+				final int tileSize = _mp.getTileSize();
+				final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
+
+				// draw neighbor first
+				if (neighborImageData != null) {
+					_overlayImageDataResources.drawImageData(
+							finalImageData,
+							neighborImageData,
+							0,
+							0,
+							tileSize,
+							tileSize);
+				}
+
+				// draw tile last to overwrite neighbor image data
+				if (tileImageData != null) {
+					_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
+				}
+
+				// create image from image data
+				_overlayImage = new Image(display, finalImageData);
+
+				return _overlayImage;
 			}
 
-			final int tileSize = _mp.getTileSize();
-			final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
-
-			// draw neighbor first
-			if (neighborImageData != null) {
-				_overlayImageDataResources.drawImageData(finalImageData, neighborImageData, 0, 0, tileSize, tileSize);
-			}
- 
-			// draw tile last to overwrite neighbor image data
-			if (tileImageData != null) {
-				_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
-			}
-
-			// create image from image data
-			_overlayImage = new Image(display, finalImageData);
+		} catch (final Exception e) {
+			// ignore
+			StatusUtil.log(e);
 		}
 
-		return _overlayImage;
+		return null;
 	}
 
 	/**
@@ -333,7 +348,7 @@ public class Tile extends Observable {
 
 					// check if the parent is already created
 					final Image parentImage = _parentTile._mapImage;
-					if (parentImage != null && !parentImage.isDisposed()) {
+					if ((parentImage != null) && !parentImage.isDisposed()) {
 						// parent image is already created
 						return new ParentImageStatus(null, false, false);
 
@@ -430,7 +445,7 @@ public class Tile extends Observable {
 	private Image getCheckedImage(Image image) {
 
 		// ckeck if available or disposed
-		if (image == null || image.isDisposed()) {
+		if ((image == null) || image.isDisposed()) {
 			image = null;
 			return null;
 		}
@@ -650,7 +665,7 @@ public class Tile extends Observable {
 	 * @return Returns <code>true</code> when loading of the tile image failed
 	 */
 	public boolean isLoadingError() {
-		return _loadingError != null && _loadingError.length() > 0;
+		return (_loadingError != null) && (_loadingError.length() > 0);
 	}
 
 	/**
@@ -758,7 +773,7 @@ public class Tile extends Observable {
 
 		_loadingError = loadingError;
 
-		if (_mapImage != null && !_mapImage.isDisposed()) {
+		if ((_mapImage != null) && !_mapImage.isDisposed()) {
 
 			try {
 				_mapImage.dispose();

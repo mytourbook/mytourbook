@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ISelection;
 
-
 /**
  * A Point of interest is essentially a {@link Waypoint} that has additional information like a
  * type, category and information, what's near it. It can also contain a value, which zoom level is
@@ -22,7 +21,7 @@ public class PointOfInterest extends Waypoint implements ISelection {
 
 	private String						info;
 
-	private int							recommendedZoom;
+	private int							recommendedZoom	= -1;
 
 	private List<? extends Waypoint>	nearestPlaces;
 
@@ -38,6 +37,9 @@ public class PointOfInterest extends Waypoint implements ISelection {
 		return nearestPlaces;
 	}
 
+	/**
+	 * @return Return the recommended zoom level or -1 when the zoom level should not be changed
+	 */
 	public int getRecommendedZoom() {
 		return recommendedZoom;
 	}
@@ -53,9 +55,9 @@ public class PointOfInterest extends Waypoint implements ISelection {
 //	public void setType(Type type) {
 //		this.type = type;
 //	}
-//	
+//
 //	public void setType(final String type) {
-//		
+//
 //		if (Type.Way.toString().toLowerCase().equals(type.toLowerCase())) {
 //			this.type = Type.Way;
 //		}
@@ -85,7 +87,7 @@ public class PointOfInterest extends Waypoint implements ISelection {
 		final StringBuilder buf = new StringBuilder();
 		buf.append(this.getName()).append(" (").append(this.getCategory()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		if (nearestPlaces != null && nearestPlaces.size() > 0) {
+		if ((nearestPlaces != null) && (nearestPlaces.size() > 0)) {
 			buf.append(" near ").append(nearestPlaces.get(0).toString()); //$NON-NLS-1$
 		}
 

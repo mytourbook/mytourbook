@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.application;
 
@@ -46,23 +46,23 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private IWorkbenchWindow					fWindow;
+	private IWorkbenchWindow					_window;
 
-	private IContributionItem					fActionViewShortList;
-	private IWorkbenchAction					fActionPreferences;
+	private IContributionItem					_actionViewShortList;
+	private IWorkbenchAction					_actionPreferences;
 
-	PersonContributionItem						fPersonSelector;
-	TourTypeContributionItem					fTourTypeSelector;
-	private MeasurementSystemContributionItem	fMeasurementSelector;
+	private IWorkbenchAction					_actionAbout;
+	private IWorkbenchAction					_actionQuit;
 
-	private IWorkbenchAction					fActionAbout;
-	private IWorkbenchAction					fActionQuit;
+	private IWorkbenchAction					_actionSavePerspective;
+	private IWorkbenchAction					_actionResetPerspective;
+	private IWorkbenchAction					_actionClosePerspective;
+	private IWorkbenchAction					_actionCloseAllPerspective;
+	private IWorkbenchAction					_actionEditActionSets;
 
-	private IWorkbenchAction					fActionSavePerspective;
-	private IWorkbenchAction					fActionResetPerspective;
-	private IWorkbenchAction					fActionClosePerspective;
-	private IWorkbenchAction					fActionCloseAllPerspective;
-	private IWorkbenchAction					fActionEditActionSets;
+	PersonContributionItem						_personSelector;
+	TourTypeContributionItem					_tourTypeSelector;
+	private MeasurementSystemContributionItem	_measurementSelector;
 
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
@@ -76,16 +76,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		{
 			final String openText = Messages.App_Action_open_perspective;
 			final MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
-			final IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
+			final IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST
+					.create(_window);
+
 			changePerspMenuMgr.add(changePerspMenuItem);
 
 			menu.add(changePerspMenuMgr);
 		}
 
-		menu.add(fActionSavePerspective);
-		menu.add(fActionResetPerspective);
-		menu.add(fActionClosePerspective);
-		menu.add(fActionCloseAllPerspective);
+		menu.add(_actionSavePerspective);
+		menu.add(_actionResetPerspective);
+		menu.add(_actionClosePerspective);
+		menu.add(_actionCloseAllPerspective);
 	}
 
 	private MenuManager createFileMenu() {
@@ -104,7 +106,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
 		 * the application menu.
 		 */
-		final ActionContributionItem quitItem = new ActionContributionItem(fActionQuit);
+		final ActionContributionItem quitItem = new ActionContributionItem(_actionQuit);
 		quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 		fileMenu.add(quitItem);
 
@@ -137,7 +139,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
 		 * the application menu.
 		 */
-		final ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
+		final ActionContributionItem prefItem = new ActionContributionItem(_actionPreferences);
 		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 		toolMenu.add(prefItem);
 
@@ -149,7 +151,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
 
 		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
-		viewMenu.add(fActionViewShortList);
+		viewMenu.add(_actionViewShortList);
 
 		viewMenu.add(new Separator());
 		addPerspectiveActions(viewMenu);
@@ -163,25 +165,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
 		final IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmPeople.add(fPersonSelector);
+		tbmPeople.add(_personSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmPeople, "people")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
 		final IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmTourType.add(fTourTypeSelector);
+		tbmTourType.add(_tourTypeSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmTourType, "tourtype")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
-		if (TourbookPlugin.getDefault()
-				.getPreferenceStore()
-				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
+		if (TourbookPlugin.getDefault().getPreferenceStore().getBoolean(
+				ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
 
 			final IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			tbmSystem.add(fMeasurementSelector);
+			tbmSystem.add(_measurementSelector);
 
 			coolBar.add(new ToolBarContributionItem(tbmSystem, "measurementSystem")); //$NON-NLS-1$
 		}
@@ -212,47 +213,47 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
 
-		fWindow = window;
+		_window = window;
 
-		fPersonSelector = new PersonContributionItem();
-		fTourTypeSelector = new TourTypeContributionItem();
-		fMeasurementSelector = new MeasurementSystemContributionItem();
+		_personSelector = new PersonContributionItem();
+		_tourTypeSelector = new TourTypeContributionItem();
+		_measurementSelector = new MeasurementSystemContributionItem();
 
-		fActionQuit = ActionFactory.QUIT.create(window);
-		register(fActionQuit);
+		_actionQuit = ActionFactory.QUIT.create(window);
+		register(_actionQuit);
 
-		fActionAbout = ActionFactory.ABOUT.create(window);
-		fActionAbout.setText(Messages.App_Action_About);
-		register(fActionAbout);
+		_actionAbout = ActionFactory.ABOUT.create(window);
+		_actionAbout.setText(Messages.App_Action_About);
+		register(_actionAbout);
 
-		fActionPreferences = ActionFactory.PREFERENCES.create(window);
-		fActionPreferences.setText(Messages.App_Action_open_preferences);
-		register(fActionPreferences);
+		_actionPreferences = ActionFactory.PREFERENCES.create(window);
+		_actionPreferences.setText(Messages.App_Action_open_preferences);
+		register(_actionPreferences);
 
-		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		_actionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 
-		fActionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
-		register(fActionEditActionSets);
+		_actionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
+		register(_actionEditActionSets);
 
-		fActionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
-		register(fActionSavePerspective);
+		_actionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
+		register(_actionSavePerspective);
 
-		fActionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
-		register(fActionResetPerspective);
+		_actionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(_actionResetPerspective);
 
-		fActionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-		register(fActionClosePerspective);
+		_actionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+		register(_actionClosePerspective);
 
-		fActionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
-		register(fActionCloseAllPerspective);
+		_actionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+		register(_actionCloseAllPerspective);
 
 	}
 
 	@Override
 	public IStatus saveState(final IMemento memento) {
 
-		fPersonSelector.saveState(memento);
-		fTourTypeSelector.saveState(memento);
+		_personSelector.saveState(memento);
+		_tourTypeSelector.saveState(memento);
 
 		return super.saveState(memento);
 	}

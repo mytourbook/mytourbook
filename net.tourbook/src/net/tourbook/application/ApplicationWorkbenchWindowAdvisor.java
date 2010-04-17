@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.application;
 
@@ -96,7 +96,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		String title = null;
 		final IProduct product = Platform.getProduct();
 		if (product != null) {
-			title = product.getName() + " - " + ApplicationVersion.APP_VERSION; //$NON-NLS-1$ 
+			title = product.getName() + " - " + ApplicationVersion.APP_VERSION; //$NON-NLS-1$
 		}
 		if (title == null) {
 			title = UI.EMPTY_STRING;
@@ -123,11 +123,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 
 			final IAdaptable input = currentPage.getInput();
-			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
+			if ((input != null) && !input.equals(wbAdvisor.getDefaultPageInput())) {
 				label = currentPage.getLabel();
 			}
 
-			if (label != null && !label.equals(UI.EMPTY_STRING)) {
+			if ((label != null) && !label.equals(UI.EMPTY_STRING)) {
 				title = NLS.bind(shellTitle, label, title);
 			}
 		}
@@ -191,13 +191,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.getWindow().getPartService().addPartListener(new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference ref) {
-				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+				if ((ref instanceof IEditorReference) || (ref instanceof IViewReference)) {
 					updateTitle();
 				}
 			}
 
 			public void partBroughtToTop(final IWorkbenchPartReference ref) {
-				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+				if ((ref instanceof IEditorReference) || (ref instanceof IViewReference)) {
 					updateTitle();
 				}
 			}
@@ -277,7 +277,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			conn.close();
 
 			// select person/tour type which was selected in the last session
-			_applicationActionBarAdvisor.fPersonSelector.fireEventNewPersonIsSelected();
+			_applicationActionBarAdvisor._personSelector.fireEventNewPersonIsSelected();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -378,7 +378,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 
 		// Nothing to do if the part hasn't changed
-		if (activePart == _lastActivePart && currentPage == _lastActivePage && persp == _lastPerspective) {
+		if ((activePart == _lastActivePart) && (currentPage == _lastActivePage) && (persp == _lastPerspective)) {
 			return;
 		}
 

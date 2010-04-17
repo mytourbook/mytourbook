@@ -25,6 +25,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1364,7 +1365,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			_poiPosition = poi.getPosition();
 			_poiName = poi.getName();
+
 			_poiZoomLevel = poi.getRecommendedZoom();
+			if (_poiZoomLevel == -1) {
+				_poiZoomLevel = _map.getZoom();
+			}
 
 			_map.setPOI(_poiPosition, _poiZoomLevel, _poiName);
 
@@ -1390,6 +1395,18 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
 				paintOneTour(tourData, false, true);
+
+			} else if (firstElement instanceof TourWayPoint) {
+
+				final TourWayPoint wp = (TourWayPoint) firstElement;
+
+				_poiPosition = wp.getPosition();
+				_poiName = wp.getName();
+				_poiZoomLevel = _map.getZoom();
+
+				_map.setPOI(_poiPosition, _poiZoomLevel, _poiName);
+
+				_actionShowPOI.setChecked(true);
 			}
 
 			enableActions();

@@ -180,6 +180,28 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
 
+	public static String	ColumnFactory_Waypoint_Altitude_Label;
+
+	public static String	ColumnFactory_Waypoint_Category;
+
+	public static String	ColumnFactory_Waypoint_Comment;
+
+	public static String	ColumnFactory_Waypoint_Date;
+
+	public static String	ColumnFactory_Waypoint_Date_Tooltip;
+
+	public static String	ColumnFactory_Waypoint_Date_Unit;
+
+	public static String	ColumnFactory_Waypoint_Description;
+
+	public static String	ColumnFactory_Waypoint_Name;
+
+	public static String	ColumnFactory_Waypoint_Symbol;
+
+	public static String		ColumnFactory_Waypoint_Time;
+	public static String		ColumnFactory_Waypoint_Time_Tooltip;
+	public static String		ColumnFactory_Waypoint_Time_Unit;
+
 	public static String		Image_configure_columns;
 
 	public static String		message_manager_pErrorSummary;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartLabel;
-import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -40,12 +37,17 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.util.ColumnDefinition;
+import net.tourbook.util.ColumnManager;
+import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -55,12 +57,10 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -69,9 +69,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -85,19 +83,20 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-public class TourMarkerView extends ViewPart implements ITourProvider {
+public class TourWaypointView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView";					//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourWaypointView";					//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -107,8 +106,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
 	private final Preferences		_prefStore				= TourbookPlugin.getDefault().getPluginPreferences();
+	private final IDialogSettings	_state					= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
-	private TableViewer				_markerViewer;
+	private ActionModifyColumns		_actionModifyColumns;
+
+	private TableViewer				_wpViewer;
 
 	private TourData				_tourData;
 
@@ -118,17 +120,31 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 
-	private final NumberFormat		_nf						= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nfAltitude				= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.shortDate();
+	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
 
 	private PageBook				_pageBook;
 	private Label					_pageNoChart;
 	private Composite				_viewerContainer;
 
-	private Chart					_tourChart;
+//	private Chart					_tourChart;
 
-	private ActionOpenMarkerDialog	_actionEditTourMarkers;
+	private ActionOpenMarkerDialog	_actionEditTourWaypoints;
 
-	class MarkerViewerContentProvicer implements IStructuredContentProvider {
+	private ColumnManager			_columnManager;
+
+	/*
+	 * measurement unit values
+	 */
+	private float					_unitValueAltitude;
+
+	{
+		_nfAltitude.setMinimumFractionDigits(1);
+		_nfAltitude.setMaximumFractionDigits(1);
+	}
+
+	class WaypointViewerContentProvicer implements IStructuredContentProvider {
 
 		public void dispose() {}
 
@@ -136,7 +152,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			if (_tourData == null) {
 				return new Object[0];
 			} else {
-				return _tourData.getTourMarkers().toArray();
+				return _tourData.getTourWayPoints().toArray();
 			}
 		}
 
@@ -146,15 +162,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	/**
 	 * Sort the markers by time
 	 */
-	private class MarkerViewerSorter extends ViewerSorter {
+	private class WayViewerSorter extends ViewerSorter {
 
-		@Override
-		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
-		}
+//		@Override
+//		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+//		}
 	}
 
-	public TourMarkerView() {
+	public TourWaypointView() {
 		super();
 	}
 
@@ -166,8 +182,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourMarkerView.this) {
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
+				if (partRef.getPart(false) == TourWaypointView.this) {
+					saveState();
 				}
 			}
 
@@ -195,33 +211,45 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 					// measurement system has changed
 
+//					UI.updateUnits();
+//					updateInternalUnitValues();
+//
+//					// keep column sequence/width
+////					_columnManager.saveState(_state);
+//
+//					// dispose viewer
+//					final Control[] children = _viewerContainer.getChildren();
+//					for (final Control element : children) {
+//						element.dispose();
+//					}
+//
+//					createUIWaypointViewer(_viewerContainer);
+//					_viewerContainer.layout();
+//
+//					reloadViewer();
+//
+
 					UI.updateUnits();
+					updateInternalUnitValues();
 
-					// dispose viewer
-					final Control[] children = _viewerContainer.getChildren();
-					for (final Control element : children) {
-						element.dispose();
-					}
+					_columnManager.saveState(_state);
+					_columnManager.clearColumns();
+					defineViewerColumns(_viewerContainer);
 
-					createTableViewer(_viewerContainer);
-					_viewerContainer.layout();
-
-					// update the viewer
-					_markerViewer.setInput(this);
+					_wpViewer = (TableViewer) recreateViewer(_wpViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					_markerViewer.getTable().setLinesVisible(
+					_wpViewer.getTable().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-					_markerViewer.refresh();
+					_wpViewer.refresh();
 
 					/*
 					 * the tree must be redrawn because the styled text does not show with the new
 					 * color
 					 */
-					_markerViewer.getTable().redraw();
-
+					_wpViewer.getTable().redraw();
 				}
 			}
 		};
@@ -235,13 +263,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				if (part == TourMarkerView.this) {
+				if (part == TourWaypointView.this) {
 					return;
 				}
 				onSelectionChanged(selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
@@ -249,7 +277,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		_tourPropertyListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if ((_tourData == null) || (part == TourMarkerView.this)) {
+				if ((_tourData == null) || (part == TourWaypointView.this)) {
 					return;
 				}
 
@@ -268,7 +296,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 								// get modified tour
 								_tourData = tourData;
 
-								_markerViewer.setInput(new Object[0]);
+								_wpViewer.setInput(new Object[0]);
 
 								// removed old tour data from the selection provider
 								_postSelectionProvider.clearSelection();
@@ -293,11 +321,17 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		_tourData = null;
 
-		_markerViewer.setInput(new Object[0]);
+		_wpViewer.setInput(new Object[0]);
 
 		_postSelectionProvider.clearSelection();
 
 		_pageBook.showPage(_pageNoChart);
+	}
+
+	private void createActions() {
+
+		_actionModifyColumns = new ActionModifyColumns(this);
+
 	}
 
 	/**
@@ -313,29 +347,28 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			}
 		});
 
-		final Control viewerControl = _markerViewer.getControl();
+		final Control viewerControl = _wpViewer.getControl();
 		final Menu menu = menuMgr.createContextMenu(viewerControl);
 		viewerControl.setMenu(menu);
 
-		getSite().registerContextMenu(menuMgr, _markerViewer);
+		getSite().registerContextMenu(menuMgr, _wpViewer);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		updateInternalUnitValues();
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_columnManager = new ColumnManager(this, _state);
+		defineViewerColumns(parent);
 
-		_viewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		createTableViewer(_viewerContainer);
+		createUI(parent);
 
+		createActions();
 		createContextMenu();
+		fillToolbar();
 
-		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
+		_actionEditTourWaypoints = new ActionOpenMarkerDialog(this, true);
 
 		addSelectionListener();
 		addTourEventListener();
@@ -356,20 +389,34 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		}
 	}
 
-	private void createTableViewer(final Composite parent) {
+	private void createUI(final Composite parent) {
 
-		final TableColumnLayout tableLayout = new TableColumnLayout();
+		_pageBook = new PageBook(parent, SWT.NONE);
+		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		layoutContainer.setLayout(tableLayout);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+		_pageNoChart = new Label(_pageBook, SWT.NONE);
+		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		_viewerContainer = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
-		table.setLayout(new TableLayout());
+		createUIWaypointViewer(_viewerContainer);
+	}
+
+	private void createUIWaypointViewer(final Composite parent) {
+
+		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION /*
+																								 * |
+																								 * SWT
+																								 * .
+																								 * MULTI
+																								 * |
+																								 * SWT
+																								 * .
+																								 * BORDER
+																								 */);
+
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
 //		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 		table.setLinesVisible(true);
@@ -382,98 +429,40 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 					return;
 				}
 
-				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
 				if ((selection.size() > 0) && (e.keyCode == SWT.CR)) {
 
 					// run async, otherwise it would pop up the dialog two times
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
-							_actionEditTourMarkers.run();
-						}
-					});
+//					Display.getCurrent().asyncExec(new Runnable() {
+//						public void run() {
+//							_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
+//							_actionEditTourWaypoints.run();
+//						}
+//					});
 				}
 			}
 		});
 
-		_markerViewer = new TableViewer(table);
-
-		/*
-		 * create columns
-		 */
-		TableViewerColumn tvc;
-		TableColumn tvcColumn;
-		final PixelConverter pixelConverter = new PixelConverter(table);
-
-		// column: time
-		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Marker_Column_time);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
-			}
-		});
-		tableLayout
-				.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), false));
-
-		// column: distance km/mi
-		tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
-		tvcColumn.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
-
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				_nf.setMinimumFractionDigits(3);
-				_nf.setMaximumFractionDigits(3);
-				cell.setText(_nf.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
-
-				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-				}
-			}
-		});
-		tableLayout
-				.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(11), false));
-
-		// column: remark
-		tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Marker_Column_remark);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				cell.setText(tourMarker.getLabel());
-			}
-		});
-		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(50, true));
+		_wpViewer = new TableViewer(table);
+		_columnManager.createColumns(_wpViewer);
 
 		/*
 		 * create table viewer
 		 */
 
-		_markerViewer.setContentProvider(new MarkerViewerContentProvicer());
-		_markerViewer.setSorter(new MarkerViewerSorter());
+		_wpViewer.setContentProvider(new WaypointViewerContentProvicer());
+		_wpViewer.setSorter(new WayViewerSorter());
 
-		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_wpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
-					fireSliderPosition(selection);
+					fireWaypointPosition(selection);
 				}
 			}
 		});
 
-		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_wpViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (isTourInDb() == false) {
@@ -481,21 +470,176 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				}
 
 				// edit selected marker
-				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-				if (selection.size() > 0) {
-					_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
-					_actionEditTourMarkers.run();
-				}
+				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
+//				if (selection.size() > 0) {
+//					_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
+//					_actionEditTourWaypoints.run();
+//				}
 			}
 		});
+	}
+
+	private void defineViewerColumns(final Composite parent) {
+
+		ColumnDefinition colDef;
+		final PixelConverter pc = new PixelConverter(parent);
+
+		/*
+		 * column: name
+		 */
+		colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(wp.getName());
+			}
+		});
+
+		/*
+		 * column: description
+		 */
+		colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(wp.getDescription());
+			}
+		});
+
+		/*
+		 * column: comment
+		 */
+		colDef = TableColumnFactory.WAYPOINT_COMMENT.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(wp.getComment());
+			}
+		});
+
+		/*
+		 * column: category
+		 */
+		colDef = TableColumnFactory.WAYPOINT_CATEGORY.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(wp.getCategory());
+			}
+		});
+
+		/*
+		 * column: symbol
+		 */
+		colDef = TableColumnFactory.WAYPOINT_SYMBOL.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(wp.getSymbol());
+			}
+		});
+
+		/*
+		 * column: altitude
+		 */
+		colDef = TableColumnFactory.WAYPOINT_ALTITUDE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				final float altitude = wp.getAltitude() / _unitValueAltitude;
+
+				cell.setText(_nfAltitude.format(altitude));
+			}
+		});
+
+		/*
+		 * column: time
+		 */
+		colDef = TableColumnFactory.WAYPOINT_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				final long time = wp.getTime();
+
+				cell.setText(time == 0 ? UI.EMPTY_STRING : _timeFormatter.print(time));
+			}
+		});
+
+		/*
+		 * column: date/time
+		 */
+		colDef = TableColumnFactory.WAYPOINT_DATE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				final long time = wp.getTime();
+
+				cell.setText(time == 0 ? UI.EMPTY_STRING : _dtFormatter.print(time));
+			}
+		});
+
+		/*
+		 * column: latitude
+		 */
+		colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(Double.toString(wp.getLatitude()));
+			}
+		});
+
+		/*
+		 * column: longitude
+		 */
+		colDef = TableColumnFactory.LONGITUDE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(true);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourWayPoint wp = (TourWayPoint) cell.getElement();
+				cell.setText(Double.toString(wp.getLongitude()));
+			}
+		});
+
 	}
 
 	@Override
 	public void dispose() {
 
+		final IWorkbenchPage page = getViewSite().getPage();
+
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getViewSite().getPage().removePartListener(_partListener);
+		page.removePostSelectionListener(_postSelectionListener);
+		page.removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -504,64 +648,45 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionEditTourMarkers);
+//		menuMgr.add(_actionEditTourWaypoints);
+//
+//		// add standard group which allows other plug-ins to contribute here
+//		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+//
+//		// set the marker which should be selected in the marker dialog
+//		final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
+//		_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
+//
+//		/*
+//		 * enable actions
+//		 */
+//		final boolean tourInDb = isTourInDb();
+//
+//		_actionEditTourWaypoints.setEnabled(tourInDb);
+	}
 
-		// add standard group which allows other plug-ins to contribute here
-		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-		// set the marker which should be selected in the marker dialog
-		final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-		_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+	private void fillToolbar() {
 
 		/*
-		 * enable actions
+		 * fill view menu
 		 */
-		final boolean tourInDb = isTourInDb();
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		_actionEditTourMarkers.setEnabled(tourInDb);
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionModifyColumns);
 	}
 
 	/**
-	 * select the chart slider(s) according to the selected marker(s)
+	 * fire waypoint position
 	 */
-	private void fireSliderPosition(final StructuredSelection selection) {
+	private void fireWaypointPosition(final StructuredSelection selection) {
 
-		// a chart must be available
-		if (_tourChart == null) {
-
-			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
-
-			if ((tourChart == null) || tourChart.isDisposed()) {
-				return;
-			} else {
-				_tourChart = tourChart;
-			}
-		}
-
-		final Object[] segments = selection.toArray();
-
-		if (segments.length > 1) {
-
-			// two or more markers are selected
-
-			_postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					_tourChart,
-					((TourMarker) segments[0]).getSerieIndex(),
-					((TourMarker) segments[segments.length - 1]).getSerieIndex()));
-
-		} else if (segments.length > 0) {
-
-			// one marker is selected
-
-			_postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					_tourChart,
-					((TourMarker) segments[0]).getSerieIndex(),
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
-		}
+		_postSelectionProvider.setSelection(selection);
 	}
 
-	public Object getMarkerViewer() {
-		return _markerViewer;
+	@Override
+	public ColumnManager getColumnManager() {
+		return _columnManager;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
@@ -570,6 +695,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		selectedTours.add(_tourData);
 
 		return selectedTours;
+	}
+
+	@Override
+	public ColumnViewer getViewer() {
+		return _wpViewer;
 	}
 
 	/**
@@ -590,34 +720,34 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		if (selection instanceof SelectionTourData) {
 
-			// a tour was selected, get the chart and update the marker viewer
+			// a tour was selected, get the chart and update the waypoint viewer
 
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 			_tourData = tourDataSelection.getTourData();
 
 			if (_tourData == null) {
-				_tourChart = null;
+//				_tourChart = null;
 			} else {
-				_tourChart = tourDataSelection.getTourChart();
+//				_tourChart = tourDataSelection.getTourChart();
 				tourId = _tourData.getTourId();
 			}
 
 		} else if (selection instanceof SelectionTourId) {
 
-			_tourChart = null;
+//			_tourChart = null;
 			tourId = ((SelectionTourId) selection).getTourId();
 
 		} else if (selection instanceof SelectionTourIds) {
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if ((tourIds != null) && (tourIds.size() > 0)) {
-				_tourChart = null;
+//				_tourChart = null;
 				tourId = tourIds.get(0);
 			}
 
 		} else if (selection instanceof SelectionActiveEditor) {
 
-			_tourChart = null;
+//			_tourChart = null;
 
 			// check tour editor
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
@@ -632,7 +762,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				final TourData tourData = tourChart.getTourData();
 				if (tourData != _tourData) {
 					_tourData = tourData;
-					_tourChart = tourChart;
+//					_tourChart = tourChart;
 					tourId = _tourData.getTourId();
 				}
 			}
@@ -643,13 +773,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-				_tourChart = null;
+//				_tourChart = null;
 				tourId = refItem.getTourId();
 			}
 
 		} else if (selection instanceof StructuredSelection) {
 
-			_tourChart = null;
+//			_tourChart = null;
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 				tourId = ((TVICatalogComparedTour) firstElement).getTourId();
@@ -674,15 +804,49 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		if (isTour) {
 			_pageBook.showPage(_viewerContainer);
-			_markerViewer.setInput(new Object[0]);
+			_wpViewer.setInput(new Object[0]);
 		}
 
-		_actionEditTourMarkers.setEnabled(isTour);
+//		_actionEditTourWaypoints.setEnabled(isTour);
+	}
+
+	@Override
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+		_viewerContainer.setRedraw(false);
+		{
+			_wpViewer.getTable().dispose();
+
+			createUIWaypointViewer(_viewerContainer);
+			_viewerContainer.layout();
+
+			// update the viewer
+			reloadViewer();
+		}
+		_viewerContainer.setRedraw(true);
+
+		return _wpViewer;
+	}
+
+	@Override
+	public void reloadViewer() {
+		_wpViewer.setInput(new Object[0]);
+	}
+
+	private void saveState() {
+
+		// check if UI is disposed
+		final Table table = _wpViewer.getTable();
+		if (table.isDisposed()) {
+			return;
+		}
+
+		_columnManager.saveState(_state);
 	}
 
 	@Override
 	public void setFocus() {
-		_markerViewer.getTable().setFocus();
+		_wpViewer.getTable().setFocus();
 	}
 
 	private void showTourFromTourProvider() {
@@ -711,6 +875,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				}
 			}
 		});
+	}
+
+	private void updateInternalUnitValues() {
+
+		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
 	}
 
 }

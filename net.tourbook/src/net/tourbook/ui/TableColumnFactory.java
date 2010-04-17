@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
@@ -38,7 +38,7 @@ public abstract class TableColumnFactory {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitude", SWT.TRAIL); //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_tooltip);
@@ -55,7 +55,7 @@ public abstract class TableColumnFactory {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeComputedDiffSegment", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
 			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
 			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_computed_difference_tooltip);
@@ -72,7 +72,7 @@ public abstract class TableColumnFactory {
 
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiffSegBorder", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
 			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
 			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_difference_tooltip);
@@ -90,7 +90,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label);
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
@@ -108,7 +108,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_h_label); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_h_label);
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_h_tooltip);
@@ -126,9 +126,9 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "/ " + UI.UNIT_LABEL_ALTITUDE;//$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label); 
-			colDef.setColumnHeader(unitLabel); 
-			colDef.setColumnUnit(unitLabel); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
@@ -144,7 +144,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_h_label); 
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_h_label);
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_h_tooltip);
@@ -162,7 +162,7 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_pace_label);
 			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
-			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
+			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 			
@@ -178,7 +178,7 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_pace_difference_label);
 			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
-			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + UI.UNIT_LABEL_PACE); 
+			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE  + UI.UNIT_LABEL_PACE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pace_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 			
@@ -228,7 +228,7 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label);
 			colDef.setColumnHeader(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_SPEED);
-			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_SPEED); 
+			colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE  + UI.UNIT_LABEL_SPEED);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
@@ -357,7 +357,7 @@ public abstract class TableColumnFactory {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distanceTotal", SWT.TRAIL); //$NON-NLS-1$
 			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_DISTANCE;//$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_DISTANCE;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_distanceTotal_label);
 			colDef.setColumnHeader(unitLabel);
@@ -381,7 +381,7 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_driving_time);
 			colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_driving_time_tooltip);
-																			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -610,7 +610,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "recordingTimeTotal", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_recording_time;//$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_recording_time;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_recording_timeTotal_label);
 			colDef.setColumnHeader(unitLabel);
@@ -631,7 +631,7 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_speed_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
-			colDef.setColumnUnit(UI.UNIT_LABEL_SPEED); 
+			colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_speed_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
@@ -811,6 +811,167 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	/*
+	 * Waypoint columns
+	 */
+	
+	public static final TableColumnFactory WAYPOINT_DATE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(15);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpDate", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Date);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Date);
+			colDef.setColumnUnit(Messages.ColumnFactory_Waypoint_Date_Unit);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Waypoint_Date_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory WAYPOINT_NAME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpName", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Name);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Name);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory WAYPOINT_DESCRIPTION = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpDescription", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Description);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Description);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory WAYPOINT_COMMENT = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpComment", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Comment);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Comment);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory	WAYPOINT_ALTITUDE				= new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+																					final int pixelWidth = pixelConverter
+																							.convertWidthInCharsToPixels(10);
+																					final ColumnDefinition colDef = new TableColumnDefinition(
+																							columnManager,
+																							"wpAltitude", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef
+																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Altitude_Label);
+																					colDef
+																							.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
+																					colDef
+																							.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+																					colDef
+																							.setColumnToolTipText(Messages.ColumnFactory_Waypoint_Altitude_Label);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory	WAYPOINT_CATEGORY				= new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
+																					final ColumnDefinition colDef = new TableColumnDefinition(
+																							columnManager,
+																							"wpCategory", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef
+																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Category);
+																					colDef
+																							.setColumnHeader(Messages.ColumnFactory_Waypoint_Category);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory	WAYPOINT_SYMBOL					= new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+																					final int pixelWidth = pixelConverter
+																							.convertWidthInCharsToPixels(30);
+																					final ColumnDefinition colDef = new TableColumnDefinition(
+																							columnManager,
+																							"wpSymbol", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef
+																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Symbol);
+																					colDef
+																							.setColumnHeader(Messages.ColumnFactory_Waypoint_Symbol);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory WAYPOINT_TIME = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(15);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpTime", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Time);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Time);
+			colDef.setColumnUnit(Messages.ColumnFactory_Waypoint_Time_Unit);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Waypoint_Time_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
 	/**
 	 * @param columnManager
 	 * @param pixelConverter

@@ -87,7 +87,7 @@
 	<extension point="org.eclipse.ui.views">
 		<view
 			allowMultiple="false"
-			category="org.eclipse.ui"
+			category="net.tourbook.category.Tools"
 			class="de.byteholder.geoclipse.poi.PoiView"
 			icon="icons/find.png"
 			id="de.byteholder.geoclipse.poi.poiView"

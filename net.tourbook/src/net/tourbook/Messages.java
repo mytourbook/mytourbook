@@ -688,6 +688,9 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 
+	public static String		Tour_Waypoint_Column_Comment;
+	public static String		Tour_Waypoint_Column_Time;
+
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
@@ -706,7 +709,6 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_title;
 
 	public static String		tour_editor_csvTimeSliceExport;
-
 	public static String		tour_editor_dlg_create_tour_message;
 	public static String		tour_editor_dlg_create_tour_title;
 	public static String		tour_editor_dlg_delete_marker_message;

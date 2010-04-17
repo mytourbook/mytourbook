@@ -361,7 +361,7 @@ public class TourData implements Comparable<Object> {
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
- 
+
 	/**
 	 * Tags
 	 */
@@ -4218,6 +4218,22 @@ public class TourData implements Comparable<Object> {
 
 	public void setTourType(final TourType tourType) {
 		this.tourType = tourType;
+	}
+
+	public void setWayPoints(final ArrayList<TourWayPoint> wptList) {
+
+		// remove old way points
+		tourWayPoints.clear();
+
+		if ((wptList == null) || (wptList.size() == 0)) {
+			return;
+		}
+
+		// set new way points
+		for (final TourWayPoint tourWayPoint : wptList) {
+			tourWayPoint.setTourData(this);
+			tourWayPoints.add(tourWayPoint);
+		}
 	}
 
 	public void setWeatherClouds(final String weatherClouds) {

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
 
@@ -55,48 +55,48 @@ public class ColumnManager {
 	/**
 	 * column definitions for all columns which are defined for the viewer
 	 */
-	private ArrayList<ColumnDefinition>	fAllDefinedColumnDefinitions	= new ArrayList<ColumnDefinition>();
+	private final ArrayList<ColumnDefinition>	_allDefinedColumnDefinitions	= new ArrayList<ColumnDefinition>();
 
 	/**
 	 * contains the column definitions for the visible columns in the sort order of the table/tree
 	 */
-	private ArrayList<ColumnDefinition>	fVisibleColumnDefinitions;
+	private ArrayList<ColumnDefinition>			_visibleColumnDefinitions;
 
 	/**
 	 * contains the column ids which are visible in the viewer
 	 */
-	private String[]					fVisibleColumnIds;
+	private String[]							_visibleColumnIds;
 
 	/**
 	 * contains a pair of column id and width for each column
 	 */
-	private String[]					fColumnIdsAndWidth;
+	private String[]							_columnIdsAndWidth;
 
-	private AbstractColumnLayout		fColumnLayout;
+	private AbstractColumnLayout				_columnLayout;
 
-	private ITourViewer					fTourViewer;
+	private final ITourViewer					_tourViewer;
 
 	/**
 	 * viewer which is managed by this {@link ColumnManager}
 	 */
-	private ColumnViewer				fColumnViewer;
+	private ColumnViewer						_columnViewer;
 
 	public ColumnManager(final ITourViewer tourViewer, final IDialogSettings viewState) {
 
-		fTourViewer = tourViewer;
+		_tourViewer = tourViewer;
 
 		restoreState(viewState);
 	}
 
 	public void addColumn(final ColumnDefinition colDef) {
-		fAllDefinedColumnDefinitions.add(colDef);
+		_allDefinedColumnDefinitions.add(colDef);
 	}
 
 	/**
 	 * Removes all defined columns
 	 */
 	public void clearColumns() {
-		fAllDefinedColumnDefinitions.clear();
+		_allDefinedColumnDefinitions.clear();
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class ColumnManager {
 	 */
 	public void createColumns(final ColumnViewer columnViewer) {
 
-		fColumnViewer = columnViewer;
+		_columnViewer = columnViewer;
 
 		setVisibleColumnDefinitions();
 
@@ -114,7 +114,7 @@ public class ColumnManager {
 
 			// create all columns in the table
 
-			for (final ColumnDefinition colDef : fVisibleColumnDefinitions) {
+			for (final ColumnDefinition colDef : _visibleColumnDefinitions) {
 				createTableColumn((TableColumnDefinition) colDef, (TableViewer) columnViewer);
 			}
 
@@ -122,7 +122,7 @@ public class ColumnManager {
 
 			// create all columns in the tree
 
-			for (final ColumnDefinition colDef : fVisibleColumnDefinitions) {
+			for (final ColumnDefinition colDef : _visibleColumnDefinitions) {
 				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) columnViewer);
 			}
 		}
@@ -164,7 +164,7 @@ public class ColumnManager {
 		/*
 		 * set column width
 		 */
-		if (fColumnLayout == null) {
+		if (_columnLayout == null) {
 
 			// set the column width with pixels
 
@@ -189,9 +189,9 @@ public class ColumnManager {
 
 				// overwrite the width
 				columnPixelData.width = getColumnWidth(colDef);
-				fColumnLayout.setColumnData(tc, columnPixelData);
+				_columnLayout.setColumnData(tc, columnPixelData);
 			} else {
-				fColumnLayout.setColumnData(tc, columnLayoutData);
+				_columnLayout.setColumnData(tc, columnLayoutData);
 			}
 		}
 
@@ -282,7 +282,7 @@ public class ColumnManager {
 	 *         for the column id is not available
 	 */
 	private ColumnDefinition getColumnDefinitionByColumnId(final String columnId) {
-		for (final ColumnDefinition colDef : fAllDefinedColumnDefinitions) {
+		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 			if (colDef.getColumnId().compareTo(columnId) == 0) {
 				return colDef;
 			}
@@ -297,7 +297,7 @@ public class ColumnManager {
 	 *         the column is not available
 	 */
 	private ColumnDefinition getColumnDefinitionByCreateIndex(final int orderIndex) {
-		for (final ColumnDefinition colDef : fVisibleColumnDefinitions) {
+		for (final ColumnDefinition colDef : _visibleColumnDefinitions) {
 			if (colDef.getCreateIndex() == orderIndex) {
 				return colDef;
 			}
@@ -312,9 +312,9 @@ public class ColumnManager {
 
 		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
 
-		if (fColumnViewer instanceof TableViewer) {
+		if (_columnViewer instanceof TableViewer) {
 
-			final Table table = ((TableViewer) fColumnViewer).getTable();
+			final Table table = ((TableViewer) _columnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
@@ -327,9 +327,9 @@ public class ColumnManager {
 				setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
 			}
 
-		} else if (fColumnViewer instanceof TreeViewer) {
+		} else if (_columnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
+			final Tree tree = ((TreeViewer) _columnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -355,17 +355,17 @@ public class ColumnManager {
 
 		int[] columnOrder = null;
 
-		if (fColumnViewer instanceof TableViewer) {
+		if (_columnViewer instanceof TableViewer) {
 
-			final Table table = ((TableViewer) fColumnViewer).getTable();
+			final Table table = ((TableViewer) _columnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
 			columnOrder = table.getColumnOrder();
 
-		} else if (fColumnViewer instanceof TreeViewer) {
+		} else if (_columnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
+			final Tree tree = ((TreeViewer) _columnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -391,12 +391,12 @@ public class ColumnManager {
 
 	private int getColumnWidth(final String columnWidthId) {
 
-		for (int columnIndex = 0; columnIndex < fColumnIdsAndWidth.length; columnIndex++) {
-			final String columnId = fColumnIdsAndWidth[columnIndex];
+		for (int columnIndex = 0; columnIndex < _columnIdsAndWidth.length; columnIndex++) {
+			final String columnId = _columnIdsAndWidth[columnIndex];
 
 			if (columnWidthId.equals(columnId)) {
 				try {
-					return Integer.parseInt(fColumnIdsAndWidth[++columnIndex]);
+					return Integer.parseInt(_columnIdsAndWidth[++columnIndex]);
 				} catch (final Exception e) {
 					// ignore format exception
 				}
@@ -433,7 +433,7 @@ public class ColumnManager {
 		final ArrayList<ColumnDefinition> allColumnsClone = new ArrayList<ColumnDefinition>();
 
 		try {
-			for (final ColumnDefinition definedColDef : fAllDefinedColumnDefinitions) {
+			for (final ColumnDefinition definedColDef : _allDefinedColumnDefinitions) {
 				allColumnsClone.add((ColumnDefinition) definedColDef.clone());
 			}
 		} catch (final CloneNotSupportedException e) {
@@ -447,17 +447,17 @@ public class ColumnManager {
 		/*
 		 * get column order from viewer
 		 */
-		if (fColumnViewer instanceof TableViewer) {
+		if (_columnViewer instanceof TableViewer) {
 
-			final Table table = ((TableViewer) fColumnViewer).getTable();
+			final Table table = ((TableViewer) _columnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
 			columnOrder = table.getColumnOrder();
 
-		} else if (fColumnViewer instanceof TreeViewer) {
+		} else if (_columnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
+			final Tree tree = ((TreeViewer) _columnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -505,13 +505,14 @@ public class ColumnManager {
 	public void openColumnDialog() {
 
 		// get the sorting order and column width from the viewer
-		fVisibleColumnIds = getColumnIdsFromViewer();
-		fColumnIdsAndWidth = getColumnIdAndWidthFromViewer();
+		_visibleColumnIds = getColumnIdsFromViewer();
+		_columnIdsAndWidth = getColumnIdAndWidthFromViewer();
 
-		(new ColumnModifyDialog(Display.getCurrent().getActiveShell(),
+		(new ColumnModifyDialog(
+				Display.getCurrent().getActiveShell(),
 				this,
 				getDialogColumns(),
-				fAllDefinedColumnDefinitions)).open();
+				_allDefinedColumnDefinitions)).open();
 	}
 
 	/**
@@ -528,13 +529,13 @@ public class ColumnManager {
 		// restore table columns sort order
 		final String mementoColumnSortOrderIds = settings.get(MEMENTO_COLUMN_SORT_ORDER);
 		if (mementoColumnSortOrderIds != null) {
-			fVisibleColumnIds = StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds);
+			_visibleColumnIds = StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds);
 		}
 
 		// restore column width
 		final String mementoColumnWidth = settings.get(MEMENTO_COLUMN_WIDTH);
 		if (mementoColumnWidth != null) {
-			fColumnIdsAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
+			_columnIdsAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
 		}
 	}
 
@@ -550,15 +551,15 @@ public class ColumnManager {
 		}
 
 		// save column sort order
-		fVisibleColumnIds = getColumnIdsFromViewer();
-		if (fVisibleColumnIds != null) {
-			settings.put(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter.convertArrayToString(fVisibleColumnIds));
+		_visibleColumnIds = getColumnIdsFromViewer();
+		if (_visibleColumnIds != null) {
+			settings.put(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter.convertArrayToString(_visibleColumnIds));
 		}
 
 		// save columns width and keep it for internal use
-		fColumnIdsAndWidth = getColumnIdAndWidthFromViewer();
-		if (fColumnIdsAndWidth != null) {
-			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(fColumnIdsAndWidth));
+		_columnIdsAndWidth = getColumnIdAndWidthFromViewer();
+		if (_columnIdsAndWidth != null) {
+			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(_columnIdsAndWidth));
 		}
 	}
 
@@ -589,7 +590,7 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Set the columns in {@link #fVisibleColumnDefinitions} to the order of the
+	 * Set the columns in {@link #_visibleColumnDefinitions} to the order of the
 	 * <code>tableItems</code> in the {@link ColumnModifyDialog}
 	 * 
 	 * @param tableItems
@@ -607,7 +608,7 @@ public class ColumnManager {
 				// data in the table item contains the input items for the viewer
 				final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
 
-				// set the visible columns 
+				// set the visible columns
 				visibleColumnIds.add(colDef.getColumnId());
 
 				// set column id and width
@@ -616,8 +617,8 @@ public class ColumnManager {
 			}
 		}
 
-		fVisibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-		fColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_columnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
 	}
 
 	/**
@@ -629,7 +630,7 @@ public class ColumnManager {
 	 * @param columnLayout
 	 */
 	public void setColumnLayout(final AbstractColumnLayout columnLayout) {
-		fColumnLayout = columnLayout;
+		_columnLayout = columnLayout;
 	}
 
 	/**
@@ -637,34 +638,34 @@ public class ColumnManager {
 	 */
 	private void setVisibleColumnDefinitions() {
 
-		fVisibleColumnDefinitions = new ArrayList<ColumnDefinition>();
+		_visibleColumnDefinitions = new ArrayList<ColumnDefinition>();
 
-		if (fVisibleColumnIds != null) {
+		if (_visibleColumnIds != null) {
 
 			// create columns with the correct sort order
 
 			int createIndex = 0;
 
-			for (final String columnId : fVisibleColumnIds) {
+			for (final String columnId : _visibleColumnIds) {
 
 				final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
 				if (colDef != null) {
 
 					colDef.setCreateIndex(createIndex++);
 
-					fVisibleColumnDefinitions.add(colDef);
+					_visibleColumnDefinitions.add(colDef);
 				}
 			}
 		}
 
-		if (fColumnIdsAndWidth != null) {
+		if (_columnIdsAndWidth != null) {
 
 			// set the width for all columns
 
-			for (int dataIdx = 0; dataIdx < fColumnIdsAndWidth.length; dataIdx++) {
+			for (int dataIdx = 0; dataIdx < _columnIdsAndWidth.length; dataIdx++) {
 
-				final String columnId = fColumnIdsAndWidth[dataIdx++];
-				final int columnWidth = Integer.valueOf(fColumnIdsAndWidth[dataIdx]);
+				final String columnId = _columnIdsAndWidth[dataIdx++];
+				final int columnWidth = Integer.valueOf(_columnIdsAndWidth[dataIdx]);
 
 				final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
 				if (colDef != null) {
@@ -677,36 +678,36 @@ public class ColumnManager {
 		 * when no columns are visible (which is the first time), show only the default columns
 		 * because every column reduces performance
 		 */
-		if (fVisibleColumnDefinitions.size() == 0 && fAllDefinedColumnDefinitions.size() > 0) {
+		if ((_visibleColumnDefinitions.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
 
 			final ArrayList<String> columnIds = new ArrayList<String>();
 			int createIndex = 0;
 
-			for (final ColumnDefinition columnDef : fAllDefinedColumnDefinitions) {
+			for (final ColumnDefinition columnDef : _allDefinedColumnDefinitions) {
 				if (columnDef.isDefaultColumn()) {
 
 					columnDef.setCreateIndex(createIndex++);
 
-					fVisibleColumnDefinitions.add(columnDef);
+					_visibleColumnDefinitions.add(columnDef);
 					columnIds.add(columnDef.getColumnId());
 				}
 			}
 
-			fVisibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
+			_visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
 		}
 
 		/*
 		 * when no default columns are set, use the first column
 		 */
-		if (fVisibleColumnDefinitions.size() == 0 && fAllDefinedColumnDefinitions.size() > 0) {
+		if ((_visibleColumnDefinitions.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
 
-			final ColumnDefinition firstColumn = fAllDefinedColumnDefinitions.get(0);
+			final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
 			firstColumn.setCreateIndex(0);
 
-			fVisibleColumnDefinitions.add(firstColumn);
+			_visibleColumnDefinitions.add(firstColumn);
 
-			fVisibleColumnIds = new String[1];
-			fVisibleColumnIds[0] = firstColumn.getColumnId();
+			_visibleColumnIds = new String[1];
+			_visibleColumnIds[0] = firstColumn.getColumnId();
 		}
 	}
 
@@ -720,7 +721,7 @@ public class ColumnManager {
 
 		setColumnIdsFromModifyDialog(tableItems);
 
-		fColumnViewer = fTourViewer.recreateViewer(fColumnViewer);
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 }

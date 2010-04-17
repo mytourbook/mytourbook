@@ -2077,15 +2077,23 @@ public class TourDatabase {
 	private void createTableTourWayPointV10(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourWayPoint
-		String sql = ("CREATE TABLE " + TABLE_TOUR_WAYPOINT + "\n") // 					//$NON-NLS-1$
-				+ "(\n" //																//$NON-NLS-1$
-				+ "   wayPointId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "   " + (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //				//$NON-NLS-1$
+		String sql = ("CREATE TABLE " + TABLE_TOUR_WAYPOINT + "\n") // 							//$NON-NLS-1$
+				+ "(\n" //																		//$NON-NLS-1$
+				+ "   wayPointId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "   " + (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //							//$NON-NLS-1$
 				//
-				+ "   latitude 			DOUBLE,		\n" //								//$NON-NLS-1$
-				+ "   longitude 		DOUBLE		\n" //								//$NON-NLS-1$
+				+ "   latitude 			DOUBLE NOT NULL,	\n" //								//$NON-NLS-1$
+				+ "   longitude 		DOUBLE NOT NULL,	\n" //								//$NON-NLS-1$
+				+ "   time				BIGINT,				\n" //								//$NON-NLS-1$
+				+ "   altitude			FLOAT,				\n" //								//$NON-NLS-1$
+				+ "   name				VARCHAR(1024),		\n" //								//$NON-NLS-1$
+				+ "   description		VARCHAR(4096),		\n" //								//$NON-NLS-1$
+				+ "   comment			VARCHAR(4096),		\n" //								//$NON-NLS-1$
+				+ "   symbol			VARCHAR(1024),		\n" //								//$NON-NLS-1$
+				+ "   category			VARCHAR(1024)		\n" //								//$NON-NLS-1$
 				//
 				+ ")";
+
 
 		System.out.println(sql);
 		System.out.println();

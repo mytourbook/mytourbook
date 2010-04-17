@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
@@ -121,83 +121,90 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer {
 
-	public static final String				ID									= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
-
-	final IDialogSettings					fState								= TourbookPlugin.getDefault()
-																						.getDialogSettingsSection(ID);
+	public static final String				ID									= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
 	public static final int					COLUMN_DATE							= 0;
 	public static final int					COLUMN_TITLE						= 1;
 	public static final int					COLUMN_DATA_FORMAT					= 2;
 	public static final int					COLUMN_FILE_NAME					= 3;
 
-	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";							//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDEX			= "selectedTourIndex";							//$NON-NLS-1$
+	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDEX			= "selectedTourIndex";						//$NON-NLS-1$
 
-	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";								//$NON-NLS-1$
-	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";						//$NON-NLS-1$
-	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";					//$NON-NLS-1$
+	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";							//$NON-NLS-1$
+	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
+	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";				//$NON-NLS-1$
 
-	private TableViewer						fTourViewer;
+	private final Preferences				_prefStore							= TourbookPlugin
+																						.getDefault()
+																						.getPluginPreferences();
 
-	private ActionClearView					fActionClearView;
-	private ActionModifyColumns				fActionModifyColumns;
-	private ActionSaveTourInDatabase		fActionSaveTour;
-	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
-	private ActionMergeIntoMenu				fActionMergeIntoTour;
-	private ActionReimportTour				fActionReimportTour;
-	private ActionAdjustYear				fActionAdjustImportedYear;
-	private ActionMergeGPXTours				fActionMergeGPXTours;
-	private ActionCreateTourIdWithTime		fActionCreateTourIdWithTime;
-	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
-	private ActionSetTourTypeMenu			fActionSetTourType;
-	private ActionEditQuick					fActionEditQuick;
-	private ActionEditTour					fActionEditTour;
-	private ActionMergeTour					fActionMergeTour;
-	private ActionSetTourTag				fActionAddTag;
-	private ActionSetTourTag				fActionRemoveTag;
-	private ActionRemoveAllTags				fActionRemoveAllTags;
-	private ActionOpenPrefDialog			fActionOpenTagPrefs;
-	private ActionOpenTour					fActionOpenTour;
-	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionExport					fActionExportTour;
+	private final IDialogSettings			_state								= TourbookPlugin
+																						.getDefault()
+																						.getDialogSettingsSection(ID);
 
-	private ImageDescriptor					imageDescDatabase;
-	private ImageDescriptor					imageDescDatabaseOtherPerson;
-	private ImageDescriptor					imageDescDatabaseAssignMergedTour;
-	private ImageDescriptor					imageDescDatabasePlaceholder;
-	private ImageDescriptor					imageDescDelete;
+	private TableViewer						_tourViewer;
 
-	private Image							imageDatabase;
-	private Image							imageDatabaseOtherPerson;
-	private Image							imageDatabaseAssignMergedTour;
-	private Image							imageDatabasePlaceholder;
-	private Image							imageDelete;
+	private ActionClearView					_actionClearView;
+	private ActionModifyColumns				_actionModifyColumns;
+	private ActionSaveTourInDatabase		_actionSaveTour;
+	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
+	private ActionMergeIntoMenu				_actionMergeIntoTour;
+	private ActionReimportTour				_actionReimportTour;
+	private ActionAdjustYear				_actionAdjustImportedYear;
+	private ActionMergeGPXTours				_actionMergeGPXTours;
+	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
+	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
+	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionEditQuick					_actionEditQuick;
+	private ActionEditTour					_actionEditTour;
+	private ActionMergeTour					_actionMergeTour;
+	private ActionSetTourTag				_actionAddTag;
+	private ActionSetTourTag				_actionRemoveTag;
+	private ActionRemoveAllTags				_actionRemoveAllTags;
+	private ActionOpenPrefDialog			_actionOpenTagPrefs;
+	private ActionOpenTour					_actionOpenTour;
+	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
+	private ActionExport					_actionExportTour;
 
-	private PostSelectionProvider			fPostSelectionProvider;
-	private IPartListener2					fPartListener;
-	private ISelectionListener				fPostSelectionListener;
-	private IPropertyChangeListener			fPrefChangeListener;
-	private ITourEventListener				fTourEventListener;
+	private ImageDescriptor					_imageDescDatabase;
+	private ImageDescriptor					_imageDescDatabaseOtherPerson;
+	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
+	private ImageDescriptor					_imageDescDatabasePlaceholder;
+	private ImageDescriptor					_imageDescDelete;
 
-	private Calendar						fCalendar							= GregorianCalendar.getInstance();
-	private DateFormat						fDateFormatter						= DateFormat.getDateInstance(DateFormat.SHORT);
-	private DateFormat						fTimeFormatter						= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private NumberFormat					fNumberFormatter					= NumberFormat.getNumberInstance();
-	private DateFormat						fDurationFormatter					= DateFormat.getTimeInstance(
+	private Image							_imageDatabase;
+	private Image							_imageDatabaseOtherPerson;
+	private Image							_imageDatabaseAssignMergedTour;
+	private Image							_imageDatabasePlaceholder;
+	private Image							_imageDelete;
+
+	private PostSelectionProvider			_postSelectionProvider;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
+
+	private final Calendar					_calendar							= GregorianCalendar.getInstance();
+	private final DateFormat				_dateFormatter						= DateFormat
+																						.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter						= DateFormat
+																						.getTimeInstance(DateFormat.SHORT);
+	private final NumberFormat				_nf									= NumberFormat.getNumberInstance();
+	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
 																						DateFormat.SHORT,
 																						Locale.GERMAN);
 
-	protected TourPerson					fActivePerson;
-	protected TourPerson					fNewActivePerson;
+	protected TourPerson					_activePerson;
+	protected TourPerson					_newActivePerson;
 
-	protected boolean						fIsPartVisible						= false;
-	protected boolean						fIsViewerPersonDataDirty			= false;
+	protected boolean						_isPartVisible						= false;
+	protected boolean						_isViewerPersonDataDirty			= false;
 
-	private ColumnManager					fColumnManager;
+	private ColumnManager					_columnManager;
 
-	private Composite						fViewerContainer;
+	private Composite						_viewerContainer;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -219,10 +226,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		reloadViewer();
 
-		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
+		_postSelectionProvider.setSelection(new SelectionDeletedTours());
 
 		// don't throw the selection again
-		fPostSelectionProvider.clearSelection();
+		_postSelectionProvider.clearSelection();
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -266,10 +273,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// prevent async error in save tour method, cleanup environment
 		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
-		fPostSelectionProvider.clearSelection();
+		_postSelectionProvider.clearSelection();
 
 		// get selected tours
-		final IStructuredSelection selection = ((IStructuredSelection) fTourViewer.getSelection());
+		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
@@ -355,7 +362,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (isTourImported) {
 
-			// 
+			//
 			rawDataMgr.updateTourDataFromDb(null);
 
 			reloadViewer();
@@ -366,7 +373,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 //						fTourViewer.setSelection(new StructuredSelection(firstTourData[0]), true);
-						fTourViewer.setSelection(selection, true);
+						_tourViewer.setSelection(selection, true);
 					}
 				});
 			}
@@ -381,7 +388,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
 				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fTourViewer.getSelection());
+				final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
 				// loop: all selected tours, selected tours can already be saved
 				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
@@ -398,7 +405,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void addPartListener() {
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -420,7 +427,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (RawDataView.this == partRef.getPart(false)) {
-					fIsPartVisible = false;
+					_isPartVisible = false;
 				}
 			}
 
@@ -430,45 +437,43 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (RawDataView.this == partRef.getPart(false)) {
-					fIsPartVisible = true;
-					if (fIsViewerPersonDataDirty || (fNewActivePerson != fActivePerson)) {
+					_isPartVisible = true;
+					if (_isViewerPersonDataDirty || (_newActivePerson != _activePerson)) {
 						reloadViewer();
 						updateViewerPersonData();
-						fNewActivePerson = fActivePerson;
-						fIsViewerPersonDataDirty = false;
+						_newActivePerson = _activePerson;
+						_isViewerPersonDataDirty = false;
 					}
 				}
 			}
 		};
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-					if (fIsPartVisible) {
+					if (_isPartVisible) {
 						updateViewerPersonData();
 					} else {
 						// keep new active person until the view is visible
-						fNewActivePerson = TourbookPlugin.getDefault().getActivePerson();
+						_newActivePerson = TourbookPlugin.getDefault().getActivePerson();
 					}
 
 				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
-					fActionSaveTour.resetPeopleList();
+					_actionSaveTour.resetPeopleList();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tour type in the raw data
 					RawDataManager.getInstance().updateTourDataFromDb(null);
 
-					fTourViewer.refresh();
+					_tourViewer.refresh();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -476,41 +481,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fState);
-					fColumnManager.clearColumns();
-					defineViewerColumns(fViewerContainer);
+					_columnManager.saveState(_state);
+					_columnManager.clearColumns();
+					defineViewerColumns(_viewerContainer);
 
-					fTourViewer = (TableViewer) recreateViewer(fTourViewer);
+					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					fTourViewer.getTable().setLinesVisible(
-							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+					_tourViewer.getTable().setLinesVisible(
+							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-					fTourViewer.refresh();
+					_tourViewer.refresh();
 
 					/*
 					 * the tree must be redrawn because the styled text does not show with the new
 					 * color
 					 */
-					fTourViewer.getTable().redraw();
+					_tourViewer.getTable().redraw();
 				}
 			}
 		};
 
-		prefStore.addPropertyChangeListener(fPrefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == RawDataView.this) {
 					return;
 				}
 
-				if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
+				if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
 
 					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
@@ -521,31 +526,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					removeTours(removedTours);
 
-					if (fIsPartVisible) {
+					if (_isPartVisible) {
 
 						RawDataManager.getInstance().updateTourDataFromDb(null);
 
 						// update the table viewer
 						reloadViewer();
 					} else {
-						fIsViewerPersonDataDirty = true;
+						_isViewerPersonDataDirty = true;
 					}
 				}
 			}
 		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == RawDataView.this) {
 					return;
 				}
 
-				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 					// update modified tours
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
@@ -555,17 +560,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						RawDataManager.getInstance().updateTourDataModel(modifiedTours);
 
 						// update viewer
-						fTourViewer.update(modifiedTours.toArray(), null);
+						_tourViewer.update(modifiedTours.toArray(), null);
 
 						// remove old selection, old selection can have the same tour but with old data
-						fPostSelectionProvider.clearSelection();
+						_postSelectionProvider.clearSelection();
 					}
 
 				} else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					// save imported file names
 					final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
-					fState.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+					_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
 					reimportAllImportFiles();
 
@@ -577,51 +582,52 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			}
 		};
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void createActions() {
 
 		// context menu
-		fActionSaveTour = new ActionSaveTourInDatabase(this, false);
-		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-		fActionMergeIntoTour = new ActionMergeIntoMenu(this);
-		fActionReimportTour = new ActionReimportTour(this);
-		fActionExportTour = new ActionExport(this);
+		_actionSaveTour = new ActionSaveTourInDatabase(this, false);
+		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
+		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
+		_actionReimportTour = new ActionReimportTour(this);
+		_actionExportTour = new ActionExport(this);
 
-		fActionEditTour = new ActionEditTour(this);
-		fActionEditQuick = new ActionEditQuick(this);
-		fActionMergeTour = new ActionMergeTour(this);
-		fActionOpenTour = new ActionOpenTour(this);
-		fActionSetTourType = new ActionSetTourTypeMenu(this);
+		_actionEditTour = new ActionEditTour(this);
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionMergeTour = new ActionMergeTour(this);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		_actionAddTag = new ActionSetTourTag(this, true);
+		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		// view toolbar
-		fActionClearView = new ActionClearView(this);
+		_actionClearView = new ActionClearView(this);
 //		fActionRefreshView = new ActionRefreshView(this);
 
 		// view menu
-		fActionModifyColumns = new ActionModifyColumns(this);
-		fActionMergeGPXTours = new ActionMergeGPXTours(this);
-		fActionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
-		fActionAdjustImportedYear = new ActionAdjustYear(this);
-		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
+		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionMergeGPXTours = new ActionMergeGPXTours(this);
+		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
+		_actionAdjustImportedYear = new ActionAdjustYear(this);
+		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 	}
 
 	private void createChart() {
 
-		final Object firstElement = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+		final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-		if (firstElement != null && firstElement instanceof TourData) {
+		if ((firstElement != null) && (firstElement instanceof TourData)) {
 			TourManager.getInstance().createTour((TourData) firstElement);
 		}
 	}
@@ -639,10 +645,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		final Menu menu = menuMgr.createContextMenu(fTourViewer.getControl());
-		fTourViewer.getControl().setMenu(menu);
+		final Menu menu = menuMgr.createContextMenu(_tourViewer.getControl());
+		_tourViewer.getControl().setMenu(menu);
 
-		getSite().registerContextMenu(menuMgr, fTourViewer);
+		getSite().registerContextMenu(menuMgr, _tourViewer);
 	}
 
 	@Override
@@ -651,13 +657,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		createResources();
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fState);
+		_columnManager = new ColumnManager(this, _state);
 		defineViewerColumns(parent);
 
-		fViewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
-		createTourViewer(fViewerContainer);
+		createTourViewer(_viewerContainer);
 
 		createActions();
 		fillToolbar();
@@ -668,28 +674,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		addTourEventListener();
 
 		// set this view part as selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
+		_activePerson = TourbookPlugin.getDefault().getActivePerson();
 
 		restoreState();
 	}
 
 	private void createResources() {
 
-		imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
-		imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
-		imageDescDatabaseAssignMergedTour = TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour);
-		imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder);
-		imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
+		_imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
+		_imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
+		_imageDescDatabaseAssignMergedTour = TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour);
+		_imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder);
+		_imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
 
 		try {
 			final Display display = Display.getCurrent();
-			imageDatabase = (Image) imageDescDatabase.createResource(display);
-			imageDatabaseOtherPerson = (Image) imageDescDatabaseOtherPerson.createResource(display);
-			imageDatabaseAssignMergedTour = (Image) imageDescDatabaseAssignMergedTour.createResource(display);
-			imageDatabasePlaceholder = (Image) imageDescDatabasePlaceholder.createResource(display);
-			imageDelete = (Image) imageDescDelete.createResource(display);
+			_imageDatabase = (Image) _imageDescDatabase.createResource(display);
+			_imageDatabaseOtherPerson = (Image) _imageDescDatabaseOtherPerson.createResource(display);
+			_imageDatabaseAssignMergedTour = (Image) _imageDescDatabaseAssignMergedTour.createResource(display);
+			_imageDatabasePlaceholder = (Image) _imageDescDatabasePlaceholder.createResource(display);
+			_imageDelete = (Image) _imageDescDelete.createResource(display);
 		} catch (final DeviceResourceException e) {
 			e.printStackTrace();
 		}
@@ -701,29 +707,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void createTourViewer(final Composite parent) {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
-		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		fTourViewer = new TableViewer(table);
-		fColumnManager.createColumns(fTourViewer);
+		_tourViewer = new TableViewer(table);
+		_columnManager.createColumns(_tourViewer);
 
 		// table viewer
-		fTourViewer.setContentProvider(new TourDataContentProvider());
-		fTourViewer.setSorter(new DeviceImportSorter());
+		_tourViewer.setContentProvider(new TourDataContentProvider());
+		_tourViewer.setSorter(new DeviceImportSorter());
 
-		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 				createChart();
 			}
 		});
 
-		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				fireSelectedTour();
 			}
@@ -739,13 +743,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineViewerColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		final PixelConverter pc = new PixelConverter(parent);
 		ColumnDefinition colDef;
 
 		/*
 		 * column: database indicator
 		 */
-		colDef = TableColumnFactory.DB_STATUS.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -759,7 +763,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: date
 		 */
-		colDef = TableColumnFactory.TOUR_DATE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -768,8 +772,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				cell.setText(fDateFormatter.format(fCalendar.getTime()));
+				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+				cell.setText(_dateFormatter.format(_calendar.getTime()));
 			}
 		});
 
@@ -777,15 +781,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_DATE);
-				fTourViewer.refresh();
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				_tourViewer.refresh();
 			}
 		});
 
 		/*
 		 * column: time
 		 */
-		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -793,9 +797,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
-				fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
+				_calendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 
-				cell.setText(fTimeFormatter.format(fCalendar.getTime()));
+				cell.setText(_timeFormatter.format(_calendar.getTime()));
 			}
 		});
 
@@ -803,15 +807,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_DATE);
-				fTourViewer.refresh();
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				_tourViewer.refresh();
 			}
 		});
 
 		/*
 		 * column: tour type
 		 */
-		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -842,7 +846,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: recording time
 		 */
-		colDef = TableColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -851,7 +855,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
 
 				if (recordingTime != 0) {
-					fCalendar.set(
+					_calendar.set(
 							0,
 							0,
 							0,
@@ -859,7 +863,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							((recordingTime % 3600) / 60),
 							((recordingTime % 3600) % 60));
 
-					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
+					cell.setText(_durationFormatter.format(_calendar.getTime()));
 				}
 			}
 		});
@@ -867,7 +871,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: driving time
 		 */
-		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -875,9 +879,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
 
 				if (drivingTime != 0) {
-					fCalendar.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
+					_calendar
+							.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 
-					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
+					cell.setText(_durationFormatter.format(_calendar.getTime()));
 				}
 			}
 		});
@@ -886,28 +891,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * column: calories (cal)
 		 */
 
-		colDef = TableColumnFactory.CALORIES.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final int tourCalories = ((TourData) cell.getElement()).getCalories();
-				cell.setText(Integer.toString(tourCalories));	
+				cell.setText(Integer.toString(tourCalories));
 			}
 		});
-		
+
 		/*
 		 * column: distance (km/mile)
 		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
 				if (tourDistance != 0) {
-					fNumberFormatter.setMinimumFractionDigits(3);
-					fNumberFormatter.setMaximumFractionDigits(3);
-					cell.setText(fNumberFormatter.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					_nf.setMinimumFractionDigits(3);
+					_nf.setMaximumFractionDigits(3);
+					cell.setText(_nf.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -915,7 +920,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: avg speed
 		 */
-		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -923,13 +928,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final int tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
 				if (drivingTime != 0) {
-					fNumberFormatter.setMinimumFractionDigits(1);
-					fNumberFormatter.setMaximumFractionDigits(1);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
 
-					cell.setText(fNumberFormatter.format(((float) tourDistance)
-							/ drivingTime
-							* 3.6
-							/ UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -937,7 +939,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: average pace
 		 */
-		colDef = TableColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -958,7 +960,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: altitude up
 		 */
-		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -973,7 +975,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: altitude down
 		 */
-		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -987,7 +989,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: tour title
 		 */
-		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -999,15 +1001,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_TITLE);
-				fTourViewer.refresh();
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);
+				_tourViewer.refresh();
 			}
 		});
 
 		/*
 		 * column: tags
 		 */
-		colDef = TableColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1024,7 +1026,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else {
 
-					// convert the tags into a list of tag ids 
+					// convert the tags into a list of tag ids
 					final ArrayList<Long> tagIds = new ArrayList<Long>();
 					for (final TourTag tourTag : tourTags) {
 						tagIds.add(tourTag.getTagId());
@@ -1038,68 +1040,68 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * column: device name
 		 */
-		colDef = TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, pc);
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
-				fTourViewer.refresh();
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
+				_tourViewer.refresh();
 			}
 		});
 
 		/*
 		 * column: device profile
 		 */
-		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, pc);
 
 		/*
 		 * column: time interval
 		 */
-		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pc);
 
 		/*
 		 * column: import file name
 		 */
-		colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, pc);
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
-				fTourViewer.refresh();
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
+				_tourViewer.refresh();
 			}
 		});
 
-		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, pc);
 	}
 
 	@Override
 	public void dispose() {
 
-		if (imageDatabase != null) {
-			imageDescDatabase.destroyResource(imageDatabase);
+		if (_imageDatabase != null) {
+			_imageDescDatabase.destroyResource(_imageDatabase);
 		}
-		if (imageDatabaseOtherPerson != null) {
-			imageDescDatabaseOtherPerson.destroyResource(imageDatabaseOtherPerson);
+		if (_imageDatabaseOtherPerson != null) {
+			_imageDescDatabaseOtherPerson.destroyResource(_imageDatabaseOtherPerson);
 		}
-		if (imageDatabaseAssignMergedTour != null) {
-			imageDescDatabaseAssignMergedTour.destroyResource(imageDatabaseAssignMergedTour);
+		if (_imageDatabaseAssignMergedTour != null) {
+			_imageDescDatabaseAssignMergedTour.destroyResource(_imageDatabaseAssignMergedTour);
 		}
-		if (imageDatabasePlaceholder != null) {
-			imageDescDatabasePlaceholder.destroyResource(imageDatabasePlaceholder);
+		if (_imageDatabasePlaceholder != null) {
+			_imageDescDatabasePlaceholder.destroyResource(_imageDatabasePlaceholder);
 		}
-		if (imageDelete != null) {
-			imageDescDelete.destroyResource(imageDelete);
+		if (_imageDelete != null) {
+			_imageDescDelete.destroyResource(_imageDelete);
 		}
 
 		// don't throw the selection again
-		fPostSelectionProvider.clearSelection();
+		_postSelectionProvider.clearSelection();
 
-		getViewSite().getPage().removePartListener(fPartListener);
-		getSite().getPage().removeSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
+		getSite().getPage().removeSelectionListener(_postSelectionListener);
 
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -1119,7 +1121,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<Long> savedToursIds = new ArrayList<Long>();
 
-		// update raw data map with the saved tour data 
+		// update raw data map with the saved tour data
 		final HashMap<Long, TourData> rawDataMap = RawDataManager.getInstance().getImportedTours();
 		for (final TourData tourData : savedTours) {
 
@@ -1133,7 +1135,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * the selection provider can contain old tour data which conflicts with the tour data in
 		 * the tour data editor
 		 */
-		fPostSelectionProvider.clearSelection();
+		_postSelectionProvider.clearSelection();
 
 		// update import viewer
 		reloadViewer();
@@ -1149,7 +1151,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void enableActions() {
 
-		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
+		final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
 
 		int savedTours = 0;
 		int unsavedTours = 0;
@@ -1197,38 +1199,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		final boolean isTourSelected = savedTours > 0;
-		final boolean isOneSavedAndValidTour = selectedValidTours == 1 && savedTours == 1;
+		final boolean isOneSavedAndValidTour = (selectedValidTours == 1) && (savedTours == 1);
 
 		final boolean canMergeIntoTour = selectedValidTours == 1;
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 		if (person != null) {
-			fActionSaveTourWithPerson.setText(NLS.bind(
-					Messages.import_data_action_save_tour_with_person,
-					person.getName()));
-			fActionSaveTourWithPerson.setPerson(person);
+			_actionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person, person
+					.getName()));
+			_actionSaveTourWithPerson.setPerson(person);
 		}
-		fActionSaveTourWithPerson.setEnabled(person != null && unsavedTours > 0);
+		_actionSaveTourWithPerson.setEnabled((person != null) && (unsavedTours > 0));
 
 		// action: save tour...
 		if (selection.size() == 1) {
-			fActionSaveTour.setText(Messages.import_data_action_save_tour_for_person);
+			_actionSaveTour.setText(Messages.import_data_action_save_tour_for_person);
 		} else {
-			fActionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
+			_actionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
 		}
-		fActionSaveTour.setEnabled(unsavedTours > 0);
+		_actionSaveTour.setEnabled(unsavedTours > 0);
 
 		// action: merge tour ... into ...
 		if (canMergeIntoTour) {
 
 			final Calendar calendar = GregorianCalendar.getInstance();
-			calendar.set(
-					firstValidTour.getStartYear(),
-					firstValidTour.getStartMonth() - 1,
-					firstValidTour.getStartDay(),
-					firstValidTour.getStartHour(),
-					firstValidTour.getStartMinute());
+			calendar.set(firstValidTour.getStartYear(), firstValidTour.getStartMonth() - 1, firstValidTour
+					.getStartDay(), firstValidTour.getStartHour(), firstValidTour.getStartMinute());
 
 			final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
 					.append(TourManager.getTourDateShort(firstValidTour))
@@ -1237,54 +1234,54 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					.append(UI.DASH_WITH_SPACE)
 					.append(firstValidTour.getDeviceName());
 
-			fActionMergeIntoTour.setText(NLS.bind(Messages.import_data_action_assignMergedTour, sb.toString()));
+			_actionMergeIntoTour.setText(NLS.bind(Messages.import_data_action_assignMergedTour, sb.toString()));
 
 		} else {
 			// tour cannot be merged, display default text
-			fActionMergeIntoTour.setText(Messages.import_data_action_assignMergedTour_default);
+			_actionMergeIntoTour.setText(Messages.import_data_action_assignMergedTour_default);
 		}
-		fActionMergeIntoTour.setEnabled(canMergeIntoTour);
+		_actionMergeIntoTour.setEnabled(canMergeIntoTour);
 
-		fActionMergeTour.setEnabled(isOneSavedAndValidTour && firstSavedTour.getMergeSourceTourId() != null);
-		fActionReimportTour.setEnabled(selectedTours > 0);
-		fActionExportTour.setEnabled(selectedValidTours > 0);
+		_actionMergeTour.setEnabled(isOneSavedAndValidTour && (firstSavedTour.getMergeSourceTourId() != null));
+		_actionReimportTour.setEnabled(selectedTours > 0);
+		_actionExportTour.setEnabled(selectedValidTours > 0);
 
-		fActionEditTour.setEnabled(isOneSavedAndValidTour);
-		fActionEditQuick.setEnabled(isOneSavedAndValidTour);
-		fActionOpenTour.setEnabled(isOneSavedAndValidTour);
-		fActionOpenMarkerDialog.setEnabled(isOneSavedAndValidTour);
-		fActionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndValidTour);
+		_actionEditTour.setEnabled(isOneSavedAndValidTour);
+		_actionEditQuick.setEnabled(isOneSavedAndValidTour);
+		_actionOpenTour.setEnabled(isOneSavedAndValidTour);
+		_actionOpenMarkerDialog.setEnabled(isOneSavedAndValidTour);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndValidTour);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+		_actionSetTourType.setEnabled(isTourSelected && (tourTypes.size() > 0));
 
-		fActionAddTag.setEnabled(isTourSelected);
+		_actionAddTag.setEnabled(isTourSelected);
 
 		/*
 		 * enable/disable remove actions
 		 */
-		if (firstSavedTour != null && savedTours == 1) {
+		if ((firstSavedTour != null) && (savedTours == 1)) {
 
 			// one tour is selected
 
 			final Set<TourTag> tourTags = firstSavedTour.getTourTags();
-			if (tourTags != null && tourTags.size() > 0) {
+			if ((tourTags != null) && (tourTags.size() > 0)) {
 
 				// at least one tag is within the tour
 
-				fActionRemoveAllTags.setEnabled(true);
-				fActionRemoveTag.setEnabled(true);
+				_actionRemoveAllTags.setEnabled(true);
+				_actionRemoveTag.setEnabled(true);
 			} else {
 				// tags are not available
-				fActionRemoveAllTags.setEnabled(false);
-				fActionRemoveTag.setEnabled(false);
+				_actionRemoveAllTags.setEnabled(false);
+				_actionRemoveTag.setEnabled(false);
 			}
 		} else {
 
 			// multiple tours are selected
 
-			fActionRemoveTag.setEnabled(isTourSelected);
-			fActionRemoveAllTags.setEnabled(isTourSelected);
+			_actionRemoveTag.setEnabled(isTourSelected);
+			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
 		// enable/disable actions for the recent tags
@@ -1295,28 +1292,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		if (TourbookPlugin.getDefault().getActivePerson() != null) {
-			menuMgr.add(fActionSaveTourWithPerson);
+			menuMgr.add(_actionSaveTourWithPerson);
 		}
-		menuMgr.add(fActionSaveTour);
-		menuMgr.add(fActionMergeIntoTour);
-		menuMgr.add(fActionReimportTour);
+		menuMgr.add(_actionSaveTour);
+		menuMgr.add(_actionMergeIntoTour);
+		menuMgr.add(_actionReimportTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionOpenMarkerDialog);
-		menuMgr.add(fActionOpenAdjustAltitudeDialog);
-		menuMgr.add(fActionMergeTour);
-		menuMgr.add(fActionOpenTour);
-		menuMgr.add(fActionExportTour);
+		menuMgr.add(_actionEditQuick);
+		menuMgr.add(_actionEditTour);
+		menuMgr.add(_actionOpenMarkerDialog);
+		menuMgr.add(_actionOpenAdjustAltitudeDialog);
+		menuMgr.add(_actionMergeTour);
+		menuMgr.add(_actionOpenTour);
+		menuMgr.add(_actionExportTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionAddTag);
-		menuMgr.add(fActionRemoveTag);
-		menuMgr.add(fActionRemoveAllTags);
+		menuMgr.add(_actionSetTourType);
+		menuMgr.add(_actionAddTag);
+		menuMgr.add(_actionRemoveTag);
+		menuMgr.add(_actionRemoveAllTags);
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(_actionOpenTagPrefs);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -1330,15 +1327,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(fActionSaveTourWithPerson);
-		tbm.add(fActionSaveTour);
+		tbm.add(_actionSaveTourWithPerson);
+		tbm.add(_actionSaveTour);
 		tbm.add(new Separator());
 
 		// place for import and transfer actions
 		tbm.add(new GroupMarker("import")); //$NON-NLS-1$
 		tbm.add(new Separator());
 
-		tbm.add(fActionClearView);
+		tbm.add(_actionClearView);
 //		tbm.add(fActionRefreshView);
 
 		/*
@@ -1346,24 +1343,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(fActionMergeGPXTours);
-		menuMgr.add(fActionCreateTourIdWithTime);
-		menuMgr.add(fActionDisableChecksumValidation);
-		menuMgr.add(fActionAdjustImportedYear);
+		menuMgr.add(_actionMergeGPXTours);
+		menuMgr.add(_actionCreateTourIdWithTime);
+		menuMgr.add(_actionDisableChecksumValidation);
+		menuMgr.add(_actionAdjustImportedYear);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionModifyColumns);
+		menuMgr.add(_actionModifyColumns);
 	}
 
 	private void fireSelectedTour() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fTourViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _tourViewer.getSelection();
 		final TourData tourData = (TourData) selection.getFirstElement();
 
 		enableActions();
 
 		if (tourData != null) {
-			fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
+			_postSelectionProvider.setSelection(new SelectionTourData(null, tourData));
 		}
 	}
 
@@ -1372,7 +1369,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public Object getAdapter(final Class adapter) {
 
 		if (adapter == ColumnViewer.class) {
-			return fTourViewer;
+			return _tourViewer;
 		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
@@ -1383,7 +1380,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final TourManager tourManager = TourManager.getInstance();
 
 		// get selected tours
-		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 
@@ -1423,20 +1420,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	public ColumnManager getColumnManager() {
-		return fColumnManager;
+		return _columnManager;
 	}
 
 	Image getDbImage(final TourData tourData) {
 		final TourPerson tourPerson = tourData.getTourPerson();
-		final long activePersonId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
+		final long activePersonId = _activePerson == null ? -1 : _activePerson.getPersonId();
 
 		final Image dbImage = tourData.isTourDeleted ? //
-				imageDelete
+				_imageDelete
 				: tourData.getMergeTargetTourId() != null ? //
-						imageDatabaseAssignMergedTour
-						: tourPerson == null ? imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
-								? imageDatabase
-								: imageDatabaseOtherPerson;
+						_imageDatabaseAssignMergedTour
+						: tourPerson == null ? _imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
+								? _imageDatabase
+								: _imageDatabaseOtherPerson;
 		return dbImage;
 	}
 
@@ -1445,7 +1442,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final TourManager tourManager = TourManager.getInstance();
 
 		// get selected tours
-		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 
@@ -1479,23 +1476,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	public ColumnViewer getViewer() {
-		return fTourViewer;
+		return _tourViewer;
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		fViewerContainer.setRedraw(false);
+		_viewerContainer.setRedraw(false);
 		{
-			fTourViewer.getTable().dispose();
-			createTourViewer(fViewerContainer);
-			fViewerContainer.layout();
+			_tourViewer.getTable().dispose();
+			createTourViewer(_viewerContainer);
+			_viewerContainer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		fViewerContainer.setRedraw(true);
+		_viewerContainer.setRedraw(true);
 
-		return fTourViewer;
+		return _tourViewer;
 	}
 
 	/**
@@ -1503,8 +1500,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	public void reimportAllImportFiles() {
 
-		final String[] prevImportedFiles = fState.getArray(STATE_IMPORTED_FILENAMES);
-		if (prevImportedFiles == null || prevImportedFiles.length == 0) {
+		final String[] prevImportedFiles = _state.getArray(STATE_IMPORTED_FILENAMES);
+		if ((prevImportedFiles == null) || (prevImportedFiles.length == 0)) {
 			return;
 		}
 
@@ -1581,7 +1578,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final int[] selectedTourIndex = new int[1];
 			// restore selected tour
 			try {
-				selectedTourIndex[0] = fState.getInt(STATE_SELECTED_TOUR_INDEX);
+				selectedTourIndex[0] = _state.getInt(STATE_SELECTED_TOUR_INDEX);
 			} catch (final NumberFormatException e) {
 
 			} finally {
@@ -1589,11 +1586,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 
-						tourData[0] = fTourViewer.getElementAt(selectedTourIndex[0]);
+						tourData[0] = _tourViewer.getElementAt(selectedTourIndex[0]);
 						reloadViewer();
 
 						if (tourData[0] != null) {
-							fTourViewer.setSelection(new StructuredSelection(tourData[0]), true);
+							_tourViewer.setSelection(new StructuredSelection(tourData[0]), true);
 						}
 					}
 				});
@@ -1608,7 +1605,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public void reloadViewer() {
 
 		// update tour data viewer
-		fTourViewer.setInput(RawDataManager.getInstance().getImportedTours().values().toArray());
+		_tourViewer.setInput(RawDataManager.getInstance().getImportedTours().values().toArray());
 	}
 
 	private void removeTours(final ArrayList<ITourItem> removedTours) {
@@ -1644,18 +1641,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final RawDataManager rawDataManager = RawDataManager.getInstance();
 
 		// restore: set merge tracks status before the tours are imported
-		final boolean isMergeTracks = fState.getBoolean(STATE_IS_MERGE_TRACKS);
-		fActionMergeGPXTours.setChecked(isMergeTracks);
+		final boolean isMergeTracks = _state.getBoolean(STATE_IS_MERGE_TRACKS);
+		_actionMergeGPXTours.setChecked(isMergeTracks);
 		rawDataManager.setMergeTracks(isMergeTracks);
 
 		// restore: set merge tracks status before the tours are imported
-		final boolean isCreateTourIdWithTime = fState.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
-		fActionCreateTourIdWithTime.setChecked(isCreateTourIdWithTime);
+		final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
+		_actionCreateTourIdWithTime.setChecked(isCreateTourIdWithTime);
 		rawDataManager.setCreateTourIdWithTime(isCreateTourIdWithTime);
 
 		// restore: is checksum validation
-		fActionDisableChecksumValidation.setChecked(fState.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
-		rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
+		_actionDisableChecksumValidation.setChecked(_state.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
+		rawDataManager.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
 
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
@@ -1666,24 +1663,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void saveState() {
 
-		// save sash weights
-		final Table table = fTourViewer.getTable();
+		// check if UI is disposed
+		final Table table = _tourViewer.getTable();
 		if (table.isDisposed()) {
 			return;
 		}
 
 		// save imported file names
 		final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
-		fState.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
+		_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
 		// save selected tour in the viewer
-		fState.put(STATE_SELECTED_TOUR_INDEX, table.getSelectionIndex());
+		_state.put(STATE_SELECTED_TOUR_INDEX, table.getSelectionIndex());
 
-		fState.put(STATE_IS_MERGE_TRACKS, fActionMergeGPXTours.isChecked());
-		fState.put(STATE_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked());
-		fState.put(STATE_IS_CREATE_TOUR_ID_WITH_TIME, fActionCreateTourIdWithTime.isChecked());
+		_state.put(STATE_IS_MERGE_TRACKS, _actionMergeGPXTours.isChecked());
+		_state.put(STATE_IS_CHECKSUM_VALIDATION, _actionDisableChecksumValidation.isChecked());
+		_state.put(STATE_IS_CREATE_TOUR_ID_WITH_TIME, _actionCreateTourIdWithTime.isChecked());
 
-		fColumnManager.saveState(fState);
+		_columnManager.saveState(_state);
 	}
 
 	/**
@@ -1704,7 +1701,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		if (tourData.getTourPerson() != null && isForceSave == false) {
+		if ((tourData.getTourPerson() != null) && (isForceSave == false)) {
 			/*
 			 * tour is already saved, resaving cannot be done in the import view it can be done in
 			 * the tour editor
@@ -1727,9 +1724,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	public void selectFirstTour() {
 
-		final TourData firstTourData = (TourData) fTourViewer.getElementAt(0);
+		final TourData firstTourData = (TourData) _tourViewer.getElementAt(0);
 		if (firstTourData != null) {
-			fTourViewer.setSelection(new StructuredSelection(firstTourData), true);
+			_tourViewer.setSelection(new StructuredSelection(firstTourData), true);
 		}
 	}
 
@@ -1742,7 +1739,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// select the last tour in the viewer
 		if (tourList.length > 0) {
 			final TourData tourData = tourList[0];
-			fTourViewer.setSelection(new StructuredSelection(tourData), true);
+			_tourViewer.setSelection(new StructuredSelection(tourData), true);
 		}
 	}
 
@@ -1752,11 +1749,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void setFocus() {
 
-		fTourViewer.getControl().setFocus();
+		_tourViewer.getControl().setFocus();
 
-		if (fPostSelectionProvider.getSelection() == null) {
+		if (_postSelectionProvider.getSelection() == null) {
 
-			// fire a selected tour when the selection provider was cleared sometime before 
+			// fire a selected tour when the selection provider was cleared sometime before
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
 					fireSelectedTour();
@@ -1770,7 +1767,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateViewerPersonData() {
 
-		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
+		_activePerson = TourbookPlugin.getDefault().getActivePerson();
 
 		// update person in save action
 		enableActions();
@@ -1778,6 +1775,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// update person in the raw data
 		RawDataManager.getInstance().updateTourDataFromDb(null);
 
-		fTourViewer.refresh();
+		_tourViewer.refresh();
 	}
 }
