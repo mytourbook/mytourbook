@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.importdata;
 
@@ -37,6 +37,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -55,50 +56,51 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
-	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
-
-	private static RawDataManager	instance							= null;
+	private static RawDataManager			_instance							= null;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData				fDeviceData							= new DeviceData();
+	private final DeviceData				_deviceData							= new DeviceData();
 
 	/**
 	 * contains tours which were imported or received
 	 */
-	private HashMap<Long, TourData>	fImportedTourData					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	_importedTourData					= new HashMap<Long, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>			fImportedFileNames					= new HashSet<String>();
+	private final HashSet<String>			_importedFileNames					= new HashSet<String>();
 
-	private boolean					fIsImported;
+	private boolean							_isImported;
+	private boolean							_isImportCanceled;
 
-	private boolean					fImportCanceled;
+	private int								_importSettingsImportYear			= -1;
+	private boolean							_importSettingsIsMergeTracks;
+	private boolean							_importSettingsIsChecksumValidation	= true;
+	private boolean							_importSettingsCreateTourIdWithTime	= false;
 
-	private int						fImportSettingsImportYear			= -1;
-	private boolean					fImportSettingsIsMergeTracks;
-	private boolean					fImportSettingsIsChecksumValidation	= true;
-	private boolean					fImportSettingsCreateTourIdWithTime	= false;
+	private String							_lastImportedFile;
 
-	private String					fLastImportedFile;
+	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
-		if (instance == null) {
-			instance = new RawDataManager();
+
+		if (_instance == null) {
+			_instance = new RawDataManager();
 		}
-		return instance;
+
+		return _instance;
 	}
 
 	/**
@@ -127,8 +129,6 @@ public class RawDataManager {
 			}
 		});
 	}
-
-	private RawDataManager() {}
 
 	void actionImportFromDevice() {
 
@@ -291,25 +291,25 @@ public class RawDataManager {
 	}
 
 	public DeviceData getDeviceData() {
-		return fDeviceData;
+		return _deviceData;
 	}
 
 	public HashSet<String> getImportedFiles() {
-		return fImportedFileNames;
+		return _importedFileNames;
 	}
 
 	/**
 	 * @return Returns all {@link TourData} which has been imported or received, tour id is the key
 	 */
 	public HashMap<Long, TourData> getImportedTours() {
-		return fImportedTourData;
+		return _importedTourData;
 	}
 
 	/**
 	 * @return Returns the import year or <code>-1</code> when the year was not set
 	 */
 	public int getImportYear() {
-		return fImportSettingsImportYear;
+		return _importSettingsImportYear;
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class RawDataManager {
 		final String fileExtension = filePathName.substring(dotPos + 1);
 
 		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
-		fIsImported = false;
+		_isImported = false;
 
 		BusyIndicator.showWhile(null, new Runnable() {
 
@@ -379,16 +379,16 @@ public class RawDataManager {
 
 						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
-							fIsImported = true;
+							_isImported = true;
 							break;
 						}
-						if (fImportCanceled) {
+						if (_isImportCanceled) {
 							break;
 						}
 					}
 				}
 
-				if (isDataImported == false && !fImportCanceled) {
+				if (isDataImported == false && !_isImportCanceled) {
 
 					/*
 					 * when data has not imported yet, try all available devices without checking
@@ -397,19 +397,19 @@ public class RawDataManager {
 					for (final TourbookDevice device : deviceList) {
 						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
-							fIsImported = true;
+							_isImported = true;
 							break;
 						}
 					}
 				}
 
 				if (isDataImported) {
-					fImportedFileNames.add(fLastImportedFile);
+					_importedFileNames.add(_lastImportedFile);
 				}
 			}
 		});
 
-		return fIsImported;
+		return _isImported;
 	}
 
 	/**
@@ -438,18 +438,18 @@ public class RawDataManager {
 			fileCollision = new FileCollisionBehavior();
 		}
 
-		device.setIsChecksumValidation(fImportSettingsIsChecksumValidation);
+		device.setIsChecksumValidation(_importSettingsIsChecksumValidation);
 
 		if (device.validateRawData(sourceFileName)) {
 
 			// file contains valid raw data for the raw data reader
 
-			if (fImportSettingsImportYear != -1) {
-				device.setImportYear(fImportSettingsImportYear);
+			if (_importSettingsImportYear != -1) {
+				device.setImportYear(_importSettingsImportYear);
 			}
 
-			device.setMergeTracks(fImportSettingsIsMergeTracks);
-			device.setCreateTourIdWithTime(fImportSettingsCreateTourIdWithTime);
+			device.setMergeTracks(_importSettingsIsMergeTracks);
+			device.setCreateTourIdWithTime(_importSettingsCreateTourIdWithTime);
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
@@ -532,7 +532,7 @@ public class RawDataManager {
 					}
 
 					if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
-						fImportCanceled = true;
+						_isImportCanceled = true;
 						fileIn.delete();
 						return false;
 					}
@@ -585,9 +585,9 @@ public class RawDataManager {
 
 			}
 
-			fLastImportedFile = sourceFileName;
+			_lastImportedFile = sourceFileName;
 
-			return device.processDeviceData(sourceFileName, fDeviceData, fImportedTourData);
+			return device.processDeviceData(sourceFileName, _deviceData, _importedTourData);
 		}
 
 		return false;
@@ -595,28 +595,71 @@ public class RawDataManager {
 	}
 
 	public void removeAllTours() {
-		fImportedTourData.clear();
-		fImportedFileNames.clear();
+		_importedTourData.clear();
+		_importedFileNames.clear();
+	}
+
+	public void removeTours(final TourData[] removedTours) {
+
+		final HashSet<?> oldFileNames = (HashSet<?>) _importedFileNames.clone();
+
+		for (final Object item : removedTours) {
+
+			final TourData tourData = (TourData) item;
+			final Long key = tourData.getTourId();
+
+			if (_importedTourData.containsKey(key)) {
+				_importedTourData.remove(key);
+			}
+		}
+
+		/*
+		 * Check if all tours from a file are removed, when yes, remove file path that the file will
+		 * not reimported. When at least one tour is still used, all tours will be reimported
+		 * because it's not yet saved which tours are removed from a file and which are not.
+		 */
+		for (final Object item : oldFileNames) {
+			if (item instanceof String) {
+
+				final String oldFilePath = (String) item;
+				boolean isNeeded = false;
+
+				for (final TourData tourData : _importedTourData.values()) {
+
+					final String tourFilePath = tourData.getTourImportFilePathRaw();
+
+					if (tourFilePath != null && tourFilePath.equals(oldFilePath)) {
+						isNeeded = true;
+						break;
+					}
+				}
+
+				if (isNeeded == false) {
+					// file path is not needed any more
+					_importedFileNames.remove(oldFilePath);
+				}
+			}
+		}
 	}
 
 	public void setCreateTourIdWithTime(final boolean isActionChecked) {
-		fImportSettingsCreateTourIdWithTime = isActionChecked;
+		_importSettingsCreateTourIdWithTime = isActionChecked;
 	}
 
 	public void setImportCanceled(final boolean importCanceled) {
-		fImportCanceled = importCanceled;
+		_isImportCanceled = importCanceled;
 	}
 
 	public void setImportYear(final int year) {
-		fImportSettingsImportYear = year;
+		_importSettingsImportYear = year;
 	}
 
 	public void setIsChecksumValidation(final boolean checked) {
-		fImportSettingsIsChecksumValidation = checked;
+		_importSettingsIsChecksumValidation = checked;
 	}
 
 	public void setMergeTracks(final boolean checked) {
-		fImportSettingsIsMergeTracks = checked;
+		_importSettingsIsMergeTracks = checked;
 	}
 
 	private RawDataView showRawDataView() {
@@ -635,7 +678,7 @@ public class RawDataManager {
 			}
 
 			// show raw data view
-			return (RawDataView) window.getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+			return (RawDataView) Util.showView(RawDataView.ID);
 
 		} catch (final WorkbenchException e) {
 			e.printStackTrace();
@@ -650,7 +693,7 @@ public class RawDataManager {
 	 */
 	public void updateTourDataFromDb(final IProgressMonitor monitor) {
 
-		if (fImportedTourData.size() < 5) {
+		if (_importedTourData.size() < 5) {
 			updateTourDataFromDbTask(null);
 		} else {
 
@@ -682,7 +725,7 @@ public class RawDataManager {
 	private void updateTourDataFromDbTask(final IProgressMonitor monitor) {
 
 		int workedDone = 0;
-		final int workedAll = fImportedTourData.size();
+		final int workedAll = _importedTourData.size();
 
 		if (monitor != null) {
 			monitor.beginTask(Messages.import_data_updateDataFromDatabase_task, workedAll);
@@ -698,7 +741,7 @@ public class RawDataManager {
 			}
 		}
 
-		for (final TourData mapTourData : fImportedTourData.values()) {
+		for (final TourData mapTourData : _importedTourData.values()) {
 
 			if (monitor != null) {
 				monitor.worked(1);
@@ -718,25 +761,23 @@ public class RawDataManager {
 
 					/*
 					 * tour is saved in the database, set rawdata file name to display
-					 * the
-					 * filepath
+					 * the filepath
 					 */
 					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
 					final Long dbTourId = dbTourData.getTourId();
 
 					// replace existing tours but do not add new tours
-					if (fImportedTourData.containsKey(dbTourId)) {
+					if (_importedTourData.containsKey(dbTourId)) {
 
 						/*
 						 * check if the tour editor contains this tour, this should not
-						 * be
-						 * necessary, just make sure the correct tour is used !!!
+						 * be necessary, just make sure the correct tour is used !!!
 						 */
 						if (editorTourId == dbTourId) {
-							fImportedTourData.put(dbTourId, tourDataEditor.getTourData());
+							_importedTourData.put(dbTourId, tourDataEditor.getTourData());
 						} else {
-							fImportedTourData.put(dbTourId, dbTourData);
+							_importedTourData.put(dbTourId, dbTourData);
 						}
 					}
 				}
@@ -766,8 +807,8 @@ public class RawDataManager {
 				final Long tourId = tourData.getTourId();
 
 				// replace existing tour do not add new tours
-				if (fImportedTourData.containsKey(tourId)) {
-					fImportedTourData.put(tourId, tourData);
+				if (_importedTourData.containsKey(tourId)) {
+					_importedTourData.put(tourId, tourData);
 				}
 			}
 		}

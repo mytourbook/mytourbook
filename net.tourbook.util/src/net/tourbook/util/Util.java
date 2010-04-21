@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
 
@@ -19,6 +19,12 @@ import java.util.Calendar;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 public class Util {
 
@@ -101,12 +107,50 @@ public class Util {
 		final int week = cal.get(Calendar.WEEK_OF_YEAR);
 		final int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 
-		if (week == 1 && dayOfMonth > 20)
+		if (week == 1 && dayOfMonth > 20) {
 			return year + 1;
+		}
 
-		if (week >= 52 && dayOfMonth < 10)
+		if (week >= 52 && dayOfMonth < 10) {
 			return year - 1;
+		}
 
 		return year;
 	}
+
+	/**
+	 * Open view and activate it
+	 * 
+	 * @param viewId
+	 * @return
+	 * @throws PartInitException
+	 */
+	public static IViewPart showView(final String viewId) {
+
+		try {
+
+			final IWorkbench wb = PlatformUI.getWorkbench();
+			if (wb == null) {
+				return null;
+			}
+
+			final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
+			if (wbWin == null) {
+				return null;
+			}
+
+			final IWorkbenchPage page = wbWin.getActivePage();
+			if (page == null) {
+				return null;
+			}
+
+			return page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+		} catch (final PartInitException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		return null;
+	}
+
 }

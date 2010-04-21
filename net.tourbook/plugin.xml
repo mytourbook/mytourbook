@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+
    <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
    <extension-point id="externalDeviceDataReader" name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
@@ -193,6 +194,7 @@
       <category
             id="net.tourbook.category.tourList"
             name="%view_category_tourDirectory"/>
+            
 	      <view
 	            category="net.tourbook.category.tourList"
 	            class="net.tourbook.ui.views.rawData.RawDataView"
@@ -381,37 +383,13 @@
       </perspectiveExtension>
       
       
-      <perspectiveExtension
-            targetID="net.tourbook.perspective.RawData">
-            
-         <viewShortcut
-               id="net.tourbook.views.rawData.RawDataView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourMarkerView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourWaypointView"/>
-      </perspectiveExtension>
       
       
-      <perspectiveExtension
-            targetID="net.tourbook.perspective.TourBook">
-            
-         <viewShortcut
-               id="net.tourbook.views.tourListView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourMarkerView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourWaypointView"/>
-      </perspectiveExtension>
       
       
       <perspectiveExtension
             targetID="net.tourbook.perspective.TourCatalog">
             
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.TourCatalogView"/>
-         <viewShortcut
-               id="net.tourbook.views.tagViewID"/>
          <viewShortcut
                id="net.tourbook.views.tourCatalog.comparedTourView"/>
          <viewShortcut
@@ -433,16 +411,6 @@
       </perspectiveExtension>
       
       
-      <perspectiveExtension
-            targetID="net.tourbook.perspective.Statistic">
-            
-         <viewShortcut
-               id="net.tourbook.views.StatisticView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourMarkerView"/>
-         <viewShortcut
-               id="net.tourbook.views.TourWaypointView"/>
-      </perspectiveExtension>
       
    </extension>
    
@@ -514,6 +482,44 @@
 
       <menuContribution
             locationURI="menu:views?before=defaultViews">
+            
+         <separator
+            name="net.tourbook.separator.TourDirectories"
+            visible="true">
+         </separator>
+            
+         <command
+            commandId="command.net.tourbook.views.rawData.RawDataView"
+            icon="icons/rawdata.gif"
+            label="%view_name_Data_Import"
+            mnemonic="%view_name_Data_Import_Mnemonic"/>
+         <command
+            commandId="command.net.tourbook.views.tourListView"
+            icon="icons/tour-list.gif"
+            label="%view_name_Book"
+            mnemonic="%view_name_Book_Mnemonic"/>
+         <command
+            commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+            icon="icons/tour-map.gif"
+            label="%view_name_tourCatalog"
+            mnemonic="%view_name_tourCatalog_Mnemonic"/>
+	     <command
+            commandId="command.net.tourbook.views.tagViewID"
+            icon="icons/tour-tag.gif"
+            label="%command_tagging_name"
+            mnemonic="%command_tagging_name_Mnemonic"
+            tooltip="%command_tagging_name_tooltip"/>
+         <command
+            commandId="command.net.tourbook.views.StatisticView"
+            icon="icons/statistics.gif"
+            label="%view_name_Statistics"
+            mnemonic="%view_name_Statistics_Mnemonic"/>
+            
+         <separator
+            name="net.tourbook.separator.TourProperties"
+            visible="true">
+         </separator>
+         
          <command
                commandId="net.tourbook.command.selectedTour"
                icon="icons/tour-chart.gif"
@@ -532,14 +538,27 @@
                commandId="net.tourbook.mapping.command.tourMap"
                icon="icons/earth-globe-abstract.png"
                label="%command_tour_map_name"
+               mnemonic="%command_tour_map_name_Mnemonic"
                tooltip="%command_tour_map_name_tooltip">
          </command>
+         
          <command
-               commandId="net.tourbook.mapping.command.taggingView"
-               icon="icons/tour-tag.gif"
-               label="%command_tagging_name"
-               tooltip="%command_tagging_name_tooltip">
-         </command>
+	           commandId="command.net.tourbook.views.TourMarkerView"
+               icon="icons/tour-marker.png"
+               label="%view_name_Marker"
+               mnemonic="%view_name_Marker_Mnemonic"/>
+         <command
+               commandId="command.net.tourbook.views.TourWaypointView"
+               icon="icons/tour-waypoint.png"
+               label="%View_Name_Waypoint"
+               mnemonic="%View_Name_Waypoint_Mnemonic"/>
+
+         
+         <separator
+               name="net.tourbook.separator.Tools"
+               visible="true">
+         </separator>
+         
          <command
                commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                icon="icons/chart-analyzer.gif"
@@ -547,6 +566,14 @@
                mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                style="push"
                tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
+         </command>
+         <command
+               commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
+               icon="icons/tour-segmenter.gif"
+               label="%command_tourChart_tool_tourSegmenter"
+               mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
+               style="push"
+               tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
          </command>
       </menuContribution>
       
@@ -612,7 +639,7 @@
                   tooltip="%command_tour_map_name_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.mapping.command.taggingView"
+                  commandId="command.net.tourbook.views.tagViewID"
                   icon="icons/tour-tag.gif"
                   label="%command_tagging_name"
                   tooltip="%command_tagging_name_tooltip">
@@ -725,6 +752,41 @@
  
    <extension
          point="org.eclipse.ui.commands">
+         
+
+
+
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
+            id="command.net.tourbook.views.rawData.RawDataView"
+            name="%view_name_Data_Import"/>
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
+            id="command.net.tourbook.views.tourListView"
+            name="%view_name_Book"/>
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
+            id="command.net.tourbook.views.tagViewID"
+            name="%view_name_tagView"/>
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
+            id="command.net.tourbook.views.tourCatalog.TourCatalogView"
+            name="%view_name_tourCatalog"/>
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewStatistic"
+            id="command.net.tourbook.views.StatisticView"
+            name="%view_name_Statistics"/>
+
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
+            id="command.net.tourbook.views.TourMarkerView"
+            name="%view_name_Marker"/>
+      <command
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
+            id="command.net.tourbook.views.TourWaypointView"
+            name="%View_Name_Waypoint"/>
+
+         
       <command
             id="net.tourbook.command.graph.altitude"
             categoryId="net.tourbook.command.category.tourEditor"
@@ -801,6 +863,7 @@
             id="net.tourbook.command.tourChart.canScrollChart"
             name="%command_tourChart_canScrollChart">
       </command>
+      
       <command
             defaultHandler="net.tourbook.application.ActionHandlerPreferences"
             id="net.tourbook.command.preferences"
@@ -862,11 +925,7 @@
             id="net.tourbook.mapping.command.tourMap"
             name="%command_tour_map_name">
       </command>
-      <command
-            defaultHandler="net.tourbook.ui.views.tagging.ActionHandlerOpenTaggingView"
-            id="net.tourbook.mapping.command.taggingView"
-            name="%command_tagging_name">
-      </command>
+
       <command
             defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
             id="net.tourbook.command.createNewTour"

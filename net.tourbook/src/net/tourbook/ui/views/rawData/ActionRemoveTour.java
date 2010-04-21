@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,22 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.ui.views.rawData;
 
-import net.tourbook.ui.views.TourSegmenterView;
-import net.tourbook.util.Util;
+import net.tourbook.Messages;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerViewTourSegmenter extends AbstractHandler {
+public class ActionRemoveTour extends Action {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+	private final RawDataView	_rawDataView;
 
-		Util.showView(TourSegmenterView.ID);
+	public ActionRemoveTour(final RawDataView rawDataView) {
 
-		return null;
+		_rawDataView = rawDataView;
+
+		setText(Messages.Import_Data_Action_RemoveTour);
+	}
+
+	@Override
+	public void run() {
+		_rawDataView.actionRemoveTour();
 	}
 
 }

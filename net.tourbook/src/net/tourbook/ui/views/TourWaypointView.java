@@ -128,8 +128,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private Label					_pageNoChart;
 	private Composite				_viewerContainer;
 
-//	private Chart					_tourChart;
-
 	private ActionOpenMarkerDialog	_actionEditTourWaypoints;
 
 	private ColumnManager			_columnManager;
@@ -210,24 +208,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					// measurement system has changed
-
-//					UI.updateUnits();
-//					updateInternalUnitValues();
-//
-//					// keep column sequence/width
-////					_columnManager.saveState(_state);
-//
-//					// dispose viewer
-//					final Control[] children = _viewerContainer.getChildren();
-//					for (final Control element : children) {
-//						element.dispose();
-//					}
-//
-//					createUIWaypointViewer(_viewerContainer);
-//					_viewerContainer.layout();
-//
-//					reloadViewer();
-//
 
 					UI.updateUnits();
 					updateInternalUnitValues();
@@ -725,29 +705,23 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 			_tourData = tourDataSelection.getTourData();
 
-			if (_tourData == null) {
-//				_tourChart = null;
-			} else {
-//				_tourChart = tourDataSelection.getTourChart();
+			if (_tourData != null) {
 				tourId = _tourData.getTourId();
 			}
 
 		} else if (selection instanceof SelectionTourId) {
 
-//			_tourChart = null;
 			tourId = ((SelectionTourId) selection).getTourId();
 
 		} else if (selection instanceof SelectionTourIds) {
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if ((tourIds != null) && (tourIds.size() > 0)) {
-//				_tourChart = null;
 				tourId = tourIds.get(0);
 			}
 
 		} else if (selection instanceof SelectionActiveEditor) {
 
-//			_tourChart = null;
 
 			// check tour editor
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
@@ -762,7 +736,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				final TourData tourData = tourChart.getTourData();
 				if (tourData != _tourData) {
 					_tourData = tourData;
-//					_tourChart = tourChart;
 					tourId = _tourData.getTourId();
 				}
 			}
@@ -773,13 +746,11 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-//				_tourChart = null;
 				tourId = refItem.getTourId();
 			}
 
 		} else if (selection instanceof StructuredSelection) {
 
-//			_tourChart = null;
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 				tourId = ((TVICatalogComparedTour) firstElement).getTourId();

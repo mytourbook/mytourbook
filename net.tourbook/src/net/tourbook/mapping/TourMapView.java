@@ -268,13 +268,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionPOI() {
 
-		final boolean isShowPOI = _actionShowPOI.isChecked();
-
-		_map.setShowPOI(isShowPOI);
-
-		if (isShowPOI) {
-			_map.setPOI(_poiPosition, _map.getZoom(), _poiName);
-		}
+//		final boolean isShowPOI = _actionShowPOI.isChecked();
+//
+//		_map.setShowPOI(isShowPOI);
+//
+//		if (isShowPOI) {
+//			_map.setPoi(_poiPosition, _map.getZoom(), _poiName);
+//		}
 	}
 
 	void actionReloadFailedMapImages() {
@@ -1371,7 +1371,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_poiZoomLevel = _map.getZoom();
 			}
 
-			_map.setPOI(_poiPosition, _poiZoomLevel, _poiName);
+//			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
 
 			_actionShowPOI.setChecked(true);
 
@@ -1404,7 +1404,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_poiName = wp.getName();
 				_poiZoomLevel = _map.getZoom();
 
-				_map.setPOI(_poiPosition, _poiZoomLevel, _poiName);
+//				_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
 
 				_actionShowPOI.setChecked(true);
 			}
@@ -1548,7 +1548,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_map.setShowOverlays(isShowTour);
 		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
 
-		// set position and zoom level for the tour
+		/*
+		 * set position and zoom level for the tour
+		 */
 		if (_isMapSynchedWithTour && isSynchronized) {
 
 			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
@@ -1783,7 +1785,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_actionShowSliderInLegend.setChecked(settings.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
-		// restore map factory by selecting the last used map factory
+		// restore map provider by selecting the last used map factory
 		_actionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
 		// default position

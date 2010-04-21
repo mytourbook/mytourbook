@@ -3668,6 +3668,10 @@ public class TourData implements Comparable<Object> {
 		}
 	}
 
+	public String getTourImportFilePathRaw() {
+		return tourImportFilePath;
+	}
+
 	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
 	}

@@ -1,20 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -92,14 +94,13 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 	private Combo						_comboMapProvider;
 	private Combo						_comboTargetZoom;
+	private ProgressBar					_progbarQueue;
 	private Text						_txtQueue;
 	private Button						_btnDownload;
 	private Button						_btnRefreshParts;
 	private Button						_btnStop;
 	private Button						_btnDeleteAll;
 	private Button						_btnDeletePart;
-
-//	private TileInfo					_tileInfo;
 
 	private int[]						_targetZoomLevels;
 	private ArrayList<MP>				_allMapProviders;
@@ -110,9 +111,16 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 	private Image						_imageRefresh;
 
-	private int[]						_updateCounter		= new int[] { 0 };
+	private final int[]					_updateCounter		= new int[] { 0 };
+	private int							_maxQueue;
 
-	private Display						_display;
+	private final Display				_display;
+
+	private final NumberFormat			_nf					= NumberFormat.getInstance();
+	{
+		_nf.setMinimumFractionDigits(1);
+		_nf.setMaximumFractionDigits(1);
+	}
 
 	class PartMP {
 
@@ -237,7 +245,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Composite innerContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(innerContainer);
@@ -246,13 +253,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				createUI10LeftPart(innerContainer);
 				createUI30Actions(innerContainer);
 			}
-
-//			/*
-//			 * tile info
-//			 */
-//			_tileInfo = new TileInfo();
-//			final Control tileInfoControl = _tileInfo.createUI(container);
-//			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(tileInfoControl);
 		}
 
 		// set download as default button
@@ -262,11 +262,12 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	private void createUI10LeftPart(final Composite parent) {
 
 		Label label;
+		final PixelConverter pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			/*
 			 * target zoom level
@@ -296,6 +297,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 			// combo: zoom level
 			_comboMapProvider = new Combo(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT)
+					.applyTo(_comboMapProvider);
 			_comboMapProvider.setVisibleItemCount(30);
 			_comboMapProvider.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -319,9 +323,27 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			label = new Label(container, SWT.NONE);
 			label.setText(Messages.Dialog_OfflineArea_Label_Queue);
 
-			_txtQueue = new Text(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtQueue);
-			_txtQueue.setBackground(_display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			final Composite progContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(progContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(progContainer);
+//			progContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			{
+				/*
+				 * progress bar
+				 */
+				_progbarQueue = new ProgressBar(progContainer, SWT.HORIZONTAL | SWT.SMOOTH);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_progbarQueue);
+
+				/*
+				 * text: queue
+				 */
+				_txtQueue = new Text(progContainer, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.FILL)
+						.hint(pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.applyTo(_txtQueue);
+				_txtQueue.setBackground(_display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			}
 		}
 	}
 
@@ -335,7 +357,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(10))
+				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(13))
 				.applyTo(layoutContainer);
 
 		/*
@@ -466,6 +488,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					_offlineManager.stopLoading();
+					_txtQueue.setText(UI.EMPTY_STRING);
 					getOfflineImageState();
 				}
 			});
@@ -604,8 +627,8 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-//		return _state;
-		return null;
+		return _state;
+//		return null;
 	}
 
 	/**
@@ -775,6 +798,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		// deselect all
 		_partViewer.setSelection(null);
 
+//		// reset queue
+//		_txtQueue.setText(UI.EMPTY_STRING);
+
 		enableControls(true);
 	}
 
@@ -899,6 +925,10 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			worldY1 *= 2;
 			worldY2 *= 2;
 		}
+
+		// initialize progress bar
+		_maxQueue = MP.getTileWaitingQueue().size();
+		_progbarQueue.setMaximum(_maxQueue);
 	}
 
 	@Override
@@ -974,7 +1004,17 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 					return;
 				}
 
-				_txtQueue.setText(Integer.toString(tileWaitingQueueSize));
+				final float progress = _maxQueue - tileWaitingQueueSize;
+				final float percent = progress * 100 / _maxQueue;
+
+				final StringBuilder sb = new StringBuilder();
+				sb.append(Integer.toString(tileWaitingQueueSize));
+				sb.append(" - ");
+				sb.append(_nf.format(percent));
+				sb.append("%");
+
+				_progbarQueue.setSelection((int) progress);
+				_txtQueue.setText(sb.toString());
 
 				/*
 				 * update state when all images are downloaded, it's possible that not all images
@@ -982,7 +1022,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				 */
 				if (tileWaitingQueueSize == 0) {
 
-					final UIJob uiJob = new UIJob(_display, "update offline state") { //$NON-NLS-1$ 
+					final UIJob uiJob = new UIJob(_display, "update offline state") { //$NON-NLS-1$
 
 						final int	_uiJobUpdateCounter	= _updateCounter[0];
 
@@ -1057,7 +1097,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			zoomIndex++;
 		}
 
-		// reselect zoom level 
+		// reselect zoom level
 		if (reselectedZoomLevelIndex == -1) {
 			// old zoom level is not available, select first zoom level
 			_comboTargetZoom.select(0);

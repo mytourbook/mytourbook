@@ -80,7 +80,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;
-	private static ExecutorService					fExecutorService;
+	private static ExecutorService					_executorService;
 
 	private static final ReentrantLock				EXECUTOR_LOCK						= new ReentrantLock();
 	private static final ReentrantLock				RESET_LOCK							= new ReentrantLock();
@@ -241,6 +241,28 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private MapViewPortData							_mapViewPort;
 
+	/**
+	 * <pre>
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * </pre>
+	 */
+	public MP() {
+
+		_projection = new Mercator();
+
+		initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
+
+	}
+
 	public static void addOfflineInfoListener(final IOfflineInfoListener listener) {
 		_offlineReloadEventListeners.add(listener);
 	}
@@ -282,28 +304,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		if (tileListener != null) {
 			_tileListeners.remove(tileListener);
 		}
-	}
-
-	/**
-	 * <pre>
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * </pre>
-	 */
-	public MP() {
-
-		_projection = new Mercator();
-
-		initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
-
 	}
 
 	public boolean canBeToggled() {
@@ -441,8 +441,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * In this method the implementing Factroy can dispose all of its temporary images and other SWT
-	 * objects that need to be disposed.
+	 * Dispose all images for this map provider.
 	 */
 	public void disposeAllImages() {
 
@@ -575,8 +574,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private ExecutorService getExecutor() {
 
-		if (fExecutorService != null) {
-			return fExecutorService;
+		if (_executorService != null) {
+			return _executorService;
 		}
 
 		/*
@@ -587,8 +586,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 			try {
 
 				// check again
-				if (fExecutorService != null) {
-					return fExecutorService;
+				if (_executorService != null) {
+					return _executorService;
 				}
 
 				final ThreadFactory threadFactory = new ThreadFactory() {
@@ -608,14 +607,14 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 					}
 				};
 
-				fExecutorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE, threadFactory);
+				_executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE, threadFactory);
 
 			} finally {
 				EXECUTOR_LOCK.unlock();
 			}
 		}
 
-		return fExecutorService;
+		return _executorService;
 	}
 
 	public GeoPosition getFavoritePosition() {

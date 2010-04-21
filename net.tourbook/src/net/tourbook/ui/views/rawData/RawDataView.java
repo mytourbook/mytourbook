@@ -151,6 +151,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
 	private ActionMergeIntoMenu				_actionMergeIntoTour;
 	private ActionReimportTour				_actionReimportTour;
+	private ActionRemoveTour				_actionRemoveTour;
 	private ActionAdjustYear				_actionAdjustImportedYear;
 	private ActionMergeGPXTours				_actionMergeGPXTours;
 	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
@@ -380,6 +381,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	/**
+	 * Remove all tours from the raw data view which are selected
+	 */
+	void actionRemoveTour() {
+
+		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
+		if (selection.size() == 0) {
+			return;
+		}
+
+		/*
+		 * convert selection to array
+		 */
+		final Object[] selectedItems = selection.toArray();
+		final TourData[] selectedTours = new TourData[selection.size()];
+		for (int i = 0; i < selectedItems.length; i++) {
+			selectedTours[i] = (TourData) selectedItems[i];
+		}
+
+		RawDataManager.getInstance().removeTours(selectedTours);
+
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
+
+		// update the table viewer
+		reloadViewer();
+	}
+
 	void actionSaveTour(final TourPerson person) {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -515,27 +543,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					return;
 				}
 
-				if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
-
-					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
-					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
-
-					if (removedTours.size() == 0) {
-						return;
-					}
-
-					removeTours(removedTours);
-
-					if (_isPartVisible) {
-
-						RawDataManager.getInstance().updateTourDataFromDb(null);
-
-						// update the table viewer
-						reloadViewer();
-					} else {
-						_isViewerPersonDataDirty = true;
-					}
-				}
+				onSelectionChanged(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -592,6 +600,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
 		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
 		_actionReimportTour = new ActionReimportTour(this);
+		_actionRemoveTour = new ActionRemoveTour(this);
 		_actionExportTour = new ActionExport(this);
 
 		_actionEditTour = new ActionEditTour(this);
@@ -1244,6 +1253,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_actionMergeTour.setEnabled(isOneSavedAndValidTour && (firstSavedTour.getMergeSourceTourId() != null));
 		_actionReimportTour.setEnabled(selectedTours > 0);
+		_actionRemoveTour.setEnabled(selectedTours > 0);
 		_actionExportTour.setEnabled(selectedValidTours > 0);
 
 		_actionEditTour.setEnabled(isOneSavedAndValidTour);
@@ -1297,6 +1307,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionSaveTour);
 		menuMgr.add(_actionMergeIntoTour);
 		menuMgr.add(_actionReimportTour);
+		menuMgr.add(_actionRemoveTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionEditQuick);
@@ -1477,6 +1488,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public ColumnViewer getViewer() {
 		return _tourViewer;
+	}
+
+	private void onSelectionChanged(final ISelection selection) {
+
+		if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
+
+			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
+			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
+
+			if (removedTours.size() == 0) {
+				return;
+			}
+
+			removeTours(removedTours);
+
+			if (_isPartVisible) {
+
+				RawDataManager.getInstance().updateTourDataFromDb(null);
+
+				// update the table viewer
+				reloadViewer();
+			} else {
+				_isViewerPersonDataDirty = true;
+			}
+		}
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
@@ -35,6 +35,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,7 +45,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -57,12 +57,17 @@ public class TourCompareManager {
 
 	private static TourCompareManager				fInstance;
 
-	private boolean									isComparing			= false;
+	private final boolean									isComparing			= false;
 
 	private TourReference[]							refTourContext;
 	private TourData[]								refToursData;
 
-	private ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
+	private final ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
+
+	/**
+	 * internal constructor
+	 */
+	private TourCompareManager() {}
 
 	/**
 	 * @param refId
@@ -184,7 +189,8 @@ public class TourCompareManager {
 		comparedTour.setTourDate(calendar.getTimeInMillis());
 		comparedTour.setStartYear(tourData.getStartYear());
 
-		final float speed = TourManager.computeTourSpeed(tourData,
+		final float speed = TourManager.computeTourSpeed(
+				tourData,
 				comparedTourItem.computedStartIndex,
 				comparedTourItem.computedEndIndex);
 
@@ -201,11 +207,6 @@ public class TourCompareManager {
 		comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
 		comparedTourItem.dbSpeed = speed;
 	}
-
-	/**
-	 * internal constructor
-	 */
-	private TourCompareManager() {}
 
 	/**
 	 * @param refTourIndex
@@ -446,7 +447,8 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							final TVICompareResultComparedTour compareResult = compareTour(refTourIndex,
+							final TVICompareResultComparedTour compareResult = compareTour(
+									refTourIndex,
 									compareTourData);
 
 							// ignore tours which could not be compared
@@ -459,8 +461,8 @@ public class TourCompareManager {
 							}
 
 							// update the message in the progress monitor
-							monitor.subTask(NLS.bind(Messages.tourCatalog_view_compare_job_subtask,
-									Integer.toString(++tourCounter)));
+							monitor.subTask(NLS.bind(Messages.tourCatalog_view_compare_job_subtask, Integer
+									.toString(++tourCounter)));
 
 							monitor.worked(1);
 						}
@@ -544,8 +546,8 @@ public class TourCompareManager {
 						// show compare result perspective
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
-						final TourCompareResultView view = (TourCompareResultView) window.getActivePage()
-								.showView(TourCompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+						final TourCompareResultView view = (TourCompareResultView) Util
+								.showView(TourCompareResultView.ID);
 
 						if (view != null) {
 							view.reloadViewer();
@@ -553,7 +555,7 @@ public class TourCompareManager {
 
 					} catch (final PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
-						.getStatus());
+								.getStatus());
 						e.printStackTrace();
 					} catch (final WorkbenchException e) {
 						e.printStackTrace();
