@@ -5541,7 +5541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * value can cause rounding errors
 				 */
 				_tourData.setWeatherWindSpd((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
-			} 
+			}
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
 			String cloudValue = IWeather._cloudDBValue[cloudIndex];
@@ -5901,18 +5901,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		}
 
-		// recording time
+		// tour time's
 		final int recordingTime = _tourData.getTourRecordingTime();
-		_dtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
-
-		// driving time
 		final int drivingTime = _tourData.getTourDrivingTime();
-		_dtDrivingTime.setTime(drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
-
-		// paused time
 		final int pausedTime = recordingTime - drivingTime;
+
+		_dtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
+		_dtDrivingTime.setTime(drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 		_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
+		// tour type/tags
 		UI.updateUITourType(_tourData.getTourType(), _lblTourType);
 		UI.updateUITags(_tourData, _lblTourTags);
 

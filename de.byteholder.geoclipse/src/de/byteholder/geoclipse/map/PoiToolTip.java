@@ -15,6 +15,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import net.tourbook.util.ToolTip;
+
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -23,7 +25,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import de.byteholder.geoclipse.ui.ToolTip;
 import de.byteholder.gpx.GeoPosition;
 
 public class PoiToolTip extends ToolTip {

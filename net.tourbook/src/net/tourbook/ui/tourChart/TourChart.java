@@ -57,7 +57,6 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -113,6 +112,9 @@ public class TourChart extends Chart {
 	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 
 	private IPropertyChangeListener			_prefChangeListener;
+	private final Preferences				_prefStore								= TourbookPlugin
+																							.getDefault()
+																							.getPluginPreferences();
 
 	private ChartLabelLayer					_labelLayer;
 	private ChartSegmentLayer				_segmentLayer;
@@ -124,6 +126,9 @@ public class TourChart extends Chart {
 	private I2ndAltiLayer					_2ndAltiLayerProvider;
 	private boolean							_isMouseModeSet;
 
+	private final TourToolTip				_tourTooltipLeft;
+	private final TourToolTip				_tourTooltipRight;
+
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
@@ -132,10 +137,8 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		gridVerticalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-		gridHorizontalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+		_gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+		_gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
 
 		setShowMouseMode();
 
@@ -151,10 +154,12 @@ public class TourChart extends Chart {
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-
-				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+				_prefStore.removePropertyChangeListener(_prefChangeListener);
 			}
 		});
+
+		_tourTooltipLeft = new TourToolTip(getChartComponents().getAxisLeft());
+		_tourTooltipRight = new TourToolTip(getChartComponents().getAxisRight());
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -200,9 +205,7 @@ public class TourChart extends Chart {
 
 	public void actionShowSRTMData(final boolean isItemChecked) {
 
-		TourbookPlugin.getDefault().getPreferenceStore().setValue(
-				ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE,
-				isItemChecked);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isItemChecked);
 
 		_tourChartConfig.isSRTMDataVisible = isItemChecked;
 		updateTourChart(true);
@@ -324,15 +327,15 @@ public class TourChart extends Chart {
 	}
 
 	private void addPrefListeners() {
+
 		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
-				final String property = event.getProperty();
 
 				if (_tourChartConfig == null) {
 					return;
 				}
 
-				final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+				final String property = event.getProperty();
 				boolean isChartModified = false;
 				boolean keepMinMax = true;
 
@@ -341,7 +344,7 @@ public class TourChart extends Chart {
 
 					// zoom preferences has changed
 
-					TourManager.updateZoomOptionsInChartConfig(_tourChartConfig, prefStore);
+					TourManager.updateZoomOptionsInChartConfig(_tourChartConfig, _prefStore);
 
 					isChartModified = true;
 
@@ -365,8 +368,8 @@ public class TourChart extends Chart {
 				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
 
-					gridVerticalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-					gridHorizontalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+					_gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+					_gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
 					isChartModified = true;
 				}
 
@@ -408,8 +411,7 @@ public class TourChart extends Chart {
 			}
 		};
 
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
-
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	public void addTourChartListener(final ITourChartSelectionListener listener) {
@@ -1058,9 +1060,7 @@ public class TourChart extends Chart {
 
 		if (property.equals(tagIsMaxEnabled) || property.equals(tabMaxValue)) {
 
-			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-			final boolean isMaxEnabled = prefStore.getBoolean(tagIsMaxEnabled);
+			final boolean isMaxEnabled = _prefStore.getBoolean(tagIsMaxEnabled);
 
 			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
 
@@ -1078,7 +1078,7 @@ public class TourChart extends Chart {
 
 				if (isMaxEnabled) {
 					// set visible max value from the preferences
-					final int maxValue = prefStore.getInt(tabMaxValue);
+					final int maxValue = _prefStore.getInt(tabMaxValue);
 					yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
 
 				} else {
@@ -1102,9 +1102,7 @@ public class TourChart extends Chart {
 
 		if (property.equals(tagIsMinEnabled) || property.equals(tabMinValue)) {
 
-			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-			final boolean isMinEnabled = prefStore.getBoolean(tagIsMinEnabled);
+			final boolean isMinEnabled = _prefStore.getBoolean(tagIsMinEnabled);
 
 			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
 
@@ -1122,7 +1120,7 @@ public class TourChart extends Chart {
 
 				if (isMinEnabled) {
 					// set visible min value from the preferences
-					final int minValue = prefStore.getInt(tabMinValue);
+					final int minValue = _prefStore.getInt(tabMinValue);
 					yData.setVisibleMinValue(valueDivisor == 0 ? minValue : minValue * valueDivisor);
 
 				} else {
@@ -1409,9 +1407,11 @@ public class TourChart extends Chart {
 
 			_isMouseModeSet = true;
 
-			setMouseMode(TourbookPlugin.getDefault().getPreferenceStore().getString(
-					ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
+			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
+
+		_tourTooltipLeft.setTourData(_tourData);
+		_tourTooltipRight.setTourData(_tourData);
 	}
 
 	/**

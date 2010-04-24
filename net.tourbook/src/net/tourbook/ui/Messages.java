@@ -211,6 +211,12 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
+	public static String	Tour_Tooltip_Label_Altitude;
+
+	public static String	Tour_Tooltip_Label_Date;
+
+	public static String	Tour_Tooltip_Label_Distance;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

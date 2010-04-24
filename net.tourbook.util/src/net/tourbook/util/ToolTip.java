@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.ui;
+package net.tourbook.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -50,7 +50,6 @@ public abstract class ToolTip {
 
 		_shell.addMouseMoveListener(new MouseMoveListener() {
 
-			@Override
 			public void mouseMove(final MouseEvent e) {
 
 			}
@@ -58,14 +57,12 @@ public abstract class ToolTip {
 
 		_shell.addMouseTrackListener(new MouseTrackListener() {
 
-			@Override
 			public void mouseEnter(final MouseEvent e) {
 				System.out.println("mouseEnter()");
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}
 
-			@Override
 			public void mouseExit(final MouseEvent e) {
 				System.out.println("mouseExit");
 				// TODO remove SYSTEM.OUT.PRINTLN
@@ -73,7 +70,6 @@ public abstract class ToolTip {
 				_shell.setVisible(false);
 			}
 
-			@Override
 			public void mouseHover(final MouseEvent e) {
 				System.out.println("mouseHover");
 				// TODO remove SYSTEM.OUT.PRINTLN

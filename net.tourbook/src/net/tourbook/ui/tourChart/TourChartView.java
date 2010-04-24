@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
@@ -73,21 +73,21 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private TourChart				fTourChart;
-	private TourChartConfiguration	fTourChartConfig;
-	private TourData				fTourData;
+	private TourChart				_tourChart;
+	private TourChartConfiguration	_tourChartConfig;
+	private TourData				_tourData;
 
-	private PostSelectionProvider	fPostSelectionProvider;
-	private ISelectionListener		fPostSelectionListener;
-	private IPropertyChangeListener	fPrefChangeListener;
-	private ITourEventListener		fTourEventListener;
-	private IPartListener2			fPartListener;
+	private PostSelectionProvider	_postSelectionProvider;
+	private ISelectionListener		_postSelectionListener;
+	private IPropertyChangeListener	_prefChangeListener;
+	private ITourEventListener		_tourEventListener;
+	private IPartListener2			_partListener;
 
-	private PageBook				fPageBook;
-	private Label					fPageNoChart;
+	private PageBook				_pageBook;
+	private Label					_pageNoChart;
 
 	private void addPartListener() {
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -109,12 +109,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -126,19 +126,19 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-					fTourChartConfig = TourManager.createTourChartConfiguration();
+					_tourChartConfig = TourManager.createTourChartConfiguration();
 
-					if (fTourChart != null) {
-						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+					if (_tourChart != null) {
+						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-					fTourChart.setMouseMode(event.getNewValue());
+					_tourChart.setMouseMode(event.getNewValue());
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	 */
 	private void addSelectionListener() {
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourChartView.this) {
@@ -156,12 +156,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				onSelectionChanged(selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
@@ -171,15 +171,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					fTourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateSegmentLayer((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					fTourChart.updateTourChart(true, true);
+					_tourChart.updateTourChart(true, true);
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (fTourData == null || part == TourChartView.this) {
+					if (_tourData == null || part == TourChartView.this) {
 						return;
 					}
 
@@ -187,7 +187,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 
-						final long chartTourId = fTourData.getTourId();
+						final long chartTourId = _tourData.getTourId();
 
 						// update chart with the modified tour
 						for (final TourData tourData : modifiedTours) {
@@ -209,7 +209,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 								updateChart(tourData);
 
 								// removed old tour data from the selection provider
-								fPostSelectionProvider.clearSelection();
+								_postSelectionProvider.clearSelection();
 
 								return;
 							}
@@ -224,11 +224,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 					// check if this tour data editor contains a tour which must be updated
 
-					if (fTourData == null) {
+					if (_tourData == null) {
 						return;
 					}
 
-					final Long tourId = fTourData.getTourId();
+					final Long tourId = _tourData.getTourId();
 
 					// update editor
 					if (UI.containsTourId(eventData, tourId) != null) {
@@ -240,18 +240,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void clearView() {
 
-		fTourData = null;
-		fTourChart.updateChart(null, false);
+		_tourData = null;
+		_tourChart.updateChart(null, false);
 
-		fPageBook.showPage(fPageNoChart);
+		_pageBook.showPage(_pageNoChart);
 
 		// removed old tour data from the selection provider
-		fPostSelectionProvider.clearSelection();
+		_postSelectionProvider.clearSelection();
 	}
 
 	@Override
@@ -265,49 +265,49 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		addPartListener();
 
 		// set this view part as selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		if (fTourData == null) {
+		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
 	}
 
 	private void createUI(final Composite parent) {
 
-		fPageBook = new PageBook(parent, SWT.NONE);
+		_pageBook = new PageBook(parent, SWT.NONE);
 
-		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoChart = new Label(_pageBook, SWT.NONE);
+		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		fTourChart = new TourChart(fPageBook, SWT.FLAT, true);
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
-		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		fTourChart.setContextProvider(new TourChartContextProvicer(this));
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart.setShowZoomActions(true);
+		_tourChart.setShowSlider(true);
+		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		_tourChart.setContextProvider(new TourChartContextProvicer(this));
 
-		fTourChart.addDoubleClickListener(new Listener() {
+		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
-				if (fTourData.getTourPerson() != null) {
-					TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+				if (_tourData.getTourPerson() != null) {
+					TourManager.getInstance().openTourInEditor(_tourData.getTourId());
 				}
 			}
 		});
 
-		fTourChartConfig = TourManager.createTourChartConfiguration();
+		_tourChartConfig = TourManager.createTourChartConfiguration();
 
 		// set chart title
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		_tourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
-				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
+				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
 		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
-		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				fPostSelectionProvider.setSelection(chartInfoSelection);
+				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
 	}
@@ -315,12 +315,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		getViewSite().getPage().removePartListener(fPartListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -334,7 +334,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			public void run() {
 				TourManager.fireEvent(
 						TourEventId.SLIDER_POSITION_CHANGED,
-						fTourChart.getChartInfo(),
+						_tourChart.getChartInfo(),
 						TourChartView.this);
 			}
 		});
@@ -342,18 +342,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		if (fTourData == null) {
+		if (_tourData == null) {
 			return null;
 		}
 
 		final ArrayList<TourData> tourList = new ArrayList<TourData>();
-		tourList.add(fTourData);
+		tourList.add(_tourData);
 
 		return tourList;
 	}
 
 	public TourChart getTourChart() {
-		return fTourChart;
+		return _tourChart;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -364,7 +364,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			if (selectionTourData != null) {
 
 				// prevent loading the same tour
-				if (fTourData != null && fTourData.equals(selectionTourData)) {
+				if (_tourData != null && _tourData.equals(selectionTourData)) {
 					return;
 				}
 
@@ -397,14 +397,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData != null) {
 
-						if (fTourData == null || fTourData.equals(tourData) == false) {
+						if (_tourData == null || _tourData.equals(tourData) == false) {
 							updateChart(tourData);
 						}
 
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
 						// set slider position
-						fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+						_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+								_tourChart,
 								chartInfo.leftSliderValuesIndex,
 								chartInfo.rightSliderValuesIndex));
 					}
@@ -416,7 +417,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
 			final Chart chart = xSliderPosition.getChart();
-			if (chart != null && chart != fTourChart) {
+			if (chart != null && chart != _tourChart) {
 
 				// it's not the same chart, check if it's the same tour
 
@@ -426,17 +427,17 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData != null) {
 
-						if (fTourData.equals(tourData)) {
+						if (_tourData.equals(tourData)) {
 
 							// it's the same tour, overwrite chart
 
-							xSliderPosition.setChart(fTourChart);
+							xSliderPosition.setChart(_tourChart);
 						}
 					}
 				}
 			}
 
-			fTourChart.setXSliderPosition(xSliderPosition);
+			_tourChart.setXSliderPosition(xSliderPosition);
 
 		} else if (selection instanceof StructuredSelection) {
 
@@ -472,8 +473,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				// prevent loading the same tour when it is not modified
 				if (editor.isDirty() == false //
-						&& fTourData != null
-						&& fTourData.equals(editorTourData)) {
+						&& _tourData != null
+						&& _tourData.equals(editorTourData)) {
 					return;
 				}
 
@@ -489,33 +490,33 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	@Override
 	public void setFocus() {
 
-		fTourChart.setFocus();
+		_tourChart.setFocus();
 
 		/*
 		 * fire tour selection
 		 */
-		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
+		_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
 
 		fireSliderPosition();
 	}
 
 	private void showTourFromTourProvider() {
 
-		fPageBook.showPage(fPageNoChart);
+		_pageBook.showPage(_pageNoChart);
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 
 				// validate widget
-				if (fPageBook.isDisposed()) {
+				if (_pageBook.isDisposed()) {
 					return;
 				}
 
 				/*
 				 * check if tour was set from a selection provider
 				 */
-				if (fTourData != null) {
+				if (_tourData != null) {
 					return;
 				}
 
@@ -529,24 +530,24 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void updateChart() {
 
-		if (fTourData == null) {
+		if (_tourData == null) {
 			// nothing to do
 			return;
 		}
 
-		TourManager.getInstance().setActiveTourChart(fTourChart);
+		TourManager.getInstance().setActiveTourChart(_tourChart);
 
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 
-		fPageBook.showPage(fTourChart);
+		_pageBook.showPage(_tourChart);
 
 		// set application window title
-		setTitleToolTip(TourManager.getTourDateShort(fTourData));
+		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 
 	private void updateChart(final Long tourId) {
 
-		if (fTourData != null && fTourData.getTourId() == tourId) {
+		if (_tourData != null && _tourData.getTourId() == tourId) {
 			// optimize
 			return;
 		}
@@ -563,7 +564,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			return;
 		}
 
-		fTourData = tourData;
+		_tourData = tourData;
 
 		updateChart();
 	}

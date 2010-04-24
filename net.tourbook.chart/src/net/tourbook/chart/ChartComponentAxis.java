@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.chart;
@@ -39,25 +39,25 @@ public class ChartComponentAxis extends Canvas {
 
 	private static final int			UNIT_OFFSET	= 7;
 
-	private Chart						fChart;
+	private final Chart					_chart;
 
-	private Image						axisImage;
+	private Image						_axisImage;
 
-	private ArrayList<ChartDrawingData>	chartDrawingData;
+	private ArrayList<ChartDrawingData>	_chartDrawingData;
 
-	private boolean						isAxisDirty;
+	private boolean						_isAxisDirty;
 
 	/**
 	 * is set to <code>true</code> when the axis is on the left side, <code>false</code> when on
 	 * the right side
 	 */
-	private boolean						fIsLeft;
+	private boolean						_isLeft;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
 		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
-		fChart = chart;
+		_chart = chart;
 
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
@@ -67,19 +67,19 @@ public class ChartComponentAxis extends Canvas {
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				axisImage = ChartUtil.disposeResource(axisImage);
+				_axisImage = ChartUtil.disposeResource(_axisImage);
 			}
 		});
 
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-				fChart.fChartComponents.getChartComponentGraph().onMouseDoubleClick(e);
+				_chart._chartComponents.getChartComponentGraph().onMouseDoubleClick(e);
 			}
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				fChart.fChartComponents.getChartComponentGraph().setFocus();
+				_chart._chartComponents.getChartComponentGraph().setFocus();
 			}
 
 		});
@@ -118,31 +118,31 @@ public class ChartComponentAxis extends Canvas {
 
 		// when the image is the same size as the new we will redraw it only if
 		// it is dirty
-		if (!isAxisDirty && axisImage != null) {
+		if (!_isAxisDirty && _axisImage != null) {
 
-			final Rectangle oldBounds = axisImage.getBounds();
+			final Rectangle oldBounds = _axisImage.getBounds();
 
 			if (oldBounds.width == axisRect.width && oldBounds.height == axisRect.height) {
 				return;
 			}
 		}
 
-		if (ChartUtil.canReuseImage(axisImage, axisRect) == false) {
-			axisImage = ChartUtil.createImage(getDisplay(), axisImage, axisRect);
+		if (ChartUtil.canReuseImage(_axisImage, axisRect) == false) {
+			_axisImage = ChartUtil.createImage(getDisplay(), _axisImage, axisRect);
 		}
 
 		// draw into the image
-		final GC gc = new GC(axisImage);
+		final GC gc = new GC(_axisImage);
 
-		gc.setBackground(fChart.getBackgroundColor());
-		gc.fillRectangle(axisImage.getBounds());
+		gc.setBackground(_chart.getBackgroundColor());
+		gc.fillRectangle(_axisImage.getBounds());
 
 		drawYUnits(gc, axisRect);
 
 		// font.dispose();
 		gc.dispose();
 
-		isAxisDirty = false;
+		_isAxisDirty = false;
 	}
 
 	/**
@@ -153,16 +153,16 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private void drawYUnits(final GC gc, final Rectangle axisRect) {
 
-		if (chartDrawingData == null) {
+		if (_chartDrawingData == null) {
 			return;
 		}
 
 		final Display display = getDisplay();
 
-		final int devX = fIsLeft ? axisRect.width - 1 : 0;
+		final int devX = _isLeft ? axisRect.width - 1 : 0;
 
 		// loop: all graphs
-		for (final ChartDrawingData drawingData : chartDrawingData) {
+		for (final ChartDrawingData drawingData : _chartDrawingData) {
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 
@@ -179,7 +179,7 @@ public class ChartComponentAxis extends Canvas {
 			final int devYBottom = drawingData.getDevYBottom();
 			final int devYTop = devYBottom - devGraphHeight;
 
-			if (fIsLeft && title != null) {
+			if (_isLeft && title != null) {
 
 				// create title with unit label
 				final StringBuilder sbTitle = new StringBuilder(title);
@@ -244,7 +244,7 @@ public class ChartComponentAxis extends Canvas {
 					// draw the unit tick
 
 					gc.setLineStyle(SWT.LINE_SOLID);
-					if (fIsLeft) {
+					if (_isLeft) {
 						gc.drawLine(devX - 5, devY, devX, devY);
 					} else {
 						gc.drawLine(devX, devY, devX + 5, devY);
@@ -255,7 +255,7 @@ public class ChartComponentAxis extends Canvas {
 				final int devYUnit = devY - unitExtend.y / 2;
 
 				// draw the unit label centered at the unit tick
-				if (fIsLeft) {
+				if (_isLeft) {
 					gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
 				} else {
 					gc.drawText(valueLabel, (devX + UNIT_OFFSET), devYUnit, true);
@@ -275,11 +275,11 @@ public class ChartComponentAxis extends Canvas {
 
 		drawAxisImage();
 
-		gc.drawImage(axisImage, 0, 0);
+		gc.drawImage(_axisImage, 0, 0);
 	}
 
 	void onResize() {
-		isAxisDirty = true;
+		_isAxisDirty = true;
 		redraw();
 	}
 
@@ -291,8 +291,8 @@ public class ChartComponentAxis extends Canvas {
 	 *            true if the axis is on the left side
 	 */
 	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
-		chartDrawingData = list;
-		fIsLeft = isLeft;
+		_chartDrawingData = list;
+		_isLeft = isLeft;
 
 		onResize();
 	}

@@ -1,22 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
@@ -48,6 +47,8 @@ public class ActionHandlerManager {
 	 */
 	private HashMap<String, ActionHandler>	fActionHandlers;
 
+	private ActionHandlerManager() {}
+
 	static ActionHandlerManager getInstance() {
 
 		if (fInstance == null) {
@@ -55,8 +56,6 @@ public class ActionHandlerManager {
 		}
 		return fInstance;
 	}
-
-	private ActionHandlerManager() {}
 
 	private void activateHandlers() {
 
@@ -97,9 +96,7 @@ public class ActionHandlerManager {
 		};
 
 		// activate the handler for all tour chart actions
-		for (final Iterator<ActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
-
-			final ActionHandler actionHandler = iterator.next();
+		for (final ActionHandler actionHandler : fActionHandlers.values()) {
 
 			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
 					actionHandler,
@@ -157,11 +154,11 @@ public class ActionHandlerManager {
 	 */
 	void updateActionHandlers(final Chart chart) {
 
-		if (fActionHandlers == null || chart.fChartActionProxies == null) {
+		if (fActionHandlers == null || chart._chartActionProxies == null) {
 			return;
 		}
 
-		for (final ActionProxy actionProxy : chart.fChartActionProxies.values()) {
+		for (final ActionProxy actionProxy : chart._chartActionProxies.values()) {
 
 			final ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
 

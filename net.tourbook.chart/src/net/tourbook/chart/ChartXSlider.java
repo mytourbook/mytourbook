@@ -221,7 +221,7 @@ public class ChartXSlider {
 
 		// fire change event when the position has changed
 		if (newDevVirtualSliderLinePos != oldPos) {
-			chartGraph.fChart.fireSliderMoveEvent();
+			chartGraph._chart.fireSliderMoveEvent();
 		}
 	}
 

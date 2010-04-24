@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
@@ -43,6 +43,7 @@ import net.tourbook.util.IExternalTourEvents;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -106,34 +107,65 @@ public class TourManager {
 	private static final int					SPEED_DIVISOR				= 10;
 	public static final int						GRADIENT_DIVISOR			= 10;
 
-	private static TourManager					instance;
+	private static TourManager					_instance;
+
+//	private final static Preferences			_prefStore					= TourbookPlugin
+//																					.getDefault()
+//																					.getPreferenceStore();
+
+	private final static Preferences			_prefStore					= TourbookPlugin
+																					.getDefault()
+																					.getPluginPreferences();
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
 	 * is not opened
 	 */
-	private static TourDataEditorView			fTourDataEditorInstance;
+	private static TourDataEditorView			_tourDataEditorInstance;
 
-	private ComputeChartValue					computeAltimeterAvg;
-	private ComputeChartValue					computeGradientAvg;
-	private ComputeChartValue					computePaceAvg;
-	private ComputeChartValue					computePowerAvg;
-	private ComputeChartValue					computeSpeedAvg;
+	private ComputeChartValue					_computeAltimeterAvg;
+	private ComputeChartValue					_computeGradientAvg;
+	private ComputeChartValue					_computePaceAvg;
+	private ComputeChartValue					_computePowerAvg;
+	private ComputeChartValue					_computeSpeedAvg;
 
-	private final LinkedHashMap<Long, TourData>	fTourDataCache				= new LinkedHashMap<Long, TourData>();
+	private final LinkedHashMap<Long, TourData>	_tourDataCache				= new LinkedHashMap<Long, TourData>();
 
-// 
-//	TourDataCache is disabled because it's much slower when tours are compared a 2nd or more times	
-//	
+//
+//	TourDataCache is disabled because it's much slower when tours are compared a 2nd or more times
+//
 //	private final TourDataCache			fTourDataCache			= new TourDataCache();
 
-	private static final ListenerList			fTourEventListeners			= new ListenerList(ListenerList.IDENTITY);
-	private static final ListenerList			fTourSaveListeners			= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			_tourEventListeners			= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			_tourSaveListeners			= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * tour chart which shows the selected tour
 	 */
-	private TourChart							fActiveTourChart;
+	private TourChart							_activeTourChart;
+
+	private TourManager() {
+
+		final IPreferenceStore prefStore = net.tourbook.util.Activator.getDefault().getPreferenceStore();
+
+		prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				if (event.getProperty().equals(IExternalTourEvents.CLEAR_TOURDATA_CACHE)) {
+
+					clearTourDataCache();
+
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+
+							// fire modify event
+							TourManager.fireEvent(TourEventId.UPDATE_UI);
+						}
+					});
+				}
+			}
+		});
+	}
 
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
@@ -164,27 +196,26 @@ public class TourManager {
 
 		final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
 		// convert the graph ids from the preferences into visible graphs in
 		// the chart panel configuration
-		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(_prefStore
+				.getString(ITourbookPreferences.GRAPH_VISIBLE));
 		for (final String prefGraphId : prefGraphIds) {
 			chartConfig.addVisibleGraph(Integer.valueOf(prefGraphId));
 		}
 
 		// set the unit which is shown on the x-axis
-		if (prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME)) {
+		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME)) {
 			chartConfig.showTimeOnXAxis = true;
 		} else {
 			chartConfig.showTimeOnXAxis = false;
 		}
 		chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
-		chartConfig.isStartTime = prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-		chartConfig.isSRTMDataVisible = prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
+		chartConfig.isStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		chartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
-		updateZoomOptionsInChartConfig(chartConfig, prefStore);
+		updateZoomOptionsInChartConfig(chartConfig, _prefStore);
 
 		return chartConfig;
 	}
@@ -199,7 +230,7 @@ public class TourManager {
 
 	public static void fireEvent(final TourEventId tourEventId, final Object eventData) {
 
-		final Object[] allListeners = fTourEventListeners.getListeners();
+		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((ITourEventListener) listener).tourChanged(null, tourEventId, eventData);
 		}
@@ -207,7 +238,7 @@ public class TourManager {
 
 	public static void fireEvent(final TourEventId tourEventId, final Object eventData, final IWorkbenchPart part) {
 
-		final Object[] allListeners = fTourEventListeners.getListeners();
+		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((ITourEventListener) listener).tourChanged(part, tourEventId, eventData);
 		}
@@ -215,11 +246,11 @@ public class TourManager {
 
 	public static TourManager getInstance() {
 
-		if (instance == null) {
-			instance = new TourManager();
+		if (_instance == null) {
+			_instance = new TourManager();
 		}
 
-		return instance;
+		return _instance;
 	}
 
 	/**
@@ -266,7 +297,7 @@ public class TourManager {
 	 *         part is not opened
 	 */
 	public static TourDataEditorView getTourDataEditor() {
-		return fTourDataEditorInstance;
+		return _tourDataEditorInstance;
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
@@ -303,13 +334,8 @@ public class TourManager {
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
-		return new DateTime(tourData.getStartYear(),
-				tourData.getStartMonth(),
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond(),
-				0);
+		return new DateTime(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay(), tourData
+				.getStartHour(), tourData.getStartMinute(), tourData.getStartSecond(), 0);
 	}
 
 	private static String getTourTimeShort(final Date date) {
@@ -323,19 +349,14 @@ public class TourManager {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
-		calendar.set(
-				tourData.getStartYear(),
-				tourData.getStartMonth() - 1,
-				tourData.getStartDay(),
-				tourData.getStartHour(),
-				tourData.getStartMinute(),
-				tourData.getStartSecond());
+		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay(), tourData
+				.getStartHour(), tourData.getStartMinute(), tourData.getStartSecond());
 
 		return UI.TimeFormatterShort.format(calendar.getTime());
 	}
 
 	public static String getTourTitle(final Date date) {
-		return getTourDateLong(date) // 
+		return getTourDateLong(date) //
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(date);
 	}
@@ -359,7 +380,7 @@ public class TourManager {
 		return getTourDateFull(tourData) + //
 				" - " //$NON-NLS-1$
 				+ getTourTimeShort(tourData)
-				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
+				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
 	}
 
 	/**
@@ -552,7 +573,7 @@ public class TourManager {
 	}
 
 	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
-		fTourDataEditorInstance = tourDataEditorView;
+		_tourDataEditorInstance = tourDataEditorView;
 	}
 
 	/**
@@ -562,37 +583,14 @@ public class TourManager {
 	 * @param prefStore
 	 */
 	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
-														final IPreferenceStore prefStore) {
+														final Preferences prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
 	}
 
-	private TourManager() {
-
-		final IPreferenceStore prefStore = net.tourbook.util.Activator.getDefault().getPreferenceStore();
-
-		prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-
-				if (event.getProperty().equals(IExternalTourEvents.CLEAR_TOURDATA_CACHE)) {
-
-					clearTourDataCache();
-
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-
-							// fire modify event
-							TourManager.fireEvent(TourEventId.UPDATE_UI);
-						}
-					});
-				}
-			}
-		});
-	}
-
 	public void addTourEventListener(final ITourEventListener listener) {
-		fTourEventListeners.add(listener);
+		_tourEventListeners.add(listener);
 	}
 
 	/**
@@ -601,7 +599,7 @@ public class TourManager {
 	 * @param listener
 	 */
 	public void addTourSaveListener(final ITourSaveListener listener) {
-		fTourSaveListeners.add(listener);
+		_tourSaveListeners.add(listener);
 	}
 
 	/**
@@ -627,15 +625,15 @@ public class TourManager {
 	 */
 	public void clearTourDataCache() {
 
-		fTourDataCache.clear();
+		_tourDataCache.clear();
 
-		if (fTourDataEditorInstance != null && fTourDataEditorInstance.isDirty()) {
+		if (_tourDataEditorInstance != null && _tourDataEditorInstance.isDirty()) {
 
-			final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+			final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
 			if (tourDataInEditor != null) {
 
 				// keep modified tour in cache
-				fTourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
+				_tourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
 			}
 		}
 	}
@@ -765,7 +763,7 @@ public class TourManager {
 	 */
 	private void createAvgCallbacks() {
 
-		computeSpeedAvg = new ComputeChartValue() {
+		_computeSpeedAvg = new ComputeChartValue() {
 
 			/*
 			 * Compute the average speed in km/h between the two sliders
@@ -778,7 +776,8 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValues()[0];
 				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
@@ -818,7 +817,7 @@ public class TourManager {
 			}
 		};
 
-		computePaceAvg = new ComputeChartValue() {
+		_computePaceAvg = new ComputeChartValue() {
 
 			/*
 			 * Compute the average pace between two sliders
@@ -831,7 +830,8 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValues()[0];
 				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
@@ -872,7 +872,7 @@ public class TourManager {
 			}
 		};
 
-		computeAltimeterAvg = new ComputeChartValue() {
+		_computeAltimeterAvg = new ComputeChartValue() {
 
 			/*
 			 * Compute the average altimeter speed between the two sliders
@@ -886,7 +886,8 @@ public class TourManager {
 				}
 
 				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME)))
+						.getHighValues()[0];
 				if (timeValues == null) {
 					return 0;
 				}
@@ -921,7 +922,7 @@ public class TourManager {
 			}
 		};
 
-		computeGradientAvg = new ComputeChartValue() {
+		_computeGradientAvg = new ComputeChartValue() {
 
 			/*
 			 * Compute the average altimeter speed between the two sliders
@@ -979,7 +980,7 @@ public class TourManager {
 														final boolean hasPropertyChanged) {
 
 		// check if the callbacks are created
-		if (computeSpeedAvg == null) {
+		if (_computeSpeedAvg == null) {
 			createAvgCallbacks();
 		}
 
@@ -1153,7 +1154,7 @@ public class TourManager {
 			yDataSpeed.setShowYSlider(true);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, computeSpeedAvg, 2));
+					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 2));
 
 			setGraphColor(prefStore, yDataSpeed, GraphColorProvider.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
@@ -1176,7 +1177,7 @@ public class TourManager {
 			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, computePaceAvg, 1));
+					new TourChartAnalyzerInfo(true, false, _computePaceAvg, 1));
 
 			setGraphColor(prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
@@ -1206,7 +1207,7 @@ public class TourManager {
 			yDataPower.setShowYSlider(true);
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, computePowerAvg, 0));
+					new TourChartAnalyzerInfo(true, false, _computePowerAvg, 0));
 
 			setGraphColor(prefStore, yDataPower, GraphColorProvider.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
@@ -1227,7 +1228,7 @@ public class TourManager {
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, computeAltimeterAvg));
+					new TourChartAnalyzerInfo(true, _computeAltimeterAvg));
 
 			setGraphColor(prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
 			chartDataModel.addXyData(yDataAltimeter);
@@ -1256,7 +1257,7 @@ public class TourManager {
 			yDataGradient.setShowYSlider(true);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, computeGradientAvg, 1));
+					new TourChartAnalyzerInfo(true, true, _computeGradientAvg, 1));
 
 			setGraphColor(prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
@@ -1455,7 +1456,7 @@ public class TourManager {
 	}
 
 	public TourChart getActiveTourChart() {
-		return fActiveTourChart;
+		return _activeTourChart;
 	}
 
 	/**
@@ -1475,13 +1476,13 @@ public class TourManager {
 		/*
 		 * get tour from tour editor when it contains the requested tour
 		 */
-		if (fTourDataEditorInstance != null) {
+		if (_tourDataEditorInstance != null) {
 
-			final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+			final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
 			if (tourDataInEditor != null && tourDataInEditor.getTourId() == requestedTourId) {
 
 				// cache tour data
-				fTourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
+				_tourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
 
 				return tourDataInEditor;
 			}
@@ -1492,7 +1493,7 @@ public class TourManager {
 		 */
 		TourData availableTourData = null;
 
-		final TourData tourDataInCache = fTourDataCache.get(requestedTourId);
+		final TourData tourDataInCache = _tourDataCache.get(requestedTourId);
 		if (tourDataInCache != null) {
 			availableTourData = tourDataInCache;
 		} else {
@@ -1504,7 +1505,7 @@ public class TourManager {
 			}
 
 			// cache tour data
-			fTourDataCache.put(tourDataFromDb.getTourId(), tourDataFromDb);
+			_tourDataCache.put(tourDataFromDb.getTourId(), tourDataFromDb);
 
 			availableTourData = tourDataFromDb;
 		}
@@ -1566,7 +1567,7 @@ public class TourManager {
 
 //		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>(fTourDataCache.values());
 
-		fTourDataCache.clear();
+		_tourDataCache.clear();
 
 		// notify listener to reload the tours
 		/*
@@ -1579,7 +1580,7 @@ public class TourManager {
 
 	public void removeTourEventListener(final ITourEventListener listener) {
 		if (listener != null) {
-			fTourEventListeners.remove(listener);
+			_tourEventListeners.remove(listener);
 		}
 	}
 
@@ -1592,12 +1593,12 @@ public class TourManager {
 	 * @param tourId
 	 */
 	public void removeTourFromCache(final Long tourId) {
-		fTourDataCache.remove(tourId);
+		_tourDataCache.remove(tourId);
 	}
 
 	public void removeTourSaveListener(final ITourSaveListener listener) {
 		if (listener != null) {
-			fTourSaveListeners.remove(listener);
+			_tourSaveListeners.remove(listener);
 		}
 	}
 
@@ -1607,11 +1608,11 @@ public class TourManager {
 	 */
 	private void replaceTourInTourEditor(final TourData tourDataForEditor) {
 
-		if (tourDataForEditor == null || fTourDataEditorInstance == null) {
+		if (tourDataForEditor == null || _tourDataEditorInstance == null) {
 			return;
 		}
 
-		final TourData tourDataInEditor = fTourDataEditorInstance.getTourData();
+		final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
 		if (tourDataInEditor == null) {
 			return;
 		}
@@ -1634,10 +1635,10 @@ public class TourManager {
 		/*
 		 * tour editor contains the wrong tour data instance
 		 */
-		if (fTourDataEditorInstance.isDirty()) {
+		if (_tourDataEditorInstance.isDirty()) {
 
 			final StringBuilder sb = new StringBuilder()//
-			.append("ERROR: ") //$NON-NLS-1$
+					.append("ERROR: ") //$NON-NLS-1$
 					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("You can solve the problem by:") //$NON-NLS-1$
@@ -1667,7 +1668,7 @@ public class TourManager {
 			/*
 			 * silently replace tour data in editor
 			 */
-			fTourDataEditorInstance.setTourData(tourDataForEditor);
+			_tourDataEditorInstance.setTourData(tourDataForEditor);
 		}
 	}
 
@@ -1679,7 +1680,7 @@ public class TourManager {
 	 */
 	public boolean saveTours() {
 
-		final Object[] allListeners = fTourSaveListeners.getListeners();
+		final Object[] allListeners = _tourSaveListeners.getListeners();
 		for (final Object tourSaveListener : allListeners) {
 			if (((ITourSaveListener) tourSaveListener).saveTour() == false) {
 				return false;
@@ -1690,7 +1691,7 @@ public class TourManager {
 	}
 
 	public void setActiveTourChart(final TourChart tourChart) {
-		fActiveTourChart = tourChart;
+		_activeTourChart = tourChart;
 	}
 
 	public void updateTourInCache(final TourData tourData) {
@@ -1699,7 +1700,7 @@ public class TourManager {
 			return;
 		}
 
-		fTourDataCache.put(tourData.getTourId(), tourData);
+		_tourDataCache.put(tourData.getTourId(), tourData);
 
 		replaceTourInTourEditor(tourData);
 	}

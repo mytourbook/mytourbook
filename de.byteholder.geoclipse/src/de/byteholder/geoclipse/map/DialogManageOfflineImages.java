@@ -131,6 +131,20 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 		public PartMP(final MP partMp) {
 			this.partMp = partMp;
 		}
+
+		@Override
+		public String toString() {
+
+			final StringBuilder sb = new StringBuilder();
+			sb.append(partMp);
+			sb.append("\tmissing:");
+			sb.append(missingImages);
+			sb.append("\texisting:");
+			sb.append(existingImages);
+
+			return sb.toString();
+		}
+
 	}
 
 	class PartViewerContentProvicer implements IStructuredContentProvider {
@@ -1005,7 +1019,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 				}
 
 				final float progress = _maxQueue - tileWaitingQueueSize;
-				final float percent = progress * 100 / _maxQueue;
+				final float percent = _maxQueue == 0 ? 0 : progress * 100 / _maxQueue;
 
 				final StringBuilder sb = new StringBuilder();
 				sb.append(Integer.toString(tileWaitingQueueSize));
