@@ -22,6 +22,7 @@ import java.util.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartComponentAxis;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
@@ -72,15 +73,16 @@ import org.eclipse.ui.IWorkbenchPartSite;
 public class TourChart extends Chart {
 
 	public static final String				COMMAND_ID_CHART_OPTIONS				= "net.tourbook.command.tourChart.options";					//$NON-NLS-1$
+
 	public static final String				COMMAND_ID_SHOW_START_TIME				= "net.tourbook.command.tourChart.showStartTime";				//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "net.tourbook.command.tourChart.canAutoZoomToSlider";		//$NON-NLS-1$
 	public static final String				COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "net.tourbook.command.tourChart.canMoveSlidersWhenZoomed";	//$NON-NLS-1$
 	public static final String				COMMAND_ID_SHOW_SRTM_DATA				= "net.tourbook.command.option.showSRTMData";					//$NON-NLS-1$
-
 	public static final String				COMMAND_ID_X_AXIS_DISTANCE				= "net.tourbook.command.tourChart.xAxisDistance";				//$NON-NLS-1$
-	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
 
+	public static final String				COMMAND_ID_X_AXIS_TIME					= "net.tourbook.command.tourChart.xAxisTime";					//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_ALTITUDE				= "net.tourbook.command.graph.altitude";						//$NON-NLS-1$
+
 	public static final String				COMMAND_ID_GRAPH_SPEED					= "net.tourbook.command.graph.speed";							//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_PACE					= "net.tourbook.command.graph.pace";							//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_POWER					= "net.tourbook.command.graph.power";							//$NON-NLS-1$
@@ -89,45 +91,45 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_GRAPH_CADENCE				= "net.tourbook.command.graph.cadence";						//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_ALTIMETER				= "net.tourbook.command.graph.altimeter";						//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_GRADIENT				= "net.tourbook.command.graph.gradient";						//$NON-NLS-1$
-
 	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE			= "net.tourbook.command.graph.tourCompare";					//$NON-NLS-1$
 
 	private TourData						_tourData;
-	private TourChartConfiguration			_tourChartConfig;
 
+	private TourChartConfiguration			_tourChartConfig;
 	private Map<String, TCActionProxy>		_actionProxies;
 
 	private final boolean					_isShowActions;
 
 	private final TCActionHandlerManager	_tcActionHandlerManager					= TCActionHandlerManager
 																							.getInstance();
-	private ActionChartOptions				_actionOptions;
 
+	private ActionChartOptions				_actionOptions;
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				_chartDataModelListener;
 
 	private final ListenerList				_selectionListeners						= new ListenerList();
-	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 
+	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 	private IPropertyChangeListener			_prefChangeListener;
+
 	private final Preferences				_prefStore								= TourbookPlugin
 																							.getDefault()
 																							.getPluginPreferences();
-
 	private ChartLabelLayer					_labelLayer;
+
 	private ChartSegmentLayer				_segmentLayer;
 	private ChartSegmentValueLayer			_segmentValueLayer;
 	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
-
 	private boolean							_isSegmentLayerVisible					= false;
+
 	private boolean							_is2ndAltiLayerVisible					= false;
 	private I2ndAltiLayer					_2ndAltiLayerProvider;
 	private boolean							_isMouseModeSet;
 
-	private final TourToolTip				_tourTooltipLeft;
-	private final TourToolTip				_tourTooltipRight;
+	private final TourInfo					_tourInfoLeft;
+
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
@@ -154,12 +156,16 @@ public class TourChart extends Chart {
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_prefChangeListener);
+				onDispose();
 			}
 		});
 
-		_tourTooltipLeft = new TourToolTip(getChartComponents().getAxisLeft());
-		_tourTooltipRight = new TourToolTip(getChartComponents().getAxisRight());
+
+		final ChartComponentAxis axisLeft = getChartComponents().getAxisLeft();
+
+		_tourInfoLeft = new TourInfo(axisLeft);
+		axisLeft.setToolTip(_tourInfoLeft);
+
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -903,6 +909,11 @@ public class TourChart extends Chart {
 		return _tourData;
 	}
 
+	private void onDispose() {
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+	}
+
 	public void removeTourChartListener(final ITourChartSelectionListener listener) {
 		_selectionListeners.remove(listener);
 	}
@@ -1410,8 +1421,7 @@ public class TourChart extends Chart {
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-		_tourTooltipLeft.setTourData(_tourData);
-		_tourTooltipRight.setTourData(_tourData);
+		_tourInfoLeft.setTourData(_tourData);
 	}
 
 	/**

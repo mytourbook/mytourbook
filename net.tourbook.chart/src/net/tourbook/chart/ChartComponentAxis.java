@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -52,6 +51,8 @@ public class ChartComponentAxis extends Canvas {
 	 * the right side
 	 */
 	private boolean						_isLeft;
+
+	private ChartToolTip				_chartToolTip;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
@@ -139,7 +140,10 @@ public class ChartComponentAxis extends Canvas {
 
 		drawYUnits(gc, axisRect);
 
-		// font.dispose();
+		if (_chartToolTip != null) {
+			_chartToolTip.paint(gc, axisRect);
+		}
+
 		gc.dispose();
 
 		_isAxisDirty = false;
@@ -295,5 +299,9 @@ public class ChartComponentAxis extends Canvas {
 		_isLeft = isLeft;
 
 		onResize();
+	}
+
+	public void setToolTip(final ChartToolTip chartToolTip) {
+		_chartToolTip = chartToolTip;
 	}
 }

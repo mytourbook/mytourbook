@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Formatter;
+
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -26,9 +30,12 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -40,27 +47,63 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class TourToolTip extends ToolTip {
 
-	private TourData				_tourData;
+	private static final int			MAX_TOOLTIP_WIDTH		= 400;
+	private static final int			MAX_DATA_WIDTH			= 300;
 
-	private Color					_bgColor;
-	private Color					_fgColor;
-	private Font					_boldFont;
+	private TourData					_tourData;
 
-	private final DateTimeFormatter	_dateFormatter	= DateTimeFormat.fullDate();
+	private Color						_bgColor;
+	private Color						_fgColor;
+	private Font						_boldFont;
+
+	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
+	private final NumberFormat			_nf1					= NumberFormat.getInstance();
+	private final NumberFormat			_nf3					= NumberFormat.getInstance();
+
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
+	}
+
+	/**
+	 * contains the controls which are displayed in the first column, these controls are used to get
+	 * the maximum width and set the first column within the differenct section to the same width
+	 */
+	private final ArrayList<Control>	_firstColumnControls	= new ArrayList<Control>();
+
+	/*
+	 * UI controls
+	 */
+	private Composite					_ttContainer;
+	private Label						_lblTitle;
+	private Label						_lblDate;
+	private Label						_lblTourTags;
+	private CLabel						_lblTourType;
+	private Label						_lblDescription;
 
 	/*
 	 * 1. column
 	 */
-	private Label					_lblTitle;
-	private Label					_lblDistance;
-	private Label					_lblDistanceUnit;
-	private Label					_lblAltitude;
-	private Label					_lblAltitudeUnit;
+	private Label						_lblRecordingTime;
+	private Label						_lblMovingTime;
+	private Label						_lblBreakTime;
 
 	/*
 	 * 2. column
 	 */
-	private Label					_lblDate;
+	private Label						_lblDistance;
+	private Label						_lblDistanceUnit;
+	private Label						_lblAltitudeUp;
+	private Label						_lblAltitudeUpUnit;
+	private Label						_lblAltitudeDown;
+	private Label						_lblAltitudeDownUnit;
+
+	private Label						_lblAvgSpeed;
+	private Label						_lblAvgSpeedUnit;
+	private Label						_lblAvgPace;
+	private Label						_lblAvgPaceUnit;
 
 	public TourToolTip(final Control control) {
 		this(control, NO_RECREATE, false);
@@ -85,50 +128,127 @@ public class TourToolTip extends ToolTip {
 		final Composite container = createUI(parent);
 		updateUI();
 
+		// compute width for all controls and equalize column width for the different sections
+		_ttContainer.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnControls);
+
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
+
 		return container;
 	}
 
 	private Composite createUI(final Composite parent) {
 
-//		/*
-//		 * shell container is necessary because the margins of the inner container will hide the
-//		 * tooltip which is not as it should be.
-//		 */
-//		final Composite shellContainer = new Composite(parent, SWT.NONE);
-//		shellContainer.setForeground(_fgColor);
-//		shellContainer.setBackground(_bgColor);
-//		shellContainer.setLayout(new FillLayout());
-//		{
+		final int margin = 5;
 
-			final Composite container = new Composite(parent, SWT.NONE);
-			container.setForeground(_fgColor);
-			container.setBackground(_bgColor);
-			GridLayoutFactory
-					.fillDefaults()
+		/*
+		 * shell container is necessary because the margins of the inner container will hide the
+		 * tooltip which is not as it should be.
+		 */
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		shellContainer.setForeground(_fgColor);
+		shellContainer.setBackground(_bgColor);
+		shellContainer.setLayout(new FillLayout());
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+
+			_ttContainer = new Composite(shellContainer, SWT.NONE);
+			_ttContainer.setForeground(_fgColor);
+			_ttContainer.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults()//
 					.numColumns(2)
-//					.spacing(20, 5)
-//					.extendedMargins(2, 2, 2, 2)
-					.applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+					.equalWidth(true)
+					.spacing(20, 5)
+					.margins(margin, margin)
+					.applyTo(_ttContainer);
+//			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
-				/*
-				 * title
-				 */
-				_lblTitle = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblTitle);
-				_lblTitle.setFont(_boldFont);
-				_lblTitle.setForeground(_fgColor);
-				_lblTitle.setBackground(_bgColor);
-
-				createUI10LeftColumn(container);
-				createUI20RightColumn(container);
+				createUI10UpperPart(_ttContainer);
+				createUI30LeftColumn(_ttContainer);
+				createUI40RightColumn(_ttContainer);
+				createUI50LowerPart(_ttContainer);
 			}
-//		}
+		}
 
-		return container;
+		return shellContainer;
 	}
 
-	private void createUI10LeftColumn(final Composite parent) {
+	private void createUI10UpperPart(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		container.setForeground(_fgColor);
+		container.setBackground(_bgColor);
+		GridLayoutFactory.fillDefaults()//
+//				.numColumns(1)
+//				.spacing(5, 0)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * title
+			 */
+			_lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+					.applyTo(_lblTitle);
+			_lblTitle.setFont(_boldFont);
+			_lblTitle.setForeground(_fgColor);
+			_lblTitle.setBackground(_bgColor);
+
+			/*
+			 * date
+			 */
+			_lblDate = createUILabelValue(container, SWT.LEAD);
+//			GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblDate);
+		}
+	}
+
+	private void createUI30LeftColumn(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		container.setForeground(_fgColor);
+		container.setBackground(_bgColor);
+		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * recording time
+			 */
+			Label label = createUILabel(container, Messages.Tour_Tooltip_Label_RecordingTime);
+			_firstColumnControls.add(label);
+
+			_lblRecordingTime = createUILabelValue(container, SWT.TRAIL);
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+
+			// force this column to take the rest of the space
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+
+			/*
+			 * moving time
+			 */
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_MovingTime);
+			_firstColumnControls.add(label);
+			_lblMovingTime = createUILabelValue(container, SWT.TRAIL);
+			createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+
+			/*
+			 * break time
+			 */
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_BreakTime);
+			_firstColumnControls.add(label);
+			_lblBreakTime = createUILabelValue(container, SWT.TRAIL);
+			createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+		}
+	}
+
+	private void createUI40RightColumn(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -145,40 +265,95 @@ public class TourToolTip extends ToolTip {
 			_lblDistanceUnit = createUILabelValue(container, SWT.LEAD);
 
 			/*
-			 * altitude
+			 * altitude up
 			 */
-			createUILabel(container, Messages.Tour_Tooltip_Label_Altitude);
-			_lblAltitude = createUILabelValue(container, SWT.TRAIL);
-			_lblAltitudeUnit = createUILabelValue(container, SWT.LEAD);
+			createUILabel(container, Messages.Tour_Tooltip_Label_AltitudeUp);
+			_lblAltitudeUp = createUILabelValue(container, SWT.TRAIL);
+			_lblAltitudeUpUnit = createUILabelValue(container, SWT.LEAD);
+
+			/*
+			 * altitude up
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AltitudeDown);
+			_lblAltitudeDown = createUILabelValue(container, SWT.TRAIL);
+			_lblAltitudeDownUnit = createUILabelValue(container, SWT.LEAD);
+
+			// spacer
+			final Label label = createUILabel(container, null);
+			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+
+			/*
+			 * avg speed
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgSpeed);
+			_lblAvgSpeed = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgSpeedUnit = createUILabelValue(container, SWT.LEAD);
+
+			/*
+			 * avg pace
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgPace);
+			_lblAvgPace = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgPaceUnit = createUILabelValue(container, SWT.LEAD);
 		}
 	}
 
-	private void createUI20RightColumn(final Composite parent) {
+	private void createUI50LowerPart(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
 			/*
-			 * date
+			 * tags
 			 */
-			createUILabel(container, Messages.Tour_Tooltip_Label_Date);
+			Label label = createUILabel(container, Messages.Tour_Tooltip_Label_Tags);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
 
-			_lblDate = createUILabelValue(container, SWT.LEAD);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblDate);
+			_lblTourTags = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+					.applyTo(_lblTourTags);
 
+			/*
+			 * tour type
+			 */
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_TourType);
+			_firstColumnControls.add(label);
+
+			_lblTourType = new CLabel(container, SWT.NONE);
+			_lblTourType.setForeground(_fgColor);
+			_lblTourType.setBackground(_bgColor);
+			GridDataFactory.swtDefaults()//
+					.grab(true, false)
+					.applyTo(_lblTourType);
+
+			/*
+			 * description
+			 */
+			_lblDescription = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.indent(0, 20)
+					.hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT)
+					.applyTo(_lblDescription);
 		}
 	}
 
 	private Label createUILabel(final Composite parent, final String labelText) {
 
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText(labelText);
 		label.setForeground(_fgColor);
 		label.setBackground(_bgColor);
+
+		if (labelText != null) {
+			label.setText(labelText);
+		}
 
 		return label;
 	}
@@ -186,52 +361,39 @@ public class TourToolTip extends ToolTip {
 	private Label createUILabelValue(final Composite parent, final int style) {
 
 		final Label label = new Label(parent, style);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+				.applyTo(label);
 		label.setForeground(_fgColor);
 		label.setBackground(_bgColor);
 
 		return label;
 	}
 
-	@Override
-	public Point getLocation(final Point tipSize, final Event event) {
-
-//		// try to position the tooltip at the bottom of the cell
-//		ViewerCell cell = v.getCell(new Point(event.x, event.y));
+//	@Override
+//	public Point getLocation(final Point tipSize, final Event event) {
 //
-//		if( cell != null ) {
-//			return tree.toDisplay(event.x,cell.getBounds().y+cell.getBounds().height);
-//		}
-
-		return super.getLocation(tipSize, event);
-	}
-
-//	final Display display = _toolTipShell.getDisplay();
-//	final Color infoColorBackground = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-//	final Color infoColorForeground = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+////		// try to position the tooltip at the bottom of the cell
+////		ViewerCell cell = v.getCell(new Point(event.x, event.y));
+////
+////		if( cell != null ) {
+////			return tree.toDisplay(event.x,cell.getBounds().y+cell.getBounds().height);
+////		}
 //
-//	_toolTipContainer = new Composite(_toolTipShell, SWT.NONE);
-//	GridLayoutFactory.fillDefaults().extendedMargins(2, 5, 2, 3).applyTo(_toolTipContainer);
-//
-//	_toolTipContainer.setBackground(infoColorBackground);
-//	_toolTipContainer.setForeground(infoColorForeground);
-//
-//	_toolTipTitle = new Label(_toolTipContainer, SWT.LEAD);
-//	_toolTipTitle.setBackground(infoColorBackground);
-//	_toolTipTitle.setForeground(infoColorForeground);
-//	_toolTipTitle.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-//
-//	_toolTipLabel = new Label(_toolTipContainer, SWT.LEAD | SWT.WRAP);
-//	_toolTipLabel.setBackground(infoColorBackground);
-//	_toolTipLabel.setForeground(infoColorForeground);
+//		return super.getLocation(tipSize, event);
+//	}
 
-	@Override
-	protected Object getToolTipArea(final Event event) {
+//	@Override
+//	protected Object getToolTipArea(final Event event) {
+//
+////		// Ensure that the tooltip is hidden when the cell is left
+////		return v.getCell(new Point(event.x, event.y));
+//
+//		return super.getToolTipArea(event);
+//	}
 
-//		// Ensure that the tooltip is hidden when the cell is left
-//		return v.getCell(new Point(event.x, event.y));
-
-		return super.getToolTipArea(event);
+	private void onDispose() {
+		_firstColumnControls.clear();
 	}
 
 	public void setTourData(final TourData tourData) {
@@ -240,32 +402,7 @@ public class TourToolTip extends ToolTip {
 
 	private void updateUI() {
 
-//		final int oldestYear = _currentYear - _numberOfYears + 1;
-//		final int tourDOY = tourDOYValues[valueIndex];
-//		_calendar.set(oldestYear, 0, 1);
-//		_calendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
-//		final String beginDate = _dateFormatter.format(_calendar.getTime());
-//
-//		_currentMonth = _calendar.get(Calendar.MONTH) + 1;
-//		_selectedTourId = _tourTimeData.fTourIds[valueIndex];
-//
-//		final String tourTags = TourDatabase.getTagNames();
-//		final String tourDescription = _tourTimeData.tourDescription.get(valueIndex).replace(
-//				UI.SYSTEM_NEW_LINE,
-//				UI.NEW_LINE);
-//
-//		final int[] startValue = _tourTimeData.fTourTimeStartValues;
-//		final int[] endValue = _tourTimeData.fTourTimeEndValues;
-//
-//		final Integer recordingTime = _tourTimeData.fTourRecordingTimeValues.get(valueIndex);
-//		final Integer drivingTime = _tourTimeData.fTourDrivingTimeValues.get(valueIndex);
-//		final int breakTime = recordingTime - drivingTime;
-//
-//		final float distance = _tourTimeData.fTourDistanceValues[valueIndex];
-//		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-//		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
-
-		final DateTime dt = new DateTime(
+		final DateTime dtTour = new DateTime(//
 				_tourData.getStartYear(),
 				_tourData.getStartMonth(),
 				_tourData.getStartDay(),
@@ -275,14 +412,15 @@ public class TourToolTip extends ToolTip {
 				0);
 
 		final int recordingTime = _tourData.getTourRecordingTime();
-		final int drivingTime = _tourData.getTourDrivingTime();
-		final int breakTime = recordingTime - drivingTime;
+		final int movingTime = _tourData.getTourDrivingTime();
+		final int breakTime = recordingTime - movingTime;
 
-		final int altiUp = (int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ALTITUDE);
-		final float distance = (_tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE);
+		final float altiUp = _tourData.getTourAltUp() / UI.UNIT_VALUE_ALTITUDE;
+		final float altiDown = _tourData.getTourAltDown() / UI.UNIT_VALUE_ALTITUDE;
+		final float distance = _tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
 
-//		dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
-//		dbDistance.add((int) (result.getInt(7) / UI.UNIT_VALUE_DISTANCE));
+		final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+		final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
 
 		final TourType tourType = _tourData.getTourType();
 		final String tourTypeName = tourType == null ? //
@@ -294,20 +432,68 @@ public class TourToolTip extends ToolTip {
 			tourTitle = tourTypeName.length() > 0 ? tourTypeName : UI.EMPTY_STRING;
 		}
 
-		_lblTitle.setText(tourTitle);
+		final String tourDescription = _tourData.getTourDescription();
 
 		/*
-		 * left column
+		 * column: both
 		 */
-		_lblDistance.setText(Integer.toString((int) distance));
+		_lblTitle.setText(tourTitle);
+		_lblDescription.setText(tourDescription);
+
+		UI.updateUITags(_tourData, _lblTourTags);
+		UI.updateUITourType(_tourData.getTourType(), _lblTourType);
+
+		/*
+		 * column: left
+		 */
+		_lblDate.setText(new Formatter().format(//
+				Messages.Tour_Tooltip_Format_DateWeek,
+				_dateFormatter.print(dtTour.getMillis()),
+				dtTour.getWeekOfWeekyear())//
+				.toString());
+
+		_lblRecordingTime.setText(new Formatter().format(
+				Messages.Tour_Tooltip_Format_Date,
+				recordingTime / 3600,
+				(recordingTime % 3600) / 60,
+				(recordingTime % 3600) % 60)//
+				.toString());
+
+		_lblMovingTime.setText(new Formatter().format(
+				Messages.Tour_Tooltip_Format_Date,
+				movingTime / 3600,
+				(movingTime % 3600) / 60,
+				(movingTime % 3600) % 60)//
+				.toString());
+
+		_lblBreakTime.setText(new Formatter().format(
+				Messages.Tour_Tooltip_Format_Date,
+				breakTime / 3600,
+				(breakTime % 3600) / 60,
+				(breakTime % 3600) % 60)//
+				.toString());
+
+		/*
+		 * column: right
+		 */
+		_lblDistance.setText(_nf3.format(distance / 1000));
 		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
-		_lblAltitude.setText(Integer.toString(altiUp));
-		_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+		_lblAltitudeUp.setText(Integer.toString((int) altiUp));
+		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		/*
-		 * right column
-		 */
-		_lblDate.setText(_dateFormatter.print(dt.getMillis()));
+		_lblAltitudeDown.setText(Integer.toString((int) altiDown));
+		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+
+		_lblAvgSpeed.setText(_nf1.format(speed));
+		_lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+
+		_lblAvgPace.setText(new Formatter().format(//
+				Messages.Tour_Tooltip_Format_Pace,
+				pace / 60,
+				pace % 60)//
+				.toString());
+		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
+
 	}
 }

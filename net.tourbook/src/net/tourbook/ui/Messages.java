@@ -211,11 +211,35 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
-	public static String	Tour_Tooltip_Label_Altitude;
+	public static String	Tour_Tooltip_Format_Date;
+
+	public static String	Tour_Tooltip_Format_DateWeek;
+
+	public static String	Tour_Tooltip_Format_Pace;
+
+	public static String	Tour_Tooltip_Label_AltitudeDown;
+
+	public static String	Tour_Tooltip_Label_AltitudeUp;
+
+	public static String	Tour_Tooltip_Label_AvgPace;
+
+	public static String	Tour_Tooltip_Label_AvgSpeed;
+
+	public static String	Tour_Tooltip_Label_BreakTime;
 
 	public static String	Tour_Tooltip_Label_Date;
 
 	public static String	Tour_Tooltip_Label_Distance;
+
+	public static String	Tour_Tooltip_Label_Hour;
+
+	public static String	Tour_Tooltip_Label_MovingTime;
+
+	public static String	Tour_Tooltip_Label_RecordingTime;
+
+	public static String	Tour_Tooltip_Label_Tags;
+
+	public static String	Tour_Tooltip_Label_TourType;
 
 	static {
 		// initialize resource bundle

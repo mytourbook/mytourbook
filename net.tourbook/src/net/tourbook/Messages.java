@@ -359,6 +359,8 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
+
+	public static String	Image__TourInfo;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
