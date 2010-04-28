@@ -213,7 +213,7 @@ public class Messages extends NLS {
 
 	public static String	Tour_Tooltip_Format_Date;
 
-	public static String	Tour_Tooltip_Format_DateWeek;
+	public static String	Tour_Tooltip_Format_DateWeekTime;
 
 	public static String	Tour_Tooltip_Format_Pace;
 
@@ -227,6 +227,8 @@ public class Messages extends NLS {
 
 	public static String	Tour_Tooltip_Label_BreakTime;
 
+	public static String	Tour_Tooltip_Label_Clouds;
+
 	public static String	Tour_Tooltip_Label_Date;
 
 	public static String	Tour_Tooltip_Label_Distance;
@@ -238,6 +240,8 @@ public class Messages extends NLS {
 	public static String	Tour_Tooltip_Label_RecordingTime;
 
 	public static String	Tour_Tooltip_Label_Tags;
+
+	public static String	Tour_Tooltip_Label_Temperature;
 
 	public static String	Tour_Tooltip_Label_TourType;
 

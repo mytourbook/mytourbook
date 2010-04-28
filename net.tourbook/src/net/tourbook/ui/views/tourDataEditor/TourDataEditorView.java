@@ -39,6 +39,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.data.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -2700,7 +2701,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			});
 
 			// fill combobox
-			for (final String speedText : IWeather._windSpeedText) {
+			for (final String speedText : IWeather.windSpeedText) {
 				_comboWindSpeedText.add(speedText);
 			}
 
@@ -2782,8 +2783,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
 
 			// fill combobox
-			for (final String fComboCloudsUIValue : IWeather._windDirectionText) {
-				_comboWindDirectionText.add(fComboCloudsUIValue);
+			for (final String windDirText : IWeather.windDirectionText) {
+				_comboWindDirectionText.add(windDirText);
 			}
 
 		}
@@ -2888,7 +2889,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			});
 
 			// fill combobox
-			for (final String cloudText : IWeather._cloudText) {
+			for (final String cloudText : IWeather.cloudText) {
 				_comboClouds.add(cloudText);
 			}
 
@@ -3591,7 +3592,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final int selectionIndex = _comboClouds.getSelectionIndex();
 
-		final String cloudKey = IWeather._cloudDBValue[selectionIndex];
+		final String cloudKey = IWeather.cloudIcon[selectionIndex];
 		final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
 		_lblCloudIcon.setImage(cloundIcon);
@@ -5500,7 +5501,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
 		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
 
-		_unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather._windSpeedKmh : IWeather._windSpeedMph;
+		_unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather.windSpeedKmh : IWeather.windSpeedMph;
 	}
 
 	/**
@@ -5544,7 +5545,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
-			String cloudValue = IWeather._cloudDBValue[cloudIndex];
+			String cloudValue = IWeather.cloudIcon[cloudIndex];
 			if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
 				// replace invalid cloud key
 				cloudValue = UI.EMPTY_STRING;
@@ -5854,26 +5855,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinWindSpeedValue.setSelection(speed);
 		_comboWindSpeedText.select(getWindSpeedTextIndex(speed));
 
-		/*
-		 * weather icon
-		 */
-		int weatherCloudsIndex = -1;
-		final String cloudValue = _tourData.getWeatherClouds();
-		if (cloudValue != null) {
-			// we cannot use a binary search as that requires sorting which we cannot...
-			for (int cloudIndex = 0; cloudIndex < IWeather._cloudDBValue.length; ++cloudIndex) {
-				if (IWeather._cloudDBValue[cloudIndex].equalsIgnoreCase(cloudValue)) {
-					weatherCloudsIndex = cloudIndex;
-					break;
-				}
-			}
-		}
-		if (weatherCloudsIndex < 0) {
-			// select first entry which is the default value
-			_comboClouds.select(0);
-		} else {
-			_comboClouds.select(weatherCloudsIndex);
-		}
+		// weather clouds
+		_comboClouds.select(_tourData.getWeatherIndex());
+
 		// icon must be displayed after the combobox entry is selected
 		displayCloudIcon();
 

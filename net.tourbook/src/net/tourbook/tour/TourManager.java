@@ -304,7 +304,10 @@ public class TourManager {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
-		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+		calendar.set(//
+				tourData.getStartYear(),
+				tourData.getStartMonth() - 1,
+				tourData.getStartDay());
 
 		return UI.DateFormatterFull.format(calendar.getTime());
 	}
@@ -324,7 +327,10 @@ public class TourManager {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
-		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+		calendar.set(//
+				tourData.getStartYear(),
+				tourData.getStartMonth() - 1,
+				tourData.getStartDay());
 
 		return UI.DateFormatterShort.format(calendar.getTime());
 	}
@@ -334,8 +340,14 @@ public class TourManager {
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
-		return new DateTime(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay(), tourData
-				.getStartHour(), tourData.getStartMinute(), tourData.getStartSecond(), 0);
+		return new DateTime(//
+				tourData.getStartYear(),
+				tourData.getStartMonth(),
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute(),
+				tourData.getStartSecond(),
+				0);
 	}
 
 	private static String getTourTimeShort(final Date date) {
@@ -349,8 +361,13 @@ public class TourManager {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
-		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay(), tourData
-				.getStartHour(), tourData.getStartMinute(), tourData.getStartSecond());
+		calendar.set(//
+				tourData.getStartYear(),
+				tourData.getStartMonth() - 1,
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute(),
+				tourData.getStartSecond());
 
 		return UI.TimeFormatterShort.format(calendar.getTime());
 	}

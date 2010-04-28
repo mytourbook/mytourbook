@@ -3713,6 +3713,14 @@ public class TourData implements Comparable<Object> {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
+	}
+
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3753,14 +3761,6 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
-
 	public Set<TourWayPoint> getTourWayPoints() {
 		return tourWayPoints;
 	}
@@ -3769,18 +3769,40 @@ public class TourData implements Comparable<Object> {
 		return weatherClouds;
 	}
 
+	/**
+	 * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
+	 *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+	 */
+	public int getWeatherIndex() {
+
+		int weatherCloudsIndex = -1;
+		final String cloudValue = getWeatherClouds();
+
+		if (cloudValue != null) {
+			// we cannot use a binary search as that requires sorting which we cannot...
+			for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
+				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(cloudValue)) {
+					weatherCloudsIndex = cloudIndex;
+					break;
+				}
+			}
+		}
+
+		return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+	}
+
 	public int getWeatherWindDir() {
 		return weatherWindDir;
+	}
+
+	public int getWeatherWindSpd() {
+		return weatherWindSpd;
 	}
 
 // not used 5.10.2008
 //	public void setDeviceDistance(final int deviceDistance) {
 //		this.deviceDistance = deviceDistance;
 //	}
-
-	public int getWeatherWindSpd() {
-		return weatherWindSpd;
-	}
 
 	/**
 	 * @param zoomLevel
@@ -3843,6 +3865,13 @@ public class TourData implements Comparable<Object> {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tour is saved in the database.
+	 */
+	public boolean isTourSaved() {
+		return tourPerson != null;
 	}
 
 	/**

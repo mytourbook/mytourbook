@@ -163,6 +163,7 @@ public class TourChart extends Chart {
 
 		final ChartComponentAxis axisLeft = getChartComponents().getAxisLeft();
 
+		// set tour info icon into the left axis
 		_tourInfoLeft = new TourInfo(axisLeft);
 		axisLeft.setToolTip(_tourInfoLeft);
 

@@ -1,6 +1,18 @@
-/**
+/*******************************************************************************
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
- */
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
@@ -20,35 +32,34 @@ import org.eclipse.swt.widgets.Event;
 
 final class TourInfo extends ChartToolTip {
 
-	private static final int		HOVER_AREA	= 2;
+	private static final int	HOVER_AREA	= 2;
 
 	/**
 	 * Control for which the tour info is displayed
 	 */
-	private final Control			_infoControl;
+	private final Control		_infoControl;
 
-	private final TourChartToolTip	_tourChartToolTip;
+	private final TourChartInfo	_tourChartInfo;
 
-	private final Image				_imageTourInfo;
-	private final Rectangle			_imageBounds;
+	private final Image			_imageTourInfo;
+	private final Rectangle		_imageBounds;
 
-	private int						_devImageX;
-	private int						_devImageY;
+	private int					_devImageX;
+	private int					_devImageY;
 
-	public class TourChartToolTip extends TourToolTip {
+	public class TourChartInfo extends TourInfoContent {
 
-		public TourChartToolTip(final Control control) {
+		public TourChartInfo(final Control control) {
 			super(control);
 		}
 
 		@Override
 		public Point getLocation(final Point tipSize, final Event event) {
 
-//			final int devX = _devImageX + _imageBounds.width + HOVER_AREA;
-//			final int devY = _devImageY - HOVER_AREA;
+			final int toolTipBorder = 7;
 
 			final int devX = _devImageX - HOVER_AREA - tipSize.x;
-			final int devY = _devImageY - HOVER_AREA;
+			final int devY = _devImageY - HOVER_AREA - toolTipBorder;
 
 			return _infoControl.toDisplay(devX, devY);
 		}
@@ -63,7 +74,8 @@ final class TourInfo extends ChartToolTip {
 			if (devMouseX >= _devImageX - HOVER_AREA
 					&& devMouseX <= _devImageX + _imageBounds.width + HOVER_AREA
 					&& devMouseY >= _devImageY - HOVER_AREA
-					&& devMouseY <= devMouseY + _imageBounds.height + HOVER_AREA) {
+					&& devMouseY <= _devImageY + _imageBounds.height + HOVER_AREA) {
+//					&& devMouseY <= devMouseY + _imageBounds.height + HOVER_AREA) {
 
 				return _imageBounds;
 			}
@@ -79,7 +91,7 @@ final class TourInfo extends ChartToolTip {
 		_imageTourInfo = TourbookPlugin.getImageDescriptor(Messages.Image__TourInfo).createImage();
 		_imageBounds = _imageTourInfo.getBounds();
 
-		_tourChartToolTip = new TourChartToolTip(control);
+		_tourChartInfo = new TourChartInfo(control);
 
 		control.addDisposeListener(new DisposeListener() {
 			@Override
@@ -97,12 +109,13 @@ final class TourInfo extends ChartToolTip {
 	public void paint(final GC gc, final Rectangle rectangle) {
 
 		_devImageX = HOVER_AREA;
-		_devImageY = rectangle.height - _imageBounds.height - HOVER_AREA;
+//		_devImageY = rectangle.height - _imageBounds.height - HOVER_AREA;
+		_devImageY = HOVER_AREA;
 
 		gc.drawImage(_imageTourInfo, _devImageX, _devImageY);
 	}
 
 	public void setTourData(final TourData tourData) {
-		_tourChartToolTip.setTourData(tourData);
+		_tourChartInfo.setTourData(tourData);
 	}
 }
