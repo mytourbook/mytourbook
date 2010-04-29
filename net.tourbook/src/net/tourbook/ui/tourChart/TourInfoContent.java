@@ -99,6 +99,13 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 	private Label						_lblMovingTime;
 	private Label						_lblBreakTime;
 
+	private Label						_lblWindSpeed;
+	private Label						_lblWindSpeedUnit;
+	private Label						_lblWindDirection;
+	private Label						_lblWindDirectionUnit;
+	private Label						_lblTemperature;
+	private CLabel						_lblClouds;
+
 	/*
 	 * 2. column
 	 */
@@ -113,10 +120,10 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 	private Label						_lblAvgSpeedUnit;
 	private Label						_lblAvgPace;
 	private Label						_lblAvgPaceUnit;
-
-	private Label						_lblTemperature;
-	private CLabel						_lblClouds;
-
+	private Label						_lblAvgPulse;
+	private Label						_lblAvgPulseUnit;
+	private Label						_lblAvgCadence;
+	private Label						_lblAvgCadenceUnit;
 
 	public TourInfoContent(final Control control) {
 		this(control, NO_RECREATE, false);
@@ -293,50 +300,39 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 			label = createUILabel(container, null);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
-			// temperature
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Temperature);
-			_firstColumnControls.add(label);
-			_lblTemperature = createUILabelValue(container, SWT.TRAIL);
-			createUILabel(container, UI.UNIT_LABEL_TEMPERATURE);
-
-			// wind direction
-			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
-//			_spinWindDirectionValue.setSelection(weatherWindDirDegree);
-//			_comboWindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
-
-			// wind speed
-			final int windSpeed = _tourData.getWeatherWindSpd();
-//			final int speed = (int) (windSpeed / _unitValueDistance);
-//			_spinWindSpeedValue.setSelection(speed);
-//			_comboWindSpeedText.select(getWindSpeedTextIndex(speed));
+			/*
+			 * avg speed
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgSpeed);
+			_lblAvgSpeed = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgSpeedUnit = createUILabelValue(container, SWT.LEAD);
 
 			/*
-			 * clouds
+			 * avg pace
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Clouds);
-			_firstColumnControls.add(label);
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgPace);
+			_lblAvgPace = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgPaceUnit = createUILabelValue(container, SWT.LEAD);
 
-			final Composite cloudContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(cloudContainer);
-			cloudContainer.setForeground(_fgColor);
-			cloudContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
-			{
-				// icon/text: clouds
-				_lblClouds = new CLabel(cloudContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-//						.align(SWT.END, SWT.FILL)
-						.grab(true, false)
-						.applyTo(_lblClouds);
+			/*
+			 * avg pulse
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgPulse);
+			_lblAvgPulse = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgPulseUnit = createUILabelValue(container, SWT.LEAD);
 
-				_lblClouds.setForeground(_fgColor);
-				_lblClouds.setBackground(_bgColor);
-			}
-
+			/*
+			 * avg cadence
+			 */
+			createUILabel(container, Messages.Tour_Tooltip_Label_AvgCadence);
+			_lblAvgCadence = createUILabelValue(container, SWT.TRAIL);
+			_lblAvgCadenceUnit = createUILabelValue(container, SWT.LEAD);
 		}
 	}
 
 	private void createUI40RightColumn(final Composite parent) {
+
+		Label label;
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -367,22 +363,39 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 			_lblAltitudeDownUnit = createUILabelValue(container, SWT.LEAD);
 
 			// spacer
-			final Label label = createUILabel(container, null);
+			label = createUILabel(container, null);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
-			/*
-			 * avg speed
-			 */
-			createUILabel(container, Messages.Tour_Tooltip_Label_AvgSpeed);
-			_lblAvgSpeed = createUILabelValue(container, SWT.TRAIL);
-			_lblAvgSpeedUnit = createUILabelValue(container, SWT.LEAD);
+			// temperature
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_Temperature);
+			_firstColumnControls.add(label);
+			_lblTemperature = createUILabelValue(container, SWT.TRAIL);
+			createUILabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+			// wind speed
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_WindSpeed);
+			_firstColumnControls.add(label);
+			_lblWindSpeed = createUILabelValue(container, SWT.TRAIL);
+			_lblWindSpeedUnit = createUILabelValue(container, SWT.LEAD);
+
+			// wind direction
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_WindDirection);
+			_firstColumnControls.add(label);
+			_lblWindDirection = createUILabelValue(container, SWT.TRAIL);
+			_lblWindDirectionUnit = createUILabelValue(container, SWT.LEAD);
 
 			/*
-			 * avg pace
+			 * clouds
 			 */
-			createUILabel(container, Messages.Tour_Tooltip_Label_AvgPace);
-			_lblAvgPace = createUILabelValue(container, SWT.TRAIL);
-			_lblAvgPaceUnit = createUILabelValue(container, SWT.LEAD);
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_Clouds);
+			_firstColumnControls.add(label);
+
+			// icon/text: clouds
+			_lblClouds = new CLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblClouds);
+
+			_lblClouds.setForeground(_fgColor);
+			_lblClouds.setBackground(_bgColor);
 		}
 	}
 
@@ -500,6 +513,35 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 		return selectedTour;
 	}
 
+	private int getWindDirectionTextIndex(final int degreeDirection) {
+
+		final float degree = (degreeDirection + 22.5f) / 45.0f;
+
+		final int directionIndex = ((int) degree) % 8;
+
+		return directionIndex;
+	}
+
+	private int getWindSpeedTextIndex(final int speed) {
+
+		final int[] unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather.windSpeedKmh : IWeather.windSpeedMph;
+
+		// set speed to max index value
+		int speedValueIndex = unitValueWindSpeed.length - 1;
+
+		for (int speedIndex = 0; speedIndex < unitValueWindSpeed.length; speedIndex++) {
+
+			final int speedMaxValue = unitValueWindSpeed[speedIndex];
+
+			if (speed <= speedMaxValue) {
+				speedValueIndex = speedIndex;
+				break;
+			}
+		}
+
+		return speedValueIndex;
+	}
+
 	private void onDispose() {
 		_firstColumnControls.clear();
 	}
@@ -584,6 +626,22 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 				(breakTime % 3600) % 60)//
 				.toString());
 
+		int windSpeed = _tourData.getWeatherWindSpeed();
+		windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
+
+		_lblWindSpeed.setText(Integer.toString(windSpeed));
+		_lblWindSpeedUnit.setText(new Formatter().format(
+				Messages.Tour_Tooltip_Format_WindSpeedUnit,
+				UI.UNIT_LABEL_SPEED,
+				IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]).toString());
+
+		// wind direction
+		final int weatherWindDirDegree = _tourData.getWeatherWindDir();
+		_lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
+		_lblWindDirectionUnit.setText(new Formatter().format(
+				Messages.Tour_Tooltip_Format_WindDirectionUnit,
+				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]).toString());
+
 		// temperature
 		int temperature = _tourData.getAvgTemperature();
 		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
@@ -591,7 +649,7 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 		}
 		_lblTemperature.setText(Integer.toString(temperature));
 
-		// weather
+		// weather clouds
 		final int weatherIndex = _tourData.getWeatherIndex();
 		final String cloudImageName = IWeather.cloudIcon[weatherIndex];
 
@@ -619,6 +677,14 @@ public class TourInfoContent extends ToolTip implements ITourProvider {
 				pace % 60)//
 				.toString());
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
+
+		// avg pulse
+		_lblAvgPulse.setText(Integer.toString(_tourData.getAvgPulse()));
+		_lblAvgPulseUnit.setText(Messages.Value_Unit_Avg_Pulse);
+
+		// avg cadence
+		_lblAvgCadence.setText(Integer.toString(_tourData.getAvgCadence()));
+		_lblAvgCadenceUnit.setText(Messages.Value_Unit_Avg_Cadence);
 
 	}
 }

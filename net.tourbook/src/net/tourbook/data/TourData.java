@@ -3795,7 +3795,7 @@ public class TourData implements Comparable<Object> {
 		return weatherWindDir;
 	}
 
-	public int getWeatherWindSpd() {
+	public int getWeatherWindSpeed() {
 		return weatherWindSpd;
 	}
 

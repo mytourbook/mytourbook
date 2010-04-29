@@ -360,7 +360,7 @@ public class Messages extends NLS {
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
 
-	public static String	Image__TourInfo;
+	public static String		Image__TourInfo;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -399,7 +399,7 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String	Import_Data_Action_RemoveTour;
+	public static String		Import_Data_Action_RemoveTour;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -928,18 +928,31 @@ public class Messages extends NLS {
 	public static String		Weather_WindDirection_W;
 
 	public static String		Weather_WindSpeed_Bft00;
+	public static String		Weather_WindSpeed_Bft00_Short;
 	public static String		Weather_WindSpeed_Bft01;
+	public static String		Weather_WindSpeed_Bft01_Short;
 	public static String		Weather_WindSpeed_Bft02;
+	public static String		Weather_WindSpeed_Bft02_Short;
 	public static String		Weather_WindSpeed_Bft03;
+	public static String		Weather_WindSpeed_Bft03_Short;
 	public static String		Weather_WindSpeed_Bft04;
+	public static String		Weather_WindSpeed_Bft04_Short;
 	public static String		Weather_WindSpeed_Bft05;
+	public static String		Weather_WindSpeed_Bft05_Short;
 	public static String		Weather_WindSpeed_Bft06;
+	public static String		Weather_WindSpeed_Bft06_Short;
 	public static String		Weather_WindSpeed_Bft07;
+	public static String		Weather_WindSpeed_Bft07_Short;
 	public static String		Weather_WindSpeed_Bft08;
+	public static String		Weather_WindSpeed_Bft08_Short;
 	public static String		Weather_WindSpeed_Bft09;
+	public static String		Weather_WindSpeed_Bft09_Short;
 	public static String		Weather_WindSpeed_Bft10;
+	public static String		Weather_WindSpeed_Bft10_Short;
 	public static String		Weather_WindSpeed_Bft11;
+	public static String		Weather_WindSpeed_Bft11_Short;
 	public static String		Weather_WindSpeed_Bft12;
+	public static String		Weather_WindSpeed_Bft12_Short;
 
 	static {
 		// initialize resource bundle

@@ -52,6 +52,21 @@ public interface IWeather {
 			Messages.Weather_WindSpeed_Bft11,
 			Messages.Weather_WindSpeed_Bft12			};
 
+	public static final String[]	windSpeedTextShort	= new String[] {
+			Messages.Weather_WindSpeed_Bft00_Short,
+			Messages.Weather_WindSpeed_Bft01_Short,
+			Messages.Weather_WindSpeed_Bft02_Short,
+			Messages.Weather_WindSpeed_Bft03_Short,
+			Messages.Weather_WindSpeed_Bft04_Short,
+			Messages.Weather_WindSpeed_Bft05_Short,
+			Messages.Weather_WindSpeed_Bft06_Short,
+			Messages.Weather_WindSpeed_Bft07_Short,
+			Messages.Weather_WindSpeed_Bft08_Short,
+			Messages.Weather_WindSpeed_Bft09_Short,
+			Messages.Weather_WindSpeed_Bft10_Short,
+			Messages.Weather_WindSpeed_Bft11_Short,
+			Messages.Weather_WindSpeed_Bft12_Short		};
+
 	/**
 	 * Wind speed in km/h
 	 */
