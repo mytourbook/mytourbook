@@ -434,6 +434,7 @@
    <extension
          point="org.eclipse.ui.menus">
 
+
       <menuContribution
             locationURI="menu:file?after=fileNew">
          <command
@@ -462,6 +463,21 @@
                visible="true">
          </separator>
       </menuContribution>
+
+
+      <menuContribution
+            locationURI="menu:help?before=about">
+         <command
+               commandId="net.tourbook.command.OpenHomePage"
+               label="%Command_App_OpenHomePage"
+               mnemonic="%Command_App_OpenHomePage_Mnemonic">
+         </command>
+         <separator
+               name="net.tourbook.separator"
+               visible="true">
+         </separator>
+      </menuContribution>
+
 
       <menuContribution
             locationURI="menu:file?after=databaseTools">
@@ -753,38 +769,43 @@
    <extension
          point="org.eclipse.ui.commands">
          
-
-
-
+         
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
             id="command.net.tourbook.views.rawData.RawDataView"
-            name="%view_name_Data_Import"/>
+            name="%view_name_Data_Import"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
+            />
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
             id="command.net.tourbook.views.tourListView"
-            name="%view_name_Book"/>
+            name="%view_name_Book"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
+            />
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
             id="command.net.tourbook.views.tagViewID"
-            name="%view_name_tagView"/>
+            name="%view_name_tagView"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
+            />
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
             id="command.net.tourbook.views.tourCatalog.TourCatalogView"
-            name="%view_name_tourCatalog"/>
+            name="%view_name_tourCatalog"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
+            />
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewStatistic"
             id="command.net.tourbook.views.StatisticView"
-            name="%view_name_Statistics"/>
+            name="%view_name_Statistics"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewStatistic"
+            />
 
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
             id="command.net.tourbook.views.TourMarkerView"
-            name="%view_name_Marker"/>
+            name="%view_name_Marker"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
+            />
       <command
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
             id="command.net.tourbook.views.TourWaypointView"
-            name="%View_Name_Waypoint"/>
+            name="%View_Name_Waypoint"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
+	  		/>
 
          
       <command
@@ -900,42 +921,48 @@
 
       <command
             id="net.tourbook.command.tourCompareWizard"
-            name="%command_tourCompare_wizard">
-      </command>
+            name="%command_tourCompare_wizard"
+            />
       <command
-            defaultHandler="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
-            name="%command_tourChart_tool_graphAnalyzer">
-      </command>
+            name="%command_tourChart_tool_graphAnalyzer"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
+            />
          
       <command
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
+            name="%command_tourChart_tool_tourSegmenter"
             defaultHandler="net.tourbook.ui.action.ActionHandlerViewTourSegmenter"
-            name="%command_tourChart_tool_tourSegmenter">
-      </command>
+            />
       
       
       <command
-            defaultHandler="net.tourbook.ui.action.ActionHandlerTourDataEditor"
             id="net.tourbook.command.tourDataEditor"
-            name="%command_view_tourEditor">
-      </command>
+            name="%command_view_tourEditor"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerTourDataEditor"
+            />
       <command
-            defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
             id="net.tourbook.mapping.command.tourMap"
-            name="%command_tour_map_name">
-      </command>
+            name="%command_tour_map_name"
+            defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
+            />
 
       <command
-            defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
             id="net.tourbook.command.createNewTour"
-            name="%command_createNewTour">
-      </command>
+            name="%command_createNewTour"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
+            />
       <command
             id="net.tourbook.command.dbTool.consistencyCheck"
+            name="%command_dbtool_consistency_check"
             defaultHandler="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
-            name="%command_dbtool_consistency_check">
-      </command>
+            />
+      <command
+            id="net.tourbook.command.OpenHomePage"
+            name="%Command_App_OpenHomePage"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerOpenHomePage"
+            />
+      
    </extension>
    
    <extension

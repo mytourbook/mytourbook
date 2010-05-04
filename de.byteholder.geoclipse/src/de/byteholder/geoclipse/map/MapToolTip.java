@@ -13,26 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package de.byteholder.geoclipse.map;
 
-import net.tourbook.ui.tourChart.TourToolTip;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
-public class ActionTourToolTipEditQuick extends ActionEditQuick {
+public abstract class MapToolTip {
 
-	private final TourToolTip	_tourInfo;
+	/**
+	 * Paints the tool tip icon in the map
+	 * 
+	 * @param gc
+	 * @param rectangle
+	 *            Rectangle where the tool tip can be painted
+	 */
+	public abstract void paint(GC gc, Rectangle rectangle);
 
-	public ActionTourToolTipEditQuick(final TourToolTip tourInfo) {
-
-		super(tourInfo);
-
-		_tourInfo = tourInfo;
-	}
-
-	@Override
-	public void run() {
-
-		_tourInfo.hide();
-
-		super.run();
-	}
 }

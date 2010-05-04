@@ -44,6 +44,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.MTRectangle;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourInfo;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -103,13 +104,13 @@ import de.byteholder.gpx.PointOfInterest;
  */
 public class TourMapView extends ViewPart implements IMapContextProvider {
 
+	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
+
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
 
 	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	public static final int							LEGEND_UNIT_DISTANCE				= 60;
-
-	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
 	public static final int							TOUR_COLOR_DEFAULT					= 0;
 	public static final int							TOUR_COLOR_ALTITUDE					= 10;
@@ -125,6 +126,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_TOUR_INFO_IN_MAP		= "action.show-tour-info-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
@@ -147,6 +149,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 																								.getPreferenceStore();
 
 	private Map										_map;
+	private TourInfo								_tourInfo;
 
 	private ISelectionListener						_postSelectionListener;
 	private IPropertyChangeListener					_prefChangeListener;
@@ -174,6 +177,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private ActionShowSliderInLegend				_actionShowSliderInLegend;
 	private ActionShowStartEndInMap					_actionShowStartEndInMap;
 	private ActionShowTourInMap						_actionShowTourInMap;
+	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
 	private ActionShowTourMarker					_actionShowTourMarker;
 	private ActionSynchWithTour						_actionSynchWithTour;
 	private ActionSynchWithSlider					_actionSynchWithSlider;
@@ -227,6 +231,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private int										_selectedProfileKey					= 0;
 
+	private final PaintManager						_paintMgr							= PaintManager.getInstance();
 	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
 
 	public TourMapView() {}
@@ -324,9 +329,18 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowStartEndInMap() {
 
-		PaintManager.getInstance().setShowStartEnd(_actionShowStartEndInMap.isChecked());
+		_paintMgr.setShowStartEnd(_actionShowStartEndInMap.isChecked());
 
 		_map.disposeOverlayImageCache();
+		_map.queueMapRedraw();
+	}
+
+	void actionSetShowTourInfoInMap() {
+
+		final boolean isVisible = _actionShowTourInfoInMap.isChecked();
+
+		_tourInfo.setVisible(isVisible);
+
 		_map.queueMapRedraw();
 	}
 
@@ -336,7 +350,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowTourMarkerInMap() {
 
-		PaintManager.getInstance().setShowTourMarker(_actionShowTourMarker.isChecked());
+		_paintMgr.setShowTourMarker(_actionShowTourMarker.isChecked());
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -346,7 +360,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		final ILegendProvider legendProvider = getLegendProvider(colorId);
 
-		PaintManager.getInstance().setLegendProvider(legendProvider);
+		_paintMgr.setLegendProvider(legendProvider);
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -590,7 +604,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					// update tour and legend
 
-					createLegendImage(PaintManager.getInstance().getLegendProvider());
+					createLegendImage(_paintMgr.getLegendProvider());
 
 					_map.disposeOverlayImageCache();
 					_map.queueMapRedraw();
@@ -629,7 +643,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 					UI.updateUnits();
 
-					createLegendImage(PaintManager.getInstance().getLegendProvider());
+					createLegendImage(_paintMgr.getLegendProvider());
 
 					_map.queueMapRedraw();
 				}
@@ -689,7 +703,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			Set<GeoPosition> positionBounds = null;
 			if (_isTour) {
-				positionBounds = PaintManager.getInstance().getTourBounds();
+				positionBounds = _paintMgr.getTourBounds();
 				if (positionBounds == null) {
 					return;
 				}
@@ -719,7 +733,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_previousTourData = null;
 
-		PaintManager.getInstance().setTourData(new ArrayList<TourData>());
+		_paintMgr.setTourData(new ArrayList<TourData>());
+
+		_tourInfo.setTourData(null);
 
 		showDefaultMap();
 	}
@@ -785,6 +801,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionShowLegendInMap = new ActionShowLegendInMap(this);
 		_actionShowScaleInMap = new ActionShowScaleInMap(this);
 		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
+		_actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
 		_actionShowTourMarker = new ActionShowTourMarker(this);
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		_actionDimMap = new ActionDimMap(this);
@@ -920,6 +937,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
 		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
 
+		// set tour info icon into the left axis
+		_tourInfo = new TourInfo(_map);
+		_map.setToolTip(_tourInfo);
+
 		_map.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
@@ -949,7 +970,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT //
 						) && (legendBounds.height < DEFAULT_LEGEND_HEIGHT))) {
 
-					createLegendImage(PaintManager.getInstance().getLegendProvider());
+					createLegendImage(_paintMgr.getLegendProvider());
 				}
 			}
 		});
@@ -1052,6 +1073,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionShowLegendInMap.setEnabled(_isTour);
 		_actionShowSliderInMap.setEnabled(_isTour);
 		_actionShowSliderInLegend.setEnabled(isOneTour);
+		_actionShowTourInfoInMap.setEnabled(isOneTour);
 
 		if (_tourDataList.size() == 0) {
 
@@ -1106,6 +1128,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		menuMgr.add(_actionShowSliderInMap);
 		menuMgr.add(_actionShowSliderInLegend);
 		menuMgr.add(_actionShowPOI);
+		menuMgr.add(_actionShowTourInfoInMap);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionSetDefaultPosition);
@@ -1432,6 +1455,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void paintAllTours() {
 
 		if (_tourDataList.size() == 0) {
+			_tourInfo.setTourData(null);
 			return;
 		}
 
@@ -1458,9 +1482,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			return;
 		}
 
-		final PaintManager paintManager = PaintManager.getInstance();
-
-		paintManager.setTourData(_tourDataList);
+		_paintMgr.setTourData(_tourDataList);
+		_tourInfo.setTourDataList(_tourDataList);
 
 		final TourData firstTourData = _tourDataList.get(0);
 
@@ -1475,7 +1498,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_actionShowSliderInLegend.isChecked());
 
 		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
-		paintManager.setTourBounds(tourBounds);
+		_paintMgr.setTourBounds(tourBounds);
 
 		_map.setShowOverlays(_actionShowTourInMap.isChecked());
 
@@ -1520,9 +1543,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			isNewTour = false;
 		}
 
-		final PaintManager paintManager = PaintManager.getInstance();
-
-		paintManager.setTourData(tourData);
+		_paintMgr.setTourData(tourData);
 
 		/*
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
@@ -1530,6 +1551,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		 */
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
+
+		_tourInfo.setTourDataList(_tourDataList);
 
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
@@ -1543,7 +1566,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// set the tour bounds
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-		paintManager.setTourBounds(tourBounds);
+		_paintMgr.setTourBounds(tourBounds);
 
 		_map.setShowOverlays(isShowTour);
 		_map.setShowLegend(isShowTour && _actionShowLegendInMap.isChecked());
@@ -1586,7 +1609,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		if (isNewTour || forceRedraw) {
 
 			// adjust legend values for the new or changed tour
-			createLegendImage(PaintManager.getInstance().getLegendProvider());
+			createLegendImage(_paintMgr.getLegendProvider());
 
 			_map.setOverlayKey(tourData.getTourId().toString());
 			_map.disposeOverlayImageCache();
@@ -1606,7 +1629,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// force single tour to be repainted
 		_previousTourData = null;
 
-		PaintManager.getInstance().setTourData(_tourDataList);
+		_paintMgr.setTourData(_tourDataList);
+		_tourInfo.setTourDataList(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
 
@@ -1631,7 +1655,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_map.disposeOverlayImageCache();
 		}
 
-		createLegendImage(PaintManager.getInstance().getLegendProvider());
+		createLegendImage(_paintMgr.getLegendProvider());
 		_map.queueMapRedraw();
 	}
 
@@ -1666,7 +1690,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						newOverlayKey += tourData.getTourId();
 					}
 				}
-				PaintManager.getInstance().setTourData(_tourDataList);
+				_paintMgr.setTourData(_tourDataList);
+				_tourInfo.setTourDataList(_tourDataList);
 
 				if (_previousOverlayKey != newOverlayKey) {
 
@@ -1676,7 +1701,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					_map.disposeOverlayImageCache();
 				}
 
-				createLegendImage(PaintManager.getInstance().getLegendProvider());
+				createLegendImage(_paintMgr.getLegendProvider());
 				_map.queueMapRedraw();
 			}
 		});
@@ -1733,7 +1758,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void restoreState() {
 
-		final PaintManager paintManager = PaintManager.getInstance();
 		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 		String state = null;
 
@@ -1764,15 +1788,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// checkbox: show start/end in map
 		_actionShowStartEndInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
-		paintManager.setShowStartEnd(_actionShowStartEndInMap.isChecked());
+		_paintMgr.setShowStartEnd(_actionShowStartEndInMap.isChecked());
 
 		// checkbox: show tour marker
 		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
 		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		paintManager.setShowTourMarker(_actionShowTourMarker.isChecked());
+		_paintMgr.setShowTourMarker(_actionShowTourMarker.isChecked());
 
 		// checkbox: show legend in map
 		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
+
+		// checkbox: show tour info in map
+		final boolean isShowTourInfo = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
+		_actionShowTourInfoInMap.setChecked(isShowTourInfo);
+		_tourInfo.setVisible(isShowTourInfo);
 
 		// checkbox: show scale
 		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);
@@ -1828,7 +1857,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				break;
 			}
 
-			paintManager.setLegendProvider(getLegendProvider(colorId));
+			_paintMgr.setLegendProvider(getLegendProvider(colorId));
 
 		} catch (final NumberFormatException e) {
 			_actionTourColorAltitude.setChecked(true);
@@ -1837,11 +1866,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// draw tour with default color
 
 		// check legend provider
-		final ILegendProvider legendProvider = paintManager.getLegendProvider();
+		final ILegendProvider legendProvider = _paintMgr.getLegendProvider();
 		if (legendProvider == null) {
 
 			// set default legend provider
-			paintManager.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
+			_paintMgr.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
 
 			// hide legend
 			_map.setShowLegend(false);
@@ -1882,6 +1911,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
 
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 
@@ -2035,7 +2065,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		int adjustedZoomLevel = 0;
 		if (isAdjustZoomLevel) {
-			adjustedZoomLevel = PaintManager.getInstance().getSynchTourZoomLevel();
+			adjustedZoomLevel = _paintMgr.getSynchTourZoomLevel();
 		}
 
 		_map.setZoom(zoom + adjustedZoomLevel);
@@ -2119,7 +2149,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 //						/*
 //						 * set position and zoomlevel to show the entire tour
 //						 */
-//						final PaintManager paintManager = PaintManager.getInstance();
+//						final PaintManager paintManager = _paintMgr;
 //						final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 //
 //						paintManager.setTourBounds(tourBounds);

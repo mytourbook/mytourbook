@@ -17,6 +17,8 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import net.tourbook.util.ITourToolTip;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -33,6 +35,8 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 public class ChartComponentAxis extends Canvas {
 
@@ -52,7 +56,7 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private boolean						_isLeft;
 
-	private ChartToolTip				_chartToolTip;
+	private ITourToolTip				_chartToolTip;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
@@ -83,6 +87,17 @@ public class ChartComponentAxis extends Canvas {
 				_chart._chartComponents.getChartComponentGraph().setFocus();
 			}
 
+		});
+
+		addListener(SWT.MouseWheel, new Listener() {
+			public void handleEvent(final Event event) {
+
+				_chart._chartComponents.getChartComponentGraph().onMouseWheel(event);
+
+				if (_chartToolTip != null) {
+					_chartToolTip.show(new Point(event.x, event.y));
+				}
+			}
 		});
 
 //		createContextMenu();
@@ -301,7 +316,7 @@ public class ChartComponentAxis extends Canvas {
 		onResize();
 	}
 
-	public void setToolTip(final ChartToolTip chartToolTip) {
+	void setToolTip(final ITourToolTip chartToolTip) {
 		_chartToolTip = chartToolTip;
 	}
 }

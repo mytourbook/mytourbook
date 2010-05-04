@@ -100,6 +100,7 @@ public interface IWeather {
 			73, // 12
 														};
 
+	public static final String		cloudIsNotDefined	= Messages.Weather_Clounds_IsNotDefined;
 	/*
 	 * _cloudText and _cloudDbValue must be in synch
 	 */
@@ -107,7 +108,7 @@ public interface IWeather {
 	 * Text for the weather
 	 */
 	public static final String[]	cloudText			= new String[] {
-			Messages.Weather_Clounds_IsNotDefined,
+			cloudIsNotDefined,
 			Messages.Weather_Clounds_Sunny,
 			Messages.Weather_Clounds_Clouny,
 			Messages.Weather_Clounds_Clouds,

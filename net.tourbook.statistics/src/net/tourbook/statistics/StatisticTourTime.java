@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics;
 
@@ -62,6 +62,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private final DateFormat			_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						_chart;
+	private StatisticTourInfo			_tourInfo;
+
 	private TourTimeData				_tourTimeData;
 
 	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
@@ -140,7 +142,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		_chart.setDrawBarChartAtBottom(false);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
-//		fChart.createChartActionHandlers();
+		// set tour info icon
+		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
+		_chart.setToolTip(_tourInfo);
 
 		_chart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, int valueIndex) {
@@ -154,6 +158,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 					}
 
 					_selectedTourId = tourIds[valueIndex];
+					_tourInfo.setTourId(_selectedTourId);
 
 					DataProviderTourTime.getInstance().setSelectedTourId(_selectedTourId);
 					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
@@ -168,7 +173,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				final long[] tourIds = _tourTimeData.fTourIds;
 				if (tourIds.length > 0) {
+
 					_selectedTourId = tourIds[valueIndex];
+					_tourInfo.setTourId(_selectedTourId);
+
 					DataProviderTourTime.getInstance().setSelectedTourId(_selectedTourId);
 					TourManager.getInstance().openTourInEditor(_selectedTourId);
 				}
@@ -189,6 +197,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						if (barChartSelection.serieIndex != -1) {
 
 							_selectedTourId = _tourTimeData.fTourIds[barChartSelection.valueIndex];
+							_tourInfo.setTourId(_selectedTourId);
+
 							TourManager.getInstance().openTourInEditor(_selectedTourId);
 						}
 					}
@@ -196,6 +206,144 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			}
 		});
 
+	}
+
+	private ChartToolTipInfo createToolTipInfo(int valueIndex) {
+
+		final int[] tourDOYValues = _tourTimeData.fTourDOYValues;
+
+		if (valueIndex >= tourDOYValues.length) {
+			valueIndex -= tourDOYValues.length;
+		}
+
+		if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
+			return null;
+		}
+
+		/*
+		 * set calendar day/month/year
+		 */
+		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int tourDOY = tourDOYValues[valueIndex];
+		_calendar.set(oldestYear, 0, 1);
+		_calendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
+		final String beginDate = _dateFormatter.format(_calendar.getTime());
+
+		_currentMonth = _calendar.get(Calendar.MONTH) + 1;
+		final long tooltipTourId = _tourTimeData.fTourIds[valueIndex];
+
+		final String tourTypeName = TourDatabase.getTourTypeName(_tourTimeData.fTypeIds[valueIndex]);
+		final String tourTags = TourDatabase.getTagNames(_tourTimeData.fTagIds.get(tooltipTourId));
+		final String tourDescription = _tourTimeData.tourDescription.get(valueIndex).replace(
+				UI.SYSTEM_NEW_LINE,
+				UI.NEW_LINE);
+
+		final int[] startValue = _tourTimeData.fTourTimeStartValues;
+		final int[] endValue = _tourTimeData.fTourTimeEndValues;
+
+		final Integer recordingTime = _tourTimeData.fTourRecordingTimeValues.get(valueIndex);
+		final Integer drivingTime = _tourTimeData.fTourDrivingTimeValues.get(valueIndex);
+		final int breakTime = recordingTime - drivingTime;
+
+		final float distance = _tourTimeData.fTourDistanceValues[valueIndex];
+		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
+		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
+
+		final StringBuilder toolTipFormat = new StringBuilder();
+		toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_distance_tour);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_altitude);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_break_time_tour);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_avg_speed);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_avg_pace);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_tour_type);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_tags);
+
+		if (tourDescription.length() > 0) {
+			toolTipFormat.append(NEW_LINE);
+			toolTipFormat.append(NEW_LINE);
+			toolTipFormat.append(Messages.tourtime_info_description);
+			toolTipFormat.append(NEW_LINE);
+			toolTipFormat.append(Messages.tourtime_info_description_text);
+		}
+
+		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+		//
+				beginDate,
+				_tourTimeData.weekValues[valueIndex],
+				//
+				distance / 1000,
+				UI.UNIT_LABEL_DISTANCE,
+				//
+				_tourTimeData.fTourAltitudeValues[valueIndex],
+				UI.UNIT_LABEL_ALTITUDE,
+				//
+				// start time
+				startValue[valueIndex] / 3600,
+				(startValue[valueIndex] % 3600) / 60,
+				//
+				// end time
+				endValue[valueIndex] / 3600 % 24,
+				(endValue[valueIndex] % 3600) / 60,
+				//
+				recordingTime / 3600,
+				(recordingTime % 3600) / 60,
+				(recordingTime % 3600) % 60,
+				//
+				drivingTime / 3600,
+				(drivingTime % 3600) / 60,
+				(drivingTime % 3600) % 60,
+				//
+				breakTime / 3600,
+				(breakTime % 3600) / 60,
+				(breakTime % 3600) % 60,
+				//
+				speed,
+				UI.UNIT_LABEL_SPEED,
+				//
+				pace / 60,
+				pace % 60,
+				UI.UNIT_LABEL_PACE,
+				//
+				tourTypeName,
+				tourTags,
+				//
+				tourDescription
+//
+				)
+				.toString();
+
+		/*
+		 * create tool tip info
+		 */
+		String tourTitle = _tourTimeData.fTourTitle.get(valueIndex);
+		if (tourTitle == null || tourTitle.trim().length() == 0) {
+			tourTitle = tourTypeName;
+		}
+
+		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		toolTipInfo.setTitle(tourTitle);
+		toolTipInfo.setLabel(toolTipLabel);
+//				toolTipInfo.setLabel(toolTipFormat.toString());
+
+		return toolTipInfo;
 	}
 
 	@Override
@@ -342,6 +490,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		if (tourIds.length == 0) {
 			_selectedTourId = null;
+			_tourInfo.setTourId(-1);
+
 			return false;
 		}
 
@@ -354,7 +504,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			if ((tourIds[tourIndex] == tourId)) {
 				selectedTours[tourIndex] = true;
 				isSelected = true;
+
 				_selectedTourId = tourId;
+				_tourInfo.setTourId(_selectedTourId);
+
 				break;
 			}
 		}
@@ -363,6 +516,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			// select first tour
 			selectedTours[0] = true;
 			_selectedTourId = tourIds[0];
+			_tourInfo.setTourId(_selectedTourId);
 		}
 
 		_chart.setSelectedBars(selectedTours);
@@ -373,143 +527,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
 		final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
-
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, int valueIndex) {
-
-				final int[] tourDOYValues = _tourTimeData.fTourDOYValues;
-
-				if (valueIndex >= tourDOYValues.length) {
-					valueIndex -= tourDOYValues.length;
-				}
-
-				if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
-					return null;
-				}
-
-				/*
-				 * set calendar day/month/year
-				 */
-				final int oldestYear = _currentYear - _numberOfYears + 1;
-				final int tourDOY = tourDOYValues[valueIndex];
-				_calendar.set(oldestYear, 0, 1);
-				_calendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
-				final String beginDate = _dateFormatter.format(_calendar.getTime());
-
-				_currentMonth = _calendar.get(Calendar.MONTH) + 1;
-				_selectedTourId = _tourTimeData.fTourIds[valueIndex];
-
-				final String tourTypeName = TourDatabase.getTourTypeName(_tourTimeData.fTypeIds[valueIndex]);
-				final String tourTags = TourDatabase.getTagNames(_tourTimeData.fTagIds.get(_selectedTourId));
-				final String tourDescription = _tourTimeData.tourDescription.get(valueIndex).replace(
-						UI.SYSTEM_NEW_LINE,
-						UI.NEW_LINE);
-
-				final int[] startValue = _tourTimeData.fTourTimeStartValues;
-				final int[] endValue = _tourTimeData.fTourTimeEndValues;
-
-				final Integer recordingTime = _tourTimeData.fTourRecordingTimeValues.get(valueIndex);
-				final Integer drivingTime = _tourTimeData.fTourDrivingTimeValues.get(valueIndex);
-				final int breakTime = recordingTime - drivingTime;
-
-				final float distance = _tourTimeData.fTourDistanceValues[valueIndex];
-				final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-				final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
-
-				final StringBuilder toolTipFormat = new StringBuilder();
-				toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_distance_tour);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_altitude);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_time);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_break_time_tour);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_avg_speed);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_avg_pace);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_tour_type);
-				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(Messages.tourtime_info_tags);
-
-				if (tourDescription.length() > 0) {
-					toolTipFormat.append(NEW_LINE);
-					toolTipFormat.append(NEW_LINE);
-					toolTipFormat.append(Messages.tourtime_info_description);
-					toolTipFormat.append(NEW_LINE);
-					toolTipFormat.append(Messages.tourtime_info_description_text);
-				}
-
-				final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
-				//
-						beginDate,
-						_tourTimeData.weekValues[valueIndex],
-						//
-						distance / 1000,
-						UI.UNIT_LABEL_DISTANCE,
-						//
-						_tourTimeData.fTourAltitudeValues[valueIndex],
-						UI.UNIT_LABEL_ALTITUDE,
-						//
-						// start time
-						startValue[valueIndex] / 3600,
-						(startValue[valueIndex] % 3600) / 60,
-						//
-						// end time
-						endValue[valueIndex] / 3600 % 24,
-						(endValue[valueIndex] % 3600) / 60,
-						//
-						recordingTime / 3600,
-						(recordingTime % 3600) / 60,
-						(recordingTime % 3600) % 60,
-						//
-						drivingTime / 3600,
-						(drivingTime % 3600) / 60,
-						(drivingTime % 3600) % 60,
-						//
-						breakTime / 3600,
-						(breakTime % 3600) / 60,
-						(breakTime % 3600) % 60,
-						//
-						speed,
-						UI.UNIT_LABEL_SPEED,
-						//
-						pace / 60,
-						pace % 60,
-						UI.UNIT_LABEL_PACE,
-						//					
-						tourTypeName,
-						tourTags,
-						//
-						tourDescription
-//
-						)
-						.toString();
-
-				/*
-				 * create tool tip info
-				 */
-				String tourTitle = _tourTimeData.fTourTitle.get(valueIndex);
-				if (tourTitle == null || tourTitle.trim().length() == 0) {
-					tourTitle = tourTypeName;
-				}
-
-				final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-				toolTipInfo.setTitle(tourTitle);
-				toolTipInfo.setLabel(toolTipLabel);
-//				toolTipInfo.setLabel(toolTipFormat.toString());
-
-				return toolTipInfo;
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+				return createToolTipInfo(valueIndex);
 			}
 		};
 

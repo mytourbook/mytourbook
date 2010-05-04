@@ -100,7 +100,7 @@ public class TourDatabase {
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
 	private static final String					TABLE_DB_VERSION							= "DbVersion";											//$NON-NLS-1$
- 
+
 	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
 	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
@@ -1105,7 +1105,7 @@ public class TourDatabase {
 	 * @param minimalDaysInFirstWeek
 	 * @return Returns <code>true</code> when the week is computed
 	 */
-	public static boolean updateTourWeek(	final Connection conn,
+	public static boolean updateTourWeek(final Connection conn,
 											final IProgressMonitor monitor,
 											final int firstDayOfWeek,
 											final int minimalDaysInFirstWeek) {
@@ -2094,7 +2094,6 @@ public class TourDatabase {
 				//
 				+ ")";
 
-
 		System.out.println(sql);
 		System.out.println();
 		stmt.execute(sql); //
@@ -2720,6 +2719,25 @@ public class TourDatabase {
 			final Statement statement = conn.createStatement();
 
 			createTableTourWayPointV10(statement);
+
+			/*
+			 * resize description column: ref derby docu page 24
+			 */
+			/**
+			 * <pre>
+			 * 
+			 * ALTER TABLE table-Name
+			 * {
+			 *     ADD COLUMN column-definition |
+			 *     ADD CONSTRAINT clause |
+			 *     DROP [ COLUMN ] column-name [ CASCADE | RESTRICT ]
+			 *     DROP { PRIMARY KEY | FOREIGN KEY constraint-name | UNIQUE
+			 *   constraint-name | CHECK constraint-name | CONSTRAINT constraint-name }
+			 *     ALTER [ COLUMN ] column-alteration |
+			 *     LOCKSIZE { ROW | TABLE }
+			 * }
+			 * </pre>
+			 */
 
 			statement.executeBatch();
 			statement.close();

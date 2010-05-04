@@ -36,7 +36,8 @@ Export-Package: net.tourbook,
  net.tourbook.tag,
  net.tourbook.tour,
  net.tourbook.ui,
- net.tourbook.ui.action
+ net.tourbook.ui.action,
+ net.tourbook.ui.tourChart
 Import-Package: de.byteholder.geoclipse,
  de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,

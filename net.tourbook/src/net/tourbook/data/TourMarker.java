@@ -34,7 +34,7 @@ public class TourMarker implements Cloneable {
 	 */
 	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
-			Messages.Tour_Marker_Position_vertical_above, // 0
+															Messages.Tour_Marker_Position_vertical_above, // 0
 			Messages.Tour_Marker_Position_vertical_below, // 1
 			Messages.Tour_Marker_Position_vertical_chart_top, // 2
 			Messages.Tour_Marker_Position_vertical_chart_bottom, // 3
@@ -355,6 +355,11 @@ public class TourMarker implements Cloneable {
 		backupMarker.visualPosition = visualPosition;
 
 		backupMarker.tourData = tourData;
+	}
+
+	public void setMarkerId() {
+		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		createId = ++_createCounter;
 	}
 
 	public void setSerieIndex(final int serieIndex) {

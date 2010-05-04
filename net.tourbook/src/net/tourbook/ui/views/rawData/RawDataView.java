@@ -57,6 +57,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
@@ -168,6 +169,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
 	private ActionExport					_actionExportTour;
+	private ActionJoinTours					_actionJoinTours;
 
 	private ImageDescriptor					_imageDescDatabase;
 	private ImageDescriptor					_imageDescDatabaseOtherPerson;
@@ -267,6 +269,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// check if the tour editor contains a modified tour
 		if (UI.isTourEditorModified()) {
+			return;
+		}
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.import_data_dlg_reimport_title,
+				Messages.Import_Data_Dlg_Confirm_Message) == false) {
 			return;
 		}
 
@@ -602,6 +611,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionReimportTour = new ActionReimportTour(this);
 		_actionRemoveTour = new ActionRemoveTour(this);
 		_actionExportTour = new ActionExport(this);
+		_actionJoinTours = new ActionJoinTours(this);
 
 		_actionEditTour = new ActionEditTour(this);
 		_actionEditQuick = new ActionEditQuick(this);
@@ -1185,7 +1195,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					if (tourData.isTourDeleted == false) {
 
-						// deleted tours are ignored, tour is not deleted
+						// tour is not deleted, deleted tours are ignored
 
 						unsavedTours++;
 						selectedValidTours++;
@@ -1255,6 +1265,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionReimportTour.setEnabled(selectedTours > 0);
 		_actionRemoveTour.setEnabled(selectedTours > 0);
 		_actionExportTour.setEnabled(selectedValidTours > 0);
+		_actionJoinTours.setEnabled(selectedValidTours > 1);
 
 		_actionEditTour.setEnabled(isOneSavedAndValidTour);
 		_actionEditQuick.setEnabled(isOneSavedAndValidTour);
@@ -1306,6 +1317,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 		menuMgr.add(_actionSaveTour);
 		menuMgr.add(_actionMergeIntoTour);
+		menuMgr.add(_actionJoinTours);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionReimportTour);
 		menuMgr.add(_actionRemoveTour);
 
@@ -1316,7 +1331,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionOpenAdjustAltitudeDialog);
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionOpenTour);
-		menuMgr.add(_actionExportTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);

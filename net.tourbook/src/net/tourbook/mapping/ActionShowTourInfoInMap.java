@@ -13,26 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.mapping;
 
-import net.tourbook.ui.tourChart.TourToolTip;
+import org.eclipse.jface.action.Action;
 
-public class ActionTourToolTipEditQuick extends ActionEditQuick {
+public class ActionShowTourInfoInMap extends Action {
 
-	private final TourToolTip	_tourInfo;
+	private final TourMapView	_mapView;
 
-	public ActionTourToolTipEditQuick(final TourToolTip tourInfo) {
+	public ActionShowTourInfoInMap(final TourMapView mapView) {
 
-		super(tourInfo);
+		super(null, AS_CHECK_BOX);
 
-		_tourInfo = tourInfo;
+		_mapView = mapView;
+
+		setText(Messages.Map_Action_ShowTourInfoInMap);
 	}
 
 	@Override
 	public void run() {
-
-		_tourInfo.hide();
-
-		super.run();
+		_mapView.actionSetShowTourInfoInMap();
 	}
+
 }

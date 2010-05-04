@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
  
@@ -177,12 +177,12 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private ActionOpenPrefDialog	_actionOpenTourTypePrefs;
 
-	private NumberFormat			_nf						= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf						= NumberFormat.getNumberInstance();
 
-	private Image					_iconPlaceholder;
-	private HashMap<Integer, Image>	_graphImages			= new HashMap<Integer, Image>();
+	private final Image					_iconPlaceholder;
+	private final HashMap<Integer, Image>	_graphImages			= new HashMap<Integer, Image>();
 
-	private int						_tourStartTimeSynchOffset;
+	private final int						_tourStartTimeSynchOffset;
 	private int						_tourTimeOffsetBackup;
 
 	private boolean					_isAdjustAltiFromSourceBackup;
@@ -203,7 +203,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		// make dialog resizable and display maximize button
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
-		// set icon for the window 
+		// set icon for the window
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.image__merge_tours).createImage());
 
 		_iconPlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder).createImage();
@@ -774,14 +774,14 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				// display synched time in the UI
 				if (_chkSynchStartTime.getSelection()) {
 
-					// set time offset for the synched tours 
+					// set time offset for the synched tours
 
 					_tourTimeOffsetBackup = getFromUITourTimeOffset();
 					updateUITourTimeOffset(_tourStartTimeSynchOffset);
 
 				} else {
 
-					// set time offset manually 
+					// set time offset manually
 
 					updateUITourTimeOffset(_tourTimeOffsetBackup);
 				}
@@ -790,7 +790,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 				if (_chkPreviewChart.getSelection() == false) {
 
-					// preview 
+					// preview
 					updateTourChart();
 				}
 			}
@@ -1884,7 +1884,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		_scaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
 		_scaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
 
-		UI.updateUITourType(_sourceTour.getTourType(), _lblTourType);
+		UI.updateUITourType(_sourceTour.getTourType(), _lblTourType, true);
 
 		onModifyProperties();
 	}

@@ -100,6 +100,8 @@ public class Messages extends NLS {
 
 	public static String		Map_Action_POI_Tooltip;
 	public static String		Map_Action_SetDefaultMapProviders;
+
+	public static String	Map_Action_ShowTourInfoInMap;
 	public static String		Map_Action_ToggleMarker;
 
 	public static String		map_action_show_legend_in_map;

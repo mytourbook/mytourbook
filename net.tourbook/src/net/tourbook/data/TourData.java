@@ -155,6 +155,7 @@ public class TourData implements Comparable<Object> {
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
 	 * <br>
+	 * this field can be read with sql statements <br>
 	 * year for startWeek
 	 */
 	@SuppressWarnings("unused")
@@ -518,6 +519,7 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	private boolean						isPowerSerieFromDevice			= false;
+
 	@Transient
 	private int[]						altimeterSerie;
 
@@ -526,6 +528,7 @@ public class TourData implements Comparable<Object> {
 
 	@Transient
 	public int[]						gradientSerie;
+
 	@Transient
 	public int[]						tourCompareSerie;
 
@@ -543,12 +546,12 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	public Rectangle					gpsBounds;
+
 	/**
 	 * Index of the segmented data in the data series
 	 */
 	@Transient
 	public int[]						segmentSerieIndex;
-
 	/**
 	 * oooo (o) DD-record // offset
 	 */
@@ -560,38 +563,38 @@ public class TourData implements Comparable<Object> {
 	 */
 	@Transient
 	public int[]						segmentSerieRecordingTime;
+
 	@Transient
 	public int[]						segmentSerieDrivingTime;
 	@Transient
 	public int[]						segmentSerieBreakTime;
 	@Transient
 	public int[]						segmentSerieTimeTotal;
-
 	@Transient
 	public int[]						segmentSerieDistanceDiff;
-	@Transient
-	public int[]						segmentSerieDistanceTotal;
 
 	@Transient
+	public int[]						segmentSerieDistanceTotal;
+	@Transient
 	public int[]						segmentSerieAltitudeDiff;
+
 	@Transient
 	public int[]						segmentSerieComputedAltitudeDiff;
 //	@Transient
 //	public int[]						segmentSerieComputedAltitudeDown;
-
 	@Transient
 	public float[]						segmentSerieAltitudeUpH;
+
 	@Transient
 	public int[]						segmentSerieAltitudeDownH;
-
 	@Transient
 	public float[]						segmentSerieSpeed;
 
 	@Transient
 	public float[]						segmentSeriePace;
+
 	@Transient
 	public float[]						segmentSeriePaceDiff;
-
 	@Transient
 	public float[]						segmentSeriePower;
 
@@ -1411,6 +1414,26 @@ public class TourData implements Comparable<Object> {
 		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
 	}
 
+	private void computeAvgCadence() {
+
+		if (cadenceSerie == null) {
+			return;
+		}
+
+		long cadenceSum = 0;
+		int cadenceCount = 0;
+
+		for (final int cadence : cadenceSerie) {
+			if (cadence > 0) {
+				cadenceCount++;
+				cadenceSum += cadence;
+			}
+		}
+		if (cadenceCount > 0) {
+			avgCadence = (int) cadenceSum / cadenceCount;
+		}
+	}
+
 //	/**
 //	 * compute altitude up/down which was used until version 9.07.0
 //	 */
@@ -1457,26 +1480,6 @@ public class TourData implements Comparable<Object> {
 //		setTourAltUp(altitudeUp);
 //		setTourAltDown(-altitudeDown);
 //	}
-
-	private void computeAvgCadence() {
-
-		if (cadenceSerie == null) {
-			return;
-		}
-
-		long cadenceSum = 0;
-		int cadenceCount = 0;
-
-		for (final int cadence : cadenceSerie) {
-			if (cadence > 0) {
-				cadenceCount++;
-				cadenceSum += cadence;
-			}
-		}
-		if (cadenceCount > 0) {
-			avgCadence = (int) cadenceSum / cadenceCount;
-		}
-	}
 
 	private void computeAvgPulse() {
 
@@ -3149,14 +3152,14 @@ public class TourData implements Comparable<Object> {
 		return deviceTravelTime;
 	}
 
+	public int getDeviceWeight() {
+		return deviceWeight;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
-
-	public int getDeviceWeight() {
-		return deviceWeight;
-	}
 
 	public int getDeviceWheel() {
 		return deviceWheel;
@@ -3218,6 +3221,10 @@ public class TourData implements Comparable<Object> {
 		return gradientSerie;
 	}
 
+	public boolean getIsDistanceFromSensor() {
+		return isDistanceFromSensor == 1;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3226,10 +3233,6 @@ public class TourData implements Comparable<Object> {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
-
-	public boolean getIsDistanceFromSensor() {
-		return isDistanceFromSensor == 1;
-	}
 
 	/**
 	 * @return the maxAltitude
@@ -3555,6 +3558,10 @@ public class TourData implements Comparable<Object> {
 		return startSecond;
 	}
 
+	public short getStartYear() {
+		return startYear;
+	}
+
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3565,10 +3572,6 @@ public class TourData implements Comparable<Object> {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
-
-	public short getStartYear() {
-		return startYear;
-	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3721,6 +3724,10 @@ public class TourData implements Comparable<Object> {
 		return tourType;
 	}
 
+	public Set<TourWayPoint> getTourWayPoints() {
+		return tourWayPoints;
+	}
+
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3761,10 +3768,6 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
-	public Set<TourWayPoint> getTourWayPoints() {
-		return tourWayPoints;
-	}
-
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3799,11 +3802,6 @@ public class TourData implements Comparable<Object> {
 		return weatherWindSpd;
 	}
 
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
-
 	/**
 	 * @param zoomLevel
 	 * @return Returns the world position for the suplied zoom level and projection id
@@ -3811,6 +3809,11 @@ public class TourData implements Comparable<Object> {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -3842,6 +3845,15 @@ public class TourData implements Comparable<Object> {
 
 		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)
 				|| devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the data in {@link #powerSerie} is from a device and
+	 *         not computed. Power data are normally available from an ergometer and not from a bike
+	 *         computer
+	 */
+	public boolean isPowerSerieFromDevice() {
+		return isPowerSerieFromDevice;
 	}
 
 	/**

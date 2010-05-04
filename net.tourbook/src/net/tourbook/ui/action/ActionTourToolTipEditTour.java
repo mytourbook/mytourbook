@@ -15,13 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.ui.tourChart.TourInfoContent;
+import net.tourbook.ui.tourChart.TourToolTip;
 
 public class ActionTourToolTipEditTour extends ActionEditTour {
 
-	private final TourInfoContent	_tourInfo;
+	private final TourToolTip	_tourInfo;
 
-	public ActionTourToolTipEditTour(final TourInfoContent tourInfo) {
+	public ActionTourToolTipEditTour(final TourToolTip tourInfo) {
 
 		super(tourInfo);
 

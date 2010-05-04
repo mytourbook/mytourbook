@@ -18,6 +18,8 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.util.ITourToolTip;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -87,7 +89,7 @@ public class Chart extends ViewForm {
 
 	private IToolBarManager				_toolbarMgr;
 	private IChartContextProvider		_chartContextProvider;
-	private boolean						_isShowZoomActions		= false;
+	private boolean						_isShowZoomActions					= false;
 
 	private boolean						_isShowMouseMode					= false;
 	private Color						_backgroundColor;
@@ -101,17 +103,17 @@ public class Chart extends ViewForm {
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
 	 * is outsite of the chart
 	 */
-	boolean								_useInternalActionBar	= true;
+	boolean								_useInternalActionBar				= true;
 
-	boolean								_useActionHandlers		= false;
+	boolean								_useActionHandlers					= false;
 
 	private int							_barSelectionSerieIndex;
 
 	private int							_barSelectionValueIndex;
-	private final ActionHandlerManager	_actionHandlerManager	= ActionHandlerManager.getInstance();
+	private final ActionHandlerManager	_actionHandlerManager				= ActionHandlerManager.getInstance();
 
 	HashMap<String, ActionProxy>		_chartActionProxies;
-	private boolean						_isFillToolbar			= true;
+	private boolean						_isFillToolbar						= true;
 
 	private boolean						_isToolbarCreated;
 	int									_synchMode;
@@ -119,22 +121,23 @@ public class Chart extends ViewForm {
 	/**
 	 * <code>true</code> to start the bar chart at the bottom of the chart
 	 */
-	private boolean						_isDrawBarChartAtBottom	= true;
+	private boolean						_isDrawBarChartAtBottom				= true;
 
 	/**
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int						_gridVerticalDistance	= 30;
+	protected int						_gridVerticalDistance				= 30;
 
-	protected int						_gridHorizontalDistance	= 70;
+	protected int						_gridHorizontalDistance				= 70;
 	/**
 	 * mouse behaviour:<br>
 	 * <br>{@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
-	private String						_mouseMode				= MOUSE_MODE_SLIDER;
+	private String						_mouseMode							= MOUSE_MODE_SLIDER;
 
 	private boolean						_isFirstContextMenu;
+
 	/**
 	 * Chart widget
 	 */
@@ -722,6 +725,14 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * @return
+	 * @return Returns control for which the tool tip is created
+	 */
+	public ChartComponentAxis getToolTipControl() {
+		return getChartComponents().getAxisLeft();
+	}
+
+	/**
 	 * returns the value index for the x-sliders
 	 */
 	public SelectionChartXSliderPosition getXSliderPosition() {
@@ -1104,6 +1115,12 @@ public class Chart extends ViewForm {
 	public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
 		_toolbarMgr = toolbarMgr;
 		_isFillToolbar = isFillToolbar;
+	}
+
+	public void setToolTip(final ITourToolTip tourToolTip) {
+
+		// set tour info icon into the left axis
+		getToolTipControl().setToolTip(tourToolTip);
 	}
 
 	/**

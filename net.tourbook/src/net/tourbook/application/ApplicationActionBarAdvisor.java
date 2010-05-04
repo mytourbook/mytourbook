@@ -35,8 +35,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
@@ -114,11 +114,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	private MenuManager createHelpMenu() {
+
 		/*
 		 * help - menu
 		 */
 		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
 
+		helpMenu.add(new Separator("about")); //$NON-NLS-1$
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
 		return helpMenu;

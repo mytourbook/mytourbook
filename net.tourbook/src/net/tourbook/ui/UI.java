@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -96,13 +95,16 @@ public class UI {
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";								//$NON-NLS-1$
 	public static final String						SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";									//$NON-NLS-1$
-	public static final char						TAB								= '\t';									//$NON-NLS-1$
-	public static final char						DOT								= '.';										//$NON-NLS-1$
+	public static final char						TAB								= '\t';
+	public static final char						DOT								= '.';
 
 	/**
-	 * contains a new line string
+	 * contains a new line
 	 */
 	public static final String						NEW_LINE						= "\n";									//$NON-NLS-1$
+	/**
+	 * contains 2 new lines
+	 */
 	public static final String						NEW_LINE2						= "\n\n";									//$NON-NLS-1$
 
 	public static final String						SYSTEM_NEW_LINE					= System
@@ -272,6 +274,8 @@ public class UI {
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 	}
+
+	private UI() {}
 
 	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
 
@@ -691,7 +695,7 @@ public class UI {
 					oldPattern = sdf.toPattern();
 					String newPattern = UI.EMPTY_STRING;
 					for (int i = 0; i < oldPattern.length(); i++) {
-						if (oldPattern.charAt(i) == 'y') { //$NON-NLS-1$
+						if (oldPattern.charAt(i) == 'y') {
 							newPattern += "yy"; //$NON-NLS-1$
 						} else {
 							newPattern += oldPattern.charAt(i);
@@ -741,7 +745,7 @@ public class UI {
 				final String oldPattern = sdf.toPattern();
 
 				//	some short formats have only one h (e.g. ths US)
-				if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$ 
+				if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$
 
 					String newPattern = UI.EMPTY_STRING;
 
@@ -922,7 +926,7 @@ public class UI {
 	 * @param weightKey
 	 * @param sashDefaultWeight
 	 */
-	public static void restoreSashWeight(	final SashForm sash,
+	public static void restoreSashWeight(final SashForm sash,
 											final IMemento fMemento,
 											final String weightKey,
 											final int[] sashDefaultWeight) {
@@ -984,21 +988,31 @@ public class UI {
 	}
 
 	/**
-	 * set width for the first column controls to the max width value
+	 * set width for all controls in one column to the max width value
 	 */
-	public static void setEqualizeColumWidths(final ArrayList<Control> firstColumnControls) {
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
+		setEqualizeColumWidths(columnControls, 0);
+	}
+
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
 
 		int maxWidth = 0;
 
 		// get max width from all first columns controls
-		for (final Control control : firstColumnControls) {
-			final int width = control.getSize().x;
+		for (final Control control : columnControls) {
+
+			if (control.isDisposed()) {
+				// this should not happen, but it did during testing
+				return;
+			}
+
+			final int width = control.getSize().x + additionalSpace;
 
 			maxWidth = width > maxWidth ? width : maxWidth;
 		}
 
 		// set width for all first column controls
-		for (final Control control : firstColumnControls) {
+		for (final Control control : columnControls) {
 			((GridData) control.getLayoutData()).widthHint = maxWidth;
 		}
 	}
@@ -1007,7 +1021,7 @@ public class UI {
 		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 	}
- 
+
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
@@ -1069,7 +1083,7 @@ public class UI {
 			e.printStackTrace();
 
 			if (e instanceof SQLException) {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", //$NON-NLS-1$ 
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", //$NON-NLS-1$
 						sqlExceptionText);
 			}
 
@@ -1109,7 +1123,7 @@ public class UI {
 		tourTagLabel.pack(true);
 	}
 
-	public static void updateUITourType(final TourType tourType, final CLabel lblTourType) {
+	public static void updateUITourType(final TourType tourType, final CLabel lblTourType, final boolean isTextDisplayed) {
 
 		// tour type
 		if (tourType == null) {
@@ -1117,7 +1131,7 @@ public class UI {
 			lblTourType.setImage(null);
 		} else {
 			lblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
-			lblTourType.setText(tourType.getName());
+			lblTourType.setText(isTextDisplayed ? tourType.getName() : UI.EMPTY_STRING);
 		}
 
 		lblTourType.pack(true);
@@ -1198,8 +1212,6 @@ public class UI {
 			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_C;
 		}
 	}
-
-	private UI() {}
 
 	/**
 	 * create image tour type image from scratch
@@ -1364,9 +1376,7 @@ public class UI {
 	 */
 	public void setTourTypeImagesDirty() {
 
-		for (final Iterator<String> iterator = _imageCache.keySet().iterator(); iterator.hasNext();) {
-
-			final String imageId = iterator.next();
+		for (final String imageId : _imageCache.keySet()) {
 
 			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
 				_dirtyImages.put(imageId, true);

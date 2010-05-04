@@ -529,9 +529,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-				if (_isGraphVisible) {
-					onMouseWheel(event);
-				}
+				onMouseWheel(event);
 			}
 		});
 
@@ -4415,7 +4413,11 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void onMouseWheel(final Event event) {
+	void onMouseWheel(final Event event) {
+
+		if (_isGraphVisible == false) {
+			return;
+		}
 
 		if (_chart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
 

@@ -62,6 +62,8 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
+
+	public static String	App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
@@ -226,6 +228,36 @@ public class Messages extends NLS {
 	public static String		DataImport_Error_invalid_data_format;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
+
+	public static String	Dialog_JoinTours_DlgArea_Message;
+
+	public static String	Dialog_JoinTours_DlgArea_Title;
+
+	public static String	Dialog_JoinTours_InvalidData_Altitude;
+
+	public static String	Dialog_JoinTours_InvalidData_Cadence;
+
+	public static String	Dialog_JoinTours_InvalidData_Distance;
+
+	public static String	Dialog_JoinTours_InvalidData_DlgMessage;
+
+	public static String	Dialog_JoinTours_InvalidData_DlgTitle;
+
+	public static String	Dialog_JoinTours_InvalidData_Latitude;
+
+	public static String	Dialog_JoinTours_InvalidData_Longitude;
+
+	public static String	Dialog_JoinTours_InvalidData_Power;
+
+	public static String	Dialog_JoinTours_InvalidData_Pulse;
+
+	public static String	Dialog_JoinTours_InvalidData;
+
+	public static String	Dialog_JoinTours_InvalidData_RequiredDataSeries;
+
+	public static String	Dialog_JoinTours_InvalidData_Time;
+
+	public static String	Dialog_JoinTours_Label_Tour;
 
 	public static String		Dialog_SelectGraphs_Title;
 
@@ -400,6 +432,8 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Data_Action_RemoveTour;
+
+	public static String	Import_Data_Dlg_Confirm_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

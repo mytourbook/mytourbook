@@ -28,6 +28,8 @@ public class Messages extends NLS {
 	public static String		App_Image_RefreshSelected;
 	public static String		App_Image_RefreshSelected_Disabled;
 
+	public static String	External_Link_HomePage;
+
 	public static String		External_Link_MapProviders;
 
 	public static String		pref_cache_clear_cache;

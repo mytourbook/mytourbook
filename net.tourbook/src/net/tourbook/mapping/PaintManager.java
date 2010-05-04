@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
 
@@ -23,83 +23,83 @@ import de.byteholder.gpx.GeoPosition;
 
 public class PaintManager {
 
-	private static PaintManager	fInstance;
+	private static PaintManager			_instance;
 
-	private ArrayList<TourData>	fTourDataList	= new ArrayList<TourData>();
+	private final ArrayList<TourData>	_tourDataList	= new ArrayList<TourData>();
 
 	/**
 	 * contains the upper left and lower right position for a tour
 	 */
-	private Set<GeoPosition>	fTourBounds;
+	private Set<GeoPosition>			_tourBounds;
 
-	private int					fSynchTourZoomLevel;
+	private int							_synchTourZoomLevel;
 
-	private ILegendProvider		fLegendProvider;
+	private ILegendProvider				_legendProvider;
 
-	private boolean				fShowStartEndInMap;
-	private boolean				fShowTourMarker;
-
-	public static PaintManager getInstance() {
-
-		if (fInstance == null) {
-			fInstance = new PaintManager();
-		}
-
-		return fInstance;
-	}
+	private boolean						_isShowStartEndInMap;
+	private boolean						_isShowTourMarker;
 
 	private PaintManager() {}
 
+	public static PaintManager getInstance() {
+
+		if (_instance == null) {
+			_instance = new PaintManager();
+		}
+
+		return _instance;
+	}
+
 	public ILegendProvider getLegendProvider() {
-		return fLegendProvider;
+		return _legendProvider;
 	}
 
 	public int getSynchTourZoomLevel() {
-		return fSynchTourZoomLevel;
+		return _synchTourZoomLevel;
 	}
 
 	/**
 	 * @return Returns the tour bounds or <code>null</code> when a tour is not set
 	 */
 	public Set<GeoPosition> getTourBounds() {
-		return fTourBounds;
+		return _tourBounds;
 	}
 
 	/**
 	 * @return Returns the current {@link TourData} which is selected in a view or editor
 	 */
 	public ArrayList<TourData> getTourData() {
-		return fTourDataList;
+		return _tourDataList;
 	}
 
 	public boolean isShowStartEndInMap() {
-		return fShowStartEndInMap;
+		return _isShowStartEndInMap;
 	}
 
 	public boolean isShowTourMarker() {
-		return fShowTourMarker;
+		return _isShowTourMarker;
 	}
 
 	public void setLegendProvider(final ILegendProvider legendProvider) {
 		if (legendProvider != null) {
-			fLegendProvider = legendProvider;
+			_legendProvider = legendProvider;
 		}
 	}
 
 	public void setShowStartEnd(final boolean isVisible) {
-		fShowStartEndInMap = isVisible;
+		_isShowStartEndInMap = isVisible;
 	}
 
 	public void setShowTourMarker(final boolean isVisible) {
-		fShowTourMarker = isVisible;
+		_isShowTourMarker = isVisible;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {
-		fSynchTourZoomLevel = zoomLevel;
+		_synchTourZoomLevel = zoomLevel;
 	}
 
 	public void setTourBounds(final Set<GeoPosition> mapPositions) {
-		fTourBounds = mapPositions;
+		_tourBounds = mapPositions;
 	}
 
 	/**
@@ -109,8 +109,8 @@ public class PaintManager {
 	 */
 	public void setTourData(final ArrayList<TourData> tourDataList) {
 
-		fTourDataList.clear();
-		fTourDataList.addAll(tourDataList);
+		_tourDataList.clear();
+		_tourDataList.addAll(tourDataList);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class PaintManager {
 	 */
 	public void setTourData(final TourData tourData) {
 
-		fTourDataList.clear();
-		fTourDataList.add(tourData);
+		_tourDataList.clear();
+		_tourDataList.add(tourData);
 	}
 }

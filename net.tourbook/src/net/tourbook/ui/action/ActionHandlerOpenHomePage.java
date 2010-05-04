@@ -15,24 +15,21 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.ui.tourChart.TourToolTip;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.widgets.Display;
 
-public class ActionTourToolTipEditQuick extends ActionEditQuick {
+import de.byteholder.geoclipse.preferences.Messages;
+import de.byteholder.geoclipse.util.Util;
 
-	private final TourToolTip	_tourInfo;
+public class ActionHandlerOpenHomePage extends AbstractHandler {
 
-	public ActionTourToolTipEditQuick(final TourToolTip tourInfo) {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		super(tourInfo);
+		Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_HomePage);
 
-		_tourInfo = tourInfo;
+		return null;
 	}
 
-	@Override
-	public void run() {
-
-		_tourInfo.hide();
-
-		super.run();
-	}
 }

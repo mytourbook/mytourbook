@@ -219,21 +219,31 @@ public class Messages extends NLS {
 	public static String	Tour_Tooltip_Label_AvgPulse;
 	public static String		Tour_Tooltip_Label_AvgSpeed;
 	public static String		Tour_Tooltip_Label_BreakTime;
+	public static String	Tour_Tooltip_Label_Calories;
+
 	public static String		Tour_Tooltip_Label_Clouds;
 	public static String		Tour_Tooltip_Label_Date;
+
+	public static String	Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
 	public static String		Tour_Tooltip_Label_Hour;
 	public static String		Tour_Tooltip_Label_MovingTime;
+
+	public static String	Tour_Tooltip_Label_NoTour;
 	public static String		Tour_Tooltip_Label_RecordingTime;
+
+	public static String	Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
 	public static String		Tour_Tooltip_Label_TourType;
 	public static String		Tour_Tooltip_Label_WindDirection;
 	public static String		Tour_Tooltip_Label_WindSpeed;
 
-	public static String	Value_Unit_Avg_Cadence;
+	public static String	Value_Unit_Cadence;
 
-	public static String	Value_Unit_Avg_Pulse;
+	public static String	Value_Unit_Calories;
+
+	public static String	Value_Unit_Pulse;
 
 	static {
 		// initialize resource bundle

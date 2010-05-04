@@ -22,7 +22,6 @@ import java.util.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartComponentAxis;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
@@ -128,7 +127,7 @@ public class TourChart extends Chart {
 	private I2ndAltiLayer					_2ndAltiLayerProvider;
 	private boolean							_isMouseModeSet;
 
-	private final TourInfo					_tourInfoLeft;
+	private final TourInfo					_tourInfo;
 
 
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
@@ -161,13 +160,13 @@ public class TourChart extends Chart {
 		});
 
 
-		final ChartComponentAxis axisLeft = getChartComponents().getAxisLeft();
+//		final ChartComponentAxis axisLeft = getChartComponents().getAxisLeft();
 
 		// set tour info icon into the left axis
-		_tourInfoLeft = new TourInfo(axisLeft);
-		axisLeft.setToolTip(_tourInfoLeft);
-
+		_tourInfo = new TourInfo(getToolTipControl());
+		setToolTip(_tourInfo);
 	}
+
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
 
@@ -1422,7 +1421,7 @@ public class TourChart extends Chart {
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-		_tourInfoLeft.setTourData(_tourData);
+		_tourInfo.setTourData(_tourData);
 	}
 
 	/**

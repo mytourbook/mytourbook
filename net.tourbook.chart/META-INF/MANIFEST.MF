@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: net.tourbook.util

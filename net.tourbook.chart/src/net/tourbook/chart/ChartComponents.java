@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ChartComponents extends Composite {
 
-	private static final int			DELAY_TIME					= 100;
+	public static final int				BAR_SELECTION_DELAY_TIME	= 100;
 
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
@@ -897,11 +897,11 @@ public class ChartComponents extends Composite {
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
-	public ChartComponentAxis getAxisLeft() {
+	ChartComponentAxis getAxisLeft() {
 		return _componentAxisLeft;
 	}
 
-	public ChartComponentAxis getAxisRight() {
+	ChartComponentAxis getAxisRight() {
 		return _componentAxisRight;
 	}
 
@@ -1022,19 +1022,19 @@ public class ChartComponents extends Composite {
 			final Display display = Display.getCurrent();
 			display.asyncExec(new Runnable() {
 				public void run() {
-					display.timerExec(DELAY_TIME, new Runnable() {
+					display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
 
-						final int	fRunnableKeyDownCounter	= _keyDownCounter[0];
+						final int	__runnableKeyDownCounter	= _keyDownCounter[0];
 
 						public void run() {
-							if (fRunnableKeyDownCounter == _keyDownCounter[0]
-									&& fRunnableKeyDownCounter != _lastKeyDownCounter[0]) {
+							if (__runnableKeyDownCounter == _keyDownCounter[0]
+									&& __runnableKeyDownCounter != _lastKeyDownCounter[0]) {
 
 								/*
 								 * prevent redoing it, this happened when the selectNext/Previous
 								 * Method took a long time when the chart was drawn
 								 */
-								_lastKeyDownCounter[0] = fRunnableKeyDownCounter;
+								_lastKeyDownCounter[0] = __runnableKeyDownCounter;
 
 								_chart.fireBarSelectionEvent(0, selectedIndex[0]);
 							}

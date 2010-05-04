@@ -13,20 +13,32 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.statistics;
 
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
+import net.tourbook.chart.ChartComponents;
+import net.tourbook.ui.tourChart.TourInfo;
 
-public abstract class ChartToolTip {
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 
-	/**
-	 * Paints the tool tip icon in the chart
-	 * 
-	 * @param gc
-	 * @param rectangle
-	 *            Rectangle where the tool tip can be painted
-	 */
-	public abstract void paint(GC gc, Rectangle rectangle);
+public class StatisticTourInfo extends TourInfo {
+
+	public StatisticTourInfo(final Control control) {
+		super(control);
+	}
+
+	@Override
+	public void show(final Point point) {
+
+		/*
+		 * delay tooltip because first the bar must be selected that which selectes the new tour
+		 */
+		_infoControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
+			public void run() {
+				_tourInfoToolTip.show(point);
+			}
+		});
+
+	}
 
 }

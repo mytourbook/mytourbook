@@ -40,6 +40,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.ITourToolTip;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -450,7 +451,7 @@ public class Map extends Canvas {
 	private int									_pannedMapDiffX;
 	private int									_pannedMapDiffY;
 
-//	private int									_drawCounter;
+	private ITourToolTip							_tourToolTip;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -1730,6 +1731,10 @@ public class Map extends Canvas {
 
 				if (_isScaleVisible) {
 					paintMap30Scale(gc);
+				}
+
+				if (_tourToolTip != null) {
+					_tourToolTip.paint(gc, _clientArea);
 				}
 			}
 
@@ -3721,6 +3726,10 @@ public class Map extends Canvas {
 		_isScaleVisible = isScaleVisible;
 	}
 
+	public void setToolTip(final ITourToolTip tourToolTip) {
+		_tourToolTip = tourToolTip;
+	}
+
 	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
 
 		_isTourPaintMethodEnhanced = isEnhanced;
@@ -3780,10 +3789,6 @@ public class Map extends Canvas {
 		this._zoomEnabled = zoomEnabled;
 	}
 
-	public void setZoomOnDoubleClickEnabled(final boolean zoomOnDoubleClickEnabled) {
-		this._zoomOnDoubleClickEnabled = zoomOnDoubleClickEnabled;
-	}
-
 //	private void showPoi(final String poiText) {
 //
 //		if (_poiTT != null && _poiTT.isVisible()) {
@@ -3804,16 +3809,8 @@ public class Map extends Canvas {
 //				_poiTTOffsetY);
 //	}
 
-	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
-
-		final Rectangle viewPort = _worldPixelViewport;
-		final int worldMouseX = viewPort.x + mouseEvent.x;
-		final int worldMouseY = viewPort.y + mouseEvent.y;
-
-		_offlineDevAreaEnd = new Point(mouseEvent.x, mouseEvent.y);
-		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
-
-		_offlineDevTileEnd = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
+	public void setZoomOnDoubleClickEnabled(final boolean zoomOnDoubleClickEnabled) {
+		this._zoomOnDoubleClickEnabled = zoomOnDoubleClickEnabled;
 	}
 
 //	/**
@@ -3889,6 +3886,18 @@ public class Map extends Canvas {
 //
 //		setPoiVisible(isVisible);
 //	}
+
+	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
+
+		final Rectangle viewPort = _worldPixelViewport;
+		final int worldMouseX = viewPort.x + mouseEvent.x;
+		final int worldMouseY = viewPort.y + mouseEvent.y;
+
+		_offlineDevAreaEnd = new Point(mouseEvent.x, mouseEvent.y);
+		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
+
+		_offlineDevTileEnd = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
+	}
 
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
