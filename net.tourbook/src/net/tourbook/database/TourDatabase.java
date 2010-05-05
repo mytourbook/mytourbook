@@ -82,8 +82,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 10;													// 10.4
+	private static final int					TOURBOOK_DB_VERSION							= 10;
 
+//	private static final int					TOURBOOK_DB_VERSION							= 10;	// 10.5.0
 //	private static final int					TOURBOOK_DB_VERSION							= 9;	// 10.3.0
 //	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
@@ -91,7 +92,6 @@ public class TourDatabase {
 //	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
-
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
@@ -1640,7 +1640,8 @@ public class TourDatabase {
 				+ "avgTemperature		INTEGER,			\n" //$NON-NLS-1$
 				+ "maxSpeed				FLOAT,				\n" //$NON-NLS-1$
 				+ "tourTitle			VARCHAR(255),		\n" //$NON-NLS-1$
-				+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$
+// OLD			+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$ // version <= 9
+				+ "tourDescription		VARCHAR(32000),		\n" //$NON-NLS-1$ // modified in version 10
 				+ "tourStartPlace		VARCHAR(255),		\n" //$NON-NLS-1$
 				+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
 				+ "calories				INTEGER,			\n" //$NON-NLS-1$
@@ -2077,31 +2078,31 @@ public class TourDatabase {
 	private void createTableTourWayPointV10(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourWayPoint
-		String sql = ("CREATE TABLE " + TABLE_TOUR_WAYPOINT + "\n") // 							//$NON-NLS-1$
+		String sql = ("CREATE TABLE " + TABLE_TOUR_WAYPOINT + "\n") // 							//$NON-NLS-1$ //$NON-NLS-2$
 				+ "(\n" //																		//$NON-NLS-1$
-				+ "   wayPointId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "   " + (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //							//$NON-NLS-1$
+				+ "   wayPointId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "   " + (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //							//$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ "   latitude 			DOUBLE NOT NULL,	\n" //								//$NON-NLS-1$
-				+ "   longitude 		DOUBLE NOT NULL,	\n" //								//$NON-NLS-1$
-				+ "   time				BIGINT,				\n" //								//$NON-NLS-1$
-				+ "   altitude			FLOAT,				\n" //								//$NON-NLS-1$
-				+ "   name				VARCHAR(1024),		\n" //								//$NON-NLS-1$
-				+ "   description		VARCHAR(4096),		\n" //								//$NON-NLS-1$
-				+ "   comment			VARCHAR(4096),		\n" //								//$NON-NLS-1$
-				+ "   symbol			VARCHAR(1024),		\n" //								//$NON-NLS-1$
-				+ "   category			VARCHAR(1024)		\n" //								//$NON-NLS-1$
+				+ "   latitude 			DOUBLE NOT NULL,		\n" //							//$NON-NLS-1$
+				+ "   longitude 		DOUBLE NOT NULL,		\n" //							//$NON-NLS-1$
+				+ "   time				BIGINT,					\n" //							//$NON-NLS-1$
+				+ "   altitude			FLOAT,					\n" //							//$NON-NLS-1$
+				+ "   name				VARCHAR(1024),			\n" //							//$NON-NLS-1$
+				+ "   description		VARCHAR(32000),			\n" //							//$NON-NLS-1$
+				+ "   comment			VARCHAR(32000),			\n" //							//$NON-NLS-1$
+				+ "   symbol			VARCHAR(4096),			\n" //							//$NON-NLS-1$
+				+ "   category			VARCHAR(4096)			\n" //							//$NON-NLS-1$
 				//
-				+ ")";
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		System.out.println();
 		stmt.execute(sql); //
 
 		// ALTER TABLE TourWayPoint ADD CONSTRAINT TourWayPoint_pk PRIMARY KEY (wayPointId);
-		sql = ("ALTER TABLE " + TABLE_TOUR_WAYPOINT) //								//$NON-NLS-1$
-				+ (" ADD CONSTRAINT " + (TABLE_TOUR_WAYPOINT + "_pk ")) //				//$NON-NLS-1$ //$NON-NLS-2$
-				+ (" PRIMARY KEY (wayPointId)");
+		sql = ("ALTER TABLE " + TABLE_TOUR_WAYPOINT) //											//$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_WAYPOINT + "_pk ")) //						//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (wayPointId)"); //$NON-NLS-1$
 
 		System.out.println(sql);
 		System.out.println();
@@ -2110,9 +2111,9 @@ public class TourDatabase {
 		// CREATE TABLE	TourData_TourWayPoint
 		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) //								//$NON-NLS-1$
 				+ "(\n" //																			//$NON-NLS-1$
-				+ "   " + (TABLE_TOUR_DATA + "_tourId				BIGINT NOT NULL,	\n") //		//$NON-NLS-1$
-				+ "   " + (TABLE_TOUR_WAYPOINT + "_wayPointId		BIGINT NOT NULL		\n") //		//$NON-NLS-1$
-				+ ")";
+				+ "   " + (TABLE_TOUR_DATA + "_tourId				BIGINT NOT NULL,	\n") //		//$NON-NLS-1$ //$NON-NLS-2$
+				+ "   " + (TABLE_TOUR_WAYPOINT + "_wayPointId		BIGINT NOT NULL		\n") //		//$NON-NLS-1$ //$NON-NLS-2$
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		System.out.println();
@@ -2121,7 +2122,7 @@ public class TourDatabase {
 		// ALTER TABLE TourData_TourWayPoint ADD CONSTRAINT TourData_TourWayPoint_pk PRIMARY KEY (TourData_tourId);
 		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) //				//$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURWAYPOINT + "_pk") //	//$NON-NLS-1$ //$NON-NLS-2$
-				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)");
+				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		System.out.println();
@@ -2297,6 +2298,7 @@ public class TourDatabase {
 		}
 
 		int newVersion = currentDbVersion;
+		final int oldVersion = currentDbVersion;
 
 		/*
 		 * database update
@@ -2366,6 +2368,12 @@ public class TourDatabase {
 		if (isPostUpdate8) {
 			updateDbDesign_008_009_PostUpdate(conn, monitor);
 		}
+
+		// display info for the successful update
+		MessageDialog.openInformation(
+				Display.getCurrent().getActiveShell(),
+				Messages.tour_database_version_info_title,
+				NLS.bind(Messages.Tour_Database_UpdateInfo, oldVersion, newVersion));
 
 		return true;
 	}
@@ -2688,7 +2696,7 @@ public class TourDatabase {
 			UI.showSQLException(e);
 		}
 
-		System.out.println("database is updated");//$NON-NLS-1$
+		System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, 9));
 		System.out.println();
 	}
 
@@ -2712,18 +2720,17 @@ public class TourDatabase {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 10));
 		}
 
-		System.out.println("Database update: 10");//$NON-NLS-1$
 		System.out.println();
+		System.out.println(NLS.bind(Messages.Tour_Database_Update, 10));
 
 		try {
 			final Statement statement = conn.createStatement();
 
 			createTableTourWayPointV10(statement);
 
-			/*
-			 * resize description column: ref derby docu page 24
-			 */
 			/**
+			 * resize description column: ref derby docu page 24
+			 * 
 			 * <pre>
 			 * 
 			 * ALTER TABLE table-Name
@@ -2732,19 +2739,36 @@ public class TourDatabase {
 			 *     ADD CONSTRAINT clause |
 			 *     DROP [ COLUMN ] column-name [ CASCADE | RESTRICT ]
 			 *     DROP { PRIMARY KEY | FOREIGN KEY constraint-name | UNIQUE
-			 *   constraint-name | CHECK constraint-name | CONSTRAINT constraint-name }
+			 *   		constraint-name | CHECK constraint-name | CONSTRAINT constraint-name }
 			 *     ALTER [ COLUMN ] column-alteration |
 			 *     LOCKSIZE { ROW | TABLE }
+			 * 
+			 *     column-alteration
+			 * 
+			 * 		column-Name SET DATA TYPE VARCHAR(integer) |
+			 * 		column-Name SET DATA TYPE VARCHAR FOR BIT DATA(integer) |
+			 * 		column-name SET INCREMENT BY integer-constant |
+			 * 		column-name RESTART WITH integer-constant |
+			 * 		column-name [ NOT ] NULL |
+			 * 		column-name [ WITH | SET ] DEFAULT default-value |
+			 * 		column-name DROP DEFAULT
 			 * }
 			 * </pre>
 			 */
 
-			statement.executeBatch();
+			final String sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN tourDescription SET DATA TYPE VARCHAR(32000) "; //$NON-NLS-1$ //$NON-NLS-2$
+
+			System.out.println(sql);
+			statement.execute(sql);
+
 			statement.close();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+
+		System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, 10));
+		System.out.println();
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) {

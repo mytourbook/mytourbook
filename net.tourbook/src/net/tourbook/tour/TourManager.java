@@ -93,16 +93,16 @@ public class TourManager {
 	public static final int						GRAPH_TOUR_COMPARE			= 2000;
 
 	public static final int[]					allGraphIDs					= new int[] {
-			GRAPH_ALTITUDE,
-			GRAPH_SPEED,
-			GRAPH_ALTIMETER,
-			GRAPH_PULSE,
-			GRAPH_TEMPERATURE,
-			GRAPH_CADENCE,
-			GRAPH_GRADIENT,
-			GRAPH_POWER,
-			GRAPH_PACE,
-			GRAPH_TOUR_COMPARE												};
+																			GRAPH_ALTITUDE,
+																			GRAPH_SPEED,
+																			GRAPH_ALTIMETER,
+																			GRAPH_PULSE,
+																			GRAPH_TEMPERATURE,
+																			GRAPH_CADENCE,
+																			GRAPH_GRADIENT,
+																			GRAPH_POWER,
+																			GRAPH_PACE,
+																			GRAPH_TOUR_COMPARE };
 
 	private static final int					SPEED_DIVISOR				= 10;
 	public static final int						GRADIENT_DIVISOR			= 10;
@@ -388,14 +388,15 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the detailed title of this tour (displayed as chart title)
+	 * @return returns the detailed title of this tour which contains:<br>
+	 *         date + time + title as it is displayed in the tour chart
 	 */
 	public static String getTourTitleDetailed(final TourData tourData) {
 
 		final String tourTitle = tourData.getTourTitle();
 
-		return getTourDateFull(tourData) + //
-				" - " //$NON-NLS-1$
+		return getTourDateFull(tourData) //
+				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData)
 				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
 	}
@@ -466,7 +467,7 @@ public class TourManager {
 	 *            when <code>true</code>, a notification is fired when the data are saved
 	 * @return a list with all persisted {@link TourData}
 	 */
-	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
+	private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
 															final boolean canFireNotification) {
 
 		TourData tourDataEditorSavedTour = null;
@@ -569,7 +570,7 @@ public class TourManager {
 	 * @param yData
 	 * @param graphName
 	 */
-	public static void setGraphColor(	final IPreferenceStore prefStore,
+	public static void setGraphColor(final IPreferenceStore prefStore,
 										final ChartDataYSerie yData,
 										final String graphName) {
 
@@ -599,7 +600,7 @@ public class TourManager {
 	 * @param chartConfig
 	 * @param prefStore
 	 */
-	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
+	public static void updateZoomOptionsInChartConfig(final TourChartConfiguration chartConfig,
 														final Preferences prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
@@ -985,7 +986,7 @@ public class TourManager {
 		return createChartDataModelInternal(tourData, chartConfig, false);
 	}
 
-	public ChartDataModel createChartDataModel(	final TourData tourData,
+	public ChartDataModel createChartDataModel(final TourData tourData,
 												final TourChartConfiguration chartConfig,
 												final boolean hasPropertyChanged) {
 

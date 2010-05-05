@@ -233,6 +233,8 @@ public class Messages extends NLS {
 
 	public static String	Dialog_JoinTours_DlgArea_Title;
 
+	public static String	Dialog_JoinTours_Group_JoinedTourTime;
+
 	public static String	Dialog_JoinTours_InvalidData_Altitude;
 
 	public static String	Dialog_JoinTours_InvalidData_Cadence;
@@ -257,7 +259,29 @@ public class Messages extends NLS {
 
 	public static String	Dialog_JoinTours_InvalidData_Time;
 
+	public static String	Dialog_JoinTours_Label_OtherFields;
+
+	public static String	Dialog_JoinTours_Label_OtherFieldsInfo;
+
 	public static String	Dialog_JoinTours_Label_Tour;
+
+	public static String	Dialog_JoinTours_Label_TourDate;
+
+	public static String	Dialog_JoinTours_Label_TourTime;
+
+	public static String	Dialog_JoinTours_Radio_ConcatenateTime;
+
+	public static String	Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
+
+	public static String	Dialog_JoinTours_Radio_KeepTime;
+
+	public static String	Dialog_JoinTours_Radio_KeepTime_Tooltip;
+
+	public static String	Dialog_JoinTours_Radio_PreserveTourTimeDiff;
+
+	public static String	Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
+
+	public static String	Dialog_JoinTours_TourTitle;
 
 	public static String		Dialog_SelectGraphs_Title;
 
@@ -696,6 +720,10 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
+
+	public static String	Tour_Database_UpdateDone;
+
+	public static String	Tour_Database_UpdateInfo;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;

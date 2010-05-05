@@ -67,6 +67,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -130,7 +131,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final int					COLUMN_FILE_NAME					= 3;
 
 	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDEX			= "selectedTourIndex";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDICES			= "SelectedTourIndices";					//$NON-NLS-1$
 
 	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";							//$NON-NLS-1$
 	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
@@ -1599,7 +1600,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final RawDataManager rawDataMgr = RawDataManager.getInstance();
 
 		rawDataMgr.getImportedTours().clear();
-		int importCounter = 0;
+		int importedFileCounter = 0;
 
 		// loop: import all files
 		for (final String fileName : importedFiles) {
@@ -1613,38 +1614,53 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final File file = new File(fileName);
 			if (file.exists()) {
 				if (rawDataMgr.importRawData(file, null, false, null)) {
-					importCounter++;
+					importedFileCounter++;
 				} else {
 					notImportedFiles.add(fileName);
 				}
 			}
 		}
 
-		if (importCounter > 0) {
+		if (importedFileCounter > 0) {
 
 			rawDataMgr.updateTourDataFromDb(monitor);
 
-			final Object[] tourData = new Object[1];
-			final int[] selectedTourIndex = new int[1];
-			// restore selected tour
-			try {
-				selectedTourIndex[0] = _state.getInt(STATE_SELECTED_TOUR_INDEX);
-			} catch (final NumberFormatException e) {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
 
-			} finally {
+					reloadViewer();
 
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
+					/*
+					 * restore selected tour
+					 */
+					final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
 
-						tourData[0] = _tourViewer.getElementAt(selectedTourIndex[0]);
-						reloadViewer();
+					if (viewerIndices != null) {
 
-						if (tourData[0] != null) {
-							_tourViewer.setSelection(new StructuredSelection(tourData[0]), true);
+						final ArrayList<Object> viewerTourData = new ArrayList<Object>();
+
+						for (final String viewerIndex : viewerIndices) {
+
+							Object tourData = null;
+
+							try {
+								final int index = Integer.parseInt(viewerIndex);
+								tourData = _tourViewer.getElementAt(index);
+							} catch (final NumberFormatException e) {
+								// just ignore
+							}
+
+							if (tourData != null) {
+								viewerTourData.add(tourData);
+							}
+						}
+
+						if (viewerTourData.size() > 0) {
+							_tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
 						}
 					}
-				});
-			}
+				}
+			});
 		}
 
 		if (notImportedFiles.size() > 0) {
@@ -1723,8 +1739,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
 		_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
-		// save selected tour in the viewer
-		_state.put(STATE_SELECTED_TOUR_INDEX, table.getSelectionIndex());
+		// keep selected tours
+		Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
 
 		_state.put(STATE_IS_MERGE_TRACKS, _actionMergeGPXTours.isChecked());
 		_state.put(STATE_IS_CHECKSUM_VALIDATION, _actionDisableChecksumValidation.isChecked());
@@ -1741,7 +1757,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param savedTours
 	 *            the saved tour is added to this list
 	 */
-	private void saveTour(	final TourData tourData,
+	private void saveTour(final TourData tourData,
 							final TourPerson person,
 							final ArrayList<TourData> savedTours,
 							final boolean isForceSave) {

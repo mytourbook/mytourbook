@@ -29,6 +29,30 @@ import org.eclipse.ui.PlatformUI;
 public class Util {
 
 	/**
+	 * @param sourceString
+	 * @param lookFor
+	 * @return Returns the number of characters which are found in the string or -1 when the
+	 *         string is <code>null</code>
+	 */
+	public static int countCharacter(final String sourceString, final char lookFor) {
+
+		if (sourceString == null) {
+			return -1;
+		}
+
+		int count = 0;
+
+		for (int i = 0; i < sourceString.length(); i++) {
+			final char c = sourceString.charAt(i);
+			if (c == lookFor) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	/**
 	 * creates a int array backup
 	 * 
 	 * @param original
@@ -116,6 +140,23 @@ public class Util {
 		}
 
 		return year;
+	}
+
+	/**
+	 * Set the state for an integer array
+	 * 
+	 * @param state
+	 * @param stateKey
+	 * @param intValues
+	 */
+	public static void setState(final IDialogSettings state, final String stateKey, final int[] intValues) {
+
+		final String[] stateIndices = new String[intValues.length];
+		for (int index = 0; index < intValues.length; index++) {
+			stateIndices[index] = Integer.toString(intValues[index]);
+		}
+
+		state.put(stateKey, stateIndices);
 	}
 
 	/**
