@@ -121,8 +121,7 @@ public class RawDataManager {
 					fileText.append(fileName);
 				}
 
-				final String errorMessage = NLS
-						.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
+				final String errorMessage = NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
 				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.app_error_title, errorMessage);
 
 				System.out.println(errorMessage);
@@ -694,7 +693,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb(final IProgressMonitor monitor) {
 
 		if (_importedTourData.size() < 5) {
-			updateTourDataFromDbTask(null);
+			updateTourDataFromDbRunnable(null);
 		} else {
 
 			if (monitor == null) {
@@ -707,7 +706,7 @@ public class RawDataManager {
 								public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 										InterruptedException {
 
-									updateTourDataFromDbTask(monitor);
+									updateTourDataFromDbRunnable(monitor);
 								}
 							});
 
@@ -717,12 +716,12 @@ public class RawDataManager {
 					e.printStackTrace();
 				}
 			} else {
-				updateTourDataFromDbTask(monitor);
+				updateTourDataFromDbRunnable(monitor);
 			}
 		}
 	}
 
-	private void updateTourDataFromDbTask(final IProgressMonitor monitor) {
+	private void updateTourDataFromDbRunnable(final IProgressMonitor monitor) {
 
 		int workedDone = 0;
 		final int workedAll = _importedTourData.size();

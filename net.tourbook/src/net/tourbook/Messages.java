@@ -63,7 +63,7 @@ public class Messages extends NLS {
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 
-	public static String	App_Action_JoinTours;
+	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
@@ -229,59 +229,36 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
-	public static String	Dialog_JoinTours_DlgArea_Message;
-
-	public static String	Dialog_JoinTours_DlgArea_Title;
-
-	public static String	Dialog_JoinTours_Group_JoinedTourTime;
-
-	public static String	Dialog_JoinTours_InvalidData_Altitude;
-
-	public static String	Dialog_JoinTours_InvalidData_Cadence;
-
-	public static String	Dialog_JoinTours_InvalidData_Distance;
-
-	public static String	Dialog_JoinTours_InvalidData_DlgMessage;
-
-	public static String	Dialog_JoinTours_InvalidData_DlgTitle;
-
-	public static String	Dialog_JoinTours_InvalidData_Latitude;
-
-	public static String	Dialog_JoinTours_InvalidData_Longitude;
-
-	public static String	Dialog_JoinTours_InvalidData_Power;
-
-	public static String	Dialog_JoinTours_InvalidData_Pulse;
-
-	public static String	Dialog_JoinTours_InvalidData;
-
-	public static String	Dialog_JoinTours_InvalidData_RequiredDataSeries;
-
-	public static String	Dialog_JoinTours_InvalidData_Time;
-
-	public static String	Dialog_JoinTours_Label_OtherFields;
-
-	public static String	Dialog_JoinTours_Label_OtherFieldsInfo;
-
-	public static String	Dialog_JoinTours_Label_Tour;
-
-	public static String	Dialog_JoinTours_Label_TourDate;
-
-	public static String	Dialog_JoinTours_Label_TourTime;
-
-	public static String	Dialog_JoinTours_Radio_ConcatenateTime;
-
-	public static String	Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
-
-	public static String	Dialog_JoinTours_Radio_KeepTime;
-
-	public static String	Dialog_JoinTours_Radio_KeepTime_Tooltip;
-
-	public static String	Dialog_JoinTours_Radio_PreserveTourTimeDiff;
-
-	public static String	Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
-
-	public static String	Dialog_JoinTours_TourTitle;
+	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
+	public static String		Dialog_JoinTours_DlgArea_Message;
+	public static String		Dialog_JoinTours_DlgArea_Title;
+	public static String		Dialog_JoinTours_Group_JoinedTourTime;
+	public static String		Dialog_JoinTours_InvalidData_Altitude;
+	public static String		Dialog_JoinTours_InvalidData_Cadence;
+	public static String		Dialog_JoinTours_InvalidData_Distance;
+	public static String		Dialog_JoinTours_InvalidData_DlgMessage;
+	public static String		Dialog_JoinTours_InvalidData_DlgTitle;
+	public static String		Dialog_JoinTours_InvalidData_Latitude;
+	public static String		Dialog_JoinTours_InvalidData_Longitude;
+	public static String		Dialog_JoinTours_InvalidData_Power;
+	public static String		Dialog_JoinTours_InvalidData_Pulse;
+	public static String		Dialog_JoinTours_InvalidData;
+	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
+	public static String		Dialog_JoinTours_InvalidData_Speed;
+	public static String		Dialog_JoinTours_InvalidData_Time;
+	public static String		Dialog_JoinTours_Label_DeviceName;
+	public static String		Dialog_JoinTours_Label_OtherFields;
+	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
+	public static String		Dialog_JoinTours_Label_Tour;
+	public static String		Dialog_JoinTours_Label_TourDate;
+	public static String		Dialog_JoinTours_Label_TourTime;
+	public static String		Dialog_JoinTours_Radio_ConcatenateTime;
+	public static String		Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
+	public static String		Dialog_JoinTours_Radio_KeepTime;
+	public static String		Dialog_JoinTours_Radio_KeepTime_Tooltip;
+	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff;
+	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
+	public static String		Dialog_JoinTours_TourTitle;
 
 	public static String		Dialog_SelectGraphs_Title;
 
@@ -457,7 +434,7 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_RemoveTour;
 
-	public static String	Import_Data_Dlg_Confirm_Message;
+	public static String		Import_Data_Dlg_Confirm_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -717,15 +694,15 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_load_all_tours;
 
-	public static String	Tour_Database_TourSaveError;
+	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
 
-	public static String	Tour_Database_UpdateDone;
+	public static String		Tour_Database_UpdateDone;
 
-	public static String	Tour_Database_UpdateInfo;
+	public static String		Tour_Database_UpdateInfo;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
@@ -751,6 +728,10 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_below;
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
+
+	public static String		Tour_Person_Dialog_GetSelectedPerson_Message;
+
+	public static String		Tour_Person_Dialog_GetSelectedPerson_Title;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;

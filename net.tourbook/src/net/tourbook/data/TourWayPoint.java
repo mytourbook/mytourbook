@@ -54,11 +54,11 @@ public class TourWayPoint implements Cloneable {
 	private float		altitude		= Float.MIN_VALUE;
 
 	private String		name;
+
 	private String		description;
 	private String		comment;
 	private String		symbol;
 	private String		category;
-
 	/**
 	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
 	 * not persisted
@@ -70,14 +70,27 @@ public class TourWayPoint implements Cloneable {
 	private GeoPosition	_geoPosition;
 
 	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
+	 * manually created way points or imported way points create a unique id to identify them, saved
+	 * way points are compared with the way point id
 	 */
 	private static int	_createCounter	= 0;
 
 	public TourWayPoint() {
-
 		this.createId = ++_createCounter;
+	}
+
+	@Override
+	public Object clone() {
+
+		// creates a shallow copy
+
+		try {
+			return super.clone();
+		} catch (final CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	@Override

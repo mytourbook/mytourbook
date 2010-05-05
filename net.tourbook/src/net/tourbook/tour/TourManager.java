@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -93,16 +94,16 @@ public class TourManager {
 	public static final int						GRAPH_TOUR_COMPARE			= 2000;
 
 	public static final int[]					allGraphIDs					= new int[] {
-																			GRAPH_ALTITUDE,
-																			GRAPH_SPEED,
-																			GRAPH_ALTIMETER,
-																			GRAPH_PULSE,
-																			GRAPH_TEMPERATURE,
-																			GRAPH_CADENCE,
-																			GRAPH_GRADIENT,
-																			GRAPH_POWER,
-																			GRAPH_PACE,
-																			GRAPH_TOUR_COMPARE };
+			GRAPH_ALTITUDE,
+			GRAPH_SPEED,
+			GRAPH_ALTIMETER,
+			GRAPH_PULSE,
+			GRAPH_TEMPERATURE,
+			GRAPH_CADENCE,
+			GRAPH_GRADIENT,
+			GRAPH_POWER,
+			GRAPH_PACE,
+			GRAPH_TOUR_COMPARE												};
 
 	private static final int					SPEED_DIVISOR				= 10;
 	public static final int						GRADIENT_DIVISOR			= 10;
@@ -180,9 +181,9 @@ public class TourManager {
 		}
 
 		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
-		final int time = Math.max(0, timeSerie[endIndex]
-				- timeSerie[startIndex]
-				- tourData.getBreakTime(startIndex, endIndex));
+		final int time = Math.max(
+				0,
+				timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
 
 		return (float) ((float) distance / time * 3.6);
 	}
@@ -467,7 +468,7 @@ public class TourManager {
 	 *            when <code>true</code>, a notification is fired when the data are saved
 	 * @return a list with all persisted {@link TourData}
 	 */
-	private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
+	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
 															final boolean canFireNotification) {
 
 		TourData tourDataEditorSavedTour = null;
@@ -570,7 +571,7 @@ public class TourManager {
 	 * @param yData
 	 * @param graphName
 	 */
-	public static void setGraphColor(final IPreferenceStore prefStore,
+	public static void setGraphColor(	final IPreferenceStore prefStore,
 										final ChartDataYSerie yData,
 										final String graphName) {
 
@@ -600,7 +601,7 @@ public class TourManager {
 	 * @param chartConfig
 	 * @param prefStore
 	 */
-	public static void updateZoomOptionsInChartConfig(final TourChartConfiguration chartConfig,
+	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
 														final Preferences prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
@@ -822,9 +823,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(0, rightTime
-							- leftTime
-							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
+					final float time = Math.max(
+							0,
+							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 					final float distance = rightDistance - leftDistance;
 
 					final float speed = distance / time * 3.6f;
@@ -876,9 +877,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(0, rightTime
-							- leftTime
-							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
+					final float time = Math.max(
+							0,
+							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 					final float distance = rightDistance - leftDistance;
 
 					if (distance == 0) {
@@ -931,9 +932,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = Math.max(0, rightTime
-							- leftTime
-							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
+					final float time = Math.max(
+							0,
+							rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 
 					return (((rightAltitude - leftAltitude) / time) * 3600);
 				}
@@ -986,7 +987,7 @@ public class TourManager {
 		return createChartDataModelInternal(tourData, chartConfig, false);
 	}
 
-	public ChartDataModel createChartDataModel(final TourData tourData,
+	public ChartDataModel createChartDataModel(	final TourData tourData,
 												final TourChartConfiguration chartConfig,
 												final boolean hasPropertyChanged) {
 
@@ -1473,6 +1474,26 @@ public class TourManager {
 		}
 	}
 
+	/**
+	 * @return Returns the active selected person in the toolbar or <code>null</code> when no person
+	 *         is selected.
+	 */
+	public TourPerson getActivePerson() {
+
+		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
+
+		if (activePerson == null) {
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
+					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
+
+			return null;
+		}
+
+		return activePerson;
+	}
+
 	public TourChart getActiveTourChart() {
 		return _activeTourChart;
 	}
@@ -1571,10 +1592,11 @@ public class TourManager {
 		}
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-					new TourEditorInput(tourId),
-					TourEditor.ID,
-					true);
+			PlatformUI
+					.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage()
+					.openEditor(new TourEditorInput(tourId), TourEditor.ID, true);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

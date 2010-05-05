@@ -405,10 +405,11 @@ public class TourData implements Comparable<Object> {
 	//
 	//
 	/**
-	 * contains the relative time in seconds, {@link #startHour}, {@link #startMinute} and
-	 * {@link #startSecond} contains the absolute time when a tour is started
+	 * Contains time in seconds relativ to the tour start which is defined in: {@link #startYear},
+	 * {@link #startMonth}, {@link #startDay}, {@link #startHour}, {@link #startMinute} and
+	 * {@link #startSecond}.
 	 * <p>
-	 * {@link #timeSerie} is null for a manually created tour
+	 * {@link #timeSerie} is <code>null</code> for a manually created tour
 	 */
 	@Transient
 	public int[]						timeSerie;
@@ -890,10 +891,7 @@ public class TourData implements Comparable<Object> {
 									? startHour < otherTourData.startHour ? -1 : (startHour == otherTourData.startHour
 											? startMinute < otherTourData.startMinute
 													? -1
-													: (startMinute == otherTourData.startMinute ? 0 : 1)
-											: 1)
-									: 1)
-							: 1)
+													: (startMinute == otherTourData.startMinute ? 0 : 1) : 1) : 1) : 1)
 					: 1);
 
 //			final int month = startMonth < otherTourData.startMonth ? -1 : (startMonth == otherTourData.startMonth
@@ -2628,6 +2626,16 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
+	 * Creates a unique tour id depending on the tour start time and current time
+	 */
+	public void createTourId() {
+
+		final String uniqueKey = Long.toString(System.currentTimeMillis());
+
+		createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
+	}
+
+	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
 	 * @param uniqueKey
@@ -3152,14 +3160,14 @@ public class TourData implements Comparable<Object> {
 		return deviceTravelTime;
 	}
 
-	public int getDeviceWeight() {
-		return deviceWeight;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	public int getDeviceWeight() {
+		return deviceWeight;
+	}
 
 	public int getDeviceWheel() {
 		return deviceWheel;
@@ -3221,10 +3229,6 @@ public class TourData implements Comparable<Object> {
 		return gradientSerie;
 	}
 
-	public boolean getIsDistanceFromSensor() {
-		return isDistanceFromSensor == 1;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3233,6 +3237,10 @@ public class TourData implements Comparable<Object> {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	public boolean getIsDistanceFromSensor() {
+		return isDistanceFromSensor == 1;
+	}
 
 	/**
 	 * @return the maxAltitude
@@ -3419,7 +3427,7 @@ public class TourData implements Comparable<Object> {
 		}
 
 //		System.out.println("joule: " + joule / 1000);
-		// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
 
 		return powerSerie;
 	}
@@ -3558,10 +3566,6 @@ public class TourData implements Comparable<Object> {
 		return startSecond;
 	}
 
-	public short getStartYear() {
-		return startYear;
-	}
-
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3572,6 +3576,10 @@ public class TourData implements Comparable<Object> {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
+
+	public short getStartYear() {
+		return startYear;
+	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3724,10 +3732,6 @@ public class TourData implements Comparable<Object> {
 		return tourType;
 	}
 
-	public Set<TourWayPoint> getTourWayPoints() {
-		return tourWayPoints;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3768,6 +3772,10 @@ public class TourData implements Comparable<Object> {
 //		}
 //	}
 
+	public Set<TourWayPoint> getTourWayPoints() {
+		return tourWayPoints;
+	}
+
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3802,6 +3810,11 @@ public class TourData implements Comparable<Object> {
 		return weatherWindSpd;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param zoomLevel
 	 * @return Returns the world position for the suplied zoom level and projection id
@@ -3809,11 +3822,6 @@ public class TourData implements Comparable<Object> {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -3854,6 +3862,16 @@ public class TourData implements Comparable<Object> {
 	 */
 	public boolean isPowerSerieFromDevice() {
 		return isPowerSerieFromDevice;
+	}
+
+	/**
+	 * @return
+	 *         Returns <code>true</code> when the data in {@link #speedSerie} are from the device
+	 *         and not computed. Speed data are normally available from an ergometer and not from a
+	 *         bike computer
+	 */
+	public boolean isSpeedSerieFromDevice() {
+		return isSpeedSerieFromDevice;
 	}
 
 	/**
@@ -4046,8 +4064,8 @@ public class TourData implements Comparable<Object> {
 		this.dpTolerance = dpTolerance;
 	}
 
-	public void setIsDistanceFromSensor(final boolean isDistanceFromSensor) {
-		this.isDistanceFromSensor = (short) (isDistanceFromSensor ? 1 : 0);
+	public void setIsDistanceFromSensor(final boolean isFromSensor) {
+		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
 	}
 
 	public void setMergedAltitudeOffset(final int altitudeDiff) {
@@ -4068,6 +4086,11 @@ public class TourData implements Comparable<Object> {
 
 	public void setMergeTargetTourId(final Long mergeTargetTourId) {
 		this.mergeTargetTourId = mergeTargetTourId;
+	}
+
+	public void setPowerSerie(final int[] powerSerie) {
+		this.powerSerie = powerSerie;
+		this.isPowerSerieFromDevice = true;
 	}
 
 	public void setRestPulse(final int restPulse) {
@@ -4109,9 +4132,29 @@ public class TourData implements Comparable<Object> {
 		paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 	}
 
+	public void setSpeedSerie(final int[] speedSerie) {
+		this.speedSerie = speedSerie;
+		this.isSpeedSerieFromDevice = true;
+	}
+
 	public void setStartAltitude(final short startAltitude) {
 		this.startAltitude = startAltitude;
 	}
+
+//	/**
+//	 * Set the week of the tour, 0 is the first week in the year
+//	 *
+//	 * @param startWeek
+//	 */
+//	public void setStartWeek(final short startWeek) {
+//		this.startWeek = startWeek;
+//	}
+//	/**
+//	 * @param startWeekYear the startWeekYear to set
+//	 */
+//	public void setStartWeekYear(final short startWeekYear) {
+//		this.startWeekYear = startWeekYear;
+//	}
 
 	public void setStartDay(final short startDay) {
 		this.startDay = startDay;
@@ -4144,21 +4187,6 @@ public class TourData implements Comparable<Object> {
 	public void setStartPulse(final short startPulse) {
 		this.startPulse = startPulse;
 	}
-
-//	/**
-//	 * Set the week of the tour, 0 is the first week in the year
-//	 *
-//	 * @param startWeek
-//	 */
-//	public void setStartWeek(final short startWeek) {
-//		this.startWeek = startWeek;
-//	}
-//	/**
-//	 * @param startWeekYear the startWeekYear to set
-//	 */
-//	public void setStartWeekYear(final short startWeekYear) {
-//		this.startWeekYear = startWeekYear;
-//	}
 
 	public void setStartSecond(final int startSecond) {
 		this.startSecond = startSecond;

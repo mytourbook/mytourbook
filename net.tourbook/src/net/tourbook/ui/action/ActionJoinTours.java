@@ -19,7 +19,9 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
 import net.tourbook.tour.DialogJoinTours;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
@@ -56,24 +58,17 @@ public class ActionJoinTours extends Action {
 		boolean isDistance = false;
 		boolean isLat = false;
 		boolean isPowerFromDevice = false;
+		boolean isSpeedFromDevice = false;
 
 		for (final TourData tourData : _tourProvider.getSelectedTours()) {
 
 			final int[] tourTimeSerie = tourData.timeSerie;
-			final int[] tourAltitudeSerie = tourData.altitudeSerie;
 			final int[] tourDistanceSerie = tourData.distanceSerie;
-			final int[] tourCadenceSerie = tourData.cadenceSerie;
-			final int[] tourPulseSerie = tourData.pulseSerie;
 			final double[] tourLatitudeSerie = tourData.latitudeSerie;
-			final double[] tourLongitudeSerie = tourData.longitudeSerie;
 
 			final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
-			final boolean isTourAltitude = (tourAltitudeSerie != null) && (tourAltitudeSerie.length > 0);
 			final boolean isTourDistance = (tourDistanceSerie != null) && (tourDistanceSerie.length > 0);
-			final boolean isTourPulse = (tourPulseSerie != null) && (tourPulseSerie.length > 0);
-			final boolean isTourCadence = (tourCadenceSerie != null) && (tourCadenceSerie.length > 0);
 			final boolean isTourLat = (tourLatitudeSerie != null) && (tourLatitudeSerie.length > 0);
-			final boolean isTourLon = (tourLongitudeSerie != null) && (tourLongitudeSerie.length > 0);
 
 			if (isFirstTour) {
 
@@ -83,6 +78,7 @@ public class ActionJoinTours extends Action {
 				isDistance = isTourDistance;
 				isLat = isTourLat;
 				isPowerFromDevice = tourData.isPowerSerieFromDevice();
+				isSpeedFromDevice = tourData.isSpeedSerieFromDevice();
 
 			} else {
 
@@ -115,6 +111,11 @@ public class ActionJoinTours extends Action {
 				if (isPowerFromDevice != tourData.isPowerSerieFromDevice()) {
 					return Messages.Dialog_JoinTours_InvalidData_Power;
 				}
+
+				// check speed
+				if (isSpeedFromDevice != tourData.isSpeedSerieFromDevice()) {
+					return Messages.Dialog_JoinTours_InvalidData_Speed;
+				}
 			}
 
 			if (isTime == false && isDistance == false && isLat == false) {
@@ -134,6 +135,13 @@ public class ActionJoinTours extends Action {
 			return;
 		}
 
+		// check person
+		final TourPerson tourPerson = TourManager.getInstance().getActivePerson();
+		if (tourPerson == null) {
+			return;
+		}
+
+		// check tour data
 		final String checkMessage = checkTourData();
 
 		final Shell activeShell = Display.getCurrent().getActiveShell();

@@ -1569,7 +1569,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 
-							reimportAllImportFilesTask(monitor, prevImportedFiles);
+							reimportAllImportFilesRunnable(monitor, prevImportedFiles);
 						}
 					});
 
@@ -1586,7 +1586,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param monitor
 	 * @param importedFiles
 	 */
-	private void reimportAllImportFilesTask(final IProgressMonitor monitor, final String[] importedFiles) {
+	private void reimportAllImportFilesRunnable(final IProgressMonitor monitor, final String[] importedFiles) {
 
 		int workedDone = 0;
 		final int workedAll = importedFiles.length;

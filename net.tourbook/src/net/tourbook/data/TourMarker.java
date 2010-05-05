@@ -76,6 +76,7 @@ public class TourMarker implements Cloneable {
 	private int						labelXOffset;
 
 	private int						labelYOffset;
+
 	/**
 	 * markerType contains the type of the marker, this can be: crossing, hotel, view point
 	 */
@@ -89,6 +90,7 @@ public class TourMarker implements Cloneable {
 	private String					label					= "";								//$NON-NLS-1$
 
 	private String					category				= "";								//$NON-NLS-1$
+
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */

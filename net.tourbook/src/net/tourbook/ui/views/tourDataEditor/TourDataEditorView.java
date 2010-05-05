@@ -930,11 +930,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
 		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
 		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
+
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
-		// create tour id
-		final String uniqueKey = Long.toString(System.currentTimeMillis());
-		tourData.createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
+		// tour id must be created after the tour date/time is set
+		tourData.createTourId();
 
 		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
 
@@ -2142,7 +2142,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //				Section.SHORT_TITLE_BAR
 				Section.TITLE_BAR
 		// | Section.DESCRIPTION
-				// | Section.EXPANDED
+		// | Section.EXPANDED
 				);
 
 		section.setText(title);
@@ -4695,9 +4695,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					_pageEditorForm.setText(UI.EMPTY_STRING);
 
 					// show info
-					_messageManager.addMessage(MESSAGE_KEY_ANOTHER_SELECTION, NLS.bind(
-							Messages.tour_editor_message_show_another_tour,
-							getTourTitle()), null, IMessageProvider.WARNING);
+					_messageManager.addMessage(
+							MESSAGE_KEY_ANOTHER_SELECTION,
+							NLS.bind(Messages.tour_editor_message_show_another_tour, getTourTitle()),
+							null,
+							IMessageProvider.WARNING);
 
 					_isInfoInTitle = true;
 				}
