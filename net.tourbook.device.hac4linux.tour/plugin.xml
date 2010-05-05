@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="net.tourbook.deviceDataReader">
+         <device
+            class="net.tourbook.device.hac4linux.tour.HAC4LinuxDeviceReader"
+            fileextension="tour"
+            id="net.tourbook.device.Hac4LinuxDeviceReader"
+            name="H4L"/>
+   </extension>
+
+</plugin>
