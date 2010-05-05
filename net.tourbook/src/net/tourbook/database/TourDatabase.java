@@ -1016,7 +1016,9 @@ public class TourDatabase {
 				ts.commit();
 
 			} catch (final Exception e) {
-				e.printStackTrace();
+
+				StatusUtil.showStatus(Messages.Tour_Database_TourSaveError, e);
+
 			} finally {
 				if (ts.isActive()) {
 					ts.rollback();

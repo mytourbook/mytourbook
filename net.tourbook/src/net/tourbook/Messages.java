@@ -716,6 +716,8 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_load_all_tours;
+
+	public static String	Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_TourWeek;
