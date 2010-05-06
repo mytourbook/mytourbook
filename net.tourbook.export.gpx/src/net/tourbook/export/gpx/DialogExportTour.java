@@ -46,6 +46,7 @@ import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.UI;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.dinopolis.gpstool.gpsinput.GPSRoute;
@@ -673,8 +674,11 @@ public class DialogExportTour extends TitleAreaDialog {
 			// label: unit
 			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
 			_lblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(
-					_lblCoumouflageSpeedUnit);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_lblCoumouflageSpeedUnit);
 		}
 	}
 
@@ -753,23 +757,25 @@ public class DialogExportTour extends TitleAreaDialog {
 					_numberFormatter.setMinimumFractionDigits(3);
 					_numberFormatter.setMaximumFractionDigits(3);
 
-					tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithDistance, new Object[] {
-							uiStartTime,
-							uiEndTime,
+					tourRangeUI = NLS.bind(
+							Messages.dialog_export_chk_tourRangeWithDistance,
+							new Object[] {
+									uiStartTime,
+									uiEndTime,
 
-							_numberFormatter.format(((float) distanceSerie[_tourStartIndex])
-									/ 1000
-									/ UI.UNIT_VALUE_DISTANCE),
+									_numberFormatter.format(((float) distanceSerie[_tourStartIndex])
+											/ 1000
+											/ UI.UNIT_VALUE_DISTANCE),
 
-							_numberFormatter.format(((float) distanceSerie[_tourEndIndex])
-									/ 1000
-									/ UI.UNIT_VALUE_DISTANCE),
+									_numberFormatter.format(((float) distanceSerie[_tourEndIndex])
+											/ 1000
+											/ UI.UNIT_VALUE_DISTANCE),
 
-							UI.UNIT_LABEL_DISTANCE,
+									UI.UNIT_LABEL_DISTANCE,
 
-							// adjust by 1 to corresponds to the number in the tour editor
-							_tourStartIndex + 1,
-							_tourEndIndex + 1 });
+									// adjust by 1 to corresponds to the number in the tour editor
+									_tourStartIndex + 1,
+									_tourEndIndex + 1 });
 
 				} else {
 
@@ -1142,6 +1148,11 @@ public class DialogExportTour extends TitleAreaDialog {
 			endIndex = _tourEndIndex;
 		}
 
+		// set track name
+		if (StringUtils.isNotBlank(tourData.getTourTitle())) {
+			track.setIdentification(tourData.getTourTitle());
+		}
+
 		/*
 		 * loop: trackpoints
 		 */
@@ -1455,21 +1466,25 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = new DateTime(minTourData.getStartYear(), minTourData.getStartMonth(), minTourData
-					.getStartDay(), minTourData.getStartHour(), minTourData.getStartMinute(), minTourData
-					.getStartSecond(), 0);
+			final DateTime dtTour = new DateTime(
+					minTourData.getStartYear(),
+					minTourData.getStartMonth(),
+					minTourData.getStartDay(),
+					minTourData.getStartHour(),
+					minTourData.getStartMinute(),
+					minTourData.getStartSecond(),
+					0);
 
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(UI
-					.format_yyyymmdd_hhmmss(
-							tourTime.getYear(),
-							tourTime.getMonthOfYear(),
-							tourTime.getDayOfMonth(),
-							tourTime.getHourOfDay(),
-							tourTime.getMinuteOfHour(),
-							tourTime.getSecondOfMinute()));
+			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
+					tourTime.getYear(),
+					tourTime.getMonthOfYear(),
+					tourTime.getDayOfMonth(),
+					tourTime.getHourOfDay(),
+					tourTime.getMinuteOfHour(),
+					tourTime.getSecondOfMinute()));
 		} else {
 
 			// display the tour date/time
@@ -1529,8 +1544,10 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		// build file path with extension
-		filePath = filePath.addTrailingSeparator().append(fileName).addFileExtension(
-				_exportExtensionPoint.getFileExtension());
+		filePath = filePath
+				.addTrailingSeparator()
+				.append(fileName)
+				.addFileExtension(_exportExtensionPoint.getFileExtension());
 
 		final File newFile = new File(filePath.toOSString());
 
