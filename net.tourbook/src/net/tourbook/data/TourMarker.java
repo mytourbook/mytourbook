@@ -34,7 +34,7 @@ public class TourMarker implements Cloneable {
 	 */
 	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
-															Messages.Tour_Marker_Position_vertical_above, // 0
+			Messages.Tour_Marker_Position_vertical_above, // 0
 			Messages.Tour_Marker_Position_vertical_below, // 1
 			Messages.Tour_Marker_Position_vertical_chart_top, // 2
 			Messages.Tour_Marker_Position_vertical_chart_bottom, // 3
@@ -120,7 +120,9 @@ public class TourMarker implements Cloneable {
 		this.createId = ++_createCounter;
 	}
 
-	private TourMarker(final TourMarker tourMarker) {
+	private TourMarker(final TourMarker tourMarker, final TourData newTourData) {
+
+		tourData = newTourData;
 
 		category = new String(tourMarker.category);
 		label = new String(tourMarker.label);
@@ -135,13 +137,15 @@ public class TourMarker implements Cloneable {
 		type = tourMarker.type;
 		visualPosition = tourMarker.visualPosition;
 		createId = tourMarker.createId;
-
-		tourData = tourMarker.tourData;
 	}
 
 	@Override
 	public TourMarker clone() {
-		return new TourMarker(this);
+		return new TourMarker(this, tourData);
+	}
+
+	public TourMarker clone(final TourData newTourData) {
+		return new TourMarker(this, newTourData);
 	}
 
 	/**
@@ -181,6 +185,11 @@ public class TourMarker implements Cloneable {
 		}
 
 		return true;
+	}
+
+	public void createMarkerId() {
+		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		createId = ++_createCounter;
 	}
 
 	/**
@@ -359,11 +368,6 @@ public class TourMarker implements Cloneable {
 		backupMarker.tourData = tourData;
 	}
 
-	public void setMarkerId() {
-		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		createId = ++_createCounter;
-	}
-
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
 	}
@@ -382,8 +386,12 @@ public class TourMarker implements Cloneable {
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append(TourMarker.class.getSimpleName()).append(" id:") //$NON-NLS-1$
+		return new StringBuilder()//
+				.append(TourMarker.class.getSimpleName())
+				.append(" id:") //$NON-NLS-1$
 				.append(markerId)
+				.append(" createId:") //$NON-NLS-1$
+				.append(createId)
 				.append(" distance:") //$NON-NLS-1$
 				.append(distance)
 				.append(" time:") //$NON-NLS-1$

@@ -2135,7 +2135,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		displaySelectedTour();
 	}
 
-	private Composite createSection(final Composite parent, final FormToolkit tk, final String title) {
+	private Composite createSection(final Composite parent,
+									final FormToolkit tk,
+									final String title,
+									final boolean isGrabVertical) {
 
 		final Section section = tk.createSection(parent,//
 				//Section.TWISTIE |
@@ -2146,7 +2149,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				);
 
 		section.setText(title);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
+		GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
 
 		final Composite sectionContainer = tk.createComposite(section);
 		section.setClient(sectionContainer);
@@ -2341,7 +2344,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		Label label;
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_tour);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_tour, true);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
 		{
 			/*
@@ -2376,7 +2379,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			descLines = descLines == 0 ? 5 : descLines;
 
 			GridDataFactory.fillDefaults()//
-					.grab(true, false)
+					.grab(true, true)
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
@@ -2409,7 +2412,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection120DateTime(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_date_time);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_date_time, false);
 		GridLayoutFactory.fillDefaults()//
 //				.equalWidth(true)
 				.numColumns(2)
@@ -2524,7 +2527,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection130Personal(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_personal);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_personal, false);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
@@ -2608,7 +2611,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection140Weather(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_weather);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_weather, false);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
@@ -2905,7 +2908,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection150Characteristics(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_characteristics);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false);
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(section);
 		{
 			/*
@@ -2961,7 +2964,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_info);
+		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_info, false);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
 		{
 			/*

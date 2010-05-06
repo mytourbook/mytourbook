@@ -487,13 +487,25 @@ public class DialogJoinTours extends TitleAreaDialog {
 			final Set<TourMarker> tourMarkers = tourTourData.getTourMarkers();
 			for (final TourMarker tourMarker : tourMarkers) {
 
-				final TourMarker clonedMarker = tourMarker.clone();
+				final TourMarker clonedMarker = tourMarker.clone(joinedTourData);
 
-				// adjust marker position, position is relativ to the tour start
-				clonedMarker.setSerieIndex(joinedTourStartIndex + clonedMarker.getSerieIndex());
+				int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
+				if (joinMarkerIndex >= joinedSliceCounter) {
+					joinMarkerIndex = joinedSliceCounter - 1;
+				}
 
 				// a cloned marker has the same marker id, create a new id
-				clonedMarker.setMarkerId();
+				clonedMarker.createMarkerId();
+
+				// adjust marker position, position is relativ to the tour start
+				clonedMarker.setSerieIndex(joinMarkerIndex);
+
+				if (isJoinTime) {
+					tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+				}
+				if (isJoinDistance) {
+					tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+				}
 
 				joinedTourMarker.add(clonedMarker);
 			}

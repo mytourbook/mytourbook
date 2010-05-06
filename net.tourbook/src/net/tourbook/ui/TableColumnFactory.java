@@ -22,6 +22,7 @@ import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableColumnDefinition;
+import net.tourbook.util.TreeColumnDefinition;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -696,6 +697,21 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory	TOUR_MARKERS	= new TableColumnFactory() {
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourMarkers", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_tour_marker_label);
+			colDef.setColumnHeader(Messages.ColumnFactory_tour_marker_header);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_marker_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory TOUR_START_TIME = new TableColumnFactory() {
 		
 		@Override

@@ -31,6 +31,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -521,7 +522,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
@@ -678,7 +679,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllColumns(parent);
 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -757,19 +758,139 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * Defines all columns for the table viewer in the column manager
+	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
+	 * default columns
 	 * 
 	 * @param parent
 	 */
-	private void defineViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
 		final PixelConverter pc = new PixelConverter(parent);
-		ColumnDefinition colDef;
 
-		/*
-		 * column: database indicator
-		 */
-		colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, pc);
+		defineColumnDatabase(pc);
+		defineColumnTourDate(pc);
+		defineColumnTime(pc);
+		defineColumnTourType(pc);
+		defineColumnRecordingTime(pc);
+		defineColumnDrivingTime(pc);
+		defineColumnCalories(pc);
+		defineColumnDistance(pc);
+		defineColumnAvgSpeed(pc);
+		defineColumnAvgPace(pc);
+		defineColumnAltitudeUp(pc);
+		defineColumnAltitudeDown(pc);
+		defineColumnTitle(pc);
+		defineColumnTags(pc);
+		defineColumnDeviceName(pc);
+		defineColumnDeviceProfile(pc);
+		defineColumnMarker(pc);
+		defineColumnTimeInterval(pc);
+		defineColumnImportFileName(pc);
+		defineColumnImportFilePath(pc);
+	}
+
+	/**
+	 * column: altitude down
+	 */
+	private void defineColumnAltitudeDown(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
+				if (tourAltDown != 0) {
+					cell.setText(Long.toString((long) (-tourAltDown / UI.UNIT_VALUE_ALTITUDE)));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: altitude up
+	 */
+	private void defineColumnAltitudeUp(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
+				if (tourAltUp != 0) {
+					cell.setText(Long.toString((long) (tourAltUp / UI.UNIT_VALUE_ALTITUDE)));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: average pace
+	 */
+	private void defineColumnAvgPace(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				final int tourDistance = tourData.getTourDistance();
+				final int drivingTime = tourData.getTourDrivingTime();
+
+				final float pace = tourDistance == 0 ? //
+						0
+						: (float) drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
+
+				cell.setText(UI.format_mm_ss((long) pace));
+			}
+		});
+	}
+
+	/**
+	 * column: avg speed
+	 */
+	private void defineColumnAvgSpeed(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourData tourData = ((TourData) cell.getElement());
+				final int tourDistance = tourData.getTourDistance();
+				final int drivingTime = tourData.getTourDrivingTime();
+				if (drivingTime != 0) {
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					cell.setText(_nf.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: calories (cal)
+	 */
+	private void defineColumnCalories(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int tourCalories = ((TourData) cell.getElement()).getCalories();
+				cell.setText(Integer.toString(tourCalories));
+			}
+		});
+	}
+
+	/**
+	 * column: database indicator
+	 */
+	private void defineColumnDatabase(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -779,94 +900,124 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				cell.setImage(getDbImage((TourData) cell.getElement()));
 			}
 		});
+	}
 
-		/*
-		 * column: date
-		 */
-		colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+	/**
+	 * column: device name
+	 */
+	private void defineColumnDeviceName(final PixelConverter pc) {
 
-				final TourData tourData = (TourData) cell.getElement();
-
-				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				cell.setText(_dateFormatter.format(_calendar.getTime()));
-			}
-		});
-
-		// sort column
+		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, pc);
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
 				_tourViewer.refresh();
 			}
 		});
+	}
 
-		/*
-		 * column: time
-		 */
-		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+	/**
+	 * column: device profile
+	 */
+	private void defineColumnDeviceProfile(final PixelConverter pc) {
 
-				final TourData tourData = (TourData) cell.getElement();
-				_calendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
+		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, pc);
+	}
 
-				cell.setText(_timeFormatter.format(_calendar.getTime()));
-			}
-		});
+	/**
+	 * column: distance (km/mile)
+	 */
+	private void defineColumnDistance(final PixelConverter pc) {
 
-		// sort column
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
-				_tourViewer.refresh();
-			}
-		});
-
-		/*
-		 * column: tour type
-		 */
-		colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				final TourType tourType = ((TourData) cell.getElement()).getTourType();
-				if (tourType == null) {
-					cell.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
-				} else {
-
-					final long tourTypeId = tourType.getTypeId();
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
-
-					/*
-					 * when a tour type image is modified, it will keep the same image resource only
-					 * the content is modified but in the rawDataView the modified image is not
-					 * displayed compared with the tourBookView which displays the correct image
-					 */
-//					final byte[] imageData = tourTypeImage.getImageData().data;
-//					final StringBuilder sb = new StringBuilder();
-//					for (final byte b : imageData) {
-//						sb.append(b);
-//					}
-					cell.setImage(tourTypeImage);
+				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
+				if (tourDistance != 0) {
+					_nf.setMinimumFractionDigits(3);
+					_nf.setMaximumFractionDigits(3);
+					cell.setText(_nf.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: recording time
-		 */
-		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+	/**
+	 * column: driving time
+	 */
+	private void defineColumnDrivingTime(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
+
+				if (drivingTime != 0) {
+					_calendar
+							.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
+
+					cell.setText(_durationFormatter.format(_calendar.getTime()));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: import file name
+	 */
+	private void defineColumnImportFileName(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, pc);
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
+				_tourViewer.refresh();
+			}
+		});
+	}
+
+	/**
+	 * column: import file path
+	 */
+	private void defineColumnImportFilePath(final PixelConverter pc) {
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, pc);
+	}
+
+	/**
+	 * column: markers
+	 */
+	private void defineColumnMarker(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				final Set<TourMarker> markerIds = tourData.getTourMarkers();
+				if (markerIds == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(markerIds.size()));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: recording time
+	 */
+	private void defineColumnRecordingTime(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -887,149 +1038,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: driving time
-		 */
-		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+	/**
+	 * column: tags
+	 */
+	private void defineColumnTags(final PixelConverter pc) {
 
-				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
-
-				if (drivingTime != 0) {
-					_calendar
-							.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
-
-					cell.setText(_durationFormatter.format(_calendar.getTime()));
-				}
-			}
-		});
-
-		/*
-		 * column: calories (cal)
-		 */
-
-		colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int tourCalories = ((TourData) cell.getElement()).getCalories();
-				cell.setText(Integer.toString(tourCalories));
-			}
-		});
-
-		/*
-		 * column: distance (km/mile)
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
-				if (tourDistance != 0) {
-					_nf.setMinimumFractionDigits(3);
-					_nf.setMaximumFractionDigits(3);
-					cell.setText(_nf.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
-				}
-			}
-		});
-
-		/*
-		 * column: avg speed
-		 */
-		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourData tourData = ((TourData) cell.getElement());
-				final int tourDistance = tourData.getTourDistance();
-				final int drivingTime = tourData.getTourDrivingTime();
-				if (drivingTime != 0) {
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(((float) tourDistance) / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
-				}
-			}
-		});
-
-		/*
-		 * column: average pace
-		 */
-		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourData tourData = (TourData) cell.getElement();
-
-				final int tourDistance = tourData.getTourDistance();
-				final int drivingTime = tourData.getTourDrivingTime();
-
-				final float pace = tourDistance == 0 ? //
-						0
-						: (float) drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
-
-				cell.setText(UI.format_mm_ss((long) pace));
-			}
-		});
-
-		/*
-		 * column: altitude up
-		 */
-		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
-				if (tourAltUp != 0) {
-					cell.setText(Long.toString((long) (tourAltUp / UI.UNIT_VALUE_ALTITUDE)));
-				}
-			}
-		});
-
-		/*
-		 * column: altitude down
-		 */
-		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
-				if (tourAltDown != 0) {
-					cell.setText(Long.toString((long) (-tourAltDown / UI.UNIT_VALUE_ALTITUDE)));
-				}
-			}
-		});
-
-		/*
-		 * column: tour title
-		 */
-		colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourData tourData = (TourData) cell.getElement();
-				cell.setText(tourData.getTourTitle());
-			}
-		});
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);
-				_tourViewer.refresh();
-			}
-		});
-
-		/*
-		 * column: tags
-		 */
-		colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1056,42 +1072,129 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: device name
-		 */
-		colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, pc);
-		colDef.addSelectionListener(new SelectionAdapter() {
+	/**
+	 * column: time
+	 */
+	private void defineColumnTime(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
-				_tourViewer.refresh();
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+				_calendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
+
+				cell.setText(_timeFormatter.format(_calendar.getTime()));
 			}
 		});
 
-		/*
-		 * column: device profile
-		 */
-		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, pc);
+		// sort column
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				_tourViewer.refresh();
+			}
+		});
+	}
 
-		/*
-		 * column: time interval
-		 */
+	/**
+	 * column: time interval
+	 */
+	private void defineColumnTimeInterval(final PixelConverter pc) {
+
 		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pc);
+	}
 
-		/*
-		 * column: import file name
-		 */
-		colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, pc);
+	/**
+	 * column: tour title
+	 */
+	private void defineColumnTitle(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourData tourData = (TourData) cell.getElement();
+				cell.setText(tourData.getTourTitle());
+			}
+		});
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);
 				_tourViewer.refresh();
 			}
 		});
+	}
 
-		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, pc);
+	/**
+	 * column: date
+	 */
+	private void defineColumnTourDate(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+				cell.setText(_dateFormatter.format(_calendar.getTime()));
+			}
+		});
+
+		// sort column
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				_tourViewer.refresh();
+			}
+		});
+	}
+
+	/**
+	 * column: tour type
+	 */
+	private void defineColumnTourType(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourType tourType = ((TourData) cell.getElement()).getTourType();
+				if (tourType == null) {
+					cell.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+				} else {
+
+					final long tourTypeId = tourType.getTypeId();
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+
+					/*
+					 * when a tour type image is modified, it will keep the same image resource only
+					 * the content is modified but in the rawDataView the modified image is not
+					 * displayed compared with the tourBookView which displays the correct image
+					 */
+//					final byte[] imageData = tourTypeImage.getImageData().data;
+//					final StringBuilder sb = new StringBuilder();
+//					for (final byte b : imageData) {
+//						sb.append(b);
+//					}
+					cell.setImage(tourTypeImage);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -1226,8 +1329,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 		if (person != null) {
-			_actionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person, person
-					.getName()));
+			_actionSaveTourWithPerson.setText(NLS.bind(
+					Messages.import_data_action_save_tour_with_person,
+					person.getName()));
 			_actionSaveTourWithPerson.setPerson(person);
 		}
 		_actionSaveTourWithPerson.setEnabled((person != null) && (unsavedTours > 0));
@@ -1244,8 +1348,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (canMergeIntoTour) {
 
 			final Calendar calendar = GregorianCalendar.getInstance();
-			calendar.set(firstValidTour.getStartYear(), firstValidTour.getStartMonth() - 1, firstValidTour
-					.getStartDay(), firstValidTour.getStartHour(), firstValidTour.getStartMinute());
+			calendar.set(
+					firstValidTour.getStartYear(),
+					firstValidTour.getStartMonth() - 1,
+					firstValidTour.getStartDay(),
+					firstValidTour.getStartHour(),
+					firstValidTour.getStartMinute());
 
 			final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
 					.append(TourManager.getTourDateShort(firstValidTour))
@@ -1757,7 +1865,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param savedTours
 	 *            the saved tour is added to this list
 	 */
-	private void saveTour(final TourData tourData,
+	private void saveTour(	final TourData tourData,
 							final TourPerson person,
 							final ArrayList<TourData> savedTours,
 							final boolean isForceSave) {
