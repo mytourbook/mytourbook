@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
 
@@ -26,9 +26,9 @@ import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
@@ -60,26 +60,25 @@ public class TagManager {
 	 * set to 9 to have a unique accelerator key
 	 */
 //	public static final int				MAX_RECENT_TAGS					= 9;
-	private static LinkedList<TourTag>	fRecentTags						= new LinkedList<TourTag>();
+	private static LinkedList<TourTag>	_recentTags						= new LinkedList<TourTag>();
 
-	private static ActionRecentTag[]	fActionsRecentTags;
+	private static ActionRecentTag[]	_actionsRecentTags;
 
-	private static ITourProvider		fTourProvider;
-	private static boolean				fIsAddMode;
-
-	private static boolean				fIsSaveTour;
+	private static ITourProvider		_tourProvider;
+	private static boolean				_isAddMode;
+	private static boolean				_isSaveTour;
 
 	public static class ActionRecentTag extends Action {
 
-		private TourTag	fTag;
+		private TourTag	_tag;
 
 		@Override
 		public void run() {
-			setTagIntoTour(fTag, fTourProvider, fIsAddMode, fIsSaveTour);
+			setTagIntoTour(_tag, _tourProvider, _isAddMode, _isSaveTour);
 		}
 
 		private void setTag(final TourTag tag) {
-			fTag = tag;
+			_tag = tag;
 		}
 	}
 
@@ -89,17 +88,17 @@ public class TagManager {
 	 * @param tourTag
 	 */
 	public static void addRecentTag(final TourTag tourTag) {
-		fRecentTags.remove(tourTag);
-		fRecentTags.addFirst(tourTag);
+		_recentTags.remove(tourTag);
+		_recentTags.addFirst(tourTag);
 	}
 
 	public static void enableRecentTagActions(final boolean isEnabled) {
 
-		if (fActionsRecentTags == null) {
+		if (_actionsRecentTags == null) {
 			return;
 		}
 
-		for (final ActionRecentTag actionRecentTag : fActionsRecentTags) {
+		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 			actionRecentTag.setEnabled(isEnabled);
 		}
 	}
@@ -115,23 +114,23 @@ public class TagManager {
 												final boolean isAddMode,
 												final boolean isSaveTour) {
 
-		if (fActionsRecentTags == null) {
+		if (_actionsRecentTags == null) {
 
 			// create actions for recenct tags
 
-			fActionsRecentTags = new ActionRecentTag[getMaxTags()];
-			for (int actionIndex = 0; actionIndex < fActionsRecentTags.length; actionIndex++) {
-				fActionsRecentTags[actionIndex] = new ActionRecentTag();
+			_actionsRecentTags = new ActionRecentTag[getMaxTags()];
+			for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
+				_actionsRecentTags[actionIndex] = new ActionRecentTag();
 			}
 		}
 
-		if (fRecentTags.size() == 0) {
+		if (_recentTags.size() == 0) {
 			return;
 		}
 
-		fTourProvider = tourProvider;
-		fIsAddMode = isAddMode;
-		fIsSaveTour = isSaveTour;
+		_tourProvider = tourProvider;
+		_isAddMode = isAddMode;
+		_isSaveTour = isSaveTour;
 
 		// add separator
 		menuMgr.add(new Separator());
@@ -145,10 +144,10 @@ public class TagManager {
 
 		// add tag's
 		int tagIndex = 0;
-		for (final ActionRecentTag actionRecentTag : fActionsRecentTags) {
+		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 			try {
 
-				final TourTag tag = fRecentTags.get(tagIndex);
+				final TourTag tag = _recentTags.get(tagIndex);
 
 				actionRecentTag.setText("&" + (tagIndex + 1) + " " + tag.getTagName()); //$NON-NLS-1$ //$NON-NLS-2$
 				actionRecentTag.setTag(tag);
@@ -166,7 +165,8 @@ public class TagManager {
 
 	private static int getMaxTags() {
 
-		int maxTags = TourbookPlugin.getDefault()
+		int maxTags = TourbookPlugin
+				.getDefault()
 				.getPreferenceStore()
 				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
 
@@ -174,19 +174,20 @@ public class TagManager {
 	}
 
 	public static ActionRecentTag[] getRecentTagActions() {
-		return fActionsRecentTags;
+		return _actionsRecentTags;
 	}
 
 	public static void restoreSettings() {
 
-		final String[] tagIds = new String[Math.min(getMaxTags(), fRecentTags.size())];
+		final String[] tagIds = new String[Math.min(getMaxTags(), _recentTags.size())];
 		int tagIndex = 0;
 
-		for (final TourTag tag : fRecentTags) {
+		for (final TourTag tag : _recentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
 		}
 
-		final String[] savedTagIds = TourbookPlugin.getDefault()
+		final String[] savedTagIds = TourbookPlugin
+				.getDefault()
 				.getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS)
 				.getArray(SETTINGS_TAG_ID);
 
@@ -199,7 +200,7 @@ public class TagManager {
 			try {
 				final TourTag tag = allTags.get(Long.parseLong(tagId));
 				if (tag != null) {
-					fRecentTags.add(tag);
+					_recentTags.add(tag);
 				}
 			} catch (final NumberFormatException e) {
 				// ignore
@@ -210,10 +211,10 @@ public class TagManager {
 	public static void saveSettings() {
 
 		final int maxTags = getMaxTags();
-		final String[] tagIds = new String[Math.min(maxTags, fRecentTags.size())];
+		final String[] tagIds = new String[Math.min(maxTags, _recentTags.size())];
 		int tagIndex = 0;
 
-		for (final TourTag tag : fRecentTags) {
+		for (final TourTag tag : _recentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
 			if (tagIndex == maxTags) {
@@ -267,8 +268,7 @@ public class TagManager {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED,
-							new TourEvent(selectedTours));
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
 				}
 
 				TourManager.fireEvent(TourEventId.NOTIFY_TAG_VIEW, //
@@ -286,7 +286,7 @@ public class TagManager {
 
 		final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-		for (final TourTag recentTag : fRecentTags) {
+		for (final TourTag recentTag : _recentTags) {
 
 			final TourTag tourTag = allTourTags.get(recentTag.getTagId());
 			if (tourTag != null) {

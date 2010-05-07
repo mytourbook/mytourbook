@@ -75,8 +75,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -156,6 +154,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private final int								_tourStartIndex;
 	private final int								_tourEndIndex;
 
+	private Point									_shellDefaultSize;
 	private Composite								_dlgContainer;
 
 	private Button									_chkExportTourRange;
@@ -192,8 +191,19 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		super(parentShell);
 
+		int shellStyle = getShellStyle();
+
+		shellStyle = //
+		SWT.NONE //
+				| SWT.TITLE
+				| SWT.CLOSE
+				| SWT.MIN
+//				| SWT.MAX
+				| SWT.RESIZE
+				| SWT.NONE;
+
 		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+		setShellStyle(shellStyle);
 
 		_exportExtensionPoint = exportExtensionPoint;
 		_formatTemplate = formatTemplate;
@@ -425,18 +435,29 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		shell.setText(Messages.dialog_export_shell_text);
 
-		shell.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
+		shell.addListener(SWT.Resize, new Listener() {
+			public void handleEvent(final Event event) {
 
 				// allow resizing the width but not the height
 
-				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				if (_shellDefaultSize == null) {
+					_shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				}
+
 				final Point shellSize = shell.getSize();
 
-				defaultSize.x = shellSize.x < defaultSize.x ? defaultSize.x : shellSize.x;
+				/*
+				 * this is not working, the shell is flickering when the shell size is below min
+				 * size and I found no way to prevent a resize :-(
+				 */
+//				if (shellSize.x < _shellDefaultSize.x) {
+//					event.doit = false;
+//				}
 
-				shell.setSize(defaultSize);
+				shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+				shellSize.y = _shellDefaultSize.y;
+
+				shell.setSize(shellSize);
 			}
 		});
 	}

@@ -2684,6 +2684,14 @@ public class TourData implements Comparable<Object> {
 	}
 
 	/**
+	 * Creates a dummy tour id which should be replaced by setting the tour id with
+	 * {@link #createTourId()} or {@link #createTourId(String)}
+	 */
+	public void createTourIdDummy() {
+		tourId = System.nanoTime();
+	}
+
+	/**
 	 * Create the tour segment list from the segment index array
 	 * 
 	 * @return

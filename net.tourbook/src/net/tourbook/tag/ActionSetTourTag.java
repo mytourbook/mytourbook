@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
 
@@ -44,37 +44,37 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionSetTourTag extends Action implements IMenuCreator {
 
-	private Menu				fMenu;
+	private Menu				_menu;
 
-	private final ITourProvider	fTourProvider;
+	private final ITourProvider	_tourProvider;
 
-	private final boolean		fIsAddMode;
-	private boolean				fIsSaveTour;
+	private final boolean		_isAddMode;
+	private final boolean		_isSaveTour;
 
 	/**
 	 * contains the tags for all selected tours in the viewer
 	 */
-	private Set<TourTag>		fSelectedTags;
+	private Set<TourTag>		_selectedTags;
 
-	private ArrayList<TourData>	fSelectedTours;
+	private ArrayList<TourData>	_selectedTours;
 
 	public class ActionTagCategory extends Action implements IMenuCreator {
 
-		private Menu			fCategoryMenu;
-		private TourTagCategory	fTagCategory;
+		private Menu					_categoryMenu;
+		private final TourTagCategory	_tagCategory;
 
 		public ActionTagCategory(final TourTagCategory tagCategory) {
 
 			super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
 			setMenuCreator(this);
 
-			fTagCategory = tagCategory;
+			_tagCategory = tagCategory;
 		}
 
 		public void dispose() {
-			if (fCategoryMenu != null) {
-				fCategoryMenu.dispose();
-				fCategoryMenu = null;
+			if (_categoryMenu != null) {
+				_categoryMenu.dispose();
+				_categoryMenu = null;
 			}
 		}
 
@@ -85,10 +85,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		public Menu getMenu(final Menu parent) {
 
 			dispose();
-			fCategoryMenu = new Menu(parent);
+			_categoryMenu = new Menu(parent);
 
 			// Add listener to repopulate the menu each time
-			fCategoryMenu.addMenuListener(new MenuAdapter() {
+			_categoryMenu.addMenuListener(new MenuAdapter() {
 				@Override
 				public void menuShown(final MenuEvent e) {
 
@@ -100,22 +100,22 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 						item.dispose();
 					}
 
-					final TagCollection tagCollection = TourDatabase.getTagEntries(fTagCategory.getCategoryId());
+					final TagCollection tagCollection = TourDatabase.getTagEntries(_tagCategory.getCategoryId());
 
 					// add actions
-					createCategoryActions(tagCollection, fCategoryMenu);
-					createTagActions(tagCollection, fCategoryMenu);
+					createCategoryActions(tagCollection, _categoryMenu);
+					createTagActions(tagCollection, _categoryMenu);
 				}
 			});
 
-			return fCategoryMenu;
+			return _categoryMenu;
 		}
 
 	}
 
 	private class ActionTourTag extends Action {
 
-		private TourTag	fTourTag;
+		private final TourTag	fTourTag;
 
 		public ActionTourTag(final TourTag tourTag) {
 
@@ -126,7 +126,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode, fIsSaveTour);
+			TagManager.setTagIntoTour(fTourTag, _tourProvider, _isAddMode, _isSaveTour);
 		}
 
 	}
@@ -144,16 +144,16 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	 * @param isAddMode
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-	 *            {@link TourData} from the tour provider is only updated
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
+	 *            from the tour provider is only updated
 	 */
 	public ActionSetTourTag(final ITourProvider tourProvider, final boolean isAddMode, final boolean isSaveTour) {
 
 		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
-		fTourProvider = tourProvider;
-		fIsAddMode = isAddMode;
-		fIsSaveTour = isSaveTour;
+		_tourProvider = tourProvider;
+		_isAddMode = isAddMode;
+		_isSaveTour = isSaveTour;
 
 		setText(isAddMode ? Messages.action_tag_add : Messages.action_tag_remove);
 		setMenuCreator(this);
@@ -187,9 +187,9 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 			final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
 
 			boolean isTagChecked = false;
-			final boolean isOneTour = fSelectedTours != null && fSelectedTours.size() == 1;
-			if (fSelectedTags != null && //
-					(isOneTour || fIsAddMode == false)) {
+			final boolean isOneTour = _selectedTours != null && _selectedTours.size() == 1;
+			if (_selectedTags != null && //
+					(isOneTour || _isAddMode == false)) {
 
 				/*
 				 * only when one tour is selected check the tag otherwise it's confusing, a
@@ -198,7 +198,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				final long tagId = menuTourTag.getTagId();
 
-				for (final TourTag checkTourTag : fSelectedTags) {
+				for (final TourTag checkTourTag : _selectedTags) {
 					if (checkTourTag.getTagId() == tagId) {
 						isTagChecked = true;
 						break;
@@ -209,12 +209,12 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 			// disable tags which are not tagged
 			if (isOneTour) {
-				if (fIsAddMode) {
+				if (_isAddMode) {
 					actionTourTag.setEnabled(!isTagChecked);
 				} else {
 					actionTourTag.setEnabled(isTagChecked);
 				}
-			} else if (fIsAddMode == false) {
+			} else if (_isAddMode == false) {
 				actionTourTag.setEnabled(isTagChecked);
 			}
 
@@ -223,9 +223,9 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -236,10 +236,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	public Menu getMenu(final Menu parent) {
 
 		dispose();
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
 		// Add listener to repopulate the menu each time
-		fMenu.addMenuListener(new MenuAdapter() {
+		_menu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuShown(final MenuEvent e) {
 
@@ -252,49 +252,49 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 				}
 
 				// check if a tour is selected
-				fSelectedTours = fTourProvider.getSelectedTours();
-				if (fSelectedTours == null || fSelectedTours.size() == 0) {
+				_selectedTours = _tourProvider.getSelectedTours();
+				if (_selectedTours == null || _selectedTours.size() == 0) {
 					// a tour is not selected
 					return;
 				}
 
 				// get all tags for all tours
-				fSelectedTags = new HashSet<TourTag>();
-				for (final TourData tourData : fSelectedTours) {
+				_selectedTags = new HashSet<TourTag>();
+				for (final TourData tourData : _selectedTours) {
 					final Set<TourTag> tags = tourData.getTourTags();
 					if (tags != null) {
-						fSelectedTags.addAll(tags);
+						_selectedTags.addAll(tags);
 					}
 				}
 
-				if (fIsAddMode) {
+				if (_isAddMode) {
 
 					// add tags, create actions for the root tags
 
 					final TagCollection rootTagCollection = TourDatabase.getRootTags();
 
-					createCategoryActions(rootTagCollection, fMenu);
-					createTagActions(rootTagCollection, fMenu);
+					createCategoryActions(rootTagCollection, _menu);
+					createTagActions(rootTagCollection, _menu);
 
 				} else {
 
 					// remove tags, create actions for all tags of all selected tours
 
-					final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(fSelectedTags);
+					final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(_selectedTags);
 					Collections.sort(sortedTags);
 
-					createTagActions(new TagCollection(sortedTags), fMenu);
+					createTagActions(new TagCollection(sortedTags), _menu);
 				}
 			}
 		});
 
-		return fMenu;
+		return _menu;
 	}
 
 	@Override
 	public void setEnabled(final boolean enabled) {
 
-		// ensure tags are available 
+		// ensure tags are available
 		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
 		super.setEnabled(enabled && allTags.size() > 0);

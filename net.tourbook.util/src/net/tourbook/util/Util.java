@@ -79,44 +79,58 @@ public class Util {
 	}
 
 	/**
-	 * @param settings
+	 * @param state
 	 * @param key
 	 * @param defaultValue
 	 * @return Returns a boolean value from {@link IDialogSettings}. When the key is not found, the
 	 *         default value is returned.
 	 */
-	public static boolean getStateBoolean(final IDialogSettings settings, final String key, final boolean defaultValue) {
-		return settings.get(key) == null ? defaultValue : settings.getBoolean(key);
+	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
+		return state.get(key) == null ? defaultValue : state.getBoolean(key);
 	}
 
 	/**
-	 * @param settings
+	 * @param state
 	 * @param key
 	 * @param defaultValue
 	 * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
 	 *         default value is returned.
 	 */
-	public static double getStateDouble(final IDialogSettings settings, final String key, final double defaultValue) {
+	public static double getStateDouble(final IDialogSettings state, final String key, final double defaultValue) {
 		try {
-			return settings.get(key) == null ? defaultValue : settings.getDouble(key);
+			return state.get(key) == null ? defaultValue : state.getDouble(key);
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
 	}
 
 	/**
-	 * @param settings
+	 * @param state
 	 * @param key
 	 * @param defaultValue
 	 * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
 	 *         default value is returned.
 	 */
-	public static int getStateInt(final IDialogSettings settings, final String key, final int defaultValue) {
+	public static int getStateInt(final IDialogSettings state, final String key, final int defaultValue) {
 		try {
-			return settings.get(key) == null ? defaultValue : settings.getInt(key);
+			return state.get(key) == null ? defaultValue : state.getInt(key);
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
+	}
+
+	/**
+	 * @param state
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static String getStateString(final IDialogSettings state, final String key, final String defaultValue) {
+
+		final String stateValue = state.get(key);
+
+		return stateValue == null ? defaultValue : stateValue;
 	}
 
 	/**

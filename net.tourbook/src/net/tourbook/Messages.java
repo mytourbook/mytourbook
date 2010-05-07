@@ -246,9 +246,15 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
 	public static String		Dialog_JoinTours_InvalidData_Time;
+	public static String	Dialog_JoinTours_Label_DefaultTitle;
+
 	public static String		Dialog_JoinTours_Label_DeviceName;
 	public static String		Dialog_JoinTours_Label_OtherFields;
 	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
+	public static String	Dialog_JoinTours_Label_Title;
+
+	public static String	Dialog_JoinTours_Label_Title_Tooltip;
+
 	public static String		Dialog_JoinTours_Label_Tour;
 	public static String		Dialog_JoinTours_Label_TourDate;
 	public static String		Dialog_JoinTours_Label_TourTime;

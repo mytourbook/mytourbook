@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.export;
 
@@ -41,42 +41,45 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionExport extends Action implements IMenuCreator {
 
-	private static ArrayList<ExportTourExtension>	fExportExtensionPoints;
- 
-	private Menu									fMenu;
-	private ArrayList<ActionExportTour>				fExportTourActions;
+	private static ArrayList<ExportTourExtension>	_exportExtensionPoints;
 
-	private ITourProvider							fTourProvider;
+	private Menu									_menu;
+	private ArrayList<ActionExportTour>				_exportTourActions;
 
-	private int										fTourStartIndex	= -1;
-	private int										fTourEndIndex	= -1;
+	private final ITourProvider						_tourProvider;
+
+	private int										_tourStartIndex	= -1;
+	private int										_tourEndIndex	= -1;
 
 	private class ActionExportTour extends Action {
 
-		private ExportTourExtension	fExportTourExtension;
+		private final ExportTourExtension	_exportTourExtension;
 
 		public ActionExportTour(final ExportTourExtension exportTourExtension) {
 
 			super(exportTourExtension.getVisibleName());
-			fExportTourExtension = exportTourExtension;
+
+			_exportTourExtension = exportTourExtension;
 		}
 
-		ActionExportTour(final String visibleName, final String fileExtension) {}
+//		ActionExportTour(final String visibleName, final String fileExtension) {}
 
 		@Override
 		public void run() {
+
 			final ArrayList<TourData> selectedTours;
-			if (fTourProvider instanceof ITourProviderAll) {
-				selectedTours = ((ITourProviderAll) fTourProvider).getAllSelectedTours();
+
+			if (_tourProvider instanceof ITourProviderAll) {
+				selectedTours = ((ITourProviderAll) _tourProvider).getAllSelectedTours();
 			} else {
-				selectedTours = fTourProvider.getSelectedTours();
+				selectedTours = _tourProvider.getSelectedTours();
 			}
 
 			if (selectedTours == null || selectedTours.size() == 0) {
 				return;
 			}
 
-			fExportTourExtension.exportTours(selectedTours, fTourStartIndex, fTourEndIndex);
+			_exportTourExtension.exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
 		}
 
 	}
@@ -93,7 +96,7 @@ public class ActionExport extends Action implements IMenuCreator {
 
 		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
-		fTourProvider = tourProvider;
+		_tourProvider = tourProvider;
 
 		setText(Messages.action_export_tour);
 		setMenuCreator(this);
@@ -104,27 +107,27 @@ public class ActionExport extends Action implements IMenuCreator {
 
 	private void addActionToMenu(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	private void createActions() {
 
-		if (fExportTourActions != null) {
+		if (_exportTourActions != null) {
 			return;
 		}
 
-		fExportTourActions = new ArrayList<ActionExportTour>();
+		_exportTourActions = new ArrayList<ActionExportTour>();
 
 		// create action for each extension point
-		for (final ExportTourExtension exportTourExtension : fExportExtensionPoints) {
-			fExportTourActions.add(new ActionExportTour(exportTourExtension));
+		for (final ExportTourExtension exportTourExtension : _exportExtensionPoints) {
+			_exportTourActions.add(new ActionExportTour(exportTourExtension));
 		}
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -133,13 +136,14 @@ public class ActionExport extends Action implements IMenuCreator {
 	 */
 	private ArrayList<ExportTourExtension> getExtensionPoints() {
 
-		if (fExportExtensionPoints != null) {
-			return fExportExtensionPoints;
+		if (_exportExtensionPoints != null) {
+			return _exportExtensionPoints;
 		}
 
-		fExportExtensionPoints = new ArrayList<ExportTourExtension>();
+		_exportExtensionPoints = new ArrayList<ExportTourExtension>();
 
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
+				TourbookPlugin.PLUGIN_ID,
 				TourbookPlugin.EXT_POINT_EXPORT_TOUR);
 
 		if (extPoint != null) {
@@ -158,7 +162,7 @@ public class ActionExport extends Action implements IMenuCreator {
 								exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
 								exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
 
-								fExportExtensionPoints.add(exportTourItem);
+								_exportExtensionPoints.add(exportTourItem);
 							}
 						} catch (final CoreException e) {
 							e.printStackTrace();
@@ -168,7 +172,7 @@ public class ActionExport extends Action implements IMenuCreator {
 			}
 		}
 
-		return fExportExtensionPoints;
+		return _exportExtensionPoints;
 	}
 
 	public Menu getMenu(final Control parent) {
@@ -178,18 +182,18 @@ public class ActionExport extends Action implements IMenuCreator {
 	public Menu getMenu(final Menu parent) {
 
 		dispose();
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
-		for (final ActionExportTour action : fExportTourActions) {
+		for (final ActionExportTour action : _exportTourActions) {
 			addActionToMenu(action);
 		}
 
-		return fMenu;
+		return _menu;
 	}
 
 	public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
-		fTourStartIndex = tourStartIndex;
-		fTourEndIndex = tourEndIndex;
+		_tourStartIndex = tourStartIndex;
+		_tourEndIndex = tourEndIndex;
 	}
 
 }

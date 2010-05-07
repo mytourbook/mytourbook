@@ -23,18 +23,31 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.Bullet;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -45,38 +58,111 @@ import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPart;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-public class DialogJoinTours extends TitleAreaDialog {
+public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
-	private static final String			STATE_JOINED_TIME			= "JoinedTime";										//$NON-NLS-1$
-	private static final String			STATE_CREATE_TOUR_MARKER	= "CreateTourMarker";									//$NON-NLS-1$
+	private static final String					STATE_TITLE						= "Title";							//$NON-NLS-1$
 
-	private final IDialogSettings		_state						= TourbookPlugin
-																			.getDefault()
-																			.getDialogSettingsSection("DialogJoinTours");	//$NON-NLS-1$
+	private static final String					STATE_IS_CREATE_TOUR_MARKER		= "isCreateTourMarker";			//$NON-NLS-1$
+	private static final String					STATE_TOUR_MARKER_TYPE			= "TourMarkerType";				//$NON-NLS-1$
+	private static final String					STATE_TOUR_MARKER_TYPE_SMALL	= "small";							//$NON-NLS-1$
+	private static final String					STATE_TOUR_MARKER_TYPE_MEDIUM	= "medium";						//$NON-NLS-1$
+	private static final String					STATE_TOUR_MARKER_TYPE_LARGE	= "large";							//$NON-NLS-1$
 
-	private final ArrayList<TourData>	_selectedTours;
+	private static final String					STATE_JOINED_TIME				= "JoinedTime";					//$NON-NLS-1$
+	private static final String					STATE_JOINED_TIME_ORIGINAL		= "original";						//$NON-NLS-1$
+	private static final String					STATE_JOINED_TIME_CONCATENATED	= "concatenated";					//$NON-NLS-1$
+
+	private final IDialogSettings				_state							= TourbookPlugin
+																						.getDefault()
+																						.getDialogSettingsSection(
+																								"DialogJoinTours"); //$NON-NLS-1$
+
+	private final DateTimeFormatter				_dtFormatterShort				= DateTimeFormat.shortDate();
+	private final DateTimeFormatter				_dtFormatterMedium				= DateTimeFormat.shortDateTime();
+	private final DateTimeFormatter				_dtFormatterFull				= DateTimeFormat.fullDateTime();
+
+	private ActionSetTourTag					_actionAddTag;
+	private ActionSetTourTag					_actionRemoveTag;
+	private ActionRemoveAllTags					_actionRemoveAllTags;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+
+	private TourData							_joinedTourData;
+	private ArrayList<TourData>					_joinedTourDataList;
+	private final TourType						_joinedTourType					= null;
+	private final Set<TourTag>					_joinedTourTags					= new HashSet<TourTag>();
+
+	private final ArrayList<TourData>			_selectedTours;
 
 	/*
 	 * UI controls
 	 */
-	private DateTime					_dtTourDate;
-	private DateTime					_dtTourTime;
+	private Text								_txtJoinedTitle;
+	private org.eclipse.swt.widgets.DateTime	_dtTourDate;
+	private org.eclipse.swt.widgets.DateTime	_dtTourTime;
 
-	private Button						_rdoKeepOriginalTime;
-	private Button						_rdoConcatenateTime;
+	private Button								_rdoKeepOriginalTime;
+	private Button								_rdoConcatenateTime;
 
-	private Button						_chkCreateTourMarker;
+	private Button								_chkCreateTourMarker;
+	private Button								_rdoTourMarkerShort;
+	private Button								_rdoTourMarkerMedium;
+	private Button								_rdoTourMarkerLarge;
+
+	private Link								_linkTourType;
+	private CLabel								_lblTourType;
+
+	private TourType							_oldTourType;
+
+	private Link								_linkTag;
+
+	private Label								_lblTourTags;
+
+	private ITourEventListener					_tourEventListener;
+
+	private Composite							_innerContainer;
 
 	public DialogJoinTours(final Shell parentShell, final ArrayList<TourData> selectedTours) {
 
 		super(parentShell);
 
+		// make dialog resizable
+		setShellStyle(getShellStyle() | SWT.RESIZE);
+
 		_selectedTours = selectedTours;
+	}
+
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+						updateUI();
+
+						// set layout when tags are added to reflow the layout
+						_innerContainer.layout(true);
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	@Override
@@ -103,124 +189,295 @@ public class DialogJoinTours extends TitleAreaDialog {
 		setMessage(Messages.Dialog_JoinTours_DlgArea_Message);
 	}
 
+	private void createActions() {
+
+		_actionAddTag = new ActionSetTourTag(this, true, false);
+		_actionRemoveTag = new ActionSetTourTag(this, false, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
+
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
+
+		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.action_tourType_modify_tourTypes,
+				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+	}
+
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
-		createUI(dlgContainer);
-		updateUI();
+		initTourData();
 
+		createUI(dlgContainer);
 		restoreState();
+
+		updateUI();
 		enableControls();
+
+		addTourEventListener();
+
+		createActions();
+		createMenus();
 
 		return dlgContainer;
 	}
 
-	private void createUI(final Composite parent) {
+	/**
+	 * create the drop down menus, this must be created after the parent control is created
+	 */
+	private void createMenus() {
 
-		Label label;
+		/*
+		 * tag menu
+		 */
+		MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				final boolean isTagInTour = _joinedTourTags.size() > 0;
+
+				// enable actions
+				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
+				_actionRemoveTag.setEnabled(isTagInTour);
+				_actionRemoveAllTags.setEnabled(isTagInTour);
+
+				// set menu items
+				menuMgr.add(_actionAddTag);
+				menuMgr.add(_actionRemoveTag);
+				menuMgr.add(_actionRemoveAllTags);
+
+				TagManager.fillRecentTagsIntoMenu(menuMgr, DialogJoinTours.this, true, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTagPrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTag.setMenu(menuMgr.createContextMenu(_linkTag));
+
+		/*
+		 * tour type menu
+		 */
+		menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				// set menu items
+
+				ActionSetTourTypeMenu.fillMenu(menuMgr, DialogJoinTours.this, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTourTypePrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
+	}
+
+	private void createUI(final Composite parent) {
 
 		final SelectionAdapter selectionAdapter = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
+				updateUI();
 				enableControls();
 			}
 		};
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+		_innerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_innerContainer);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_innerContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			/*
-			 * keep tour time
-			 */
-			final Group groupTourTime = new Group(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(groupTourTime);
-			groupTourTime.setText(Messages.Dialog_JoinTours_Group_JoinedTourTime);
-			GridLayoutFactory.swtDefaults().applyTo(groupTourTime);
-			{
-				_rdoKeepOriginalTime = new Button(groupTourTime, SWT.RADIO);
-				_rdoKeepOriginalTime.setText(Messages.Dialog_JoinTours_Radio_KeepTime);
-				_rdoKeepOriginalTime.addSelectionListener(selectionAdapter);
-
-				_rdoConcatenateTime = new Button(groupTourTime, SWT.RADIO);
-				_rdoConcatenateTime.setText(Messages.Dialog_JoinTours_Radio_ConcatenateTime);
-				_rdoConcatenateTime.addSelectionListener(selectionAdapter);
-
-				final Composite dateContainer = new Composite(groupTourTime, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.grab(false, false)
-						.indent(16, 0)
-//						.span(2, 1)
-						.applyTo(dateContainer);
-				GridLayoutFactory.fillDefaults().numColumns(4).applyTo(dateContainer);
-				{
-					/*
-					 * tour start: date
-					 */
-					label = new Label(dateContainer, SWT.NONE);
-					label.setText(Messages.Dialog_JoinTours_Label_TourDate);
-
-					_dtTourDate = new DateTime(dateContainer, SWT.DATE | SWT.DROP_DOWN | SWT.BORDER);
-					GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
-
-					/*
-					 * tour start: time
-					 */
-					label = new Label(dateContainer, SWT.NONE);
-					GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(Messages.Dialog_JoinTours_Label_TourTime);
-
-					_dtTourTime = new DateTime(dateContainer, SWT.TIME | SWT.DROP_DOWN | SWT.BORDER);
-					GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourTime);
-				}
-			}
-
-			/*
-			 * checkbox: set marker for each tour
-			 */
-			_chkCreateTourMarker = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkCreateTourMarker);
-			_chkCreateTourMarker.setText(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker);
-
-			/*
-			 * info
-			 */
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
-			label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
-
-			// use a bulleted list to display this info
-			final StyleRange style = new StyleRange();
-			style.metrics = new GlyphMetrics(0, 0, 10);
-			final Bullet bullet = new Bullet(style);
-
-			final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
-			final int lineCount = Util.countCharacter(infoText, '\n');
-
-			final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//¨
-					.align(SWT.FILL, SWT.BEGINNING)
-					.indent(0, 10)
-					.span(2, 1)
-					.applyTo(styledText);
-			styledText.setText(infoText);
-			styledText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-			styledText.setLineBullet(0, lineCount + 1, bullet);
-
+			createUI10Title(_innerContainer);
+			createUI20Marker(_innerContainer, selectionAdapter);
+			createUI30TypeTags(_innerContainer);
+			createUI40TourTime(_innerContainer, selectionAdapter);
+			createUI50Info(_innerContainer);
 		}
+	}
 
-//		container.layout(true);
+	private void createUI10Title(final Composite parent) {
+		Label label;
+		/*
+		 * tour title
+		 */
+		label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Dialog_JoinTours_Label_Title);
+		label.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
+
+		_txtJoinedTitle = new Text(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtJoinedTitle);
+		_txtJoinedTitle.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
+	}
+
+	private void createUI20Marker(final Composite parent, final SelectionAdapter selectionAdapter) {
+		/*
+		 * checkbox: set marker for each tour
+		 */
+		_chkCreateTourMarker = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkCreateTourMarker);
+		_chkCreateTourMarker.setText(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker);
+		_chkCreateTourMarker.addSelectionListener(selectionAdapter);
+
+		final Composite markerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).indent(16, 0).applyTo(markerContainer);
+		GridLayoutFactory.fillDefaults()//
+//					.numColumns(3)
+				.applyTo(markerContainer);
+		{
+			_rdoTourMarkerShort = new Button(markerContainer, SWT.RADIO);
+			_rdoTourMarkerShort.setText(UI.EMPTY_STRING);
+
+			_rdoTourMarkerMedium = new Button(markerContainer, SWT.RADIO);
+			_rdoTourMarkerMedium.setText(UI.EMPTY_STRING);
+
+			_rdoTourMarkerLarge = new Button(markerContainer, SWT.RADIO);
+			_rdoTourMarkerLarge.setText(UI.EMPTY_STRING);
+		}
+	}
+
+	/**
+	 * tags
+	 */
+	private void createUI30TypeTags(final Composite parent) {
+
+		_linkTag = new Link(parent, SWT.NONE);
+		_linkTag.setText(Messages.tour_editor_label_tour_tag);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_linkTag);
+		_linkTag.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_linkTag);
+			}
+		});
+
+		_lblTourTags = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				// hint is necessary that the width is not expanded when the text is long
+				.hint(200, SWT.DEFAULT)
+				.span(2, 1)
+				.applyTo(_lblTourTags);
+
+		/*
+		 * tour type
+		 */
+		_linkTourType = new Link(parent, SWT.NONE);
+		_linkTourType.setText(Messages.tour_editor_label_tour_type);
+		_linkTourType.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_linkTourType);
+			}
+		});
+
+		_lblTourType = new CLabel(parent, SWT.NONE);
+		GridDataFactory.swtDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(_lblTourType);
+	}
+
+	/**
+	 * tour time
+	 */
+	private void createUI40TourTime(final Composite parent, final SelectionAdapter selectionAdapter) {
+
+		final Group groupTourTime = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(groupTourTime);
+		groupTourTime.setText(Messages.Dialog_JoinTours_Group_JoinedTourTime);
+		GridLayoutFactory.swtDefaults().applyTo(groupTourTime);
+		{
+			_rdoKeepOriginalTime = new Button(groupTourTime, SWT.RADIO);
+			_rdoKeepOriginalTime.setText(Messages.Dialog_JoinTours_Radio_KeepTime);
+			_rdoKeepOriginalTime.addSelectionListener(selectionAdapter);
+
+			_rdoConcatenateTime = new Button(groupTourTime, SWT.RADIO);
+			_rdoConcatenateTime.setText(Messages.Dialog_JoinTours_Radio_ConcatenateTime);
+			_rdoConcatenateTime.addSelectionListener(selectionAdapter);
+
+			final Composite dateContainer = new Composite(groupTourTime, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(false, false)
+					.indent(16, 0)
+					.applyTo(dateContainer);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(dateContainer);
+			{
+				/*
+				 * tour start: date
+				 */
+				Label label = new Label(dateContainer, SWT.NONE);
+				label.setText(Messages.Dialog_JoinTours_Label_TourDate);
+
+				_dtTourDate = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.DATE | SWT.DROP_DOWN | SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
+				_dtTourDate.addSelectionListener(selectionAdapter);
+
+				/*
+				 * tour start: time
+				 */
+				label = new Label(dateContainer, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(label);
+				label.setText(Messages.Dialog_JoinTours_Label_TourTime);
+
+				_dtTourTime = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.TIME | SWT.DROP_DOWN | SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourTime);
+				_dtTourTime.addSelectionListener(selectionAdapter);
+			}
+		}
+	}
+
+	/**
+	 * info
+	 */
+	private void createUI50Info(final Composite container) {
+
+		final Label label = new Label(container, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+
+		// use a bulleted list to display this info
+		final StyleRange style = new StyleRange();
+		style.metrics = new GlyphMetrics(0, 0, 10);
+		final Bullet bullet = new Bullet(style);
+
+		final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
+		final int lineCount = Util.countCharacter(infoText, '\n');
+
+		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults()//¨
+				.align(SWT.FILL, SWT.BEGINNING)
+				.indent(0, 10)
+				.span(2, 1)
+				.applyTo(styledText);
+		styledText.setText(infoText);
+		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		styledText.setLineBullet(0, lineCount + 1, bullet);
 	}
 
 	private void enableControls() {
 
 		final boolean isOriginalTime = _rdoKeepOriginalTime.getSelection();
+		final boolean showMarker = _chkCreateTourMarker.getSelection();
 
 		_dtTourDate.setEnabled(isOriginalTime == false);
 		_dtTourTime.setEnabled(isOriginalTime == false);
+
+		_rdoTourMarkerShort.setEnabled(showMarker);
+		_rdoTourMarkerMedium.setEnabled(showMarker);
+		_rdoTourMarkerLarge.setEnabled(showMarker);
 	}
 
 	@Override
@@ -229,6 +486,46 @@ public class DialogJoinTours extends TitleAreaDialog {
 		// keep window size and position
 //		return _state;
 		return null;
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		// return joined tour
+
+		return _joinedTourDataList;
+	}
+
+	private void initTourData() {
+
+		_joinedTourData = new TourData();
+
+		/*
+		 * create a dummy tour id that setting of the tags and tour type works otherwise the tour
+		 * can cause NPE when a tour has no id
+		 */
+		_joinedTourData.createTourIdDummy();
+
+		_joinedTourDataList = new ArrayList<TourData>();
+		_joinedTourDataList.add(_joinedTourData);
+
+		/*
+		 * set tags and tour type
+		 */
+		for (final TourData tourData : _selectedTours) {
+
+			// get tour type from the first tour which has a tour type
+			if (_oldTourType == null) {
+				_oldTourType = tourData.getTourType();
+			}
+
+			// get all tags
+			final Set<TourTag> tourTags = tourData.getTourTags();
+			_joinedTourTags.addAll(tourTags);
+		}
+
+		_joinedTourData.setTourType(_oldTourType);
+		_joinedTourData.setTourTags(_joinedTourTags);
 	}
 
 	/**
@@ -284,11 +581,8 @@ public class DialogJoinTours extends TitleAreaDialog {
 		final int[] joinedTemperatureSerie = new int[joinedSliceCounter];
 		final int[] joinedTimeSerie = new int[joinedSliceCounter];
 
-		final TourData joinedTourData = new TourData();
-
 		int joinedCalories = 0;
 		boolean isJoinedDistanceFromSensor = false;
-		TourType joinedTourType = null;
 		short joinedDeviceTimeInterval = -1;
 		final HashSet<TourMarker> joinedTourMarker = new HashSet<TourMarker>();
 		final ArrayList<TourWayPoint> joinedWayPoints = new ArrayList<TourWayPoint>();
@@ -303,7 +597,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 		long relTourTimeOffset = 0;
 		long absFirstTourStartTimeSec = 0;
 		long absJoinedTourStartTimeSec = 0;
-		org.joda.time.DateTime joinedTourStart = null;
+		DateTime joinedTourStart = null;
 
 		boolean isFirstTour = true;
 
@@ -353,7 +647,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 
 				if (isOriginalTime) {
 
-					joinedTourStart = new org.joda.time.DateTime(
+					joinedTourStart = new DateTime(
 							tourTourData.getStartYear(),
 							tourTourData.getStartMonth(),
 							tourTourData.getStartDay(),
@@ -384,7 +678,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 
 				if (isOriginalTime) {
 
-					final org.joda.time.DateTime tourStart = new org.joda.time.DateTime(
+					final DateTime tourStart = new DateTime(
 							tourTourData.getStartYear(),
 							tourTourData.getStartMonth(),
 							tourTourData.getStartDay(),
@@ -487,7 +781,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 			final Set<TourMarker> tourMarkers = tourTourData.getTourMarkers();
 			for (final TourMarker tourMarker : tourMarkers) {
 
-				final TourMarker clonedMarker = tourMarker.clone(joinedTourData);
+				final TourMarker clonedMarker = tourMarker.clone(_joinedTourData);
 
 				int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
 				if (joinMarkerIndex >= joinedSliceCounter) {
@@ -538,7 +832,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 
 				final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
 
-				final TourMarker tourMarker = new TourMarker(joinedTourData, ChartLabel.MARKER_TYPE_CUSTOM);
+				final TourMarker tourMarker = new TourMarker(_joinedTourData, ChartLabel.MARKER_TYPE_CUSTOM);
 
 				tourMarker.setSerieIndex(joinMarkerIndex);
 				tourMarker.setLabel(TourManager.getTourDateFull(tourTourData));
@@ -562,7 +856,7 @@ public class DialogJoinTours extends TitleAreaDialog {
 			}
 
 			/*
-			 * create title/description
+			 * create description
 			 */
 			final String tourDescription = tourTourData.getTourDescription();
 
@@ -596,9 +890,6 @@ public class DialogJoinTours extends TitleAreaDialog {
 					joinedDeviceTimeInterval = -1;
 				}
 			}
-			if (joinedTourType == null) {
-				joinedTourType = tourTourData.getTourType();
-			}
 
 			/*
 			 * summarize other fields
@@ -616,70 +907,70 @@ public class DialogJoinTours extends TitleAreaDialog {
 		/*
 		 * setup tour data
 		 */
-		joinedTourData.setTourTitle(Messages.Dialog_JoinTours_TourTitle);
-		joinedTourData.setTourDescription(joinedDescription.toString());
-		joinedTourData.setTourMarkers(joinedTourMarker);
-		joinedTourData.setWayPoints(joinedWayPoints);
+		_joinedTourData.setStartHour((short) joinedTourStart.getHourOfDay());
+		_joinedTourData.setStartMinute((short) joinedTourStart.getMinuteOfHour());
+		_joinedTourData.setStartSecond((short) joinedTourStart.getSecondOfMinute());
+		_joinedTourData.setStartYear((short) joinedTourStart.getYear());
+		_joinedTourData.setStartMonth((short) joinedTourStart.getMonthOfYear());
+		_joinedTourData.setStartDay((short) joinedTourStart.getDayOfMonth());
 
-		joinedTourData.setStartHour((short) joinedTourStart.getHourOfDay());
-		joinedTourData.setStartMinute((short) joinedTourStart.getMinuteOfHour());
-		joinedTourData.setStartSecond((short) joinedTourStart.getSecondOfMinute());
-		joinedTourData.setStartYear((short) joinedTourStart.getYear());
-		joinedTourData.setStartMonth((short) joinedTourStart.getMonthOfYear());
-		joinedTourData.setStartDay((short) joinedTourStart.getDayOfMonth());
-
-		joinedTourData.setWeek(joinedTourStart);
-
-		joinedTourData.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
-		joinedTourData.setDeviceTimeInterval(joinedDeviceTimeInterval);
-		joinedTourData.setCalories(joinedCalories);
-
-		if (isJoinAltitude) {
-			joinedTourData.altitudeSerie = joinedAltitudeSerie;
-		}
-		if (isJoinDistance) {
-			joinedTourData.distanceSerie = joinedDistanceSerie;
-		}
-		if (isJoinCadence) {
-			joinedTourData.cadenceSerie = joinedCadenceSerie;
-		}
-		if (isJoinLat) {
-			joinedTourData.latitudeSerie = joinedLatitudeSerie;
-		}
-		if (isJoinLon) {
-			joinedTourData.longitudeSerie = joinedLongitudeSerie;
-		}
-		if (isJoinPower) {
-			joinedTourData.setPowerSerie(joinedPowerSerie);
-		}
-		if (isJoinPulse) {
-			joinedTourData.pulseSerie = joinedPulseSerie;
-		}
-		if (isJoinSpeed) {
-			joinedTourData.setSpeedSerie(joinedSpeedSerie);
-		}
-		if (isJoinTemperature) {
-			joinedTourData.temperatureSerie = joinedTemperatureSerie;
-		}
-		if (isJoinTime) {
-			joinedTourData.timeSerie = joinedTimeSerie;
-		}
-
-		joinedTourData.computeAltitudeUpDown();
-		joinedTourData.computeTourDrivingTime();
-		joinedTourData.computeComputedValues();
-
-		joinedTourData.setDeviceName(Messages.Dialog_JoinTours_Label_DeviceName);
+		_joinedTourData.setWeek(joinedTourStart);
 
 		// tour id must be created after the tour date/time is set
-		joinedTourData.createTourId();
+		_joinedTourData.createTourId();
 
-		joinedTourData.setTourType(joinedTourType);
+		_joinedTourData.setTourTitle(_txtJoinedTitle.getText());
+		_joinedTourData.setTourDescription(joinedDescription.toString());
+
+		_joinedTourData.setTourType(_joinedTourType);
+		_joinedTourData.setTourTags(_joinedTourTags);
+		_joinedTourData.setTourMarkers(joinedTourMarker);
+		_joinedTourData.setWayPoints(joinedWayPoints);
+		_joinedTourData.setDeviceName(Messages.Dialog_JoinTours_Label_DeviceName);
+
+		_joinedTourData.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
+		_joinedTourData.setDeviceTimeInterval(joinedDeviceTimeInterval);
+		_joinedTourData.setCalories(joinedCalories);
+
+		if (isJoinAltitude) {
+			_joinedTourData.altitudeSerie = joinedAltitudeSerie;
+		}
+		if (isJoinDistance) {
+			_joinedTourData.distanceSerie = joinedDistanceSerie;
+		}
+		if (isJoinCadence) {
+			_joinedTourData.cadenceSerie = joinedCadenceSerie;
+		}
+		if (isJoinLat) {
+			_joinedTourData.latitudeSerie = joinedLatitudeSerie;
+		}
+		if (isJoinLon) {
+			_joinedTourData.longitudeSerie = joinedLongitudeSerie;
+		}
+		if (isJoinPower) {
+			_joinedTourData.setPowerSerie(joinedPowerSerie);
+		}
+		if (isJoinPulse) {
+			_joinedTourData.pulseSerie = joinedPulseSerie;
+		}
+		if (isJoinSpeed) {
+			_joinedTourData.setSpeedSerie(joinedSpeedSerie);
+		}
+		if (isJoinTemperature) {
+			_joinedTourData.temperatureSerie = joinedTemperatureSerie;
+		}
+		if (isJoinTime) {
+			_joinedTourData.timeSerie = joinedTimeSerie;
+		}
+
+		_joinedTourData.computeAltitudeUpDown();
+		_joinedTourData.computeTourDrivingTime();
+		_joinedTourData.computeComputedValues();
 
 		// set person which is required to save a tour
-		joinedTourData.setTourPerson(TourManager.getInstance().getActivePerson());
+		_joinedTourData.setTourPerson(TourManager.getInstance().getActivePerson());
 
-		TourManager.saveModifiedTour(joinedTourData);
+		TourManager.saveModifiedTour(_joinedTourData);
 	}
 
 	@Override
@@ -693,35 +984,90 @@ public class DialogJoinTours extends TitleAreaDialog {
 
 	private void onDispose() {
 
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 	}
 
 	private void restoreState() {
 
-		final int joinedTime = Util.getStateInt(_state, STATE_JOINED_TIME, 0);
-		_rdoKeepOriginalTime.setSelection(joinedTime == 0);
-		_rdoConcatenateTime.setSelection(joinedTime == 1);
+		_txtJoinedTitle.setText(Util.getStateString(_state, STATE_TITLE, Messages.Dialog_JoinTours_Label_DefaultTitle));
 
-		_chkCreateTourMarker.setSelection(Util.getStateBoolean(_state, STATE_CREATE_TOUR_MARKER, true));
+		// time
+		final String joinedTime = Util.getStateString(_state, STATE_JOINED_TIME, STATE_JOINED_TIME_ORIGINAL);
+		_rdoKeepOriginalTime.setSelection(joinedTime.equals(STATE_JOINED_TIME_ORIGINAL));
+		_rdoConcatenateTime.setSelection(joinedTime.equals(STATE_JOINED_TIME_CONCATENATED));
+
+		// marker
+		_chkCreateTourMarker.setSelection(Util.getStateBoolean(_state, STATE_IS_CREATE_TOUR_MARKER, true));
+
+		final String selectedMarker = Util.getStateString(_state, STATE_TOUR_MARKER_TYPE, STATE_TOUR_MARKER_TYPE_SMALL);
+		_rdoTourMarkerShort.setSelection(selectedMarker.equals(STATE_TOUR_MARKER_TYPE_SMALL));
+		_rdoTourMarkerMedium.setSelection(selectedMarker.equals(STATE_TOUR_MARKER_TYPE_MEDIUM));
+		_rdoTourMarkerLarge.setSelection(selectedMarker.equals(STATE_TOUR_MARKER_TYPE_LARGE));
+
+		/*
+		 * update UI from selected tours
+		 */
+
+		// date/time
+		final TourData firstTour = _selectedTours.get(0);
+		_dtTourDate.setDate(firstTour.getStartYear(), firstTour.getStartMonth() - 1, firstTour.getStartDay());
+		_dtTourTime.setTime(firstTour.getStartHour(), firstTour.getStartMinute(), firstTour.getStartSecond());
 	}
 
 	private void saveState() {
 
-		final int selectedTimeJoining = _rdoKeepOriginalTime.getSelection() //
-				? 0
-				: _rdoConcatenateTime.getSelection() //
-						? 1
-						: 0;
+		_state.put(STATE_TITLE, _txtJoinedTitle.getText());
 
-		_state.put(STATE_JOINED_TIME, selectedTimeJoining);
-		_state.put(STATE_CREATE_TOUR_MARKER, _chkCreateTourMarker.getSelection());
+		/*
+		 * joined time
+		 */
+		final String selectedTime = _rdoKeepOriginalTime.getSelection() //
+				? STATE_JOINED_TIME_ORIGINAL
+				: _rdoConcatenateTime.getSelection() //
+						? STATE_JOINED_TIME_CONCATENATED
+						: STATE_JOINED_TIME_ORIGINAL;
+
+		_state.put(STATE_JOINED_TIME, selectedTime);
+
+		/*
+		 * marker
+		 */
+		final String selectedMarker = _rdoTourMarkerShort.getSelection() //
+				? STATE_TOUR_MARKER_TYPE_SMALL
+				: _rdoTourMarkerMedium.getSelection() //
+						? STATE_TOUR_MARKER_TYPE_MEDIUM
+						: _rdoTourMarkerLarge.getSelection() //
+								? STATE_TOUR_MARKER_TYPE_LARGE
+								: STATE_TOUR_MARKER_TYPE_SMALL;
+
+		_state.put(STATE_IS_CREATE_TOUR_MARKER, _chkCreateTourMarker.getSelection());
+		_state.put(STATE_TOUR_MARKER_TYPE, selectedMarker);
 	}
 
 	private void updateUI() {
 
-		final TourData firstTour = _selectedTours.get(0);
+		final DateTime joinedTourStart = new DateTime(
+				_dtTourDate.getYear(),
+				_dtTourDate.getMonth() + 1,
+				_dtTourDate.getDay(),
+				_dtTourTime.getHours(),
+				_dtTourTime.getMinutes(),
+				_dtTourTime.getSeconds(),
+				0);
 
-		_dtTourDate.setDate(firstTour.getStartYear(), firstTour.getStartMonth() - 1, firstTour.getStartDay());
-		_dtTourTime.setTime(firstTour.getStartHour(), firstTour.getStartMinute(), firstTour.getStartSecond());
+		_rdoTourMarkerShort.setText(_dtFormatterShort.print(joinedTourStart.getMillis()));
+		_rdoTourMarkerShort.pack(true);
+
+		_rdoTourMarkerMedium.setText(_dtFormatterMedium.print(joinedTourStart.getMillis()));
+		_rdoTourMarkerMedium.pack(true);
+
+		_rdoTourMarkerLarge.setText(_dtFormatterFull.print(joinedTourStart.getMillis()));
+		_rdoTourMarkerLarge.pack(true);
+
+		// tour type/tags
+		UI.updateUITourType(_joinedTourData.getTourType(), _lblTourType, true);
+		UI.updateUITags(_joinedTourData, _lblTourTags);
+
 	}
 
 //	private void setTourData() {
