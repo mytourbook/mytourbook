@@ -722,7 +722,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 		_lblTitle.setText(tourTitle);
 		_lblTourType.setToolTipText(tourTypeName);
 
-		UI.updateUITourType(tourType, _lblTourType, false);
+		UI.updateUITourType(_tourData, _lblTourType, false);
 
 		if (_hasTags) {
 			UI.updateUITags(_tourData, _lblTourTags);

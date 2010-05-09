@@ -230,9 +230,23 @@ public class Messages extends NLS {
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
+	public static String	Dialog_JoinTours_ComboText_ConcatenateTime;
+
+	public static String	Dialog_JoinTours_ComboText_KeepTime;
+
+	public static String	Dialog_JoinTours_ComboText_MarkerTourTime;
+
+	public static String	Dialog_JoinTours_ComboText_TourTypeCustom;
+
+	public static String	Dialog_JoinTours_ComboText_TourTypeFromTour;
+
+	public static String	Dialog_JoinTours_ComboText_TourTypePrevious;
+
 	public static String		Dialog_JoinTours_DlgArea_Message;
 	public static String		Dialog_JoinTours_DlgArea_Title;
 	public static String		Dialog_JoinTours_Group_JoinedTourTime;
+
+	public static String	Dialog_JoinTours_Group_TourType;
 	public static String		Dialog_JoinTours_InvalidData_Altitude;
 	public static String		Dialog_JoinTours_InvalidData_Cadence;
 	public static String		Dialog_JoinTours_InvalidData_Distance;
@@ -257,13 +271,22 @@ public class Messages extends NLS {
 
 	public static String		Dialog_JoinTours_Label_Tour;
 	public static String		Dialog_JoinTours_Label_TourDate;
+
+	public static String	Dialog_JoinTours_Label_TourMarker;
+
+	public static String	Dialog_JoinTours_Label_TourMarkerText;
+
+	public static String	Dialog_JoinTours_Label_TourStartDateTime;
 	public static String		Dialog_JoinTours_Label_TourTime;
-	public static String		Dialog_JoinTours_Radio_ConcatenateTime;
+
+	public static String	Dialog_JoinTours_Label_TourType;
+
+	public static String	Dialog_JoinTours_Link_TourType;
 	public static String		Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
-	public static String		Dialog_JoinTours_Radio_KeepTime;
 	public static String		Dialog_JoinTours_Radio_KeepTime_Tooltip;
 	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff;
 	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
+
 	public static String		Dialog_JoinTours_TourTitle;
 
 	public static String		Dialog_SelectGraphs_Title;

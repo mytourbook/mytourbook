@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
@@ -36,7 +36,7 @@ public class ChartLabelLayer implements IChartLayer {
 	private static final int			LABEL_WIDTH		= 4;
 	private static final int			LABEL_OFFSET	= 3;
 
-	private int							fLabelOffset	= LABEL_OFFSET;
+	private final int					fLabelOffset	= LABEL_OFFSET;
 
 	private final ArrayList<ChartLabel>	fChartLabels	= new ArrayList<ChartLabel>();
 
@@ -111,24 +111,29 @@ public class ChartLabelLayer implements IChartLayer {
 			boolean isVertical = true;
 
 			final int labelHeight = labelExtend.y;
+			final int labelHeight2 = labelExtend.y / 2;
 			final int labelWidth = labelExtend.x;
 
 //			fMarkerOffset = 0;
 
 			switch (visualPosition) {
 			case ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH:
+				devXMarker += labelHeight2 - markerWidth2;
 				devYMarker -= fLabelOffset;
 				break;
 
 			case ChartLabel.VISUAL_VERTICAL_BELOW_GRAPH:
+				devXMarker += labelHeight2 - markerWidth2;
 				devYMarker += labelWidth + fLabelOffset + markerWidth2;
 				break;
 
 			case ChartLabel.VISUAL_VERTICAL_TOP_CHART:
+				devXMarker += labelHeight2 - markerWidth2;
 				devYMarker = devYTop + labelWidth;
 				break;
 
 			case ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART:
+				devXMarker += labelHeight2 - markerWidth2;
 				devYMarker = devYBottom - fLabelOffset;
 				break;
 

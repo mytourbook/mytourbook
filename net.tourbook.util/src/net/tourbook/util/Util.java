@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -104,6 +105,49 @@ public class Util {
 		}
 	}
 
+//	/**
+//	 * @param combo
+//	 *            combo box, the items in the combo box
+//	 *            must correspond to the items in the states array
+//	 * @param states
+//	 *            array which contains all states
+//	 * @return Returns the state which is selected or null when nothing is selected
+//	 */
+//	public static String getStateFromCombo(final Combo combo, final String[] states) {
+//
+//		final int selectedIndex = combo.getSelectionIndex();
+//		if (selectedIndex == -1 || selectedIndex >= states.length) {
+//			return null;
+//		} else {
+//			return states[selectedIndex];
+//		}
+//	}
+
+	/**
+	 * @param combo
+	 *            combo box, the items in the combo box
+	 *            must correspond to the items in the states array
+	 * @param states
+	 *            array which contains all states
+	 * @param defaultState
+	 *            state when an item is not selected in the combo box
+	 * @return Returns the state which is selected in the combo box
+	 */
+	public static String getStateFromCombo(final Combo combo, final String[] states, final String defaultState) {
+
+		final int selectedIndex = combo.getSelectionIndex();
+
+		String selectedState;
+
+		if (selectedIndex == -1) {
+			selectedState = defaultState;
+		} else {
+			selectedState = states[selectedIndex];
+		}
+
+		return selectedState;
+	}
+
 	/**
 	 * @param state
 	 * @param key
@@ -114,6 +158,21 @@ public class Util {
 	public static int getStateInt(final IDialogSettings state, final String key, final int defaultValue) {
 		try {
 			return state.get(key) == null ? defaultValue : state.getInt(key);
+		} catch (final NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @param state
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a long value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static long getStateLong(final IDialogSettings state, final String key, final int defaultValue) {
+		try {
+			return state.get(key) == null ? defaultValue : state.getLong(key);
 		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
@@ -154,6 +213,36 @@ public class Util {
 		}
 
 		return year;
+	}
+
+	/**
+	 * Selects an item in the combo box which is retrieved from a state.
+	 * 
+	 * @param state
+	 * @param stateKey
+	 * @param comboStates
+	 *            this array must must have the same number of entries as the combo box has items
+	 * @param defaultState
+	 * @param combo
+	 */
+	public static void selectStateInCombo(	final IDialogSettings state,
+											final String stateKey,
+											final String[] comboStates,
+											final String defaultState,
+											final Combo combo) {
+
+		final String stateValue = Util.getStateString(state, stateKey, defaultState);
+
+		int stateIndex = 0;
+		for (final String comboStateValue : comboStates) {
+			if (stateValue.equals(comboStateValue)) {
+				break;
+			}
+
+			stateIndex++;
+		}
+
+		combo.select(stateIndex);
 	}
 
 	/**

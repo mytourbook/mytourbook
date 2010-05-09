@@ -403,13 +403,12 @@ public class TourManager {
 	}
 
 	/**
-	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourEventId#TOUR_CHANGED} event.
+	 * Saves tours which have been modified and updates the tour data editor.
 	 * <p>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done.
 	 * <p>
-	 * Event {@link TourEventId#TOUR_CHANGED} is always fired.
+	 * The event {@link TourEventId#TOUR_CHANGED} is fired always.
 	 * 
 	 * @param tourData
 	 *            modified tour

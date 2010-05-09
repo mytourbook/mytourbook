@@ -1884,7 +1884,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		_scaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
 		_scaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
 
-		UI.updateUITourType(_sourceTour.getTourType(), _lblTourType, true);
+		UI.updateUITourType(_sourceTour, _lblTourType, true);
 
 		onModifyProperties();
 	}

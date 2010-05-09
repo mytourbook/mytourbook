@@ -856,11 +856,11 @@ public class UI {
 		Point pt = new Point(rect.x, rect.y + rect.height);
 		pt = control.getParent().toDisplay(pt);
 
-		final Menu menu = control.getMenu();
+		final Menu contextMenu = control.getMenu();
 
-		if (menu != null && menu.isDisposed() == false) {
-			menu.setLocation(pt.x, pt.y);
-			menu.setVisible(true);
+		if (contextMenu != null && contextMenu.isDisposed() == false) {
+			contextMenu.setLocation(pt.x, pt.y);
+			contextMenu.setVisible(true);
 		}
 	}
 
@@ -926,7 +926,7 @@ public class UI {
 	 * @param weightKey
 	 * @param sashDefaultWeight
 	 */
-	public static void restoreSashWeight(final SashForm sash,
+	public static void restoreSashWeight(	final SashForm sash,
 											final IMemento fMemento,
 											final String weightKey,
 											final int[] sashDefaultWeight) {
@@ -1123,12 +1123,14 @@ public class UI {
 		tourTagLabel.pack(true);
 	}
 
-	public static void updateUITourType(final TourType tourType, final CLabel lblTourType, final boolean isTextDisplayed) {
+	public static void updateUITourType(final TourData tourData, final CLabel lblTourType, final boolean isTextDisplayed) {
+
+		final TourType tourType = tourData.getTourType();
 
 		// tour type
 		if (tourType == null) {
 			lblTourType.setText(UI.EMPTY_STRING);
-			lblTourType.setImage(null);
+			lblTourType.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
 		} else {
 			lblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 			lblTourType.setText(isTextDisplayed ? tourType.getName() : UI.EMPTY_STRING);
@@ -1261,6 +1263,11 @@ public class UI {
 	}
 
 	private void drawTourTypeImage(final long typeId, final GC gcImage) {
+
+		if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+			// make the image invisible
+			return;
+		}
 
 		final Display display = Display.getCurrent();
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);

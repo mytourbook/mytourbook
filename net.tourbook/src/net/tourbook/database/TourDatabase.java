@@ -128,34 +128,34 @@ public class TourDatabase {
 	 */
 	public static final int						ENTITY_IS_NOT_SAVED							= -1;
 
-	private static TourDatabase					instance;
+	private static TourDatabase					_instance;
 
-	private static NetworkServerControl			server;
+	private static NetworkServerControl			_server;
 
-	private static EntityManagerFactory			emFactory;
+	private static EntityManagerFactory			_emFactory;
 
-	private ComboPooledDataSource				fPooledDataSource;
+	private ComboPooledDataSource				_pooledDataSource;
 
-	private static ArrayList<TourType>			fActiveTourTypes;
-	private static ArrayList<TourType>			fTourTypes;
+	private static ArrayList<TourType>			_activeTourTypes;
+	private static ArrayList<TourType>			_tourTypes;
 
-	private static HashMap<Long, TourTag>		fTourTags;
-	private static HashMap<Long, TagCollection>	fTagCollections;
+	private static HashMap<Long, TourTag>		_tourTags;
+	private static HashMap<Long, TagCollection>	_tagCollections;
 
-	private boolean								fIsTableChecked;
-	private boolean								fIsVersionChecked;
+	private boolean								_isTableChecked;
+	private boolean								_isVersionChecked;
 
-	private final ListenerList					fPropertyListeners							= new ListenerList(
+	private final ListenerList					_propertyListeners							= new ListenerList(
 																									ListenerList.IDENTITY);
 
-	private final String						fDatabasePath								= (Platform
+	private final String						_databasePath								= (Platform
 																									.getInstanceLocation()
 																									.getURL()
 																									.getPath() + "derby-database");				//$NON-NLS-1$
 
 	{
 		// set storage location for the database
-		System.setProperty("derby.system.home", fDatabasePath); //$NON-NLS-1$
+		System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
 // derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
@@ -186,14 +186,14 @@ public class TourDatabase {
 	 */
 	public static void clearTourTags() {
 
-		if (fTourTags != null) {
-			fTourTags.clear();
-			fTourTags = null;
+		if (_tourTags != null) {
+			_tourTags.clear();
+			_tourTags = null;
 		}
 
-		if (fTagCollections != null) {
-			fTagCollections.clear();
-			fTagCollections = null;
+		if (_tagCollections != null) {
+			_tagCollections.clear();
+			_tagCollections = null;
 		}
 	}
 
@@ -203,9 +203,9 @@ public class TourDatabase {
 	 */
 	public static void clearTourTypes() {
 
-		if (fTourTypes != null) {
-			fTourTypes.clear();
-			fTourTypes = null;
+		if (_tourTypes != null) {
+			_tourTypes.clear();
+			_tourTypes = null;
 		}
 
 		UI.getInstance().setTourTypeImagesDirty();
@@ -305,8 +305,9 @@ public class TourDatabase {
 			// create result text
 			final StringBuilder sb = new StringBuilder();
 			{
-				sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage, Integer
-						.toString(tourCounter[0])));
+				sb.append(NLS.bind(
+						Messages.tour_database_computeComputedValues_resultMessage,
+						Integer.toString(tourCounter[0])));
 
 				final String runnerResultText = runner.getResultText();
 				if (runnerResultText != null) {
@@ -315,8 +316,10 @@ public class TourDatabase {
 				}
 			}
 
-			MessageDialog.openInformation(shell, Messages.tour_database_computeComputedValues_resultTitle, sb
-					.toString());
+			MessageDialog.openInformation(
+					shell,
+					Messages.tour_database_computeComputedValues_resultTitle,
+					sb.toString());
 		}
 	}
 
@@ -377,7 +380,7 @@ public class TourDatabase {
 	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
 	 */
 	public static ArrayList<TourType> getActiveTourTypes() {
-		return fActiveTourTypes;
+		return _activeTourTypes;
 	}
 
 	private static ArrayList<Long> getAllTourIds() {
@@ -413,8 +416,8 @@ public class TourDatabase {
 	@SuppressWarnings("unchecked")
 	public static HashMap<Long, TourTag> getAllTourTags() {
 
-		if (fTourTags != null) {
-			return fTourTags;
+		if (_tourTags != null) {
+			return _tourTags;
 		}
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -424,16 +427,16 @@ public class TourDatabase {
 			final Query query = em.createQuery("SELECT TourTag" //$NON-NLS-1$
 					+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$ //$NON-NLS-2$
 
-			fTourTags = new HashMap<Long, TourTag>();
+			_tourTags = new HashMap<Long, TourTag>();
 
 			for (final TourTag tourTag : ((List<TourTag>) query.getResultList())) {
-				fTourTags.put(tourTag.getTagId(), tourTag);
+				_tourTags.put(tourTag.getTagId(), tourTag);
 			}
 
 			em.close();
 		}
 
-		return fTourTags;
+		return _tourTags;
 	}
 
 	/**
@@ -442,11 +445,11 @@ public class TourDatabase {
 	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getAllTourTypes() {
 
-		if (fTourTypes != null) {
-			return fTourTypes;
+		if (_tourTypes != null) {
+			return _tourTypes;
 		}
 
-		fTourTypes = new ArrayList<TourType>();
+		_tourTypes = new ArrayList<TourType>();
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
@@ -456,31 +459,31 @@ public class TourDatabase {
 					+ (" FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
 
-			fTourTypes = (ArrayList<TourType>) query.getResultList();
+			_tourTypes = (ArrayList<TourType>) query.getResultList();
 
 			em.close();
 		}
 
-		return fTourTypes;
+		return _tourTypes;
 	}
 
 	public static TourDatabase getInstance() {
-		if (instance == null) {
-			instance = new TourDatabase();
+		if (_instance == null) {
+			_instance = new TourDatabase();
 		}
-		return instance;
+		return _instance;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static TagCollection getRootTags() {
 
-		if (fTagCollections == null) {
-			fTagCollections = new HashMap<Long, TagCollection>();
+		if (_tagCollections == null) {
+			_tagCollections = new HashMap<Long, TagCollection>();
 		}
 
 		final long rootTagId = -1L;
 
-		TagCollection rootEntry = fTagCollections.get(Long.valueOf(rootTagId));
+		TagCollection rootEntry = _tagCollections.get(Long.valueOf(rootTagId));
 		if (rootEntry != null) {
 			return rootEntry;
 		}
@@ -518,7 +521,7 @@ public class TourDatabase {
 
 		em.close();
 
-		fTagCollections.put(rootTagId, rootEntry);
+		_tagCollections.put(rootTagId, rootEntry);
 
 		return rootEntry;
 	}
@@ -529,13 +532,13 @@ public class TourDatabase {
 	 */
 	public static TagCollection getTagEntries(final long categoryId) {
 
-		if (fTagCollections == null) {
-			fTagCollections = new HashMap<Long, TagCollection>();
+		if (_tagCollections == null) {
+			_tagCollections = new HashMap<Long, TagCollection>();
 		}
 
 		final Long categoryIdValue = Long.valueOf(categoryId);
 
-		TagCollection categoryEntries = fTagCollections.get(categoryIdValue);
+		TagCollection categoryEntries = _tagCollections.get(categoryIdValue);
 		if (categoryEntries != null) {
 			return categoryEntries;
 		}
@@ -566,7 +569,7 @@ public class TourDatabase {
 
 		em.close();
 
-		fTagCollections.put(categoryIdValue, categoryEntries);
+		_tagCollections.put(categoryIdValue, categoryEntries);
 
 		return categoryEntries;
 	}
@@ -680,6 +683,24 @@ public class TourDatabase {
 		}
 
 		return tourPeople;
+	}
+
+	/**
+	 * Get tour type from id
+	 * 
+	 * @param tourTypeId
+	 * @return Returns a {@link TourType} from the id or <code>null</code> when tour type is not
+	 *         available for the id.
+	 */
+	public static TourType getTourType(final long tourTypeId) {
+
+		for (final TourType tourType : getAllTourTypes()) {
+			if (tourType.getTypeId() == tourTypeId) {
+				return tourType;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -981,7 +1002,7 @@ public class TourDatabase {
 		 * data are valid
 		 */
 		if (tourData.getTourPerson() == null) {
-			System.out.println("Cannot save a tour without a person: " + tourData);//$NON-NLS-1$
+			StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
 			return null;
 		}
 
@@ -1054,7 +1075,7 @@ public class TourDatabase {
 
 				// all tour types are selected
 
-				fActiveTourTypes = fTourTypes;
+				_activeTourTypes = _tourTypes;
 				return;
 
 			} else {
@@ -1067,8 +1088,8 @@ public class TourDatabase {
 
 		case TourTypeFilter.FILTER_TYPE_DB:
 
-			fActiveTourTypes = new ArrayList<TourType>();
-			fActiveTourTypes.add(tourTypeFilter.getTourType());
+			_activeTourTypes = new ArrayList<TourType>();
+			_activeTourTypes.add(tourTypeFilter.getTourType());
 
 			return;
 
@@ -1080,10 +1101,10 @@ public class TourDatabase {
 
 				// create a list with all tour types from the set
 
-				fActiveTourTypes = new ArrayList<TourType>();
+				_activeTourTypes = new ArrayList<TourType>();
 
 				for (final Object item : tourTypes) {
-					fActiveTourTypes.add((TourType) item);
+					_activeTourTypes.add((TourType) item);
 				}
 				return;
 			}
@@ -1095,7 +1116,7 @@ public class TourDatabase {
 		}
 
 		// set default empty list
-		fActiveTourTypes = new ArrayList<TourType>();
+		_activeTourTypes = new ArrayList<TourType>();
 	}
 
 	/**
@@ -1107,7 +1128,7 @@ public class TourDatabase {
 	 * @param minimalDaysInFirstWeek
 	 * @return Returns <code>true</code> when the week is computed
 	 */
-	public static boolean updateTourWeek(final Connection conn,
+	public static boolean updateTourWeek(	final Connection conn,
 											final IProgressMonitor monitor,
 											final int firstDayOfWeek,
 											final int minimalDaysInFirstWeek) {
@@ -1184,7 +1205,7 @@ public class TourDatabase {
 	}
 
 	public void addPropertyListener(final IPropertyListener listener) {
-		fPropertyListeners.add(listener);
+		_propertyListeners.add(listener);
 	}
 
 	private boolean checkDb() {
@@ -1212,7 +1233,7 @@ public class TourDatabase {
 	private void checkServer() throws MyTourbookException {
 
 		// when the server is started, nothing is to do here
-		if (server != null) {
+		if (_server != null) {
 			return;
 		}
 
@@ -1262,7 +1283,7 @@ public class TourDatabase {
 				}
 
 				try {
-					server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
+					_server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
 				} catch (final UnknownHostException e2) {
 					e2.printStackTrace();
 				} catch (final Exception e2) {
@@ -1275,12 +1296,12 @@ public class TourDatabase {
 					 * check if another derby server is already running (this can happen during
 					 * development)
 					 */
-					server.ping();
+					_server.ping();
 
 				} catch (final Exception e) {
 
 					try {
-						server.start(null);
+						_server.start(null);
 					} catch (final Exception e2) {
 						e2.printStackTrace();
 					}
@@ -1291,7 +1312,7 @@ public class TourDatabase {
 					while (true) {
 
 						try {
-							server.ping();
+							_server.ping();
 							break;
 						} catch (final Exception e1) {
 							StatusUtil.log(NLS.bind("Starting derby server: {0}", ++pingCounter), e); //$NON-NLS-1$
@@ -1309,7 +1330,7 @@ public class TourDatabase {
 						connection.close();
 
 						// log database path
-						StatusUtil.handleStatus("Database path: " + fDatabasePath, Status.INFO); //$NON-NLS-1$
+						StatusUtil.handleStatus("Database path: " + _databasePath, Status.INFO); //$NON-NLS-1$
 
 					} catch (final SQLException e1) {
 						UI.showSQLException(e1);
@@ -1326,7 +1347,7 @@ public class TourDatabase {
 	 */
 	private void checkTable() {
 
-		if (fIsTableChecked) {
+		if (_isTableChecked) {
 			return;
 		}
 
@@ -1372,7 +1393,7 @@ public class TourDatabase {
 				}
 				stmt.close();
 
-				fIsTableChecked = true;
+				_isTableChecked = true;
 
 			} catch (final SQLException e) {
 				UI.showSQLException(e);
@@ -1400,7 +1421,7 @@ public class TourDatabase {
 	 */
 	private boolean checkVersion(final IProgressMonitor monitor) {
 
-		if (fIsVersionChecked) {
+		if (_isVersionChecked) {
 			return true;
 		}
 
@@ -1455,7 +1476,7 @@ public class TourDatabase {
 
 			conn.close();
 
-			fIsVersionChecked = true;
+			_isVersionChecked = true;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -2147,7 +2168,7 @@ public class TourDatabase {
 	}
 
 	public void firePropertyChange(final int propertyId) {
-		final Object[] allListeners = fPropertyListeners.getListeners();
+		final Object[] allListeners = _propertyListeners.getListeners();
 		for (final Object allListener : allListeners) {
 			final IPropertyListener listener = (IPropertyListener) allListener;
 			listener.propertyChanged(TourDatabase.this, propertyId);
@@ -2170,8 +2191,8 @@ public class TourDatabase {
 	 */
 	public EntityManager getEntityManager() {
 
-		if (emFactory != null) {
-			return emFactory.createEntityManager();
+		if (_emFactory != null) {
+			return _emFactory.createEntityManager();
 		}
 
 		try {
@@ -2190,7 +2211,7 @@ public class TourDatabase {
 
 					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 
-					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+					_emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 				}
 			};
 
@@ -2206,7 +2227,7 @@ public class TourDatabase {
 				checkTable();
 				checkVersion(null);
 
-				emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+				_emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
 			} else {
 				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
@@ -2220,7 +2241,7 @@ public class TourDatabase {
 			e.printStackTrace();
 		}
 
-		if (emFactory == null) {
+		if (_emFactory == null) {
 			try {
 				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
 			} catch (final Exception e) {
@@ -2228,7 +2249,7 @@ public class TourDatabase {
 			}
 			return null;
 		} else {
-			final EntityManager em = emFactory.createEntityManager();
+			final EntityManager em = _emFactory.createEntityManager();
 
 			return em;
 		}
@@ -2236,20 +2257,20 @@ public class TourDatabase {
 
 	private Connection getPooledConnection() throws SQLException {
 
-		if (fPooledDataSource == null) {
+		if (_pooledDataSource == null) {
 			try {
 
-				fPooledDataSource = new ComboPooledDataSource();
+				_pooledDataSource = new ComboPooledDataSource();
 
 				//loads the jdbc driver
-				fPooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
-				fPooledDataSource.setJdbcUrl(DERBY_URL);
-				fPooledDataSource.setUser(TABLE_SCHEMA);
-				fPooledDataSource.setPassword(TABLE_SCHEMA);
+				_pooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
+				_pooledDataSource.setJdbcUrl(DERBY_URL);
+				_pooledDataSource.setUser(TABLE_SCHEMA);
+				_pooledDataSource.setPassword(TABLE_SCHEMA);
 
-				fPooledDataSource.setMaxPoolSize(100);
-				fPooledDataSource.setMaxStatements(100);
-				fPooledDataSource.setMaxStatementsPerConnection(20);
+				_pooledDataSource.setMaxPoolSize(100);
+				_pooledDataSource.setMaxStatements(100);
+				_pooledDataSource.setMaxStatementsPerConnection(20);
 
 			} catch (final PropertyVetoException e) {
 				e.printStackTrace();
@@ -2258,7 +2279,7 @@ public class TourDatabase {
 
 		Connection conn = null;
 		try {
-			conn = fPooledDataSource.getConnection();
+			conn = _pooledDataSource.getConnection();
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 //			throw e;
@@ -2268,7 +2289,7 @@ public class TourDatabase {
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {
-		fPropertyListeners.remove(listener);
+		_propertyListeners.remove(listener);
 	}
 
 	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
@@ -2283,7 +2304,7 @@ public class TourDatabase {
 		final String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
 				currentDbVersion,
 				TOURBOOK_DB_VERSION,
-				fDatabasePath });
+				_databasePath });
 
 		final MessageDialog dialog = new MessageDialog(
 				Display.getDefault().getActiveShell(),
@@ -2499,7 +2520,7 @@ public class TourDatabase {
 		if (monitor != null) {
 			monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 		}
-		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+		_emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
 		if (monitor != null) {
 			monitor.subTask(Messages.Tour_Database_load_all_tours);
@@ -2513,9 +2534,9 @@ public class TourDatabase {
 			final TourData tourData = getTourFromDb(tourId);
 
 			if (monitor != null) {
-				final String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] {
-						tourIdx++,
-						tourList.size() });
+				final String msg = NLS.bind(
+						Messages.Tour_Database_update_tour,
+						new Object[] { tourIdx++, tourList.size() });
 				monitor.subTask(msg);
 			}
 
@@ -2529,8 +2550,8 @@ public class TourDatabase {
 		}
 
 		// cleanup everything as if nothing has happened
-		emFactory.close();
-		emFactory = null;
+		_emFactory.close();
+		_emFactory = null;
 	}
 
 	private void updateDbDesign_004_005(final Connection conn, final IProgressMonitor monitor) {

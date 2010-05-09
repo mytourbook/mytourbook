@@ -5900,7 +5900,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 
 		// tour type/tags
-		UI.updateUITourType(_tourData.getTourType(), _lblTourType, true);
+		UI.updateUITourType(_tourData, _lblTourType, true);
 		UI.updateUITags(_tourData, _lblTourTags);
 
 		// measurement system
