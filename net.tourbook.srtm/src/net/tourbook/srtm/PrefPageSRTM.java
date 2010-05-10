@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.srtm;
 
@@ -63,7 +63,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 	private IPreferenceStore		fPrefStore;
 
-	private String					fDefaultSRTMFilePath	= Platform.getInstanceLocation().getURL().getPath();
+	private final String					fDefaultSRTMFilePath	= Platform.getInstanceLocation().getURL().getPath();
 
 	private Composite				fPrefContainer;
 	private Composite				fPathContainer;
@@ -120,7 +120,8 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		{
 			// field: use default location
-			fUseDefaultLocation = new BooleanFieldEditor(IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
+			fUseDefaultLocation = new BooleanFieldEditor(
+					IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
 					Messages.prefPage_srtm_chk_use_default_location,
 					group);
 			fUseDefaultLocation.setPage(this);
@@ -136,7 +137,8 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(fPathContainer);
 			{
 				// field: path for the srtm data
-				fDataPathEditor = new DirectoryFieldEditor(IPreferences.SRTM_DATA_FILEPATH,
+				fDataPathEditor = new DirectoryFieldEditor(
+						IPreferences.SRTM_DATA_FILEPATH,
 						Messages.prefPage_srtm_editor_data_filepath,
 						fPathContainer);
 				fDataPathEditor.setPage(this);
@@ -347,6 +349,11 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 	@Override
 	public boolean performOk() {
 
+		if (fUseDefaultLocation == null) {
+			// page is not initialized this case happened and created an NPE
+			return super.performOk();
+		}
+
 		if (validateData() == false) {
 			return false;
 		}
@@ -364,9 +371,10 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 			ElevationSRTM3.clearElevationFileCache();
 
 			// fire event to clear the tour data cache which remove existing srtm data
-			net.tourbook.util.Activator.getDefault().getPreferenceStore().setValue(
-					IExternalTourEvents.CLEAR_TOURDATA_CACHE,
-					Math.random());
+			net.tourbook.util.Activator
+					.getDefault()
+					.getPreferenceStore()
+					.setValue(IExternalTourEvents.CLEAR_TOURDATA_CACHE, Math.random());
 		}
 
 		return super.performOk();
