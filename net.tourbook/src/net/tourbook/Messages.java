@@ -74,6 +74,7 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
 	public static String		action_export_tour;
+	public static String		action_print_tour;
 	public static String		action_tag_add;
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;

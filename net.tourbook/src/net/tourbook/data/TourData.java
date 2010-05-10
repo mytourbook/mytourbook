@@ -64,11 +64,15 @@ import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
 @Entity
-public class TourData implements Comparable<Object> {
+@XStreamAlias("TourData")
+public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * 
@@ -4391,5 +4395,15 @@ public class TourData implements Comparable<Object> {
 		sb.append(System.identityHashCode(this));
 
 		return sb.toString();
+	}
+
+	@Override
+	public String toXml() {
+		XStream xstream = new XStream();
+		// Scan for xstream annotations
+		// At class level we have an annotation to indicate the xml root element. (@XStreamAlias("TourData"))
+		// This needs to be constant and fixed, because it is used in the XSL transformation as an entry point of the xml.
+		xstream.autodetectAnnotations(true);
+		return xstream.toXML(this);
 	}
 }

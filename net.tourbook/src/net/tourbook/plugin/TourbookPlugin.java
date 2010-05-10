@@ -39,6 +39,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	public static final String		EXT_POINT_STATISTIC_YEAR				= "statisticYear";				//$NON-NLS-1$
 	public static final String		EXT_POINT_EXPORT_TOUR					= "exportTour";				//$NON-NLS-1$
+	public static final String		EXT_POINT_PRINT_TOUR					= "printTour";				//$NON-NLS-1$
 	public static final String		EXT_POINT_DEVICE_DATA_READER			= "deviceDataReader";			//$NON-NLS-1$
 	public static final String		EXT_POINT_EXTERNAL_DEVICE_DATA_READER	= "externalDeviceDataReader";	//$NON-NLS-1$
 

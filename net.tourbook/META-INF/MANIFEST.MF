@@ -28,6 +28,7 @@ Export-Package: net.tourbook,
  net.tourbook.data,
  net.tourbook.database,
  net.tourbook.export,
+ net.tourbook.printing,
  net.tourbook.importdata,
  net.tourbook.mapping,
  net.tourbook.plugin,
@@ -44,5 +45,7 @@ Import-Package: de.byteholder.geoclipse,
  de.byteholder.geoclipse.mapprovider,
  de.byteholder.geoclipse.preferences,
  de.byteholder.geoclipse.util,
- de.byteholder.gpx
+ de.byteholder.gpx,
+ net.tourbook.export,
+ net.tourbook.printing
 

@@ -33,6 +33,7 @@ import net.tourbook.export.ActionExport;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceView;
+import net.tourbook.printing.ActionPrint;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
@@ -170,6 +171,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionRefreshView				_actionRefreshView;
 
 	private ActionExport					_actionExportTour;
+	
+	private ActionPrint						_actionPrintTour;
 
 	private int								_selectedYear					= -1;
 	private int								_selectedMonth					= -1;
@@ -401,6 +404,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionExportTour = new ActionExport(this);
+		
+		_actionPrintTour = new ActionPrint(this);
 
 		fillActions();
 	}
@@ -1473,6 +1478,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		_actionExportTour.setEnabled(isTourSelected);
+		
+		_actionPrintTour.setEnabled(isTourSelected);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -1553,6 +1560,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionOpenTour);
 		menuMgr.add(_actionExportTour);
+		menuMgr.add(_actionPrintTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
