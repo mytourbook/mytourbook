@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -90,40 +90,40 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private static final int			COLUMN_HEIGHT			= 4;
 	private static final int			COLUMN_WEIGHT			= 5;
 
-	private TableViewer					fPeopleViewer;
-	private Button						fButtonAdd;
+	private TableViewer					_peopleViewer;
+	private Button						_btnAdd;
 //	private Button						fButtonDelete;
 
-	private Composite					fPersonDetailContainer;
-	private Text						fTextFirstName;
-	private Text						fTextLastName;
-	private Text						fTextHeight;
-	private Text						fTextWeight;
-	private Combo						fComboDevice;
-	private Combo						fComboBike;
-	private DirectoryFieldEditor		fRawDataPathEditor;
+	private Composite					_personDetailContainer;
+	private Text						_txtFirstName;
+	private Text						_txtLastName;
+	private Text						_txtHeight;
+	private Text						_txtWeight;
+	private Combo						_cboDevice;
+	private Combo						_cboBike;
+	private DirectoryFieldEditor		_rawDataPathEditor;
 
-	private ModifyListener				fTextFirstNameModifyListener;
-	private ModifyListener				fTextLastNameModifyListener;
-	private ModifyListener				fTextHeightModifyListener;
-	private ModifyListener				fTextWeightModifyListener;
-	private ModifyListener				fComboDeviceModifyListener;
-	private ModifyListener				fComboBikeModifyListener;
+	private ModifyListener				_textFirstNameModifyListener;
+	private ModifyListener				_textLastNameModifyListener;
+	private ModifyListener				_textHeightModifyListener;
+	private ModifyListener				_textWeightModifyListener;
+	private ModifyListener				_comboDeviceModifyListener;
+	private ModifyListener				_comboBikeModifyListener;
+	private IPropertyChangeListener		_prefChangeListener;
 
-	private ArrayList<TourPerson>		fPeople;
+	private ArrayList<TourPerson>		_people;
 
-	private TourPerson					fCurrentPerson;
-	private boolean						fIsPersonModified;
-	private TourBike[]					fBikes;
+	private TourPerson					_currentPerson;
+	private boolean						_isPersonModified;
+	private TourBike[]					_bikes;
 
 	/**
 	 * this device list has all the devices which are visible in the device combobox
 	 */
-	private ArrayList<ExternalDevice>	fDeviceList;
+	private ArrayList<ExternalDevice>	_deviceList;
 
-	private IPropertyChangeListener		fPrefChangeListener;
-	private boolean						fIsPersonListModified	= false;
-	protected boolean					fIsNewPerson			= false;
+	private boolean						_isPersonListModified	= false;
+	private boolean						_isNewPerson			= false;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -132,13 +132,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		public void dispose() {}
 
 		public Object[] getElements(final Object parent) {
-			if (fPeople == null) {
-				fPeople = TourDatabase.getTourPeople();
+			if (_people == null) {
+				_people = TourDatabase.getTourPeople();
 			}
-			if (fPeople == null) {
+			if (_people == null) {
 				return new Object[0];
 			} else {
-				return fPeople.toArray(new TourPerson[fPeople.size()]);
+				return _people.toArray(new TourPerson[_people.size()]);
 			}
 		}
 
@@ -157,7 +157,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return fIsPersonModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
+				return _isPersonModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
 
 			case COLUMN_FIRSTNAME:
 				return tourPerson.getFirstName();
@@ -170,7 +170,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				final String deviceId = tourPerson.getDeviceReaderId();
 
 				if (deviceId != null) {
-					for (final ExternalDevice device : fDeviceList) {
+					for (final ExternalDevice device : _deviceList) {
 						if (device != null && deviceId.equals(device.deviceId)) {
 							return device.visibleName;
 						}
@@ -190,20 +190,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void addModifyListener() {
 
-		fTextFirstName.addModifyListener(fTextFirstNameModifyListener);
-		fTextLastName.addModifyListener(fTextLastNameModifyListener);
-		fTextHeight.addModifyListener(fTextHeightModifyListener);
-		fTextWeight.addModifyListener(fTextWeightModifyListener);
+		_txtFirstName.addModifyListener(_textFirstNameModifyListener);
+		_txtLastName.addModifyListener(_textLastNameModifyListener);
+		_txtHeight.addModifyListener(_textHeightModifyListener);
+		_txtWeight.addModifyListener(_textWeightModifyListener);
 
-		fComboDevice.addModifyListener(fComboDeviceModifyListener);
-		fComboBike.addModifyListener(fComboBikeModifyListener);
+		_cboDevice.addModifyListener(_comboDeviceModifyListener);
+		_cboBike.addModifyListener(_comboBikeModifyListener);
 
-		fRawDataPathEditor.setPropertyChangeListener(new org.eclipse.jface.util.IPropertyChangeListener() {
+		_rawDataPathEditor.setPropertyChangeListener(new org.eclipse.jface.util.IPropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent event) {
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 
-					fIsPersonModified = true;
-					fPeopleViewer.update(fCurrentPerson, null);
+					_isPersonModified = true;
+					_peopleViewer.update(_currentPerson, null);
 
 					validatePerson();
 				}
@@ -214,7 +214,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -222,7 +222,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				if (property.equals(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED)) {
 
 					// create new bike list
-					fComboBike.removeAll();
+					_cboBike.removeAll();
 					createBikeList();
 
 					// update person details
@@ -232,22 +232,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		};
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createBikeList() {
 
 		// create bike list
-		fComboBike.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
+		_cboBike.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
 
 		final ArrayList<TourBike> bikes = TourDatabase.getTourBikes();
 
 		if (bikes == null) {
-			fBikes = new TourBike[0];
+			_bikes = new TourBike[0];
 		} else {
-			fBikes = bikes.toArray(new TourBike[bikes.size()]);
-			for (final TourBike bike : fBikes) {
-				fComboBike.add(bike.getName());
+			_bikes = bikes.toArray(new TourBike[bikes.size()]);
+			for (final TourBike bike : _bikes) {
+				_cboBike.add(bike.getName());
 			}
 		}
 	}
@@ -275,10 +275,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// enableButtons();
 		addPrefListener();
 
-		fPeopleViewer.setInput(this);
+		_peopleViewer.setInput(this);
 
 		// select first person
-		fPeopleViewer.getTable().setSelection(0);
+		_peopleViewer.getTable().setSelection(0);
 		showSelectedPersonDetails();
 		enableButtons(true);
 
@@ -290,17 +290,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		/*
 		 * field: bike
 		 */
-		lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		lbl = new Label(_personDetailContainer, SWT.NONE);
 		lbl.setText(Messages.Pref_People_Label_bike);
-		fComboBike = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fComboBike.setVisibleItemCount(10);
-		fComboBike.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		fComboBikeModifyListener = new ModifyListener() {
+		_cboBike = new Combo(_personDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_cboBike.setVisibleItemCount(10);
+		_cboBike.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		_comboBikeModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
-					int selectedIndex = fComboBike.getSelectionIndex();
+				if (_currentPerson != null) {
+					int selectedIndex = _cboBike.getSelectionIndex();
 					if (selectedIndex != -1) {
-						final TourBike personTourBike = fCurrentPerson.getTourBike();
+						final TourBike personTourBike = _currentPerson.getTourBike();
 						if (selectedIndex == 0) {
 							if (personTourBike == null) {
 								// person had no bike this was not changed
@@ -308,8 +308,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 							} else {
 								// person had before a bike which is now
 								// removed
-								fCurrentPerson.setTourBike(null);
-								fIsPersonModified = true;
+								_currentPerson.setTourBike(null);
+								_isPersonModified = true;
 							}
 							return;
 						}
@@ -317,16 +317,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 						// adjust to correct index in the bike array
 						selectedIndex--;
 
-						final TourBike selectedBike = fBikes[selectedIndex];
+						final TourBike selectedBike = _bikes[selectedIndex];
 
 						if (personTourBike == null || (personTourBike.getBikeId() != selectedBike.getBikeId())) {
 
-							fCurrentPerson.setTourBike(selectedBike);
-							fIsPersonModified = true;
+							_currentPerson.setTourBike(selectedBike);
+							_isPersonModified = true;
 						}
 
-						if (fIsPersonModified) {
-							fPeopleViewer.update(fCurrentPerson, null);
+						if (_isPersonModified) {
+							_peopleViewer.update(_currentPerson, null);
 						}
 					}
 				}
@@ -335,7 +335,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		createBikeList();
 		// filler
-		lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		lbl = new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -343,32 +343,32 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldDevice() {
 
-		final Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		final Label lbl = new Label(_personDetailContainer, SWT.NONE);
 		lbl.setText(Messages.Pref_People_Label_device);
 
-		fComboDevice = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fComboDevice.setVisibleItemCount(10);
-		fComboDevice.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		_cboDevice = new Combo(_personDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_cboDevice.setVisibleItemCount(10);
+		_cboDevice.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
-		fComboDeviceModifyListener = new ModifyListener() {
+		_comboDeviceModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
 
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 
 					final ExternalDevice device = getSelectedDevice();
 
-					if (device == null && fCurrentPerson.getDeviceReaderId() == null) {
+					if (device == null && _currentPerson.getDeviceReaderId() == null) {
 						return;
 					}
 
 					if (device == null
-							|| (device.deviceId != null && !device.deviceId.equals(fCurrentPerson.getDeviceReaderId()))) {
+							|| (device.deviceId != null && !device.deviceId.equals(_currentPerson.getDeviceReaderId()))) {
 
-						fCurrentPerson.setDeviceReaderId(device == null ? null : device.deviceId);
+						_currentPerson.setDeviceReaderId(device == null ? null : device.deviceId);
 
-						fIsPersonModified = true;
+						_isPersonModified = true;
 
-						fPeopleViewer.update(fCurrentPerson, null);
+						_peopleViewer.update(_currentPerson, null);
 					}
 				}
 				validatePerson();
@@ -376,26 +376,26 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		// spacer
-		new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 
 		// create device list
-		fDeviceList = new ArrayList<ExternalDevice>();
+		_deviceList = new ArrayList<ExternalDevice>();
 
 		// add special device
-		fDeviceList.add(null);
+		_deviceList.add(null);
 
 		// add all devices which can read from a device
 		final List<ExternalDevice> deviceList = DeviceManager.getExternalDeviceList();
 		for (final ExternalDevice device : deviceList) {
-			fDeviceList.add(device);
+			_deviceList.add(device);
 		}
 
 		// add all devices to the combobox
-		for (final ExternalDevice device : fDeviceList) {
+		for (final ExternalDevice device : _deviceList) {
 			if (device == null) {
-				fComboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
+				_cboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
 			} else {
-				fComboDevice.add(device.visibleName);
+				_cboDevice.add(device.visibleName);
 			}
 		}
 	}
@@ -405,20 +405,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldFirstName() {
 
-		final Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		final Label lbl = new Label(_personDetailContainer, SWT.NONE);
 		lbl.setText(Messages.Pref_People_Label_first_name);
 
-		fTextFirstName = new Text(fPersonDetailContainer, SWT.BORDER);
-		fTextFirstName.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		fTextFirstNameModifyListener = new ModifyListener() {
+		_txtFirstName = new Text(_personDetailContainer, SWT.BORDER);
+		_txtFirstName.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		_textFirstNameModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 					final String firstName = ((Text) (e.widget)).getText();
-					if (!firstName.equals(fCurrentPerson.getFirstName())) {
-						fIsPersonModified = true;
+					if (!firstName.equals(_currentPerson.getFirstName())) {
+						_isPersonModified = true;
 
-						fCurrentPerson.setFirstName(firstName);
-						fPeopleViewer.update(fCurrentPerson, null);
+						_currentPerson.setFirstName(firstName);
+						_peopleViewer.update(_currentPerson, null);
 					}
 				}
 				validatePerson();
@@ -426,7 +426,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		// spacer
-		new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -435,34 +435,34 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldHeight(final int floatInputWidth) {
 
 		final InputFieldFloat floatInput = new InputFieldFloat(
-				fPersonDetailContainer,
+				_personDetailContainer,
 				Messages.Pref_People_Label_height,
 				floatInputWidth);
 
-		fTextHeight = floatInput.getTextField();
+		_txtHeight = floatInput.getTextField();
 
-		fTextHeightModifyListener = new ModifyListener() {
+		_textHeightModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 					final Text control = (Text) e.widget;
 					try {
 						final float value = Float.parseFloat(((Text) (e.widget)).getText());
-						if (value != fCurrentPerson.getHeight()) {
-							fCurrentPerson.setHeight(value);
-							fPeopleViewer.update(fCurrentPerson, null);
+						if (value != _currentPerson.getHeight()) {
+							_currentPerson.setHeight(value);
+							_peopleViewer.update(_currentPerson, null);
 						}
 						UI.setDefaultColor(control);
 					} catch (final NumberFormatException e1) {
 						UI.setErrorColor(control);
 					}
-					fIsPersonModified = true;
+					_isPersonModified = true;
 					validatePerson();
 				}
 			}
 		};
 
 		// filler
-		new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -470,28 +470,28 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldLastName() {
 
-		final Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		final Label lbl = new Label(_personDetailContainer, SWT.NONE);
 		lbl.setText(Messages.Pref_People_Label_last_name);
 
-		fTextLastName = new Text(fPersonDetailContainer, SWT.BORDER);
+		_txtLastName = new Text(_personDetailContainer, SWT.BORDER);
 		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fTextLastName.setLayoutData(gd);
-		fTextLastNameModifyListener = new ModifyListener() {
+		_txtLastName.setLayoutData(gd);
+		_textLastNameModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 					final String lastName = ((Text) (e.widget)).getText();
-					if (!lastName.equals(fCurrentPerson.getLastName())) {
-						fCurrentPerson.setLastName(lastName);
-						fIsPersonModified = true;
+					if (!lastName.equals(_currentPerson.getLastName())) {
+						_currentPerson.setLastName(lastName);
+						_isPersonModified = true;
 
-						fPeopleViewer.update(fCurrentPerson, null);
+						_peopleViewer.update(_currentPerson, null);
 					}
 				}
 			}
 		};
 
 		// filler
-		new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -500,34 +500,34 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldWeight(final int floatInputWidth) {
 
 		final InputFieldFloat floatInput = new InputFieldFloat(
-				fPersonDetailContainer,
+				_personDetailContainer,
 				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
-		fTextWeight = floatInput.getTextField();
+		_txtWeight = floatInput.getTextField();
 
-		fTextWeightModifyListener = new ModifyListener() {
+		_textWeightModifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
+				if (_currentPerson != null) {
 					final Text control = (Text) e.widget;
 					try {
 						final float value = Float.parseFloat(((Text) (e.widget)).getText());
-						if (value != fCurrentPerson.getWeight()) {
-							fCurrentPerson.setWeight(value);
-							fPeopleViewer.update(fCurrentPerson, null);
+						if (value != _currentPerson.getWeight()) {
+							_currentPerson.setWeight(value);
+							_peopleViewer.update(_currentPerson, null);
 						}
 						UI.setDefaultColor(control);
 					} catch (final NumberFormatException e1) {
 						UI.setErrorColor(control);
 					}
-					fIsPersonModified = true;
+					_isPersonModified = true;
 					validatePerson();
 				}
 			}
 		};
 
 		// filler
-		new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	private void createPeopleViewer(final Composite container) {
@@ -568,29 +568,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		tc.setText(Messages.Pref_People_Column_weight);
 		layouter.addColumnData(new ColumnPixelData(convertHorizontalDLUsToPixels(8 * 4), true));
 
-		fPeopleViewer = new TableViewer(table);
+		_peopleViewer = new TableViewer(table);
 
-		fPeopleViewer.setContentProvider(new ClientsContentProvider());
-		fPeopleViewer.setLabelProvider(new ClientsLabelProvider());
+		_peopleViewer.setContentProvider(new ClientsContentProvider());
+		_peopleViewer.setLabelProvider(new ClientsLabelProvider());
 
-		fPeopleViewer.setSorter(new ViewerSorter() {
+		_peopleViewer.setSorter(new ViewerSorter() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return collator.compare(((TourPerson) e1).getLastName(), ((TourPerson) e2).getLastName());
 			}
 		});
 
-		fPeopleViewer.setComparator(new ViewerComparator() {
+		_peopleViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return ((TourPerson) e1).getLastName().compareTo(((TourPerson) e2).getLastName());
 			}
 		});
 
-		fPeopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_peopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-				if (fIsNewPerson) {
-					fIsNewPerson = false;
+				if (_isNewPerson) {
+					_isNewPerson = false;
 				} else {
 					savePerson();
 				}
@@ -599,10 +599,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			}
 		});
 
-		fPeopleViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				fTextFirstName.setFocus();
-				fTextFirstName.selectAll();
+				_txtFirstName.setFocus();
+				_txtFirstName.selectAll();
 			}
 		});
 	}
@@ -618,10 +618,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		container.setLayout(gridLayout);
 
 		// button: add
-		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText(Messages.Pref_People_Action_add_person);
-		setButtonLayoutData(fButtonAdd);
-		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+		_btnAdd = new Button(container, SWT.NONE);
+		_btnAdd.setText(Messages.Pref_People_Action_add_person);
+		setButtonLayoutData(_btnAdd);
+		_btnAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onAddPerson();
@@ -660,13 +660,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		groupPersonInfo.setLayoutData(gd);
 
-		fPersonDetailContainer = new Composite(groupPersonInfo, SWT.NONE);
+		_personDetailContainer = new Composite(groupPersonInfo, SWT.NONE);
 		gl = new GridLayout(3, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
-		fPersonDetailContainer.setLayout(gl);
+		_personDetailContainer.setLayout(gl);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fPersonDetailContainer.setLayoutData(gd);
+		_personDetailContainer.setLayoutData(gd);
 
 		createFieldFirstName();
 		createFieldLastName();
@@ -678,11 +678,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		/**
 		 * field: path to save raw tour data
 		 */
-		fRawDataPathEditor = new DirectoryFieldEditor(
+		_rawDataPathEditor = new DirectoryFieldEditor(
 				ITourbookPreferences.DUMMY_FIELD,
 				Messages.Pref_People_Label_rawdata_path,
-				fPersonDetailContainer);
-		fRawDataPathEditor.setEmptyStringAllowed(true);
+				_personDetailContainer);
+		_rawDataPathEditor.setEmptyStringAllowed(true);
 
 		// placeholder
 		new Label(parent, SWT.NONE);
@@ -739,8 +739,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	@Override
 	public void dispose() {
 
-		if (fPrefChangeListener != null) {
-			TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		if (_prefChangeListener != null) {
+			TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 		}
 
 		super.dispose();
@@ -752,30 +752,30 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 //		boolean isPersonSelected = !selection.isEmpty();
 
-		fButtonAdd.setEnabled(fCurrentPerson == null || (fCurrentPerson != null && isPersonValid));
+		_btnAdd.setEnabled(_currentPerson == null || (_currentPerson != null && isPersonValid));
 
 		// fButtonDelete.setEnabled(isPersonSelected);
 	}
 
 	private void firePersonListModifyEvent() {
-		if (fIsPersonListModified) {
+		if (_isPersonListModified) {
 
 			// fire bike list modify event
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED, Math.random());
 
-			fIsPersonListModified = false;
+			_isPersonListModified = false;
 		}
 	}
 
 	private ExternalDevice getSelectedDevice() {
 
-		final int selectedIndex = fComboDevice.getSelectionIndex();
+		final int selectedIndex = _cboDevice.getSelectionIndex();
 
 		if (selectedIndex == -1 || selectedIndex == 0) {
 			return null;
 		}
 
-		return fDeviceList.get(selectedIndex);
+		return _deviceList.get(selectedIndex);
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -797,32 +797,32 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		savePerson();
 
-		fCurrentPerson = new TourPerson();
+		_currentPerson = new TourPerson();
 
-		fCurrentPerson.setLastName(""); //$NON-NLS-1$
-		fCurrentPerson.setFirstName(""); //$NON-NLS-1$
-		fCurrentPerson.setHeight(1.77f);
-		fCurrentPerson.setWeight(80f);
+		_currentPerson.setLastName(""); //$NON-NLS-1$
+		_currentPerson.setFirstName(""); //$NON-NLS-1$
+		_currentPerson.setHeight(1.77f);
+		_currentPerson.setWeight(80f);
 
-		fPeople.add(fCurrentPerson);
+		_people.add(_currentPerson);
 
-		fIsPersonModified = true;
-		fIsPersonListModified = true;
+		_isPersonModified = true;
+		_isPersonListModified = true;
 
 		// update ui viewer
-		fPeopleViewer.add(fCurrentPerson);
-		fIsNewPerson = true;
-		fPeopleViewer.setSelection(new StructuredSelection(fCurrentPerson));
+		_peopleViewer.add(_currentPerson);
+		_isNewPerson = true;
+		_peopleViewer.setSelection(new StructuredSelection(_currentPerson));
 		validatePerson();
 
 		// edit first name
-		fTextFirstName.selectAll();
-		fTextFirstName.setFocus();
+		_txtFirstName.selectAll();
+		_txtFirstName.setFocus();
 	}
 
 	private void onDeletePerson() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fPeopleViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
 		if (selection.isEmpty()) {
 			return;
 		}
@@ -847,7 +847,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			@SuppressWarnings("unchecked")
 			public void run() {
 
-				final Table table = fPeopleViewer.getTable();
+				final Table table = _peopleViewer.getTable();
 				final int lastIndex = table.getSelectionIndex();
 
 				for (final Iterator<TourPerson> iter = selection.iterator(); iter.hasNext();) {
@@ -856,22 +856,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					deletePerson(person);
 
 					// remove from data model
-					fPeople.remove(person);
+					_people.remove(person);
 				}
 
 				// remove from ui
-				fPeopleViewer.remove(selection.toArray());
+				_peopleViewer.remove(selection.toArray());
 
 				// select next person
-				if (lastIndex >= fPeople.size()) {
-					table.setSelection(fPeople.size() - 1);
+				if (lastIndex >= _people.size()) {
+					table.setSelection(_people.size() - 1);
 				} else {
 					table.setSelection(lastIndex);
 				}
 
-				fCurrentPerson = null;
-				fIsPersonModified = false;
-				fIsPersonListModified = true;
+				_currentPerson = null;
+				_isPersonModified = false;
+				_isPersonListModified = true;
 
 				showSelectedPersonDetails();
 			}
@@ -897,15 +897,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void removeModifyListener() {
 
-		fTextFirstName.removeModifyListener(fTextFirstNameModifyListener);
-		fTextLastName.removeModifyListener(fTextLastNameModifyListener);
-		fTextHeight.removeModifyListener(fTextHeightModifyListener);
-		fTextWeight.removeModifyListener(fTextWeightModifyListener);
+		_txtFirstName.removeModifyListener(_textFirstNameModifyListener);
+		_txtLastName.removeModifyListener(_textLastNameModifyListener);
+		_txtHeight.removeModifyListener(_textHeightModifyListener);
+		_txtWeight.removeModifyListener(_textWeightModifyListener);
 
-		fComboDevice.addModifyListener(fComboDeviceModifyListener);
-		fComboBike.addModifyListener(fComboBikeModifyListener);
+		_cboDevice.addModifyListener(_comboDeviceModifyListener);
+		_cboBike.addModifyListener(_comboBikeModifyListener);
 
-		fRawDataPathEditor.setPropertyChangeListener(null);
+		_rawDataPathEditor.setPropertyChangeListener(null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -917,9 +917,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" WHERE TourData.tourPerson.personId=" + person.getPersonId())); //$NON-NLS-1$
+			final Query query = em.createQuery(//
+					"SELECT tourData" //$NON-NLS-1$
+							+ (" FROM TourData as tourData") //$NON-NLS-1$
+							+ (" WHERE tourData.tourPerson.personId=" + person.getPersonId())); //$NON-NLS-1$
 
 			final ArrayList<TourData> tourDataList = (ArrayList<TourData>) query.getResultList();
 
@@ -960,18 +961,18 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void savePerson() {
 
-		if (fCurrentPerson != null && fIsPersonModified && validatePerson()) {
+		if (_currentPerson != null && _isPersonModified && validatePerson()) {
 
-			fCurrentPerson.setRawDataPath(fRawDataPathEditor.getStringValue());
-			fCurrentPerson.persist();
+			_currentPerson.setRawDataPath(_rawDataPathEditor.getStringValue());
+			_currentPerson.persist();
 
 			// update modify flag before the viewer is updated
-			fIsPersonModified = false;
-			fIsPersonListModified = true;
+			_isPersonModified = false;
+			_isPersonListModified = true;
 
-			fPeopleViewer.update(fCurrentPerson, null);
+			_peopleViewer.update(_currentPerson, null);
 
-			fIsPersonModified = false;
+			_isPersonModified = false;
 		}
 
 	}
@@ -985,13 +986,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		int bikeIndex = 0;
 		final TourBike personBike = person.getTourBike();
 
-		if (personBike == null || fBikes == null) {
-			fComboBike.select(0);
+		if (personBike == null || _bikes == null) {
+			_cboBike.select(0);
 		} else {
 			boolean isBikeFound = false;
-			for (final TourBike bike : fBikes) {
+			for (final TourBike bike : _bikes) {
 				if (personBike.getBikeId() == bike.getBikeId()) {
-					fComboBike.select(bikeIndex + 1);
+					_cboBike.select(bikeIndex + 1);
 					isBikeFound = true;
 					break;
 				}
@@ -1000,7 +1001,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			// when the bike id was not found, select "no selection" entry
 			if (!isBikeFound) {
-				fComboBike.select(0);
+				_cboBike.select(0);
 			}
 		}
 	}
@@ -1013,16 +1014,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId == null) {
-			fComboDevice.select(0);
+			_cboDevice.select(0);
 		} else {
 
 			int deviceIndex = 0;
 
-			for (final ExternalDevice device : fDeviceList) {
+			for (final ExternalDevice device : _deviceList) {
 
 				if (device != null) {
 					if (deviceId.equals(device.deviceId)) {
-						fComboDevice.select(deviceIndex);
+						_cboDevice.select(deviceIndex);
 						break;
 					}
 				}
@@ -1032,7 +1033,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			// when the device id was not found, select "no selection" entry
 			if (deviceIndex == 0) {
-				fComboDevice.select(0);
+				_cboDevice.select(0);
 			}
 		}
 	}
@@ -1042,7 +1043,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void showSelectedPersonDetails() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fPeopleViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
 
 		final Object item = selection.getFirstElement();
 		boolean isEnabled = true;
@@ -1050,69 +1051,69 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		if (item instanceof TourPerson) {
 
 			final TourPerson person = (TourPerson) item;
-			fCurrentPerson = person;
+			_currentPerson = person;
 
 			removeModifyListener();
 
-			fTextFirstName.setText(person.getFirstName());
-			fTextLastName.setText(person.getLastName());
-			fTextHeight.setText(Float.toString(person.getHeight()));
-			fTextWeight.setText(Float.toString(person.getWeight()));
+			_txtFirstName.setText(person.getFirstName());
+			_txtLastName.setText(person.getLastName());
+			_txtHeight.setText(Float.toString(person.getHeight()));
+			_txtWeight.setText(Float.toString(person.getWeight()));
 
 			selectDevice(person);
 			selectBike(person);
 
-			fRawDataPathEditor.setStringValue(person.getRawDataPath());
+			_rawDataPathEditor.setStringValue(person.getRawDataPath());
 
 			addModifyListener();
 
 		} else {
 
 			isEnabled = false;
-			fCurrentPerson = null;
+			_currentPerson = null;
 
-			fTextFirstName.setText(""); //$NON-NLS-1$
-			fTextLastName.setText(""); //$NON-NLS-1$
-			fTextHeight.setText(""); //$NON-NLS-1$
-			fTextWeight.setText(""); //$NON-NLS-1$
+			_txtFirstName.setText(""); //$NON-NLS-1$
+			_txtLastName.setText(""); //$NON-NLS-1$
+			_txtHeight.setText(""); //$NON-NLS-1$
+			_txtWeight.setText(""); //$NON-NLS-1$
 
-			fComboDevice.select(0);
-			fComboBike.select(0);
+			_cboDevice.select(0);
+			_cboBike.select(0);
 
-			fRawDataPathEditor.setStringValue(null);
+			_rawDataPathEditor.setStringValue(null);
 		}
 
-		fTextFirstName.setEnabled(isEnabled);
-		fTextLastName.setEnabled(isEnabled);
-		fTextHeight.setEnabled(isEnabled);
-		fTextWeight.setEnabled(isEnabled);
+		_txtFirstName.setEnabled(isEnabled);
+		_txtLastName.setEnabled(isEnabled);
+		_txtHeight.setEnabled(isEnabled);
+		_txtWeight.setEnabled(isEnabled);
 
-		fComboBike.setEnabled(isEnabled);
-		fComboDevice.setEnabled(isEnabled);
-		fRawDataPathEditor.setEnabled(isEnabled, fPersonDetailContainer);
+		_cboBike.setEnabled(isEnabled);
+		_cboDevice.setEnabled(isEnabled);
+		_rawDataPathEditor.setEnabled(isEnabled, _personDetailContainer);
 	}
 
 	private boolean validatePerson() {
 
 		boolean isValid = false;
 
-		if (fCurrentPerson == null) {
+		if (_currentPerson == null) {
 
 			isValid = true;
 
-		} else if (fTextFirstName.getText().trim().equals("")) { //$NON-NLS-1$
+		} else if (_txtFirstName.getText().trim().equals("")) { //$NON-NLS-1$
 
 			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-		} else if (!fRawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
-				&& !fRawDataPathEditor.isValid()) {
+		} else if (!_rawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
+				&& !_rawDataPathEditor.isValid()) {
 
 			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 
 		} else {
 			try {
-				Float.parseFloat(fTextHeight.getText());
-				Float.parseFloat(fTextWeight.getText());
+				Float.parseFloat(_txtHeight.getText());
+				Float.parseFloat(_txtWeight.getText());
 				isValid = true;
 			} catch (final NumberFormatException e) {
 				setErrorMessage(Messages.Pref_People_Error_invalid_number);
@@ -1122,12 +1123,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		enableButtons(isValid);
 
 		if (isValid) {
-			fPeopleViewer.getTable().setEnabled(true);
+			_peopleViewer.getTable().setEnabled(true);
 			setErrorMessage(null);
 			return true;
 		} else {
 
-			fPeopleViewer.getTable().setEnabled(false);
+			_peopleViewer.getTable().setEnabled(false);
 			return false;
 		}
 	}

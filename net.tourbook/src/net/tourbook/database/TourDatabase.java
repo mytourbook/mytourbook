@@ -95,23 +95,24 @@ public class TourDatabase {
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
-	 * database tables
+	 * database tables, renamed table names to uppercase otherwise conn.getMetaData().getColumns()
+	 * would not work !!!
 	 */
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
-	private static final String					TABLE_DB_VERSION							= "DbVersion";											//$NON-NLS-1$
+	private static final String					TABLE_DB_VERSION							= "DBVERSION";											// "DbVersion";			//$NON-NLS-1$
 
-	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
-	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_DATA								= "TourData";											//$NON-NLS-1$
-	public static final String					TABLE_TOUR_MARKER							= "TourMarker";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_WAYPOINT							= "TourWayPoint";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_PERSON							= "TourPerson";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_REFERENCE						= "TourReference";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TAG								= "TourTag";											//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TYPE								= "TourType";											//$NON-NLS-1$
+	public static final String					TABLE_TOUR_BIKE								= "TOURBIKE";											//"TourBike";			//$NON-NLS-1$
+	public static final String					TABLE_TOUR_CATEGORY							= "TOURCATEGORY";										// "TourCategory";		//$NON-NLS-1$
+	public static final String					TABLE_TOUR_COMPARED							= "TOURCOMPARED";										// "TourCompared";		//$NON-NLS-1$
+	public static final String					TABLE_TOUR_DATA								= "TOURDATA";											// "TourData";			//$NON-NLS-1$
+	public static final String					TABLE_TOUR_MARKER							= "TOURMARKER";										// "TourMarker";			//$NON-NLS-1$
+	public static final String					TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";										// "TourWayPoint";		//$NON-NLS-1$
+	public static final String					TABLE_TOUR_PERSON							= "TOURPERSON";										// "TourPerson";			//$NON-NLS-1$
+	public static final String					TABLE_TOUR_REFERENCE						= "TOURREFERENCE";										// "TourReference";		//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG								= "TOURTAG";											// "TourTag";			//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";									// "TourTagCategory";	//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TYPE								= "TOURTYPE";											// "TourType";			//$NON-NLS-1$
 
 	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);			//$NON-NLS-1$
@@ -128,13 +129,16 @@ public class TourDatabase {
 	 */
 	public static final int						ENTITY_IS_NOT_SAVED							= -1;
 
+	/**
+	 * maximum length for a tour description
+	 */
+	public static final int						MAX_DESCRIPTION_LENGTH						= 32000;
+
 	private static TourDatabase					_instance;
 
 	private static NetworkServerControl			_server;
-
 	private static EntityManagerFactory			_emFactory;
-
-	private ComboPooledDataSource				_pooledDataSource;
+	private static ComboPooledDataSource		_pooledDataSource;
 
 	private static ArrayList<TourType>			_activeTourTypes;
 	private static ArrayList<TourType>			_tourTypes;
@@ -178,7 +182,160 @@ public class TourDatabase {
 		}
 	}
 
+	private class DatabaseColumn {
+
+	}
+
 	private TourDatabase() {}
+
+//	public String[] getColumnsNames(String table) {
+//		String query = "select * from bornes";
+//		String[] names;
+//		try {
+//			PreparedStatement pstmt;
+//			ResultSetMetaData rsmd;
+//			int numColumns, i = 1;
+//			pstmt = conn.prepareStatement(query);
+//			rsmd = pstmt.getMetaData();
+//			numColumns = rsmd.getColumnCount();
+//			while (i <= numColumns) {
+//				String str = rsmd.getColumnName(i);
+//				System.out.println(str);
+//				vNames.add(str);
+//				i++;
+//			}
+//		} catch (SQLException sqle) {
+//			System.out.println(sqle.toString());
+//		} catch (Exception e) {
+//			System.out.println("getColumnNames: " + e.toString());
+//			e.printStackTrace();
+//		}
+//		names = new String[vNames.size()];
+//		for (int i = 0; i < vNames.size(); i++) {
+//			names[i] = new String(vNames.elementAt(i));
+//		}
+//		try {
+//			conn.close();
+//		} catch (SQLException sqle) {
+//			System.out.println("close: " + sqle.toString());
+//			sqle.printStackTrace();
+//		}
+//		return names;
+//	}
+
+	public static boolean checkFieldLength(final String fieldContent, final int maxLength) {
+
+		final HashMap<String, DatabaseColumn> _tableTourData = new HashMap<String, DatabaseColumn>();
+
+		Connection conn = null;
+		try {
+
+//			/*
+//			 * Check if the tourdata table exists
+//			 */
+//			final DatabaseMetaData metaData = conn.getMetaData();
+//
+//			final ResultSet columns = metaData.getColumns(null, TABLE_SCHEMA, TABLE_TOUR_DATA, null);
+//			while (columns.next()) {
+//				final String name = columns.getString("COLUMN_NAME");
+//				final String pos = columns.getString("ORDINAL_POSITION");
+//				final String type = columns.getString("TYPE_NAME");
+//				System.out.println("name = " + name + ", pos = " + pos + ", type = " + type);
+//			}
+
+			conn = getPooledConnection();
+
+			final DatabaseMetaData metaData = conn.getMetaData();
+			final ResultSet dbTables = metaData.getTables(null, null, null, null);
+
+			while (dbTables.next()) {
+
+				if (dbTables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
+
+					/**
+					 * <pre>
+					 * 
+					 * Each column description has the following columns:
+					 * 
+					 * 1 TABLE_CAT			String => table catalog (may be null)
+					 * 2 TABLE_SCHEM		String => table schema (may be null)
+					 * 3 TABLE_NAME			String => table name
+					 * 4 COLUMN_NAME		String => column name
+					 * 5 DATA_TYPE			int => SQL type from java.sql.Types
+					 * 6 TYPE_NAME			String => Data source dependent type name, for a UDT the type name is fully qualified
+					 * 7 COLUMN_SIZE		int => column size.
+					 * 8 BUFFER_LENGTH is not used.
+					 * 9 DECIMAL_DIGITS		int => the number of fractional digits. Null is returned for data types where DECIMAL_DIGITS is not applicable.
+					 * 10 NUM_PREC_RADIX	int => Radix (typically either 10 or 2)
+					 * 11 NULLABLE			int => is NULL allowed.
+					 *  	columnNoNulls - might not allow NULL values
+					 *  	columnNullable - definitely allows NULL values
+					 *  	columnNullableUnknown - nullability unknown
+					 * 12 REMARKS 			String => comment describing column (may be null)
+					 * 13 COLUMN_DEF		String => default value for the column, which should be interpreted as a string when the value is enclosed in single quotes (may be null)
+					 * 14 SQL_DATA_TYPE 	int => unused
+					 * 15 SQL_DATETIME_SUB 	int => unused
+					 * 16 CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column
+					 * 17 ORDINAL_POSITION 	int => index of column in table (starting at 1)
+					 * 18 IS_NULLABLE 		String => ISO rules are used to determine the nullability for a column.
+					 *  	YES --- if the parameter can include NULLs
+					 *  	NO --- if the parameter cannot include NULLs
+					 *  	empty string --- if the nullability for the parameter is unknown
+					 * 19 SCOPE_CATLOG 		String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF)
+					 * 20 SCOPE_SCHEMA 		String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF)
+					 * 21 SCOPE_TABLE 		String => table name that this the scope of a reference attribure (null if the DATA_TYPE isn't REF)
+					 * 22 SOURCE_DATA_TYPE	short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE isn't DISTINCT or user-generated REF)
+					 * 23 IS_AUTOINCREMENT	String => Indicates whether this column is auto incremented
+					 * 		YES --- if the column is auto incremented
+					 * 		NO --- if the column is not auto incremented
+					 * 		empty string --- if it cannot be determined whether the column is auto incremented parameter is unknown
+					 * 
+					 * The COLUMN_SIZE column the specified column size for the given column. For numeric data, this is the maximum precision. For character data, this is the length in characters. For datetime datatypes, this is the length in characters of the String representation (assuming the maximum allowed precision of the fractional seconds component). For binary data, this is the length in bytes. For the ROWID datatype, this is the length in bytes. Null is returned for data types where the column size is not applicable.
+					 * 
+					 * </pre>
+					 */
+
+					final ResultSet dbColumns = metaData.getColumns(null, null, TABLE_TOUR_DATA, null);
+
+					System.out.println("getRow()\t" + dbColumns.getRow());
+					// TODO remove SYSTEM.OUT.PRINTLN
+
+					while (dbColumns.next()) {
+
+						System.out.println(dbColumns.getString(6)
+								+ "\t"
+								+ dbColumns.getInt(7)
+								+ "\t"
+								+ dbColumns.getString(4));
+						// TODO remove SYSTEM.OUT.PRINTLN
+
+//						dbColumns.
+
+					}
+
+				}
+			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+			try {
+				conn.close();
+			} catch (final SQLException e) {
+				UI.showSQLException(e);
+			}
+		}
+
+//		if (fieldContent.length() >= maxLength) {
+//
+//			MessageDialog.openInformation(
+//					Display.getDefault().getActiveShell(),
+//					Messages.Tour_Database_Dialog_CheckFieldLength_Title,
+//					NLS.bind(Messages.Tour_Database_Dialog_CheckFieldLength_Message, new Object[] {}));
+//		}
+
+		return false;
+	}
 
 	/**
 	 * removes all tour tags which are loaded from the database so the next time they will be
@@ -424,8 +581,7 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourTag" //$NON-NLS-1$
-					+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$ //$NON-NLS-2$
+			final Query query = em.createQuery("SELECT tourTag FROM TourTag AS tourTag"); //$NON-NLS-1$
 
 			_tourTags = new HashMap<Long, TourTag>();
 
@@ -455,9 +611,11 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourType" //$NON-NLS-1$
-					+ (" FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
+			final Query query = em.createQuery(//
+					//
+					"SELECT tourType" //$NON-NLS-1$
+							+ (" FROM TourType AS tourType") //$NON-NLS-1$
+							+ (" ORDER  BY tourType.name")); //$NON-NLS-1$
 
 			_tourTypes = (ArrayList<TourType>) query.getResultList();
 
@@ -472,6 +630,38 @@ public class TourDatabase {
 			_instance = new TourDatabase();
 		}
 		return _instance;
+	}
+
+	private static Connection getPooledConnection() throws SQLException {
+
+		if (_pooledDataSource == null) {
+			try {
+
+				_pooledDataSource = new ComboPooledDataSource();
+
+				//loads the jdbc driver
+				_pooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
+				_pooledDataSource.setJdbcUrl(DERBY_URL);
+				_pooledDataSource.setUser(TABLE_SCHEMA);
+				_pooledDataSource.setPassword(TABLE_SCHEMA);
+
+				_pooledDataSource.setMaxPoolSize(100);
+				_pooledDataSource.setMaxStatements(100);
+				_pooledDataSource.setMaxStatementsPerConnection(20);
+
+			} catch (final PropertyVetoException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Connection conn = null;
+		try {
+			conn = _pooledDataSource.getConnection();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return conn;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -502,20 +692,24 @@ public class TourDatabase {
 		/*
 		 * read tag categories from db
 		 */
-		Query query = em.createQuery("SELECT TourTagCategory " //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS TourTagCategory ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTagCategory.isRoot = 1") //$NON-NLS-1$
-				+ (" ORDER  BY TourTagCategory.name")); //$NON-NLS-1$
+		Query query = em.createQuery(//
+				//
+				"SELECT ttCategory" //$NON-NLS-1$
+						+ (" FROM TourTagCategory AS ttCategory") //$NON-NLS-1$
+						+ (" WHERE ttCategory.isRoot=1") //$NON-NLS-1$
+						+ (" ORDER  BY ttCategory.name")); //$NON-NLS-1$
 
 		rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
 		/*
 		 * read tour tags from db
 		 */
-		query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " AS TourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTag.isRoot = 1") //$NON-NLS-1$
-				+ (" ORDER  BY TourTag.name")); //$NON-NLS-1$
+		query = em.createQuery(//
+				//
+				"SELECT tourTag" //$NON-NLS-1$
+						+ (" FROM TourTag AS tourTag ") //$NON-NLS-1$
+						+ (" WHERE tourTag.isRoot=1") //$NON-NLS-1$
+						+ (" ORDER  BY tourTag.name")); //$NON-NLS-1$
 
 		rootEntry.tourTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -632,9 +826,11 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourBike " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_BIKE + " TourBike ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ORDER  BY TourBike.name")); //$NON-NLS-1$
+			final Query query = em.createQuery(//
+					//
+					"SELECT tourBike" //$NON-NLS-1$
+							+ (" FROM TourBike AS tourBike ") //$NON-NLS-1$
+							+ (" ORDER  BY tourBike.name")); //$NON-NLS-1$
 
 			bikeList = (ArrayList<TourBike>) query.getResultList();
 
@@ -673,9 +869,11 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ORDER  BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
+			final Query query = em.createQuery(//
+					//
+					"SELECT TourPerson" //$NON-NLS-1$
+							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
+							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
 
 			tourPeople = (ArrayList<TourPerson>) query.getResultList();
 
@@ -1351,9 +1549,11 @@ public class TourDatabase {
 			return;
 		}
 
+		Connection conn = null;
+
 		try {
 
-			final Connection conn = getPooledConnection();
+			conn = getPooledConnection();
 
 			/*
 			 * Check if the tourdata table exists
@@ -1362,7 +1562,6 @@ public class TourDatabase {
 			final ResultSet tables = metaData.getTables(null, null, null, null);
 			while (tables.next()) {
 				if (tables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
-					conn.close();
 					return;
 				}
 			}
@@ -1407,10 +1606,16 @@ public class TourDatabase {
 				}
 			}
 
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (final SQLException e) {
+				UI.showSQLException(e);
+			}
 		}
 	}
 
@@ -1663,8 +1868,8 @@ public class TourDatabase {
 				+ "avgTemperature		INTEGER,			\n" //$NON-NLS-1$
 				+ "maxSpeed				FLOAT,				\n" //$NON-NLS-1$
 				+ "tourTitle			VARCHAR(255),		\n" //$NON-NLS-1$
-// OLD			+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$ // version <= 9
-				+ "tourDescription		VARCHAR(32000),		\n" //$NON-NLS-1$ // modified in version 10
+// OLD			+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$ 										// version <= 9
+				+ "tourDescription		VARCHAR(" + MAX_DESCRIPTION_LENGTH + "),	\n" //$NON-NLS-1$ //$NON-NLS-2$	// modified in version 10
 				+ "tourStartPlace		VARCHAR(255),		\n" //$NON-NLS-1$
 				+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
 				+ "calories				INTEGER,			\n" //$NON-NLS-1$
@@ -2111,8 +2316,8 @@ public class TourDatabase {
 				+ "   time				BIGINT,					\n" //							//$NON-NLS-1$
 				+ "   altitude			FLOAT,					\n" //							//$NON-NLS-1$
 				+ "   name				VARCHAR(1024),			\n" //							//$NON-NLS-1$
-				+ "   description		VARCHAR(32000),			\n" //							//$NON-NLS-1$
-				+ "   comment			VARCHAR(32000),			\n" //							//$NON-NLS-1$
+				+ "   description		VARCHAR(" + MAX_DESCRIPTION_LENGTH + "),	\n" //		//$NON-NLS-1$ //$NON-NLS-2$
+				+ "   comment			VARCHAR(" + MAX_DESCRIPTION_LENGTH + "),	\n" //		//$NON-NLS-1$ //$NON-NLS-2$
 				+ "   symbol			VARCHAR(4096),			\n" //							//$NON-NLS-1$
 				+ "   category			VARCHAR(4096)			\n" //							//$NON-NLS-1$
 				//
@@ -2253,39 +2458,6 @@ public class TourDatabase {
 
 			return em;
 		}
-	}
-
-	private Connection getPooledConnection() throws SQLException {
-
-		if (_pooledDataSource == null) {
-			try {
-
-				_pooledDataSource = new ComboPooledDataSource();
-
-				//loads the jdbc driver
-				_pooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
-				_pooledDataSource.setJdbcUrl(DERBY_URL);
-				_pooledDataSource.setUser(TABLE_SCHEMA);
-				_pooledDataSource.setPassword(TABLE_SCHEMA);
-
-				_pooledDataSource.setMaxPoolSize(100);
-				_pooledDataSource.setMaxStatements(100);
-				_pooledDataSource.setMaxStatementsPerConnection(20);
-
-			} catch (final PropertyVetoException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Connection conn = null;
-		try {
-			conn = _pooledDataSource.getConnection();
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-//			throw e;
-		}
-
-		return conn;
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {
@@ -2779,7 +2951,9 @@ public class TourDatabase {
 			 * </pre>
 			 */
 
-			final String sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN tourDescription SET DATA TYPE VARCHAR(32000) "; //$NON-NLS-1$ //$NON-NLS-2$
+			final String sql = "ALTER TABLE " + TABLE_TOUR_DATA //$NON-NLS-1$
+					+ " ALTER COLUMN tourDescription" //$NON-NLS-1$
+					+ " SET DATA TYPE VARCHAR(" + MAX_DESCRIPTION_LENGTH + ") "; //$NON-NLS-1$ //$NON-NLS-2$
 
 			System.out.println(sql);
 			statement.execute(sql);

@@ -230,6 +230,11 @@ public class Messages extends NLS {
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
+
+	public static String	Dialog_JoinTours_Checkbox_IncludeDescription;
+
+	public static String	Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
+
 	public static String	Dialog_JoinTours_ComboText_ConcatenateTime;
 
 	public static String	Dialog_JoinTours_ComboText_KeepTime;
@@ -260,7 +265,11 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
 	public static String		Dialog_JoinTours_InvalidData_Time;
+	public static String	Dialog_JoinTours_Label_CreateTourMarker;
+
 	public static String	Dialog_JoinTours_Label_DefaultTitle;
+
+	public static String	Dialog_JoinTours_Label_Description;
 
 	public static String		Dialog_JoinTours_Label_DeviceName;
 	public static String		Dialog_JoinTours_Label_OtherFields;
@@ -720,6 +729,10 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
+
+	public static String	Tour_Database_Dialog_CheckFieldLength_Message;
+
+	public static String	Tour_Database_Dialog_CheckFieldLength_Title;
 
 	public static String		Tour_Database_load_all_tours;
 

@@ -74,6 +74,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
 	private static final String					STATE_TITLE								= "Title";							//$NON-NLS-1$
 
+	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";			//$NON-NLS-1$
+	private static final String					STATE_IS_INCLUDE_MARKER_WAYPOINTS		= "isIncludeMarkerWaypoints";		//$NON-NLS-1$
+
 	private static final String					STATE_IS_CREATE_TOUR_MARKER				= "isCreateTourMarker";			//$NON-NLS-1$
 	private static final String					STATE_MARKER_TYPE						= "TourMarkerType";				//$NON-NLS-1$
 	private static final String					STATE_MARKER_TYPE_SMALL					= "small";							//$NON-NLS-1$
@@ -172,6 +175,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 	private Link								_linkTag;
 	private Label								_lblTourTags;
 
+	private Button								_chkIncludeDescription;
+	private Button								_chkIncludeMarkerWaypoints;
 	private Button								_chkCreateTourMarker;
 	private Label								_lblMarkerText;
 	private Combo								_cboTourMarker;
@@ -348,13 +353,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
 		_dlgInnerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
-		GridLayoutFactory.swtDefaults().numColumns(3).spacing(5, 8).applyTo(_dlgInnerContainer);
+		GridLayoutFactory.swtDefaults().numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
 //		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI10Title(_dlgInnerContainer);
 			createUI20TourTime(_dlgInnerContainer, defaultSelectionAdapter);
 			createUI30TypeTags(_dlgInnerContainer);
-			createUI40Marker(_dlgInnerContainer, defaultSelectionAdapter);
+			createUI40DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
 			createUI50Info(_dlgInnerContainer);
 		}
 	}
@@ -520,16 +525,43 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 	/**
 	 * checkbox: set marker for each tour
 	 */
-	private void createUI40Marker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+	private void createUI40DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
 
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-		label.setText(Messages.Dialog_JoinTours_Label_TourMarker);
+		/*
+		 * description
+		 */
+//		Label label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+//		label.setText(Messages.Dialog_JoinTours_Label_Description);
+
+		// checkbox
+		_chkIncludeDescription = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(3, 1).indent(0, 10).applyTo(_chkIncludeDescription);
+		_chkIncludeDescription.setText(Messages.Dialog_JoinTours_Checkbox_IncludeDescription);
+
+		/*
+		 * include existing tour marker
+		 */
+//		label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+//		label.setText(Messages.Dialog_JoinTours_Label_TourMarker);
+
+		// checkbox
+		_chkIncludeMarkerWaypoints = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkIncludeMarkerWaypoints);
+		_chkIncludeMarkerWaypoints.setText(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints);
+
+		/*
+		 * create tour marker
+		 */
+//		label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+//		label.setText(Messages.Dialog_JoinTours_Label_CreateTourMarker);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-				.span(2, 1)
+				.span(3, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(0, 3).applyTo(container);
 		{
@@ -699,7 +731,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 	/**
 	 * Join the tours and create a new tour
 	 */
-	private void joinTours() {
+	private boolean joinTours() {
 
 		final boolean isOriginalTime = getStateJoinedTime().equals(STATE_JOINED_TIME_ORIGINAL);
 
@@ -939,39 +971,51 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 				joinedSerieIndex++;
 			}
 
-			/*
-			 * copy tour markers
-			 */
 			final Set<TourMarker> tourMarkers = tourTourData.getTourMarkers();
-			for (final TourMarker tourMarker : tourMarkers) {
 
-				final TourMarker clonedMarker = tourMarker.clone(_joinedTourData);
+			if (_chkIncludeMarkerWaypoints.getSelection()) {
 
-				int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
-				if (joinMarkerIndex >= joinedSliceCounter) {
-					joinMarkerIndex = joinedSliceCounter - 1;
+				/*
+				 * copy tour markers
+				 */
+				for (final TourMarker tourMarker : tourMarkers) {
+
+					final TourMarker clonedMarker = tourMarker.clone(_joinedTourData);
+
+					int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
+					if (joinMarkerIndex >= joinedSliceCounter) {
+						joinMarkerIndex = joinedSliceCounter - 1;
+					}
+
+					// a cloned marker has the same marker id, create a new id
+					clonedMarker.createMarkerId();
+
+					// adjust marker position, position is relativ to the tour start
+					clonedMarker.setSerieIndex(joinMarkerIndex);
+
+					if (isJoinTime) {
+						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+					}
+					if (isJoinDistance) {
+						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+					}
+
+					joinedTourMarker.add(clonedMarker);
 				}
 
-				// a cloned marker has the same marker id, create a new id
-				clonedMarker.createMarkerId();
-
-				// adjust marker position, position is relativ to the tour start
-				clonedMarker.setSerieIndex(joinMarkerIndex);
-
-				if (isJoinTime) {
-					tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+				/*
+				 * copy way points
+				 */
+				for (final TourWayPoint wayPoint : tourTourData.getTourWayPoints()) {
+					joinedWayPoints.add((TourWayPoint) wayPoint.clone());
 				}
-				if (isJoinDistance) {
-					tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
-				}
-
-				joinedTourMarker.add(clonedMarker);
 			}
 
-			/*
-			 * create a tour marker
-			 */
 			if (_chkCreateTourMarker.getSelection()) {
+
+				/*
+				 * create a tour marker
+				 */
 
 				// first find a free marker position in the tour
 				int tourMarkerIndex = -1;
@@ -1030,27 +1074,23 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 			}
 
 			/*
-			 * copy way points
-			 */
-			for (final TourWayPoint wayPoint : tourTourData.getTourWayPoints()) {
-				joinedWayPoints.add((TourWayPoint) wayPoint.clone());
-			}
-
-			/*
 			 * create description
 			 */
-			final String tourDescription = tourTourData.getTourDescription();
+			if (_chkIncludeDescription.getSelection()) {
 
-			if (joinedDescription.length() > 0) {
-				// set space between two tours
-				joinedDescription.append(UI.NEW_LINE2);
-			}
+				final String tourDescription = tourTourData.getTourDescription();
 
-			joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour);
-			joinedDescription.append(TourManager.getTourTitleDetailed(tourTourData));
-			if (tourDescription.length() > 0) {
-				joinedDescription.append(UI.NEW_LINE);
-				joinedDescription.append(tourDescription);
+				if (joinedDescription.length() > 0) {
+					// set space between two tours
+					joinedDescription.append(UI.NEW_LINE2);
+				}
+
+				joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour);
+				joinedDescription.append(TourManager.getTourTitleDetailed(tourTourData));
+				if (tourDescription.length() > 0) {
+					joinedDescription.append(UI.NEW_LINE);
+					joinedDescription.append(tourDescription);
+				}
 			}
 
 			/*
@@ -1085,6 +1125,16 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 			isFirstTour = false;
 			joinedTourStartIndex = joinedSerieIndex;
 			joinedTourStartDistance += relTourDistance;
+		}
+
+		/*
+		 * check description size
+		 */
+//		if (joinedDescription.length() >= TourDatabase.MAX_DESCRIPTION_LENGTH) {
+//
+//		}
+		if (TourDatabase.checkFieldLength(UI.EMPTY_STRING, 5) == false) {
+			return false;
 		}
 
 		/*
@@ -1157,17 +1207,25 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		_joinedTourData.setTourPerson(TourManager.getInstance().getActivePerson());
 
 		_joinedTourData = TourManager.saveModifiedTour(_joinedTourData);
+
+		return true;
 	}
+
 
 	@Override
 	protected void okPressed() {
 
-		joinTours();
+		TourDatabase.checkFieldLength("", 3);
 
-		// state must be set after the tour is saved because the tour type id is set when the tour is saved
-		saveState();
-
-		super.okPressed();
+		return;
+//		if (joinTours() == false) {
+//			return;
+//		}
+//
+//		// state must be set after the tour is saved because the tour type id is set when the tour is saved
+//		saveState();
+//
+//		super.okPressed();
 	}
 
 	private void onDispose() {
@@ -1216,7 +1274,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 				STATE_JOINED_TIME_ORIGINAL,
 				_cboJoinedTime);
 
-		// marker
+		// description/marker/waypoints
+		_chkIncludeDescription.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_DESCRIPTION, true));
+		_chkIncludeMarkerWaypoints.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_MARKER_WAYPOINTS, true));
 		_chkCreateTourMarker.setSelection(Util.getStateBoolean(_state, STATE_IS_CREATE_TOUR_MARKER, true));
 
 		/*
@@ -1241,7 +1301,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		// joined time
 		_state.put(STATE_JOINED_TIME, getStateJoinedTime());
 
-		// marker
+		// description/marker
+		_state.put(STATE_IS_INCLUDE_DESCRIPTION, _chkIncludeDescription.getSelection());
+		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
 		_state.put(STATE_IS_CREATE_TOUR_MARKER, _chkCreateTourMarker.getSelection());
 		_state.put(STATE_MARKER_TYPE, getStateTourMarker());
 	}

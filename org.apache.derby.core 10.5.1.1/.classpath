@@ -3,7 +3,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="derby.jar" sourcepath="L:/eclipse-plugins/derby/org.apache.derby.core_10.5.1.764942/db-derby-10.5.1.1-src/java"/>
-	<classpathentry exported="true" kind="lib" path="derbyclient.jar" sourcepath="L:/eclipse-plugins/derby/org.apache.derby.core_10.5.1.764942/db-derby-10.5.1.1-src/java"/>
+	<classpathentry exported="true" kind="lib" path="derbyclient.jar" sourcepath="L:/eclipse-plugins/derby/org.apache.derby.core_10.5.1.764942/db-derby-10.5.1.1-src/java/client"/>
 	<classpathentry exported="true" kind="lib" path="derbytools.jar" sourcepath="L:/eclipse-plugins/derby/org.apache.derby.core_10.5.1.764942/db-derby-10.5.1.1-src/java"/>
 	<classpathentry exported="true" kind="lib" path="derbynet.jar" sourcepath="L:/eclipse-plugins/derby/org.apache.derby.core_10.5.1.764942/db-derby-10.5.1.1-src/java"/>
 	<classpathentry kind="output" path="bin"/>

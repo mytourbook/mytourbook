@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.tag;
@@ -46,9 +46,11 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			/*
 			 * read tour tags from db
 			 */
-			Query query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " AS TourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" WHERE TourTag.isRoot = 1")); //$NON-NLS-1$
+			Query query = em.createQuery(//
+					//
+					"SELECT tourTag" //$NON-NLS-1$
+							+ (" FROM TourTag AS tourTag ") //$NON-NLS-1$
+							+ (" WHERE tourTag.isRoot = 1")); //$NON-NLS-1$
 
 			tourTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -60,9 +62,11 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			/*
 			 * read tag categories from db
 			 */
-			query = em.createQuery("SELECT TourTagCategory " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS TourTagCategory ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" WHERE TourTagCategory.isRoot = 1")); //$NON-NLS-1$
+			query = em.createQuery(//
+					//
+					"SELECT tourTagCategory" //$NON-NLS-1$
+							+ (" FROM TourTagCategory AS tourTagCategory") //$NON-NLS-1$
+							+ (" WHERE tourTagCategory.isRoot = 1")); //$NON-NLS-1$
 
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 

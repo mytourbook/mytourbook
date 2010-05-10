@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * 
@@ -35,23 +35,23 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
  */
 public class ReferenceTourManager {
 
-	private static ReferenceTourManager				instance			= null;
+	private static ReferenceTourManager				_instance			= null;
 
-	private final HashMap<Long, TourCompareConfig>	fCompareConfigCache	= new HashMap<Long, TourCompareConfig>();
-
-	public static ReferenceTourManager getInstance() {
-		if (instance == null) {
-			instance = new ReferenceTourManager();
-		}
-		return instance;
-	}
+	private final HashMap<Long, TourCompareConfig>	_compareConfigCache	= new HashMap<Long, TourCompareConfig>();
 
 	private ReferenceTourManager() {}
+
+	public static ReferenceTourManager getInstance() {
+		if (_instance == null) {
+			_instance = new ReferenceTourManager();
+		}
+		return _instance;
+	}
 
 	/**
 	 * @return Returns an array with all reference tours
 	 */
-	public Object[] getReferenceTours() {
+	public Object[] getAllReferenceTours() {
 
 		List<?> referenceTours = null;
 
@@ -59,8 +59,7 @@ public class ReferenceTourManager {
 
 		if (em != null) {
 
-			referenceTours = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList(); //$NON-NLS-1$ //$NON-NLS-2$
+			referenceTours = em.createQuery("SELECT refTour FROM TourReference AS refTour").getResultList(); //$NON-NLS-1$
 
 			em.close();
 		}
@@ -78,7 +77,7 @@ public class ReferenceTourManager {
 	 */
 	public TourCompareConfig getTourCompareConfig(final long refId) {
 
-		TourCompareConfig compareConfig = fCompareConfigCache.get(refId);
+		TourCompareConfig compareConfig = _compareConfigCache.get(refId);
 
 		if (compareConfig != null) {
 			return compareConfig;
@@ -102,17 +101,19 @@ public class ReferenceTourManager {
 			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
 			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
 
-			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(refTourData,
+			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
+					refTourData,
 					refTourChartConfig);
 
-			compareConfig = new TourCompareConfig(refTour,
+			compareConfig = new TourCompareConfig(
+					refTour,
 					chartDataModel,
 					refTourData.getTourId(),
 					refTourChartConfig,
 					compTourchartConfig);
 
 			// keep ref config in the cache
-			fCompareConfigCache.put(refId, compareConfig);
+			_compareConfigCache.put(refId, compareConfig);
 		}
 
 		return compareConfig;

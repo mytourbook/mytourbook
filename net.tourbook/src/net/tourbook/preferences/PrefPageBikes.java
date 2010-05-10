@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -76,26 +76,26 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	private static final int	COLUMN_TYPE			= 2;
 	private static final int	COLUMN_WEIGHT		= 3;
 
-	private TableViewer			fBikeViewer;
-	private Button				fButtonAdd;
+	private TableViewer			_bikeViewer;
+	private Button				_btnAdd;
 
 	/*
 	 * disabled 30.12.2007 because deleted bikes causes errors then the tourbike is stored in
 	 * TourData
 	 */
 //	private Button				fButtonDelete;
-	private Text				fTextBikeName;
-	private Text				fTextWeight;
-	private Combo				fComboBikeType;
-	private Combo				fComboFrontTyre;
-	private Combo				fComboRearTyre;
+	private Text				_txtBikeName;
+	private Text				_txtWeight;
+	private Combo				_cboBikeType;
+	private Combo				_cboFrontTyre;
+	private Combo				_cboRearTyre;
 
-	private ArrayList<TourBike>	fBikes;
-	private TourBike			fCurrentBike;
-	private boolean				fIsBikeModified;
-	private boolean				fIsBikeListModified	= false;
+	private ArrayList<TourBike>	_bikes;
+	private TourBike			_currentBike;
+	private boolean				_isBikeModified;
+	private boolean				_isBikeListModified	= false;
 
-	private boolean				isMetricSystem		= true;
+	private final boolean		_isMetricSystem		= true;
 
 	private class BikeContentProvider implements IStructuredContentProvider {
 
@@ -104,13 +104,13 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		public void dispose() {}
 
 		public Object[] getElements(final Object parent) {
-			if (fBikes == null) {
-				fBikes = TourDatabase.getTourBikes();
+			if (_bikes == null) {
+				_bikes = TourDatabase.getTourBikes();
 			}
-			if (fBikes == null) {
+			if (_bikes == null) {
 				return new Object[0];
 			} else {
-				return fBikes.toArray(new TourBike[fBikes.size()]);
+				return _bikes.toArray(new TourBike[_bikes.size()]);
 			}
 		}
 
@@ -129,7 +129,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return fIsBikeModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
+				return _isBikeModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
 
 			case COLUMN_NAME:
 				return bike.getName();
@@ -170,18 +170,18 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 */
 		lbl = new Label(container, SWT.NONE);
 		lbl.setText("&Name:"); //$NON-NLS-1$
-		fTextBikeName = new Text(container, SWT.BORDER);
+		_txtBikeName = new Text(container, SWT.BORDER);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fTextBikeName.setLayoutData(gd);
-		fTextBikeName.addModifyListener(new ModifyListener() {
+		_txtBikeName.setLayoutData(gd);
+		_txtBikeName.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 					final String name = ((Text) (e.widget)).getText();
-					if (!name.equals(fCurrentBike.getName())) {
-						fIsBikeModified = true;
+					if (!name.equals(_currentBike.getName())) {
+						_isBikeModified = true;
 
-						fCurrentBike.setName(name);
-						fBikeViewer.update(fCurrentBike, null);
+						_currentBike.setName(name);
+						_bikeViewer.update(_currentBike, null);
 					}
 				}
 			}
@@ -192,52 +192,52 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 */
 		lbl = new Label(container, SWT.NONE);
 		lbl.setText("&Type:"); //$NON-NLS-1$
-		fComboBikeType = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fComboBikeType.setVisibleItemCount(20);
+		_cboBikeType = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_cboBikeType.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		gd.widthHint = 50;
-		fComboBikeType.setLayoutData(gd);
-		fComboBikeType.addSelectionListener(new SelectionAdapter() {
+		_cboBikeType.setLayoutData(gd);
+		_cboBikeType.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				final int selectedIndex = fComboBikeType.getSelectionIndex();
+				final int selectedIndex = _cboBikeType.getSelectionIndex();
 
 				// select tyres
-				fComboFrontTyre.select(IBikeDefinitions.i_tireF[selectedIndex]);
-				fComboRearTyre.select(IBikeDefinitions.i_tireR[selectedIndex]);
+				_cboFrontTyre.select(IBikeDefinitions.i_tireF[selectedIndex]);
+				_cboRearTyre.select(IBikeDefinitions.i_tireR[selectedIndex]);
 
 				// set new weight
-				final float weight = IBikeDefinitions.def_mr[selectedIndex] * (isMetricSystem ? 1 : 2.2f);
-				fTextWeight.setText(Float.toString(weight));
+				final float weight = IBikeDefinitions.def_mr[selectedIndex] * (_isMetricSystem ? 1 : 2.2f);
+				_txtWeight.setText(Float.toString(weight));
 
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 
-					fCurrentBike.setWeight(weight);
+					_currentBike.setWeight(weight);
 
 					// update viewer
-					fBikeViewer.update(fCurrentBike, null);
+					_bikeViewer.update(_currentBike, null);
 				}
 			}
 		});
 
-		fComboBikeType.addModifyListener(new ModifyListener() {
+		_cboBikeType.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 					final int index = ((Combo) (e.widget)).getSelectionIndex();
-					if (index != fCurrentBike.getTypeId()) {
-						fCurrentBike.setTypeId(index);
-						fCurrentBike.setFrontTyreId(fComboFrontTyre.getSelectionIndex());
-						fCurrentBike.setRearTyreId(fComboRearTyre.getSelectionIndex());
+					if (index != _currentBike.getTypeId()) {
+						_currentBike.setTypeId(index);
+						_currentBike.setFrontTyreId(_cboFrontTyre.getSelectionIndex());
+						_currentBike.setRearTyreId(_cboRearTyre.getSelectionIndex());
 
-						fIsBikeModified = true;
-						fBikeViewer.update(fCurrentBike, null);
+						_isBikeModified = true;
+						_bikeViewer.update(_currentBike, null);
 					}
 				}
 			}
 		});
 		for (final String bikeType : IBikeDefinitions.bikeType) {
-			fComboBikeType.add(bikeType);
+			_cboBikeType.add(bikeType);
 		}
 
 		/*
@@ -246,18 +246,18 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		final InputFieldFloat floatInput = new InputFieldFloat(container, "&Weight (kg):", //$NON-NLS-1$
 				convertHorizontalDLUsToPixels(40));
 
-		fTextWeight = floatInput.getTextField();
-		fTextWeight.addModifyListener(new ModifyListener() {
+		_txtWeight = floatInput.getTextField();
+		_txtWeight.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 					final Text control = (Text) e.widget;
 					try {
 						final float value = Float.parseFloat(((Text) (e.widget)).getText());
-						if (value != fCurrentBike.getWeight()) {
-							fCurrentBike.setWeight(value);
+						if (value != _currentBike.getWeight()) {
+							_currentBike.setWeight(value);
 
-							fIsBikeModified = true;
-							fBikeViewer.update(fCurrentBike, null);
+							_isBikeModified = true;
+							_bikeViewer.update(_currentBike, null);
 						}
 						UI.setDefaultColor(control);
 					} catch (final NumberFormatException e1) {
@@ -272,26 +272,26 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 */
 		lbl = new Label(container, SWT.NONE);
 		lbl.setText("&Front Tyre:"); //$NON-NLS-1$
-		fComboFrontTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fComboFrontTyre.setVisibleItemCount(20);
+		_cboFrontTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_cboFrontTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		gd.widthHint = 50;
-		fComboFrontTyre.setLayoutData(gd);
-		fComboFrontTyre.addModifyListener(new ModifyListener() {
+		_cboFrontTyre.setLayoutData(gd);
+		_cboFrontTyre.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 					final int index = ((Combo) (e.widget)).getSelectionIndex();
-					if (index != fCurrentBike.getFrontTyreId()) {
-						fCurrentBike.setFrontTyreId(index);
+					if (index != _currentBike.getFrontTyreId()) {
+						_currentBike.setFrontTyreId(index);
 
-						fIsBikeModified = true;
-						fBikeViewer.update(fCurrentBike, null);
+						_isBikeModified = true;
+						_bikeViewer.update(_currentBike, null);
 					}
 				}
 			}
 		});
 		for (final String tyre : IBikeDefinitions.tyreType) {
-			fComboFrontTyre.add(tyre);
+			_cboFrontTyre.add(tyre);
 		}
 
 		/*
@@ -299,26 +299,26 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 */
 		lbl = new Label(container, SWT.NONE);
 		lbl.setText("&Rear Tyre:"); //$NON-NLS-1$
-		fComboRearTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fComboRearTyre.setVisibleItemCount(20);
+		_cboRearTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_cboRearTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		gd.widthHint = 50;
-		fComboRearTyre.setLayoutData(gd);
-		fComboRearTyre.addModifyListener(new ModifyListener() {
+		_cboRearTyre.setLayoutData(gd);
+		_cboRearTyre.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (fCurrentBike != null) {
+				if (_currentBike != null) {
 					final int index = ((Combo) (e.widget)).getSelectionIndex();
-					if (index != fCurrentBike.getRearTyreId()) {
-						fCurrentBike.setRearTyreId(index);
+					if (index != _currentBike.getRearTyreId()) {
+						_currentBike.setRearTyreId(index);
 
-						fIsBikeModified = true;
-						fBikeViewer.update(fCurrentBike, null);
+						_isBikeModified = true;
+						_bikeViewer.update(_currentBike, null);
 					}
 				}
 			}
 		});
 		for (final String tyre : IBikeDefinitions.tyreType) {
-			fComboRearTyre.add(tyre);
+			_cboRearTyre.add(tyre);
 		}
 
 		// placeholder
@@ -337,7 +337,8 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gridData.widthHint = convertWidthInCharsToPixels(20);
 		layouter.setLayoutData(gridData);
 
-		final Table table = new Table(layouter,
+		final Table table = new Table(
+				layouter,
 				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -359,19 +360,19 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		tc.setText("kg"); //$NON-NLS-1$
 		layouter.addColumnData(new ColumnWeightData(4));
 
-		fBikeViewer = new TableViewer(table);
+		_bikeViewer = new TableViewer(table);
 
-		fBikeViewer.setContentProvider(new BikeContentProvider());
-		fBikeViewer.setLabelProvider(new BikeLabelProvider());
+		_bikeViewer.setContentProvider(new BikeContentProvider());
+		_bikeViewer.setLabelProvider(new BikeLabelProvider());
 
-		fBikeViewer.setSorter(new ViewerSorter() {
+		_bikeViewer.setSorter(new ViewerSorter() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return collator.compare(((TourBike) e1).getName(), ((TourBike) e2).getName());
 			}
 		});
 
-		fBikeViewer.setComparator(new ViewerComparator() {
+		_bikeViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return ((TourBike) e1).getName().compareTo(((TourBike) e2).getName());
@@ -379,16 +380,16 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		});
 
-		fBikeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_bikeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				selectBike();
 			}
 		});
 
-		fBikeViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_bikeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				fTextBikeName.setFocus();
-				fTextBikeName.selectAll();
+				_txtBikeName.setFocus();
+				_txtBikeName.selectAll();
 			}
 		});
 	}
@@ -404,10 +405,10 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		container.setLayout(gridLayout);
 
 		// button: add
-		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText("&Add..."); //$NON-NLS-1$
-		setButtonLayoutData(fButtonAdd);
-		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+		_btnAdd = new Button(container, SWT.NONE);
+		_btnAdd.setText("&Add..."); //$NON-NLS-1$
+		setButtonLayoutData(_btnAdd);
+		_btnAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onAddBike();
@@ -447,10 +448,10 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		createBikeViewerButtons(container);
 		createBikeDetails(container);
 
-		fBikeViewer.setInput(this);
+		_bikeViewer.setInput(this);
 
 		// select first bike
-		fBikeViewer.getTable().setSelection(0);
+		_bikeViewer.getTable().setSelection(0);
 		selectBike();
 
 		// update the bike details
@@ -514,9 +515,10 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" WHERE TourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
+			final Query query = em.createQuery(//
+					"SELECT tourPerson" //$NON-NLS-1$
+							+ (" FROM TourPerson AS tourPerson") //$NON-NLS-1$
+							+ (" WHERE tourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
 
 			final ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
 
@@ -553,17 +555,17 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	}
 
 	private void enableButtons() {
-		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
 //		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
 	private void fireBikeListModifyEvent() {
-		if (fIsBikeListModified) {
+		if (_isBikeListModified) {
 
 			// fire bike list modify event
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED, Math.random());
 
-			fIsBikeListModified = false;
+			_isBikeListModified = false;
 		}
 	}
 
@@ -583,26 +585,26 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		saveBike();
 
-		fCurrentBike = new TourBike();
-		fIsBikeModified = true;
-		fCurrentBike.setName("<name>"); //$NON-NLS-1$
-		fCurrentBike.setWeight(10);
+		_currentBike = new TourBike();
+		_isBikeModified = true;
+		_currentBike.setName("<name>"); //$NON-NLS-1$
+		_currentBike.setWeight(10);
 
-		fBikes.add(fCurrentBike);
-		fIsBikeListModified = true;
+		_bikes.add(_currentBike);
+		_isBikeListModified = true;
 
 		// update ui viewer
-		fBikeViewer.add(fCurrentBike);
-		fBikeViewer.setSelection(new StructuredSelection(fCurrentBike));
+		_bikeViewer.add(_currentBike);
+		_bikeViewer.setSelection(new StructuredSelection(_currentBike));
 
 		// edit name field
-		fTextBikeName.selectAll();
-		fTextBikeName.setFocus();
+		_txtBikeName.selectAll();
+		_txtBikeName.setFocus();
 	}
 
 	private void onDeleteBike() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
 		if (selection.isEmpty()) {
 			return;
 		}
@@ -624,7 +626,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		BusyIndicator.showWhile(null, new Runnable() {
 			public void run() {
 
-				final Table table = fBikeViewer.getTable();
+				final Table table = _bikeViewer.getTable();
 				final int lastIndex = table.getSelectionIndex();
 
 				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
@@ -633,23 +635,23 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 					deleteBike(bike);
 
 					// remove from data model
-					fBikes.remove(bike);
+					_bikes.remove(bike);
 				}
 
 				// remove from ui
-				fBikeViewer.remove(selection.toArray());
+				_bikeViewer.remove(selection.toArray());
 
 				// select next bike
-				if (lastIndex >= fBikes.size()) {
-					table.setSelection(fBikes.size() - 1);
+				if (lastIndex >= _bikes.size()) {
+					table.setSelection(_bikes.size() - 1);
 				} else {
 					table.setSelection(lastIndex);
 				}
 
-				fCurrentBike = null;
+				_currentBike = null;
 
-				fIsBikeModified = false;
-				fIsBikeListModified = true;
+				_isBikeModified = false;
+				_isBikeListModified = true;
 
 				updateBikeDetails();
 			}
@@ -675,17 +677,17 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	 */
 	private void saveBike() {
 
-		if (fCurrentBike != null && fIsBikeModified) {
-			fCurrentBike.persist();
+		if (_currentBike != null && _isBikeModified) {
+			_currentBike.persist();
 
 			// update modify flag
-			fIsBikeModified = false;
-			fBikeViewer.update(fCurrentBike, null);
+			_isBikeModified = false;
+			_bikeViewer.update(_currentBike, null);
 
-			fIsBikeListModified = true;
+			_isBikeListModified = true;
 		}
 
-		fIsBikeModified = false;
+		_isBikeModified = false;
 	}
 
 	private void selectBike() {
@@ -699,7 +701,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	 */
 	private void updateBikeDetails() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
 
 		final Object item = selection.getFirstElement();
 		boolean isEnabled = true;
@@ -707,32 +709,32 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		if (item instanceof TourBike) {
 			final TourBike bike = (TourBike) item;
 			// set the current bike before the fields are updated
-			fCurrentBike = bike;
+			_currentBike = bike;
 
-			fTextBikeName.setText(bike.getName());
-			fTextWeight.setText(Float.toString(bike.getWeight()));
-			UI.setDefaultColor(fTextWeight);
+			_txtBikeName.setText(bike.getName());
+			_txtWeight.setText(Float.toString(bike.getWeight()));
+			UI.setDefaultColor(_txtWeight);
 
-			fComboBikeType.select(bike.getTypeId());
-			fComboFrontTyre.select(bike.getFrontTyreId());
-			fComboRearTyre.select(bike.getRearTyreId());
+			_cboBikeType.select(bike.getTypeId());
+			_cboFrontTyre.select(bike.getFrontTyreId());
+			_cboRearTyre.select(bike.getRearTyreId());
 
 		} else {
 			isEnabled = false;
-			fCurrentBike = null;
+			_currentBike = null;
 
-			fTextBikeName.setText(""); //$NON-NLS-1$
-			fTextWeight.setText(""); //$NON-NLS-1$
-			fComboBikeType.select(0);
-			fComboFrontTyre.select(0);
-			fComboRearTyre.select(0);
+			_txtBikeName.setText(""); //$NON-NLS-1$
+			_txtWeight.setText(""); //$NON-NLS-1$
+			_cboBikeType.select(0);
+			_cboFrontTyre.select(0);
+			_cboRearTyre.select(0);
 		}
 
-		fTextBikeName.setEnabled(isEnabled);
-		fTextWeight.setEnabled(isEnabled);
-		fComboBikeType.setEnabled(isEnabled);
-		fComboFrontTyre.setEnabled(isEnabled);
-		fComboRearTyre.setEnabled(isEnabled);
+		_txtBikeName.setEnabled(isEnabled);
+		_txtWeight.setEnabled(isEnabled);
+		_cboBikeType.setEnabled(isEnabled);
+		_cboFrontTyre.setEnabled(isEnabled);
+		_cboRearTyre.setEnabled(isEnabled);
 	}
 
 }
