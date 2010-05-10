@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.5"?>
+<plugin>
+
+   <extension point="net.tourbook.printTour">
+      <print
+            class="net.tourbook.printing.PrintTourPDF"
+            id="net.tourbook.print.pdf"
+            name="PDF">
+      </print>
+   </extension>
+
+</plugin>

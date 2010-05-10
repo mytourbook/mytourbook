@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tour Printing
+Bundle-SymbolicName: net.tourbook.printing;singleton:=true
+Bundle-Version: 10.3.1.qualifier
+Bundle-Activator: net.tourbook.printing.Activator
+Bundle-Vendor: MyTourbook
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.tourbook,
+ net.tourbook.ext.jars.printing,
+ net.tourbook.ext.jars,
+ net.tourbook.util
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
