@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" exclude-result-prefixes="fo">
 	<xsl:output method="xml" version="1.0" omit-xml-declaration="no" indent="yes" />
-	<xsl:param name="versionParam" select="'test'" />
+	<!-- parameters passed from java code into the TransFormer, usefull for pre-formatting data in java -->
+	<xsl:param name="startDate" select="''" />
 	<!-- ========================= -->
 	<!-- root element: tourdata -->
 	<!-- ========================= -->
@@ -15,12 +16,27 @@
 			<fo:page-sequence master-reference="simpleA4">
 				<fo:flow flow-name="xsl-region-body">
 					<fo:block font-size="16pt" font-weight="bold" space-after="5mm">
-						Tour: <xsl:value-of select="tourTitle" /> - <xsl:value-of select="$versionParam" />
+						Tour: <xsl:value-of select="tourTitle" />
 					</fo:block>
 					<fo:block font-size="12pt" space-after="5mm">
-						Start date: <xsl:value-of select="startDay" /> / <xsl:value-of select="startMonth" /> / <xsl:value-of select="startYear" /> 
+						<xsl:value-of select="tourDescription" />
 					</fo:block>
-				</fo:flow>
+					<fo:block font-size="12pt" space-after="5mm">
+						Start date: <xsl:value-of select="$startDate" />
+					</fo:block>
+					<fo:block font-size="12pt" space-after="5mm">
+						Tour Distance: <xsl:value-of select="tourDistance" /> 						 
+					</fo:block>
+					<fo:block font-size="12pt" space-after="5mm">
+						Maximum Speed: <xsl:value-of select="maxSpeed" /> 						 
+					</fo:block>					
+					<fo:block font-size="12pt" space-after="5mm">
+						Altitude Meters Up: <xsl:value-of select="tourAltUp" /> 						 
+					</fo:block>
+					<fo:block font-size="12pt" space-after="5mm">
+						Altitude Meters Up: <xsl:value-of select="tourAltDown" /> 						 
+					</fo:block>
+				</fo:flow>				
 			</fo:page-sequence>
 		</fo:root>
 	</xsl:template>

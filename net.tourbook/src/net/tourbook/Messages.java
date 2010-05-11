@@ -54,6 +54,37 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String		Dialog_Print_Chk_TourRangeDisabled;
+	public static String		Dialog_Print_Chk_TourRangeWithDistance;
+	public static String		Dialog_Print_Chk_TourRangeWithoutDistance;
+	public static String		Dialog_Print_Chk_CamouflageSpeedInput_Tooltip;
+	public static String		Dialog_Print_Chk_CamouflageSpeed;
+	public static String		Dialog_Print_Chk_CamouflageSpeed_Tooltip;
+	public static String		Dialog_Print_Chk_PrintMarkers;
+	public static String		Dialog_Print_Chk_PrintMarkers_Tooltip;
+	public static String		Dialog_Print_Chk_PrintNotes;
+	public static String		Dialog_Print_Chk_PrintNotes_Tooltip;
+	public static String		Dialog_Print_Chk_OverwriteFiles;
+	public static String		Dialog_Print_Chk_OverwriteFiles_Tooltip;
+	public static String		Dialog_Print_Btn_Print;
+	public static String		Dialog_Print_Dialog_Message;
+	public static String		Dialog_Print_File_Dialog_Text;
+	public static String		Dialog_Print_Error_CamouflageSpeedIsInvalid;
+	public static String		Dialog_Print_Dialog_Title;
+	public static String		Dialog_Print_Dir_Dialog_Message;
+	public static String		Dialog_Print_Dir_Dialog_Text;
+	public static String		Dialog_Print_Group_PdfFileName;
+	public static String		Dialog_Print_Group_Options;
+	public static String		Dialog_Print_Label_PrintFilePath;
+	public static String		Dialog_Print_Label_FileName;
+	public static String		Dialog_Print_Label_FilePath;
+	public static String		Dialog_Print_Lbl_PdfFilePath;
+	public static String		Dialog_Print_Msg_FileAlreadyExists;
+	public static String		Dialog_Print_Msg_FileNameIsInvalid;
+	public static String		Dialog_Print_Msg_PathIsNotAvailable;
+	public static String		Dialog_Print_Shell_Text;
+	public static String		Dialog_Print_Txt_FilePath_Tooltip;
+
 	public static String		dialog_is_tour_editor_modified_message;
 	public static String		dialog_is_tour_editor_modified_title;
 
@@ -232,27 +263,27 @@ public class Messages extends NLS {
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
 
-	public static String	Dialog_JoinTours_Checkbox_IncludeDescription;
+	public static String		Dialog_JoinTours_Checkbox_IncludeDescription;
 
-	public static String	Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
+	public static String		Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
 
-	public static String	Dialog_JoinTours_ComboText_ConcatenateTime;
+	public static String		Dialog_JoinTours_ComboText_ConcatenateTime;
 
-	public static String	Dialog_JoinTours_ComboText_KeepTime;
+	public static String		Dialog_JoinTours_ComboText_KeepTime;
 
-	public static String	Dialog_JoinTours_ComboText_MarkerTourTime;
+	public static String		Dialog_JoinTours_ComboText_MarkerTourTime;
 
-	public static String	Dialog_JoinTours_ComboText_TourTypeCustom;
+	public static String		Dialog_JoinTours_ComboText_TourTypeCustom;
 
-	public static String	Dialog_JoinTours_ComboText_TourTypeFromTour;
+	public static String		Dialog_JoinTours_ComboText_TourTypeFromTour;
 
-	public static String	Dialog_JoinTours_ComboText_TourTypePrevious;
+	public static String		Dialog_JoinTours_ComboText_TourTypePrevious;
 
 	public static String		Dialog_JoinTours_DlgArea_Message;
 	public static String		Dialog_JoinTours_DlgArea_Title;
 	public static String		Dialog_JoinTours_Group_JoinedTourTime;
 
-	public static String	Dialog_JoinTours_Group_TourType;
+	public static String		Dialog_JoinTours_Group_TourType;
 	public static String		Dialog_JoinTours_InvalidData_Altitude;
 	public static String		Dialog_JoinTours_InvalidData_Cadence;
 	public static String		Dialog_JoinTours_InvalidData_Distance;
@@ -266,32 +297,32 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
 	public static String		Dialog_JoinTours_InvalidData_Time;
-	public static String	Dialog_JoinTours_Label_CreateTourMarker;
+	public static String		Dialog_JoinTours_Label_CreateTourMarker;
 
-	public static String	Dialog_JoinTours_Label_DefaultTitle;
+	public static String		Dialog_JoinTours_Label_DefaultTitle;
 
-	public static String	Dialog_JoinTours_Label_Description;
+	public static String		Dialog_JoinTours_Label_Description;
 
 	public static String		Dialog_JoinTours_Label_DeviceName;
 	public static String		Dialog_JoinTours_Label_OtherFields;
 	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
-	public static String	Dialog_JoinTours_Label_Title;
+	public static String		Dialog_JoinTours_Label_Title;
 
-	public static String	Dialog_JoinTours_Label_Title_Tooltip;
+	public static String		Dialog_JoinTours_Label_Title_Tooltip;
 
 	public static String		Dialog_JoinTours_Label_Tour;
 	public static String		Dialog_JoinTours_Label_TourDate;
 
-	public static String	Dialog_JoinTours_Label_TourMarker;
+	public static String		Dialog_JoinTours_Label_TourMarker;
 
-	public static String	Dialog_JoinTours_Label_TourMarkerText;
+	public static String		Dialog_JoinTours_Label_TourMarkerText;
 
-	public static String	Dialog_JoinTours_Label_TourStartDateTime;
+	public static String		Dialog_JoinTours_Label_TourStartDateTime;
 	public static String		Dialog_JoinTours_Label_TourTime;
 
-	public static String	Dialog_JoinTours_Label_TourType;
+	public static String		Dialog_JoinTours_Label_TourType;
 
-	public static String	Dialog_JoinTours_Link_TourType;
+	public static String		Dialog_JoinTours_Link_TourType;
 	public static String		Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
 	public static String		Dialog_JoinTours_Radio_KeepTime_Tooltip;
 	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff;
@@ -731,9 +762,9 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
-	public static String	Tour_Database_Dialog_CheckFieldLength_Message;
+	public static String		Tour_Database_Dialog_CheckFieldLength_Message;
 
-	public static String	Tour_Database_Dialog_CheckFieldLength_Title;
+	public static String		Tour_Database_Dialog_CheckFieldLength_Title;
 
 	public static String		Tour_Database_load_all_tours;
 
