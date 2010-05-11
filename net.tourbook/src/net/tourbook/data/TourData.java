@@ -20,6 +20,7 @@ import static javax.persistence.FetchType.EAGER;
 
 import java.awt.Point;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -42,6 +43,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
@@ -64,14 +73,13 @@ import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
 @Entity
-@XStreamAlias("TourData")
+@XmlType(name = "TourData")
+@XmlRootElement(name="TourData")
+@XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
@@ -236,6 +244,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * total distance of the tour in meters (metric system), this value is computed from the
 	 * distance data serie
 	 */
+	@XmlElement
 	private int							tourDistance;
 
 	/**
@@ -251,11 +260,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * altitude up (m)
 	 */
+	@XmlElement
 	private int							tourAltUp;
 
 	/**
 	 * altitude down (m)
 	 */
+	@XmlElement
 	private int							tourAltDown;
 
 	/**
@@ -284,6 +295,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * maximum speed in metric system
 	 */
+	@XmlElement
 	private float						maxSpeed;																	// db-version 4
 
 	private int							avgPulse;																	// db-version 4
@@ -295,7 +307,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String						weatherClouds;																// db-version 8
 	private int							restPulse;																	// db-version 8
 
+	@XmlElement
 	private String						tourTitle;																	// db-version 4
+	@XmlElement
 	private String						tourDescription;															// db-version 4
 
 	private String						tourStartPlace;															// db-version 4
@@ -3384,7 +3398,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int bodyHeight = 188;
 
 		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD = 0.8f;// Strömungskoeffizient
+		final float cD = 0.8f;// Strï¿½mungskoeffizient
 		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
@@ -4397,13 +4411,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return sb.toString();
 	}
 
+	
+	@XmlElement
+	public String getTest(){
+		return "jokl";
+	}
+	
 	@Override
 	public String toXml() {
-		XStream xstream = new XStream();
-		// Scan for xstream annotations
-		// At class level we have an annotation to indicate the xml root element. (@XStreamAlias("TourData"))
-		// This needs to be constant and fixed, because it is used in the XSL transformation as an entry point of the xml.
-		xstream.autodetectAnnotations(true);
-		return xstream.toXML(this);
+		try {
+			JAXBContext context = JAXBContext.newInstance(this.getClass());
+			Marshaller marshaller = context.createMarshaller();
+			StringWriter sw = new StringWriter();
+			marshaller.marshal(this, sw);
+			return sw.toString();
+			
+		} catch (JAXBException e){
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 }
