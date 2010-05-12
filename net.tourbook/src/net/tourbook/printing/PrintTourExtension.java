@@ -6,11 +6,11 @@ import net.tourbook.data.TourData;
 
 public abstract class PrintTourExtension {
 	
-	private String	fPrintId;
-	private String	fVisibleName;
+	private String	_printId;
+	private String	_visibleName;
 
  	/**
-	 * Prints the tour in the {@link TourData} list. If only one tour is printed, the values of
+	 * Prints the tours in the {@link TourData} list. If only one tour is printed, the values of
 	 * tourStartIndex and tourEndIndex is the range which points are printed, when the index is -1,
 	 * the whole tour is printed.
 	 * 
@@ -19,31 +19,31 @@ public abstract class PrintTourExtension {
 	 * @param tourEndIndex
 	 */
 	public abstract void printTours(ArrayList<TourData> tourDataList, int tourStartIndex, int tourEndIndex);
-
+	
 	public String getPrintId() {
-		return fPrintId;
+		return _printId;
 	}
 
 	public String getVisibleName() {
-		return fVisibleName;
+		return _visibleName;
 	}
 
 	public void setPrintId(final String fPrintId) {
-		this.fPrintId = fPrintId;
+		this._printId = fPrintId;
 	}
 
 	public void setVisibleName(final String fVisibleName) {
-		this.fVisibleName = fVisibleName;
+		this._visibleName = fVisibleName;
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder().append("id: ")//$NON-NLS-1$
-				.append(fPrintId)
+				.append(_printId)
 				.append(" \t") //$NON-NLS-1$
 				//
 				.append("name: ") //$NON-NLS-1$
-				.append(fVisibleName)
+				.append(_visibleName)
 				.append(" \t") //$NON-NLS-1$
 				//
 				.toString();

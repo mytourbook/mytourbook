@@ -1,5 +1,4 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +15,7 @@
 package net.tourbook.printing;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.xml.transform.TransformerException;
+
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
@@ -33,6 +35,7 @@ import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.UI;
 
+import org.apache.fop.apps.FOPException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -79,16 +82,16 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final int				SIZING_TEXT_FIELD_WIDTH		= 250;
 	private static final int				COMBO_HISTORY_LENGTH		= 20;
 
-	private static final String				STATE_IS_EXPORT_TOUR_RANGE	= "isExportTourRange";								//$NON-NLS-1$
-	private static final String				STATE_IS_EXPORT_MARKERS		= "isExportMarkers";								//$NON-NLS-1$
-	private static final String				STATE_IS_EXPORT_NOTES		= "isExportNotes";									//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_TOUR_RANGE	= "isPrintTourRange";							//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";								//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";								//$NON-NLS-1$
 
-	private static final String				STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";								//$NON-NLS-1$
-	private static final String				STATE_CAMOUFLAGE_SPEED		= "camouflageSpeedValue";							//$NON-NLS-1$
+	private static final String				STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";							//$NON-NLS-1$
+	private static final String				STATE_CAMOUFLAGE_SPEED		= "camouflageSpeedValue";						//$NON-NLS-1$
 
-	private static final String				STATE_EXPORT_PATH_NAME		= "exportPathName";								//$NON-NLS-1$
-	private static final String				STATE_EXPORT_FILE_NAME		= "exportFileName";								//$NON-NLS-1$
-	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";								//$NON-NLS-1$
+	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";								//$NON-NLS-1$
+	private static final String				STATE_PRINT_FILE_NAME		= "printtFileName";								//$NON-NLS-1$
+	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";							//$NON-NLS-1$
 
 	private static final DecimalFormat		_intFormatter				= (DecimalFormat) NumberFormat
 																				.getInstance(Locale.US);
@@ -125,9 +128,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private Point							_shellDefaultSize;
 	private Composite						_dlgContainer;
 
-	private Button							_chkExportTourRange;
-	private Button							_chkExportMarkers;
-	private Button							_chkExportNotes;
+	private Button							_chkPrintTourRange;
+	private Button							_chkPrintMarkers;
+	private Button							_chkPrinttNotes;
 
 	private Button							_chkCamouflageSpeed;
 	private Text							_txtCamouflageSpeed;
@@ -143,7 +146,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private Button							_chkOverwriteFiles;
 
 	private ProgressIndicator				_progressIndicator;
-	private ImageComboLabel					_lblExportedFilePath;
+	private ImageComboLabel					_lblPrintFilePath;
 
 	private boolean							_isInit;
 
@@ -181,7 +184,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	/**
 	 * @return Returns <code>true</code> when a part of a tour can be printed
 	 */
-	private boolean canExportTourPart() {
+	private boolean canPrintTourPart() {
 		return (_tourDataList.size() == 1) && (_tourStartIndex >= 0) && (_tourEndIndex > 0);
 	}
 
@@ -270,7 +273,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_inputContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_inputContainer);
 		GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(_inputContainer);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		createUIOption(_inputContainer);
 		createUIDestination(_inputContainer);
@@ -409,8 +411,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 		{
 			createUIOptionCamouflageSpeed(group);
-			createUIOptionExportMarkers(group);
-			createUIOptionExportNotes(group);
+			createUIOptionPrintMarkers(group);
+			createUIOptionPrintNotes(group);
 			createUIOptionTourPart(group);
 		}
 	}
@@ -464,26 +466,26 @@ public class DialogPrintTour extends TitleAreaDialog {
 		}
 	}
 
-	private void createUIOptionExportMarkers(final Composite parent) {
+	private void createUIOptionPrintMarkers(final Composite parent) {
 
 		/*
-		 * checkbox: export markers
+		 * checkbox: print markers
 		 */
-		_chkExportMarkers = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportMarkers);
-		_chkExportMarkers.setText(Messages.Dialog_Print_Chk_PrintMarkers);
-		_chkExportMarkers.setToolTipText(Messages.Dialog_Print_Chk_PrintMarkers_Tooltip);
+		_chkPrintMarkers = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkPrintMarkers);
+		_chkPrintMarkers.setText(Messages.Dialog_Print_Chk_PrintMarkers);
+		_chkPrintMarkers.setToolTipText(Messages.Dialog_Print_Chk_PrintMarkers_Tooltip);
 	}
 
-	private void createUIOptionExportNotes(final Composite parent) {
+	private void createUIOptionPrintNotes(final Composite parent) {
 
 		/*
-		 * checkbox: export notes
+		 * checkbox: print notes
 		 */
-		_chkExportNotes = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportNotes);
-		_chkExportNotes.setText(Messages.Dialog_Print_Chk_PrintNotes);
-		_chkExportNotes.setToolTipText(Messages.Dialog_Print_Chk_PrintNotes_Tooltip);
+		_chkPrinttNotes = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkPrinttNotes);
+		_chkPrinttNotes.setText(Messages.Dialog_Print_Chk_PrintNotes);
+		_chkPrinttNotes.setToolTipText(Messages.Dialog_Print_Chk_PrintNotes_Tooltip);
 	}
 
 	private void createUIOptionTourPart(final Composite parent) {
@@ -551,12 +553,12 @@ public class DialogPrintTour extends TitleAreaDialog {
 			}
 		}
 
-		_chkExportTourRange = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportTourRange);
+		_chkPrintTourRange = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkPrintTourRange);
 
-		_chkExportTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.Dialog_Print_Chk_TourRangeDisabled);
+		_chkPrintTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.Dialog_Print_Chk_TourRangeDisabled);
 
-		_chkExportTourRange.addSelectionListener(new SelectionAdapter() {
+		_chkPrintTourRange.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				enableFields();
@@ -568,7 +570,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 		final int selectedTours = _tourDataList.size();
 
-		// hide progress bar when only one tour is exported
+		// hide progress bar when only one tour is printed
 		if (selectedTours < 2) {
 			return;
 		}
@@ -585,14 +587,14 @@ public class DialogPrintTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_progressIndicator);
 
 			/*
-			 * label: exported filename
+			 * label: printed filename
 			 */
-			_lblExportedFilePath = new ImageComboLabel(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblExportedFilePath);
+			_lblPrintFilePath = new ImageComboLabel(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblPrintFilePath);
 		}
 	}
 
-	private void doExport() throws IOException {
+	private void doPrint() throws IOException {
 
 		// disable button's
 		getButton(IDialogConstants.OK_ID).setEnabled(false);
@@ -613,50 +615,73 @@ public class DialogPrintTour extends TitleAreaDialog {
 		final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
 
 		if (_tourDataList.size() == 1) {
-
-			// export one tour
-
+			// print one tour
 			final TourData tourData = _tourDataList.get(0);
-
+			
+			if (_printExtensionPoint instanceof PrintTourPDF) {
+				try {
+					//TODO handle exception
+					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, completeFilePath);
+				} catch (FOPException e) {
+					e.printStackTrace();
+				} catch (TransformerException e) {
+					e.printStackTrace();
+				}
+			}
 		} else {
 			/*
-			 * export each tour separately
+			 * print each tour separately
 			 */
 
-			final String exportPathName = getExportPathName();
+			final String printPathName = getPrintPathName();
 			_progressIndicator.beginTask(_tourDataList.size());
 
-			final Job exportJob = new Job("export files") { //$NON-NLS-1$
+			final Job printJob = new Job("print tours") { //$NON-NLS-1$
 				@Override
 				public IStatus run(final IProgressMonitor monitor) {
 
 					monitor.beginTask(UI.EMPTY_STRING, _tourDataList.size());
-					final IPath exportFilePath = new Path(exportPathName).addTrailingSeparator();
+					final IPath printFilePath = new Path(printPathName).addTrailingSeparator();
 
 					for (final TourData tourData : _tourDataList) {
 
 						// get filepath
-						final IPath filePath = exportFilePath
+						final IPath filePath = printFilePath
 								.append(UI.format_yyyymmdd_hhmmss(tourData))
 								.addFileExtension(PDF_FILE_EXTENSION);
 
 						/*
-						 * update dialog progress monitor
+						 *	print: update dialog progress monitor
 						 */
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
 
-								// display exported filepath
-								_lblExportedFilePath.setText(NLS.bind(Messages.Dialog_Print_Lbl_PdfFilePath, filePath
+								// display printed filepath
+								_lblPrintFilePath.setText(NLS.bind(Messages.Dialog_Print_Lbl_PdfFilePath, filePath
 										.toOSString()));
 
 								// !!! force label update !!!
-								_lblExportedFilePath.update();
+								_lblPrintFilePath.update();
 
 								_progressIndicator.worked(1);
+
 							}
 						});
 
+						
+						if (_printExtensionPoint instanceof PrintTourPDF) {
+							try {
+								//TODO handle exception
+								((PrintTourPDF)_printExtensionPoint).printPDF(tourData, filePath.toOSString());
+							} catch (FOPException e) {
+								e.printStackTrace();
+							} catch (TransformerException e) {
+								e.printStackTrace();
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							}
+						}			
+						
 						// check if overwrite dialog was canceled
 						if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
 							break;
@@ -667,15 +692,15 @@ public class DialogPrintTour extends TitleAreaDialog {
 				}
 			};
 
-			exportJob.schedule();
+			printJob.schedule();
 			try {
-				exportJob.join();
+				printJob.join();
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		MessageDialog.openInformation(getShell(), "not yet implemented", "printing is not yet implemented");
+		MessageDialog.openInformation(getShell(), "Not yet implemented", "Beware, printing is not yet fully implemented.");
 	}
 
 	private void enableExportButton(final boolean isEnabled) {
@@ -694,10 +719,10 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_txtCamouflageSpeed.setEnabled(isCamouflageTime);
 		_lblCoumouflageSpeedUnit.setEnabled(isCamouflageTime);
 
-		_chkExportTourRange.setEnabled(canExportTourPart());
+		_chkPrintTourRange.setEnabled(canPrintTourPart());
 		// when disabled, uncheck it
-		if (_chkExportTourRange.isEnabled() == false) {
-			_chkExportTourRange.setSelection(false);
+		if (_chkPrintTourRange.isEnabled() == false) {
+			_chkPrintTourRange.setSelection(false);
 		}
 	}
 
@@ -707,11 +732,11 @@ public class DialogPrintTour extends TitleAreaDialog {
 		return _state;
 	}
 
-	private String getExportFileName() {
+	private String getPrintFileName() {
 		return _comboFile.getText().trim();
 	}
 
-	private String getExportPathName() {
+	private String getPrintPathName() {
 		return _comboPath.getText().trim();
 	}
 
@@ -745,7 +770,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				result[0] = _chkExportTourRange.getSelection()
+				result[0] = _chkPrintTourRange.getSelection()
 						&& (_tourDataList.size() == 1)
 						&& (_tourStartIndex != -1)
 						&& (_tourEndIndex != -1);
@@ -763,7 +788,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 				try {
-					doExport();
+					doPrint();
 				} catch (final IOException e) {
 					e.printStackTrace();
 				}
@@ -779,7 +804,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		dialog.setText(Messages.Dialog_Print_Dir_Dialog_Text);
 		dialog.setMessage(Messages.Dialog_Print_Dir_Dialog_Message);
 
-		dialog.setFilterPath(getExportPathName());
+		dialog.setFilterPath(getPrintPathName());
 
 		final String selectedDirectoryName = dialog.open();
 
@@ -796,7 +821,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		final FileDialog dialog = new FileDialog(_dlgContainer.getShell(), SWT.SAVE);
 		dialog.setText(Messages.Dialog_Print_File_Dialog_Text);
 
-		dialog.setFilterPath(getExportPathName());
+		dialog.setFilterPath(getPrintPathName());
 		dialog.setFilterExtensions(new String[] { fileExtension });
 		dialog.setFileName("*." + fileExtension);//$NON-NLS-1$
 
@@ -809,9 +834,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 	}
 
 	private void restoreState() {
-		_chkExportTourRange.setSelection(_state.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
-		_chkExportMarkers.setSelection(_state.getBoolean(STATE_IS_EXPORT_MARKERS));
-		_chkExportNotes.setSelection(_state.getBoolean(STATE_IS_EXPORT_NOTES));
+		_chkPrintTourRange.setSelection(_state.getBoolean(STATE_IS_PRINT_TOUR_RANGE));
+		_chkPrintMarkers.setSelection(_state.getBoolean(STATE_IS_PRINT_MARKERS));
+		_chkPrinttNotes.setSelection(_state.getBoolean(STATE_IS_PRINT_NOTES));
 
 		// camouflage speed
 		_chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
@@ -820,8 +845,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_txtCamouflageSpeed.selectAll();
 
 		// export file/path
-		UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
-		UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
+		UI.restoreCombo(_comboFile, _state.getArray(STATE_PRINT_FILE_NAME));
+		UI.restoreCombo(_comboPath, _state.getArray(STATE_PRINT_PATH_NAME));
 		_chkOverwriteFiles.setSelection(_state.getBoolean(STATE_IS_OVERWRITE_FILES));
 	}
 
@@ -829,13 +854,13 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 		// export file/path
 		if (validateFilePath()) {
-			_state.put(STATE_EXPORT_PATH_NAME, getUniqueItems(_comboPath.getItems(), getExportPathName()));
-			_state.put(STATE_EXPORT_FILE_NAME, getUniqueItems(_comboFile.getItems(), getExportFileName()));
+			_state.put(STATE_PRINT_PATH_NAME, getUniqueItems(_comboPath.getItems(), getPrintPathName()));
+			_state.put(STATE_PRINT_FILE_NAME, getUniqueItems(_comboFile.getItems(), getPrintFileName()));
 		}
 
 		// export tour part
-		if (canExportTourPart()) {
-			_state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
+		if (canPrintTourPart()) {
+			_state.put(STATE_IS_PRINT_TOUR_RANGE, _chkPrintTourRange.getSelection());
 		}
 
 		// camouflage speed
@@ -843,8 +868,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_state.put(STATE_CAMOUFLAGE_SPEED, _txtCamouflageSpeed.getText());
 
 		_state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
-		_state.put(STATE_IS_EXPORT_MARKERS, _chkExportMarkers.getSelection());
-		_state.put(STATE_IS_EXPORT_NOTES, _chkExportNotes.getSelection());
+		_state.put(STATE_IS_PRINT_MARKERS, _chkPrintMarkers.getSelection());
+		_state.put(STATE_IS_PRINT_NOTES, _chkPrinttNotes.getSelection());
 	}
 
 	private void setError(final String message) {
@@ -934,7 +959,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private boolean validateFilePath() {
 
 		// check path
-		IPath filePath = new Path(getExportPathName());
+		IPath filePath = new Path(getPrintPathName());
 		if (new File(filePath.toOSString()).exists() == false) {
 
 			// invalid path
@@ -944,7 +969,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 		boolean returnValue = false;
 
-		String fileName = getExportFileName();
+		String fileName = getPrintFileName();
 
 		// remove extentions
 		final int extPos = fileName.indexOf('.');

@@ -43,11 +43,28 @@ public class PrintTourPDF extends PrintTourExtension {
 	private final String			_printOutputPath	= (Platform.getInstanceLocation().getURL().getPath() + "print-output");
 	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
 	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.shortTime();
+	private File					_xslFile;
 
 	/**
 	 * plugin extension constructor
 	 */
-	public PrintTourPDF() {}
+	public PrintTourPDF() {
+		// prepare xsl file for transformation
+		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
+
+		try {
+			URL fileUrl = null;
+			try {
+				fileUrl = FileLocator.toFileURL(url);
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+			_xslFile = new File(fileUrl.toURI());
+
+		} catch (final URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	/**
 	 * performs the actual PDF generation
@@ -56,19 +73,19 @@ public class PrintTourPDF extends PrintTourExtension {
 	 * http://www.ibm.com/developerworks/xml/library/x-xslfo
 	 * 
 	 * @param object
-	 * @param xslFile
 	 * @param pdfFile
 	 * @throws FileNotFoundException
 	 * @throws FOPException
 	 * @throws TransformerException
 	 */
-	public void generatePDF(final IXmlSerializable object, final File xslFile, final File pdfFile)
+	public void printPDF(final IXmlSerializable object, final String pdfFilePath)
 			throws FileNotFoundException, FOPException, TransformerException {
 
 		FileOutputStream pdfContentStream = null;
 		BufferedOutputStream pdfContent = null;
 		try {
 			// setup pdf outpoutStream
+			File pdfFile = new File(pdfFilePath);
 			pdfContentStream = new FileOutputStream(pdfFile);
 			pdfContent = new BufferedOutputStream(pdfContentStream);
 
@@ -77,7 +94,7 @@ public class PrintTourPDF extends PrintTourExtension {
 			final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 
 			// setup xsl stylesheet source
-			final FileInputStream xslFileStream = new FileInputStream(xslFile);
+			final FileInputStream xslFileStream = new FileInputStream(_xslFile);
 			final StreamSource xslSource = new StreamSource(xslFileStream);
 
 			// get transformer
@@ -106,7 +123,6 @@ public class PrintTourPDF extends PrintTourExtension {
 			}
 		}
 	}
-	
 
 	@Override
 	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
@@ -114,40 +130,8 @@ public class PrintTourPDF extends PrintTourExtension {
 		new DialogPrintTour(Display.getCurrent().getActiveShell(), this, tourDataList, tourStartIndex, tourEndIndex)
 				.open();
 
-		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
-
-		File xslFile = null;
-		try {
-			URL fileUrl = null;
-			try {
-				fileUrl = FileLocator.toFileURL(url);
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-			xslFile = new File(fileUrl.toURI());
-
-		} catch (final URISyntaxException e1) {
-			e1.printStackTrace();
-		}
-
 		// hardcoded pdf output path for development
-		final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
-
-		for (final TourData tourData : tourDataList) {
-			System.out.println("### printing: " + tourData.getTourTitle());
-			try {
-				generatePDF(tourData, xslFile, pdfFile);
-			} catch (final FOPException e) {
-				e.printStackTrace();
-			} catch (final IOException e) {
-				e.printStackTrace();
-			} catch (final TransformerException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// new PrintDialog(Display.getCurrent().getActiveShell()).open();
-
+		// final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
 	}
 
 	/**
