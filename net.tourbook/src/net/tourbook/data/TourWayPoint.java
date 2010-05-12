@@ -28,52 +28,58 @@ import de.byteholder.gpx.GeoPosition;
 @Entity
 public class TourWayPoint implements Cloneable {
 
+	public static final int	DB_LENGTH_NAME			= 1024;
+	public static final int	DB_LENGTH_DESCRIPTION	= 4096;
+	public static final int	DB_LENGTH_COMMENT		= 4096;
+	public static final int	DB_LENGTH_SYMBOL		= 1024;
+	public static final int	DB_LENGTH_CATEGORY		= 1024;
+
 	/**
 	 * Unique id for the {@link TourWayPoint} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private final long	wayPointId		= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long			wayPointId				= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@ManyToOne(optional = false)
-	private TourData	tourData;
+	private TourData		tourData;
 
 	// initialize with invalid values
-	private double		longitude		= Double.MIN_VALUE;
+	private double			longitude				= Double.MIN_VALUE;
 
-	private double		latitude		= Double.MIN_VALUE;
+	private double			latitude				= Double.MIN_VALUE;
 
 	/**
 	 * absolute time
 	 */
-	private long		time			= 0;
+	private long			time					= 0;
 
 	/**
 	 * altitude in meters
 	 */
-	private float		altitude		= Float.MIN_VALUE;
+	private float			altitude				= Float.MIN_VALUE;
 
-	private String		name;
+	private String			name;
 
-	private String		description;
-	private String		comment;
-	private String		symbol;
-	private String		category;
+	private String			description;
+	private String			comment;
+	private String			symbol;
+	private String			category;
 	/**
 	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
-	private long		createId		= 0;
+	private long			createId				= 0;
 
 	@Transient
-	private GeoPosition	_geoPosition;
+	private GeoPosition		_geoPosition;
 
 	/**
 	 * manually created way points or imported way points create a unique id to identify them, saved
 	 * way points are compared with the way point id
 	 */
-	private static int	_createCounter	= 0;
+	private static int		_createCounter			= 0;
 
 	public TourWayPoint() {
 		this.createId = ++_createCounter;

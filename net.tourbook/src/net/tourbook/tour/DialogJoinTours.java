@@ -1133,9 +1133,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 //		if (joinedDescription.length() >= TourDatabase.MAX_DESCRIPTION_LENGTH) {
 //
 //		}
-		if (TourDatabase.checkFieldLength(UI.EMPTY_STRING, 5) == false) {
-			return false;
-		}
+//		if (TourDatabase.checkFieldLength(UI.EMPTY_STRING, 5) == false) {
+//			return false;
+//		}
 
 		/*
 		 * setup tour data
@@ -1215,7 +1215,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 	@Override
 	protected void okPressed() {
 
-		TourDatabase.checkFieldLength("", 3);
+//		TourDatabase.checkFieldLength("", 3);
 
 		return;
 //		if (joinTours() == false) {

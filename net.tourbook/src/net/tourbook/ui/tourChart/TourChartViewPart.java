@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
@@ -40,17 +40,17 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TourChartViewPart extends ViewPart {
 
-	public TourData						fTourData;
+	public TourData						_tourData;
 
-	protected TourChart					fTourChart;
-	protected TourChartConfiguration	fTourChartConfig;
+	protected TourChart					_tourChart;
+	protected TourChartConfiguration	_tourChartConfig;
 
-	public PostSelectionProvider		fPostSelectionProvider;
+	public PostSelectionProvider		_postSelectionProvider;
 
-	private IPropertyChangeListener		fPrefChangeListener;
-	private ITourEventListener			fTourEventListener;
-	private ISelectionListener			fPostSelectionListener;
-	private IPartListener2				fPartListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
+	private ISelectionListener			_postSelectionListener;
+	private IPartListener2				_partListener;
 
 	/**
 	 * set the part listener to save the view settings, the listeners are called before the controls
@@ -58,7 +58,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	 */
 	private void addPartListeners() {
 
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -81,12 +81,12 @@ public abstract class TourChartViewPart extends ViewPart {
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -98,20 +98,20 @@ public abstract class TourChartViewPart extends ViewPart {
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-					fTourChartConfig = TourManager.createTourChartConfiguration();
+					_tourChartConfig = TourManager.createTourChartConfiguration();
 
-					if (fTourChart != null) {
-						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+					if (_tourChart != null) {
+						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-					fTourChart.setMouseMode(event.getNewValue());
+					_tourChart.setMouseMode(event.getNewValue());
 				}
 			}
 		};
 
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -119,42 +119,42 @@ public abstract class TourChartViewPart extends ViewPart {
 	 */
 	private void addSelectionListener() {
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(part, selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (fTourData == null || part == TourChartViewPart.this) {
+				if (_tourData == null || part == TourChartViewPart.this) {
 					return;
 				}
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-					fTourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateSegmentLayer((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-					fTourChart.updateTourChart(true, true);
+					_tourChart.updateTourChart(true, true);
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-					fTourData = null;
-					fPostSelectionProvider.clearSelection();
+					_tourData = null;
+					_postSelectionProvider.clearSelection();
 
 					updateChart();
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final TourData tourData = UI.getTourPropertyTourData((TourEvent) eventData, fTourData);
+					final TourData tourData = UI.getTourPropertyTourData((TourEvent) eventData, _tourData);
 					if (tourData != null) {
 
-						fTourData = tourData;
+						_tourData = tourData;
 
 						updateChart();
 					}
@@ -162,7 +162,7 @@ public abstract class TourChartViewPart extends ViewPart {
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	@Override
@@ -174,19 +174,19 @@ public abstract class TourChartViewPart extends ViewPart {
 		addPartListeners();
 
 		// set this part as selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 	}
 
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		getSite().getPage().removePartListener(fPartListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}

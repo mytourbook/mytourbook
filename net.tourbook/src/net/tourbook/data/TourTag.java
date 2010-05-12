@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.data;
@@ -35,40 +35,42 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourTag implements Comparable<Object> {
 
-	public static final int			EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
-	public static final int			EXPAND_TYPE_FLAT			= 1;
-	public static final int			EXPAND_TYPE_YEAR_DAY		= 2;
+	public static final int				DB_LENGTH_NAME				= 255;
+
+	public static final int				EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
+	public static final int				EXPAND_TYPE_FLAT			= 1;
+	public static final int				EXPAND_TYPE_YEAR_DAY		= 2;
 
 	/*
 	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long						tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
 	 * <code>true</code>, 0 = <code>false</code>
 	 */
-	private int						isRoot						= 0;
+	private int							isRoot						= 0;
 
 	/**
 	 * Display name of the tag
 	 */
 	@Basic(optional = false)
-	private String					name;
+	private String						name;
 
 	/**
 	 * when a tag is expanded in the tag tree viewer, the tours can be displayed in different
 	 * structures
 	 */
-	private int						expandType					= EXPAND_TYPE_FLAT;
+	private int							expandType					= EXPAND_TYPE_FLAT;
 
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private Set<TourData>			tourData					= new HashSet<TourData>();
+	private final Set<TourData>			tourData					= new HashSet<TourData>();
 
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
+	private final Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
 
 	public TourTag() {}
 

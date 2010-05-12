@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,12 +31,17 @@ import net.tourbook.ui.UI;
 @Entity
 public class TourPerson {
 
-	public static final int	PERSON_ID_NOT_DEFINED	= -1;
+	public static final int	DB_LENGTH_LAST_NAME			= 80;
+	public static final int	DB_LENGTH_FIRST_NAME		= 80;
+	public static final int	DB_LENGTH_RAW_DATA_PATH		= 255;
+	public static final int	DB_LENGTH_DEVICE_READER_ID	= 255;
+
+	public static final int	PERSON_ID_NOT_DEFINED		= -1;
 	// public static final int PERSON_ID_ALL = -2;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long		personId				= PERSON_ID_NOT_DEFINED;
+	private long			personId					= PERSON_ID_NOT_DEFINED;
 
 	@Basic(optional = false)
 	private String			firstName;

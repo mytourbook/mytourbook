@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
 
@@ -27,6 +27,8 @@ import net.tourbook.database.TourDatabase;
 
 @Entity
 public class TourBike {
+
+	public static final int	DB_LENGTH_NAME		= 255;
 
 	public static final int	BIKE_ID_NOT_DEFINED	= -1;
 
@@ -70,6 +72,10 @@ public class TourBike {
 
 	public int getRearTyreId() {
 		return rearTyreId;
+	}
+
+	public int getTypeId() {
+		return typeId;
 	}
 
 	public float getWeight() {
@@ -122,16 +128,12 @@ public class TourBike {
 		this.rearTyreId = rearTyre;
 	}
 
-	public void setWeight(final float weight) {
-		this.weight = weight;
-	}
-
-	public int getTypeId() {
-		return typeId;
-	}
-
 	public void setTypeId(final int typeId) {
 		this.typeId = typeId;
+	}
+
+	public void setWeight(final float weight) {
+		this.weight = weight;
 	}
 
 }

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.data;
@@ -29,27 +29,29 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType {
 
+	public static final int	DB_LENGTH_NAME	= 100;
+
 	/**
 	 * contains the entity id
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long	typeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long			typeId			= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String	name;
+	private String			name;
 
-	private short	colorBrightRed;
-	private short	colorBrightGreen;
-	private short	colorBrightBlue;
+	private short			colorBrightRed;
+	private short			colorBrightGreen;
+	private short			colorBrightBlue;
 
-	private short	colorDarkRed;
-	private short	colorDarkGreen;
-	private short	colorDarkBlue;
+	private short			colorDarkRed;
+	private short			colorDarkGreen;
+	private short			colorDarkBlue;
 
-	private short	colorLineRed;
-	private short	colorLineGreen;
-	private short	colorLineBlue;
+	private short			colorLineRed;
+	private short			colorLineGreen;
+	private short			colorLineBlue;
 
 	/**
 	 * default constructor used in ejb

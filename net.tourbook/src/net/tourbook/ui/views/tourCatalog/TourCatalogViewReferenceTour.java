@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
@@ -52,48 +52,53 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 	public static final String	ID				= "net.tourbook.views.tourCatalog.referenceTourView";	//$NON-NLS-1$
 
-	private long				fActiveRefId	= -1;
+	private long				_activeRefId	= -1;
 
-	private PageBook			fPageBook;
-	private Label				fPageNoChart;
+	private PageBook			_pageBook;
+	private Label				_pageNoChart;
 
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		super.createPartControl(parent);
 
-		fPageBook = new PageBook(parent, SWT.NONE);
+		_pageBook = new PageBook(parent, SWT.NONE);
 
-		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoChart = new Label(_pageBook, SWT.NONE);
+		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		fTourChart = new TourChart(fPageBook, SWT.FLAT, true);
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
-		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		fTourChart.setContextProvider(new TourChartContextProvicer(this));
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart.setShowZoomActions(true);
+		_tourChart.setShowSlider(true);
+		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		_tourChart.setContextProvider(new TourChartContextProvicer(this));
 
-		fTourChart.addDoubleClickListener(new Listener() {
+		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
-				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+				TourManager.getInstance().openTourInEditor(_tourData.getTourId());
 			}
 		});
 
 		// set chart title
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		_tourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
-				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
+
+				if (_tourData == null) {
+					return;
+				}
+
+				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
 		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
-		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				fPostSelectionProvider.setSelection(chartInfoSelection);
+				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
 
-		fPageBook.showPage(fPageNoChart);
+		_pageBook.showPage(_pageNoChart);
 
 		// show current selected tour
 		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
@@ -104,12 +109,12 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 	public ArrayList<TourData> getSelectedTours() {
 		final ArrayList<TourData> selectedTour = new ArrayList<TourData>();
-		selectedTour.add(fTourData);
+		selectedTour.add(_tourData);
 		return selectedTour;
 	}
 
 	public TourChart getTourChart() {
-		return fTourChart;
+		return _tourChart;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -145,9 +150,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 	@Override
 	public void setFocus() {
-		fTourChart.setFocus();
+		_tourChart.setFocus();
 
-		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
+		_postSelectionProvider.setSelection(new SelectionTourChart(_tourChart));
 	}
 
 	/**
@@ -159,21 +164,25 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 	private void setTourCompareConfig(final TourCompareConfig compareConfig) {
 
 		// save the chart slider positions for the old ref tour
-		final TourCompareConfig oldRefTourConfig = ReferenceTourManager.getInstance()
-				.getTourCompareConfig(fActiveRefId);
+		final TourCompareConfig oldRefTourConfig = ReferenceTourManager
+				.getInstance()
+				.getTourCompareConfig(_activeRefId);
 
 		if (oldRefTourConfig != null) {
 
-			final SelectionChartXSliderPosition oldXSliderPosition = fTourChart.getXSliderPosition();
+			final SelectionChartXSliderPosition oldXSliderPosition = _tourChart.getXSliderPosition();
 
-			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
-					oldXSliderPosition.getLeftSliderValueIndex(),
-					oldXSliderPosition.getRightSliderValueIndex()));
+			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, oldXSliderPosition
+					.getLeftSliderValueIndex(), oldXSliderPosition.getRightSliderValueIndex()));
 		}
 
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		_tourChart.addDataModelListener(new IDataModelListener() {
 
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
+
+				if (_tourData == null) {
+					return;
+				}
 
 				final ChartDataXSerie xData = changedChartDataModel.getXData();
 				final TourReference refTour = compareConfig.getRefTour();
@@ -186,14 +195,16 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED, new TourPropertyRefTourChanged(fTourChart,
+				TourManager.fireEvent(TourEventId.REFERENCE_TOUR_CHANGED, new TourPropertyRefTourChanged(
+						_tourChart,
 						refTour.getRefId(),
 						refTourXMarkerValue), TourCatalogViewReferenceTour.this);
 
 				// set title
-				changedChartDataModel.setTitle(NLS.bind(Messages.tourCatalog_view_label_chart_title_reference_tour,
+				changedChartDataModel.setTitle(NLS.bind(
+						Messages.tourCatalog_view_label_chart_title_reference_tour,
 						refTour.getLabel(),
-						TourManager.getTourTitleDetailed(fTourData)));
+						TourManager.getTourTitleDetailed(_tourData)));
 
 			}
 		});
@@ -202,7 +213,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 	private void showRefTour(final long refId) {
 
 		// check if the ref tour is already displayed
-		if (refId == fActiveRefId) {
+		if (refId == _activeRefId) {
 			return;
 		}
 
@@ -215,16 +226,16 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		 * show new ref tour
 		 */
 
-		fTourData = tourCompareConfig.getRefTourData();
-		fTourChartConfig = tourCompareConfig.getRefTourChartConfig();
+		_tourData = tourCompareConfig.getRefTourData();
+		_tourChartConfig = tourCompareConfig.getRefTourChartConfig();
 
 		setTourCompareConfig(tourCompareConfig);
 
 		// set active ref id after the configuration is set
-		fActiveRefId = refId;
+		_activeRefId = refId;
 
 		// ???
-		fTourChart.onExecuteZoomOut(false);
+		_tourChart.onExecuteZoomOut(false);
 
 		updateChart();
 
@@ -233,18 +244,18 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 	@Override
 	public void updateChart() {
 
-		if (fTourData == null) {
-			fActiveRefId = -1;
-			fPageBook.showPage(fPageNoChart);
+		if (_tourData == null) {
+			_activeRefId = -1;
+			_pageBook.showPage(_pageNoChart);
 			return;
 		}
 
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 
-		fPageBook.showPage(fTourChart);
+		_pageBook.showPage(_tourChart);
 
 		// set application window title
-		setTitleToolTip(TourManager.getTourDateShort(fTourData));
+		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 
 }

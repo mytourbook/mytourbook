@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,19 +82,28 @@ import org.joda.time.DateTime;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
+	public static final int				DB_LENGTH_DEVICE_TOUR_TYPE		= 2;
+	public static final int				DB_LENGTH_DEVICE_PLUGIN_ID		= 255;
+	public static final int				DB_LENGTH_DEVICE_PLUGIN_NAME	= 255;
+	public static final int				DB_LENGTH_DEVICE_MODE_NAME		= 255;
+	public static final int				DB_LENGTH_TOUR_TITLE			= 255;
+	public static final int				DB_LENGTH_TOUR_DESCRIPTION		= 4096;
+	public static final int				DB_LENGTH_TOUR_DESCRIPTION_V10	= 32000;
+	public static final int				DB_LENGTH_TOUR_START_PLACE		= 255;
+	public static final int				DB_LENGTH_TOUR_END_PLACE		= 255;
+	public static final int				DB_LENGTH_TOUR_IMPORT_FILE_PATH	= 255;
+	public static final int				DB_LENGTH_WEATHER_CLOUDS		= 255;
+
 	/**
 	 * 
 	 */
-	@Transient
 	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 
-	@Transient
 	public static final float			MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Device Id for manually created tours
 	 */
-	@Transient
 	public static final String			DEVICE_ID_FOR_MANUAL_TOUR		= "manual";								//$NON-NLS-1$
 
 	/**
@@ -102,13 +111,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * disabled because they are not available, tour duration can be edited<br>
 	 * this is the id of the deviceDataReader
 	 */
-	@Transient
 	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
 
-	// initialize SRTM
+	/*
+	 * initialize SRTM
+	 */
 	@SuppressWarnings("unused")
 	@Transient
 	private static final NumberForm		srtmNumberForm					= new NumberForm();
+
 	@Transient
 	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
 
@@ -3398,7 +3409,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int bodyHeight = 188;
 
 		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD = 0.8f;// Strï¿½mungskoeffizient
+		final float cD = 0.8f;// Strömungskoeffizient
 		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
@@ -4419,6 +4430,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	
 	@Override
 	public String toXml() {
+
 		try {
 			JAXBContext context = JAXBContext.newInstance(this.getClass());
 			Marshaller marshaller = context.createMarshaller();

@@ -25,27 +25,30 @@ import javax.persistence.Transient;
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.UI;
 
 @Entity
 public class TourMarker implements Cloneable {
 
+	public static final int			DB_LENGTH_LABEL			= 255;
+	public static final int			DB_LENGTH_CATEGORY		= 100;
+
 	/**
 	 * visual position for markers, they must correspond to the position in {@link ChartLabel}
 	 */
-	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
-			Messages.Tour_Marker_Position_vertical_above, // 0
-			Messages.Tour_Marker_Position_vertical_below, // 1
-			Messages.Tour_Marker_Position_vertical_chart_top, // 2
-			Messages.Tour_Marker_Position_vertical_chart_bottom, // 3
-			Messages.Tour_Marker_Position_horizontal_above_left, // 4
-			Messages.Tour_Marker_Position_horizontal_above_centered, // 5
-			Messages.Tour_Marker_Position_horizontal_above_right, // 6
-			Messages.Tour_Marker_Position_horizontal_below_left, // 7
-			Messages.Tour_Marker_Position_horizontal_below_centered, // 8
-			Messages.Tour_Marker_Position_horizontal_below_right, // 9
-			Messages.Tour_Marker_Position_horizontal_left, // 10
-			Messages.Tour_Marker_Position_horizontal_right, // 11
+			Messages.Tour_Marker_Position_vertical_above, // 				0
+			Messages.Tour_Marker_Position_vertical_below, //				1
+			Messages.Tour_Marker_Position_vertical_chart_top, // 			2
+			Messages.Tour_Marker_Position_vertical_chart_bottom, // 		3
+			Messages.Tour_Marker_Position_horizontal_above_left, // 		4
+			Messages.Tour_Marker_Position_horizontal_above_centered, // 	5
+			Messages.Tour_Marker_Position_horizontal_above_right, // 		6
+			Messages.Tour_Marker_Position_horizontal_below_left, // 		7
+			Messages.Tour_Marker_Position_horizontal_below_centered, // 	8
+			Messages.Tour_Marker_Position_horizontal_below_right, // 		9
+			Messages.Tour_Marker_Position_horizontal_left, // 				10
+			Messages.Tour_Marker_Position_horizontal_right, // 				11
 															};
 
 	/**
@@ -87,9 +90,9 @@ public class TourMarker implements Cloneable {
 	 */
 	private int						serieIndex;
 
-	private String					label					= "";								//$NON-NLS-1$
+	private String					label					= UI.EMPTY_STRING;
 
-	private String					category				= "";								//$NON-NLS-1$
+	private String					category				= UI.EMPTY_STRING;
 
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
