@@ -1,21 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
-// author:	Wolfgang Schramm 
+// author:	Wolfgang Schramm
 // created:	6. July 2007
 
 import java.util.ArrayList;
@@ -55,28 +55,28 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	private static final String		MEMENTO_TOUR_ID	= "tourId";						//$NON-NLS-1$
 
-	private TourEditorInput			fEditorInput;
+	private TourEditorInput			_editorInput;
 
-	private TourChart				fTourChart;
-	private TourChartConfiguration	fTourChartConfig;
-	private TourData				fTourData;
+	private TourChart				_tourChart;
+	private TourChartConfiguration	_tourChartConfig;
+	private TourData				_tourData;
 
-	private boolean					fIsTourDirty	= false;
+	private boolean					_isTourDirty	= false;
 
-	private PostSelectionProvider	fPostSelectionProvider;
-	private ISelectionListener		fPostSelectionListener;
-	private IPartListener2			fPartListener;
-	private ITourEventListener		fTourEventListener;
+	private PostSelectionProvider	_postSelectionProvider;
+	private ISelectionListener		_postSelectionListener;
+	private IPartListener2			_partListener;
+	private ITourEventListener		_tourEventListener;
 
 	private void addPartListener() {
 
 		// set the part listener
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
 					if (partRef.getPart(false) == TourEditor.this) {
-						fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
+						_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
 					}
 				}
 			}
@@ -97,12 +97,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		};
 
 		// register the part listener
-		getSite().getPage().addPartListener(fPartListener);
+		getSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addSelectionListener() {
 
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
@@ -115,12 +115,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourEditor.this) {
@@ -129,15 +129,15 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					fTourChart.updateSegmentLayer((Boolean) eventData);
+					_tourChart.updateSegmentLayer((Boolean) eventData);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					fTourChart.updateTourChart(true);
+					_tourChart.updateTourChart(true);
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (fTourData == null) {
+					if (_tourData == null) {
 						return;
 					}
 
@@ -145,7 +145,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
-					final long tourId = fTourData.getTourId();
+					final long tourId = _tourData.getTourId();
 
 					// check if the tour in the editor was modified
 					for (final Object object : modifiedTours) {
@@ -157,7 +157,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 								updateChart(tourData);
 
 								// removed old tour data from the selection provider
-								fPostSelectionProvider.clearSelection();
+								_postSelectionProvider.clearSelection();
 
 								// exit here because only one tourdata can be inside a tour editor
 								return;
@@ -170,10 +170,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					// check if this tour viewer contains a tour which must be updated
 
 					// update editor
-					if (UI.containsTourId(eventData, fTourData.getTourId()) != null) {
+					if (UI.containsTourId(eventData, _tourData.getTourId()) != null) {
 
 						// reload tour data and update chart
-						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
+						updateChart(TourManager.getInstance().getTourData(_tourData.getTourId()));
 					}
 				}
 			}
@@ -181,14 +181,14 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			private void updateChart(final TourData tourData) {
 
 				// keep modified data
-				fTourData = tourData;
+				_tourData = tourData;
 
 				// update chart
-				fTourChart.updateTourChart(tourData, false);
+				_tourChart.updateTourChart(tourData, false);
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void createActions() {
@@ -202,21 +202,21 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		addTourEventListener();
 		createActions();
 
-		fTourChart = new TourChart(parent, SWT.FLAT, true);
+		_tourChart = new TourChart(parent, SWT.FLAT, true);
 
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
-		fTourChart.setContextProvider(new TourChartContextProvider(this));
+		_tourChart.setShowZoomActions(true);
+		_tourChart.setShowSlider(true);
+		_tourChart.setContextProvider(new TourChartContextProvider(this));
 
 		// fire a slider move selection when a slider was moved in the tour chart
-		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				fPostSelectionProvider.setSelection(chartInfoSelection);
+				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
 
-		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChart.createTourEditorActionHandlers(fTourChartConfig);
+		_tourChartConfig = TourManager.createTourChartConfiguration();
+		_tourChart.createTourEditorActionHandlers(_tourChartConfig);
 
 		updateTourChart();
 	}
@@ -226,10 +226,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 		final IWorkbenchPartSite site = getSite();
 
-		site.getPage().removePartListener(fPartListener);
-		site.getPage().removePostSelectionListener(fPostSelectionListener);
+		site.getPage().removePartListener(_partListener);
+		site.getPage().removePostSelectionListener(_postSelectionListener);
 
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		super.dispose();
 	}
@@ -240,13 +240,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	@Override
 	public void doSaveAs() {}
 
-
 	public TourChart getTourChart() {
-		return fTourChart;
+		return _tourChart;
 	}
 
 	public TourData getTourData() {
-		return fTourData;
+		return _tourData;
 	}
 
 	@Override
@@ -255,17 +254,17 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		setSite(site);
 		setInput(input);
 
-		fEditorInput = (TourEditorInput) input;
+		_editorInput = (TourEditorInput) input;
 
 		// set selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		addSelectionListener();
 	}
 
 	@Override
 	public boolean isDirty() {
-		return fIsTourDirty;
+		return _isTourDirty;
 	}
 
 	@Override
@@ -282,8 +281,8 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			if (chart == null) {
 				return;
 			}
-			
-			if (chart != fTourChart) {
+
+			if (chart != _tourChart) {
 
 				// it's not the same chart, check if it's the same tour
 
@@ -293,23 +292,23 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData != null) {
 
-						if (fTourData.equals(tourData)) {
+						if (_tourData.equals(tourData)) {
 
 							// it's the same tour, overwrite chart
 
-							xSliderPosition.setChart(fTourChart);
+							xSliderPosition.setChart(_tourChart);
 						}
 					}
 				}
 			}
 
-			fTourChart.setXSliderPosition(xSliderPosition);
+			_tourChart.setXSliderPosition(xSliderPosition);
 
 		} else if (selection instanceof SelectionDeletedTours) {
 
 			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
-			final long tourId = fTourData.getTourId().longValue();
+			final long tourId = _tourData.getTourId().longValue();
 
 			// find the current tour id in the removed tour id's
 			for (final ITourItem tourItem : removedTours) {
@@ -331,9 +330,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData != null) {
 
-						if (fTourData == null || fTourData.equals(tourData) == false) {
+						if (_tourData == null || _tourData.equals(tourData) == false) {
 
-							fTourData = tourData;
+							_tourData = tourData;
 
 							updateTourChart();
 						}
@@ -341,7 +340,8 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
 						// set slider position
-						fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+						_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+								_tourChart,
 								chartInfo.leftSliderValuesIndex,
 								chartInfo.rightSliderValuesIndex));
 					}
@@ -358,12 +358,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	}
 
 	public void saveState(final IMemento memento) {
-		memento.putString(MEMENTO_TOUR_ID, Long.toString(fEditorInput.getTourId()));
+		memento.putString(MEMENTO_TOUR_ID, Long.toString(_editorInput.getTourId()));
 	}
 
 	@Override
 	public void setFocus() {
-		fTourChart.setFocus();
+		_tourChart.setFocus();
 	}
 
 	@Override
@@ -372,7 +372,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append("[TourEditor] "); //$NON-NLS-1$
-		sb.append(fTourData);
+		sb.append(_tourData);
 
 		return sb.toString();
 	}
@@ -382,27 +382,28 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	 */
 	private void updateTourChart() {
 
-		// load tourdata 
-		fTourData = TourManager.getInstance().getTourData(fEditorInput.getTourId());
+		// load tourdata
+		_tourData = TourManager.getInstance().getTourData(_editorInput.getTourId());
 
-		if (fTourData != null) {
+		if (_tourData != null) {
 
 			// show the tour chart
 
-			fTourChart.addDataModelListener(new IDataModelListener() {
+			_tourChart.addDataModelListener(new IDataModelListener() {
 				public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle(NLS.bind(Messages.Tour_Book_Label_chart_title,
-							TourManager.getTourTitleDetailed(fTourData)));
+					changedChartDataModel.setTitle(NLS.bind(
+							Messages.Tour_Book_Label_chart_title,
+							TourManager.getTourTitleDetailed(_tourData)));
 				}
 			});
 
-			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+			_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 
-			final String tourTitle = TourManager.getTourDateShort(fTourData);
+			final String tourTitle = TourManager.getTourDateShort(_tourData);
 
-			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
+			_editorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???"); //$NON-NLS-1$

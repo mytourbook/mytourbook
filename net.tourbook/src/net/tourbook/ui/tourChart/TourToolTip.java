@@ -31,10 +31,12 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionTourToolTipEditQuick;
 import net.tourbook.ui.action.ActionTourToolTipEditTour;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -43,11 +45,13 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -96,7 +100,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private Label						_lblDate;
 	private Label						_lblTourTags;
 	private CLabel						_lblTourType;
-	private Label						_lblDescription;
+	private Text						_txtDescription;
 
 	/*
 	 * 1. column
@@ -534,6 +538,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private void createUI50LowerPart(final Composite parent) {
 
 		Label label;
+		final PixelConverter pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -563,18 +568,38 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			 */
 			if (_hasDescription) {
 
+				// label
 				label = createUILabel(container, Messages.Tour_Tooltip_Label_Description);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
 						.applyTo(label);
 
-				_lblDescription = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
+				// text field
+				int style;
+				final int lineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
+
+				if (lineCount > 10) {
+					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER | SWT.V_SCROLL;
+				} else {
+					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY;
+				}
+
+				_txtDescription = new Text(container, style);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
-						.hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT)
-						.applyTo(_lblDescription);
+//						.hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT)
+						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
+						.applyTo(_txtDescription);
+
+				if (lineCount > 10) {
+					final GridData gd = (GridData) _txtDescription.getLayoutData();
+					gd.heightHint = pc.convertHeightInCharsToPixels(20);
+				}
+
+				_txtDescription.setForeground(_fgColor);
+				_txtDescription.setBackground(_bgColor);
 			}
 		}
 	}
@@ -717,8 +742,6 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			tourTitle = tourTypeName.length() > 0 ? tourTypeName : UI.EMPTY_STRING;
 		}
 
-		final String tourDescription = _tourData.getTourDescription();
-
 		_lblTitle.setText(tourTitle);
 		_lblTourType.setToolTipText(tourTypeName);
 
@@ -728,7 +751,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			UI.updateUITags(_tourData, _lblTourTags);
 		}
 		if (_hasDescription) {
-			_lblDescription.setText(tourDescription);
+			_txtDescription.setText(_tourData.getTourDescription());
 		}
 
 		/*

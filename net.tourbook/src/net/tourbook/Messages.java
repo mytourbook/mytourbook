@@ -259,30 +259,25 @@ public class Messages extends NLS {
 	public static String		DataImport_Error_file_does_not_exist_title;
 	public static String		DataImport_Error_invalid_data_format;
 
+	public static String		Db_Field_TourData_Description;
+	public static String		Db_Field_TourData_EndPlace;
+	public static String		Db_Field_TourData_StartPlace;
+	public static String		Db_Field_TourData_Title;
+
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
-
 	public static String		Dialog_JoinTours_Checkbox_IncludeDescription;
-
 	public static String		Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
-
 	public static String		Dialog_JoinTours_ComboText_ConcatenateTime;
-
 	public static String		Dialog_JoinTours_ComboText_KeepTime;
-
 	public static String		Dialog_JoinTours_ComboText_MarkerTourTime;
-
 	public static String		Dialog_JoinTours_ComboText_TourTypeCustom;
-
 	public static String		Dialog_JoinTours_ComboText_TourTypeFromTour;
-
 	public static String		Dialog_JoinTours_ComboText_TourTypePrevious;
-
 	public static String		Dialog_JoinTours_DlgArea_Message;
 	public static String		Dialog_JoinTours_DlgArea_Title;
 	public static String		Dialog_JoinTours_Group_JoinedTourTime;
-
 	public static String		Dialog_JoinTours_Group_TourType;
 	public static String		Dialog_JoinTours_InvalidData_Altitude;
 	public static String		Dialog_JoinTours_InvalidData_Cadence;
@@ -298,36 +293,25 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_Speed;
 	public static String		Dialog_JoinTours_InvalidData_Time;
 	public static String		Dialog_JoinTours_Label_CreateTourMarker;
-
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
-
 	public static String		Dialog_JoinTours_Label_Description;
-
 	public static String		Dialog_JoinTours_Label_DeviceName;
 	public static String		Dialog_JoinTours_Label_OtherFields;
 	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
 	public static String		Dialog_JoinTours_Label_Title;
-
 	public static String		Dialog_JoinTours_Label_Title_Tooltip;
-
 	public static String		Dialog_JoinTours_Label_Tour;
 	public static String		Dialog_JoinTours_Label_TourDate;
-
 	public static String		Dialog_JoinTours_Label_TourMarker;
-
 	public static String		Dialog_JoinTours_Label_TourMarkerText;
-
 	public static String		Dialog_JoinTours_Label_TourStartDateTime;
 	public static String		Dialog_JoinTours_Label_TourTime;
-
 	public static String		Dialog_JoinTours_Label_TourType;
-
 	public static String		Dialog_JoinTours_Link_TourType;
 	public static String		Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
 	public static String		Dialog_JoinTours_Radio_KeepTime_Tooltip;
 	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff;
 	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
-
 	public static String		Dialog_JoinTours_TourTitle;
 
 	public static String		Dialog_SelectGraphs_Title;
@@ -765,6 +749,10 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_CheckFieldLength_Message;
 
 	public static String		Tour_Database_Dialog_CheckFieldLength_Title;
+
+	public static String	Tour_Database_Dialog_ValidateFields_Message;
+
+	public static String	Tour_Database_Dialog_ValidateFields_Title;
 
 	public static String		Tour_Database_load_all_tours;
 

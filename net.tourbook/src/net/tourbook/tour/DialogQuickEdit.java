@@ -209,7 +209,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 //				Section.SHORT_TITLE_BAR
 				Section.TITLE_BAR
 		// | Section.DESCRIPTION
-				// | Section.EXPANDED
+		// | Section.EXPANDED
 				);
 
 		section.setText(title);
@@ -739,6 +739,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	protected void okPressed() {
 
 		updateModelFromUI();
+
+		if (_tourData.isValidForSave() == false) {
+			// data are not valid to be saved which is done in the action which opened this dialog
+			return;
+		}
 
 		super.okPressed();
 	}

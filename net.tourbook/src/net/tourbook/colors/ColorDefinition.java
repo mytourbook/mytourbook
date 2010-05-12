@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.colors;
 
@@ -25,26 +25,27 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ColorDefinition {
 
-	private String				fPrefName;
-	private String				fVisibleName;
+	private String				_prefName;
+	private String				_visibleName;
 
-	private GraphColorItem[]	fColorParts;
+	private GraphColorItem[]	_colorParts;
+	private RGB					_lineColor;
 
-	private RGB					fLineColor;
-	private RGB					fDefaultLineColor;
-	private RGB					fNewLineColor;
+	private RGB					_defaultLineColor;
 
-	private RGB					fGradientBright;
-	private RGB					fDefaultGradientBright;
-	private RGB					fNewGradientBright;
+	private RGB					_newLineColor;
+	private RGB					_gradientBright;
+	private RGB					_defaultGradientBright;
 
-	private RGB					fGradientDark;
-	private RGB					fDefaultGradientDark;
-	private RGB					fNewGradientDark;
+	private RGB					_newGradientBright;
+	private RGB					_gradientDark;
+	private RGB					_defaultGradientDark;
 
-	private LegendColor			fLegendColor;
-	private LegendColor			fDefaultLegendColor;
-	private LegendColor			fNewLegendColor;
+	private RGB					_newGradientDark;
+	private LegendColor			_legendColor;
+	private LegendColor			_defaultLegendColor;
+
+	private LegendColor			_newLegendColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -69,14 +70,14 @@ public class ColorDefinition {
 								final RGB defaultLineColor,
 								final LegendColor defaultLegendColor) {
 
-		fPrefName = prefName;
-		fVisibleName = visibleName;
+		_prefName = prefName;
+		_visibleName = visibleName;
 
-		fDefaultGradientBright = defaultGradientBright;
-		fDefaultGradientDark = defaultGradientDark;
-		fDefaultLineColor = defaultLineColor;
+		_defaultGradientBright = defaultGradientBright;
+		_defaultGradientDark = defaultGradientDark;
+		_defaultLineColor = defaultLineColor;
 
-		fDefaultLegendColor = defaultLegendColor;
+		_defaultLegendColor = defaultLegendColor;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String graphPrefName = getGraphPrefName();
@@ -86,101 +87,131 @@ public class ColorDefinition {
 		 */
 		final String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
 		if (prefStore.contains(prefColorGradientBright)) {
-			fGradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
+			_gradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
 		} else {
-			fGradientBright = fDefaultGradientBright;
+			_gradientBright = _defaultGradientBright;
 		}
-		fNewGradientBright = fGradientBright;
+		_newGradientBright = _gradientBright;
 
 		/*
 		 * gradient dark
 		 */
 		final String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
 		if (prefStore.contains(prefColorGradientDark)) {
-			fGradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
+			_gradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
 		} else {
-			fGradientDark = fDefaultGradientDark;
+			_gradientDark = _defaultGradientDark;
 		}
-		fNewGradientDark = fGradientDark;
+		_newGradientDark = _gradientDark;
 
 		/*
 		 * line color
 		 */
 		final String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
 		if (prefStore.contains(prefColorLine)) {
-			fLineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
+			_lineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
 		} else {
-			fLineColor = fDefaultLineColor;
+			_lineColor = _defaultLineColor;
 		}
-		fNewLineColor = fLineColor;
+		_newLineColor = _lineColor;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ColorDefinition other = (ColorDefinition) obj;
+		if (_prefName == null) {
+			if (other._prefName != null) {
+				return false;
+			}
+		} else if (!_prefName.equals(other._prefName)) {
+			return false;
+		}
+		return true;
 	}
 
 	public RGB getDefaultGradientBright() {
-		return fDefaultGradientBright;
+		return _defaultGradientBright;
 	}
 
 	public RGB getDefaultGradientDark() {
-		return fDefaultGradientDark;
+		return _defaultGradientDark;
 	}
 
 	public LegendColor getDefaultLegendColor() {
-		return fDefaultLegendColor;
+		return _defaultLegendColor;
 	}
 
 	public RGB getDefaultLineColor() {
-		return fDefaultLineColor;
+		return _defaultLineColor;
 	}
 
 	public RGB getGradientBright() {
-		return fGradientBright;
+		return _gradientBright;
 	}
 
 	public RGB getGradientDark() {
-		return fGradientDark;
+		return _gradientDark;
 	}
 
 	public GraphColorItem[] getGraphColorParts() {
-		return fColorParts;
+		return _colorParts;
 	}
 
 	public String getGraphPrefName() {
-		return ITourbookPreferences.GRAPH_COLORS + fPrefName + "."; //$NON-NLS-1$
+		return ITourbookPreferences.GRAPH_COLORS + _prefName + "."; //$NON-NLS-1$
 	}
 
 	public String getImageId() {
-		return fPrefName;
+		return _prefName;
 	}
 
 	public LegendColor getLegendColor() {
-		return fLegendColor;
+		return _legendColor;
 	}
 
 	public RGB getLineColor() {
-		return fLineColor;
+		return _lineColor;
 	}
 
 	public RGB getNewGradientBright() {
-		return fNewGradientBright;
+		return _newGradientBright;
 	}
 
 	public RGB getNewGradientDark() {
-		return fNewGradientDark;
+		return _newGradientDark;
 	}
 
 	public LegendColor getNewLegendColor() {
-		return fNewLegendColor;
+		return _newLegendColor;
 	}
 
 	public RGB getNewLineColor() {
-		return fNewLineColor;
+		return _newLineColor;
 	}
 
 	public String getPrefName() {
-		return fPrefName;
+		return _prefName;
 	}
 
 	public String getVisibleName() {
-		return fVisibleName;
+		return _visibleName;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((_prefName == null) ? 0 : _prefName.hashCode());
+		return result;
 	}
 
 	/**
@@ -189,46 +220,46 @@ public class ColorDefinition {
 	 * @param children
 	 */
 	public void setColorNames(final GraphColorItem[] children) {
-		fColorParts = children;
+		_colorParts = children;
 	}
 
 	public void setGradientBright(final RGB gradientBright) {
-		fGradientBright = gradientBright;
+		_gradientBright = gradientBright;
 	}
 
 	public void setGradientDark(final RGB gradientDark) {
-		fGradientDark = gradientDark;
+		_gradientDark = gradientDark;
 	}
 
 	public void setLegendColor(final LegendColor legendColor) {
-		fLegendColor = legendColor;
+		_legendColor = legendColor;
 	}
 
 	public void setLineColor(final RGB lineColor) {
-		fLineColor = lineColor;
+		_lineColor = lineColor;
 	}
 
 	public void setNewGradientBright(final RGB newGradientBright) {
-		fNewGradientBright = newGradientBright;
+		_newGradientBright = newGradientBright;
 	}
 
 	public void setNewGradientDark(final RGB newGradientDark) {
-		fNewGradientDark = newGradientDark;
+		_newGradientDark = newGradientDark;
 	}
 
 	public void setNewLegendColor(final LegendColor newLegendColor) {
-		fNewLegendColor = newLegendColor;
+		_newLegendColor = newLegendColor;
 	}
 
 	public void setNewLineColor(final RGB newLineColor) {
-		fNewLineColor = newLineColor;
+		_newLineColor = newLineColor;
 	}
 
 	public void setPrefName(final String prefName) {
-		fPrefName = prefName;
+		_prefName = prefName;
 	}
 
 	public void setVisibleName(final String visibleName) {
-		fVisibleName = visibleName;
+		_visibleName = visibleName;
 	}
 }

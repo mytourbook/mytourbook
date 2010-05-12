@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
@@ -43,26 +43,26 @@ import org.eclipse.jface.action.Separator;
  */
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	private TourEditor					fTourEditor;
+	private TourEditor						_tourEditor;
 
-	private ActionEditQuick				fActionQuickEdit;
-	private ActionEditTour				fActionEditTour;
-	private ActionOpenMarkerDialog		fActionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	fActionAdjustAltitude;
+	private ActionEditQuick					_actionQuickEdit;
+	private ActionEditTour					_actionEditTour;
+	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	_actionAdjustAltitude;
 
-	private ActionCreateRefTour			fActionCreateRefTour;
-	private ActionCreateMarker			fActionCreateMarker;
-	private ActionCreateMarker			fActionCreateMarkerLeft;
-	private ActionCreateMarker			fActionCreateMarkerRight;
+	private ActionCreateRefTour				_actionCreateRefTour;
+	private ActionCreateMarker				_actionCreateMarker;
+	private ActionCreateMarker				_actionCreateMarkerLeft;
+	private ActionCreateMarker				_actionCreateMarkerRight;
 
-	private ActionSetTourTypeMenu			fActionSetTourType;
-	private ActionSetTourTag			fActionAddTag;
-	private ActionSetTourTag			fActionRemoveTag;
-	private ActionRemoveAllTags			fActionRemoveAllTags;
-	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionSetTourTag				_actionAddTag;
+	private ActionSetTourTag				_actionRemoveTag;
+	private ActionRemoveAllTags				_actionRemoveAllTags;
+	private ActionOpenPrefDialog			_actionOpenTagPrefs;
 
-	private ChartXSlider				fLeftSlider;
-	private ChartXSlider				fRightSlider;
+	private ChartXSlider					_leftSlider;
+	private ChartXSlider					_rightSlider;
 
 	/**
 	 * @param tourEditor
@@ -70,38 +70,40 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	 */
 	TourChartContextProvider(final TourEditor tourEditor) {
 
-		fTourEditor = tourEditor;
-		final TourChart tourChart = fTourEditor.getTourChart();
+		_tourEditor = tourEditor;
+		final TourChart tourChart = _tourEditor.getTourChart();
 
-		fActionQuickEdit = new ActionEditQuick(this);
-		fActionEditTour = new ActionEditTour(this);
+		_actionQuickEdit = new ActionEditQuick(this);
+		_actionEditTour = new ActionEditTour(this);
 
-		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		fActionOpenMarkerDialog.setEnabled(true);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenMarkerDialog.setEnabled(true);
 
-		fActionAdjustAltitude = new ActionOpenAdjustAltitudeDialog(this);
-		fActionAdjustAltitude.setEnabled(true);
-		
+		_actionAdjustAltitude = new ActionOpenAdjustAltitudeDialog(this);
+		_actionAdjustAltitude.setEnabled(true);
 
-		fActionCreateRefTour = new ActionCreateRefTour(tourChart);
+		_actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		fActionCreateMarker = new ActionCreateMarker(this, //
+		_actionCreateMarker = new ActionCreateMarker(this, //
 				Messages.tourCatalog_view_action_create_marker,
 				true);
 
-		fActionCreateMarkerLeft = new ActionCreateMarker(this,
+		_actionCreateMarkerLeft = new ActionCreateMarker(
+				this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		fActionCreateMarkerRight = new ActionCreateMarker(this,
+		_actionCreateMarkerRight = new ActionCreateMarker(
+				this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
-		fActionSetTourType = new ActionSetTourTypeMenu(this);
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
+		_actionAddTag = new ActionSetTourTag(this, true);
+		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
@@ -114,75 +116,75 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 								final int mouseDownDevPositionY) {
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionQuickEdit);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionOpenMarkerDialog);
-		menuMgr.add(fActionAdjustAltitude);
+		menuMgr.add(_actionQuickEdit);
+		menuMgr.add(_actionEditTour);
+		menuMgr.add(_actionOpenMarkerDialog);
+		menuMgr.add(_actionAdjustAltitude);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionAddTag);
-		menuMgr.add(fActionRemoveTag);
-		menuMgr.add(fActionRemoveAllTags);
+		menuMgr.add(_actionSetTourType);
+		menuMgr.add(_actionAddTag);
+		menuMgr.add(_actionRemoveTag);
+		menuMgr.add(_actionRemoveAllTags);
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(_actionOpenTagPrefs);
 
 		/*
 		 * enable actions
 		 */
-		final boolean isDataAvailable = fTourEditor.getTourData() != null
-				&& fTourEditor.getTourData().getTourPerson() != null;
+		final boolean isDataAvailable = _tourEditor.getTourData() != null
+				&& _tourEditor.getTourData().getTourPerson() != null;
 
-		fActionQuickEdit.setEnabled(isDataAvailable);
-		fActionEditTour.setEnabled(isDataAvailable);
+		_actionQuickEdit.setEnabled(isDataAvailable);
+		_actionEditTour.setEnabled(isDataAvailable);
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {
 
-		fLeftSlider = leftSlider;
-		fRightSlider = rightSlider;
+		_leftSlider = leftSlider;
+		_rightSlider = rightSlider;
 
 		if (leftSlider != null || rightSlider != null) {
 
 			// marker actions
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(fActionCreateMarker);
+				menuMgr.add(_actionCreateMarker);
 			} else {
-				menuMgr.add(fActionCreateMarkerLeft);
-				menuMgr.add(fActionCreateMarkerRight);
+				menuMgr.add(_actionCreateMarkerLeft);
+				menuMgr.add(_actionCreateMarkerRight);
 			}
 
-			menuMgr.add(fActionCreateRefTour);
+			menuMgr.add(_actionCreateRefTour);
 			menuMgr.add(new Separator());
 
 			// action: create reference tour
-			final TourData tourData = fTourEditor.getTourChart().getTourData();
+			final TourData tourData = _tourEditor.getTourChart().getTourData();
 			final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
 
-			fActionCreateRefTour.setEnabled(canCreateRefTours);
+			_actionCreateRefTour.setEnabled(canCreateRefTours);
 
 		}
 
 	}
 
 	public Chart getChart() {
-		return fTourEditor.getTourChart();
+		return _tourEditor.getTourChart();
 	}
 
 	public ChartXSlider getLeftSlider() {
-		return fLeftSlider;
+		return _leftSlider;
 	}
 
 	public ChartXSlider getRightSlider() {
-		return fRightSlider;
+		return _rightSlider;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> tourList = new ArrayList<TourData>();
-		tourList.add(fTourEditor.getTourData());
+		tourList.add(_tourEditor.getTourData());
 
 		return tourList;
 	}
@@ -190,5 +192,5 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	public boolean showOnlySliderContextMenu() {
 		return false;
 	}
- 
+
 }

@@ -54,6 +54,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
+import net.tourbook.database.FIELD_VALIDATION;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -78,14 +80,10 @@ import org.joda.time.DateTime;
  */
 @Entity
 @XmlType(name = "TourData")
-@XmlRootElement(name="TourData")
+@XmlRootElement(name = "TourData")
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
-	public static final int				DB_LENGTH_DEVICE_TOUR_TYPE		= 2;
-	public static final int				DB_LENGTH_DEVICE_PLUGIN_ID		= 255;
-	public static final int				DB_LENGTH_DEVICE_PLUGIN_NAME	= 255;
-	public static final int				DB_LENGTH_DEVICE_MODE_NAME		= 255;
 	public static final int				DB_LENGTH_TOUR_TITLE			= 255;
 	public static final int				DB_LENGTH_TOUR_DESCRIPTION		= 4096;
 	public static final int				DB_LENGTH_TOUR_DESCRIPTION_V10	= 32000;
@@ -93,6 +91,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int				DB_LENGTH_TOUR_END_PLACE		= 255;
 	public static final int				DB_LENGTH_TOUR_IMPORT_FILE_PATH	= 255;
 	public static final int				DB_LENGTH_WEATHER_CLOUDS		= 255;
+	public static final int				DB_LENGTH_DEVICE_TOUR_TYPE		= 2;
+	public static final int				DB_LENGTH_DEVICE_PLUGIN_ID		= 255;
+	public static final int				DB_LENGTH_DEVICE_PLUGIN_NAME	= 255;
+	public static final int				DB_LENGTH_DEVICE_MODE_NAME		= 255;
 
 	/**
 	 * 
@@ -912,25 +914,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int compareTo(final Object obj) {
 
 		if (obj instanceof TourData) {
+
 			final TourData otherTourData = (TourData) obj;
 
-			return startYear < otherTourData.startYear ? -1 : (startYear == otherTourData.startYear
-					? startMonth < otherTourData.startMonth ? -1 : (startMonth == otherTourData.startMonth
-							? startDay < otherTourData.startDay ? -1 : (startDay == otherTourData.startDay
-									? startHour < otherTourData.startHour ? -1 : (startHour == otherTourData.startHour
+			return startYear < otherTourData.startYear ? -1 : startYear == otherTourData.startYear
+					? startMonth < otherTourData.startMonth ? -1 : startMonth == otherTourData.startMonth
+							? startDay < otherTourData.startDay ? -1 : startDay == otherTourData.startDay
+									? startHour < otherTourData.startHour ? -1 : startHour == otherTourData.startHour
 											? startMinute < otherTourData.startMinute
 													? -1
-													: (startMinute == otherTourData.startMinute ? 0 : 1) : 1) : 1) : 1)
-					: 1);
-
-//			final int month = startMonth < otherTourData.startMonth ? -1 : (startMonth == otherTourData.startMonth
-//					? 0
-//					: 1);
-//			final int day = startDay < otherTourData.startDay ? -1 : (startDay == otherTourData.startDay ? 0 : 1);
-//			final int hour = startHour < otherTourData.startHour ? -1 : (startHour == otherTourData.startHour ? 0 : 1);
-//			final int minure = startMinute < otherTourData.startMinute ? -1 : (startMinute == otherTourData.startMinute
-//					? 0
-//					: 1);
+													: startSecond == otherTourData.startSecond //
+															? 0
+															: 1 //
+											: 1 //
+									: 1 //
+							: 1 //
+					: 1;
 		}
 
 		return 0;
@@ -3660,6 +3659,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return serie;
 	}
 
+	@XmlElement
+	public String getTest() {
+		return "jokl"; //$NON-NLS-1$
+	}
+
 	public int getTourAltDown() {
 		return tourAltDown;
 	}
@@ -3761,14 +3765,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3809,6 +3805,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //		}
 //	}
 
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
+	}
+
 	public Set<TourWayPoint> getTourWayPoints() {
 		return tourWayPoints;
 	}
@@ -3843,14 +3847,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return weatherWindDir;
 	}
 
-	public int getWeatherWindSpeed() {
-		return weatherWindSpd;
-	}
-
 // not used 5.10.2008
 //	public void setDeviceDistance(final int deviceDistance) {
 //		this.deviceDistance = deviceDistance;
 //	}
+
+	public int getWeatherWindSpeed() {
+		return weatherWindSpd;
+	}
 
 	/**
 	 * @param zoomLevel
@@ -3939,6 +3943,72 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean isTourSaved() {
 		return tourPerson != null;
+	}
+
+	/**
+	 * Checks if VARCHAR fields have the correct length
+	 * 
+	 * @return Returns <code>true</code> when the data are valid and can be saved
+	 */
+	public boolean isValidForSave() {
+
+		/*
+		 * check: tour title
+		 */
+		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+				tourTitle,
+				DB_LENGTH_TOUR_TITLE,
+				Messages.Db_Field_TourData_Title);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourTitle = tourTitle.substring(0, DB_LENGTH_TOUR_TITLE);
+		}
+
+		/*
+		 * check: tour description
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourDescription,
+				DB_LENGTH_TOUR_DESCRIPTION_V10,
+				Messages.Db_Field_TourData_Description);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourDescription = tourDescription.substring(0, DB_LENGTH_TOUR_DESCRIPTION_V10);
+		}
+
+		/*
+		 * check: tour start location
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourStartPlace,
+				DB_LENGTH_TOUR_START_PLACE,
+				Messages.Db_Field_TourData_StartPlace);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourStartPlace = tourStartPlace.substring(0, DB_LENGTH_TOUR_START_PLACE);
+		}
+
+		/*
+		 * check: tour end location
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourEndPlace,
+				DB_LENGTH_TOUR_END_PLACE,
+				Messages.Db_Field_TourData_EndPlace);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
+		}
+
+		return true;
 	}
 
 	/**
@@ -4169,15 +4239,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 	}
 
-	public void setSpeedSerie(final int[] speedSerie) {
-		this.speedSerie = speedSerie;
-		this.isSpeedSerieFromDevice = true;
-	}
-
-	public void setStartAltitude(final short startAltitude) {
-		this.startAltitude = startAltitude;
-	}
-
 //	/**
 //	 * Set the week of the tour, 0 is the first week in the year
 //	 *
@@ -4192,6 +4253,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public void setStartWeekYear(final short startWeekYear) {
 //		this.startWeekYear = startWeekYear;
 //	}
+
+	public void setSpeedSerie(final int[] speedSerie) {
+		this.speedSerie = speedSerie;
+		this.isSpeedSerieFromDevice = true;
+	}
+
+	public void setStartAltitude(final short startAltitude) {
+		this.startAltitude = startAltitude;
+	}
 
 	public void setStartDay(final short startDay) {
 		this.startDay = startDay;
@@ -4422,26 +4492,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return sb.toString();
 	}
 
-	
-	@XmlElement
-	public String getTest(){
-		return "jokl";
-	}
-	
 	@Override
 	public String toXml() {
 
 		try {
-			JAXBContext context = JAXBContext.newInstance(this.getClass());
-			Marshaller marshaller = context.createMarshaller();
-			StringWriter sw = new StringWriter();
+			final JAXBContext context = JAXBContext.newInstance(this.getClass());
+			final Marshaller marshaller = context.createMarshaller();
+			final StringWriter sw = new StringWriter();
 			marshaller.marshal(this, sw);
 			return sw.toString();
-			
-		} catch (JAXBException e){
+
+		} catch (final JAXBException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 }

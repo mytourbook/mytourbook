@@ -448,7 +448,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * @return Returns all tour types which are stored in the database sorted by name
+	 * @return Returns the backend of all tour types which are stored in the database sorted by name
 	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getAllTourTypes() {
@@ -770,6 +770,33 @@ public class TourDatabase {
 		}
 
 		return tourTypeName;
+	}
+
+	/**
+	 * Checks if a field exceeds the max length
+	 * 
+	 * @param field
+	 * @param maxLength
+	 * @param uiFieldName
+	 * @return Returns {@link FIELD_VALIDATION} status
+	 */
+	public static FIELD_VALIDATION isFieldValidForSave(final String field, final int maxLength, final String uiFieldName) {
+
+		if (field != null && field.length() > maxLength) {
+
+			if (MessageDialog.openConfirm(
+					Display.getDefault().getActiveShell(),
+					Messages.Tour_Database_Dialog_ValidateFields_Title,
+					NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message, //
+							new Object[] { uiFieldName, field.length(), maxLength }))) {
+
+				return FIELD_VALIDATION.TRUNCATE;
+			} else {
+				return FIELD_VALIDATION.IS_INVALID;
+			}
+		}
+
+		return FIELD_VALIDATION.IS_VALID;
 	}
 
 	/**
@@ -1565,44 +1592,6 @@ public class TourDatabase {
 		exec(stmt, sql);
 	}
 
-	/**
-	 * create table {@link #TABLE_TOUR_BIKE}
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createTableTourBike(final Statement stmt) throws SQLException {
-
-		String sql;
-
-		/*
-		 * CREATE TABLE TourBike
-		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
-				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
-				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
-				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
-				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
-				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * ALTER TABLE TourBike
-		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$
-				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-	}
-
 //	/**
 //	 * create table {@link #TABLE_TOUR_CATEGORY}
 //	 *
@@ -1640,6 +1629,44 @@ public class TourDatabase {
 //				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
 //	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_BIKE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourBike(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE TABLE TourBike
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_BIKE //									//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1), \n" //$NON-NLS-1$
+				+ "	name			" + varCharKomma(TourBike.DB_LENGTH_NAME) //	//$NON-NLS-1$
+				+ "	weight 			FLOAT,										\n" //$NON-NLS-1$ // kg
+				+ "	typeId 			INTEGER,									\n" //$NON-NLS-1$
+				+ "	frontTyreId	 	INTEGER,									\n" //$NON-NLS-1$
+				+ "	rearTyreId 		INTEGER										\n" //$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourBike
+		 */
+		sql = "ALTER TABLE " + TABLE_TOUR_BIKE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_BIKE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (bikeId)"; //										//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+	}
 
 	/**
 	 * create table {@link #TABLE_TOUR_COMPARED}
@@ -1804,7 +1831,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourData ADD CONSTRAINT TourData_pk PRIMARY KEY (tourId);
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_DATA + "								\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_DATA + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_DATA + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (tourId)"; //										//$NON-NLS-1$
 
@@ -1830,7 +1857,7 @@ public class TourDatabase {
 				+ "(															\n" //$NON-NLS-1$
 				//
 				+ "	markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$
+				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	time 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	distance 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	serieIndex 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
@@ -1851,7 +1878,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourMarker ADD CONSTRAINT TourMarker_pk PRIMARY KEY (markerId);
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_MARKER + "							\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_MARKER + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_MARKER + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (markerId)"; //										//$NON-NLS-1$
 
@@ -1860,8 +1887,8 @@ public class TourDatabase {
 		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURMARKER //							//$NON-NLS-1$
 				+ "(																	\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,		\n")//$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_MARKER + "_markerId		BIGINT NOT NULL			\n")//$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_MARKER + "_markerId		BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ")"; //																//$NON-NLS-1$
 
@@ -1871,7 +1898,7 @@ public class TourDatabase {
 		 * ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY
 		 * (TourData_tourId);
 		 */
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURMARKER + "				\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURMARKER + "				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURMARKER + "_pk	\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1910,7 +1937,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourPerson
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_PERSON + "							\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_PERSON + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_PERSON + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (personId)"; //										//$NON-NLS-1$
 
@@ -1934,7 +1961,7 @@ public class TourDatabase {
 				+ "(															\n" //$NON-NLS-1$
 				//
 				+ "	refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_DATA + "_tourId	BIGINT,					\n")//$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId	BIGINT,					\n")//$NON-NLS-1$ //$NON-NLS-2$
 				+ "	startIndex					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	endIndex 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ ("	label 					" + varCharNoKomma(TourReference.DB_LENGTH_LABEL)) //$NON-NLS-1$
@@ -1946,7 +1973,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourReference ADD CONSTRAINT TourReference_pk PRIMARY KEY (refId);
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_REFERENCE + "							\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_REFERENCE + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_REFERENCE + "_pk				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (refId)"; //										//$NON-NLS-1$
 
@@ -1958,8 +1985,8 @@ public class TourDatabase {
 		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE //					//$NON-NLS-1$
 				+ "(																\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,	\n")//$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_REFERENCE + "_refId 		BIGINT NOT NULL		\n")//$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_REFERENCE + "_refId 		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ")"; //																//$NON-NLS-1$
 
@@ -1969,7 +1996,7 @@ public class TourDatabase {
 		 * ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY
 		 * (TourData_tourId);
 		 */
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE + "				\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE + "				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURREFERENCE + "_pk 	\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1998,7 +2025,7 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		sql = "ALTER TABLE " + TABLE_TOUR_TAG_CATEGORY + "						\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_TAG_CATEGORY + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_TAG_CATEGORY + "_pk			\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (tagCategoryId)"; //								//$NON-NLS-1$
 
@@ -2011,8 +2038,8 @@ public class TourDatabase {
 		sql = "CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG //					//$NON-NLS-1$
 				+ "(																\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_TAG + "_tagId						BIGINT NOT NULL,\n")//$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId		BIGINT NOT NULL	\n")//$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_TAG + "_tagId						BIGINT NOT NULL,\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId		BIGINT NOT NULL	\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ")"; //																//$NON-NLS-1$
 
@@ -2024,15 +2051,15 @@ public class TourDatabase {
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //			//$NON-NLS-1$
 		final String field_TourTagCategory_tagCategoryId = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId"; //$NON-NLS-1$
 
-		sql = "ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "					\n" //$NON-NLS-1$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTag_tagId + "\n"//$NON-NLS-1$ //$NON-NLS-2$
+		sql = "ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTag_tagId + "\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ "	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)							\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"; //							//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
 
-		sql = "ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "					\n" //$NON-NLS-1$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTagCategory_tagCategoryId + "\n"//$NON-NLS-1$ //$NON-NLS-2$
+		sql = "ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTagCategory_tagCategoryId + "\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ "	FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId)			\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)"; //			//$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2044,8 +2071,8 @@ public class TourDatabase {
 		sql = "CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY //		//$NON-NLS-1$
 				+ "(															\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1	BIGINT NOT NULL,\n")//$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2	BIGINT NOT NULL	\n") //$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1	BIGINT NOT NULL,\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2	BIGINT NOT NULL	\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ")"; //															//$NON-NLS-1$
 
@@ -2109,7 +2136,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_TAG + "								\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_TAG + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk 					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (tagId)"; //										//$NON-NLS-1$
 
@@ -2124,8 +2151,8 @@ public class TourDatabase {
 		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG //						//$NON-NLS-1$
 				+ "(															\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_TAG + "_tagId" + "		BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	" + TABLE_TOUR_DATA + "_tourId" + "		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_TAG + "_tagId" + "		BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId" + "		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				//
 				+ ")"; //															//$NON-NLS-1$
 
@@ -2134,14 +2161,14 @@ public class TourDatabase {
 		/*
 		 * Add Constrainsts
 		 */
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ "	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId) 					\n"//$NON-NLS-1$ //$NON-NLS-2$
 				+ "	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
 
 		exec(stmt, sql);
 
-		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"; //			//$NON-NLS-1$ //$NON-NLS-2$
@@ -2184,7 +2211,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourType
 		 */
-		sql = "ALTER TABLE " + TABLE_TOUR_TYPE + "								\n" //$NON-NLS-1$
+		sql = "ALTER TABLE " + TABLE_TOUR_TYPE + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_TYPE + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (typeId)"; //										//$NON-NLS-1$
 
@@ -2208,7 +2235,7 @@ public class TourDatabase {
 				+ "(																			\n" //$NON-NLS-1$
 				//
 				+ "	wayPointId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_DATA + "_tourId	BIGINT,										\n") //$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId	BIGINT,										\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	latitude 			DOUBLE NOT NULL,										\n" //$NON-NLS-1$
 				+ "	longitude 			DOUBLE NOT NULL,										\n" //$NON-NLS-1$
 				+ "	time				BIGINT,													\n" //$NON-NLS-1$
@@ -2226,7 +2253,7 @@ public class TourDatabase {
 		/*
 		 * ALTER TABLE TourWayPoint ADD CONSTRAINT TourWayPoint_pk PRIMARY KEY (wayPointId);
 		 */
-		sql = ("ALTER TABLE " + TABLE_TOUR_WAYPOINT) + "									\n" //$NON-NLS-1$
+		sql = ("ALTER TABLE " + TABLE_TOUR_WAYPOINT) + "									\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	ADD CONSTRAINT " + TABLE_TOUR_WAYPOINT + "_pk 							\n")//$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	PRIMARY KEY (wayPointId)"); //												//$NON-NLS-1$
 
@@ -2238,8 +2265,8 @@ public class TourDatabase {
 		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) //							//$NON-NLS-1$
 				+ "(																		\n" //$NON-NLS-1$
 				//
-				+ ("	" + TABLE_TOUR_DATA + "_tourId				BIGINT NOT NULL,		\n") //$NON-NLS-1$
-				+ ("	" + TABLE_TOUR_WAYPOINT + "_wayPointId		BIGINT NOT NULL			\n") //$NON-NLS-1$
+				+ ("	" + TABLE_TOUR_DATA + "_tourId				BIGINT NOT NULL,		\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_WAYPOINT + "_wayPointId		BIGINT NOT NULL			\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ")"; //																		//$NON-NLS-1$
 
@@ -2249,7 +2276,7 @@ public class TourDatabase {
 		 * ALTER TABLE TourData_TourWayPoint ADD CONSTRAINT TourData_TourWayPoint_pk PRIMARY KEY
 		 * (TourData_tourId);
 		 */
-		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) + "						\n" //$NON-NLS-1$
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURWAYPOINT) + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURWAYPOINT + "_pk				\n")//$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"); //							//$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2872,7 +2899,7 @@ public class TourDatabase {
 				 */
 
 				final String sql = //
-				"ALTER TABLE " + TABLE_TOUR_DATA + "							\n" //$NON-NLS-1$
+				"ALTER TABLE " + TABLE_TOUR_DATA + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
 						+ "	ALTER COLUMN tourDescription						\n" //$NON-NLS-1$
 						+ "	SET DATA TYPE " + varCharNoKomma(TourData.DB_LENGTH_TOUR_DESCRIPTION_V10); //$NON-NLS-1$
 

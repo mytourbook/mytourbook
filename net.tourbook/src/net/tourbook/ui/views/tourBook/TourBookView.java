@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
@@ -54,6 +54,7 @@ import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
@@ -170,8 +171,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionModifyColumns				_actionModifyColumns;
 	private ActionRefreshView				_actionRefreshView;
 
+	private ActionJoinTours					_actionJoinTours;
 	private ActionExport					_actionExportTour;
-	
 	private ActionPrint						_actionPrintTour;
 
 	private int								_selectedYear					= -1;
@@ -385,6 +386,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		_actionMergeTour = new ActionMergeTour(this);
+		_actionJoinTours = new ActionJoinTours(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 		_actionAddTag = new ActionSetTourTag(this, true);
@@ -404,7 +406,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionExportTour = new ActionExport(this);
-		
 		_actionPrintTour = new ActionPrint(this);
 
 		fillActions();
@@ -469,8 +470,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin.getDefault().getPluginPreferences().getBoolean(
-				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourViewer = new TreeViewer(tree);
 		_columnManager.createColumns(_tourViewer);
@@ -1338,19 +1341,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * column: week day
 	 */
 	private void defineColumnWeekDay(final PixelConverter pixelConverter) {
-		
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(
-				_columnManager,
-				pixelConverter);
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					
+
 					final int weekDay = ((TVITourBookTour) element).colWeekDay;
-					
+
 					cell.setText(_weekDays[weekDay]);
 					setCellColor(cell, element);
 				}
@@ -1477,8 +1478,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			_actionDeleteTour.setEnabled(false);
 		}
 
+		_actionJoinTours.setEnabled(tourItems > 1);
 		_actionExportTour.setEnabled(isTourSelected);
-		
+
 		_actionPrintTour.setEnabled(isTourSelected);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1557,8 +1559,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionEditTour);
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionOpenAdjustAltitudeDialog);
-		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionOpenTour);
+		menuMgr.add(_actionMergeTour);
+		menuMgr.add(_actionJoinTours);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionPrintTour);
 
@@ -1580,7 +1585,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_postSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
 
@@ -1968,7 +1972,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final ArrayList<String> selectedTourIds = new ArrayList<String>();
 		for (final Long tourId : _selectedTourIds) {
 			selectedTourIds.add(tourId.toString());
-		} 
+		}
 		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
 		// action: select tours for year/month

@@ -98,14 +98,14 @@ public class TourMarker implements Cloneable {
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */
 	@Transient
-	private int						visibleType;
+	private int						_visibleType;
 
 	/**
 	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
-	private long					createId				= 0;
+	private long					_createId				= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -120,7 +120,7 @@ public class TourMarker implements Cloneable {
 		this.tourData = tourData;
 		this.type = markerType;
 
-		this.createId = ++_createCounter;
+		_createId = ++_createCounter;
 	}
 
 	private TourMarker(final TourMarker tourMarker, final TourData newTourData) {
@@ -139,7 +139,7 @@ public class TourMarker implements Cloneable {
 		time = tourMarker.time;
 		type = tourMarker.type;
 		visualPosition = tourMarker.visualPosition;
-		createId = tourMarker.createId;
+		_createId = tourMarker._createId;
 	}
 
 	@Override
@@ -192,7 +192,7 @@ public class TourMarker implements Cloneable {
 
 	public void createMarkerId() {
 		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		createId = ++_createCounter;
+		_createId = ++_createCounter;
 	}
 
 	/**
@@ -214,8 +214,10 @@ public class TourMarker implements Cloneable {
 		if (!(obj instanceof TourMarker)) {
 			return false;
 		}
+
 		final TourMarker other = (TourMarker) obj;
-		if (createId == 0) {
+
+		if (_createId == 0) {
 
 			// tour is from the database
 			if (markerId != other.markerId) {
@@ -224,7 +226,7 @@ public class TourMarker implements Cloneable {
 		} else {
 
 			// tour was create or imported
-			if (createId != other.createId) {
+			if (_createId != other._createId) {
 				return false;
 			}
 		}
@@ -276,7 +278,7 @@ public class TourMarker implements Cloneable {
 	}
 
 	public int getVisibleType() {
-		return visibleType;
+		return _visibleType;
 	}
 
 	public int getVisualPosition() {
@@ -295,7 +297,7 @@ public class TourMarker implements Cloneable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (createId ^ (createId >>> 32));
+		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (markerId ^ (markerId >>> 32));
 		return result;
 	}
@@ -380,7 +382,7 @@ public class TourMarker implements Cloneable {
 	}
 
 	public void setVisibleType(final int visibleType) {
-		this.visibleType = visibleType;
+		this._visibleType = visibleType;
 	}
 
 	public void setVisualPosition(final int visualPosition) {
@@ -394,7 +396,7 @@ public class TourMarker implements Cloneable {
 				.append(" id:") //$NON-NLS-1$
 				.append(markerId)
 				.append(" createId:") //$NON-NLS-1$
-				.append(createId)
+				.append(_createId)
 				.append(" distance:") //$NON-NLS-1$
 				.append(distance)
 				.append(" time:") //$NON-NLS-1$

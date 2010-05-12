@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.colors;
 
@@ -61,7 +61,7 @@ public class GraphColorProvider {
 	public static final String				PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
 
 	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
-	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$ 
+	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
 	public static final String				PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
 	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
 
@@ -95,52 +95,37 @@ public class GraphColorProvider {
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
 
-	private static final LegendColor		LEGEND_COLOR_ALTITUDE		= new LegendColor(new ValueColor[] {
-																		//
+	private static final LegendColor		LEGEND_COLOR_ALTITUDE		= new LegendColor(
+																				new ValueColor[] {
 			new ValueColor(10, 130, 0, 157),
 			new ValueColor(50, 255, 85, 13),
 			new ValueColor(100, 255, 255, 0),
 			new ValueColor(150, 0, 170, 9),
-			new ValueColor(190, 23, 163, 255)
-
-//			<legendcolor prefname="altitude">
-//			<valuecolor blue="157"	green="0"	red="130" value="10"/>
-//			<valuecolor blue="13"	green="85"	red="255" value="50"/>
-//			<valuecolor blue="0"	green="255" red="255" value="100"/>
-//			<valuecolor blue="9"	green="170" red="0" value="150"/>
-//			<valuecolor blue="255"	green="163"	red="23" value="190"/>
-
-																		//
-//			new ValueColor(10, 161, 85, 0),
-//			new ValueColor(50, 232, 169, 0),
-//			new ValueColor(100, 0, 241, 0),
-//			new ValueColor(150, 0, 154, 255),
-//			new ValueColor(190, 144, 219, 255)							//
-																		},
+			new ValueColor(190, 23, 163, 255)									},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				15,
 																				LegendColor.BRIGHTNESS_LIGHTNING,
-																				39)
+																				39);
 
-																		;
-
-	private static final LegendColor		LEGEND_COLOR_PULSE			= new LegendColor(new ValueColor[] {
+	private static final LegendColor		LEGEND_COLOR_PULSE			= new LegendColor(
+																				new ValueColor[] {
 			new ValueColor(10, 0, 203, 0),
 			new ValueColor(50, 57, 255, 0),
 			new ValueColor(100, 255, 255, 0),
 			new ValueColor(150, 255, 0, 0),
-			new ValueColor(190, 255, 0, 247)							},
+			new ValueColor(190, 255, 0, 247)									},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				11,
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				10);
 
-	private static final LegendColor		LEGEND_COLOR_GRADIENT		= new LegendColor(new ValueColor[] {
+	private static final LegendColor		LEGEND_COLOR_GRADIENT		= new LegendColor(
+																				new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
 			new ValueColor(100, 0, 237, 0),
 			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0)								},
+			new ValueColor(190, 255, 0, 0)										},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				23,
 																				LegendColor.BRIGHTNESS_DIMMING,
@@ -150,12 +135,13 @@ public class GraphColorProvider {
 																				true,
 																				20);
 
-	private static final LegendColor		LEGEND_COLOR_PACE			= new LegendColor(new ValueColor[] {
+	private static final LegendColor		LEGEND_COLOR_PACE			= new LegendColor(
+																				new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 255, 255, 0),
 			new ValueColor(100, 0, 169, 0),
 			new ValueColor(150, 0, 255, 255),
-			new ValueColor(190, 0, 0, 255)								},
+			new ValueColor(190, 0, 0, 255)										},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
@@ -163,12 +149,13 @@ public class GraphColorProvider {
 
 																		;
 
-	private static final LegendColor		LEGEND_COLOR_SPEED			= new LegendColor(new ValueColor[] {
+	private static final LegendColor		LEGEND_COLOR_SPEED			= new LegendColor(
+																				new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
 			new ValueColor(100, 0, 169, 0),
 			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0)								},
+			new ValueColor(190, 255, 0, 0)										},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
@@ -186,7 +173,7 @@ public class GraphColorProvider {
 					new RGB(45, 188, 45),
 					LEGEND_COLOR_ALTITUDE),
 
-			new ColorDefinition(PREF_GRAPH_HEARTBEAT,
+			new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
 					Messages.Graph_Label_Heartbeat,
 					new RGB(255, 255, 255),
 					new RGB(253, 0, 0),
@@ -214,21 +201,21 @@ public class GraphColorProvider {
 					new RGB(240, 0, 150),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_TEMPTERATURE,
+			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, //
 					Messages.Graph_Label_Temperature,
 					new RGB(255, 255, 255),
 					new RGB(0, 217, 240),
 					new RGB(0, 216, 240),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_GRADIENT,
+			new ColorDefinition(PREF_GRAPH_GRADIENT, //
 					Messages.Graph_Label_Gradient,
 					new RGB(255, 255, 255),
 					new RGB(249, 231, 0),
 					new RGB(236, 206, 0),
 					LEGEND_COLOR_GRADIENT),
 
-			new ColorDefinition(PREF_GRAPH_ALTIMETER,
+			new ColorDefinition(PREF_GRAPH_ALTIMETER, //
 					Messages.Graph_Label_Altimeter,
 					new RGB(255, 255, 255),
 					new RGB(255, 180, 0),
@@ -242,7 +229,7 @@ public class GraphColorProvider {
 					new RGB(228, 106, 16),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE,
+			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
 					Messages.Graph_Label_Tour_Compare,
 					new RGB(255, 255, 255),
 					new RGB(255, 140, 26),
@@ -255,6 +242,7 @@ public class GraphColorProvider {
 					new RGB(239, 167, 16),
 					new RGB(203, 141, 14),
 					null),
+
 			new ColorDefinition(PREF_GRAPH_TIME,//
 					Messages.Graph_Pref_color_statistic_time,
 					new RGB(255, 255, 255),
@@ -265,6 +253,8 @@ public class GraphColorProvider {
 	private static GraphColorProvider		instance;
 
 	private ColorDefinition[]				fGraphColorDefinitions;
+
+	public GraphColorProvider() {}
 
 	public static GraphColorProvider getInstance() {
 		if (instance == null) {
@@ -353,8 +343,6 @@ public class GraphColorProvider {
 			}
 		}
 	}
-
-	public GraphColorProvider() {}
 
 	/**
 	 * @param preferenceName

@@ -4565,6 +4565,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (_isTourDirty) {
 
+			if (_tourData.isValidForSave() == false) {
+				return false;
+			}
+
 			if (_tourData.getTourPerson() == null) {
 
 				// tour is modified but not yet saved in the database

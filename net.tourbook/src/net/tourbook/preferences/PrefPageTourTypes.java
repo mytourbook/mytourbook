@@ -16,6 +16,7 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -56,6 +57,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -76,7 +78,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private TreeViewer							_colorViewer;
+	private TreeViewer							_tourTypeViewer;
 	private ColorDefinition						_expandedItem;
 	private GraphColorItem						_selectedColor;
 
@@ -125,6 +127,22 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
+	}
+
+	private final class TourTypeComparator extends ViewerComparator {
+		@Override
+		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+			if (e1 instanceof TourTypeColorDefinition && e2 instanceof TourTypeColorDefinition) {
+
+				final TourTypeColorDefinition ttcDef1 = (TourTypeColorDefinition) e1;
+				final TourTypeColorDefinition ttcDef2 = (TourTypeColorDefinition) e2;
+
+				return ttcDef1.compareTo(ttcDef2);
+			}
+
+			return 0;
+		}
 	}
 
 	/**
@@ -184,7 +202,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		enableButtons();
 
-		_colorViewer.setInput(this);
+		_tourTypeViewer.setInput(this);
 
 		return viewerContainer;
 	}
@@ -305,36 +323,38 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		tc = new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
-		_colorViewer = new TreeViewer(tree);
-		_colorViewer.setContentProvider(new ColorContentProvider());
+		_tourTypeViewer = new TreeViewer(tree);
+		_tourTypeViewer.setContentProvider(new ColorContentProvider());
 
 		_colorLabelProvider = new GraphColorLabelProvider(this);
-		_colorViewer.setLabelProvider(_colorLabelProvider);
+		_tourTypeViewer.setLabelProvider(_colorLabelProvider);
 
-		_colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_tourTypeViewer.setComparator(new TourTypeComparator());
+
+		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectColor();
 				enableButtons();
 			}
 		});
 
-		_colorViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
-				final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
 
 				if (selection instanceof ColorDefinition) {
 
 					// expand/collapse current item
 					final ColorDefinition treeItem = (ColorDefinition) selection;
 
-					if (_colorViewer.getExpandedState(treeItem)) {
-						_colorViewer.collapseToLevel(treeItem, 1);
+					if (_tourTypeViewer.getExpandedState(treeItem)) {
+						_tourTypeViewer.collapseToLevel(treeItem, 1);
 					} else {
 						if (_expandedItem != null) {
-							_colorViewer.collapseToLevel(_expandedItem, 1);
+							_tourTypeViewer.collapseToLevel(_expandedItem, 1);
 						}
-						_colorViewer.expandToLevel(treeItem, 1);
+						_tourTypeViewer.expandToLevel(treeItem, 1);
 						_expandedItem = treeItem;
 					}
 				} else if (selection instanceof GraphColorItem) {
@@ -345,7 +365,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			}
 		});
 
-		_colorViewer.addTreeListener(new ITreeViewerListener() {
+		_tourTypeViewer.addTreeListener(new ITreeViewerListener() {
 
 			public void treeCollapsed(final TreeExpansionEvent event) {
 
@@ -369,9 +389,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						public void run() {
 
 							if (_expandedItem != null) {
-								_colorViewer.collapseToLevel(_expandedItem, 1);
+								_tourTypeViewer.collapseToLevel(_expandedItem, 1);
 							}
-							_colorViewer.expandToLevel(treeItem, 1);
+							_tourTypeViewer.expandToLevel(treeItem, 1);
 							_expandedItem = treeItem;
 						}
 					});
@@ -477,7 +497,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private void enableButtons() {
 
-		final ITreeSelection selection = (ITreeSelection) _colorViewer.getSelection();
+		final ITreeSelection selection = (ITreeSelection) _tourTypeViewer.getSelection();
 
 		if (selection.isEmpty()) {
 			_btnDelete.setEnabled(false);
@@ -510,7 +530,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private TourTypeColorDefinition getSelectedColorDefinition() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
 		final Object selectedItem = selection.getFirstElement();
 
 		TourTypeColorDefinition selectedColorDefinition = null;
@@ -524,7 +544,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	public TreeViewer getTreeViewer() {
-		return _colorViewer;
+		return _tourTypeViewer;
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -577,10 +597,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			_colorDefinitions.add(newColorDefinition);
 
-			_colorViewer.add(this, newColorDefinition);
+			_tourTypeViewer.add(this, newColorDefinition);
 
 			// update internal tour type list
 			_tourTypes.add(saveTourType);
+			Collections.sort(_tourTypes);
 
 			_isModified = true;
 		}
@@ -613,8 +634,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			/*
 			 * update the tree viewer, the color images will be recreated in the label provider
 			 */
-			_colorViewer.update(_selectedColor, null);
-			_colorViewer.update(colorDefinition, null);
+			_tourTypeViewer.update(_selectedColor, null);
+			_tourTypeViewer.update(colorDefinition, null);
 
 			/*
 			 * update the tour type in the db
@@ -634,6 +655,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// replace tour type with new one
 			_tourTypes.remove(oldTourType);
 			_tourTypes.add(savedTourType);
+			Collections.sort(_tourTypes);
 
 			UI.getInstance().setTourTypeImagesDirty();
 			_btnTourTypeImage.setImage(UI.getInstance().getTourTypeImage(savedTourType.getTypeId()));
@@ -667,7 +689,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		if (deleteTourType(selectedTourType)) {
 
 			// update color viewer
-			_colorViewer.remove(selectedColorDefinition);
+			_tourTypeViewer.remove(selectedColorDefinition);
 
 			// update import combo
 			// fComboImportTourType.remove(getTourTypeIndex(selectedTourType));
@@ -712,7 +734,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			selectedColorDefinition.setTourType(saveTourType);
 
 			// update viewer
-			_colorViewer.update(selectedColorDefinition, null);
+			_tourTypeViewer.update(selectedColorDefinition, null);
 
 			_isModified = true;
 		}
@@ -723,7 +745,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void onSelectColor() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
 		final Object firstElement = selection.getFirstElement();
 
 		if (firstElement instanceof GraphColorItem) {

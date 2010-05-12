@@ -29,6 +29,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 
@@ -72,10 +73,24 @@ public class TourTag implements Comparable<Object> {
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
 	private final Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
 
+	/**
+	 * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
+	 * persisted
+	 */
+	@Transient
+	private long						_createId					= 0;
+
+	/**
+	 * manually created marker or imported marker create a unique id to identify them, saved marker
+	 * are compared with the marker id
+	 */
+	private static int					_createCounter				= 0;
+
 	public TourTag() {}
 
 	public TourTag(final String tagName) {
 		name = tagName.trim();
+		_createId = ++_createCounter;
 	}
 
 	public int compareTo(final Object obj) {
@@ -88,24 +103,35 @@ public class TourTag implements Comparable<Object> {
 		return 0;
 	}
 
-	/**
-	 * Returns true if both tag id's have the same value.
-	 * 
-	 * @see IComparator#equals
-	 */
 	@Override
 	public boolean equals(final Object obj) {
-
-		if (obj instanceof TourTag) {
-			final long otherId = ((TourTag) obj).getTagId();
-			return otherId == tagId;
-		}
-
 		if (this == obj) {
 			return true;
 		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 
-		return false;
+		final TourTag other = (TourTag) obj;
+
+		if (_createId == 0) {
+
+			// tour tag is from the database
+			if (tagId != other.tagId) {
+				return false;
+			}
+		} else {
+
+			// tour tag was create or imported
+			if (_createId != other._createId) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public int getExpandType() {
@@ -130,10 +156,20 @@ public class TourTag implements Comparable<Object> {
 
 	@Override
 	public int hashCode() {
-		int result = 17;
-		result = (int) (37 * result + tagId);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (_createId ^ (_createId >>> 32));
+		result = prime * result + (int) (tagId ^ (tagId >>> 32));
 		return result;
 	}
+
+//	@Override
+//	public int hashCode() {
+//		int result = 17;
+//		result = prime * result + (int) (_createId ^ (_createId >>> 32));
+//		result = (int) (37 * result + tagId);
+//		return result;
+//	}
 
 	public boolean isRoot() {
 		return isRoot == 1;

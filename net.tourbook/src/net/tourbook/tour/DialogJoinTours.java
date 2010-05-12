@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -187,6 +188,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
+
+		// sort tours by date/time
+		Collections.sort(selectedTours);
 
 		_selectedTours = selectedTours;
 	}
@@ -1128,16 +1132,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		}
 
 		/*
-		 * check description size
-		 */
-//		if (joinedDescription.length() >= TourDatabase.MAX_DESCRIPTION_LENGTH) {
-//
-//		}
-//		if (TourDatabase.checkFieldLength(UI.EMPTY_STRING, 5) == false) {
-//			return false;
-//		}
-
-		/*
 		 * setup tour data
 		 */
 		_joinedTourData.setStartHour((short) joinedTourStart.getHourOfDay());
@@ -1206,26 +1200,29 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		// set person which is required to save a tour
 		_joinedTourData.setTourPerson(TourManager.getInstance().getActivePerson());
 
+		/*
+		 * check size of the fields
+		 */
+		if (_joinedTourData.isValidForSave() == false) {
+			return false;
+		}
+
 		_joinedTourData = TourManager.saveModifiedTour(_joinedTourData);
 
 		return true;
 	}
 
-
 	@Override
 	protected void okPressed() {
 
-//		TourDatabase.checkFieldLength("", 3);
+		if (joinTours() == false) {
+			return;
+		}
 
-		return;
-//		if (joinTours() == false) {
-//			return;
-//		}
-//
-//		// state must be set after the tour is saved because the tour type id is set when the tour is saved
-//		saveState();
-//
-//		super.okPressed();
+		// state must be set after the tour is saved because the tour type id is set when the tour is saved
+		saveState();
+
+		super.okPressed();
 	}
 
 	private void onDispose() {
