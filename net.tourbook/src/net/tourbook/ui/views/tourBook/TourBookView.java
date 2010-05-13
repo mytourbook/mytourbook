@@ -45,6 +45,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
@@ -1522,8 +1523,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
-		// enable/disable actions for the recent tags
+		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(isTourSelected);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected);
 	}
 
 	private void fillActions() {
@@ -1569,6 +1571,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
+		TourTypeMenuManager.fillRecentTourTypesIntoMenu(menuMgr, this, true);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionAddTag);
 		menuMgr.add(_actionRemoveTag);
 		menuMgr.add(_actionRemoveAllTags);

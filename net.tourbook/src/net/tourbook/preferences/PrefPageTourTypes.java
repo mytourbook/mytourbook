@@ -78,6 +78,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
+	private static final String[]				SORT_PROPERTY	= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
+
 	private TreeViewer							_tourTypeViewer;
 	private ColorDefinition						_expandedItem;
 	private GraphColorItem						_selectedColor;
@@ -91,7 +93,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private IInputValidator						_tourNameValidator;
 
-	private boolean								_isModified	= false;
+	private boolean								_isModified		= false;
 
 	private GraphColorLabelProvider				_colorLabelProvider;
 
@@ -142,6 +144,12 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			}
 
 			return 0;
+		}
+
+		@Override
+		public boolean isSorterProperty(final Object element, final String property) {
+			// sort when the name has changed
+			return true;
 		}
 	}
 
@@ -324,12 +332,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
 		_tourTypeViewer = new TreeViewer(tree);
+
 		_tourTypeViewer.setContentProvider(new ColorContentProvider());
+		_tourTypeViewer.setComparator(new TourTypeComparator());
+		_tourTypeViewer.setUseHashlookup(true);
 
 		_colorLabelProvider = new GraphColorLabelProvider(this);
 		_tourTypeViewer.setLabelProvider(_colorLabelProvider);
-
-		_tourTypeViewer.setComparator(new TourTypeComparator());
 
 		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -571,6 +580,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				_tourNameValidator);
 
 		if (dialog.open() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -605,6 +615,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			_isModified = true;
 		}
+
+		setFocusToViewer();
+		return;
 	}
 
 	/**
@@ -682,6 +695,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				1);
 
 		if (dialog.open() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -699,6 +713,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			_isModified = true;
 		}
+
+		setFocusToViewer();
 	}
 
 	private void onRenameTourType() {
@@ -713,7 +729,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
 				selectedTourType.getName(),
 				_tourNameValidator);
+
 		if (dialog.open() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -731,13 +749,18 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		if (saveTourType != null) {
 
+			// update model
 			selectedColorDefinition.setTourType(saveTourType);
 
-			// update viewer
-			_tourTypeViewer.update(selectedColorDefinition, null);
+			Collections.sort(_tourTypes);
+
+			// update viewer, resort types when necessary
+			_tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
 
 			_isModified = true;
 		}
+
+		setFocusToViewer();
 	}
 
 	/**
@@ -770,6 +793,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		} else {
 			_colorSelector.setEnabled(false);
 		}
+
+		setFocusToViewer();
 	}
 
 	@Override
@@ -778,5 +803,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		fireModifyEvent();
 
 		return super.performOk();
+	}
+
+	private void setFocusToViewer() {
+		// set focus back to the tree
+		_tourTypeViewer.getTree().setFocus();
 	}
 }

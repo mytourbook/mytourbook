@@ -178,9 +178,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
-		public TreeViewerItem getRootItem() {
-			return _rootItem;
-		}
+//		public TreeViewerItem getRootItem() {
+//			return _rootItem;
+//		}
 
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
@@ -327,6 +327,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tagViewer = new TreeViewer(tree);
+
 		_tagViewer.setContentProvider(new TagViewerContentProvicer());
 		_tagViewer.setComparator(new TagViewerComparator());
 		_tagViewer.setUseHashlookup(true);
@@ -597,9 +598,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				UI.EMPTY_STRING,
 				null);
 
-		inputDialog.open();
-
-		if (inputDialog.getReturnCode() != Window.OK) {
+		if (inputDialog.open() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -704,6 +704,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			_isModified = true;
 		}
+
+		setFocusToViewer();
 	}
 
 	/**
@@ -732,9 +734,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				UI.EMPTY_STRING,
 				null);
 
-		inputDialog.open();
-
-		if (inputDialog.getReturnCode() != Window.OK) {
+		if (inputDialog.open() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -860,6 +861,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			_isModified = true;
 		}
+
+		setFocusToViewer();
 	}
 
 	/**
@@ -885,9 +888,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		final InputDialog inputDialog = new InputDialog(getShell(), dlgTitle, dlgMessage, name, null);
 
-		inputDialog.open();
+		if (inputDialog.open() != Window.OK) {
 
-		if (inputDialog.getReturnCode() != Window.OK) {
+			setFocusToViewer();
 			return;
 		}
 
@@ -926,6 +929,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 
 		_isModified = true;
+
+		setFocusToViewer();
 	}
 
 	private void onReset() {
@@ -939,70 +944,74 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
 				1);
 
-		if ((dialog.open()) == Window.OK) {
-
-			try {
-
-				System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
-
-				final StringBuilder sb = new StringBuilder();
-				final Connection conn = TourDatabase.getInstance().getConnection();
-
-				/*
-				 * remove join table tag->category
-				 */
-				sb.append("DELETE FROM "); //$NON-NLS-1$
-				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
-				int result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Deleted " //$NON-NLS-1$
-						+ result
-						+ " entries from " //$NON-NLS-1$
-						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
-
-				/*
-				 * remove jointable category<->category
-				 */
-				sb.setLength(0);
-				sb.append("DELETE FROM "); //$NON-NLS-1$
-				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
-				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Deleted " //$NON-NLS-1$
-						+ result
-						+ " entries from " //$NON-NLS-1$
-						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
-
-				/*
-				 * set tags to root
-				 */
-				sb.setLength(0);
-				sb.append("UPDATE "); //$NON-NLS-1$
-				sb.append(TourDatabase.TABLE_TOUR_TAG);
-				sb.append(" SET isRoot=1"); //$NON-NLS-1$
-				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
-
-				/*
-				 * set categories to root
-				 */
-				sb.setLength(0);
-				sb.append("UPDATE "); //$NON-NLS-1$
-				sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
-				sb.append(" SET isRoot=1"); //$NON-NLS-1$
-				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
-
-				conn.close();
-
-				// update the tag viewer
-				_rootItem = new TVIPrefTagRoot(_tagViewer);
-				updateTagViewer();
-
-				_isModified = true;
-
-			} catch (final SQLException e) {
-				UI.showSQLException(e);
-			}
+		if (dialog.open() != Window.OK) {
+			setFocusToViewer();
+			return;
 		}
+
+		try {
+
+			System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
+
+			final StringBuilder sb = new StringBuilder();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			/*
+			 * remove join table tag->category
+			 */
+			sb.append("DELETE FROM "); //$NON-NLS-1$
+			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+			int result = conn.createStatement().executeUpdate(sb.toString());
+			System.out.println("Deleted " //$NON-NLS-1$
+					+ result
+					+ " entries from " //$NON-NLS-1$
+					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+
+			/*
+			 * remove jointable category<->category
+			 */
+			sb.setLength(0);
+			sb.append("DELETE FROM "); //$NON-NLS-1$
+			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+			result = conn.createStatement().executeUpdate(sb.toString());
+			System.out.println("Deleted " //$NON-NLS-1$
+					+ result
+					+ " entries from " //$NON-NLS-1$
+					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+
+			/*
+			 * set tags to root
+			 */
+			sb.setLength(0);
+			sb.append("UPDATE "); //$NON-NLS-1$
+			sb.append(TourDatabase.TABLE_TOUR_TAG);
+			sb.append(" SET isRoot=1"); //$NON-NLS-1$
+			result = conn.createStatement().executeUpdate(sb.toString());
+			System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			/*
+			 * set categories to root
+			 */
+			sb.setLength(0);
+			sb.append("UPDATE "); //$NON-NLS-1$
+			sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
+			sb.append(" SET isRoot=1"); //$NON-NLS-1$
+			result = conn.createStatement().executeUpdate(sb.toString());
+			System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			conn.close();
+
+			// update the tag viewer
+			_rootItem = new TVIPrefTagRoot(_tagViewer);
+			updateTagViewer();
+
+			_isModified = true;
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		setFocusToViewer();
 	}
 
 	@Override
@@ -1022,6 +1031,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	public void reloadViewer() {}
+
+	private void setFocusToViewer() {
+
+		// set focus back to the tree
+		_tagViewer.getTree().setFocus();
+	}
 
 	public void setIsModified() {
 		_isModified = true;

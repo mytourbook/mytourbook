@@ -26,6 +26,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -299,7 +300,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void postWindowOpen() {
 
-		TagManager.restoreSettings();
+		TagManager.restoreState();
+		TourTypeMenuManager.restoreState();
+
 		loadPeopleData();
 	}
 
@@ -342,7 +345,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 //		TourDatabase.getInstance().closeConnectionPool();
 
-		TagManager.saveSettings();
+		TagManager.saveState();
+		TourTypeMenuManager.saveState();
 
 		return super.preWindowShellClose();
 	}

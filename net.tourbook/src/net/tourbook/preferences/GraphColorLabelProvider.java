@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -33,20 +33,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class GraphColorLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-	private final IColorTreeViewer			fColorTreeViewer;
+	private final IColorTreeViewer			_colorTreeViewer;
 
-	private final HashMap<String, Image>	fImageCache	= new HashMap<String, Image>();
-	private final HashMap<String, Color>	fColorCache	= new HashMap<String, Color>();
+	private final HashMap<String, Image>	_imageCache	= new HashMap<String, Image>();
+	private final HashMap<String, Color>	_colorCache	= new HashMap<String, Color>();
 
-	private final int						fTreeItemHeight;
+	private final int						_treeItemHeight;
 
 	/**
 	 * @param colorTree
 	 */
 	GraphColorLabelProvider(final IColorTreeViewer colorTreeViewer) {
 
-		fColorTreeViewer = colorTreeViewer;
-		fTreeItemHeight = fColorTreeViewer.getTreeViewer().getTree().getItemHeight();
+		_colorTreeViewer = colorTreeViewer;
+		_treeItemHeight = _colorTreeViewer.getTreeViewer().getTree().getItemHeight();
 	}
 
 	@Override
@@ -59,35 +59,35 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 
 	void disposeGraphImages() {
 
-		for (final Image image : fImageCache.values()) {
+		for (final Image image : _imageCache.values()) {
 			(image).dispose();
 		}
-		fImageCache.clear();
+		_imageCache.clear();
 
-		for (final Color color : fColorCache.values()) {
+		for (final Color color : _colorCache.values()) {
 			(color).dispose();
 		}
-		fColorCache.clear();
+		_colorCache.clear();
 	}
 
 	public void disposeResources(final String colorId, final String imageId) {
 
-		final Image image = fImageCache.get(colorId);
+		final Image image = _imageCache.get(colorId);
 		if (image != null && !image.isDisposed()) {
 			image.dispose();
 		}
-		fImageCache.remove(colorId);
+		_imageCache.remove(colorId);
 
-		final Color color = fColorCache.get(colorId);
+		final Color color = _colorCache.get(colorId);
 		if (color != null && !color.isDisposed()) {
 			color.dispose();
 		}
-		fColorCache.remove(colorId);
+		_colorCache.remove(colorId);
 
 		/*
 		 * dispose color image for the graph definition
 		 */
-		fImageCache.remove(imageId);
+		_imageCache.remove(imageId);
 	}
 
 	private Image drawColorImage(final GraphColorItem graphColor) {
@@ -95,11 +95,11 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		final Display display = Display.getCurrent();
 
 		final String colorId = graphColor.getColorId();
-		Image image = fImageCache.get(colorId);
+		Image image = _imageCache.get(colorId);
 
 		if (image == null || image.isDisposed()) {
 
-			final int imageHeight = fTreeItemHeight;
+			final int imageHeight = _treeItemHeight;
 			final int imageWidth = imageHeight * 4;
 
 			final Rectangle borderRect = new Rectangle(0, 1, imageWidth - 1, imageHeight - 2);
@@ -115,7 +115,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 					/*
 					 * tell the legend provider with which color the legend should be painted
 					 */
-					final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
+					final ILegendProvider legendProvider = _colorTreeViewer.getLegendProvider();
 					legendProvider.setLegendColorColors(graphColor.getColorDefinition().getNewLegendColor());
 
 					TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
@@ -133,7 +133,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 			}
 			gc.dispose();
 
-			fImageCache.put(colorId, image);
+			_imageCache.put(colorId, image);
 		}
 
 		return image;
@@ -145,11 +145,11 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		final GraphColorItem[] graphColors = colorDefinition.getGraphColorParts();
 
 		final String imageId = colorDefinition.getImageId();
-		Image definitionImage = fImageCache.get(imageId);
+		Image definitionImage = _imageCache.get(imageId);
 
 		if (definitionImage == null || definitionImage.isDisposed()) {
 
-			final int imageHeight = fTreeItemHeight;
+			final int imageHeight = _treeItemHeight;
 			final int imageWidth = 4 * imageHeight;
 
 			final int colorHeight = imageHeight - 2;
@@ -176,7 +176,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 					if (graphColorItem.isLegend()) {
 
 						// tell the legend provider how to draw the legend
-						final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
+						final ILegendProvider legendProvider = _colorTreeViewer.getLegendProvider();
 						legendProvider.setLegendColorColors(graphColorItem.getColorDefinition().getNewLegendColor());
 
 						TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
@@ -199,7 +199,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 			}
 			gc.dispose();
 
-			fImageCache.put(imageId, definitionImage);
+			_imageCache.put(imageId, definitionImage);
 		}
 
 		return definitionImage;
@@ -240,11 +240,11 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 
 		final String colorId = graphColor.getColorId();
 
-		Color imageColor = fColorCache.get(colorId);
+		Color imageColor = _colorCache.get(colorId);
 
 		if (imageColor == null) {
 			imageColor = new Color(display, graphColor.getNewRGB());
-			fColorCache.put(colorId, imageColor);
+			_colorCache.put(colorId, imageColor);
 		}
 
 		return imageColor;

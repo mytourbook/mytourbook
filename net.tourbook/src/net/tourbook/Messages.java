@@ -91,6 +91,8 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
 
+	public static String		Action_TourType_RecentlyUsed;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 
@@ -523,6 +525,9 @@ public class Messages extends NLS {
 	public static String		merge_tour_source_graph_temperature;
 	public static String		merge_tour_source_graph_temperature_tooltip;
 
+	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
+	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
+
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_unit_high;
@@ -750,9 +755,9 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_Dialog_CheckFieldLength_Title;
 
-	public static String	Tour_Database_Dialog_ValidateFields_Message;
+	public static String		Tour_Database_Dialog_ValidateFields_Message;
 
-	public static String	Tour_Database_Dialog_ValidateFields_Title;
+	public static String		Tour_Database_Dialog_ValidateFields_Title;
 
 	public static String		Tour_Database_load_all_tours;
 

@@ -88,6 +88,8 @@ public class UI {
 
 	public static final String						EMPTY_STRING					= "";										//$NON-NLS-1$
 	public static final String						SPACE							= " ";										//$NON-NLS-1$
+	public static final String						SPACE2							= "  ";									//$NON-NLS-1$
+	public static final String						SPACE4							= "    ";									//$NON-NLS-1$
 	public static final String						COLON_SPACE						= ": ";									//$NON-NLS-1$
 	public static final String						UNDERSCORE						= "_";										//$NON-NLS-1$
 	public static final String						DASH							= "-";										//$NON-NLS-1$
@@ -95,6 +97,7 @@ public class UI {
 	public static final String						DASH_WITH_DOUBLE_SPACE			= "   -   ";								//$NON-NLS-1$
 	public static final String						SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";									//$NON-NLS-1$
+	public static final String						MNEMONIC						= "&";										//$NON-NLS-1$
 	public static final char						TAB								= '\t';
 	public static final char						DOT								= '.';
 
@@ -102,6 +105,7 @@ public class UI {
 	 * contains a new line
 	 */
 	public static final String						NEW_LINE						= "\n";									//$NON-NLS-1$
+
 	/**
 	 * contains 2 new lines
 	 */

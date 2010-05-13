@@ -30,11 +30,13 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.UI;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -42,33 +44,41 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TagManager {
 
-	public static final String[]		EXPAND_TYPE_NAMES				= {
+	public static final String[]			EXPAND_TYPE_NAMES				= {
 			Messages.app_action_expand_type_flat,
 			Messages.app_action_expand_type_year_day,
-			Messages.app_action_expand_type_year_month_day				};
+			Messages.app_action_expand_type_year_month_day					};
 
-	public static final int[]			EXPAND_TYPES					= {
+	public static final int[]				EXPAND_TYPES					= {
 			TourTag.EXPAND_TYPE_FLAT,
 			TourTag.EXPAND_TYPE_YEAR_DAY,
-			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY							};
+			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY								};
 
-	private static final String			SETTINGS_SECTION_RECENT_TAGS	= "recentTags";				//$NON-NLS-1$
-	private static final String			SETTINGS_TAG_ID					= "tagId";						//$NON-NLS-1$
+	private static final String				SETTINGS_SECTION_RECENT_TAGS	= "TagManager.RecentTags";						//$NON-NLS-1$
+	private static final String				SETTINGS_TAG_ID					= "tagId";										//$NON-NLS-1$
+
+	private static IDialogSettings			_state							= TourbookPlugin
+																					.getDefault()
+																					.getDialogSettingsSection(
+																							SETTINGS_SECTION_RECENT_TAGS);
 
 	/**
 	 * number of tags which are displayed in the context menu or saved in the dialog settings, it's
-	 * set to 9 to have a unique accelerator key
+	 * max number is 9 to have a unique accelerator key
 	 */
-//	public static final int				MAX_RECENT_TAGS					= 9;
-	private static LinkedList<TourTag>	_recentTags						= new LinkedList<TourTag>();
+	private static LinkedList<TourTag>		_recentTags						= new LinkedList<TourTag>();
 
-	private static ActionRecentTag[]	_actionsRecentTags;
+	private static ActionRecentTag[]		_actionsRecentTags;
 
-	private static ITourProvider		_tourProvider;
-	private static boolean				_isAddMode;
-	private static boolean				_isSaveTour;
+	private static ITourProvider			_tourProvider;
+	private static boolean					_isAddMode;
+	private static boolean					_isSaveTour;
 
-	public static class ActionRecentTag extends Action {
+	private static IPropertyChangeListener	_prefChangeListener;
+
+	private static int						_maxTags						= -1;
+
+	private static class ActionRecentTag extends Action {
 
 		private TourTag	_tag;
 
@@ -87,7 +97,7 @@ public class TagManager {
 	 * 
 	 * @param tourTag
 	 */
-	public static void addRecentTag(final TourTag tourTag) {
+	private static void addRecentTag(final TourTag tourTag) {
 		_recentTags.remove(tourTag);
 		_recentTags.addFirst(tourTag);
 	}
@@ -115,32 +125,20 @@ public class TagManager {
 												final boolean isSaveTour) {
 
 		if (_actionsRecentTags == null) {
-
-			// create actions for recenct tags
-
-			_actionsRecentTags = new ActionRecentTag[getMaxTags()];
-			for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
-				_actionsRecentTags[actionIndex] = new ActionRecentTag();
-			}
+			initTagManager();
 		}
 
 		if (_recentTags.size() == 0) {
 			return;
 		}
 
+		if (_maxTags < 1) {
+			return;
+		}
+
 		_tourProvider = tourProvider;
 		_isAddMode = isAddMode;
 		_isSaveTour = isSaveTour;
-
-		// add separator
-		menuMgr.add(new Separator());
-
-		/*
-		 * add title menu item
-		 */
-		final Action titleAction = new Action(Messages.action_tag_recently_used, SWT.NONE) {};
-		titleAction.setEnabled(false);
-		menuMgr.add(titleAction);
 
 		// add tag's
 		int tagIndex = 0;
@@ -149,8 +147,9 @@ public class TagManager {
 
 				final TourTag tag = _recentTags.get(tagIndex);
 
-				actionRecentTag.setText("&" + (tagIndex + 1) + " " + tag.getTagName()); //$NON-NLS-1$ //$NON-NLS-2$
 				actionRecentTag.setTag(tag);
+				actionRecentTag.setText(//
+						(UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName())); //$NON-NLS-1$
 
 				menuMgr.add(actionRecentTag);
 
@@ -163,40 +162,35 @@ public class TagManager {
 		}
 	}
 
-	private static int getMaxTags() {
+	private static void initTagManager() {
 
-		int maxTags = TourbookPlugin
-				.getDefault()
-				.getPreferenceStore()
-				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
+		setActions();
 
-		return maxTags = maxTags == 0 ? 3 : maxTags;
+		// create pref listener
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// check if the number of recent tags has changed
+				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
+					setActions();
+				}
+			}
+		};
+
+		// add pref listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
 
-	public static ActionRecentTag[] getRecentTagActions() {
-		return _actionsRecentTags;
-	}
+	public static void restoreState() {
 
-	public static void restoreSettings() {
-
-		final String[] tagIds = new String[Math.min(getMaxTags(), _recentTags.size())];
-		int tagIndex = 0;
-
-		for (final TourTag tag : _recentTags) {
-			tagIds[tagIndex++] = Long.toString(tag.getTagId());
-		}
-
-		final String[] savedTagIds = TourbookPlugin
-				.getDefault()
-				.getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS)
-				.getArray(SETTINGS_TAG_ID);
-
-		if (savedTagIds == null) {
+		final String[] allStateTagIds = _state.getArray(SETTINGS_TAG_ID);
+		if (allStateTagIds == null) {
 			return;
 		}
 
 		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
-		for (final String tagId : savedTagIds) {
+		for (final String tagId : allStateTagIds) {
 			try {
 				final TourTag tag = allTags.get(Long.parseLong(tagId));
 				if (tag != null) {
@@ -208,21 +202,42 @@ public class TagManager {
 		}
 	}
 
-	public static void saveSettings() {
+	public static void saveState() {
 
-		final int maxTags = getMaxTags();
-		final String[] tagIds = new String[Math.min(maxTags, _recentTags.size())];
+		if (_maxTags < 1) {
+			// tour types are not initialized or not visible, do nothing
+			return;
+		}
+
+		final String[] tagIds = new String[Math.min(_maxTags, _recentTags.size())];
 		int tagIndex = 0;
 
 		for (final TourTag tag : _recentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
-			if (tagIndex == maxTags) {
+			if (tagIndex == _maxTags) {
 				break;
 			}
 		}
 
-		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);
+		_state.put(SETTINGS_TAG_ID, tagIds);
+	}
+
+	/**
+	 * create actions for recenct tags
+	 */
+	private static void setActions() {
+
+		_maxTags = TourbookPlugin
+				.getDefault()
+				.getPreferenceStore()
+				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
+
+		_actionsRecentTags = new ActionRecentTag[_maxTags];
+
+		for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
+			_actionsRecentTags[actionIndex] = new ActionRecentTag();
+		}
 	}
 
 	public static void setTagIntoTour(	final TourTag tourTag,
@@ -256,7 +271,7 @@ public class TagManager {
 					}
 				}
 
-				TagManager.addRecentTag(tourTag);
+				addRecentTag(tourTag);
 
 				if (isSaveTour) {
 

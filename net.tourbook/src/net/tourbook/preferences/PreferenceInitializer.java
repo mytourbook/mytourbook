@@ -86,14 +86,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 			final String graphPrefName = graphDefinition.getGraphPrefName();
 
-			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT, graphDefinition
-					.getDefaultGradientBright());
+			PreferenceConverter.setDefault(
+					store,
+					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
+					graphDefinition.getDefaultGradientBright());
 
-			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_DARK, graphDefinition
-					.getDefaultGradientDark());
+			PreferenceConverter.setDefault(
+					store,
+					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
+					graphDefinition.getDefaultGradientDark());
 
-			PreferenceConverter.setDefault(store, graphPrefName + GraphColorProvider.PREF_COLOR_LINE, graphDefinition
-					.getDefaultLineColor());
+			PreferenceConverter.setDefault(
+					store,
+					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
+					graphDefinition.getDefaultLineColor());
 
 		}
 
@@ -192,7 +198,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * general appearance
 		 */
-		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
+		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES, 5);
+		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 5);
 		store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, true);
 
 		/*
