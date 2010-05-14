@@ -84,6 +84,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -176,8 +177,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-import de.byteholder.geoclipse.util.Util;
-
 // author: Wolfgang Schramm
 // create: 24.08.2007
 
@@ -245,11 +244,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	// marker viewer
 	private ColumnDefinition					_colDefMarker;
 
-	private ActionModifyColumns					_actionModifyColumns;
-
 	private ActionSaveTour						_actionSaveTour;
 	private ActionCreateTour					_actionCreateTour;
 	private ActionUndoChanges					_actionUndoChanges;
+	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
+	private ActionComputeDistanceValues			_actionComputeDistanceValues;
 	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
 	private ActionToggleReadEditMode			_actionToggleReadEditMode;
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
@@ -267,6 +266,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
 	private ActionDeleteTourMarker				_actionDeleteTourMarker;
+	private ActionModifyColumns					_actionModifyColumns;
 
 	/*
 	 * ui tabs
@@ -512,11 +512,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	fCellEditor;
+		private final TextCellEditor	__cellEditor;
 
 		private MarkerEditingSupport(final TextCellEditor cellEditor) {
 			super(_markerViewer);
-			fCellEditor = cellEditor;
+			__cellEditor = cellEditor;
 		}
 
 		@Override
@@ -531,7 +531,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		@Override
 		protected CellEditor getCellEditor(final Object element) {
-			return fCellEditor;
+			return __cellEditor;
 		}
 
 		@Override
@@ -592,19 +592,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class SliceDoubleEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	fCellEditor;
-		private double[]				fDataSerie;
+		private final TextCellEditor	__cellEditor;
+		private double[]				__dataSerie;
 
 		private SliceDoubleEditingSupport(final TextCellEditor cellEditor, final double[] dataSerie) {
 			super(_sliceViewer);
-			fCellEditor = cellEditor;
-			fDataSerie = dataSerie;
+			__cellEditor = cellEditor;
+			__dataSerie = dataSerie;
 		}
 
 		@Override
 		protected boolean canEdit(final Object element) {
 
-			if ((fDataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
 				return false;
 			}
 
@@ -613,16 +613,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		@Override
 		protected CellEditor getCellEditor(final Object element) {
-			return fCellEditor;
+			return __cellEditor;
 		}
 
 		@Override
 		protected Object getValue(final Object element) {
-			return new Float(fDataSerie[((TimeSlice) element).serieIndex]).toString();
+			return new Float(__dataSerie[((TimeSlice) element).serieIndex]).toString();
 		}
 
 		public void setDataSerie(final double[] dataSerie) {
-			fDataSerie = dataSerie;
+			__dataSerie = dataSerie;
 		}
 
 		@Override
@@ -635,12 +635,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final double enteredValue = Double.parseDouble((String) value);
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
-					if (enteredValue != fDataSerie[serieIndex]) {
+					if (enteredValue != __dataSerie[serieIndex]) {
 
 						// value has changed
 
 						// update dataserie
-						fDataSerie[serieIndex] = enteredValue;
+						__dataSerie[serieIndex] = enteredValue;
 
 						/*
 						 * worldposition has changed, this is an absolute overkill, wenn only one
@@ -660,19 +660,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class SliceIntegerEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	fCellEditor;
-		private int[]					fDataSerie;
+		private final TextCellEditor	__cellEditor;
+		private int[]					__dataSerie;
 
 		private SliceIntegerEditingSupport(final TextCellEditor cellEditor, final int[] dataSerie) {
 			super(_sliceViewer);
-			fCellEditor = cellEditor;
-			fDataSerie = dataSerie;
+			__cellEditor = cellEditor;
+			__dataSerie = dataSerie;
 		}
 
 		@Override
 		protected boolean canEdit(final Object element) {
 
-			if ((fDataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
 				return false;
 			}
 
@@ -681,19 +681,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		@Override
 		protected CellEditor getCellEditor(final Object element) {
-			return fCellEditor;
+			return __cellEditor;
 		}
 
 		@Override
 		protected Object getValue(final Object element) {
 
-			final int metricValue = fDataSerie[((TimeSlice) element).serieIndex];
+			final int metricValue = __dataSerie[((TimeSlice) element).serieIndex];
 			int displayedValue = metricValue;
 
 			/*
 			 * convert current measurement system into metric
 			 */
-			if (fDataSerie == _serieAltitude) {
+			if (__dataSerie == _serieAltitude) {
 
 				if (_unitValueAltitude != 1) {
 
@@ -702,7 +702,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					displayedValue /= _unitValueAltitude;
 				}
 
-			} else if (fDataSerie == _serieTemperature) {
+			} else if (__dataSerie == _serieTemperature) {
 
 				if (_unitValueTemperature != 1) {
 
@@ -716,7 +716,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		public void setDataSerie(final int[] dataSerie) {
-			fDataSerie = dataSerie;
+			__dataSerie = dataSerie;
 		}
 
 		@Override
@@ -731,7 +731,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					 */
 					final int enteredValue = Integer.parseInt((String) value);
 					int metricValue = enteredValue;
-					if (fDataSerie == _serieAltitude) {
+					if (__dataSerie == _serieAltitude) {
 
 						if (_unitValueAltitude != 1) {
 
@@ -742,7 +742,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							metricValue = Math.round(noneMetricValue * _unitValueAltitude);
 						}
 
-					} else if (fDataSerie == _serieTemperature) {
+					} else if (__dataSerie == _serieTemperature) {
 
 						if (_unitValueTemperature != 1) {
 
@@ -756,12 +756,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
-					if (metricValue != fDataSerie[serieIndex]) {
+					if (metricValue != __dataSerie[serieIndex]) {
 
 						// value has changed
 
 						// update dataserie
-						fDataSerie[serieIndex] = metricValue;
+						__dataSerie[serieIndex] = metricValue;
 
 						updateUIAfterSliceEdit();
 					}
@@ -775,11 +775,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private final class SliceMarkerEditingSupport extends EditingSupport {
 
-		private final TextCellEditor	fCellEditor;
+		private final TextCellEditor	__cellEditor;
 
 		private SliceMarkerEditingSupport(final TextCellEditor cellEditor) {
 			super(_sliceViewer);
-			fCellEditor = cellEditor;
+			__cellEditor = cellEditor;
 		}
 
 		@Override
@@ -794,7 +794,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		@Override
 		protected CellEditor getCellEditor(final Object element) {
-			return fCellEditor;
+			return __cellEditor;
 		}
 
 		@Override
@@ -899,6 +899,62 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+	}
+
+	/**
+	 * Compute distance values from the geo positions
+	 * <p>
+	 * Performs the run() method in {@link ActionComputeDistanceValues}
+	 */
+	void actionComputeDistanceValuesFromGeoPosition() {
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.TourEditor_Dialog_ComputeDistanceValues_Title,
+				NLS.bind(Messages.TourEditor_Dialog_ComputeDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+			return;
+		}
+
+		final double[] latSerie = _tourData.latitudeSerie;
+		final double[] lonSerie = _tourData.longitudeSerie;
+
+		final int[] distanceSerie = new int[latSerie.length];
+		_tourData.distanceSerie = distanceSerie;
+
+		double distance = 0;
+		double latStart = latSerie[0];
+		double lonStart = lonSerie[0];
+
+		// compute distance for every time slice
+		for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+
+			final double latEnd = latSerie[serieIndex];
+			final double lonEnd = lonSerie[serieIndex];
+
+			/*
+			 * haversine algorithm is much less accurate compared with vincenty
+			 */
+//			final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+			final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+
+			distance += distDiff;
+			distanceSerie[serieIndex] = (int) distance;
+
+			latStart = latEnd;
+			lonStart = lonEnd;
+		}
+
+		// set distance in markers
+		final Set<TourMarker> allTourMarker = _tourData.getTourMarkers();
+		if (allTourMarker != null) {
+
+			for (final TourMarker tourMarker : allTourMarker) {
+				final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+				tourMarker.setDistance(markerDistance);
+			}
+		}
+
+		updateUIAfterDistanceModifications();
 	}
 
 	/**
@@ -1129,6 +1185,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		}
+	}
+
+	void actionDeleteDistanceValues() {
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.TourEditor_Dialog_DeleteDistanceValues_Title,
+				NLS.bind(Messages.TourEditor_Dialog_DeleteDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+			return;
+		}
+
+		_tourData.distanceSerie = null;
+
+		// reset distance in markers
+		final Set<TourMarker> allTourMarker = _tourData.getTourMarkers();
+		if (allTourMarker != null) {
+
+			for (final TourMarker tourMarker : allTourMarker) {
+				tourMarker.setDistance(0);
+			}
+		}
+
+		updateUIAfterDistanceModifications();
 	}
 
 	/**
@@ -1645,6 +1724,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		} else {
 
 			_tourData = null;
+
+			// set slice viewer dirty
+			_sliceViewerTourId = -1;
+
 			_postSelectionProvider.clearSelection();
 
 			setTourClean();
@@ -1685,6 +1768,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSaveTour = new ActionSaveTour(this);
 		_actionCreateTour = new ActionCreateTour(this);
 		_actionUndoChanges = new ActionUndoChanges(this);
+		_actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
+		_actionComputeDistanceValues = new ActionComputeDistanceValues(this);
 		_actionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
 		_actionToggleReadEditMode = new ActionToggleReadEditMode(this);
 
@@ -3723,12 +3808,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionToggleRowSelectMode.setEnabled(isTableViewerTab && isTourValid && (_isManualTour == false));
 		_actionToggleReadEditMode.setEnabled(isTourInDb);
 
-		_actionModifyColumns.setEnabled(isTableViewerTab);
+		_actionModifyColumns.setEnabled(isTableViewerTab && isTourValid);
 	}
 
 	private void enableControls() {
 
 		final boolean canEdit = _isEditMode && isTourInDb();
+
+		// at least 2 positions are necessary to compute the distance
+		final boolean isGeoAvailable = _tourData != null
+				&& _tourData.latitudeSerie != null
+				&& _tourData.latitudeSerie.length >= 2;
 
 		_txtTitle.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
@@ -3761,6 +3851,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_sliceViewer.getTable().setEnabled(_isManualTour == false);
 		_markerViewer.getTable().setEnabled(_isManualTour == false);
+
+		_actionDeleteDistanceValues.setEnabled(canEdit);
+		_actionComputeDistanceValues.setEnabled(canEdit && isGeoAvailable);
 	}
 
 	private void fillMarkerContextMenu(final IMenuManager menuMgr) {
@@ -3876,6 +3969,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(_actionUndoChanges);
+		menuMgr.add(_actionDeleteDistanceValues);
+		menuMgr.add(_actionComputeDistanceValues);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionModifyColumns);
@@ -4803,7 +4898,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (_tabFolder.getSelection() == _tabSlices) {
 
 			if (_sliceViewerTourId == -1L) {
-				// load viewer when this is not done
+
+				// load viewer when this is was not yet done
 				_sliceViewerTourId = _tourData.getTourId();
 
 				reloadViewer();
@@ -5698,6 +5794,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	private void updateUIAfterDistanceModifications() {
+
+		updateUIAfterSliceEdit();
+
+		// update distance in the UI, this must be done after updateUIAfterSliceEdit()
+		updateUITab1Tour();
+
+		updateUITab2Marker();
+
+		/*
+		 * set slice viewer dirty when the time slice tab is not selected -> slice viewer was not
+		 * updated in updateUIAfterSliceEdit()
+		 */
+		if (_tabFolder.getSelection() != _tabSlices) {
+			_sliceViewerTourId = -1;
+		}
+	}
+
 	private void updateUIAfterSliceEdit() {
 
 		setTourDirty();
@@ -5706,7 +5820,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		getDataSeriesFromTourData();
 
 		// refresh the whole viewer because the computed data series could have been changed
-		getViewer().refresh();
+		final ColumnViewer viewer = getViewer();
+		if (viewer != null) {
+			viewer.refresh();
+		}
 
 		// display modified time slices in other views
 		fireModifyNotification();

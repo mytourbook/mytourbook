@@ -91,11 +91,8 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
 
-	public static String		Action_TourType_RecentlyUsed;
-
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
-
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
@@ -490,7 +487,7 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_RemoveTour;
 
-	public static String		Import_Data_Dlg_Confirm_Message;
+	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -752,23 +749,16 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_Dialog_CheckFieldLength_Message;
-
 	public static String		Tour_Database_Dialog_CheckFieldLength_Title;
-
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
-
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
-
 	public static String		Tour_Database_load_all_tours;
-
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
 	public static String		Tour_Database_Update_TourWeek;
 	public static String		Tour_Database_Update_TourWeek_Info;
-
 	public static String		Tour_Database_UpdateDone;
-
 	public static String		Tour_Database_UpdateInfo;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
@@ -1017,6 +1007,13 @@ public class Messages extends NLS {
 	public static String		TourData_Label_new_marker;
 
 	public static String		TourDataEditorView_tour_editor_status_tour_contains_ref_tour;
+
+	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
+	public static String		TourEditor_Action_DeleteDistanceValues;
+	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
+	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
+	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;
+	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
 
 	public static String		UI_Label_no_chart_is_selected;
 

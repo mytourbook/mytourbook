@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -68,7 +69,6 @@ import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 import de.byteholder.geoclipse.util.PixelConverter;
-import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefaultActions {

@@ -19,6 +19,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.tourbook.util.Util;
+
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -117,7 +119,6 @@ import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 import de.byteholder.geoclipse.util.PixelConverter;
-import de.byteholder.geoclipse.util.Util;
 import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {

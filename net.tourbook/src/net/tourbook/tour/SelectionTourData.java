@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
@@ -26,14 +26,14 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionTourData implements ISelection {
 
-	private TourChart	fTourChart;
-	private TourData	fTourData;
+	private TourChart	_tourChart;
+	private TourData	_tourData;
 
-	private boolean		fForceRedraw	= false;
+	private boolean		_isForceRedraw	= false;
 
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
-		fTourChart = tourChart;
-		fTourData = tourData;
+		_tourChart = tourChart;
+		_tourData = tourData;
 	}
 
 	/**
@@ -44,13 +44,13 @@ public class SelectionTourData implements ISelection {
 	 *            {@link TourData} has been changed
 	 */
 	public SelectionTourData(final TourChart tourChart, final TourData tourData, final boolean forceRedraw) {
-		fTourChart = tourChart;
-		fTourData = tourData;
-		fForceRedraw = forceRedraw;
+		_tourChart = tourChart;
+		_tourData = tourData;
+		_isForceRedraw = forceRedraw;
 	}
 
 	public SelectionTourData(final TourData tourData) {
-		fTourData = tourData;
+		_tourData = tourData;
 	}
 
 	/**
@@ -58,11 +58,11 @@ public class SelectionTourData implements ISelection {
 	 *         not available
 	 */
 	public TourChart getTourChart() {
-		return fTourChart;
+		return _tourChart;
 	}
 
 	public TourData getTourData() {
-		return fTourData;
+		return _tourData;
 	}
 
 	public boolean isEmpty() {
@@ -70,11 +70,11 @@ public class SelectionTourData implements ISelection {
 	}
 
 	public boolean isForceRedraw() {
-		return fForceRedraw;
+		return _isForceRedraw;
 	}
 
 	public void setForceRedraw(final boolean fForceRedraw) {
-		this.fForceRedraw = fForceRedraw;
+		this._isForceRedraw = fForceRedraw;
 	}
 
 	@Override
@@ -85,19 +85,19 @@ public class SelectionTourData implements ISelection {
 		sb.append("[SelectionTourData]\n");//$NON-NLS-1$
 
 		sb.append("\tfTourData:");//$NON-NLS-1$
-		if (fTourData == null) {
-			sb.append(fTourData);
+		if (_tourData == null) {
+			sb.append(_tourData);
 		} else {
-			sb.append(fTourData.toString());
+			sb.append(_tourData.toString());
 		}
 
 		sb.append(UI.NEW_LINE);
 
 		sb.append("\tfTourChart:");//$NON-NLS-1$
-		if (fTourChart == null) {
-			sb.append(fTourChart);
+		if (_tourChart == null) {
+			sb.append(_tourChart);
 		} else {
-			sb.append(fTourChart.toString());
+			sb.append(_tourChart.toString());
 		}
 
 		sb.append(UI.NEW_LINE);

@@ -315,7 +315,7 @@ public class Tile extends Observable {
 			}
 
 		} catch (final Exception e) {
-			// ignore
+			// log it but don't show because it happened too often
 			StatusUtil.log(e);
 		}
 

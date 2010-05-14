@@ -76,7 +76,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
 	 */
 	public static final int							UI_MIN_ZOOM_LEVEL					= 1;
-	public static final int							UI_MAX_ZOOM_LEVEL					= 18;
+	public static final int							UI_MAX_ZOOM_LEVEL					= 19;
 
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;

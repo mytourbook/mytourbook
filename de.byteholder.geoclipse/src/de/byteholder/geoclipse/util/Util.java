@@ -4,14 +4,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.tourbook.util.StatusUtil;
- 
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
@@ -22,29 +19,7 @@ public class Util {
 	private static final String	URL_SPACE				= " ";		//$NON-NLS-1$
 	private static final String	URL_SPACE_REPLACEMENT	= "%20";	//$NON-NLS-1$
 
-	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
-		// accelerate with Ctrl + Shift key
-		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
-
-		final Scale scale = (Scale) event.widget;
-		final int newValueDiff = event.count > 0 ? accelerator : -accelerator;
-
-		return scale.getSelection() + newValueDiff;
-	}
-
-	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
-
-		// accelerate with Ctrl + Shift key
-		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
-
-		final Spinner spinner = (Spinner) event.widget;
-		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
-
-		spinner.setSelection(spinner.getSelection() + newValue);
-	}
 
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
@@ -52,7 +27,7 @@ public class Util {
 
 	/**
 	 *** Hex-encodes a URL argument
-	 *** 
+	 ***
 	 *** @param s
 	 *            The URL argument to encode
 	 *** @param obfuscateAll
@@ -66,14 +41,14 @@ public class Util {
 		if (s != null) {
 			final char ch[] = new char[s.length()];
 			s.getChars(0, s.length(), ch, 0);
-			for (int i = 0; i < ch.length; i++) {
-				if (obfuscateAll || shouldEncodeArgChar(ch[i])) {
+			for (final char element : ch) {
+				if (obfuscateAll || shouldEncodeArgChar(element)) {
 					// escape non-alphanumeric characters
 					sb.append("%"); //$NON-NLS-1$
-					sb.append(Integer.toHexString(0x100 + (ch[i] & 0xFF)).substring(1));
+					sb.append(Integer.toHexString(0x100 + (element & 0xFF)).substring(1));
 				} else {
 					// letters and digits are ok as-is
-					sb.append(ch[i]);
+					sb.append(element);
 				}
 			}
 		}
@@ -84,7 +59,7 @@ public class Util {
 	public static void log(final String message) {
 //		System.out.println(//
 //				System.nanoTime() + " "
-//				//                                                 012345678901234				
+//				//                                                 012345678901234
 //						+ Thread.currentThread().getName().concat("               ").substring(0, 14)
 //						+ "\t"
 //						+ message);
@@ -121,7 +96,7 @@ public class Util {
 
 	/**
 	 *** Returns true if the specified character should be hex-encoded in a URL
-	 *** 
+	 ***
 	 * @param ch
 	 *            The character to test
 	 *** @return True if the specified character should be hex-encoded in a URL
@@ -145,11 +120,11 @@ public class Util {
 	 */
 	private static String urlEncodeForSpaces(final char[] input) {
 		final StringBuffer retu = new StringBuffer(input.length);
-		for (int i = 0; i < input.length; i++) {
-			if (input[i] == ' ') {
+		for (final char element : input) {
+			if (element == ' ') {
 				retu.append("%20"); //$NON-NLS-1$
 			} else {
-				retu.append(input[i]);
+				retu.append(element);
 			}
 		}
 		return retu.toString();

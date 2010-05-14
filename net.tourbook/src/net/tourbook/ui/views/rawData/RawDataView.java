@@ -277,7 +277,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
 				Messages.import_data_dlg_reimport_title,
-				Messages.Import_Data_Dlg_Confirm_Message) == false) {
+				Messages.Import_Data_Dialog_ConfirmReimport_Message) == false) {
 			return;
 		}
 
@@ -384,7 +384,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				// reselect tours
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-//						fTourViewer.setSelection(new StructuredSelection(firstTourData[0]), true);
 						_tourViewer.setSelection(selection, true);
 					}
 				});
@@ -936,7 +935,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
-				if (tourDistance != 0) {
+				if (tourDistance == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
 					_nf.setMinimumFractionDigits(3);
 					_nf.setMaximumFractionDigits(3);
 					cell.setText(_nf.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));

@@ -1575,9 +1575,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionAddTag);
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(_actionRemoveTag);
 		menuMgr.add(_actionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(_actionOpenTagPrefs);
 
 		menuMgr.add(new Separator());
