@@ -53,6 +53,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
@@ -1388,15 +1389,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_actionAddTag.setEnabled(isTourSelected);
 
-		/*
-		 * enable/disable remove actions
-		 */
+		Set<TourTag> existingTags = null;
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
 		if ((firstSavedTour != null) && (savedTours == 1)) {
 
 			// one tour is selected
 
-			final Set<TourTag> tourTags = firstSavedTour.getTourTags();
-			if ((tourTags != null) && (tourTags.size() > 0)) {
+			final TourType tourType = firstSavedTour.getTourType();
+
+			existingTags = firstSavedTour.getTourTags();
+			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+
+			if ((existingTags != null) && (existingTags.size() > 0)) {
 
 				// at least one tag is within the tour
 
@@ -1415,9 +1420,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
-		// enable/disable actions for the recent tags
-		TagManager.enableRecentTagActions(isTourSelected);
-
+		// enable/disable actions for tags/tour types
+		TagManager.enableRecentTagActions(isTourSelected, existingTags);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1442,12 +1447,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionOpenTour);
 
+		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
+		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+
+		// tour tag actions
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionAddTag);
+		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
 		menuMgr.add(_actionRemoveTag);
 		menuMgr.add(_actionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(_actionOpenTagPrefs);
 
 		// add standard group which allows other plug-ins to contribute here

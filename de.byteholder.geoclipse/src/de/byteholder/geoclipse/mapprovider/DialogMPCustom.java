@@ -441,7 +441,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			// sash
 			final Sash sash = new Sash(container, SWT.VERTICAL);
-			UI.addSashColorHandler(sash);
+			net.tourbook.util.UI.addSashColorHandler(sash);
 
 			// right part (map)
 			final Composite mapContainer = new Composite(container, SWT.NONE);

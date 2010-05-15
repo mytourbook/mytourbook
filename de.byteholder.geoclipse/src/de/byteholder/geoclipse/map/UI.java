@@ -7,21 +7,14 @@ import net.tourbook.util.StatusUtil;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.byteholder.geoclipse.Messages;
- 
+
 public class UI {
 
 	public static final String	EMPTY_STRING	= "";				//$NON-NLS-1$
@@ -49,36 +42,6 @@ public class UI {
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
-
-	public static void addSashColorHandler(final Sash sash) {
-
-		sash.addMouseTrackListener(new MouseTrackListener() {
-
-			public void mouseEnter(final MouseEvent e) {
-				sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-			}
-
-			public void mouseExit(final MouseEvent e) {
-				sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-			}
-
-			public void mouseHover(final MouseEvent e) {}
-		});
-
-		sash.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				// hide background when sash is dragged
-
-				if (e.detail == SWT.DRAG) {
-					sash.setBackground(null);
-				} else {
-					sash.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-				}
-			}
-		});
-	}
 
 	/**
 	 * @param file
@@ -130,11 +93,11 @@ public class UI {
 				addedChars++;
 
 			} else if (nameChar == ' '
-				|| nameChar == DASH
-				|| nameChar == '_'
+					|| nameChar == DASH
+					|| nameChar == '_'
 					|| nameChar == '.'
-						|| nameChar == '/'
-							|| nameChar == ':') {
+					|| nameChar == '/'
+					|| nameChar == ':') {
 
 				// don't repeat dashes
 
@@ -163,8 +126,8 @@ public class UI {
 			 */
 			int currentWordLength = 0;
 			int maxWordLength = 0;
-			for (int charIndex = 0; charIndex < originalId.length; charIndex++) {
-				if (originalId[charIndex] == DASH) {
+			for (final char element : originalId) {
+				if (element == DASH) {
 					maxWordLength = (maxWordLength >= currentWordLength) ? maxWordLength : currentWordLength;
 					currentWordLength = 0;
 				} else {

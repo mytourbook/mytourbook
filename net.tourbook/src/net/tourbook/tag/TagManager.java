@@ -102,14 +102,69 @@ public class TagManager {
 		_recentTags.addFirst(tourTag);
 	}
 
-	public static void enableRecentTagActions(final boolean isEnabled) {
+	public static void enableRecentTagActions(final boolean isEnabled, final ArrayList<Long> allExistingTagIds) {
 
 		if (_actionsRecentTags == null) {
 			return;
 		}
 
+		final boolean isExistingTagIds = allExistingTagIds != null && allExistingTagIds.size() > 0;
+
 		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
-			actionRecentTag.setEnabled(isEnabled);
+
+			if (isExistingTagIds && isEnabled) {
+
+				// disable action when it's tag id is contained in allExistingTagIds
+
+				final long recentTagId = actionRecentTag._tag.getTagId();
+
+				boolean isExistTagId = false;
+
+				for (final long existingTagId : allExistingTagIds) {
+					if (recentTagId == existingTagId) {
+						isExistTagId = true;
+						break;
+					}
+				}
+
+				actionRecentTag.setEnabled(isExistTagId == false);
+
+			} else {
+				actionRecentTag.setEnabled(isEnabled);
+			}
+		}
+	}
+
+	public static void enableRecentTagActions(final boolean isEnabled, final Set<TourTag> allExistingTags) {
+
+		if (_actionsRecentTags == null) {
+			return;
+		}
+
+		final boolean isExistingTags = allExistingTags != null && allExistingTags.size() > 0;
+
+		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
+
+			if (isExistingTags && isEnabled) {
+
+				// disable action when it's tag id is contained in allExistingTagIds
+
+				final long recentTagId = actionRecentTag._tag.getTagId();
+
+				boolean isExistTagId = false;
+
+				for (final TourTag existingTag : allExistingTags) {
+					if (recentTagId == existingTag.getTagId()) {
+						isExistTagId = true;
+						break;
+					}
+				}
+
+				actionRecentTag.setEnabled(isExistTagId == false);
+
+			} else {
+				actionRecentTag.setEnabled(isEnabled);
+			}
 		}
 	}
 
@@ -119,10 +174,10 @@ public class TagManager {
 	 * @param menuMgr
 	 * @param isSaveTour
 	 */
-	public static void fillRecentTagsIntoMenu(	final IMenuManager menuMgr,
-												final ITourProvider tourProvider,
-												final boolean isAddMode,
-												final boolean isSaveTour) {
+	public static void fillMenuRecentTags(	final IMenuManager menuMgr,
+											final ITourProvider tourProvider,
+											final boolean isAddMode,
+											final boolean isSaveTour) {
 
 		if (_actionsRecentTags == null) {
 			initTagManager();
@@ -149,7 +204,7 @@ public class TagManager {
 
 				actionRecentTag.setTag(tag);
 				actionRecentTag.setText(//
-						(UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName())); //$NON-NLS-1$
+						(UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
 
 				menuMgr.add(actionRecentTag);
 

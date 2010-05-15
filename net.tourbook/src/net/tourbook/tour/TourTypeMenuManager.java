@@ -93,14 +93,56 @@ public class TourTypeMenuManager {
 		_recentTourTypes.addFirst(tourType);
 	}
 
-	public static void enableRecentTourTypeActions(final boolean isEnabled) {
+	/**
+	 * @param isEnabled
+	 * @param existingTourTypeId
+	 */
+	public static void enableRecentTourTypeActions(final boolean isEnabled, final long existingTourTypeId) {
 
 		if (_actionsRecentTourTypes == null) {
 			return;
 		}
 
 		for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
-			actionRecentTourType.setEnabled(isEnabled);
+
+			if (isEnabled) {
+
+				// enable tour type
+
+				boolean isExistingTourTypeId = false;
+
+				// check if the existing tour type should be enabled
+				if (existingTourTypeId != TourDatabase.ENTITY_IS_NOT_SAVED
+						&& actionRecentTourType.__tourType.getTypeId() == existingTourTypeId) {
+
+					isExistingTourTypeId = true;
+				}
+
+				actionRecentTourType.setEnabled(isExistingTourTypeId == false);
+
+				if (isExistingTourTypeId) {
+
+					// hide image because it looks ugly (on windows) when it's disabled
+					actionRecentTourType.setImageDescriptor(null);
+
+				} else {
+
+					// set tour type image
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(
+							actionRecentTourType.__tourType.getTypeId());
+
+					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+				}
+
+			} else {
+
+				// disable tour type
+
+				actionRecentTourType.setEnabled(false);
+
+				// hide image because it looks ugly (on windows) when it's disabled
+				actionRecentTourType.setImageDescriptor(null);
+			}
 		}
 	}
 
@@ -111,9 +153,9 @@ public class TourTypeMenuManager {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 */
-	public static void fillRecentTourTypesIntoMenu(	final IMenuManager menuMgr,
-													final ITourProvider tourProvider,
-													final boolean isSaveTour) {
+	public static void fillMenuRecentTourTypes(	final IMenuManager menuMgr,
+												final ITourProvider tourProvider,
+												final boolean isSaveTour) {
 
 		if (_actionsRecentTourTypes == null) {
 			initTourTypeManager();
@@ -140,10 +182,6 @@ public class TourTypeMenuManager {
 				actionRecentTourType.setTourType(tourType);
 				actionRecentTourType.setText(//
 						(UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + tourType.getName()));
-
-				// set tour type image
-				final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
-				actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
 				menuMgr.add(actionRecentTourType);
 

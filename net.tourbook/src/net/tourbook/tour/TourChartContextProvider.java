@@ -16,12 +16,16 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
@@ -107,6 +111,30 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
+	/**
+	 * enable actions
+	 */
+	private void enableActions() {
+
+		final TourData tourData = _tourEditor.getTourData();
+		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
+
+		final Set<TourTag> allExistingTags = isDataAvailable ? tourData.getTourTags() : null;
+
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		if (tourData != null) {
+			final TourType tourType = tourData.getTourType();
+			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+		}
+
+		_actionQuickEdit.setEnabled(isDataAvailable);
+		_actionEditTour.setEnabled(isDataAvailable);
+
+		// enable/disable actions for tags/tour types
+		TagManager.enableRecentTagActions(isDataAvailable, allExistingTags);
+		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
+	}
+
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {}
@@ -121,22 +149,20 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionAdjustAltitude);
 
+		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
+		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+
+		// tour tag actions
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionAddTag);
+		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
 		menuMgr.add(_actionRemoveTag);
 		menuMgr.add(_actionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(_actionOpenTagPrefs);
 
-		/*
-		 * enable actions
-		 */
-		final boolean isDataAvailable = _tourEditor.getTourData() != null
-				&& _tourEditor.getTourData().getTourPerson() != null;
-
-		_actionQuickEdit.setEnabled(isDataAvailable);
-		_actionEditTour.setEnabled(isDataAvailable);
+		enableActions();
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,

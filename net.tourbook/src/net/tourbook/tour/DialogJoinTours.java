@@ -272,6 +272,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		initTourData();
 
 		createUI(dlgContainer);
+
 		restoreState();
 
 		updateUITourTypeTags();
@@ -314,7 +315,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 				menuMgr.add(_actionRemoveTag);
 				menuMgr.add(_actionRemoveAllTags);
 
-				TagManager.fillRecentTagsIntoMenu(menuMgr, DialogJoinTours.this, true, false);
+				TagManager.fillMenuRecentTags(menuMgr, DialogJoinTours.this, true, false);
 
 				menuMgr.add(new Separator());
 				menuMgr.add(_actionOpenTagPrefs);

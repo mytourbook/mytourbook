@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * 
@@ -19,17 +19,21 @@
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -45,80 +49,94 @@ import org.eclipse.jface.action.Separator;
  */
 class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	/** 
-	 * 
-	 */
-	private final Chart					fChart;
-	private final IBarSelectionProvider	fBarSelectionProvider;
+	private final Chart					_chart;
+	private final IBarSelectionProvider	_barSelectionProvider;
 
-	private final ActionEditQuick		fActionEditQuick;
-	private final ActionEditTour		fActionEditTour;
-	private final ActionOpenTour		fActionOpenTour;
+	private final ActionEditQuick		_actionEditQuick;
+	private final ActionEditTour		_actionEditTour;
+	private final ActionOpenTour		_actionOpenTour;
 
-	private final ActionSetTourTypeMenu		fActionSetTourType;
-	private final ActionSetTourTag		fActionAddTag;
-	private final ActionSetTourTag		fActionRemoveTag;
+	private final ActionSetTourTypeMenu	_actionSetTourType;
+	private final ActionSetTourTag		_actionAddTag;
+	private final ActionSetTourTag		_actionRemoveTag;
 
-	private final ActionRemoveAllTags	fActionRemoveAllTags;
-	private final ActionOpenPrefDialog	fActionOpenTagPrefs;
+	private final ActionRemoveAllTags	_actionRemoveAllTags;
+	private final ActionOpenPrefDialog	_actionOpenTagPrefs;
 
 	public TourChartContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
-		fChart = chart;
-		fBarSelectionProvider = barSelectionProvider;
+		_chart = chart;
+		_barSelectionProvider = barSelectionProvider;
 
-		fActionEditQuick = new ActionEditQuick(this);
-		fActionEditTour = new ActionEditTour(this);
-		fActionOpenTour = new ActionOpenTour(this);
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionEditTour = new ActionEditTour(this);
+		_actionOpenTour = new ActionOpenTour(this);
 
-		fActionSetTourType = new ActionSetTourTypeMenu(this);
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
+		_actionAddTag = new ActionSetTourTag(this, true);
+		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(net.tourbook.Messages.action_tag_open_tagging_structure,
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				net.tourbook.Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	private void enableActions(final boolean isTourHovered) {
 
 		boolean isTagAvailable = false;
-		final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
+		Set<TourTag> allExistingTags = null;
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+		final Long selectedTourId = _barSelectionProvider.getSelectedTourId();
 		if (selectedTourId != null) {
+
 			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
+
 			if (tourData != null) {
-				isTagAvailable = tourData.getTourTags().size() > 0;
+
+				allExistingTags = tourData.getTourTags();
+				isTagAvailable = allExistingTags.size() > 0;
+
+				final TourType tourType = tourData.getTourType();
+				existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 			}
 		}
 
-		fActionEditQuick.setEnabled(isTourHovered);
-		fActionEditTour.setEnabled(isTourHovered);
-		fActionOpenTour.setEnabled(isTourHovered);
+		_actionEditQuick.setEnabled(isTourHovered);
+		_actionEditTour.setEnabled(isTourHovered);
+		_actionOpenTour.setEnabled(isTourHovered);
 
-		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getAllTourTypes().size() > 0);
-		fActionAddTag.setEnabled(isTourHovered);
-		fActionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
-		fActionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
+		_actionSetTourType.setEnabled(isTourHovered && TourDatabase.getAllTourTypes().size() > 0);
+		_actionAddTag.setEnabled(isTourHovered);
+		_actionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
+		_actionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
 
-		// enable actions for the recent tags
-		TagManager.enableRecentTagActions(isTourHovered);
+		// enable/disable actions for tags/tour types
+		TagManager.enableRecentTagActions(isTourHovered, allExistingTags);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourHovered, existingTourTypeId);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {
 
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionOpenTour);
+		menuMgr.add(_actionEditQuick);
+		menuMgr.add(_actionEditTour);
+		menuMgr.add(_actionOpenTour);
 
+		// tour type action
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionAddTag);
-		menuMgr.add(fActionRemoveTag);
-		menuMgr.add(fActionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(_actionSetTourType);
+		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+
+		// tour tag actions
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionAddTag);
+		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+		menuMgr.add(_actionRemoveTag);
+		menuMgr.add(_actionRemoveAllTags);
+		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions(hoveredBarSerieIndex != -1);
 	}
@@ -132,7 +150,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 										final ChartXSlider rightSlider) {}
 
 	public Chart getChart() {
-		return fChart;
+		return _chart;
 	}
 
 	public ChartXSlider getLeftSlider() {
@@ -145,7 +163,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
+		final Long selectedTourId = _barSelectionProvider.getSelectedTourId();
 		if (selectedTourId != null) {
 
 			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
@@ -160,7 +178,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 		return null;
 	}
- 
+
 	public boolean showOnlySliderContextMenu() {
 		return false;
 	}

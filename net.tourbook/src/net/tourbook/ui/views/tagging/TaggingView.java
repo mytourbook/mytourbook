@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
@@ -44,6 +44,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
@@ -109,69 +110,66 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";			//$NON-NLS-1$
 
-	final IDialogSettings					fViewState						= TourbookPlugin
- 																					.getDefault()
-																					.getDialogSettingsSection(ID);
-
 	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";						//$NON-NLS-1$
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 
-	private int								fTagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
+	private final IDialogSettings			_state							= TourbookPlugin
+																					.getDefault()
+																					.getDialogSettingsSection(ID);
 
-	private Composite						fViewerContainer;
+	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 
-	private TreeViewer						fTagViewer;
-	private TVITagViewRoot					fRootItem;
+	private Composite						_viewerContainer;
 
-	private ColumnManager					fColumnManager;
+	private TreeViewer						_tagViewer;
+	private TVITagViewRoot					_bootItem;
 
-	private PostSelectionProvider			fPostSelectionProvider;
+	private ColumnManager					_columnManager;
 
-	private ITourEventListener				fTourEventListener;
-	private ISelectionListener				fPostSelectionListener;
+	private PostSelectionProvider			_postSelectionProvider;
 
-	private ActionSetTourTag				fActionAddTag;
-	private ActionCollapseAll				fActionCollapseAll;
-	private ActionCollapseOthers			fActionCollapseOthers;
-	private ActionEditQuick					fActionEditQuick;
-	private ActionEditTour					fActionEditTour;
-	private ActionExpandSelection			fActionExpandSelection;
-	private ActionOpenPrefDialog			fActionOpenTagPrefs;
-	private ActionSetLayoutHierarchical		fActionSetLayoutHierarchical;
-	private ActionSetLayoutFlat				fActionSetLayoutFlat;
-	private ActionRefreshView				fActionRefreshView;
-	private ActionRemoveAllTags				fActionRemoveAllTags;
-	private ActionSetTourTag				fActionRemoveTag;
-	private ActionRenameTag					fActionRenameTag;
-	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
-	private ActionMenuSetTagStructure		fActionSetTagStructure;
-	private ActionSetTourTypeMenu			fActionSetTourType;
-	private ActionOpenTour					fActionOpenTour;
+	private ITourEventListener				_tourEventListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private IPartListener2					_partListener;
 
-	private ActionModifyColumns				fActionModifyColumns;
+	private ActionSetTourTag				_actionAddTag;
+	private ActionCollapseAll				_actionCollapseAll;
+	private ActionCollapseOthers			_actionCollapseOthers;
+	private ActionEditQuick					_actionEditQuick;
+	private ActionEditTour					_actionEditTour;
+	private ActionExpandSelection			_actionExpandSelection;
+	private ActionOpenPrefDialog			_actionOpenTagPrefs;
+	private ActionSetLayoutHierarchical		_actionSetLayoutHierarchical;
+	private ActionSetLayoutFlat				_actionSetLayoutFlat;
+	private ActionRefreshView				_actionRefreshView;
+	private ActionRemoveAllTags				_actionRemoveAllTags;
+	private ActionSetTourTag				_actionRemoveTag;
+	private ActionRenameTag					_actionRenameTag;
+	private ActionMenuSetAllTagStructures	_actionSetAllTagStructures;
+	private ActionMenuSetTagStructure		_actionSetTagStructure;
+	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionOpenTour					_actionOpenTour;
 
-	private IPropertyChangeListener			fPrefChangeListener;
+	private ActionModifyColumns				_actionModifyColumns;
 
-	private final Image						fImgTagCategory					= TourbookPlugin
+	private final Image						_imgTagCategory					= TourbookPlugin
 																					.getImageDescriptor(
 																							Messages.Image__tag_category)
 																					.createImage();
-	private final Image						fImgTag							= TourbookPlugin.getImageDescriptor(
+	private final Image						_imgTag							= TourbookPlugin.getImageDescriptor(
 																					Messages.Image__tag).createImage();
-	private final Image						fImgTagRoot						= TourbookPlugin
+	private final Image						_imgTagRoot						= TourbookPlugin
 																					.getImageDescriptor(
 																							Messages.Image__tag_root)
 																					.createImage();
 
-	private IPartListener2					fPartListener;
+	private boolean							_isRecTimeFormat_hhmmss;
+	private boolean							_isDriveTimeFormat_hhmmss;
 
-	private boolean							fIsRecTimeFormat_hhmmss;
-	private boolean							fIsDriveTimeFormat_hhmmss;
-	private boolean							fIsPauseTimeFormat_hhmmss;
-
-	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
+	private static final NumberFormat		_nf								= NumberFormat.getNumberInstance();
 
 	/**
 	 * comparatore is sorting the tree items
@@ -297,7 +295,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void addPartListener() {
 
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -322,14 +320,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
-		getViewSite().getPage().addPartListener(fPartListener);
+		getViewSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -341,7 +339,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					// update viewer
 
-					fTagViewer.refresh();
+					_tagViewer.refresh();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -349,56 +347,56 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fViewState);
-					fColumnManager.clearColumns();
-					defineViewerColumns(fViewerContainer);
+					_columnManager.saveState(_state);
+					_columnManager.clearColumns();
+					defineViewerColumns(_viewerContainer);
 
-					fTagViewer = (TreeViewer) recreateViewer(fTagViewer);
+					_tagViewer = (TreeViewer) recreateViewer(_tagViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					readDisplayFormats();
 
-					fTagViewer.getTree().setLinesVisible(
+					_tagViewer.getTree().setLinesVisible(
 							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-					fTagViewer.refresh();
+					_tagViewer.refresh();
 
 					/*
 					 * the tree must be redrawn because the styled text does not show with the new
 					 * color
 					 */
-					fTagViewer.getTree().redraw();
+					_tagViewer.getTree().redraw();
 				}
 			}
 		};
 
 		// register the listener
-		prefStore.addPropertyChangeListener(fPrefChangeListener);
+		prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
 
 		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
 					final SelectionDeletedTours deletedTourSelection = (SelectionDeletedTours) selection;
 
-					updateViewerAfterTourIsDeleted(fRootItem, deletedTourSelection.removedTours);
+					updateViewerAfterTourIsDeleted(_bootItem, deletedTourSelection.removedTours);
 				}
 			}
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TaggingView.this) {
@@ -413,10 +411,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						final boolean isAddMode = changedTags.isAddMode();
 
 						// get a clone of the modified tours/tags because the tours are removed from the list
-						final ChangedTags changedTagsClone = new ChangedTags(changedTags.getModifiedTags(), changedTags
-								.getModifiedTours(), isAddMode);
+						final ChangedTags changedTagsClone = new ChangedTags(
+								changedTags.getModifiedTags(),
+								changedTags.getModifiedTours(),
+								isAddMode);
 
-						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
+						updateViewerAfterTagStructureIsModified(_bootItem, changedTagsClone, isAddMode);
 					}
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED || eventId == TourEventId.UPDATE_UI) {
@@ -427,44 +427,44 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
-						updateViewerAfterTourIsModified(fRootItem, modifiedTours);
+						updateViewerAfterTourIsModified(_bootItem, modifiedTours);
 					}
 				}
 			}
 		};
 
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void createActions() {
 
-		fActionEditQuick = new ActionEditQuick(this);
-		fActionEditTour = new ActionEditTour(this);
-		fActionOpenTour = new ActionOpenTour(this);
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionEditTour = new ActionEditTour(this);
+		_actionOpenTour = new ActionOpenTour(this);
 
-		fActionSetTourType = new ActionSetTourTypeMenu(this);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		_actionAddTag = new ActionSetTourTag(this, true);
+		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionRefreshView = new ActionRefreshView(this);
-		fActionSetTagStructure = new ActionMenuSetTagStructure(this);
-		fActionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
-		fActionRenameTag = new ActionRenameTag(this);
+		_actionRefreshView = new ActionRefreshView(this);
+		_actionSetTagStructure = new ActionMenuSetTagStructure(this);
+		_actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
+		_actionRenameTag = new ActionRenameTag(this);
 
-		fActionExpandSelection = new ActionExpandSelection(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
-		fActionCollapseOthers = new ActionCollapseOthers(this);
+		_actionExpandSelection = new ActionExpandSelection(this);
+		_actionCollapseAll = new ActionCollapseAll(this);
+		_actionCollapseOthers = new ActionCollapseOthers(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
 				Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
-		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
-		fActionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
+		_actionSetLayoutFlat = new ActionSetLayoutFlat(this);
+		_actionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
 
-		fActionModifyColumns = new ActionModifyColumns(this);
+		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
 	/**
@@ -481,7 +481,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		});
 
 		// add the context menu to the table viewer
-		final Control tourViewer = fTagViewer.getControl();
+		final Control tourViewer = _tagViewer.getControl();
 		final Menu menu = menuMgr.createContextMenu(tourViewer);
 		tourViewer.setMenu(menu);
 	}
@@ -490,20 +490,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void createPartControl(final Composite parent) {
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fViewState);
+		_columnManager = new ColumnManager(this, _state);
 		defineViewerColumns(parent);
 
-		fViewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
 		createActions();
 		fillViewMenu();
 
 		// viewer must be created after the action are created
-		createTagViewer(fViewerContainer);
+		createTagViewer(_viewerContainer);
 
 		// set selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
 		addTourEventListener();
 		addPrefListener();
@@ -526,18 +526,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin.getDefault().getPluginPreferences().getBoolean(
-				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		fTagViewer = new TreeViewer(tree);
-		fColumnManager.createColumns(fTagViewer);
+		_tagViewer = new TreeViewer(tree);
+		_columnManager.createColumns(_tagViewer);
 
-		fTagViewer.setContentProvider(new TagContentProvider());
-		fTagViewer.setComparer(new TagComparer());
-		fTagViewer.setComparator(new TagComparator());
-		fTagViewer.setUseHashlookup(true);
+		_tagViewer.setContentProvider(new TagContentProvider());
+		_tagViewer.setComparer(new TagComparer());
+		_tagViewer.setComparator(new TagComparator());
+		_tagViewer.setUseHashlookup(true);
 
-		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
@@ -548,7 +550,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					// one tour is selected
 
 					final TVITagViewTour tourItem = (TVITagViewTour) selectedItem;
-					fPostSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
+					_postSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
 
 				} else {
 
@@ -563,18 +565,18 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						}
 					}
 
-					fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+					_postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
 				}
 
 				enableActions();
 			}
 		});
 
-		fTagViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_tagViewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			public void doubleClick(final DoubleClickEvent event) {
 
-				final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
 
 				if (selection instanceof TVITagViewTour) {
 
@@ -588,10 +590,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					final TreeViewerItem tourItem = (TreeViewerItem) selection;
 
-					if (fTagViewer.getExpandedState(tourItem)) {
-						fTagViewer.collapseToLevel(tourItem, 1);
+					if (_tagViewer.getExpandedState(tourItem)) {
+						_tagViewer.collapseToLevel(tourItem, 1);
 					} else {
-						fTagViewer.expandToLevel(tourItem, 1);
+						_tagViewer.expandToLevel(tourItem, 1);
 					}
 				}
 			}
@@ -620,7 +622,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * tree column: category/tag/year/month/tour
 		 */
-		colDef = TreeColumnFactory.TAG.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TAG.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
@@ -644,12 +646,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
 					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-					cell.setImage(tagItem.isRoot ? fImgTagRoot : fImgTag);
+					cell.setImage(tagItem.isRoot ? _imgTagRoot : _imgTag);
 
 				} else if (viewItem instanceof TVITagViewTagCategory) {
 
 					styledString.append(viewItem.treeColumn, UI.TAG_CATEGORY_STYLER);
-					cell.setImage(fImgTagCategory);
+					cell.setImage(_imgTagCategory);
 
 				} else if (viewItem instanceof TVITagViewYear || viewItem instanceof TVITagViewMonth) {
 
@@ -674,7 +676,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: title
 		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -694,7 +696,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: tags
 		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -715,7 +717,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: recording time (h)
 		 */
-		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -729,7 +731,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
 
 				if (element instanceof TVITagViewTour) {
-					if (fIsRecTimeFormat_hhmmss) {
+					if (_isRecTimeFormat_hhmmss) {
 						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
 					} else {
 						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
@@ -745,7 +747,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: driving time (h)
 		 */
-		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -758,7 +760,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
 
 				if (element instanceof TVITagViewTour) {
-					if (fIsDriveTimeFormat_hhmmss) {
+					if (_isDriveTimeFormat_hhmmss) {
 						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
 					} else {
 						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
@@ -774,7 +776,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: paused time (h)
 		 */
-		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -797,9 +799,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						/ dbRecordingTime
 						* 100;
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(relativePausedTime));
+				_nf.setMinimumFractionDigits(1);
+				_nf.setMaximumFractionDigits(1);
+				cell.setText(_nf.format(relativePausedTime));
 
 				setCellColor(cell, element);
 
@@ -809,7 +811,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: distance (km/miles)
 		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -823,10 +825,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				if (colDistance != 0) {
 
 					// set distance
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
 
-					final String distance = fNF.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+					final String distance = _nf.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
 
 					cell.setText(distance);
 					setCellColor(cell, element);
@@ -837,7 +839,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: altitude up (m)
 		 */
-		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -859,7 +861,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: altitude down (m)
 		 */
-		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -881,7 +883,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: max altitude
 		 */
-		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -903,7 +905,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: max speed
 		 */
-		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -916,10 +918,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
 				if (colMaxSpeed != 0) {
 
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
 
-					cell.setText(fNF.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -928,7 +930,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: max pulse
 		 */
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -950,20 +952,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: avg speed km/h - mph
 		 */
-		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				_nf.setMinimumFractionDigits(1);
+				_nf.setMaximumFractionDigits(1);
 
 				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 				if (colAvgSpeed != 0) {
 
-					cell.setText(fNF.format(colAvgSpeed));
+					cell.setText(_nf.format(colAvgSpeed));
 					setCellColor(cell, element);
 				}
 			}
@@ -972,7 +974,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: avg pace min/km - min/mi
 		 */
-		colDef = TreeColumnFactory.AVG_PACE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -993,7 +995,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: avg pulse
 		 */
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1013,7 +1015,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		}); /*
 			 * column: avg cadence
 			 */
-		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1035,7 +1037,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		/*
 		 * column: avg temperature
 		 */
-		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1063,21 +1065,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 
-		fImgTag.dispose();
-		fImgTagRoot.dispose();
-		fImgTagCategory.dispose();
+		_imgTag.dispose();
+		_imgTagRoot.dispose();
+		_imgTagCategory.dispose();
 
 		super.dispose();
 	}
 
 	private void enableActions() {
 
-		final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
-		final int treeItems = fTagViewer.getTree().getItemCount();
+		final StructuredSelection selection = (StructuredSelection) _tagViewer.getSelection();
+		final int treeItems = _tagViewer.getTree().getItemCount();
 
 		/*
 		 * count number of selected items
@@ -1114,99 +1116,108 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
-		fActionEditTour.setEnabled(tourItems == 1);
-		fActionOpenTour.setEnabled(tourItems == 1);
-		fActionEditQuick.setEnabled(tourItems == 1);
+		_actionEditTour.setEnabled(tourItems == 1);
+		_actionOpenTour.setEnabled(tourItems == 1);
+		_actionEditQuick.setEnabled(tourItems == 1);
 
 		// action: set tour type
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// action: add tag
-		fActionAddTag.setEnabled(isTourSelected);
+		_actionAddTag.setEnabled(isTourSelected);
 
-		// actions: remove tags
+		ArrayList<Long> existingTagIds = null;
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		if (firstTour != null && tourItems == 1) {
 
 			// one tour is selected
 
-			final ArrayList<Long> tagIds = firstTour.tagIds;
-			if (tagIds != null && tagIds.size() > 0) {
+			existingTagIds = firstTour.tagIds;
+			existingTourTypeId = firstTour.tourTypeId;
+
+			if (existingTagIds != null && existingTagIds.size() > 0) {
 
 				// at least one tag is within the tour
 
-				fActionRemoveAllTags.setEnabled(true);
-				fActionRemoveTag.setEnabled(true);
+				_actionRemoveAllTags.setEnabled(true);
+				_actionRemoveTag.setEnabled(true);
 			} else {
 				// tags are not available
-				fActionRemoveAllTags.setEnabled(false);
-				fActionRemoveTag.setEnabled(false);
+				_actionRemoveAllTags.setEnabled(false);
+				_actionRemoveTag.setEnabled(false);
 			}
 		} else {
 
 			// multiple tours are selected
 
-			fActionRemoveTag.setEnabled(isTourSelected);
-			fActionRemoveAllTags.setEnabled(isTourSelected);
+			_actionRemoveTag.setEnabled(isTourSelected);
+			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
 		// enable rename action
 		if (selectedItems == 1) {
 			if (isTagSelected) {
-				fActionRenameTag.setText(Messages.action_tag_rename_tag);
-				fActionRenameTag.setEnabled(true);
+				_actionRenameTag.setText(Messages.action_tag_rename_tag);
+				_actionRenameTag.setEnabled(true);
 			} else if (isCategorySelected) {
-				fActionRenameTag.setText(Messages.action_tag_rename_tag_category);
-				fActionRenameTag.setEnabled(true);
+				_actionRenameTag.setText(Messages.action_tag_rename_tag_category);
+				_actionRenameTag.setEnabled(true);
 
 			} else {
-				fActionRenameTag.setEnabled(false);
+				_actionRenameTag.setEnabled(false);
 			}
 		} else {
-			fActionRenameTag.setEnabled(false);
+			_actionRenameTag.setEnabled(false);
 		}
 
 		/*
 		 * tree expand type can be set if only tags are selected or when an item is selected which
 		 * is not a category
 		 */
-		fActionSetTagStructure.setEnabled(isTagSelected || (items == 1 && categoryItems == 0));
-		fActionSetAllTagStructures.setEnabled(treeItems > 0);
+		_actionSetTagStructure.setEnabled(isTagSelected || (items == 1 && categoryItems == 0));
+		_actionSetAllTagStructures.setEnabled(treeItems > 0);
 
-		fActionExpandSelection.setEnabled(firstElement == null ? false : //
+		_actionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElementHasChildren : //
 						true);
 
-		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
-		fActionCollapseAll.setEnabled(treeItems > 0);
+		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+		_actionCollapseAll.setEnabled(treeItems > 0);
 
-		// enable/disable actions for the recent tags
-		TagManager.enableRecentTagActions(isTourSelected);
+		// enable/disable actions for tags/tour types
+		TagManager.enableRecentTagActions(isTourSelected, existingTagIds);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(fActionCollapseOthers);
-		menuMgr.add(fActionExpandSelection);
-		menuMgr.add(fActionCollapseAll);
+		menuMgr.add(_actionCollapseOthers);
+		menuMgr.add(_actionExpandSelection);
+		menuMgr.add(_actionCollapseAll);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionRenameTag);
-		menuMgr.add(fActionSetTagStructure);
-		menuMgr.add(fActionSetAllTagStructures);
+		menuMgr.add(_actionRenameTag);
+		menuMgr.add(_actionSetTagStructure);
+		menuMgr.add(_actionSetAllTagStructures);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionOpenTour);
+		menuMgr.add(_actionEditQuick);
+		menuMgr.add(_actionEditTour);
+		menuMgr.add(_actionOpenTour);
 
+		// tour type actions
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionAddTag);
-		menuMgr.add(fActionRemoveTag);
-		menuMgr.add(fActionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(_actionSetTourType);
+		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+
+		// tour tag actions
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionAddTag);
+		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+		menuMgr.add(_actionRemoveTag);
+		menuMgr.add(_actionRemoveAllTags);
+		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions();
 	}
@@ -1220,10 +1231,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		// recreate the toolbar
 		tbm.removeAll();
 
-		tbm.add(fActionExpandSelection);
-		tbm.add(fActionCollapseAll);
+		tbm.add(_actionExpandSelection);
+		tbm.add(_actionCollapseAll);
 
-		tbm.add(fActionRefreshView);
+		tbm.add(_actionRefreshView);
 
 		tbm.update(true);
 	}
@@ -1235,11 +1246,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(fActionSetLayoutFlat);
-		menuMgr.add(fActionSetLayoutHierarchical);
+		menuMgr.add(_actionSetLayoutFlat);
+		menuMgr.add(_actionSetLayoutHierarchical);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionModifyColumns);
+		menuMgr.add(_actionModifyColumns);
 
 	}
 
@@ -1248,20 +1259,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public Object getAdapter(final Class adapter) {
 
 		if (adapter == ColumnViewer.class) {
-			return fTagViewer;
+			return _tagViewer;
 		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
 	public ColumnManager getColumnManager() {
-		return fColumnManager;
+		return _columnManager;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
-		final IStructuredSelection selectedTours = ((IStructuredSelection) fTagViewer.getSelection());
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tagViewer.getSelection());
 
 		final TourManager tourManager = TourManager.getInstance();
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
@@ -1284,40 +1295,40 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	public ColumnViewer getViewer() {
-		return fTagViewer;
+		return _tagViewer;
 	}
 
 	private void readDisplayFormats() {
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
-		fIsRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+		_isRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		fIsDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+		_isDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		fViewerContainer.setRedraw(false);
+		_viewerContainer.setRedraw(false);
 		{
-			final Object[] expandedElements = fTagViewer.getExpandedElements();
-			final ISelection selection = fTagViewer.getSelection();
+			final Object[] expandedElements = _tagViewer.getExpandedElements();
+			final ISelection selection = _tagViewer.getSelection();
 
-			fTagViewer.getTree().dispose();
+			_tagViewer.getTree().dispose();
 
-			createTagViewer(fViewerContainer);
-			fViewerContainer.layout();
+			createTagViewer(_viewerContainer);
+			_viewerContainer.layout();
 
-			fTagViewer.setInput(fRootItem = new TVITagViewRoot(this, fTagViewLayout));
+			_tagViewer.setInput(_bootItem = new TVITagViewRoot(this, _tagViewLayout));
 
-			fTagViewer.setExpandedElements(expandedElements);
-			fTagViewer.setSelection(selection);
+			_tagViewer.setExpandedElements(expandedElements);
+			_tagViewer.setSelection(selection);
 		}
-		fViewerContainer.setRedraw(true);
+		_viewerContainer.setRedraw(true);
 
-		return fTagViewer;
+		return _tagViewer;
 	}
 
 	/**
@@ -1325,37 +1336,37 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	public void reloadViewer() {
 
-		final Tree tree = fTagViewer.getTree();
+		final Tree tree = _tagViewer.getTree();
 		tree.setRedraw(false);
 		{
-			final Object[] expandedElements = fTagViewer.getExpandedElements();
+			final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-			fTagViewer.setInput(fRootItem = new TVITagViewRoot(this, fTagViewLayout));
-			fTagViewer.setExpandedElements(expandedElements);
+			_tagViewer.setInput(_bootItem = new TVITagViewRoot(this, _tagViewLayout));
+			_tagViewer.setExpandedElements(expandedElements);
 		}
 		tree.setRedraw(true);
 	}
 
 	private void restoreState() {
 
-		fTagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
+		_tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
 
 		// restore view layout
 		try {
 
-			final int viewLayout = fViewState.getInt(MEMENTO_TAG_VIEW_LAYOUT);
+			final int viewLayout = _state.getInt(MEMENTO_TAG_VIEW_LAYOUT);
 			switch (viewLayout) {
 
 			case TAG_VIEW_LAYOUT_FLAT:
 
-				fTagViewLayout = viewLayout;
-				fActionSetLayoutFlat.setChecked(true);
+				_tagViewLayout = viewLayout;
+				_actionSetLayoutFlat.setChecked(true);
 				break;
 
 			case TAG_VIEW_LAYOUT_HIERARCHICAL:
 
-				fTagViewLayout = viewLayout;
-				fActionSetLayoutHierarchical.setChecked(true);
+				_tagViewLayout = viewLayout;
+				_actionSetLayoutHierarchical.setChecked(true);
 				break;
 
 			default:
@@ -1365,17 +1376,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		} catch (final NumberFormatException e) {
 
 			// set default tag view layout
-			fTagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
-			fActionSetLayoutHierarchical.setChecked(true);
+			_tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
+			_actionSetLayoutHierarchical.setChecked(true);
 		}
 	}
 
 	private void saveState() {
 
-		fColumnManager.saveState(fViewState);
+		_columnManager.saveState(_state);
 
 		// save view layout
-		fViewState.put(MEMENTO_TAG_VIEW_LAYOUT, fTagViewLayout);
+		_state.put(MEMENTO_TAG_VIEW_LAYOUT, _tagViewLayout);
 
 //		final Object[] expandedElements = fTagViewer.getExpandedElements();
 //		final Object[] visibleExpandedElements = fTagViewer.getVisibleExpandedElements();
@@ -1401,7 +1412,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void setFocus() {
 
 	}
- 
+
 	private void setTagViewTitle(final Object newInput) {
 
 		String description = UI.EMPTY_STRING;
@@ -1416,7 +1427,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	public void setViewLayout(final int tagViewStructure) {
-		fTagViewLayout = tagViewStructure;
+		_tagViewLayout = tagViewStructure;
 		reloadViewer();
 	}
 
@@ -1438,7 +1449,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			return;
 		}
 
-		// loop: all children of the current parent item 
+		// loop: all children of the current parent item
 		for (final Object object : children) {
 
 			if (object instanceof TVITagViewTag) {
@@ -1457,13 +1468,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						 */
 
 						// add/remove tours from the tag
-						tagItem.refresh(fTagViewer, changedTags.getModifiedTours(), changedTags.isAddMode());
+						tagItem.refresh(_tagViewer, changedTags.getModifiedTours(), changedTags.isAddMode());
 
 						// update tag totals
 						TVITagViewItem.readTagTotals(tagItem);
 
 						// update viewer
-						fTagViewer.refresh(tagItem);
+						_tagViewer.refresh(tagItem);
 
 						removedIds.add(modifiedTagId);
 					}
@@ -1541,7 +1552,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			parentChildren.removeAll(deletedTourItems);
 
 			// update viewer
-			fTagViewer.remove(deletedTourItems.toArray());
+			_tagViewer.remove(deletedTourItems.toArray());
 		}
 	}
 
@@ -1593,7 +1604,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 							}
 
 							// update item in the viewer
-							fTagViewer.update(tourItem, null);
+							_tagViewer.update(tourItem, null);
 
 							// a tour exists only once as a child in a tree item
 							break;

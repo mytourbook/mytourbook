@@ -1491,12 +1491,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionAddTag.setEnabled(isTourSelected);
 
 		// remove tags
+		ArrayList<Long> existingTagIds = null;
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		if (isOneTour) {
 
 			// one tour is selected
 
-			final ArrayList<Long> tagIds = firstTour.getTagIds();
-			if (tagIds != null && tagIds.size() > 0) {
+			existingTagIds = firstTour.getTagIds();
+			existingTourTypeId = firstTour.getTourTypeId();
+
+			if (existingTagIds != null && existingTagIds.size() > 0) {
 
 				// at least one tag is within the tour
 
@@ -1524,8 +1528,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
 		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected);
+		TagManager.enableRecentTagActions(isTourSelected, existingTagIds);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
 	}
 
 	private void fillActions() {
@@ -1569,13 +1573,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionPrintTour);
 
+		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillRecentTourTypesIntoMenu(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
 
+		// tour tag actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionAddTag);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
 		menuMgr.add(_actionRemoveTag);
 		menuMgr.add(_actionRemoveAllTags);
 		menuMgr.add(_actionOpenTagPrefs);

@@ -1,23 +1,24 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
@@ -34,7 +35,7 @@ public class TVITourBookTour extends TVITourBookItem {
 	/**
 	 * id's for the tags or <code>null</code> when tags are not available
 	 */
-	private ArrayList<Long>	fTagIds;
+	private ArrayList<Long>	_tagIds;
 
 	/**
 	 * id's for the markers or <code>null</code> when markers are not available
@@ -67,10 +68,10 @@ public class TVITourBookTour extends TVITourBookItem {
 	}
 
 	public ArrayList<Long> getTagIds() {
-		if (sqlTagIds != null && fTagIds == null) {
-			fTagIds = new ArrayList<Long>(sqlTagIds);
+		if (sqlTagIds != null && _tagIds == null) {
+			_tagIds = new ArrayList<Long>(sqlTagIds);
 		}
-		return fTagIds;
+		return _tagIds;
 	}
 
 	@Override
@@ -78,6 +79,10 @@ public class TVITourBookTour extends TVITourBookItem {
 		return tourId;
 	}
 
+	/**
+	 * @return Returns the tour type id of the tour or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when
+	 *         the tour type is not set.
+	 */
 	public long getTourTypeId() {
 		return tourTypeId;
 	}
