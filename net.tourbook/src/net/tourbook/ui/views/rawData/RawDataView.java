@@ -241,7 +241,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
 
 		// check if the tour editor contains a modified tour
-		if (UI.isTourEditorModified()) {
+		if (TourManager.isTourEditorModified()) {
 			return;
 		}
 
@@ -271,7 +271,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	void actionReimportTour() {
 
 		// check if the tour editor contains a modified tour
-		if (UI.isTourEditorModified()) {
+		if (TourManager.isTourEditorModified()) {
 			return;
 		}
 

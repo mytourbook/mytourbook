@@ -35,8 +35,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -73,10 +71,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 public class UI {
@@ -823,30 +818,30 @@ public class UI {
 		return null;
 	}
 
-	/**
-	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-	 * modified. A message dialog informs the user about the modified tour and the requested actions
-	 * cannot be done.
-	 * 
-	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
-	 */
-	public static boolean isTourEditorModified() {
-
-		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-		if (tourDataEditor != null && tourDataEditor.isDirty()) {
-
-			openTourEditor(true);
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.dialog_is_tour_editor_modified_title,
-					Messages.dialog_is_tour_editor_modified_message);
-
-			return true;
-		}
-
-		return false;
-	}
+//	/**
+//	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
+//	 * modified. A message dialog informs the user about the modified tour and the requested actions
+//	 * cannot be done.
+//	 *
+//	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
+//	 */
+//	public static boolean isTourEditorModified() {
+//
+//		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+//		if (tourDataEditor != null && tourDataEditor.isDirty()) {
+//
+//			openTourEditor(true);
+//
+//			MessageDialog.openInformation(
+//					Display.getCurrent().getActiveShell(),
+//					Messages.dialog_is_tour_editor_modified_title,
+//					Messages.dialog_is_tour_editor_modified_message);
+//
+//			return true;
+//		}
+//
+//		return false;
+//	}
 
 	/**
 	 * Opens the menu for a control aligned below the control on the left side
@@ -868,45 +863,45 @@ public class UI {
 		}
 	}
 
-	public static TourDataEditorView openTourEditor(final boolean isActive) {
-
-		IViewPart viewPart = null;
-
-		TourDataEditorView tourEditor = null;
-
-		try {
-
-			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
-			final String viewId = TourDataEditorView.ID;
-			viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
-
-			if (viewPart instanceof TourDataEditorView) {
-				tourEditor = (TourDataEditorView) viewPart;
-
-				if (isActive) {
-
-					page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
-
-				} else if (page.isPartVisible(viewPart) == false || isActive) {
-
-					page.bringToTop(viewPart);
-				}
-// this does not restore the part when it's in a fast view
+//	public static TourDataEditorView openTourEditor(final boolean isActive) {
 //
-//			final IWorkbenchPartReference partRef = page.getReference(viewPart);
-//			final int partState = page.getPartState(partRef);
-//			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
-//			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
-
-			}
-
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
-
-		return tourEditor;
-	}
+//		IViewPart viewPart = null;
+//
+//		TourDataEditorView tourEditor = null;
+//
+//		try {
+//
+//			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//
+//			final String viewId = TourDataEditorView.ID;
+//			viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
+//
+//			if (viewPart instanceof TourDataEditorView) {
+//				tourEditor = (TourDataEditorView) viewPart;
+//
+//				if (isActive) {
+//
+//					page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+//
+//				} else if (page.isPartVisible(viewPart) == false || isActive) {
+//
+//					page.bringToTop(viewPart);
+//				}
+//// this does not restore the part when it's in a fast view
+////
+////			final IWorkbenchPartReference partRef = page.getReference(viewPart);
+////			final int partState = page.getPartState(partRef);
+////			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
+////			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
+//
+//			}
+//
+//		} catch (final PartInitException e) {
+//			e.printStackTrace();
+//		}
+//
+//		return tourEditor;
+//	}
 
 	public static void restoreCombo(final Combo combo, final String[] comboItems) {
 

@@ -129,6 +129,11 @@ public class ActionJoinTours extends Action {
 	@Override
 	public void run() {
 
+		// check if the tour editor contains a modified tour
+		if (TourManager.isTourEditorModified()) {
+			return;
+		}
+
 		// get selected tour, make sure at least two tours are selected
 		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 		if (selectedTours == null || selectedTours.size() < 2) {

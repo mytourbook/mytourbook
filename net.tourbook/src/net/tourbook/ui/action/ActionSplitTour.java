@@ -15,27 +15,54 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.data.TourData;
+import net.tourbook.tour.DialogSplitTour;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
 
-public class ActionEditTour extends Action {
+public class ActionSplitTour extends Action {
 
-	public ActionEditTour(final ITourProvider tourProvider) {
+	private TourDataEditorView	_tourDataEditor;
 
-		setText(Messages.App_Action_edit_tour);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+	private int					_tourSplitIndex;
 
-		setEnabled(false);
+	/**
+	 * @param tourDataEditor
+	 * @param tourProvider
+	 */
+	public ActionSplitTour(final TourDataEditorView tourDataEditor) {
+
+		_tourDataEditor = tourDataEditor;
+
+		setText(Messages.App_Action_SplitTour);
 	}
 
 	@Override
 	public void run() {
-		TourManager.openTourEditor(true);
+
+		// check if the tour editor contains a modified tour
+		if (TourManager.isTourEditorModified()) {
+			return;
+		}
+
+		// get tour
+		final ArrayList<TourData> selectedTours = _tourDataEditor.getSelectedTours();
+		if (selectedTours == null || selectedTours.size() == 0) {
+			return;
+		}
+
+		new DialogSplitTour(Display.getCurrent().getActiveShell(), //
+				selectedTours.get(0),
+				_tourSplitIndex).open();
 	}
 
+	public void setTourRange(final int tourSplitIndex) {
+		_tourSplitIndex = tourSplitIndex;
+	}
 }

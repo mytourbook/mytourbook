@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
@@ -27,9 +27,8 @@ import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
-import net.tourbook.ui.UI;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -83,7 +82,7 @@ public class ActionRemoveComparedTours extends Action {
 
 				if (TourCompareManager.removeComparedTourFromDb(compId)) {
 
-					// update model: remove compared tour 
+					// update model: remove compared tour
 					compTourItem.remove();
 
 					// update viewer: remove item
@@ -130,9 +129,9 @@ public class ActionRemoveComparedTours extends Action {
 				final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId)
 						.values();
 
-				for (final Iterator<StoredComparedTour> iteratorCompTours = storedCompTours.iterator(); iteratorCompTours.hasNext();) {
+				for (final StoredComparedTour storedComparedTour : storedCompTours) {
 
-					final long compId = (iteratorCompTours.next()).comparedId;
+					final long compId = (storedComparedTour).comparedId;
 
 					TourCompareManager.removeComparedTourFromDb(compId);
 
@@ -178,7 +177,7 @@ public class ActionRemoveComparedTours extends Action {
 	@Override
 	public void run() {
 
-		if (UI.isTourEditorModified()) {
+		if (TourManager.isTourEditorModified()) {
 			return;
 		}
 

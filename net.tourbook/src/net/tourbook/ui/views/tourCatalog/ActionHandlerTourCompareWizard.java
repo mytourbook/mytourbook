@@ -16,7 +16,7 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.application.PerspectiveFactoryCompareTours;
-import net.tourbook.ui.UI;
+import net.tourbook.tour.TourManager;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -36,7 +36,7 @@ public class ActionHandlerTourCompareWizard extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		if (UI.isTourEditorModified()) {
+		if (TourManager.isTourEditorModified()) {
 			return null;
 		}
 		

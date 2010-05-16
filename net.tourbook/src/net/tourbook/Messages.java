@@ -93,6 +93,8 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
+
+	public static String	App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
@@ -191,6 +193,8 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
+
+	public static String	App_Action_SplitTour;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -314,6 +318,16 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_TourTitle;
 
 	public static String		Dialog_SelectGraphs_Title;
+
+	public static String	Dialog_SplitTour_ComboText_KeepSlices;
+
+	public static String	Dialog_SplitTour_ComboText_RemoveSlices;
+
+	public static String	Dialog_SplitTour_DlgArea_Message;
+
+	public static String	Dialog_SplitTour_DlgArea_Title;
+
+	public static String	Dialog_SplitTour_Label_SplitMethod;
 
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;

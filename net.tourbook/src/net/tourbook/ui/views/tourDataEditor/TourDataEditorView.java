@@ -71,9 +71,11 @@ import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionExtractTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.action.ActionSplitTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -258,6 +260,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionCreateTourMarker				_actionCreateTourMarker;
 	private ActionExport						_actionExportTour;
 	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
+	private ActionSplitTour						_actionSplitTour;
+	private ActionExtractTour					_actionExtractTour;
 
 	private ActionSetTourTag					_actionAddTag;
 	private ActionSetTourTag					_actionRemoveTag;
@@ -1783,6 +1787,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionDeleteTourMarker = new ActionDeleteTourMarker(this);
 		_actionExportTour = new ActionExport(this);
 		_actionCsvTimeSliceExport = new ActionCSVTimeSliceExport(this);
+		_actionSplitTour = new ActionSplitTour(this);
+		_actionExtractTour = new ActionExtractTour(this);
 
 		_actionAddTag = new ActionSetTourTag(this, true, false);
 		_actionRemoveTag = new ActionSetTourTag(this, false, false);
@@ -3856,6 +3862,62 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionComputeDistanceValues.setEnabled(canEdit && isGeoAvailable);
 	}
 
+	/**
+	 * enable actions
+	 */
+	private void enableSliceActions() {
+
+		final StructuredSelection sliceSelection = (StructuredSelection) _sliceViewer.getSelection();
+
+		final boolean isOneSliceSelected = sliceSelection.size() == 1;
+		final boolean isSliceSelected = sliceSelection.size() > 0;
+		final boolean isTourInDb = isTourInDb();
+
+		// check if a marker can be created
+		boolean canCreateMarker = false;
+		if (isOneSliceSelected) {
+			final TimeSlice oneTimeSlice = (TimeSlice) sliceSelection.getFirstElement();
+			canCreateMarker = _markerMap.containsKey(oneTimeSlice.serieIndex) == false;
+		}
+		// get selected Marker
+		TourMarker selectedMarker = null;
+		for (final Iterator<?> iterator = sliceSelection.iterator(); iterator.hasNext();) {
+			final TimeSlice timeSlice = (TimeSlice) iterator.next();
+			if (_markerMap.containsKey(timeSlice.serieIndex)) {
+				selectedMarker = _markerMap.get(timeSlice.serieIndex);
+				break;
+			}
+		}
+
+		_actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
+		_actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb);
+
+		// select marker
+		_actionOpenMarkerDialog.setSelectedMarker(selectedMarker);
+
+		_actionDeleteTimeSlicesRemoveTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);
+		_actionDeleteTimeSlicesKeepTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);
+
+		_actionExportTour.setEnabled(true);
+		_actionCsvTimeSliceExport.setEnabled(isSliceSelected);
+
+		_actionSplitTour.setEnabled(isOneSliceSelected);
+		_actionExtractTour.setEnabled(sliceSelection.size() >= 2);
+
+		// set start/end position into the actions
+		if (isSliceSelected) {
+
+			final Object[] sliceArray = sliceSelection.toArray();
+			final TimeSlice firstTimeSlice = (TimeSlice) sliceArray[0];
+			final TimeSlice lastTimeSlice = (TimeSlice) sliceArray[sliceArray.length - 1];
+
+			_actionExportTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
+
+			_actionSplitTour.setTourRange(firstTimeSlice.serieIndex);
+			_actionExtractTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
+		}
+	}
+
 	private void fillMarkerContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(_actionOpenMarkerDialog);
@@ -3888,57 +3950,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionDeleteTimeSlicesRemoveTime);
 		menuMgr.add(_actionDeleteTimeSlicesKeepTime);
+		menuMgr.add(_actionSplitTour);
+		menuMgr.add(_actionExtractTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionCsvTimeSliceExport);
 
-		/*
-		 * enable actions
-		 */
-		final StructuredSelection sliceSelection = (StructuredSelection) _sliceViewer.getSelection();
-
-		final boolean isOneSliceSelected = sliceSelection.size() == 1;
-		final boolean isSliceSelected = sliceSelection.size() > 0;
-		final boolean isTourInDb = isTourInDb();
-
-		// check if a marker can be created
-		boolean canCreateMarker = false;
-		if (isOneSliceSelected) {
-			final TimeSlice timeSlice = (TimeSlice) sliceSelection.getFirstElement();
-			canCreateMarker = _markerMap.containsKey(timeSlice.serieIndex) == false;
-		}
-		// get selected Marker
-		TourMarker selectedMarker = null;
-		for (final Iterator<?> iterator = sliceSelection.iterator(); iterator.hasNext();) {
-			final TimeSlice timeSlice = (TimeSlice) iterator.next();
-			if (_markerMap.containsKey(timeSlice.serieIndex)) {
-				selectedMarker = _markerMap.get(timeSlice.serieIndex);
-				break;
-			}
-		}
-
-		_actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
-		_actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb);
-
-		// select marker
-		_actionOpenMarkerDialog.setSelectedMarker(selectedMarker);
-
-		_actionDeleteTimeSlicesRemoveTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);
-		_actionDeleteTimeSlicesKeepTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);
-
-		_actionExportTour.setEnabled(true);
-		_actionCsvTimeSliceExport.setEnabled(isSliceSelected);
-
-		// set start/end position in export action
-		if (isSliceSelected) {
-
-			final Object[] sliceArray = sliceSelection.toArray();
-			final TimeSlice firstTimeSlice = (TimeSlice) sliceArray[0];
-			final TimeSlice lastTimeSlice = (TimeSlice) sliceArray[sliceArray.length - 1];
-
-			_actionExportTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
-		}
+		enableSliceActions();
 	}
 
 	private void fillToolbar() {
