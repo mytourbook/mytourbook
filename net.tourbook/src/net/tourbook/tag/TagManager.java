@@ -112,13 +112,19 @@ public class TagManager {
 
 		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
+			final TourTag actionTag = actionRecentTag._tag;
+			if (actionTag == null) {
+				actionRecentTag.setEnabled(false);
+				continue;
+			}
+
 			if (isExistingTagIds && isEnabled) {
 
 				// disable action when it's tag id is contained in allExistingTagIds
 
-				final long recentTagId = actionRecentTag._tag.getTagId();
-
 				boolean isExistTagId = false;
+
+				final long recentTagId = actionTag.getTagId();
 
 				for (final long existingTagId : allExistingTagIds) {
 					if (recentTagId == existingTagId) {
@@ -145,13 +151,19 @@ public class TagManager {
 
 		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
+			final TourTag actionTag = actionRecentTag._tag;
+			if (actionTag == null) {
+				actionRecentTag.setEnabled(false);
+				continue;
+			}
+
 			if (isExistingTags && isEnabled) {
 
-				// disable action when it's tag id is contained in allExistingTagIds
-
-				final long recentTagId = actionRecentTag._tag.getTagId();
+				// disable action when it's tag id is contained in allExistingTags
 
 				boolean isExistTagId = false;
+
+				final long recentTagId = actionTag.getTagId();
 
 				for (final TourTag existingTag : allExistingTags) {
 					if (recentTagId == existingTag.getTagId()) {
