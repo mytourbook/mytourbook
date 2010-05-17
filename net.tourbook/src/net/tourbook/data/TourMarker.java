@@ -28,7 +28,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 @Entity
-public class TourMarker implements Cloneable {
+public class TourMarker implements Cloneable, Comparable<Object> {
 
 	public static final int			DB_LENGTH_LABEL			= 255;
 	public static final int			DB_LENGTH_CATEGORY		= 100;
@@ -149,6 +149,20 @@ public class TourMarker implements Cloneable {
 
 	public TourMarker clone(final TourData newTourData) {
 		return new TourMarker(this, newTourData);
+	}
+
+	@Override
+	public int compareTo(final Object other) {
+
+		// default sorting for tour markers is by index
+
+		if (other instanceof TourMarker) {
+			final TourMarker otherTourMarker = (TourMarker) other;
+
+			return serieIndex - otherTourMarker.getSerieIndex();
+		}
+
+		return 0;
 	}
 
 	/**

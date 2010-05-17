@@ -17,7 +17,6 @@ package net.tourbook.tour;
 
 import java.text.NumberFormat;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -681,10 +680,11 @@ public class DialogMarker extends TitleAreaDialog {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
-		if (_selectedTourMarker != null) {
+		final boolean isMarkerSelected = _selectedTourMarker != null;
+
+		if (isMarkerSelected) {
 			_btnUndo.setEnabled(_selectedTourMarker.compareTo(_backupMarker, true) == false);
 		} else {
 			_btnUndo.setEnabled(false);
@@ -693,18 +693,19 @@ public class DialogMarker extends TitleAreaDialog {
 		/*
 		 * button: delete marker
 		 */
-		boolean isCustomMarker = false;
-		final IStructuredSelection markerSelection = (IStructuredSelection) _markerViewer.getSelection();
-
-		// check if custom markers are selected
-		for (final Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
-			final TourMarker tourMarker = iter.next();
-			if (tourMarker.getType() != ChartLabel.MARKER_TYPE_DEVICE) {
-				isCustomMarker = true;
-				break;
-			}
-		}
-		_btnDelete.setEnabled(isCustomMarker);
+//		boolean isCustomMarker = false;
+//		final IStructuredSelection markerSelection = (IStructuredSelection) _markerViewer.getSelection();
+//
+//		// check if custom markers are selected
+//		for (final Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
+//			final TourMarker tourMarker = iter.next();
+//			if (tourMarker.getType() != ChartLabel.MARKER_TYPE_DEVICE) {
+//				isCustomMarker = true;
+//				break;
+//			}
+//		}
+//		_btnDelete.setEnabled(isCustomMarker);
+		_btnDelete.setEnabled(isMarkerSelected);
 
 		final boolean isMarkerAvailable = _markerViewer.getTable().getItemCount() != 0;
 
@@ -797,6 +798,7 @@ public class DialogMarker extends TitleAreaDialog {
 				_markerViewer.setSelection(new StructuredSelection(nextMarker), true);
 			}
 
+			_markerViewer.getTable().setFocus();
 		}
 	}
 

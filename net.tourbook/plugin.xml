@@ -364,10 +364,10 @@
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
    </extension>
-   
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          
+   <!--
       <perspectiveExtension
             targetID="*">
             
@@ -382,10 +382,7 @@
          <perspectiveShortcut
                id="net.tourbook.perspective.CompareTours"/>
       </perspectiveExtension>
-      
-      
-      
-      
+   -->
       
       
       <perspectiveExtension

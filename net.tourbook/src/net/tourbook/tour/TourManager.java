@@ -168,6 +168,58 @@ public class TourManager {
 		});
 	}
 
+	/**
+	 * Compares two {@link TourData}
+	 * 
+	 * @param tourData1
+	 * @param tourData2
+	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
+	 * @throws MyTourbookException
+	 *             throws this exception when {@link TourData} are corrupted
+	 */
+	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
+
+		if (tourData1 == null || tourData2 == null) {
+			return true;
+		}
+
+		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
+
+			final StringBuilder sb = new StringBuilder()//
+					.append("ERROR: ") //$NON-NLS-1$
+					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("You can solve the problem by:") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("- restarting the application") //$NON-NLS-1$
+					.append(UI.NEW_LINE)
+					.append("- close the tour editor in all perspectives") //$NON-NLS-1$
+					.append(UI.NEW_LINE)
+					.append("- save/revert tour and select another tour") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("Tour in Editor:") //$NON-NLS-1$
+					.append(tourData2.toStringWithHash())
+					.append(UI.NEW_LINE)
+					.append("Selected Tour:") //$NON-NLS-1$
+					.append(tourData1.toStringWithHash())
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
+					.append(
+							"However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
+
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
+
+			throw new MyTourbookException(sb.toString());
+		}
+
+		return true;
+	}
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -550,7 +602,7 @@ public class TourManager {
 				final TourData tourDataInEditor = tourDataEditor.getTourData();
 
 				try {
-					UI.checkTourData(tourData, tourDataInEditor);
+					checkTourData(tourData, tourDataInEditor);
 				} catch (final MyTourbookException e) {
 					e.printStackTrace();
 				}

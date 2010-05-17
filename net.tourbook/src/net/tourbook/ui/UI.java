@@ -28,7 +28,6 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
-import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -223,11 +222,11 @@ public class UI {
 	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");				//$NON-NLS-1$
 	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");			//$NON-NLS-1$
 
-	private static DateFormat						fDateFormatterShort;
-	private static DateFormat						fTimeFormatterShort;
+	private static DateFormat						_dateFormatterShort;
+	private static DateFormat						_timeFormatterShort;
 
-	private static StringBuilder					fFormatterSB					= new StringBuilder();
-	private static Formatter						fFormatter						= new Formatter(fFormatterSB);
+	private static StringBuilder					_formatterSB					= new StringBuilder();
+	private static Formatter						_formatter						= new Formatter(_formatterSB);
 
 	public static Styler							TAG_STYLER;
 	public static Styler							TAG_CATEGORY_STYLER;
@@ -321,59 +320,6 @@ public class UI {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Compares two {@link TourData}
-	 * 
-	 * @param tourData1
-	 * @param tourData2
-	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
-	 * @throws MyTourbookException
-	 *             throws this exception when {@link TourData} are corrupted
-	 */
-	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
-
-		if (tourData1 == null || tourData2 == null) {
-			return true;
-		}
-
-		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
-
-			final StringBuilder sb = new StringBuilder()//
-					.append("ERROR: ") //$NON-NLS-1$
-					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("You can solve the problem by:") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("- restarting the application") //$NON-NLS-1$
-					.append(UI.NEW_LINE)
-					.append("- close the tour editor in all perspectives") //$NON-NLS-1$
-					.append(UI.NEW_LINE)
-					.append("- save/revert tour and select another tour") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append(UI.NEW_LINE)
-					.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("Tour in Editor:") //$NON-NLS-1$
-					.append(tourData2.toStringWithHash())
-					.append(UI.NEW_LINE)
-					.append("Selected Tour:") //$NON-NLS-1$
-					.append(tourData1.toStringWithHash())
-					.append(UI.NEW_LINE2)
-					.append(UI.NEW_LINE)
-					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-					.append(
-							"However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
-
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
-
-			throw new MyTourbookException(sb.toString());
-		}
-
-		return true;
 	}
 
 	/**
@@ -526,9 +472,9 @@ public class UI {
 
 	public static Formatter format_hh_mm(final long time) {
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
-		return fFormatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
+		return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
 	}
 
 	/**
@@ -539,13 +485,13 @@ public class UI {
 	 */
 	public static String format_hh_mm_ss(final long time) {
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
 		if (time >= 3600) {
 
 			// display hours
 
-			return fFormatter.format(//
+			return _formatter.format(//
 					Messages.Format_hhmmss,
 					(time / 3600),
 					((time % 3600) / 60),
@@ -555,7 +501,7 @@ public class UI {
 
 			// ignore hours
 
-			return fFormatter.format(//
+			return _formatter.format(//
 					Messages.Format_hhmm,
 					((time % 3600) / 60),
 					((time % 3600) % 60)).toString();
@@ -570,10 +516,10 @@ public class UI {
 	 */
 	public static String format_hhh_mm_ss(final long time) {
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 		// display hours
 
-		return fFormatter.format(//
+		return _formatter.format(//
 				Messages.Format_hhmmss,
 				(time / 3600),
 				((time % 3600) / 60),
@@ -582,15 +528,15 @@ public class UI {
 
 	public static String format_mm_ss(final long time) {
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
 		if (time < 0) {
-			fFormatterSB.append(UI.DASH);
+			_formatterSB.append(UI.DASH);
 		}
 
 		final long timeAbs = time < 0 ? 0 - time : time;
 
-		return fFormatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
+		return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
 	}
 
 	public static String format_yyyymmdd_hhmmss(final int year,
@@ -600,9 +546,9 @@ public class UI {
 												final int minute,
 												final int second) {
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
-		return fFormatter.format(//
+		return _formatter.format(//
 				Messages.Format_yyyymmdd_hhmmss,
 				year,
 				month,
@@ -619,9 +565,9 @@ public class UI {
 			return UI.EMPTY_STRING;
 		}
 
-		fFormatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
-		return fFormatter.format(//
+		return _formatter.format(//
 				Messages.Format_yyyymmdd_hhmmss,
 				tourData.getStartYear(),
 				tourData.getStartMonth(),
@@ -660,12 +606,12 @@ public class UI {
 	 */
 	public static DateFormat getFormatterDateShort() {
 
-		if (fDateFormatterShort == null) {
+		if (_dateFormatterShort == null) {
 
 			final DateFormat dateInstance = DateFormat.getDateInstance(DateFormat.SHORT);
 			if (dateInstance instanceof SimpleDateFormat) {
 
-				final SimpleDateFormat sdf = (SimpleDateFormat) (fDateFormatterShort = dateInstance);
+				final SimpleDateFormat sdf = (SimpleDateFormat) (_dateFormatterShort = dateInstance);
 
 				String oldPattern = sdf.toPattern();
 
@@ -707,7 +653,7 @@ public class UI {
 			}
 		}
 
-		return fDateFormatterShort;
+		return _dateFormatterShort;
 	}
 
 	/******************************************************************************
@@ -734,12 +680,12 @@ public class UI {
 	 */
 	public static DateFormat getFormatterTimeShort() {
 
-		if (fTimeFormatterShort == null) {
+		if (_timeFormatterShort == null) {
 
 			final DateFormat timeInstance = DateFormat.getTimeInstance(DateFormat.SHORT);
 			if (timeInstance instanceof SimpleDateFormat) {
 
-				final SimpleDateFormat sdf = (SimpleDateFormat) (fTimeFormatterShort = timeInstance);
+				final SimpleDateFormat sdf = (SimpleDateFormat) (_timeFormatterShort = timeInstance);
 
 				final String oldPattern = sdf.toPattern();
 
@@ -763,7 +709,7 @@ public class UI {
 			}
 		}
 
-		return fTimeFormatterShort;
+		return _timeFormatterShort;
 	}
 
 	public static UI getInstance() {
@@ -818,30 +764,6 @@ public class UI {
 		return null;
 	}
 
-//	/**
-//	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-//	 * modified. A message dialog informs the user about the modified tour and the requested actions
-//	 * cannot be done.
-//	 *
-//	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
-//	 */
-//	public static boolean isTourEditorModified() {
-//
-//		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-//		if (tourDataEditor != null && tourDataEditor.isDirty()) {
-//
-//			openTourEditor(true);
-//
-//			MessageDialog.openInformation(
-//					Display.getCurrent().getActiveShell(),
-//					Messages.dialog_is_tour_editor_modified_title,
-//					Messages.dialog_is_tour_editor_modified_message);
-//
-//			return true;
-//		}
-//
-//		return false;
-//	}
 
 	/**
 	 * Opens the menu for a control aligned below the control on the left side
@@ -863,45 +785,6 @@ public class UI {
 		}
 	}
 
-//	public static TourDataEditorView openTourEditor(final boolean isActive) {
-//
-//		IViewPart viewPart = null;
-//
-//		TourDataEditorView tourEditor = null;
-//
-//		try {
-//
-//			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//
-//			final String viewId = TourDataEditorView.ID;
-//			viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
-//
-//			if (viewPart instanceof TourDataEditorView) {
-//				tourEditor = (TourDataEditorView) viewPart;
-//
-//				if (isActive) {
-//
-//					page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
-//
-//				} else if (page.isPartVisible(viewPart) == false || isActive) {
-//
-//					page.bringToTop(viewPart);
-//				}
-//// this does not restore the part when it's in a fast view
-////
-////			final IWorkbenchPartReference partRef = page.getReference(viewPart);
-////			final int partState = page.getPartState(partRef);
-////			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
-////			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
-//
-//			}
-//
-//		} catch (final PartInitException e) {
-//			e.printStackTrace();
-//		}
-//
-//		return tourEditor;
-//	}
 
 	public static void restoreCombo(final Combo combo, final String[] comboItems) {
 

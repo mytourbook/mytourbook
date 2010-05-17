@@ -3950,10 +3950,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionDeleteTimeSlicesRemoveTime);
 		menuMgr.add(_actionDeleteTimeSlicesKeepTime);
-		menuMgr.add(_actionSplitTour);
-		menuMgr.add(_actionExtractTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(_actionSplitTour);
+		menuMgr.add(_actionExtractTour);
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionCsvTimeSliceExport);
 
@@ -4655,7 +4655,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (selectedTourData != null) {
 			try {
-				UI.checkTourData(selectedTourData, _tourData);
+				TourManager.checkTourData(selectedTourData, _tourData);
 			} catch (final MyTourbookException e) {
 				System.out.println("Selection:" + selection);//$NON-NLS-1$
 				e.printStackTrace();
@@ -4780,7 +4780,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// ensure that the tour manager contains the same tour data
 		if ((_tourData != null) && _isTourDirty) {
 			try {
-				UI.checkTourData(_tourData, getTourData(_tourData.getTourId()));
+				TourManager.checkTourData(_tourData, getTourData(_tourData.getTourId()));
 			} catch (final MyTourbookException e) {
 				e.printStackTrace();
 			}

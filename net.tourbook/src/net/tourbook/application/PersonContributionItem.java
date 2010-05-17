@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.application;
 
 import java.util.ArrayList;
@@ -24,10 +23,13 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
+import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -41,16 +43,19 @@ import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID		= "net.tourbook.clientselector";		//$NON-NLS-1$
+	private static final String		ID			= "net.tourbook.clientselector";		//$NON-NLS-1$
 
-	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
+	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
+	private IPreferenceStore		_prefStore	= _activator.getPreferenceStore();
+	private IDialogSettings			_state		= _activator.getDialogSettings();
 
-	private static final boolean	osx		= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
+	private static final boolean	osx			= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
 
-	private Combo					fComboPeople;
+	private IPropertyChangeListener	_prefChangeListener;
 
-	private IPropertyChangeListener	fPrefChangeListener;
-	private ArrayList<TourPerson>	fPeople;
+	private ArrayList<TourPerson>	_allPeople;
+
+	private Combo					_cboPeople;
 
 	public PersonContributionItem() {
 		this(ID);
@@ -65,7 +70,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	 */
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -75,11 +80,11 @@ public class PersonContributionItem extends CustomControlContribution {
 					// fill people combobox with modified people list
 					fillPeopleComboBox();
 
-					final TourPerson currentPerson = plugin.getActivePerson();
+					final TourPerson currentPerson = _activator.getActivePerson();
 
 					// reselect the person which was selected before
 					if (currentPerson == null) {
-						fComboPeople.select(0);
+						_cboPeople.select(0);
 					} else {
 						// try to set and select the old person
 						final long previousPersonId = currentPerson.getPersonId();
@@ -90,19 +95,8 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		};
 		// register the listener
-		plugin.getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		_activator.getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
 	}
-
-//	@Override
-//	protected Control createControl(Composite parent) {
-//
-//		Composite control = createPeopleComboBox(parent);
-//
-//		addPrefListener();
-//		reselectLastPerson();
-//
-//		return control;
-//	}
 
 	@Override
 	protected Control createControl(final Composite parent) {
@@ -134,33 +128,33 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	private Composite createPeopleComboBox(final Composite parent) {
 
-		fComboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		_cboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-		fComboPeople.setVisibleItemCount(20);
-		fComboPeople.setToolTipText(Messages.App_People_tooltip);
+		_cboPeople.setVisibleItemCount(20);
+		_cboPeople.setToolTipText(Messages.App_People_tooltip);
 
-		fComboPeople.addDisposeListener(new DisposeListener() {
+		_cboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				if (fPrefChangeListener != null) {
-					plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+				if (_prefChangeListener != null) {
+					_activator.getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 				}
 			}
 		});
 
-		fComboPeople.addSelectionListener(new SelectionAdapter() {
+		_cboPeople.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				final int selectedIndex = fComboPeople.getSelectionIndex();
+				final int selectedIndex = _cboPeople.getSelectionIndex();
 				if (selectedIndex == -1) {
 					return;
 				}
 
 				if (selectedIndex == 0) {
 					// all people are selected
-					plugin.setActivePerson(null);
+					_activator.setActivePerson(null);
 				} else {
 					// a person is selected
-					plugin.setActivePerson(fPeople.get(selectedIndex - 1));
+					_activator.setActivePerson(_allPeople.get(selectedIndex - 1));
 				}
 
 				fireEventNewPersonIsSelected();
@@ -169,29 +163,29 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fillPeopleComboBox();
 
-		return fComboPeople;
+		return _cboPeople;
 	}
 
 	private void fillPeopleComboBox() {
 
-		fComboPeople.removeAll();
+		_cboPeople.removeAll();
 
 		/*
 		 * removed the dash in the "All People" string because the whole item was not displayed on
 		 * mac osx
 		 */
-		fComboPeople.add(Messages.App_People_item_all);
+		_cboPeople.add(Messages.App_People_item_all);
 
-		fPeople = TourDatabase.getTourPeople();
+		_allPeople = TourDatabase.getTourPeople();
 
-		if (fPeople == null) {
+		if (_allPeople == null) {
 			return;
 		}
 
-		for (final TourPerson person : fPeople) {
+		for (final TourPerson person : _allPeople) {
 			String lastName = person.getLastName();
 			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			fComboPeople.add(person.getFirstName() + lastName);
+			_cboPeople.add(person.getFirstName() + lastName);
 		}
 	}
 
@@ -199,7 +193,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	 * fire event that client has changed
 	 */
 	void fireEventNewPersonIsSelected() {
-		plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 	}
 
 	/**
@@ -207,34 +201,33 @@ public class PersonContributionItem extends CustomControlContribution {
 	 */
 	private void reselectLastPerson() {
 
-		Long lastPersonId;
 		try {
 
-			lastPersonId = plugin.getDialogSettings().getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
+			final long lastPersonId = _state.getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
 
 			// try to reselect the last person
 			reselectPerson(lastPersonId);
 
 		} catch (final NumberFormatException e) {
 			// no last person id, select all
-			fComboPeople.select(0);
+			_cboPeople.select(0);
 		}
 	}
 
 	private void reselectPerson(final long previousPersonId) {
 
-		if (fPeople == null) {
-			fComboPeople.select(0);
+		if (_allPeople == null) {
+			_cboPeople.select(0);
 			return;
 		}
 
 		TourPerson currentPerson = null;
 		int personIndex = 1;
 
-		for (final TourPerson person : fPeople) {
+		for (final TourPerson person : _allPeople) {
 			if (previousPersonId == person.getPersonId()) {
 				// previous person was found
-				fComboPeople.select(personIndex);
+				_cboPeople.select(personIndex);
 				currentPerson = person;
 				break;
 			}
@@ -243,10 +236,10 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		if (currentPerson == null) {
 			// old person was not found in the new list
-			fComboPeople.select(0);
+			_cboPeople.select(0);
 		}
 
-		plugin.setActivePerson(currentPerson);
+		_activator.setActivePerson(currentPerson);
 	}
 
 	/**
@@ -254,19 +247,21 @@ public class PersonContributionItem extends CustomControlContribution {
 	 * 
 	 * @param memento
 	 */
-	private void saveSettings(final IMemento memento) {
+	public void saveState(final IMemento memento) {
 
-		final int selectedIndex = fComboPeople.getSelectionIndex();
+		if (_cboPeople == null || _cboPeople.isDisposed()) {
+			StatusUtil.log("cannot save selected person, _cboPeople.isDisposed()");//$NON-NLS-1$
+			return;
+		}
+
+		final int selectedIndex = _cboPeople.getSelectionIndex();
 
 		long personId = -1;
 		if (selectedIndex > 0) {
-			personId = fPeople.get(selectedIndex - 1).getPersonId();
+			personId = _allPeople.get(selectedIndex - 1).getPersonId();
 		}
 
-		plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
+		_state.put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
 	}
 
-	public void saveState(final IMemento memento) {
-		saveSettings(memento);
-	}
 }

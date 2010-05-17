@@ -187,7 +187,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		super(parentShell);
 
 		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+//		setShellStyle(getShellStyle() | SWT.RESIZE);
 
 		// sort tours by date/time
 		Collections.sort(selectedTours);
@@ -358,7 +358,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
 		_dlgInnerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
-		GridLayoutFactory.swtDefaults().numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
+		GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
 //		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI10Title(_dlgInnerContainer);
@@ -794,6 +794,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		int joinedTourStartIndex = 0;
 		int joinedTourStartDistance = 0;
 		int joinedRecordingTime = 0;
+		int joinedDrivingTime = 0;
 		int joinedDistance = 0;
 		int joinedCalories = 0;
 		boolean isJoinedDistanceFromSensor = false;
@@ -999,10 +1000,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 					clonedMarker.setSerieIndex(joinMarkerIndex);
 
 					if (isJoinTime) {
-						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+						clonedMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
 					}
 					if (isJoinDistance) {
-						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+						clonedMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
 					}
 
 					joinedTourMarker.add(clonedMarker);
@@ -1120,7 +1121,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 			/*
 			 * summarize other fields
 			 */
+			tourTourData.computeTourDrivingTime();
+
 			joinedRecordingTime += tourTourData.getTourRecordingTime();
+			joinedDrivingTime += tourTourData.getTourDrivingTime();
+
 			joinedDistance += tourTourData.getTourDistance();
 			joinedCalories += tourTourData.getCalories();
 
@@ -1159,6 +1164,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		_joinedTourData.setCalories(joinedCalories);
 
 		_joinedTourData.setTourRecordingTime(joinedRecordingTime);
+		_joinedTourData.setTourDrivingTime(joinedDrivingTime);
 		_joinedTourData.setTourDistance(joinedDistance);
 
 		// !! tour type and tour tags are already set !!
@@ -1195,7 +1201,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		}
 
 		_joinedTourData.computeAltitudeUpDown();
-		_joinedTourData.computeTourDrivingTime();
 		_joinedTourData.computeComputedValues();
 
 		// set person which is required to save a tour

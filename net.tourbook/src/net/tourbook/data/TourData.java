@@ -2081,12 +2081,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void computeTourDrivingTime() {
 
-		if (isManualTour() == false) {
-			if ((timeSerie == null) || (timeSerie.length == 0)) {
-				tourDrivingTime = 0;
-			} else {
-				tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
-			}
+		if (isManualTour()) {
+			// manual tours do not have data series
+			return;
+		}
+
+		if ((timeSerie == null) || (timeSerie.length == 0)) {
+			tourDrivingTime = 0;
+		} else {
+			tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
 		}
 	}
 
@@ -3724,6 +3727,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourImportFilePath;
 	}
 
+	/**
+	 * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
+	 *         are not available.
+	 */
 	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
 	}

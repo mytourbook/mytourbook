@@ -15,70 +15,232 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.Bullet;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GlyphMetrics;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * Split tour at a time slice position and save extracted time slices as a new tour
  */
-public class DialogSplitTour extends TitleAreaDialog {
+public class DialogSplitTour extends TitleAreaDialog implements ITourProvider {
 
-	private static final String		STATE_SPLIT_METHOD			= "SplitMethod";			//$NON-NLS-1$
-	private static final String		STATE_SPLIT_METHOD_REMOVE	= "remove";				//$NON-NLS-1$
-	private static final String		STATE_SPLIT_METHOD_KEEP		= "keep";					//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE						= "TourTitle";						//$NON-NLS-1$
 
+	private static final String					STATE_TOUR_TITLE_SOURCE					= "TourTitleSource";				//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE_FROM_TOUR		= "fromTour";						//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE_FROM_MARKER		= "fromFirstMarker";				//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE_CUSTOM			= "custom";						//$NON-NLS-1$
+
+	private static final String					STATE_SPLIT_METHOD						= "SplitMethod";					//$NON-NLS-1$
+	private static final String					STATE_SPLIT_METHOD_REMOVE				= "remove";						//$NON-NLS-1$
+	private static final String					STATE_SPLIT_METHOD_KEEP					= "keep";							//$NON-NLS-1$
+
+	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";			//$NON-NLS-1$
+	private static final String					STATE_IS_INCLUDE_MARKER_WAYPOINTS		= "isIncludeMarkerWaypoints";		//$NON-NLS-1$
+
+	private static final String					STATE_JOINED_TIME						= "JoinedTime";					//$NON-NLS-1$
+	private static final String					STATE_JOINED_TIME_ORIGINAL				= "original";						//$NON-NLS-1$
+	private static final String					STATE_JOINED_TIME_CONCATENATED			= "concatenated";					//$NON-NLS-1$
+
+	private static final String					STATE_TYPE_SELECTED_ID					= "TourTypeId";					//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE						= "TourTypeSource";				//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_FROM_SELECTED_TOURS	= "fromTour";						//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR	= "previous";						//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_CUSTOM				= "custom";						//$NON-NLS-1$
+
+	/**
+	 * tour title state
+	 */
+	private static final String[]				ALL_STATES_TOUR_TILE_SOURCE				= new String[] {
+			STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
+			STATE_TOUR_TITLE_SOURCE_FROM_MARKER, //
+			STATE_TOUR_TITLE_SOURCE_CUSTOM, //
+																						};
+	private static final String[]				STATE_COMBO_TEXT_TOUR_TITLE_SOURCE		= new String[] {
+			Messages.Dialog_SplitTour_ComboText_TourTitleFromTour,
+			Messages.Dialog_SplitTour_ComboText_TourTitleFromFirstMarker,
+			Messages.Dialog_SplitTour_ComboText_TourTileCustom,
+																						//
+																						};
 	/**
 	 * split method states
 	 */
-	private static final String[]	ALL_STATES_SPLIT_METHOD		= new String[] {
+	private static final String[]				ALL_STATES_SPLIT_METHOD					= new String[] {
 			STATE_SPLIT_METHOD_REMOVE,
-			STATE_SPLIT_METHOD_KEEP							//
-																};
-	private static final String[]	STATE_TEXT_SPLIT_METHOD		= new String[] {
+			STATE_SPLIT_METHOD_KEEP													//
+																						};
+	private static final String[]				STATE_COMBO_TEXT_SPLIT_METHOD			= new String[] {
 			Messages.Dialog_SplitTour_ComboText_RemoveSlices,
-			Messages.Dialog_SplitTour_ComboText_KeepSlices		//
-																};
+			Messages.Dialog_SplitTour_ComboText_KeepSlices								//
+																						};
 
-	private TourData				_tourData;
+	/**
+	 * tour type states
+	 */
+	private static final String[]				ALL_STATES_TOUR_TYPE					= new String[] {
+			STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
+			STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR,
+			STATE_TYPE_SOURCE_CUSTOM													//
+																						};
+	private static final String[]				STATE_TEXT_TOUR_TYPE_SOURCE				= new String[] {
+			Messages.Dialog_JoinTours_ComboText_TourTypeFromTour,
+			Messages.Dialog_JoinTours_ComboText_TourTypePrevious,
+			Messages.Dialog_JoinTours_ComboText_TourTypeCustom							//
+																						};
 
-	private int						_timeSliceSplitIndex;
+	/**
+	 * joined time states
+	 */
+	private static final String[]				ALL_STATES_JOINED_TIME					= new String[] {
+			STATE_JOINED_TIME_ORIGINAL,
+			STATE_JOINED_TIME_CONCATENATED												//
+																						};
+	private static final String[]				STATE_TEXT_JOINED_TIME					= new String[] {
+			Messages.Dialog_JoinTours_ComboText_KeepTime,
+			Messages.Dialog_JoinTours_ComboText_ConcatenateTime						//
+																						};
 
-	private final IDialogSettings	_state						= TourbookPlugin.getDefault().getDialogSettingsSection(
-																		"DialogSplitTour"); //$NON-NLS-1$
+	private final IDialogSettings				_state									= TourbookPlugin
+																								.getDefault()
+																								.getDialogSettingsSection(
+																										"DialogSplit");	//$NON-NLS-1$
 
-	private Combo					_cboSplitMethod;
-	private Combo					_cboTourTypeSource;
-	private Link					_linkTourType;
-	private CLabel					_lblTourType;
+	private ActionSetTourTag					_actionAddTag;
+	private ActionSetTourTag					_actionRemoveTag;
+	private ActionRemoveAllTags					_actionRemoveAllTags;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+
+	private String								_tourTitleFromTour;
+	private String								_tourTitleFromCustom;
+	private String								_tourTitleFromMarker;
+
+	private long								_tourTypeIdFromSelectedTours			= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long								_tourTypeIdPreviousSplittedTour			= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long								_tourTypeIdCustom						= TourDatabase.ENTITY_IS_NOT_SAVED;
+
+	private ITourEventListener					_tourEventListener;
+
+	/*
+	 * UI controls
+	 */
+	private Composite							_dlgInnerContainer;
+
+	private Text								_txtTourTitle;
+	private Combo								_cboTourTitleSource;
+
+	private Combo								_cboSplitMethod;
+
+	private Combo								_cboJoinedTime;
+	private Label								_lblTourStartDate;
+	private Label								_lblTourStartTime;
+	private org.eclipse.swt.widgets.DateTime	_dtTourDate;
+	private org.eclipse.swt.widgets.DateTime	_dtTourTime;
+
+	private Combo								_cboTourTypeSource;
+	private Link								_linkTourType;
+	private CLabel								_lblTourType;
+
+	private Link								_linkTag;
+	private Label								_lblTourTags;
+
+	private Button								_chkIncludeDescription;
+	private Button								_chkIncludeMarkerWaypoints;
+
+	private TourData							_tourDataSource;
+	private TourData							_tourDataTarget;
+	private ArrayList<TourData>					_tourDataTargetList;
+
+	private int									_timeSliceSplitIndex;
 
 	public DialogSplitTour(final Shell parentShell, final TourData tourData, final int timeSliceSplitIndex) {
 
 		super(parentShell);
 
 		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+//		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		_tourData = tourData;
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__MyTourbook16).createImage());
+
+		_tourDataSource = tourData;
 
 		_timeSliceSplitIndex = timeSliceSplitIndex;
+	}
+
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+						// update custom tour type id
+						final String stateTourTypeSource = getStateTourTypeSource();
+
+						if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+							final TourType tourType = _tourDataTarget.getTourType();
+							_tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType
+									.getTypeId();
+						}
+
+						// tour type or tags can have been changed within this dialog
+						updateUITourTypeTags();
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	@Override
@@ -87,6 +249,13 @@ public class DialogSplitTour extends TitleAreaDialog {
 		super.configureShell(shell);
 
 		shell.setText(Messages.Dialog_SplitTour_DlgArea_Title);
+
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
 	}
 
 	@Override
@@ -98,14 +267,40 @@ public class DialogSplitTour extends TitleAreaDialog {
 		setMessage(Messages.Dialog_SplitTour_DlgArea_Message);
 	}
 
+	private void createActions() {
+
+		_actionAddTag = new ActionSetTourTag(this, true, false);
+		_actionRemoveTag = new ActionSetTourTag(this, false, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
+
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
+
+		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.action_tourType_modify_tourTypes,
+				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+	}
+
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
+		initTargetTourData();
+
 		createUI(dlgContainer);
+		createActions();
+		createMenus();
 
 		restoreState();
+
+		updateUITourTypeTags();
+		updateUIFromModel();
+
+		enableControls();
+
+		addTourEventListener();
 
 		return dlgContainer;
 	}
@@ -113,17 +308,124 @@ public class DialogSplitTour extends TitleAreaDialog {
 	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
+	private void createMenus() {
+
+		/*
+		 * tag menu
+		 */
+		final MenuManager tagMenuMgr = new MenuManager();
+
+		tagMenuMgr.setRemoveAllWhenShown(true);
+		tagMenuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				final Set<TourTag> joinedTourTags = _tourDataTarget.getTourTags();
+				final boolean isTagInTour = joinedTourTags != null && joinedTourTags.size() > 0;
+
+				// enable actions
+				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
+				_actionRemoveTag.setEnabled(isTagInTour);
+				_actionRemoveAllTags.setEnabled(isTagInTour);
+
+				// set menu items
+				menuMgr.add(_actionAddTag);
+				menuMgr.add(_actionRemoveTag);
+				menuMgr.add(_actionRemoveAllTags);
+
+				TagManager.fillMenuRecentTags(menuMgr, DialogSplitTour.this, true, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTagPrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTag.setMenu(tagMenuMgr.createContextMenu(_linkTag));
+
+		/*
+		 * tour type menu
+		 */
+		final MenuManager typeMenuMgr = new MenuManager();
+
+		typeMenuMgr.setRemoveAllWhenShown(true);
+		typeMenuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				// set menu items
+
+				ActionSetTourTypeMenu.fillMenu(menuMgr, DialogSplitTour.this, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTourTypePrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTourType.setMenu(typeMenuMgr.createContextMenu(_linkTourType));
+	}
 
 	private void createUI(final Composite parent) {
 
-		final Composite dlgContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
-		GridLayoutFactory.swtDefaults().numColumns(3).spacing(10, 8).applyTo(dlgContainer);
-//		dlgContainer(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		final SelectionAdapter defaultSelectionAdapter = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+			}
+		};
+
+		_dlgInnerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
+		GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
+//		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI20SplitMethod(dlgContainer);
-			createUI30TourType(parent);
+			createUI10Title(_dlgInnerContainer);
+			createUI20SplitMethod(_dlgInnerContainer);
+			createUI22TourTime(_dlgInnerContainer, defaultSelectionAdapter);
+			createUI30TypeTags(_dlgInnerContainer);
+			createUI40DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
+			createUI50Info(_dlgInnerContainer);
 		}
+	}
+
+	/**
+	 * tour title
+	 */
+	private void createUI10Title(final Composite parent) {
+
+		// label: title
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Dialog_SplitTour_Label_TourTitle);
+		label.setToolTipText(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip);
+
+		// combo: title source
+		_cboTourTitleSource = new Combo(parent, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(_cboTourTitleSource);
+		_cboTourTitleSource.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectTourTitleSource();
+			}
+		});
+
+		// fill combo
+		for (final String comboText : STATE_COMBO_TEXT_TOUR_TITLE_SOURCE) {
+			_cboTourTitleSource.add(comboText);
+		}
+
+		// spacer
+		new Label(parent, SWT.NONE);
+
+		// text: title
+		_txtTourTitle = new Text(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.indent(0, -5)
+				.applyTo(_txtTourTitle);
+		_txtTourTitle.setToolTipText(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip);
 	}
 
 	/**
@@ -139,13 +441,79 @@ public class DialogSplitTour extends TitleAreaDialog {
 		label.setText(Messages.Dialog_SplitTour_Label_SplitMethod);
 
 		_cboSplitMethod = new Combo(parent, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_cboSplitMethod);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboSplitMethod);
 
 		// fill combo
-		for (final String timeText : STATE_TEXT_SPLIT_METHOD) {
+		for (final String timeText : STATE_COMBO_TEXT_SPLIT_METHOD) {
 			_cboSplitMethod.add(timeText);
 		}
 
+	}
+
+	/**
+	 * tour time
+	 */
+	private void createUI22TourTime(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+
+		final SelectionAdapter dateTimeUpdateListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+			}
+		};
+
+		/*
+		 * tour time
+		 */
+		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(label);
+		label.setText(Messages.Dialog_JoinTours_Label_TourStartDateTime);
+
+		_cboJoinedTime = new Combo(parent, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboJoinedTime);
+		_cboJoinedTime.addSelectionListener(defaultSelectionAdapter);
+
+		// fill combo
+		for (final String timeText : STATE_TEXT_JOINED_TIME) {
+			_cboJoinedTime.add(timeText);
+		}
+
+		/*
+		 * tour start date/time
+		 */
+		//spacer
+		new Label(parent, SWT.NONE);
+
+		final Composite dateContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(0, -5)
+				.applyTo(dateContainer);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(dateContainer);
+		{
+			/*
+			 * tour start: date
+			 */
+			_lblTourStartDate = new Label(dateContainer, SWT.NONE);
+			_lblTourStartDate.setText(Messages.Dialog_JoinTours_Label_TourDate);
+
+			_dtTourDate = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.DATE | SWT.DROP_DOWN | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
+			_dtTourDate.addSelectionListener(dateTimeUpdateListener);
+
+			/*
+			 * tour start: time
+			 */
+			_lblTourStartTime = new Label(dateContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblTourStartTime);
+			_lblTourStartTime.setText(Messages.Dialog_JoinTours_Label_TourTime);
+
+			_dtTourTime = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.TIME | SWT.DROP_DOWN | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourTime);
+			_dtTourTime.addSelectionListener(dateTimeUpdateListener);
+		}
 	}
 
 	/**
@@ -153,7 +521,7 @@ public class DialogSplitTour extends TitleAreaDialog {
 	 * 
 	 * @param defaultSelectionAdapter
 	 */
-	private void createUI30TourType(final Composite parent) {
+	private void createUI30TypeTags(final Composite parent) {
 
 		/*
 		 * tour type
@@ -165,20 +533,18 @@ public class DialogSplitTour extends TitleAreaDialog {
 		label.setText(Messages.Dialog_JoinTours_Label_TourType);
 
 		_cboTourTypeSource = new Combo(parent, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(_cboTourTypeSource);
-//		_cboTourTypeSource.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//				onSelectTourTypeSource();
-//			}
-//		});
-//
-//		// fill combo
-//		for (final String tourTypeText : STATE_TEXT_TOUR_TYPE_SOURCE) {
-//			_cboTourTypeSource.add(tourTypeText);
-//		}
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboTourTypeSource);
+		_cboTourTypeSource.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectTourTypeSource();
+			}
+		});
+
+		// fill combo
+		for (final String tourTypeText : STATE_TEXT_TOUR_TYPE_SOURCE) {
+			_cboTourTypeSource.add(tourTypeText);
+		}
 
 		// spacer
 		new Label(parent, SWT.NONE);
@@ -186,6 +552,7 @@ public class DialogSplitTour extends TitleAreaDialog {
 		final Composite tourTypeContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false)//
 				.indent(0, -8)
+				.span(2, 1)
 				.applyTo(tourTypeContainer);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(tourTypeContainer);
 		{
@@ -201,6 +568,95 @@ public class DialogSplitTour extends TitleAreaDialog {
 			_lblTourType = new CLabel(tourTypeContainer, SWT.NONE);
 			GridDataFactory.swtDefaults().grab(true, false).applyTo(_lblTourType);
 		}
+
+		/*
+		 * tags
+		 */
+		_linkTag = new Link(parent, SWT.NONE);
+		_linkTag.setText(Messages.tour_editor_label_tour_tag);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_linkTag);
+		_linkTag.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_linkTag);
+			}
+		});
+
+		_lblTourTags = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				// hint is necessary that the width is not expanded when the text is long
+				.hint(200, SWT.DEFAULT)
+				.span(2, 1)
+				.applyTo(_lblTourTags);
+	}
+
+	/**
+	 * checkbox: set marker for each tour
+	 */
+	private void createUI40DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+
+		/*
+		 * checkbox: description
+		 */
+		_chkIncludeDescription = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(3, 1).indent(0, 10).applyTo(_chkIncludeDescription);
+		_chkIncludeDescription.setText(Messages.Dialog_JoinTours_Checkbox_IncludeDescription);
+
+		/*
+		 * checkbox: include existing tour marker
+		 */
+		_chkIncludeMarkerWaypoints = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkIncludeMarkerWaypoints);
+		_chkIncludeMarkerWaypoints.setText(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints);
+
+	}
+
+	/**
+	 * info
+	 */
+	private void createUI50Info(final Composite container) {
+
+		final Label label = new Label(container, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+
+		// use a bulleted list to display this info
+		final StyleRange style = new StyleRange();
+		style.metrics = new GlyphMetrics(0, 0, 10);
+		final Bullet bullet = new Bullet(style);
+
+		final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
+		final int lineCount = Util.countCharacter(infoText, '\n');
+
+		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.BEGINNING)
+				.indent(0, 10)
+				.span(2, 1)
+				.applyTo(styledText);
+		styledText.setText(infoText);
+		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		styledText.setLineBullet(0, lineCount + 1, bullet);
+	}
+
+	private void enableControls() {
+
+		final boolean isCustomTime = getStateJoinedTime().equals(STATE_JOINED_TIME_ORIGINAL) == false;
+		final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
+		final boolean isCustomTourTitle = getStateTourTitleSource().equals(STATE_TOUR_TITLE_SOURCE_CUSTOM);
+
+		_txtTourTitle.setEnabled(isCustomTourTitle);
+
+		_dtTourDate.setEnabled(isCustomTime);
+		_dtTourTime.setEnabled(isCustomTime);
+		_lblTourStartDate.setEnabled(isCustomTime);
+		_lblTourStartTime.setEnabled(isCustomTime);
+
+		_linkTourType.setEnabled(isCustomTourType);
+		_lblTourType.setEnabled(isCustomTourType);
 	}
 
 	@Override
@@ -211,19 +667,642 @@ public class DialogSplitTour extends TitleAreaDialog {
 		return null;
 	}
 
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		// return joined tour
+
+		return _tourDataTargetList;
+	}
+
+	private String getStateJoinedTime() {
+		return Util.getStateFromCombo(_cboJoinedTime, ALL_STATES_JOINED_TIME, STATE_JOINED_TIME_ORIGINAL);
+	}
+
 	private String getStateSplitMethod() {
 		return Util.getStateFromCombo(_cboSplitMethod, ALL_STATES_SPLIT_METHOD, STATE_SPLIT_METHOD_REMOVE);
+	}
+
+	private String getStateTourTitleSource() {
+		return Util.getStateFromCombo(
+				_cboTourTitleSource,
+				ALL_STATES_TOUR_TILE_SOURCE,
+				STATE_TOUR_TITLE_SOURCE_FROM_TOUR);
+	}
+
+	private String getStateTourTypeSource() {
+		return Util.getStateFromCombo(_cboTourTypeSource, ALL_STATES_TOUR_TYPE, STATE_TYPE_SOURCE_FROM_SELECTED_TOURS);
+	}
+
+	/**
+	 * Create {@link TourData} for the splitted tour
+	 */
+	private void initTargetTourData() {
+
+		_tourDataTarget = new TourData();
+
+		/*
+		 * create a dummy tour id because setting of the tags and tour type works requires it
+		 * otherwise it would cause a NPE when a tour has no id
+		 */
+		_tourDataTarget.createTourIdDummy();
+
+		_tourDataTargetList = new ArrayList<TourData>();
+		_tourDataTargetList.add(_tourDataTarget);
+
+		/*
+		 * set tour title
+		 */
+		_tourTitleFromTour = _tourDataSource.getTourTitle();
+		_tourTitleFromMarker = UI.EMPTY_STRING;
+
+		// get title from first marker which is within the splitted tour
+		final ArrayList<TourMarker> sortedMarker = new ArrayList<TourMarker>(_tourDataSource.getTourMarkers());
+		Collections.sort(sortedMarker);
+
+		for (final TourMarker tourMarker : sortedMarker) {
+			if (tourMarker.getSerieIndex() >= _timeSliceSplitIndex) {
+				_tourTitleFromMarker = tourMarker.getLabel();
+				break;
+			}
+		}
+		// set default custom marker
+		_tourTitleFromCustom = _tourTitleFromMarker;
+
+		/*
+		 * get all tags
+		 */
+		final Set<TourTag> joinedTourTags = new HashSet<TourTag>();
+		final Set<TourTag> tourTags = _tourDataSource.getTourTags();
+		joinedTourTags.addAll(tourTags);
+		_tourDataTarget.setTourTags(joinedTourTags);
+
+		/*
+		 * set tour type
+		 */
+		// get tour type id
+		final TourType tourType = _tourDataSource.getTourType();
+		if (tourType != null) {
+			_tourTypeIdFromSelectedTours = tourType.getTypeId();
+		}
+
+		_tourTypeIdCustom = //
+		_tourTypeIdPreviousSplittedTour = Util.getStateLong(
+				_state,
+				STATE_TYPE_SELECTED_ID,
+				TourDatabase.ENTITY_IS_NOT_SAVED);
+
+		final String stateTourTypeSource = Util.getStateString(
+				_state,
+				STATE_TYPE_SOURCE,
+				STATE_TYPE_SOURCE_FROM_SELECTED_TOURS);
+
+		long joinedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+		if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_SELECTED_TOURS)) {
+			joinedTourTypeId = _tourTypeIdFromSelectedTours;
+		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR)
+				|| stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+			joinedTourTypeId = _tourTypeIdPreviousSplittedTour;
+		}
+
+		_tourDataTarget.setTourType(TourDatabase.getTourType(joinedTourTypeId));
 	}
 
 	@Override
 	protected void okPressed() {
 
+//		if (joinTours() == false) {
+//			return;
+//		}
+
+		// state must be set after the tour is saved because the tour type id is set when the tour is saved
 		saveState();
 
 		super.okPressed();
 	}
 
+	private void onDispose() {
+
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+	}
+
+//	/**
+//	 * Join the tours and create a new tour
+//	 */
+//	private boolean joinTours() {
+//
+//		final boolean isOriginalTime = getStateJoinedTime().equals(STATE_JOINED_TIME_ORIGINAL);
+//
+//		/**
+//		 * number of slices, time series are already checked in ActionJoinTours
+//		 */
+//		int joinedSliceCounter = 0;
+//
+//		for (final TourData tourData : _selectedTours) {
+//
+//			final int[] tourTimeSerie = tourData.timeSerie;
+//			final int[] tourDistanceSerie = tourData.distanceSerie;
+//			final double[] tourLatitudeSerie = tourData.latitudeSerie;
+//
+//			final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
+//			final boolean isTourDistance = (tourDistanceSerie != null) && (tourDistanceSerie.length > 0);
+//			final boolean isTourLat = (tourLatitudeSerie != null) && (tourLatitudeSerie.length > 0);
+//
+//			if (isTourTime) {
+//				joinedSliceCounter += tourTimeSerie.length;
+//			} else if (isTourDistance) {
+//				joinedSliceCounter += tourDistanceSerie.length;
+//			} else if (isTourLat) {
+//				joinedSliceCounter += tourLatitudeSerie.length;
+//			}
+//		}
+//
+//		boolean isJoinAltitude = false;
+//		boolean isJoinDistance = false;
+//		boolean isJoinCadence = false;
+//		boolean isJoinLat = false;
+//		boolean isJoinLon = false;
+//		boolean isJoinPower = false;
+//		boolean isJoinPulse = false;
+//		boolean isJoinSpeed = false;
+//		boolean isJoinTemperature = false;
+//		boolean isJoinTime = false;
+//
+//		final int[] joinedAltitudeSerie = new int[joinedSliceCounter];
+//		final int[] joinedCadenceSerie = new int[joinedSliceCounter];
+//		final int[] joinedDistanceSerie = new int[joinedSliceCounter];
+//		final double[] joinedLatitudeSerie = new double[joinedSliceCounter];
+//		final double[] joinedLongitudeSerie = new double[joinedSliceCounter];
+//		final int[] joinedPowerSerie = new int[joinedSliceCounter];
+//		final int[] joinedPulseSerie = new int[joinedSliceCounter];
+//		final int[] joinedSpeedSerie = new int[joinedSliceCounter];
+//		final int[] joinedTemperatureSerie = new int[joinedSliceCounter];
+//		final int[] joinedTimeSerie = new int[joinedSliceCounter];
+//
+//		final StringBuilder joinedDescription = new StringBuilder();
+//		final HashSet<TourMarker> joinedTourMarker = new HashSet<TourMarker>();
+//		final ArrayList<TourWayPoint> joinedWayPoints = new ArrayList<TourWayPoint>();
+//
+//		int joinedSerieIndex = 0;
+//		int joinedTourStartIndex = 0;
+//		int joinedTourStartDistance = 0;
+//		int joinedRecordingTime = 0;
+//		int joinedDistance = 0;
+//		int joinedCalories = 0;
+//		boolean isJoinedDistanceFromSensor = false;
+//		short joinedDeviceTimeInterval = -1;
+//
+//		int relTourTime = 0;
+//		long relTourTimeOffset = 0;
+//		long absFirstTourStartTimeSec = 0;
+//		long absJoinedTourStartTimeSec = 0;
+//		DateTime joinedTourStart = null;
+//
+//		boolean isFirstTour = true;
+//
+//		/*
+//		 * copy tour data series into joined data series
+//		 */
+//		for (final TourData tourTourData : _selectedTours) {
+//
+//			final int[] tourAltitudeSerie = tourTourData.altitudeSerie;
+//			final int[] tourCadenceSerie = tourTourData.cadenceSerie;
+//			final int[] tourDistanceSerie = tourTourData.distanceSerie;
+//			final double[] tourLatitudeSerie = tourTourData.latitudeSerie;
+//			final double[] tourLongitudeSerie = tourTourData.longitudeSerie;
+//			final int[] tourPulseSerie = tourTourData.pulseSerie;
+//			final int[] tourTemperatureSerie = tourTourData.temperatureSerie;
+//			final int[] tourTimeSerie = tourTourData.timeSerie;
+//
+//			final boolean isTourAltitude = (tourAltitudeSerie != null) && (tourAltitudeSerie.length > 0);
+//			final boolean isTourCadence = (tourCadenceSerie != null) && (tourCadenceSerie.length > 0);
+//			final boolean isTourDistance = (tourDistanceSerie != null) && (tourDistanceSerie.length > 0);
+//			final boolean isTourLat = (tourLatitudeSerie != null) && (tourLatitudeSerie.length > 0);
+//			final boolean isTourLon = (tourLongitudeSerie != null) && (tourLongitudeSerie.length > 0);
+//			final boolean isTourPulse = (tourPulseSerie != null) && (tourPulseSerie.length > 0);
+//			final boolean isTourTemperature = (tourTemperatureSerie != null) && (tourTemperatureSerie.length > 0);
+//			final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
+//
+//			/*
+//			 * get speed/power data when it's from the device
+//			 */
+//			int[] tourPowerSerie = null;
+//			int[] tourSpeedSerie = null;
+//			final boolean isTourPower = tourTourData.isPowerSerieFromDevice();
+//			final boolean isTourSpeed = tourTourData.isSpeedSerieFromDevice();
+//			if (isTourPower) {
+//				tourPowerSerie = tourTourData.getPowerSerie();
+//			}
+//			if (isTourSpeed) {
+//				tourSpeedSerie = tourTourData.getSpeedSerie();
+//			}
+//
+//			/*
+//			 * set tour time
+//			 */
+//			final DateTime tourStartTime = new DateTime(
+//					tourTourData.getStartYear(),
+//					tourTourData.getStartMonth(),
+//					tourTourData.getStartDay(),
+//					tourTourData.getStartHour(),
+//					tourTourData.getStartMinute(),
+//					tourTourData.getStartSecond(),
+//					0);
+//
+//			if (isFirstTour) {
+//
+//				// get start date/time
+//
+//				if (isOriginalTime) {
+//
+//					joinedTourStart = tourStartTime;
+//
+//				} else {
+//
+//					joinedTourStart = new org.joda.time.DateTime(
+//							_dtTourDate.getYear(),
+//							_dtTourDate.getMonth() + 1,
+//							_dtTourDate.getDay(),
+//							_dtTourTime.getHours(),
+//							_dtTourTime.getMinutes(),
+//							_dtTourTime.getSeconds(),
+//							0);
+//				}
+//
+//				// tour start in absolute seconds
+//				absJoinedTourStartTimeSec = joinedTourStart.getMillis() / 1000;
+//				absFirstTourStartTimeSec = absJoinedTourStartTimeSec;
+//
+//			} else {
+//
+//				// get relative time offset
+//
+//				if (isOriginalTime) {
+//
+//					final DateTime tourStart = tourStartTime;
+//
+//					final long absTourStartTimeSec = tourStart.getMillis() / 1000;
+//
+//					// keep original time
+//					relTourTimeOffset = absTourStartTimeSec - absFirstTourStartTimeSec;
+//
+//				} else {
+//
+//					/*
+//					 * remove time gaps between tours, add relative time from the last tour and add
+//					 * 1 second for the start of the next tour
+//					 */
+//					relTourTimeOffset += relTourTime + 1;
+//				}
+//			}
+//
+//			/*
+//			 * get number of slices
+//			 */
+//			int tourSliceCounter = 0;
+//			if (isTourTime) {
+//				tourSliceCounter = tourTimeSerie.length;
+//			} else if (isTourDistance) {
+//				tourSliceCounter = tourDistanceSerie.length;
+//			} else if (isTourLat) {
+//				tourSliceCounter = tourLatitudeSerie.length;
+//			}
+//
+//			int relTourDistance = 0;
+//
+//			/*
+//			 * copy data series
+//			 */
+//			for (int tourSerieIndex = 0; tourSerieIndex < tourSliceCounter; tourSerieIndex++) {
+//
+//				if (isTourTime) {
+//
+//					relTourTime = tourTimeSerie[tourSerieIndex];
+//
+//					joinedTimeSerie[joinedSerieIndex] = (int) (relTourTimeOffset + relTourTime);
+//
+//					isJoinTime = true;
+//				}
+//
+//				if (isTourAltitude) {
+//					joinedAltitudeSerie[joinedSerieIndex] = tourAltitudeSerie[tourSerieIndex];
+//					isJoinAltitude = true;
+//				}
+//				if (isTourCadence) {
+//					joinedCadenceSerie[joinedSerieIndex] = tourCadenceSerie[tourSerieIndex];
+//					isJoinCadence = true;
+//				}
+//
+//				if (isTourDistance) {
+//
+//					relTourDistance = tourDistanceSerie[tourSerieIndex];
+//
+//					joinedDistanceSerie[joinedSerieIndex] = joinedTourStartDistance + relTourDistance;
+//					isJoinDistance = true;
+//				}
+//
+//				if (isTourPulse) {
+//					joinedPulseSerie[joinedSerieIndex] = tourPulseSerie[tourSerieIndex];
+//					isJoinPulse = true;
+//				}
+//				if (isTourLat) {
+//					joinedLatitudeSerie[joinedSerieIndex] = tourLatitudeSerie[tourSerieIndex];
+//					isJoinLat = true;
+//				}
+//				if (isTourLon) {
+//					joinedLongitudeSerie[joinedSerieIndex] = tourLongitudeSerie[tourSerieIndex];
+//					isJoinLon = true;
+//				}
+//				if (isTourTemperature) {
+//					joinedTemperatureSerie[joinedSerieIndex] = tourTemperatureSerie[tourSerieIndex];
+//					isJoinTemperature = true;
+//				}
+//				if (isTourPower) {
+//					joinedPowerSerie[joinedSerieIndex] = tourPowerSerie[tourSerieIndex];
+//					isJoinPower = true;
+//				}
+//				if (isTourSpeed) {
+//					joinedSpeedSerie[joinedSerieIndex] = tourSpeedSerie[tourSerieIndex];
+//					isJoinSpeed = true;
+//				}
+//
+//				joinedSerieIndex++;
+//			}
+//
+//			final Set<TourMarker> tourMarkers = tourTourData.getTourMarkers();
+//
+//			if (_chkIncludeMarkerWaypoints.getSelection()) {
+//
+//				/*
+//				 * copy tour markers
+//				 */
+//				for (final TourMarker tourMarker : tourMarkers) {
+//
+//					final TourMarker clonedMarker = tourMarker.clone(_tourDataTarget);
+//
+//					int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
+//					if (joinMarkerIndex >= joinedSliceCounter) {
+//						joinMarkerIndex = joinedSliceCounter - 1;
+//					}
+//
+//					// a cloned marker has the same marker id, create a new id
+//					clonedMarker.createMarkerId();
+//
+//					// adjust marker position, position is relativ to the tour start
+//					clonedMarker.setSerieIndex(joinMarkerIndex);
+//
+//					if (isJoinTime) {
+//						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+//					}
+//					if (isJoinDistance) {
+//						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+//					}
+//
+//					joinedTourMarker.add(clonedMarker);
+//				}
+//
+//				/*
+//				 * copy way points
+//				 */
+//				for (final TourWayPoint wayPoint : tourTourData.getTourWayPoints()) {
+//					joinedWayPoints.add((TourWayPoint) wayPoint.clone());
+//				}
+//			}
+//
+//			if (_chkCreateTourMarker.getSelection()) {
+//
+//				/*
+//				 * create a tour marker
+//				 */
+//
+//				// first find a free marker position in the tour
+//				int tourMarkerIndex = -1;
+//				for (int tourSerieIndex = 0; tourSerieIndex < tourSliceCounter; tourSerieIndex++) {
+//
+//					boolean isIndexAvailable = true;
+//
+//					// check if a marker occupies the current index
+//					for (final TourMarker tourMarker : tourMarkers) {
+//						if (tourMarker.getSerieIndex() == tourSerieIndex) {
+//							isIndexAvailable = false;
+//							break;
+//						}
+//					}
+//
+//					if (isIndexAvailable) {
+//						// free index was found
+//						tourMarkerIndex = tourSerieIndex;
+//						break;
+//					}
+//				}
+//
+//				if (tourMarkerIndex != -1) {
+//
+//					// create tour marker label
+//					final String stateTourMarker = getStateTourMarker();
+//					final long tourStartTimeMS = tourStartTime.getMillis();
+//
+//					String markerLabel = UI.EMPTY_STRING;
+//
+//					if (stateTourMarker.equals(STATE_MARKER_TYPE_SMALL)) {
+//						markerLabel = _dtFormatterShort.print(tourStartTimeMS);
+//					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_MEDIUM)) {
+//						markerLabel = _dtFormatterMedium.print(tourStartTimeMS);
+//					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_LARGE)) {
+//						markerLabel = _dtFormatterFull.print(tourStartTimeMS);
+//					}
+//
+//					final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
+//
+//					final TourMarker tourMarker = new TourMarker(_tourDataTarget, ChartLabel.MARKER_TYPE_CUSTOM);
+//
+//					tourMarker.setSerieIndex(joinMarkerIndex);
+//					tourMarker.setLabel(markerLabel);
+//					tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH);
+//
+//					if (isJoinTime) {
+//						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+//					}
+//					if (isJoinDistance) {
+//						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+//					}
+//
+//					joinedTourMarker.add(tourMarker);
+//				}
+//			}
+//
+//			/*
+//			 * create description
+//			 */
+//			if (_chkIncludeDescription.getSelection()) {
+//
+//				final String tourDescription = tourTourData.getTourDescription();
+//
+//				if (joinedDescription.length() > 0) {
+//					// set space between two tours
+//					joinedDescription.append(UI.NEW_LINE2);
+//				}
+//
+//				joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour);
+//				joinedDescription.append(TourManager.getTourTitleDetailed(tourTourData));
+//				if (tourDescription.length() > 0) {
+//					joinedDescription.append(UI.NEW_LINE);
+//					joinedDescription.append(tourDescription);
+//				}
+//			}
+//
+//			/*
+//			 * other tour values
+//			 */
+//			if (isFirstTour) {
+//				isJoinedDistanceFromSensor = tourTourData.getIsDistanceFromSensor();
+//				joinedDeviceTimeInterval = tourTourData.getDeviceTimeInterval();
+//			} else {
+//				if (isJoinedDistanceFromSensor && tourTourData.getIsDistanceFromSensor()) {
+//					// keep TRUE state
+//				} else {
+//					isJoinedDistanceFromSensor = false;
+//				}
+//				if (joinedDeviceTimeInterval == tourTourData.getDeviceTimeInterval()) {
+//					// keep value
+//				} else {
+//					joinedDeviceTimeInterval = -1;
+//				}
+//			}
+//
+//			/*
+//			 * summarize other fields
+//			 */
+//			joinedRecordingTime += tourTourData.getTourRecordingTime();
+//			joinedDistance += tourTourData.getTourDistance();
+//			joinedCalories += tourTourData.getCalories();
+//
+//			/*
+//			 * init next tour
+//			 */
+//			isFirstTour = false;
+//			joinedTourStartIndex = joinedSerieIndex;
+//			joinedTourStartDistance += relTourDistance;
+//		}
+//
+//		/*
+//		 * setup tour data
+//		 */
+//		_tourDataTarget.setStartHour((short) joinedTourStart.getHourOfDay());
+//		_tourDataTarget.setStartMinute((short) joinedTourStart.getMinuteOfHour());
+//		_tourDataTarget.setStartSecond((short) joinedTourStart.getSecondOfMinute());
+//		_tourDataTarget.setStartYear((short) joinedTourStart.getYear());
+//		_tourDataTarget.setStartMonth((short) joinedTourStart.getMonthOfYear());
+//		_tourDataTarget.setStartDay((short) joinedTourStart.getDayOfMonth());
+//
+//		_tourDataTarget.setWeek(joinedTourStart);
+//
+//		// tour id must be created after the tour date/time is set
+//		_tourDataTarget.createTourId();
+//
+//		_tourDataTarget.setTourTitle(_txtJoinedTitle.getText());
+//		_tourDataTarget.setTourDescription(joinedDescription.toString());
+//
+//		_tourDataTarget.setTourMarkers(joinedTourMarker);
+//		_tourDataTarget.setWayPoints(joinedWayPoints);
+//		_tourDataTarget.setDeviceName(Messages.Dialog_JoinTours_Label_DeviceName);
+//
+//		_tourDataTarget.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
+//		_tourDataTarget.setDeviceTimeInterval(joinedDeviceTimeInterval);
+//		_tourDataTarget.setCalories(joinedCalories);
+//
+//		_tourDataTarget.setTourRecordingTime(joinedRecordingTime);
+//		_tourDataTarget.setTourDistance(joinedDistance);
+//
+//		// !! tour type and tour tags are already set !!
+//
+//		if (isJoinAltitude) {
+//			_tourDataTarget.altitudeSerie = joinedAltitudeSerie;
+//		}
+//		if (isJoinDistance) {
+//			_tourDataTarget.distanceSerie = joinedDistanceSerie;
+//		}
+//		if (isJoinCadence) {
+//			_tourDataTarget.cadenceSerie = joinedCadenceSerie;
+//		}
+//		if (isJoinLat) {
+//			_tourDataTarget.latitudeSerie = joinedLatitudeSerie;
+//		}
+//		if (isJoinLon) {
+//			_tourDataTarget.longitudeSerie = joinedLongitudeSerie;
+//		}
+//		if (isJoinPower) {
+//			_tourDataTarget.setPowerSerie(joinedPowerSerie);
+//		}
+//		if (isJoinPulse) {
+//			_tourDataTarget.pulseSerie = joinedPulseSerie;
+//		}
+//		if (isJoinSpeed) {
+//			_tourDataTarget.setSpeedSerie(joinedSpeedSerie);
+//		}
+//		if (isJoinTemperature) {
+//			_tourDataTarget.temperatureSerie = joinedTemperatureSerie;
+//		}
+//		if (isJoinTime) {
+//			_tourDataTarget.timeSerie = joinedTimeSerie;
+//		}
+//
+//		_tourDataTarget.computeAltitudeUpDown();
+//		_tourDataTarget.computeTourDrivingTime();
+//		_tourDataTarget.computeComputedValues();
+//
+//		// set person which is required to save a tour
+//		_tourDataTarget.setTourPerson(TourManager.getInstance().getActivePerson());
+//
+//		/*
+//		 * check size of the fields
+//		 */
+//		if (_tourDataTarget.isValidForSave() == false) {
+//			return false;
+//		}
+//
+//		_tourDataTarget = TourManager.saveModifiedTour(_tourDataTarget);
+//
+//		return true;
+//	}
+
+	private void onSelectTourTitleSource() {
+
+		updateUIFromModel();
+		enableControls();
+	}
+
+	private void onSelectTourTypeSource() {
+
+		final String stateTourTypeSource = getStateTourTypeSource();
+
+		long joinedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+		if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_SELECTED_TOURS)) {
+			joinedTourTypeId = _tourTypeIdFromSelectedTours;
+		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR)) {
+			joinedTourTypeId = _tourTypeIdPreviousSplittedTour;
+		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+			joinedTourTypeId = _tourTypeIdCustom;
+		}
+
+		_tourDataTarget.setTourType(TourDatabase.getTourType(joinedTourTypeId));
+
+		updateUITourTypeTags();
+
+		enableControls();
+	}
+
 	private void restoreState() {
+
+		// tour title source
+		Util.selectStateInCombo(
+				_state,
+				STATE_TOUR_TITLE_SOURCE,
+				ALL_STATES_TOUR_TILE_SOURCE,
+				STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
+				_cboTourTitleSource);
 
 		// split method
 		Util.selectStateInCombo(
@@ -233,13 +1312,93 @@ public class DialogSplitTour extends TitleAreaDialog {
 				STATE_SPLIT_METHOD_REMOVE,
 				_cboSplitMethod);
 
+		// tour type source
+		Util.selectStateInCombo(
+				_state,
+				STATE_TYPE_SOURCE,
+				ALL_STATES_TOUR_TYPE,
+				STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
+				_cboTourTypeSource);
+
+		// joined time
+		Util.selectStateInCombo(
+				_state,
+				STATE_JOINED_TIME,
+				ALL_STATES_JOINED_TIME,
+				STATE_JOINED_TIME_ORIGINAL,
+				_cboJoinedTime);
+
+		// description/marker/waypoints
+		_chkIncludeDescription.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_DESCRIPTION, true));
+		_chkIncludeMarkerWaypoints.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_MARKER_WAYPOINTS, true));
+
+		/*
+		 * update UI from selected tours
+		 */
+
+		// date/time
+		_dtTourDate.setDate(
+				_tourDataSource.getStartYear(),
+				_tourDataSource.getStartMonth() - 1,
+				_tourDataSource.getStartDay());
+		_dtTourTime.setTime(
+				_tourDataSource.getStartHour(),
+				_tourDataSource.getStartMinute(),
+				_tourDataSource.getStartSecond());
 	}
 
 	private void saveState() {
 
+		// tour title
+		_state.put(STATE_TOUR_TITLE, _txtTourTitle.getText());
+		_state.put(STATE_TOUR_TITLE_SOURCE, getStateTourTitleSource());
+
+		// tour type
+		final TourType tourType = _tourDataTarget.getTourType();
+		_state.put(STATE_TYPE_SELECTED_ID, tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId());
+		_state.put(STATE_TYPE_SOURCE, getStateTourTypeSource());
+
 		// split method
 		_state.put(STATE_SPLIT_METHOD, getStateSplitMethod());
 
+		// joined time
+		_state.put(STATE_JOINED_TIME, getStateJoinedTime());
+
+		// description/marker
+		_state.put(STATE_IS_INCLUDE_DESCRIPTION, _chkIncludeDescription.getSelection());
+		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
+	}
+
+	private void updateUIFromModel() {
+
+		/*
+		 * tour title
+		 */
+		final String stateTourTitleSource = getStateTourTitleSource();
+
+		String tourTitle = _txtTourTitle.getText();
+
+		if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_TOUR)) {
+			tourTitle = _tourTitleFromTour;
+		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_MARKER)) {
+			tourTitle = _tourTitleFromMarker;
+		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_CUSTOM)) {
+			tourTitle = _tourTitleFromCustom;
+		}
+
+		// update ui
+		_txtTourTitle.setText(tourTitle);
+
+	}
+
+	private void updateUITourTypeTags() {
+
+		// tour type/tags
+		UI.updateUITourType(_tourDataTarget, _lblTourType, true);
+		UI.updateUITags(_tourDataTarget, _lblTourTags);
+
+		// reflow layout that the tags are aligned correctly
+		_dlgInnerContainer.layout(true);
 	}
 
 }

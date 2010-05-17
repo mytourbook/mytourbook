@@ -323,11 +323,27 @@ public class Messages extends NLS {
 
 	public static String	Dialog_SplitTour_ComboText_RemoveSlices;
 
+	public static String	Dialog_SplitTour_ComboText_TourTileCustom;
+
+	public static String	Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;
+
+	public static String	Dialog_SplitTour_ComboText_TourTitleFromTour;
+
+	public static String	Dialog_SplitTour_ComboText_TourTypeCustom;
+
+	public static String	Dialog_SplitTour_ComboText_TourTypeFromTour;
+
+	public static String	Dialog_SplitTour_ComboText_TourTypePrevious;
+
 	public static String	Dialog_SplitTour_DlgArea_Message;
 
 	public static String	Dialog_SplitTour_DlgArea_Title;
 
 	public static String	Dialog_SplitTour_Label_SplitMethod;
+
+	public static String	Dialog_SplitTour_Label_TourTitle;
+
+	public static String	Dialog_SplitTour_Label_TourTitle_Tooltip;
 
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
@@ -431,6 +447,8 @@ public class Messages extends NLS {
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
+
+	public static String	Image__MyTourbook16;
 	public static String		Image__open_folder_add;
 	public static String		Image__options;
 	public static String		Image__quick_edit;
