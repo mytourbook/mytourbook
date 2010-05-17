@@ -105,6 +105,21 @@ public class TourTypeMenuManager {
 
 		for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
 
+			final TourType tourType = actionRecentTourType.__tourType;
+			if (tourType == null) {
+
+				// disable tour type
+
+				actionRecentTourType.setEnabled(false);
+
+				// hide image because it looks ugly (on windows) when it's disabled
+				actionRecentTourType.setImageDescriptor(null);
+
+				continue;
+			}
+
+			final long tourTypeId = tourType.getTypeId();
+
 			if (isEnabled) {
 
 				// enable tour type
@@ -112,9 +127,7 @@ public class TourTypeMenuManager {
 				boolean isExistingTourTypeId = false;
 
 				// check if the existing tour type should be enabled
-				if (existingTourTypeId != TourDatabase.ENTITY_IS_NOT_SAVED
-						&& actionRecentTourType.__tourType.getTypeId() == existingTourTypeId) {
-
+				if (existingTourTypeId != TourDatabase.ENTITY_IS_NOT_SAVED && tourTypeId == existingTourTypeId) {
 					isExistingTourTypeId = true;
 				}
 
@@ -128,8 +141,7 @@ public class TourTypeMenuManager {
 				} else {
 
 					// set tour type image
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(
-							actionRecentTourType.__tourType.getTypeId());
+					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
 
 					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 				}
