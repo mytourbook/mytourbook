@@ -68,7 +68,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
@@ -1596,15 +1595,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_postSelectionProvider.setSelection(selection);
 	}
 
-	@Override
-	public Object getAdapter(final Class adapter) {
-
-		if (adapter == ColumnViewer.class) {
-			return _tourViewer;
-		}
-
-		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _tourViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	public ColumnManager getColumnManager() {
 		return _columnManager;

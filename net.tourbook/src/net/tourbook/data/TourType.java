@@ -181,4 +181,9 @@ public class TourType implements Comparable<Object> {
 		this.name = name;
 	}
 
+	@Override
+	public String toString() {
+		return "TourType [name=" + name + "]";
+	}
+
 }

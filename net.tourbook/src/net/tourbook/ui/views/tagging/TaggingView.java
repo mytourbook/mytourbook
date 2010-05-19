@@ -65,7 +65,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
@@ -1254,16 +1253,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getAdapter(final Class adapter) {
-
-		if (adapter == ColumnViewer.class) {
-			return _tagViewer;
-		}
-
-		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _tagViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	public ColumnManager getColumnManager() {
 		return _columnManager;

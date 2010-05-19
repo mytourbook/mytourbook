@@ -57,7 +57,6 @@ import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
@@ -1627,16 +1626,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getAdapter(final Class adapter) {
-
-		if (adapter == ColumnViewer.class) {
-			return fSegmentViewer;
-		}
-
-		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return fSegmentViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	public ColumnManager getColumnManager() {
 		return fColumnManager;

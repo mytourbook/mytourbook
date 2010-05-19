@@ -91,7 +91,6 @@ import net.tourbook.util.Util;
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
@@ -178,6 +177,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 // author: Wolfgang Schramm
 // create: 24.08.2007
@@ -272,98 +273,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionDeleteTourMarker				_actionDeleteTourMarker;
 	private ActionModifyColumns					_actionModifyColumns;
 
-	/*
-	 * ui tabs
-	 */
-	private PageBook							_pageBook;
-
-	private Label								_pageNoTour;
-	private Form								_pageEditorForm;
-
-	private CTabFolder							_tabFolder;
-	private CTabItem							_tabTour;
-	private CTabItem							_tabMarker;
-	private CTabItem							_tabSlices;
-	private CTabItem							_tabInfo;
-
-	/**
-	 * contains the controls which are displayed in the first column, these controls are used to get
-	 * the maximum width and set the first column within the differenct section to the same width
-	 */
-	private final ArrayList<Control>			_firstColumnControls			= new ArrayList<Control>();
-	private final ArrayList<Control>			_firstColumnContainerControls	= new ArrayList<Control>();
-	private final ArrayList<Control>			_secondColumnControls			= new ArrayList<Control>();
-
-	private TourChart							_tourChart;
-	private TourData							_tourData;
-	private Composite							_tourContainer;
-	private ScrolledComposite					_scrolledTabInfo;
-
-	private Composite							_infoContainer;
-	private Composite							_markerViewerContainer;
-	private Composite							_sliceContainer;
-
-	private Composite							_sliceViewerContainer;
-	private Label								_timeSliceLabel;
-	private TableViewer							_sliceViewer;
-
-	private Object[]							_sliceViewerItems;
-	private ColumnManager						_sliceColumnManager;
-
-	private TableViewer							_markerViewer;
-	private ColumnManager						_markerColumnManager;
-
-	private FormToolkit							_tk;
-
-	/*
-	 * tab: tour
-	 */
-
-	private Text								_txtTitle;
-	private Text								_txtDescription;
-	private Text								_txtStartLocation;
-	private Text								_txtEndLocation;
-
-	private Spinner								_spinRestPuls;
-	private Spinner								_spinTourCalories;
-
-	private Spinner								_spinTemperature;
-
-	private Spinner								_spinWindDirectionValue;
-	private Spinner								_spinWindSpeedValue;
-	private Combo								_comboWindDirectionText;
-	private Combo								_comboWindSpeedText;
-
-	private CLabel								_lblCloudIcon;
-	private Combo								_comboClouds;
-
-	private Text								_txtTourDistance;
-	private Label								_lblTourDistanceUnit;
-	private Link								_linkTag;
-
-	private Label								_lblTourTags;
-	private Link								_linkTourType;
-	private CLabel								_lblTourType;
-
-	private DateTime							_dtTourDate;
-	private DateTime							_dtStartTime;
-	private DateTime							_dtRecordingTime;
-	private DateTime							_dtDrivingTime;
-	private DateTime							_dtPausedTime;
-
-	/*
-	 * tab: info
-	 */
-	private Text								_txtRefTour;
-	private Text								_txtTimeSlicesCount;
-	private Text								_txtDeviceName;
-	private Text								_txtDistanceSensor;
-	private ImageComboLabel						_txtImportFilePath;
-	private Text								_txtPerson;
-	private Text								_txtTourId;
-	private Text								_txtMergeFromTourId;
-	private Text								_txtMergeIntoTourId;
-
 	private MessageManager						_messageManager;
 
 	private PostSelectionProvider				_postSelectionProvider;
@@ -372,7 +281,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 	private ITourSaveListener					_tourSaveListener;
+
 	private final Calendar						_calendar						= GregorianCalendar.getInstance();
+
+	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
 
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
@@ -393,6 +305,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_nf3NoGroup.setMaximumFractionDigits(3);
 		_nf3NoGroup.setGroupingUsed(false);
 	}
+
 	/**
 	 * <code>true</code>: rows can be selected in the viewer<br>
 	 * <code>false</code>: cell can be selected in the viewer
@@ -510,9 +423,112 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private int									_defaultSpinnerWidth;
 
+	/*
+	 * ##################################################
+	 * UI controls
+	 * ##################################################
+	 */
+
+	// pages
+	private PageBook							_pageBook;
+	private Label								_pageNoTour;
+	private Form								_pageEditorForm;
+
+	// tab folder
+	private CTabFolder							_tabFolder;
+	private CTabItem							_tabTour;
+	private CTabItem							_tabMarker;
+	private CTabItem							_tabSlices;
+	private CTabItem							_tabInfo;
+
+	/**
+	 * contains the controls which are displayed in the first column, these controls are used to get
+	 * the maximum width and set the first column within the differenct section to the same width
+	 */
+	private final ArrayList<Control>			_firstColumnControls			= new ArrayList<Control>();
+	private final ArrayList<Control>			_firstColumnContainerControls	= new ArrayList<Control>();
+	private final ArrayList<Control>			_secondColumnControls			= new ArrayList<Control>();
+
+	private TourChart							_tourChart;
+	private TourData							_tourData;
+	private Composite							_tourContainer;
+	private ScrolledComposite					_scrolledTabInfo;
+
+	private Composite							_infoContainer;
+	private Composite							_markerViewerContainer;
+	private Composite							_sliceContainer;
+
+	private Composite							_sliceViewerContainer;
+	private Label								_timeSliceLabel;
+	private TableViewer							_sliceViewer;
+
+	private Object[]							_sliceViewerItems;
+	private ColumnManager						_sliceColumnManager;
+
+	private TableViewer							_markerViewer;
+	private ColumnManager						_markerColumnManager;
+
+	private FormToolkit							_tk;
+
+	/*
+	 * tab: tour
+	 */
+	private Text								_txtTitle;
+	private Text								_txtDescription;
+	private Text								_txtStartLocation;
+	private Text								_txtEndLocation;
+
+	private Spinner								_spinRestPuls;
+	private Spinner								_spinTourCalories;
+
+	private Spinner								_spinTemperature;
+	private Label								_lblTemperatureUnit;
+
+	private Spinner								_spinWindDirectionValue;
+	private Spinner								_spinWindSpeedValue;
+	private Combo								_comboWindDirectionText;
+	private Combo								_comboWindSpeedText;
+
+	private CLabel								_lblCloudIcon;
+	private Combo								_comboClouds;
+
+	private Text								_txtTourDistance;
+	private Label								_lblTourDistanceUnit;
+	private Link								_linkTag;
+
+	private Label								_lblTourTags;
+	private Link								_linkTourType;
+	private CLabel								_lblTourType;
+
+	private DateTime							_dtTourDate;
+	private DateTime							_dtStartTime;
+	private DateTime							_dtRecordingTime;
+	private DateTime							_dtDrivingTime;
+	private DateTime							_dtPausedTime;
+
 	private Label								_lblSpeedUnit;
 
-	private Label								_lblTemperatureUnit;
+	/*
+	 * tab: info
+	 */
+	private Text								_txtRefTour;
+	private Text								_txtTimeSlicesCount;
+	private Text								_txtDeviceName;
+	private Text								_txtDistanceSensor;
+	private ImageComboLabel						_txtImportFilePath;
+	private Text								_txtPerson;
+	private Text								_txtTourId;
+	private Text								_txtMergeFromTourId;
+	private Text								_txtMergeIntoTourId;
+
+	private Text								_txtDateTimeCreated;
+	private Text								_txtDateTimeModified;
+
+	/*
+	 * ##################################################
+	 * End of UI controls
+	 * ##################################################
+	 */
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -967,7 +983,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public void actionCreateTour() {
 
 		// check if a person is selected
-		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
+		final TourPerson activePerson = TourbookPlugin.getActivePerson();
 		if (activePerson == null) {
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
@@ -1742,10 +1758,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean confirmUndoChanges() {
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// check if confirmation is disabled
-		if (store.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
+		if (prefStore.getBoolean(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR)) {
 
 			return true;
 
@@ -1761,7 +1777,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					null,
 					null);
 
-			store.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
+			prefStore.setValue(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR, dialog.getToggleState());
 
 			return dialog.getReturnCode() == Window.OK;
 		}
@@ -3051,6 +3067,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection410Info(final Composite parent) {
 
+		Label label;
+
 		// keep border style
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
@@ -3059,9 +3077,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
 		{
 			/*
+			 * date/time created
+			 */
+			label = _tk.createLabel(section, Messages.Tour_Editor_Label_DateTimeCreated);
+
+			_txtDateTimeCreated = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeCreated);
+
+			/*
+			 * date/time modified
+			 */
+			label = _tk.createLabel(section, Messages.Tour_Editor_Label_DateTimeModified);
+
+			_txtDateTimeModified = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeModified);
+
+			/*
 			 * reference tours
 			 */
-			Label label = _tk.createLabel(section, Messages.tour_editor_label_ref_tour);
+			label = _tk.createLabel(section, Messages.tour_editor_label_ref_tour);
 			GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
 			_txtRefTour = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
@@ -4101,16 +4135,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sliderSelection;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getAdapter(final Class adapter) {
-
-		if (adapter == ColumnViewer.class) {
-			return _sliceViewer;
-		}
-
-		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	public ColumnManager getColumnManager() {
 
@@ -6142,6 +6175,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		} else {
 			_txtTourId.setText(Long.toString(tourId));
 		}
+
+		/*
+		 * date/time created
+		 */
+		final org.joda.time.DateTime dtCreated = _tourData.getDateTimeCreated();
+		_txtDateTimeCreated.setText(dtCreated == null ? //
+				UI.EMPTY_STRING
+				: _dtFormatter.print(dtCreated.getMillis()));
+
+		/*
+		 * date/time modified
+		 */
+		final org.joda.time.DateTime dtModified = _tourData.getDateTimeModified();
+		_txtDateTimeModified.setText(dtModified == null ? //
+				UI.EMPTY_STRING
+				: _dtFormatter.print(dtModified.getMillis()));
 
 		/*
 		 * merge from tour ID

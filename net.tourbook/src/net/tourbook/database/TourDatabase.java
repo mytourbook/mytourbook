@@ -77,6 +77,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
+import org.joda.time.DateTime;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -85,9 +86,10 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 10;
+	private static final int					TOURBOOK_DB_VERSION							= 11;													// 10.6.0 - 19-05-2010
 
-//	private static final int					TOURBOOK_DB_VERSION							= 10;	// 10.5.0
+//	private static final int					TOURBOOK_DB_VERSION							= 11;	// 10.6.0 - 19-05-2010
+//	private static final int					TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
 //	private static final int					TOURBOOK_DB_VERSION							= 9;	// 10.3.0
 //	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
 //	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
@@ -100,13 +102,11 @@ public class TourDatabase {
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
-	 * database tables, renamed table names to uppercase otherwise conn.getMetaData().getColumns()
-	 * would not work !!!
+	 * !!! database tables, renamed table names to uppercase otherwise
+	 * conn.getMetaData().getColumns() would not work !!!
 	 */
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
-
 	private static final String					TABLE_DB_VERSION							= "DBVERSION";											// "DbVersion";			//$NON-NLS-1$
-
 	public static final String					TABLE_TOUR_BIKE								= "TOURBIKE";											//"TourBike";			//$NON-NLS-1$
 	public static final String					TABLE_TOUR_COMPARED							= "TOURCOMPARED";										// "TourCompared";		//$NON-NLS-1$
 	public static final String					TABLE_TOUR_DATA								= "TOURDATA";											// "TourData";			//$NON-NLS-1$
@@ -400,7 +400,7 @@ public class TourDatabase {
 
 		try {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
+			final Connection conn = getInstance().getConnection();
 			{
 				final ResultSet result = conn.createStatement()//
 						.executeQuery("SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
@@ -1083,6 +1083,15 @@ public class TourDatabase {
 			return null;
 		}
 
+		final DateTime dtNow = new DateTime();
+
+		final long dtSaved = (dtNow.getYear() * 10000000000L)
+				+ (dtNow.getMonthOfYear() * 100000000)
+				+ (dtNow.getDayOfMonth() * 1000000)
+				+ (dtNow.getHourOfDay() * 10000)
+				+ (dtNow.getMinuteOfHour() * 100)
+				+ dtNow.getSecondOfMinute();
+
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		TourData persistedEntity = null;
@@ -1102,11 +1111,15 @@ public class TourDatabase {
 
 						// tour is not yet persisted
 
+						tourData.setDateTimeCreated(dtSaved);
+
 						em.persist(tourData);
 
 						persistedEntity = tourData;
 
 					} else {
+
+						tourData.setDateTimeModified(dtSaved);
 
 						persistedEntity = em.merge(tourData);
 					}
@@ -1250,7 +1263,7 @@ public class TourDatabase {
 
 				// get tour date
 				stmtSelect.setLong(1, tourId);
-				stmtSelect.execute();
+//				stmtSelect.execute();
 
 				final ResultSet result = stmtSelect.executeQuery();
 				while (result.next()) {
@@ -1327,7 +1340,7 @@ public class TourDatabase {
 
 		try {
 
-			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
 
 			if (splashHandler == null) {
 				checkServerCreateRunnable().run(null);
@@ -1821,6 +1834,13 @@ public class TourDatabase {
 				// tourWayPoints is mapped in TourData
 				//
 				// version 10 end
+
+				// version 11 start
+				//
+				+ "	DateTimeCreated			BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
+				+ "	DateTimeModified		BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
+				//
+				// version 11 end
 
 				+ "	serieData 				BLOB NOT NULL						\n" //$NON-NLS-1$
 				//
@@ -2362,7 +2382,7 @@ public class TourDatabase {
 				}
 			};
 
-			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
 
 			if (splashHandler == null) {
 				try {
@@ -2485,16 +2505,22 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 8;
 		}
 
-		boolean isPostUpdate8 = false;
+		boolean isPostUpdate9 = false;
 		if (currentDbVersion == 8) {
 			updateDbDesign_008_009(conn, monitor);
 			currentDbVersion = newVersion = 9;
-			isPostUpdate8 = true;
+			isPostUpdate9 = true;
 		}
 
 		if (currentDbVersion == 9) {
 			updateDbDesign_009_010(conn, monitor);
 			currentDbVersion = newVersion = 10;
+		}
+
+		boolean isPostUpdate11 = false;
+		if (currentDbVersion == 10) {
+			currentDbVersion = newVersion = updateDbDesign_010_011(conn, monitor);
+			isPostUpdate11 = true;
 		}
 
 		/*
@@ -2510,8 +2536,11 @@ public class TourDatabase {
 			TourDatabase.computeComputedValuesForAllTours(monitor);
 			TourManager.getInstance().removeAllToursFromCache();
 		}
-		if (isPostUpdate8) {
+		if (isPostUpdate9) {
 			updateDbDesign_008_009_PostUpdate(conn, monitor);
+		}
+		if (isPostUpdate11) {
+			updateDbDesign_010_011_PostUpdate(conn, monitor);
 		}
 
 		// display info for the successful update
@@ -2821,7 +2850,7 @@ public class TourDatabase {
 		logDbUpdateStart(dbVersion);
 
 		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 9));
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, dbVersion));
 		}
 
 		try {
@@ -2913,6 +2942,117 @@ public class TourDatabase {
 		}
 
 		logDbUpdateEnd(dbVersion);
+	}
+
+	private int updateDbDesign_010_011(final Connection conn, final IProgressMonitor monitor) {
+
+		final int dbVersion = 11;
+
+		logDbUpdateStart(dbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, dbVersion));
+		}
+
+		try {
+
+			String sql;
+			final Statement stmt = conn.createStatement();
+			{
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN DateTimeCreated		BIGINT	DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN DateTimeModified		BIGINT	DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+			}
+			stmt.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		logDbUpdateEnd(dbVersion);
+
+		return dbVersion;
+	}
+
+	/**
+	 * Set create date/time from the tour date
+	 * 
+	 * @param conn
+	 * @param monitor
+	 */
+	private void updateDbDesign_010_011_PostUpdate(final Connection conn, final IProgressMonitor monitor) {
+
+		try {
+
+			final PreparedStatement stmtSelect = conn.prepareStatement(//
+					//
+					"SELECT" //									//$NON-NLS-1$
+								//
+							+ " StartYear," // 					// 1 //$NON-NLS-1$
+							+ " StartMonth," // 				// 2 //$NON-NLS-1$
+							+ " StartDay," // 					// 3 //$NON-NLS-1$
+							+ " StartHour," // 					// 4 //$NON-NLS-1$
+							+ " StartMinute," // 				// 5 //$NON-NLS-1$
+							+ " StartSecond" // 				// 6 //$NON-NLS-1$
+							//
+							+ " FROM " + TABLE_TOUR_DATA //		//$NON-NLS-1$
+							+ " WHERE TourId=?" //				$NON-NLS-1$ //$NON-NLS-1$
+					);
+
+			final PreparedStatement stmtUpdate = conn.prepareStatement(//
+					//
+					"UPDATE " + TABLE_TOUR_DATA //				//$NON-NLS-1$
+							//
+							+ " SET" //							//$NON-NLS-1$
+							//
+							+ " DateTimeCreated=?" //			// 1 //$NON-NLS-1$
+							//
+							+ " WHERE tourId=?"); //			// 2 //$NON-NLS-1$
+
+			int tourIdx = 1;
+			final ArrayList<Long> tourList = getAllTourIds();
+
+			// loop: all tours
+			for (final Long tourId : tourList) {
+
+				if (monitor != null) {
+					monitor.subTask(NLS.bind(//
+							Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
+							new Object[] { tourIdx++, tourList.size() }));
+				}
+
+				// get tour date
+				stmtSelect.setLong(1, tourId);
+				final ResultSet result = stmtSelect.executeQuery();
+
+				while (result.next()) {
+
+					// get date from database
+					final short dbYear = result.getShort(1);
+					final short dbMonth = result.getShort(2);
+					final short dbDay = result.getShort(3);
+					final short dbHour = result.getShort(4);
+					final short dbMinute = result.getShort(5);
+					final short dbSecond = result.getShort(6);
+
+					final long dtCreated = (dbYear * 10000000000L)
+							+ (dbMonth * 100000000)
+							+ (dbDay * 1000000)
+							+ (dbHour * 10000)
+							+ (dbMinute * 100)
+							+ dbSecond;
+
+					// update DateTimeCreated in the database
+					stmtUpdate.setLong(1, dtCreated);
+					stmtUpdate.setLong(2, tourId);
+					stmtUpdate.executeUpdate();
+				}
+			}
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) {

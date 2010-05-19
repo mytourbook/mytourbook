@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.DialogSplitTour;
+import net.tourbook.tour.DialogExtractTour;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -57,7 +57,12 @@ public class ActionSplitTour extends Action {
 			return;
 		}
 
-		new DialogSplitTour(Display.getCurrent().getActiveShell(), //
+		// check person
+		if (TourManager.isPersonSelected() == false) {
+			return;
+		}
+
+		new DialogExtractTour(Display.getCurrent().getActiveShell(), //
 				selectedTours.get(0),
 				_tourSplitIndex).open();
 	}

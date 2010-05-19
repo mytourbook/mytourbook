@@ -140,21 +140,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private Long						tourId;
 
 	/**
-	 * HH (d) hour of tour
-	 */
-	private short						startHour;
-
-	/**
-	 * MM (d) minute of tour
-	 */
-	private short						startMinute;
-
-	/**
-	 * altitude difference for the merged tour
-	 */
-	private int							startSecond;																// db-version 7
-
-	/**
 	 * year of tour start
 	 */
 	private short						startYear;
@@ -168,6 +153,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * dd (d) day of tour
 	 */
 	private short						startDay;
+
+	/**
+	 * HH (d) hour of tour
+	 */
+	private short						startHour;
+
+	/**
+	 * MM (d) minute of tour
+	 */
+	private short						startMinute;
+
+	/**
+	 * altitude difference for the merged tour
+	 */
+	private int							startSecond;																// db-version 7
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
@@ -368,6 +368,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int							mergedAltitudeOffset;														// db-version 7
 
 	/**
+	 * Date/Time when tour data set was created, value is set to tour date before db version 11
+	 */
+	private long						dateTimeCreated;															// db-version 11
+
+	/**
+	 * Date/Time when tour data was modified, default value is 0
+	 */
+	private long						dateTimeModified;															// db-version 11
+
+	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
@@ -541,10 +551,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	private int[]						powerSerie;
 
-	/*
-	 * computed data series
-	 */
-
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
@@ -560,6 +566,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public int[]						gradientSerie;
+
+	/*
+	 * computed data series
+	 */
 
 	@Transient
 	public int[]						tourCompareSerie;
@@ -584,6 +594,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]						segmentSerieIndex;
+
 	/**
 	 * oooo (o) DD-record // offset
 	 */
@@ -598,10 +609,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public int[]						segmentSerieDrivingTime;
+
 	@Transient
 	public int[]						segmentSerieBreakTime;
 	@Transient
 	public int[]						segmentSerieTimeTotal;
+
 	@Transient
 	public int[]						segmentSerieDistanceDiff;
 
@@ -609,10 +622,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[]						segmentSerieDistanceTotal;
 	@Transient
 	public int[]						segmentSerieAltitudeDiff;
-
 	@Transient
 	public int[]						segmentSerieComputedAltitudeDiff;
-//	@Transient
+	//	@Transient
 //	public int[]						segmentSerieComputedAltitudeDown;
 	@Transient
 	public float[]						segmentSerieAltitudeUpH;
@@ -624,12 +636,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public float[]						segmentSeriePace;
-
 	@Transient
 	public float[]						segmentSeriePaceDiff;
+
 	@Transient
 	public float[]						segmentSeriePower;
-
 	@Transient
 	public float[]						segmentSerieGradient;
 
@@ -638,7 +649,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public float[]						segmentSerieCadence;
-
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data are not imported they are from the database
@@ -729,6 +739,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	private TourData					_mergeSourceTourData;
+
+	@Transient
+	private DateTime					_dateTimeCreated;
+
+	@Transient
+	private DateTime					_dateTimeModified;
 
 	public TourData() {}
 
@@ -1460,53 +1476,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-//	/**
-//	 * compute altitude up/down which was used until version 9.07.0
-//	 */
-//	private void computeAltitudeUpDownWithTime() {
-//
-//		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		int lastTime = 0;
-//		int currentAltitude = altitudeSerie[0];
-//		int lastAltitude = currentAltitude;
-//
-//		int altitudeUp = 0;
-//		int altitudeDown = 0;
-//
-//		final int minTimeDiff = 10;
-//
-//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
-//
-//			final int currentTime = timeSerie[timeIndex];
-//
-//			final int timeDiff = currentTime - lastTime;
-//
-//			currentAltitude = altitudeSerie[timeIndex];
-//
-//			if (timeDiff >= minTimeDiff) {
-//
-//				final int altitudeDiff = currentAltitude - lastAltitude;
-//
-//				if (altitudeDiff >= 0) {
-//					altitudeUp += altitudeDiff;
-//				} else {
-//					altitudeDown += altitudeDiff;
-//				}
-//
-//				lastTime = currentTime;
-//				lastAltitude = currentAltitude;
-//			}
-//		}
-//
-//		setTourAltUp(altitudeUp);
-//		setTourAltDown(-altitudeDown);
-//	}
-
 	private void computeAvgPulse() {
 
 		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
@@ -1641,6 +1610,53 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		return totalBreakTime;
 	}
+
+//	/**
+//	 * compute altitude up/down which was used until version 9.07.0
+//	 */
+//	private void computeAltitudeUpDownWithTime() {
+//
+//		if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		int lastTime = 0;
+//		int currentAltitude = altitudeSerie[0];
+//		int lastAltitude = currentAltitude;
+//
+//		int altitudeUp = 0;
+//		int altitudeDown = 0;
+//
+//		final int minTimeDiff = 10;
+//
+//		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
+//
+//			final int currentTime = timeSerie[timeIndex];
+//
+//			final int timeDiff = currentTime - lastTime;
+//
+//			currentAltitude = altitudeSerie[timeIndex];
+//
+//			if (timeDiff >= minTimeDiff) {
+//
+//				final int altitudeDiff = currentAltitude - lastAltitude;
+//
+//				if (altitudeDiff >= 0) {
+//					altitudeUp += altitudeDiff;
+//				} else {
+//					altitudeDown += altitudeDiff;
+//				}
+//
+//				lastTime = currentTime;
+//				lastAltitude = currentAltitude;
+//			}
+//		}
+//
+//		setTourAltUp(altitudeUp);
+//		setTourAltDown(-altitudeDown);
+//	}
 
 	/**
 	 * compute maximum and average fields
@@ -3161,6 +3177,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return calories;
 	}
 
+	/**
+	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
+	 *         date/time is not available
+	 */
+	public DateTime getDateTimeCreated() {
+
+		if (_dateTimeCreated != null || dateTimeCreated == 0) {
+			return _dateTimeCreated;
+		}
+
+		_dateTimeCreated = Util.createDateTimeFromYMDhms(dateTimeCreated);
+
+		return _dateTimeCreated;
+	}
+
+	/**
+	 * @return Returns {@link DateTime} when the tour was modified or <code>null</code> when
+	 *         date/time is not available
+	 */
+	public DateTime getDateTimeModified() {
+
+		if (_dateTimeModified != null || dateTimeModified == 0) {
+			return _dateTimeModified;
+		}
+
+		_dateTimeModified = Util.createDateTimeFromYMDhms(dateTimeModified);
+
+		return _dateTimeModified;
+	}
+
 	public String getDeviceId() {
 		return devicePluginId;
 	}
@@ -3199,14 +3245,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceTravelTime;
 	}
 
+	public int getDeviceWeight() {
+		return deviceWeight;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
-
-	public int getDeviceWeight() {
-		return deviceWeight;
-	}
 
 	public int getDeviceWheel() {
 		return deviceWheel;
@@ -3268,6 +3314,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
+	public boolean getIsDistanceFromSensor() {
+		return isDistanceFromSensor == 1;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3276,10 +3326,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
-
-	public boolean getIsDistanceFromSensor() {
-		return isDistanceFromSensor == 1;
-	}
 
 	/**
 	 * @return the maxAltitude
@@ -3605,6 +3651,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startSecond;
 	}
 
+	public short getStartYear() {
+		return startYear;
+	}
+
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3615,10 +3665,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
-
-	public short getStartYear() {
-		return startYear;
-	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3683,7 +3729,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return the tourDescription
 	 */
 	public String getTourDescription() {
-		return tourDescription == null ? "" : tourDescription; //$NON-NLS-1$
+		return tourDescription == null ? UI.EMPTY_STRING : tourDescription;
 	}
 
 	/**
@@ -3701,7 +3747,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return the tourEndPlace
 	 */
 	public String getTourEndPlace() {
-		return tourEndPlace == null ? "" : tourEndPlace; //$NON-NLS-1$
+		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
 	}
 
 	/**
@@ -3755,7 +3801,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return the tourStartPlace
 	 */
 	public String getTourStartPlace() {
-		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
+		return tourStartPlace == null ? UI.EMPTY_STRING : tourStartPlace;
 	}
 
 	/**
@@ -3769,7 +3815,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @return the tourTitle
 	 */
 	public String getTourTitle() {
-		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
+		return tourTitle == null ? UI.EMPTY_STRING : tourTitle;
+	}
+
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
+	public TourType getTourType() {
+		return tourType;
 	}
 
 //	/**
@@ -3812,14 +3866,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //		}
 //	}
 
-	/**
-	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
-	 *         defined
-	 */
-	public TourType getTourType() {
-		return tourType;
-	}
-
 	public Set<TourWayPoint> getTourWayPoints() {
 		return tourWayPoints;
 	}
@@ -3854,14 +3900,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return weatherWindDir;
 	}
 
+	public int getWeatherWindSpeed() {
+		return weatherWindSpd;
+	}
+
 // not used 5.10.2008
 //	public void setDeviceDistance(final int deviceDistance) {
 //		this.deviceDistance = deviceDistance;
 //	}
-
-	public int getWeatherWindSpeed() {
-		return weatherWindSpd;
-	}
 
 	/**
 	 * @param zoomLevel
@@ -4124,6 +4170,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.calories = calories;
 	}
 
+	public void setDateTimeCreated(final long dateTimeCreated) {
+		this.dateTimeCreated = dateTimeCreated;
+	}
+
+	public void setDateTimeModified(final long dateTimeModified) {
+		this.dateTimeModified = dateTimeModified;
+	}
+
 	public void setDeviceId(final String deviceId) {
 		this.devicePluginId = deviceId;
 	}
@@ -4211,6 +4265,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.restPulse = restPulse;
 	}
 
+//	/**
+//	 * Set the week of the tour, 0 is the first week in the year
+//	 *
+//	 * @param startWeek
+//	 */
+//	public void setStartWeek(final short startWeek) {
+//		this.startWeek = startWeek;
+//	}
+//	/**
+//	 * @param startWeekYear the startWeekYear to set
+//	 */
+//	public void setStartWeekYear(final short startWeekYear) {
+//		this.startWeekYear = startWeekYear;
+//	}
+
 	private void setSpeed(	final int serieIndex,
 							final int speedMetric,
 							final int speedImperial,
@@ -4245,21 +4314,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		paceSerieSeconds[serieIndex] = (int) paceMetricSeconds / 10;
 		paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 	}
-
-//	/**
-//	 * Set the week of the tour, 0 is the first week in the year
-//	 *
-//	 * @param startWeek
-//	 */
-//	public void setStartWeek(final short startWeek) {
-//		this.startWeek = startWeek;
-//	}
-//	/**
-//	 * @param startWeekYear the startWeekYear to set
-//	 */
-//	public void setStartWeekYear(final short startWeekYear) {
-//		this.startWeekYear = startWeekYear;
-//	}
 
 	public void setSpeedSerie(final int[] speedSerie) {
 		this.speedSerie = speedSerie;

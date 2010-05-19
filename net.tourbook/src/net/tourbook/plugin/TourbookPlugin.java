@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,45 +35,59 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID								= "net.tourbook";				//$NON-NLS-1$
+	public static final String				PLUGIN_ID								= "net.tourbook";				//$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR				= "statisticYear";				//$NON-NLS-1$
-	public static final String		EXT_POINT_EXPORT_TOUR					= "exportTour";				//$NON-NLS-1$
-	public static final String		EXT_POINT_PRINT_TOUR					= "printTour";				//$NON-NLS-1$
-	public static final String		EXT_POINT_DEVICE_DATA_READER			= "deviceDataReader";			//$NON-NLS-1$
-	public static final String		EXT_POINT_EXTERNAL_DEVICE_DATA_READER	= "externalDeviceDataReader";	//$NON-NLS-1$
+	public static final String				EXT_POINT_STATISTIC_YEAR				= "statisticYear";				//$NON-NLS-1$
+	public static final String				EXT_POINT_EXPORT_TOUR					= "exportTour";				//$NON-NLS-1$
+	public static final String				EXT_POINT_PRINT_TOUR					= "printTour";					//$NON-NLS-1$
+	public static final String				EXT_POINT_DEVICE_DATA_READER			= "deviceDataReader";			//$NON-NLS-1$
+	public static final String				EXT_POINT_EXTERNAL_DEVICE_DATA_READER	= "externalDeviceDataReader";	//$NON-NLS-1$
 
 	// The shared instance.
-	private static TourbookPlugin	plugin;
+	private static TourbookPlugin			_instance;
 
-	// Resource bundle.
-	private ResourceBundle			resourceBundle;
+	private static ResourceBundle			_resourceBundle;
 
 	/**
 	 * active person (selected in the combobox), is set to <code>null</code> when 'All People' are
 	 * selected
 	 */
-	private TourPerson				fCurrentPerson;
+	private static TourPerson				_activePerson;
 
-	private TourTypeFilter			fActiveTourTypeFilter;
+	private static TourTypeFilter			_activeTourTypeFilter;
 
-	private MyTourbookSplashHandler	fSplashHandler;
+	private static MyTourbookSplashHandler	_splashHandler;
 
-	private BundleContext			fContext;
+	private static BundleContext			_bundleContext;
 
 	/**
 	 * The constructor.
 	 */
 	public TourbookPlugin() {
-		super();
-		plugin = this;
+//		super();
+//		_instance = this;
+	}
+
+	/**
+	 * @return Returns the active selected person or <code>null</code> when no person is selected
+	 */
+	public static TourPerson getActivePerson() {
+		return _activePerson;
+	}
+
+	public static TourTypeFilter getActiveTourTypeFilter() {
+		return _activeTourTypeFilter;
+	}
+
+	public static BundleContext getBundleContext() {
+		return _bundleContext;
 	}
 
 	/**
 	 * Returns the shared instance.
 	 */
 	public static TourbookPlugin getDefault() {
-		return plugin;
+		return _instance;
 	}
 
 	/**
@@ -88,10 +102,26 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * Returns the plugin's resource bundle,
+	 */
+	private static ResourceBundle getResourceBundle() {
+		try {
+			if (_resourceBundle == null) {
+				_resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
+			}
+		} catch (final MissingResourceException x) {
+			_resourceBundle = null;
+		}
+		return _resourceBundle;
+	}
+
+	/**
 	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(final String key) {
-		final ResourceBundle bundle = TourbookPlugin.getDefault().getResourceBundle();
+
+		final ResourceBundle bundle = getResourceBundle();
+
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
 		} catch (final MissingResourceException e) {
@@ -99,19 +129,21 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		}
 	}
 
-	/**
-	 * @return Returns the active selected person or <code>null</code> when no person is selected
-	 */
-	public TourPerson getActivePerson() {
-		return fCurrentPerson;
+	public static MyTourbookSplashHandler getSplashHandler() {
+		return _splashHandler;
 	}
 
-	public TourTypeFilter getActiveTourTypeFilter() {
-		return fActiveTourTypeFilter;
+	public static void setActivePerson(final TourPerson currentPerson) {
+		_activePerson = currentPerson;
 	}
 
-	public BundleContext getBundleContext() {
-		return fContext;
+	public static void setActiveTourTypeFilter(final TourTypeFilter tourTypeFilter) {
+		_activeTourTypeFilter = tourTypeFilter;
+		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
+	}
+
+	public static void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
+		_splashHandler = splashHandler;
 	}
 
 	/**
@@ -131,51 +163,25 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return section;
 	}
 
-	/**
-	 * Returns the plugin's resource bundle,
-	 */
-	public ResourceBundle getResourceBundle() {
-		try {
-			if (resourceBundle == null) {
-				resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
-			}
-		} catch (final MissingResourceException x) {
-			resourceBundle = null;
-		}
-		return resourceBundle;
-	}
-
-	public MyTourbookSplashHandler getSplashHandler() {
-		return fSplashHandler;
-	}
-
 	public void log(final String message, final Throwable exception) {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
 	}
 
-	public void setActivePerson(final TourPerson currentPerson) {
-		fCurrentPerson = currentPerson;
-	}
-
-	public void setActiveTourTypeFilter(final TourTypeFilter tourTypeFilter) {
-		fActiveTourTypeFilter = tourTypeFilter;
-		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
-	}
-
-	public void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
-		fSplashHandler = splashHandler;
-	}
-
 	@Override
 	public void start(final BundleContext context) throws Exception {
+
 		super.start(context);
-		plugin = this;
-		fContext = context;
+
+		_instance = this;
+		_bundleContext = context;
 	}
 
 	@Override
 	public void stop(final BundleContext context) throws Exception {
-		plugin = null;
+
+		_instance = null;
+		_bundleContext = null;
+
 		super.stop(context);
 	}
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.application;
 
@@ -88,6 +88,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private ArrayList<TourTypeFilter>	fTourTypeFilters;
 
 	protected double					fPropertyValue;
+
+	public TourTypeContributionItem() {
+		this(ID);
+	}
+
+	protected TourTypeContributionItem(final String id) {
+		super(id);
+	}
 
 	/**
 	 * @return Returns a list with all tour type filters
@@ -367,14 +375,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		}
 	}
 
-	public TourTypeContributionItem() {
-		this(ID);
-	}
-
-	protected TourTypeContributionItem(final String id) {
-		super(id);
-	}
-
 	/**
 	 * listen for changes in the person list
 	 */
@@ -395,7 +395,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 					if (fPropertyValue != propertyValue) {
 
 						fillFilterComboBox();
-						reselectTourType(plugin.getActiveTourTypeFilter());
+						reselectTourType(TourbookPlugin.getActiveTourTypeFilter());
 					}
 				}
 			}
@@ -553,7 +553,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			activeTourTypeFilter = fTourTypeFilters.get(0);
 		}
 
-		plugin.setActiveTourTypeFilter(activeTourTypeFilter);
+		TourbookPlugin.setActiveTourTypeFilter(activeTourTypeFilter);
 	}
 
 	void saveState(final IMemento memento) {
@@ -581,6 +581,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			fComboTourType.select(selectionIndex);
 		}
 
-		plugin.setActiveTourTypeFilter(fTourTypeFilters.get(selectionIndex));
+		TourbookPlugin.setActiveTourTypeFilter(fTourTypeFilters.get(selectionIndex));
 	}
 }

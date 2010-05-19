@@ -72,7 +72,6 @@ import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.GroupMarker;
@@ -501,7 +500,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						updateViewerPersonData();
 					} else {
 						// keep new active person until the view is visible
-						_newActivePerson = TourbookPlugin.getDefault().getActivePerson();
+						_newActivePerson = TourbookPlugin.getActivePerson();
 					}
 
 				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
@@ -697,7 +696,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		_activePerson = TourbookPlugin.getDefault().getActivePerson();
+		_activePerson = TourbookPlugin.getActivePerson();
 
 		restoreState();
 	}
@@ -1329,7 +1328,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final boolean canMergeIntoTour = selectedValidTours == 1;
 
 		// action: save tour with person
-		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
+		final TourPerson person = TourbookPlugin.getActivePerson();
 		if (person != null) {
 			_actionSaveTourWithPerson.setText(NLS.bind(
 					Messages.import_data_action_save_tour_with_person,
@@ -1427,7 +1426,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		if (TourbookPlugin.getDefault().getActivePerson() != null) {
+		if (TourbookPlugin.getActivePerson() != null) {
 			menuMgr.add(_actionSaveTourWithPerson);
 		}
 		menuMgr.add(_actionSaveTour);
@@ -1509,16 +1508,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getAdapter(final Class adapter) {
-
-		if (adapter == ColumnViewer.class) {
-			return _tourViewer;
-		}
-
-		return Platform.getAdapterManager().getAdapter(this, adapter);
-	}
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _tourViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	public ArrayList<TourData> getAllSelectedTours() {
 
@@ -1952,7 +1950,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateViewerPersonData() {
 
-		_activePerson = TourbookPlugin.getDefault().getActivePerson();
+		_activePerson = TourbookPlugin.getActivePerson();
 
 		// update person in save action
 		enableActions();

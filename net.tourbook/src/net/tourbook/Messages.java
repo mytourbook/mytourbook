@@ -54,6 +54,12 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String	Dialog_ExtractTour_DlgArea_Message;
+
+	public static String	Dialog_ExtractTour_DlgArea_Title;
+
+	public static String	Dialog_ExtractTour_Label_SplitMethod;
+
 	public static String		Dialog_Print_Chk_TourRangeDisabled;
 	public static String		Dialog_Print_Chk_TourRangeWithDistance;
 	public static String		Dialog_Print_Chk_TourRangeWithoutDistance;
@@ -275,6 +281,10 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_ComboText_ConcatenateTime;
 	public static String		Dialog_JoinTours_ComboText_KeepTime;
 	public static String		Dialog_JoinTours_ComboText_MarkerTourTime;
+	public static String	Dialog_JoinTours_ComboText_TourTileCustom;
+
+	public static String	Dialog_JoinTours_ComboText_TourTitleFromTour;
+
 	public static String		Dialog_JoinTours_ComboText_TourTypeCustom;
 	public static String		Dialog_JoinTours_ComboText_TourTypeFromTour;
 	public static String		Dialog_JoinTours_ComboText_TourTypePrevious;
@@ -299,6 +309,8 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
 	public static String		Dialog_JoinTours_Label_Description;
 	public static String		Dialog_JoinTours_Label_DeviceName;
+
+	public static String	Dialog_JoinTours_Label_JoinMethod;
 	public static String		Dialog_JoinTours_Label_OtherFields;
 	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
 	public static String		Dialog_JoinTours_Label_Title;
@@ -307,7 +319,7 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Label_TourDate;
 	public static String		Dialog_JoinTours_Label_TourMarker;
 	public static String		Dialog_JoinTours_Label_TourMarkerText;
-	public static String		Dialog_JoinTours_Label_TourStartDateTime;
+
 	public static String		Dialog_JoinTours_Label_TourTime;
 	public static String		Dialog_JoinTours_Label_TourType;
 	public static String		Dialog_JoinTours_Link_TourType;
@@ -319,7 +331,13 @@ public class Messages extends NLS {
 
 	public static String		Dialog_SelectGraphs_Title;
 
+	public static String	Dialog_SplitTour_Checkbox_IncludeDescription;
+
+	public static String	Dialog_SplitTour_ComboText_CustomTime;
+
 	public static String	Dialog_SplitTour_ComboText_KeepSlices;
+
+	public static String	Dialog_SplitTour_ComboText_KeepTime;
 
 	public static String	Dialog_SplitTour_ComboText_RemoveSlices;
 
@@ -340,6 +358,8 @@ public class Messages extends NLS {
 	public static String	Dialog_SplitTour_DlgArea_Title;
 
 	public static String	Dialog_SplitTour_Label_SplitMethod;
+
+	public static String	Dialog_SplitTour_Label_TourStartDateTime;
 
 	public static String	Dialog_SplitTour_Label_TourTitle;
 
@@ -553,6 +573,8 @@ public class Messages extends NLS {
 	public static String		merge_tour_source_graph_heartbeat_tooltip;
 	public static String		merge_tour_source_graph_temperature;
 	public static String		merge_tour_source_graph_temperature_tooltip;
+
+	public static String	NT001_DialogExtractTour_InvalidTourData;
 
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
@@ -785,6 +807,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
+
+	public static String	Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
@@ -792,6 +816,10 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Update_TourWeek_Info;
 	public static String		Tour_Database_UpdateDone;
 	public static String		Tour_Database_UpdateInfo;
+
+	public static String	Tour_Editor_Label_DateTimeCreated;
+
+	public static String	Tour_Editor_Label_DateTimeModified;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;

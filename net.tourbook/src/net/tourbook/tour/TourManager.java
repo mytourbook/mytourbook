@@ -220,6 +220,7 @@ public class TourManager {
 
 		return true;
 	}
+
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -452,6 +453,28 @@ public class TourManager {
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData)
 				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
+	}
+
+	/**
+	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
+	 * person is not selected.
+	 * 
+	 * @return Returns <code>true</code> when a person is selected otherwise <code>false</code>
+	 */
+	public static boolean isPersonSelected() {
+
+		final TourPerson activePerson = TourbookPlugin.getActivePerson();
+
+		if (activePerson == null) {
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
+					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1588,26 +1611,6 @@ public class TourManager {
 			// load tour from database
 			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
 		}
-	}
-
-	/**
-	 * @return Returns the active selected person in the toolbar or <code>null</code> when no person
-	 *         is selected.
-	 */
-	public TourPerson getActivePerson() {
-
-		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
-
-		if (activePerson == null) {
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
-					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
-
-			return null;
-		}
-
-		return activePerson;
 	}
 
 	public TourChart getActiveTourChart() {

@@ -80,7 +80,7 @@ public class PersonContributionItem extends CustomControlContribution {
 					// fill people combobox with modified people list
 					fillPeopleComboBox();
 
-					final TourPerson currentPerson = _activator.getActivePerson();
+					final TourPerson currentPerson = TourbookPlugin.getActivePerson();
 
 					// reselect the person which was selected before
 					if (currentPerson == null) {
@@ -151,10 +151,10 @@ public class PersonContributionItem extends CustomControlContribution {
 
 				if (selectedIndex == 0) {
 					// all people are selected
-					_activator.setActivePerson(null);
+					TourbookPlugin.setActivePerson(null);
 				} else {
 					// a person is selected
-					_activator.setActivePerson(_allPeople.get(selectedIndex - 1));
+					TourbookPlugin.setActivePerson(_allPeople.get(selectedIndex - 1));
 				}
 
 				fireEventNewPersonIsSelected();
@@ -239,7 +239,7 @@ public class PersonContributionItem extends CustomControlContribution {
 			_cboPeople.select(0);
 		}
 
-		_activator.setActivePerson(currentPerson);
+		TourbookPlugin.setActivePerson(currentPerson);
 	}
 
 	/**

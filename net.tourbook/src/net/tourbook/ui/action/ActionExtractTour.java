@@ -58,6 +58,11 @@ public class ActionExtractTour extends Action {
 			return;
 		}
 
+		// check person
+		if (TourManager.isPersonSelected() == false) {
+			return;
+		}
+
 		new DialogExtractTour(Display.getCurrent().getActiveShell(), //
 				selectedTours.get(0),
 				_tourStartIndex,
