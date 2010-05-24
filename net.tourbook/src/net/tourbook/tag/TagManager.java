@@ -272,7 +272,7 @@ public class TagManager {
 		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 		for (final String tagId : allStateTagIds) {
 			try {
-				final TourTag tag = allTags.get(Long.parseLong(tagId));
+				final TourTag tag = allTags.get(Long.valueOf(tagId));
 				if (tag != null) {
 					_recentTags.add(tag);
 				}

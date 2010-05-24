@@ -400,7 +400,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
 						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-					final double propertyValue = Double.valueOf(event.getNewValue().toString()).doubleValue();
+					final String newValue = event.getNewValue().toString();
+					final double propertyValue = Double.parseDouble(newValue);
 
 					// check if the event was originated from this tour type
 					// combobox

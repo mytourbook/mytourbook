@@ -1952,7 +1952,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		if (selectedTourIds != null) {
 			for (final String tourId : selectedTourIds) {
 				try {
-					_selectedTourIds.add(Long.parseLong(tourId));
+					_selectedTourIds.add(Long.valueOf(tourId));
 				} catch (final NumberFormatException e) {
 					// ignore
 				}

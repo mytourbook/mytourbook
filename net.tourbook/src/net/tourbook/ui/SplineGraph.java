@@ -239,12 +239,13 @@ public class SplineGraph extends Canvas {
 		final double[] graphPointsY = fSplineData.graphYValues;
 		final boolean[] isPointMovable = fSplineData.isPointMovable;
 
-		final int pointLength = graphPointsX.length;
 
 		// check if 2 points are available
-		if (graphPointsX == null || pointLength < 2) {
+		if (graphPointsX == null || graphPointsX.length < 2) {
 			return;
 		}
+
+		final int pointLength = graphPointsX.length;
 
 		float graphXMin = fXMinComputed;
 		float graphXMax = fXMaxComputed;

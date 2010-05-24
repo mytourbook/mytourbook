@@ -42,6 +42,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
+import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -418,7 +419,7 @@ public class GraphColorProvider {
 
 				// check value colors
 				final IMemento[] mementoValueColors = mementoLegendColor.getChildren(MEMENTO_CHILD_VALUE_COLOR);
-				if (mementoLegendColors == null) {
+				if (mementoValueColors == null) {
 					continue;
 				}
 

@@ -250,7 +250,7 @@ public class TourManager {
 		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(_prefStore
 				.getString(ITourbookPreferences.GRAPH_VISIBLE));
 		for (final String prefGraphId : prefGraphIds) {
-			chartConfig.addVisibleGraph(Integer.valueOf(prefGraphId));
+			chartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
 		// set the unit which is shown on the x-axis

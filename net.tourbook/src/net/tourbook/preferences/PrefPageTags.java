@@ -131,7 +131,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	/**
 	 * Sort the tags and categories
 	 */
-	private final class TagViewerComparator extends ViewerComparator {
+	private final static class TagViewerComparator extends ViewerComparator {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {

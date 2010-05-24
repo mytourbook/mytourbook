@@ -480,7 +480,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
 
 					final String newValue = event.getNewValue().toString();
-					final Integer prefProfileKey = Integer.parseInt(newValue);
+					final Integer prefProfileKey = Integer.valueOf(newValue);
 
 					if (prefProfileKey != _selectedProfileKey) {
 

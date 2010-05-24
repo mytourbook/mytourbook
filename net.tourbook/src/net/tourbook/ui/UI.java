@@ -1201,7 +1201,7 @@ public class UI {
 			// tour type was not found use default color
 
 			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_WHITE);
-			drawingColors.colorDark = display.getSystemColor(SWT.COLOR_WHITE);
+			drawingColors.colorDark = drawingColors.colorBright;
 			drawingColors.colorLine = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
 			// prevent disposing the colors
