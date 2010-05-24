@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.HashMap;
@@ -36,71 +35,72 @@ public abstract class ChartDataSerie {
 	/**
 	 * Default color, when default color is not set
 	 */
-	private static RGB				DefaultDefaultRGB				= new RGB(0xFF, 0xA5, 0xCB);
+	private static RGB				DEFAULT_DEFAULT_RGB				= new RGB(0xFF, 0xA5, 0xCB);
 
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
 	 * value. When lowValues is null then the low values is set to 0
 	 */
-	int[][]							fLowValues;
+	int[][]							_lowValues;
 
-	int[][]							fHighValues;
+	int[][]							_highValues;
 
 	/**
 	 * divisor for highValues
 	 */
-	private int						valueDivisor					= 1;
+	private int						_valueDivisor					= 1;
 
 	/**
 	 * unit which is drawn on the x-axis
 	 */
-	private int						axisUnit						= AXIS_UNIT_NUMBER;
+	private int						_axisUnit						= AXIS_UNIT_NUMBER;
 
 	/**
 	 * Text label for the unit
 	 */
-	private String					unitLabel						= new String();
+	private String					_unitLabel						= new String();
 
 	/**
 	 * Text label for the chart data, e.g. distance, altitude, speed...
 	 */
-	private String					label							= new String();
+	private String					_label							= new String();
 
-	private HashMap<String, Object>	fCustomData						= new HashMap<String, Object>();
+	private HashMap<String, Object>	_customData						= new HashMap<String, Object>();
 
 	/**
 	 * max value which is used to draw the chart
 	 */
-	protected int					fVisibleMaxValue;
+	protected int					_visibleMaxValue;
 
 	/**
 	 * min value which is used to draw the chart
 	 */
-	protected int					fVisibleMinValue;
+	protected int					_visibleMinValue;
 
-	private RGB						fRgbBright[]					= new RGB[] { new RGB(255, 0, 0) };
-	private RGB						fRgbDark[]						= new RGB[] { new RGB(0, 0, 255) };
-	private RGB						fRgbLine[]						= new RGB[] { new RGB(0, 255, 0) };
+	private RGB						_rgbBright[]					= new RGB[] { new RGB(255, 0, 0) };
+	private RGB						_rgbDark[]						= new RGB[] { new RGB(0, 0, 255) };
+	private RGB						_rgbLine[]						= new RGB[] { new RGB(0, 255, 0) };
+
 	/**
 	 * minimum value found in the provided values
 	 */
-	int								fOriginalMinValue;
+	int								_originalMinValue;
 
 	/**
 	 * maximum value found in the provided values
 	 */
-	int								fOriginalMaxValue;
+	int								_originalMaxValue;
 
-	private RGB						fDefaultRGB;
+	private RGB						_defaultRGB;
 
 	/**
 	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
 	 */
-	private boolean					fIsForceMinValue				= false;
-	private boolean					fIsForceMaxValue				= false;
+	private boolean					_isForceMinValue				= false;
+	private boolean					_isForceMaxValue				= false;
 
 	public int getAxisUnit() {
-		return axisUnit;
+		return _axisUnit;
 	}
 
 	/**
@@ -108,8 +108,8 @@ public abstract class ChartDataSerie {
 	 * it was not been set.
 	 */
 	public Object getCustomData(final String key) {
-		if (fCustomData.containsKey(key)) {
-			return fCustomData.get(key);
+		if (_customData.containsKey(key)) {
+			return _customData.get(key);
 		} else {
 			return null;
 		}
@@ -124,86 +124,86 @@ public abstract class ChartDataSerie {
 		 * when default color is not set, return an ugly color to see in the ui that something is
 		 * wrong
 		 */
-		if (fDefaultRGB == null) {
-			return DefaultDefaultRGB;
+		if (_defaultRGB == null) {
+			return DEFAULT_DEFAULT_RGB;
 		}
 
-		return fDefaultRGB;
+		return _defaultRGB;
 	}
 
 	/**
 	 * @return returns the value array
 	 */
 	public int[][] getHighValues() {
-		return fHighValues;
+		return _highValues;
 	}
 
 	public String getLabel() {
-		return label;
+		return _label;
 	}
 
 	/**
 	 * @return Returns the lowValues.
 	 */
 	public int[][] getLowValues() {
-		return fLowValues;
+		return _lowValues;
 	}
 
 	public int getOriginalMaxValue() {
-		return fOriginalMaxValue;
+		return _originalMaxValue;
 	}
 
 	public int getOriginalMinValue() {
-		return fOriginalMinValue;
+		return _originalMinValue;
 	}
 
 	public RGB[] getRgbBright() {
-		return fRgbBright;
+		return _rgbBright;
 	}
 
 	public RGB[] getRgbDark() {
-		return fRgbDark;
+		return _rgbDark;
 	}
 
 	public RGB[] getRgbLine() {
-		return fRgbLine;
+		return _rgbLine;
 	}
 
 	/**
 	 * @return Returns the unit label for the data, e.g. m km/h sec h:m
 	 */
 	public String getUnitLabel() {
-		return unitLabel;
+		return _unitLabel;
 	}
 
 	public int getValueDivisor() {
-		return valueDivisor;
+		return _valueDivisor;
 	}
 
 	/**
 	 * @return returns the maximum value in the data serie
 	 */
 	public int getVisibleMaxValue() {
-		return fVisibleMaxValue;
+		return _visibleMaxValue;
 	}
 
 	/**
 	 * @return returns the minimum value in the data serie
 	 */
 	public int getVisibleMinValue() {
-		return fVisibleMinValue;
+		return _visibleMinValue;
 	}
 
 	public boolean isForceMaxValue() {
-		return fIsForceMaxValue;
+		return _isForceMaxValue;
 	}
 
 	public boolean isForceMinValue() {
-		return fIsForceMinValue;
+		return _isForceMinValue;
 	}
 
 	public void setAxisUnit(final int axisUnit) {
-		this.axisUnit = axisUnit;
+		this._axisUnit = axisUnit;
 	}
 
 	/**
@@ -211,41 +211,41 @@ public abstract class ChartDataSerie {
 	 * value.
 	 */
 	public void setCustomData(final String key, final Object value) {
-		fCustomData.put(key, value);
+		_customData.put(key, value);
 	}
 
 	public void setDefaultRGB(final RGB color) {
-		fDefaultRGB = color;
+		_defaultRGB = color;
 	}
 
 	public void setLabel(final String label) {
-		this.label = label;
+		this._label = label;
 	}
 
 	void setMinMaxValues(final int valueSeries[][]) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
-			fVisibleMaxValue = fVisibleMinValue = 0;
-			fOriginalMaxValue = fOriginalMinValue = 0;
-			fHighValues = new int[1][2];
-			fLowValues = new int[1][2];
+			_visibleMaxValue = _visibleMinValue = 0;
+			_originalMaxValue = _originalMinValue = 0;
+			_highValues = new int[1][2];
+			_lowValues = new int[1][2];
 		} else {
 
-			fHighValues = valueSeries;
+			_highValues = valueSeries;
 
 			// set initial min/max value
-			fVisibleMaxValue = fVisibleMinValue = valueSeries[0][0];
+			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
 
 			// calculate min/max highValues
 			for (final int[] valueSerie : valueSeries) {
-				
+
 				if (valueSerie == null) {
 					continue;
 				}
-				
+
 				for (final int value : valueSerie) {
-					fVisibleMaxValue = (fVisibleMaxValue >= value) ? fVisibleMaxValue : value;
-					fVisibleMinValue = (fVisibleMinValue <= value) ? fVisibleMinValue : value;
+					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 				}
 			}
 
@@ -253,32 +253,32 @@ public abstract class ChartDataSerie {
 			 * force the min/max values to have not the same value this is necessary to display a
 			 * visible line in the chart
 			 */
-			if (fVisibleMinValue == fVisibleMaxValue) {
+			if (_visibleMinValue == _visibleMaxValue) {
 
-				fVisibleMaxValue++;
+				_visibleMaxValue++;
 
-				if (fVisibleMinValue > 0) {
-					fVisibleMinValue--;
+				if (_visibleMinValue > 0) {
+					_visibleMinValue--;
 				}
 			}
 
-			fOriginalMinValue = fVisibleMinValue;
-			fOriginalMaxValue = fVisibleMaxValue;
+			_originalMinValue = _visibleMinValue;
+			_originalMaxValue = _visibleMaxValue;
 		}
 	}
 
 	abstract void setMinMaxValues(int[][] lowValues, int[][] highValues);
 
 	public void setRgbBright(final RGB[] rgbBright) {
-		fRgbBright = rgbBright;
+		_rgbBright = rgbBright;
 	}
 
 	public void setRgbDark(final RGB[] rgbDark) {
-		fRgbDark = rgbDark;
+		_rgbDark = rgbDark;
 	}
 
 	public void setRgbLine(final RGB[] rgbLine) {
-		fRgbLine = rgbLine;
+		_rgbLine = rgbLine;
 	}
 
 	/**
@@ -286,29 +286,29 @@ public abstract class ChartDataSerie {
 	 *            The measurement to set.
 	 */
 	public void setUnitLabel(final String unit) {
-		this.unitLabel = unit == null ? "" : unit; //$NON-NLS-1$
+		this._unitLabel = unit == null ? Util.EMPTY_STRING : unit;
 	}
 
 	public void setValueDivisor(final int valueDivisor) {
-		this.valueDivisor = valueDivisor;
+		this._valueDivisor = valueDivisor;
 	}
 
 	public void setVisibleMaxValue(final int maxValue) {
-		fVisibleMaxValue = maxValue;
+		_visibleMaxValue = maxValue;
 	}
 
 	public void setVisibleMaxValue(final int maxValue, final boolean forceValue) {
-		fVisibleMaxValue = maxValue > fVisibleMinValue ? maxValue : fVisibleMinValue + 1 * valueDivisor;
-		fIsForceMaxValue = forceValue;
+		_visibleMaxValue = maxValue > _visibleMinValue ? maxValue : _visibleMinValue + 1 * _valueDivisor;
+		_isForceMaxValue = forceValue;
 	}
 
 	public void setVisibleMinValue(final int minValue) {
-		fVisibleMinValue = minValue;
+		_visibleMinValue = minValue;
 	}
 
 	public void setVisibleMinValue(final int minValue, final boolean forceValue) {
-		fVisibleMinValue = minValue;
-		fIsForceMinValue = forceValue;
+		_visibleMinValue = minValue;
+		_isForceMinValue = forceValue;
 	}
 
 }

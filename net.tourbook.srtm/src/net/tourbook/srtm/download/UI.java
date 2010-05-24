@@ -13,32 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistics;
+package net.tourbook.srtm.download;
 
-import net.tourbook.chart.ChartComponents;
-import net.tourbook.ui.tourChart.TourInfo;
+public interface UI {
 
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Control;
-
-public class StatisticTourInfo extends TourInfo {
-
-	public StatisticTourInfo(final Control control) {
-		super(control);
-	}
-
-	@Override
-	public void show(final Point point) {
-
-		/*
-		 * delay tooltip because first the bar must be selected which selects the tour
-		 */
-		_infoControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
-			public void run() {
-				_tourInfoToolTip.show(point);
-			}
-		});
-
-	}
+	String	EMPTY_STRING	= "";	//$NON-NLS-1$
 
 }

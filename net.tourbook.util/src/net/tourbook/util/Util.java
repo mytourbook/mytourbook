@@ -15,13 +15,17 @@
  *******************************************************************************/
 package net.tourbook.util;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Calendar;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IViewPart;
@@ -317,6 +321,21 @@ public class Util {
 //	  return s;
 //	}
 
+	public static String getSQLExceptionText(final SQLException e) {
+
+		final StringBuilder sb = new StringBuilder()//
+				.append("SQLException") //$NON-NLS-1$
+				.append(UI.NEW_LINE2)
+				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
+				.append(UI.NEW_LINE);
+
+		return sb.toString();
+	}
+
 	/**
 	 * @param state
 	 * @param key
@@ -326,21 +345,6 @@ public class Util {
 	 */
 	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
-	}
-
-	/**
-	 * @param state
-	 * @param key
-	 * @param defaultValue
-	 * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
-	 *         default value is returned.
-	 */
-	public static double getStateDouble(final IDialogSettings state, final String key, final double defaultValue) {
-		try {
-			return state.get(key) == null ? defaultValue : state.getDouble(key);
-		} catch (final NumberFormatException e) {
-			return defaultValue;
-		}
 	}
 
 //	/**
@@ -360,6 +364,21 @@ public class Util {
 //			return states[selectedIndex];
 //		}
 //	}
+
+	/**
+	 * @param state
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
+	 *         default value is returned.
+	 */
+	public static double getStateDouble(final IDialogSettings state, final String key, final double defaultValue) {
+		try {
+			return state.get(key) == null ? defaultValue : state.getDouble(key);
+		} catch (final NumberFormatException e) {
+			return defaultValue;
+		}
+	}
 
 	/**
 	 * @param combo
@@ -500,6 +519,24 @@ public class Util {
 		state.put(stateKey, stateIndices);
 	}
 
+	public static void showSQLException(SQLException e) {
+
+		while (e != null) {
+
+			final String sqlExceptionText = getSQLExceptionText(e);
+
+			System.out.println(sqlExceptionText);
+			e.printStackTrace();
+
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), //
+					"SQL Error",//$NON-NLS-1$
+					sqlExceptionText);
+
+			e = e.getNextException();
+		}
+
+	}
+
 	/**
 	 * Open view and activate it
 	 * 
@@ -535,4 +572,14 @@ public class Util {
 		return null;
 	}
 
+	public static void sqlClose(final Statement stmt) {
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (final SQLException e) {
+				showSQLException(e);
+			}
+		}
+	}
 }

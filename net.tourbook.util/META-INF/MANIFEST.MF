@@ -7,7 +7,7 @@ Bundle-Activator: net.tourbook.util.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.util
 Import-Package: org.joda.time

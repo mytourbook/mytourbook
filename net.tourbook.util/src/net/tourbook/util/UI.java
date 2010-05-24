@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,16 @@ public class UI {
 
 	public static final String	EMPTY_STRING			= "";															//$NON-NLS-1$
 	public static final String	STRING_0				= "0";															//$NON-NLS-1$
+
+	/**
+	 * contains a new line
+	 */
+	public static final String	NEW_LINE				= "\n";														//$NON-NLS-1$
+
+	/**
+	 * contains 2 new lines
+	 */
+	public static final String	NEW_LINE2				= "\n\n";														//$NON-NLS-1$
 
 	public static void addSashColorHandler(final Sash sash) {
 
@@ -139,7 +149,7 @@ public class UI {
 
 		return new VerifyListener() {
 			public void verifyText(final VerifyEvent e) {
-				if (e.text.equals("")) { //$NON-NLS-1$
+				if (e.text.equals(UI.EMPTY_STRING)) {
 					return;
 				}
 				try {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -281,11 +281,11 @@ public class ChartComponents extends Composite {
 		switch (xAxisUnit) {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
-			unitValue = ChartUtil.roundTimeValue(unitRawValue);
+			unitValue = Util.roundTimeValue(unitRawValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
-			unitValue = ChartUtil.roundDecimalValue(unitRawValue);
+			unitValue = Util.roundDecimalValue(unitRawValue);
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_WEEK:
@@ -340,7 +340,7 @@ public class ChartComponents extends Composite {
 				}
 
 				units.add(new ChartUnit(unitPos, //
-						ChartUtil.formatValue(unitLabelValue, //
+						Util.formatValue(unitLabelValue, //
 								xAxisUnit,
 								valueDivisor,
 								false)));
@@ -432,12 +432,12 @@ public class ChartComponents extends Composite {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 		case ChartDataSerie.AXIS_UNIT_MINUTE_SECOND:
-			graphUnit = ChartUtil.roundTimeValue(graphUnitValue);
+			graphUnit = Util.roundTimeValue(graphUnitValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			// unit is a decimal number
-			graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
+			graphUnit = Util.roundDecimalValue(graphUnitValue);
 			break;
 		}
 
@@ -484,7 +484,7 @@ public class ChartComponents extends Composite {
 			graphMinValue = Math.max(0, (((yData.getVisibleMinValue() / 3600) * 3600)));
 
 			graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
-			graphUnit = ChartUtil.roundTimeValue((int) graphUnit);
+			graphUnit = Util.roundTimeValue((int) graphUnit);
 		}
 
 		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
@@ -525,7 +525,7 @@ public class ChartComponents extends Composite {
 		// loop: create unit label for all units
 		while (graphValue <= graphMaxValue) {
 
-			final String unitLabel = ChartUtil.formatValue(graphValue, unitType, valueDivisor, false);
+			final String unitLabel = Util.formatValue(graphValue, unitType, valueDivisor, false);
 
 			unitList.add(new ChartUnit(graphValue, unitLabel));
 
@@ -540,7 +540,7 @@ public class ChartComponents extends Composite {
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
 
-			unitList.add(new ChartUnit(graphMaxValue, "")); //$NON-NLS-1$
+			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
 		}
 	}
 
@@ -727,7 +727,7 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 
-		final int months = xData.fHighValues[0].length;
+		final int months = xData._highValues[0].length;
 		final float scaleX = (float) devGraphWidth / months;
 		drawingData.setScaleX(scaleX);
 
@@ -846,7 +846,7 @@ public class ChartComponents extends Composite {
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 		final int[] yearValues = chartSegments.years;
 
-		final int yearCounter = xData.fHighValues[0].length;
+		final int yearCounter = xData._highValues[0].length;
 		final float scaleX = (float) devGraphWidth / yearCounter;
 		drawingData.setScaleX(scaleX);
 
@@ -1244,7 +1244,7 @@ public class ChartComponents extends Composite {
 		final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
 		final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
-		final int[] xValues = _chartDataModel.getXData().fHighValues[0];
+		final int[] xValues = _chartDataModel.getXData()._highValues[0];
 		final boolean centerSliderPosition = sliderPosition.isCenterSliderPosition();
 
 		// move left slider

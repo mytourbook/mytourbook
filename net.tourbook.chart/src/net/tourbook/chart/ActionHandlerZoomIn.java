@@ -21,12 +21,12 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerZoomIn extends ActionHandler {
 
 	public ActionHandlerZoomIn() {
-		fCommandId = Chart.COMMAND_ID_ZOOM_IN;
+		_commandId = Chart.COMMAND_ID_ZOOM_IN;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fChart.onExecuteZoomIn();
+		_chart.onExecuteZoomIn();
 
 		return null;
 	}

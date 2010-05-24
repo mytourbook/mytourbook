@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/bytecode/cglib/cglib-2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="slf4j-api-1.5.8.jar" sourcepath="L:/java-resources/slf4j/slf4j-1.5.8/slf4j-api/src"/>
 	<classpathentry exported="true" kind="lib" path="slf4j-log4j12-1.5.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/hibernate-entitymanager.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-entitymanager-3.4.0.GA/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/dom4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="L:/java-resources/ejb3-persistence"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/hibernate3.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-core-3.3.2.GA/project/core/src"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/optional/c3p0/c3p0-0.9.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/optional/ehcache/ehcache-1.2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/commons-collections-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/javassist-3.9.0.GA.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/required/jta-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/dom4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/lib/ejb3-persistence.jar" sourcepath="L:/java-resources/ejb3-persistence"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.4.0/hibernate-entitymanager.jar" sourcepath="L:/java-resources/hibernate-3.4.0/hibernate-entitymanager-3.4.0.GA/src"/>
-	<classpathentry exported="true" kind="lib" path="slf4j-api-1.5.8.jar" sourcepath="L:/java-resources/slf4j/slf4j-1.5.8/slf4j-api/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/bytecode/cglib/cglib-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/optional/c3p0/c3p0-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-3.3.2/lib/optional/ehcache/ehcache-1.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

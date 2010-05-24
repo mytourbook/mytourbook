@@ -63,6 +63,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionRemoveAllTags	_actionRemoveAllTags;
 	private final ActionOpenPrefDialog	_actionOpenTagPrefs;
 
+
 	public TourChartContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
 		_chart = chart;

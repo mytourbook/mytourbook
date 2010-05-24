@@ -72,7 +72,7 @@ public class ChartComponentAxis extends Canvas {
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				_axisImage = ChartUtil.disposeResource(_axisImage);
+				_axisImage = Util.disposeResource(_axisImage);
 			}
 		});
 
@@ -143,8 +143,8 @@ public class ChartComponentAxis extends Canvas {
 			}
 		}
 
-		if (ChartUtil.canReuseImage(_axisImage, axisRect) == false) {
-			_axisImage = ChartUtil.createImage(getDisplay(), _axisImage, axisRect);
+		if (Util.canReuseImage(_axisImage, axisRect) == false) {
+			_axisImage = Util.createImage(getDisplay(), _axisImage, axisRect);
 		}
 
 		// draw into the image
@@ -203,7 +203,7 @@ public class ChartComponentAxis extends Canvas {
 				// create title with unit label
 				final StringBuilder sbTitle = new StringBuilder(title);
 				if (unitLabel.length() > 0) {
-					sbTitle.append(ChartUtil.DASH_WITH_SPACE);
+					sbTitle.append(Util.DASH_WITH_SPACE);
 					sbTitle.append(unitLabel);
 				}
 

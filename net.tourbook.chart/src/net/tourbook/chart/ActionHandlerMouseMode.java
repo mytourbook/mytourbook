@@ -21,7 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerMouseMode extends ActionHandler {
 
 	public ActionHandlerMouseMode() {
-		fCommandId = Chart.COMMAND_ID_MOUSE_MODE;
+		_commandId = Chart.COMMAND_ID_MOUSE_MODE;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -29,7 +29,7 @@ public class ActionHandlerMouseMode extends ActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fChart.onExecuteMouseMode(isItemChecked);
+			_chart.onExecuteMouseMode(isItemChecked);
 		}
 
 		return null;

@@ -325,9 +325,9 @@ public class DialogExportTour extends TitleAreaDialog {
 //		// device infos
 //		final String productName = productInfo.getProductName();
 //		context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
-//		context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
-//		context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
-//		context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
+//		context.put("productid", UI.EMPTY_STRING + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
+//		context.put("devicemajorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
+//		context.put("deviceminorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// time, heart, cadence, min/max
 		Date starttime = null;

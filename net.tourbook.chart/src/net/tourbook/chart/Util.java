@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartUtil {
+public class Util {
 
 	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
 	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$

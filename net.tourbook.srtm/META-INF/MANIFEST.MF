@@ -8,7 +8,7 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  de.byteholder.geoclipse
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
  com.enterprisedt.net.ftp.internal,

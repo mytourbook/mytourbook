@@ -6,7 +6,7 @@ Bundle-Version: 3.4.0
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: slf4j-api-1.5.8.jar,
  slf4j-log4j12-1.5.8.jar,
  log4j.jar,

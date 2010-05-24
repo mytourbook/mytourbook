@@ -449,7 +449,7 @@ public class ChartComponentGraph extends Canvas {
 			final ChartDrawingData chartDrawingData = _drawingData.get(0);
 			final ChartDataXSerie xData = chartDrawingData.getXData();
 
-			selectedBarItems = new boolean[xData.fHighValues[0].length];
+			selectedBarItems = new boolean[xData._highValues[0].length];
 			selectedBarItems[_hoveredBarValueIndex] = true;
 		}
 
@@ -1084,7 +1084,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// format: mm:ss
 
-				labelText.append(ChartUtil.format_mm_ss(yValue));
+				labelText.append(Util.format_mm_ss(yValue));
 
 			} else {
 
@@ -1632,8 +1632,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		if (ChartUtil.canReuseImage(_cumstomLayerImage, graphRect) == false) {
-			_cumstomLayerImage = ChartUtil.createImage(getDisplay(), _cumstomLayerImage, graphRect);
+		if (Util.canReuseImage(_cumstomLayerImage, graphRect) == false) {
+			_cumstomLayerImage = Util.createImage(getDisplay(), _cumstomLayerImage, graphRect);
 		}
 
 		final GC gc = new GC(_cumstomLayerImage);
@@ -1723,10 +1723,10 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
-				if (ChartUtil.canReuseImage(_graphImage, imageRect) == false) {
+				if (Util.canReuseImage(_graphImage, imageRect) == false) {
 
 					// create image on which the graph is drawn
-					_graphImage = ChartUtil.createImage(getDisplay(), _graphImage, imageRect);
+					_graphImage = Util.createImage(getDisplay(), _graphImage, imageRect);
 				}
 
 				// create graphics context
@@ -1989,8 +1989,8 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		if (ChartUtil.canReuseImage(_layerImage, graphRect) == false) {
-			_layerImage = ChartUtil.createImage(getDisplay(), _layerImage, graphRect);
+		if (Util.canReuseImage(_layerImage, graphRect) == false) {
+			_layerImage = Util.createImage(getDisplay(), _layerImage, graphRect);
 		}
 
 		if (_layerImage.isDisposed()) {
@@ -3209,7 +3209,7 @@ public class ChartComponentGraph extends Canvas {
 						+ drawingData.getGraphYBottom();
 
 				// create the slider text
-				labelText.append(ChartUtil.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
+				labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
 				labelText.append(' ');
 				labelText.append(yData.getUnitLabel());
 				labelText.append("  "); //$NON-NLS-1$
@@ -3853,22 +3853,22 @@ public class ChartComponentGraph extends Canvas {
 	private void onDispose() {
 
 		// dispose resources
-		_cursorResizeLeftRight = ChartUtil.disposeResource(_cursorResizeLeftRight);
-		_cursorResizeTopDown = ChartUtil.disposeResource(_cursorResizeTopDown);
-		_cursorDragged = ChartUtil.disposeResource(_cursorDragged);
-		_cursorHand05x = ChartUtil.disposeResource(_cursorHand05x);
-		_cursorHand = ChartUtil.disposeResource(_cursorHand);
-		_cursorHand2x = ChartUtil.disposeResource(_cursorHand2x);
-		_cursorHand5x = ChartUtil.disposeResource(_cursorHand5x);
-		_cursorModeSlider = ChartUtil.disposeResource(_cursorModeSlider);
-		_cursorModeZoom = ChartUtil.disposeResource(_cursorModeZoom);
-		_cursorModeZoomMove = ChartUtil.disposeResource(_cursorModeZoomMove);
+		_cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
+		_cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
+		_cursorDragged = Util.disposeResource(_cursorDragged);
+		_cursorHand05x = Util.disposeResource(_cursorHand05x);
+		_cursorHand = Util.disposeResource(_cursorHand);
+		_cursorHand2x = Util.disposeResource(_cursorHand2x);
+		_cursorHand5x = Util.disposeResource(_cursorHand5x);
+		_cursorModeSlider = Util.disposeResource(_cursorModeSlider);
+		_cursorModeZoom = Util.disposeResource(_cursorModeZoom);
+		_cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
 
-		_graphImage = ChartUtil.disposeResource(_graphImage);
-		_layerImage = ChartUtil.disposeResource(_layerImage);
-		_cumstomLayerImage = ChartUtil.disposeResource(_cumstomLayerImage);
+		_graphImage = Util.disposeResource(_graphImage);
+		_layerImage = Util.disposeResource(_layerImage);
+		_cumstomLayerImage = Util.disposeResource(_cumstomLayerImage);
 
-		_gridColor = ChartUtil.disposeResource(_gridColor);
+		_gridColor = Util.disposeResource(_gridColor);
 
 		// dispose tooltip
 		if (_toolTipShell != null) {
@@ -5155,7 +5155,7 @@ public class ChartComponentGraph extends Canvas {
 				final ChartDrawingData chartDrawingData = _drawingData.get(0);
 				final ChartDataXSerie xData = chartDrawingData.getXData();
 
-				_selectedBarItems = new boolean[xData.fHighValues[0].length];
+				_selectedBarItems = new boolean[xData._highValues[0].length];
 			}
 
 		} else {
@@ -5496,7 +5496,7 @@ public class ChartComponentGraph extends Canvas {
 
 							// selected position was found
 							final ChartDrawingData chartDrawingData = _drawingData.get(0);
-							final int[] xValues = chartDrawingData.getXData().fHighValues[0];
+							final int[] xValues = chartDrawingData.getXData()._highValues[0];
 
 							final float xPosition = xValues[selectedIndex] * chartDrawingData.getScaleX();
 
