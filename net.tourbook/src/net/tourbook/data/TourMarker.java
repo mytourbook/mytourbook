@@ -123,32 +123,26 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 		_createId = ++_createCounter;
 	}
 
-	private TourMarker(final TourMarker tourMarker, final TourData newTourData) {
-
-		tourData = newTourData;
-
-		category = new String(tourMarker.category);
-		label = new String(tourMarker.label);
-
-		distance = tourMarker.distance;
-		labelXOffset = tourMarker.labelXOffset;
-		labelYOffset = tourMarker.labelYOffset;
-		markerId = tourMarker.markerId;
-		markerType = tourMarker.markerType;
-		serieIndex = tourMarker.serieIndex;
-		time = tourMarker.time;
-		type = tourMarker.type;
-		visualPosition = tourMarker.visualPosition;
-		_createId = tourMarker._createId;
-	}
-
 	@Override
 	public TourMarker clone() {
-		return new TourMarker(this, tourData);
+
+		TourMarker newTourMarker = null;
+
+		try {
+			newTourMarker = (TourMarker) super.clone();
+		} catch (final CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+
+		return newTourMarker;
 	}
 
 	public TourMarker clone(final TourData newTourData) {
-		return new TourMarker(this, newTourData);
+
+		final TourMarker newTourMarker = clone();
+		newTourMarker.tourData = newTourData;
+
+		return newTourMarker;
 	}
 
 	@Override
@@ -371,8 +365,8 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 	 */
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
-		backupMarker.category = new String(category);
-		backupMarker.label = new String(label);
+		backupMarker.category = category;
+		backupMarker.label = label;
 
 		backupMarker.distance = distance;
 		backupMarker.labelXOffset = labelXOffset;

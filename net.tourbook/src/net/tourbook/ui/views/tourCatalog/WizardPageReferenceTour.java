@@ -27,6 +27,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.TableLayoutComposite;
@@ -107,7 +108,7 @@ public class WizardPageReferenceTour extends WizardPage {
 			case COLUMN_REF_TOUR:
 				return tourRef.getLabel();
 			}
-			return ""; //$NON-NLS-1$
+			return UI.EMPTY_STRING;
 		}
 	}
 
@@ -370,7 +371,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 			// hide the chart
 			_refTourChart.updateChart(null, false);
-			_chartGroup.setText(""); //$NON-NLS-1$
+			_chartGroup.setText(UI.EMPTY_STRING);
 		}
 	}
 

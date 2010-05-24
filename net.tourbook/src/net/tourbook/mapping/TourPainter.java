@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import java.awt.Point;
@@ -30,9 +29,9 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -58,19 +57,17 @@ public class TourPainter extends MapPainter {
 	private static final int				MARGIN				= 2;
 	private static final int				MARKER_POLE			= 16;
 
-	private static final String				SPACER				= " ";						//$NON-NLS-1$
-	private static final String				IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
-	private static final String				IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
-	private static final String				IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
+	private static final String				SPACER				= " ";												//$NON-NLS-1$
+	private static final String				IMAGE_START_MARKER	= "map-marker-start.png";							//$NON-NLS-1$
+	private static final String				IMAGE_END_MARKER	= "map-marker-end.png";							//$NON-NLS-1$
+	private static final String				IMAGE_TOUR_MARKER	= "map-marker-tour.png";							//$NON-NLS-1$
 
 	private static TourPainter				_instance;
-	private static IPropertyChangeListener	_prefChangeListener;
+	private static boolean					_isInitialized		= false;
 
-	private final Image						_imageStartMarker;
-	private final Image						_imageEndMarker;
-	private final Image						_imageTourMarker;
-	private final Image						_positionImage;
-	private final Image						_markerImage;
+	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+
+	private static IPropertyChangeListener	_prefChangeListener;
 
 	private int[]							_dataSerie;
 	private ILegendProvider					_legendProvider;
@@ -85,6 +82,15 @@ public class TourPainter extends MapPainter {
 	private static boolean					_prefWithBorder;
 	private static int						_prefBorderWidth;
 
+	/*
+	 * resources
+	 */
+	private static Image					_imageStartMarker;
+	private static Image					_imageEndMarker;
+	private static Image					_imageTourMarker;
+	private static Image					_positionImage;
+	private static Image					_markerImage;
+
 	private final static ColorCacheInt		_colorCache			= new ColorCacheInt();
 
 	static {
@@ -96,8 +102,8 @@ public class TourPainter extends MapPainter {
 		getTourPainterSettings();
 
 		// create pref listener
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
@@ -108,7 +114,7 @@ public class TourPainter extends MapPainter {
 		};
 
 		// add pref listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 
 		// remove pre listener
 		/*
@@ -120,6 +126,67 @@ public class TourPainter extends MapPainter {
 //				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 //			}
 //		});
+	}
+
+	public TourPainter() {
+
+		super();
+
+		if (_isInitialized == false) {
+
+			/*
+			 * I've not yet understood to manage this problem because TourPainter() is created from
+			 * an extension point but setting the instance in the constructor is not valid according
+			 * to FindBugs
+			 */
+			_isInitialized = true;
+
+			final Display display = Display.getCurrent();
+
+			final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+			final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
+
+			_positionImage = createPositionImage(systemColorBlue);
+			_markerImage = createPositionImage(systemColorRed);
+
+			_imageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
+			_imageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
+			_imageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
+
+		}
+	}
+
+	private static Image createPositionImage(final Color positionColor) {
+
+		final Display display = Display.getCurrent();
+
+		final int width = 8;
+		final int height = 8;
+
+		final Image positionImage = new Image(display, width, height);
+		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
+
+		final GC gc = new GC(positionImage);
+		{
+			gc.setBackground(colorTransparent);
+			gc.fillRectangle(0, 0, width, height);
+
+			gc.setBackground(positionColor);
+			gc.fillOval(1, 1, width - 2, height - 2);
+		}
+
+		/*
+		 * set transparency
+		 */
+		final ImageData imageData = positionImage.getImageData();
+		imageData.transparentPixel = imageData.getPixel(0, 0);
+		final Image transparentImage = new Image(display, imageData);
+
+		gc.dispose();
+		positionImage.dispose();
+		colorTransparent.dispose();
+
+		return transparentImage;
 	}
 
 	/**
@@ -467,57 +534,6 @@ public class TourPainter extends MapPainter {
 		_prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
 		_prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
 		_prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
-	}
-
-	public TourPainter() {
-
-		super();
-
-		_instance = this;
-
-		final Display display = Display.getCurrent();
-
-		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
-		_positionImage = createPositionImage(systemColorBlue);
-		_markerImage = createPositionImage(systemColorRed);
-
-		_imageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
-		_imageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
-		_imageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
-	}
-
-	private Image createPositionImage(final Color positionColor) {
-
-		final Display display = Display.getCurrent();
-
-		final int width = 8;
-		final int height = 8;
-
-		final Image positionImage = new Image(display, width, height);
-		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
-
-		final GC gc = new GC(positionImage);
-		{
-			gc.setBackground(colorTransparent);
-			gc.fillRectangle(0, 0, width, height);
-
-			gc.setBackground(positionColor);
-			gc.fillOval(1, 1, width - 2, height - 2);
-		}
-
-		/*
-		 * set transparency
-		 */
-		final ImageData imageData = positionImage.getImageData();
-		imageData.transparentPixel = imageData.getPixel(0, 0);
-		final Image transparentImage = new Image(display, imageData);
-
-		gc.dispose();
-		positionImage.dispose();
-		colorTransparent.dispose();
-
-		return transparentImage;
 	}
 
 	@Override
@@ -1233,7 +1249,7 @@ public class TourPainter extends MapPainter {
 		if (tourDataList == null) {
 			return false;
 		}
- 
+
 		for (final TourData tourData : tourDataList) {
 
 			// check tour data

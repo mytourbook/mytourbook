@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,19 +42,17 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTour extends Action {
 
-	private TourBookView	fTourViewer;
-	private TreeViewerItem	fNextSelectedTreeItem;
+	private TourBookView	_tourViewer;
+	private TreeViewerItem	_nextSelectedTreeItem;
 
 	public ActionDeleteTour(final TourBookView tourBookView) {
 
-		fTourViewer = tourBookView;
+		_tourViewer = tourBookView;
 
 		setText(Messages.Tour_Book_Action_delete_selected_tours);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
-
-		setEnabled(false);
 	}
 
 	private void deleteTours(	final IStructuredSelection selection,
@@ -107,7 +105,7 @@ public class ActionDeleteTour extends Action {
 		 * select the item which is before the removed items, this is not yet finished because there
 		 * are multiple possibilities
 		 */
-		fNextSelectedTreeItem = null;
+		_nextSelectedTreeItem = null;
 
 		if (firstSelectedParent != null) {
 
@@ -119,9 +117,9 @@ public class ActionDeleteTour extends Action {
 				// there are children still available
 
 				if (firstSelectedTourIndex < remainingChildren) {
-					fNextSelectedTreeItem = firstSelectedChildren.get(firstSelectedTourIndex);
+					_nextSelectedTreeItem = firstSelectedChildren.get(firstSelectedTourIndex);
 				} else {
-					fNextSelectedTreeItem = firstSelectedChildren.get(remainingChildren - 1);
+					_nextSelectedTreeItem = firstSelectedChildren.get(remainingChildren - 1);
 				}
 
 			} else {
@@ -130,7 +128,7 @@ public class ActionDeleteTour extends Action {
 				 * it's possible that the parent does not have any children, then also this parent
 				 * must be removed (to be done later)
 				 */
-				fNextSelectedTreeItem = firstSelectedParent;
+				_nextSelectedTreeItem = firstSelectedParent;
 				// for (TreeViewerItem tourParent : tourParents) {
 				//
 				// }
@@ -154,7 +152,7 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// get selected tours
-		final ColumnViewer treeViewer = fTourViewer.getViewer();
+		final ColumnViewer treeViewer = _tourViewer.getViewer();
 		final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 
 		int selectedTours = 0;
@@ -205,7 +203,7 @@ public class ActionDeleteTour extends Action {
 			}
 		}
 
-		final PostSelectionProvider postSelectionProvider = fTourViewer.getPostSelectionProvider();
+		final PostSelectionProvider postSelectionProvider = _tourViewer.getPostSelectionProvider();
 
 		// fire post selection
 		postSelectionProvider.setSelection(selectionRemovedTours);
@@ -214,8 +212,8 @@ public class ActionDeleteTour extends Action {
 		selectionRemovedTours.removedTours.clear();
 		postSelectionProvider.clearSelection();
 
-		if (fNextSelectedTreeItem != null) {
-			fTourViewer.getViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
+		if (_nextSelectedTreeItem != null) {
+			_tourViewer.getViewer().setSelection(new StructuredSelection(_nextSelectedTreeItem), true);
 		}
 	}
 

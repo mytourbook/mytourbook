@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
@@ -32,8 +31,8 @@ public class DeviceManager {
 
 	public static final String			DEVICE_IS_NOT_SELECTED	= Messages.DeviceManager_Selection_device_is_not_selected;
 
-	private static List<TourbookDevice>	fDeviceList;
-	private static List<ExternalDevice>	fExternalDeviceList;
+	private static List<TourbookDevice>	_deviceList;
+	private static List<ExternalDevice>	_externalDeviceList;
 
 	/**
 	 * read devices from the extension registry
@@ -43,10 +42,10 @@ public class DeviceManager {
 	@SuppressWarnings("unchecked")
 	public static List<TourbookDevice> getDeviceList() {
 
-		if (fDeviceList == null) {
-			fDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+		if (_deviceList == null) {
+			_deviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
 		}
-		return fDeviceList;
+		return _deviceList;
 	}
 
 	/**
@@ -57,18 +56,19 @@ public class DeviceManager {
 	@SuppressWarnings("unchecked")
 	public static List<ExternalDevice> getExternalDeviceList() {
 
-		if (fExternalDeviceList == null) {
-			fExternalDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_EXTERNAL_DEVICE_DATA_READER);
+		if (_externalDeviceList == null) {
+			_externalDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_EXTERNAL_DEVICE_DATA_READER);
 		}
-		return fExternalDeviceList;
+		return _externalDeviceList;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static List readDeviceExtensions(final String extensionPointName) {
-		final ArrayList ret = new ArrayList();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static ArrayList readDeviceExtensions(final String extensionPointName) {
 
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
-				extensionPointName);
+		final ArrayList deviceList = new ArrayList();
+
+		final IExtensionPoint extPoint = Platform.getExtensionRegistry()//
+				.getExtensionPoint(TourbookPlugin.PLUGIN_ID, extensionPointName);
 
 		if (extPoint != null) {
 
@@ -89,7 +89,7 @@ public class DeviceManager {
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 								device.fileExtension = configElement.getAttribute("fileextension"); //$NON-NLS-1$
 
-								ret.add(device);
+								deviceList.add(device);
 							}
 							if (object instanceof ExternalDevice) {
 
@@ -98,7 +98,7 @@ public class DeviceManager {
 								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 
-								ret.add(device);
+								deviceList.add(device);
 							}
 						} catch (final CoreException e) {
 							e.printStackTrace();
@@ -107,6 +107,7 @@ public class DeviceManager {
 				}
 			}
 		}
-		return ret;
+
+		return deviceList;
 	}
 }

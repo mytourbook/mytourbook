@@ -28,6 +28,8 @@ public class Messages extends NLS {
 	public static String		App_Image_RefreshSelected;
 	public static String		App_Image_RefreshSelected_Disabled;
 
+	public static String	External_Link_Forum;
+
 	public static String	External_Link_HomePage;
 
 	public static String		External_Link_MapProviders;
@@ -93,6 +95,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_Map_Link_MapProvider;
 	public static String		Pref_Map_Link_MapProvider_Tooltip;
+
+	public static String	Pref_Map_MonitorMessage_DeletedOfflineImages;
 
 	public static String		Pref_Map_ProviderType_Custom;
 	public static String		Pref_Map_ProviderType_MapProfile;

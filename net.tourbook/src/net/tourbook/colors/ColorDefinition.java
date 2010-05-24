@@ -29,22 +29,21 @@ public class ColorDefinition {
 	private String				_visibleName;
 
 	private GraphColorItem[]	_colorParts;
+
 	private RGB					_lineColor;
-
 	private RGB					_defaultLineColor;
-
 	private RGB					_newLineColor;
+
 	private RGB					_gradientBright;
 	private RGB					_defaultGradientBright;
-
 	private RGB					_newGradientBright;
+
 	private RGB					_gradientDark;
 	private RGB					_defaultGradientDark;
-
 	private RGB					_newGradientDark;
+
 	private LegendColor			_legendColor;
 	private LegendColor			_defaultLegendColor;
-
 	private LegendColor			_newLegendColor;
 
 	/**

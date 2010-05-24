@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,28 +31,30 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class TourEditorInput implements IEditorInput, IPersistableElement {
 
-	private long	fTourId;
-	String			fEditorTitle	= UI.EMPTY_STRING;
+	private long	_tourId;
+
+	String			editorTitle	= UI.EMPTY_STRING;
 
 	public TourEditorInput(final long tourId) {
-		fTourId = tourId;
+		_tourId = tourId;
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-
-		/*
-		 * check if the tour is already open
-		 */
-
-		if (obj instanceof TourEditorInput) {
-
-			if (((TourEditorInput) obj).fTourId == fTourId) {
-				return true;
-			}
+		if (this == obj) {
+			return true;
 		}
-
-		return false;
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourEditorInput)) {
+			return false;
+		}
+		final TourEditorInput other = (TourEditorInput) obj;
+		if (_tourId != other._tourId) {
+			return false;
+		}
+		return true;
 	}
 
 	public boolean exists() {
@@ -61,7 +63,6 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 		 */
 		return true;
 	}
-
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -91,11 +92,19 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	public String getToolTipText() {
-		return fEditorTitle;
+		return editorTitle;
 	}
 
 	public long getTourId() {
-		return fTourId;
+		return _tourId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (_tourId ^ (_tourId >>> 32));
+		return result;
 	}
 
 	public void saveState(final IMemento memento) {

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
@@ -143,6 +143,9 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private static final String					IMPORT_FILE_PATH				= "MapProvider_ImportFilePath";								//$NON-NLS-1$
 	private static final String					EXPORT_FILE_PATH				= "MapProvider_ExportFilePath";								//$NON-NLS-1$
 
+	private final IPreferenceStore				_prefStore						= Activator.getDefault() //
+																						.getPreferenceStore();
+
 	private final MapProviderManager			_mpMgr							= MapProviderManager.getInstance();
 
 	/**
@@ -167,14 +170,12 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 * is <code>true</code> when the job is canceled
 	 */
 	private boolean								_isOfflineJobCanceled			= true;
-
 	private boolean								_isOfflineJobRunning			= false;
 
 	private boolean								_isDisableModifyListener		= false;
 
-	private final IPreferenceStore				_prefStore						= Activator
-																						.getDefault()
-																						.getPreferenceStore();
+	private boolean								_isDeleteError;
+	private long								_deleteUIUpdateTime;
 
 	/**
 	 * map provider which is currently selected in the list
@@ -182,6 +183,17 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private MP									_selectedMapProvider;
 
 	private MP									_newMapProvider;
+
+	private boolean								_isNewMapProvider				= false;
+	private boolean								_isModifiedMapProvider			= false;
+	private boolean								_isModifiedMapProviderList		= false;
+	private boolean								_isForceUpdateMapProviderList	= false;
+	private boolean								_isValid						= true;
+
+	private final ModifyListener				_modifyListener;
+
+	private boolean								_isModifiedOfflineFolder;
+	private boolean								_isModifiedMapProviderId;
 
 	/*
 	 * UI controls
@@ -215,18 +227,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private Button								_btnEdit;
 	private Button								_btnImport;
 	private Button								_btnExport;
-
-	private boolean								_isNewMapProvider				= false;
-	private boolean								_isModifiedMapProvider			= false;
-	private boolean								_isModifiedMapProviderList		= false;
-	private boolean								_isForceUpdateMapProviderList	= false;
-	private boolean								_isValid						= true;
-
-	private final ModifyListener				_modifyListener;
-
-	private boolean								_isModifiedOfflineFolder;
-	private boolean								_isModifiedMapProviderId;
-	private boolean								_isDeleteError;
 
 	private ActionRefreshOfflineInfoSelected	_actionRefreshSelected;
 	private ActionRefreshOfflineInfoAll			_actionRefreshAll;
@@ -1001,7 +1001,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			Label label = new Label(detailContainer, SWT.NONE);
 			label.setText(Messages.Pref_Map_Lable_MapProvider);
 
-			// text: map provider 
+			// text: map provider
 			_txtMapProviderName = new Text(detailContainer, SWT.BORDER);
 			GridDataFactory.fillDefaults().applyTo(_txtMapProviderName);
 			_txtMapProviderName.addModifyListener(new ModifyListener() {
@@ -1068,8 +1068,11 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 				// label: offline info
 				_lblOfflineFolderInfo = new Label(_offlineContainer, SWT.TRAIL);
-				GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(
-						_lblOfflineFolderInfo);
+				GridDataFactory
+						.fillDefaults()
+						.grab(true, false)
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_lblOfflineFolderInfo);
 			}
 
 			/*
@@ -1298,24 +1301,44 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
 	 * 
 	 * @param directory
+	 * @param monitor
 	 * @return Returns <code>true</code> if all deletions were successful
 	 */
-	private boolean deleteDir(final File directory) {
+	private void deleteDir(final File directory, final IProgressMonitor monitor) {
+
+		if (monitor.isCanceled()) {
+			return;
+		}
 
 		if (directory.isDirectory()) {
 
 			final String[] children = directory.list();
 
 			for (final String element : children) {
-				final boolean success = deleteDir(new File(directory, element));
-				if (success == false) {
-					_isDeleteError = true;
-				}
+				deleteDir(new File(directory, element), monitor);
 			}
+
+			// update monitor every 200ms
+			final long time = System.currentTimeMillis();
+			if (time > _deleteUIUpdateTime + 200) {
+				_deleteUIUpdateTime = time;
+				monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, directory.toString()));
+			}
+
 		}
 
 		// The directory is now empty so delete it
-		return directory.delete();
+		final boolean isDeleted = directory.delete();
+
+		// canceled must be checked before isDeleted because this returns false when the monitor is canceled
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		if (isDeleted == false) {
+			_isDeleteError = true;
+			monitor.setCanceled(true);
+		}
 	}
 
 	private void deleteFile(final String filePath) {
@@ -1391,18 +1414,23 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 	private void deleteOfflineMapFilesDir(final File tileCacheDir) {
 
 		_isDeleteError = false;
+		_deleteUIUpdateTime = System.currentTimeMillis();
 
 		try {
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(
-					false,
-					false,
-					new IRunnableWithProgress() {
-						@Override
-						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-								InterruptedException {
-							deleteDir(tileCacheDir);
-						}
-					});
+
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					monitor.beginTask(UI.EMPTY_STRING, IProgressMonitor.UNKNOWN);
+
+					deleteDir(tileCacheDir, monitor);
+				}
+			};
+
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+
 		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (final InterruptedException e) {
@@ -1410,7 +1438,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		if (_isDeleteError) {
-			StatusUtil.log(NLS.bind(Messages.pref_map_error_deleteTiles_message, tileCacheDir), new Exception());
+			StatusUtil.showStatus(NLS.bind(Messages.pref_map_error_deleteTiles_message, tileCacheDir), new Exception());
 		}
 	}
 
@@ -1862,7 +1890,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			return;
 		}
 
-		// get map provider which will be selected when the current will be removed 
+		// get map provider which will be selected when the current will be removed
 		final int selectionIndex = _mpViewer.getTable().getSelectionIndex();
 		Object nextSelectedMapProvider = _mpViewer.getElementAt(selectionIndex + 1);
 		if (nextSelectedMapProvider == null) {
@@ -2696,7 +2724,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		// check if id is modified
 		if ((oldFactoryId != null) && (oldFactoryId.equals(mpId) == false)) {
 
-			// id is modified 
+			// id is modified
 			// update all profiles with the new id
 
 			for (final MP mp : MapProviderManager.getInstance().getAllMapProviders()) {

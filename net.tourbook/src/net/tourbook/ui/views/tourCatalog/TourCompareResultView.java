@@ -55,8 +55,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -65,7 +63,10 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -104,18 +105,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
-	private final IDialogSettings				_state				= TourbookPlugin
-																			.getDefault()
+	private final IPreferenceStore				_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IDialogSettings				_state				= TourbookPlugin.getDefault() //
 																			.getDialogSettingsSection(ID);
 
-	/**
-	 * resource manager for images
-	 */
-	private Image								_dbImage			= TourbookPlugin.getImageDescriptor(
-																			Messages.Image__database).createImage(true);
-
-	private Composite							_viewerContainer;
-	private CheckboxTreeViewer					_tourViewer;
 	private TVICompareResultRootItem			_tootItem;
 
 	private PostSelectionProvider				_postSelectionProvider;
@@ -125,6 +118,26 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourPropertyListener;
 	private ITourEventListener					_compareTourPropertyListener;
+
+	private boolean								_isToolbarCreated;
+
+	private final NumberFormat					_nf					= NumberFormat.getNumberInstance();
+
+	private ColumnManager						_columnManager;
+
+	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
+
+	/*
+	 * resources
+	 */
+	private Image								_dbImage			= TourbookPlugin.getImageDescriptor(//
+																			Messages.Image__database).createImage(true);
+
+	/*
+	 * UI controls
+	 */
+	private Composite							_viewerContainer;
+	private CheckboxTreeViewer					_tourViewer;
 
 	private ActionSaveComparedTours				_actionSaveComparedTours;
 	private ActionRemoveComparedTourSaveStatus	_actionRemoveComparedTourSaveStatus;
@@ -140,14 +153,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionEditTour						_actionEditTour;
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionOpenTour						_actionOpenTour;
-
-	private boolean								_isToolbarCreated;
-
-	private final NumberFormat					_nf					= NumberFormat.getNumberInstance();
-
-	private ColumnManager						_columnManager;
-
-	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -198,8 +203,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 						if (comparedTourItem instanceof TVICompareResultComparedTour) {
 							final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) comparedTourItem;
 
-							resultItem.movedStartIndex = compareTourProperty.startIndex;
-							resultItem.movedEndIndex = compareTourProperty.endIndex;
+//							resultItem.movedStartIndex = compareTourProperty.startIndex;
+//							resultItem.movedEndIndex = compareTourProperty.endIndex;
 							resultItem.movedSpeed = compareTourProperty.speed;
 
 							// update viewer
@@ -228,8 +233,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 							} else {
 
-								compareTourItem.movedStartIndex = compareTourProperty.startIndex;
-								compareTourItem.movedEndIndex = compareTourProperty.endIndex;
+//								compareTourItem.movedStartIndex = compareTourProperty.startIndex;
+//								compareTourItem.movedEndIndex = compareTourProperty.endIndex;
 								compareTourItem.movedSpeed = compareTourProperty.speed;
 							}
 
@@ -287,10 +292,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	private void addPrefListener() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -309,7 +312,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					_tourViewer.getTree().setLinesVisible(
-							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
@@ -321,7 +324,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				}
 			}
 		};
-		prefStore.addPropertyChangeListener(_prefChangeListener);
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -471,10 +475,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin
-				.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourViewer = new ContainerCheckedTreeViewer(tree);
 		_columnManager.createColumns(_tourViewer);
@@ -809,8 +810,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getSite().getPage().removePartListener(_partListener);
 		TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		_dbImage.dispose();
 
@@ -1197,8 +1198,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			removedTourItem.dbEndIndex = -1;
 			removedTourItem.dbSpeed = 0;
 
-			removedTourItem.movedStartIndex = -1;
-			removedTourItem.movedEndIndex = -1;
+//			removedTourItem.movedStartIndex = -1;
+//			removedTourItem.movedEndIndex = -1;
 			removedTourItem.movedSpeed = 0;
 		}
 

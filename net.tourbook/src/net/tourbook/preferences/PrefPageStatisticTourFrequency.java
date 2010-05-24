@@ -1,31 +1,31 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartUtil;
+import net.tourbook.chart.Util;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -44,22 +44,27 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage implements IWorkbenchPreferencePage,
 		IPropertyChangeListener {
 
-	private IntegerFieldEditor												fEditorDistanceLowValue;
-	private IntegerFieldEditor												fEditorDistanceInterval;
-	private IntegerFieldEditor												fEditorDistanceNumbers;
-	private Label															fLblDistanceExampleLabel;
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private IntegerFieldEditor												fEditorAltitudeLowValue;
-	private IntegerFieldEditor												fEditorAltitudeInterval;
-	private IntegerFieldEditor												fEditorAltitudeNumbers;
-	private Label															fLblAltitudeExampleLabel;
+	private IPropertyChangeListener	_prefChangeListener;
 
-	private IntegerFieldEditor												fEditorDurationLowValue;
-	private IntegerFieldEditor												fEditorDurationInterval;
-	private IntegerFieldEditor												fEditorDurationNumbers;
-	private Label															fLblDurationExampleLabel;
+	/*
+	 * UI constrols
+	 */
+	private IntegerFieldEditor		_editorDistanceLowValue;
+	private IntegerFieldEditor		_editorDistanceInterval;
+	private IntegerFieldEditor		_editorDistanceNumbers;
+	private Label					_lblDistanceExampleLabel;
 
-	private org.eclipse.core.runtime.Preferences.IPropertyChangeListener	fPrefChangeListener;
+	private IntegerFieldEditor		_editorAltitudeLowValue;
+	private IntegerFieldEditor		_editorAltitudeInterval;
+	private IntegerFieldEditor		_editorAltitudeNumbers;
+	private Label					_lblAltitudeExampleLabel;
+
+	private IntegerFieldEditor		_editorDurationLowValue;
+	private IntegerFieldEditor		_editorDurationInterval;
+	private IntegerFieldEditor		_editorDurationNumbers;
+	private Label					_lblDurationExampleLabel;
 
 	public PrefPageStatisticTourFrequency() {
 		super(GRID);
@@ -67,8 +72,8 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (event.getProperty().equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 					computeAllExamples();
@@ -76,32 +81,35 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 			}
 		};
 
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void computeAllExamples() {
 
-		fEditorDistanceInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_DISTANCE));
+		_editorDistanceInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_DISTANCE));
 
-		computeExample(fLblDistanceExampleLabel,
-				fEditorDistanceLowValue.getIntValue(),
-				fEditorDistanceInterval.getIntValue(),
-				fEditorDistanceNumbers.getIntValue(),
+		computeExample(
+				_lblDistanceExampleLabel,
+				_editorDistanceLowValue.getIntValue(),
+				_editorDistanceInterval.getIntValue(),
+				_editorDistanceNumbers.getIntValue(),
 				UI.UNIT_LABEL_DISTANCE,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
-		fEditorAltitudeInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_ALTITUDE));
-		computeExample(fLblAltitudeExampleLabel,
-				fEditorAltitudeLowValue.getIntValue(),
-				fEditorAltitudeInterval.getIntValue(),
-				fEditorAltitudeNumbers.getIntValue(),
+		_editorAltitudeInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_ALTITUDE));
+		computeExample(
+				_lblAltitudeExampleLabel,
+				_editorAltitudeLowValue.getIntValue(),
+				_editorAltitudeInterval.getIntValue(),
+				_editorAltitudeNumbers.getIntValue(),
 				UI.UNIT_LABEL_ALTITUDE,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
-		computeExample(fLblDurationExampleLabel,
-				fEditorDurationLowValue.getIntValue(),
-				fEditorDurationInterval.getIntValue(),
-				fEditorDurationNumbers.getIntValue(),
+		computeExample(
+				_lblDurationExampleLabel,
+				_editorDurationLowValue.getIntValue(),
+				_editorDurationInterval.getIntValue(),
+				_editorDurationNumbers.getIntValue(),
 				Messages.Pref_Statistic_Label_h,
 				ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 	}
@@ -120,7 +128,7 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 		for (int number = 0; number < numbers; number++) {
 
 			if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
-				text.append(ChartUtil.formatValue((lowValue * 60) + (interval * number * 60), unitType));
+				text.append(Util.formatValue((lowValue * 60) + (interval * number * 60), unitType));
 			} else {
 				text.append(lowValue + (interval * number));
 			}
@@ -147,7 +155,7 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.hint(300, SWT.DEFAULT)
-				.applyTo(fLblDurationExampleLabel);
+				.applyTo(_lblDurationExampleLabel);
 
 		parent.layout(true);
 
@@ -188,40 +196,43 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 		label.setText(Messages.Pref_Statistic_Label_altitude);
 
 		// altitude example
-		fLblAltitudeExampleLabel = new Label(parent, SWT.NONE);
+		_lblAltitudeExampleLabel = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 //				.hint(200, SWT.DEFAULT)
-				.applyTo(fLblAltitudeExampleLabel);
+				.applyTo(_lblAltitudeExampleLabel);
 
 		// low value
-		fEditorAltitudeLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
+		_editorAltitudeLowValue = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
 				Messages.Pref_Statistic_Label_altitude_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorAltitudeLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeLowValue);
+		UI.setFieldWidth(parent, _editorAltitudeLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorAltitudeLowValue);
 
 		// interval
-		fEditorAltitudeInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
+		_editorAltitudeInterval = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
 				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorAltitudeInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeInterval);
+		UI.setFieldWidth(parent, _editorAltitudeInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorAltitudeInterval);
 
 		// numbers
-		fEditorAltitudeNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
+		_editorAltitudeNumbers = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
 				Messages.Pref_Statistic_Label_altitude_quantity,
 				parent,
 				2);
-		fEditorAltitudeNumbers.setValidRange(2, 99);
-		UI.setFieldWidth(parent, fEditorAltitudeNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeNumbers);
+		_editorAltitudeNumbers.setValidRange(2, 99);
+		UI.setFieldWidth(parent, _editorAltitudeNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorAltitudeNumbers);
 
-		fEditorAltitudeLowValue.setPropertyChangeListener(this);
-		fEditorAltitudeInterval.setPropertyChangeListener(this);
-		fEditorAltitudeNumbers.setPropertyChangeListener(this);
+		_editorAltitudeLowValue.setPropertyChangeListener(this);
+		_editorAltitudeInterval.setPropertyChangeListener(this);
+		_editorAltitudeNumbers.setPropertyChangeListener(this);
 	}
 
 	private void createFieldsDistance(final Composite parent) {
@@ -234,39 +245,42 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 		label.setText(Messages.Pref_Statistic_Label_distance);
 
 		// distance example
-		fLblDistanceExampleLabel = new Label(parent, SWT.NONE);
+		_lblDistanceExampleLabel = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 //				.hint(200, SWT.DEFAULT)
-				.applyTo(fLblDistanceExampleLabel);
+				.applyTo(_lblDistanceExampleLabel);
 
 		// low value
-		fEditorDistanceLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
+		_editorDistanceLowValue = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
 				Messages.Pref_Statistic_Label_distance_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDistanceLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceLowValue);
+		UI.setFieldWidth(parent, _editorDistanceLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDistanceLowValue);
 
 		// interval
-		fEditorDistanceInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_INTERVAL,
+		_editorDistanceInterval = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DISTANCE_INTERVAL,
 				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDistanceInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceInterval);
+		UI.setFieldWidth(parent, _editorDistanceInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDistanceInterval);
 
 		// numbers
-		fEditorDistanceNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_NUMBERS,
+		_editorDistanceNumbers = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DISTANCE_NUMBERS,
 				Messages.Pref_Statistic_Label_distance_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, fEditorDistanceNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceNumbers);
+		UI.setFieldWidth(parent, _editorDistanceNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDistanceNumbers);
 
-		fEditorDistanceLowValue.setPropertyChangeListener(this);
-		fEditorDistanceInterval.setPropertyChangeListener(this);
-		fEditorDistanceNumbers.setPropertyChangeListener(this);
+		_editorDistanceLowValue.setPropertyChangeListener(this);
+		_editorDistanceInterval.setPropertyChangeListener(this);
+		_editorDistanceNumbers.setPropertyChangeListener(this);
 	}
 
 	private void createFieldsDuration(final Composite parent) {
@@ -282,45 +296,48 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 		label.setText(Messages.Pref_Statistic_Label_duration);
 
 		// duration example
-		fLblDurationExampleLabel = new Label(parent, SWT.NONE);
+		_lblDurationExampleLabel = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 //				.hint(200, SWT.DEFAULT)
-				.applyTo(fLblDurationExampleLabel);
+				.applyTo(_lblDurationExampleLabel);
 
 		// low value
-		fEditorDurationLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_LOW_VALUE,
+		_editorDurationLowValue = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DURATION_LOW_VALUE,
 				Messages.Pref_Statistic_Label_duration_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDurationLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationLowValue);
+		UI.setFieldWidth(parent, _editorDurationLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDurationLowValue);
 
 		// interval
-		fEditorDurationInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_INTERVAL,
+		_editorDurationInterval = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DURATION_INTERVAL,
 				Messages.Pref_Statistic_Label_duration_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDurationInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationInterval);
+		UI.setFieldWidth(parent, _editorDurationInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDurationInterval);
 
 		// numbers
-		fEditorDurationNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_NUMBERS,
+		_editorDurationNumbers = new IntegerFieldEditor(
+				ITourbookPreferences.STAT_DURATION_NUMBERS,
 				Messages.Pref_Statistic_Label_duration_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, fEditorDurationNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationNumbers);
+		UI.setFieldWidth(parent, _editorDurationNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(_editorDurationNumbers);
 
-		fEditorDurationLowValue.setPropertyChangeListener(this);
-		fEditorDurationInterval.setPropertyChangeListener(this);
-		fEditorDurationNumbers.setPropertyChangeListener(this);
+		_editorDurationLowValue.setPropertyChangeListener(this);
+		_editorDurationInterval.setPropertyChangeListener(this);
+		_editorDurationNumbers.setPropertyChangeListener(this);
 	}
 
 	@Override
 	public void dispose() {
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -337,16 +354,16 @@ public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage im
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		if (event.getProperty().equals(FieldEditor.VALUE)) {
-			if (!fEditorAltitudeLowValue.isValid()
-					|| !fEditorDistanceLowValue.isValid()
-					|| !fEditorDistanceInterval.isValid()
-					|| !fEditorDistanceNumbers.isValid()
-					|| !fEditorAltitudeLowValue.isValid()
-					|| !fEditorAltitudeInterval.isValid()
-					|| !fEditorAltitudeNumbers.isValid()
-					|| !fEditorDurationLowValue.isValid()
-					|| !fEditorDurationInterval.isValid()
-					|| !fEditorDurationNumbers.isValid()) {
+			if (!_editorAltitudeLowValue.isValid()
+					|| !_editorDistanceLowValue.isValid()
+					|| !_editorDistanceInterval.isValid()
+					|| !_editorDistanceNumbers.isValid()
+					|| !_editorAltitudeLowValue.isValid()
+					|| !_editorAltitudeInterval.isValid()
+					|| !_editorAltitudeNumbers.isValid()
+					|| !_editorDurationLowValue.isValid()
+					|| !_editorDurationInterval.isValid()
+					|| !_editorDurationNumbers.isValid()) {
 				return;
 			}
 

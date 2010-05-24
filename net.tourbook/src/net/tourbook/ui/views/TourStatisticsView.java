@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
@@ -34,10 +33,11 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -53,54 +53,51 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourStatisticsView extends ViewPart implements ITourProvider {
 
-	static public final String		ID			= "net.tourbook.views.StatisticView";						//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.StatisticView";				//$NON-NLS-1$
 
-	final IDialogSettings			fViewState	= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private StatisticContainer		fStatisticContainer;
+	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(
+														"TourStatisticsView");						//$NON-NLS-1$
 
-	private PostSelectionProvider	fPostSelectionProvider;
-	private IPartListener2			fPartListener;
+	private StatisticContainer		_statisticContainer;
 
-	private IPropertyChangeListener	fPrefChangeListener;
+	private PostSelectionProvider	_postSelectionProvider;
+	private IPartListener2			_partListener;
+	private IPropertyChangeListener	_prefChangeListener;
+	private ITourEventListener		_tourEventListener;
+	private ISelectionListener		_postSelectionListener;
 
-	TourPerson						fActivePerson;
-	TourTypeFilter					fActiveTourTypeFilter;
+	private TourPerson				_activePerson;
+	private TourTypeFilter			_activeTourTypeFilter;
 
-	public NumberFormat				fNF			= NumberFormat.getNumberInstance();
+	private RGB						_rgbYearFg	= new RGB(255, 255, 255);
+	private RGB						_rgbMonthFg	= new RGB(128, 64, 0);
+	private RGB						_rgbTourFg	= new RGB(0, 0, 128);
 
-	private RGB						fRGBYearFg	= new RGB(255, 255, 255);
-	private RGB						fRGBMonthFg	= new RGB(128, 64, 0);
-	private RGB						fRGBTourFg	= new RGB(0, 0, 128);
+	private RGB						_rgbYearBg	= new RGB(111, 130, 197);
+	private RGB						_rgbMonthBg	= new RGB(220, 220, 255);
+	private RGB						_rgbTourBg	= new RGB(240, 240, 255);
 
-	private RGB						fRGBYearBg	= new RGB(111, 130, 197);
-	private RGB						fRGBMonthBg	= new RGB(220, 220, 255);
-	private RGB						fRGBTourBg	= new RGB(240, 240, 255);
+	private Color					_colorYearFg;
+	private Color					_colorMonthFg;
+	private Color					_colorTourFg;
 
-	private Color					fColorYearFg;
-	private Color					fColorMonthFg;
-	private Color					fColorTourFg;
+	private Color					_colorYearBg;
+	private Color					_colorMonthBg;
+	private Color					_colorTourBg;
 
-	private Color					fColorYearBg;
-	private Color					fColorMonthBg;
-	private Color					fColorTourBg;
-
-	public Font						fFontNormal;
-	public Font						fFontBold;
-
-	protected Long					fActiveTourId;
-
-	private ITourEventListener		fTourEventListener;
-	private ISelectionListener		fPostSelectionListener;
+	public Font						_fontNormal;
+	public Font						_fontBold;
 
 	private void addPartListener() {
 
 		// set the part listener
-		fPartListener = new IPartListener2() {
+		_partListener = new IPartListener2() {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
-					fStatisticContainer.activateActions(getSite());
+					_statisticContainer.activateActions(getSite());
 				}
 			}
 
@@ -108,16 +105,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
-
 					saveState();
-
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourStatisticsView.this);
 				}
 			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
-					fStatisticContainer.deactivateActions(getSite());
+					_statisticContainer.deactivateActions(getSite());
 				}
 			}
 
@@ -131,14 +125,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		};
 
 		// register the part listener
-		getSite().getPage().addPartListener(fPartListener);
+		getSite().getPage().addPartListener(_partListener);
 	}
 
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new IPropertyChangeListener() {
 
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -148,8 +142,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					fActivePerson = TourbookPlugin.getActivePerson();
-					fActiveTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+					_activePerson = TourbookPlugin.getActivePerson();
+					_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
 					refreshStatistics();
 
@@ -160,7 +154,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
-					fStatisticContainer.refreshStatisticProvider();
+					_statisticContainer.refreshStatisticProvider();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -174,13 +168,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
 
 		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
+		_postSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
@@ -191,12 +185,12 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
 	private void addTourEventListener() {
 
-		fTourEventListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
 
 				if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
@@ -221,7 +215,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				}
 			}
 		};
-		TourManager.getInstance().addTourEventListener(fTourEventListener);
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	@Override
@@ -230,58 +224,58 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		createResources();
 
 		// this view is a selection provider, set it before the statistics container is created
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		fStatisticContainer = new StatisticContainer(getViewSite(), fPostSelectionProvider, parent, SWT.NONE);
+		_statisticContainer = new StatisticContainer(getViewSite(), _postSelectionProvider, parent, SWT.NONE);
 
 		addPartListener();
 		addPrefListener();
 		addSelectionListener();
 		addTourEventListener();
 
-		fActivePerson = TourbookPlugin.getActivePerson();
-		fActiveTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+		_activePerson = TourbookPlugin.getActivePerson();
+		_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-		fStatisticContainer.restoreStatistics(fViewState, fActivePerson, fActiveTourTypeFilter);
+		_statisticContainer.restoreStatistics(_state, _activePerson, _activeTourTypeFilter);
 	}
 
 	private void createResources() {
 
 		final Display display = Display.getCurrent();
 
-		fColorYearFg = new Color(display, fRGBYearFg);
-		fColorYearBg = new Color(display, fRGBYearBg);
-		fColorMonthFg = new Color(display, fRGBMonthFg);
-		fColorMonthBg = new Color(display, fRGBMonthBg);
-		fColorTourFg = new Color(display, fRGBTourFg);
-		fColorTourBg = new Color(display, fRGBTourBg);
+		_colorYearFg = new Color(display, _rgbYearFg);
+		_colorYearBg = new Color(display, _rgbYearBg);
+		_colorMonthFg = new Color(display, _rgbMonthFg);
+		_colorMonthBg = new Color(display, _rgbMonthBg);
+		_colorTourFg = new Color(display, _rgbTourFg);
+		_colorTourBg = new Color(display, _rgbTourBg);
 
-		fFontNormal = JFaceResources.getFontRegistry().get(JFaceResources.DIALOG_FONT);
-		fFontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+		_fontNormal = JFaceResources.getFontRegistry().get(JFaceResources.DIALOG_FONT);
+		_fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
 	@Override
 	public void dispose() {
 
-		getViewSite().getPage().removePartListener(fPartListener);
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removeTourEventListener(fTourEventListener);
+		getViewSite().getPage().removePartListener(_partListener);
+		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		fColorYearFg.dispose();
-		fColorYearBg.dispose();
-		fColorMonthFg.dispose();
-		fColorMonthBg.dispose();
-		fColorTourFg.dispose();
-		fColorTourBg.dispose();
+		_colorYearFg.dispose();
+		_colorYearBg.dispose();
+		_colorMonthFg.dispose();
+		_colorMonthBg.dispose();
+		_colorTourFg.dispose();
+		_colorTourBg.dispose();
 
 		super.dispose();
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		final TourbookStatistic selectedStatistic = fStatisticContainer.getSelectedStatistic();
+		final TourbookStatistic selectedStatistic = _statisticContainer.getSelectedStatistic();
 		if (selectedStatistic == null) {
 			return null;
 		}
@@ -291,7 +285,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return null;
 		}
 
-//		final TourData tourInDb = TourDatabase.getTourFromDb(selectedTourId);
 		final TourData selectedTourData = TourManager.getInstance().getTourData(selectedTourId);
 		if (selectedTourData == null) {
 			return null;
@@ -303,11 +296,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	}
 
 	private void refreshStatistics() {
-		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeFilter);
+		_statisticContainer.refreshStatistic(_activePerson, _activeTourTypeFilter);
 	}
 
 	public void saveState() {
-		fStatisticContainer.saveState(fViewState);
+		_statisticContainer.saveState(_state);
 	}
 
 	@Override

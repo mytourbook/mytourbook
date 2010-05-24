@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerXAxisTime extends TCActionHandler {
 
 	public ActionHandlerXAxisTime() {
-		fCommandId = TourChart.COMMAND_ID_X_AXIS_TIME;
+		_commandId = TourChart.COMMAND_ID_X_AXIS_TIME;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerXAxisTime extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.actionXAxisTime(isItemChecked);
+			_tourChart.actionXAxisTime(isItemChecked);
 		}
 
 		return null;

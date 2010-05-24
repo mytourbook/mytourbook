@@ -1,23 +1,24 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
 
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -94,7 +95,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		createUI(dlgAreaContainer);
 
 		// trick to show the message
-		setMessage(""); //$NON-NLS-1$
+		setMessage(UI.EMPTY_STRING);
 		setMessage(Messages.modify_mapprovider_dialog_area_message);
 
 		return dlgAreaContainer;

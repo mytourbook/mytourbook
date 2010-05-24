@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerXAxisDistance extends TCActionHandler {
 
 	public ActionHandlerXAxisDistance() {
-		fCommandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
+		_commandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerXAxisDistance extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.actionXAxisDistance(isItemChecked);
+			_tourChart.actionXAxisDistance(isItemChecked);
 		}
 
 		return null;

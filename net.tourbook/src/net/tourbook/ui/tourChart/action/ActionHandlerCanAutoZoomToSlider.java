@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerCanAutoZoomToSlider extends TCActionHandler {
 
 	public ActionHandlerCanAutoZoomToSlider() {
-		fCommandId = TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER;
+		_commandId = TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerCanAutoZoomToSlider extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.actionCanAutoZoomToSlider(isItemChecked);
+			_tourChart.actionCanAutoZoomToSlider(isItemChecked);
 		}
 
 		return null;

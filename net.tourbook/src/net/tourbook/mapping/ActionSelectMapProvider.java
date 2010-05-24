@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
 
@@ -195,13 +195,14 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 	/**
 	 * @return Returns the map provider {@link MP} which is currently selected or OSM when there
-	 *         is
-	 *         no selected map provider
+	 *         is no selected map provider
 	 */
 	public MP getSelectedMapProvider() {
+
 		if (_selectedMP == null) {
-			return _mpActions.get(0)._mp;
+			return MapProviderManager.getInstance().getDefaultMapProvider();
 		}
+
 		return _selectedMP;
 	}
 
@@ -209,7 +210,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		if (_selectedMP != null) {
 
-			// map profile tile offline images are deleted, reset state  
+			// map profile tile offline images are deleted, reset state
 			_selectedMP.resetTileImageAvailability();
 		}
 

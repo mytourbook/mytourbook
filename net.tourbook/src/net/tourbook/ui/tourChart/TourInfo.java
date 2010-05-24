@@ -54,7 +54,7 @@ public class TourInfo implements ITourToolTip {
 
 	private boolean						_isVisible		= true;
 
-	protected class TourInfoToolTip extends TourToolTip {
+	public class TourInfoToolTip extends TourToolTip {
 
 		public TourInfoToolTip(final Control control) {
 			super(control);
@@ -155,6 +155,8 @@ public class TourInfo implements ITourToolTip {
 			return null;
 		}
 
+
+
 		@Override
 		protected boolean shouldCreateToolTip(final Event event) {
 
@@ -200,6 +202,10 @@ public class TourInfo implements ITourToolTip {
 		_devImageY = HOVER_AREA;
 
 		gc.drawImage(_imageTourInfo, _devImageX, _devImageY);
+	}
+
+	public void setActionsEnabled(final boolean isEnabled) {
+		_tourInfoToolTip.setActionsEnabled(isEnabled);
 	}
 
 	public void setTourData(final TourData tourData) {

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.preferences;
@@ -31,8 +31,9 @@ import net.tourbook.mapping.LegendConfig;
 import net.tourbook.mapping.LegendProvider;
 import net.tourbook.mapping.ValueColor;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
 import net.tourbook.util.TreeColumnLayout;
- 
+
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -107,9 +108,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 *    {@link GraphColorItem}
 	 *    ...
 	 *    {@link GraphColorItem}
-	 *    
+	 * 
 	 *    ...
-	 *    
+	 * 
 	 * {@link ColorDefinition}
 	 *    {@link GraphColorItem}
 	 *    {@link GraphColorItem}
@@ -117,7 +118,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 *    {@link GraphColorItem}
 	 * </pre>
 	 */
-	private class ColorContentProvider implements ITreeContentProvider {
+	private static class ColorContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
 
@@ -282,13 +283,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		tc.setText(Messages.Pref_ChartColors_Column_color);
 		treeLayouter.addColumnData(new ColumnWeightData(30, true));
 
-		tc = new TreeColumn(tree, SWT.NONE);
+		new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(colorWidth, true));
 
-		tc = new TreeColumn(tree, SWT.NONE);
+		new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(colorWidth, true));
 
-		tc = new TreeColumn(tree, SWT.NONE);
+		new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(10, false));
 
 		fColorViewer = new TreeViewer(tree);
@@ -415,7 +416,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		legendConfig.unitLabels = fUnitLabels;
 		legendConfig.legendMinValue = 0;
 		legendConfig.legendMaxValue = 200;
-		legendConfig.unitText = ""; //$NON-NLS-1$
+		legendConfig.unitText = UI.EMPTY_STRING;
 
 		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = fValueColors;

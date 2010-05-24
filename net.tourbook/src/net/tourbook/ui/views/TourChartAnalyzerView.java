@@ -24,11 +24,11 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
-import net.tourbook.chart.ChartUtil;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.chart.Util;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
@@ -180,11 +180,11 @@ public class TourChartAnalyzerView extends ViewPart {
 		addListeners();
 		addActions();
 
-		// show chart info for the current selection
-		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		if (selection != null) {
-
-		}
+//		// show chart info for the current selection
+//		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+//		if (selection != null) {
+//
+//		}
 	}
 
 	private void createUIHeader10Left() {
@@ -759,25 +759,25 @@ public class TourChartAnalyzerView extends ViewPart {
 			 */
 			if (graphInfo.leftValue != leftValue) {
 				graphInfo.leftValue = leftValue;
-				graphInfo.lblLeft.setText(ChartUtil.formatValue(leftValue, unitType, valueDivisor, true) + UI.SPACE);
+				graphInfo.lblLeft.setText(Util.formatValue(leftValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.rightValue != rightValue) {
 				graphInfo.rightValue = rightValue;
-				graphInfo.lblRight.setText(ChartUtil.formatValue(rightValue, unitType, valueDivisor, true) + UI.SPACE);
+				graphInfo.lblRight.setText(Util.formatValue(rightValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.minValue != min) {
 				graphInfo.minValue = min;
-				graphInfo.lblMin.setText(ChartUtil.formatValue(min, unitType, valueDivisor, true) + UI.SPACE);
+				graphInfo.lblMin.setText(Util.formatValue(min, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
 			if (graphInfo.maxValue != max) {
 				graphInfo.maxValue = max;
-				graphInfo.lblMax.setText(ChartUtil.formatValue(max, unitType, valueDivisor, true) + UI.SPACE);
+				graphInfo.lblMax.setText(Util.formatValue(max, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 
@@ -792,18 +792,18 @@ public class TourChartAnalyzerView extends ViewPart {
 
 					avgValue *= avgDivisor;
 
-					if (graphInfo.avgValue != avgValue) {
+					if (graphInfo.avgValue != (int) avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.lblAvg.setText(ChartUtil.formatInteger((int) avgValue, avgDivisor, analyzerInfo
+						graphInfo.lblAvg.setText(Util.formatInteger((int) avgValue, avgDivisor, analyzerInfo
 								.getAvgDecimals(), false)
 								+ UI.SPACE);
 						outCounter++;
 					}
 
 				} else {
-					if (graphInfo.avgValue != avgValue) {
+					if (graphInfo.avgValue != (int) avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.lblAvg.setText(ChartUtil.formatValue((int) avgValue, unitType, valueDivisor, true)
+						graphInfo.lblAvg.setText(Util.formatValue((int) avgValue, unitType, valueDivisor, true)
 								+ UI.SPACE);
 						outCounter++;
 					}
@@ -817,7 +817,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			final int diffValue = rightValue - leftValue;
 			if (graphInfo.diffValue != diffValue) {
 				graphInfo.diffValue = diffValue;
-				graphInfo.lblDiff.setText(ChartUtil.formatValue(diffValue, unitType, valueDivisor, true) + UI.SPACE);
+				graphInfo.lblDiff.setText(Util.formatValue(diffValue, unitType, valueDivisor, true) + UI.SPACE);
 				outCounter++;
 			}
 		}

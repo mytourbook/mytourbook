@@ -39,8 +39,6 @@ import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -48,9 +46,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -91,18 +92,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	private static final String		SORT_PROPERTY	= "sort";				//$NON-NLS-1$
+	private static final String		SORT_PROPERTY	= "sort";											//$NON-NLS-1$
 
-	private TreeViewer				_tagViewer;
-	private ToolBar					_toolBar;
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private Button					_btnNewTag;
-	private Button					_btnNewTagCategory;
-	private Button					_btnRename;
-	private Button					_btnReset;
+	private IPropertyChangeListener	_prefChangeListener;
 
 	private TVIPrefTagRoot			_rootItem;
 
+	private boolean					_isModified		= false;
+
+	private long					_dragStartTime;
+
+	/*
+	 * image resources
+	 */
 	private Image					_imgTag			= TourbookPlugin
 															.getImageDescriptor(Messages.Image__tag)
 															.createImage();
@@ -113,11 +117,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 															.getImageDescriptor(Messages.Image__tag_category)
 															.createImage();
 
-	private boolean					_isModified		= false;
+	/*
+	 * UI constrols
+	 */
+	private TreeViewer				_tagViewer;
+	private ToolBar					_toolBar;
 
-	private long					_dragStartTime;
-
-	private IPropertyChangeListener	_prefChangeListener;
+	private Button					_btnNewTag;
+	private Button					_btnNewTagCategory;
+	private Button					_btnRename;
+	private Button					_btnReset;
 
 	/**
 	 * Sort the tags and categories
@@ -201,8 +210,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -223,7 +233,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createButtons(final Composite parent) {
@@ -519,7 +529,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		_imgTagRoot.dispose();
 		_imgTagCategory.dispose();
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}

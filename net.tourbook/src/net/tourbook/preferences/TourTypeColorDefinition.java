@@ -37,7 +37,12 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 	 */
 	public TourTypeColorDefinition(final TourType tourType, final String prefName, final String visibleName) {
 
-		super(prefName, visibleName, DEFAULT_GRADIENT_BRIGHT, DEFAULT_GRADIENT_DARK, DEFAULT_LINE_COLOR, null);
+		// rgb values must be cloned that each tour type has it's own color
+		super(prefName, visibleName, //
+				new RGB(DEFAULT_GRADIENT_BRIGHT.red, DEFAULT_GRADIENT_BRIGHT.green, DEFAULT_GRADIENT_BRIGHT.blue), //
+				new RGB(DEFAULT_GRADIENT_DARK.red, DEFAULT_GRADIENT_DARK.green, DEFAULT_GRADIENT_DARK.blue),
+				new RGB(DEFAULT_LINE_COLOR.red, DEFAULT_LINE_COLOR.green, DEFAULT_LINE_COLOR.blue),
+				null);
 
 		_tourType = tourType;
 	}
@@ -64,8 +69,39 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 		return 0;
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof TourTypeColorDefinition)) {
+			return false;
+		}
+		final TourTypeColorDefinition other = (TourTypeColorDefinition) obj;
+		if (_tourType == null) {
+			if (other._tourType != null) {
+				return false;
+			}
+		} else if (!_tourType.equals(other._tourType)) {
+			return false;
+		}
+		return true;
+	}
+
 	public TourType getTourType() {
 		return _tourType;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((_tourType == null) ? 0 : _tourType.hashCode());
+		return result;
 	}
 
 	public void setTourType(final TourType fTourType) {

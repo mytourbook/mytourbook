@@ -58,8 +58,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -67,6 +65,9 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -106,14 +107,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
+	private final IPreferenceStore		_prefStore							= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
 	private final IDialogSettings		_state								= TourbookPlugin
 																					.getDefault()
 																					.getDialogSettingsSection(ID);
 
 	private TVICatalogRootItem			_rootItem;
-
-	private Composite					_viewerContainer;
-	private TreeViewer					_tourViewer;
 
 	private final NumberFormat			_nf									= NumberFormat.getNumberInstance();
 
@@ -124,6 +125,29 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ITourEventListener			_compareTourPropertyListener;
 	private IPropertyChangeListener		_prefChangeListener;
 	private ITourEventListener			_tourEventListener;
+
+	/**
+	 * tour item which is selected by the link tour action
+	 */
+	protected TVICatalogComparedTour	_linkedTour;
+
+	/**
+	 * ref id which is currently selected in the tour viewer
+	 */
+	private long						_activeRefId;
+
+	/**
+	 * flag if actions are added to the toolbar
+	 */
+	private boolean						_isToolbarCreated					= false;
+
+	private ColumnManager				_columnManager;
+
+	/*
+	 * UI controls
+	 */
+	private Composite					_viewerContainer;
+	private TreeViewer					_tourViewer;
 
 	private ActionRemoveComparedTours	_actionRemoveComparedTours;
 	private ActionRenameRefTour			_actionRenameRefTour;
@@ -142,23 +166,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ActionSetTourTag			_actionRemoveTag;
 	private ActionTourCompareWizard		_actionTourCompareWizard;
 	private ActionOpenTour				_actionOpenTour;
-
-	/**
-	 * tour item which is selected by the link tour action
-	 */
-	protected TVICatalogComparedTour	_linkedTour;
-
-	/**
-	 * ref id which is currently selected in the tour viewer
-	 */
-	private long						_activeRefId;
-
-	/**
-	 * flag if actions are added to the toolbar
-	 */
-	private boolean						_isToolbarCreated					= false;
-
-	private ColumnManager				_columnManager;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -376,10 +383,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	private void addPrefListener() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -403,7 +408,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					_tourViewer.getTree().setLinesVisible(
-							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
@@ -415,7 +420,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		};
-		prefStore.addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addTourEventListener() {
@@ -533,10 +538,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin
-				.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourViewer = new TreeViewer(tree);
 		_columnManager.createColumns(_tourViewer);
@@ -711,7 +713,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
@@ -22,12 +22,13 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
 	static final Calendar	calendar		= GregorianCalendar.getInstance();
 
-	static final String		SQL_SUM_COLUMNS	= "" // //$NON-NLS-1$
+	static final String		SQL_SUM_COLUMNS	= UI.EMPTY_STRING //
 													+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
 													+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
 													+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
@@ -43,7 +44,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
 													+ "AVG(AVGTEMPERATURE)," //		14	//$NON-NLS-1$
 
-													+ "AVG(WEATHERWINDDIR)," //		15	//$NON-NLS-1$ 
+													+ "AVG(WEATHERWINDDIR)," //		15	//$NON-NLS-1$
 													+ "AVG(WEATHERWINDSPD)," //		16	//$NON-NLS-1$
 													+ "AVG(RESTPULSE)," //			17	//$NON-NLS-1$
 
@@ -117,7 +118,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		final long dbDrivingTime = result.getLong(startIndex + 8);
 
 		colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
+		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000f / dbDistance;
 
 		colMaxAltitude = result.getLong(startIndex + 9);
 		colMaxPulse = result.getLong(startIndex + 10);

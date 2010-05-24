@@ -49,8 +49,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -58,6 +56,9 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -97,7 +98,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart implements ITourProvider {
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView";					//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourMarkerView";				//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -106,9 +107,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	public static final int			COLUMN_X_OFFSET			= 4;
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
-	private final Preferences		_prefStore				= TourbookPlugin.getDefault().getPluginPreferences();
-
-	private TableViewer				_markerViewer;
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private TourData				_tourData;
 
@@ -120,10 +119,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private final NumberFormat		_nf						= NumberFormat.getNumberInstance();
 
+	/*
+	 * UI controls
+	 */
 	private PageBook				_pageBook;
 	private Label					_pageNoChart;
 	private Composite				_viewerContainer;
 
+	private TableViewer				_markerViewer;
 	private Chart					_tourChart;
 
 	private ActionOpenMarkerDialog	_actionEditTourMarkers;
@@ -186,8 +189,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 

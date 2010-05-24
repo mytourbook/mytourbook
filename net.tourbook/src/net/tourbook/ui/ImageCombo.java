@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
@@ -90,13 +90,6 @@ public final class ImageCombo extends Composite {
 	Color							foreground, background;
 	Font							font;
 
-	static int checkStyle(final int style) {
-		final int mask = gtk
-				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
-				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
-		return style & mask;
-	}
-
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its
 	 * behavior and appearance.
@@ -143,7 +136,7 @@ public final class ImageCombo extends Composite {
 		fLabel = new ImageComboLabel(this, SWT.SHADOW_NONE | SWT.FLAT);
 		fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-		int arrowStyle = SWT.ARROW | SWT.DOWN;
+		final int arrowStyle = SWT.ARROW | SWT.DOWN;
 
 		arrow = new Button(this, arrowStyle);
 
@@ -210,6 +203,13 @@ public final class ImageCombo extends Composite {
 
 		createPopup(-1);
 		initAccessible();
+	}
+
+	static int checkStyle(final int style) {
+		final int mask = gtk
+				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
+				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
+		return style & mask;
 	}
 
 	/**
@@ -558,7 +558,7 @@ public final class ImageCombo extends Composite {
 
 //	/**
 //	 * Gets the editable state.
-//	 * 
+//	 *
 //	 * @return whether or not the reciever is editable
 //	 * @exception SWTException
 //	 *            <ul>
@@ -674,7 +674,7 @@ public final class ImageCombo extends Composite {
 //	 * receiver's text field, and whose y coordinate is the end of the selection. The returned
 //	 * values are zero-relative. An "empty" selection as indicated by the the x and y coordinates
 //	 * having the same value.
-//	 * 
+//	 *
 //	 * @return a point representing the selection start and end
 //	 * @exception SWTException
 //	 *            <ul>
@@ -741,7 +741,7 @@ public final class ImageCombo extends Composite {
 
 ////	/**
 ////	 * Returns the height of the receivers's text field.
-////	 * 
+////	 *
 ////	 * @return the text height
 ////	 * @exception SWTException
 ////	 *            <ul>
@@ -759,7 +759,7 @@ public final class ImageCombo extends Composite {
 //	 * Returns the maximum number of characters that the receiver's text field is capable of
 //	 * holding. If this has not been changed by <code>setTextLimit()</code>, it will be the
 //	 * constant <code>Combo.LIMIT</code>.
-//	 * 
+//	 *
 //	 * @return the text limit
 //	 * @exception SWTException
 //	 *            <ul>
@@ -1314,7 +1314,7 @@ public final class ImageCombo extends Composite {
 				}
 			}
 
-			// Further work : Need to add support for incremental search in 
+			// Further work : Need to add support for incremental search in
 			// pop up list as characters typed in text widget
 
 			final Event e = new Event();
@@ -1497,7 +1497,7 @@ public final class ImageCombo extends Composite {
 	 */
 	public void removeAll() {
 		checkWidget();
-		fLabel.setText(""); //$NON-NLS-1$
+		fLabel.setText(UI.EMPTY_STRING);
 		table.removeAll();
 	}
 
@@ -1575,7 +1575,7 @@ public final class ImageCombo extends Composite {
 
 		if (index == -1) {
 			table.deselectAll();
-			fLabel.setText(""); //$NON-NLS-1$
+			fLabel.setText(UI.EMPTY_STRING);
 			return;
 		}
 
@@ -1727,7 +1727,7 @@ public final class ImageCombo extends Composite {
 			add(item, null);
 		}
 //		if (!text.getEditable()) {
-//			text.setText(""); //$NON-NLS-1$
+//			text.setText(UI.EMPTY_STRING); //$NON-NLS-1$
 //		}
 	}
 
@@ -1826,7 +1826,7 @@ public final class ImageCombo extends Composite {
 //	/**
 //	 * Sets the maximum number of characters that the receiver's text field is capable of holding to
 //	 * be the argument.
-//	 * 
+//	 *
 //	 * @param limit
 //	 *        new text limit
 //	 * @exception IllegalArgumentException

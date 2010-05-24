@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.ui;
@@ -45,18 +45,18 @@ public class TourTypeFilter {
 	public static final int		SYSTEM_FILTER_ID_ALL			= 1;
 	public static final int		SYSTEM_FILTER_ID_NOT_DEFINED	= 2;
 
-	private int					fFilterType;
+	private int					_filterType;
 
-	private String				fSystemFilterName;
-	private int					fSystemFilterId;
+	private String				_systemFilterName;
+	private int					_systemFilterId;
 
 	/**
 	 * contains the tour type from the database when {@link TourTypeFilter#getFilterType()} is
 	 * {@link TourTypeFilter#FILTER_TYPE_DB}
 	 */
-	private TourType			fTourType;
+	private TourType			_tourType;
 
-	private TourTypeFilterSet	fTourTypeSet;
+	private TourTypeFilterSet	_tourTypeSet;
 
 	/**
 	 * Create a filter with type {@link #FILTER_TYPE_SYSTEM}
@@ -65,10 +65,10 @@ public class TourTypeFilter {
 	 */
 	public TourTypeFilter(final int systemFilterId, final String filterName) {
 
-		fFilterType = FILTER_TYPE_SYSTEM;
+		_filterType = FILTER_TYPE_SYSTEM;
 
-		fSystemFilterName = filterName;
-		fSystemFilterId = systemFilterId;
+		_systemFilterName = filterName;
+		_systemFilterId = systemFilterId;
 	}
 
 	/**
@@ -77,8 +77,8 @@ public class TourTypeFilter {
 	 * @param tourType
 	 */
 	public TourTypeFilter(final TourType tourType) {
-		fFilterType = FILTER_TYPE_DB;
-		fTourType = tourType;
+		_filterType = FILTER_TYPE_DB;
+		_tourType = tourType;
 	}
 
 	/**
@@ -87,8 +87,8 @@ public class TourTypeFilter {
 	 * @param filterSet
 	 */
 	public TourTypeFilter(final TourTypeFilterSet filterSet) {
-		fFilterType = FILTER_TYPE_TOURTYPE_SET;
-		fTourTypeSet = filterSet;
+		_filterType = FILTER_TYPE_TOURTYPE_SET;
+		_tourTypeSet = filterSet;
 	}
 
 //	/**
@@ -146,13 +146,13 @@ public class TourTypeFilter {
 //	}
 
 	public String getFilterName() {
-		switch (fFilterType) {
+		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
-			return fSystemFilterName;
+			return _systemFilterName;
 		case FILTER_TYPE_DB:
-			return fTourType.getName();
+			return _tourType.getName();
 		case FILTER_TYPE_TOURTYPE_SET:
-			return fTourTypeSet.getName();
+			return _tourTypeSet.getName();
 		default:
 			break;
 		}
@@ -164,7 +164,7 @@ public class TourTypeFilter {
 	 *         {@link TourTypeFilter#FILTER_TYPE_*}
 	 */
 	public int getFilterType() {
-		return fFilterType;
+		return _filterType;
 	}
 
 	/**
@@ -175,11 +175,11 @@ public class TourTypeFilter {
 		String sqlWhereClause = UI.EMPTY_STRING;
 		final ArrayList<Long> sqlTourTypes = new ArrayList<Long>();
 
-		switch (fFilterType) {
+		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
-			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
+			if (_systemFilterId == SYSTEM_FILTER_ID_ALL) {
 				// select all tour types also not defined tour types
-				sqlWhereClause = ""; //$NON-NLS-1$
+				sqlWhereClause = UI.EMPTY_STRING;
 			} else {
 				// select tour types which are not defined
 				sqlWhereClause = " AND TourData.tourType_typeId IS NULL"; //$NON-NLS-1$
@@ -189,12 +189,12 @@ public class TourTypeFilter {
 		case FILTER_TYPE_DB:
 
 			sqlWhereClause = " AND TourData.tourType_typeId=?"; //$NON-NLS-1$
-			sqlTourTypes.add(fTourType.getTypeId());
+			sqlTourTypes.add(_tourType.getTypeId());
 			break;
 
 		case FILTER_TYPE_TOURTYPE_SET:
 
-			final Object[] tourTypes = fTourTypeSet.getTourTypes();
+			final Object[] tourTypes = _tourTypeSet.getTourTypes();
 
 			if (tourTypes.length == 0) {
 				// select nothing
@@ -205,20 +205,22 @@ public class TourTypeFilter {
 				// select all tours were the tour type is defined in the tour type list
 
 				int itemIndex = 0;
-				String filter = ""; //$NON-NLS-1$
+				final StringBuilder sb = new StringBuilder();
 
 				for (final Object item : tourTypes) {
 
 					if (itemIndex > 0) {
-						filter += " OR "; //$NON-NLS-1$
+						sb.append(" OR "); //$NON-NLS-1$
 					}
 
-					filter += " TourData.tourType_typeId=?"; //$NON-NLS-1$
+					sb.append(" TourData.tourType_typeId=?"); //$NON-NLS-1$
+
 					sqlTourTypes.add(((TourType) item).getTypeId());
 
 					itemIndex++;
 				}
-				sqlWhereClause = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+
+				sqlWhereClause = " AND (" + sb.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			break;
@@ -231,11 +233,11 @@ public class TourTypeFilter {
 	}
 
 	public int getSystemFilterId() {
-		return fSystemFilterId;
+		return _systemFilterId;
 	}
 
 	public String getSystemFilterName() {
-		return fSystemFilterName;
+		return _systemFilterName;
 	}
 
 	/**
@@ -243,7 +245,7 @@ public class TourTypeFilter {
 	 *         is {@link TourTypeFilter#FILTER_TYPE_DB}
 	 */
 	public TourType getTourType() {
-		return fTourType;
+		return _tourType;
 	}
 
 	/**
@@ -251,11 +253,11 @@ public class TourTypeFilter {
 	 *         returns {@link TourTypeFilter#FILTER_TYPE_TOURTYPE_SET}
 	 */
 	public TourTypeFilterSet getTourTypeSet() {
-		return fTourTypeSet;
+		return _tourTypeSet;
 	}
 
 	public void setName(final String filterName) {
-		switch (fFilterType) {
+		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
 			// not supported
 			break;
@@ -265,7 +267,7 @@ public class TourTypeFilter {
 			break;
 
 		case FILTER_TYPE_TOURTYPE_SET:
-			fTourTypeSet.setName(filterName);
+			_tourTypeSet.setName(filterName);
 			break;
 
 		default:
@@ -278,7 +280,7 @@ public class TourTypeFilter {
 	 *         {@link TourType}, this tours will be painted with the default color
 	 */
 	public boolean showUndefinedTourTypes() {
-		return fFilterType == FILTER_TYPE_SYSTEM;
+		return _filterType == FILTER_TYPE_SYSTEM;
 
 	}
 

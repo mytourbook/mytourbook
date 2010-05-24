@@ -300,14 +300,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-			descLines = descLines < 1 ? 5 : descLines;
+			descLines = descLines == 0 ? 5 : descLines;
 
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(5))
+					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(descLines))
 					.applyTo(_txtDescription);
 		}
 	}

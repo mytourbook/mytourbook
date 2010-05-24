@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,13 +28,12 @@ import net.tourbook.plugin.TourbookPlugin;
  */
 public class SQLFilter {
 
-	private String			fWhereClause	= UI.EMPTY_STRING;
+	private String			_sqlWhereClause	= UI.EMPTY_STRING;
 
-	private ArrayList<Long>	fParameters		= new ArrayList<Long>();
+	private ArrayList<Long>	_parameters		= new ArrayList<Long>();
 
 	public SQLFilter() {
 
-		final TourbookPlugin plugin = TourbookPlugin.getDefault();
 		final StringBuilder sb = new StringBuilder();
 
 		/*
@@ -50,7 +49,7 @@ public class SQLFilter {
 			// select only one person
 
 			sb.append(" AND TourData.tourPerson_personId = ?"); //$NON-NLS-1$
-			fParameters.add(activePerson.getPersonId());
+			_parameters.add(activePerson.getPersonId());
 		}
 
 		/*
@@ -62,17 +61,17 @@ public class SQLFilter {
 			final SQLData sqlData = activeTourTypeFilter.getSQLData();
 
 			sb.append(sqlData.whereString);
-			fParameters.addAll(sqlData.longParameters);
+			_parameters.addAll(sqlData.longParameters);
 		}
 
-		fWhereClause = sb.toString();
+		_sqlWhereClause = sb.toString();
 	}
 
 	/**
 	 * @return Returns the where clause to filter the tour types
 	 */
 	public String getWhereClause() {
-		return fWhereClause;
+		return _sqlWhereClause;
 	}
 
 	/**
@@ -86,7 +85,7 @@ public class SQLFilter {
 	public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
 		int parameterIndex = startIndex;
-		for (final Long longParameter : fParameters) {
+		for (final Long longParameter : _parameters) {
 
 			if (longParameter != null) {
 				statement.setLong(parameterIndex, longParameter.longValue());
@@ -97,6 +96,6 @@ public class SQLFilter {
 
 	@Override
 	public String toString() {
-		return fWhereClause;
+		return _sqlWhereClause;
 	}
 }

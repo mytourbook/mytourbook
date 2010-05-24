@@ -65,8 +65,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -74,7 +72,10 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -114,12 +115,39 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 
+	private final IPreferenceStore			_prefStore						= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
+
 	private final IDialogSettings			_state							= TourbookPlugin
 																					.getDefault()
 																					.getDialogSettingsSection(ID);
 
 	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 
+	private boolean							_isRecTimeFormat_hhmmss;
+	private boolean							_isDriveTimeFormat_hhmmss;
+
+
+	private static final NumberFormat		_nf								= NumberFormat.getNumberInstance();
+
+	/*
+	 * resources
+	 */
+	private final Image						_imgTagCategory					= TourbookPlugin
+																					.getImageDescriptor(
+																							Messages.Image__tag_category)
+																					.createImage();
+	private final Image						_imgTag							= TourbookPlugin.getImageDescriptor(
+																					Messages.Image__tag).createImage();
+	private final Image						_imgTagRoot						= TourbookPlugin
+																					.getImageDescriptor(
+																							Messages.Image__tag_root)
+																					.createImage();
+
+	/*
+	 * UI controls
+	 */
 	private Composite						_viewerContainer;
 
 	private TreeViewer						_tagViewer;
@@ -151,24 +179,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionMenuSetTagStructure		_actionSetTagStructure;
 	private ActionSetTourTypeMenu			_actionSetTourType;
 	private ActionOpenTour					_actionOpenTour;
-
 	private ActionModifyColumns				_actionModifyColumns;
-
-	private final Image						_imgTagCategory					= TourbookPlugin
-																					.getImageDescriptor(
-																							Messages.Image__tag_category)
-																					.createImage();
-	private final Image						_imgTag							= TourbookPlugin.getImageDescriptor(
-																					Messages.Image__tag).createImage();
-	private final Image						_imgTagRoot						= TourbookPlugin
-																					.getImageDescriptor(
-																							Messages.Image__tag_root)
-																					.createImage();
-
-	private boolean							_isRecTimeFormat_hhmmss;
-	private boolean							_isDriveTimeFormat_hhmmss;
-
-	private static final NumberFormat		_nf								= NumberFormat.getNumberInstance();
 
 	/**
 	 * comparatore is sorting the tree items
@@ -324,10 +335,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void addPrefListener() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -357,7 +366,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					readDisplayFormats();
 
 					_tagViewer.getTree().setLinesVisible(
-							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tagViewer.refresh();
 
@@ -371,7 +380,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		};
 
 		// register the listener
-		prefStore.addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -525,10 +534,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin
-				.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tagViewer = new TreeViewer(tree);
 		_columnManager.createColumns(_tagViewer);
@@ -1066,7 +1072,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		_imgTag.dispose();
 		_imgTagRoot.dispose();
@@ -1299,12 +1305,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void readDisplayFormats() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_isRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		_isDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 

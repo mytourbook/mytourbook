@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
 
@@ -23,9 +23,10 @@ import net.tourbook.data.TourTag;
 
 public class ChangedTags {
 
-	private HashMap<Long, TourTag>	fModifiedTags;
-	private ArrayList<TourData>		fModifiedTours;
-	private boolean					fIsAddMode;
+	private HashMap<Long, TourTag>	_modifiedTags	= null;
+	private ArrayList<TourData>		_modifiedTours;
+
+	private boolean					_isAddMode;
 
 	/**
 	 * Creates a copy of the modifiedTags parameter and modifiedTours parameter
@@ -43,13 +44,13 @@ public class ChangedTags {
 						final ArrayList<TourData> modifiedTours,
 						final boolean isAddMode) {
 
-		if (fModifiedTags == null) {
-			fModifiedTags = new HashMap<Long, TourTag>();
+		if (_modifiedTags == null) {
+			_modifiedTags = new HashMap<Long, TourTag>();
 		}
 
-		fModifiedTags.putAll(modifiedTags);
-		fModifiedTours = (ArrayList<TourData>) modifiedTours.clone();
-		fIsAddMode = isAddMode;
+		_modifiedTags.putAll(modifiedTags);
+		_modifiedTours = (ArrayList<TourData>) modifiedTours.clone();
+		_isAddMode = isAddMode;
 	}
 
 	/**
@@ -64,28 +65,28 @@ public class ChangedTags {
 	@SuppressWarnings("unchecked")
 	public ChangedTags(final TourTag modifiedTag, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
 
-		if (fModifiedTags == null) {
-			fModifiedTags = new HashMap<Long, TourTag>();
+		if (_modifiedTags == null) {
+			_modifiedTags = new HashMap<Long, TourTag>();
 		}
 
-		fModifiedTags.put(modifiedTag.getTagId(), modifiedTag);
-		fModifiedTours = (ArrayList<TourData>) modifiedTours.clone();
-		fIsAddMode = isAddMode;
+		_modifiedTags.put(modifiedTag.getTagId(), modifiedTag);
+		_modifiedTours = (ArrayList<TourData>) modifiedTours.clone();
+		_isAddMode = isAddMode;
 	}
 
 	/**
 	 * @return Returns the modified tags
 	 */
 	public HashMap<Long, TourTag> getModifiedTags() {
-		return fModifiedTags;
+		return _modifiedTags;
 	}
 
 	public ArrayList<TourData> getModifiedTours() {
-		return fModifiedTours;
+		return _modifiedTours;
 	}
 
 	public boolean isAddMode() {
-		return fIsAddMode;
+		return _isAddMode;
 	}
 
 }

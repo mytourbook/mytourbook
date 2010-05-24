@@ -52,11 +52,12 @@ import net.tourbook.ui.tourChart.action.TCActionHandlerManager;
 import net.tourbook.ui.tourChart.action.TCActionProxy;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -92,6 +93,10 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_GRAPH_GRADIENT				= "net.tourbook.command.graph.gradient";						//$NON-NLS-1$
 	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE			= "net.tourbook.command.graph.tourCompare";					//$NON-NLS-1$
 
+	private final IPreferenceStore			_prefStore								= TourbookPlugin
+																							.getDefault()
+																							.getPreferenceStore();
+
 	private TourData						_tourData;
 
 	private TourChartConfiguration			_tourChartConfig;
@@ -102,39 +107,36 @@ public class TourChart extends Chart {
 	private final TCActionHandlerManager	_tcActionHandlerManager					= TCActionHandlerManager
 																							.getInstance();
 
-	private ActionChartOptions				_actionOptions;
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				_chartDataModelListener;
-
 	private final ListenerList				_selectionListeners						= new ListenerList();
-
 	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 	private IPropertyChangeListener			_prefChangeListener;
 
-	private final Preferences				_prefStore								= TourbookPlugin
-																							.getDefault()
-																							.getPluginPreferences();
-	private ChartLabelLayer					_labelLayer;
+	private boolean							_isSegmentLayerVisible					= false;
+	private boolean							_is2ndAltiLayerVisible					= false;
+	private boolean							_isMouseModeSet;
 
+	/*
+	 * UI controls
+	 */
+	private ChartLabelLayer					_labelLayer;
 	private ChartSegmentLayer				_segmentLayer;
 	private ChartSegmentValueLayer			_segmentValueLayer;
 	private ChartLayer2ndAltiSerie			_layer2ndAltiSerie;
-	private boolean							_isSegmentLayerVisible					= false;
-
-	private boolean							_is2ndAltiLayerVisible					= false;
 	private I2ndAltiLayer					_2ndAltiLayerProvider;
-	private boolean							_isMouseModeSet;
+
+	private ActionChartOptions				_actionOptions;
 
 	private final TourInfo					_tourInfo;
 
-
-	public TourChart(final Composite parent, final int style, final boolean showActions) {
+	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
 		super(parent, style);
 
-		_isShowActions = showActions;
+		_isShowActions = isShowActions;
 
 		addPrefListeners();
 
@@ -159,14 +161,10 @@ public class TourChart extends Chart {
 			}
 		});
 
-
-//		final ChartComponentAxis axisLeft = getChartComponents().getAxisLeft();
-
 		// set tour info icon into the left axis
 		_tourInfo = new TourInfo(getToolTipControl());
 		setToolTip(_tourInfo);
 	}
-
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
 
@@ -334,8 +332,8 @@ public class TourChart extends Chart {
 
 	private void addPrefListeners() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (_tourChartConfig == null) {
 					return;
@@ -740,7 +738,7 @@ public class TourChart extends Chart {
 	 */
 	public void enableTourActions() {
 
-		final int[] allGraphIds = TourManager.allGraphIDs;
+		final int[] allGraphIds = TourManager.getAllGraphIDs();
 		final ArrayList<Integer> checkedGraphIds = _tourChartConfig.getVisibleGraphs();
 		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
 
@@ -1156,6 +1154,21 @@ public class TourChart extends Chart {
 	public void setMouseMode(final Object newMouseMode) {
 		super.setMouseMode(newMouseMode);
 		enableZoomOptions();
+	}
+
+	/**
+	 * Enable or disable the edit actions in the tour info tooltip, by default the edit
+	 * actions are enabled.
+	 * 
+	 * @param isEnabled
+	 */
+	public void setTourInfoActionsEnabled(final boolean isEnabled) {
+
+		if (_tourInfo == null) {
+			return;
+		}
+
+		_tourInfo.setActionsEnabled(isEnabled);
 	}
 
 	/**

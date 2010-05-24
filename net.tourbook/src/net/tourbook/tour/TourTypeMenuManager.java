@@ -27,22 +27,27 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 /**
+ * Manage recently used tour types and fills the context menu
+ * <p>
+ * The method {@link #fillMenuRecentTourTypes} creates the actions and must be called before the
+ * actions are enabled/disabled with {@link #enableRecentTourTypeActions}
  */
 public class TourTypeMenuManager {
 
-	private static final String				STATE_ID			= "TourTypeManager.RecentTourTypes";			//$NON-NLS-1$
-	private static final String				STATE_TOUR_TYPE_ID	= "TourTypeId";								//$NON-NLS-1$
+	private static final String				STATE_ID			= "TourTypeManager.RecentTourTypes";				//$NON-NLS-1$
+	private static final String				STATE_TOUR_TYPE_ID	= "TourTypeId";									//$NON-NLS-1$
+
+	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	/**
 	 * Tour type manager state is saved in {@link #STATE_ID}
@@ -67,6 +72,7 @@ public class TourTypeMenuManager {
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
+	private static boolean					_isInitialized		= false;
 	private static boolean					_isSaveTour;
 
 	private static class RecentTourTypeAction extends Action {
@@ -81,6 +87,25 @@ public class TourTypeMenuManager {
 		private void setTourType(final TourType tourType) {
 			__tourType = tourType;
 		}
+	}
+
+	private static void addPrefChangeListener() {
+		// create pref listener
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// check if the number of recent tour types has changed
+				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
+					setActions();
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+					updateTourTypes();
+				}
+			}
+		};
+
+		// add pref listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -99,8 +124,8 @@ public class TourTypeMenuManager {
 	 */
 	public static void enableRecentTourTypeActions(final boolean isEnabled, final long existingTourTypeId) {
 
-		if (_actionsRecentTourTypes == null) {
-			return;
+		if (_isInitialized == false) {
+			initTourTypeManager();
 		}
 
 		for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
@@ -141,9 +166,10 @@ public class TourTypeMenuManager {
 				} else {
 
 					// set tour type image
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+//					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+//					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
-					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+					actionRecentTourType.setImageDescriptor(UI.getInstance().getTourTypeImageDescriptor(tourTypeId));
 				}
 
 			} else {
@@ -169,7 +195,7 @@ public class TourTypeMenuManager {
 												final ITourProvider tourProvider,
 												final boolean isSaveTour) {
 
-		if (_actionsRecentTourTypes == null) {
+		if (_isInitialized == false) {
 			initTourTypeManager();
 		}
 
@@ -189,11 +215,11 @@ public class TourTypeMenuManager {
 		for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
 			try {
 
-				final TourType tourType = _recentTourTypes.get(tourTypeIndex);
+				final TourType recentTourType = _recentTourTypes.get(tourTypeIndex);
 
-				actionRecentTourType.setTourType(tourType);
+				actionRecentTourType.setTourType(recentTourType);
 				actionRecentTourType.setText(//
-						(UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + tourType.getName()));
+						(UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + recentTourType.getName()));
 
 				menuMgr.add(actionRecentTourType);
 
@@ -206,34 +232,13 @@ public class TourTypeMenuManager {
 		}
 	}
 
-//	private static int getMaxTourTypes() {
-//
-//		final int maxTourTypes = TourbookPlugin
-//				.getDefault()
-//				.getPreferenceStore()
-//				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
-//
-//		return maxTourTypes;
-//	}
-
-	private static void initTourTypeManager() {
+	private static synchronized void initTourTypeManager() {
 
 		setActions();
 
-		// create pref listener
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
-				final String property = event.getProperty();
+		addPrefChangeListener();
 
-				// check if the number of recent tour types has changed
-				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
-					setActions();
-				}
-			}
-		};
-
-		// add pref listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_isInitialized = true;
 	}
 
 	public static void restoreState() {
@@ -343,59 +348,30 @@ public class TourTypeMenuManager {
 		BusyIndicator.showWhile(Display.getCurrent(), runnable);
 	}
 
-//	public static void setTourTypeIntoTour(	final TourType tourType,
-//											final ITourProvider tourProvider,
-//											final boolean isSaveTour) {
-//
-//		final Runnable runnable = new Runnable() {
-//
-//			public void run() {
-//
-//				// get tours which tour type should be set
-//				ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-//
-//				if (selectedTours == null || selectedTours.size() == 0) {
-//					return;
-//				}
-//
-//				// set tour type into all selected tours
-//				for (final TourData tourData : selectedTours) {
-//					tourData.setTourType(tourType);
-//				}
-//
-//				addRecentTourType(tourType);
-//
-//				if (isSaveTour) {
-//
-//					// save all tours with the modified tour type
-//					final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
-//					selectedTours = savedTours;
-//
-//				} else {
-//
-//					// tours are not saved but the tour provider must be notified
-//
-//					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
-//				}
-//			}
-//
-//		};
-//		BusyIndicator.showWhile(Display.getCurrent(), runnable);
-//	}
-
 	/**
-	 * Update the names of all recent tour types
+	 * Tour types has changed
 	 */
-	public static void updateTourTypeNames() {
+	private static void updateTourTypes() {
 
-//		final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
-//
-//		for (final TourType recentTag : _recentTourTypes) {
-//
-//			final TourType tourTag = dbTourTypes.get(recentTag.getTypeId());
-//			if (tourTag != null) {
-//				recentTag.setTagName(tourTag.getName());
-//			}
-//		}
+		final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
+		final LinkedList<TourType> validTourTypes = new LinkedList<TourType>();
+
+		// check if the tour types are still available
+		for (final TourType recentTourType : _recentTourTypes) {
+
+			final long recentTypeId = recentTourType.getTypeId();
+
+			for (final TourType dbTourType : dbTourTypes) {
+
+				if (recentTypeId == dbTourType.getTypeId()) {
+					validTourTypes.add(dbTourType);
+					break;
+				}
+			}
+		}
+
+		// set updated list
+		_recentTourTypes.clear();
+		_recentTourTypes = validTourTypes;
 	}
 }

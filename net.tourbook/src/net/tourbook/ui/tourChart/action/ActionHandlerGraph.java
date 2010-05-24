@@ -34,12 +34,12 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 	public ActionHandlerGraph(final int graphId, final String commandId) {
 
 		fGraphId = graphId;
-		fCommandId = commandId;
+		_commandId = commandId;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		final TourChartConfiguration chartConfig = fTourChart.getTourChartConfig();
+		final TourChartConfiguration chartConfig = _tourChart.getTourChartConfig();
 		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
 		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);
@@ -49,7 +49,7 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 
 			// this is a toggle button so the check status must be reset
 
-			TCActionHandlerManager.getInstance().updateUICheckState(fCommandId);
+			TCActionHandlerManager.getInstance().updateUICheckState(_commandId);
 
 			return null;
 		}
@@ -62,8 +62,8 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 			chartConfig.removeVisibleGraph(fGraphId);
 		}
 
-		fTourChart.enableTourActions();
-		fTourChart.updateTourChart(true);
+		_tourChart.enableTourActions();
+		_tourChart.updateTourChart(true);
 
 		return null;
 	}

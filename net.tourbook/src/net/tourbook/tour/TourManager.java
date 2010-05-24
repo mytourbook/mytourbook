@@ -44,7 +44,6 @@ import net.tourbook.util.IExternalTourEvents;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -93,7 +92,7 @@ public class TourManager {
 	public static final int						GRAPH_PACE					= 1008;
 	public static final int						GRAPH_TOUR_COMPARE			= 2000;
 
-	public static final int[]					allGraphIDs					= new int[] {
+	private static final int[]					_allGraphIDs				= new int[] {
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
 			GRAPH_ALTIMETER,
@@ -110,13 +109,9 @@ public class TourManager {
 
 	private static TourManager					_instance;
 
-//	private final static Preferences			_prefStore					= TourbookPlugin
-//																					.getDefault()
-//																					.getPreferenceStore();
-
-	private final static Preferences			_prefStore					= TourbookPlugin
+	private final static IPreferenceStore		_prefStore					= TourbookPlugin
 																					.getDefault()
-																					.getPluginPreferences();
+																					.getPreferenceStore();
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
@@ -296,6 +291,10 @@ public class TourManager {
 		for (final Object listener : allListeners) {
 			((ITourEventListener) listener).tourChanged(part, tourEventId, eventData);
 		}
+	}
+
+	public static int[] getAllGraphIDs() {
+		return _allGraphIDs;
 	}
 
 	public static TourManager getInstance() {
@@ -741,7 +740,7 @@ public class TourManager {
 	 * @param prefStore
 	 */
 	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
-														final Preferences prefStore) {
+														final IPreferenceStore prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
@@ -1594,24 +1593,24 @@ public class TourManager {
 		}
 	}
 
-	/**
-	 * @param tourData
-	 * @param useNormalizedData
-	 */
-	// public void createTour(final TourData tourData) {
-	//
-	// openTourEditor(createTourEditorInput(tourData));
-	// }
-	/**
-	 * @param tourData
-	 */
-	public void createTour(TourData tourData) {
-
-		if (tourData.getTourPerson() != null) {
-			// load tour from database
-			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
-		}
-	}
+//	/**
+//	 * @param tourData
+//	 * @param useNormalizedData
+//	 */
+//	// public void createTour(final TourData tourData) {
+//	//
+//	// openTourEditor(createTourEditorInput(tourData));
+//	// }
+//	/**
+//	 * @param tourData
+//	 */
+//	public void createTour(TourData tourData) {
+//
+//		if (tourData.getTourPerson() != null) {
+//			// load tour from database
+//			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
+//		}
+//	}
 
 	public TourChart getActiveTourChart() {
 		return _activeTourChart;
@@ -1637,7 +1636,7 @@ public class TourManager {
 		if (_tourDataEditorInstance != null) {
 
 			final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
-			if (tourDataInEditor != null && tourDataInEditor.getTourId() == requestedTourId) {
+			if (tourDataInEditor != null && tourDataInEditor.getTourId().equals(requestedTourId)) {
 
 				// cache tour data
 				_tourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);

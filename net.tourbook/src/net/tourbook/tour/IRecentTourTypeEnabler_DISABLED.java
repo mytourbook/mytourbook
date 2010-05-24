@@ -13,24 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.tour;
 
-import java.util.List;
-
-import net.tourbook.ui.UI;
+import net.tourbook.data.TourType;
 
 /**
- * Configuration for the map legend to visualize one unit in a tour
+ * Enable or disable recently used tour types
  */
-public class LegendConfig {
+public interface IRecentTourTypeEnabler_DISABLED {
 
-	public int				legendMinValue;
-	public int				legendMaxValue;
+	/**
+	 * @param tourType
+	 * @return Return <code>true</code> when the tour type should be enabled, <code>false</code>
+	 *         will disable the recent tour type
+	 */
+	public boolean isTourTypeEnabled(TourType tourType);
 
-	public List<Integer>	units;
-	public List<String>		unitLabels;
-
-	public int				unitFactor	= 1;
-
-	public String			unitText	= UI.EMPTY_STRING;
 }

@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 /**
  * Represents a reference tour which is between the {@link #startIndex} and {@link #endIndex} in the
@@ -46,7 +47,7 @@ public class TourReference {
 
 	private int				endIndex;
 
-	private String			label			= "";	//$NON-NLS-1$
+	private String			label			= UI.EMPTY_STRING;
 
 	public TourReference() {}
 

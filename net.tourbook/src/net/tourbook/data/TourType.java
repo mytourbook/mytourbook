@@ -123,6 +123,10 @@ public class TourType implements Comparable<Object> {
 		return true;
 	}
 
+	public long getCreateId() {
+		return _createId;
+	}
+
 	/**
 	 * @return Returns the name for the tour type
 	 */

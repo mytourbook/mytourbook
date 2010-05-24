@@ -51,8 +51,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.Util;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -60,6 +58,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -148,9 +148,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 																								.getDefault()
 																								.getPreferenceStore();
 
-	private Map										_map;
-	private TourInfo								_tourInfo;
-
 	private ISelectionListener						_postSelectionListener;
 	private IPropertyChangeListener					_prefChangeListener;
 	private IPropertyChangeListener					_tourbookPrefChangeListener;
@@ -163,35 +160,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 */
 	private final ArrayList<TourData>				_tourDataList						= new ArrayList<TourData>();
 	private TourData								_previousTourData;
-
-	private ActionDimMap							_actionDimMap;
-	private ActionManageMapProviders				_actionManageProvider;
-	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
-	private ActionSelectMapProvider					_actionSelectMapProvider;
-	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
-	private ActionSetDefaultPosition				_actionSetDefaultPosition;
-	private ActionShowPOI							_actionShowPOI;
-	private ActionShowLegendInMap					_actionShowLegendInMap;
-	private ActionShowScaleInMap					_actionShowScaleInMap;
-	private ActionShowSliderInMap					_actionShowSliderInMap;
-	private ActionShowSliderInLegend				_actionShowSliderInLegend;
-	private ActionShowStartEndInMap					_actionShowStartEndInMap;
-	private ActionShowTourInMap						_actionShowTourInMap;
-	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
-	private ActionShowTourMarker					_actionShowTourMarker;
-	private ActionSynchWithTour						_actionSynchWithTour;
-	private ActionSynchWithSlider					_actionSynchWithSlider;
-	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
-	private ActionTourColor							_actionTourColorAltitude;
-	private ActionTourColor							_actionTourColorGradient;
-	private ActionTourColor							_actionTourColorPulse;
-	private ActionTourColor							_actionTourColorSpeed;
-	private ActionTourColor							_actionTourColorPace;
-	private ActionZoomIn							_actionZoomIn;
-	private ActionZoomOut							_actionZoomOut;
-	private ActionZoomCentered						_actionZoomCentered;
-	private ActionZoomShowAll						_actionZoomShowAll;
-	private ActionZoomShowEntireTour				_actionZoomShowEntireTour;
 
 	private boolean									_isMapSynchedWithTour;
 	private boolean									_isMapSynchedWithSlider;
@@ -233,6 +201,41 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private final PaintManager						_paintMgr							= PaintManager.getInstance();
 	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
+
+	/*
+	 * UI controls
+	 */
+	private Map										_map;
+	private TourInfo								_tourInfo;
+
+	private ActionDimMap							_actionDimMap;
+	private ActionManageMapProviders				_actionManageProvider;
+	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
+	private ActionSelectMapProvider					_actionSelectMapProvider;
+	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
+	private ActionSetDefaultPosition				_actionSetDefaultPosition;
+	private ActionShowPOI							_actionShowPOI;
+	private ActionShowLegendInMap					_actionShowLegendInMap;
+	private ActionShowScaleInMap					_actionShowScaleInMap;
+	private ActionShowSliderInMap					_actionShowSliderInMap;
+	private ActionShowSliderInLegend				_actionShowSliderInLegend;
+	private ActionShowStartEndInMap					_actionShowStartEndInMap;
+	private ActionShowTourInMap						_actionShowTourInMap;
+	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
+	private ActionShowTourMarker					_actionShowTourMarker;
+	private ActionSynchWithTour						_actionSynchWithTour;
+	private ActionSynchWithSlider					_actionSynchWithSlider;
+	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
+	private ActionTourColor							_actionTourColorAltitude;
+	private ActionTourColor							_actionTourColorGradient;
+	private ActionTourColor							_actionTourColorPulse;
+	private ActionTourColor							_actionTourColorSpeed;
+	private ActionTourColor							_actionTourColorPace;
+	private ActionZoomIn							_actionZoomIn;
+	private ActionZoomOut							_actionZoomOut;
+	private ActionZoomCentered						_actionZoomCentered;
+	private ActionZoomShowAll						_actionZoomShowAll;
+	private ActionZoomShowEntireTour				_actionZoomShowEntireTour;
 
 	public TourMapView() {}
 
@@ -469,9 +472,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		/*
 		 * observe map preferences
 		 */
-		_mapPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_mapPrefChangeListener = new IPropertyChangeListener() {
 			@Override
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 				if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
@@ -490,7 +493,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			}
 		};
 		// !!! SRTM pref store !!!
-		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(_mapPrefChangeListener);
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(_mapPrefChangeListener);
 
 		_map.addZoomListener(new IZoomListener() {
 			@Override
@@ -560,9 +563,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
+		_prefChangeListener = new IPropertyChangeListener() {
 			@Override
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -612,7 +615,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			}
 		};
 
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -631,9 +634,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void addTourbookPrefListener() {
 
-		_tourbookPrefChangeListener = new Preferences.IPropertyChangeListener() {
+		_tourbookPrefChangeListener = new IPropertyChangeListener() {
 			@Override
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -651,7 +654,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_tourbookPrefChangeListener);
+		_prefStore.addPropertyChangeListener(_tourbookPrefChangeListener);
 	}
 
 	private void addTourEventListener() {
@@ -1028,9 +1031,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		final Preferences pluginPreferences = TourbookPlugin.getDefault().getPluginPreferences();
-		pluginPreferences.removePropertyChangeListener(_prefChangeListener);
-		pluginPreferences.removePropertyChangeListener(_tourbookPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
+
+		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(_mapPrefChangeListener);
 
 		super.dispose();
 	}
@@ -2110,8 +2114,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 							null,
 							null);
 
-					_prefStore.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog
-							.getToggleState());
+					_prefStore.setValue(
+							ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+							dialog.getToggleState());
 				}
 			});
 		}

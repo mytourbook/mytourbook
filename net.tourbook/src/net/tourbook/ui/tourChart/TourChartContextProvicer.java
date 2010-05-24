@@ -134,7 +134,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 
 		final Set<TourTag> allExistingTags = tourData == null ? null : tourData.getTourTags();
-		final boolean isTagAvailable = allExistingTags.size() > 0;
+		final boolean isTagAvailable = allExistingTags == null ? false : allExistingTags.size() > 0;
 
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		if (tourData != null) {
@@ -215,7 +215,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 			final TourData tourData = _tourChartViewer.getTourChart().getTourData();
 			final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 
-			final boolean canCreateRefTours = tourData.altitudeSerie != null
+			final boolean canCreateRefTours = tourData != null
+					&& tourData.altitudeSerie != null
 					&& tourData.distanceSerie != null
 					&& isTourSaved;
 

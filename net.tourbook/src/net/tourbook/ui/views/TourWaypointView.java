@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
@@ -51,14 +50,15 @@ import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -105,7 +105,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	public static final int			COLUMN_X_OFFSET			= 4;
 	public static final int			COLUMN_Y_OFFSET			= 5;
 
-	private final Preferences		_prefStore				= TourbookPlugin.getDefault().getPluginPreferences();
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 	private final IDialogSettings	_state					= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
 	private ActionModifyColumns		_actionModifyColumns;
@@ -200,8 +200,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -450,7 +450,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				}
 
 				// edit selected marker
-				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
+//				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
 //				if (selection.size() > 0) {
 //					_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
 //					_actionEditTourWaypoints.run();
@@ -721,7 +721,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			}
 
 		} else if (selection instanceof SelectionActiveEditor) {
-
 
 			// check tour editor
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();

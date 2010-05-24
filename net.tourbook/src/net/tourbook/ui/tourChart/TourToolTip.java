@@ -82,8 +82,10 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 		_nf3.setMaximumFractionDigits(3);
 	}
 
-	private ActionTourToolTipEditTour	_actionEditTour;
-	private ActionTourToolTipEditQuick	_actionEditQuick;
+	private boolean						_hasTags;
+	private boolean						_hasDescription;
+
+	private boolean						_isActionsVisible		= true;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
@@ -139,8 +141,8 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private Label						_lblCalories;
 	private Label						_lblRestPulse;
 
-	private boolean						_hasTags;
-	private boolean						_hasDescription;
+	private ActionTourToolTipEditTour	_actionEditTour;
+	private ActionTourToolTipEditQuick	_actionEditQuick;
 
 	public TourToolTip(final Control control) {
 		this(control, NO_RECREATE, false);
@@ -294,6 +296,11 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	}
 
 	private void createUI12Toolbar(final Composite container) {
+
+		if (_isActionsVisible == false) {
+			// actions are not enabled
+			return;
+		}
 
 		/*
 		 * create actions
@@ -657,6 +664,10 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 
 	private void enableControls() {
 
+		if (_isActionsVisible == false) {
+			return;
+		}
+
 		final boolean isTourSaved = _tourData.isTourSaved();
 
 		_actionEditQuick.setEnabled(isTourSaved);
@@ -709,6 +720,10 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private void onDispose() {
 		_firstColumnControls.clear();
 		_secondColumnControls.clear();
+	}
+
+	void setActionsEnabled(final boolean isEnabled) {
+		_isActionsVisible = isEnabled;
 	}
 
 	public void setTourData(final ArrayList<TourData> tourDataList) {

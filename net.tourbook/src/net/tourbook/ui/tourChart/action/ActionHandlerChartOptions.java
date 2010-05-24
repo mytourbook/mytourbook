@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerChartOptions extends TCActionHandler {
 
 	public ActionHandlerChartOptions() {
-		fCommandId = TourChart.COMMAND_ID_CHART_OPTIONS;
+		_commandId = TourChart.COMMAND_ID_CHART_OPTIONS;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {

@@ -46,6 +46,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -131,12 +132,14 @@ public class RawDataManager {
 
 	void actionImportFromDevice() {
 
-		new WizardImportDialog(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-				new WizardImportData(),
-				Messages.Import_Wizard_Dlg_title).open();
+		final WizardImportDialog dialog = new WizardImportDialog(PlatformUI
+				.getWorkbench()
+				.getActiveWorkbenchWindow()
+				.getShell(), new WizardImportData(), Messages.Import_Wizard_Dlg_title);
 
-		showRawDataView();
+		if (dialog.open() == Window.OK) {
+			showRawDataView();
+		}
 	}
 
 	void actionImportFromDeviceDirect() {
@@ -153,9 +156,9 @@ public class RawDataManager {
 
 		importWizard.setAutoDownload();
 
-		dialog.open();
-
-		showRawDataView();
+		if (dialog.open() == Window.OK) {
+			showRawDataView();
+		}
 	}
 
 	/**
@@ -211,10 +214,6 @@ public class RawDataManager {
 
 		final String[] selectedFileNames = fileDialog.getFileNames();
 		setImportCanceled(false);
-
-//		Display.getDefault().asyncExec(new Runnable() {
-//
-//			public void run() {
 
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
@@ -284,9 +283,6 @@ public class RawDataManager {
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
-//			}
-//		});
-
 	}
 
 	public DeviceData getDeviceData() {

@@ -192,7 +192,7 @@ public class DialogMarker extends TitleAreaDialog {
 	/**
 	 * Sort the markers by time
 	 */
-	private class MarkerViewerSorter extends ViewerSorter {
+	private static class MarkerViewerSorter extends ViewerSorter {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
@@ -555,6 +555,7 @@ public class DialogMarker extends TitleAreaDialog {
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this));
+		_tourChart.setTourInfoActionsEnabled(false);
 
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {
@@ -693,18 +694,6 @@ public class DialogMarker extends TitleAreaDialog {
 		/*
 		 * button: delete marker
 		 */
-//		boolean isCustomMarker = false;
-//		final IStructuredSelection markerSelection = (IStructuredSelection) _markerViewer.getSelection();
-//
-//		// check if custom markers are selected
-//		for (final Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
-//			final TourMarker tourMarker = iter.next();
-//			if (tourMarker.getType() != ChartLabel.MARKER_TYPE_DEVICE) {
-//				isCustomMarker = true;
-//				break;
-//			}
-//		}
-//		_btnDelete.setEnabled(isCustomMarker);
 		_btnDelete.setEnabled(isMarkerSelected);
 
 		final boolean isMarkerAvailable = _markerViewer.getTable().getItemCount() != 0;

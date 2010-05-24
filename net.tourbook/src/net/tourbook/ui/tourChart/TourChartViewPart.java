@@ -25,8 +25,9 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener2;
@@ -39,6 +40,8 @@ import org.eclipse.ui.part.ViewPart;
  * Provides a skeleton for a view which displays a tour chart
  */
 public abstract class TourChartViewPart extends ViewPart {
+
+	private final IPreferenceStore		_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public TourData						_tourData;
 
@@ -86,8 +89,8 @@ public abstract class TourChartViewPart extends ViewPart {
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -111,7 +114,7 @@ public abstract class TourChartViewPart extends ViewPart {
 			}
 		};
 
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -186,7 +189,7 @@ public abstract class TourChartViewPart extends ViewPart {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,8 +41,10 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -63,31 +65,37 @@ import org.w3c.dom.Element;
 
 public class TourTypeContributionItem extends CustomControlContribution {
 
-	private static final String			ID							= "net.tourbook.tourtypefilter";	//$NON-NLS-1$
+	private static final String								ID							= "net.tourbook.tourtypefilter";				//$NON-NLS-1$
 
-	private static final String			TAG_NAME					= "name";							//$NON-NLS-1$
-	private static final String			TAG_FILTER_TYPE				= "filterType";					//$NON-NLS-1$
-	private static final String			TAG_SYSTEM_ID				= "systemId";						//$NON-NLS-1$
-	private static final String			TAG_TOUR_TYPE_ID			= "tourTypeId";					//$NON-NLS-1$
+	private static final String								TAG_NAME					= "name";										//$NON-NLS-1$
+	private static final String								TAG_FILTER_TYPE				= "filterType";								//$NON-NLS-1$
+	private static final String								TAG_SYSTEM_ID				= "systemId";									//$NON-NLS-1$
+	private static final String								TAG_TOUR_TYPE_ID			= "tourTypeId";								//$NON-NLS-1$
 
-	private static final String			MEMENTO_ROOT_FILTER_LIST	= "filterlist";					//$NON-NLS-1$
-	private static final String			MEMENTO_CHILD_FILTER		= "filter";						//$NON-NLS-1$
-	private static final String			MEMENTO_CHILD_TOURTYPE		= "tourtype";						//$NON-NLS-1$
+	private static final String								MEMENTO_ROOT_FILTER_LIST	= "filterlist";								//$NON-NLS-1$
+	private static final String								MEMENTO_CHILD_FILTER		= "filter";									//$NON-NLS-1$
+	private static final String								MEMENTO_CHILD_TOURTYPE		= "tourtype";									//$NON-NLS-1$
 
-	private static final String			MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";				//$NON-NLS-1$
+	private static final String								MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";							//$NON-NLS-1$
 
-	static TourbookPlugin				plugin						= TourbookPlugin.getDefault();
+	private IPreferenceStore								_prefStore					= TourbookPlugin
+																								.getDefault()
+																								.getPreferenceStore();
 
-	private IPropertyChangeListener		fPrefChangeListener;
+	private final IDialogSettings							_state						= TourbookPlugin
+																								.getDefault()
+																								.getDialogSettingsSection(
+																										"TourTypeContributionItem");
+	private org.eclipse.jface.util.IPropertyChangeListener	_prefChangeListener;
 
-	private TourTypeCombo				fComboTourType;
+	private TourTypeCombo									_comboTourType;
 
 	/**
 	 * contains the tour type filters which are displayed in the combobox
 	 */
-	private ArrayList<TourTypeFilter>	fTourTypeFilters;
+	private ArrayList<TourTypeFilter>						_tourTypeFilters;
 
-	protected double					fPropertyValue;
+	private double											_propertyValue;
 
 	public TourTypeContributionItem() {
 		this(ID);
@@ -130,11 +138,13 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		}
 
 		if (isSysFilterAll == false) {
-			filterList.add(new TourTypeFilter(TourTypeFilter.SYSTEM_FILTER_ID_ALL,
+			filterList.add(new TourTypeFilter(
+					TourTypeFilter.SYSTEM_FILTER_ID_ALL,
 					Messages.App_Tour_type_item_all_types));
 		}
 		if (isSysFilterNotDefined == false) {
-			filterList.add(new TourTypeFilter(TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
+			filterList.add(new TourTypeFilter(
+					TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
 					Messages.App_Tour_type_item_not_defined));
 		}
 
@@ -380,8 +390,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	 */
 	private void addPrefListener() {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -392,17 +404,16 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 					// check if the event was originated from this tour type
 					// combobox
-					if (fPropertyValue != propertyValue) {
+					if (_propertyValue != propertyValue) {
 
 						fillFilterComboBox();
 						reselectTourType(TourbookPlugin.getActiveTourTypeFilter());
 					}
 				}
 			}
-
 		};
-		// register the listener
-		plugin.getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	@Override
@@ -424,41 +435,41 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private Composite createUI(final Composite parent) {
 
-		fComboTourType = new TourTypeCombo(parent, SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
+		_comboTourType = new TourTypeCombo(parent, SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
 
-		fComboTourType.setVisibleItemCount(50);
-		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
+		_comboTourType.setVisibleItemCount(50);
+		_comboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
 
-		fComboTourType.addDisposeListener(new DisposeListener() {
+		_comboTourType.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
-				plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+				_prefStore.removePropertyChangeListener(_prefChangeListener);
 			}
 		});
 
-		fComboTourType.addSelectionListener(new SelectionAdapter() {
+		_comboTourType.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
 				setActiveTourTypeFilter();
 
 				// fire change event
-				fPropertyValue = Math.random();
-				plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, fPropertyValue);
+				_propertyValue = Math.random();
+				_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
 
 			}
 		});
 
-		return fComboTourType.getControl();
+		return _comboTourType.getControl();
 	}
 
 	private void fillFilterComboBox() {
 
-		fTourTypeFilters = getTourTypeFilters();
+		_tourTypeFilters = getTourTypeFilters();
 
-		fComboTourType.removeAll();
+		_comboTourType.removeAll();
 
-		for (final TourTypeFilter tourTypeFilter : fTourTypeFilters) {
-			fComboTourType.add(tourTypeFilter.getFilterName(), getFilterImage(tourTypeFilter));
+		for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
+			_comboTourType.add(tourTypeFilter.getFilterName(), getFilterImage(tourTypeFilter));
 		}
 	}
 
@@ -492,8 +503,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private void reselectLastTourType() {
 
-		final String lastTourTypeFilterName = plugin.getDialogSettings()
-				.get(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER);
+		final String lastTourTypeFilterName = _state.get(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER);
 
 		TourTypeFilter selectTourTypeFilter = null;
 
@@ -501,7 +511,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 			// find the name in the filter list
 
-			for (final TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+			for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
 				if (tourTypeFilter.getFilterName().equals(lastTourTypeFilterName)) {
 					selectTourTypeFilter = tourTypeFilter;
 					break;
@@ -513,7 +523,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 			// get the filter which selects all tour types
 
-			for (final TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+			for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
 				if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM
 						&& tourTypeFilter.getSystemFilterId() == TourTypeFilter.SYSTEM_FILTER_ID_ALL) {
 					selectTourTypeFilter = tourTypeFilter;
@@ -537,10 +547,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		// find the tour type filter in the combobox
 		int tourTypeIndex = 0;
-		for (final TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+		for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
 			if (tourTypeFilter.getFilterName().equals(selectTourTypeFilter.getFilterName())) {
 				activeTourTypeFilter = tourTypeFilter;
-				fComboTourType.select(tourTypeIndex);
+				_comboTourType.select(tourTypeIndex);
 				break;
 			}
 
@@ -549,8 +559,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		if (activeTourTypeFilter == null) {
 			// filter was not found, set first filter as active filter
-			fComboTourType.select(0);
-			activeTourTypeFilter = fTourTypeFilters.get(0);
+			_comboTourType.select(0);
+			activeTourTypeFilter = _tourTypeFilters.get(0);
 		}
 
 		TourbookPlugin.setActiveTourTypeFilter(activeTourTypeFilter);
@@ -559,11 +569,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	void saveState(final IMemento memento) {
 
 		// save selected tour type filter
-		final int selectionIndex = fComboTourType.getSelectionIndex();
+		final int selectionIndex = _comboTourType.getSelectionIndex();
 
 		if (selectionIndex != -1) {
-			plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER,
-					fTourTypeFilters.get(selectionIndex).getFilterName());
+			_state.put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER, //
+					_tourTypeFilters.get(selectionIndex).getFilterName());
 		}
 	}
 
@@ -572,15 +582,15 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	 */
 	private void setActiveTourTypeFilter() {
 
-		int selectionIndex = fComboTourType.getSelectionIndex();
+		int selectionIndex = _comboTourType.getSelectionIndex();
 
 		// check selection
 		if (selectionIndex == -1) {
 			// nothing is selected, select first entry
 			selectionIndex = 0;
-			fComboTourType.select(selectionIndex);
+			_comboTourType.select(selectionIndex);
 		}
 
-		TourbookPlugin.setActiveTourTypeFilter(fTourTypeFilters.get(selectionIndex));
+		TourbookPlugin.setActiveTourTypeFilter(_tourTypeFilters.get(selectionIndex));
 	}
 }

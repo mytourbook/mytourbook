@@ -133,28 +133,14 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 			Messages.Dialog_SplitTour_ComboText_TourTypeCustom							//
 																						};
 
-//	/**
-//	 * state: start time
-//	 */
-//	private static final String[]				ALL_STATES_SPLIT_TIME					= new String[] {
-//			STATE_SPLIT_EXTRACT_TIME_ORIGINAL,
-//			STATE_SPLIT_EXTRACT_TIME_CUSTOM											//
-//																						};
-//	private static final String[]				STATE_COMBO_TEXT_SPLIT_TIME				= new String[] {
-//			Messages.Dialog_SplitTour_ComboText_KeepTime,
-//			Messages.Dialog_SplitTour_ComboText_CustomTime								//
-//																						};
-
 	private final IDialogSettings				_state									= TourbookPlugin
 																								.getDefault()
 																								.getDialogSettingsSection(
 																										"DialogSplit");	//$NON-NLS-1$
 
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
-	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+	private TourData							_tourDataSource;
+	private TourData							_tourDataTarget;
+	private ArrayList<TourData>					_tourDataTargetList;
 
 	private String								_tourTitleFromTour;
 	private String								_tourTitleFromCustom;
@@ -165,6 +151,11 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 	private long								_tourTypeIdCustom						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	private ITourEventListener					_tourEventListener;
+
+	private int									_extractStartIndex;
+	private int									_extractEndIndex;
+
+	private boolean								_isSplitTour;
 
 	/*
 	 * UI controls
@@ -192,14 +183,11 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 	private Button								_chkIncludeDescription;
 	private Button								_chkIncludeMarkerWaypoints;
 
-	private TourData							_tourDataSource;
-	private TourData							_tourDataTarget;
-	private ArrayList<TourData>					_tourDataTargetList;
-
-	private int									_extractStartIndex;
-	private int									_extractEndIndex;
-
-	private boolean								_isSplitTour;
+	private ActionSetTourTag					_actionAddTag;
+	private ActionSetTourTag					_actionRemoveTag;
+	private ActionRemoveAllTags					_actionRemoveAllTags;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
 	public DialogExtractTour(final Shell parentShell, final TourData tourData, final int extractStartIndex) {
 
@@ -256,6 +244,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 							// tour type or tags can have been changed within this dialog
 							updateUITourTypeTags();
+
+							// enable/disable tag/type context menu
+							enableControls();
 						}
 					}
 				}
@@ -295,48 +286,31 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 				: Messages.Dialog_ExtractTour_DlgArea_Message);
 	}
 
-	private void createActions() {
-
-		_actionAddTag = new ActionSetTourTag(this, true, false);
-		_actionRemoveTag = new ActionSetTourTag(this, false, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
-
-		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-				Messages.action_tourType_modify_tourTypes,
-				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
-	}
-
-	@Override
-	protected Control createDialogArea(final Composite parent) {
-
-		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
-
-		initTargetTourData();
-
-		createUI(dlgContainer);
-		createActions();
-		createMenus();
-
-		restoreState();
-
-		updateUITourTypeTags();
-		updateUIFromModel();
-
-		enableControls();
-
-		addTourEventListener();
-
-		return dlgContainer;
-	}
-
 	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
-	private void createMenus() {
+	private void createActionMenus() {
+
+		/*
+		 * tour type menu
+		 */
+		final MenuManager typeMenuMgr = new MenuManager();
+
+		typeMenuMgr.setRemoveAllWhenShown(true);
+		typeMenuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				// set menu items
+
+				ActionSetTourTypeMenu.fillMenu(menuMgr, DialogExtractTour.this, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTourTypePrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTourType.setMenu(typeMenuMgr.createContextMenu(_linkTourType));
 
 		/*
 		 * tag menu
@@ -369,27 +343,44 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 		// set menu for the tag item
 		_linkTag.setMenu(tagMenuMgr.createContextMenu(_linkTag));
+	}
 
-		/*
-		 * tour type menu
-		 */
-		final MenuManager typeMenuMgr = new MenuManager();
+	private void createActions() {
 
-		typeMenuMgr.setRemoveAllWhenShown(true);
-		typeMenuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager menuMgr) {
+		_actionAddTag = new ActionSetTourTag(this, true, false);
+		_actionRemoveTag = new ActionSetTourTag(this, false, false);
+		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
 
-				// set menu items
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
 
-				ActionSetTourTypeMenu.fillMenu(menuMgr, DialogExtractTour.this, false);
+		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.action_tourType_modify_tourTypes,
+				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+	}
 
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTourTypePrefs);
-			}
-		});
+	@Override
+	protected Control createDialogArea(final Composite parent) {
 
-		// set menu for the tag item
-		_linkTourType.setMenu(typeMenuMgr.createContextMenu(_linkTourType));
+		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
+
+		initTargetTourData();
+
+		createUI(dlgContainer);
+		createActions();
+		createActionMenus();
+
+		restoreState();
+
+		updateUITourTypeTags();
+		updateUIFromModel();
+
+		enableControls();
+
+		addTourEventListener();
+
+		return dlgContainer;
 	}
 
 	private void createUI(final Composite parent) {
@@ -492,7 +483,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		};
 
 		/*
-		 * tour time
+		 * keep original time
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -505,12 +496,12 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		_chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_ComboText_KeepTime);
 		_chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
 
-		/*
-		 * tour start date/time
-		 */
 		//spacer
 		new Label(parent, SWT.NONE);
 
+		/*
+		 * tour start date/time
+		 */
 		final Composite dateContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
@@ -672,6 +663,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		final boolean isCustomTime = _chkKeepOriginalDateTime.getSelection() == false;
 		final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
 		final boolean isCustomTourTitle = getStateTourTitleSource().equals(STATE_TOUR_TITLE_SOURCE_CUSTOM);
+		final TourType tourType = _tourDataTarget.getTourType();
 
 		_txtTourTitle.setEditable(isCustomTourTitle);
 
@@ -682,6 +674,12 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 		_linkTourType.setEnabled(isCustomTourType);
 		_lblTourType.setEnabled(isCustomTourType);
+
+		// enable/disable actions for tags/tour types
+		TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
+//		TourTypeMenuManager.enableRecentTourTypeActions(true, tourType == null
+//				? TourDatabase.ENTITY_IS_NOT_SAVED
+//				: tourType.getTypeId());
 	}
 
 	/**
@@ -1087,7 +1085,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 			return false;
 		}
 
-		_tourDataTarget = TourManager.saveModifiedTour(_tourDataTarget);
+		TourManager.saveModifiedTour(_tourDataTarget);
 
 		return true;
 	}
@@ -1124,7 +1122,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 	}
 
 	/**
-	 * Create {@link TourData} for the splitted tour
+	 * Create {@link TourData} for the splitted/extracted tour
 	 */
 	private void initTargetTourData() {
 

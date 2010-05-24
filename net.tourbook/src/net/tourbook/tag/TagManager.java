@@ -32,11 +32,12 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -57,10 +58,15 @@ public class TagManager {
 	private static final String				SETTINGS_SECTION_RECENT_TAGS	= "TagManager.RecentTags";						//$NON-NLS-1$
 	private static final String				SETTINGS_TAG_ID					= "tagId";										//$NON-NLS-1$
 
+	private static final IPreferenceStore	_prefStore						= TourbookPlugin
+																					.getDefault()
+																					.getPreferenceStore();
 	private static IDialogSettings			_state							= TourbookPlugin
 																					.getDefault()
 																					.getDialogSettingsSection(
 																							SETTINGS_SECTION_RECENT_TAGS);
+
+	private static boolean					_isInitialized					= false;
 
 	/**
 	 * number of tags which are displayed in the context menu or saved in the dialog settings, it's
@@ -68,15 +74,15 @@ public class TagManager {
 	 */
 	private static LinkedList<TourTag>		_recentTags						= new LinkedList<TourTag>();
 
+	private static int						_maxRecentActions				= -1;
 	private static ActionRecentTag[]		_actionsRecentTags;
 
 	private static ITourProvider			_tourProvider;
+
 	private static boolean					_isAddMode;
 	private static boolean					_isSaveTour;
 
 	private static IPropertyChangeListener	_prefChangeListener;
-
-	private static int						_maxTags						= -1;
 
 	private static class ActionRecentTag extends Action {
 
@@ -90,6 +96,24 @@ public class TagManager {
 		private void setTag(final TourTag tag) {
 			_tag = tag;
 		}
+	}
+
+	private static void addPrefListener() {
+
+		// create pref listener
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// check if the number of recent tags has changed
+				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
+					setActions();
+				}
+			}
+		};
+
+		// add pref listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -191,7 +215,7 @@ public class TagManager {
 											final boolean isAddMode,
 											final boolean isSaveTour) {
 
-		if (_actionsRecentTags == null) {
+		if (_isInitialized == false) {
 			initTagManager();
 		}
 
@@ -199,11 +223,12 @@ public class TagManager {
 			return;
 		}
 
-		if (_maxTags < 1) {
+		if (_maxRecentActions < 1) {
 			return;
 		}
 
 		_tourProvider = tourProvider;
+
 		_isAddMode = isAddMode;
 		_isSaveTour = isSaveTour;
 
@@ -229,24 +254,12 @@ public class TagManager {
 		}
 	}
 
-	private static void initTagManager() {
+	private static synchronized void initTagManager() {
 
 		setActions();
+		addPrefListener();
 
-		// create pref listener
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
-				final String property = event.getProperty();
-
-				// check if the number of recent tags has changed
-				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
-					setActions();
-				}
-			}
-		};
-
-		// add pref listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_isInitialized = true;
 	}
 
 	public static void restoreState() {
@@ -271,18 +284,18 @@ public class TagManager {
 
 	public static void saveState() {
 
-		if (_maxTags < 1) {
+		if (_maxRecentActions < 1) {
 			// tour types are not initialized or not visible, do nothing
 			return;
 		}
 
-		final String[] tagIds = new String[Math.min(_maxTags, _recentTags.size())];
+		final String[] tagIds = new String[Math.min(_maxRecentActions, _recentTags.size())];
 		int tagIndex = 0;
 
 		for (final TourTag tag : _recentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
-			if (tagIndex == _maxTags) {
+			if (tagIndex == _maxRecentActions) {
 				break;
 			}
 		}
@@ -295,12 +308,12 @@ public class TagManager {
 	 */
 	private static void setActions() {
 
-		_maxTags = TourbookPlugin
+		_maxRecentActions = TourbookPlugin
 				.getDefault()
 				.getPreferenceStore()
 				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
 
-		_actionsRecentTags = new ActionRecentTag[_maxTags];
+		_actionsRecentTags = new ActionRecentTag[_maxRecentActions];
 
 		for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
 			_actionsRecentTags[actionIndex] = new ActionRecentTag();

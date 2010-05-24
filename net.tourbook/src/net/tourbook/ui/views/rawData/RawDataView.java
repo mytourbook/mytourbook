@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,8 +72,6 @@ import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -85,8 +83,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -138,14 +139,58 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
 	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";				//$NON-NLS-1$
 
-	private final Preferences				_prefStore							= TourbookPlugin
+	private final IPreferenceStore			_prefStore							= TourbookPlugin
 																						.getDefault()
-																						.getPluginPreferences();
+																						.getPreferenceStore();
 
 	private final IDialogSettings			_state								= TourbookPlugin
 																						.getDefault()
 																						.getDialogSettingsSection(ID);
 
+	private PostSelectionProvider			_postSelectionProvider;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
+
+	protected TourPerson					_activePerson;
+	protected TourPerson					_newActivePerson;
+
+	protected boolean						_isPartVisible						= false;
+	protected boolean						_isViewerPersonDataDirty			= false;
+
+	private ColumnManager					_columnManager;
+
+	private final Calendar					_calendar							= GregorianCalendar.getInstance();
+
+	private final NumberFormat				_nf									= NumberFormat.getNumberInstance();
+	private final DateFormat				_dateFormatter						= DateFormat
+																						.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter						= DateFormat
+																						.getTimeInstance(DateFormat.SHORT);
+	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
+																						DateFormat.SHORT,
+																						Locale.GERMAN);
+
+	/*
+	 * resources
+	 */
+	private ImageDescriptor					_imageDescDatabase;
+	private ImageDescriptor					_imageDescDatabaseOtherPerson;
+	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
+	private ImageDescriptor					_imageDescDatabasePlaceholder;
+	private ImageDescriptor					_imageDescDelete;
+
+	private Image							_imageDatabase;
+	private Image							_imageDatabaseOtherPerson;
+	private Image							_imageDatabaseAssignMergedTour;
+	private Image							_imageDatabasePlaceholder;
+	private Image							_imageDelete;
+
+	/*
+	 * UI controls
+	 */
+	private Composite						_viewerContainer;
 	private TableViewer						_tourViewer;
 
 	private ActionClearView					_actionClearView;
@@ -172,44 +217,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
 	private ActionExport					_actionExportTour;
 	private ActionJoinTours					_actionJoinTours;
-
-	private ImageDescriptor					_imageDescDatabase;
-	private ImageDescriptor					_imageDescDatabaseOtherPerson;
-	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
-	private ImageDescriptor					_imageDescDatabasePlaceholder;
-	private ImageDescriptor					_imageDescDelete;
-
-	private Image							_imageDatabase;
-	private Image							_imageDatabaseOtherPerson;
-	private Image							_imageDatabaseAssignMergedTour;
-	private Image							_imageDatabasePlaceholder;
-	private Image							_imageDelete;
-
-	private PostSelectionProvider			_postSelectionProvider;
-	private IPartListener2					_partListener;
-	private ISelectionListener				_postSelectionListener;
-	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
-
-	private final Calendar					_calendar							= GregorianCalendar.getInstance();
-	private final DateFormat				_dateFormatter						= DateFormat
-																						.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter						= DateFormat
-																						.getTimeInstance(DateFormat.SHORT);
-	private final NumberFormat				_nf									= NumberFormat.getNumberInstance();
-	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
-																						DateFormat.SHORT,
-																						Locale.GERMAN);
-
-	protected TourPerson					_activePerson;
-	protected TourPerson					_newActivePerson;
-
-	protected boolean						_isPartVisible						= false;
-	protected boolean						_isViewerPersonDataDirty			= false;
-
-	private ColumnManager					_columnManager;
-
-	private Composite						_viewerContainer;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -490,8 +497,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -643,15 +650,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 	}
 
-	private void createChart() {
-
-		final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
-
-		if ((firstElement != null) && (firstElement instanceof TourData)) {
-			TourManager.getInstance().createTour((TourData) firstElement);
-		}
-	}
-
 	/**
 	 * create the views context menu
 	 */
@@ -743,7 +741,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				createChart();
+				onOpenTourInEditor();
 			}
 		});
 
@@ -1174,6 +1172,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
 				if (tourType == null) {
 					cell.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
@@ -1187,11 +1186,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					 * the content is modified but in the rawDataView the modified image is not
 					 * displayed compared with the tourBookView which displays the correct image
 					 */
-//					final byte[] imageData = tourTypeImage.getImageData().data;
-//					final StringBuilder sb = new StringBuilder();
-//					for (final byte b : imageData) {
-//						sb.append(b);
-//					}
 					cell.setImage(tourTypeImage);
 				}
 			}
@@ -1508,16 +1502,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _tourViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
-
 	public ArrayList<TourData> getAllSelectedTours() {
 
 		final TourManager tourManager = TourManager.getInstance();
@@ -1620,6 +1604,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public ColumnViewer getViewer() {
 		return _tourViewer;
+	}
+
+	private void onOpenTourInEditor() {
+
+		final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+
+		if ((firstElement != null) && (firstElement instanceof TourData)) {
+//			TourManager.getInstance().openTourInEditor(((TourData) firstElement).getTourId());
+			TourManager.openTourEditor(true);
+		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

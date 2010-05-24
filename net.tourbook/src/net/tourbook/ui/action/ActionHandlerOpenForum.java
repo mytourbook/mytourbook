@@ -13,24 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.ui.action;
 
-import java.util.List;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.widgets.Display;
 
-import net.tourbook.ui.UI;
+import de.byteholder.geoclipse.preferences.Messages;
+import de.byteholder.geoclipse.util.Util;
 
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class LegendConfig {
+public class ActionHandlerOpenForum extends AbstractHandler {
 
-	public int				legendMinValue;
-	public int				legendMaxValue;
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-	public List<Integer>	units;
-	public List<String>		unitLabels;
+		Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_Forum);
 
-	public int				unitFactor	= 1;
+		return null;
+	}
 
-	public String			unitText	= UI.EMPTY_STRING;
 }

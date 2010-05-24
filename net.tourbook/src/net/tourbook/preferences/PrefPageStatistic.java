@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -56,22 +56,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageStatistic extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private TableViewer						fStatViewer;
+	private TableViewer						_statViewer;
 
-	private boolean							fIsModified	= false;
+	private boolean							_isModified	= false;
 
-	private ArrayList<TourbookStatistic>	fVisibleStatistics;
+	private ArrayList<TourbookStatistic>	_visibleStatistics;
 
-	private Button							fBtnUp;
-
-	private Button							fBtnDown;
+	private Button							_btnUp;
+	private Button							_btnDown;
 
 	private class StatContentProvicer implements IStructuredContentProvider {
 
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return fVisibleStatistics.toArray();
+			return _visibleStatistics.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -97,10 +96,10 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		container.setLayout(gl);
 
 		// button: up
-		fBtnUp = new Button(container, SWT.NONE);
-		fBtnUp.setText(Messages.app_action_button_up);
-		setButtonLayoutData(fBtnUp);
-		fBtnUp.addSelectionListener(new SelectionAdapter() {
+		_btnUp = new Button(container, SWT.NONE);
+		_btnUp.setText(Messages.app_action_button_up);
+		setButtonLayoutData(_btnUp);
+		_btnUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onMoveUp();
@@ -108,10 +107,10 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		});
 
 		// button: down
-		fBtnDown = new Button(container, SWT.NONE);
-		fBtnDown.setText(Messages.app_action_button_down);
-		setButtonLayoutData(fBtnDown);
-		fBtnDown.addSelectionListener(new SelectionAdapter() {
+		_btnDown = new Button(container, SWT.NONE);
+		_btnDown.setText(Messages.app_action_button_down);
+		setButtonLayoutData(_btnDown);
+		_btnDown.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onMoveDown();
@@ -125,13 +124,13 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		final Composite uiContainer = createUI(parent);
 
-		fVisibleStatistics = StatisticContainer.getStatisticProviders();
+		_visibleStatistics = StatisticContainer.getStatisticProviders();
 
 		// load viewer
-		fStatViewer.setInput(new Object());
+		_statViewer.setInput(new Object());
 
 		// select first statistic provider
-		fStatViewer.setSelection(new StructuredSelection(fVisibleStatistics.get(0)));
+		_statViewer.setSelection(new StructuredSelection(_visibleStatistics.get(0)));
 
 		return uiContainer;
 	}
@@ -170,7 +169,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		table.setHeaderVisible(false);
 		table.setLinesVisible(false);
 
-		fStatViewer = new TableViewer(table);
+		_statViewer = new TableViewer(table);
 
 		/*
 		 * create columns
@@ -178,7 +177,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		TableViewerColumn tvc;
 
 		// column: map provider
-		tvc = new TableViewerColumn(fStatViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(_statViewer, SWT.LEAD);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -193,8 +192,8 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * create table viewer
 		 */
-		fStatViewer.setContentProvider(new StatContentProvicer());
-		fStatViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_statViewer.setContentProvider(new StatContentProvicer());
+		_statViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableActions();
 			}
@@ -203,70 +202,70 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 	private void enableActions() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fStatViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) _statViewer.getSelection();
 
 		final Object selectedItem = selection.getFirstElement();
-		final Table filterTable = fStatViewer.getTable();
+		final Table filterTable = _statViewer.getTable();
 
-		fBtnUp.setEnabled(selectedItem != null && filterTable.getSelectionIndex() > 0);
+		_btnUp.setEnabled(selectedItem != null && filterTable.getSelectionIndex() > 0);
 
-		fBtnDown.setEnabled(selectedItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
+		_btnDown.setEnabled(selectedItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
 	}
 
 	public void init(final IWorkbench workbench) {}
 
 	private void onMoveDown() {
 
-		final Object selectedItem = ((IStructuredSelection) fStatViewer.getSelection()).getFirstElement();
+		final Object selectedItem = ((IStructuredSelection) _statViewer.getSelection()).getFirstElement();
 		if (selectedItem == null) {
 			return;
 		}
 
-		final Table viewerTable = fStatViewer.getTable();
+		final Table viewerTable = _statViewer.getTable();
 		final int selectionIndex = viewerTable.getSelectionIndex();
 
 		if (selectionIndex < viewerTable.getItemCount() - 1) {
 
-			fStatViewer.remove(selectedItem);
-			fStatViewer.insert(selectedItem, selectionIndex + 1);
+			_statViewer.remove(selectedItem);
+			_statViewer.insert(selectedItem, selectionIndex + 1);
 
 			// reselect moved item
-			fStatViewer.setSelection(new StructuredSelection(selectedItem));
+			_statViewer.setSelection(new StructuredSelection(selectedItem));
 
 			if (viewerTable.getSelectionIndex() == viewerTable.getItemCount() - 1) {
-				fBtnUp.setFocus();
+				_btnUp.setFocus();
 			} else {
-				fBtnDown.setFocus();
+				_btnDown.setFocus();
 			}
 
-			fIsModified = true;
+			_isModified = true;
 		}
 	}
 
 	private void onMoveUp() {
 
-		final Object selectedItem = ((IStructuredSelection) fStatViewer.getSelection()).getFirstElement();
+		final Object selectedItem = ((IStructuredSelection) _statViewer.getSelection()).getFirstElement();
 		if (selectedItem == null) {
 			return;
 		}
 
-		final Table viewerTable = fStatViewer.getTable();
+		final Table viewerTable = _statViewer.getTable();
 
 		final int selectionIndex = viewerTable.getSelectionIndex();
 		if (selectionIndex > 0) {
-			fStatViewer.remove(selectedItem);
-			fStatViewer.insert(selectedItem, selectionIndex - 1);
+			_statViewer.remove(selectedItem);
+			_statViewer.insert(selectedItem, selectionIndex - 1);
 
 			// reselect moved item
-			fStatViewer.setSelection(new StructuredSelection(selectedItem));
+			_statViewer.setSelection(new StructuredSelection(selectedItem));
 
 			if (viewerTable.getSelectionIndex() == 0) {
-				fBtnDown.setFocus();
+				_btnDown.setFocus();
 			} else {
-				fBtnUp.setFocus();
+				_btnUp.setFocus();
 			}
 
-			fIsModified = true;
+			_isModified = true;
 		}
 	}
 
@@ -275,14 +274,14 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		super.performDefaults();
 
-		fIsModified = true;
+		_isModified = true;
 
-		fVisibleStatistics = StatisticContainer.getStatisticExtensionPoints();
+		_visibleStatistics = StatisticContainer.getStatisticExtensionPoints();
 
-		fStatViewer.setInput(new Object());
+		_statViewer.setInput(new Object());
 
 		// select first statistic provider
-		fStatViewer.setSelection(new StructuredSelection(fVisibleStatistics.get(0)));
+		_statViewer.setSelection(new StructuredSelection(_visibleStatistics.get(0)));
 	}
 
 	@Override
@@ -290,7 +289,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		final boolean isOK = super.performOk();
 
-		if (isOK && fIsModified) {
+		if (isOK && _isModified) {
 			saveSettings();
 		}
 
@@ -302,7 +301,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * save order of all statistic providers in the pref store
 		 */
-		final TableItem[] items = fStatViewer.getTable().getItems();
+		final TableItem[] items = _statViewer.getTable().getItems();
 		final String[] statisticIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
@@ -310,12 +309,13 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		// set new value and fire event
-		TourbookPlugin.getDefault()
+		TourbookPlugin
+				.getDefault()
 				.getPreferenceStore()
-				.setValue(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS,
+				.setValue(
+						ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS,
 						StringToArrayConverter.convertArrayToString(statisticIds));
-		
-		
+
 	}
 
 }

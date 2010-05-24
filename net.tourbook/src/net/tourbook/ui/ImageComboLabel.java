@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
@@ -92,7 +92,7 @@ public class ImageComboLabel extends Canvas {
 	// The tooltip is used for two purposes - the application can set
 	// a tooltip or the tooltip can be used to display the full text when the
 	// the text has been truncated due to the label being too short.
-	// The appToolTip stores the tooltip set by the application.  Control.tooltiptext 
+	// The appToolTip stores the tooltip set by the application.  Control.tooltiptext
 	// contains whatever tooltip is currently being displayed.
 	private String				appToolTipText;
 
@@ -106,18 +106,6 @@ public class ImageComboLabel extends Canvas {
 													| SWT.DRAW_TAB
 													| SWT.DRAW_TRANSPARENT
 													| SWT.DRAW_DELIMITER;
-
-	/**
-	 * Check the style bits to ensure that no invalid styles are applied.
-	 */
-	private static int checkStyle(int style) {
-		if ((style & SWT.BORDER) != 0) {
-			style |= SWT.SHADOW_IN;
-		}
-		final int mask = SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.SHADOW_NONE | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
-		style = style & mask;
-		return style |= SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED;
-	}
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its
@@ -188,6 +176,19 @@ public class ImageComboLabel extends Canvas {
 
 		initAccessible();
 
+	}
+
+	/**
+	 * Check the style bits to ensure that no invalid styles are applied.
+	 */
+	private static int checkStyle(int style) {
+		if ((style & SWT.BORDER) != 0) {
+			style |= SWT.SHADOW_IN;
+		}
+		final int mask = SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.SHADOW_NONE | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
+		style = style & mask;
+		style |= SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED;
+		return style;
 	}
 
 //protected void checkSubclass () {
@@ -881,7 +882,7 @@ public class ImageComboLabel extends Canvas {
 	public void setText(String text) {
 		checkWidget();
 		if (text == null) {
-			text = ""; //$NON-NLS-1$
+			text = UI.EMPTY_STRING;
 		}
 		if (!text.equals(this.text)) {
 			this.text = text;

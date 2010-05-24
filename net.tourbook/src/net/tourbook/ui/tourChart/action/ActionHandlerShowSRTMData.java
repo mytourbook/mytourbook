@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerShowSRTMData extends TCActionHandler {
 
 	public ActionHandlerShowSRTMData() {
-		fCommandId = TourChart.COMMAND_ID_SHOW_SRTM_DATA;
+		_commandId = TourChart.COMMAND_ID_SHOW_SRTM_DATA;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerShowSRTMData extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.actionShowSRTMData(isItemChecked);
+			_tourChart.actionShowSRTMData(isItemChecked);
 		}
 
 		return null;

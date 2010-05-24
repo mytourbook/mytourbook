@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -36,14 +37,14 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ActionCreateRefTour extends Action {
 
-	private TourChart	fTourChart;
+	private TourChart	_tourChart;
 
 	public ActionCreateRefTour(final TourChart tourChart) {
 
 		setText(Messages.tourCatalog_view_action_create_reference_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_map_ref_tour_new));
 
-		fTourChart = tourChart;
+		_tourChart = tourChart;
 	}
 
 	@Override
@@ -53,14 +54,15 @@ public class ActionCreateRefTour extends Action {
 			return;
 		}
 
-		final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
-		final TourData tourData = fTourChart.getTourData();
+		final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+		final TourData tourData = _tourChart.getTourData();
 
 		// get the reference tour name
-		final InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
+		final InputDialog dialog = new InputDialog(
+				Display.getCurrent().getActiveShell(),
 				Messages.tourCatalog_view_dlg_add_reference_tour_title,
 				Messages.tourCatalog_view_dlg_add_reference_tour_msg,
-				"", //$NON-NLS-1$
+				UI.EMPTY_STRING,
 				null);
 
 		if (dialog.open() != Window.OK) {
@@ -68,7 +70,8 @@ public class ActionCreateRefTour extends Action {
 		}
 
 		// create new tour reference
-		final TourReference newTourReference = new TourReference(dialog.getValue(),
+		final TourReference newTourReference = new TourReference(
+				dialog.getValue(),
 				tourData,
 				chartInfo.leftSliderValuesIndex,
 				chartInfo.rightSliderValuesIndex);

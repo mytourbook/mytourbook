@@ -79,15 +79,11 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 		for (final TourType tourType : tourTypes) {
 
 			boolean isChecked = false;
-
 			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
 				isChecked = true;
 			}
 
-			final ActionSetTourType actionTourType = new ActionSetTourType(tourType, tourProvider, isSaveTour);
-			actionTourType.setChecked(isChecked);
-
-			menuMgr.add(actionTourType);
+			menuMgr.add(new ActionSetTourType(tourType, tourProvider, isSaveTour, isChecked));
 		}
 	}
 
@@ -124,15 +120,11 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 		for (final TourType tourType : tourTypes) {
 
 			boolean isChecked = false;
-
 			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
 				isChecked = true;
 			}
 
-			final ActionSetTourType actionTourType = new ActionSetTourType(tourType, _tourProvider, true);
-			actionTourType.setChecked(isChecked);
-
-			addActionToMenu(actionTourType, menu);
+			addActionToMenu(new ActionSetTourType(tourType, _tourProvider, true, isChecked), menu);
 		}
 	}
 

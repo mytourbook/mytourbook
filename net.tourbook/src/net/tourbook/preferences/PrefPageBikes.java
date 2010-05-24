@@ -16,22 +16,14 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.data.TourBike;
-import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -46,10 +38,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -129,7 +118,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return _isBikeModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
+				return _isBikeModified ? "*" : UI.EMPTY_STRING; //$NON-NLS-1$
 
 			case COLUMN_NAME:
 				return bike.getName();
@@ -140,7 +129,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			case COLUMN_WEIGHT:
 				return Float.toString(bike.getWeight());
 			}
-			return ""; //$NON-NLS-1$
+			return UI.EMPTY_STRING;
 		}
 	}
 
@@ -323,11 +312,11 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		// placeholder
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText(""); //$NON-NLS-1$
+		lbl.setText(UI.EMPTY_STRING);
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText(""); //$NON-NLS-1$
+		lbl.setText(UI.EMPTY_STRING);
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText(""); //$NON-NLS-1$
+		lbl.setText(UI.EMPTY_STRING);
 	}
 
 	private void createBikeViewer(final Composite container) {
@@ -364,13 +353,6 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		_bikeViewer.setContentProvider(new BikeContentProvider());
 		_bikeViewer.setLabelProvider(new BikeLabelProvider());
-
-		_bikeViewer.setSorter(new ViewerSorter() {
-			@Override
-			public int compare(final Viewer viewer, final Object e1, final Object e2) {
-				return collator.compare(((TourBike) e1).getName(), ((TourBike) e2).getName());
-			}
-		});
 
 		_bikeViewer.setComparator(new ViewerComparator() {
 			@Override
@@ -460,102 +442,102 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		return container;
 	}
 
-	/**
-	 * Delete bike from the the database
-	 * 
-	 * @param bike
-	 * @return
-	 */
-	private boolean deleteBike(final TourBike bike) {
+//	/**
+//	 * Delete bike from the the database
+//	 *
+//	 * @param bike
+//	 * @return
+//	 */
+//	private boolean deleteBike(final TourBike bike) {
+//
+//		if (deleteBikeFromPerson(bike)) {
+//			if (deleteBikeFromDb(bike)) {
+//				return true;
+//			}
+//		}
+//
+//		return false;
+//	}
 
-		if (deleteBikeFromPerson(bike)) {
-			if (deleteBikeFromDb(bike)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean deleteBikeFromDb(final TourBike bike) {
-
-		boolean returnResult = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-			final TourBike entity = em.find(TourBike.class, bike.getBikeId());
-
-			if (entity != null) {
-				ts.begin();
-				em.remove(entity);
-				ts.commit();
-			}
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				returnResult = true;
-			}
-			em.close();
-		}
-
-		return returnResult;
-	}
-
-	private boolean deleteBikeFromPerson(final TourBike bike) {
-
-		boolean returnResult = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query query = em.createQuery(//
-					"SELECT tourPerson" //$NON-NLS-1$
-							+ (" FROM TourPerson AS tourPerson") //$NON-NLS-1$
-							+ (" WHERE tourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
-
-			final ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
-
-			if (people.size() > 0) {
-
-				final EntityTransaction ts = em.getTransaction();
-
-				try {
-
-					ts.begin();
-
-					// remove bike from all persons
-					for (final TourPerson person : people) {
-						person.setTourBike(null);
-						em.merge(person);
-					}
-
-					ts.commit();
-
-				} catch (final Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (ts.isActive()) {
-						ts.rollback();
-					}
-				}
-			}
-
-			returnResult = true;
-			em.close();
-		}
-
-		return returnResult;
-	}
+//	private boolean deleteBikeFromDb(final TourBike bike) {
+//
+//		boolean returnResult = false;
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//		final EntityTransaction ts = em.getTransaction();
+//
+//		try {
+//			final TourBike entity = em.find(TourBike.class, bike.getBikeId());
+//
+//			if (entity != null) {
+//				ts.begin();
+//				em.remove(entity);
+//				ts.commit();
+//			}
+//
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (ts.isActive()) {
+//				ts.rollback();
+//			} else {
+//				returnResult = true;
+//			}
+//			em.close();
+//		}
+//
+//		return returnResult;
+//	}
+//
+//	private boolean deleteBikeFromPerson(final TourBike bike) {
+//
+//		boolean returnResult = false;
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			final Query query = em.createQuery(//
+//					"SELECT tourPerson" //$NON-NLS-1$
+//							+ (" FROM TourPerson AS tourPerson") //$NON-NLS-1$
+//							+ (" WHERE tourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
+//
+//			final ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
+//
+//			if (people.size() > 0) {
+//
+//				final EntityTransaction ts = em.getTransaction();
+//
+//				try {
+//
+//					ts.begin();
+//
+//					// remove bike from all persons
+//					for (final TourPerson person : people) {
+//						person.setTourBike(null);
+//						em.merge(person);
+//					}
+//
+//					ts.commit();
+//
+//				} catch (final Exception e) {
+//					e.printStackTrace();
+//				} finally {
+//					if (ts.isActive()) {
+//						ts.rollback();
+//					}
+//				}
+//			}
+//
+//			returnResult = true;
+//			em.close();
+//		}
+//
+//		return returnResult;
+//	}
 
 	private void enableButtons() {
-		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
+//		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
 //		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
@@ -602,61 +584,61 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		_txtBikeName.setFocus();
 	}
 
-	private void onDeleteBike() {
-
-		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
-		if (selection.isEmpty()) {
-			return;
-		}
-
-		// ask for the reference tour name
-		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
-
-		final MessageDialog dialog = new MessageDialog(this.getShell(), "Delete Bike", //$NON-NLS-1$
-				null,
-				"Are you sure to delete the bike(s) and remove them from ALL related persons?", //$NON-NLS-1$
-				MessageDialog.QUESTION,
-				buttons,
-				1);
-
-		if (dialog.open() != Window.OK) {
-			return;
-		}
-
-		BusyIndicator.showWhile(null, new Runnable() {
-			public void run() {
-
-				final Table table = _bikeViewer.getTable();
-				final int lastIndex = table.getSelectionIndex();
-
-				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
-					final TourBike bike = (TourBike) iter.next();
-
-					deleteBike(bike);
-
-					// remove from data model
-					_bikes.remove(bike);
-				}
-
-				// remove from ui
-				_bikeViewer.remove(selection.toArray());
-
-				// select next bike
-				if (lastIndex >= _bikes.size()) {
-					table.setSelection(_bikes.size() - 1);
-				} else {
-					table.setSelection(lastIndex);
-				}
-
-				_currentBike = null;
-
-				_isBikeModified = false;
-				_isBikeListModified = true;
-
-				updateBikeDetails();
-			}
-		});
-	}
+//	private void onDeleteBike() {
+//
+//		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
+//		if (selection.isEmpty()) {
+//			return;
+//		}
+//
+//		// ask for the reference tour name
+//		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
+//
+//		final MessageDialog dialog = new MessageDialog(this.getShell(), "Delete Bike", //$NON-NLS-1$
+//				null,
+//				"Are you sure to delete the bike(s) and remove them from ALL related persons?", //$NON-NLS-1$
+//				MessageDialog.QUESTION,
+//				buttons,
+//				1);
+//
+//		if (dialog.open() != Window.OK) {
+//			return;
+//		}
+//
+//		BusyIndicator.showWhile(null, new Runnable() {
+//			public void run() {
+//
+//				final Table table = _bikeViewer.getTable();
+//				final int lastIndex = table.getSelectionIndex();
+//
+//				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+//					final TourBike bike = (TourBike) iter.next();
+//
+//					deleteBike(bike);
+//
+//					// remove from data model
+//					_bikes.remove(bike);
+//				}
+//
+//				// remove from ui
+//				_bikeViewer.remove(selection.toArray());
+//
+//				// select next bike
+//				if (lastIndex >= _bikes.size()) {
+//					table.setSelection(_bikes.size() - 1);
+//				} else {
+//					table.setSelection(lastIndex);
+//				}
+//
+//				_currentBike = null;
+//
+//				_isBikeModified = false;
+//				_isBikeListModified = true;
+//
+//				updateBikeDetails();
+//			}
+//		});
+//	}
 
 	@Override
 	public boolean performCancel() {
@@ -723,8 +705,8 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			isEnabled = false;
 			_currentBike = null;
 
-			_txtBikeName.setText(""); //$NON-NLS-1$
-			_txtWeight.setText(""); //$NON-NLS-1$
+			_txtBikeName.setText(UI.EMPTY_STRING);
+			_txtWeight.setText(UI.EMPTY_STRING);
 			_cboBikeType.select(0);
 			_cboFrontTyre.select(0);
 			_cboRearTyre.select(0);

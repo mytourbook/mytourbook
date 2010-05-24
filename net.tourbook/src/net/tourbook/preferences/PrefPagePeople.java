@@ -16,16 +16,10 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourBike;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
@@ -35,12 +29,10 @@ import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -56,10 +48,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -81,7 +70,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID						= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
+	public static final String			ID						= "net.tourbook.preferences.PrefPagePeopleId";		//$NON-NLS-1$
 
 	private static final int			COLUMN_IS_MODIFIED		= 0;
 	private static final int			COLUMN_FIRSTNAME		= 1;
@@ -90,18 +79,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private static final int			COLUMN_HEIGHT			= 4;
 	private static final int			COLUMN_WEIGHT			= 5;
 
-	private TableViewer					_peopleViewer;
-	private Button						_btnAdd;
-//	private Button						fButtonDelete;
-
-	private Composite					_personDetailContainer;
-	private Text						_txtFirstName;
-	private Text						_txtLastName;
-	private Text						_txtHeight;
-	private Text						_txtWeight;
-	private Combo						_cboDevice;
-	private Combo						_cboBike;
-	private DirectoryFieldEditor		_rawDataPathEditor;
+	private final IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private ModifyListener				_textFirstNameModifyListener;
 	private ModifyListener				_textLastNameModifyListener;
@@ -124,6 +102,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private boolean						_isPersonListModified	= false;
 	private boolean						_isNewPerson			= false;
+
+	/*
+	 * UI controls
+	 */
+	private TableViewer					_peopleViewer;
+	private Button						_btnAdd;
+
+	private Composite					_personDetailContainer;
+	private Text						_txtFirstName;
+	private Text						_txtLastName;
+	private Text						_txtHeight;
+	private Text						_txtWeight;
+	private Combo						_cboDevice;
+	private Combo						_cboBike;
+	private DirectoryFieldEditor		_rawDataPathEditor;
 
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
@@ -157,7 +150,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return _isPersonModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
+				return _isPersonModified ? "*" : UI.EMPTY_STRING; //$NON-NLS-1$
 
 			case COLUMN_FIRSTNAME:
 				return tourPerson.getFirstName();
@@ -184,7 +177,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			case COLUMN_WEIGHT:
 				return Float.toString(tourPerson.getWeight());
 			}
-			return ""; //$NON-NLS-1$
+			return UI.EMPTY_STRING;
 		}
 	}
 
@@ -214,8 +207,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -232,7 +226,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		};
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createBikeList() {
@@ -334,8 +328,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		createBikeList();
+
 		// filler
-		lbl = new Label(_personDetailContainer, SWT.NONE);
+		new Label(_personDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -573,10 +568,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_peopleViewer.setContentProvider(new ClientsContentProvider());
 		_peopleViewer.setLabelProvider(new ClientsLabelProvider());
 
-		_peopleViewer.setSorter(new ViewerSorter() {
+		_peopleViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(final Viewer viewer, final Object e1, final Object e2) {
-				return collator.compare(((TourPerson) e1).getLastName(), ((TourPerson) e2).getLastName());
+				return ((TourPerson) e1).getLastName().compareTo(((TourPerson) e2).getLastName());
 			}
 		});
 
@@ -689,58 +684,58 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		new Label(parent, SWT.NONE);
 	}
 
-	/**
-	 * Delete person from the the database
-	 * 
-	 * @param person
-	 * @return
-	 */
-	private boolean deletePerson(final TourPerson person) {
+//	/**
+//	 * Delete person from the the database
+//	 *
+//	 * @param person
+//	 * @return
+//	 */
+//	private boolean deletePerson(final TourPerson person) {
+//
+//		if (removePersonFromTourData(person)) {
+//			if (deletePersonFromDb(person)) {
+//				return true;
+//			}
+//		}
+//
+//		return false;
+//	}
 
-		if (removePersonFromTourData(person)) {
-			if (deletePersonFromDb(person)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean deletePersonFromDb(final TourPerson person) {
-
-		boolean returnResult = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-			final TourPerson entity = em.find(TourPerson.class, person.getPersonId());
-
-			if (entity != null) {
-				ts.begin();
-				em.remove(entity);
-				ts.commit();
-			}
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				returnResult = true;
-			}
-			em.close();
-		}
-
-		return returnResult;
-	}
+//	private boolean deletePersonFromDb(final TourPerson person) {
+//
+//		boolean returnResult = false;
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//		final EntityTransaction ts = em.getTransaction();
+//
+//		try {
+//			final TourPerson entity = em.find(TourPerson.class, person.getPersonId());
+//
+//			if (entity != null) {
+//				ts.begin();
+//				em.remove(entity);
+//				ts.commit();
+//			}
+//
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (ts.isActive()) {
+//				ts.rollback();
+//			} else {
+//				returnResult = true;
+//			}
+//			em.close();
+//		}
+//
+//		return returnResult;
+//	}
 
 	@Override
 	public void dispose() {
 
 		if (_prefChangeListener != null) {
-			TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+			_prefStore.removePropertyChangeListener(_prefChangeListener);
 		}
 
 		super.dispose();
@@ -799,8 +794,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_currentPerson = new TourPerson();
 
-		_currentPerson.setLastName(""); //$NON-NLS-1$
-		_currentPerson.setFirstName(""); //$NON-NLS-1$
+		_currentPerson.setLastName(UI.EMPTY_STRING);
+		_currentPerson.setFirstName(UI.EMPTY_STRING);
 		_currentPerson.setHeight(1.77f);
 		_currentPerson.setWeight(80f);
 
@@ -820,63 +815,63 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_txtFirstName.setFocus();
 	}
 
-	private void onDeletePerson() {
-
-		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
-		if (selection.isEmpty()) {
-			return;
-		}
-
-		// ask for the reference tour name
-		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
-
-		final MessageDialog dialog = new MessageDialog(
-				getShell(),
-				Messages.Pref_People_Dlg_del_person_title,
-				null,
-				Messages.Pref_People_Dlg_del_person_message,
-				MessageDialog.QUESTION,
-				buttons,
-				1);
-
-		if (dialog.open() != Window.OK) {
-			return;
-		}
-
-		BusyIndicator.showWhile(null, new Runnable() {
-			@SuppressWarnings("unchecked")
-			public void run() {
-
-				final Table table = _peopleViewer.getTable();
-				final int lastIndex = table.getSelectionIndex();
-
-				for (final Iterator<TourPerson> iter = selection.iterator(); iter.hasNext();) {
-					final TourPerson person = iter.next();
-
-					deletePerson(person);
-
-					// remove from data model
-					_people.remove(person);
-				}
-
-				// remove from ui
-				_peopleViewer.remove(selection.toArray());
-
-				// select next person
-				if (lastIndex >= _people.size()) {
-					table.setSelection(_people.size() - 1);
-				} else {
-					table.setSelection(lastIndex);
-				}
-
-				_currentPerson = null;
-				_isPersonModified = false;
-				_isPersonListModified = true;
-
-				showSelectedPersonDetails();
-			}
-		});
-	}
+//	private void onDeletePerson() {
+//
+//		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
+//		if (selection.isEmpty()) {
+//			return;
+//		}
+//
+//		// ask for the reference tour name
+//		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
+//
+//		final MessageDialog dialog = new MessageDialog(
+//				getShell(),
+//				Messages.Pref_People_Dlg_del_person_title,
+//				null,
+//				Messages.Pref_People_Dlg_del_person_message,
+//				MessageDialog.QUESTION,
+//				buttons,
+//				1);
+//
+//		if (dialog.open() != Window.OK) {
+//			return;
+//		}
+//
+//		BusyIndicator.showWhile(null, new Runnable() {
+//			@SuppressWarnings("unchecked")
+//			public void run() {
+//
+//				final Table table = _peopleViewer.getTable();
+//				final int lastIndex = table.getSelectionIndex();
+//
+//				for (final Iterator<TourPerson> iter = selection.iterator(); iter.hasNext();) {
+//					final TourPerson person = iter.next();
+//
+//					deletePerson(person);
+//
+//					// remove from data model
+//					_people.remove(person);
+//				}
+//
+//				// remove from ui
+//				_peopleViewer.remove(selection.toArray());
+//
+//				// select next person
+//				if (lastIndex >= _people.size()) {
+//					table.setSelection(_people.size() - 1);
+//				} else {
+//					table.setSelection(lastIndex);
+//				}
+//
+//				_currentPerson = null;
+//				_isPersonModified = false;
+//				_isPersonListModified = true;
+//
+//				showSelectedPersonDetails();
+//			}
+//		});
+//	}
 
 	@Override
 	public boolean performCancel() {
@@ -908,53 +903,52 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_rawDataPathEditor.setPropertyChangeListener(null);
 	}
 
-	@SuppressWarnings("unchecked")
-	private boolean removePersonFromTourData(final TourPerson person) {
-
-		boolean returnResult = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query query = em.createQuery(//
-					"SELECT tourData" //$NON-NLS-1$
-							+ (" FROM TourData as tourData") //$NON-NLS-1$
-							+ (" WHERE tourData.tourPerson.personId=" + person.getPersonId())); //$NON-NLS-1$
-
-			final ArrayList<TourData> tourDataList = (ArrayList<TourData>) query.getResultList();
-
-			if (tourDataList.size() > 0) {
-
-				final EntityTransaction ts = em.getTransaction();
-
-				try {
-
-					ts.begin();
-
-					// remove person from all saved tour data for this person
-					for (final TourData tourData : tourDataList) {
-						tourData.setTourPerson(null);
-						em.merge(tourData);
-					}
-
-					ts.commit();
-
-				} catch (final Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (ts.isActive()) {
-						ts.rollback();
-					}
-				}
-			}
-
-			returnResult = true;
-			em.close();
-		}
-
-		return returnResult;
-	}
+//	private boolean removePersonFromTourData(final TourPerson person) {
+//
+//		boolean returnResult = false;
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			final Query query = em.createQuery(//
+//					"SELECT tourData" //$NON-NLS-1$
+//							+ (" FROM TourData as tourData") //$NON-NLS-1$
+//							+ (" WHERE tourData.tourPerson.personId=" + person.getPersonId())); //$NON-NLS-1$
+//
+//			final ArrayList<TourData> tourDataList = (ArrayList<TourData>) query.getResultList();
+//
+//			if (tourDataList.size() > 0) {
+//
+//				final EntityTransaction ts = em.getTransaction();
+//
+//				try {
+//
+//					ts.begin();
+//
+//					// remove person from all saved tour data for this person
+//					for (final TourData tourData : tourDataList) {
+//						tourData.setTourPerson(null);
+//						em.merge(tourData);
+//					}
+//
+//					ts.commit();
+//
+//				} catch (final Exception e) {
+//					e.printStackTrace();
+//				} finally {
+//					if (ts.isActive()) {
+//						ts.rollback();
+//					}
+//				}
+//			}
+//
+//			returnResult = true;
+//			em.close();
+//		}
+//
+//		return returnResult;
+//	}
 
 	/**
 	 * save current person when it was modified
@@ -1072,10 +1066,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			isEnabled = false;
 			_currentPerson = null;
 
-			_txtFirstName.setText(""); //$NON-NLS-1$
-			_txtLastName.setText(""); //$NON-NLS-1$
-			_txtHeight.setText(""); //$NON-NLS-1$
-			_txtWeight.setText(""); //$NON-NLS-1$
+			_txtFirstName.setText(UI.EMPTY_STRING);
+			_txtLastName.setText(UI.EMPTY_STRING);
+			_txtHeight.setText(UI.EMPTY_STRING);
+			_txtWeight.setText(UI.EMPTY_STRING);
 
 			_cboDevice.select(0);
 			_cboBike.select(0);
@@ -1101,11 +1095,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			isValid = true;
 
-		} else if (_txtFirstName.getText().trim().equals("")) { //$NON-NLS-1$
+		} else if (_txtFirstName.getText().trim().equals(UI.EMPTY_STRING)) {
 
 			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-		} else if (!_rawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
+		} else if (!_rawDataPathEditor.getStringValue().trim().equals(UI.EMPTY_STRING)
 				&& !_rawDataPathEditor.isValid()) {
 
 			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);

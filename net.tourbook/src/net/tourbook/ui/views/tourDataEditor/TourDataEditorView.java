@@ -91,8 +91,6 @@ import net.tourbook.util.Util;
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -107,6 +105,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -191,6 +191,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
+
+	private final IPreferenceStore				_prefStore						= TourbookPlugin
+																						.getDefault()
+																						.getPreferenceStore();
 
 	private final IDialogSettings				_viewState						= TourbookPlugin
 																						.getDefault()
@@ -576,7 +580,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					setTourDirty();
 
 					// update viewer
-					getViewer().update(element, null);
+					super.getViewer().update(element, null);
 
 					// display modified time slices in this editor and in other views/editors
 					fireModifyNotification();
@@ -603,7 +607,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Sort the markers by time
 	 */
-	private class MarkerViewerSorter extends ViewerSorter {
+	private static class MarkerViewerSorter extends ViewerSorter {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
@@ -1528,8 +1532,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (_tourData == null) {
 					return;
@@ -1581,7 +1585,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -2152,10 +2156,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void createMenus() {
 
+		MenuManager menuMgr;
+
+		/*
+		 * tour type menu
+		 */
+		menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				// set menu items
+
+				ActionSetTourTypeMenu.fillMenu(menuMgr, TourDataEditorView.this, false);
+
+				menuMgr.add(new Separator());
+				menuMgr.add(_actionOpenTourTypePrefs);
+			}
+		});
+
+		// set menu for the tag item
+		_linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
+
 		/*
 		 * tag menu
 		 */
-		MenuManager menuMgr = new MenuManager();
+		menuMgr = new MenuManager();
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -2182,27 +2209,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// set menu for the tag item
 		_linkTag.setMenu(menuMgr.createContextMenu(_linkTag));
-
-		/*
-		 * tour type menu
-		 */
-		menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager menuMgr) {
-
-				// set menu items
-
-				ActionSetTourTypeMenu.fillMenu(menuMgr, TourDataEditorView.this, false);
-
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTourTypePrefs);
-			}
-		});
-
-		// set menu for the tag item
-		_linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
 	}
 
 	@Override
@@ -3802,7 +3808,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		page.removePostSelectionListener(_postSelectionListener);
 		page.removePartListener(_partListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 		TourManager.getInstance().removeTourSaveListener(_tourSaveListener);
@@ -4228,30 +4234,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return 0;
 	}
 
-	/**
-	 * Converts a string into a int value
-	 * 
-	 * @param valueText
-	 * @return Returns the float value for the parameter valueText, return <code>0</code>
-	 * @throws IllegalArgumentException
-	 */
-	private int getIntValue(String valueText) throws IllegalArgumentException {
-
-		valueText = valueText.trim();
-		if (valueText.length() == 0) {
-
-			return 0;
-
-		} else {
-
-			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
-			if (convertedValue instanceof Integer) {
-				return ((Integer) convertedValue).intValue();
-			}
-		}
-
-		return 0;
-	}
+//	/**
+//	 * Converts a string into a int value
+//	 *
+//	 * @param valueText
+//	 * @return Returns the float value for the parameter valueText, return <code>0</code>
+//	 * @throws IllegalArgumentException
+//	 */
+//	private int getIntValue(String valueText) throws IllegalArgumentException {
+//
+//		valueText = valueText.trim();
+//		if (valueText.length() == 0) {
+//
+//			return 0;
+//
+//		} else {
+//
+//			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
+//			if (convertedValue instanceof Integer) {
+//				return ((Integer) convertedValue).intValue();
+//			}
+//		}
+//
+//		return 0;
+//	}
 
 	private double[] getRemainingDoubleSerieData(final double[] dataSerie, final int firstIndex, final int lastIndex) {
 
@@ -4919,7 +4925,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						} else {
 
-							if (_tourData.getTourId() != tourData.getTourId()) {
+							if (_tourData.getTourId().equals(tourData.getTourId())) {
 
 								// a new tour id is in the selection
 								_tourData = tourData;

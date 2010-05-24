@@ -45,8 +45,9 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -71,9 +72,10 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements ITourChartViewer {
 
-	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.TourChartView";				//$NON-NLS-1$
 
-	private TourChart				_tourChart;
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
 
@@ -83,8 +85,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private ITourEventListener		_tourEventListener;
 	private IPartListener2			_partListener;
 
+	/*
+	 * UI controls
+	 */
 	private PageBook				_pageBook;
 	private Label					_pageNoChart;
+
+	private TourChart				_tourChart;
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -114,8 +121,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -138,7 +145,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -320,7 +328,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -545,7 +553,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 	}
 
-	private void updateChart(final Long tourId) {
+	private void updateChart(final long tourId) {
 
 		if (_tourData != null && _tourData.getTourId() == tourId) {
 			// optimize

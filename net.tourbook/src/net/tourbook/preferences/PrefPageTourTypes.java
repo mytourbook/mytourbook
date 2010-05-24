@@ -37,7 +37,6 @@ import net.tourbook.ui.UI;
 import net.tourbook.util.TreeColumnLayout;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.ColorSelector;
@@ -54,6 +53,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -80,25 +80,27 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private static final String[]				SORT_PROPERTY	= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
 
-	private TreeViewer							_tourTypeViewer;
+	private GraphColorLabelProvider				_colorLabelProvider;
+
 	private ColorDefinition						_expandedItem;
 	private GraphColorItem						_selectedColor;
-
-	private Button								_btnAdd;
-	private Button								_btnDelete;
-	private Button								_btnRename;
 
 	private ArrayList<TourType>					_tourTypes;
 	private ArrayList<TourTypeColorDefinition>	_colorDefinitions;
 
-	private IInputValidator						_tourNameValidator;
-
 	private boolean								_isModified		= false;
 
-	private GraphColorLabelProvider				_colorLabelProvider;
+	/*
+	 * UI controls
+	 */
+	private TreeViewer							_tourTypeViewer;
 
 	private ColorSelector						_colorSelector;
 	private Button								_btnTourTypeImage;
+
+	private Button								_btnAdd;
+	private Button								_btnDelete;
+	private Button								_btnRename;
 
 	private class ColorContentProvider implements ITreeContentProvider {
 
@@ -106,8 +108,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		public Object[] getChildren(final Object parentElement) {
 			if (parentElement instanceof ColorDefinition) {
-				final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
-				return graphDefinition.getGraphColorParts();
+				return ((ColorDefinition) parentElement).getGraphColorParts();
 			}
 			return null;
 		}
@@ -131,7 +132,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	}
 
-	private final class TourTypeComparator extends ViewerComparator {
+	private static final class TourTypeComparator extends ViewerComparator {
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
@@ -158,7 +159,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void createColorNames(final ColorDefinition colorDefinition) {
 
-		// use the first three color, mapping color is not used in tour types
+		// use the first 3 color, the mapping color is not used in tour types
 		final int graphNamesLength = GraphColorProvider.colorNames.length - 1;
 
 		final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
@@ -188,9 +189,17 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		if (_tourTypes != null) {
 			for (final TourType tourType : _tourTypes) {
 
+				final long typeId = tourType.getTypeId();
+
+				// create a unique name for each tour type
+				final String colorName = "tourtype." + // //$NON-NLS-1$
+						(typeId == TourDatabase.ENTITY_IS_NOT_SAVED ? //
+								"crId" + tourType.getCreateId() //$NON-NLS-1$
+								: typeId);
+
 				final TourTypeColorDefinition colorDefinition = new TourTypeColorDefinition(
 						tourType,
-						"tourtype." + tourType.getTypeId(), //$NON-NLS-1$
+						colorName,
 						tourType.getName(),
 						tourType.getRGBBright(),
 						tourType.getRGBDark(),
@@ -201,12 +210,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				createColorNames(colorDefinition);
 			}
 		}
-
-		_tourNameValidator = new IInputValidator() {
-			public String isValid(final String newText) {
-				return null;
-			}
-		};
 
 		enableButtons();
 
@@ -325,10 +328,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		tc.setText(Messages.Pref_TourTypes_Column_Color);
 		treeLayouter.addColumnData(new ColumnWeightData(3, true));
 
-		tc = new TreeColumn(tree, SWT.NONE);
+		new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
-		tc = new TreeColumn(tree, SWT.NONE);
+		new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
 		_tourTypeViewer = new TreeViewer(tree);
@@ -572,24 +575,24 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private void onAddTourType() {
 
 		// ask for the tour type name
-		final InputDialog dialog = new InputDialog(
+		final InputDialog inputDialog = new InputDialog(
 				this.getShell(),
 				Messages.Pref_TourTypes_Dlg_new_tour_type_title,
 				Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
 				UI.EMPTY_STRING,
-				_tourNameValidator);
+				null);
 
-		if (dialog.open() != Window.OK) {
+		if (inputDialog.open() != Window.OK) {
 			setFocusToViewer();
 			return;
 		}
 
 		// create new tour type
-		final TourType newTourType = new TourType(dialog.getValue());
+		final TourType newTourType = new TourType(inputDialog.getValue());
 
-		final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
+		final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
 				newTourType,
-				Long.toString(newTourType.getTypeId()),
+				"crId" + newTourType.getCreateId(),
 				newTourType.getName());
 
 		newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
@@ -608,6 +611,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			_colorDefinitions.add(newColorDefinition);
 
 			_tourTypeViewer.add(this, newColorDefinition);
+
+			_tourTypeViewer.setSelection(new StructuredSelection(newColorDefinition), true);
+
+			_tourTypeViewer.collapseAll();
+			_tourTypeViewer.expandToLevel(newColorDefinition, 1);
 
 			// update internal tour type list
 			_tourTypes.add(saveTourType);
@@ -705,9 +713,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update color viewer
 			_tourTypeViewer.remove(selectedColorDefinition);
 
-			// update import combo
-			// fComboImportTourType.remove(getTourTypeIndex(selectedTourType));
-
 			// update internal list
 			_tourTypes.remove(selectedTourType);
 
@@ -724,11 +729,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		// ask for the tour type name
 		final InputDialog dialog = new InputDialog(
-				this.getShell(),
+				getShell(),
 				Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
 				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
 				selectedTourType.getName(),
-				_tourNameValidator);
+				null);
 
 		if (dialog.open() != Window.OK) {
 			setFocusToViewer();

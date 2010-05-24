@@ -367,7 +367,6 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          
-   <!--
       <perspectiveExtension
             targetID="*">
             
@@ -382,6 +381,8 @@
          <perspectiveShortcut
                id="net.tourbook.perspective.CompareTours"/>
       </perspectiveExtension>
+      
+   <!--
    -->
       
       
@@ -440,7 +441,6 @@
                icon="icons/device-synchronize-direct.gif"
                label="%command_device_synchronize_direct"
                mnemonic="%command_device_synchronize_direct_mnemonic"
-               style="push"
                tooltip="%command_device_synchronize_direct_tooltip">
          </command>
          <command
@@ -448,14 +448,14 @@
                icon="icons/device-synchronize.gif"
                label="%command_device_synchronize_configured"
                mnemonic="%command_device_synchronize_configured_mnemonic"
-               style="push"
                tooltip="%command_device_synchronize_configured_tooltip">
          </command>
          <command
                commandId="net.tourbook.command.device.importFromFile"
                icon="icons/folder_open_add.gif"
-               label="%command_device_importFromFile">
-         </command>
+               label="%command_device_importFromFile"
+               mnemonic="%command_device_importFromFile_mnemonic"
+		 />
          <separator
                name="net.tourbook.separator"
                visible="true">
@@ -469,6 +469,11 @@
                commandId="net.tourbook.command.OpenHomePage"
                label="%Command_App_OpenHomePage"
                mnemonic="%Command_App_OpenHomePage_Mnemonic">
+         </command>
+         <command
+               commandId="net.tourbook.command.OpenForum"
+               label="%Command_App_OpenForum"
+               mnemonic="%Command_App_OpenForum_Mnemonic">
          </command>
          <separator
                name="net.tourbook.separator"
@@ -745,8 +750,9 @@
          <command
                commandId="net.tourbook.command.device.importFromFile"
                icon="icons/open_folder_add.gif"
-               label="%command_device_importFromFile">
-         </command>
+               label="%command_device_importFromFile"
+               mnemonic="%command_device_importFromFile_mnemonic"
+         />
       </menuContribution>
       
       <menuContribution
@@ -959,6 +965,11 @@
             id="net.tourbook.command.OpenHomePage"
             name="%Command_App_OpenHomePage"
             defaultHandler="net.tourbook.ui.action.ActionHandlerOpenHomePage"
+            />
+      <command
+            id="net.tourbook.command.OpenForum"
+            name="%Command_App_OpenForum"
+            defaultHandler="net.tourbook.ui.action.ActionHandlerOpenForum"
             />
       
    </extension>

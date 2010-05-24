@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *  
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Alfred Barten
@@ -21,11 +21,13 @@ package de.byteholder.gpx;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.util.UI;
+
 public class GeoCoord {
 
-	public static final int	faktg	= 60 * 60 * 60;
-	public static final int	faktm	= 60 * 60;
-	public static final int	fakts	= 60;
+	public static final int			faktg			= 60 * 60 * 60;
+	public static final int			faktm			= 60 * 60;
+	public static final int			fakts			= 60;
 
 	final static private int		PATTERN_ANZ		= 10;
 
@@ -47,6 +49,7 @@ public class GeoCoord {
 	// _kein_ Update in updateDecimal und updateDegrees,
 	// d.h. add etc. fkt. nicht!
 	private double					doubleValue		= 0.;
+
 	/***********************************************************************************
 	 * Zur Erkennung von Strings: zunächst werden Ersetzungen vorgenommen: blank -> (nichts) " ->
 	 * (nichts) [SW] vorne -> - vorne [SW] hinten -> - vorne [NEO] -> (nichts) , -> . ° -> : ' -> :
@@ -84,8 +87,9 @@ public class GeoCoord {
 		patternString[8] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)"); //$NON-NLS-1$
 		patternString[9] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)"); //$NON-NLS-1$
 
-		for (int i = 0; i < PATTERN_ANZ; i++)
+		for (int i = 0; i < PATTERN_ANZ; i++) {
 			pattern[i] = Pattern.compile(patternString[i]);
+		}
 
 	}
 
@@ -138,7 +142,7 @@ public class GeoCoord {
 	}
 
 	// dummies; siehe GeoLon / GeoLat
-	public char directionPlus() { 
+	public char directionPlus() {
 		return '!';
 	}
 
@@ -172,12 +176,15 @@ public class GeoCoord {
 	public int getHashkeyDist() {
 		// Minutes-genau; Wert < 21600; 21600^2 < 2^30
 		// absichtlich grob, damit "benachbarte" Punkte in gleiche "Toepfe" fallen
-		if (direction == 'N')
+		if (direction == 'N') {
 			return 60 * (89 - degrees) + minutes;
-		if (direction == 'S')
+		}
+		if (direction == 'S') {
 			return 60 * (90 + degrees) + minutes;
-		if (direction == 'W')
+		}
+		if (direction == 'W') {
 			return 60 * (179 - degrees) + minutes;
+		}
 		return 60 * (180 + degrees) + minutes;
 
 	}
@@ -224,31 +231,37 @@ public class GeoCoord {
 
 		// Kommentar s. o.
 
-		//    blank       -> (nichts) 
-		//    "           -> (nichts) 
-		//    [NEO]       -> (nichts) 
-		s = s.replace(" ", "").replace("\"", "").replace("N", "").replace("E", "").replace("O", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+		//    blank       -> (nichts)
+		//    "           -> (nichts)
+		//    [NEO]       -> (nichts)
+		s = s.replace(" ", UI.EMPTY_STRING) //$NON-NLS-1$
+				.replace("\"", UI.EMPTY_STRING) //$NON-NLS-1$
+				.replace("N", UI.EMPTY_STRING) //$NON-NLS-1$
+				.replace("E", UI.EMPTY_STRING) //$NON-NLS-1$
+				.replace("O", UI.EMPTY_STRING); //$NON-NLS-1$
 
 		//  [SW] vorne  -> - vorne
 		//  [SW] hinten -> - vorne
-		if (s.startsWith("S")) //$NON-NLS-1$
+		if (s.startsWith("S")) { //$NON-NLS-1$
 			s = "-" + s.substring(1); //$NON-NLS-1$
-		else if (s.startsWith("W")) //$NON-NLS-1$
+		} else if (s.startsWith("W")) { //$NON-NLS-1$
 			s = "-" + s.substring(1); //$NON-NLS-1$
-		else if (s.endsWith("S")) //$NON-NLS-1$
+		} else if (s.endsWith("S")) { //$NON-NLS-1$
 			s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
-		else if (s.endsWith("W")) //$NON-NLS-1$
+		} else if (s.endsWith("W")) { //$NON-NLS-1$
 			s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
+		}
 
-		//  ,           -> .  
-		//  °           -> :  
-		//  '           -> :  
+		//  ,           -> .
+		//  °           -> :
+		//  '           -> :
 		s = s.replace(',', '.').replace('\u00B0', ':') // degree sign
 				.replace('\'', ':');
 
 		//  : hinten    -> (nichts)
-		if (s.endsWith(":")) //$NON-NLS-1$
+		if (s.endsWith(":")) { //$NON-NLS-1$
 			s = s.substring(0, s.length() - 1);
+		}
 
 		return s;
 	}
@@ -279,8 +292,9 @@ public class GeoCoord {
 
 		for (pat = 0; pat < PATTERN_ANZ; pat++) {
 			matcher = pattern[pat].matcher(s);
-			if (matcher.matches())
+			if (matcher.matches()) {
 				break;
+			}
 		}
 
 		if (pat == PATTERN_ANZ) {
@@ -292,7 +306,7 @@ public class GeoCoord {
 		switch (pat) {
 
 		case 0:
-		case 1: // -ggg:mm oder -gggMM   
+		case 1: // -ggg:mm oder -gggMM
 			degrees = new Integer(matcher.group(2)).intValue();
 			minutes = new Integer(matcher.group(3)).intValue();
 			seconds = 0;
@@ -308,7 +322,7 @@ public class GeoCoord {
 			tertias = 0;
 			break;
 
-		case 4: // -ggg:mm:ss:tt z.B. von toStringFine (mit Tertias, d. h. um Faktor 60 genauer)      
+		case 4: // -ggg:mm:ss:tt z.B. von toStringFine (mit Tertias, d. h. um Faktor 60 genauer)
 
 			degrees = new Integer(matcher.group(2)).intValue();
 			minutes = new Integer(matcher.group(3)).intValue();
@@ -316,7 +330,7 @@ public class GeoCoord {
 			tertias = new Integer(matcher.group(5)).intValue();
 			break;
 
-		case 5: // -ggg.ggggg        
+		case 5: // -ggg.ggggg
 
 			final double dg = new Double(matcher.group(2)).doubleValue();
 			degrees = (int) dg;
@@ -352,10 +366,11 @@ public class GeoCoord {
 			break;
 		}
 
-		if (matcher.group(1).equals("-")) //$NON-NLS-1$
+		if (matcher.group(1).equals("-")) { //$NON-NLS-1$
 			direction = directionMinus();
-		else
+		} else {
 			direction = directionPlus();
+		}
 		updateDecimal();
 	}
 
@@ -379,8 +394,9 @@ public class GeoCoord {
 
 	public void setDirection(final char r) {
 		direction = r;
-		if (direction == 'O')
+		if (direction == 'O') {
 			direction = 'E';
+		}
 		updateDecimal();
 	}
 
@@ -389,7 +405,7 @@ public class GeoCoord {
 	}
 
 	public void setMean(final GeoCoord k1, final GeoCoord k2) {
-		// auf Mittelwert von k1 und k2 setzen (1-dimensional!) 
+		// auf Mittelwert von k1 und k2 setzen (1-dimensional!)
 		set(k1);
 		div(2.);
 		final GeoCoord kHelp = new GeoCoord();
@@ -449,8 +465,9 @@ public class GeoCoord {
 	public void toLeft(final GeoCoord r) {
 		// auf Rasterrand zur Linken shiften
 		final int raster = r.decimal;
-		if (decimal < 0)
+		if (decimal < 0) {
 			decimal -= raster;
+		}
 		decimal /= raster;
 		decimal *= raster;
 
@@ -472,8 +489,9 @@ public class GeoCoord {
 		final int raster = r.decimal;
 		decimal /= raster;
 		decimal *= raster;
-		if (decimal >= 0)
+		if (decimal >= 0) {
 			decimal += raster;
+		}
 		updateDegrees();
 	}
 
@@ -508,8 +526,9 @@ public class GeoCoord {
 
 		double d = decimal;
 		d /= faktg;
-		if (d < 0)
+		if (d < 0) {
 			d = -d;
+		}
 
 		return "" + NumberForm.f5(d) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -518,8 +537,9 @@ public class GeoCoord {
 	public String toStringDegreesMinutesDirection() {
 
 		double m = decimal;
-		if (m < 0)
+		if (m < 0) {
 			m = -m;
+		}
 		m -= degrees * faktg;
 		m /= faktm;
 		return "" + NumberForm.n2(degrees) + ":" + NumberForm.n2f3(m) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -564,18 +584,18 @@ public class GeoCoord {
 		// optimized: dec = Math.abs(decimal);
 		int dec = ((decimal < 0) ? -decimal : decimal);
 		degrees = dec / faktg;
-		
+
 		dec -= degrees * faktg;
 		minutes = dec / faktm;
-		
+
 		dec -= minutes * faktm;
 		seconds = dec / fakts;
-		
+
 		dec -= seconds * fakts;
 		tertias = dec;
-		
+
 		direction = decimal < 0 ? directionMinus() : directionPlus();
- 
+
 		doubleValue = decimal;
 		doubleValue /= faktg;
 	}

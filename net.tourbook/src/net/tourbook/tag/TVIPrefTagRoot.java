@@ -36,8 +36,6 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 	@Override
 	protected void fetchChildren() {
 
-		ArrayList<TourTag> tourTags = new ArrayList<TourTag>();
-
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
@@ -51,7 +49,7 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 							+ (" FROM TourTag AS tourTag ") //$NON-NLS-1$
 							+ (" WHERE tourTag.isRoot = 1")); //$NON-NLS-1$
 
-			tourTags = (ArrayList<TourTag>) query.getResultList();
+			final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
 
 			for (final TourTag tourTag : tourTags) {
 				final TVIPrefTag tagItem = new TVIPrefTag(getTagViewer(), tourTag);

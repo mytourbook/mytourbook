@@ -24,12 +24,12 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerCanMoveSlidersWhenZoomed extends TCActionHandler {
 
 	public ActionHandlerCanMoveSlidersWhenZoomed() {
-		fCommandId = TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED;
+		_commandId = TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fTourChart.actionCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
+		_tourChart.actionCanAutoMoveSliders(HandlerUtil.isItemChecked(execEvent));
 
 		return null;
 	}

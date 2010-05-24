@@ -42,13 +42,24 @@ class ActionSetTourType extends Action {
 	 *            when <code>true</code> the tour will be saved and a
 	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
 	 *            from the tour provider is only updated
+	 * @param isChecked
 	 */
-	public ActionSetTourType(final TourType tourType, final ITourProvider tourProvider, final boolean isSaveTour) {
+	public ActionSetTourType(	final TourType tourType,
+								final ITourProvider tourProvider,
+								final boolean isSaveTour,
+								final boolean isChecked) {
 
 		super(tourType.getName(), AS_CHECK_BOX);
 
-		final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
-		setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+		if (isChecked == false) {
+
+			// show image when tour type can be selected, disabled images look ugly on win
+			final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+			setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+		}
+
+		setChecked(isChecked);
+		setEnabled(isChecked == false);
 
 		_tourType = tourType;
 		_tourProvider = tourProvider;

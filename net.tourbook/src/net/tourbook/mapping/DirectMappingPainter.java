@@ -34,18 +34,18 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-	private Map					_map;
-	private TourData			_tourData;
+	private Map			_map;
+	private TourData	_tourData;
 
-	private int					_leftSliderValueIndex;
-	private int					_rightSliderValueIndex;
+	private int			_leftSliderValueIndex;
+	private int			_rightSliderValueIndex;
 
-	private boolean				_isTourVisible;
-	private boolean				_isShowSliderInMap;
-	private boolean				_isShowSliderInLegend;
+	private boolean		_isTourVisible;
+	private boolean		_isShowSliderInMap;
+	private boolean		_isShowSliderInLegend;
 
-	private final Image			_imageLeftSlider;
-	private final Image			_imageRightSlider;
+	private final Image	_imageLeftSlider;
+	private final Image	_imageRightSlider;
 
 	/**
 	 * 
@@ -88,7 +88,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
 		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(
- 				latitudeSerie[sliderValueIndex],
+				latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
 
 		// check if slider is visible
@@ -123,15 +123,18 @@ public class DirectMappingPainter implements IDirectPainter {
 			return;
 		}
 
+		final TourPainter tourPainter = TourPainter.getInstance();
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
-		final int leftValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+		final int leftValueInlegendPosition = tourPainter.getLegendValuePosition(
+				legendImageBounds,
 				_leftSliderValueIndex);
 		if (leftValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
 
-		final int rightValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+		final int rightValueInlegendPosition = tourPainter.getLegendValuePosition(
+				legendImageBounds,
 				_rightSliderValueIndex);
 		if (rightValueInlegendPosition == Integer.MIN_VALUE) {
 			return;

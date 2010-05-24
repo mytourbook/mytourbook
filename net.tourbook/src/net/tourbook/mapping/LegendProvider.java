@@ -1,32 +1,39 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.chart.ChartUtil;
+import net.tourbook.chart.Util;
 
 import org.eclipse.swt.graphics.Rectangle;
 
 public class LegendProvider implements ILegendProvider {
 
-	private LegendConfig	fLegendConfig;
-	private LegendColor		fLegendColor;
-	private int				fColorId;
+	private LegendConfig	_legendConfig;
+	private LegendColor		_legendColor;
+
+	private int				_colorId;
+
+	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
+		_legendConfig = legendConfig;
+		_legendColor = legendColor;
+		_colorId = colorId;
+	}
 
 	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
 
@@ -43,7 +50,7 @@ public class LegendProvider implements ILegendProvider {
 		final int graphUnitValue = graphRange / Math.max(1, unitCount);
 
 		// round the unit
-		final float graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
+		final float graphUnit = Util.roundDecimalValue(graphUnitValue);
 
 		/*
 		 * adjust min value
@@ -77,7 +84,7 @@ public class LegendProvider implements ILegendProvider {
 
 			unitList.add(graphValue);
 
-			// prevent endless loops 
+			// prevent endless loops
 			if (graphValue >= graphMaxValue || unitCounter > 100) {
 				break;
 			}
@@ -89,31 +96,25 @@ public class LegendProvider implements ILegendProvider {
 		return unitList;
 	}
 
-	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
-		fLegendConfig = legendConfig;
-		fLegendColor = legendColor;
-		fColorId = colorId;
+	public int getColorValue(final int legendValue) {
+		return TourPainter.getLegendColor(_legendConfig, _legendColor, legendValue);
 	}
 
 	public LegendColor getLegendColor() {
-		return fLegendColor;
+		return _legendColor;
 	}
 
 	public LegendConfig getLegendConfig() {
-		return fLegendConfig;
+		return _legendConfig;
 	}
 
 	public int getTourColorId() {
-		return fColorId;
-	}
-
-	public int getColorValue(final int legendValue) {
-		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
+		return _colorId;
 	}
 
 	public void setLegendColorColors(final LegendColor legendColor) {
 
-		final ValueColor[] valueColors = fLegendColor.valueColors;
+		final ValueColor[] valueColors = _legendColor.valueColors;
 		final ValueColor[] newValueColors = legendColor.valueColors;
 
 		// copy new colors into current legend colors
@@ -127,15 +128,15 @@ public class LegendProvider implements ILegendProvider {
 			valueColor.blue = newValueColor.blue;
 		}
 
-		fLegendColor.minBrightness = legendColor.minBrightness;
-		fLegendColor.minBrightnessFactor = legendColor.minBrightnessFactor;
-		fLegendColor.maxBrightness = legendColor.maxBrightness;
-		fLegendColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
+		_legendColor.minBrightness = legendColor.minBrightness;
+		_legendColor.minBrightnessFactor = legendColor.minBrightnessFactor;
+		_legendColor.maxBrightness = legendColor.maxBrightness;
+		_legendColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
 
-		fLegendColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
-		fLegendColor.overwriteMinValue = legendColor.overwriteMinValue;
-		fLegendColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
-		fLegendColor.overwriteMaxValue = legendColor.overwriteMaxValue;
+		_legendColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
+		_legendColor.overwriteMinValue = legendColor.overwriteMinValue;
+		_legendColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
+		_legendColor.overwriteMaxValue = legendColor.overwriteMaxValue;
 	}
 
 	/**
@@ -148,29 +149,29 @@ public class LegendProvider implements ILegendProvider {
 	 */
 	public void setLegendColorValues(final Rectangle legendBounds, int minValue, int maxValue, final String unitText) {
 
-		final int unitFactor = fLegendConfig.unitFactor;
+		final int unitFactor = _legendConfig.unitFactor;
 
-		if (fLegendColor.isMinValueOverwrite && minValue < fLegendColor.overwriteMinValue * unitFactor) {
-			minValue = fLegendColor.overwriteMinValue * unitFactor;
+		if (_legendColor.isMinValueOverwrite && minValue < _legendColor.overwriteMinValue * unitFactor) {
+			minValue = _legendColor.overwriteMinValue * unitFactor;
 		}
-		if (fLegendColor.isMaxValueOverwrite && maxValue > fLegendColor.overwriteMaxValue * unitFactor) {
-			maxValue = fLegendColor.overwriteMaxValue * unitFactor;
+		if (_legendColor.isMaxValueOverwrite && maxValue > _legendColor.overwriteMaxValue * unitFactor) {
+			maxValue = _legendColor.overwriteMaxValue * unitFactor;
 		}
 
 		if (maxValue < minValue) {
 			maxValue = minValue + 1;
 		}
-		
+
 		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
 		if (legendUnits.size() > 0) {
 
 			final Integer legendMinValue = legendUnits.get(0);
 			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			fLegendConfig.units = legendUnits;
-			fLegendConfig.unitText = unitText;
-			fLegendConfig.legendMinValue = legendMinValue;
-			fLegendConfig.legendMaxValue = legendMaxValue;
+			_legendConfig.units = legendUnits;
+			_legendConfig.unitText = unitText;
+			_legendConfig.legendMinValue = legendMinValue;
+			_legendConfig.legendMaxValue = legendMaxValue;
 
 			/*
 			 * set color configuration, each tour has a different altitude config
@@ -181,7 +182,8 @@ public class LegendProvider implements ILegendProvider {
 			final int diffMinMax10 = diffMinMax / 10;
 			final int midValueAbsolute = legendMinValue + diffMinMax2;
 
-			final ValueColor[] valueColors = fLegendColor.valueColors;
+			final ValueColor[] valueColors = _legendColor.valueColors;
+
 			valueColors[0].value = legendMinValue + diffMinMax10;
 			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
 			valueColors[2].value = midValueAbsolute;
@@ -216,13 +218,13 @@ public class LegendProvider implements ILegendProvider {
 			}
 		}
 
-		final int unitFactor = fLegendConfig.unitFactor;
+		final int unitFactor = _legendConfig.unitFactor;
 
-		if (fLegendColor.isMinValueOverwrite && minValue < fLegendColor.overwriteMinValue * unitFactor) {
-			minValue = fLegendColor.overwriteMinValue * unitFactor;
+		if (_legendColor.isMinValueOverwrite && minValue < _legendColor.overwriteMinValue * unitFactor) {
+			minValue = _legendColor.overwriteMinValue * unitFactor;
 		}
-		if (fLegendColor.isMaxValueOverwrite && maxValue > fLegendColor.overwriteMaxValue * unitFactor) {
-			maxValue = fLegendColor.overwriteMaxValue * unitFactor;
+		if (_legendColor.isMaxValueOverwrite && maxValue > _legendColor.overwriteMaxValue * unitFactor) {
+			maxValue = _legendColor.overwriteMaxValue * unitFactor;
 		}
 
 		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
@@ -231,10 +233,10 @@ public class LegendProvider implements ILegendProvider {
 			final Integer legendMinValue = legendUnits.get(0);
 			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			fLegendConfig.units = legendUnits;
-			fLegendConfig.unitText = unitText;
-			fLegendConfig.legendMinValue = legendMinValue;
-			fLegendConfig.legendMaxValue = legendMaxValue;
+			_legendConfig.units = legendUnits;
+			_legendConfig.unitText = unitText;
+			_legendConfig.legendMinValue = legendMinValue;
+			_legendConfig.legendMaxValue = legendMaxValue;
 
 			/*
 			 * set color configuration, each tour has a different altitude config
@@ -245,7 +247,8 @@ public class LegendProvider implements ILegendProvider {
 			final int diffMinMax10 = diffMinMax / 10;
 			final int midValueAbsolute = legendMinValue + diffMinMax2;
 
-			final ValueColor[] valueColors = fLegendColor.valueColors;
+			final ValueColor[] valueColors = _legendColor.valueColors;
+
 			valueColors[0].value = legendMinValue + diffMinMax10;
 			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
 			valueColors[2].value = midValueAbsolute;

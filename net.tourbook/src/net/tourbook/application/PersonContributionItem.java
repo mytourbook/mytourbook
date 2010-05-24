@@ -23,13 +23,14 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
+import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -45,11 +46,12 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	private static final String		ID			= "net.tourbook.clientselector";		//$NON-NLS-1$
 
-	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
-	private IPreferenceStore		_prefStore	= _activator.getPreferenceStore();
-	private IDialogSettings			_state		= _activator.getDialogSettings();
+	private static final boolean	IS_OSX		= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
 
-	private static final boolean	osx			= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
+	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
+
+	private final IDialogSettings	_state		= _activator.getDialogSettings();
+	private final IPreferenceStore	_prefStore	= _activator.getPreferenceStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
@@ -70,8 +72,9 @@ public class PersonContributionItem extends CustomControlContribution {
 	 */
 	private void addPrefListener() {
 
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -92,10 +95,9 @@ public class PersonContributionItem extends CustomControlContribution {
 					}
 				}
 			}
-
 		};
 		// register the listener
-		_activator.getPluginPreferences().addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		Composite content;
 
-		if (osx) {
+		if (IS_OSX) {
 
 			content = createPeopleComboBox(parent);
 
@@ -136,7 +138,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		_cboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				if (_prefChangeListener != null) {
-					_activator.getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+					_prefStore.removePropertyChangeListener(_prefChangeListener);
 				}
 			}
 		});
@@ -184,7 +186,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		for (final TourPerson person : _allPeople) {
 			String lastName = person.getLastName();
-			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			lastName = lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : UI.SPACE + lastName;
 			_cboPeople.add(person.getFirstName() + lastName);
 		}
 	}

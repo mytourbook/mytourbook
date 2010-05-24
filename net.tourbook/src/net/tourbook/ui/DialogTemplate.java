@@ -29,7 +29,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class DialogTemplate extends TitleAreaDialog {
 
-//	private final IDialogSettings	_state	= TourbookPlugin.getDefault().getDialogSettingsSection("DialogTemplate");	//$NON-NLS-1$
+//	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+//	private final IDialogSettings	_state	= TourbookPlugin.getDefault().getDialogSettingsSection("Dialog???");	//$NON-NLS-1$
 
 	public DialogTemplate(final Shell parentShell) {
 

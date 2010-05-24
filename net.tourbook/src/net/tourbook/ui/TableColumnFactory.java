@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableColumnDefinition;
-import net.tourbook.util.TreeColumnDefinition;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -906,20 +905,13 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-																					final int pixelWidth = pixelConverter
-																							.convertWidthInCharsToPixels(10);
-																					final ColumnDefinition colDef = new TableColumnDefinition(
-																							columnManager,
-																							"wpAltitude", SWT.TRAIL); //$NON-NLS-1$
-			
-			colDef
-																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Altitude_Label);
-																					colDef
-																							.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
-																					colDef
-																							.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
-																					colDef
-																							.setColumnToolTipText(Messages.ColumnFactory_Waypoint_Altitude_Label);
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(10);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpAltitude", SWT.TRAIL); //$NON-NLS-1$
+
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Altitude_Label);
+			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Waypoint_Altitude_Label);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -933,14 +925,10 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
-																					final ColumnDefinition colDef = new TableColumnDefinition(
-																							columnManager,
-																							"wpCategory", SWT.LEAD); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpCategory", SWT.LEAD); //$NON-NLS-1$
 			
-			colDef
-																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Category);
-																					colDef
-																							.setColumnHeader(Messages.ColumnFactory_Waypoint_Category);
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Category);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Category);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -953,16 +941,11 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-																					final int pixelWidth = pixelConverter
-																							.convertWidthInCharsToPixels(30);
-																					final ColumnDefinition colDef = new TableColumnDefinition(
-																							columnManager,
-																							"wpSymbol", SWT.LEAD); //$NON-NLS-1$
-			
-			colDef
-																							.setColumnLabel(Messages.ColumnFactory_Waypoint_Symbol);
-																					colDef
-																							.setColumnHeader(Messages.ColumnFactory_Waypoint_Symbol);
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(30);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "wpSymbol", SWT.LEAD); //$NON-NLS-1$
+
+			colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Symbol);
+			colDef.setColumnHeader(Messages.ColumnFactory_Waypoint_Symbol);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			

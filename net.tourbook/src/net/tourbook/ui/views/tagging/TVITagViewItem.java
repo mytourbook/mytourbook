@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
@@ -28,7 +28,7 @@ import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
-	static final String	SQL_SUM_COLUMNS			= ""// //$NON-NLS-1$
+	static final String	SQL_SUM_COLUMNS			= UI.EMPTY_STRING //
 														+ "SUM(tourDistance)," // 		0	//$NON-NLS-1$
 														+ "SUM(tourRecordingTime)," //	1	//$NON-NLS-1$
 														+ "SUM(tourDrivingTime)," //	2	//$NON-NLS-1$
@@ -43,7 +43,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 														+ "SUM(1)";		//				11	//$NON-NLS-1$
 
-	static final String	SQL_SUM_COLUMNS_TOUR	= ""// //$NON-NLS-1$
+	static final String	SQL_SUM_COLUMNS_TOUR	= UI.EMPTY_STRING //
 														+ "tourDistance," // 			0	//$NON-NLS-1$
 														+ "tourRecordingTime," //		1	//$NON-NLS-1$
 														+ "tourDrivingTime," //			2	//$NON-NLS-1$
@@ -155,10 +155,9 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		colAvgTemperature = result.getLong(startIndex + 10);
 
 		// prevent divide by 0
-		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
+		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)
 		colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
-		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000 / colDistance;
-		
+		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000f / colDistance;
 
 	}
 

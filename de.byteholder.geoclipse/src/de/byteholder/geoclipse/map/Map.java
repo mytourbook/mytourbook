@@ -39,8 +39,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tourbook.util.StatusUtil;
 import net.tourbook.util.ITourToolTip;
+import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -451,7 +451,7 @@ public class Map extends Canvas {
 	private int									_pannedMapDiffX;
 	private int									_pannedMapDiffY;
 
-	private ITourToolTip							_tourToolTip;
+	private ITourToolTip						_tourToolTip;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {

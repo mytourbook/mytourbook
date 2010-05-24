@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerShowStartTime extends TCActionHandler {
 
 	public ActionHandlerShowStartTime() {
-		fCommandId = TourChart.COMMAND_ID_SHOW_START_TIME;
+		_commandId = TourChart.COMMAND_ID_SHOW_START_TIME;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
@@ -32,7 +32,7 @@ public class ActionHandlerShowStartTime extends TCActionHandler {
 		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
-			fTourChart.actionShowStartTime(isItemChecked);
+			_tourChart.actionShowStartTime(isItemChecked);
 		}
 
 		return null;

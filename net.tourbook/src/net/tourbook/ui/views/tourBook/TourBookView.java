@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,8 +68,6 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -77,7 +75,10 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -113,21 +114,18 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID								= "net.tourbook.views.tourListView";		//$NON-NLS-1$
+	static public final String				ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
-	private final IDialogSettings			_state							= TourbookPlugin
-																					.getDefault()
-																					.getDialogSettingsSection(
-																							"ViewTourBook");			//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_YEAR				= "selectedYear";							//$NON-NLS-1$
-	private static final String				STATE_SELECTED_MONTH			= "selectedMonth";							//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOURS			= "selectedTours";							//$NON-NLS-1$
+	private static final String				STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 
-	private static final String				STATE_SELECT_YEAR_MONTH_TOURS	= "isSelectYearMonthTours";				//$NON-NLS-1$
-
-	private Composite						_viewerContainer;
-	private TreeViewer						_tourViewer;
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
+																						.getPreferenceStore();
+	private final IDialogSettings			_state								= TourbookPlugin.getDefault() //
+																						.getDialogSettingsSection(ID);
 
 	private ColumnManager					_columnManager;
 
@@ -139,14 +137,27 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private TVITourBookRoot					_rootItem;
 
-	private NumberFormat					_nf								= NumberFormat.getNumberInstance();
-	private Calendar						_calendar						= GregorianCalendar.getInstance();
-	private DateFormat						_timeFormatter					= DateFormat
-																					.getTimeInstance(DateFormat.SHORT);
+	private NumberFormat					_nf									= NumberFormat.getNumberInstance();
+	private Calendar						_calendar							= GregorianCalendar.getInstance();
+	private DateFormat						_timeFormatter						= DateFormat
+																						.getTimeInstance(DateFormat.SHORT);
 
-	private final String[]					_weekDays						= DateFormatSymbols
-																					.getInstance()
-																					.getShortWeekdays();
+	private static final String[]			_weekDays							= DateFormatSymbols
+																						.getInstance()
+																						.getShortWeekdays();
+
+	private int								_selectedYear						= -1;
+	private int								_selectedMonth						= -1;
+	private ArrayList<Long>					_selectedTourIds					= new ArrayList<Long>();
+
+	private boolean							_isRecTimeFormat_hhmmss;
+	private boolean							_isDriveTimeFormat_hhmmss;
+
+	/*
+	 * UI controls
+	 */
+	private Composite						_viewerContainer;
+	private TreeViewer						_tourViewer;
 
 	private ActionEditQuick					_actionEditQuick;
 
@@ -154,7 +165,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionCollapseOthers			_actionCollapseOthers;
 	private ActionExpandSelection			_actionExpandSelection;
 
-	private ActionDeleteTour				_actionDeleteTour;
+	private ActionDeleteTourMenu			_actionDeleteTour;
 	private ActionEditTour					_actionEditTour;
 	private ActionOpenTour					_actionOpenTour;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
@@ -175,14 +186,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionExport					_actionExportTour;
 	private ActionPrint						_actionPrintTour;
 
-	private int								_selectedYear					= -1;
-	private int								_selectedMonth					= -1;
-	private ArrayList<Long>					_selectedTourIds				= new ArrayList<Long>();
-
-	private boolean							_isRecTimeFormat_hhmmss;
-	private boolean							_isDriveTimeFormat_hhmmss;
-
-	private class ItemComparer implements IElementComparer {
+	private static class ItemComparer implements IElementComparer {
 
 		public boolean equals(final Object a, final Object b) {
 
@@ -259,10 +263,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBookView.this) {
-
 					saveState();
-
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourBookView.this);
 				}
 			}
 
@@ -281,10 +282,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void addPrefListener() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_prefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -320,7 +319,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					readDisplayFormats();
 
 					_tourViewer.getTree().setLinesVisible(
-							prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					_tourViewer.refresh();
 
@@ -334,7 +333,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		};
 
 		// register the listener
-		prefStore.addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -381,7 +380,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionEditTour = new ActionEditTour(this);
 		_actionOpenTour = new ActionOpenTour(this);
-		_actionDeleteTour = new ActionDeleteTour(this);
+		_actionDeleteTour = new ActionDeleteTourMenu(this);
 
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
@@ -455,6 +454,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		readDisplayFormats();
 		restoreState();
 
+		enableActions();
+
 		// update the viewer
 		_rootItem = new TVITourBookRoot(this);
 		_tourViewer.setInput(this);
@@ -470,10 +471,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(TourbookPlugin
-				.getDefault()
-				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_tourViewer = new TreeViewer(tree);
 		_columnManager.createColumns(_tourViewer);
@@ -1238,18 +1236,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
 					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
 
-					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only
 					 * the content is modified but in the rawDataView the modified image is not
 					 * displayed compared with the tourBookView which displays the correct image
 					 */
-//					final byte[] imageData = tourTypeImage.getImageData().data;
-//					final StringBuilder sb = new StringBuilder();
-//					for (final byte b : imageData) {
-//						sb.append(b);
-//					}
 					cell.setImage(tourTypeImage);
+					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
 				}
 			}
 		});
@@ -1416,7 +1409,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		getViewSite().getPage().removePartListener(_partListener);
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -1818,12 +1811,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void readDisplayFormats() {
 
-		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
-
-		_isRecTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
+		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 
-		_isDriveTimeFormat_hhmmss = prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
+		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
@@ -1968,7 +1959,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		}
 
-		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_SELECT_YEAR_MONTH_TOURS));
+		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
 
 	}
 
@@ -1986,7 +1977,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
 
 		// action: select tours for year/month
-		_state.put(STATE_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
+		_state.put(STATE_IS_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
 
 		_columnManager.saveState(_state);
 	}

@@ -1,22 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
 import java.util.Map;
-
 
 import net.tourbook.ui.tourChart.TourChart;
 
@@ -32,11 +31,11 @@ import org.eclipse.ui.menus.UIElement;
  */
 public abstract class TCActionHandler extends AbstractHandler implements IElementUpdater {
 
-	String			fCommandId;
-	TourChart		fTourChart;
+	String			_commandId;
+	TourChart		_tourChart;
 
-	private boolean	fisEnabled;
-	private boolean	fIsChecked;
+	private boolean	_isEnabled;
+	private boolean	_isChecked;
 
 	/**
 	 * Update the UI enablement state for an action handler
@@ -46,12 +45,12 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	}
 
 	public String getCommandId() {
-		return fCommandId;
+		return _commandId;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return fisEnabled;
+		return _isEnabled;
 	}
 
 	/**
@@ -62,8 +61,8 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 */
 	public void setChecked(final boolean isChecked) {
 
-		if (fIsChecked != isChecked) {
-			fIsChecked = isChecked;
+		if (_isChecked != isChecked) {
+			_isChecked = isChecked;
 		}
 	}
 
@@ -75,8 +74,8 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 */
 	public void setEnabled(final boolean isEnabled) {
 
-		if (fisEnabled != isEnabled) {
-			fisEnabled = isEnabled;
+		if (_isEnabled != isEnabled) {
+			_isEnabled = isEnabled;
 		}
 	}
 
@@ -95,14 +94,14 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	}
 
 	public void setTourChart(final TourChart tourChart) {
-		fTourChart = tourChart;
+		_tourChart = tourChart;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void updateElement(final UIElement element, final Map parameters) {
 
 		// update check state in the UI
-		element.setChecked(fIsChecked);
+		element.setChecked(_isChecked);
 	}
 
 }
