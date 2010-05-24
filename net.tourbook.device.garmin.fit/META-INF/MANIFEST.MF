@@ -10,5 +10,5 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.ejb3;bundle-version="3.4.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.tourbook.chart

@@ -4,11 +4,11 @@ Bundle-Name: Import .CRP files
 Bundle-SymbolicName: net.tourbook.device.crp;singleton:=true
 Bundle-Version: 10.3.1.qualifier
 Bundle-Activator: net.tourbook.device.crp.Activator
-Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
  net.tourbook.device,
  net.tourbook.chart
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

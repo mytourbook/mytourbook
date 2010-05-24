@@ -4,11 +4,11 @@ Bundle-Name: Device Reader for CM414M and CM436M
 Bundle-SymbolicName: net.tourbook.device.cm4xxm;singleton:=true
 Bundle-Version: 10.3.1.qualifier
 Bundle-Activator: net.tourbook.device.cm4xxm.Activator
-Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
  net.tourbook.device,
  net.tourbook.rxtx
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

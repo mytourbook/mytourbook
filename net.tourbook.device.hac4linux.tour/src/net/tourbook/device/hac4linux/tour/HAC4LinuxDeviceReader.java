@@ -42,6 +42,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
@@ -214,7 +215,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 			return "Jogging";
 		}
 		else {
-			return ""; //$NON-NLS-1$
+			return UI.EMPTY_STRING;
 		}
 	}
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  ********************************************************************************
  *
  * @author Alfred Barten
@@ -28,7 +28,7 @@ Version since Edge 500 V 1.54:
 data field  type offset description
 ------------------------------------------------------------
 type        char    0   const 0x05
-timestamp   long    1   # sec. since 31.12.1989 0 h UTC 
+timestamp   long    1   # sec. since 31.12.1989 0 h UTC
 latitude    long    5   latitude  = 180 * [value] / LONG_MAX
 longitude   long    9   longitude = 180 * [value] / LONG_MAX
 distance    long   13   in cm
@@ -61,14 +61,14 @@ t.|timestamp  |latitude   |longitude  |distance   |unknown1   |elev.|speed|unk.2
 05 36 d2 29 25 14 08 1a 24 3b ff 42 04 62 b9 03 00 ff ff ff 7f 96 0d 81 11 ff ff 86 4b ff 0e
 05 38 d2 29 25 ea 06 1a 24 a2 f9 42 04 b0 bc 03 00 ff ff ff 7f 99 0d cd 11 ff ff 87 4b ff 0e
 05 3e d2 29 25 8d 04 1a 24 85 e8 42 04 63 c7 03 00 ff ff ff 7f a1 0d 0b 11 ff ff 88 49 ff 0e
-05 3f d2 29 25 1a 04 1a 24 a8 e5 42 04 0f c9 03 00 ff ff ff 7f a2 0d 1d 11 ff ff 88 49 ff 0e 
+05 3f d2 29 25 1a 04 1a 24 a8 e5 42 04 0f c9 03 00 ff ff ff 7f a2 0d 1d 11 ff ff 88 49 ff 0e
 
 Version <= 1.46
 t.|timestamp  |latitude   |longitude  |distance   |unknown1   |elev.|speed|unk.2|hr|cd|u3|t.|
-04 92 88 da 24 40 32 1a 24 34 e6 4d 04 f4 27 05 00 ff ff ff 7f ea 0d 6f 24 ff ff 85 ff ff 15 
-04 96 88 da 24 29 33 1a 24 0c fd 4d 04 db 40 05 00 ff ff ff 7f e7 0d f1 22 ff ff 82 ff ff 15 
-04 97 88 da 24 7d 33 1a 24 a0 02 4e 04 42 44 05 00 ff ff ff 7f e6 0d 5a 22 ff ff 81 ff ff 15 
-04 9b 88 da 24 0f 32 1a 24 76 1d 4e 04 82 47 05 00 ff ff ff 7f e6 0d d6 23 ff ff 7e ff ff 15 
+04 92 88 da 24 40 32 1a 24 34 e6 4d 04 f4 27 05 00 ff ff ff 7f ea 0d 6f 24 ff ff 85 ff ff 15
+04 96 88 da 24 29 33 1a 24 0c fd 4d 04 db 40 05 00 ff ff ff 7f e7 0d f1 22 ff ff 82 ff ff 15
+04 97 88 da 24 7d 33 1a 24 a0 02 4e 04 42 44 05 00 ff ff ff 7f e6 0d 5a 22 ff ff 81 ff ff 15
+04 9b 88 da 24 0f 32 1a 24 76 1d 4e 04 82 47 05 00 ff ff ff 7f e6 0d d6 23 ff ff 7e ff ff 15
 
  *******************************************************************************/
 
@@ -91,6 +91,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 //tourData.createTourId
 //tourData.computeComputedValues
@@ -205,15 +206,18 @@ public class FitDataReader extends TourbookDevice {
 		// time += deltaTime;
 
 		final int lat = getLong(a, latOff);
-		if (lat == LONG_MAX)
+		if (lat == LONG_MAX) {
 			return null;
+		}
 		final double latD = 180. * lat / LONG_MAX;
-		if (latD > 90. || latD < -90.)
+		if (latD > 90. || latD < -90.) {
 			return null;
+		}
 
 		final int lon = getLong(a, lonOff);
-		if (lon == LONG_MAX)
+		if (lon == LONG_MAX) {
 			return null;
+		}
 
 		final double lonD = 180. * lon / LONG_MAX;
 
@@ -230,20 +234,23 @@ public class FitDataReader extends TourbookDevice {
 		final double speedD = 3.6 * speed / 100; // [0.1 km/h]
 
 		int pulse = getChar(a, pulseOff);
-		if (pulse == 0xFF)
+		if (pulse == 0xFF) {
 			pulse = 0;
-		else
+		} else {
 			pulseExists = true;
+		}
 
 		int cadence = getChar(a, cadenceOff);
-		if (cadence == 0xFF)
+		if (cadence == 0xFF) {
 			cadence = 0;
-		else
+		} else {
 			cadenceExists = true;
+		}
 
 		int temperature = getChar(a, temperatureOff);
-		if (temperature > 128)
+		if (temperature > 128) {
 			temperature -= 256;
+		}
 
 		/*
 		 * create time slice
@@ -304,13 +311,15 @@ public class FitDataReader extends TourbookDevice {
 		BufferedReader bufferedReader = null;
 
 		try {
-			if (validateRawData(importFileName) == false)
+			if (validateRawData(importFileName) == false) {
 				return false;
+			}
 
 			final int BUFSIZE = 33;
 			final char[] a = new char[BUFSIZE];
-			for (int i = 0; i < BUFSIZE; i++)
+			for (int i = 0; i < BUFSIZE; i++) {
 				a[i] = 0;
+			}
 
 			final FileInputStream fileInputStream = new FileInputStream(importFileName);
 			final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "ISO-8859-1"); //$NON-NLS-1$
@@ -321,11 +330,13 @@ public class FitDataReader extends TourbookDevice {
 
 			do {
 				final int ir = bufferedReader.read();
-				if (ir == -1)
+				if (ir == -1) {
 					break;
+				}
 
-				for (int j = 0; j < BUFSIZE - 1; j++)
+				for (int j = 0; j < BUFSIZE - 1; j++) {
 					a[j] = a[j + 1];
+				}
 				a[BUFSIZE - 1] = (char) ir;
 
 				timeData = null;
@@ -359,14 +370,15 @@ public class FitDataReader extends TourbookDevice {
 						&& a[25] == 0xFF
 						&& a[26] == 0xFF
 						&& a[29] == 0xFF
-						&& a[30] != 0xFF // temperature                  
+						&& a[30] != 0xFF // temperature
 				) {
 					// Version <= 1.46
 					timeData = getTimeData(a, 1, 5, 9, 13, 21, 23, 27, 28, 30);
 				}
 
-				if (timeData != null)
+				if (timeData != null) {
 					timeDataList.add(timeData);
+				}
 			}
 			while (true);
 			bufferedReader.close();
@@ -408,10 +420,12 @@ public class FitDataReader extends TourbookDevice {
 
 				// disable data series when no data are available
 				final TimeData firstTimeData = timeDataList.get(0);
-				if (!pulseExists)
+				if (!pulseExists) {
 					firstTimeData.pulse = Integer.MIN_VALUE;
-				if (!cadenceExists)
+				}
+				if (!cadenceExists) {
 					firstTimeData.cadence = Integer.MIN_VALUE;
+				}
 
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
@@ -451,10 +465,11 @@ public class FitDataReader extends TourbookDevice {
 			fileReader = new BufferedReader(new FileReader(fileName));
 			final char[] buf = new char[12];
 			final int nChar = fileReader.read(buf, 0, 12);
-			if (nChar < 12)
+			if (nChar < 12) {
 				return false;
+			}
 
-			final String fileType = "" + buf[9] + buf[10] + buf[11]; //$NON-NLS-1$
+			final String fileType = UI.EMPTY_STRING + buf[9] + buf[10] + buf[11];
 
 			System.out.println("FitDataReader: fileType = " + fileType); //$NON-NLS-1$
 

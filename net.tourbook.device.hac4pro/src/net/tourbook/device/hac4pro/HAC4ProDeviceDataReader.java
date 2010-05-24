@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.hac4pro;
 
@@ -56,6 +56,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 	private GregorianCalendar	fFileDate;
 
+	// plugin constructor
+	public HAC4ProDeviceDataReader() {
+		canReadFromDevice = true;
+	}
+
 	/**
 	 * @param timeData
 	 * @param rawData
@@ -89,11 +94,6 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 		// distance (6 bits)
 		timeData.distance = (short) (data & 0x003F) * 10;
-	}
-
-	// plugin constructor
-	public HAC4ProDeviceDataReader() {
-		canReadFromDevice = true;
 	}
 
 	/**
@@ -537,8 +537,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				// dump DD block
 				// dumpBlock(file, recordBuffer);
 				//
-				// System.out.println("");
-				// System.out.println("");
+				// System.out.println(UI.EMPTY_STRING);
+				// System.out.println(UI.EMPTY_STRING);
 
 				offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
 

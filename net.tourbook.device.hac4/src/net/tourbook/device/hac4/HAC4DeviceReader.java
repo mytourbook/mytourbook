@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.hac4;
 
@@ -35,6 +35,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 public class HAC4DeviceReader extends TourbookDevice {
 
@@ -122,8 +123,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	public String getDeviceModeName(final int profileId) {
 
-		// "81" jogging 
-		// "91" ski 
+		// "81" jogging
+		// "91" ski
 		// "A1" bike
 		// "B1" ski-bike
 
@@ -176,7 +177,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		RandomAccessFile fileRawData = null;
 
 		final byte[] buffer = new byte[5];
-		String recordType = ""; //$NON-NLS-1$
+		String recordType = UI.EMPTY_STRING;
 
 		final HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
 		final TourType defaultTourType = getTourType();

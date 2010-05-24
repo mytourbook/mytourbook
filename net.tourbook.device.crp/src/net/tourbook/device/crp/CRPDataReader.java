@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.crp;
 
@@ -30,6 +30,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 public class CRPDataReader extends TourbookDevice {
 
@@ -126,7 +127,7 @@ public class CRPDataReader extends TourbookDevice {
 			final ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			@SuppressWarnings("unused")//$NON-NLS-1$
+			@SuppressWarnings("unused")
 			final
 			String fileVersion = tokenLine.nextToken();
 
@@ -174,7 +175,7 @@ public class CRPDataReader extends TourbookDevice {
 			tokenLine.nextToken();
 
 			// tour name
-			String tourName = ""; //$NON-NLS-1$
+			String tourName = UI.EMPTY_STRING;
 			if (tokenLine.hasMoreTokens()) {
 				tourName = tokenLine.nextToken("\t"); //$NON-NLS-1$
 			}
@@ -201,7 +202,7 @@ public class CRPDataReader extends TourbookDevice {
 			/*
 			 * lines: tour description
 			 */
-			String tourDesc = ""; //$NON-NLS-1$
+			String tourDesc = UI.EMPTY_STRING;
 			while ((line = fileReader.readLine()) != null) {
 				tourDesc += line + "\n"; //$NON-NLS-1$
 			}
@@ -244,15 +245,15 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-			@SuppressWarnings("unused")//$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int speed;
 			int altitude;
-			@SuppressWarnings("unused")//$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int color;
-			@SuppressWarnings("unused")//$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int symbol;
 			int temperature;
-			@SuppressWarnings("unused")//$NON-NLS-1$
+			@SuppressWarnings("unused")
 			String trackpointTime;
 
 			int oldDistance = 0;
@@ -279,7 +280,7 @@ public class CRPDataReader extends TourbookDevice {
 				trackpointTime = tokenLine.nextToken();
 
 				// get comment for current trackpoint
-				String comment = ""; //$NON-NLS-1$
+				String comment = UI.EMPTY_STRING;
 				if (tokenLine.hasMoreTokens()) {
 					comment = tokenLine.nextToken("\t"); //$NON-NLS-1$
 				}

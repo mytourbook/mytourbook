@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm, Markus Stipp
- *  
+ * Copyright (C) 2005, 2010  Wolfgang Schramm, Markus Stipp
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.cm4xxm;
 
@@ -39,6 +39,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 public class CM4XXMDeviceReader extends TourbookDevice {
 
@@ -123,8 +124,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 	public String getDeviceModeName(final int profileId) {
 
-		// "2E" bike2 (CM414M) 
-		// "3E" bike1 (CM414M) 
+		// "2E" bike2 (CM414M)
+		// "3E" bike1 (CM414M)
 
 		switch (profileId) {
 		case 46: // 0x2E
@@ -168,7 +169,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		RandomAccessFile fileRawData = null;
 
 		final byte[] buffer = new byte[5];
-		String recordType = ""; //$NON-NLS-1$
+		String recordType = UI.EMPTY_STRING;
 
 		final CM4XXMDeviceData cm4xxmDeviceData = new CM4XXMDeviceData();
 

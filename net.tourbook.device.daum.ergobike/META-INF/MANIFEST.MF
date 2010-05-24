@@ -9,4 +9,4 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
