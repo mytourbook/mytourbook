@@ -368,7 +368,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int							mergedAltitudeOffset;														// db-version 7
 
 	/**
-	 * Date/Time when tour data set was created, value is set to tour date before db version 11
+	 * Date/Time when tour data was created. This value is set to the tour start date before db
+	 * version 11, otherwise the value is set when the tour is saved the first time.
 	 */
 	private long						dateTimeCreated;															// db-version 11
 
@@ -4485,8 +4486,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.weatherWindDir = weatherWindDir;
 	}
 
-	public void setWeatherWindSpd(final int weatherWindSpd) {
-		this.weatherWindSpd = weatherWindSpd;
+	public void setWeatherWindSpeed(final int weatherWindSpeed) {
+		this.weatherWindSpd = weatherWindSpeed;
 	}
 
 	public void setWeek(final DateTime dt) {
@@ -4523,6 +4524,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		startWeekYear = (short) Util.getYearForWeek(_calendar);
 	}
 
+	/**
+	 * Set world positions which are cached
+	 * 
+	 * @param projectionId
+	 * @param worldPositions
+	 * @param zoomLevel
+	 */
 	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {
 		_worldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}

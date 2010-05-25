@@ -54,11 +54,11 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
-	public static String	Dialog_ExtractTour_DlgArea_Message;
+	public static String		Dialog_ExtractTour_DlgArea_Message;
 
-	public static String	Dialog_ExtractTour_DlgArea_Title;
+	public static String		Dialog_ExtractTour_DlgArea_Title;
 
-	public static String	Dialog_ExtractTour_Label_SplitMethod;
+	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
 	public static String		Dialog_Print_Chk_TourRangeDisabled;
 	public static String		Dialog_Print_Chk_TourRangeWithDistance;
@@ -100,7 +100,7 @@ public class Messages extends NLS {
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 
-	public static String	App_Action_ExtractTour;
+	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
@@ -200,7 +200,7 @@ public class Messages extends NLS {
 
 	public static String		App_Action_set_tour_type;
 
-	public static String	App_Action_SplitTour;
+	public static String		App_Action_SplitTour;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -281,9 +281,9 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_ComboText_ConcatenateTime;
 	public static String		Dialog_JoinTours_ComboText_KeepTime;
 	public static String		Dialog_JoinTours_ComboText_MarkerTourTime;
-	public static String	Dialog_JoinTours_ComboText_TourTileCustom;
+	public static String		Dialog_JoinTours_ComboText_TourTileCustom;
 
-	public static String	Dialog_JoinTours_ComboText_TourTitleFromTour;
+	public static String		Dialog_JoinTours_ComboText_TourTitleFromTour;
 
 	public static String		Dialog_JoinTours_ComboText_TourTypeCustom;
 	public static String		Dialog_JoinTours_ComboText_TourTypeFromTour;
@@ -310,7 +310,7 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Label_Description;
 	public static String		Dialog_JoinTours_Label_DeviceName;
 
-	public static String	Dialog_JoinTours_Label_JoinMethod;
+	public static String		Dialog_JoinTours_Label_JoinMethod;
 	public static String		Dialog_JoinTours_Label_OtherFields;
 	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
 	public static String		Dialog_JoinTours_Label_Title;
@@ -331,39 +331,27 @@ public class Messages extends NLS {
 
 	public static String		Dialog_SelectGraphs_Title;
 
-	public static String	Dialog_SplitTour_Checkbox_IncludeDescription;
+	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
+	public static String		Dialog_SplitTour_ComboText_CustomTime;
+	public static String		Dialog_SplitTour_ComboText_KeepSlices;
+	public static String		Dialog_SplitTour_ComboText_KeepTime;
+	public static String		Dialog_SplitTour_ComboText_RemoveSlices;
+	public static String		Dialog_SplitTour_ComboText_TourTileCustom;
+	public static String		Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;
+	public static String		Dialog_SplitTour_ComboText_TourTitleFromTour;
+	public static String		Dialog_SplitTour_ComboText_TourTypeCustom;
+	public static String		Dialog_SplitTour_ComboText_TourTypeFromTour;
+	public static String		Dialog_SplitTour_ComboText_TourTypePrevious;
+	public static String		Dialog_SplitTour_DlgArea_Message;
+	public static String		Dialog_SplitTour_DlgArea_Title;
+	public static String		Dialog_SplitTour_Label_DefaultTitle;
+	public static String		Dialog_SplitTour_Label_DeviceName;
 
-	public static String	Dialog_SplitTour_ComboText_CustomTime;
-
-	public static String	Dialog_SplitTour_ComboText_KeepSlices;
-
-	public static String	Dialog_SplitTour_ComboText_KeepTime;
-
-	public static String	Dialog_SplitTour_ComboText_RemoveSlices;
-
-	public static String	Dialog_SplitTour_ComboText_TourTileCustom;
-
-	public static String	Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;
-
-	public static String	Dialog_SplitTour_ComboText_TourTitleFromTour;
-
-	public static String	Dialog_SplitTour_ComboText_TourTypeCustom;
-
-	public static String	Dialog_SplitTour_ComboText_TourTypeFromTour;
-
-	public static String	Dialog_SplitTour_ComboText_TourTypePrevious;
-
-	public static String	Dialog_SplitTour_DlgArea_Message;
-
-	public static String	Dialog_SplitTour_DlgArea_Title;
-
-	public static String	Dialog_SplitTour_Label_SplitMethod;
-
-	public static String	Dialog_SplitTour_Label_TourStartDateTime;
-
-	public static String	Dialog_SplitTour_Label_TourTitle;
-
-	public static String	Dialog_SplitTour_Label_TourTitle_Tooltip;
+	public static String	Dialog_SplitTour_Label_OtherFieldsInfo;
+	public static String		Dialog_SplitTour_Label_SplitMethod;
+	public static String		Dialog_SplitTour_Label_TourStartDateTime;
+	public static String		Dialog_SplitTour_Label_TourTitle;
+	public static String		Dialog_SplitTour_Label_TourTitle_Tooltip;
 
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
@@ -468,7 +456,7 @@ public class Messages extends NLS {
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 
-	public static String	Image__MyTourbook16;
+	public static String		Image__MyTourbook16;
 	public static String		Image__open_folder_add;
 	public static String		Image__options;
 	public static String		Image__quick_edit;
@@ -574,7 +562,7 @@ public class Messages extends NLS {
 	public static String		merge_tour_source_graph_temperature;
 	public static String		merge_tour_source_graph_temperature_tooltip;
 
-	public static String	NT001_DialogExtractTour_InvalidTourData;
+	public static String		NT001_DialogExtractTour_InvalidTourData;
 
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
@@ -798,7 +786,7 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
 
-	public static String	Tour_Book_Action_delete_selected_tours_menu;
+	public static String		Tour_Book_Action_delete_selected_tours_menu;
 	public static String		Tour_Book_Action_delete_selected_tours_task;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
@@ -810,7 +798,7 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 
-	public static String	Tour_Database_PostUpdate011_SetTourCreateTime;
+	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
@@ -819,9 +807,9 @@ public class Messages extends NLS {
 	public static String		Tour_Database_UpdateDone;
 	public static String		Tour_Database_UpdateInfo;
 
-	public static String	Tour_Editor_Label_DateTimeCreated;
+	public static String		Tour_Editor_Label_DateTimeCreated;
 
-	public static String	Tour_Editor_Label_DateTimeModified;
+	public static String		Tour_Editor_Label_DateTimeModified;
 
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
@@ -1072,6 +1060,8 @@ public class Messages extends NLS {
 
 	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String		TourEditor_Action_DeleteDistanceValues;
+
+	public static String	TourEditor_Action_SetStartDistanceTo0;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;

@@ -90,7 +90,9 @@ import net.tourbook.util.Util;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -177,6 +179,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -251,32 +254,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	// marker viewer
 	private ColumnDefinition					_colDefMarker;
 
-	private ActionSaveTour						_actionSaveTour;
-	private ActionCreateTour					_actionCreateTour;
-	private ActionUndoChanges					_actionUndoChanges;
-	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
-	private ActionComputeDistanceValues			_actionComputeDistanceValues;
-	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
-	private ActionToggleReadEditMode			_actionToggleReadEditMode;
-	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
-	private ActionDeleteTimeSlicesKeepTime		_actionDeleteTimeSlicesKeepTime;
-	private ActionDeleteTimeSlicesRemoveTime	_actionDeleteTimeSlicesRemoveTime;
-	private ActionCreateTourMarker				_actionCreateTourMarker;
-	private ActionExport						_actionExportTour;
-	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
-	private ActionSplitTour						_actionSplitTour;
-	private ActionExtractTour					_actionExtractTour;
-
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
-	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
-
-	private ActionDeleteTourMarker				_actionDeleteTourMarker;
-	private ActionModifyColumns					_actionModifyColumns;
-
 	private MessageManager						_messageManager;
 
 	private PostSelectionProvider				_postSelectionProvider;
@@ -347,7 +324,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private SelectionAdapter					_tourTimeListener;
 	private SelectionAdapter					_dateTimeListener;
 
-	private PixelConverter						_pixelConverter;
+	private PixelConverter						_pc;
 
 	/**
 	 * this width is used as a hint for the width of the description field, this value also
@@ -373,6 +350,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * when <code>true</code> additional info is displayed in the title area
 	 */
 	private boolean								_isInfoInTitle;
+
+	/**
+	 * is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+	 */
+	private boolean								_isCellEditorActive				= false;
 
 	/**
 	 * every requested UI update increased this counter
@@ -403,6 +385,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private SliceDoubleEditingSupport			_latitudeEditingSupport;
 	private SliceDoubleEditingSupport			_longitudeEditingSupport;
 
+	private int									_enableActionCounter			= 0;
+
 	/**
 	 * contains all markers with the data serie index as key
 	 */
@@ -432,6 +416,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * UI controls
 	 * ##################################################
 	 */
+
+//	private Display									_display;
 
 	// pages
 	private PageBook							_pageBook;
@@ -527,6 +513,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private Text								_txtDateTimeCreated;
 	private Text								_txtDateTimeModified;
+
+	/*
+	 * actions
+	 */
+	private ActionSaveTour						_actionSaveTour;
+	private ActionCreateTour					_actionCreateTour;
+	private ActionUndoChanges					_actionUndoChanges;
+	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
+	private ActionSetStartDistanceTo0			_actionSetStartDistanceTo0;
+	private ActionComputeDistanceValues			_actionComputeDistanceValues;
+	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
+	private ActionToggleReadEditMode			_actionToggleReadEditMode;
+	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
+	private ActionDeleteTimeSlicesKeepTime		_actionDeleteTimeSlicesKeepTime;
+	private ActionDeleteTimeSlicesRemoveTime	_actionDeleteTimeSlicesRemoveTime;
+	private ActionCreateTourMarker				_actionCreateTourMarker;
+	private ActionExport						_actionExportTour;
+	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
+	private ActionSplitTour						_actionSplitTour;
+	private ActionExtractTour					_actionExtractTour;
+
+	private ActionSetTourTag					_actionAddTag;
+	private ActionSetTourTag					_actionRemoveTag;
+	private ActionRemoveAllTags					_actionRemoveAllTags;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+
+	private ActionDeleteTourMarker				_actionDeleteTourMarker;
+	private ActionModifyColumns					_actionModifyColumns;
 
 	/*
 	 * ##################################################
@@ -923,6 +939,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+	}
+
+	/**
+	 * It took me hours to find this location where the editor is activated/deactivated
+	 * without using TableViewerEditor which is activated in setCellEditingSupport but not
+	 * in the row edit mode.
+	 */
+	private final class TextCellEditorCustomized extends TextCellEditor {
+
+		private TextCellEditorCustomized(final Composite parent) {
+			super(parent);
+		}
+
+		@Override
+		public void activate() {
+
+			super.activate();
+
+			_isCellEditorActive = true;
+			enableActionsDelayed();
+		}
+
+		@Override
+		public void deactivate() {
+
+			super.deactivate();
+
+			_isCellEditorActive = false;
+			enableActionsDelayed();
+		}
 	}
 
 	/**
@@ -1454,6 +1500,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		saveTourIntoDB();
 	}
 
+	void actionSetStartDistanceTo0() {
+
+		// it is already checked if a valid data serie is available and first distance is > 0
+
+		final int[] distanceSerie = _tourData.distanceSerie;
+		final int distanceOffset = distanceSerie[0];
+
+		// adjust distance data serie
+		for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
+			final int sliceDistance = distanceSerie[serieIndex];
+			distanceSerie[serieIndex] = sliceDistance - distanceOffset;
+		}
+
+		// adjust distance in markers
+		final Set<TourMarker> allTourMarker = _tourData.getTourMarkers();
+		if (allTourMarker != null) {
+
+			for (final TourMarker tourMarker : allTourMarker) {
+				final int markerDistance = tourMarker.getDistance();
+				if (markerDistance > 0) {
+					tourMarker.setDistance(markerDistance - distanceOffset);
+				}
+			}
+		}
+
+		updateUIAfterDistanceModifications();
+	}
+
 	void actionToggleReadEditMode() {
 
 		_isEditMode = _actionToggleReadEditMode.isChecked();
@@ -1796,6 +1870,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionComputeDistanceValues = new ActionComputeDistanceValues(this);
 		_actionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
 		_actionToggleReadEditMode = new ActionToggleReadEditMode(this);
+		_actionSetStartDistanceTo0 = new ActionSetStartDistanceTo0(this);
 
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
@@ -2003,53 +2078,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		};
-
-//		_verifyIntValue = new ModifyListener() {
-//
-//			public void modifyText(final ModifyEvent event) {
-//
-//				if (_isDirtyDisabled || _isSavingInProgress) {
-//					return;
-//				}
-//
-//				final Text widget = (Text) event.widget;
-//				final String valueText = widget.getText().trim();
-//
-//				if (valueText.length() > 0) {
-//					try {
-//
-//						Integer.parseInt(valueText);
-//
-//						_messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
-//
-//					} catch (final IllegalArgumentException e) {
-//
-//						// wrong characters are entered, display an error message
-//
-//						_messageManager.addMessage(
-//								widget.getData(WIDGET_KEY),
-//								e.getLocalizedMessage(),
-//								null,
-//								IMessageProvider.ERROR,
-//								widget);
-//					}
-//				}
-//
-//				/*
-//				 * set tour dirty must be set after validation because an error can occur which
-//				 * enables actions
-//				 */
-//				if (_isTourDirty) {
-//					/*
-//					 * when an error occured previously and is now solved, the save action must be
-//					 * enabled
-//					 */
-//					enableActions();
-//				} else {
-//					setTourDirty();
-//				}
-//			}
-//		};
 	}
 
 	/**
@@ -2083,7 +2111,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		// create editing support after the viewer is created but before the columns are created
-		final TextCellEditor cellEditor = new TextCellEditor(_markerViewer.getTable());
+		final TextCellEditor cellEditor = new TextCellEditorCustomized(_markerViewer.getTable());
 		_colDefMarker.setEditingSupport(new MarkerEditingSupport(cellEditor));
 
 		_markerColumnManager.setColumnLayout(tableLayout);
@@ -2214,6 +2242,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	@Override
 	public void createPartControl(final Composite parent) {
 
+//		_display = parent.getDisplay();
+
 		updateInternalUnitValues();
 
 		// define columns for the viewers
@@ -2225,7 +2255,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		restoreStateBeforeUI();
 
-		createFieldListener(); // must be set before the UI is created
+		// must be set before the UI is created
+		createFieldListener();
+
 		createUI(parent);
 		createMenus();
 
@@ -2319,9 +2351,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		/*
-		 * create editing support after the viewer is created but before the columns are created
+		 * create editing support after the viewer is created but before the columns are created.
 		 */
-		final TextCellEditor cellEditor = new TextCellEditor(_sliceViewer.getTable());
+		final TextCellEditor cellEditor = new TextCellEditorCustomized(_sliceViewer.getTable());
 
 		_altitudeEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieAltitude);
 		_pulseEditingSupport = new SliceIntegerEditingSupport(cellEditor, _seriePulse);
@@ -2336,7 +2368,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_colDefCadence.setEditingSupport(_cadenceEditingSupport);
 		_colDefLatitude.setEditingSupport(_latitudeEditingSupport);
 		_colDefLongitude.setEditingSupport(_longitudeEditingSupport);
-
 		_colDefSliceMarker.setEditingSupport(new SliceMarkerEditingSupport(cellEditor));
 
 		_sliceColumnManager.createColumns(_sliceViewer);
@@ -2419,7 +2450,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tk.decorateFormHeading(_pageEditorForm);
 
 		_messageManager = new MessageManager(_pageEditorForm);
-		_pixelConverter = new PixelConverter(parent);
+		_pc = new PixelConverter(parent);
 
 		final Composite formBody = _pageEditorForm.getBody();
 		GridLayoutFactory.fillDefaults().applyTo(formBody);
@@ -2496,7 +2527,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_textColumnWidth, _pixelConverter.convertHeightInCharsToPixels(descLines))
+					.hint(_textColumnWidth, _pc.convertHeightInCharsToPixels(descLines))
 					.applyTo(_txtDescription);
 
 			_txtDescription.addModifyListener(_modifyListener);
@@ -3835,36 +3866,101 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final boolean isTourInDb = isTourInDb();
 		final boolean isTourValid = isTourValid() && isTourInDb;
+		final boolean isNotManualTour = _isManualTour == false;
+		final boolean canEdit = _isEditMode && isTourInDb();
+
+		// all actions are disabled when a cell editor is activated
+		final boolean isCellEditorInactive = _isCellEditorActive == false;
 
 		final CTabItem selectedTab = _tabFolder.getSelection();
 		final boolean isTableViewerTab = (selectedTab == _tabSlices) || (selectedTab == _tabMarker);
+		final boolean isTourData = _tourData != null;
+
 		final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
 
+		// at least 2 positions are necessary to compute the distance
+		final boolean isGeoAvailable = isTourData
+				&& _tourData.latitudeSerie != null
+				&& _tourData.latitudeSerie.length >= 2;
+
+		final boolean isDistanceAvailable = isTourData //
+				&& _tourData.distanceSerie != null
+				&& _tourData.distanceSerie.length > 0;
+
+		final boolean isDistanceLargerThan0 = isTourData //
+				&& isDistanceAvailable
+				&& _tourData.distanceSerie[0] > 0;
 		/*
 		 * tour can only be saved when it's already saved in the database,except manual tours
 		 */
-		_actionSaveTour.setEnabled(_isTourDirty && isTourValid);
+		_actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
 
-		_actionCreateTour.setEnabled(!_isTourDirty);
-		_actionUndoChanges.setEnabled(_isTourDirty);
+		_actionCreateTour.setEnabled(isCellEditorInactive && !_isTourDirty);
+		_actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
 
-		_actionOpenAdjustAltitudeDialog.setEnabled(canUseTool);
-		_actionOpenMarkerDialog.setEnabled(canUseTool);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
+		_actionOpenMarkerDialog.setEnabled(isCellEditorInactive && canUseTool);
 
-		_actionToggleRowSelectMode.setEnabled(isTableViewerTab && isTourValid && (_isManualTour == false));
-		_actionToggleReadEditMode.setEnabled(isTourInDb);
+		_actionToggleRowSelectMode.setEnabled(isCellEditorInactive
+				&& isTableViewerTab
+				&& isTourValid
+				&& (_isManualTour == false));
+		_actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-		_actionModifyColumns.setEnabled(isTableViewerTab && isTourValid);
+		_actionModifyColumns.setEnabled(isCellEditorInactive && isTableViewerTab && isTourValid);
+
+		_actionSetStartDistanceTo0.setEnabled(isCellEditorInactive
+				&& isNotManualTour
+				&& canEdit
+				&& isDistanceLargerThan0);
+		_actionDeleteDistanceValues.setEnabled(isCellEditorInactive
+				&& isNotManualTour
+				&& canEdit
+				&& isDistanceAvailable);
+		_actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
+	}
+
+	/**
+	 * Dlay enable/disable actions.
+	 * <p>
+	 * When a user traverses the edit fields in a viewer the actions are enabled and disable which
+	 * flickers the UI, therefor it is delayed.
+	 */
+	private void enableActionsDelayed() {
+
+		_enableActionCounter++;
+
+		final UIJob uiJob = new UIJob(UI.EMPTY_STRING) {
+
+			final int	__runnableCounter	= _enableActionCounter;
+
+			@Override
+			public IStatus runInUIThread(final IProgressMonitor monitor) {
+
+				// check if view is not disposed
+				if (_pageBook.isDisposed()) {
+					return Status.OK_STATUS;
+				}
+
+				// check if a newer runnable was created
+				if (__runnableCounter != _enableActionCounter) {
+					return Status.OK_STATUS;
+				}
+
+				enableActions();
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		uiJob.setSystem(true);
+		uiJob.schedule(10);
 	}
 
 	private void enableControls() {
 
 		final boolean canEdit = _isEditMode && isTourInDb();
-
-		// at least 2 positions are necessary to compute the distance
-		final boolean isGeoAvailable = _tourData != null
-				&& _tourData.latitudeSerie != null
-				&& _tourData.latitudeSerie.length >= 2;
+		final boolean isNotManualTour = _isManualTour == false;
 
 		_txtTitle.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
@@ -3895,11 +3991,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
 
-		_sliceViewer.getTable().setEnabled(_isManualTour == false);
-		_markerViewer.getTable().setEnabled(_isManualTour == false);
-
-		_actionDeleteDistanceValues.setEnabled(canEdit);
-		_actionComputeDistanceValues.setEnabled(canEdit && isGeoAvailable);
+		_sliceViewer.getTable().setEnabled(isNotManualTour);
+		_markerViewer.getTable().setEnabled(isNotManualTour);
 	}
 
 	/**
@@ -4028,6 +4121,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(_actionUndoChanges);
+		menuMgr.add(_actionSetStartDistanceTo0);
 		menuMgr.add(_actionDeleteDistanceValues);
 		menuMgr.add(_actionComputeDistanceValues);
 		menuMgr.add(new Separator());
@@ -4059,6 +4153,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
+
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
@@ -4141,16 +4245,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sliderSelection;
 	}
 
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
-
 	public ColumnManager getColumnManager() {
 
 		final CTabItem selectedTab = _tabFolder.getSelection();
@@ -4209,31 +4303,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	/**
-	 * Converts a string into a float value
-	 * 
-	 * @param valueText
-	 * @return Returns the float value for the parameter valueText, return <code>0</code>
-	 * @throws IllegalArgumentException
-	 */
-	private float getFloatValue(String valueText) throws IllegalArgumentException {
-
-		valueText = valueText.trim();
-		if (valueText.length() == 0) {
-
-			return 0;
-
-		} else {
-
-			final Object convertedValue = StringToNumberConverter.toFloat(true).convert(valueText);
-			if (convertedValue instanceof Float) {
-				return ((Float) convertedValue).floatValue();
-			}
-		}
-
-		return 0;
-	}
-
 //	/**
 //	 * Converts a string into a int value
 //	 *
@@ -4258,6 +4327,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //
 //		return 0;
 //	}
+
+	/**
+	 * Converts a string into a float value
+	 * 
+	 * @param valueText
+	 * @return Returns the float value for the parameter valueText, return <code>0</code>
+	 * @throws IllegalArgumentException
+	 */
+	private float getFloatValue(String valueText) throws IllegalArgumentException {
+
+		valueText = valueText.trim();
+		if (valueText.length() == 0) {
+
+			return 0;
+
+		} else {
+
+			final Object convertedValue = StringToNumberConverter.toFloat(true).convert(valueText);
+			if (convertedValue instanceof Float) {
+				return ((Float) convertedValue).floatValue();
+			}
+		}
+
+		return 0;
+	}
 
 	private double[] getRemainingDoubleSerieData(final double[] dataSerie, final int firstIndex, final int lastIndex) {
 
@@ -4555,7 +4649,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private boolean isTourInDb() {
 
-		if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
+		if (_tourData != null && _tourData.getTourPerson() != null) {
 			return true;
 		}
 
@@ -5096,9 +5190,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_markerViewerContainer.setRedraw(false);
 				{
 					_markerViewerContainer.getChildren()[0].dispose();
-//					table.dispose();
 
 					createMarkerViewer(_markerViewerContainer);
+
 					_markerViewerContainer.layout();
 
 					// update the viewer
@@ -5127,6 +5221,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					table.dispose();
 
 					createSliceViewer(_sliceViewerContainer);
+
 					_sliceViewerContainer.layout();
 
 					// update the viewer
@@ -5358,6 +5453,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_actionToggleRowSelectMode.setChecked(_isRowEditMode);
 		_actionToggleReadEditMode.setChecked(_isEditMode);
+
+		_actionSetStartDistanceTo0.setText(NLS.bind(
+				Messages.TourEditor_Action_SetStartDistanceTo0,
+				UI.UNIT_LABEL_DISTANCE));
 	}
 
 	private void saveState() {
@@ -5559,6 +5658,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
 			@Override
 			protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
+
 				return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
 						|| (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
 						|| ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) && (event.keyCode == SWT.CR))
@@ -5704,7 +5804,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * changed when the tour is being modified then the computation of the speed
 				 * value can cause rounding errors
 				 */
-				_tourData.setWeatherWindSpd((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
+				_tourData.setWeatherWindSpeed((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
 			}
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
@@ -5994,9 +6094,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		enableActions();
 		enableControls();
 
-		if (_tourData.isManualTour()) {
+		// action depends on the selected unit
+		_actionSetStartDistanceTo0.setText(NLS.bind(
+				Messages.TourEditor_Action_SetStartDistanceTo0,
+				UI.UNIT_LABEL_DISTANCE));
 
-		}
+		// show editor page
 		_pageBook.showPage(_pageEditorForm);
 
 		_isDirtyDisabled = false;

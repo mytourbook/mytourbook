@@ -834,7 +834,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			 * changed when the tour is being modified then the computation of the speed
 			 * value can cause rounding errors
 			 */
-			_tourData.setWeatherWindSpd((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
+			_tourData.setWeatherWindSpeed((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
 		}
 
 		final int cloudIndex = _comboClouds.getSelectionIndex();

@@ -137,10 +137,21 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 		return newTourMarker;
 	}
 
+	/**
+	 * Creates a clone of another marker but set's new {@link TourData} and set's the state that the
+	 * marker is not yet saved
+	 * 
+	 * @param newTourData
+	 * @return
+	 */
 	public TourMarker clone(final TourData newTourData) {
 
 		final TourMarker newTourMarker = clone();
+
 		newTourMarker.tourData = newTourData;
+
+		newTourMarker.markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		newTourMarker._createId = ++_createCounter;
 
 		return newTourMarker;
 	}
@@ -198,10 +209,10 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 		return true;
 	}
 
-	public void createMarkerId() {
-		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		_createId = ++_createCounter;
-	}
+//	public void setCreateId() {
+//		markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+//		_createId = ++_createCounter;
+//	}
 
 	/**
 	 * !!!!!!!!!!!!!!!!!<br>

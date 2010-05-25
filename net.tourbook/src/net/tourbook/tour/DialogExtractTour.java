@@ -32,7 +32,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -65,13 +65,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPart;
 import org.joda.time.DateTime;
 
 /**
  * Split tour at a time slice position and save extracted time slices as a new tour
  */
-public class DialogExtractTour extends TitleAreaDialog implements ITourProvider {
+public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2 {
 
 	private static final String					STATE_TOUR_TITLE						= "TourTitle";						//$NON-NLS-1$
 	private static final String					STATE_IS_KEEP_ORIGINAL_TIME				= "isKeepOriginalTime";			//$NON-NLS-1$
@@ -157,6 +156,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 	private boolean								_isSplitTour;
 
+	private DateTime							_extractedTourStartTime;
 	/*
 	 * UI controls
 	 */
@@ -217,43 +217,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 		_extractStartIndex = extractStartIndex;
 		_extractEndIndex = extractEndIndex;
-	}
-
-	private void addTourEventListener() {
-
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-
-						// check if it's the correct tour
-						if (_tourDataTarget == modifiedTours.get(0)) {
-
-							// update custom tour type id
-							final String stateTourTypeSource = getStateTourTypeSource();
-
-							if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
-								final TourType tourType = _tourDataTarget.getTourType();
-								_tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType
-										.getTypeId();
-							}
-
-							// tour type or tags can have been changed within this dialog
-							updateUITourTypeTags();
-
-							// enable/disable tag/type context menu
-							enableControls();
-						}
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	@Override
@@ -377,8 +340,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		updateUIFromModel();
 
 		enableControls();
-
-		addTourEventListener();
 
 		return dlgContainer;
 	}
@@ -627,7 +588,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		_chkIncludeMarkerWaypoints = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults().span(3, 1).indent(0, -5).applyTo(_chkIncludeMarkerWaypoints);
 		_chkIncludeMarkerWaypoints.setText(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints);
-
 	}
 
 	/**
@@ -644,7 +604,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		style.metrics = new GlyphMetrics(0, 0, 10);
 		final Bullet bullet = new Bullet(style);
 
-		final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
+		final String infoText = Messages.Dialog_SplitTour_Label_OtherFieldsInfo;
 		final int lineCount = Util.countCharacter(infoText, '\n');
 
 		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
@@ -663,7 +623,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		final boolean isCustomTime = _chkKeepOriginalDateTime.getSelection() == false;
 		final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
 		final boolean isCustomTourTitle = getStateTourTitleSource().equals(STATE_TOUR_TITLE_SOURCE_CUSTOM);
-		final TourType tourType = _tourDataTarget.getTourType();
 
 		_txtTourTitle.setEditable(isCustomTourTitle);
 
@@ -677,9 +636,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
-//		TourTypeMenuManager.enableRecentTourTypeActions(true, tourType == null
-//				? TourDatabase.ENTITY_IS_NOT_SAVED
-//				: tourType.getTypeId());
 	}
 
 	/**
@@ -768,277 +724,166 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		final int[] extractTemperatureSerie = new int[extractSerieLength];
 		final int[] extractTimeSerie = new int[extractSerieLength];
 
-		final StringBuilder joinedDescription = new StringBuilder();
-		final HashSet<TourMarker> joinedTourMarker = new HashSet<TourMarker>();
-		final ArrayList<TourWayPoint> joinedWayPoints = new ArrayList<TourWayPoint>();
+		final HashSet<TourMarker> extractedTourMarker = new HashSet<TourMarker>();
+		final ArrayList<TourWayPoint> extractedWayPoints = new ArrayList<TourWayPoint>();
 
-		int joinedSerieIndex = 0;
-		int joinedTourStartIndex = 0;
-		int joinedTourStartDistance = 0;
-		int joinedRecordingTime = 0;
-		int joinedDistance = 0;
-		int joinedCalories = 0;
-		boolean isJoinedDistanceFromSensor = false;
-		short joinedDeviceTimeInterval = -1;
-
-		int relTourTime = 0;
-		long relTourTimeOffset = 0;
-		long absFirstTourStartTimeSec = 0;
-		long absJoinedTourStartTimeSec = 0;
-		DateTime joinedTourStart = null;
-
+		/*
+		 * get start date/time
+		 */
+		DateTime extractedTourStart = null;
 		final boolean isOriginalTime = _chkKeepOriginalDateTime.getSelection();
-
-		boolean isFirstTour = true;
-
-		/*
-		 * copy tour data series into joined data series
-		 */
-
-		/*
-		 * set tour time
-		 */
-		final DateTime tourStartTime = new DateTime(
-				_tourDataSource.getStartYear(),
-				_tourDataSource.getStartMonth(),
-				_tourDataSource.getStartDay(),
-				_tourDataSource.getStartHour(),
-				_tourDataSource.getStartMinute(),
-				_tourDataSource.getStartSecond(),
-				0);
-
-		if (isFirstTour) {
-
-			// get start date/time
-
-			if (isOriginalTime) {
-
-				joinedTourStart = tourStartTime;
-
-			} else {
-
-				joinedTourStart = new org.joda.time.DateTime(
-						_dtTourDate.getYear(),
-						_dtTourDate.getMonth() + 1,
-						_dtTourDate.getDay(),
-						_dtTourTime.getHours(),
-						_dtTourTime.getMinutes(),
-						_dtTourTime.getSeconds(),
-						0);
-			}
-
-			// tour start in absolute seconds
-			absJoinedTourStartTimeSec = joinedTourStart.getMillis() / 1000;
-			absFirstTourStartTimeSec = absJoinedTourStartTimeSec;
-
+		if (isOriginalTime) {
+			extractedTourStart = _extractedTourStartTime;
 		} else {
-
-			// get relative time offset
-
-			if (isOriginalTime) {
-
-				final DateTime tourStart = tourStartTime;
-
-				final long absTourStartTimeSec = tourStart.getMillis() / 1000;
-
-				// keep original time
-				relTourTimeOffset = absTourStartTimeSec - absFirstTourStartTimeSec;
-
-			} else {
-
-				/*
-				 * remove time gaps between tours, add relative time from the last tour and add
-				 * 1 second for the start of the next tour
-				 */
-				relTourTimeOffset += relTourTime + 1;
-			}
+			extractedTourStart = new DateTime(
+					_dtTourDate.getYear(),
+					_dtTourDate.getMonth() + 1,
+					_dtTourDate.getDay(),
+					_dtTourTime.getHours(),
+					_dtTourTime.getMinutes(),
+					_dtTourTime.getSeconds(),
+					0);
 		}
 
-		/*
-		 * get number of slices
-		 */
-		int tourSliceCounter = 0;
+		int relTourStartTime = 0;
+		int extractedRecordingTime = 0;
 		if (isTourTime) {
-			tourSliceCounter = tourTimeSerie.length;
-		} else if (isTourDistance) {
-			tourSliceCounter = tourDistanceSerie.length;
-		} else if (isTourLat) {
-			tourSliceCounter = tourLatitudeSerie.length;
+			relTourStartTime = tourTimeSerie[_extractStartIndex];
+			extractedRecordingTime = tourTimeSerie[_extractEndIndex] - relTourStartTime;
 		}
 
-		int relTourDistance = 0;
+		// get distance
+		int extractedDistance = 0;
+		int relTourStartDistance = 0;
+		if (isTourDistance) {
+			relTourStartDistance = tourDistanceSerie[_extractStartIndex];
+			extractedDistance = tourDistanceSerie[_extractEndIndex] - relTourStartDistance;
+		}
 
 		/*
-		 * copy data series
+		 * copy existing data series
 		 */
-		for (int tourSerieIndex = 0; tourSerieIndex < tourSliceCounter; tourSerieIndex++) {
+		int extractedSerieIndex = 0;
+		for (int sourceSerieIndex = _extractStartIndex; sourceSerieIndex <= _extractEndIndex; sourceSerieIndex++) {
 
 			if (isTourTime) {
-
-				relTourTime = tourTimeSerie[tourSerieIndex];
-
-				extractTimeSerie[joinedSerieIndex] = (int) (relTourTimeOffset + relTourTime);
+				extractTimeSerie[extractedSerieIndex] = tourTimeSerie[sourceSerieIndex] - relTourStartTime;
 			}
 
 			if (isTourAltitude) {
-				extractAltitudeSerie[joinedSerieIndex] = tourAltitudeSerie[tourSerieIndex];
+				extractAltitudeSerie[extractedSerieIndex] = tourAltitudeSerie[sourceSerieIndex];
 			}
 			if (isTourCadence) {
-				extractCadenceSerie[joinedSerieIndex] = tourCadenceSerie[tourSerieIndex];
+				extractCadenceSerie[extractedSerieIndex] = tourCadenceSerie[sourceSerieIndex];
 			}
 
 			if (isTourDistance) {
-
-				relTourDistance = tourDistanceSerie[tourSerieIndex];
-
-				extractDistanceSerie[joinedSerieIndex] = joinedTourStartDistance + relTourDistance;
+				extractDistanceSerie[extractedSerieIndex] = tourDistanceSerie[sourceSerieIndex] - relTourStartDistance;
 			}
 
 			if (isTourPulse) {
-				extractPulseSerie[joinedSerieIndex] = tourPulseSerie[tourSerieIndex];
+				extractPulseSerie[extractedSerieIndex] = tourPulseSerie[sourceSerieIndex];
 			}
 			if (isTourLat) {
-				extractLatitudeSerie[joinedSerieIndex] = tourLatitudeSerie[tourSerieIndex];
+				extractLatitudeSerie[extractedSerieIndex] = tourLatitudeSerie[sourceSerieIndex];
 			}
 			if (isTourLon) {
-				extractLongitudeSerie[joinedSerieIndex] = tourLongitudeSerie[tourSerieIndex];
+				extractLongitudeSerie[extractedSerieIndex] = tourLongitudeSerie[sourceSerieIndex];
 			}
 			if (isTourTemperature) {
-				extractTemperatureSerie[joinedSerieIndex] = tourTemperatureSerie[tourSerieIndex];
+				extractTemperatureSerie[extractedSerieIndex] = tourTemperatureSerie[sourceSerieIndex];
 			}
 			if (isTourPower) {
-				extractPowerSerie[joinedSerieIndex] = tourPowerSerie[tourSerieIndex];
+				extractPowerSerie[extractedSerieIndex] = tourPowerSerie[sourceSerieIndex];
 			}
 			if (isTourSpeed) {
-				extractSpeedSerie[joinedSerieIndex] = tourSpeedSerie[tourSerieIndex];
+				extractSpeedSerie[extractedSerieIndex] = tourSpeedSerie[sourceSerieIndex];
 			}
 
-			joinedSerieIndex++;
+			extractedSerieIndex++;
 		}
 
+		/*
+		 * get tour markers, way points
+		 */
 		final Set<TourMarker> tourMarkers = _tourDataSource.getTourMarkers();
-
 		if (_chkIncludeMarkerWaypoints.getSelection()) {
 
-			/*
-			 * copy tour markers
-			 */
 			for (final TourMarker tourMarker : tourMarkers) {
 
-				final TourMarker clonedMarker = tourMarker.clone(_tourDataTarget);
+				final int markerSerieIndex = tourMarker.getSerieIndex();
 
-				int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
-				if (joinMarkerIndex >= extractSerieLength) {
-					joinMarkerIndex = extractSerieLength - 1;
+				// skip marker which are not within the extracted time slices
+				if (markerSerieIndex < _extractStartIndex || markerSerieIndex > _extractEndIndex) {
+					continue;
 				}
 
-				// a cloned marker has the same marker id, create a new id
-				clonedMarker.createMarkerId();
+				final int extractedMarkerIndex = markerSerieIndex - _extractStartIndex;
+
+				final TourMarker extractedMarker = tourMarker.clone(_tourDataTarget);
 
 				// adjust marker position, position is relativ to the tour start
-				clonedMarker.setSerieIndex(joinMarkerIndex);
+				extractedMarker.setSerieIndex(extractedMarkerIndex);
 
 				if (isTourTime) {
-					tourMarker.setTime(extractTimeSerie[joinMarkerIndex]);
+					tourMarker.setTime(extractTimeSerie[extractedMarkerIndex]);
 				}
 				if (isTourDistance) {
-					tourMarker.setDistance(extractDistanceSerie[joinMarkerIndex]);
+					tourMarker.setDistance(extractDistanceSerie[extractedMarkerIndex]);
 				}
 
-				joinedTourMarker.add(clonedMarker);
+				extractedTourMarker.add(extractedMarker);
 			}
 
 			/*
-			 * copy way points
+			 * copy all way points, they can be independant of the tour
 			 */
 			for (final TourWayPoint wayPoint : _tourDataSource.getTourWayPoints()) {
-				joinedWayPoints.add((TourWayPoint) wayPoint.clone());
+				extractedWayPoints.add((TourWayPoint) wayPoint.clone());
 			}
 		}
 
-		/*
-		 * create description
-		 */
+		// get description
+		String extractedDescription = UI.EMPTY_STRING;
 		if (_chkIncludeDescription.getSelection()) {
-
-			final String tourDescription = _tourDataSource.getTourDescription();
-
-			if (joinedDescription.length() > 0) {
-				// set space between two tours
-				joinedDescription.append(UI.NEW_LINE2);
-			}
-
-			joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour);
-			joinedDescription.append(TourManager.getTourTitleDetailed(_tourDataSource));
-			if (tourDescription.length() > 0) {
-				joinedDescription.append(UI.NEW_LINE);
-				joinedDescription.append(tourDescription);
-			}
+			extractedDescription = _tourDataSource.getTourDescription();
 		}
-
-		/*
-		 * other tour values
-		 */
-		if (isFirstTour) {
-			isJoinedDistanceFromSensor = _tourDataSource.getIsDistanceFromSensor();
-			joinedDeviceTimeInterval = _tourDataSource.getDeviceTimeInterval();
-		} else {
-			if (isJoinedDistanceFromSensor && _tourDataSource.getIsDistanceFromSensor()) {
-				// keep TRUE state
-			} else {
-				isJoinedDistanceFromSensor = false;
-			}
-			if (joinedDeviceTimeInterval == _tourDataSource.getDeviceTimeInterval()) {
-				// keep value
-			} else {
-				joinedDeviceTimeInterval = -1;
-			}
-		}
-
-		/*
-		 * summarize other fields
-		 */
-		joinedRecordingTime += _tourDataSource.getTourRecordingTime();
-		joinedDistance += _tourDataSource.getTourDistance();
-		joinedCalories += _tourDataSource.getCalories();
-
-		/*
-		 * init next tour
-		 */
-		isFirstTour = false;
-		joinedTourStartIndex = joinedSerieIndex;
-		joinedTourStartDistance += relTourDistance;
 
 		/*
 		 * set target tour data
 		 */
-		_tourDataTarget.setStartHour((short) joinedTourStart.getHourOfDay());
-		_tourDataTarget.setStartMinute((short) joinedTourStart.getMinuteOfHour());
-		_tourDataTarget.setStartSecond((short) joinedTourStart.getSecondOfMinute());
-		_tourDataTarget.setStartYear((short) joinedTourStart.getYear());
-		_tourDataTarget.setStartMonth((short) joinedTourStart.getMonthOfYear());
-		_tourDataTarget.setStartDay((short) joinedTourStart.getDayOfMonth());
+		_tourDataTarget.setStartYear((short) extractedTourStart.getYear());
+		_tourDataTarget.setStartMonth((short) extractedTourStart.getMonthOfYear());
+		_tourDataTarget.setStartDay((short) extractedTourStart.getDayOfMonth());
+		_tourDataTarget.setStartHour((short) extractedTourStart.getHourOfDay());
+		_tourDataTarget.setStartMinute((short) extractedTourStart.getMinuteOfHour());
+		_tourDataTarget.setStartSecond((short) extractedTourStart.getSecondOfMinute());
 
-		_tourDataTarget.setWeek(joinedTourStart);
+		_tourDataTarget.setWeek(extractedTourStart);
 
 		// tour id must be created after the tour date/time is set
 		_tourDataTarget.createTourId();
 
 		_tourDataTarget.setTourTitle(_txtTourTitle.getText());
-		_tourDataTarget.setTourDescription(joinedDescription.toString());
+		_tourDataTarget.setTourDescription(extractedDescription.toString());
 
-		_tourDataTarget.setTourMarkers(joinedTourMarker);
-		_tourDataTarget.setWayPoints(joinedWayPoints);
-		_tourDataTarget.setDeviceName(Messages.Dialog_JoinTours_Label_DeviceName);
+		_tourDataTarget.setTourMarkers(extractedTourMarker);
+		_tourDataTarget.setWayPoints(extractedWayPoints);
+		_tourDataTarget.setDeviceName(Messages.Dialog_SplitTour_Label_DeviceName);
 
-		_tourDataTarget.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
-		_tourDataTarget.setDeviceTimeInterval(joinedDeviceTimeInterval);
-		_tourDataTarget.setCalories(joinedCalories);
+		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.getIsDistanceFromSensor());
+		_tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
+//		_tourDataTarget.setCalories();
 
-		_tourDataTarget.setTourRecordingTime(joinedRecordingTime);
-		_tourDataTarget.setTourDistance(joinedDistance);
+		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);
+		_tourDataTarget.setTourDistance(extractedDistance);
 
 		// !! tour type and tour tags are already set !!
+
+		_tourDataTarget.setWeatherClouds(_tourDataSource.getWeatherClouds());
+		_tourDataTarget.setWeatherWindDir(_tourDataSource.getWeatherWindDir());
+		_tourDataTarget.setWeatherWindSpeed(_tourDataSource.getWeatherWindSpeed());
+		_tourDataTarget.setRestPulse(_tourDataSource.getRestPulse());
 
 		if (isTourAltitude) {
 			_tourDataTarget.altitudeSerie = extractAltitudeSerie;
@@ -1094,14 +939,14 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-//		return _state;
-		return null;
+		return _state;
+//		return null;
 	}
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		// return joined tour
+		// return extracted tour
 
 		return _tourDataTargetList;
 	}
@@ -1159,10 +1004,10 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		/*
 		 * get all tags
 		 */
-		final Set<TourTag> joinedTourTags = new HashSet<TourTag>();
+		final Set<TourTag> extractedTourTags = new HashSet<TourTag>();
 		final Set<TourTag> tourTags = _tourDataSource.getTourTags();
-		joinedTourTags.addAll(tourTags);
-		_tourDataTarget.setTourTags(joinedTourTags);
+		extractedTourTags.addAll(tourTags);
+		_tourDataTarget.setTourTags(extractedTourTags);
 
 		/*
 		 * set tour type
@@ -1184,16 +1029,16 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 				STATE_TYPE_SOURCE,
 				STATE_TYPE_SOURCE_FROM_SELECTED_TOURS);
 
-		long joinedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		long extractedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
 		if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_SELECTED_TOURS)) {
-			joinedTourTypeId = _tourTypeIdFromSelectedTours;
+			extractedTourTypeId = _tourTypeIdFromSelectedTours;
 		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_PREVIOUS_TOUR)
 				|| stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
-			joinedTourTypeId = _tourTypeIdPreviousSplittedTour;
+			extractedTourTypeId = _tourTypeIdPreviousSplittedTour;
 		}
 
-		_tourDataTarget.setTourType(TourDatabase.getTourType(joinedTourTypeId));
+		_tourDataTarget.setTourType(TourDatabase.getTourType(extractedTourTypeId));
 	}
 
 	@Override
@@ -1224,17 +1069,17 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 
 		final String stateTourTypeSource = getStateTourTypeSource();
 
-		long joinedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		long extractedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
 		if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_SELECTED_TOURS)) {
-			joinedTourTypeId = _tourTypeIdFromSelectedTours;
+			extractedTourTypeId = _tourTypeIdFromSelectedTours;
 		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_PREVIOUS_TOUR)) {
-			joinedTourTypeId = _tourTypeIdPreviousSplittedTour;
+			extractedTourTypeId = _tourTypeIdPreviousSplittedTour;
 		} else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
-			joinedTourTypeId = _tourTypeIdCustom;
+			extractedTourTypeId = _tourTypeIdCustom;
 		}
 
-		_tourDataTarget.setTourType(TourDatabase.getTourType(joinedTourTypeId));
+		_tourDataTarget.setTourType(TourDatabase.getTourType(extractedTourTypeId));
 
 		updateUITourTypeTags();
 
@@ -1246,7 +1091,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		_txtTourTitle.setText(Util.getStateString(
 				_state,
 				STATE_TOUR_TITLE,
-				Messages.Dialog_JoinTours_Label_DefaultTitle));
+				Messages.Dialog_SplitTour_Label_DefaultTitle));
 
 		// tour title source
 		Util.selectStateInCombo(
@@ -1283,15 +1128,34 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		 * update UI from selected tours
 		 */
 
-		// date/time
-		_dtTourDate.setDate(
+		final DateTime tourStartTime = new DateTime(
 				_tourDataSource.getStartYear(),
-				_tourDataSource.getStartMonth() - 1,
-				_tourDataSource.getStartDay());
-		_dtTourTime.setTime(
+				_tourDataSource.getStartMonth(),
+				_tourDataSource.getStartDay(),
 				_tourDataSource.getStartHour(),
 				_tourDataSource.getStartMinute(),
-				_tourDataSource.getStartSecond());
+				_tourDataSource.getStartSecond(),
+				0);
+
+		int relativeExtractedStartTime = 0;
+
+		final int[] tourTimeSerie = _tourDataSource.timeSerie;
+		final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
+		if (isTourTime) {
+			relativeExtractedStartTime = tourTimeSerie[_extractStartIndex];
+		}
+		_extractedTourStartTime = tourStartTime.plusSeconds(relativeExtractedStartTime);
+
+		// date/time
+		_dtTourDate.setDate(
+				_extractedTourStartTime.getYear(),
+				_extractedTourStartTime.getMonthOfYear() - 1,
+				_extractedTourStartTime.getDayOfMonth());
+
+		_dtTourTime.setTime(
+				_extractedTourStartTime.getHourOfDay(),
+				_extractedTourStartTime.getMinuteOfHour(),
+				_extractedTourStartTime.getSecondOfMinute());
 	}
 
 	private void saveState() {
@@ -1314,6 +1178,35 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider 
 		// description/marker
 		_state.put(STATE_IS_INCLUDE_DESCRIPTION, _chkIncludeDescription.getSelection());
 		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
+	}
+
+	@Override
+	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+
+		if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+			// check if it's the correct tour
+			if (_tourDataTarget == modifiedTours.get(0)) {
+
+				// update custom tour type id
+				final String stateTourTypeSource = getStateTourTypeSource();
+
+				if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+
+					final TourType tourType = _tourDataTarget.getTourType();
+
+					_tourTypeIdCustom = tourType == null ? //
+							TourDatabase.ENTITY_IS_NOT_SAVED
+							: tourType.getTypeId();
+				}
+
+				// tour type or tags can have been changed within this dialog
+				updateUITourTypeTags();
+
+				// enable/disable tag/type context menu
+				enableControls();
+			}
+		}
 	}
 
 	private void updateUIFromModel() {

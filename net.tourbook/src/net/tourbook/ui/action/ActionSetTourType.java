@@ -24,9 +24,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 class ActionSetTourType extends Action {
 
@@ -68,10 +66,10 @@ class ActionSetTourType extends Action {
 
 	@Override
 	public void run() {
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-				TourTypeMenuManager.setTourTypeIntoTour(_tourType, _tourProvider, _isSaveTour);
-			}
-		});
+		TourTypeMenuManager.setTourTypeIntoTour(_tourType, _tourProvider, _isSaveTour);
+//		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+//			public void run() {
+//			}
+//		});
 	}
 }

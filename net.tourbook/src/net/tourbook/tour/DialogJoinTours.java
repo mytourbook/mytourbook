@@ -33,7 +33,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -66,12 +66,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPart;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
+public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	private static final String					STATE_TOUR_TITLE						= "Title";							//$NON-NLS-1$
 	private static final String					STATE_TOUR_TYPE_ID						= "TourTypeId";					//$NON-NLS-1$
@@ -216,40 +215,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		_selectedTours = selectedTours;
 	}
 
-	private void addTourEventListener() {
-
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-
-						// check if it's the correct tour
-						if (_joinedTourData == modifiedTours.get(0)) {
-
-							// update custom tour type id
-							final String stateTourTypeSource = getStateTourTypeSource();
-
-							if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
-								final TourType tourType = _joinedTourData.getTourType();
-								_tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType
-										.getTypeId();
-							}
-
-							// tour type or tags can have been changed within this dialog
-							updateUITourTypeTags();
-						}
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
-
 	@Override
 	protected void configureShell(final Shell shell) {
 
@@ -305,8 +270,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		updateUIFromModel();
 
 		enableControls();
-
-		addTourEventListener();
 
 		createActions();
 		createMenus();
@@ -981,7 +944,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 
 				} else {
 
-					joinedTourStart = new org.joda.time.DateTime(
+					joinedTourStart = new DateTime(
 							_dtTourDate.getYear(),
 							_dtTourDate.getMonth() + 1,
 							_dtTourDate.getDay(),
@@ -1106,9 +1069,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 					if (joinMarkerIndex >= joinedSliceCounter) {
 						joinMarkerIndex = joinedSliceCounter - 1;
 					}
-
-					// a cloned marker has the same marker id, create a new id
-					clonedMarker.createMarkerId();
 
 					// adjust marker position, position is relativ to the tour start
 					clonedMarker.setSerieIndex(joinMarkerIndex);
@@ -1281,6 +1241,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		_joinedTourData.setTourDrivingTime(joinedDrivingTime);
 		_joinedTourData.setTourDistance(joinedDistance);
 
+
 		// !! tour type and tour tags are already set !!
 
 		if (isJoinAltitude) {
@@ -1448,6 +1409,28 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider {
 		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
 		_state.put(STATE_IS_CREATE_TOUR_MARKER, _chkCreateTourMarker.getSelection());
 		_state.put(STATE_MARKER_TYPE, getStateTourMarker());
+	}
+
+	@Override
+	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+
+		if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+			// check if it's the correct tour
+			if (_joinedTourData == modifiedTours.get(0)) {
+
+				// update custom tour type id
+				final String stateTourTypeSource = getStateTourTypeSource();
+
+				if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+					final TourType tourType = _joinedTourData.getTourType();
+					_tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+				}
+
+				// tour type or tags can have been changed within this dialog
+				updateUITourTypeTags();
+			}
+		}
 	}
 
 	private void updateUIFromModel() {

@@ -30,6 +30,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -363,7 +364,11 @@ public class TagManager {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+					if (tourProvider instanceof ITourProvider2) {
+						((ITourProvider2) tourProvider).toursAreModified(selectedTours);
+					} else {
+						TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+					}
 				}
 
 				TourManager.fireEvent(TourEventId.NOTIFY_TAG_VIEW, //

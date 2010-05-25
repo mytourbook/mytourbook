@@ -3,14 +3,17 @@
 <plugin>
    <extension
          point="net.tourbook.statisticYear">
+         
       <statistic
             class="net.tourbook.statistics.StatisticTourTime"
             id="net.tourbook.statistics.StatisticTourTime"
             name="%Pref_Tour_Time"/>
+            
       <statistic
             class="net.tourbook.statistics.StatisticDayCombined"
             id="net.tourbook.statistics.StatisticSummaryDayCombined"
             name="%Pref_Day_Summary"/>
+            
       <statistic
             class="net.tourbook.statistics.StatisticWeekCombined"
             id="net.tourbook.statistics.StatisticSummaryWeekCombined"
@@ -23,10 +26,6 @@
             class="net.tourbook.statistics.StatisticYearCombined"
             id="net.tourbook.statistics.StatisticSummaryYear"
             name="%Pref_Year_Summary"/>
-      <statistic
-            class="net.tourbook.statistics.StatisticTourNumbers"
-            id="net.tourbook.statistics.StatisticTourNumbers"
-            name="%Pref_Tour_Numbers"/>
 
       <statistic
             class="net.tourbook.statistics.StatisticDayTourTime"
@@ -78,6 +77,10 @@
             class="net.tourbook.statistics.StatisticYearAltitude"
             id="net.tourbook.statistics.StatisticSummaryYearAltitude"
             name="%Pref_Year_Summary_Altitude"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticTourNumbers"
+            id="net.tourbook.statistics.StatisticTourNumbers"
+            name="%Pref_Tour_Numbers"/>
             
 
    </extension>

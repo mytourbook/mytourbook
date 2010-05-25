@@ -2173,6 +2173,7 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 
 		final Display display = getDisplay();
+
 		final Path path = new Path(display);
 		final Path path2 = isPath2 ? new Path(display) : null;
 
@@ -2183,10 +2184,17 @@ public class ChartComponentGraph extends Canvas {
 		final float devY0 = devYBottom + (scaleY * graphYBottom);
 
 		float devXPrev = xValues[startIndex] * scaleX;
+		int yValuePrev = yValues[startIndex];
 
 		final Rectangle chartRectangle = gc.getClipping();
+		final int devXWidth = chartRectangle.width;
 
-		// draw the lines into the path
+		boolean isDrawFirstPoint = true;
+		boolean isDrawLastPoint = false;
+
+		/*
+		 * draw the lines into the paths
+		 */
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
 			// check array bounds
@@ -2199,6 +2207,8 @@ public class ChartComponentGraph extends Canvas {
 			if (_canScrollZoomedChart == false) {
 				graphX -= graphValueOffset;
 			}
+
+			final float devX = graphX * scaleX;
 
 			int yValue = yValues[xValueIndex];
 			int yValue2 = 0;
@@ -2224,33 +2234,53 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			final float devX = graphX * scaleX;
+			if (devX < 0) {
+
+				// keep current position which is used as the painting starting point
+				devXPrev = devX;
+				yValuePrev = yValue;
+				continue;
+			}
+			if (devX > devXWidth) {
+				isDrawLastPoint = true;
+			}
 
 			/*
 			 * draw first point
 			 */
-			if (xValueIndex == startIndex) {
+			if (isDrawFirstPoint) {
 
 				// move to the first point
+
+				// set the point before devX==0 that the first line is not visible
+				final float devXFirstPoint = devXPrev - 1;
 
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 					// start from the bottom of the chart
-					path.moveTo(devX, devY0 - (graphYBottom * scaleY));
+
+					path.moveTo(devXFirstPoint, devY0 - (graphYBottom * scaleY));
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					// start from the x-axis
+
 					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
-					path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
+
+					path.moveTo(devXFirstPoint, devY0 - (graphXAxisLine * scaleY));
 				}
+
+				path.lineTo(devXFirstPoint, devY0 - (yValuePrev * scaleY));
 
 				if (path2 != null) {
-					path2.moveTo(devX, devY0 - (yValue2 * scaleY));
+					path2.moveTo(devXFirstPoint, devY0 - (yValue2 * scaleY));
+					path2.lineTo(devXFirstPoint, devY0 - (yValue2 * scaleY));
 				}
+
+				isDrawFirstPoint = false;
 			}
 
-			// optimize to draw only one line starting at the current x-position
+			// optimization: draw only ONE line for the current x-position
 			if (devX != devXPrev) {
 
 				// draw line to the next point
@@ -2264,9 +2294,9 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * draw last point
 			 */
-			if ((xValueIndex == endIndex - 1 && //
-			(graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM || //
-			graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO))) {
+			if ((xValueIndex == endIndex - 1 || isDrawLastPoint) && //
+					(graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM //
+					|| graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO)) {
 
 				/*
 				 * this is the last point for a filled graph, draw the line to the x-axis
@@ -2275,20 +2305,28 @@ public class ChartComponentGraph extends Canvas {
 				int graphXAxisLine = 0;
 
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
+
 					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : graphYBottom;
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 				}
+				final float devYAxisLine = graphXAxisLine * scaleY;
 
-				path.lineTo(devX, devY0 - (graphXAxisLine * scaleY));
-				path.moveTo(devX, devY0 - (graphXAxisLine * scaleY));
+				// set the point after the visible area that the last line is not visible
+				final float devXLastPoint = devX + 1;
+
+				path.lineTo(devXLastPoint, devY0 - (yValue * scaleY));
+				path.lineTo(devXLastPoint, devY0 - devYAxisLine);
+				path.moveTo(devXLastPoint, devY0 - devYAxisLine);
 
 				if (path2 != null) {
-					path.lineTo(devX, devY0 - (yValue2 * scaleY));
-					path.moveTo(devX, devY0 - (yValue2 * scaleY));
+					path.lineTo(devXLastPoint, devY0 - (yValue2 * scaleY));
+					path.moveTo(devXLastPoint, devY0 - (yValue2 * scaleY));
 				}
+
+				break;
 			}
 
 			devXPrev = devX;
@@ -2316,11 +2354,13 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final int devChartWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
 
-		// fill the graph
+		/*
+		 * fill the graph
+		 */
 		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 			/*
-			 * adjust the fill gradient in the hight, otherwise the fill is not in the whole
+			 * adjust the fill gradient in the height, otherwise the fill is not in the whole
 			 * rectangle
 			 */
 

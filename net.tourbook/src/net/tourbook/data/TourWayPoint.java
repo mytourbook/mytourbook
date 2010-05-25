@@ -23,6 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.util.StatusUtil;
 import de.byteholder.gpx.GeoPosition;
 
 @Entity
@@ -81,19 +82,23 @@ public class TourWayPoint implements Cloneable {
 	 */
 	private static int		_createCounter			= 0;
 
-	public TourWayPoint() {
-		this.createId = ++_createCounter;
-	}
+	public TourWayPoint() {}
 
 	@Override
 	public Object clone() {
 
-		// creates a shallow copy
-
 		try {
-			return super.clone();
+
+			// creates a shallow copy
+			final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
+
+			// set create id to uniquely identify the way point
+			newWayPoint.createId = ++_createCounter;
+
+			return newWayPoint;
+
 		} catch (final CloneNotSupportedException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 
 		return null;
