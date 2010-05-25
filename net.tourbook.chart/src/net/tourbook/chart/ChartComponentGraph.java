@@ -1699,9 +1699,9 @@ public class ChartComponentGraph extends Canvas {
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devNewImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math.min(
-						getDevVisibleGraphHeight(),
-						ChartComponents.CHART_MAX_HEIGHT));
+				final int devNewImageHeight = Math.max(
+						ChartComponents.CHART_MIN_HEIGHT,
+						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
 				 * when the image is the same size as the new we will redraw it only if it is set to
@@ -2344,8 +2344,12 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * fill above 0 line
 			 */
-			gc.fillGradientRectangle(0, (int) (devY0 - (graphFillYBottom * scaleY)) + 1, devChartWidth, (int) -Math
-					.min(devGraphHeight, Math.abs(devYTop - devY0)), true);
+			gc.fillGradientRectangle(
+					0,
+					(int) (devY0 - (graphFillYBottom * scaleY)) + 1,
+					devChartWidth,
+					(int) -Math.min(devGraphHeight, Math.abs(devYTop - devY0)),
+					true);
 
 			/*
 			 * fill below 0 line
@@ -3034,6 +3038,11 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		boolean isUnitLabelPrinted = false;
+		int devXLastUnitRightPos = 0;
+		int devXFirstUnitRightPos = 0;
+
+		final String unitLabel = drawingData.getXData().getUnitLabel();
+		final int unitLabelExtendX = gc.textExtent(unitLabel).x;
 
 		for (final ChartUnit unit : units) {
 
@@ -3076,8 +3085,7 @@ public class ChartComponentGraph extends Canvas {
 						gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
 					}
 
-					final Point unitValueExtend = gc.textExtent(unit.valueLabel);
-					final int unitValueExtendX = unitValueExtend.x;
+					final int unitValueExtendX = gc.textExtent(unit.valueLabel).x;
 
 					// draw the unit value
 					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
@@ -3101,7 +3109,10 @@ public class ChartComponentGraph extends Canvas {
 
 							if (unitCounter == 0) {
 
-								// this is the first unit, do not center it
+								/*
+								 * this is the first unit, do not center it otherwise it would be
+								 * clipped on the left border
+								 */
 
 								if (devXUnitTick == 0) {
 
@@ -3110,11 +3121,13 @@ public class ChartComponentGraph extends Canvas {
 									// draw unit label (km, mi, h)
 									if (isUnitLabelPrinted == false) {
 										isUnitLabelPrinted = true;
-										gc.drawText(drawingData.getXData().getUnitLabel(),//
+										gc.drawText(unitLabel,//
 												devXUnitTick + unitValueExtendX + 2,
 												devYBottom + 7,
 												true);
 									}
+
+									devXFirstUnitRightPos = devXUnitTick + unitValueExtendX + 2 + unitLabelExtendX + 2;
 								}
 
 							} else {
@@ -3132,20 +3145,41 @@ public class ChartComponentGraph extends Canvas {
 										 */
 
 										devXUnitValue = devVisibleChartWidth - unitValueExtendX;
+
+										// check if the unit value will overlap the previous unit value
+										if (devXUnitValue <= devXLastUnitRightPos + -1) {
+											break;
+										}
+									}
+
+									// check if the unit value will overlap the first unit value
+									if (devXUnitValue <= devXFirstUnitRightPos) {
+										continue;
 									}
 
 									gc.drawText(unit.valueLabel, devXUnitValue, devYBottom + 7, true);
 
-									// draw unit label (km, mi, h)
+//									gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//									gc.fillRectangle(devXUnitValue, devYBottom + 7, unitValueExtendX, 10);
+
+									// draw unit label (km, mi, h) for the first unit
 									if (isUnitLabelPrinted == false) {
 
 										isUnitLabelPrinted = true;
 
-										gc.drawText(drawingData.getXData().getUnitLabel(),//
+										gc.drawText(unitLabel,//
 												devXUnitTick + unitValueExtend2 + 2,
 												devYBottom + 7,
 												true);
+
+										devXFirstUnitRightPos = devXUnitTick
+												+ unitValueExtendX
+												+ 2
+												+ unitLabelExtendX
+												+ 2;
 									}
+
+									devXLastUnitRightPos = devXUnitValue + unitValueExtendX;
 								}
 							}
 						}
