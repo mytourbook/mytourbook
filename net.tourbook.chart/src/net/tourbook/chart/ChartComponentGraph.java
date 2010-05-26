@@ -2186,6 +2186,14 @@ public class ChartComponentGraph extends Canvas {
 		float devXPrev = xValues[startIndex] * scaleX;
 		int yValuePrev = yValues[startIndex];
 
+		// force the bottom and top value not to drawn over the border
+		if (yValuePrev < graphYBottom) {
+			yValuePrev = graphYBottom;
+		}
+		if (yValuePrev > graphYTop) {
+			yValuePrev = graphYTop;
+		}
+
 		final Rectangle chartRectangle = gc.getClipping();
 		final int devXWidth = chartRectangle.width;
 
@@ -2234,13 +2242,17 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+			// check if position is visible
 			if (devX < 0) {
 
 				// keep current position which is used as the painting starting point
 				devXPrev = devX;
 				yValuePrev = yValue;
+
 				continue;
 			}
+
+			// check if last visible position is reached
 			if (devX > devXWidth) {
 				isDrawLastPoint = true;
 			}

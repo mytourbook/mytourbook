@@ -72,6 +72,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 
 	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
 	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.shortTime();
+	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.mediumDateTime();
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();
 
@@ -141,6 +142,14 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private Label						_lblCalories;
 	private Label						_lblRestPulse;
 
+	private Label						_lblDateTimeCreated;
+	private Label						_lblDateTimeCreatedValue;
+	private Label						_lblDateTimeModified;
+	private Label						_lblDateTimeModifiedValue;
+
+	/*
+	 * actions
+	 */
 	private ActionTourToolTipEditTour	_actionEditTour;
 	private ActionTourToolTipEditQuick	_actionEditQuick;
 
@@ -220,19 +229,16 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 		shellContainer.setForeground(_fgColor);
 		shellContainer.setBackground(_bgColor);
 		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
-//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-
 			_ttContainer = new Composite(shellContainer, SWT.NONE);
 			_ttContainer.setForeground(_fgColor);
 			_ttContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults()//
+			GridLayoutFactory.fillDefaults() //
 					.numColumns(2)
 					.equalWidth(true)
 					.spacing(20, 5)
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
 					.applyTo(_ttContainer);
-//			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
 				createUI10UpperPart(_ttContainer);
 
@@ -242,6 +248,8 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 				if (_hasTags || _hasDescription) {
 					createUI50LowerPart(_ttContainer);
 				}
+
+				createUI60CreateModifyTime(_ttContainer);
 			}
 		}
 
@@ -430,6 +438,10 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			_secondColumnControls.add(_lblRestPulse);
 
 			createUILabel(container, Messages.Value_Unit_Pulse);
+
+			// ----------------- spacer ----------------
+			label = createUILabel(container, null);
+			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 		}
 	}
 
@@ -493,6 +505,22 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
 			/*
+			 * clouds
+			 */
+			label = createUILabel(container, Messages.Tour_Tooltip_Label_Clouds);
+			_firstColumnControls.add(label);
+
+			// icon: clouds
+			_lblClouds = new CLabel(container, SWT.TRAIL);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
+			_lblClouds.setForeground(_fgColor);
+			_lblClouds.setBackground(_bgColor);
+
+			// text: clouds
+			_lblCloudsUnit = createUILabelValue(container, SWT.LEAD);
+			GridDataFactory.swtDefaults().applyTo(_lblCloudsUnit);
+
+			/*
 			 * temperature
 			 */
 			label = createUILabel(container, Messages.Tour_Tooltip_Label_Temperature);
@@ -523,22 +551,6 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 			_secondColumnControls.add(_lblWindDirection);
 
 			_lblWindDirectionUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * clouds
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Clouds);
-			_firstColumnControls.add(label);
-
-			// icon: clouds
-			_lblClouds = new CLabel(container, SWT.TRAIL);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
-			_lblClouds.setForeground(_fgColor);
-			_lblClouds.setBackground(_bgColor);
-
-			// text: clouds
-			_lblCloudsUnit = createUILabelValue(container, SWT.LEAD);
-			GridDataFactory.swtDefaults().applyTo(_lblCloudsUnit);
 		}
 	}
 
@@ -589,14 +601,14 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 				if (lineCount > 10) {
 					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER | SWT.V_SCROLL;
 				} else {
-					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY;
+					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
 				}
 
 				_txtDescription = new Text(container, style);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
+						.grab(true, false)
 						.indent(0, 5)
-//						.hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT)
 						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
 						.applyTo(_txtDescription);
 
@@ -607,6 +619,57 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 
 				_txtDescription.setForeground(_fgColor);
 				_txtDescription.setBackground(_bgColor);
+			}
+		}
+	}
+
+	private void createUI60CreateModifyTime(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		container.setForeground(_fgColor);
+		container.setBackground(_bgColor);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.equalWidth(true)
+				.spacing(20, 5)
+				.applyTo(container);
+		{
+			final Composite rightContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(rightContainer);
+			rightContainer.setForeground(_fgColor);
+			rightContainer.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rightContainer);
+			{
+				/*
+				 * date/time modified
+				 */
+				_lblDateTimeModified = createUILabel(rightContainer, Messages.Tour_Tooltip_Label_DateTimeModified);
+
+				_lblDateTimeModifiedValue = createUILabelValue(rightContainer, SWT.LEAD);
+				GridDataFactory.fillDefaults().applyTo(_lblDateTimeModifiedValue);
+			}
+
+			final Composite leftContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(leftContainer);
+			leftContainer.setForeground(_fgColor);
+			leftContainer.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(leftContainer);
+			//			leftContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			{
+				/*
+				 * date/time created
+				 */
+				_lblDateTimeCreated = createUILabel(leftContainer, Messages.Tour_Tooltip_Label_DateTimeCreated);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.END, SWT.FILL)
+						.applyTo(_lblDateTimeCreated);
+
+				_lblDateTimeCreatedValue = createUILabelValue(leftContainer, SWT.TRAIL);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.FILL)
+						.applyTo(_lblDateTimeCreatedValue);
 			}
 		}
 	}
@@ -627,8 +690,7 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private Label createUILabelValue(final Composite parent, final int style) {
 
 		final Label label = new Label(parent, style);
-		GridDataFactory.fillDefaults()//
-				.applyTo(label);
+		GridDataFactory.fillDefaults().applyTo(label);
 		label.setForeground(_fgColor);
 		label.setBackground(_bgColor);
 
@@ -880,5 +942,29 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 		_lblCalories.setText(Integer.toString(_tourData.getCalories()));
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
 
+		/*
+		 * date/time
+		 */
+
+		// date/time created
+		final DateTime dtCreated = _tourData.getDateTimeCreated();
+		_lblDateTimeCreatedValue.setText(dtCreated == null ? //
+				UI.EMPTY_STRING
+				: _dtFormatter.print(dtCreated.getMillis()));
+
+		// date/time modified
+		final DateTime dtModified = _tourData.getDateTimeModified();
+		if (dtModified == null) {
+
+			// hide label/value
+			_lblDateTimeModified.setVisible(false);
+			_lblDateTimeModifiedValue.setVisible(false);
+
+		} else {
+
+			_lblDateTimeModifiedValue.setText(dtModified == null ? //
+					UI.EMPTY_STRING
+					: _dtFormatter.print(dtModified.getMillis()));
+		}
 	}
 }

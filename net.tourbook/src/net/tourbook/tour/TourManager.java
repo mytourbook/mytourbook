@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -29,6 +30,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
@@ -525,7 +527,7 @@ public class TourManager {
 
 					page.bringToTop(viewPart);
 				}
-// this does not restore the part when it's in a fast view
+// HINT: this does not restore the part when it's in a fast view
 //
 //			final IWorkbenchPartReference partRef = page.getReference(viewPart);
 //			final int partState = page.getPartState(partRef);
@@ -539,6 +541,252 @@ public class TourManager {
 		}
 
 		return tourEditor;
+	}
+
+	/**
+	 * Remove time slices from {@link TourData}
+	 * 
+	 * @param tourData
+	 * @param firstIndex
+	 * @param lastIndex
+	 * @param isRemoveTime
+	 */
+	public static void removeTimeSlices(final TourData tourData,
+										final int firstIndex,
+										final int lastIndex,
+										final boolean isRemoveTime) {
+
+		if (isRemoveTime) {
+			// this must be done before the time series are modified
+			removeTimeSlicesTimeAndDistance(tourData, firstIndex, lastIndex);
+		}
+
+		int[] intSerie = tourData.altitudeSerie;
+		if (intSerie != null) {
+			tourData.altitudeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+		intSerie = tourData.cadenceSerie;
+		if (intSerie != null) {
+			tourData.cadenceSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+		intSerie = tourData.distanceSerie;
+		if (intSerie != null) {
+			tourData.distanceSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+		intSerie = tourData.pulseSerie;
+		if (intSerie != null) {
+			tourData.pulseSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+		intSerie = tourData.temperatureSerie;
+		if (intSerie != null) {
+			tourData.temperatureSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+		intSerie = tourData.timeSerie;
+		if (intSerie != null) {
+			tourData.timeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+		}
+
+		double[] doubleSerie = tourData.latitudeSerie;
+		if (doubleSerie != null) {
+			tourData.latitudeSerie = removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex);
+		}
+		doubleSerie = tourData.longitudeSerie;
+		if (doubleSerie != null) {
+			tourData.longitudeSerie = removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex);
+		}
+
+		/*
+		 * get speed/power data when it's from the device
+		 */
+		final boolean isTourPower = tourData.isPowerSerieFromDevice();
+		final boolean isTourSpeed = tourData.isSpeedSerieFromDevice();
+		if (isTourPower) {
+			intSerie = tourData.getPowerSerie();
+			if (intSerie != null) {
+				tourData.setPowerSerie(removeTimeSlicesInteger(intSerie, firstIndex, lastIndex));
+			}
+		}
+		if (isTourSpeed) {
+			intSerie = tourData.getSpeedSerieFromDevice();
+			if (intSerie != null) {
+				tourData.setSpeedSerie(removeTimeSlicesInteger(intSerie, firstIndex, lastIndex));
+			}
+		}
+
+		// reset computed data series and clear cached world positions
+		tourData.clearComputedSeries();
+		tourData.clearWorldPositions();
+
+		// segments must be recomputed
+		tourData.segmentSerieIndex = null;
+
+		removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
+	}
+
+	private static double[] removeTimeSlicesDouble(final double[] dataSerie,
+														final int firstIndex,
+														final int lastIndex) {
+
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+
+		final double[] newDataSerie = new double[newSerieLength];
+
+		if (firstIndex == 0) {
+
+			// delete from start, copy data by skipping removed slices
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
+
+		} else if (lastIndex == oldSerieLength - 1) {
+
+			// delete until the end
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, newSerieLength);
+
+		} else {
+
+			// delete somewhere in the middle
+
+			// copy start segment
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, firstIndex);
+
+			// copy end segment
+			final int copyLength = oldSerieLength - (lastIndex + 1);
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
+		}
+
+		return newDataSerie;
+	}
+
+	private static int[] removeTimeSlicesInteger(	final int[] oldDataSerie,
+														final int firstIndex,
+														final int lastIndex) {
+
+		final int oldSerieLength = oldDataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+
+		final int[] newDataSerie = new int[newSerieLength];
+
+		if (firstIndex == 0) {
+
+			// delete from start, copy data by skipping removed slices
+			System.arraycopy(oldDataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
+
+		} else if (lastIndex == oldSerieLength - 1) {
+
+			// delete until the end
+			System.arraycopy(oldDataSerie, 0, newDataSerie, 0, newSerieLength);
+
+		} else {
+
+			// delete somewhere in the middle
+
+			// copy start segment
+			System.arraycopy(oldDataSerie, 0, newDataSerie, 0, firstIndex);
+
+			// copy end segment
+			final int copyLength = oldSerieLength - (lastIndex + 1);
+			System.arraycopy(oldDataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
+		}
+
+		return newDataSerie;
+	}
+
+	private static void removeTimeSlicesTimeAndDistance(final TourData _tourData, final int firstIndex, final int lastIndex) {
+
+		final int[] timeSerie = _tourData.timeSerie;
+		final int[] distSerie = _tourData.distanceSerie;
+
+		if ((timeSerie == null) || (timeSerie.length == 0)) {
+			return;
+		}
+
+		/*
+		 * check if lastIndex is the last time slice, this will already remove time and distance
+		 */
+		if (lastIndex == timeSerie.length - 1) {
+			return;
+		}
+
+		final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
+		int distDiff = -1;
+
+		if (distSerie != null) {
+			distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
+		}
+
+		// update remaining time and distance data series
+		for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
+
+			timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+
+			if (distDiff != -1) {
+				distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
+			}
+		}
+	}
+
+	/**
+	 * Removes markers which are deleted and updates marker serie index which are positioned after
+	 * the deleted time slices
+	 * 
+	 * @param tourData
+	 * @param firstSerieIndex
+	 * @param lastSerieIndex
+	 * @param isRemoveTime
+	 */
+	private static void removeTourMarkers(	final TourData tourData,
+											final int firstSerieIndex,
+											final int lastSerieIndex,
+											final boolean isRemoveTime) {
+
+		// check if markers are available
+		final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
+		if (allTourMarkers.size() == 0) {
+			return;
+		}
+
+		/*
+		 * remove deleted markers
+		 */
+		final TourMarker[] markerCloneList = allTourMarkers.toArray(new TourMarker[allTourMarkers.size()]);
+		for (final TourMarker tourMarker : markerCloneList) {
+
+			final int markerSerieIndex = tourMarker.getSerieIndex();
+
+			if ((markerSerieIndex >= firstSerieIndex) && (markerSerieIndex <= lastSerieIndex)) {
+				allTourMarkers.remove(tourMarker);
+			}
+		}
+
+		/*
+		 * update marker index in the remaining markers
+		 */
+		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
+		final int[] timeSerie = tourData.timeSerie;
+		final int[] distSerie = tourData.distanceSerie;
+
+		for (final TourMarker tourMarker : allTourMarkers) {
+
+			final int markerSerieIndex = tourMarker.getSerieIndex();
+
+			// check if the current marker is positioned after the removed time slices
+			if (markerSerieIndex > lastSerieIndex) {
+
+				final int serieIndex = markerSerieIndex - diffSerieIndex;
+				tourMarker.setSerieIndex(serieIndex);
+
+				if (isRemoveTime) {
+
+					if (timeSerie != null) {
+						tourMarker.setTime(timeSerie[serieIndex]);
+					}
+
+					if (distSerie != null) {
+						tourMarker.setDistance(distSerie[serieIndex]);
+					}
+				}
+			}
+		}
 	}
 
 	/**

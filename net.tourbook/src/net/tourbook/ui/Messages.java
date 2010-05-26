@@ -224,6 +224,10 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_Clouds;
 	public static String		Tour_Tooltip_Label_Date;
 
+	public static String	Tour_Tooltip_Label_DateTimeCreated;
+
+	public static String	Tour_Tooltip_Label_DateTimeModified;
+
 	public static String	Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
 	public static String		Tour_Tooltip_Label_Hour;

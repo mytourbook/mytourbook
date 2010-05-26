@@ -280,6 +280,9 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 		return markerId;
 	}
 
+	/**
+	 * @return Returns position of this marker in the data serie
+	 */
 	public int getSerieIndex() {
 		return serieIndex;
 	}

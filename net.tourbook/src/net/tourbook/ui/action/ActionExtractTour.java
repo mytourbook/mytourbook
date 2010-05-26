@@ -47,7 +47,7 @@ public class ActionExtractTour extends Action {
 	@Override
 	public void run() {
 
-		// check if the tour editor contains a modified tour
+		// make sure the tour editor does not contain a modified tour
 		if (TourManager.isTourEditorModified()) {
 			return;
 		}
@@ -63,10 +63,13 @@ public class ActionExtractTour extends Action {
 			return;
 		}
 
-		new DialogExtractTour(Display.getCurrent().getActiveShell(), //
+		new DialogExtractTour(
+				Display.getCurrent().getActiveShell(),
 				selectedTours.get(0),
 				_tourStartIndex,
-				_tourEndIndex).open();
+				_tourEndIndex,
+				_tourDataEditor
+		).open();
 	}
 
 	public void setTourRange(final int tourStartIndex, final int tourEndIndex) {

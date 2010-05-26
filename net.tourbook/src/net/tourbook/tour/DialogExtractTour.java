@@ -36,6 +36,7 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
@@ -137,6 +138,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 																								.getDialogSettingsSection(
 																										"DialogSplit");	//$NON-NLS-1$
 
+	private TourDataEditorView					_tourDataEditor;
+
 	private TourData							_tourDataSource;
 	private TourData							_tourDataTarget;
 	private ArrayList<TourData>					_tourDataTargetList;
@@ -155,6 +158,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private int									_extractEndIndex;
 
 	private boolean								_isSplitTour;
+	private boolean								_canRemoveTimeSlices;
 
 	private DateTime							_extractedTourStartTime;
 	/*
@@ -189,23 +193,15 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
-	public DialogExtractTour(final Shell parentShell, final TourData tourData, final int extractStartIndex) {
-
-		super(parentShell);
-
-		_isSplitTour = true;
-
-		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__MyTourbook16).createImage());
-
-		_tourDataSource = tourData;
-
-		_extractStartIndex = extractStartIndex;
-	}
+	/*
+	 * end of UI controls
+	 */
 
 	public DialogExtractTour(	final Shell parentShell,
 								final TourData tourData,
 								final int extractStartIndex,
-								final int extractEndIndex) {
+								final int extractEndIndex,
+								final TourDataEditorView tourDataEditor) {
 
 		super(parentShell);
 
@@ -213,10 +209,31 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__MyTourbook16).createImage());
 
+		_tourDataEditor = tourDataEditor;
 		_tourDataSource = tourData;
 
 		_extractStartIndex = extractStartIndex;
 		_extractEndIndex = extractEndIndex;
+
+		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
+	}
+
+	public DialogExtractTour(	final Shell parentShell,
+								final TourData tourData,
+								final int extractStartIndex,
+								final TourDataEditorView tourDataEditor) {
+
+		super(parentShell);
+
+		_isSplitTour = true;
+
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__MyTourbook16).createImage());
+
+		_tourDataEditor = tourDataEditor;
+		_tourDataSource = tourData;
+
+		_extractStartIndex = extractStartIndex;
+		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 	}
 
 	@Override
@@ -665,7 +682,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
 
 		/*
-		 * get speed/power data when it's from the device
+		 * get speed/power data when data are created by the device
 		 */
 		int[] tourPowerSerie = null;
 		int[] tourSpeedSerie = null;
@@ -708,6 +725,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		}
 
 		if (_isSplitTour) {
+			// set end index to the last time slice
 			_extractEndIndex = dataSerieLength - 1;
 		}
 
@@ -850,6 +868,19 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		}
 
 		/*
+		 * get calories
+		 */
+		int extractedCalories = 0;
+		if (_extractStartIndex == 0 && _extractEndIndex == (dataSerieLength - 1)) {
+
+			// tour is copied, the calories can also be copied
+			extractedCalories = _tourDataSource.getCalories();
+
+		} else {
+			// TODO calories should be set when they are computed
+		}
+
+		/*
 		 * set target tour data
 		 */
 		_tourDataTarget.setStartYear((short) extractedTourStart.getYear());
@@ -873,17 +904,18 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.getIsDistanceFromSensor());
 		_tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
-//		_tourDataTarget.setCalories();
 
 		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);
 		_tourDataTarget.setTourDistance(extractedDistance);
 
-		// !! tour type and tour tags are already set !!
-
 		_tourDataTarget.setWeatherClouds(_tourDataSource.getWeatherClouds());
 		_tourDataTarget.setWeatherWindDir(_tourDataSource.getWeatherWindDir());
 		_tourDataTarget.setWeatherWindSpeed(_tourDataSource.getWeatherWindSpeed());
+
 		_tourDataTarget.setRestPulse(_tourDataSource.getRestPulse());
+		_tourDataTarget.setCalories(extractedCalories);
+
+		_tourDataTarget.setDpTolerance(_tourDataSource.getDpTolerance());
 
 		if (isTourAltitude) {
 			_tourDataTarget.altitudeSerie = extractAltitudeSerie;
@@ -903,7 +935,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		if (isTourPower) {
 			_tourDataTarget.setPowerSerie(extractPowerSerie);
 		}
-		if (isTourPower) {
+		if (isTourPulse) {
 			_tourDataTarget.pulseSerie = extractPulseSerie;
 		}
 		if (isTourSpeed) {
@@ -932,6 +964,16 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		TourManager.saveModifiedTour(_tourDataTarget);
 
+		// check if time slices should be removed
+		if (getStateSplitMethod().equals(STATE_EXTRACT_METHOD_REMOVE)) {
+
+			TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true);
+			
+			_tourDataEditor.updateUI(_tourDataSource, true);
+
+			TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourDataSource));
+		}
+
 		return true;
 	}
 
@@ -940,7 +982,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		// keep window size and position
 		return _state;
-//		return null;
 	}
 
 	@Override
@@ -1229,6 +1270,19 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		// update ui
 		_txtTourTitle.setText(tourTitle);
 
+		if (_canRemoveTimeSlices == false) {
+
+			// select option that time slices cannot be removed
+
+			Util.selectStateInCombo(
+					_state,
+					STATE_EXTRACT_METHOD,
+					ALL_STATES_EXTRACT_METHOD,
+					STATE_EXTRACT_METHOD_KEEP,
+					_cboSplitMethod);
+
+			_cboSplitMethod.setEnabled(false);
+		}
 	}
 
 	private void updateUITourTypeTags() {

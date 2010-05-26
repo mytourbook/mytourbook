@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
@@ -25,17 +25,17 @@ public class TourEvent {
 	/**
 	 * contains the tours which have been modified
 	 */
-	private ArrayList<TourData>	fModifiedTours;
+	private ArrayList<TourData>	_modifiedTours;
 
 	/**
-	 * when <code>true</code>, tour data have been reverted and {@link TourEvent#fModifiedTours}
+	 * when <code>true</code>, tour data have been reverted and {@link TourEvent#_modifiedTours}
 	 * contains the reverted {@link TourData}
 	 */
 	public boolean				isReverted		= false;
 
 	/**
 	 * when <code>true</code>, tour data have been modified in the {@link TourDataEditorView},
-	 * {@link TourEvent#fModifiedTours} contains the modified {@link TourData}
+	 * {@link TourEvent#_modifiedTours} contains the modified {@link TourData}
 	 */
 	public boolean				isTourModified	= false;
 
@@ -45,15 +45,15 @@ public class TourEvent {
 	public TourData				tourDataEditorSavedTour;
 
 	public TourEvent(final ArrayList<TourData> modifiedTour) {
-		fModifiedTours = modifiedTour;
+		_modifiedTours = modifiedTour;
 	}
 
 	public TourEvent(final TourData tourData) {
 		
-		fModifiedTours = new ArrayList<TourData>();
+		_modifiedTours = new ArrayList<TourData>();
 
 		if (tourData != null) {
-			fModifiedTours.add(tourData);
+			_modifiedTours.add(tourData);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class TourEvent {
 	 * @return Returns all tours which have been modified
 	 */
 	public ArrayList<TourData> getModifiedTours() {
-		return fModifiedTours;
+		return _modifiedTours;
 	}
 
 }

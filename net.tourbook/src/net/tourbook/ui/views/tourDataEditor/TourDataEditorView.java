@@ -1358,56 +1358,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		Arrays.sort(indices);
 		int lastSelectionIndex = indices[0];
 
-		if (removeTime) {
-			// this must be done before the time series are modified
-			removeTimeAndDistance(firstIndex, lastIndex);
-		}
+		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, removeTime);
 
-		/*
-		 * update data series
-		 */
-		int[] intSerie = _tourData.altitudeSerie;
-		if (intSerie != null) {
-			_tourData.altitudeSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-		intSerie = _tourData.cadenceSerie;
-		if (intSerie != null) {
-			_tourData.cadenceSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-		intSerie = _tourData.distanceSerie;
-		if (intSerie != null) {
-			_tourData.distanceSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-		intSerie = _tourData.pulseSerie;
-		if (intSerie != null) {
-			_tourData.pulseSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-		intSerie = _tourData.temperatureSerie;
-		if (intSerie != null) {
-			_tourData.temperatureSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-		intSerie = _tourData.timeSerie;
-		if (intSerie != null) {
-			_tourData.timeSerie = getRemainingIntegerSerieData(intSerie, firstIndex, lastIndex);
-		}
-
-		double[] doubleSerie = _tourData.latitudeSerie;
-		if (doubleSerie != null) {
-			_tourData.latitudeSerie = getRemainingDoubleSerieData(doubleSerie, firstIndex, lastIndex);
-		}
-		doubleSerie = _tourData.longitudeSerie;
-		if (doubleSerie != null) {
-			_tourData.longitudeSerie = getRemainingDoubleSerieData(doubleSerie, firstIndex, lastIndex);
-		}
-
-		// reset computed data series and clear cached world positions
-		_tourData.clearComputedSeries();
-		_tourData.clearWorldPositions();
-
-		// segments must be recomputed
-		_tourData.segmentSerieIndex = null;
-
-		removeTourMarkers(firstIndex, lastIndex, removeTime);
+		updateMarkerMap();
 
 		getDataSeriesFromTourData();
 
@@ -4353,70 +4306,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return 0;
 	}
 
-	private double[] getRemainingDoubleSerieData(final double[] dataSerie, final int firstIndex, final int lastIndex) {
-
-		final int oldSerieLength = dataSerie.length;
-		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
-
-		final double[] newDataSerie = new double[newSerieLength];
-
-		if (firstIndex == 0) {
-
-			// delete from start, copy data by skipping removed slices
-			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
-
-		} else if (lastIndex == oldSerieLength - 1) {
-
-			// delete until the end
-			System.arraycopy(dataSerie, 0, newDataSerie, 0, newSerieLength);
-
-		} else {
-
-			// delete somewhere in the middle
-
-			// copy start segment
-			System.arraycopy(dataSerie, 0, newDataSerie, 0, firstIndex);
-
-			// copy end segment
-			final int copyLength = oldSerieLength - (lastIndex + 1);
-			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
-		}
-
-		return newDataSerie;
-	}
-
-	private int[] getRemainingIntegerSerieData(final int[] oldDataSerie, final int firstIndex, final int lastIndex) {
-
-		final int oldSerieLength = oldDataSerie.length;
-		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
-
-		final int[] newDataSerie = new int[newSerieLength];
-
-		if (firstIndex == 0) {
-
-			// delete from start, copy data by skipping removed slices
-			System.arraycopy(oldDataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
-
-		} else if (lastIndex == oldSerieLength - 1) {
-
-			// delete until the end
-			System.arraycopy(oldDataSerie, 0, newDataSerie, 0, newSerieLength);
-
-		} else {
-
-			// delete somewhere in the middle
-
-			// copy start segment
-			System.arraycopy(oldDataSerie, 0, newDataSerie, 0, firstIndex);
-
-			// copy end segment
-			final int copyLength = oldSerieLength - (lastIndex + 1);
-			System.arraycopy(oldDataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
-		}
-
-		return newDataSerie;
-	}
-
 	private TimeSlice[] getRemainingSliceItems(final Object[] dataViewerItems, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = dataViewerItems.length;
@@ -5348,94 +5237,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
-	private void removeTimeAndDistance(final int firstIndex, final int lastIndex) {
-
-		final int[] timeSerie = _tourData.timeSerie;
-		final int[] distSerie = _tourData.distanceSerie;
-
-		if ((timeSerie == null) || (timeSerie.length == 0)) {
-			return;
-		}
-
-		/*
-		 * check if lastIndex is the last time slice, this will already remove time and distance
-		 */
-		if (lastIndex == timeSerie.length - 1) {
-			return;
-		}
-
-		final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
-		int distDiff = -1;
-
-		if (distSerie != null) {
-			distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
-		}
-
-		// update remaining time and distance data series
-		for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
-
-			timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
-
-			if (distDiff != -1) {
-				distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
-			}
-		}
-	}
-
-	/**
-	 * Removes markers which are deleted and updates marker serie index which are positioned after
-	 * the deleted time slices
-	 * 
-	 * @param firstSerieIndex
-	 * @param lastSerieIndex
-	 * @param removeTime
-	 */
-	private void removeTourMarkers(final int firstSerieIndex, final int lastSerieIndex, final boolean removeTime) {
-
-		// check if markers are available
-		final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-		if (tourMarkers.size() == 0) {
-			return;
-		}
-
-		// remove deleted markers from tourData
-		final TourMarker[] markerCopy = tourMarkers.toArray(new TourMarker[tourMarkers.size()]);
-
-		for (final TourMarker tourMarker : markerCopy) {
-
-			final int markerSerieIndex = tourMarker.getSerieIndex();
-			if ((markerSerieIndex >= firstSerieIndex) && (markerSerieIndex <= lastSerieIndex)) {
-				tourMarkers.remove(tourMarker);
-			}
-		}
-		updateMarkerMap();
-
-		// update marker index
-		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
-		final int[] timeSerie = _tourData.timeSerie;
-		final int[] distSerie = _tourData.distanceSerie;
-
-		for (final TourMarker tourMarker : _markerMap.values()) {
-
-			final int markerSerieIndex = tourMarker.getSerieIndex();
-
-			if (markerSerieIndex > lastSerieIndex) {
-				final int serieIndex = markerSerieIndex - diffSerieIndex;
-				tourMarker.setSerieIndex(serieIndex);
-
-				if (removeTime) {
-
-					tourMarker.setTime(timeSerie[serieIndex]);
-
-					if (distSerie != null) {
-						tourMarker.setDistance(distSerie[serieIndex]);
-					}
-				}
-			}
-		}
-		updateMarkerMap();
-	}
-
 	private void restoreStateBeforeUI() {
 
 		_isRowEditMode = _viewState.getBoolean(STATE_ROW_EDIT_MODE);
@@ -5768,7 +5569,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * converts the {@link TourMarker} from {@link TourData} into the map {@link #_markerMap}
+	 * converts {@link TourMarker} from {@link #_tourData} into the map {@link #_markerMap}
 	 */
 	void updateMarkerMap() {
 
@@ -5943,6 +5744,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		updateUIFromModel(tourData, true, true);
 	}
 
+	/**
+	 * @param tourData
+	 * @param isDirty
+	 *            When <code>true</code>, the tour is set to be dirty
+	 */
 	public void updateUI(final TourData tourData, final boolean isDirty) {
 
 		updateUI(tourData);
@@ -6069,12 +5875,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		updateMarkerMap();
 
 		// a tour which is not saved has no tour references
-		final Collection<TourReference> tourReferences = _uiRunnableTourData.getTourReferences();
-		if (tourReferences == null) {
-			_isReferenceTourAvailable = false;
-		} else {
-			_isReferenceTourAvailable = tourReferences.size() > 0;
-		}
+		_isReferenceTourAvailable = _tourData.isContainReferenceTour();
 
 		// show tour type image when tour type is set
 		final TourType tourType = _uiRunnableTourData.getTourType();
@@ -6094,7 +5895,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		enableActions();
 		enableControls();
 
-		// action depends on the selected unit
+		// this action displays selected unit label
 		_actionSetStartDistanceTo0.setText(NLS.bind(
 				Messages.TourEditor_Action_SetStartDistanceTo0,
 				UI.UNIT_LABEL_DISTANCE));

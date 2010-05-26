@@ -3542,6 +3542,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return getSpeedSerieInternal();
 	}
 
+	public int[] getSpeedSerieFromDevice() {
+
+		if (isSpeedSerieFromDevice) {
+			return speedSerie;
+		}
+
+		return null;
+	}
+
 	private int[] getSpeedSerieInternal() {
 
 		computeSpeedSerie();
@@ -3652,10 +3661,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startSecond;
 	}
 
-	public short getStartYear() {
-		return startYear;
-	}
-
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3666,6 +3671,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
+
+	public short getStartYear() {
+		return startYear;
+	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3934,6 +3943,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		result = 37 * result + this.getTourRecordingTime();
 
 		return result;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
+	 *         <code>false</code>
+	 */
+	public boolean isContainReferenceTour() {
+
+		if (tourReferences == null) {
+			return false;
+		} else {
+			return tourReferences.size() > 0;
+		}
 	}
 
 	/**
@@ -4257,6 +4279,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.mergeTargetTourId = mergeTargetTourId;
 	}
 
+	/**
+	 * Sets the power data serie and set's a flag that the data serie is from a device
+	 * 
+	 * @param powerSerie
+	 */
 	public void setPowerSerie(final int[] powerSerie) {
 		this.powerSerie = powerSerie;
 		this.isPowerSerieFromDevice = true;
@@ -4265,21 +4292,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public void setRestPulse(final int restPulse) {
 		this.restPulse = restPulse;
 	}
-
-//	/**
-//	 * Set the week of the tour, 0 is the first week in the year
-//	 *
-//	 * @param startWeek
-//	 */
-//	public void setStartWeek(final short startWeek) {
-//		this.startWeek = startWeek;
-//	}
-//	/**
-//	 * @param startWeekYear the startWeekYear to set
-//	 */
-//	public void setStartWeekYear(final short startWeekYear) {
-//		this.startWeekYear = startWeekYear;
-//	}
 
 	private void setSpeed(	final int serieIndex,
 							final int speedMetric,
@@ -4316,6 +4328,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		paceSerieSecondsImperial[serieIndex] = (int) paceImperialSeconds / 10;
 	}
 
+	/**
+	 * Sets the speed data serie and set's a flag that the data serie is from a device
+	 * 
+	 * @param speedSerie
+	 */
 	public void setSpeedSerie(final int[] speedSerie) {
 		this.speedSerie = speedSerie;
 		this.isSpeedSerieFromDevice = true;
@@ -4415,7 +4432,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.tourImportFilePath = tourImportFilePath;
 	}
 
-	public void setTourMarkers(final HashSet<TourMarker> tourMarkers) {
+	public void setTourMarkers(final Set<TourMarker> tourMarkers) {
 
 		if (this.tourMarkers != null) {
 			this.tourMarkers.clear();

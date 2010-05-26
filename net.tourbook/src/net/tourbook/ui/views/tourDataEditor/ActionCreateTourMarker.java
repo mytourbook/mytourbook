@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.ui.views.tourDataEditor;
@@ -33,14 +33,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionCreateTourMarker extends Action {
 
-	private TourDataEditorView	fTourDataEditorView;
+	private TourDataEditorView	_tourDataEditor;
 
 	public ActionCreateTourMarker(final TourDataEditorView tourDataEditorView) {
 
 		super(Messages.tourCatalog_view_action_create_marker);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
 
-		fTourDataEditorView = tourDataEditorView;
+		_tourDataEditor = tourDataEditorView;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class ActionCreateTourMarker extends Action {
 	 */
 	private TourMarker createTourMarker(final TourData tourData) {
 
-		final StructuredSelection selection = (StructuredSelection) fTourDataEditorView.getSliceViewer().getSelection();
+		final StructuredSelection selection = (StructuredSelection) _tourDataEditor.getSliceViewer().getSelection();
 		final Object firstElement = selection.getFirstElement();
 
 		if (firstElement instanceof TimeSlice && tourData.timeSerie != null) {
@@ -79,7 +79,7 @@ public class ActionCreateTourMarker extends Action {
 	@Override
 	public void run() {
 
-		final TourData tourData = fTourDataEditorView.getTourData();
+		final TourData tourData = _tourDataEditor.getTourData();
 
 		final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null);
 
@@ -92,7 +92,7 @@ public class ActionCreateTourMarker extends Action {
 		}
 
 		// markers in tourData could be modified even when the Cancel button is pressed
-		fTourDataEditorView.updateMarkerMap();
+		_tourDataEditor.updateMarkerMap();
 	}
 
 }

@@ -62,9 +62,11 @@ public class ActionSplitTour extends Action {
 			return;
 		}
 
-		new DialogExtractTour(Display.getCurrent().getActiveShell(), //
+		new DialogExtractTour(
+				Display.getCurrent().getActiveShell(),
 				selectedTours.get(0),
-				_tourSplitIndex).open();
+				_tourSplitIndex,
+				_tourDataEditor).open();
 	}
 
 	public void setTourRange(final int tourSplitIndex) {
