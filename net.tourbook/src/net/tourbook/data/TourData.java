@@ -617,35 +617,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * data for the tour segments
 	 */
 	@Transient
+	public int[]						segmentSerieTimeTotal;
+	@Transient
 	public int[]						segmentSerieRecordingTime;
-
 	@Transient
 	public int[]						segmentSerieDrivingTime;
-
 	@Transient
 	public int[]						segmentSerieBreakTime;
-	@Transient
-	public int[]						segmentSerieTimeTotal;
 
 	@Transient
 	public int[]						segmentSerieDistanceDiff;
-
 	@Transient
 	public int[]						segmentSerieDistanceTotal;
+
 	@Transient
 	public int[]						segmentSerieAltitudeDiff;
 	@Transient
 	public int[]						segmentSerieComputedAltitudeDiff;
-	//	@Transient
-//	public int[]						segmentSerieComputedAltitudeDown;
+
 	@Transient
 	public float[]						segmentSerieAltitudeUpH;
-
 	@Transient
 	public int[]						segmentSerieAltitudeDownH;
+
 	@Transient
 	public float[]						segmentSerieSpeed;
-
 	@Transient
 	public float[]						segmentSeriePace;
 	@Transient
@@ -2720,7 +2716,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					//
 					+ uniqueKey;
 
-			tourId = Long.parseLong(tourIdKey);
+			tourId = Long.valueOf(tourIdKey);
 
 		} catch (final NumberFormatException e) {
 
@@ -2736,7 +2732,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					//
 					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
 
-			tourId = Long.parseLong(tourIdKey);
+			tourId = Long.valueOf(tourIdKey);
 		}
 
 		return tourId;
@@ -2791,8 +2787,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		int timeTotal = 0;
 		int distanceTotal = 0;
-		int altitudeUp = 0;
-		int altitudeDown = 0;
+
+		int altitudeUpSummarizedBorder = 0;
+		int altitudeUpSummarizedComputed = 0;
+		int altitudeDownSummarizedBorder = 0;
+		int altitudeDownSummarizedComputed = 0;
 
 		final int tourPace = (int) (tourDistance == 0
 				? 0
@@ -2886,17 +2885,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				segmentSerieAltitudeDiff[segmentIndex] = segment.altitudeDiffSegmentBorder = altitudeDiff;
 
 				if (altitudeDiff > 0) {
-					segment.altitudeUpTotal = altitudeUp += altitudeDiff;
-					segment.altitudeDownTotal = altitudeDown;
+					segment.altitudeUpSummarizedBorder = altitudeUpSummarizedBorder += altitudeDiff;
+					segment.altitudeDownSummarizedBorder = altitudeDownSummarizedBorder;
 
 				} else {
-					segment.altitudeUpTotal = altitudeUp;
-					segment.altitudeDownTotal = altitudeDown += altitudeDiff;
+					segment.altitudeUpSummarizedBorder = altitudeUpSummarizedBorder;
+					segment.altitudeDownSummarizedBorder = altitudeDownSummarizedBorder += altitudeDiff;
 				}
 
 				if ((segmentSerieComputedAltitudeDiff != null)
 						&& (segmentIndex < segmentSerieComputedAltitudeDiff.length)) {
-					segment.computedAltitudeDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
+
+					final int segmentDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
+
+					segment.altitudeDiffSegmentComputed = segmentDiff;
+
+					if (segmentDiff > 0) {
+
+						segment.altitudeUpSummarizedComputed = altitudeUpSummarizedComputed += segmentDiff;
+						segment.altitudeDownSummarizedComputed = altitudeDownSummarizedComputed;
+
+					} else {
+
+						segment.altitudeUpSummarizedComputed = altitudeUpSummarizedComputed;
+						segment.altitudeDownSummarizedComputed = altitudeDownSummarizedComputed += segmentDiff;
+					}
 				}
 
 				int altitudeUpH = 0;
@@ -2920,9 +2933,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					}
 				}
 
-				segment.altitudeUpH = altitudeUpH;
+				segment.altitudeUpHour = altitudeUpH;
 
-				segmentSerieAltitudeDownH[segmentIndex] = segment.altitudeDownH = altitudeDownH;
+				segmentSerieAltitudeDownH[segmentIndex] = segment.altitudeDownHour = altitudeDownH;
 				segmentSerieAltitudeUpH[segmentIndex] = recordingTime == 0 ? //
 						0
 						: (float) (altitudeUpH + altitudeDownH) / recordingTime * 3600 / UI.UNIT_VALUE_ALTITUDE;
@@ -3469,7 +3482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int bodyHeight = 188;
 
 		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD = 0.8f;// Str�mungskoeffizient
+		final float cD = 0.8f;// Streomungskoeffizient
 		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
@@ -3847,6 +3860,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourType;
 	}
 
+	public Set<TourWayPoint> getTourWayPoints() {
+		return tourWayPoints;
+	}
+
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3887,10 +3904,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //		}
 //	}
 
-	public Set<TourWayPoint> getTourWayPoints() {
-		return tourWayPoints;
-	}
-
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3925,11 +3938,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return weatherWindSpd;
 	}
 
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
-
 	/**
 	 * @param zoomLevel
 	 * @return Returns the world position for the suplied zoom level and projection id
@@ -3937,6 +3945,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
 		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
+
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -4023,6 +4036,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		} else {
 			return true;
 		}
+	}
+
+	public boolean isTourImportFilePathAvailable() {
+		
+		if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**
@@ -4598,11 +4620,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			final StringWriter sw = new StringWriter();
 			marshaller.marshal(this, sw);
 			return sw.toString();
+
 		} catch (final JAXBException e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
-
 }
