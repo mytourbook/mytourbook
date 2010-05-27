@@ -621,6 +621,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			if (_printExtensionPoint instanceof PrintTourPDF) {
 				try {
 					//TODO handle exception
+					//System.out.println("tour id:"+tourData.getTourId());	
 					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, completeFilePath);
 				} catch (FOPException e) {
 					e.printStackTrace();
@@ -762,9 +763,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 	}
 
 	/**
-	 * @return Return <code>true</code> when a part of a tour can be exported
+	 * @return Return <code>true</code> when a part of a tour can be printed
 	 */
-	private boolean isExportTourPart() {
+	private boolean isPrintTourPart() {
 
 		final boolean[] result = new boolean[1];
 

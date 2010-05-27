@@ -22,11 +22,14 @@ import javax.xml.transform.stream.StreamSource;
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.Messages;
+import net.tourbook.ui.UI;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.render.afp.tools.StringUtils;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -34,6 +37,8 @@ import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import com.thoughtworks.xstream.XStream;
 
 public class PrintTourPDF extends PrintTourExtension {
 
@@ -91,6 +96,20 @@ public class PrintTourPDF extends PrintTourExtension {
 
 			// setup xml input source
 			final String xml = object.toXml();
+						
+			/* debug logging
+			System.err.println("--------------------------------------------------------");
+			System.err.println(object.toXml());
+			System.err.println("--------------------------------------------------------");
+						
+			XStream xStream = new XStream();
+			try {
+				FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"), xStream.toXML(object));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			*/
+			
 			final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 
 			// setup xsl stylesheet source
@@ -106,9 +125,8 @@ public class PrintTourPDF extends PrintTourExtension {
 			foUserAgent.setProducer(this.getClass().getName());
 			final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
-			// setup transformation parameters
-			transformer.setParameter("startDate", formatStartDate((TourData) object));
-
+			setTransformationParameters((TourData)object, transformer);
+			
 			// perform transformation
 			final Result res = new SAXResult(fop.getDefaultHandler());
 			transformer.transform(xmlSource, res);
@@ -124,6 +142,38 @@ public class PrintTourPDF extends PrintTourExtension {
 		}
 	}
 
+	/**
+	 * configures parameters used in the xsl transformation
+	 * @param _tourData
+	 * @param _transformer
+	 */
+	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer){
+		_transformer.setParameter("startDate", formatStartDate(_tourData));
+		
+		_transformer.setParameter("tourTime", (_tourData.getTourRecordingTime() / 3600) + ":" 
+				+ StringUtils.lpad(""+((_tourData.getTourRecordingTime() % 3600) / 60), '0', 2) + ":" 
+				+ StringUtils.lpad(""+(_tourData.getTourRecordingTime() % 3600) % 60, '0', 2));
+		
+		_transformer.setParameter("tourDrivingTime", (_tourData.getTourDrivingTime() / 3600) + ":" 
+				+ StringUtils.lpad(""+((_tourData.getTourDrivingTime() % 3600) / 60), '0', 2) + ":"
+				+ StringUtils.lpad(""+(_tourData.getTourDrivingTime() % 3600) % 60, '0', 2));			
+		
+		final int tourBreakTime = _tourData.getTourRecordingTime() - _tourData.getTourDrivingTime();
+		
+		_transformer.setParameter("tourBreakTime", StringUtils.lpad(""+(tourBreakTime / 3600), '0', 1) + ":" 
+				+ StringUtils.lpad(""+((tourBreakTime % 3600) / 60), '0', 2) + ":"
+				+ StringUtils.lpad(""+(tourBreakTime % 3600) % 60, '0', 2));
+		
+		_transformer.setParameter("unitAltitude", UI.UNIT_VALUE_ALTITUDE);
+		_transformer.setParameter("unitDistance", new Double(UI.UNIT_VALUE_DISTANCE));
+		_transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE);
+		_transformer.setParameter("unitLabelDistance", UI.UNIT_LABEL_DISTANCE);
+		_transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED);
+		_transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ALTITUDE);
+		_transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE);
+		_transformer.setParameter("unitLabelHeartBeat", net.tourbook.Messages.Graph_Label_Heartbeat_unit);
+	}
+	
 	@Override
 	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
@@ -149,10 +199,6 @@ public class PrintTourPDF extends PrintTourExtension {
 				_tourData.getStartMinute(),
 				_tourData.getStartSecond(),
 				0);
-
-		final int recordingTime = _tourData.getTourRecordingTime();
-		final int movingTime = _tourData.getTourDrivingTime();
-		final int breakTime = recordingTime - movingTime;
 
 		return new Formatter().format(
 				Messages.Tour_Tooltip_Format_DateWeekTime,

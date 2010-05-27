@@ -268,6 +268,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * total driving time in seconds
 	 */
+	@XmlElement
 	private int							tourDrivingTime;
 
 	/**
@@ -301,8 +302,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * maximum altitude in metric system
 	 */
+	@XmlElement
 	private int							maxAltitude;																// db-version 4
 
+	@XmlElement
 	private int							maxPulse;																	// db-version 4
 
 	/**
@@ -311,7 +314,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	private float						maxSpeed;																	// db-version 4
 
+	@XmlElement
 	private int							avgPulse;																	// db-version 4
+
+	@XmlElement
 	private int							avgCadence;																// db-version 4
 	private int							avgTemperature;															// db-version 4
 
@@ -325,7 +331,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	private String						tourDescription;															// db-version 4
 
+	@XmlElement
 	private String						tourStartPlace;															// db-version 4
+	@XmlElement
 	private String						tourEndPlace;																// db-version 4
 
 	private Integer						calories;																	// db-version 4
@@ -3458,7 +3466,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final int bodyHeight = 188;
 
 		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		final float cD = 0.8f;// Strömungskoeffizient
+		final float cD = 0.8f;// Strï¿½mungskoeffizient
 		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
@@ -4587,11 +4595,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			final StringWriter sw = new StringWriter();
 			marshaller.marshal(this, sw);
 			return sw.toString();
-
 		} catch (final JAXBException e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
+
 }
