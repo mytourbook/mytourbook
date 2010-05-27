@@ -81,17 +81,17 @@ public class PrintTourPDF extends PrintTourExtension {
 	 * @throws FOPException
 	 * @throws TransformerException
 	 */
-	public void printPDF(final IXmlSerializable object, final String pdfFilePath, final boolean isPrintMarkers, final boolean isOverwriteFiles)
+	public void printPDF(final IXmlSerializable object, final PrintSettings printSettings)
 			throws FileNotFoundException, FOPException, TransformerException {
 		boolean canWriteFile = true;
 		FileOutputStream pdfContentStream = null;
 		BufferedOutputStream pdfContent = null;
 		try {
 			// setup pdf outpoutStream
-			File pdfFile = new File(pdfFilePath);
+			File pdfFile = new File(printSettings.getCompleteFilePath());
 			
 			if (pdfFile.exists()) {
-				if (isOverwriteFiles) {
+				if (printSettings.isOverwriteFiles()) {
 					// overwrite is enabled in the UI
 				} else {
 					final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
@@ -111,12 +111,11 @@ public class PrintTourPDF extends PrintTourExtension {
 				// setup xml input source
 				final String xml = object.toXml();
 							
-				
+				/* debug logging
 				System.err.println("--------------------------------------------------------");
 				System.err.println(object.toXml());
 				System.err.println("--------------------------------------------------------");
-				
-				/* debug logging			
+							
 				XStream xStream = new XStream();
 				try {
 					FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"), xStream.toXML(object));
@@ -140,7 +139,7 @@ public class PrintTourPDF extends PrintTourExtension {
 				foUserAgent.setProducer(this.getClass().getName());
 				final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
-				setTransformationParameters((TourData)object, transformer, isPrintMarkers);
+				setTransformationParameters((TourData)object, transformer, printSettings);
 				
 				// perform transformation
 				final Result res = new SAXResult(fop.getDefaultHandler());
@@ -163,8 +162,12 @@ public class PrintTourPDF extends PrintTourExtension {
 	 * @param _tourData
 	 * @param _transformer
 	 */
-	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer, final boolean isPrintMarkers){
-		_transformer.setParameter("isPrintMarkers", isPrintMarkers);
+	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer, final PrintSettings printSettings){
+		_transformer.setParameter("isPrintMarkers", printSettings.isPrintMarkers());
+		_transformer.setParameter("isPrintDescription", printSettings.isPrintDescription());
+		
+		_transformer.setParameter("paperSize", printSettings.getPaperSize().toString());
+		_transformer.setParameter("paperOrientation", printSettings.getPaperOrientation().toString());
 		
 		_transformer.setParameter("startDate", formatStartDate(_tourData));
 		
@@ -182,14 +185,15 @@ public class PrintTourPDF extends PrintTourExtension {
 				+ StringUtils.lpad(""+((tourBreakTime % 3600) / 60), '0', 2) + ":"
 				+ StringUtils.lpad(""+(tourBreakTime % 3600) % 60, '0', 2));
 		
-		_transformer.setParameter("unitAltitude", UI.UNIT_VALUE_ALTITUDE);
+		_transformer.setParameter("unitAltitude", new Double(UI.UNIT_VALUE_ALTITUDE));
 		_transformer.setParameter("unitDistance", new Double(UI.UNIT_VALUE_DISTANCE));
 		_transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE);
 		_transformer.setParameter("unitLabelDistance", UI.UNIT_LABEL_DISTANCE);
 		_transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED);
 		_transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ALTITUDE);
 		_transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE);
-		_transformer.setParameter("unitLabelHeartBeat", net.tourbook.Messages.Graph_Label_Heartbeat_unit);
+		_transformer.setParameter("unitLabelHeartBeat", Messages.Value_Unit_Pulse);
+		_transformer.setParameter("unitLabelCadence", Messages.Value_Unit_Cadence);
 	}
 	
 	@Override
