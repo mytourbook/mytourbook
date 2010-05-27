@@ -35,8 +35,8 @@
 				
 				<fo:block margin-bottom="5pt" font-size="10pt">
 					<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-						<fo:table-column column-width="4cm" />
-						<fo:table-column column-width="8cm" />
+						<fo:table-column column-width="25%" />
+						<fo:table-column column-width="75%" />
 						<fo:table-header>
 	    					<fo:table-row>
 	    						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
@@ -86,8 +86,8 @@
 				
 				<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 					<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-						<fo:table-column column-width="4cm" />
-						<fo:table-column column-width="8cm" />
+						<fo:table-column column-width="25%" />
+						<fo:table-column column-width="75%" />
 						<fo:table-header>
 	    					<fo:table-row>
 	    						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
@@ -150,8 +150,8 @@
 				
 				<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 					<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-						<fo:table-column column-width="4cm" />
-						<fo:table-column column-width="8cm" />
+						<fo:table-column column-width="25%" />
+						<fo:table-column column-width="75%" />
 						<fo:table-header>
 	    					<fo:table-row>
 	    						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
@@ -196,8 +196,8 @@
 				
 				<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 					<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-						<fo:table-column column-width="4cm" />
-						<fo:table-column column-width="8cm" />
+						<fo:table-column column-width="25%" />
+						<fo:table-column column-width="75%" />
 						<fo:table-header>
 	    					<fo:table-row>
 	    						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
