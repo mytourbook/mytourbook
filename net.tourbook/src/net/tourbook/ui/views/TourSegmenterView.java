@@ -148,8 +148,28 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private IPropertyChangeListener							_prefChangeListener;
 	private ITourEventListener								_tourEventListener;
 
-	private final NumberFormat								_nf									= NumberFormat
+	private final NumberFormat								_nf_0_0								= NumberFormat
 																										.getNumberInstance();
+	private final NumberFormat								_nf_1_0								= NumberFormat
+																										.getNumberInstance();
+	private final NumberFormat								_nf_1_1								= NumberFormat
+																										.getNumberInstance();
+	private final NumberFormat								_nf_3_3								= NumberFormat
+																										.getNumberInstance();
+	{
+		_nf_0_0.setMinimumFractionDigits(0);
+		_nf_0_0.setMaximumFractionDigits(0);
+
+		_nf_1_0.setMinimumFractionDigits(1);
+		_nf_1_0.setMaximumFractionDigits(0);
+
+		_nf_1_1.setMinimumFractionDigits(1);
+		_nf_1_1.setMaximumFractionDigits(1);
+
+		_nf_3_3.setMinimumFractionDigits(3);
+		_nf_3_3.setMaximumFractionDigits(3);
+	}
+
 	private int												_maxDistanceScale;
 	private int												_scaleDistancePage;
 
@@ -170,11 +190,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * contains all segmenters
 	 */
 	private static HashMap<SegmenterType, TourSegmenter>	_allTourSegmenter;
-
-//	/**
-//	 * contains the {@link #IS_SEGMENTER_}* bit's which tells which segmenter can be used
-//	 */
-//	private int												fAvailableSegmenterData;
 
 	private ArrayList<TourSegmenter>						_availableSegmenter					= new ArrayList<TourSegmenter>();
 
@@ -404,7 +419,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					 */
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					recreateViewer(null);
 
@@ -668,7 +683,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllColumns(parent);
 
 		createUI(parent);
 		createActions();
@@ -1174,12 +1189,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		createSegmentViewer(_viewerContainer);
 	}
 
-	private void defineViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		ColumnDefinition colDef;
+		final PixelConverter pc = new PixelConverter(parent);
 
-		final SelectionAdapter defaultColumnSelectionListener = new SelectionAdapter() {
+		final SelectionAdapter defaultListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_DEFAULT);
@@ -1187,109 +1201,44 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		};
 
-		/*
-		 * column: TOTAL recording time
-		 */
-		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourSegment segment = (TourSegment) cell.getElement();
-				cell.setText(UI.format_hh_mm_ss(segment.timeTotal));
-			}
-		});
+		defineColumnRecordingTimeTotal(pc, defaultListener);
 
-		/*
-		 * column: TOTAL distance (km/mile)
-		 */
-		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+		defineColumnDistanceTotal(pc, defaultListener);
+		defineColumnDistance(pc, defaultListener);
 
-				final TourSegment segment = (TourSegment) cell.getElement();
+		defineColumnRecordingTime(pc, defaultListener);
+		defineColumnDrivingTime(pc, defaultListener);
+		defineColumnPausedTime(pc, defaultListener);
 
-				_nf.setMinimumFractionDigits(3);
-				_nf.setMaximumFractionDigits(3);
+		defineColumnAltitudeDiffSegmentBorder(pc, defaultListener);
+		defineColumnAltitudeDiffSegmentComputed(pc, defaultListener);
+		defineColumnAltitudeUpSummarizedComputed(pc, defaultListener);
+		defineColumnAltitudeDownSummarizedComputed(pc, defaultListener);
 
-				cell.setText(_nf.format((segment.distanceTotal) / (1000 * UI.UNIT_VALUE_DISTANCE)));
-			}
-		});
+		defineColumnGradient(pc);
 
-		/*
-		 * column: distance (km/mile)
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+		defineColumnAltitudeUpHour(pc, defaultListener);
+		defineColumnAltitudeDownHour(pc, defaultListener);
 
-				final TourSegment segment = (TourSegment) cell.getElement();
+		defineColumnAvgSpeed(pc);
+		defineColumnAvgPace(pc);
+		defineColumnAvgPaceDifference(pc);
+		defineColumnAvgPulse(pc);
+		defineColumnAvgPulseDifference(pc);
 
-				_nf.setMinimumFractionDigits(3);
-				_nf.setMaximumFractionDigits(3);
+		defineColumnAltitudeUpSummarizedBorder(pc, defaultListener);
+		defineColumnAltitudeDownSummarizedBorder(pc, defaultListener);
+	}
 
-				cell.setText(_nf.format((segment.distanceDiff) / (1000 * UI.UNIT_VALUE_DISTANCE)));
-			}
-		});
+	/**
+	 * column: altitude diff segment border (m/ft)
+	 */
+	private void defineColumnAltitudeDiffSegmentBorder(	final PixelConverter pc,
+														final SelectionAdapter defaultColumnSelectionListener) {
 
-		/*
-		 * column: recording time
-		 */
-		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourSegment segment = (TourSegment) cell.getElement();
-				cell.setText(UI.format_hh_mm_ss(segment.recordingTime));
-			}
-		});
+		final ColumnDefinition colDef;
 
-		/*
-		 * column: driving time
-		 */
-		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourSegment segment = (TourSegment) cell.getElement();
-				cell.setText(UI.format_hh_mm_ss(segment.drivingTime));
-			}
-		});
-
-		/*
-		 * column: break time
-		 */
-		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final int breakTime = segment.breakTime;
-				if (breakTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(UI.format_hh_mm_ss(breakTime));
-				}
-			}
-		});
-
-		/*
-		 * column: altitude diff segment border (m/ft)
-		 */
-		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1297,21 +1246,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-
-				_nf.setMinimumFractionDigits(0);
-				_nf.setMaximumFractionDigits(0);
 
 				final int altitudeDiff = segment.altitudeDiffSegmentBorder;
 
-				cell.setText(_nf.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(_nf_0_0.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
 				setCellColor(cell, altitudeDiff);
 			}
 		});
+	}
 
-		/*
-		 * column: computed altitude diff (m/ft)
-		 */
-		colDef = TableColumnFactory.ALTITUDE_COMPUTED_DIFF_SEGMENT.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: computed altitude diff (m/ft)
+	 */
+	private void defineColumnAltitudeDiffSegmentComputed(	final PixelConverter pc,
+															final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1320,44 +1272,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				_nf.setMinimumFractionDigits(0);
-				_nf.setMaximumFractionDigits(0);
+				final int altitudeDiff = segment.altitudeDiffSegmentComputed;
 
-				final int altitudeDiff = segment.computedAltitudeDiff;
-
-				cell.setText(_nf.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(_nf_0_0.format(altitudeDiff / UI.UNIT_VALUE_ALTITUDE));
 				setCellColor(cell, altitudeDiff);
 			}
 		});
+	}
 
-		/*
-		 * column: gradient
-		 */
-		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
-				_segmentViewer.refresh();
-			}
-		});
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+	/**
+	 * column: altitude down m/h
+	 */
+	private void defineColumnAltitudeDownHour(	final PixelConverter pc,
+												final SelectionAdapter defaultColumnSelectionListener) {
 
-				final TourSegment segment = (TourSegment) cell.getElement();
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
+		final ColumnDefinition colDef;
 
-				cell.setText(_nf.format(segment.gradient));
-			}
-		});
-
-		/*
-		 * column: altitude up m/h
-		 */
-		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, pixelConverter);
+		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1368,22 +1299,72 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeUpH / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					final float result = (segment.altitudeDownHour / UI.UNIT_VALUE_ALTITUDE)
+							/ segment.drivingTime
+							* 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						_nf.setMinimumFractionDigits(1);
-						_nf.setMaximumFractionDigits(0);
-						cell.setText(_nf.format(result));
+						cell.setText(_nf_1_0.format(result));
 					}
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: altitude down m/h
-		 */
-		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: total altitude down (m/ft)
+	 */
+	private void defineColumnAltitudeDownSummarizedBorder(	final PixelConverter pc,
+															final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				cell.setText(_nf_0_0.format(segment.altitudeDownSummarizedBorder / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+	}
+
+	/**
+	 * column: total altitude down (m/ft)
+	 */
+	private void defineColumnAltitudeDownSummarizedComputed(final PixelConverter pc,
+															final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				cell.setText(_nf_0_0.format(segment.altitudeDownSummarizedComputed / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+	}
+
+	/**
+	 * column: altitude up m/h
+	 */
+	private void defineColumnAltitudeUpHour(final PixelConverter pc,
+											final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1394,45 +1375,69 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeDownH / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
+					final float result = (segment.altitudeUpHour / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						_nf.setMinimumFractionDigits(1);
-						_nf.setMaximumFractionDigits(0);
-						cell.setText(_nf.format(result));
+						cell.setText(_nf_1_0.format(result));
 					}
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: average speed
-		 */
-		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: total altitude up (m/ft)
+	 */
+	private void defineColumnAltitudeUpSummarizedBorder(final PixelConverter pc,
+														final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
-				_segmentViewer.refresh();
-			}
-		});
+		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
-				cell.setText(_nf.format(segment.speed));
+
+				cell.setText(_nf_0_0.format(segment.altitudeUpSummarizedBorder / UI.UNIT_VALUE_ALTITUDE));
 			}
 		});
+	}
 
-		/*
-		 * column: average pace
-		 */
-		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: total altitude up (m/ft)
+	 */
+	private void defineColumnAltitudeUpSummarizedComputed(	final PixelConverter pc,
+															final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_COMPUTED.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				cell.setText(_nf_0_0.format(segment.altitudeUpSummarizedComputed / UI.UNIT_VALUE_ALTITUDE));
+			}
+		});
+	}
+
+	/**
+	 * column: average pace
+	 */
+	private void defineColumnAvgPace(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1449,11 +1454,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				cell.setText(UI.format_mm_ss(segment.pace));
 			}
 		});
+	}
 
-		/*
-		 * column: pace difference
-		 */
-		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: pace difference
+	 */
+	private void defineColumnAvgPaceDifference(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1463,11 +1473,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				cell.setText(UI.format_mm_ss(segment.paceDiff));
 			}
 		});
+	}
 
-		/*
-		 * column: average pulse
-		 */
-		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: average pulse
+	 */
+	private void defineColumnAvgPulse(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1489,11 +1504,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: pulse difference
-		 */
-		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: pulse difference
+	 */
+	private void defineColumnAvgPulseDifference(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1510,11 +1530,42 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: total altitude up (m/ft)
-		 */
-		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: average speed
+	 */
+	private void defineColumnAvgSpeed(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
+				_segmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(_nf_1_1.format(segment.speed));
+			}
+		});
+	}
+
+	/**
+	 * column: distance (km/mile)
+	 */
+	private void defineColumnDistance(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1523,17 +1574,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				_nf.setMinimumFractionDigits(0);
-				_nf.setMaximumFractionDigits(0);
-
-				cell.setText(_nf.format(segment.altitudeUpTotal / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(_nf_3_3.format((segment.distanceDiff) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
 		});
+	}
 
-		/*
-		 * column: total altitude down (m/ft)
-		 */
-		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: TOTAL distance (km/mile)
+	 */
+	private void defineColumnDistanceTotal(	final PixelConverter pc,
+											final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1542,13 +1596,119 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				_nf.setMinimumFractionDigits(0);
-				_nf.setMaximumFractionDigits(0);
-
-				cell.setText(_nf.format(segment.altitudeDownTotal / UI.UNIT_VALUE_ALTITUDE));
+				cell.setText(_nf_3_3.format((segment.distanceTotal) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
 		});
+	}
 
+	/**
+	 * column: driving time
+	 */
+	private void defineColumnDrivingTime(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(UI.format_hh_mm_ss(segment.drivingTime));
+			}
+		});
+	}
+
+	/**
+	 * column: gradient
+	 */
+	private void defineColumnGradient(final PixelConverter pc) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				_segmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				cell.setText(_nf_1_1.format(segment.gradient));
+			}
+		});
+	}
+
+	/**
+	 * column: break time
+	 */
+	private void defineColumnPausedTime(final PixelConverter pc, final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final int breakTime = segment.breakTime;
+				if (breakTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_hh_mm_ss(breakTime));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: recording time
+	 */
+	private void defineColumnRecordingTime(	final PixelConverter pc,
+											final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(UI.format_hh_mm_ss(segment.recordingTime));
+			}
+		});
+	}
+
+	/**
+	 * column: TOTAL recording time
+	 */
+	private void defineColumnRecordingTimeTotal(final PixelConverter pc,
+												final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourSegment segment = (TourSegment) cell.getElement();
+				cell.setText(UI.format_hh_mm_ss(segment.timeTotal));
+			}
+		});
 	}
 
 	@Override
@@ -2206,17 +2366,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// metric
 
 			// format distance
+			String distanceText;
 			final float selectedDistance = scaleDistance / 1000;
 			if (selectedDistance >= 10) {
-				_nf.setMinimumFractionDigits(0);
-				_nf.setMaximumFractionDigits(0);
+				distanceText = _nf_0_0.format(selectedDistance);
 			} else {
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
+				distanceText = _nf_1_1.format(selectedDistance);
 			}
 
 			// update UI
-			_lblDistanceValue.setText(_nf.format(selectedDistance) + UI.SPACE + UI.UNIT_LABEL_DISTANCE);
+			_lblDistanceValue.setText(distanceText + UI.SPACE + UI.UNIT_LABEL_DISTANCE);
 		}
 	}
 

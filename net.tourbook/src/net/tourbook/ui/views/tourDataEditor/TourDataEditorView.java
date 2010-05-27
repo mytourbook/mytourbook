@@ -3860,7 +3860,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				&& (_isManualTour == false));
 		_actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-		_actionModifyColumns.setEnabled(isCellEditorInactive && isTableViewerTab && isTourValid);
+		_actionModifyColumns.setEnabled(isCellEditorInactive && isTableViewerTab);// && isTourValid);
 
 		_actionSetStartDistanceTo0.setEnabled(isCellEditorInactive
 				&& isNotManualTour
@@ -6052,8 +6052,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtDistanceSensor.pack(true);
 
 		// import file path
-		final String tourImportFilePath = _tourData.getTourImportFilePath();
-		_txtImportFilePath.setText(tourImportFilePath == null ? UI.EMPTY_STRING : tourImportFilePath);
+		_txtImportFilePath.setText(_tourData.isTourImportFilePathAvailable()
+				? _tourData.getTourImportFilePath()
+				: UI.EMPTY_STRING);
 
 		/*
 		 * reference tours

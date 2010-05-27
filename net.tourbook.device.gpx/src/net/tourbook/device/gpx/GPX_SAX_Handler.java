@@ -544,6 +544,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
+
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 

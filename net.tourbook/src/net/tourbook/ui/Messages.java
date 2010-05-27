@@ -27,12 +27,20 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
+	public static String	ColumnFactory_altitude_down_computed_label;
+
+	public static String	ColumnFactory_altitude_down_computed_tooltip;
+
 	public static String		ColumnFactory_altitude_down_h_label;
 	public static String		ColumnFactory_altitude_down_h_tooltip;
 	public static String		ColumnFactory_altitude_down_label;
 	public static String		ColumnFactory_altitude_down_tooltip;
 	public static String		ColumnFactory_altitude_label;
 	public static String		ColumnFactory_altitude_tooltip;
+	public static String	ColumnFactory_altitude_up_computed_label;
+
+	public static String	ColumnFactory_altitude_up_computed_tooltip;
+
 	public static String		ColumnFactory_altitude_up_h_label;
 	public static String		ColumnFactory_altitude_up_h_tooltip;
 	public static String		ColumnFactory_altitude_up_label;

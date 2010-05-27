@@ -48,16 +48,18 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory ALTITUDE_COMPUTED_DIFF_SEGMENT = new TableColumnFactory() {
+	public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_COMPUTED = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
+			String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL;
+
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeComputedDiffSegment", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
-			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
-			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_HORIZONTAL);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_computed_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
@@ -70,11 +72,13 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
+			String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_VERTICAL;
+
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiffSegBorder", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
-			colDef.setColumnHeader(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
-			colDef.setColumnUnit(UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE+UI.SYMBOL_DOUBLE_VERTICAL);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_difference_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
@@ -82,7 +86,7 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory ALTITUDE_DOWN = new TableColumnFactory() {
+	public static final TableColumnFactory ALTITUDE_DOWN_SUMMARIZED_BORDER = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -96,6 +100,25 @@ public abstract class TableColumnFactory {
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 		
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory ALTITUDE_DOWN_SUMMARIZED_COMPUTED = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "\\ " + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL; //$NON-NLS-1$
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownSummarizedComputed", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_computed_label);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_computed_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
 			return colDef;
 		};
 	};
@@ -118,7 +141,7 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
-	public static final TableColumnFactory ALTITUDE_UP = new TableColumnFactory() {
+	public static final TableColumnFactory ALTITUDE_UP_SUMMARIZED_BORDER = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
@@ -132,6 +155,25 @@ public abstract class TableColumnFactory {
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory ALTITUDE_UP_SUMMARIZED_COMPUTED = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "/ " + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL;//$NON-NLS-1$
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpSummarizedComputed", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_computed_label);
+			colDef.setColumnHeader(unitLabel);
+			colDef.setColumnUnit(unitLabel);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_computed_tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
 			return colDef;
 		};
 	};

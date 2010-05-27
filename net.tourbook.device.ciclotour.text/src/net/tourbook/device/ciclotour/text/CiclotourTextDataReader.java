@@ -16,9 +16,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.util.StatusUtil;
 
 public class CiclotourTextDataReader extends TourbookDevice {
-	private static final String	FILE_HEADER	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:"; //$NON-NLS-1$
+
+	private static final String	FILE_HEADER_EN	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:";	//$NON-NLS-1$
+	private static final String	FILE_HEADER_DE	= "Zeit:	Strecke:	Höhe:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";	//$NON-NLS-1$
 
 	public CiclotourTextDataReader() {
 		canReadFromDevice = false;
@@ -66,14 +69,13 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				final int day = Integer.parseInt(dayDenom);
 				final int month = Integer.parseInt(monthDenom);
 				int year = Integer.parseInt(yearDenom);
-				
+
 				// we assume that a two-digit date smaller 90 is in the 21st century,
 				// and dates larger 90 in the 20st century, covering a timespan of
 				// 1900 to 2089, which should be ample.
 				if (year < 90) {
 					year += 2000;
-				}
-				else {
+				} else {
 					year += 1900;
 				}
 
@@ -82,7 +84,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				cal.set(Calendar.YEAR, year);
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.showStatus(e);
 		}
 
 		return cal;
@@ -178,15 +180,20 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 				// file format is Tabbed Seperated Values
 				tokenizer = new StringTokenizer(tokenLine, "\t"); //$NON-NLS-1$
+
 				final String recTime = tokenizer.nextToken();
 				distance = Float.parseFloat(tokenizer.nextToken());
 				alt = Integer.parseInt(tokenizer.nextToken());
+
 				// not recorded, but read for the fun of it.
 				final float speed = Float.parseFloat(tokenizer.nextToken());
+
 				final int heartrate = Integer.parseInt(tokenizer.nextToken());
 				final float temperature = Float.parseFloat(tokenizer.nextToken());
+
 				// same as with speed ...
 				final float gradient = Float.parseFloat(tokenizer.nextToken());
+
 				final int cadence = Integer.parseInt(tokenizer.nextToken());
 
 				final DateFormat df = DateFormat.getTimeInstance(DateFormat.MEDIUM, Locale.GERMAN);
@@ -228,6 +235,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				// add new tour to the map
 				tourDataMap.put(tourId, tourData);
 
+				tourData.importRawDataFile = fileName;
+				tourData.setTourImportFilePath(fileName);
+
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
@@ -235,11 +245,10 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-
 			}
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.showStatus(e);
 		}
 
 		return true;
@@ -261,16 +270,26 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			final String header = reader.readLine();
 
-			return header.startsWith(FILE_HEADER);
+			if (header.startsWith(FILE_HEADER_EN)) {
+				return true;
+			}
+
+			if (header.startsWith(FILE_HEADER_DE)) {
+				return true;
+			}
+
+			return false;
+
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.showStatus(e);
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				try {
 					reader.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					StatusUtil.showStatus(e);
 				}
+			}
 		}
 
 		return false;

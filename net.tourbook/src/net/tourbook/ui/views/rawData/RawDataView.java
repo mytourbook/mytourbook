@@ -315,13 +315,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				String importFilePathName = tourData.importRawDataFile;
 				if (importFilePathName == null) {
 
-					importFilePathName = tourData.getTourImportFilePath();
+					if (tourData.isTourImportFilePathAvailable()) {
 
-					if (importFilePathName == null) {
+						importFilePathName = tourData.getTourImportFilePath();
+
+					} else {
+
 						MessageDialog.openInformation(
 								Display.getCurrent().getActiveShell(),
 								Messages.import_data_dlg_reimport_title,
 								Messages.import_data_dlg_reimport_message);
+
 						continue;
 					}
 				}
@@ -791,7 +795,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineColumnAltitudeDown(final PixelConverter pc) {
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(
+				_columnManager,
+				pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -808,7 +814,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineColumnAltitudeUp(final PixelConverter pc) {
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(
+				_columnManager,
+				pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
