@@ -76,8 +76,6 @@ import org.joda.time.DateTime;
 
 public class DialogPrintTour extends TitleAreaDialog {
 
-	private static final String				UI_AVERAGE_SYMBOL			= "� ";											//$NON-NLS-1$
-
 	private static final int				VERTICAL_SECTION_MARGIN		= 10;
 	private static final int				SIZING_TEXT_FIELD_WIDTH		= 250;
 	private static final int				COMBO_HISTORY_LENGTH		= 20;
@@ -85,9 +83,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final String				STATE_IS_PRINT_TOUR_RANGE	= "isPrintTourRange";							//$NON-NLS-1$
 	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";								//$NON-NLS-1$
 	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";								//$NON-NLS-1$
-
-	private static final String				STATE_IS_CAMOUFLAGE_SPEED	= "isCamouflageSpeed";							//$NON-NLS-1$
-	private static final String				STATE_CAMOUFLAGE_SPEED		= "camouflageSpeedValue";						//$NON-NLS-1$
 
 	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";								//$NON-NLS-1$
 	private static final String				STATE_PRINT_FILE_NAME		= "printtFileName";								//$NON-NLS-1$
@@ -131,10 +126,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private Button							_chkPrintTourRange;
 	private Button							_chkPrintMarkers;
 	private Button							_chkPrinttNotes;
-
-	private Button							_chkCamouflageSpeed;
-	private Text							_txtCamouflageSpeed;
-	private Label							_lblCoumouflageSpeedUnit;
 
 	private Composite						_inputContainer;
 
@@ -410,59 +401,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 		{
-			createUIOptionCamouflageSpeed(group);
 			createUIOptionPrintMarkers(group);
 			createUIOptionPrintNotes(group);
 			createUIOptionTourPart(group);
-		}
-	}
-
-	private void createUIOptionCamouflageSpeed(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			/*
-			 * checkbox: camouflage speed
-			 */
-			_chkCamouflageSpeed = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkCamouflageSpeed);
-			_chkCamouflageSpeed.setText(Messages.Dialog_Print_Chk_CamouflageSpeed);
-			_chkCamouflageSpeed.setToolTipText(Messages.Dialog_Print_Chk_CamouflageSpeed_Tooltip);
-			_chkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					validateFields();
-					enableFields();
-
-					if (_chkCamouflageSpeed.getSelection()) {
-						_txtCamouflageSpeed.setFocus();
-					}
-				}
-			});
-
-			// text: speed
-			_txtCamouflageSpeed = new Text(container, SWT.BORDER | SWT.TRAIL);
-			_txtCamouflageSpeed.setToolTipText(Messages.Dialog_Print_Chk_CamouflageSpeedInput_Tooltip);
-			_txtCamouflageSpeed.addModifyListener(new ModifyListener() {
-				public void modifyText(final ModifyEvent e) {
-					validateFields();
-					enableFields();
-				}
-			});
-			_txtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
-				public void handleEvent(final Event e) {
-					net.tourbook.util.UI.verifyIntegerInput(e, false);
-				}
-			});
-
-			// label: unit
-			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-			_lblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(
-					_lblCoumouflageSpeedUnit);
 		}
 	}
 
@@ -603,17 +544,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 		final String completeFilePath = _txtFilePath.getText();
 
 		final boolean isOverwriteFiles = _chkOverwriteFiles.getSelection();
-		final boolean isCamouflageSpeed = _chkCamouflageSpeed.getSelection();
-		final float[] camouflageSpeed = new float[1];
-		try {
-			camouflageSpeed[0] = Float.parseFloat(_txtCamouflageSpeed.getText());
-		} catch (final NumberFormatException e) {
-			camouflageSpeed[0] = 0.1F;
-		}
-		camouflageSpeed[0] *= UI.UNIT_VALUE_DISTANCE / 3.6f;
-
-		final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
-
+		final boolean isPrintMarkers = _chkPrintMarkers.getSelection();
+		
 		if (_tourDataList.size() == 1) {
 			// print one tour
 			final TourData tourData = _tourDataList.get(0);
@@ -622,7 +554,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 				try {
 					//TODO handle exception
 					//System.out.println("tour id:"+tourData.getTourId());	
-					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, completeFilePath);
+					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, completeFilePath, isPrintMarkers, isOverwriteFiles);
 				} catch (FOPException e) {
 					e.printStackTrace();
 				} catch (TransformerException e) {
@@ -673,7 +605,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 						if (_printExtensionPoint instanceof PrintTourPDF) {
 							try {
 								//TODO handle exception
-								((PrintTourPDF)_printExtensionPoint).printPDF(tourData, filePath.toOSString());
+								((PrintTourPDF)_printExtensionPoint).printPDF(tourData, filePath.toOSString(), isPrintMarkers, isOverwriteFiles);
 							} catch (FOPException e) {
 								e.printStackTrace();
 							} catch (TransformerException e) {
@@ -682,11 +614,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 								e.printStackTrace();
 							}
 						}			
-						
-						// check if overwrite dialog was canceled
-						if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
-							break;
-						}
 					}
 
 					return Status.OK_STATUS;
@@ -704,7 +631,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		MessageDialog.openInformation(getShell(), "Not yet implemented", "Beware, printing is not yet fully implemented.");
 	}
 
-	private void enableExportButton(final boolean isEnabled) {
+	private void enablePrintButton(final boolean isEnabled) {
 		final Button okButton = getButton(IDialogConstants.OK_ID);
 		if (okButton != null) {
 
@@ -713,12 +640,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	}
 
 	private void enableFields() {
-
 		_comboFile.setEnabled(true);
-
-		final boolean isCamouflageTime = _chkCamouflageSpeed.getSelection();
-		_txtCamouflageSpeed.setEnabled(isCamouflageTime);
-		_lblCoumouflageSpeedUnit.setEnabled(isCamouflageTime);
 
 		_chkPrintTourRange.setEnabled(canPrintTourPart());
 		// when disabled, uncheck it
@@ -839,12 +761,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_chkPrintMarkers.setSelection(_state.getBoolean(STATE_IS_PRINT_MARKERS));
 		_chkPrinttNotes.setSelection(_state.getBoolean(STATE_IS_PRINT_NOTES));
 
-		// camouflage speed
-		_chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
-		final String camouflageSpeed = _state.get(STATE_CAMOUFLAGE_SPEED);
-		_txtCamouflageSpeed.setText(camouflageSpeed == null ? "10" : camouflageSpeed);//$NON-NLS-1$
-		_txtCamouflageSpeed.selectAll();
-
 		// export file/path
 		UI.restoreCombo(_comboFile, _state.getArray(STATE_PRINT_FILE_NAME));
 		UI.restoreCombo(_comboPath, _state.getArray(STATE_PRINT_PATH_NAME));
@@ -864,10 +780,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 			_state.put(STATE_IS_PRINT_TOUR_RANGE, _chkPrintTourRange.getSelection());
 		}
 
-		// camouflage speed
-		_state.put(STATE_IS_CAMOUFLAGE_SPEED, _chkCamouflageSpeed.getSelection());
-		_state.put(STATE_CAMOUFLAGE_SPEED, _txtCamouflageSpeed.getText());
-
 		_state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
 		_state.put(STATE_IS_PRINT_MARKERS, _chkPrintMarkers.getSelection());
 		_state.put(STATE_IS_PRINT_NOTES, _chkPrinttNotes.getSelection());
@@ -875,7 +787,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 	private void setError(final String message) {
 		setErrorMessage(message);
-		enableExportButton(false);
+		enablePrintButton(false);
 	}
 
 	/**
@@ -942,19 +854,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 			return;
 		}
 
-		// speed value
-		final boolean isEqualizeTimeEnabled = _chkCamouflageSpeed.getSelection();
-		if (isEqualizeTimeEnabled) {
-
-			if (net.tourbook.util.UI.verifyIntegerValue(_txtCamouflageSpeed.getText()) == false) {
-				setError(Messages.Dialog_Print_Error_CamouflageSpeedIsInvalid);
-				_txtCamouflageSpeed.setFocus();
-				return;
-			}
-		}
-
 		setErrorMessage(null);
-		enableExportButton(true);
+		enablePrintButton(true);
 	}
 
 	private boolean validateFilePath() {

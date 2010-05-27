@@ -49,6 +49,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -397,6 +398,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	@XmlElementWrapper(name="TourMarkers")
+	@XmlElement(name="TourMarker")
 	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
 	/**

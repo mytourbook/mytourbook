@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" exclude-result-prefixes="fo">
 	<xsl:output method="xml" version="1.0" omit-xml-declaration="no" indent="yes" />
 	<!-- parameters passed from java code into the TransFormer, usefull for pre-formatting data in java or configuring i18n -->
+	<xsl:param name="isPrintMarkers" select="''" />
 	<xsl:param name="startDate" select="''" />	
 	<xsl:param name="unitAltitude" select="''" />
 	<xsl:param name="unitDistance" select="''" />
@@ -83,6 +84,10 @@
 					</fo:table>
 				</fo:block>
 				
+				<!-- insert TourMarkes content if needed -->
+				<xsl:if test="$isPrintMarkers">
+					<xsl:apply-templates select="//TourMarkers"/> 
+				</xsl:if>
 				
 				<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 					<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
@@ -244,4 +249,55 @@
 			</fo:page-sequence>
 		</fo:root>
 	</xsl:template>
+	
+	<!-- ========================= -->
+	<!-- element: TourMarkers -->
+	<!-- ========================= -->
+	<xsl:template match="TourMarkers">
+
+			<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
+				<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
+					<fo:table-column column-width="25%" />
+					<fo:table-column column-width="75%" />
+					<fo:table-header>
+	   					<fo:table-row>
+	   						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
+	   							<fo:block text-align="center" vertical-align="middle">
+	   								Tour Markers
+	   							</fo:block>
+	   						</fo:table-cell>	
+	   					</fo:table-row>
+	   				</fo:table-header>
+	   				<fo:table-body>
+					<xsl:choose> 
+						<xsl:when test="count(TourMarker) > 0">
+	
+								<xsl:for-each select="TourMarker">
+			      					<xsl:sort select="@serieIndex"/>		
+									<!-- tour marker -->
+									<fo:table-row>
+										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+											<fo:block text-align="right" vertical-align="top" white-space-collapse="false" white-space="pre"><xsl:value-of select="format-number(distance div 1000 div $unitDistance, '#.##')" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelDistance" /></fo:block>
+										</fo:table-cell>
+										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+											<fo:block text-align="left"><xsl:value-of select="label" /></fo:block>
+										</fo:table-cell>
+									</fo:table-row>
+			    				</xsl:for-each>
+													
+						</xsl:when> 
+						<xsl:otherwise> 
+							<fo:table-row>
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt" number-columns-spanned="2">
+									<fo:block text-align="left">No markers found.</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+						</xsl:otherwise> 
+					</xsl:choose> 
+					</fo:table-body>
+				</fo:table>
+			</fo:block>	
+		
+	</xsl:template>
+		
 </xsl:stylesheet>

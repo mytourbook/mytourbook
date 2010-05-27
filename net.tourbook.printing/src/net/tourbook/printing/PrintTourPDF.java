@@ -21,10 +21,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
+import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -37,8 +37,6 @@ import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import com.thoughtworks.xstream.XStream;
 
 public class PrintTourPDF extends PrintTourExtension {
 
@@ -83,54 +81,72 @@ public class PrintTourPDF extends PrintTourExtension {
 	 * @throws FOPException
 	 * @throws TransformerException
 	 */
-	public void printPDF(final IXmlSerializable object, final String pdfFilePath)
+	public void printPDF(final IXmlSerializable object, final String pdfFilePath, final boolean isPrintMarkers, final boolean isOverwriteFiles)
 			throws FileNotFoundException, FOPException, TransformerException {
-
+		boolean canWriteFile = true;
 		FileOutputStream pdfContentStream = null;
 		BufferedOutputStream pdfContent = null;
 		try {
 			// setup pdf outpoutStream
 			File pdfFile = new File(pdfFilePath);
-			pdfContentStream = new FileOutputStream(pdfFile);
-			pdfContent = new BufferedOutputStream(pdfContentStream);
-
-			// setup xml input source
-			final String xml = object.toXml();
-						
-			/* debug logging
-			System.err.println("--------------------------------------------------------");
-			System.err.println(object.toXml());
-			System.err.println("--------------------------------------------------------");
-						
-			XStream xStream = new XStream();
-			try {
-				FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"), xStream.toXML(object));
-			} catch (IOException e) {
-				e.printStackTrace();
+			
+			if (pdfFile.exists()) {
+				if (isOverwriteFiles) {
+					// overwrite is enabled in the UI
+				} else {
+					final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
+					canWriteFile = UI.confirmOverwrite(fileCollisionBehaviour, pdfFile);
+					
+					if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+						return;
+					}
+				}
 			}
-			*/
-			
-			final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 
-			// setup xsl stylesheet source
-			final FileInputStream xslFileStream = new FileInputStream(_xslFile);
-			final StreamSource xslSource = new StreamSource(xslFileStream);
+			if (canWriteFile) {
+				
+				pdfContentStream = new FileOutputStream(pdfFile);
+				pdfContent = new BufferedOutputStream(pdfContentStream);
 
-			// get transformer
-			final TransformerFactory tfactory = TransformerFactory.newInstance();
-			final Transformer transformer = tfactory.newTransformer(xslSource);
+				// setup xml input source
+				final String xml = object.toXml();
+							
+				
+				System.err.println("--------------------------------------------------------");
+				System.err.println(object.toXml());
+				System.err.println("--------------------------------------------------------");
+				
+				/* debug logging			
+				XStream xStream = new XStream();
+				try {
+					FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"), xStream.toXML(object));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				*/
+				
+				final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 
-			// setup FOP
-			final FOUserAgent foUserAgent = _fopFactory.newFOUserAgent();
-			foUserAgent.setProducer(this.getClass().getName());
-			final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
+				// setup xsl stylesheet source
+				final FileInputStream xslFileStream = new FileInputStream(_xslFile);
+				final StreamSource xslSource = new StreamSource(xslFileStream);
 
-			setTransformationParameters((TourData)object, transformer);
-			
-			// perform transformation
-			final Result res = new SAXResult(fop.getDefaultHandler());
-			transformer.transform(xmlSource, res);
+				// get transformer
+				final TransformerFactory tfactory = TransformerFactory.newInstance();
+				final Transformer transformer = tfactory.newTransformer(xslSource);
 
+				// setup FOP
+				final FOUserAgent foUserAgent = _fopFactory.newFOUserAgent();
+				foUserAgent.setProducer(this.getClass().getName());
+				final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
+
+				setTransformationParameters((TourData)object, transformer, isPrintMarkers);
+				
+				// perform transformation
+				final Result res = new SAXResult(fop.getDefaultHandler());
+				transformer.transform(xmlSource, res);
+
+			}
 		} finally {
 			if (pdfContent != null) {
 				try {
@@ -147,7 +163,9 @@ public class PrintTourPDF extends PrintTourExtension {
 	 * @param _tourData
 	 * @param _transformer
 	 */
-	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer){
+	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer, final boolean isPrintMarkers){
+		_transformer.setParameter("isPrintMarkers", isPrintMarkers);
+		
 		_transformer.setParameter("startDate", formatStartDate(_tourData));
 		
 		_transformer.setParameter("tourTime", (_tourData.getTourRecordingTime() / 3600) + ":" 

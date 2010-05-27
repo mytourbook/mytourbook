@@ -15,12 +15,23 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.StringWriter;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
@@ -28,7 +39,10 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 @Entity
-public class TourMarker implements Cloneable, Comparable<Object> {
+@XmlType(name = "TourMarker")
+@XmlRootElement(name = "TourMarker")
+@XmlAccessorType(XmlAccessType.NONE)
+public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
 
 	public static final int			DB_LENGTH_LABEL			= 255;
 	public static final int			DB_LENGTH_CATEGORY		= 100;
@@ -72,6 +86,7 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 	/**
 	 * distance in metric system
 	 */
+	@XmlElement
 	private int						distance;
 
 	private int						visualPosition;
@@ -88,8 +103,10 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 	/**
 	 * position of this marker in the data serie
 	 */
+	@XmlAttribute
 	private int						serieIndex;
 
+	@XmlElement
 	private String					label					= UI.EMPTY_STRING;
 
 	private String					category				= UI.EMPTY_STRING;
@@ -426,6 +443,21 @@ public class TourMarker implements Cloneable, Comparable<Object> {
 				.append(" serieIndex:") //$NON-NLS-1$
 				.append(serieIndex)
 				.toString();
+	}
+
+	@Override
+	public String toXml() {
+		try {
+			final JAXBContext context = JAXBContext.newInstance(this.getClass());
+			final Marshaller marshaller = context.createMarshaller();
+			final StringWriter sw = new StringWriter();
+			marshaller.marshal(this, sw);
+			return sw.toString();
+		} catch (final JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 }
