@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.database.PersonManager;
 import net.tourbook.tour.DialogExtractTour;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -59,7 +60,7 @@ public class ActionExtractTour extends Action {
 		}
 
 		// check person
-		if (TourManager.isPersonSelected() == false) {
+		if (PersonManager.isPersonAvailable() == false) {
 			return;
 		}
 
@@ -68,8 +69,7 @@ public class ActionExtractTour extends Action {
 				selectedTours.get(0),
 				_tourStartIndex,
 				_tourEndIndex,
-				_tourDataEditor
-		).open();
+				_tourDataEditor).open();
 	}
 
 	public void setTourRange(final int tourStartIndex, final int tourEndIndex) {

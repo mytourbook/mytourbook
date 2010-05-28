@@ -503,6 +503,30 @@ public class Util {
 	}
 
 	/**
+	 * Selects a text item in the combo box. When text item is not available, the first item is
+	 * selected
+	 * 
+	 * @param combo
+	 * @param comboItems
+	 * @param selectedItem
+	 *            Text which should be selected in the combo box
+	 */
+	public static void selectTextInCombo(final Combo combo, final String[] comboItems, final String selectedItem) {
+
+		int comboIndex = 0;
+
+		for (final String comboStateValue : comboItems) {
+			if (selectedItem.equals(comboStateValue)) {
+				break;
+			}
+
+			comboIndex++;
+		}
+
+		combo.select(comboIndex);
+	}
+
+	/**
 	 * Set the state for an integer array
 	 * 
 	 * @param state

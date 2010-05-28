@@ -21,6 +21,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
@@ -125,14 +126,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		public void dispose() {}
 
 		public Object[] getElements(final Object parent) {
+
 			if (_people == null) {
-				_people = TourDatabase.getTourPeople();
+				_people = PersonManager.getTourPeople();
 			}
-			if (_people == null) {
-				return new Object[0];
-			} else {
-				return _people.toArray(new TourPerson[_people.size()]);
-			}
+
+			return _people.toArray(new TourPerson[_people.size()]);
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
@@ -1099,8 +1098,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-		} else if (!_rawDataPathEditor.getStringValue().trim().equals(UI.EMPTY_STRING)
-				&& !_rawDataPathEditor.isValid()) {
+		} else if (!_rawDataPathEditor.getStringValue().trim().equals(UI.EMPTY_STRING) && !_rawDataPathEditor.isValid()) {
 
 			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 

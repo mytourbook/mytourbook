@@ -23,9 +23,11 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -74,6 +76,7 @@ import org.joda.time.DateTime;
 public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2 {
 
 	private static final String					STATE_TOUR_TITLE						= "TourTitle";						//$NON-NLS-1$
+	private static final String					STATE_PERSON_ID							= "PersonId";						//$NON-NLS-1$
 	private static final String					STATE_IS_KEEP_ORIGINAL_TIME				= "isKeepOriginalTime";			//$NON-NLS-1$
 	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";			//$NON-NLS-1$
 	private static final String					STATE_IS_INCLUDE_MARKER_WAYPOINTS		= "isIncludeMarkerWaypoints";		//$NON-NLS-1$
@@ -158,6 +161,10 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private int									_extractEndIndex;
 
 	private boolean								_isSplitTour;
+
+	/**
+	 * is <code>true</code> when tour slices can be deleted
+	 */
 	private boolean								_canRemoveTimeSlices;
 
 	private DateTime							_extractedTourStartTime;
@@ -184,6 +191,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private Link								_linkTag;
 	private Label								_lblTourTags;
 
+	private Combo								_cboPerson;
+
 	private Button								_chkIncludeDescription;
 	private Button								_chkIncludeMarkerWaypoints;
 
@@ -196,6 +205,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/*
 	 * end of UI controls
 	 */
+	private TourPerson[]						_people;
 
 	public DialogExtractTour(	final Shell parentShell,
 								final TourData tourData,
@@ -216,6 +226,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_extractEndIndex = extractEndIndex;
 
 		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
+//
+//		// make dialog resizable
+//		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
 	public DialogExtractTour(	final Shell parentShell,
@@ -233,7 +246,11 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_tourDataSource = tourData;
 
 		_extractStartIndex = extractStartIndex;
+
 		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
+//
+//		// make dialog resizable
+//		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
 	@Override
@@ -379,8 +396,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			createUI20Title(_dlgInnerContainer);
 			createUI22TourTime(_dlgInnerContainer, defaultSelectionAdapter);
 			createUI30TypeTags(_dlgInnerContainer);
-			createUI40DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
-			createUI50Info(_dlgInnerContainer);
+			createUI40Person(_dlgInnerContainer);
+			createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
+//			createUI60Info(_dlgInnerContainer);
 		}
 	}
 
@@ -588,9 +606,28 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	}
 
 	/**
+	 * person
+	 */
+	private void createUI40Person(final Composite parent) {
+
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(label);
+		label.setText(Messages.Dialog_SplitTour_Label_Person);
+		label.setToolTipText(Messages.Dialog_SplitTour_Label_Person_Tooltip);
+
+		_cboPerson = new Combo(parent, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboPerson);
+		_cboPerson.setVisibleItemCount(20);
+		_cboPerson.setToolTipText(Messages.Dialog_SplitTour_Label_Person_Tooltip);
+	}
+
+	/**
 	 * checkbox: set marker for each tour
 	 */
-	private void createUI40DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+	private void createUI50DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
 
 		/*
 		 * checkbox: description
@@ -610,7 +647,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/**
 	 * info
 	 */
-	private void createUI50Info(final Composite container) {
+	private void createUI60Info(final Composite container) {
 
 		final Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
@@ -953,7 +990,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_tourDataTarget.computeComputedValues();
 
 		// set person which is required to save a tour
-		_tourDataTarget.setTourPerson(TourbookPlugin.getActivePerson());
+		_tourDataTarget.setTourPerson(getSelectedPerson());
 
 		/*
 		 * check size of the fields
@@ -968,7 +1005,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		if (getStateSplitMethod().equals(STATE_EXTRACT_METHOD_REMOVE)) {
 
 			TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true);
-			
+
 			_tourDataEditor.updateUI(_tourDataSource, true);
 
 			TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourDataSource));
@@ -981,7 +1018,16 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-		return _state;
+//		return _state;
+		return null;
+	}
+
+	private TourPerson getSelectedPerson() {
+
+		final int selectedIndex = _cboPerson.getSelectionIndex();
+		final TourPerson person = _people[selectedIndex];
+
+		return person;
 	}
 
 	@Override
@@ -1102,7 +1148,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	private void onSelectTourTitleSource() {
 
-		updateUIFromModel();
+		updateUITourTitle();
 		enableControls();
 	}
 
@@ -1197,6 +1243,33 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				_extractedTourStartTime.getHourOfDay(),
 				_extractedTourStartTime.getMinuteOfHour(),
 				_extractedTourStartTime.getSecondOfMinute());
+
+		/*
+		 * fill person combo and reselect previous person
+		 */
+		final long statePersonId = Util.getStateLong(_state, STATE_PERSON_ID, -1);
+
+		if (_people == null) {
+			final ArrayList<TourPerson> people = PersonManager.getTourPeople();
+			_people = people.toArray(new TourPerson[people.size()]);
+		}
+
+		int index = 0;
+		int personIndex = 0;
+
+		for (final TourPerson person : _people) {
+
+			_cboPerson.add(person.getName());
+
+			if (person.getPersonId() == statePersonId) {
+				personIndex = index;
+			}
+
+			index++;
+		}
+
+		_cboPerson.select(personIndex);
+
 	}
 
 	private void saveState() {
@@ -1219,6 +1292,11 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		// description/marker
 		_state.put(STATE_IS_INCLUDE_DESCRIPTION, _chkIncludeDescription.getSelection());
 		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
+
+		/*
+		 * person
+		 */
+		_state.put(STATE_PERSON_ID, getSelectedPerson().getPersonId());
 	}
 
 	@Override
@@ -1252,23 +1330,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	private void updateUIFromModel() {
 
-		/*
-		 * tour title
-		 */
-		final String stateTourTitleSource = getStateTourTitleSource();
-
-		String tourTitle = _txtTourTitle.getText();
-
-		if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_TOUR)) {
-			tourTitle = _tourTitleFromTour;
-		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_MARKER)) {
-			tourTitle = _tourTitleFromMarker;
-		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_CUSTOM)) {
-			tourTitle = _tourTitleFromCustom;
-		}
-
-		// update ui
-		_txtTourTitle.setText(tourTitle);
+		updateUITourTitle();
 
 		if (_canRemoveTimeSlices == false) {
 
@@ -1283,6 +1345,27 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 			_cboSplitMethod.setEnabled(false);
 		}
+	}
+
+	/**
+	 * update tour title
+	 */
+	private void updateUITourTitle() {
+
+		final String stateTourTitleSource = getStateTourTitleSource();
+
+		String tourTitle = _txtTourTitle.getText();
+
+		if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_TOUR)) {
+			tourTitle = _tourTitleFromTour;
+		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_FROM_MARKER)) {
+			tourTitle = _tourTitleFromMarker;
+		} else if (stateTourTitleSource.equals(STATE_TOUR_TITLE_SOURCE_CUSTOM)) {
+			tourTitle = _tourTitleFromCustom;
+		}
+
+		// update ui
+		_txtTourTitle.setText(tourTitle);
 	}
 
 	private void updateUITourTypeTags() {

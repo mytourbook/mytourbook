@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.database.PersonManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
@@ -178,7 +178,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		 */
 		_cboPeople.add(Messages.App_People_item_all);
 
-		_allPeople = TourDatabase.getTourPeople();
+		_allPeople = PersonManager.getTourPeople();
 
 		if (_allPeople == null) {
 			return;

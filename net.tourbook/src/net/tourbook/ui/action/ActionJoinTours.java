@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.database.PersonManager;
 import net.tourbook.tour.DialogJoinTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -140,7 +141,7 @@ public class ActionJoinTours extends Action {
 		}
 
 		// check person
-		if (TourManager.isPersonSelected() == false) {
+		if (PersonManager.isPersonAvailable() == false) {
 			return;
 		}
 

@@ -31,7 +31,6 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -456,27 +455,27 @@ public class TourManager {
 				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
 	}
 
-	/**
-	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
-	 * person is not selected.
-	 * 
-	 * @return Returns <code>true</code> when a person is selected otherwise <code>false</code>
-	 */
-	public static boolean isPersonSelected() {
-
-		final TourPerson activePerson = TourbookPlugin.getActivePerson();
-
-		if (activePerson == null) {
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
-					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
-
-			return false;
-		}
-
-		return true;
-	}
+//	/**
+//	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
+//	 * person is not selected.
+//	 *
+//	 * @return Returns <code>true</code> when a person is selected otherwise <code>false</code>
+//	 */
+//	public static boolean isPersonSelected() {
+//
+//		final TourPerson activePerson = TourbookPlugin.getActivePerson();
+//
+//		if (activePerson == null) {
+//			MessageDialog.openInformation(
+//					Display.getCurrent().getActiveShell(),
+//					Messages.Tour_Person_Dialog_GetSelectedPerson_Title,
+//					Messages.Tour_Person_Dialog_GetSelectedPerson_Message);
+//
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 	/**
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's

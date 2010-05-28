@@ -730,31 +730,31 @@ public class TourDatabase {
 		return tourData;
 	}
 
-	/**
-	 * @return Returns all tour people in the db sorted by last/first name
-	 */
-	@SuppressWarnings("unchecked")
-	public static ArrayList<TourPerson> getTourPeople() {
-
-		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query emQuery = em.createQuery(//
-					//
-					"SELECT TourPerson" //$NON-NLS-1$
-							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
-							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
-
-			tourPeople = (ArrayList<TourPerson>) emQuery.getResultList();
-
-			em.close();
-		}
-
-		return tourPeople;
-	}
+//	/**
+//	 * @return Returns all tour people in the db sorted by last/first name
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public static ArrayList<TourPerson> getTourPeople() {
+//
+//		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			final Query emQuery = em.createQuery(//
+//					//
+//					"SELECT TourPerson" //$NON-NLS-1$
+//							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
+//							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
+//
+//			tourPeople = (ArrayList<TourPerson>) emQuery.getResultList();
+//
+//			em.close();
+//		}
+//
+//		return tourPeople;
+//	}
 
 	/**
 	 * Get tour type from id

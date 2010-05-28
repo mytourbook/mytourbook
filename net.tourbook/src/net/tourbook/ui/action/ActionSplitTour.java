@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.database.PersonManager;
 import net.tourbook.tour.DialogExtractTour;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -58,7 +59,7 @@ public class ActionSplitTour extends Action {
 		}
 
 		// check person
-		if (TourManager.isPersonSelected() == false) {
+		if (PersonManager.isPersonAvailable() == false) {
 			return;
 		}
 

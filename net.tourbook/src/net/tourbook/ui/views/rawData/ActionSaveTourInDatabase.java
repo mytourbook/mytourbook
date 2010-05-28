@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
@@ -40,20 +40,19 @@ public class ActionSaveTourInDatabase extends Action {
 
 	private static final String		MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
 
-	private RawDataView				fRawDataView;
+	private RawDataView				_rawDataView;
 
-	private TourPerson				fTourPerson;
+	private ArrayList<TourPerson>	_people;
+	private TourPerson				_tourPerson;
 
-	private List<TourbookDevice>	fDeviceList;
-
-	private ArrayList<TourPerson>	fPeople;
+	private List<TourbookDevice>	_deviceList;
 
 	private class PeopleContentProvider implements IStructuredContentProvider {
 
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return fPeople.toArray();
+			return _people.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -78,11 +77,10 @@ public class ActionSaveTourInDatabase extends Action {
 
 	public ActionSaveTourInDatabase(final RawDataView viewPart, final boolean isWithPerson) {
 
-		fRawDataView = viewPart;
+		_rawDataView = viewPart;
 
-		setImageDescriptor(isWithPerson
-				? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour)
-				: TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
+		setImageDescriptor(isWithPerson ? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour) : TourbookPlugin
+				.getImageDescriptor(Messages.Image__database_other_person));
 
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
 
@@ -90,7 +88,7 @@ public class ActionSaveTourInDatabase extends Action {
 		// other views");
 		setEnabled(false);
 
-		fDeviceList = DeviceManager.getDeviceList();
+		_deviceList = DeviceManager.getDeviceList();
 	}
 
 	public IDialogSettings getDialogSettings() {
@@ -117,7 +115,7 @@ public class ActionSaveTourInDatabase extends Action {
 		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId != null) {
-			for (final TourbookDevice device : fDeviceList) {
+			for (final TourbookDevice device : _deviceList) {
 				if (deviceId.equals(device.deviceId)) {
 					return device.visibleName;
 				}
@@ -131,7 +129,7 @@ public class ActionSaveTourInDatabase extends Action {
 	 * force the people list to be recreated the next time when it's used
 	 */
 	public void resetPeopleList() {
-		fPeople = null;
+		_people = null;
 	}
 
 	/**
@@ -145,26 +143,25 @@ public class ActionSaveTourInDatabase extends Action {
 		final TourPerson person;
 
 		// get the person, when not set
-		if (fTourPerson == null) {
+		if (_tourPerson == null) {
 			person = selectPersonInDialog();
 			if (person == null) {
 				return;
 			}
 		} else {
-			person = fTourPerson;
+			person = _tourPerson;
 		}
 
-		fRawDataView.actionSaveTour(person);
+		_rawDataView.actionSaveTour(person);
 	}
 
 	private TourPerson selectPersonInDialog() {
 
-		if (fPeople == null) {
-			// read people list from the db
-			fPeople = TourDatabase.getTourPeople();
+		if (_people == null) {
+			_people = PersonManager.getTourPeople();
 		}
 
-		final ResizeableListDialog dialog = new ResizeableListDialog(fRawDataView.getSite().getShell());
+		final ResizeableListDialog dialog = new ResizeableListDialog(_rawDataView.getSite().getShell());
 
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());
@@ -177,7 +174,7 @@ public class ActionSaveTourInDatabase extends Action {
 		final IDialogSettings settings = getDialogSettings();
 		try {
 			final long personId = settings.getLong(MEMENTO_SELECTED_PERSON);
-			for (final TourPerson person : fPeople) {
+			for (final TourPerson person : _people) {
 				if (person.getPersonId() == personId) {
 					dialog.setInitialSelections(new TourPerson[] { person });
 					break;
@@ -189,7 +186,7 @@ public class ActionSaveTourInDatabase extends Action {
 		dialog.create();
 
 		// disable ok button when no people are available
-		if (fPeople.size() == 0) {
+		if (_people.size() == 0) {
 			dialog.getOkButton().setEnabled(false);
 		}
 
@@ -216,7 +213,7 @@ public class ActionSaveTourInDatabase extends Action {
 	 * @param person
 	 */
 	void setPerson(final TourPerson person) {
-		fTourPerson = person;
+		_tourPerson = person;
 	}
 
 }

@@ -60,6 +60,10 @@ public class Messages extends NLS {
 
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
+	public static String	Dialog_PersonManager_PersonIsNotAvailable_Message;
+
+	public static String	Dialog_PersonManager_PersonIsNotAvailable_Title;
+
 	public static String		Dialog_Print_Chk_TourRangeDisabled;
 	public static String		Dialog_Print_Chk_TourRangeWithDistance;
 	public static String		Dialog_Print_Chk_TourRangeWithoutDistance;
@@ -355,6 +359,10 @@ public class Messages extends NLS {
 	public static String		Dialog_SplitTour_Label_DeviceName;
 
 	public static String	Dialog_SplitTour_Label_OtherFieldsInfo;
+
+	public static String	Dialog_SplitTour_Label_Person;
+
+	public static String	Dialog_SplitTour_Label_Person_Tooltip;
 	public static String		Dialog_SplitTour_Label_SplitMethod;
 	public static String		Dialog_SplitTour_Label_TourStartDateTime;
 	public static String		Dialog_SplitTour_Label_TourTitle;

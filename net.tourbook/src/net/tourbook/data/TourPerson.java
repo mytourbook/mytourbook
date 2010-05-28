@@ -25,6 +25,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
@@ -93,7 +94,10 @@ public class TourPerson {
 	 * @return Return the person first and last name
 	 */
 	public String getName() {
-		return firstName + (lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : " " + lastName); //$NON-NLS-1$
+		return firstName + //
+				(lastName.equals(UI.EMPTY_STRING) ? //
+						UI.EMPTY_STRING
+						: UI.SPACE + lastName);
 	}
 
 	public long getPersonId() {
@@ -143,6 +147,11 @@ public class TourPerson {
 			}
 			em.close();
 		}
+
+		if (isSaved) {
+			PersonManager.refreshPeople();
+		}
+
 		return isSaved;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,15 +38,15 @@ public class WizardImportData extends Wizard {
 
 	public static final String			SYSPROPERTY_IMPORT_PERSON	= "mytourbook.import.person";	//$NON-NLS-1$
 
-	private WizardPageImportSettings	fPageImportSettings;
-	private final List<File>					fReceivedFiles				= new ArrayList<File>();
+	private WizardPageImportSettings	_importSettings;
+	private final List<File>			_receivedFiles				= new ArrayList<File>();
 
 	/**
 	 * contains the device which is used to read the data from it
 	 */
-	private ExternalDevice				fImportDevice;
+	private ExternalDevice				_importDevice;
 
-	private IRunnableWithProgress		fRunnableReceiveData;
+	private IRunnableWithProgress		_runnableReceiveData;
 
 	WizardImportData() {
 
@@ -57,25 +57,21 @@ public class WizardImportData extends Wizard {
 	@Override
 	public void addPages() {
 
-		fPageImportSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
-		addPage(fPageImportSettings);
+		_importSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
+		addPage(_importSettings);
 
 	}
-
-//	public void appendReceivedFile(final File inFile) {
-//		fReceivedFiles.add(inFile);
-//	}
 
 	@Override
 	public boolean performFinish() {
 
-		if (fPageImportSettings.validatePage() == false) {
+		if (_importSettings.validatePage() == false) {
 			return false;
 		}
 
 		receiveData();
 
-		fPageImportSettings.persistDialogSettings();
+		_importSettings.persistDialogSettings();
 
 		return true;
 	}
@@ -85,7 +81,7 @@ public class WizardImportData extends Wizard {
 	 */
 	private boolean receiveData() {
 
-		final Combo comboPorts = fPageImportSettings.fComboPorts;
+		final Combo comboPorts = _importSettings._cboPorts;
 
 		if (comboPorts.isDisposed()) {
 			return false;
@@ -104,15 +100,15 @@ public class WizardImportData extends Wizard {
 		/*
 		 * when the Cancel button is pressed multiple times, the app calls this function each time
 		 */
-		if (fRunnableReceiveData != null) {
+		if (_runnableReceiveData != null) {
 			return false;
 		}
 
 		/*
 		 * set the device which is used to read the data
 		 */
-		fImportDevice = fPageImportSettings.getSelectedDevice();
-		if (fImportDevice == null) {
+		_importDevice = _importSettings.getSelectedDevice();
+		if (_importDevice == null) {
 			return false;
 		}
 
@@ -123,26 +119,26 @@ public class WizardImportData extends Wizard {
 		 * receive data from the device
 		 */
 		try {
-			fRunnableReceiveData = fImportDevice.createImportRunnable(portName, fReceivedFiles);
-			getContainer().run(true, true, fRunnableReceiveData);
+			_runnableReceiveData = _importDevice.createImportRunnable(portName, _receivedFiles);
+			getContainer().run(true, true, _runnableReceiveData);
 		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 
-		if (fReceivedFiles.size() == 0 || fImportDevice.isImportCanceled()) {
+		if (_receivedFiles.size() == 0 || _importDevice.isImportCanceled()) {
 			// data has not been received or the user canceled the import
 			return true;
 		}
 
 		// import received files
 		final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
-		for (final File inFile : fReceivedFiles) {
+		for (final File inFile : _receivedFiles) {
 			rawDataManager.importRawData(
 					inFile,
-					fPageImportSettings.fPathEditor.getStringValue(),
-					fImportDevice.buildNewFileNames,
+					_importSettings._pathEditor.getStringValue(),
+					_importDevice.buildNewFileNames,
 					fileCollision);
 		}
 
@@ -170,7 +166,7 @@ public class WizardImportData extends Wizard {
 						// start downloading
 						final boolean importResult = receiveData();
 
-						fPageImportSettings.persistDialogSettings();
+						_importSettings.persistDialogSettings();
 
 						if (importResult) {
 							getContainer().getShell().close();
