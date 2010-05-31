@@ -857,7 +857,7 @@ public class TourManager {
 															final boolean canFireNotification) {
 
 		TourData tourDataEditorSavedTour = null;
-		boolean fireChangeEvent = false;
+		boolean doFireChangeEvent = false;
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
 		for (final TourData tourData : modifiedTours) {
@@ -912,7 +912,7 @@ public class TourManager {
 					 */
 					tourDataEditor.updateUI(savedTour);
 
-					fireChangeEvent = true;
+					doFireChangeEvent = true;
 
 				} else {
 
@@ -932,7 +932,7 @@ public class TourManager {
 				// save the tour
 				savedTour = TourDatabase.saveTour(tourData);
 
-				fireChangeEvent = true;
+				doFireChangeEvent = true;
 			}
 
 			if (savedTour != null) {
@@ -940,7 +940,7 @@ public class TourManager {
 			}
 		}
 
-		if (canFireNotification && fireChangeEvent) {
+		if (canFireNotification && doFireChangeEvent) {
 			final TourEvent propertyData = new TourEvent(savedTours);
 			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
 			fireEvent(TourEventId.TOUR_CHANGED, propertyData);

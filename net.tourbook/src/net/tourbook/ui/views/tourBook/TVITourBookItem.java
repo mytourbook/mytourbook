@@ -28,11 +28,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	static final Calendar	calendar		= GregorianCalendar.getInstance();
 
-	static final String		SQL_SUM_COLUMNS	= UI.EMPTY_STRING //
-													+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
-													+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
-													+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
-													+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$
+	static final String		SQL_SUM_COLUMNS	= UI.EMPTY_STRING
+											//
+													+ "SUM(TOURDISTANCE)," // 		1	//$NON-NLS-1$
+													+ "SUM(TOURRECORDINGTIME)," //	2	//$NON-NLS-1$
+													+ "SUM(TOURDRIVINGTIME)," //	3	//$NON-NLS-1$
+													+ "SUM(TOURALTUP)," //			4	//$NON-NLS-1$
 													+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
 													+ "SUM(1)," //					6	//$NON-NLS-1$
 													+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
@@ -63,7 +64,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	int						tourDay;
 
 	long					colTourDate;
+//	DateTime				colTourDate;
 	String					colTourTitle;
+	long					colPersonId;										// tourPerson_personId
 
 	long					colCounter;
 	long					colCalories;

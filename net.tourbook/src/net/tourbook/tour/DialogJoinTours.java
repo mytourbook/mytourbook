@@ -24,9 +24,11 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -49,15 +51,11 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.Bullet;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -74,6 +72,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	private static final String					STATE_TOUR_TITLE						= "Title";							//$NON-NLS-1$
 	private static final String					STATE_TOUR_TYPE_ID						= "TourTypeId";					//$NON-NLS-1$
+	private static final String					STATE_PERSON_ID							= "PersonId";						//$NON-NLS-1$
 
 	private static final String					STATE_IS_KEEP_ORIGINAL_TIME				= "isKeepOriginalTime";			//$NON-NLS-1$
 	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";			//$NON-NLS-1$
@@ -166,6 +165,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	private ArrayList<TourData>					_joinedTourDataList;
 
 	private final ArrayList<TourData>			_selectedTours;
+	private TourPerson[]						_people;
 
 	private long								_tourTypeIdFromSelectedTours			= TourDatabase.ENTITY_IS_NOT_SAVED;
 	private long								_tourTypeIdPreviousJoinedTour			= TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -204,6 +204,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	private Button								_chkCreateTourMarker;
 	private Label								_lblMarkerText;
 	private Combo								_cboTourMarker;
+
+	private Combo								_cboPerson;
 
 	public DialogJoinTours(final Shell parentShell, final ArrayList<TourData> selectedTours) {
 
@@ -354,8 +356,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			createUI20Title(_dlgInnerContainer);
 			createUI22TourTime(_dlgInnerContainer, defaultSelectionAdapter);
 			createUI30TypeTags(_dlgInnerContainer);
-			createUI40DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
-			createUI50Info(_dlgInnerContainer);
+			createUI40Person(_dlgInnerContainer);
+			createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
 		}
 	}
 
@@ -581,9 +583,29 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	}
 
 	/**
+	 * person
+	 */
+	private void createUI40Person(final Composite parent) {
+
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(label);
+		label.setText(Messages.Dialog_SplitTour_Label_Person);
+		label.setToolTipText(Messages.Dialog_SplitTour_Label_Person_Tooltip);
+
+		// combo: person
+		_cboPerson = new Combo(parent, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_cboPerson);
+		_cboPerson.setVisibleItemCount(20);
+		_cboPerson.setToolTipText(Messages.Dialog_SplitTour_Label_Person_Tooltip);
+	}
+
+	/**
 	 * checkbox: set marker for each tour
 	 */
-	private void createUI40DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+	private void createUI50DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
 
 		/*
 		 * description
@@ -653,33 +675,33 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		}
 	}
 
-	/**
-	 * info
-	 */
-	private void createUI50Info(final Composite container) {
-
-		final Label label = new Label(container, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
-		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
-
-		// use a bulleted list to display this info
-		final StyleRange style = new StyleRange();
-		style.metrics = new GlyphMetrics(0, 0, 10);
-		final Bullet bullet = new Bullet(style);
-
-		final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
-		final int lineCount = Util.countCharacter(infoText, '\n');
-
-		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.BEGINNING)
-				.indent(0, 10)
-				.span(2, 1)
-				.applyTo(styledText);
-		styledText.setText(infoText);
-		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		styledText.setLineBullet(0, lineCount + 1, bullet);
-	}
+//	/**
+//	 * info
+//	 */
+//	private void createUI50Info(final Composite container) {
+//
+//		final Label label = new Label(container, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+//		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+//
+//		// use a bulleted list to display this info
+//		final StyleRange style = new StyleRange();
+//		style.metrics = new GlyphMetrics(0, 0, 10);
+//		final Bullet bullet = new Bullet(style);
+//
+//		final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
+//		final int lineCount = Util.countCharacter(infoText, '\n');
+//
+//		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+//		GridDataFactory.fillDefaults()//
+//				.align(SWT.FILL, SWT.BEGINNING)
+//				.indent(0, 10)
+//				.span(2, 1)
+//				.applyTo(styledText);
+//		styledText.setText(infoText);
+//		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+//		styledText.setLineBullet(0, lineCount + 1, bullet);
+//	}
 
 	private void enableControls() {
 
@@ -708,6 +730,14 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		// keep window size and position
 //		return _state;
 		return null;
+	}
+
+	private TourPerson getSelectedPerson() {
+
+		final int selectedIndex = _cboPerson.getSelectionIndex();
+		final TourPerson person = _people[selectedIndex];
+
+		return person;
 	}
 
 	@Override
@@ -849,7 +879,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		boolean isJoinPower = false;
 		boolean isJoinPulse = false;
 		boolean isJoinSpeed = false;
-		boolean isJoinTemperature = false;
+//		boolean isJoinTemperature = false;
 		boolean isJoinTime = false;
 
 		final int[] joinedAltitudeSerie = new int[joinedSliceCounter];
@@ -1038,10 +1068,14 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 					joinedLongitudeSerie[joinedSerieIndex] = tourLongitudeSerie[tourSerieIndex];
 					isJoinLon = true;
 				}
+
 				if (isTourTemperature) {
 					joinedTemperatureSerie[joinedSerieIndex] = tourTemperatureSerie[tourSerieIndex];
-					isJoinTemperature = true;
+				} else {
+					// set temperature to temporarily value
+					joinedTemperatureSerie[joinedSerieIndex] = Integer.MIN_VALUE;
 				}
+
 				if (isTourPower) {
 					joinedPowerSerie[joinedSerieIndex] = tourPowerSerie[tourSerieIndex];
 					isJoinPower = true;
@@ -1241,7 +1275,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		_joinedTourData.setTourDrivingTime(joinedDrivingTime);
 		_joinedTourData.setTourDistance(joinedDistance);
 
-
 		// !! tour type and tour tags are already set !!
 
 		if (isJoinAltitude) {
@@ -1268,9 +1301,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		if (isJoinSpeed) {
 			_joinedTourData.setSpeedSerie(joinedSpeedSerie);
 		}
-		if (isJoinTemperature) {
-			_joinedTourData.temperatureSerie = joinedTemperatureSerie;
-		}
+
+		_joinedTourData.temperatureSerie = joinedTemperatureSerie;
+
 		if (isJoinTime) {
 			_joinedTourData.timeSerie = joinedTimeSerie;
 		}
@@ -1279,7 +1312,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		_joinedTourData.computeComputedValues();
 
 		// set person which is required to save a tour
-		_joinedTourData.setTourPerson(TourbookPlugin.getActivePerson());
+		_joinedTourData.setTourPerson(getSelectedPerson());
 
 		/*
 		 * check size of the fields
@@ -1287,6 +1320,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		if (_joinedTourData.isValidForSave() == false) {
 			return false;
 		}
+
+		_joinedTourData.cleanupDataSeries();
 
 		_joinedTourData = TourManager.saveModifiedTour(_joinedTourData);
 
@@ -1385,6 +1420,33 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		final TourData firstTour = _selectedTours.get(0);
 		_dtTourDate.setDate(firstTour.getStartYear(), firstTour.getStartMonth() - 1, firstTour.getStartDay());
 		_dtTourTime.setTime(firstTour.getStartHour(), firstTour.getStartMinute(), firstTour.getStartSecond());
+
+		/*
+		 * fill person combo and reselect previous person
+		 */
+		final long statePersonId = Util.getStateLong(_state, STATE_PERSON_ID, -1);
+
+		if (_people == null) {
+			final ArrayList<TourPerson> people = PersonManager.getTourPeople();
+			_people = people.toArray(new TourPerson[people.size()]);
+		}
+
+		int index = 0;
+		int personIndex = 0;
+
+		for (final TourPerson person : _people) {
+
+			_cboPerson.add(person.getName());
+
+			if (person.getPersonId() == statePersonId) {
+				personIndex = index;
+			}
+
+			index++;
+		}
+
+		_cboPerson.select(personIndex);
+
 	}
 
 	private void saveState() {
@@ -1409,6 +1471,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		_state.put(STATE_IS_INCLUDE_MARKER_WAYPOINTS, _chkIncludeMarkerWaypoints.getSelection());
 		_state.put(STATE_IS_CREATE_TOUR_MARKER, _chkCreateTourMarker.getSelection());
 		_state.put(STATE_MARKER_TYPE, getStateTourMarker());
+
+		// person
+		_state.put(STATE_PERSON_ID, getSelectedPerson().getPersonId());
 	}
 
 	@Override

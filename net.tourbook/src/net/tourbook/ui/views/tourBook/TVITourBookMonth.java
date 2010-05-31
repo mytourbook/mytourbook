@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
@@ -49,7 +49,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = UI.EMPTY_STRING + // 
+		final String sqlString = UI.EMPTY_STRING + //
 				//
 				"SELECT " //								//$NON-NLS-1$
 				//
@@ -72,8 +72,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ "avgPulse," //						17	//$NON-NLS-1$
 				+ "avgCadence," //						18	//$NON-NLS-1$
 				+ "avgTemperature," //					19	//$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId,"//			20	//$NON-NLS-1$ 
-				+ "Tmarker.markerId,"//					21	//$NON-NLS-1$ 
+				+ "jTdataTtag.TourTag_tagId,"//			20	//$NON-NLS-1$
+				+ "Tmarker.markerId,"//					21	//$NON-NLS-1$
 				+ "startHour," //						22	//$NON-NLS-1$
 				+ "startMinute," //						23	//$NON-NLS-1$
 				+ "startWeek," //						24	//$NON-NLS-1$
@@ -84,7 +84,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ "weatherClouds," //                   28  //$NON-NLS-1$
 				+ "restPulse," //                    	29  //$NON-NLS-1$
 
-				+ "calories" //							30	//$NON-NLS-1$
+				+ "calories," //						30	//$NON-NLS-1$
+				+ "tourPerson_personId" //				31	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -190,6 +191,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.colRestPulse = result.getInt(29);
 
 					tourItem.colCalories = result.getInt(30);
+					tourItem.colPersonId = result.getLong(31);
 
 					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.colTourDate = calendar.getTimeInMillis();
@@ -223,7 +225,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 				prevTourId = resultTourId;
 			}
 
-//			TourDatabase.disableRuntimeStatistic(conn); 
+//			TourDatabase.disableRuntimeStatistic(conn);
 
 			conn.close();
 

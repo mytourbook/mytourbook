@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
 
@@ -24,11 +24,11 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 public class PostSelectionProvider implements IPostSelectionProvider {
 
-	ListenerList				postSelectionListeners	= new ListenerList();
-	private ISelection			currentSelection;
+	private ListenerList	_postSelectionListeners	= new ListenerList();
+	private ISelection		_currentSelection;
 
 	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
-		postSelectionListeners.add(listener);
+		_postSelectionListeners.add(listener);
 	}
 
 	public void addSelectionChangedListener(final ISelectionChangedListener listener) {}
@@ -37,15 +37,15 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 	 * Clears the current selection in the selection provider
 	 */
 	public void clearSelection() {
-		currentSelection = null;
+		_currentSelection = null;
 	}
 
 	public ISelection getSelection() {
-		return currentSelection;
+		return _currentSelection;
 	}
 
 	public void removePostSelectionChangedListener(final ISelectionChangedListener listener) {
-		postSelectionListeners.remove(listener);
+		_postSelectionListeners.remove(listener);
 	}
 
 	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {}
@@ -56,11 +56,12 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 			return;
 		}
 
-		currentSelection = selection;
+		_currentSelection = selection;
 
-		final SelectionChangedEvent event = new SelectionChangedEvent(this, currentSelection);
+		final SelectionChangedEvent event = new SelectionChangedEvent(this, _currentSelection);
 
-		final Object[] listeners = postSelectionListeners.getListeners();
+		final Object[] listeners = _postSelectionListeners.getListeners();
+
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {

@@ -184,6 +184,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Tour_WeekDay_Header;
 	public static String		ColumnFactory_Tour_WeekDay_Label;
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
+
+	public static String	ColumnFactory_TourPerson;
+
+	public static String	ColumnFactory_TourPerson_Tooltip;
 	public static String		ColumnFactory_TourWeekYear_Header;
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;

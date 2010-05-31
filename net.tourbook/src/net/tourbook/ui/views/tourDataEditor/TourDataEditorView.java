@@ -1609,6 +1609,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						updateUIFromModel(_tourData, false, true);
 					}
+
+				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+					// display renamed person
+
+					// updateUITab4Info(); do NOT work
+					//
+					// tour data must be reloaded
 				}
 			}
 		};

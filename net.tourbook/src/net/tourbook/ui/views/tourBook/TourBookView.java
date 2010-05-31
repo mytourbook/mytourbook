@@ -28,6 +28,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.export.ActionExport;
 import net.tourbook.plugin.TourbookPlugin;
@@ -60,6 +61,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.util.ColumnManager;
@@ -138,6 +140,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private TVITourBookRoot					_rootItem;
 
 	private NumberFormat					_nf									= NumberFormat.getNumberInstance();
+
 	private Calendar						_calendar							= GregorianCalendar.getInstance();
 	private DateFormat						_timeFormatter						= DateFormat
 																						.getTimeInstance(DateFormat.SHORT);
@@ -182,6 +185,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionModifyColumns				_actionModifyColumns;
 	private ActionRefreshView				_actionRefreshView;
 
+	private ActionSetPerson			_actionSetOtherPerson;
 	private ActionJoinTours					_actionJoinTours;
 	private ActionExport					_actionExportTour;
 	private ActionPrint						_actionPrintTour;
@@ -386,6 +390,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionJoinTours = new ActionJoinTours(this);
+		_actionSetOtherPerson = new ActionSetPerson(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 		_actionAddTag = new ActionSetTourTag(this, true);
@@ -531,48 +536,50 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		final PixelConverter pc = new PixelConverter(parent);
 
-		defineColumnDate(pixelConverter);
-		defineColumnWeekDay(pixelConverter);
-		defineColumnTime(pixelConverter);
-		defineColumnTourType(pixelConverter);
+		defineColumnDate(pc);
+		defineColumnWeekDay(pc);
+		defineColumnTime(pc);
+		defineColumnTourType(pc);
 
-		defineColumnDistance(pixelConverter);
-		defineColumnAltitudeUp(pixelConverter);
-		defineColumnTimeDriving(pixelConverter);
+		defineColumnDistance(pc);
+		defineColumnAltitudeUp(pc);
+		defineColumnTimeDriving(pc);
 
-		defineColumnWeatherClouds(pixelConverter);
-		defineColumnTitle(pixelConverter);
-		defineColumnTags(pixelConverter);
+		defineColumnWeatherClouds(pc);
+		defineColumnTitle(pc);
+		defineColumnTags(pc);
 
-		defineColumnMarker(pixelConverter);
-		defineColumnCalories(pixelConverter);
-		defineColumnRestPulse(pixelConverter);
+		defineColumnMarker(pc);
+		defineColumnCalories(pc);
+		defineColumnRestPulse(pc);
 
-		defineColumnTimeRecording(pixelConverter);
-		defineColumnTimeBreak(pixelConverter);
-		defineColumnTimeBreakRelative(pixelConverter);
+		defineColumnTimeRecording(pc);
+		defineColumnTimeBreak(pc);
+		defineColumnTimeBreakRelative(pc);
 
-		defineColumnAltitudeDown(pixelConverter);
+		defineColumnAltitudeDown(pc);
 
-		defineColumnMaxAltitude(pixelConverter);
-		defineColumnMaxSpeed(pixelConverter);
-		defineColumnMaxPulse(pixelConverter);
+		defineColumnMaxAltitude(pc);
+		defineColumnMaxSpeed(pc);
+		defineColumnMaxPulse(pc);
 
-		defineColumnAvgSpeed(pixelConverter);
-		defineColumnAvgPace(pixelConverter);
-		defineColumnAvgPulse(pixelConverter);
-		defineColumnAvgCadence(pixelConverter);
-		defineColumnAvgTemperature(pixelConverter);
+		defineColumnAvgSpeed(pc);
+		defineColumnAvgPace(pc);
+		defineColumnAvgPulse(pc);
+		defineColumnAvgCadence(pc);
+		defineColumnAvgTemperature(pc);
 
-		defineColumnWeatherWindSpeed(pixelConverter);
-		defineColumnWeatherWindDirection(pixelConverter);
+		defineColumnWeatherWindSpeed(pc);
+		defineColumnWeatherWindDirection(pc);
 
-		defineColumnWeekNo(pixelConverter);
-		defineColumnWeekYear(pixelConverter);
-		defineColumnTimeInterval(pixelConverter);
-		defineColumnDeviceDistance(pixelConverter);
+		defineColumnWeekNo(pc);
+		defineColumnWeekYear(pc);
+		defineColumnTimeInterval(pc);
+		defineColumnDeviceDistance(pc);
+
+		defineColumnPerson(pc);
 	}
 
 	/**
@@ -971,6 +978,28 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 
 				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: person
+	 */
+	private void defineColumnPerson(final PixelConverter pixelConverter) {
+		
+		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					
+					final long dbPersonId = ((TVITourBookTour) element).colPersonId;
+
+					cell.setText(PersonManager.getPersonName(dbPersonId));
+
+//					setCellColor(cell, element);
+				}
 			}
 		});
 	}
@@ -1472,8 +1501,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		_actionJoinTours.setEnabled(tourItems > 1);
-		_actionExportTour.setEnabled(isTourSelected);
+		_actionSetOtherPerson.setEnabled(isTourSelected);
 
+		_actionExportTour.setEnabled(isTourSelected);
 		_actionPrintTour.setEnabled(isTourSelected);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1579,6 +1609,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionOpenTagPrefs);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(_actionSetOtherPerson);
 		menuMgr.add(_actionDeleteTour);
 
 		enableActions();
@@ -1960,7 +1991,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
-
 	}
 
 	private void saveState() {

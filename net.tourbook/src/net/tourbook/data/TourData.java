@@ -398,8 +398,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	@XmlElementWrapper(name="TourMarkers")
-	@XmlElement(name="TourMarker")
+	@XmlElementWrapper(name = "TourMarkers")
+	@XmlElement(name = "TourMarker")
 	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
 	/**
@@ -759,7 +759,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Removed data series when the sum of all values is 0
 	 */
-	private void cleanupDataSeries() {
+	public void cleanupDataSeries() {
 
 		int sumAltitude = 0;
 		int sumCadence = 0;
@@ -800,8 +800,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				sumPulse += pulseSerie[serieIndex];
 			}
 			if (temperatureSerie != null) {
+
 				final int temp = temperatureSerie[serieIndex];
-				sumTemperature += (temp < 0) ? -temp : temp;
+
+				if (temp == Integer.MIN_VALUE) {
+					// remove invalid values which are set temporaritly
+					temperatureSerie[serieIndex] = 0;
+				} else {
+					sumTemperature += temp < 0 ? -temp : temp;
+				}
 			}
 			if (powerSerie != null) {
 				sumPower += powerSerie[serieIndex];
@@ -1557,12 +1564,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		long temperatureSum = 0;
+		int tempLength = temperatureSerie.length;
 
 		for (final int temperature : temperatureSerie) {
-			temperatureSum += temperature;
+			if (temperature == Integer.MIN_VALUE) {
+				// ignore invalid values
+				tempLength--;
+			} else {
+				temperatureSum += temperature;
+			}
 		}
 
-		final int tempLength = temperatureSerie.length;
 		if (tempLength > 0) {
 			avgTemperature = (int) temperatureSum / tempLength;
 		}
@@ -4039,11 +4051,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public boolean isTourImportFilePathAvailable() {
-		
+
 		if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
 			return true;
 		}
-		
+
 		return false;
 	}
 

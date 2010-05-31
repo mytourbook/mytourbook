@@ -148,6 +148,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 																								.getDefault()
 																								.getPreferenceStore();
 
+	private boolean									_isPartVisible;
+
+	/**
+	 * contains selection which was set when the part is hidden
+	 */
+	private ISelection								_selectionWhenHidden;
+
 	private ISelectionListener						_postSelectionListener;
 	private IPropertyChangeListener					_prefChangeListener;
 	private IPropertyChangeListener					_tourbookPrefChangeListener;
@@ -547,7 +554,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourMapView.this) {
+					_isPartVisible = false;
+				}
+			}
 
 			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -556,7 +567,19 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourMapView.this) {
+
+					_isPartVisible = true;
+
+					if (_selectionWhenHidden != null) {
+
+						onSelectionChanged(_selectionWhenHidden);
+
+						_selectionWhenHidden = null;
+					}
+				}
+			}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
 	}
@@ -1254,6 +1277,19 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		if (_isPartVisible == false) {
+
+			if (selection instanceof SelectionTourData
+					|| selection instanceof SelectionTourId
+					|| selection instanceof SelectionTourIds
+					|| selection instanceof SelectionActiveEditor) {
+
+				// keep only selected tours
+				_selectionWhenHidden = selection;
+			}
+			return;
+		}
+
 		if (selection instanceof SelectionTourData) {
 
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
@@ -1448,6 +1484,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			if (refItem != null) {
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
+
 				paintOneTour(tourData, false, true);
 
 				enableActions();

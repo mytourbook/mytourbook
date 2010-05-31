@@ -58,6 +58,8 @@ public class Messages extends NLS {
 
 	public static String		Dialog_ExtractTour_DlgArea_Title;
 
+	public static String	Dialog_ExtractTour_Label_DeviceName;
+
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
 	public static String	Dialog_PersonManager_PersonIsNotAvailable_Message;
@@ -210,6 +212,8 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
+
+	public static String	App_Action_SetPerson;
 
 	public static String		App_Action_SplitTour;
 

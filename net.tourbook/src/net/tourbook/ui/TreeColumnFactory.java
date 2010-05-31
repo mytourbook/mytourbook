@@ -236,8 +236,7 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
-public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
-		
+	public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
@@ -378,6 +377,21 @@ public static final TreeColumnFactory DEVICE_NAME = new TreeColumnFactory() {
 			colDef.setColumnUnit(Messages.ColumnFactory_paused_relative_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_paused_time_relative_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+
+	public static final TreeColumnFactory PERSON = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourPerson", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourPerson);
+			colDef.setColumnHeader(Messages.ColumnFactory_TourPerson);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourPerson_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			return colDef;
 		};

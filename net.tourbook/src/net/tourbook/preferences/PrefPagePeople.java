@@ -26,6 +26,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;
@@ -752,7 +753,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	private void firePersonListModifyEvent() {
+
 		if (_isPersonListModified) {
+
+			TourManager.getInstance().clearTourDataCache();
 
 			// fire bike list modify event
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED, Math.random());

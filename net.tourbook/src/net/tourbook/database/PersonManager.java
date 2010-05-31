@@ -22,6 +22,7 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -71,6 +72,28 @@ public class PersonManager {
 
 			em.close();
 		}
+	}
+
+	/**
+	 * @param personId
+	 * @return Returns the person name (first + last) for the person id or an empty string when
+	 *         person is not available
+	 */
+	public static String getPersonName(final long personId) {
+
+		ArrayList<TourPerson> people = _people;
+
+		if (people != null) {
+			people = getTourPeople();
+		}
+
+		for (final TourPerson tourPerson : people) {
+			if (tourPerson.getPersonId() == personId) {
+				return tourPerson.getName();
+			}
+		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	/**

@@ -67,6 +67,7 @@ public class ActionSplitTour extends Action {
 				Display.getCurrent().getActiveShell(),
 				selectedTours.get(0),
 				_tourSplitIndex,
+				-1,
 				_tourDataEditor).open();
 	}
 
