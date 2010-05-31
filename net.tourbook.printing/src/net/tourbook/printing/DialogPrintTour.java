@@ -27,7 +27,6 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
@@ -410,38 +409,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 	}
 
-	private void createUIPaperFormat(final Composite parent) {
-
-		// container
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Dialog_Print_Group_Paper);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group); 
-		{
-			createUIPaperSize(group);
-			createUIPaperOrientation(group);
-		}
-	}
-	
-	private void createUIPaperSize(final Composite parent){
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Dialog_Print_Label_Paper_Size);
-		_comboPaperSize = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
-		_comboPaperSize.setVisibleItemCount(2);
-		_comboPaperSize.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		_comboPaperSize.setItems(PAPER_SIZE_ITEMS);
-	}
-	
-	private void createUIPaperOrientation(final Composite parent){
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Dialog_Print_Label_Paper_Orientation);
-		_comboPaperOrientation = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
-		_comboPaperOrientation.setVisibleItemCount(2);
-		_comboPaperOrientation.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		_comboPaperOrientation.setItems(PAPER_ORIENTATION_ITEMS);
-	}
-	
-	
 	private void createUIOption(final Composite parent) {
 
 		// container
@@ -454,7 +421,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			createUIOptionPrintNotes(group);
 		}
 	}
-
+	
 	private void createUIOptionPrintMarkers(final Composite parent) {
 
 		/*
@@ -465,7 +432,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_chkPrintMarkers.setText(Messages.Dialog_Print_Chk_PrintMarkers);
 		_chkPrintMarkers.setToolTipText(Messages.Dialog_Print_Chk_PrintMarkers_Tooltip);
 	}
-
+	
 	private void createUIOptionPrintNotes(final Composite parent) {
 
 		/*
@@ -475,6 +442,38 @@ public class DialogPrintTour extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkPrintNotes);
 		_chkPrintNotes.setText(Messages.Dialog_Print_Chk_PrintNotes);
 		_chkPrintNotes.setToolTipText(Messages.Dialog_Print_Chk_PrintNotes_Tooltip);
+	}
+	
+	
+	private void createUIPaperFormat(final Composite parent) {
+
+		// container
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Dialog_Print_Group_Paper);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group); 
+		{
+			createUIPaperSize(group);
+			createUIPaperOrientation(group);
+		}
+	}
+
+	private void createUIPaperOrientation(final Composite parent){
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Dialog_Print_Label_Paper_Orientation);
+		_comboPaperOrientation = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_comboPaperOrientation.setVisibleItemCount(2);
+		_comboPaperOrientation.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		_comboPaperOrientation.setItems(PAPER_ORIENTATION_ITEMS);
+	}
+
+	private void createUIPaperSize(final Composite parent){
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Dialog_Print_Label_Paper_Size);
+		_comboPaperSize = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
+		_comboPaperSize.setVisibleItemCount(2);
+		_comboPaperSize.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		_comboPaperSize.setItems(PAPER_SIZE_ITEMS);
 	}
 
 	private void createUIProgress(final Composite parent) {
@@ -554,9 +553,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 					//TODO handle exception
 					//System.out.println("tour id:"+tourData.getTourId());	
 					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, printSettings);
-				} catch (FOPException e) {
+				} catch (final FOPException e) {
 					e.printStackTrace();
-				} catch (TransformerException e) {
+				} catch (final TransformerException e) {
 					e.printStackTrace();
 				}
 			}
@@ -606,11 +605,11 @@ public class DialogPrintTour extends TitleAreaDialog {
 								//TODO handle exception
 								printSettings.setCompleteFilePath(filePath.toOSString());
 								((PrintTourPDF)_printExtensionPoint).printPDF(tourData, printSettings);
-							} catch (FOPException e) {
+							} catch (final FOPException e) {
 								e.printStackTrace();
-							} catch (TransformerException e) {
+							} catch (final TransformerException e) {
 								e.printStackTrace();
-							} catch (FileNotFoundException e) {
+							} catch (final FileNotFoundException e) {
 								e.printStackTrace();
 							}
 						}			
@@ -629,16 +628,16 @@ public class DialogPrintTour extends TitleAreaDialog {
 		}
 	}
 
+	private void enableFields() {
+		_comboFile.setEnabled(true);
+	}
+
 	private void enablePrintButton(final boolean isEnabled) {
 		final Button okButton = getButton(IDialogConstants.OK_ID);
 		if (okButton != null) {
 
 			okButton.setEnabled(isEnabled);
 		}
-	}
-
-	private void enableFields() {
-		_comboFile.setEnabled(true);
 	}
 
 	@Override
@@ -733,7 +732,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		try {
 			_comboPaperSize.select(_state.getInt(STATE_PAPER_SIZE));
 			_comboPaperOrientation.select(_state.getInt(STATE_PAPER_ORIENTATION));			
-		} catch (NumberFormatException nfe){
+		} catch (final NumberFormatException nfe){
 			_comboPaperSize.select(0);
 			_comboPaperOrientation.select(0);
 		}
