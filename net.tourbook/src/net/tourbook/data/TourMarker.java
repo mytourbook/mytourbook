@@ -81,6 +81,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	private int						type;
 
+	@XmlElement
 	private int						time;
 
 	/**

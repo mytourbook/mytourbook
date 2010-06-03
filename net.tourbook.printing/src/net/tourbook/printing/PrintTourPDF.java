@@ -29,7 +29,6 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
-import org.apache.fop.render.afp.tools.StringUtils;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -89,14 +88,14 @@ public class PrintTourPDF extends PrintTourExtension {
 		try {
 			// setup pdf outpoutStream
 			File pdfFile = new File(printSettings.getCompleteFilePath());
-			
+
 			if (pdfFile.exists()) {
 				if (printSettings.isOverwriteFiles()) {
 					// overwrite is enabled in the UI
 				} else {
 					final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
 					canWriteFile = UI.confirmOverwrite(fileCollisionBehaviour, pdfFile);
-					
+
 					if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
 						return;
 					}
@@ -104,26 +103,27 @@ public class PrintTourPDF extends PrintTourExtension {
 			}
 
 			if (canWriteFile) {
-				
+
 				pdfContentStream = new FileOutputStream(pdfFile);
 				pdfContent = new BufferedOutputStream(pdfContentStream);
 
 				// setup xml input source
 				final String xml = object.toXml();
-							
-				/* debug logging
-				System.err.println("--------------------------------------------------------");
-				System.err.println(object.toXml());
-				System.err.println("--------------------------------------------------------");
-							
-				XStream xStream = new XStream();
-				try {
-					FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"), xStream.toXML(object));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				*/
-				
+
+				/*
+				 * debug logging
+				 * System.err.println("--------------------------------------------------------");
+				 * System.err.println(object.toXml());
+				 * System.err.println("--------------------------------------------------------");
+				 * XStream xStream = new XStream();
+				 * try {
+				 * FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"),
+				 * xStream.toXML(object));
+				 * } catch (IOException e) {
+				 * e.printStackTrace();
+				 * }
+				 */
+
 				final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 
 				// setup xsl stylesheet source
@@ -139,8 +139,8 @@ public class PrintTourPDF extends PrintTourExtension {
 				foUserAgent.setProducer(this.getClass().getName());
 				final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
-				setTransformationParameters((TourData)object, transformer, printSettings);
-				
+				setTransformationParameters((TourData) object, transformer, printSettings);
+
 				// perform transformation
 				final Result res = new SAXResult(fop.getDefaultHandler());
 				transformer.transform(xmlSource, res);
@@ -157,34 +157,52 @@ public class PrintTourPDF extends PrintTourExtension {
 		}
 	}
 
+	/*
+	private void createMapForPrinting(final TourData _tourData, final Shell parentShell) {
+
+		final Display display = new Display();
+		final Shell shell = new Shell(display);
+		shell.setSize(800, 600);
+
+		final TourMapView tmv = new TourMapView();
+
+		tmv.paintOneTourForPrinting(_tourData);
+
+		final Canvas map = tmv.getMap();
+
+		final Image image = new Image(shell.getDisplay(), 800, 600);
+
+		GC gc = new GC(map);
+		gc.copyArea(image, 0, 0);
+		gc.dispose();
+
+		ImageData data = image.getImageData();
+		ImageLoader loader = new ImageLoader();
+		loader.data = new ImageData[] { data };
+		loader.save("c:/temp/image.png", SWT.IMAGE_PNG);
+
+		image.dispose();
+
+	}
+	*/
+
 	/**
 	 * configures parameters used in the xsl transformation
+	 * 
 	 * @param _tourData
 	 * @param _transformer
 	 */
-	private void setTransformationParameters(final TourData _tourData, final Transformer _transformer, final PrintSettings printSettings){
-		_transformer.setParameter("isPrintMarkers", printSettings.isPrintMarkers());
-		_transformer.setParameter("isPrintDescription", printSettings.isPrintDescription());
-		
-		_transformer.setParameter("paperSize", printSettings.getPaperSize().toString());
-		_transformer.setParameter("paperOrientation", printSettings.getPaperOrientation().toString());
-		
+	private void setTransformationParameters(	final TourData _tourData,
+												final Transformer _transformer,
+												final PrintSettings _printSettings) {
+		_transformer.setParameter("isPrintMarkers", _printSettings.isPrintMarkers());
+		_transformer.setParameter("isPrintDescription", _printSettings.isPrintDescription());
+
+		_transformer.setParameter("paperSize", _printSettings.getPaperSize().toString());
+		_transformer.setParameter("paperOrientation", _printSettings.getPaperOrientation().toString());
+
 		_transformer.setParameter("startDate", formatStartDate(_tourData));
-		
-		_transformer.setParameter("tourTime", (_tourData.getTourRecordingTime() / 3600) + ":" 
-				+ StringUtils.lpad(""+((_tourData.getTourRecordingTime() % 3600) / 60), '0', 2) + ":" 
-				+ StringUtils.lpad(""+(_tourData.getTourRecordingTime() % 3600) % 60, '0', 2));
-		
-		_transformer.setParameter("tourDrivingTime", (_tourData.getTourDrivingTime() / 3600) + ":" 
-				+ StringUtils.lpad(""+((_tourData.getTourDrivingTime() % 3600) / 60), '0', 2) + ":"
-				+ StringUtils.lpad(""+(_tourData.getTourDrivingTime() % 3600) % 60, '0', 2));			
-		
-		final int tourBreakTime = _tourData.getTourRecordingTime() - _tourData.getTourDrivingTime();
-		
-		_transformer.setParameter("tourBreakTime", StringUtils.lpad(""+(tourBreakTime / 3600), '0', 1) + ":" 
-				+ StringUtils.lpad(""+((tourBreakTime % 3600) / 60), '0', 2) + ":"
-				+ StringUtils.lpad(""+(tourBreakTime % 3600) % 60, '0', 2));
-		
+
 		_transformer.setParameter("unitAltitude", new Double(UI.UNIT_VALUE_ALTITUDE));
 		_transformer.setParameter("unitDistance", new Double(UI.UNIT_VALUE_DISTANCE));
 		_transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE);
@@ -194,8 +212,9 @@ public class PrintTourPDF extends PrintTourExtension {
 		_transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE);
 		_transformer.setParameter("unitLabelHeartBeat", Messages.Value_Unit_Pulse);
 		_transformer.setParameter("unitLabelCadence", Messages.Value_Unit_Cadence);
+		_transformer.setParameter("unitLabelCalories", Messages.Value_Unit_Calories);
 	}
-	
+
 	@Override
 	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 

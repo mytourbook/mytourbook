@@ -16,9 +16,31 @@
 	<xsl:param name="unitLabelTemperature" select="''" />
 	<xsl:param name="unitLabelHeartBeat" select="''" />
 	<xsl:param name="unitLabelCadence" select="''" />
-	<xsl:param name="tourTime" select="''" />
-	<xsl:param name="tourBreakTime" select="''" />
-	<xsl:param name="tourDrivingTime" select="''" />
+	<xsl:param name="unitLabelCalories" select="''" />
+			
+	<xsl:template name="FormatTime">
+		<xsl:param name="theTime" />
+		<xsl:variable name="hh">
+      		<xsl:value-of select="floor($theTime div 3600)" />
+    	</xsl:variable>
+		<xsl:variable name="mm">
+      		<xsl:value-of select="floor(($theTime mod 3600) div 60)" />
+    	</xsl:variable>
+		<xsl:variable name="ss">
+      		<xsl:value-of select="($theTime mod 3600) mod 60" />
+    	</xsl:variable>
+    	<xsl:value-of select="$hh"/>
+    	<xsl:value-of select="':'"/>
+ 		<xsl:if test="(string-length($mm) &lt; 2)">
+      		<xsl:value-of select="0"/>
+    	</xsl:if>    	
+     	<xsl:value-of select="$mm"/>
+    	<xsl:value-of select="':'"/>
+ 		<xsl:if test="(string-length($ss) &lt; 2)">
+      		<xsl:value-of select="0"/>
+    	</xsl:if>    	
+     	<xsl:value-of select="$ss"/>
+	</xsl:template>
 			
 	<!-- ========================= -->
 	<!-- root element: TourData -->
@@ -140,7 +162,11 @@
 									<fo:block text-align="right" vertical-align="top">Tour time:</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
-									<fo:block text-align="left"><xsl:value-of select="$tourTime" /></fo:block>
+									<fo:block text-align="left">
+										<xsl:call-template name="FormatTime">
+	          								<xsl:with-param name="theTime" select="tourRecordingTime"/>
+	        							</xsl:call-template>									
+									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<!-- tour moving time -->
@@ -149,7 +175,11 @@
 									<fo:block text-align="right" vertical-align="top">Tour pausing time:</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
-									<fo:block text-align="left"><xsl:value-of select="$tourBreakTime" /></fo:block>
+									<fo:block text-align="left">
+										<xsl:call-template name="FormatTime">
+	          								<xsl:with-param name="theTime" select="tourRecordingTime - tourDrivingTime"/>
+	        							</xsl:call-template>									
+									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<!-- tour moving time -->
@@ -158,7 +188,11 @@
 									<fo:block text-align="right" vertical-align="top">Tour moving time:</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
-									<fo:block text-align="left"><xsl:value-of select="$tourDrivingTime" /></fo:block>
+									<fo:block text-align="left">
+										<xsl:call-template name="FormatTime">
+	          								<xsl:with-param name="theTime" select="tourDrivingTime"/>
+	        							</xsl:call-template>
+	        						</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<!-- tour distance -->
@@ -198,6 +232,15 @@
 	    					</fo:table-row>
 	    				</fo:table-header>
 						<fo:table-body>
+							<!-- rest pulse -->
+							<fo:table-row>
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+									<fo:block text-align="right" vertical-align="top">Rest pulse:</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+									<fo:block text-align="left"><xsl:value-of select="restPulse" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelHeartBeat" /></fo:block>
+								</fo:table-cell>
+							</fo:table-row>
 							<!-- maximum pulse -->
 							<fo:table-row>
 								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
@@ -214,6 +257,15 @@
 								</fo:table-cell>
 								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 									<fo:block text-align="left"><xsl:value-of select="avgPulse" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelHeartBeat" /></fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+							<!-- calories -->
+							<fo:table-row>
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+									<fo:block text-align="right" vertical-align="top">Calories:</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+									<fo:block text-align="left"><xsl:value-of select="calories" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelCalories" /></fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<!-- average cadence -->
@@ -288,11 +340,12 @@
 
 			<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 				<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-					<fo:table-column column-width="25%" />
-					<fo:table-column column-width="75%" />
+					<fo:table-column column-width="15%" />
+					<fo:table-column column-width="15%" />
+					<fo:table-column column-width="70%" />
 					<fo:table-header>
 	   					<fo:table-row>
-	   						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
+	   						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="3" background-color="#E1E1E1">
 	   							<fo:block text-align="center" vertical-align="middle">
 	   								Tour Markers
 	   							</fo:block>
@@ -308,7 +361,16 @@
 									<!-- tour marker -->
 									<fo:table-row>
 										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
-											<fo:block text-align="right" vertical-align="top" white-space-collapse="false" white-space="pre"><xsl:value-of select="format-number(distance div 1000 div $unitDistance, '#.##')" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelDistance" /></fo:block>
+											<fo:block text-align="left" vertical-align="top" white-space-collapse="false" white-space="pre">
+												<xsl:call-template name="FormatTime">
+	          										<xsl:with-param name="theTime" select="time"/>
+	        									</xsl:call-template>
+											</fo:block>
+										</fo:table-cell>
+										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+											<fo:block text-align="left" vertical-align="top" white-space-collapse="false" white-space="pre">								
+												<xsl:value-of select="format-number(distance div 1000 div $unitDistance, '#.##')" /><xsl:text>&#160;</xsl:text><xsl:value-of select="$unitLabelDistance" />
+											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 											<fo:block text-align="left"><xsl:value-of select="label" /></fo:block>
@@ -319,7 +381,7 @@
 						</xsl:when> 
 						<xsl:otherwise> 
 							<fo:table-row>
-								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt" number-columns-spanned="2">
+								<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt" number-columns-spanned="3">
 									<fo:block text-align="left">No markers found.</fo:block>
 								</fo:table-cell>
 							</fo:table-row>

@@ -264,6 +264,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * total recording time in seconds
 	 */
+	@XmlElement
 	private int							tourRecordingTime;
 
 	/**
@@ -325,6 +326,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int							weatherWindDir;															// db-version 8
 	private int							weatherWindSpd;															// db-version 8
 	private String						weatherClouds;																// db-version 8
+	@XmlElement
 	private int							restPulse;																	// db-version 8
 
 	@XmlElement
@@ -337,6 +339,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	private String						tourEndPlace;																// db-version 4
 
+	@XmlElement
 	private Integer						calories;																	// db-version 4
 	private float						bikerWeight;																// db-version 4
 
