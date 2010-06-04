@@ -815,7 +815,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 				_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
+						final boolean isTileInfo = _chkShowTileInfo.getSelection();
+						_map.setShowDebugInfo(isTileInfo, isTileInfo);
 					}
 				});
 
@@ -1382,7 +1383,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_prefPageMapFactory.deleteOfflineMap(_mpWms);
 
 		_map.setZoom(zoom);
-		_map.setGeoCenterPosition(center);
+		_map.setMapCenter(center);
 
 		// display map
 		_map.queueMapRedraw();
@@ -1400,7 +1401,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		// debug tile info
 		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
 		_chkShowTileInfo.setSelection(isShowDebugInfo);
-		_map.setShowDebugInfo(isShowDebugInfo);
+		_map.setShowDebugInfo(isShowDebugInfo, isShowDebugInfo);
 
 		// tile image logging
 		final boolean isShowImageLogging = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
@@ -1444,7 +1445,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			positionRect.setRect(positionRect.getX(), 0.0d, positionRect.getWidth(), positionRect.getHeight());
 //		}
 
-		java.awt.Rectangle viewport = _map.getMapPixelViewport();
+		java.awt.Rectangle viewport = _map.getWorldPixelViewport();
 
 //		System.out.println();
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -1501,7 +1502,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			final Point center = new Point((int) centerX, (int) centerY);
 
 			final GeoPosition devCenter = mp.pixelToGeo(center, zoom);
-			_map.setGeoCenterPosition(devCenter);
+			_map.setMapCenter(devCenter);
 
 			// check zoom level
 			if (++zoom >= maximumZoomLevel) {
@@ -1511,7 +1512,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			_map.setZoom(zoom);
 
 			positionRect = getPositionBounds(positions, zoom);
-			viewport = _map.getMapPixelViewport();
+			viewport = _map.getWorldPixelViewport();
 		}
 
 		// the algorithm generated a larger zoom level as necessary
@@ -1654,7 +1655,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		if (isUpdatePosition) {
 			// set position to previous position
 			_map.setZoom(_mpWms.getLastUsedZoom());
-			_map.setGeoCenterPosition(_mpWms.getLastUsedPosition());
+			_map.setMapCenter(_mpWms.getLastUsedPosition());
 		}
 	}
 
@@ -1679,12 +1680,12 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 		if (mapZoom < factoryMinZoom) {
 			_map.setZoom(factoryMinZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		if (mapZoom > factoryMaxZoom) {
 			_map.setZoom(factoryMaxZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 	}
 

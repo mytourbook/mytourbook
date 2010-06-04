@@ -511,6 +511,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory ID = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "id", SWT.LEAD); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Id_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_Id_Label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Id_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory LATITUDE = new TableColumnFactory() {
 		
 		@Override

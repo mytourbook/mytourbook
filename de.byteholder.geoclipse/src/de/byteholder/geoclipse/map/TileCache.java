@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
@@ -26,38 +26,38 @@ import java.util.concurrent.Future;
  */
 public class TileCache {
 
-	private int										fMaxTiles		= 10;
+	private final int								_maxTiles;
 
-	private final ConcurrentHashMap<String, Tile>	tileCache		= new ConcurrentHashMap<String, Tile>();
-	private final ConcurrentLinkedQueue<String>		tileCacheFifo	= new ConcurrentLinkedQueue<String>();
+	private final ConcurrentHashMap<String, Tile>	_tileCache		= new ConcurrentHashMap<String, Tile>();
+	private final ConcurrentLinkedQueue<String>		_tileCacheFifo	= new ConcurrentLinkedQueue<String>();
 
 	public TileCache(final int maxTiles) {
-		fMaxTiles = maxTiles;
+		_maxTiles = maxTiles;
 	}
 
 	public void add(final String tileKey, final Tile tile) {
 
 		// check if space is available in the cache
-		final int cacheSize = tileCacheFifo.size();
-		if (cacheSize > fMaxTiles) {
+		final int cacheSize = _tileCacheFifo.size();
+		if (cacheSize > _maxTiles) {
 
-			// remove cached tiles 
-			for (int cacheIndex = fMaxTiles; cacheIndex < cacheSize; cacheIndex++) {
-				removeTile(tileCacheFifo.poll());
+			// remove cached tiles
+			for (int cacheIndex = _maxTiles; cacheIndex < cacheSize; cacheIndex++) {
+				removeTile(_tileCacheFifo.poll());
 			}
 		}
 
-		tileCache.put(tileKey, tile);
-		tileCacheFifo.add(tileKey);
+		_tileCache.put(tileKey, tile);
+		_tileCacheFifo.add(tileKey);
 	}
 
 	public Tile get(final String tileKey) {
-		return tileCache.get(tileKey);
+		return _tileCache.get(tileKey);
 	}
 
 	public void remove(final String tileKey) {
 
-		tileCacheFifo.remove(tileKey);
+		_tileCacheFifo.remove(tileKey);
 
 		removeTile(tileKey);
 	}
@@ -69,7 +69,7 @@ public class TileCache {
 
 		Tile checkedTile = null;
 
-		final Collection<Tile> tiles = tileCache.values();
+		final Collection<Tile> tiles = _tileCache.values();
 		for (final Tile tile : tiles) {
 
 			if (checkedTile == null) {
@@ -88,8 +88,8 @@ public class TileCache {
 			}
 		}
 
-		tileCache.clear();
-		tileCacheFifo.clear();
+		_tileCache.clear();
+		_tileCacheFifo.clear();
 
 		if (checkedTile != null) {
 			checkedTile = null;
@@ -101,7 +101,7 @@ public class TileCache {
 	 */
 	public void removeParentTiles() {
 
-		for (final Tile tile : tileCache.values()) {
+		for (final Tile tile : _tileCache.values()) {
 
 			/*
 			 * check if this is a parent tile, child tiles are not removed to prevent
@@ -115,17 +115,17 @@ public class TileCache {
 					tileChild.setParentTile(null);
 				}
 
-				// remove parent 
+				// remove parent
 				final String parentTileKey = tile.getTileKey();
-				tileCache.remove(parentTileKey);
-				tileCacheFifo.remove(parentTileKey);
+				_tileCache.remove(parentTileKey);
+				_tileCacheFifo.remove(parentTileKey);
 			}
 		}
 	}
 
 	private void removeTile(final String tileKey) {
 
-		final Tile removedTile = tileCache.remove(tileKey);
+		final Tile removedTile = _tileCache.remove(tileKey);
 
 		if (removedTile == null) {
 			return;
@@ -172,7 +172,7 @@ public class TileCache {
 			}
 
 			// remove orphan child
-			tileCache.remove(tileChild.getTileKey());
+			_tileCache.remove(tileChild.getTileKey());
 
 			tileChild.setParentTile(null);
 		}
@@ -185,14 +185,14 @@ public class TileCache {
 	 */
 	public void resetOverlays() {
 
-		for (final Tile tile : tileCache.values()) {
+		for (final Tile tile : _tileCache.values()) {
 			tile.resetOverlay();
 		}
 	}
 
 	public void resetTileImageAvailability() {
 
-		for (final Tile tile : tileCache.values()) {
+		for (final Tile tile : _tileCache.values()) {
 			tile.setIsOfflineImageAvailable(false);
 		}
 	}
@@ -202,7 +202,7 @@ public class TileCache {
 	 */
 	public void stopLoadingTiles() {
 
-		for (final Tile tile : tileCache.values()) {
+		for (final Tile tile : _tileCache.values()) {
 
 			if (tile.isLoading()) {
 

@@ -1,20 +1,20 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.mapping;
- 
+
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.PrefPageAppearanceColors;
@@ -69,7 +69,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	private static final String			STATE_LIVE_UPDATE	= "IsLiveUpdate";	//$NON-NLS-1$
 
-	// ---------- UI controls---------- 
+	// ---------- UI controls----------
 
 	private Canvas						_canvasMappingColor;
 	private Image						_imageMappingColor;
@@ -96,7 +96,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private ColorSelector				_colorSelectorLow;
 	private ColorSelector				_colorSelectorMin;
 
-	// ---------- fields ---------- 
+	// ---------- fields ----------
 
 	private PrefPageAppearanceColors	_prefPage;
 
@@ -214,8 +214,10 @@ public class DialogMappingColor extends TitleAreaDialog {
 		final int legendHeight = Math.max(100, legendSize.y);
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
-		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
-				new PaletteData(0xff, 0xff00, 0xff00000));
+		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, new PaletteData(
+				0xff,
+				0xff00,
+				0xff0000));
 
 		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
 
@@ -308,8 +310,11 @@ public class DialogMappingColor extends TitleAreaDialog {
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(maxContainer);
 
 			_colorSelectorMax = new ColorSelector(maxContainer);
-			GridDataFactory.swtDefaults().grab(false, true).align(SWT.BEGINNING, SWT.BEGINNING).applyTo(
-					_colorSelectorMax.getButton());
+			GridDataFactory
+					.swtDefaults()
+					.grab(false, true)
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_colorSelectorMax.getButton());
 			_colorSelectorMax.addListener(new IPropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent event) {
 					onSelectColor(_colorSelectorMax, 0);
@@ -324,8 +329,11 @@ public class DialogMappingColor extends TitleAreaDialog {
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(highContainer);
 
 			_colorSelectorHigh = new ColorSelector(highContainer);
-			GridDataFactory.swtDefaults().grab(false, true).align(SWT.BEGINNING, SWT.BEGINNING).applyTo(
-					_colorSelectorHigh.getButton());
+			GridDataFactory
+					.swtDefaults()
+					.grab(false, true)
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_colorSelectorHigh.getButton());
 
 			_colorSelectorHigh.addListener(new IPropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent event) {
@@ -356,8 +364,11 @@ public class DialogMappingColor extends TitleAreaDialog {
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(lowContainer);
 
 			_colorSelectorLow = new ColorSelector(lowContainer);
-			GridDataFactory.swtDefaults().grab(false, true).align(SWT.BEGINNING, SWT.END).applyTo(
-					_colorSelectorLow.getButton());
+			GridDataFactory
+					.swtDefaults()
+					.grab(false, true)
+					.align(SWT.BEGINNING, SWT.END)
+					.applyTo(_colorSelectorLow.getButton());
 
 			_colorSelectorLow.addListener(new IPropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent event) {
@@ -373,8 +384,11 @@ public class DialogMappingColor extends TitleAreaDialog {
 			GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(minContainer);
 
 			_colorSelectorMin = new ColorSelector(minContainer);
-			GridDataFactory.swtDefaults().grab(false, true).align(SWT.BEGINNING, SWT.END).applyTo(
-					_colorSelectorMin.getButton());
+			GridDataFactory
+					.swtDefaults()
+					.grab(false, true)
+					.align(SWT.BEGINNING, SWT.END)
+					.applyTo(_colorSelectorMin.getButton());
 
 			_colorSelectorMin.addListener(new IPropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent event) {

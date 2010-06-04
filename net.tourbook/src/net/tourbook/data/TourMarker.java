@@ -38,6 +38,8 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 @Entity
 @XmlType(name = "TourMarker")
 @XmlRootElement(name = "TourMarker")
@@ -124,6 +126,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	@Transient
 	private long					_createId				= 0;
+
+	/**
+	 * Contains <b>width</b> and <b>height</b> of the marker image.
+	 * <p>
+	 * <b>x</b> and <b>y</b> contain the width and height of the marker banner which is the marker
+	 * label text including the border
+	 */
+	@Transient
+	private Rectangle				_markerBounds;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -294,6 +305,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return labelYOffset;
 	}
 
+	/**
+	 * @return Contains <b>width</b> and <b>height</b> of the marker image.
+	 *         <p>
+	 *         <b>x</b> and <b>y</b> contains the width and height of the marker banner which is the
+	 *         marker label text including the border
+	 */
+	public Rectangle getMarkerBounds() {
+		return _markerBounds;
+	}
+
 	public long getMarkerId() {
 		return markerId;
 	}
@@ -411,6 +432,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		backupMarker.visualPosition = visualPosition;
 
 		backupMarker.tourData = tourData;
+	}
+
+	/**
+	 * @param markerBounds
+	 */
+	public void setMarkerBounds(final Rectangle markerBounds) {
+		_markerBounds = markerBounds;
 	}
 
 	public void setSerieIndex(final int serieIndex) {

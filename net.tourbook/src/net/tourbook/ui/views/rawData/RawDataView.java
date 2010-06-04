@@ -35,6 +35,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
@@ -1009,11 +1010,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				final Set<TourMarker> markerIds = tourData.getTourMarkers();
-				if (markerIds == null) {
+				final Set<TourMarker> tourMarker = tourData.getTourMarkers();
+				final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
+				if (tourMarker == null && wayPoints == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(markerIds.size()));
+
+					int size = 0;
+					if (tourMarker != null) {
+						size = tourMarker.size();
+					}
+					if (wayPoints != null) {
+						size = wayPoints.size();
+					}
+					cell.setText(Integer.toString(size));
 				}
 			}
 		});

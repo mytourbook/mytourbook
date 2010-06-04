@@ -60,7 +60,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class TourToolTip extends ToolTip implements ITourProvider {
 
 	private static final int			SHELL_MARGIN			= 5;
-	private static final int			MAX_TOOLTIP_WIDTH		= 400;
+//	private static final int			MAX_TOOLTIP_WIDTH		= 400;
 	private static final int			MAX_DATA_WIDTH			= 300;
 
 	private TourData					_tourData;
@@ -948,9 +948,19 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 
 		// date/time created
 		final DateTime dtCreated = _tourData.getDateTimeCreated();
-		_lblDateTimeCreatedValue.setText(dtCreated == null ? //
-				UI.EMPTY_STRING
-				: _dtFormatter.print(dtCreated.getMillis()));
+		if (dtCreated == null) {
+
+			// tour was not yet saved
+
+			_lblDateTimeCreated.setVisible(false);
+			_lblDateTimeCreatedValue.setVisible(false);
+
+		} else {
+
+			_lblDateTimeCreatedValue.setText(dtCreated == null ? //
+					UI.EMPTY_STRING
+					: _dtFormatter.print(dtCreated.getMillis()));
+		}
 
 		// date/time modified
 		final DateTime dtModified = _tourData.getDateTimeModified();

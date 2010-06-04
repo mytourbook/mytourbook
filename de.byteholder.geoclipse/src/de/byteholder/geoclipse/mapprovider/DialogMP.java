@@ -76,7 +76,7 @@ public class DialogMP extends TitleAreaDialog {
 	protected void actionShowFavoritePosition() {
 
 		_map.setZoom(_mp.getFavoriteZoom());
-		_map.setGeoCenterPosition(_mp.getFavoritePosition());
+		_map.setMapCenter(_mp.getFavoritePosition());
 
 		_map.queueMapRedraw();
 	}

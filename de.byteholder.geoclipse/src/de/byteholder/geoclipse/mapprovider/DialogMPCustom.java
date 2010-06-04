@@ -827,7 +827,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 			_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
+					final boolean isTileInfo = _chkShowTileInfo.getSelection();
+					_map.setShowDebugInfo(isTileInfo, isTileInfo);
 				}
 			});
 
@@ -1073,7 +1074,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		// set position to previous position
 		_map.setZoom(_mpCustom.getLastUsedZoom());
-		_map.setGeoCenterPosition(_mpCustom.getLastUsedPosition());
+		_map.setMapCenter(_mpCustom.getLastUsedPosition());
 	}
 
 	@Override
@@ -1257,7 +1258,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		// debug tile info
 		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
 		_chkShowTileInfo.setSelection(isShowDebugInfo);
-		_map.setShowDebugInfo(isShowDebugInfo);
+		_map.setShowDebugInfo(isShowDebugInfo, isShowDebugInfo);
 
 		// tile image loading
 		final boolean isShowImageLogging = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG);
@@ -1400,12 +1401,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 		if (mapZoom < factoryMinZoom) {
 			_map.setZoom(factoryMinZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		if (mapZoom > factoryMaxZoom) {
 			_map.setZoom(factoryMaxZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 	}
 
@@ -1429,12 +1430,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
 			_map.setZoom(newFactoryMinZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		if (oldZoomLevel > newFactoryMaxZoom) {
 			_map.setZoom(newFactoryMaxZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		/*

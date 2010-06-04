@@ -72,11 +72,6 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	public static final int							OFFLINE_INFO_NOT_READ				= -1;
 
-	/**
-	 * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
-	 */
-	public static final int							UI_MIN_ZOOM_LEVEL					= 1;
-	public static final int							UI_MAX_ZOOM_LEVEL					= 19;
 
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;
@@ -130,8 +125,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 																								.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
 	// map min/max zoom level
 	private int										_minZoomLevel						= 0;
-	private int										_maxZoomLevel						= UI_MAX_ZOOM_LEVEL
-																								- UI_MIN_ZOOM_LEVEL;
+	private int										_maxZoomLevel						= Map.UI_MAX_ZOOM_LEVEL
+																								- Map.UI_MIN_ZOOM_LEVEL;
 
 	private int										_defaultZoomLevel					= 0;
 
@@ -477,7 +472,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * @param tile
 	 */
 	public void doPostCreation(final Tile tile) {
-	// default does nothing
+		// default does nothing
 	}
 
 	@Override
@@ -671,7 +666,8 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	/**
 	 * @param zoom
-	 * @return
+	 * @return Return an array of coordinates in pixels that indicates the center in the world map
+	 *         for the given zoom level.
 	 */
 	public Point2D getMapCenterInPixelsAtZoom(final int zoom) {
 		return _mapCenterInPixelsAtZoom[zoom];
@@ -684,8 +680,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	private int getMapSizeInTiles(int zoom) {
 
 		// ensure array bounds, this is Math.min() inline
-		final int b = _mapWidthInTilesAtZoom.length - 1;
-		zoom = (zoom <= b) ? zoom : b;
+		final int maxBounds = _mapWidthInTilesAtZoom.length - 1;
+
+		zoom = (zoom <= maxBounds) ? zoom : maxBounds;
 
 		return _mapWidthInTilesAtZoom[zoom];
 	}
@@ -695,7 +692,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 *         wide)
 	 */
 	public Dimension getMapTileSize(final int zoom) {
+
 		final int mapTileSize = getMapSizeInTiles(zoom);
+
 		return new Dimension(mapTileSize, mapTileSize);
 	}
 
@@ -906,7 +905,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		return tile;
 	}
- 
+
 	public TileImageCache getTileImageCache() {
 		return _tileImageCache;
 	}

@@ -123,91 +123,91 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
 
-	private static final int				MAP_MAX_ZOOM_LEVEL						= MP.UI_MAX_ZOOM_LEVEL
-																							- MP.UI_MIN_ZOOM_LEVEL;
+	private static final int						MAP_MAX_ZOOM_LEVEL						= Map.UI_MAX_ZOOM_LEVEL
+																									- Map.UI_MIN_ZOOM_LEVEL;
 
-	public static final String				DEFAULT_URL								= "http://";								//$NON-NLS-1$
+	public static final String						DEFAULT_URL								= "http://";								//$NON-NLS-1$
 
-	private static final String				DIALOG_SETTINGS_VIEWER_WIDTH			= "ViewerWidth";							//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "IsShowTileInfo";						//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_LIVE_VIEW			= "IsLiveView";							//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED	= "IsPropertiesExpanded";					//$NON-NLS-1$
-
+	private static final String						DIALOG_SETTINGS_VIEWER_WIDTH			= "ViewerWidth";							//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "IsShowTileInfo";						//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_LIVE_VIEW			= "IsLiveView";							//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";				//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED	= "IsPropertiesExpanded";					//$NON-NLS-1$
 
 	/*
 	 * UI controls
 	 */
-	private Display							_display;
-	private Button							_btnOk;
+	private Display									_display;
+	private Button									_btnOk;
 
-	private Composite						_leftContainer;
-	private Composite						_innerContainer;
-	private ViewerDetailForm				_detailForm;
+	private Composite								_leftContainer;
+	private Composite								_innerContainer;
+	private ViewerDetailForm						_detailForm;
 
-	private ExpandableComposite				_propContainer;
-	private Composite						_propInnerContainer;
+	private ExpandableComposite						_propContainer;
+	private Composite								_propInnerContainer;
 
-	private ContainerCheckedTreeViewer		_treeViewer;
-	private TVIMapProviderRoot				_rootItem;
+	private ContainerCheckedTreeViewer				_treeViewer;
+	private TVIMapProviderRoot						_rootItem;
 
-	private ToolBar							_toolbar;
-	private Button							_btnShowProfileMap;
-	private Button							_btnShowOsmMap;
+	private ToolBar									_toolbar;
+	private Button									_btnShowProfileMap;
+	private Button									_btnShowOsmMap;
 
-	private Label							_lblMapInfo;
-	private Label							_lblTileInfo;
-	private Text							_txtMpUrl;
-	private Button							_chkLiveView;
-	private Button							_chkShowTileInfo;
+	private Label									_lblMapInfo;
+	private Label									_lblTileInfo;
+	private Text									_txtMpUrl;
+	private Button									_chkLiveView;
+	private Button									_chkShowTileInfo;
 
-	private Spinner							_spinMinZoom;
-	private Spinner							_spinMaxZoom;
+	private Spinner									_spinMinZoom;
+	private Spinner									_spinMaxZoom;
 
-	private Spinner							_spinAlpha;
-	private Scale							_scaleAlpha;
-	private Button							_chkTransparentPixel;
-	private Button							_chkTransparentBlack;
-	private Button							_chkBrightness;
-	private Spinner							_spinBright;
-	private Scale							_scaleBright;
-	private Label							_lblAlpha;
+	private Spinner									_spinAlpha;
+	private Scale									_scaleAlpha;
+	private Button									_chkTransparentPixel;
+	private Button									_chkTransparentBlack;
+	private Button									_chkBrightness;
+	private Spinner									_spinBright;
+	private Scale									_scaleBright;
+	private Label									_lblAlpha;
 
-	private ExpandableComposite				_transparentContainer;
-	private ColorSelector					_colorSelectorTransparent0;
-	private ColorSelector					_colorSelectorTransparent1;
-	private ColorSelector					_colorSelectorTransparent2;
-	private ColorSelector					_colorSelectorTransparent3;
-	private ColorSelector					_colorSelectorTransparent4;
-	private ColorSelector					_colorSelectorTransparent5;
-	private ColorSelector					_colorSelectorTransparent6;
-	private ColorSelector					_colorSelectorTransparent7;
-	private ColorSelector					_colorSelectorTransparent8;
-	private ColorSelector					_colorSelectorTransparent9;
-	private ColorSelector					_colorSelectorTransparent10;
-	private ColorSelector					_colorSelectorTransparent11;
-	private ColorSelector					_colorSelectorTransparent12;
-	private ColorSelector					_colorSelectorTransparent13;
-	private ColorSelector					_colorSelectorTransparent14;
-	private ColorSelector					_colorSelectorTransparent15;
-	private ColorSelector					_colorSelectorTransparent16;
-	private ColorSelector					_colorSelectorTransparent17;
-	private ColorSelector					_colorSelectorTransparent18;
-	private ColorSelector					_colorSelectorTransparent19;
-	private ColorSelector					_colorSelectorTransparent20;
+	private ExpandableComposite						_transparentContainer;
+	private ColorSelector							_colorSelectorTransparent0;
+	private ColorSelector							_colorSelectorTransparent1;
+	private ColorSelector							_colorSelectorTransparent2;
+	private ColorSelector							_colorSelectorTransparent3;
+	private ColorSelector							_colorSelectorTransparent4;
+	private ColorSelector							_colorSelectorTransparent5;
+	private ColorSelector							_colorSelectorTransparent6;
+	private ColorSelector							_colorSelectorTransparent7;
+	private ColorSelector							_colorSelectorTransparent8;
+	private ColorSelector							_colorSelectorTransparent9;
+	private ColorSelector							_colorSelectorTransparent10;
+	private ColorSelector							_colorSelectorTransparent11;
+	private ColorSelector							_colorSelectorTransparent12;
+	private ColorSelector							_colorSelectorTransparent13;
+	private ColorSelector							_colorSelectorTransparent14;
+	private ColorSelector							_colorSelectorTransparent15;
+	private ColorSelector							_colorSelectorTransparent16;
+	private ColorSelector							_colorSelectorTransparent17;
+	private ColorSelector							_colorSelectorTransparent18;
+	private ColorSelector							_colorSelectorTransparent19;
+	private ColorSelector							_colorSelectorTransparent20;
 
-	private ColorSelector					_colorImageBackground;
+	private ColorSelector							_colorImageBackground;
 
-	private final FormToolkit						_formTk									= new FormToolkit(Display
-																							.getCurrent());
-	private ExpandableComposite				_logContainer;
-	private Button							_chkShowTileImageLog;
-	private Combo							_cboTileImageLog;
-	private Text							_txtLogDetail;
+	private final FormToolkit						_formTk									= new FormToolkit(
+																									Display
+																											.getCurrent());
+	private ExpandableComposite						_logContainer;
+	private Button									_chkShowTileImageLog;
+	private Combo									_cboTileImageLog;
+	private Text									_txtLogDetail;
 
-	private Image							_imageMap;
-	private Image							_imagePlaceholder;
-	private Image							_imageLayer;
+	private Image									_imageMap;
+	private Image									_imagePlaceholder;
+	private Image									_imageLayer;
 
 	/*
 	 * none UI items
@@ -215,28 +215,29 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private final IDialogSettings					_dialogSettings;
 
-	private final MPPlugin						_mpDefault;
-	private MPProfile						_mpProfile;
+	private final MPPlugin							_mpDefault;
+	private MPProfile								_mpProfile;
 
-	private String							_defaultMessage;
+	private String									_defaultMessage;
 
 	// image logging
-	private boolean							_isTileImageLogging;
+	private boolean									_isTileImageLogging;
 	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
-	private int								_statUpdateCounter						= 0;
+	private int										_statUpdateCounter						= 0;
 
-	private int								_statIsQueued;
-	private int								_statStartLoading;
-	private int								_statEndLoading;
-	private int								_statErrorLoading;
+	private int										_statIsQueued;
+	private int										_statStartLoading;
+	private int										_statEndLoading;
+	private int										_statErrorLoading;
 
-	private long							_dragStartTime;
+	private long									_dragStartTime;
 
-	private boolean							_isInitUI								= false;
-	private boolean							_isLiveView;
+	private boolean									_isInitUI								= false;
+	private boolean									_isLiveView;
 
-	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat						_nfLatLon								= NumberFormat
+																									.getNumberInstance();
 
 	{
 		// initialize lat/lon formatter
@@ -565,7 +566,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			/*
 			 * tree viewer
-	 		 */
+			 */
 			_treeViewer = new ContainerCheckedTreeViewer(tree);
 
 			_treeViewer.setContentProvider(new MapContentProvider());
@@ -631,7 +632,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 						}
 
 						public void dragSetData(final DragSourceEvent event) {
-						// data are set in LocalSelectionTransfer
+							// data are set in LocalSelectionTransfer
 						}
 
 						public void dragStart(final DragSourceEvent event) {
@@ -920,9 +921,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 					final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
-					cell.setText(mpWrapper.isBrightnessForNextMp()
-							? Integer.toString(mpWrapper.getBrightnessValueForNextMp())
-							: UI.EMPTY_STRING);
+					cell.setText(mpWrapper.isBrightnessForNextMp() ? Integer.toString(mpWrapper
+							.getBrightnessValueForNextMp()) : UI.EMPTY_STRING);
 
 				} else {
 
@@ -939,9 +939,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-			/*
-			 * !!! label provider is necessary to prevent a NPE !!!
-			 */
+				/*
+				 * !!! label provider is necessary to prevent a NPE !!!
+				 */
 			}
 		});
 		tc = tvc.getColumn();
@@ -1253,9 +1253,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				_spinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMinZoom);
-				_spinMinZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				_spinMinZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				_spinMinZoom.setSelection(MP.UI_MIN_ZOOM_LEVEL);
+				_spinMinZoom.setMinimum(Map.UI_MIN_ZOOM_LEVEL);
+				_spinMinZoom.setMaximum(Map.UI_MAX_ZOOM_LEVEL);
+				_spinMinZoom.setSelection(Map.UI_MIN_ZOOM_LEVEL);
 				_spinMinZoom.addMouseWheelListener(mouseWheelListener);
 				_spinMinZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1285,9 +1285,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				// spinner: min zoom level
 				_spinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMaxZoom);
-				_spinMaxZoom.setMinimum(MP.UI_MIN_ZOOM_LEVEL);
-				_spinMaxZoom.setMaximum(MP.UI_MAX_ZOOM_LEVEL);
-				_spinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+				_spinMaxZoom.setMinimum(Map.UI_MIN_ZOOM_LEVEL);
+				_spinMaxZoom.setMaximum(Map.UI_MAX_ZOOM_LEVEL);
+				_spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
 				_spinMaxZoom.addMouseWheelListener(mouseWheelListener);
 				_spinMaxZoom.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1369,7 +1369,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					_map.setShowDebugInfo(_chkShowTileInfo.getSelection());
+					final boolean isTileInfo = _chkShowTileInfo.getSelection();
+					_map.setShowDebugInfo(isTileInfo, isTileInfo);
 				}
 			});
 
@@ -1438,9 +1439,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		_map.addZoomListener(new IZoomListener() {
 			public void zoomChanged(final ZoomEvent event) {
-			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+				// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
 //				resetMapProfile();
-			// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
 			}
 		});
 
@@ -1457,10 +1458,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 								lon + 360
 								: lon;
 
-				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mousePosition.latitude),
-						_nfLatLon.format(lon),
-						Integer.toString(event.mapZoomLevel + 1) }));
+				_lblMapInfo.setText(NLS.bind(
+						Messages.Dialog_MapConfig_Label_MapInfo,
+						new Object[] {
+								_nfLatLon.format(mousePosition.latitude),
+								_nfLatLon.format(lon),
+								Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
 
@@ -1477,8 +1480,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// label: tile info
 			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
-			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					_lblTileInfo);
+			GridDataFactory
+					.fillDefaults()
+					.hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT)
+					.applyTo(_lblTileInfo);
 			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
@@ -1694,7 +1699,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		return colorValue == 0 ? -1 : colorValue;
 	}
 
-
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
@@ -1714,7 +1718,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 
 		return _dialogSettings;
- 
+
 		// disable bounds
 //		return null;
 	}
@@ -1997,11 +2001,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMax() {
 
-		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			_spinMaxZoom.setSelection(MP.UI_MAX_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
 		}
 
 		if (mapMaxValue < mapMinValue) {
@@ -2035,8 +2039,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private void onModifyZoomSpinnerMin() {
 
-		final int mapMinValue = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int mapMaxValue = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int mapMinValue = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+		final int mapMaxValue = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 
 		if (mapMinValue > mapMaxValue) {
 			_spinMinZoom.setSelection(mapMaxValue + 1);
@@ -2186,7 +2190,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// show tile info
 		final boolean isShowDebugInfo = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_SHOW_TILE_INFO);
 		_chkShowTileInfo.setSelection(isShowDebugInfo);
-		_map.setShowDebugInfo(isShowDebugInfo);
+		_map.setShowDebugInfo(isShowDebugInfo, isShowDebugInfo);
 
 		// is live view
 		final boolean isLiveView = _dialogSettings.getBoolean(DIALOG_SETTINGS_IS_LIVE_VIEW);
@@ -2240,12 +2244,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		if (mapZoom < factoryMinZoom) {
 			_map.setZoom(factoryMinZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		if (mapZoom > factoryMaxZoom) {
 			_map.setZoom(factoryMaxZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 	}
 
@@ -2314,12 +2318,14 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				}
 
 				// show at most 3 decimals
-				_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-						Integer.toString(_statIsQueued % 1000),
-						Integer.toString(_statEndLoading % 1000),
-						Integer.toString(_statStartLoading % 1000),
-						Integer.toString(_statErrorLoading % 1000), //
-				}));
+				_lblTileInfo.setText(NLS.bind(
+						Messages.Dialog_MapConfig_TileInfo_Statistics,
+						new Object[] {
+								Integer.toString(_statIsQueued % 1000),
+								Integer.toString(_statEndLoading % 1000),
+								Integer.toString(_statStartLoading % 1000),
+								Integer.toString(_statErrorLoading % 1000), //
+						}));
 
 				final String logEntry = displayLogEntries(_logEntries, _cboTileImageLog);
 
@@ -2418,8 +2424,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int oldZoomLevel = _map.getZoom();
 		final GeoPosition mapCenter = _map.getGeoCenter();
 
-		final int newFactoryMinZoom = _spinMinZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
-		final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - MP.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMinZoom = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+		final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 
 		// set new zoom level before other map actions are done
 		_mpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
@@ -2427,11 +2433,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		// ensure the zoom level is in the valid range
 		if (oldZoomLevel < newFactoryMinZoom) {
 			_map.setZoom(newFactoryMinZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 		if (oldZoomLevel > newFactoryMaxZoom) {
 			_map.setZoom(newFactoryMaxZoom);
-			_map.setGeoCenterPosition(mapCenter);
+			_map.setMapCenter(mapCenter);
 		}
 
 		// keep map position
@@ -2607,8 +2613,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// zoom level
 			final int minZoomLevel = _mpProfile.getMinZoomLevel();
 			final int maxZoomLevel = _mpProfile.getMaxZoomLevel();
-			_spinMinZoom.setSelection(minZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
-			_spinMaxZoom.setSelection(maxZoomLevel + MP.UI_MIN_ZOOM_LEVEL);
+			_spinMinZoom.setSelection(minZoomLevel + Map.UI_MIN_ZOOM_LEVEL);
+			_spinMaxZoom.setSelection(maxZoomLevel + Map.UI_MIN_ZOOM_LEVEL);
 
 			final int color = _mpProfile.getBackgroundColor();
 			_colorImageBackground.setColorValue(new RGB(
@@ -2633,7 +2639,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		// set position to previous position
 		_map.setZoom(_mpProfile.getLastUsedZoom());
-		_map.setGeoCenterPosition(_mpProfile.getLastUsedPosition());
+		_map.setMapCenter(_mpProfile.getLastUsedPosition());
 
 		// create root item and update viewer
 		_rootItem = new TVIMapProviderRoot(_treeViewer, allMpWrappers);

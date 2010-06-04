@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
-  
+
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
@@ -40,12 +40,12 @@ public class CylindricalProjection extends Projection {
 		// calc the pixels per degree
 		final Dimension mapSizeInTiles = mp.getMapTileSize(zoom);
 
-		final double size_in_pixels = mapSizeInTiles.getWidth() * tileSize;
+		final double size_in_pixels = mapSizeInTiles.width * tileSize;
 		final double ppd = size_in_pixels / 360;
 
 		// the center of the world
-		final double centerX = tileSize * mapSizeInTiles.getWidth() / 2;
-		final double centerY = tileSize * mapSizeInTiles.getHeight() / 2;
+		final double centerX = tileSize * mapSizeInTiles.width / 2;
+		final double centerY = tileSize * mapSizeInTiles.height / 2;
 
 		final double x = c.longitude * ppd + centerX;
 		final double y = -c.latitude * ppd + centerY;

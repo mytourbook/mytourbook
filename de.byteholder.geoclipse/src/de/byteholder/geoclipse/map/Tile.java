@@ -22,6 +22,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
@@ -165,6 +166,9 @@ public class Tile extends Observable {
 	 */
 	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
+	private ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+
 	/**
 	 * Create a new Tile at the specified tile point and zoom level
 	 * 
@@ -236,6 +240,45 @@ public class Tile extends Observable {
 		}
 
 		return sb.toString();
+	}
+
+	public void addMarkerBounds(final int x, final int y, final int width, final int height, final int zoomLevel) {
+
+		initMarkerBounds(zoomLevel);
+
+		final Rectangle markerBounds = new Rectangle(x, y, width, height);
+
+		_markerBounds[zoomLevel].add(markerBounds);
+	}
+
+	/**
+	 * @param x
+	 *            left position relative to the tile image
+	 * @param y
+	 *            top position relative to the tile image
+	 * @param width
+	 * @param height
+	 * @param zoomLevel
+	 * @param parts
+	 *            number of parts for which the marker is painted
+	 */
+	public void addMarkerBounds(final int x,
+								final int y,
+								final int width,
+								final int height,
+								final int zoomLevel,
+								final int parts) {
+
+		initMarkerBounds(zoomLevel);
+
+//		final Rectangle markerBounds = new Rectangle(x < 0 ? 0 : x, y < 0 ? 0 : y, width, height);
+		final Rectangle markerBounds = new Rectangle(x, y, width, height);
+
+		if (parts == 1) {
+			_markerBounds[zoomLevel].add(markerBounds);
+		} else {
+			_markerPartBounds[zoomLevel].add(markerBounds);
+		}
 	}
 
 	@Override
@@ -562,6 +605,15 @@ public class Tile extends Observable {
 		return _parentTile;
 	}
 
+	/**
+	 * @param zoomLevel
+	 * @return Returns marker bounds which are set for a part or <code>null</code> when there are no
+	 *         part marker bounds
+	 */
+	public ArrayList<Rectangle> getPartMarkerBounds(final int zoomLevel) {
+		return _markerPartBounds[zoomLevel];
+	}
+
 	public String getTileCustomPath() {
 		return _tileCustomPath;
 	}
@@ -585,6 +637,13 @@ public class Tile extends Observable {
 	public long getTimeStartLoading() {
 		return _timeStartLoading;
 	}
+
+//	/**
+//	 * @return Returns <code>true</code> when this tile is a child of another tile
+//	 */
+//	public boolean isChildTile() {
+//		return fParentTile != null;
+//	}
 
 	/**
 	 * @return Returns the url which is used to load the tile, or null when it's not loaded
@@ -614,13 +673,6 @@ public class Tile extends Observable {
 		return _zoom;
 	}
 
-//	/**
-//	 * @return Returns <code>true</code> when this tile is a child of another tile
-//	 */
-//	public boolean isChildTile() {
-//		return fParentTile != null;
-//	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -634,6 +686,33 @@ public class Tile extends Observable {
 	 */
 	public void incrementOverlayContent() {
 		_overlayContent++;
+	}
+
+	/**
+	 * creates marker bounds array for the zoom level
+	 * 
+	 * @param zoomLevel
+	 */
+	private void initMarkerBounds(final int zoomLevel) {
+
+		if (_markerBounds[zoomLevel] != null) {
+			return;
+		}
+
+		TILE_LOCK.lock();
+		{
+			try {
+
+				// check again
+				if (_markerBounds[zoomLevel] == null) {
+					_markerBounds[zoomLevel] = new ArrayList<Rectangle>();
+					_markerPartBounds[zoomLevel] = new ArrayList<Rectangle>();
+				}
+
+			} finally {
+				TILE_LOCK.unlock();
+			}
+		}
 	}
 
 	/**
@@ -726,7 +805,6 @@ public class Tile extends Observable {
 
 				// check again
 				if (_childrenWithErrors == null) {
-
 					_childrenWithErrors = new ConcurrentHashMap<String, Tile>();
 				}
 

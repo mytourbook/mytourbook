@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.mapping;
@@ -34,29 +34,14 @@ public class TourMapPropertyView extends ViewPart {
 
 	public static final String	ID	= "net.tourbook.mapping.TourMapPropertyView";	//$NON-NLS-1$
 
-	private Button				fRadioTileInfoNo;
-	private Button				fRadioTileInfoYes;
+	private Button				_chkTileInfo;
+	private Button				_chkTileBorder;
 
-	private Scale				fScaleDimMap;
+	private Scale				_scaleDimMap;
 
 	private void createLayout(final Composite parent) {
 
 		Label label;
-
-//		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-//		scrolledContainer.setExpandVertical(true);
-//		scrolledContainer.setExpandHorizontal(true);
-//
-//		final Composite viewContainer = new Composite(scrolledContainer, SWT.NONE);
-//		GridLayoutFactory.fillDefaults().applyTo(viewContainer);
-//
-//		scrolledContainer.setContent(viewContainer);
-//		scrolledContainer.addControlListener(new ControlAdapter() {
-//			@Override
-//			public void controlResized(final ControlEvent e) {
-//				scrolledContainer.setMinSize(viewContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-//			}
-//		});
 
 		final Composite infoContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(infoContainer);
@@ -69,13 +54,13 @@ public class TourMapPropertyView extends ViewPart {
 			label = new Label(infoContainer, SWT.NONE);
 			label.setText(Messages.map_properties_map_dim_level);
 
-			fScaleDimMap = new Scale(infoContainer, SWT.NONE);
-			fScaleDimMap.setIncrement(1);
-			fScaleDimMap.setPageIncrement(10);
-			fScaleDimMap.setMinimum(0);
-			fScaleDimMap.setMaximum(100);
-			GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(fScaleDimMap);
-			fScaleDimMap.addSelectionListener(new SelectionAdapter() {
+			_scaleDimMap = new Scale(infoContainer, SWT.NONE);
+			_scaleDimMap.setIncrement(1);
+			_scaleDimMap.setPageIncrement(10);
+			_scaleDimMap.setMinimum(0);
+			_scaleDimMap.setMaximum(100);
+			GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(_scaleDimMap);
+			_scaleDimMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onChangeProperty();
@@ -85,34 +70,28 @@ public class TourMapPropertyView extends ViewPart {
 			/*
 			 * tile info
 			 */
-			label = new Label(infoContainer, SWT.NONE);
-			label.setText(Messages.map_properties_show_tile_info);
+			_chkTileInfo = new Button(infoContainer, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkTileInfo);
+			_chkTileInfo.setText(Messages.Map_Properties_ShowTileInfo);
+			_chkTileInfo.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent event) {
+					onChangeProperty();
+				}
+			});
 
-			// group: yes/no
-			final Composite groupChartType = new Composite(infoContainer, SWT.NONE);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupChartType);
-
-			{
-				// radio: no
-				fRadioTileInfoNo = new Button(groupChartType, SWT.RADIO);
-				fRadioTileInfoNo.setText(Messages.map_properties_show_tile_info_no);
-				fRadioTileInfoNo.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						onChangeProperty();
-					}
-				});
-
-				// radio: yes
-				fRadioTileInfoYes = new Button(groupChartType, SWT.RADIO);
-				fRadioTileInfoYes.setText(Messages.map_properties_show_tile_info_yes);
-				fRadioTileInfoYes.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						onChangeProperty();
-					}
-				});
-			}
+			/*
+			 * tile border
+			 */
+			_chkTileBorder = new Button(infoContainer, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkTileBorder);
+			_chkTileBorder.setText(Messages.Map_Properties_ShowTileBorder);
+			_chkTileBorder.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent event) {
+					onChangeProperty();
+				}
+			});
 		}
 	}
 
@@ -133,13 +112,12 @@ public class TourMapPropertyView extends ViewPart {
 
 		// set new values in the pref store
 
-		// radio: tile info
-		final boolean isShowTileInfo = fRadioTileInfoYes.getSelection();
-		store.setValue(TourMapView.PREF_SHOW_TILE_INFO, isShowTileInfo);
+		// tile info/border
+		store.setValue(TourMapView.PREF_SHOW_TILE_INFO, _chkTileInfo.getSelection());
+		store.setValue(TourMapView.PREF_SHOW_TILE_BORDER, _chkTileBorder.getSelection());
 
 		// dim level
-		store.setValue(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL, fScaleDimMap.getSelection());
-
+		store.setValue(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL, _scaleDimMap.getSelection());
 	}
 
 	private void restoreSettings() {
@@ -148,16 +126,12 @@ public class TourMapPropertyView extends ViewPart {
 
 		// get values from pref store
 
-		// tile info
-		final boolean isShowTileInfo = store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
-		if (isShowTileInfo) {
-			fRadioTileInfoYes.setSelection(true);
-		} else {
-			fRadioTileInfoNo.setSelection(true);
-		}
+		// tile info/border
+		_chkTileInfo.setSelection(store.getBoolean(TourMapView.PREF_SHOW_TILE_INFO));
+		_chkTileBorder.setSelection(store.getBoolean(TourMapView.PREF_SHOW_TILE_BORDER));
 
 		// dim map
-		fScaleDimMap.setSelection(store.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL));
+		_scaleDimMap.setSelection(store.getInt(TourMapView.PREF_DEBUG_MAP_DIM_LEVEL));
 	}
 
 	@Override

@@ -27,7 +27,7 @@ import net.tourbook.util.StatusUtil;
 import de.byteholder.gpx.GeoPosition;
 
 @Entity
-public class TourWayPoint implements Cloneable {
+public class TourWayPoint implements Cloneable, Comparable<Object> {
 
 	public static final int	DB_LENGTH_NAME			= 1024;
 	public static final int	DB_LENGTH_DESCRIPTION	= 4096;
@@ -66,15 +66,16 @@ public class TourWayPoint implements Cloneable {
 	private String			comment;
 	private String			symbol;
 	private String			category;
+
+	@Transient
+	private GeoPosition		_geoPosition;
+
 	/**
 	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
-	private long			createId				= 0;
-
-	@Transient
-	private GeoPosition		_geoPosition;
+	private long			_createId				= 0;
 
 	/**
 	 * manually created way points or imported way points create a unique id to identify them, saved
@@ -82,7 +83,11 @@ public class TourWayPoint implements Cloneable {
 	 */
 	private static int		_createCounter			= 0;
 
-	public TourWayPoint() {}
+	public TourWayPoint() {
+
+		// set create id to uniquely identify the way point
+		_createId = ++_createCounter;
+	}
 
 	@Override
 	public Object clone() {
@@ -93,7 +98,7 @@ public class TourWayPoint implements Cloneable {
 			final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
 
 			// set create id to uniquely identify the way point
-			newWayPoint.createId = ++_createCounter;
+			newWayPoint._createId = ++_createCounter;
 
 			return newWayPoint;
 
@@ -102,6 +107,48 @@ public class TourWayPoint implements Cloneable {
 		}
 
 		return null;
+	}
+
+	@Override
+	public int compareTo(final Object other) {
+
+		/*
+		 * set default sorting by time or by id (creation time)
+		 */
+
+		if (other instanceof TourWayPoint) {
+
+			final TourWayPoint otherWP = (TourWayPoint) other;
+
+			if (time != 0 && otherWP.time != 0) {
+				return time > otherWP.time ? 1 : -1;
+			}
+
+			if (_createId == 0) {
+
+				if (otherWP._createId == 0) {
+
+					// both way points are persisted
+					return wayPointId > otherWP.wayPointId ? 1 : -1;
+				}
+
+				return 1;
+
+			} else {
+
+				// _createId != 0
+
+				if (otherWP._createId != 0) {
+
+					// both way points are created and not persisted
+					return _createId > otherWP._createId ? 1 : -1;
+				}
+
+				return -1;
+			}
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -117,7 +164,7 @@ public class TourWayPoint implements Cloneable {
 		}
 
 		final TourWayPoint other = (TourWayPoint) obj;
-		if (createId == 0) {
+		if (_createId == 0) {
 
 			// tour is from the database
 			if (wayPointId != other.wayPointId) {
@@ -126,7 +173,7 @@ public class TourWayPoint implements Cloneable {
 		} else {
 
 			// tour was create or imported
-			if (createId != other.createId) {
+			if (_createId != other._createId) {
 				return false;
 			}
 		}
@@ -143,6 +190,14 @@ public class TourWayPoint implements Cloneable {
 
 	public String getComment() {
 		return comment;
+	}
+
+	/**
+	 * @return Returns a unique id for manually created way points because the {@link #wayPointId}
+	 *         is {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet persisted
+	 */
+	public long getCreateId() {
+		return _createId;
 	}
 
 	public String getDescription() {
@@ -182,11 +237,19 @@ public class TourWayPoint implements Cloneable {
 		return tourData;
 	}
 
+	/**
+	 * @return Returns the persistence id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the
+	 *         entity is not yet saved
+	 */
+	public long getWayPointId() {
+		return wayPointId;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (createId ^ (createId >>> 32));
+		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
 		return result;
 	}
@@ -248,7 +311,7 @@ public class TourWayPoint implements Cloneable {
 		sb.append("wayPointId:");
 		sb.append(wayPointId);
 		sb.append("\tcreateId:");
-		sb.append(createId);
+		sb.append(_createId);
 		sb.append("\tname:");
 		sb.append(name);
 		sb.append("\tlat:");

@@ -141,8 +141,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private static final String						MEMENTO_TOUR_COLOR_ID				= "tour-color-id";							//$NON-NLS-1$
 
-	final static String								PREF_SHOW_TILE_INFO					= "map.debug.show.tile-info";				//$NON-NLS-1$
-	final static String								PREF_DEBUG_MAP_DIM_LEVEL			= "map.debug.dim-map";						//$NON-NLS-1$
+	static final String								PREF_SHOW_TILE_INFO					= "MapDebug.ShowTileInfo";					//$NON-NLS-1$
+	static final String								PREF_SHOW_TILE_BORDER				= "MapDebug.ShowTileBorder";				//$NON-NLS-1$
+	static final String								PREF_DEBUG_MAP_DIM_LEVEL			= "MapDebug.MapDimLevel";					//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore							= TourbookPlugin
 																								.getDefault()
@@ -304,10 +305,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	void actionSetDefaultPosition() {
 		if (_defaultPosition == null) {
 			_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
-			_map.setGeoCenterPosition(new GeoPosition(0, 0));
+			_map.setMapCenter(new GeoPosition(0, 0));
 		} else {
 			_map.setZoom(_defaultZoom);
-			_map.setGeoCenterPosition(_defaultPosition);
+			_map.setMapCenter(_defaultPosition);
 		}
 		_map.queueMapRedraw();
 	}
@@ -592,13 +593,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 				final String property = event.getProperty();
 
-				if (property.equals(PREF_SHOW_TILE_INFO)) {
+				if (property.equals(PREF_SHOW_TILE_INFO) || property.equals(PREF_SHOW_TILE_BORDER)) {
 
 					// map properties has changed
 
 					final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
+					final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
-					_map.setShowDebugInfo(isShowTileInfo);
+					_map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
 					_map.queueMapRedraw();
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
@@ -749,7 +751,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			final GeoPosition geoPosition = _map.getMapProvider().pixelToGeo(center, zoom);
 
-			_map.setGeoCenterPosition(geoPosition);
+			_map.setMapCenter(geoPosition);
 		}
 	}
 
@@ -896,7 +898,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
 		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
-				new PaletteData(0xff, 0xff00, 0xff00000));
+				new PaletteData(0xff, 0xff00, 0xff0000));
 
 		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
 
@@ -1467,9 +1469,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_poiName = wp.getName();
 				_poiZoomLevel = _map.getZoom();
 
-//				_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
+				_map.setMapCenter(_poiPosition);
 
-				_actionShowPOI.setChecked(true);
 			}
 
 			enableActions();
@@ -1638,7 +1639,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 				// position tour to the previous position
 				_map.setZoom(tourData.mapZoomLevel);
-				_map.setGeoCenterPosition(new GeoPosition(
+				_map.setMapCenter(new GeoPosition(
 						tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
 			}
@@ -1919,7 +1920,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// debug info
 		final boolean isShowTileInfo = _prefStore.getBoolean(TourMapView.PREF_SHOW_TILE_INFO);
-		_map.setShowDebugInfo(isShowTileInfo);
+		final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
+
+		_map.setShowDebugInfo(isShowTileInfo, isShowTileBorder);
 
 		// set dim level/color after the map providers are set
 		if (_mapDimLevel == -1) {
@@ -2029,7 +2032,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		final int sliderIndex = Math.max(0, Math.min(_currentSelectedSliderValueIndex, latitudeSerie.length - 1));
 
-		_map.setGeoCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
 	}
 
@@ -2055,7 +2058,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle positionRect = getPositionRect(positions, zoom);
-		java.awt.Rectangle viewport = _map.getMapPixelViewport();
+		java.awt.Rectangle viewport = _map.getWorldPixelViewport();
 
 //		// zoom until the tour is visible in the map
 //		while (!viewport.contains(positionRect)) {
@@ -2087,7 +2090,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					positionRect.x + positionRect.width / 2,
 					positionRect.y + positionRect.height / 2);
 
-			_map.setGeoCenterPosition(mp.pixelToGeo(center, zoom));
+			_map.setMapCenter(mp.pixelToGeo(center, zoom));
 
 			zoom++;
 
@@ -2098,7 +2101,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			_map.setZoom(zoom);
 
 			positionRect = getPositionRect(positions, zoom);
-			viewport = _map.getMapPixelViewport();
+			viewport = _map.getWorldPixelViewport();
 		}
 
 		// the algorithm generated a larger zoom level as necessary
