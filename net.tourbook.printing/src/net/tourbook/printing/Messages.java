@@ -37,6 +37,29 @@ public class Messages extends NLS {
 	public static String		Dialog_Print_Shell_Text;
 	public static String		Dialog_Print_Txt_FilePath_Tooltip;
 
+	public static String		Tour_Print_Tour;
+	public static String		Tour_Print_Start;
+	public static String		Tour_Print_Start_Location;
+	public static String		Tour_Print_End_Location;
+	public static String		Tour_Print_Time_Distance_Speed;
+	public static String		Tour_Print_Tour_Time;
+	public static String		Tour_Print_Tour_Pausing_Time;
+	public static String		Tour_Print_Tour_Moving_Time;
+	public static String		Tour_Print_Distance;
+	public static String		Tour_Print_Maximum_Speed;
+	public static String		Tour_Print_Personal;
+	public static String		Tour_Print_Rest_Pulse;
+	public static String		Tour_Print_Maximum_Pulse;
+	public static String		Tour_Print_Average_Pulse;
+	public static String		Tour_Print_Calories;
+	public static String		Tour_Print_Average_Cadence;
+	public static String		Tour_Print_Altitude;
+	public static String		Tour_Print_Highest_Altitude;
+	public static String		Tour_Print_Meters_Up;
+	public static String		Tour_Print_Meters_Down;
+	public static String		Tour_Print_Tour_Markers;
+	public static String		Tour_Print_No_Markers_Found;
+	
 	public static String		app_btn_browse;
 
 	static {

@@ -32,6 +32,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -139,12 +140,15 @@ public class PrintTourPDF extends PrintTourExtension {
 				foUserAgent.setProducer(this.getClass().getName());
 				final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
+				setTranslationParameters(transformer);
 				setTransformationParameters((TourData) object, transformer, printSettings);
 
 				// perform transformation
 				final Result res = new SAXResult(fop.getDefaultHandler());
 				transformer.transform(xmlSource, res);
 
+				// launch the pdf file (will only work if the user has a registered pdf viewer installed) 
+				Program.launch(printSettings.getCompleteFilePath());
 			}
 		} finally {
 			if (pdfContent != null) {
@@ -157,34 +161,31 @@ public class PrintTourPDF extends PrintTourExtension {
 		}
 	}
 
-	/*
-	private void createMapForPrinting(final TourData _tourData, final Shell parentShell) {
+	private void setTranslationParameters(final Transformer _transformer) {
 
-		final Display display = new Display();
-		final Shell shell = new Shell(display);
-		shell.setSize(800, 600);
-
-		final TourMapView tmv = new TourMapView();
-
-		tmv.paintOneTourForPrinting(_tourData);
-
-		final Canvas map = tmv.getMap();
-
-		final Image image = new Image(shell.getDisplay(), 800, 600);
-
-		GC gc = new GC(map);
-		gc.copyArea(image, 0, 0);
-		gc.dispose();
-
-		ImageData data = image.getImageData();
-		ImageLoader loader = new ImageLoader();
-		loader.data = new ImageData[] { data };
-		loader.save("c:/temp/image.png", SWT.IMAGE_PNG);
-
-		image.dispose();
-
+		_transformer.setParameter("lang.Tour_Print_Tour", net.tourbook.printing.Messages.Tour_Print_Tour);
+		_transformer.setParameter("lang.Tour_Print_Start", net.tourbook.printing.Messages.Tour_Print_Start);
+		_transformer.setParameter("lang.Tour_Print_Start_Location", net.tourbook.printing.Messages.Tour_Print_Start_Location);
+		_transformer.setParameter("lang.Tour_Print_End_Location", net.tourbook.printing.Messages.Tour_Print_End_Location);
+		_transformer.setParameter("lang.Tour_Print_Time_Distance_Speed", net.tourbook.printing.Messages.Tour_Print_Time_Distance_Speed);
+		_transformer.setParameter("lang.Tour_Print_Tour_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Time);
+		_transformer.setParameter("lang.Tour_Print_Tour_Pausing_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Pausing_Time);
+		_transformer.setParameter("lang.Tour_Print_Tour_Moving_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Moving_Time);
+		_transformer.setParameter("lang.Tour_Print_Distance", net.tourbook.printing.Messages.Tour_Print_Distance);
+		_transformer.setParameter("lang.Tour_Print_Maximum_Speed", net.tourbook.printing.Messages.Tour_Print_Maximum_Speed);
+		_transformer.setParameter("lang.Tour_Print_Personal", net.tourbook.printing.Messages.Tour_Print_Personal);
+		_transformer.setParameter("lang.Tour_Print_Rest_Pulse", net.tourbook.printing.Messages.Tour_Print_Rest_Pulse);
+		_transformer.setParameter("lang.Tour_Print_Maximum_Pulse", net.tourbook.printing.Messages.Tour_Print_Maximum_Pulse);
+		_transformer.setParameter("lang.Tour_Print_Average_Pulse", net.tourbook.printing.Messages.Tour_Print_Average_Pulse);
+		_transformer.setParameter("lang.Tour_Print_Calories", net.tourbook.printing.Messages.Tour_Print_Calories);
+		_transformer.setParameter("lang.Tour_Print_Average_Cadence", net.tourbook.printing.Messages.Tour_Print_Average_Cadence);
+		_transformer.setParameter("lang.Tour_Print_Altitude", net.tourbook.printing.Messages.Tour_Print_Altitude);
+		_transformer.setParameter("lang.Tour_Print_Highest_Altitude", net.tourbook.printing.Messages.Tour_Print_Highest_Altitude);
+		_transformer.setParameter("lang.Tour_Print_Meters_Up", net.tourbook.printing.Messages.Tour_Print_Meters_Up);
+		_transformer.setParameter("lang.Tour_Print_Meters_Down", net.tourbook.printing.Messages.Tour_Print_Meters_Down);
+		_transformer.setParameter("lang.Tour_Print_Tour_Markers", net.tourbook.printing.Messages.Tour_Print_Tour_Markers);
+		_transformer.setParameter("lang.Tour_Print_No_Markers_Found", net.tourbook.printing.Messages.Tour_Print_No_Markers_Found);
 	}
-	*/
 
 	/**
 	 * configures parameters used in the xsl transformation
@@ -215,11 +216,18 @@ public class PrintTourPDF extends PrintTourExtension {
 		_transformer.setParameter("unitLabelCalories", Messages.Value_Unit_Calories);
 	}
 
+	private DialogPrintTour	dpt;
+
 	@Override
 	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-		new DialogPrintTour(Display.getCurrent().getActiveShell(), this, tourDataList, tourStartIndex, tourEndIndex)
-				.open();
+		dpt = new DialogPrintTour(
+				Display.getCurrent().getActiveShell(),
+				this,
+				tourDataList,
+				tourStartIndex,
+				tourEndIndex);
+		dpt.open();
 
 		// hardcoded pdf output path for development
 		// final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
