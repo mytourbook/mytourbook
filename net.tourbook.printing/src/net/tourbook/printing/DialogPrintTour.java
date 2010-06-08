@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -78,17 +79,17 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final int				COMBO_HISTORY_LENGTH		= 20;
 
 	private static final String				STATE_PAPER_SIZE			= "printPaperSize";								//$NON-NLS-1$
-	private static final String				STATE_PAPER_ORIENTATION		= "printPaperOrientation";						//$NON-NLS-1$
-	
+	private static final String				STATE_PAPER_ORIENTATION		= "printPaperOrientation";							//$NON-NLS-1$
+
 	private static final String[]			PAPER_SIZE_ITEMS;
 	private static final String[]			PAPER_ORIENTATION_ITEMS;
-	
-	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";								//$NON-NLS-1$
-	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";								//$NON-NLS-1$
 
-	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";								//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";								//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";									//$NON-NLS-1$
+
+	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";									//$NON-NLS-1$
 	private static final String				STATE_PRINT_FILE_NAME		= "printtFileName";								//$NON-NLS-1$
-	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";							//$NON-NLS-1$
+	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";								//$NON-NLS-1$
 
 	private static final DecimalFormat		_intFormatter				= (DecimalFormat) NumberFormat
 																				.getInstance(Locale.US);
@@ -109,7 +110,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_double2Formatter.applyPattern("0.00"); //$NON-NLS-1$
 		_double6Formatter.applyPattern("0.0000000"); //$NON-NLS-1$
 		_dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-		
+
 		PAPER_SIZE_ITEMS = new String[2];
 		PAPER_SIZE_ITEMS[0] = Messages.Dialog_Print_Label_Paper_Size_A4;
 		PAPER_SIZE_ITEMS[1] = Messages.Dialog_Print_Label_Paper_Size_Letter;
@@ -117,8 +118,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		PAPER_ORIENTATION_ITEMS = new String[2];
 		PAPER_ORIENTATION_ITEMS[0] = Messages.Dialog_Print_Label_Paper_Orientation_Portrait;
 		PAPER_ORIENTATION_ITEMS[1] = Messages.Dialog_Print_Label_Paper_Orientation_Landscape;
-			
-			
+
 	}
 
 	private final IDialogSettings			_state						= TourbookPlugin
@@ -141,9 +141,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private Combo							_comboPaperSize;
 	private Combo							_comboPaperOrientation;
 
-	
 	private Composite						_inputContainer;
-	
+
 	private Combo							_comboFile;
 	private Combo							_comboPath;
 	private Button							_btnSelectFile;
@@ -386,7 +385,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(3, 1).applyTo(_chkOverwriteFiles);
 			_chkOverwriteFiles.setText(Messages.Dialog_Print_Chk_OverwriteFiles);
 			_chkOverwriteFiles.setToolTipText(Messages.Dialog_Print_Chk_OverwriteFiles_Tooltip);
-			
+
 			// -----------------------------------------------------------------------------
 
 			/*
@@ -421,7 +420,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			createUIOptionPrintNotes(group);
 		}
 	}
-	
+
 	private void createUIOptionPrintMarkers(final Composite parent) {
 
 		/*
@@ -432,7 +431,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_chkPrintMarkers.setText(Messages.Dialog_Print_Chk_PrintMarkers);
 		_chkPrintMarkers.setToolTipText(Messages.Dialog_Print_Chk_PrintMarkers_Tooltip);
 	}
-	
+
 	private void createUIOptionPrintNotes(final Composite parent) {
 
 		/*
@@ -443,22 +442,21 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_chkPrintNotes.setText(Messages.Dialog_Print_Chk_PrintNotes);
 		_chkPrintNotes.setToolTipText(Messages.Dialog_Print_Chk_PrintNotes_Tooltip);
 	}
-	
-	
+
 	private void createUIPaperFormat(final Composite parent) {
 
 		// container
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Dialog_Print_Group_Paper);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group); 
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		{
 			createUIPaperSize(group);
 			createUIPaperOrientation(group);
 		}
 	}
 
-	private void createUIPaperOrientation(final Composite parent){
+	private void createUIPaperOrientation(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Dialog_Print_Label_Paper_Orientation);
 		_comboPaperOrientation = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
@@ -467,7 +465,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		_comboPaperOrientation.setItems(PAPER_ORIENTATION_ITEMS);
 	}
 
-	private void createUIPaperSize(final Composite parent){
+	private void createUIPaperSize(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Dialog_Print_Label_Paper_Size);
 		_comboPaperSize = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
@@ -504,7 +502,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		}
 	}
 
-	private void doPrint() throws IOException {
+	private void doPrint() throws IOException, FOPException, TransformerException {
 
 		// disable button's
 		getButton(IDialogConstants.OK_ID).setEnabled(false);
@@ -514,7 +512,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 		final PrintSettings printSettings = new PrintSettings();
 		printSettings.setCompleteFilePath(completeFilePath);
-		
+
 		switch (_comboPaperSize.getSelectionIndex()) {
 		case 0:
 			printSettings.setPaperSize(PaperSize.A4);
@@ -526,7 +524,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		default:
 			break;
 		}
-		
+
 		switch (_comboPaperOrientation.getSelectionIndex()) {
 		case 0:
 			printSettings.setPaperOrientation(PaperOrientation.PORTRAIT);
@@ -538,26 +536,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 		default:
 			break;
 		}
-	
+
 		printSettings.setOverwriteFiles(_chkOverwriteFiles.getSelection());
 		printSettings.setPrintMarkers(_chkPrintMarkers.getSelection());
 		printSettings.setPrintDescription(_chkPrintNotes.getSelection());
-		
-		
+
 		if (_tourDataList.size() == 1) {
 			// print one tour
 			final TourData tourData = _tourDataList.get(0);
-			
+
 			if (_printExtensionPoint instanceof PrintTourPDF) {
-				try {
-					//TODO handle exception
-					//System.out.println("tour id:"+tourData.getTourId());	
-					((PrintTourPDF)_printExtensionPoint).printPDF(tourData, printSettings);
-				} catch (final FOPException e) {
-					e.printStackTrace();
-				} catch (final TransformerException e) {
-					e.printStackTrace();
-				}
+				//System.out.println("tour id:"+tourData.getTourId());	
+				((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
 			}
 		} else {
 			/*
@@ -582,7 +572,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 								.addFileExtension(PDF_FILE_EXTENSION);
 
 						/*
-						 *	print: update dialog progress monitor
+						 * print: update dialog progress monitor
 						 */
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
@@ -599,20 +589,21 @@ public class DialogPrintTour extends TitleAreaDialog {
 							}
 						});
 
-						
 						if (_printExtensionPoint instanceof PrintTourPDF) {
+							printSettings.setCompleteFilePath(filePath.toOSString());
 							try {
-								//TODO handle exception
-								printSettings.setCompleteFilePath(filePath.toOSString());
-								((PrintTourPDF)_printExtensionPoint).printPDF(tourData, printSettings);
-							} catch (final FOPException e) {
-								e.printStackTrace();
-							} catch (final TransformerException e) {
-								e.printStackTrace();
+								((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
 							} catch (final FileNotFoundException e) {
 								e.printStackTrace();
+								displayErrorMessage(e);
+							} catch (final FOPException e) {
+								e.printStackTrace();
+								displayErrorMessage(e);
+							} catch (final TransformerException e) {
+								e.printStackTrace();
+								displayErrorMessage(e);
 							}
-						}			
+						}
 					}
 
 					return Status.OK_STATUS;
@@ -626,6 +617,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void displayErrorMessage(final Exception exception) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				ErrorDialog.openError(
+						Display.getCurrent().getActiveShell(),
+						Messages.Dialog_Print_Error_Title,
+						Messages.Dialog_Print_Error_Message,
+						new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.Dialog_Print_Error_Title, exception));
+			}
+		});
 	}
 
 	private void enableFields() {
@@ -684,8 +687,9 @@ public class DialogPrintTour extends TitleAreaDialog {
 			public void run() {
 				try {
 					doPrint();
-				} catch (final IOException e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
+					displayErrorMessage(e);
 				}
 			}
 		});
@@ -731,12 +735,12 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private void restoreState() {
 		try {
 			_comboPaperSize.select(_state.getInt(STATE_PAPER_SIZE));
-			_comboPaperOrientation.select(_state.getInt(STATE_PAPER_ORIENTATION));			
-		} catch (final NumberFormatException nfe){
+			_comboPaperOrientation.select(_state.getInt(STATE_PAPER_ORIENTATION));
+		} catch (final NumberFormatException nfe) {
 			_comboPaperSize.select(0);
 			_comboPaperOrientation.select(0);
 		}
-		
+
 		_chkPrintMarkers.setSelection(_state.getBoolean(STATE_IS_PRINT_MARKERS));
 		_chkPrintNotes.setSelection(_state.getBoolean(STATE_IS_PRINT_NOTES));
 
@@ -749,7 +753,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private void saveState() {
 		_state.put(STATE_PAPER_SIZE, _comboPaperSize.getSelectionIndex());
 		_state.put(STATE_PAPER_ORIENTATION, _comboPaperOrientation.getSelectionIndex());
-		
+
 		// print file/path
 		if (validateFilePath()) {
 			_state.put(STATE_PRINT_PATH_NAME, getUniqueItems(_comboPath.getItems(), getPrintPathName()));
@@ -867,7 +871,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			setError(Messages.Dialog_Print_Msg_FileNameIsInvalid);
 
 		} else if (newFile.exists()) {
-			
+
 			// file already exists
 
 			setMessage(

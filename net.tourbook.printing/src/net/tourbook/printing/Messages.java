@@ -36,6 +36,9 @@ public class Messages extends NLS {
 	public static String		Dialog_Print_Msg_PathIsNotAvailable;
 	public static String		Dialog_Print_Shell_Text;
 	public static String		Dialog_Print_Txt_FilePath_Tooltip;
+	public static String		Dialog_Print_Error_Title;
+	public static String		Dialog_Print_Error_Message;
+
 
 	public static String		Tour_Print_Tour;
 	public static String		Tour_Print_Start;
