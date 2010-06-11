@@ -41,9 +41,9 @@ public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
 
-	private static final String				COLUMN_2			= "  ";								//$NON-NLS-1$
-	private static final String				COLUMN_4			= "    ";								//$NON-NLS-1$
-	private static final String				COLUMN_5			= "     ";								//$NON-NLS-1$
+	private static final String				COLUMN_2			= "  ";										//$NON-NLS-1$
+	private static final String				COLUMN_4			= "    ";										//$NON-NLS-1$
+	private static final String				COLUMN_5			= "     ";										//$NON-NLS-1$
 
 	private OverlayTourState				_overlayTourState	= OverlayTourState.TILE_IS_NOT_CHECKED;
 	private OverlayImageState				_overlayImageState	= OverlayImageState.NOT_SET;
@@ -744,7 +744,7 @@ public class Tile extends Observable {
 	 * @return Returns <code>true</code> when loading of the tile image failed
 	 */
 	public boolean isLoadingError() {
-		return (_loadingError != null) && (_loadingError.length() > 0);
+		return _loadingError != null && _loadingError.length() > 0;
 	}
 
 	/**
@@ -814,6 +814,10 @@ public class Tile extends Observable {
 		}
 
 		_childrenWithErrors.put(childTile.getTileKey(), childTile);
+
+//		System.out.println("setChildLoadingError\t" + childTile.getTileKey());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	/**

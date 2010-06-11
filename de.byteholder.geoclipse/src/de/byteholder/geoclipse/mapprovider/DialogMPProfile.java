@@ -1435,6 +1435,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 				.grab(true, true)
 				.applyTo(_map);
 
+		_map.setQueueMapRedraw(false);
 		_map.setShowScale(true);
 
 		_map.addZoomListener(new IZoomListener() {
@@ -2004,13 +2005,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		final int mapMinValue = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 		final int mapMaxValue = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
 
-		if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-			_spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
-		}
+		_isInitUI = true;
+		{
+			if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
+				_spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
+			}
 
-		if (mapMaxValue < mapMinValue) {
-			_spinMinZoom.setSelection(mapMinValue + 1);
+			if (mapMaxValue < mapMinValue) {
+				_spinMinZoom.setSelection(mapMinValue + 1);
+			}
 		}
+		_isInitUI = false;
 
 		updateLiveView();
 	}
@@ -2074,7 +2079,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			setMapZoomLevelFromInfo(_mpProfile);
 
-			_map.setMapProviderWithReset(_mpProfile, true);
+			_map.setMapProviderWithReset(_mpProfile);
 
 		} else {
 
@@ -2085,7 +2090,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			// ensure the map is using the correct zoom levels
 			setMapZoomLevelFromInfo(_mpDefault);
 
-			_map.setMapProviderWithReset(_mpDefault, true);
+			_map.setMapProviderWithReset(_mpDefault);
 		}
 	}
 
@@ -2106,7 +2111,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		 */
 		setMapZoomLevelFromInfo(_mpProfile);
 
-		_map.setMapProviderWithReset(_mpProfile, true);
+		_map.setMapProviderWithReset(_mpProfile);
 	}
 
 	/**
@@ -2635,11 +2640,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		MPProfile.updateMpFromWrapper(allMpWrappers);
 
 		// set factory this is required when zoom and position is set
-		_map.setMapProviderWithReset(_mpProfile, true);
+		_map.setMapProviderWithReset(_mpProfile);
 
 		// set position to previous position
 		_map.setZoom(_mpProfile.getLastUsedZoom());
 		_map.setMapCenter(_mpProfile.getLastUsedPosition());
+
+		_map.setQueueMapRedraw(true);
 
 		// create root item and update viewer
 		_rootItem = new TVIMapProviderRoot(_treeViewer, allMpWrappers);

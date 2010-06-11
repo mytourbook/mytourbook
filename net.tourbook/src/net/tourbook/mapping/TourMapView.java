@@ -242,7 +242,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private ActionZoomIn							_actionZoomIn;
 	private ActionZoomOut							_actionZoomOut;
 	private ActionZoomCentered						_actionZoomCentered;
-	private ActionZoomShowAll						_actionZoomShowAll;
+	private ActionZoomShowEntireEarth				_actionZoomShowAll;
 	private ActionZoomShowEntireTour				_actionZoomShowEntireTour;
 
 	public TourMapView() {}
@@ -463,7 +463,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	void actionZoomShowEntireMap() {
+
+		_map.setMapCenter(new GeoPosition(0.0, 0.0));
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
+
 		_map.queueMapRedraw();
 	}
 
@@ -814,7 +817,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionZoomIn = new ActionZoomIn(this);
 		_actionZoomOut = new ActionZoomOut(this);
 		_actionZoomCentered = new ActionZoomCentered(this);
-		_actionZoomShowAll = new ActionZoomShowAll(this);
+		_actionZoomShowAll = new ActionZoomShowEntireEarth(this);
 		_actionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
 		_actionSynchWithTour = new ActionSynchWithTour(this);
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
@@ -954,10 +957,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_map = new Map(parent, SWT.NONE);
-		_map.setDirectPainter(_directMappingPainter);
-
 		_mapLegend = new MapLegend();
+
+		_map = new Map(parent, SWT.NONE);
+		_map.setQueueMapRedraw(false);
+
+		_map.setDirectPainter(_directMappingPainter);
+//		_map.setLiveView(true);
+
 		_map.setLegend(_mapLegend);
 		_map.setShowLegend(true);
 		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
@@ -1029,6 +1036,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				} else {
 					_map.queueMapRedraw();
 				}
+
+				/*
+				 * enable map drawing, this is done very late to disable flickering which is caused
+				 * by setting up the map
+				 */
+				_map.setQueueMapRedraw(true);
 
 				if (_mapDimLevel < 30) {
 					showDimWarning();
@@ -2058,7 +2071,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		int zoom = mp.getMinimumZoomLevel();
 
 		Rectangle positionRect = getPositionRect(positions, zoom);
-		java.awt.Rectangle viewport = _map.getWorldPixelViewport();
+		Rectangle viewport = _map.getWorldPixelViewport();
 
 //		// zoom until the tour is visible in the map
 //		while (!viewport.contains(positionRect)) {

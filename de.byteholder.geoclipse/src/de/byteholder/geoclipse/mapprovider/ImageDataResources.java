@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
- 
 package de.byteholder.geoclipse.mapprovider;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,7 +43,6 @@ public class ImageDataResources {
 	private final int					_tileSize;
 
 	public ImageDataResources(final int tileSize) {
-
 		_tileSize = tileSize;
 	}
 

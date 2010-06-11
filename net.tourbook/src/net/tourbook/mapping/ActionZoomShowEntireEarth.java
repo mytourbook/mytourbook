@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,15 +19,15 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomShowAll extends Action {
+public class ActionZoomShowEntireEarth extends Action {
 
-	private TourMapView	fMapView;
+	private TourMapView	_mapView;
 
-	public ActionZoomShowAll(final TourMapView mapView) {
+	public ActionZoomShowEntireEarth(final TourMapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fMapView = mapView;
+		_mapView = mapView;
 
 		setToolTipText(Messages.map_action_zoom_show_all);
 
@@ -37,7 +37,7 @@ public class ActionZoomShowAll extends Action {
 
 	@Override
 	public void run() {
-		fMapView.actionZoomShowEntireMap();
+		_mapView.actionZoomShowEntireMap();
 	}
 
 }

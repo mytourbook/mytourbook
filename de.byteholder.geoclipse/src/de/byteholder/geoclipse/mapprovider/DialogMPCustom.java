@@ -73,63 +73,64 @@ import de.byteholder.gpx.GeoPosition;
 
 public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefaultActions {
 
-	private static final String				PARAMETER_TRAILING_CHAR					= "}";													//$NON-NLS-1$
-	private static final String				PARAMETER_LEADING_CHAR					= "{";													//$NON-NLS-1$
+	private static final String						PARAMETER_TRAILING_CHAR					= "}";													//$NON-NLS-1$
+	private static final String						PARAMETER_LEADING_CHAR					= "{";													//$NON-NLS-1$
 
-	private static final int				MAX_RANDOM								= 9999;
+	private static final int						MAX_RANDOM								= 9999;
 
-	private static final int				UI_MAX_ZOOM_LEVEL						= 20;
-	private static final int				UI_MIN_ZOOM_LEVEL						= 1;
-	private static final int				MAP_MAX_ZOOM_LEVEL						= UI_MAX_ZOOM_LEVEL
-																							- UI_MIN_ZOOM_LEVEL;
+	private static final int						UI_MAX_ZOOM_LEVEL						= 20;
+	private static final int						UI_MIN_ZOOM_LEVEL						= 1;
+	private static final int						MAP_MAX_ZOOM_LEVEL						= UI_MAX_ZOOM_LEVEL
+																									- UI_MIN_ZOOM_LEVEL;
 
-	public static final String				DEFAULT_URL								= "http://";											//$NON-NLS-1$
+	public static final String						DEFAULT_URL								= "http://";											//$NON-NLS-1$
 
-	private static final String				DIALOG_SETTINGS_VIEWER_WIDTH			= "ViewerWidth";										//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_VIEWER_WIDTH			= "ViewerWidth";										//$NON-NLS-1$
 
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "IsShowTileInfo";									//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";							//$NON-NLS-1$
-	private static final String				DIALOG_SETTINGS_EXAMPLE_URL				= "ExampleUrl";										//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_INFO		= "IsShowTileInfo";									//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG	= "IsShowTileImageLogging";							//$NON-NLS-1$
+	private static final String						DIALOG_SETTINGS_EXAMPLE_URL				= "ExampleUrl";										//$NON-NLS-1$
 
 	// feldberg
 //	private static final String				DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/16/34225/22815.png";	//$NON-NLS-1$
 
 	// tremola
-	private static final String				DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/15/17165/11587.png";	//$NON-NLS-1$
+	private static final String						DEFAULT_EXAMPLE							= "http://tile.openstreetmap.org/15/17165/11587.png";	//$NON-NLS-1$
 
 	/*
 	 * UI controls
 	 */
-	private Display							_display;
+	private Display									_display;
 
-	private Button							_btnOk;
-	private Composite						_leftContainer;
+	private Button									_btnOk;
+	private Composite								_leftContainer;
 
-	private ViewerDetailForm				_detailForm;
-	private ToolBar							_toolbar;
+	private ViewerDetailForm						_detailForm;
+	private ToolBar									_toolbar;
 
-	private Label							_lblMapInfo;
+	private Label									_lblMapInfo;
 
-	private Label							_lblTileInfo;
-	private Button							_chkShowTileInfo;
-	private Text							_txtExampleUrl;
-	private Text							_txtCustomUrl;
-	private Combo							_cboTileImageLog;
-	private Button							_btnShowMap;
+	private Label									_lblTileInfo;
+	private Button									_chkShowTileInfo;
+	private Text									_txtExampleUrl;
+	private Text									_txtCustomUrl;
+	private Combo									_cboTileImageLog;
+	private Button									_btnShowMap;
 
-	private Spinner							_spinMinZoom;
-	private Spinner							_spinMaxZoom;
-	private Button							_btnShowOsmMap;
-	private Composite						_partContainer;
-	private Button							_chkShowTileImageLog;
+	private Spinner									_spinMinZoom;
+	private Spinner									_spinMaxZoom;
+	private Button									_btnShowOsmMap;
+	private Composite								_partContainer;
+	private Button									_chkShowTileImageLog;
 
-	private Label							_lblLog;
-	private Text							_txtImageFormat;
+	private Label									_lblLog;
+	private Text									_txtImageFormat;
 
 	/*
 	 * NON-UI fields
 	 */
-	private final NumberFormat					_nfLatLon								= NumberFormat.getNumberInstance();
+	private final NumberFormat						_nfLatLon								= NumberFormat
+																									.getNumberInstance();
 
 	{
 		// initialize lat/lon formatter
@@ -140,7 +141,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 	/**
 	 * url parameter items which can be selected in the combobox for each parameter
 	 */
-	private final ArrayList<PartUIItem>			PART_ITEMS								= new ArrayList<PartUIItem>();
+	private final ArrayList<PartUIItem>				PART_ITEMS								= new ArrayList<PartUIItem>();
 
 	{
 		PART_ITEMS.add(new PartUIItem(//
@@ -187,34 +188,34 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private final IDialogSettings					_dialogSettings;
 
-	private final PrefPageMapProviders			_prefPageMapFactory;
+	private final PrefPageMapProviders				_prefPageMapFactory;
 
-	private String							_defaultMessage;
+	private String									_defaultMessage;
 
 	/**
 	 * contains the custom url with all url parts which are converted to a string
 	 */
-	private String							_customUrl;
-	private String							_previousCustomUrl;
+	private String									_customUrl;
+	private String									_previousCustomUrl;
 
-	private MPCustom						_mpCustom;
+	private MPCustom								_mpCustom;
 	private final MP								_defaultMapProvider;
 
-	private boolean							_isInitUI								= false;
+	private boolean									_isInitUI								= false;
 
-	private boolean							_isEnableTileImageLogging;
+	private boolean									_isEnableTileImageLogging;
 	private final ConcurrentLinkedQueue<LogEntry>	_logEntries								= new ConcurrentLinkedQueue<LogEntry>();
 
-	private int								_statUpdateCounter						= 0;
-	private int								_statIsQueued;
-	private int								_statStartLoading;
-	private int								_statEndLoading;
-	private int								_statErrorLoading;
+	private int										_statUpdateCounter						= 0;
+	private int										_statIsQueued;
+	private int										_statStartLoading;
+	private int										_statEndLoading;
+	private int										_statErrorLoading;
 
-	private int								_previousMinZoom;
-	private int								_previousMaxZoom;
+	private int										_previousMinZoom;
+	private int										_previousMaxZoom;
 
-	private static final ReentrantLock		LOG_LOCK								= new ReentrantLock();
+	private static final ReentrantLock				LOG_LOCK								= new ReentrantLock();
 
 	enum PART_TYPE {
 		NONE, //
@@ -223,7 +224,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		ZOOM, //
 		X, //
 		Y, //
-		//
+			//
 		RANDOM_INTEGER, //
 		RANDOM_ALPHA, //
 		//
@@ -231,7 +232,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 	private class PartRow {
 
-		private final Combo						rowCombo;
+		private final Combo							rowCombo;
 
 		/**
 		 * The hashmap contains all widgets for one row
@@ -279,7 +280,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 //		PAGE_LAT_BOTTOM, //
 //		PAGE_LON_LEFT, //
 //		PAGE_LON_RIGHT, //
-		//
+//
 		SPINNER_RANDOM_START, //
 		SPINNER_RANDOM_END, //
 		//
@@ -893,6 +894,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 				.grab(true, true)
 				.applyTo(_map);
 
+		_map.setQueueMapRedraw(false);
 		_map.setShowScale(true);
 
 		_map.addMousePositionListener(new IPositionListener() {
@@ -908,10 +910,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 								lon + 360
 								: lon;
 
-				_lblMapInfo.setText(NLS.bind(Messages.Dialog_MapConfig_Label_MapInfo, new Object[] {
-						_nfLatLon.format(mousePosition.latitude),
-						_nfLatLon.format(lon),
-						Integer.toString(event.mapZoomLevel + 1) }));
+				_lblMapInfo.setText(NLS.bind(
+						Messages.Dialog_MapConfig_Label_MapInfo,
+						new Object[] {
+								_nfLatLon.format(mousePosition.latitude),
+								_nfLatLon.format(lon),
+								Integer.toString(event.mapZoomLevel + 1) }));
 			}
 		});
 
@@ -928,8 +932,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			// label: tile info
 			_lblTileInfo = new Label(infoContainer, SWT.TRAIL);
-			GridDataFactory.fillDefaults().hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT).applyTo(
-					_lblTileInfo);
+			GridDataFactory
+					.fillDefaults()
+					.hint(pixelConverter.convertWidthInCharsToPixels(25), SWT.DEFAULT)
+					.applyTo(_lblTileInfo);
 			_lblTileInfo.setToolTipText(Messages.Dialog_MapConfig_TileInfo_Tooltip_Line1
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line2
 					+ Messages.Dialog_MapConfig_TileInfo_Tooltip_Line3);
@@ -1070,11 +1076,13 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		setMessage(_defaultMessage);
 
 		// set factory and display map
-		_map.setMapProviderWithReset(mp, true);
+		_map.setMapProviderWithReset(mp);
 
 		// set position to previous position
 		_map.setZoom(_mpCustom.getLastUsedZoom());
 		_map.setMapCenter(_mpCustom.getLastUsedPosition());
+
+		_map.setQueueMapRedraw(true);
 	}
 
 	@Override
@@ -1119,7 +1127,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 		 */
 		updateMapZoomLevel(_mpCustom);
 
-		_map.setMapProviderWithReset(_mpCustom, true);
+		_map.setMapProviderWithReset(_mpCustom);
 	}
 
 	private void onSelectOsmMap() {
@@ -1133,7 +1141,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			updateMapZoomLevel(_mpCustom);
 
-			_map.setMapProviderWithReset(_mpCustom, true);
+			_map.setMapProviderWithReset(_mpCustom);
 
 		} else {
 
@@ -1144,7 +1152,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
 			_defaultMapProvider.setStateToReloadOfflineCounter();
 
-			_map.setMapProviderWithReset(_defaultMapProvider, true);
+			_map.setMapProviderWithReset(_defaultMapProvider);
 		}
 	}
 
@@ -1368,12 +1376,14 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 					}
 
 					// show at most 3 decimals
-					_lblTileInfo.setText(NLS.bind(Messages.Dialog_MapConfig_TileInfo_Statistics, new Object[] {
-							Integer.toString(_statIsQueued % 1000),
-							Integer.toString(_statEndLoading % 1000),
-							Integer.toString(_statStartLoading % 1000),
-							Integer.toString(_statErrorLoading % 1000), //
-					}));
+					_lblTileInfo.setText(NLS.bind(
+							Messages.Dialog_MapConfig_TileInfo_Statistics,
+							new Object[] {
+									Integer.toString(_statIsQueued % 1000),
+									Integer.toString(_statEndLoading % 1000),
+									Integer.toString(_statStartLoading % 1000),
+									Integer.toString(_statErrorLoading % 1000), //
+							}));
 
 					displayLogEntries(_logEntries, _cboTileImageLog);
 

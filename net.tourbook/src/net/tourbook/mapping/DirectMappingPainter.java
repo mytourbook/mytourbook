@@ -87,17 +87,20 @@ public class DirectMappingPainter implements IDirectPainter {
 
 		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
-		final java.awt.Point worldMarkerPos = mp.geoToPixel(new GeoPosition(
+		final java.awt.Point worldPixelMarkerAWT = mp.geoToPixel(new GeoPosition(
 				latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
 
+		// convert awt to swt point
+		final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
+
 		// check if slider is visible
-		final java.awt.Rectangle viewport = painterContext.viewport;
-		if (viewport.contains(worldMarkerPos)) {
+		final Rectangle viewport = painterContext.viewport;
+		if (viewport.contains(worldPixelMarker)) {
 
 			// convert world position into device position
-			final int devMarkerPosX = worldMarkerPos.x - viewport.x;
-			final int devMarkerPosY = worldMarkerPos.y - viewport.y;
+			final int devMarkerPosX = worldPixelMarker.x - viewport.x;
+			final int devMarkerPosY = worldPixelMarker.y - viewport.y;
 
 			// get marker size
 			final Rectangle bounds = markerImage.getBounds();

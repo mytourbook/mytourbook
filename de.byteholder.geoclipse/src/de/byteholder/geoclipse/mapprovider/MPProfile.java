@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -53,6 +53,12 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 	private boolean					_isSaveImage			= true;
 
+	public MPProfile() {}
+
+	public MPProfile(final ArrayList<MPWrapper> mpWrappers) {
+		_mpWrappers = mpWrappers;
+	}
+
 	/**
 	 * Sort map provider wrapper by position (by name when position is not available)
 	 * 
@@ -69,7 +75,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 				if (pos1 > -1 && pos2 > -1) {
 
-					// sort by position 
+					// sort by position
 					return pos1 - pos2;
 
 				} else if (pos1 > -1) {
@@ -86,7 +92,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 					// sort by name when position is not set
 					return mp1.getMP().getName().compareTo(mp2.getMP().getName());
- 				}
+				}
 			}
 		});
 	}
@@ -133,12 +139,6 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
 		wrapper.setAlpha(mp.getProfileAlpha());
 		wrapper.setIsTransparentBlack(mp.isProfileTransparentBlack());
-	}
-
-	public MPProfile() {}
-
-	public MPProfile(final ArrayList<MPWrapper> mpWrappers) {
-		_mpWrappers = mpWrappers;
 	}
 
 	@Override
@@ -217,9 +217,12 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 						null,
 						childMp.getProjection().getId());
 
-				// check if a tile with the requested child tile key is already in a cache
+				/*
+				 * check if a tile with the requested child tile key is already in the normal tile
+				 * cache or in the error tile cache
+				 */
 				Tile childTile = tileCache.get(childTileKey);
-				if (childTile != null) {
+				if (childTile == null) {
 					childTile = errorTiles.get(childTileKey);
 				}
 
@@ -431,10 +434,11 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		final String validClassName = validMapProvider.getClass().getName();
 		if (wrapperClassName.equals(validClassName) == false) {
 
-			StatusUtil.showStatus(NLS.bind(Messages.DBG056_MapProfile_WrongClassForMapProvider, new Object[] {
-					mpWrapper.getMapProviderId(),
-					wrapperClassName,
-					validClassName }), new Exception());
+			StatusUtil.showStatus(
+					NLS.bind(
+							Messages.DBG056_MapProfile_WrongClassForMapProvider,
+							new Object[] { mpWrapper.getMapProviderId(), wrapperClassName, validClassName }),
+					new Exception());
 
 			return false;
 		}

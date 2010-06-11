@@ -44,7 +44,6 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapViewPortData;
 import de.byteholder.geoclipse.map.Mercator;
 import de.byteholder.geoclipse.map.OverlayTourState;
 import de.byteholder.geoclipse.map.Projection;
@@ -68,7 +67,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private static final int						TILE_CACHE_SIZE						= 2000;													//2000;
 	private static final int						ERROR_CACHE_SIZE					= 10000;													//10000;
-	private static final int						IMAGE_CACHE_SIZE					= 100;
+	private static final int						IMAGE_CACHE_SIZE					= 200;
 
 	public static final int							OFFLINE_INFO_NOT_READ				= -1;
 
@@ -153,7 +152,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 */
 	private double[]								_longitudeRadianWidthInPixels;
 
-	private boolean									_useOfflineImage					= true;
+	private boolean									_isOfflineImageUsed					= true;
 
 	/**
 	 * This is the image shown as long as the real tile image is not yet fully loaded.
@@ -234,7 +233,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	private boolean									_isProfileBrightnessForNextMp		= false;
 	private int										_profileBrightnessValueForNextMp	= 77;
 
-	private MapViewPortData							_mapViewPort;
+//	private MapViewPortData							_mapViewPort;
 
 	/**
 	 * <pre>
@@ -305,34 +304,34 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		return _canBeToggled;
 	}
 
-	/**
-	 * Checks if a tile is displayed in the map viewport.
-	 * 
-	 * @param tile
-	 *            Tile which is checked
-	 * @return Returns <code>true</code> when the tile is displayed in the current map viewport.
-	 */
-	public boolean checkViewPort(final Tile tile) {
-
-		// check zoom level
-		if (tile.getZoom() != _mapViewPort.mapZoomLevel) {
-			return false;
-		}
-
-		// check position
-		final int tileX = tile.getX();
-		final int tileY = tile.getY();
-
-		if (tileX >= _mapViewPort.tilePosMinX
-				&& tileX <= _mapViewPort.tilePosMaxX
-				&& tileY >= _mapViewPort.tilePosMinY
-				&& tileY <= _mapViewPort.tilePosMaxY) {
-
-			return true;
-		}
-
-		return false;
-	}
+//	/**
+//	 * Checks if a tile is displayed in the map viewport.
+//	 *
+//	 * @param tile
+//	 *            Tile which is checked
+//	 * @return Returns <code>true</code> when the tile is displayed in the current map viewport.
+//	 */
+//	public boolean checkViewPort(final Tile tile) {
+//
+//		// check zoom level
+//		if (tile.getZoom() != _mapViewPort.mapZoomLevel) {
+//			return false;
+//		}
+//
+//		// check position
+//		final int tileX = tile.getX();
+//		final int tileY = tile.getY();
+//
+//		if (tileX >= _mapViewPort.tilePosMinX
+//				&& tileX <= _mapViewPort.tilePosMaxX
+//				&& tileY >= _mapViewPort.tilePosMinY
+//				&& tileY <= _mapViewPort.tilePosMaxY) {
+//
+//			return true;
+//		}
+//
+//		return false;
+//	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -394,7 +393,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				_errorImage = new Image(display, tileSize, tileSize);
 
-				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
+				final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
 				final GC gc = new GC(getErrorImage());
 				{
 					gc.setBackground(bgColor);
@@ -420,7 +419,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 				_loadingImage = new Image(display, tileSize, tileSize);
 
-				final Color bgColor = new Color(display, Map.DEFAULT_BACKGROUND_RGB);
+				final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
 				final GC gc = new GC(getLoadingImage());
 				{
 					gc.setBackground(bgColor);
@@ -876,8 +875,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		 */
 		Image cachedTileImage = null;
 
-		final boolean useOfflineImage = isUseOfflineImage();
-		if (useOfflineImage) {
+		if (_isOfflineImageUsed) {
 			cachedTileImage = _tileImageCache.getTileImage(tile);
 		}
 
@@ -888,7 +886,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 			if (isTileValid(tilePositionX, tilePositionY, zoom)) {
 
 				// set state if an offline image for the current tile is available
-				if (useOfflineImage) {
+				if (_isOfflineImageUsed) {
 					_tileImageCache.setOfflineImageAvailability(tile);
 				}
 
@@ -1077,7 +1075,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	/**
-	 * @returns Return <code>true</code> if this point in <em>tiles</em> is valid at this zoom
+	 * @returns Returns <code>true</code> when this point in <em>tiles</em> is valid at this zoom
 	 *          level. For example, if the zoom level is 0 (zoomed all the way out, there is only
 	 *          one tile), x,y must be 0,0
 	 */
@@ -1099,7 +1097,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		}
 
 		// check if out of zoom bounds
-		if (zoomLevel < getMinimumZoomLevel() || zoomLevel > getMaximumZoomLevel()) {
+		if (zoomLevel < _minZoomLevel || zoomLevel > _maxZoomLevel) {
 			return false;
 		}
 
@@ -1107,7 +1105,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public boolean isUseOfflineImage() {
-		return _useOfflineImage;
+		return _isOfflineImageUsed;
 	}
 
 	/**
@@ -1340,9 +1338,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 		_lastUsedZoom = zoom;
 	}
 
-	public void setMapViewPort(final MapViewPortData mapViewPort) {
-		_mapViewPort = mapViewPort;
-	}
+//	public void setMapViewPort(final MapViewPortData mapViewPort) {
+//		_mapViewPort = mapViewPort;
+//	}
 
 	public void setName(final String mapProviderName) {
 		_mapProviderName = mapProviderName;
@@ -1399,7 +1397,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	}
 
 	public void setUseOfflineImage(final boolean useOfflineImage) {
-		_useOfflineImage = useOfflineImage;
+		_isOfflineImageUsed = useOfflineImage;
 	}
 
 	/**

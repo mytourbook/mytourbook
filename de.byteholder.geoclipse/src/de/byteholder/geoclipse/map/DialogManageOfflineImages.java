@@ -87,6 +87,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	private final OfflineLoadManager	_offlineManager		= OfflineLoadManager.getInstance();
 
 	private MP							_selectedMp;
+	private MPProfile					_mpProfile;
 	private final int					_mapZoomLevel;
 
 	private final Point					_offlineWorldStart;
@@ -117,6 +118,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 	private final Display				_display;
 
 	private final NumberFormat			_nf					= NumberFormat.getInstance();
+
 	{
 		_nf.setMinimumFractionDigits(1);
 		_nf.setMaximumFractionDigits(1);
@@ -564,8 +566,32 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 			 * check if only one part should be deleted, all will be deleted when the selectedPartMP
 			 * is null
 			 */
-			if (selectedPartMp != null && offlineMp != selectedPartMp) {
-				continue;
+//			if (selectedPartMp != null && offlineMp != selectedPartMp) {
+			if (selectedPartMp != null) {
+
+				// mp is set --> only 1 mp will be deleted
+
+				if (_mpProfile == null) {
+
+					if (selectedPartMp != offlineMp) {
+						// delete only the selected mp offline images
+						continue;
+					}
+				} else {
+
+					// a mp profile is available in the mp list
+
+					if (_mpProfile == offlineMp) {
+
+						// delete also the mp profile offline images !!!
+
+					} else {
+
+						if (selectedPartMp != offlineMp) {
+							continue;
+						}
+					}
+				}
 			}
 
 			double worldX1 = Math.min(worldStartX, worldEndX);
@@ -830,6 +856,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 		// add all visible mp's which a profile mp contains
 		if (_selectedMp instanceof MPProfile) {
+
+			_mpProfile = (MPProfile) _selectedMp;
+
 			final MPProfile mpProfile = (MPProfile) _selectedMp;
 			for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
 				if (mpWrapper.isDisplayedInMap()) {

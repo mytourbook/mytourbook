@@ -1310,7 +1310,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 			// ensure the map is using the correct zoom levels
 			updateMapZoomLevels(_defaultMapProvider);
 
-			_map.setMapProviderWithReset(_defaultMapProvider, true);
+			_map.setMapProviderWithReset(_defaultMapProvider);
 		}
 	}
 
@@ -1371,7 +1371,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		 */
 		updateMapZoomLevels(_mpWms);
 
-		_map.setMapProviderWithReset(_mpWms, true);
+		_map.setMapProviderWithReset(_mpWms);
 	}
 
 	private void resetMap(final GeoPosition center, final int zoom) {
@@ -1445,7 +1445,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			positionRect.setRect(positionRect.getX(), 0.0d, positionRect.getWidth(), positionRect.getHeight());
 //		}
 
-		java.awt.Rectangle viewport = _map.getWorldPixelViewport();
+		org.eclipse.swt.graphics.Rectangle viewport = _map.getWorldPixelViewport();
 
 //		System.out.println();
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -1650,7 +1650,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 		_mpWms.initializeLayers();
 
 		// set factory and display map
-		_map.setMapProviderWithReset(_mpWms, true);
+		_map.setMapProviderWithReset(_mpWms);
 
 		if (isUpdatePosition) {
 			// set position to previous position

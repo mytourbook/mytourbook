@@ -24,7 +24,6 @@
 package de.byteholder.geoclipse.map;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -36,6 +35,7 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +86,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -205,7 +206,9 @@ public class Map extends Canvas {
 																									.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						DEFAULT_BACKGROUND_RGB						= new RGB(181, 208, 208);
+	public final static RGB						OSM_BACKGROUND_RGB							= new RGB(181, 208, 208);
+
+	private final static RGB					DEFAULT_BACKGROUND_RGB						= new RGB(0x40, 0x40, 0x40);
 
 	private static final RGB					_transparentRGB								= new RGB(0xfe, 0xfe, 0xfe);
 
@@ -246,19 +249,6 @@ public class Map extends Canvas {
 	private GeoPosition							_addressLocation;
 
 	/**
-	 * Specifies whether zooming is enabled (the mouse wheel, for example, zooms)
-	 */
-	private boolean								_zoomEnabled								= true;
-
-//	/**
-//	 * Indicates whether the component should re-center the map when the "middle" mouse button is
-//	 * pressed
-//	 */
-//	private boolean								_recenterOnClickEnabled						= true;
-//
-//	private boolean								_zoomOnDoubleClickEnabled					= true;
-
-	/**
 	 * The overlay to delegate to for painting the "foreground" of the map component. This would
 	 * include painting waypoints, day/night, etc. Also receives mouse events.
 	 */
@@ -270,8 +260,8 @@ public class Map extends Canvas {
 	private final Cursor						_cursorDefault;
 	private final Cursor						_cursorCross;
 
-	private int									_redrawMapCounter							= 0;
-	private int									_overlayRunnableCounter						= 0;
+	private AtomicInteger						_redrawMapCounter							= new AtomicInteger();
+	private AtomicInteger						_overlayRunnableCounter						= new AtomicInteger();
 
 	private boolean								_isLeftMouseButtonPressed					= false;
 
@@ -294,7 +284,6 @@ public class Map extends Canvas {
 																									.getNumberInstance();
 
 	{
-
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf2.setMinimumFractionDigits(2);
@@ -342,40 +331,56 @@ public class Map extends Canvas {
 	private boolean								_isLegendVisible;
 
 	/**
-	 * The position, in <I>map coordinates</I> of the center point. This is defined as the distance
-	 * from the top and left edges of the map in pixels. Dragging the map component will change the
-	 * center position. Zooming in/out will cause the center to be recalculated so as to remain in
-	 * the center of the new "map". <br>
+	 * This is the most important point for the map because all operations depend on it.
+	 * <p>
+	 * Center position of the map viewport in <I>world pixel</I>. Dragging the map component will
+	 * change the center position. Zooming in/out will cause the center to be recalculated so as to
+	 * remain in the center of the new "map".
+	 * <p>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * <br>
+	 * This MUST be in {@link Double} to be accurate when the map is zoomed<br>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * <br>
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
-	 * <br>
-	 * This center MUST be kept in double because the center would move to another position when the
-	 * map is zoomed because of rounding errors <br>
-	 * <br>
-	 * This cost me some hours to fix it <br>
-	 * <br>
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
 	 */
-	private Point2D								_worldPixelMapCenter						= new Point2D.Double(0, 0);
+	private Point2D								_worldPixelMapCenter						= null;
 
 	/**
-	 * Viewport in the world map where the {@link #_mapImage} is painted <br>
+	 * Viewport in the map where the {@link #_mapImage} is painted <br>
 	 * <br>
-	 * <b>x</b> and <b>y</b> contains the position in world pixel, which is the <b>top/left
-	 * corner</b>, <br>
+	 * <b>x</b> and <b>y</b> is the <b>top/left</b> corner in world pixel<br>
 	 * <b>width</b> and <b>height</b> contains the visible area in device pixel
+	 * <p>
+	 * <b>!!! x/y values can also be negative when the map is smaller than the viewport !!!</b>
+	 * <p>
+	 * I havn't yet fully understood how it works but I adjusted the map successfully in 10.6 and
+	 * tried to document this behaviour.
 	 */
 	private Rectangle							_worldPixelViewport;
+
+	/**
+	 * Size in device pixel where the map is displayed
+	 */
+	private Rectangle							_devMapViewport;
+
+	/**
+	 * Size of the map in tiles at the current zoom level {@link #_mapZoomLevel} (num tiles tall by
+	 * num tiles wide)
+	 */
+	private Dimension							_mapTileSize;
+
+	/**
+	 * Size of a tile in pixel (tile is quadratic)
+	 */
+	private int									_tilePixelSize;
 
 	/**
 	 * Contains the client area of the map without trimmings, this rectangle has the width and
 	 * height of the map image
 	 */
-	private org.eclipse.swt.graphics.Rectangle	_clientArea;
+	private Rectangle							_clientArea;
 
 	private final List<IZoomListener>			_zoomListeners;
-
 	private final ListenerList					_mousePositionListeners						= new ListenerList(
 																									ListenerList.IDENTITY);
 	private final ListenerList					_poiListeners								= new ListenerList(
@@ -397,7 +402,7 @@ public class Map extends Canvas {
 //	private boolean										_isPoiPositionInViewport;
 ////	private GeoPosition									_poiGeoPosition;
 //	private final Image									_poiImage;
-//	private final org.eclipse.swt.graphics.Rectangle	_poiImageBounds;
+//	private final Rectangle	_poiImageBounds;
 //	private final Point									_poiImageDevPosition						= new Point(0, 0);
 //
 //	/*
@@ -422,16 +427,6 @@ public class Map extends Canvas {
 	private int									_tilePosMinY;
 	private int									_tilePosMaxY;
 
-	// viewport data which are changed when map is resized or zoomed
-	private Rectangle							_devVisibleViewport;
-
-	/**
-	 * contains the size of the map at the given zoom in tiles (num tiles tall by num tiles wide)
-	 */
-	private Dimension							_mapTileSize;
-	private int									_worldViewportX;
-	private int									_worldViewportY;
-
 	private final Display						_display;
 	private final Thread						_displayThread;
 
@@ -455,12 +450,15 @@ public class Map extends Canvas {
 	private Point								_offlineWorldEnd;
 	private Point								_offlineWorldMouseMove;
 
-	private org.eclipse.swt.graphics.Rectangle	_currentOfflineArea;
-	private org.eclipse.swt.graphics.Rectangle	_previousOfflineArea;
+	private Rectangle							_currentOfflineArea;
+	private Rectangle							_previousOfflineArea;
 
 	private IMapContextProvider					_mapContextProvider;
 
-	private boolean								_disableContextMenu							= false;
+	/**
+	 * Is <code>true</code> when the map context menu can be displayed
+	 */
+	private boolean								_isContextMenuEnabled						= true;
 
 	private DropTarget							_dropTarget;
 
@@ -469,6 +467,8 @@ public class Map extends Canvas {
 //	private int									_pannedMapDiffY;
 
 	private ITourToolTip						_tourToolTip;
+
+	private boolean								_isRedrawEnabled							= true;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -487,21 +487,21 @@ public class Map extends Canvas {
 			int offset = (e.stateMask & SWT.CONTROL) != 0 ? 20 : 1;
 			offset *= (e.stateMask & SWT.SHIFT) != 0 ? 10 : 1;
 
-			int delta_x = 0;
-			int delta_y = 0;
+			int xDiff = 0;
+			int yDiff = 0;
 
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
-				delta_x = -offset;
+				xDiff = -offset;
 				break;
 			case SWT.ARROW_RIGHT:
-				delta_x = offset;
+				xDiff = offset;
 				break;
 			case SWT.ARROW_UP:
-				delta_y = -offset;
+				yDiff = -offset;
 				break;
 			case SWT.ARROW_DOWN:
-				delta_y = offset;
+				yDiff = offset;
 				break;
 			}
 
@@ -514,15 +514,16 @@ public class Map extends Canvas {
 				break;
 			}
 
-			if ((delta_x != 0) || (delta_y != 0)) {
+			if (xDiff != 0 || yDiff != 0) {
 
 				final Rectangle bounds = _worldPixelViewport;
-				final double x = bounds.getCenterX() + delta_x;
-				final double y = bounds.getCenterY() + delta_y;
-				final Point2D.Double pixelCenter = new Point2D.Double(x, y);
+
+				final double newCenterX = bounds.x + bounds.width / 2.0 + xDiff;
+				final double newCenterY = bounds.y + bounds.height / 2.0 + yDiff;
+
+				final Point2D.Double pixelCenter = new Point2D.Double(newCenterX, newCenterY);
 
 				setMapCenterInWorldPixel(pixelCenter);
-
 				updateViewPortData();
 
 				queueMapRedraw();
@@ -550,10 +551,8 @@ public class Map extends Canvas {
 
 		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
-
 			if (e.button == 1) {
-				recenterMap(e.x, e.y);
-				zoomIn();
+				onMouseDoubleClick(e);
 			}
 		}
 
@@ -638,7 +637,7 @@ public class Map extends Canvas {
 	 * @param newHeight
 	 * @return
 	 */
-	public static boolean canReuseImage(final Image image, final org.eclipse.swt.graphics.Rectangle clientArea) {
+	public static boolean canReuseImage(final Image image, final Rectangle clientArea) {
 
 		// check if we could reuse the existing image
 
@@ -646,7 +645,7 @@ public class Map extends Canvas {
 			return false;
 		} else {
 			// image exist, check for the bounds
-			final org.eclipse.swt.graphics.Rectangle oldBounds = image.getBounds();
+			final Rectangle oldBounds = image.getBounds();
 
 			if (!((oldBounds.width == clientArea.width) && (oldBounds.height == clientArea.height))) {
 				return false;
@@ -665,9 +664,7 @@ public class Map extends Canvas {
 	 * @param clientArea
 	 * @return returns a new created image
 	 */
-	public static Image createImage(final Display display,
-									final Image image,
-									final org.eclipse.swt.graphics.Rectangle clientArea) {
+	public static Image createImage(final Display display, final Image image, final Rectangle clientArea) {
 
 		if ((image != null) && !image.isDisposed()) {
 			image.dispose();
@@ -874,8 +871,7 @@ public class Map extends Canvas {
 	private void checkImageTemplate9Parts() {
 
 		final int parts = 3;
-		final int tileSize = _mp.getTileSize();
-		final int partedTileSize = tileSize * parts;
+		final int partedTileSize = _tilePixelSize * parts;
 
 		if ((_image9Parts != null) && (_image9Parts.isDisposed() == false)) {
 			if (_image9Parts.getBounds().width == partedTileSize) {
@@ -916,7 +912,7 @@ public class Map extends Canvas {
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				if ((_mp == null) || _disableContextMenu) {
+				if ((_mp == null) || _isContextMenuEnabled == false) {
 					return;
 				}
 
@@ -966,8 +962,9 @@ public class Map extends Canvas {
 
 		_isSelectOfflineArea = false;
 		_isPaintOfflineArea = false;
-		_disableContextMenu = false;
 		_isOfflineSelectionStarted = false;
+
+		_isContextMenuEnabled = true;
 
 		setCursor(_cursorDefault);
 
@@ -1035,8 +1032,8 @@ public class Map extends Canvas {
 			// TODO DEBUG
 			// TODO DEBUG
 			// TODO DEBUG
-			_mp.resetAll(true);
-			// TODO DEBUG END
+//			_mp.resetAll(true);
+// TODO DEBUG END
 		}
 
 		_tileOverlayPaintQueue.clear();
@@ -1064,7 +1061,7 @@ public class Map extends Canvas {
 		/*
 		 * !!! DON'T OPTIMIZE THE NEXT LINE, OTHERWISE THE WRONG MOUSE POSITION IS FIRED !!!
 		 */
-		final Rectangle topLeftViewPort = getWorldPixelViewport();
+		final Rectangle topLeftViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 
 		final int worldMouseX = topLeftViewPort.x + _mouseMovePosition.x;
 		final int worldMouseY = topLeftViewPort.y + _mouseMovePosition.y;
@@ -1150,9 +1147,8 @@ public class Map extends Canvas {
 
 	private Point getOfflineAreaTilePosition(final int worldPosX, final int worldPosY) {
 
-		final int tileSize = _mp.getTileSize();
-		int tilePosX = (int) Math.floor((double) worldPosX / (double) tileSize);
-		int tilePosY = (int) Math.floor((double) worldPosY / (double) tileSize);
+		int tilePosX = (int) Math.floor((double) worldPosX / (double) _tilePixelSize);
+		int tilePosY = (int) Math.floor((double) worldPosY / (double) _tilePixelSize);
 
 		final int mapTiles = _mapTileSize.width;
 
@@ -1175,8 +1171,8 @@ public class Map extends Canvas {
 
 		// get device rectangle for this tile
 		return new Point(//
-				tilePosX * tileSize - _worldViewportX,
-				tilePosY * tileSize - _worldViewportY);
+				tilePosX * _tilePixelSize - _worldPixelViewport.x,
+				tilePosY * _tilePixelSize - _worldPixelViewport.y);
 	}
 
 	/**
@@ -1198,6 +1194,28 @@ public class Map extends Canvas {
 		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
 	}
 
+//	private Point2D.Double getWorldPixelAdjustedCenter(double newCenterX, double newCenterY) {
+//
+//		if (newCenterX < 0) {
+//			newCenterX = 0;
+//		}
+//		final int maxWidth = _mapTileSize.width * _tilePixelSize;
+//		if (newCenterX > maxWidth) {
+//			newCenterX = maxWidth;
+//		}
+//
+//		if (newCenterY < 0) {
+//			newCenterY = 0;
+//		}
+//
+//		final int maxHeight = _mapTileSize.height * _tilePixelSize;
+//		if (newCenterY > maxHeight) {
+//			newCenterY = maxHeight;
+//		}
+//
+//		return new Point2D.Double(newCenterX, newCenterY);
+//	}
+
 	/**
 	 * Returns the bounds of the viewport in pixels. This can be used to transform points into the
 	 * world bitmap coordinate space. The viewport is the part of the map, that you can currently
@@ -1205,32 +1223,40 @@ public class Map extends Canvas {
 	 * 
 	 * @return Returns the bounds in <em>pixels</em> of the "view" of this map
 	 */
-	private Rectangle getWorldPixelTopLeftViewport(final Point2D mapWorldPixelCenter) {
- 
+	private Rectangle getWorldPixelTopLeftViewport(final Point2D worldPixelMapCenter) {
+
 		if (_clientArea == null) {
 			_clientArea = getClientArea();
 		}
 
-		// calculate the "visible" viewport area in pixels
 		final int devWidth = _clientArea.width;
 		final int devHeight = _clientArea.height;
 
-		final int worldX = (int) (mapWorldPixelCenter.getX() - devWidth / 2d);
-		final int worldY = (int) (mapWorldPixelCenter.getY() - devHeight / 2d);
+		final int worldX = (int) (worldPixelMapCenter.getX() - (devWidth / 2d));
+		final int worldY = (int) (worldPixelMapCenter.getY() - (devHeight / 2d));
 
-		final Rectangle viewPort = new Rectangle(worldX, worldY, devWidth, devHeight);
+		final Rectangle worldPixelTopLeftViewport = new Rectangle(worldX, worldY, devWidth, devHeight);
 
-		return viewPort;
+		return worldPixelTopLeftViewport;
 	}
 
 	/**
 	 * @return Returns the map viewport in world pixel<br>
-	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the center <br>
+	 *         <b>x</b> and <b>y</b> contains the position in world pixel of the map center <br>
 	 *         <b>width</b> and <b>height</b> contains the visible area in device pixel
 	 */
 	public Rectangle getWorldPixelViewport() {
 		return getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 	}
+
+//	/**
+//	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
+//	 *
+//	 * @return the value of this property
+//	 */
+//	public boolean isDrawTileBorders() {
+//		return _isShowTileInfo;
+//	}
 
 	/**
 	 * Gets the current zoom level, or <code>null</code> when a tile
@@ -1242,14 +1268,16 @@ public class Map extends Canvas {
 		return _mapZoomLevel;
 	}
 
-//	/**
-//	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
-//	 *
-//	 * @return the value of this property
-//	 */
-//	public boolean isDrawTileBorders() {
-//		return _isShowTileInfo;
-//	}
+	private void initMap() {
+
+		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+		_tilePixelSize = _mp.getTileSize();
+
+		final double tileDefaultCenter = (double) _tilePixelSize / 2;
+
+		_worldPixelMapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
+		_worldPixelViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+	}
 
 	/**
 	 * Checks if a part within the parted image is modified. This method is optimized to search
@@ -1372,38 +1400,39 @@ public class Map extends Canvas {
 		return false;
 	}
 
-//	/**
-//	 * Indicates if the map should recenter itself on mouse clicks.
-//	 *
-//	 * @return boolean indicating if the map should recenter itself
-//	 */
-//	public boolean isRecenterOnClickEnabled() {
-//		return _recenterOnClickEnabled;
-//	}
+	/**
+	 * Checks is a tile position is within a map. It is possible that the tile is outside of the map
+	 * when it's value is negative or greater than the map border.
+	 * <p>
+	 * {@link #setMapCenterInWorldPixel(Point2D)}
+	 * <p>
+	 * In version before 10.6 the map was repeated on the x axis.
+	 * 
+	 * @param tilePosX
+	 * @param tilePosY
+	 * @return
+	 */
+	private boolean isTileOnMap(final int tilePosX, final int tilePosY) {
 
-	private boolean isTileOnMap(final int x, final int y, final Dimension mapSize) {
-
-		if (y >= mapSize.getHeight()) {
-			return false;
-		} else if (y < 0) {
+		if (tilePosY < 0 || tilePosY >= _mapTileSize.height) {
 			return false;
 		} else {
+
+			if (_mapZoomLevel < 5) {
+
+				if (tilePosX < 0 || tilePosX >= _mapTileSize.width) {
+					return false;
+				}
+			} else {
+
+				// display one additional tile when the the map is zoomed enough
+				if (tilePosX < -1 || tilePosX > _mapTileSize.width) {
+					return false;
+				}
+			}
 			return true;
 		}
 	}
-
-	/**
-	 * A property indicating if the map should be zoomable by the user using the mouse wheel.
-	 * 
-	 * @return the current property value
-	 */
-	public boolean isZoomEnabled() {
-		return _zoomEnabled;
-	}
-
-//	public boolean isZoomOnDoubleClickEnabled() {
-//		return _zoomOnDoubleClickEnabled;
-//	}
 
 	/**
 	 * onDispose is called when the map is disposed
@@ -1492,6 +1521,22 @@ public class Map extends Canvas {
 		}
 	}
 
+	private void onMouseDoubleClick(final MouseEvent mouseEvent) {
+
+		/*
+		 * set new map center
+		 */
+		final double x = _worldPixelViewport.x + mouseEvent.x;
+		final double y = _worldPixelViewport.y + mouseEvent.y;
+
+		setMapCenterInWorldPixel(new Point2D.Double(x, y));
+
+		// ensure that all internal data are correctly setup
+		setZoom(_mapZoomLevel);
+
+		queueMapRedraw();
+	}
+
 	private void onMouseDown(final MouseEvent e) {
 
 		// check if left mouse button is pressed
@@ -1526,16 +1571,6 @@ public class Map extends Canvas {
 		}
 	}
 
-//	/**
-//	 * Gets the current pixel center of the map. This point is in the global bitmap coordinate
-//	 * system, not as lat/longs.
-//	 *
-//	 * @return Returns the current center of the map in as a world pixel value
-//	 */
-//	public Point2D getCenterInWorldPixel() {
-//		return _mapCenterInWorldPixel;
-//	}
-
 	private void onMouseMove(final MouseEvent event) {
 
 		final int devMouseX = event.x;
@@ -1565,15 +1600,13 @@ public class Map extends Canvas {
 
 		if (_mp != null) {
 
-			final int tileSize = _mp.getTileSize();
-
-			final Rectangle topLeftViewPort = getWorldPixelViewport();
+			final Rectangle topLeftViewPort = _worldPixelViewport;
 
 			final int worldMouseX = topLeftViewPort.x + _mouseMovePosition.x;
 			final int worldMouseY = topLeftViewPort.y + _mouseMovePosition.y;
 
-			final int tileX = worldMouseX / tileSize;
-			final int tileY = worldMouseY / tileSize;
+			final int tileX = worldMouseX / _tilePixelSize;
+			final int tileY = worldMouseY / _tilePixelSize;
 
 //			System.out.println(//
 //					("x:" + devMouseX) //
@@ -1629,7 +1662,7 @@ public class Map extends Canvas {
 
 		if (_isSelectOfflineArea) {
 
-			_disableContextMenu = true;
+			_isContextMenuEnabled = false;
 
 			if (_isOfflineSelectionStarted == false) {
 				/*
@@ -1668,7 +1701,7 @@ public class Map extends Canvas {
 
 			} else if (event.button == 2) {
 				// if the middle mouse button is clicked, recenter the view
-				recenterMap(event.x, event.y);
+//				recenterMap(event.x, event.y);
 			}
 		}
 
@@ -1682,6 +1715,17 @@ public class Map extends Canvas {
 //		}
 
 	}
+
+//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
+//
+//		if (_poiTT == null) {
+//			_poiTT = new PoiToolTip(getShell());
+//		}
+//
+//		_poiTT.geoPosition = poiGeoPosition;
+//
+//		return _poiTT;
+//	}
 
 	/**
 	 * There are far too many calls from SWT on this method. Much more than would bereally needed. I
@@ -1733,9 +1777,6 @@ public class Map extends Canvas {
 
 	private void onResize() {
 
-//		System.out.println("onResize()");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		/*
 		 * the method getClientArea() is only correct in a dialog when it's called in the create()
 		 * method after super.create();
@@ -1747,17 +1788,6 @@ public class Map extends Canvas {
 
 		queueMapRedraw();
 	}
-
-//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
-//
-//		if (_poiTT == null) {
-//			_poiTT = new PoiToolTip(getShell());
-//		}
-//
-//		_poiTT.geoPosition = poiGeoPosition;
-//
-//		return _poiTT;
-//	}
 
 	private void openOfflineImageDialog() {
 
@@ -1832,9 +1862,10 @@ public class Map extends Canvas {
 
 		_drawTime = System.currentTimeMillis();
 
-//		System.out.println("paintMap()\t" + (int) (1000f / ((System.nanoTime() - start) / 1000000))+" fps");
-//		System.out.println("paintMap()\t" + (int) (((System.nanoTime() - start) / 1000000)) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("paintMap()\t"
+//				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
+//				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
+//		);
 
 		redraw();
 	}
@@ -1846,41 +1877,33 @@ public class Map extends Canvas {
 	 */
 	private void paintMap10Tiles(final GC gc) {
 
-		final int tileSize = _mp.getTileSize();
-
-		/*
-		 * draw all visible tiles
-		 */
 		for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
 			for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
 
-				// get device rectangle for this tile
-				final Rectangle devTilePosition = new Rectangle(//
-						tilePosX * tileSize - _worldViewportX,
-						tilePosY * tileSize - _worldViewportY,
-						tileSize,
-						tileSize);
+				/*
+				 * convert tile world position into device position
+				 */
+				final int devTileX = tilePosX * _tilePixelSize - _worldPixelViewport.x;
+				final int devTileY = tilePosY * _tilePixelSize - _worldPixelViewport.y;
+
+				final Rectangle devTileViewport = new Rectangle(devTileX, devTileY, _tilePixelSize, _tilePixelSize);
 
 				// check if current tile is within the painting area
-				if (devTilePosition.intersects(_devVisibleViewport)) {
+				if (devTileViewport.intersects(_devMapViewport)) {
 
 					/*
 					 * get the tile from the factory. the tile must not have been completely
 					 * downloaded after this step.
 					 */
 
-					if (isTileOnMap(tilePosX, tilePosY, _mapTileSize)) {
+					if (isTileOnMap(tilePosX, tilePosY)) {
 
-						paintTile(gc, tilePosX, tilePosY, devTilePosition);
+						paintTile(gc, tilePosX, tilePosY, devTileViewport);
 
 					} else {
 
-						/*
-						 * if tile is off the map to the north or south, draw map background
-						 */
-
-						gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
-						gc.fillRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
+						gc.setBackground(_defaultBackgroundColor);
+						gc.fillRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 					}
 				}
 			}
@@ -1895,7 +1918,7 @@ public class Map extends Canvas {
 			return;
 		}
 
-		final org.eclipse.swt.graphics.Rectangle imageBounds = legendImage.getBounds();
+		final Rectangle imageBounds = legendImage.getBounds();
 
 		// draw legend on bottom left
 		int yPos = _worldPixelViewport.height - 5 - imageBounds.height;
@@ -2109,7 +2132,6 @@ public class Map extends Canvas {
 		/*
 		 * draw tile box for tiles which are selected within the area box
 		 */
-		final int tileSize = _mp.getTileSize();
 		final int devTileStartX = _offlineDevTileStart.x;
 		final int devTileStartY = _offlineDevTileStart.y;
 		final int devTileEndX = _offlineDevTileEnd.x;
@@ -2120,8 +2142,8 @@ public class Map extends Canvas {
 		final int devTileEndX2 = Math.max(devTileStartX, devTileEndX);
 		final int devTileEndY2 = Math.max(devTileStartY, devTileEndY);
 
-		for (int devX = devTileStartX2; devX <= devTileEndX2; devX += tileSize) {
-			for (int devY = devTileStartY2; devY <= devTileEndY2; devY += tileSize) {
+		for (int devX = devTileStartX2; devX <= devTileEndX2; devX += _tilePixelSize) {
+			for (int devY = devTileStartY2; devY <= devTileEndY2; devY += _tilePixelSize) {
 
 //				gc.setLineStyle(SWT.LINE_SOLID);
 //				gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
@@ -2160,7 +2182,7 @@ public class Map extends Canvas {
 			devHeight = devAreaY1 - devAreaY2;
 		}
 
-		_currentOfflineArea = new org.eclipse.swt.graphics.Rectangle(devX, devY, devWidth, devHeight);
+		_currentOfflineArea = new Rectangle(devX, devY, devWidth, devHeight);
 
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
@@ -2232,15 +2254,15 @@ public class Map extends Canvas {
 
 	private void paintOverlay10() {
 
+		final int currentRunnableCounter = _overlayRunnableCounter.incrementAndGet();
+
 		if (isDisposed()) {
 			return;
 		}
 
-		_overlayRunnableCounter++;
-
 		final Runnable uiOverlayRunnable = new Runnable() {
 
-			final int	__runnableCounter	= _overlayRunnableCounter;
+			final int	__runnableCounter	= currentRunnableCounter;
 
 			@Override
 			public void run() {
@@ -2250,7 +2272,7 @@ public class Map extends Canvas {
 				}
 
 				// check if a newer runnable is available
-				if (__runnableCounter != _overlayRunnableCounter) {
+				if (__runnableCounter != _overlayRunnableCounter.get()) {
 					return;
 				}
 
@@ -2411,14 +2433,14 @@ public class Map extends Canvas {
 		final TileCache tileCache = MP.getTileCache();
 
 		final String projectionId = _mp.getProjection().getId();
-		final int partSize = _mp.getTileSize();
+		final int partSize = _tilePixelSize;
 
 		final int tileZoom = tile.getZoom();
 		final int tileX = tile.getX();
 		final int tileY = tile.getY();
 		final int maxTiles = (int) Math.pow(2, tileZoom);
 
-		final ArrayList<org.eclipse.swt.graphics.Rectangle> partMarkerBounds = tile.getPartMarkerBounds(tileZoom);
+		final ArrayList<Rectangle> partMarkerBounds = tile.getPartMarkerBounds(tileZoom);
 		final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.size() > 0;
 
 		for (int yIndex = 0; yIndex < 3; yIndex++) {
@@ -2533,7 +2555,7 @@ public class Map extends Canvas {
 				}
 
 				if (isMarkerBounds) {
-					for (final org.eclipse.swt.graphics.Rectangle markerBound : partMarkerBounds) {
+					for (final Rectangle markerBound : partMarkerBounds) {
 
 						/*
 						 * set marker bounds into the tile
@@ -2554,18 +2576,6 @@ public class Map extends Canvas {
 								&& (devYMarker + markerHeight > devYPart);
 
 						if (isMarkerInTile) {
-
-//							System.out.println(//
-//									("z:" + tileZoom)
-//											+ (" x:" + devXMarker)
-//											+ (" y:" + devYMarker)
-//											+ (" w:" + markerWidth)
-//											+ (" h:" + markerHeight)
-//											+ (" " + tile)
-//									//
-//									);
-							// TODO remove SYSTEM.OUT.PRINTLN
-
 							tile.addMarkerBounds(devXMarker, devYMarker, markerWidth, markerHeight, tileZoom);
 						}
 					}
@@ -2592,7 +2602,7 @@ public class Map extends Canvas {
 		boolean isOverlayPainted = false;
 
 		// create 1 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(_mp.getTileSize(), _transparentRGB);
+		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize, _transparentRGB);
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);
@@ -2635,7 +2645,7 @@ public class Map extends Canvas {
 	private void paintTile(	final GC gc,
 							final int tilePositionX,
 							final int tilePositionY,
-							final Rectangle devTilePosition) {
+							final Rectangle devTileViewport) {
 
 		// get tile from the map provider, this also starts the loading of the tile image
 		final Tile tile = _mp.getTile(tilePositionX, tilePositionY, _mapZoomLevel);
@@ -2645,37 +2655,37 @@ public class Map extends Canvas {
 
 			// map image is available and valid
 
-			gc.drawImage(tileImage, devTilePosition.x, devTilePosition.y);
+			gc.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
 
 		} else {
-			paintTile10Image(gc, tile, devTilePosition);
+			paintTile10Image(gc, tile, devTileViewport);
 		}
 
 		if (_isDrawOverlays) {
-			paintTile20Overlay(gc, tile, devTilePosition);
+			paintTile20Overlay(gc, tile, devTileViewport);
 		}
 
 		if (_isShowTileInfo || _isShowTileBorder) {
-			paintTile30Info(gc, tile, devTilePosition);
+			paintTile30Info(gc, tile, devTileViewport);
 		}
 	}
 
 	/**
 	 * draw the tile map image
 	 */
-	private void paintTile10Image(final GC gc, final Tile tile, final Rectangle devTilePosition) {
+	private void paintTile10Image(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		if (tile.isLoadingError()) {
 
 			// map image contains an error, it could not be loaded
 
 			final Image errorImage = _mp.getErrorImage();
-			final org.eclipse.swt.graphics.Rectangle imageBounds = errorImage.getBounds();
+			final Rectangle imageBounds = errorImage.getBounds();
 
 			gc.setBackground(_display.getSystemColor(SWT.COLOR_GRAY));
-			gc.fillRectangle(devTilePosition.x, devTilePosition.y, imageBounds.width, imageBounds.height);
+			gc.fillRectangle(devTileViewport.x, devTileViewport.y, imageBounds.width, imageBounds.height);
 
-			paintTileInfoError(gc, devTilePosition, tile);
+			paintTileInfoError(gc, devTileViewport, tile);
 
 			return;
 		}
@@ -2684,9 +2694,9 @@ public class Map extends Canvas {
 
 			//map image could not be loaded from offline file
 
-			gc.drawImage(_mp.getErrorImage(), devTilePosition.x, devTilePosition.y);
+			gc.drawImage(_mp.getErrorImage(), devTileViewport.x, devTileViewport.y);
 
-			paintTileInfoError(gc, devTilePosition, tile);
+			paintTileInfoError(gc, devTileViewport, tile);
 
 			return;
 		}
@@ -2714,7 +2724,10 @@ public class Map extends Canvas {
 				 * offline image is not availabe, show loading... message
 				 */
 
-				gc.drawImage(_mp.getLoadingImage(), devTilePosition.x, devTilePosition.y);
+				gc.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);
+
+//				gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+//				gc.drawString(Messages.geoclipse_extensions_loading, devTileViewport.x, devTileViewport.y, true);
 			}
 		}
 	}
@@ -2724,10 +2737,10 @@ public class Map extends Canvas {
 	 * 
 	 * @param gc
 	 * @param tile
-	 * @param devTileRectangle
+	 * @param devTileViewport
 	 *            Position of the tile
 	 */
-	private void paintTile20Overlay(final GC gc, final Tile tile, final Rectangle devTileRectangle) {
+	private void paintTile20Overlay(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		/*
 		 * Priority 1: draw overlay image
@@ -2771,7 +2784,7 @@ public class Map extends Canvas {
 		// draw overlay image
 		if ((drawingImage != null) && (drawingImage.isDisposed() == false)) {
 			try {
-				gc.drawImage(drawingImage, devTileRectangle.x, devTileRectangle.y);
+				gc.drawImage(drawingImage, devTileViewport.x, devTileViewport.y);
 			} catch (final Exception e) {
 
 				/*
@@ -2869,9 +2882,9 @@ public class Map extends Canvas {
 	/**
 	 * @param gc
 	 * @param tile
-	 * @param devTilePosition
+	 * @param devTileViewport
 	 */
-	private void paintTile30Info(final GC gc, final Tile tile, final Rectangle devTilePosition) {
+	private void paintTile30Info(final GC gc, final Tile tile, final Rectangle devTileViewport) {
 
 		final ConcurrentHashMap<String, Tile> childrenWithErrors = tile.getChildrenWithErrors();
 
@@ -2879,18 +2892,16 @@ public class Map extends Canvas {
 				|| tile.isOfflineError()
 				|| ((childrenWithErrors != null) && (childrenWithErrors.size() > 0))) {
 
-			paintTileInfoError(gc, devTilePosition, tile);
+			paintTileInfoError(gc, devTileViewport, tile);
 
 			return;
 		}
-
-		final int tileSize = _mp.getTileSize();
 
 		if (_isShowTileBorder) {
 
 			// draw tile border
 			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-			gc.drawRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
+			gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 		}
 
 		if (_isShowTileInfo) {
@@ -2901,8 +2912,8 @@ public class Map extends Canvas {
 
 			final int leftMargin = 10;
 
-			paintTileInfoLatLon(gc, tile, devTilePosition, 10, leftMargin);
-			paintTileInfoPosition(gc, devTilePosition, tile, 50, leftMargin);
+			paintTileInfoLatLon(gc, tile, devTileViewport, 10, leftMargin);
+			paintTileInfoPosition(gc, devTileViewport, tile, 50, leftMargin);
 
 			// draw tile image path/url
 			final StringBuilder sb = new StringBuilder();
@@ -2912,27 +2923,25 @@ public class Map extends Canvas {
 			_textWrapper.printText(
 					gc,
 					sb.toString(),
-					devTilePosition.x + leftMargin,
-					devTilePosition.y + 80,
-					devTilePosition.width - 20);
+					devTileViewport.x + leftMargin,
+					devTileViewport.y + 80,
+					devTileViewport.width - 20);
 		}
 	}
 
-	private void paintTileInfoError(final GC gc, final Rectangle devTilePosition, final Tile tile) {
-
-		final int tileSize = _mp.getTileSize();
+	private void paintTileInfoError(final GC gc, final Rectangle devTileViewport, final Tile tile) {
 
 		// draw tile border
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-		gc.drawRectangle(devTilePosition.x, devTilePosition.y, tileSize, tileSize);
+		gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
 		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		final int leftMargin = 10;
 
-		paintTileInfoLatLon(gc, tile, devTilePosition, 10, leftMargin);
-		paintTileInfoPosition(gc, devTilePosition, tile, 50, leftMargin);
+		paintTileInfoLatLon(gc, tile, devTileViewport, 10, leftMargin);
+		paintTileInfoPosition(gc, devTileViewport, tile, 50, leftMargin);
 
 		// display loading error
 		final StringBuilder sb = new StringBuilder();
@@ -2966,14 +2975,14 @@ public class Map extends Canvas {
 		_textWrapper.printText(
 				gc,
 				sb.toString(),
-				devTilePosition.x + leftMargin,
-				devTilePosition.y + 80,
-				devTilePosition.width - 20);
+				devTileViewport.x + leftMargin,
+				devTileViewport.y + 80,
+				devTileViewport.width - 20);
 	}
 
 	private void paintTileInfoLatLon(	final GC gc,
 										final Tile tile,
-										final Rectangle devTilePosition,
+										final Rectangle devTileViewport,
 										final int topMargin,
 										final int leftMargin) {
 
@@ -2990,13 +2999,13 @@ public class Map extends Canvas {
 		sb.append(Messages.TileInfo_Position_Latitude);
 		sb.append(_nfLatLon.format(bbox.bottom));
 		gc.drawString(sb.toString(), //
-				devTilePosition.x + leftMargin,
-				devTilePosition.y + topMargin);
+				devTileViewport.x + leftMargin,
+				devTileViewport.y + topMargin);
 
 		// lat - top
 		gc.drawString(_nfLatLon.format(bbox.top), //
-				devTilePosition.x + leftMargin + dev2ndColumn,
-				devTilePosition.y + topMargin);
+				devTileViewport.x + leftMargin + dev2ndColumn,
+				devTileViewport.y + topMargin);
 
 		sb.setLength(0);
 
@@ -3004,13 +3013,13 @@ public class Map extends Canvas {
 		sb.append(Messages.TileInfo_Position_Longitude);
 		sb.append(_nfLatLon.format(bbox.left));
 		gc.drawString(sb.toString(), //
-				devTilePosition.x + leftMargin,
-				devTilePosition.y + topMargin + devLineHeight);
+				devTileViewport.x + leftMargin,
+				devTileViewport.y + topMargin + devLineHeight);
 
 		// lon - right
 		gc.drawString(_nfLatLon.format(bbox.right), //
-				devTilePosition.x + leftMargin + dev2ndColumn,
-				devTilePosition.y + topMargin + devLineHeight);
+				devTileViewport.x + leftMargin + dev2ndColumn,
+				devTileViewport.y + topMargin + devLineHeight);
 	}
 
 	/**
@@ -3044,7 +3053,7 @@ public class Map extends Canvas {
 	}
 
 	private void paintTileInfoPosition(	final GC gc,
-										final Rectangle devTilePosition,
+										final Rectangle devTileViewport,
 										final Tile tile,
 										final int topMargin,
 										final int leftMargin) {
@@ -3057,7 +3066,7 @@ public class Map extends Canvas {
 				.append(Messages.TileInfo_Position_Y)
 				.append(tile.getY());
 
-		gc.drawString(text.toString(), devTilePosition.x + leftMargin, devTilePosition.y + topMargin);
+		gc.drawString(text.toString(), devTileViewport.x + leftMargin, devTileViewport.y + topMargin);
 	}
 
 	/**
@@ -3077,24 +3086,13 @@ public class Map extends Canvas {
 		final double worldPixelMapCenterY = _worldPixelMapCenter.getY();
 
 		final double newCenterX = worldPixelMapCenterX - mapDiffX;
-
-		double newCenterY = worldPixelMapCenterY - mapDiffY;
-
-		if (newCenterY < 0) {
-			newCenterY = 0;
-		}
-
-		final int maxHeight = (int) (_mp.getMapTileSize(_mapZoomLevel).getHeight() * _mp.getTileSize());
-		if (newCenterY > maxHeight) {
-			newCenterY = maxHeight;
-		}
-
-		// set new map center
-		setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
+		final double newCenterY = worldPixelMapCenterY - mapDiffY;
 
 		_mouseDownPosition = movePosition;
 		_isMapPanned = true;
 
+		// set new map center
+		setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
 		updateViewPortData();
 
 		queueMapRedraw();
@@ -3364,25 +3362,32 @@ public class Map extends Canvas {
 	 */
 	public void queueMapRedraw() {
 
-		if (isDisposed() || (_mp == null)) {
+		final int redrawCounter = _redrawMapCounter.incrementAndGet();
+
+		if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
 			return;
 		}
 
-		if (_devVisibleViewport == null) {
-			// viewport is not yet initialized, this happens only the first time when a map is displayed
+		if (_devMapViewport == null) {
+
+			// internal data are not yet initialized, this happens only the first time when a map is displayed
+
+			initMap();
 			updateViewPortData();
 		}
 
-		_redrawMapCounter++;
 		_requestedRedrawTime = System.currentTimeMillis();
 
 		if (_requestedRedrawTime - _drawTime > 200) {
+
+//			System.out.println("queueMapRedraw()-time > 200\t" + (_requestedRedrawTime - _drawTime));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// update display even when this is not the last created runnable
 
 			final Runnable synchImageRunnable = new Runnable() {
 
-				final int	__synchRunnableCounter	= _redrawMapCounter;
+				final int	__synchRunnableCounter	= redrawCounter;
 
 				@Override
 				public void run() {
@@ -3392,7 +3397,7 @@ public class Map extends Canvas {
 					}
 
 					// check if a newer runnable is available
-					if (__synchRunnableCounter != _redrawMapCounter) {
+					if (__synchRunnableCounter != _redrawMapCounter.get()) {
 						// a newer queryRedraw is available
 						return;
 					}
@@ -3407,13 +3412,14 @@ public class Map extends Canvas {
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-			_display.asyncExec(synchImageRunnable);
+			// TODO check if this is working when disabled
+//			_display.asyncExec(synchImageRunnable);
 
 		} else {
 
 			final Runnable asynchImageRunnable = new Runnable() {
 
-				final int	__asynchRunnableCounter	= _redrawMapCounter;
+				final int	__asynchRunnableCounter	= redrawCounter;
 
 				@Override
 				public void run() {
@@ -3423,7 +3429,7 @@ public class Map extends Canvas {
 					}
 
 					// check if a newer runnable is available
-					if (__asynchRunnableCounter != _redrawMapCounter) {
+					if (__asynchRunnableCounter != _redrawMapCounter.get()) {
 						// a newer queryRedraw is available
 						return;
 					}
@@ -3450,18 +3456,6 @@ public class Map extends Canvas {
 		tile.setOverlayImageState(OverlayImageState.NOT_SET);
 
 		_tileOverlayPaintQueue.add(tile);
-	}
-
-	private void recenterMap(final int ex, final int ey) {
-
-		final Rectangle bounds = getWorldPixelViewport();
-
-		final double x = bounds.x + ex;
-		final double y = bounds.y + ey;
-
-		setMapCenterInWorldPixel(new Point2D.Double(x, y));
-
-		queueMapRedraw();
 	}
 
 	/**
@@ -3550,6 +3544,13 @@ public class Map extends Canvas {
 		_mapLegend = legend;
 	}
 
+	/**
+	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
+	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
+	 * confuse the user because the map is not displaying the current state.
+	 * 
+	 * @param isLiveView
+	 */
 	public void setLiveView(final boolean isLiveView) {
 		_isLiveView = isLiveView;
 	}
@@ -3585,51 +3586,87 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-	/**
-	 * Sets the center of the map in pixel coordinates.
-	 * 
-	 * @param worldPixelCenter
+	/*
+	 * keep old method because it is not easy to understand
 	 */
-	private void setMapCenterInWorldPixel(Point2D worldPixelCenter) {
+//	/**
+//	 * Sets the center of the map in pixel coordinates.
+//	 *
+//	 * @param worldPixelCenter
+//	 */
+//	private void setMapCenterInWorldPixelOLD(Point2D worldPixelCenter) {
+//
+//		/*
+//		 * check if the center is within the map
+//		 */
+//
+//		final int viewportPixelHeight = getWorldPixelViewport().height;
+//
+//		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(worldPixelCenter);
+//
+//		// don't let the user pan over the top edge
+//		if (newTopLeftPixelVP.y < 0) {
+//			final double centerY = viewportPixelHeight / 2d;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		// don't let the user pan over the bottom edge
+//		final Dimension mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+//		final int mapHeight = (int) mapTileSize.getHeight() * _mp.getTileSize();
+//
+//		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
+//			final double centerY = mapHeight - viewportPixelHeight / 2;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		// if map is too small then just center it
+//		if (mapHeight < newTopLeftPixelVP.height) {
+//			final double centerY = mapHeight / 2d;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		_worldPixelMapCenter = worldPixelCenter;
+//
+//		fireMousePosition();
+//
+//		/*
+//		 * hide previous offline area when map position has changed because the area has no absolute
+//		 * position
+//		 */
+////		_currentOfflineArea = null;
+//	}
 
-		/*
-		 * check if the center is within the map
-		 */
+	/**
+	 * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates. The
+	 * method {@link #isTileOnMap(int, int)}
+	 * 
+	 * @param newWorldPixelCenter
+	 */
+	private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter) {
 
-		final int viewportPixelHeight = getWorldPixelViewport().height;
+		double newCenterX = newWorldPixelCenter.getX();
+		double newCenterY = newWorldPixelCenter.getY();
 
-		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(worldPixelCenter);
-
-		// don't let the user pan over the top edge
-		if (newTopLeftPixelVP.y < 0) {
-			final double centerY = viewportPixelHeight / 2d;
-			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+		if (newCenterX < 0) {
+			newCenterX = -1;
+		}
+		final int maxWidth = _mapTileSize.width * _tilePixelSize;
+		if (newCenterX > maxWidth) {
+			newCenterX = maxWidth + 1;
 		}
 
-		// don't let the user pan over the bottom edge
-		final Dimension mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
-		final int mapHeight = (int) mapTileSize.getHeight() * _mp.getTileSize();
-
-		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
-			final double centerY = mapHeight - viewportPixelHeight / 2;
-			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+		if (newCenterY < 0) {
+			newCenterY = -1;
 		}
 
-		// if map is too small then just center it
-		if (mapHeight < newTopLeftPixelVP.height) {
-			final double centerY = mapHeight / 2d;
-			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+		final int maxHeight = _mapTileSize.height * _tilePixelSize;
+		if (newCenterY > maxHeight) {
+			newCenterY = maxHeight + 1;
 		}
 
-		_worldPixelMapCenter = worldPixelCenter;
+		_worldPixelMapCenter = new Point2D.Double(newCenterX, newCenterY);
 
 		fireMousePosition();
-
-		/*
-		 * hide previous offline area when map position has changed because the area has no absolute
-		 * position
-		 */
-//		_currentOfflineArea = null;
 	}
 
 	/**
@@ -3640,6 +3677,10 @@ public class Map extends Canvas {
 	public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
 		_mapContextProvider = mapContextProvider;
 	}
+
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
 
 	/**
 	 * Sets the map provider for the map and redraws the map
@@ -3661,11 +3702,14 @@ public class Map extends Canvas {
 
 		_mp = mp;
 
-		// check if the map is initialized
-		if (_worldPixelViewport == null) {
-			onResize();
-		}
+//		// check if the map is initialized
+//		if (_worldPixelViewport == null) {
+//			onResize();
+//		}
 
+		/*
+		 * !!! initialize map by setting the zoom level which setups all important data !!!
+		 */
 		if (refresh) {
 			setZoom(zoom);
 			setMapCenter(center);
@@ -3676,19 +3720,13 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
-
 	/**
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
 	 * position as the previous tile factory
 	 * 
 	 * @param mp
-	 * @param isDrawMap
-	 *            When <code>true</code> the map is queued to be redrawn
 	 */
-	public synchronized void setMapProviderWithReset(final MP mp, final boolean isDrawMap) {
+	public synchronized void setMapProviderWithReset(final MP mp) {
 
 		if (_mp != null) {
 			// keep tiles with loading errors that they are not loaded again when the factory has not changed
@@ -3697,23 +3735,12 @@ public class Map extends Canvas {
 
 		_mp = mp;
 
-		if (isDrawMap) {
-			queueMapRedraw();
-		}
+		queueMapRedraw();
 	}
 
 	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
 		_distanceUnitValue = distanceUnitValue;
 		_distanceUnitLabel = distanceUnitLabel;
-	}
-
-	/**
-	 * Set a key to uniquely identify overlays which is used to cache the overlays
-	 * 
-	 * @param key
-	 */
-	public void setOverlayKey(final String key) {
-		_overlayKey = key;
 	}
 
 //	public void setPoi(final GeoPosition poiPosition, final int zoomLevel, final String poiText) {
@@ -3785,15 +3812,31 @@ public class Map extends Canvas {
 //		}
 //	}
 
-//	/**
-//	 * Sets whether the map should recenter itself on mouse clicks (middle mouse clicks?)
-//	 *
-//	 * @param b
-//	 *            if should recenter
-//	 */
-//	public void setRecenterOnClickEnabled(final boolean b) {
-//		_recenterOnClickEnabled = b;
-//	}
+	/**
+	 * Set a key to uniquely identify overlays which is used to cache the overlays
+	 * 
+	 * @param key
+	 */
+	public void setOverlayKey(final String key) {
+		_overlayKey = key;
+	}
+
+	/**
+	 * @param isRedrawEnabled
+	 *            Set <code>true</code> to enable map drawing (which is the default). When
+	 *            <code>false</code>, map drawing is disabled.
+	 *            <p>
+	 *            This feature can enable the drawing of the map very late that flickering of the
+	 *            map is prevented when the map is setup.
+	 */
+	public void setQueueMapRedraw(final boolean isRedrawEnabled) {
+
+		_isRedrawEnabled = isRedrawEnabled;
+
+		if (isRedrawEnabled) {
+			queueMapRedraw();
+		}
+	}
 
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
@@ -3807,6 +3850,13 @@ public class Map extends Canvas {
 		_isShowTileBorder = isShowTileBorder;
 		queueMapRedraw();
 	}
+
+//	public void setShowPOI(final boolean isShowPOI) {
+//
+//		_isPoiVisible = isShowPOI;
+//
+//		queueMapRedraw();
+//	}
 
 	/**
 	 * Legend will be drawn into the map when the visibility is <code>true</code>
@@ -3828,78 +3878,12 @@ public class Map extends Canvas {
 		_isDrawOverlays = showOverlays;
 	}
 
-//	public void setShowPOI(final boolean isShowPOI) {
-//
-//		_isPoiVisible = isShowPOI;
-//
-//		queueMapRedraw();
-//	}
-
 	public void setShowScale(final boolean isScaleVisible) {
 		_isScaleVisible = isScaleVisible;
 	}
 
 	public void setToolTip(final ITourToolTip tourToolTip) {
 		_tourToolTip = tourToolTip;
-	}
-
-	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
-
-		_isTourPaintMethodEnhanced = isEnhanced;
-
-		disposeOverlayImageCache();
-	}
-
-	/**
-	 * Set the zoom level for the map and centers the map to the previous center. The zoom level is
-	 * checked if the map provider supports the requested zoom level.
-	 * 
-	 * @param newZoomLevel
-	 *            the new zoom level, the zoom level is adjusted to the min/max zoom levels
-	 */
-	public void setZoom(int newZoomLevel) {
-
-		if (_mp == null) {
-			return;
-		}
-
-		// check if the requested zoom level is within the bounds of the map provider
-		final int mpMinimumZoomLevel = _mp.getMinimumZoomLevel();
-		final int mpMaximumZoomLevel = _mp.getMaximumZoomLevel();
-		if (((newZoomLevel < mpMinimumZoomLevel) || (newZoomLevel > mpMaximumZoomLevel))) {
-			// adjust zoom level
-			newZoomLevel = Math.max(newZoomLevel, mpMinimumZoomLevel);
-			newZoomLevel = Math.min(newZoomLevel, mpMaximumZoomLevel);
-		}
-
-		final int oldzoom = _mapZoomLevel;
-		final Point2D oldCenter = _worldPixelMapCenter;
-		final Dimension oldMapTileSize = _mp.getMapTileSize(oldzoom);
-
-		_mapZoomLevel = newZoomLevel;
-
-		final Dimension mapTileSize = _mp.getMapTileSize(newZoomLevel);
-
-		final Point2D.Double pixelCenter = new Point2D.Double(//
-				oldCenter.getX() * (mapTileSize.getWidth() / oldMapTileSize.getWidth()),
-				oldCenter.getY() * (mapTileSize.getHeight() / oldMapTileSize.getHeight()));
-
-		setMapCenterInWorldPixel(pixelCenter);
-
-		updateViewPortData();
-//		updatePoiVisibility();
-
-		fireZoomEvent(newZoomLevel);
-	}
-
-	/**
-	 * A property indicating if the map should be zoomable by the user using the mouse wheel.
-	 * 
-	 * @param zoomEnabled
-	 *            the new value of the property
-	 */
-	public void setZoomEnabled(final boolean zoomEnabled) {
-		this._zoomEnabled = zoomEnabled;
 	}
 
 //	private void showPoi(final String poiText) {
@@ -3920,10 +3904,6 @@ public class Map extends Canvas {
 //				_poiImageBounds.width,
 //				_poiImageBounds.height,
 //				_poiTTOffsetY);
-//	}
-
-//	public void setZoomOnDoubleClickEnabled(final boolean zoomOnDoubleClickEnabled) {
-//		this._zoomOnDoubleClickEnabled = zoomOnDoubleClickEnabled;
 //	}
 
 //	/**
@@ -4000,11 +3980,84 @@ public class Map extends Canvas {
 //		setPoiVisible(isVisible);
 //	}
 
+	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+
+		_isTourPaintMethodEnhanced = isEnhanced;
+
+		disposeOverlayImageCache();
+	}
+
+	/**
+	 * Set the zoom level for the map and centers the map to the previous center. The zoom level is
+	 * checked if the map provider supports the requested zoom level.
+	 * <p>
+	 * The map is initialize when this is not yet done be setting all internal data !!!
+	 * 
+	 * @param newZoomLevel
+	 *            zoom level for the map, it is adjusted to the min/max zoom levels
+	 */
+	public void setZoom(final int newZoomLevel) {
+
+		if (_mp == null) {
+			return;
+		}
+
+		/*
+		 * check if the requested zoom level is within the bounds of the map provider
+		 */
+		int adjustedZoomLevel = newZoomLevel;
+		final int mpMinimumZoomLevel = _mp.getMinimumZoomLevel();
+		final int mpMaximumZoomLevel = _mp.getMaximumZoomLevel();
+		if (((newZoomLevel < mpMinimumZoomLevel) || (newZoomLevel > mpMaximumZoomLevel))) {
+			adjustedZoomLevel = Math.max(newZoomLevel, mpMinimumZoomLevel);
+			adjustedZoomLevel = Math.min(adjustedZoomLevel, mpMaximumZoomLevel);
+		}
+
+		// check if zoom level has changed
+		if (_mapZoomLevel == adjustedZoomLevel) {
+			// this is disabled that a double click can set the center of the map
+			// return;
+		}
+
+		final int oldzoom = _mapZoomLevel;
+		final Dimension oldMapTileSize = _mp.getMapTileSize(oldzoom);
+
+		// check if map is initialized or zoom level has not changed
+		Point2D oldCenter = _worldPixelMapCenter;
+		if (oldCenter == null) {
+
+			/*
+			 * setup map center
+			 */
+
+			initMap();
+
+			oldCenter = _worldPixelMapCenter;
+		}
+
+		_mapZoomLevel = adjustedZoomLevel;
+
+		// update values for the new zoom level !!!
+		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+
+		final Dimension newMapTileSize = _mp.getMapTileSize(adjustedZoomLevel);
+
+		final Point2D.Double newWorldPixelCenter = new Point2D.Double(//
+				oldCenter.getX() * ((double) newMapTileSize.width / oldMapTileSize.width),
+				oldCenter.getY() * ((double) newMapTileSize.height / oldMapTileSize.height));
+
+		setMapCenterInWorldPixel(newWorldPixelCenter);
+		updateViewPortData();
+
+//		updatePoiVisibility();
+
+		fireZoomEvent(adjustedZoomLevel);
+	}
+
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
-		final Rectangle viewPort = _worldPixelViewport;
-		final int worldMouseX = viewPort.x + mouseEvent.x;
-		final int worldMouseY = viewPort.y + mouseEvent.y;
+		final int worldMouseX = _worldPixelViewport.x + mouseEvent.x;
+		final int worldMouseY = _worldPixelViewport.y + mouseEvent.y;
 
 		_offlineDevAreaEnd = new Point(mouseEvent.x, mouseEvent.y);
 		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
@@ -4014,7 +4067,7 @@ public class Map extends Canvas {
 
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
-	 * {@link #paintMap10Tiles(GC)}
+	 * {@link #paintMap10Tiles(GC)}. Some values are cached to optimize performance.
 	 * 
 	 * @return
 	 */
@@ -4025,46 +4078,33 @@ public class Map extends Canvas {
 			return;
 		}
 
-		// optimize performance by keeping the viewport
-		final Rectangle viewport = _worldPixelViewport = getWorldPixelViewport();
+		_worldPixelViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 
-		_worldViewportX = viewport.x;
-		_worldViewportY = viewport.y;
+//		System.out.println(_worldPixelMapCenter + "\t" + _worldPixelViewport);
 
-		final int visiblePixelWidth = viewport.width;
-		final int visiblePixelHeight = viewport.height;
+		final int visiblePixelWidth = _worldPixelViewport.width;
+		final int visiblePixelHeight = _worldPixelViewport.height;
 
-		_devVisibleViewport = new Rectangle(0, 0, visiblePixelWidth, visiblePixelHeight);
+		_devMapViewport = new Rectangle(0, 0, visiblePixelWidth, visiblePixelHeight);
 
-		final int tileSize = _mp.getTileSize();
 		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+		_tilePixelSize = _mp.getTileSize();
 
 		// get the visible tiles which can be displayed in the viewport area
-		final int numTileWidth = (int) Math.ceil((double) visiblePixelWidth / (double) tileSize);
-		final int numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) tileSize);
+		final int numTileWidth = (int) Math.ceil((double) visiblePixelWidth / (double) _tilePixelSize);
+		final int numTileHeight = (int) Math.ceil((double) visiblePixelHeight / (double) _tilePixelSize);
 
 		/*
 		 * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen
-		 * to the Map's origin.
+		 * to the map's origin.
 		 */
-		final int tileOffsetX = (int) Math.floor((double) _worldViewportX / (double) tileSize);
-		final int tileOffsetY = (int) Math.floor((double) _worldViewportY / (double) tileSize);
+		final int tileOffsetX = (int) Math.floor((double) _worldPixelViewport.x / (double) _tilePixelSize);
+		final int tileOffsetY = (int) Math.floor((double) _worldPixelViewport.y / (double) _tilePixelSize);
 
 		_tilePosMinX = tileOffsetX;
 		_tilePosMinY = tileOffsetY;
-		_tilePosMaxX = tileOffsetX + numTileWidth;
-		_tilePosMaxY = tileOffsetY + numTileHeight;
-
-		_mp.setMapViewPort(new MapViewPortData(//
-				_mapZoomLevel,
-				_tilePosMinX,
-				_tilePosMaxX,
-				_tilePosMinY,
-				_tilePosMaxY));
-
-//		System.out.println(_tilePosMinX + "-" + _tilePosMaxX + " / " + _tilePosMinY + "-" + _tilePosMaxY);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
+		_tilePosMaxX = _tilePosMinX + numTileWidth;
+		_tilePosMaxY = _tilePosMinY + numTileHeight;
 	}
 
 	public void zoomIn() {
@@ -4076,5 +4116,4 @@ public class Map extends Canvas {
 		setZoom(_mapZoomLevel - 1);
 		queueMapRedraw();
 	}
-
 }
