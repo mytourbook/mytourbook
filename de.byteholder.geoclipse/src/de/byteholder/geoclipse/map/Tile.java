@@ -166,8 +166,15 @@ public class Tile extends Observable {
 	 */
 	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	@SuppressWarnings("unchecked")
 	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+
+	@SuppressWarnings("unchecked")
+	private ArrayList<Rectangle>[]			_twpBounds			= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	@SuppressWarnings("unchecked")
+	private ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 
 	/**
 	 * Create a new Tile at the specified tile point and zoom level
@@ -242,13 +249,17 @@ public class Tile extends Observable {
 		return sb.toString();
 	}
 
-	public void addMarkerBounds(final int x, final int y, final int width, final int height, final int zoomLevel) {
+	public void addMarkerBounds(final int x, //
+								final int y,
+								final int width,
+								final int height,
+								final int zoomLevel) {
 
-		initMarkerBounds(zoomLevel);
+		if (_markerBounds[zoomLevel] == null) {
+			initBounds(zoomLevel);
+		}
 
-		final Rectangle markerBounds = new Rectangle(x, y, width, height);
-
-		_markerBounds[zoomLevel].add(markerBounds);
+		_markerBounds[zoomLevel].add(new Rectangle(x, y, width, height));
 	}
 
 	/**
@@ -269,7 +280,9 @@ public class Tile extends Observable {
 								final int zoomLevel,
 								final int parts) {
 
-		initMarkerBounds(zoomLevel);
+		if (_markerBounds[zoomLevel] == null) {
+			initBounds(zoomLevel);
+		}
 
 //		final Rectangle markerBounds = new Rectangle(x < 0 ? 0 : x, y < 0 ? 0 : y, width, height);
 		final Rectangle markerBounds = new Rectangle(x, y, width, height);
@@ -284,6 +297,26 @@ public class Tile extends Observable {
 	@Override
 	public void addObserver(final Observer o) {
 		super.addObserver(o);
+	}
+
+	public void addTourWayPointBounds(	final int x,
+										final int y,
+										final int width,
+										final int height,
+										final int zoomLevel,
+										final int parts) {
+
+		if (_markerBounds[zoomLevel] == null) {
+			initBounds(zoomLevel);
+		}
+
+		final Rectangle twpBounds = new Rectangle(x, y, width, height);
+
+		if (parts == 1) {
+			_twpBounds[zoomLevel].add(twpBounds);
+		} else {
+			_twpPartBounds[zoomLevel].add(twpBounds);
+		}
 	}
 
 	/**
@@ -393,7 +426,7 @@ public class Tile extends Observable {
 					final Image parentImage = _parentTile._mapImage;
 					if ((parentImage != null) && !parentImage.isDisposed()) {
 						// parent image is already created
-						return new ParentImageStatus(null, false, false);
+						return new ParentImageStatus(null, false, false, false);
 
 					}
 
@@ -418,7 +451,7 @@ public class Tile extends Observable {
 					} else {
 
 						// all children are not yet loaded, create return status
-						return new ParentImageStatus(null, false, false);
+						return new ParentImageStatus(null, false, false, false);
 					}
 
 				} finally {
@@ -601,6 +634,10 @@ public class Tile extends Observable {
 		return _overlayTourState;
 	}
 
+	/**
+	 * @return Return the parent tile when this tile is a child tile or <code>null</code> when this
+	 *         is NOT a child tile.
+	 */
 	public Tile getParentTile() {
 		return _parentTile;
 	}
@@ -634,16 +671,16 @@ public class Tile extends Observable {
 		return _timeIsQueued;
 	}
 
-	public long getTimeStartLoading() {
-		return _timeStartLoading;
-	}
-
 //	/**
 //	 * @return Returns <code>true</code> when this tile is a child of another tile
 //	 */
 //	public boolean isChildTile() {
 //		return fParentTile != null;
 //	}
+
+	public long getTimeStartLoading() {
+		return _timeStartLoading;
+	}
 
 	/**
 	 * @return Returns the url which is used to load the tile, or null when it's not loaded
@@ -693,25 +730,24 @@ public class Tile extends Observable {
 	 * 
 	 * @param zoomLevel
 	 */
-	private void initMarkerBounds(final int zoomLevel) {
-
-		if (_markerBounds[zoomLevel] != null) {
-			return;
-		}
+	private void initBounds(final int zoomLevel) {
 
 		TILE_LOCK.lock();
-		{
-			try {
+		try {
 
-				// check again
-				if (_markerBounds[zoomLevel] == null) {
-					_markerBounds[zoomLevel] = new ArrayList<Rectangle>();
-					_markerPartBounds[zoomLevel] = new ArrayList<Rectangle>();
-				}
+			// check again
+			if (_markerBounds[zoomLevel] == null) {
 
-			} finally {
-				TILE_LOCK.unlock();
+				// create bounds for current zoomlevel
+
+				_markerBounds[zoomLevel] = new ArrayList<Rectangle>();
+				_markerPartBounds[zoomLevel] = new ArrayList<Rectangle>();
+				_twpBounds[zoomLevel] = new ArrayList<Rectangle>();
+				_twpPartBounds[zoomLevel] = new ArrayList<Rectangle>();
 			}
+
+		} finally {
+			TILE_LOCK.unlock();
 		}
 	}
 

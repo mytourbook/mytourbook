@@ -67,10 +67,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 	private static final int						TILE_CACHE_SIZE						= 2000;													//2000;
 	private static final int						ERROR_CACHE_SIZE					= 10000;													//10000;
-	private static final int						IMAGE_CACHE_SIZE					= 200;
+	private static final int						IMAGE_CACHE_SIZE					= 200;														//200;
 
 	public static final int							OFFLINE_INFO_NOT_READ				= -1;
-
 
 	// loading tiles pool
 	private static final int						THREAD_POOL_SIZE					= 20;
@@ -102,7 +101,7 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 	 * {@link #THREAD_POOL_SIZE} can be loaded at the same time, the other tiles are waiting in this
 	 * queue. <br>
 	 * <br>
-	 * TODO !!!!! THIS IS JDK 1.6 !!!!!!!
+	 * !!!!! THIS IS JDK 1.6 !!!!!!!
 	 */
 	private static final LinkedBlockingDeque<Tile>	_tileWaitingQueue					= new LinkedBlockingDeque<Tile>();
 
@@ -979,7 +978,11 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		if (urlString == null) {
 			final Exception e = new Exception();
-			StatusUtil.log(NLS.bind(Messages.DBG041_Error_InvalidUrlNull, tile.getTileKey()), e);
+			StatusUtil.log(
+					NLS.bind(
+							Messages.DBG041_Error_InvalidUrlNull,
+							this.getClass().getName() + " - " + tile.getTileKey()),
+					e);
 			throw e;
 		}
 

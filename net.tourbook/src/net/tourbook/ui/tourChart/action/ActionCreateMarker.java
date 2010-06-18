@@ -1,19 +1,18 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
@@ -36,10 +35,10 @@ public class ActionCreateMarker extends Action {
 	/**
 	 * 
 	 */
-	private final IChartContextProvider	fChartContextProvider;
-	private boolean						fIsLeftSlider;
+	private final IChartContextProvider	_chartContextProvider;
+	private boolean						_isLeftSlider;
 
-	private IMarkerReceiver				fMarkerReceiver;
+	private IMarkerReceiver				_markerReceiver;
 
 	public ActionCreateMarker(	final IChartContextProvider chartContextProvider,
 								final String text,
@@ -50,8 +49,8 @@ public class ActionCreateMarker extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new_disabled));
 
-		fChartContextProvider = chartContextProvider;
-		fIsLeftSlider = isLeftSlider;
+		_chartContextProvider = chartContextProvider;
+		_isLeftSlider = isLeftSlider;
 	}
 
 	/**
@@ -62,12 +61,12 @@ public class ActionCreateMarker extends Action {
 	 */
 	private TourMarker createTourMarker(final TourData tourData) {
 
-		final ChartXSlider leftSlider = fChartContextProvider.getLeftSlider();
-		final ChartXSlider rightSlider = fChartContextProvider.getRightSlider();
+		final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
+		final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
 
 		final ChartXSlider slider = rightSlider == null ? //
 				leftSlider
-				: fIsLeftSlider ? leftSlider : rightSlider;
+				: _isLeftSlider ? leftSlider : rightSlider;
 
 		if (slider == null || tourData.timeSerie == null) {
 			return null;
@@ -93,7 +92,7 @@ public class ActionCreateMarker extends Action {
 	@Override
 	public void run() {
 
-		final Chart chart = fChartContextProvider.getChart();
+		final Chart chart = _chartContextProvider.getChart();
 
 		TourData tourData = null;
 		final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
@@ -110,8 +109,8 @@ public class ActionCreateMarker extends Action {
 			return;
 		}
 
-		if (fMarkerReceiver != null) {
-			fMarkerReceiver.addTourMarker(newTourMarker);
+		if (_markerReceiver != null) {
+			_markerReceiver.addTourMarker(newTourMarker);
 
 			// the marker dialog will not be opened
 			return;
@@ -128,6 +127,6 @@ public class ActionCreateMarker extends Action {
 	}
 
 	public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
-		fMarkerReceiver = markerReceiver;
+		_markerReceiver = markerReceiver;
 	}
 }

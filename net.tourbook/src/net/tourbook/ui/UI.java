@@ -484,12 +484,16 @@ public class UI {
 	}
 
 	/**
-	 * ignore hours when they are 0
+	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
 	 * 
 	 * @param time
 	 * @return
 	 */
 	public static String format_hh_mm_ss(final long time) {
+
+		if (time == -1) {
+			return UI.EMPTY_STRING;
+		}
 
 		_formatterSB.setLength(0);
 

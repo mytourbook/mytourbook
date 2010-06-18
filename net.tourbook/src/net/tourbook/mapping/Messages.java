@@ -32,9 +32,19 @@ public class Messages extends NLS {
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
 
+	public static String	Image_Action_TourWayPoint;
+
+	public static String	Image_Action_TourWayPoint_Disabled;
+
 	public static String	Image_Map_MarkerSliderLeft;
 
 	public static String	Image_Map_MarkerSliderRight;
+
+	public static String	Image_Map_TourEndMarker;
+
+	public static String	Image_Map_TourStartMarker;
+
+	public static String	Image_Map_WayPoint;
 
 	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
@@ -102,6 +112,8 @@ public class Messages extends NLS {
 	public static String		Map_Action_SetDefaultMapProviders;
 
 	public static String	Map_Action_ShowTourInfoInMap;
+
+	public static String	Map_Action_ShowWayPoints;
 	public static String		Map_Action_ToggleMarker;
 
 	public static String	Map_Properties_ShowTileBorder;

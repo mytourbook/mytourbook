@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
@@ -109,8 +109,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private HashMap<Long, TourData>			_tourDataMap;
 
 	private int								_lapCounter;
-	private boolean							_setLapMarker				= false;
-	private boolean							_setLapStartTime			= false;
+	private boolean							_isSetLapMarker				= false;
+	private boolean							_isSetLapStartTime			= false;
 	private ArrayList<Long>					_lapStart					= new ArrayList<Long>();
 
 	private boolean							_isImported;
@@ -128,8 +128,18 @@ public class GarminSAXHandler extends DefaultHandler {
 		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
-	static DateTimeFormatter				_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy"); //$NON-NLS-1$
-	static SimpleDateFormat					_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy"); //$NON-NLS-1$
+	static DateTimeFormatter				_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy");						//$NON-NLS-1$
+	static SimpleDateFormat					_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy");								//$NON-NLS-1$
+
+	public GarminSAXHandler(final TourbookDevice deviceDataReader,
+							final String importFileName,
+							final DeviceData deviceData,
+							final HashMap<Long, TourData> tourDataMap) {
+
+		_deviceDataReader = deviceDataReader;
+		_importFilePath = importFileName;
+		_tourDataMap = tourDataMap;
+	}
 
 	private static void formatDT(	final DateTimeFormatter jodaFormatter,
 									final SimpleDateFormat jdkFormatter,
@@ -150,13 +160,6 @@ public class GarminSAXHandler extends DefaultHandler {
 		sbJdk.append(jdkFormatter.format(dt.toDate()));
 		sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-
-//	public static int getWeekOfDate(Date date) {
-//		Calendar cal = date.toCalendar();
-//		cal.setFirstDayOfWeek(Calendar.MONDAY);
-//		cal.setMinimalDaysInFirstWeek(4); // Conforming to ISO 8601
-//		return cal.get(Calendar.WEEK_OF_YEAR);
-//	}
 
 	public static void main(final String[] args) {
 
@@ -259,16 +262,6 @@ public class GarminSAXHandler extends DefaultHandler {
 		System.out.println(buffer.toString());
 	}
 
-	public GarminSAXHandler(final TourbookDevice deviceDataReader,
-							final String importFileName,
-							final DeviceData deviceData,
-							final HashMap<Long, TourData> tourDataMap) {
-
-		_deviceDataReader = deviceDataReader;
-		_importFilePath = importFileName;
-		_tourDataMap = tourDataMap;
-	}
-
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
@@ -308,33 +301,11 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			if (name.equals(TAG_TRACKPOINT)) {
 
-				/*
-				 * keep trackpoint data
-				 */
+				// keep trackpoint data
+
 				_isInTrackpoint = false;
 
-				if (_timeData != null) {
-
-					// set virtual time if time is not available
-					if (_timeData.absoluteTime == Long.MIN_VALUE) {
-
-						_timeData.absoluteTime = new DateTime(2000, 1, 1, 0, 0, 0, 0).getMillis();
-					}
-
-					if (_setLapMarker) {
-						_setLapMarker = false;
-
-						_timeData.marker = 1;
-						_timeData.markerLabel = Integer.toString(_lapCounter - 1);
-					}
-
-					_dtList.add(_timeData);
-				}
-
-				if (_setLapStartTime) {
-					_setLapStartTime = false;
-					_lapStart.add(_currentTime);
-				}
+				finalizeTrackpoint();
 
 			} else if (name.equals(TAG_NOTES)) {
 
@@ -347,25 +318,23 @@ public class GarminSAXHandler extends DefaultHandler {
 				_isInLap = false;
 
 			} else if (name.equals(TAG_CALORIES)) {
+
 				_isInCalories = false;
+
 				try {
 					/* every lab has a calorie value */
 					_calories += Integer.parseInt(_characters.toString());
 					_characters.delete(0, _characters.length());
 				} catch (final NumberFormatException e) {}
-			}
-			/*
-			 * else if (name.equals(TAG_ID)) { fIsInId = false; fId = fCharacters.toString();
-			 * fCharacters.delete(0, fCharacters.length()); }
-			 */
-			else if (name.equals(TAG_ACTIVITY)) {
+
+			} else if (name.equals(TAG_ACTIVITY)) {
 
 				/*
 				 * version 2: activity and tour ends
 				 */
 				_isInActivity = false;
 
-				setTourData();
+				finalizeTour();
 
 			} else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
 
@@ -375,15 +344,210 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				_isInCourse = false;
 
-				setTourData();
+				finalizeTour();
 			}
 
 		} catch (final NumberFormatException e) {
-			e.printStackTrace();
+			StatusUtil.showStatus(e);
 		} catch (final ParseException e) {
-			e.printStackTrace();
+			StatusUtil.showStatus(e);
 		}
 
+	}
+
+	private void finalizeTour() {
+
+		// check if data are available
+		if (_dtList.size() == 0) {
+			return;
+		}
+
+		validateTimeSeries();
+
+		// create data object for each tour
+		final TourData tourData = new TourData();
+
+		// set tour notes
+		setTourNotes(tourData);
+
+		/*
+		 * set tour start date/time
+		 */
+
+		/*
+		 * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
+		 * partly corrupt. When tour starts with the date 2007-04-01, move forward in the list until
+		 * another date occures and use this as the start date.
+		 */
+		int validIndex = 0;
+		DateTime dt = null;
+
+		for (final TimeData timeData : _dtList) {
+
+			dt = new DateTime(timeData.absoluteTime);
+
+			if (dt.getYear() == 2007 && dt.getMonthOfYear() == 4 && dt.getDayOfMonth() == 1) {
+
+				// this is an invalid time slice
+
+				validIndex++;
+				continue;
+
+			} else {
+
+				// this is a valid time slice
+				break;
+			}
+		}
+		if (validIndex == 0) {
+
+			// date is not 2007-04-01
+
+		} else {
+
+			if (validIndex == _dtList.size()) {
+
+				// all time data start with 2007-04-01
+
+				dt = new DateTime(_dtList.get(0).absoluteTime);
+
+			} else {
+
+				// the date starts with 2007-04-01 but it changes to another date
+
+				dt = new DateTime(_dtList.get(validIndex).absoluteTime);
+
+				/*
+				 * create a new list by removing invalid time slices
+				 */
+
+				final ArrayList<TimeData> oldDtList = _dtList;
+				_dtList = new ArrayList<TimeData>();
+
+				int _tdIndex = 0;
+				for (final TimeData timeData : oldDtList) {
+
+					if (_tdIndex < validIndex) {
+						_tdIndex++;
+						continue;
+					}
+
+					_dtList.add(timeData);
+				}
+
+				StatusUtil.showStatus(NLS.bind(//
+						Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
+						_importFilePath,
+						dt.toString()));
+			}
+		}
+
+		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
+
+		tourData.setStartHour((short) dt.getHourOfDay());
+		tourData.setStartMinute((short) dt.getMinuteOfHour());
+		tourData.setStartSecond((short) dt.getSecondOfMinute());
+
+		tourData.setStartYear((short) dt.getYear());
+		tourData.setStartMonth((short) dt.getMonthOfYear());
+		tourData.setStartDay((short) dt.getDayOfMonth());
+
+		tourData.setWeek(dt);
+
+		tourData.setDeviceTimeInterval((short) -1);
+		tourData.importRawDataFile = _importFilePath;
+		tourData.setTourImportFilePath(_importFilePath);
+
+		tourData.createTimeSeries(_dtList, true);
+		tourData.computeAltitudeUpDown();
+
+		tourData.setDeviceModeName(_activitySport);
+
+		tourData.setCalories(_calories);
+
+		// after all data are added, the tour id can be created
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
+		String uniqueKey;
+
+		if (_deviceDataReader.isCreateTourIdWithTime) {
+
+			/*
+			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
+			 * export and import found a wrong tour when exporting was done with camouflage speed ->
+			 * this will result in a NEW tour
+			 */
+			final int tourRecordingTime = tourData.getTourRecordingTime();
+
+			if (distanceSerie == null) {
+				uniqueKey = Integer.toString(tourRecordingTime);
+			} else {
+
+				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+
+				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+			}
+
+		} else {
+
+			/*
+			 * original version to create tour id
+			 */
+			if (distanceSerie == null) {
+				uniqueKey = "42984"; //$NON-NLS-1$
+			} else {
+				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+			}
+		}
+
+		Long tourId;
+
+		/*
+		 * if (fId != null) { try{ tourId = Long.parseLong(fId); } catch (final
+		 * NumberFormatException e) { tourId = tourData.createTourId(uniqueKey); } } else
+		 */
+		{
+			tourId = tourData.createTourId(uniqueKey);
+		}
+
+		// check if the tour is already imported
+		if (_tourDataMap.containsKey(tourId) == false) {
+
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
+
+			tourData.setDeviceId(_deviceDataReader.deviceId);
+			tourData.setDeviceName(_deviceDataReader.visibleName);
+
+			// add new tour to other tours
+			_tourDataMap.put(tourId, tourData);
+		}
+
+		_isImported = true;
+	}
+
+	private void finalizeTrackpoint() {
+
+		if (_timeData != null) {
+
+			// set virtual time if time is not available
+			if (_timeData.absoluteTime == Long.MIN_VALUE) {
+				_timeData.absoluteTime = new DateTime(2000, 1, 1, 0, 0, 0, 0).getMillis();
+			}
+
+			if (_isSetLapMarker) {
+				_isSetLapMarker = false;
+
+				_timeData.marker = 1;
+				_timeData.markerLabel = Integer.toString(_lapCounter - 1);
+			}
+
+			_dtList.add(_timeData);
+		}
+
+		if (_isSetLapStartTime) {
+			_isSetLapStartTime = false;
+			_lapStart.add(_currentTime);
+		}
 	}
 
 	private double getDoubleValue(final String textValue) {
@@ -567,176 +731,6 @@ public class GarminSAXHandler extends DefaultHandler {
 		return _isImported;
 	}
 
-	private void setTourData() {
-
-		// check if data are available
-		if (_dtList.size() == 0) {
-			return;
-		}
-
-		validateTimeSeries();
-
-		// create data object for each tour
-		final TourData tourData = new TourData();
-
-		// set tour notes
-		setTourNotes(tourData);
-
-		/*
-		 * set tour start date/time
-		 */
-
-		/*
-		 * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
-		 * partly corrupt. When tour starts with the date 2007-04-01, move forward in the list until
-		 * another date occures and use this as the start date.
-		 */
-		int validIndex = 0;
-		DateTime dt = null;
-
-		for (final TimeData timeData : _dtList) {
-
-			dt = new DateTime(timeData.absoluteTime);
-
-			if (dt.getYear() == 2007 && dt.getMonthOfYear() == 4 && dt.getDayOfMonth() == 1) {
-
-				// this is an invalid time slice
-
-				validIndex++;
-				continue;
-
-			} else {
-
-				// this is a valid time slice
-				break;
-			}
-		}
-		if (validIndex == 0) {
-
-			// date is not 2007-04-01
-
-		} else {
-
-			if (validIndex == _dtList.size()) {
-
-				// all time data start with 2007-04-01
-
-				dt = new DateTime(_dtList.get(0).absoluteTime);
-
-			} else {
-
-				// the date starts with 2007-04-01 but it changes to another date
-
-				dt = new DateTime(_dtList.get(validIndex).absoluteTime);
-
-				/*
-				 * create a new list by removing invalid time slices
-				 */
-
-				final ArrayList<TimeData> oldDtList = _dtList;
-				_dtList = new ArrayList<TimeData>();
-
-				int _tdIndex = 0;
-				for (final TimeData timeData : oldDtList) {
-
-					if (_tdIndex < validIndex) {
-						_tdIndex++;
-						continue;
-					}
-
-					_dtList.add(timeData);
-				}
-
-				StatusUtil.showStatus(NLS.bind(//
-						Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
-						_importFilePath,
-						dt.toString()));
-			}
-		}
-
-		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
-
-		tourData.setStartHour((short) dt.getHourOfDay());
-		tourData.setStartMinute((short) dt.getMinuteOfHour());
-		tourData.setStartSecond((short) dt.getSecondOfMinute());
-
-		tourData.setStartYear((short) dt.getYear());
-		tourData.setStartMonth((short) dt.getMonthOfYear());
-		tourData.setStartDay((short) dt.getDayOfMonth());
-
-		tourData.setWeek(dt);
-
-		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
-
-		tourData.createTimeSeries(_dtList, true);
-		tourData.computeAltitudeUpDown();
-
-		tourData.setDeviceModeName(_activitySport);
-
-		tourData.setCalories(_calories);
-
-		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-
-		if (_deviceDataReader.isCreateTourIdWithTime) {
-
-			/*
-			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
-			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this will result in a NEW tour
-			 */
-			final int tourRecordingTime = tourData.getTourRecordingTime();
-
-			if (distanceSerie == null) {
-				uniqueKey = Integer.toString(tourRecordingTime);
-			} else {
-
-				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
-
-				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
-			}
-
-		} else {
-
-			/*
-			 * original version to create tour id
-			 */
-			if (distanceSerie == null) {
-				uniqueKey = "42984"; //$NON-NLS-1$
-			} else {
-				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
-			}
-		}
-
-		Long tourId;
-
-		/*
-		 * if (fId != null) { try{ tourId = Long.parseLong(fId); } catch (final
-		 * NumberFormatException e) { tourId = tourData.createTourId(uniqueKey); } } else
-		 */
-		{
-			tourId = tourData.createTourId(uniqueKey);
-		}
-
-		// check if the tour is already imported
-		if (_tourDataMap.containsKey(tourId) == false) {
-
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-
-			tourData.setDeviceId(_deviceDataReader.deviceId);
-			tourData.setDeviceName(_deviceDataReader.visibleName);
-
-			// add new tour to other tours
-			_tourDataMap.put(tourId, tourData);
-		}
-
-		_isImported = true;
-	}
-
 	/**
 	 * Set the notes into the description and/or title field
 	 * 
@@ -802,10 +796,11 @@ public class GarminSAXHandler extends DefaultHandler {
 						_isInLap = true;
 
 						_lapCounter++;
+
 						if (_lapCounter > 1) {
-							_setLapMarker = true;
+							_isSetLapMarker = true;
 						}
-						_setLapStartTime = true;
+						_isSetLapStartTime = true;
 					}
 
 				} else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
@@ -817,7 +812,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					_isInCourse = true;
 
 					_lapCounter = 0;
-					_setLapMarker = false;
+					_isSetLapMarker = false;
 					_lapStart.clear();
 
 					_dtList.clear();
@@ -854,13 +849,12 @@ public class GarminSAXHandler extends DefaultHandler {
 						_isInLap = true;
 
 						_lapCounter++;
+
 						if (_lapCounter > 1) {
-							_setLapMarker = true;
+							_isSetLapMarker = true;
 						}
-						_setLapStartTime = true;
-					} /*
-					 * else if (name.equals(TAG_ID)) { fIsInId = true; }
-					 */
+						_isSetLapStartTime = true;
+					}
 
 				} else if (_isInCourse) {
 
@@ -894,7 +888,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					}
 
 					_lapCounter = 0;
-					_setLapMarker = false;
+					_isSetLapMarker = false;
 					_lapStart.clear();
 
 					_dtList.clear();

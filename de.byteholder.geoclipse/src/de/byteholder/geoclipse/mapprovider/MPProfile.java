@@ -374,7 +374,8 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		return new ParentImageStatus(//
 				parentImage.getImageData(),
 				isFinal,
-				_isSaveImage && isChildError == false);
+				_isSaveImage,
+				isChildError);
 	}
 
 	@Override

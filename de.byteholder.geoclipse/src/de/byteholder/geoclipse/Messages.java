@@ -33,11 +33,9 @@ public class Messages extends NLS {
 	public static String		Dialog_CustomConfig_Label_ZoomLevel;
 	public static String		Dialog_CustomConfig_Text_ImageFormat_Tooltip;
 
-	public static String	Dialog_DropNoPOI_InvalidData;
-
-	public static String	Dialog_DropNoPOI_Message;
-
-	public static String	Dialog_DropNoPOI_Title;
+	public static String		Dialog_DropNoPOI_InvalidData;
+	public static String		Dialog_DropNoPOI_Message;
+	public static String		Dialog_DropNoPOI_Title;
 
 	public static String		Dialog_MapConfig_Button_LiveView;
 	public static String		Dialog_MapConfig_Button_LiveView_Tooltip;
@@ -159,6 +157,12 @@ public class Messages extends NLS {
 	public static String		MP_Error_DialogTitle_ConfigurationError;
 	public static String		MP_Error_DialogTitle_Wms;
 	public static String		MP_Error_Title_ErrorInXmlFile;
+
+	public static String	MP_Manager_DeletedOfflineImages_MonitorMessage;
+
+	public static String	MP_Manager_DeletedOfflineImagesParts_MonitorMessage;
+
+	public static String	MP_Manager_DeleteOfflineImages_CannotDeleteFolder;
 
 	public static String		MP_Manager_Task_GetWms;
 

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import java.util.List;
+
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 
@@ -29,6 +31,7 @@ import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.gpx.GeoPosition;
 
@@ -126,12 +129,29 @@ public class DirectMappingPainter implements IDirectPainter {
 			return;
 		}
 
-		final TourPainter tourPainter = TourPainter.getInstance();
+		final List<MapPainter> allMapPainter = _map.getMapPainter();
+		if (allMapPainter == null || allMapPainter.size() == 0) {
+			return;
+		}
+
+		// get first tour painter
+		TourPainter tourPainter = null;
+		for (final MapPainter mapPainter : allMapPainter) {
+			if (mapPainter instanceof TourPainter) {
+				tourPainter = (TourPainter) mapPainter;
+				break;
+			}
+		}
+		if (tourPainter == null) {
+			return;
+		}
+
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
 		final int leftValueInlegendPosition = tourPainter.getLegendValuePosition(
 				legendImageBounds,
 				_leftSliderValueIndex);
+
 		if (leftValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
@@ -139,6 +159,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		final int rightValueInlegendPosition = tourPainter.getLegendValuePosition(
 				legendImageBounds,
 				_rightSliderValueIndex);
+
 		if (rightValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}

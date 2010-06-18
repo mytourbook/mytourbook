@@ -83,14 +83,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	private int						type;
 
-	@XmlElement
-	private int						time;
-
 	/**
-	 * distance in metric system
+	 * Time in seconds relative to the tour start. When value is not available it is set to
+	 * <code>-1</code>.
 	 */
 	@XmlElement
-	private int						distance;
+	private int						time					= -1;
+
+	/**
+	 * Distance in meters in the metric system or <code>-1</code> when the distance is not available
+	 */
+	@XmlElement
+	private int						distance				= -1;
 
 	private int						visualPosition;
 
@@ -287,7 +291,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return Returns the distance of the marker in metric system
+	 * @return Returns distance in meters in the metric system or -1 when the distance is not
+	 *         available
 	 */
 	public int getDistance() {
 		return distance;
@@ -394,6 +399,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * Sets the distance with the metric system
 	 * 
 	 * @param distance
+	 *            Distance in meter or <code>-1</code> when the distance is not available
 	 */
 	public void setDistance(final int distance) {
 		this.distance = distance;
@@ -445,6 +451,11 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.serieIndex = serieIndex;
 	}
 
+	/**
+	 * @param time
+	 *            Time in seconds relative to the tour start. When value is not available it is set
+	 *            to -1.
+	 */
 	public void setTime(final int time) {
 		this.time = time;
 	}

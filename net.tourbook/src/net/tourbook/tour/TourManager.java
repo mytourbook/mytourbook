@@ -33,6 +33,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider;
@@ -622,9 +623,7 @@ public class TourManager {
 		removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
 	}
 
-	private static double[] removeTimeSlicesDouble(final double[] dataSerie,
-														final int firstIndex,
-														final int lastIndex) {
+	private static double[] removeTimeSlicesDouble(final double[] dataSerie, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = dataSerie.length;
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
@@ -656,9 +655,7 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static int[] removeTimeSlicesInteger(	final int[] oldDataSerie,
-														final int firstIndex,
-														final int lastIndex) {
+	private static int[] removeTimeSlicesInteger(final int[] oldDataSerie, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = oldDataSerie.length;
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
@@ -690,7 +687,9 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static void removeTimeSlicesTimeAndDistance(final TourData _tourData, final int firstIndex, final int lastIndex) {
+	private static void removeTimeSlicesTimeAndDistance(final TourData _tourData,
+														final int firstIndex,
+														final int lastIndex) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final int[] distSerie = _tourData.distanceSerie;
@@ -1905,7 +1904,9 @@ public class TourManager {
 			final TourData tourDataFromDb = TourDatabase.getTourFromDb(requestedTourId);
 
 			if (tourDataFromDb == null) {
-				return null;
+
+				// try to get tour from raw data manager
+				return RawDataManager.getInstance().getImportedTours().get(requestedTourId);
 			}
 
 			// cache tour data

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -25,19 +25,19 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public static final int	IGNORE_SLIDER_POSITION			= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
-	private int				fLeftSliderValueIndex			= IGNORE_SLIDER_POSITION;
-	private int				fRightSliderValueIndex			= IGNORE_SLIDER_POSITION;
+	private int				_leftSliderValueIndex			= IGNORE_SLIDER_POSITION;
+	private int				_rightSliderValueIndex			= IGNORE_SLIDER_POSITION;
 
-	private boolean			fCenterSliderPosition			= false;
+	private boolean			_isCenterSliderPosition			= false;
 
-	private Chart			fChart;
+	private Chart			_chart;
 
 	public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
 
-		fChart = chart;
+		_chart = chart;
 
-		fLeftSliderValueIndex = leftValueIndex;
-		fRightSliderValueIndex = rightValueIndex;
+		_leftSliderValueIndex = leftValueIndex;
+		_rightSliderValueIndex = rightValueIndex;
 	}
 
 	public SelectionChartXSliderPosition(	final Chart chart,
@@ -47,23 +47,23 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 		this(chart, serieIndex1, serieIndex2);
 
-		this.fCenterSliderPosition = centerSliderPosition;
+		this._isCenterSliderPosition = centerSliderPosition;
 	}
 
 	public Chart getChart() {
-		return fChart;
+		return _chart;
 	}
 
 	public int getLeftSliderValueIndex() {
-		return fLeftSliderValueIndex;
+		return _leftSliderValueIndex;
 	}
 
 	public int getRightSliderValueIndex() {
-		return fRightSliderValueIndex;
+		return _rightSliderValueIndex;
 	}
 
 	public boolean isCenterSliderPosition() {
-		return fCenterSliderPosition;
+		return _isCenterSliderPosition;
 	}
 
 	public boolean isEmpty() {
@@ -71,6 +71,6 @@ public class SelectionChartXSliderPosition implements ISelection {
 	}
 
 	public void setChart(final Chart chart) {
-		fChart = chart;
+		_chart = chart;
 	}
 }

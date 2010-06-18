@@ -104,6 +104,7 @@ import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 import de.byteholder.gpx.GeoPosition;
@@ -126,9 +127,12 @@ public class Map extends Canvas {
 	public static final int						UI_MIN_ZOOM_LEVEL							= MAP_MIN_ZOOM_LEVEL + 1;
 	public static final int						UI_MAX_ZOOM_LEVEL							= MAP_MAX_ZOOM_LEVEL + 1;
 
-	private static final String					DIRECTION_E									= "E";
-	private static final String					DIRECTION_N									= "N";
+	private static final String					DIRECTION_E									= "E";															//$NON-NLS-1$
+	private static final String					DIRECTION_N									= "N";															//$NON-NLS-1$
 
+	/*
+	 * Wikipedia data
+	 */
 //	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
 	private static final String					WIKI_PARAMETER_TYPE							= "type";														//$NON-NLS-1$
 
@@ -144,25 +148,24 @@ public class Map extends Canvas {
 //	D_M_S_N_D_M_S_E
 
 	private static final String					PATTERN_SEPARATOR							= "_";															//$NON-NLS-1$
-	private static final String					PATTERN_END									= "_?(.*)";
+	private static final String					PATTERN_END									= "_?(.*)";													//$NON-NLS-1$
 
 	private static final String					PATTERN_WIKI_URL							= ".*pagename=([^&]*).*params=(.*)";							//$NON-NLS-1$
 	private static final String					PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR	= ":";															//$NON-NLS-1$
 
-	private static final String					PATTERN_DOUBLE								= "([-+]?[0-9]*\\.?[0-9]+)";
+	private static final String					PATTERN_DOUBLE								= "([-+]?[0-9]*\\.?[0-9]+)";									//$NON-NLS-1$
 	private static final String					PATTERN_DOUBLE_SEP							= PATTERN_DOUBLE
 																									+ PATTERN_SEPARATOR;
 
-	private static final String					PATTERN_DIRECTION_NS						= "([NS])_";
-	private static final String					PATTERN_DIRECTION_WE						= "([WE])";
+	private static final String					PATTERN_DIRECTION_NS						= "([NS])_";													//$NON-NLS-1$
+	private static final String					PATTERN_DIRECTION_WE						= "([WE])";													//$NON-NLS-1$
 
 //	private static final String							PATTERN_WIKI_POSITION_10					= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
 //	private static final String							PATTERN_WIKI_POSITION_20					= "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";									//$NON-NLS-1$
 //	private static final String							PATTERN_WIKI_POSITION_21					= "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";				//$NON-NLS-1$
 //	private static final String							PATTERN_WIKI_POSITION_22					= "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";	//$NON-NLS-1$
 
-	private static final String					PATTERN_WIKI_POSITION_D_D					= PATTERN_DOUBLE
-																									+ ";"
+	private static final String					PATTERN_WIKI_POSITION_D_D					= PATTERN_DOUBLE + ";" //$NON-NLS-1$
 																									+ PATTERN_DOUBLE
 																									+ PATTERN_END;
 
@@ -462,10 +465,6 @@ public class Map extends Canvas {
 
 	private DropTarget							_dropTarget;
 
-//	private boolean								_doPaintPannedMap;
-//	private int									_pannedMapDiffX;
-//	private int									_pannedMapDiffY;
-
 	private ITourToolTip						_tourToolTip;
 
 	private boolean								_isRedrawEnabled							= true;
@@ -624,59 +623,15 @@ public class Map extends Canvas {
 
 		_transparentColor = new Color(_display, _transparentRGB);
 
-//		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
+		//		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
 //		_poiImageBounds = _poiImage.getBounds();
 
 		paintOverlay();
 	}
 
 	/**
-	 * Checks if an image can be reused, this is true if the image exists and has the same size
-	 * 
-	 * @param newWidth
-	 * @param newHeight
-	 * @return
+	 * @return Returns rgb values for the color which is used as transparent color in the map.
 	 */
-	public static boolean canReuseImage(final Image image, final Rectangle clientArea) {
-
-		// check if we could reuse the existing image
-
-		if ((image == null) || image.isDisposed()) {
-			return false;
-		} else {
-			// image exist, check for the bounds
-			final Rectangle oldBounds = image.getBounds();
-
-			if (!((oldBounds.width == clientArea.width) && (oldBounds.height == clientArea.height))) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * creates a new image
-	 * 
-	 * @param display
-	 * @param image
-	 *            image which will be disposed if the image is not null
-	 * @param clientArea
-	 * @return returns a new created image
-	 */
-	public static Image createImage(final Display display, final Image image, final Rectangle clientArea) {
-
-		if ((image != null) && !image.isDisposed()) {
-			image.dispose();
-		}
-
-		// ensure the image has a width/height of 1, otherwise this causes troubles
-		final int width = Math.max(1, clientArea.width);
-		final int height = Math.max(1, clientArea.height);
-
-		return new Image(display, width, height);
-	}
-
 	public static RGB getTransparentRGB() {
 		return _transparentRGB;
 	}
@@ -866,6 +821,31 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * Checks if an image can be reused, this is true if the image exists and has the same size
+	 * 
+	 * @param newWidth
+	 * @param newHeight
+	 * @return
+	 */
+	private boolean canReuseImage(final Image image, final Rectangle clientArea) {
+
+		// check if we could reuse the existing image
+
+		if ((image == null) || image.isDisposed()) {
+			return false;
+		}
+
+		// image exist, check image bounds
+		final Rectangle oldBounds = image.getBounds();
+
+		if (!((oldBounds.width == clientArea.width) && (oldBounds.height == clientArea.height))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * make sure that the parted overlay image has the correct size
 	 */
 	private void checkImageTemplate9Parts() {
@@ -928,14 +908,31 @@ public class Map extends Canvas {
 		setMenu(menuMgr.createContextMenu(this));
 	}
 
-	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
+	/**
+	 * Creates a new image, old image is disposed
+	 * 
+	 * @param display
+	 * @param image
+	 *            image which will be disposed if the image is not null
+	 * @param clientArea
+	 * @return returns a new created image
+	 */
+	private Image createImage(final Display display, final Image image, final Rectangle clientArea) {
 
-		_mp.setDimLevel(dimLevel, dimColor);
+		if (image != null) {
+			image.dispose();
+		}
 
-		// remove all cached map images
-		_mp.disposeTileImages();
+		// ensure the image has a width/height of 1, otherwise this causes troubles
+		final int width = Math.max(1, clientArea.width);
+		final int height = Math.max(1, clientArea.height);
 
-		resetAll();
+		return new Image(display, width, height);
+	}
+
+	public void deleteFailedImageFiles() {
+
+		MapProviderManager.deleteOfflineMap(_mp, true);
 	}
 
 //	private Composite createPoiToolTip(final Shell shell) {
@@ -955,20 +952,14 @@ public class Map extends Canvas {
 //		return container;
 //	}
 
-	/**
-	 * hide offline area and all states
-	 */
-	private void disableOfflineAreaSelection() {
+	public synchronized void dimMap(final int dimLevel, final RGB dimColor) {
 
-		_isSelectOfflineArea = false;
-		_isPaintOfflineArea = false;
-		_isOfflineSelectionStarted = false;
+		_mp.setDimLevel(dimLevel, dimColor);
 
-		_isContextMenuEnabled = true;
+		// remove all cached map images
+		_mp.disposeTileImages();
 
-		setCursor(_cursorDefault);
-
-		redraw();
+		resetAll();
 	}
 
 //	/**
@@ -1000,40 +991,28 @@ public class Map extends Canvas {
 //	}
 
 	/**
+	 * hide offline area and all states
+	 */
+	private void disableOfflineAreaSelection() {
+
+		_isSelectOfflineArea = false;
+		_isPaintOfflineArea = false;
+		_isOfflineSelectionStarted = false;
+
+		_isContextMenuEnabled = true;
+
+		setCursor(_cursorDefault);
+
+		redraw();
+	}
+
+	/**
 	 * Disposes all overlay image cache and the overlay painting queue
 	 */
 	public synchronized void disposeOverlayImageCache() {
 
 		if (_mp != null) {
 			_mp.resetOverlays();
-
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-			// TODO DEBUG
-//			_mp.resetAll(true);
-// TODO DEBUG END
 		}
 
 		_tileOverlayPaintQueue.clear();
@@ -1137,6 +1116,13 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * @return Returns the overlay map painter which are defined as plugin extension
+	 */
+	public List<MapPainter> getMapPainter() {
+		return _overlays;
+	}
+
+	/**
 	 * Get the current map provider
 	 * 
 	 * @return Returns the current map provider
@@ -1175,25 +1161,6 @@ public class Map extends Canvas {
 				tilePosY * _tilePixelSize - _worldPixelViewport.y);
 	}
 
-	/**
-	 * @param tileKey
-	 * @return Returns the key to identify overlay images in the image cache
-	 */
-	private String getOverlayKey(final Tile tile) {
-		return _overlayKey + tile.getTileKey();
-	}
-
-	/**
-	 * @param tile
-	 * @param xOffset
-	 * @param yOffset
-	 * @param projectionId
-	 * @return
-	 */
-	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
-		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
-	}
-
 //	private Point2D.Double getWorldPixelAdjustedCenter(double newCenterX, double newCenterY) {
 //
 //		if (newCenterX < 0) {
@@ -1214,6 +1181,34 @@ public class Map extends Canvas {
 //		}
 //
 //		return new Point2D.Double(newCenterX, newCenterY);
+//	}
+
+	/**
+	 * @param tileKey
+	 * @return Returns the key to identify overlay images in the image cache
+	 */
+	private String getOverlayKey(final Tile tile) {
+		return _overlayKey + tile.getTileKey();
+	}
+
+	/**
+	 * @param tile
+	 * @param xOffset
+	 * @param yOffset
+	 * @param projectionId
+	 * @return
+	 */
+	private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
+		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
+	}
+
+//	/**
+//	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
+//	 *
+//	 * @return the value of this property
+//	 */
+//	public boolean isDrawTileBorders() {
+//		return _isShowTileInfo;
 //	}
 
 	/**
@@ -1248,15 +1243,6 @@ public class Map extends Canvas {
 	public Rectangle getWorldPixelViewport() {
 		return getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 	}
-
-//	/**
-//	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
-//	 *
-//	 * @return the value of this property
-//	 */
-//	public boolean isDrawTileBorders() {
-//		return _isShowTileInfo;
-//	}
 
 	/**
 	 * Gets the current zoom level, or <code>null</code> when a tile
@@ -1571,6 +1557,17 @@ public class Map extends Canvas {
 		}
 	}
 
+//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
+//
+//		if (_poiTT == null) {
+//			_poiTT = new PoiToolTip(getShell());
+//		}
+//
+//		_poiTT.geoPosition = poiGeoPosition;
+//
+//		return _poiTT;
+//	}
+
 	private void onMouseMove(final MouseEvent event) {
 
 		final int devMouseX = event.x;
@@ -1716,17 +1713,6 @@ public class Map extends Canvas {
 
 	}
 
-//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
-//
-//		if (_poiTT == null) {
-//			_poiTT = new PoiToolTip(getShell());
-//		}
-//
-//		_poiTT.geoPosition = poiGeoPosition;
-//
-//		return _poiTT;
-//	}
-
 	/**
 	 * There are far too many calls from SWT on this method. Much more than would bereally needed. I
 	 * don't know why this is. As a result of this, the Component uses up much CPU, because it runs
@@ -1739,20 +1725,16 @@ public class Map extends Canvas {
 
 		// draw map image to the screen
 
+//		final long startTime = System.nanoTime();
+//		long imageTime = 0;
+
 		if ((_mapImage != null) && !_mapImage.isDisposed()) {
 
 			final GC gc = event.gc;
 
-//			if (_doPaintPannedMap) {
-//
-//				/*
-//				 * paint the old map image for the panned map
-//				 */
-//				gc.drawImage(_mapImage, _pannedMapDiffX, _pannedMapDiffY);
-//
-//			} else {
-
+//			final long startImage = System.nanoTime();
 			gc.drawImage(_mapImage, 0, 0);
+//			imageTime = System.nanoTime() - startImage;
 
 			if (_directMapPainter != null) {
 
@@ -1773,6 +1755,12 @@ public class Map extends Canvas {
 			}
 //			}
 		}
+
+//		final double totalTime = (System.nanoTime() - startTime) / 1000000.0;
+//		final double imageTimeD = imageTime / 1000000.0;
+//		System.out.println("" + totalTime + "ms\t" + imageTimeD + "ms\t" + imageTimeD / totalTime);
+// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	private void onResize() {
@@ -3544,48 +3532,6 @@ public class Map extends Canvas {
 		_mapLegend = legend;
 	}
 
-	/**
-	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
-	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
-	 * confuse the user because the map is not displaying the current state.
-	 * 
-	 * @param isLiveView
-	 */
-	public void setLiveView(final boolean isLiveView) {
-		_isLiveView = isLiveView;
-	}
-
-	/**
-	 * Set the center of the map to a geo position (with lat/long)
-	 * 
-	 * @param geoPosition
-	 *            Center position in lat/lon
-	 */
-	public void setMapCenter(final GeoPosition geoPosition) {
-
-		if (Thread.currentThread() == _displayThread) {
-
-			setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
-
-		} else {
-
-			// current thread is not the display thread
-
-			_display.syncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (!isDisposed()) {
-						setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
-					}
-				}
-			});
-		}
-
-		updateViewPortData();
-
-		queueMapRedraw();
-	}
-
 	/*
 	 * keep old method because it is not easy to understand
 	 */
@@ -3637,6 +3583,52 @@ public class Map extends Canvas {
 //	}
 
 	/**
+	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
+	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
+	 * confuse the user because the map is not displaying the current state.
+	 * 
+	 * @param isLiveView
+	 */
+	public void setLiveView(final boolean isLiveView) {
+		_isLiveView = isLiveView;
+	}
+
+	/**
+	 * Set the center of the map to a geo position (with lat/long)
+	 * 
+	 * @param geoPosition
+	 *            Center position in lat/lon
+	 */
+	public void setMapCenter(final GeoPosition geoPosition) {
+
+		if (Thread.currentThread() == _displayThread) {
+
+			setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
+
+		} else {
+
+			// current thread is not the display thread
+
+			_display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (!isDisposed()) {
+						setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
+					}
+				}
+			});
+		}
+
+		updateViewPortData();
+
+		queueMapRedraw();
+	}
+
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
+
+	/**
 	 * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates. The
 	 * method {@link #isTileOnMap(int, int)}
 	 * 
@@ -3678,10 +3670,6 @@ public class Map extends Canvas {
 		_mapContextProvider = mapContextProvider;
 	}
 
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
-
 	/**
 	 * Sets the map provider for the map and redraws the map
 	 * 
@@ -3718,29 +3706,6 @@ public class Map extends Canvas {
 		}
 
 		queueMapRedraw();
-	}
-
-	/**
-	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
-	 * position as the previous tile factory
-	 * 
-	 * @param mp
-	 */
-	public synchronized void setMapProviderWithReset(final MP mp) {
-
-		if (_mp != null) {
-			// keep tiles with loading errors that they are not loaded again when the factory has not changed
-			_mp.resetAll(_mp == mp);
-		}
-
-		_mp = mp;
-
-		queueMapRedraw();
-	}
-
-	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
-		_distanceUnitValue = distanceUnitValue;
-		_distanceUnitLabel = distanceUnitLabel;
 	}
 
 //	public void setPoi(final GeoPosition poiPosition, final int zoomLevel, final String poiText) {
@@ -3813,6 +3778,29 @@ public class Map extends Canvas {
 //	}
 
 	/**
+	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
+	 * position as the previous tile factory
+	 * 
+	 * @param mp
+	 */
+	public synchronized void setMapProviderWithReset(final MP mp) {
+
+		if (_mp != null) {
+			// keep tiles with loading errors that they are not loaded again when the factory has not changed
+			_mp.resetAll(_mp == mp);
+		}
+
+		_mp = mp;
+
+		queueMapRedraw();
+	}
+
+	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
+		_distanceUnitValue = distanceUnitValue;
+		_distanceUnitLabel = distanceUnitLabel;
+	}
+
+	/**
 	 * Set a key to uniquely identify overlays which is used to cache the overlays
 	 * 
 	 * @param key
@@ -3820,6 +3808,13 @@ public class Map extends Canvas {
 	public void setOverlayKey(final String key) {
 		_overlayKey = key;
 	}
+
+//	public void setShowPOI(final boolean isShowPOI) {
+//
+//		_isPoiVisible = isShowPOI;
+//
+//		queueMapRedraw();
+//	}
 
 	/**
 	 * @param isRedrawEnabled
@@ -3851,13 +3846,6 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
-//	public void setShowPOI(final boolean isShowPOI) {
-//
-//		_isPoiVisible = isShowPOI;
-//
-//		queueMapRedraw();
-//	}
-
 	/**
 	 * Legend will be drawn into the map when the visibility is <code>true</code>
 	 * 
@@ -3876,14 +3864,6 @@ public class Map extends Canvas {
 	 */
 	public void setShowOverlays(final boolean showOverlays) {
 		_isDrawOverlays = showOverlays;
-	}
-
-	public void setShowScale(final boolean isScaleVisible) {
-		_isScaleVisible = isScaleVisible;
-	}
-
-	public void setToolTip(final ITourToolTip tourToolTip) {
-		_tourToolTip = tourToolTip;
 	}
 
 //	private void showPoi(final String poiText) {
@@ -3979,6 +3959,14 @@ public class Map extends Canvas {
 //
 //		setPoiVisible(isVisible);
 //	}
+
+	public void setShowScale(final boolean isScaleVisible) {
+		_isScaleVisible = isScaleVisible;
+	}
+
+	public void setToolTip(final ITourToolTip tourToolTip) {
+		_tourToolTip = tourToolTip;
+	}
 
 	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
 

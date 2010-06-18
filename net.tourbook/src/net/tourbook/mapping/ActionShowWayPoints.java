@@ -19,26 +19,25 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowTourMarker extends Action {
+public class ActionShowWayPoints extends Action {
 
 	private TourMapView	_mapView;
 
-	public ActionShowTourMarker(final TourMapView mapView) {
+	public ActionShowWayPoints(final TourMapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 
 		_mapView = mapView;
 
-		setText(Messages.map_action_show_tour_marker);
+		setText(Messages.Map_Action_ShowWayPoints);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker));
-		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_TourWayPoint));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_TourWayPoint_Disabled));
 	}
 
 	@Override
 	public void run() {
-		_mapView.actionSetShowTourMarkerInMap();
+		_mapView.actionSetShowWayPointsInMap();
 	}
 
 }

@@ -117,8 +117,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 
-	private final NumberFormat		_nf						= NumberFormat.getNumberInstance();
-
+	private final NumberFormat		_nf_3_3					= NumberFormat.getNumberInstance();
+	{
+		_nf_3_3.setMinimumFractionDigits(3);
+		_nf_3_3.setMaximumFractionDigits(3);
+	}
 	/*
 	 * UI controls
 	 */
@@ -149,11 +152,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	/**
 	 * Sort the markers by time
 	 */
-	private class MarkerViewerSorter extends ViewerSorter {
+	private static class MarkerViewerSorter extends ViewerSorter {
 
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+// time is disabled because it's not always available in gpx files
+			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
 		}
 	}
 
@@ -433,9 +438,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-				_nf.setMinimumFractionDigits(3);
-				_nf.setMaximumFractionDigits(3);
-				cell.setText(_nf.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				final int markerDistance = tourMarker.getDistance();
+				if (markerDistance == -1) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_3_3.format(((float) markerDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));

@@ -127,6 +127,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private static final String						MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_INFO_IN_MAP		= "action.show-tour-info-in-map";			//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_WAY_POINTS				= "action.show-way-points-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
@@ -231,6 +232,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private ActionShowTourInMap						_actionShowTourInMap;
 	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
 	private ActionShowTourMarker					_actionShowTourMarker;
+	private ActionShowWayPoints						_actionShowWayPoints;
 	private ActionSynchWithTour						_actionSynchWithTour;
 	private ActionSynchWithSlider					_actionSynchWithSlider;
 	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
@@ -294,6 +296,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	}
 
 	void actionReloadFailedMapImages() {
+		_map.deleteFailedImageFiles();
 		_map.resetAll();
 	}
 
@@ -361,7 +364,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowTourMarkerInMap() {
 
-		_paintMgr.setShowTourMarker(_actionShowTourMarker.isChecked());
+		_paintMgr.isShowTourMarker = _actionShowTourMarker.isChecked();
+
+		_map.disposeOverlayImageCache();
+		_map.queueMapRedraw();
+	}
+
+	void actionSetShowWayPointsInMap() {
+
+		_paintMgr.isShowWayPoints = _actionShowWayPoints.isChecked();
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -834,6 +845,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		_actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
 		_actionShowTourMarker = new ActionShowTourMarker(this);
+		_actionShowWayPoints = new ActionShowWayPoints(this);
 		_actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		_actionDimMap = new ActionDimMap(this);
 		_actionManageProvider = new ActionManageMapProviders(this);
@@ -1112,6 +1124,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_actionShowStartEndInMap.setEnabled(isOneTour);
 		_actionShowTourMarker.setEnabled(_isTour);
+		_actionShowWayPoints.setEnabled(_isTour);
 		_actionShowLegendInMap.setEnabled(_isTour);
 		_actionShowSliderInMap.setEnabled(_isTour);
 		_actionShowSliderInLegend.setEnabled(isOneTour);
@@ -1163,13 +1176,16 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void fillMapMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionShowStartEndInMap);
-		menuMgr.add(_actionShowTourMarker);
 		menuMgr.add(_actionShowLegendInMap);
 		menuMgr.add(_actionShowScaleInMap);
 		menuMgr.add(_actionShowSliderInMap);
 		menuMgr.add(_actionShowSliderInLegend);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(_actionShowTourMarker);
+		menuMgr.add(_actionShowWayPoints);
 		menuMgr.add(_actionShowPOI);
+		menuMgr.add(_actionShowStartEndInMap);
 		menuMgr.add(_actionShowTourInfoInMap);
 		menuMgr.add(new Separator());
 
@@ -1848,7 +1864,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// checkbox: show tour marker
 		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
 		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		_paintMgr.setShowTourMarker(_actionShowTourMarker.isChecked());
+		_paintMgr.isShowTourMarker = _actionShowTourMarker.isChecked();
+
+		// checkbox: show way points
+		state = settings.get(MEMENTO_SHOW_WAY_POINTS);
+		_actionShowWayPoints.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_WAY_POINTS));
+		_paintMgr.isShowWayPoints = _actionShowWayPoints.isChecked();
 
 		// checkbox: show legend in map
 		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
@@ -1962,13 +1983,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		settings.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
 
-		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
-		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
 		settings.put(MEMENTO_SHOW_LEGEND_IN_MAP, _actionShowLegendInMap.isChecked());
+		settings.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
 		settings.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
+		settings.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
 		settings.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
+		settings.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
 
 		settings.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
 

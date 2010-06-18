@@ -11,7 +11,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse;
-import java.util.ArrayList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -25,21 +26,21 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapPainter;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 
-
 public class GeoclipseExtensions {
 
-	private static GeoclipseExtensions	fInstance;
+	private static GeoclipseExtensions	_instance;
 
+	private ArrayList<MPPlugin>			_tileFactories;
 
-	private ArrayList<MPPlugin>			fTileFactories;
+	private GeoclipseExtensions() {}
 
 	public static GeoclipseExtensions getInstance() {
 
-		if (fInstance == null) {
-			fInstance = new GeoclipseExtensions();
+		if (_instance == null) {
+			_instance = new GeoclipseExtensions();
 		}
 
-		return fInstance;
+		return _instance;
 	}
 
 	public static void registerOverlays(final Map map) {
@@ -66,22 +67,20 @@ public class GeoclipseExtensions {
 		}
 	}
 
-	private GeoclipseExtensions() {}
-
 	/**
 	 * @return Returns a list with all available map/tile factories
 	 */
 	public List<MPPlugin> readFactories() {
 
-		if (fTileFactories != null) {
-			return fTileFactories;
+		if (_tileFactories != null) {
+			return _tileFactories;
 		}
 
 		final IExtensionRegistry registry = RegistryFactory.getRegistry();
 		final IExtensionPoint point = registry.getExtensionPoint("de.byteholder.geoclipse.tilefactory"); //$NON-NLS-1$
 		final IExtension[] extensions = point.getExtensions();
 
-		fTileFactories = new ArrayList<MPPlugin>();
+		_tileFactories = new ArrayList<MPPlugin>();
 
 		for (final IExtension extension : extensions) {
 			final IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -96,10 +95,10 @@ public class GeoclipseExtensions {
 			}
 
 			if (o != null && o instanceof MPPlugin) {
-				fTileFactories.add((MPPlugin) o);
+				_tileFactories.add((MPPlugin) o);
 			}
 		}
 
-		return fTileFactories;
+		return _tileFactories;
 	}
 }

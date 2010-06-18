@@ -515,7 +515,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addMouseTrackListener(new MouseTrackListener() {
 			public void mouseEnter(final MouseEvent e) {
-			// forceFocus();
+				// forceFocus();
 			}
 
 			public void mouseExit(final MouseEvent e) {
@@ -1103,7 +1103,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// calculate position of the slider label
 			final Point labelExtend = gc.stringExtent(labelText.toString());
-			final int labelWidth = labelExtend.x + 4;
+			final int labelWidth = labelExtend.x + 0;
 			int labelXPos = devSliderLinePos - labelWidth / 2;
 
 			final int labelRightPos = labelXPos + labelWidth;
@@ -1146,12 +1146,13 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			label.setText(labelText.toString());
-			label.setHeight(labelExtend.y - 5);
-			label.setWidth(labelWidth);
-			label.setX(labelXPos);
+			label.text = labelText.toString();
 
-			label.setY(drawingData.getDevYBottom() - drawingData.getDevGraphHeight() - label.getHeight());
+			label.height = labelExtend.y - 5;
+			label.width = labelWidth;
+
+			label.x = labelXPos;
+			label.y = drawingData.getDevYBottom() - drawingData.getDevGraphHeight() - label.height;
 
 			/*
 			 * get the y position of the marker which marks the y value in the graph
@@ -1166,7 +1167,7 @@ public class ChartComponentGraph extends Canvas {
 			if (yValue > yData.getVisibleMaxValue()) {
 				yGraph = drawingData.getDevYTop();
 			}
-			label.setYGraph(yGraph);
+			label.yGraph = yGraph;
 		}
 	}
 
@@ -2876,10 +2877,10 @@ public class ChartComponentGraph extends Canvas {
 			final Color colorBright = new Color(display, yData.getRgbBright()[0]);
 			final Color colorDark = new Color(display, yData.getRgbDark()[0]);
 
-			final int labelHeight = label.getHeight();
-			final int labelWidth = label.getWidth();
-			final int labelX = label.getX();
-			final int labelY = label.getY();
+			final int labelHeight = label.height;
+			final int labelWidth = label.width;
+			final int labelX = label.x;
+			final int labelY = label.y;
 
 			final int devYBottom = drawingData.getDevYBottom();
 			final boolean isSliderHovered = _mouseOverXSlider != null && _mouseOverXSlider == slider;
@@ -2912,21 +2913,21 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw label background
 //			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
-			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
+//			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
 
 			// draw label border
 			gc.setForeground(colorLine);
 			gc.setLineStyle(SWT.LINE_SOLID);
-			gc.drawRoundRectangle(labelX, labelY, labelWidth, labelHeight, 4, 4);
+			gc.drawRoundRectangle(labelX, labelY - 4, labelWidth, labelHeight + 3, 4, 4);
 
 			// draw slider label
 			gc.setForeground(colorTxt);
-			gc.drawText(label.getText(), labelX + 2, labelY - 2, true);
+			gc.drawText(label.text, labelX + 2, labelY - 5, true);
 
 			// draw a tiny marker on the graph
 			gc.setAlpha(0xff);
 			gc.setBackground(colorLine);
-			gc.fillRectangle(devSliderLinePos - 3, label.getYGraph() - 2, 7, 3);
+			gc.fillRectangle(devSliderLinePos - 3, label.yGraph - 2, 7, 3);
 
 			/*
 			 * draw a marker below the x-axis to make the selection more visible
@@ -5788,13 +5789,13 @@ public class ChartComponentGraph extends Canvas {
 
 			final ChartXSliderLabel onBotLabel = onBotLabels.get(labelIndex);
 
-			final int onTopWidth2 = onTopLabel.getWidth() / 2;
-			final int onTopDevX = onTopLabel.getX();
-			final int onBotWidth2 = onBotLabel.getWidth() / 2;
-			final int onBotDevX = onBotLabel.getX();
+			final int onTopWidth2 = onTopLabel.width / 2;
+			final int onTopDevX = onTopLabel.x;
+			final int onBotWidth2 = onBotLabel.width / 2;
+			final int onBotDevX = onBotLabel.x;
 
 			if (onTopDevX + onTopWidth2 > onBotDevX - onBotWidth2 && onTopDevX - onTopWidth2 < onBotDevX + onBotWidth2) {
-				onBotLabel.setY(onBotLabel.getY() + onBotLabel.getHeight());
+				onBotLabel.y = onBotLabel.y + onBotLabel.height + 5;
 			}
 			labelIndex++;
 		}

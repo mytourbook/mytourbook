@@ -50,7 +50,8 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public int		importYear								= -1;
 
 	/**
-	 * when <code>true</code> the tracks in one file will be merged to one track
+	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
+	 * created for each track
 	 */
 	public boolean	isMergeTracks							= false;
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -303,10 +303,12 @@ public class MPWms extends MP implements ITileLoader {
 		mapRequest.setFormat(Util.encodeSpace(getImageFormat()));
 
 		// only WGS84/EPSG:4326 is currently supported
-		mapRequest.setSRS(SRS_EPSG_4326);
 //		mapRequest.setSRS(SRS_EPSG_3857);
+		mapRequest.setSRS(SRS_EPSG_4326);
 		mapRequest.setBBox(createBBox(tile));
 		mapRequest.setTransparent(_isLoadTransparentImages);
+//		mapRequest.setExceptions(Util.encodeUrl("application/vnd.ogc.se_xml", false));
+		mapRequest.setExceptions("XML");
 
 		// keep url
 		final String finalUrl = mapRequest.getFinalURL().toString();
@@ -403,7 +405,7 @@ public class MPWms extends MP implements ITileLoader {
 
 				} else {
 
-					// sort by position 
+					// sort by position
 					return -mt1.getPositionIndex() - -mt2.getPositionIndex();
 				}
 			}
@@ -423,7 +425,7 @@ public class MPWms extends MP implements ITileLoader {
 
 				} else {
 
-					// sort by position 
+					// sort by position
 					return mt1.getPositionIndex() - mt2.getPositionIndex();
 				}
 			}

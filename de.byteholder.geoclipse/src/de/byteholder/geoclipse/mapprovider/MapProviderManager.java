@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -42,6 +42,7 @@ import net.tourbook.util.StringToArrayConverter;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -69,6 +70,7 @@ import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
+import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
@@ -83,9 +85,7 @@ public class MapProviderManager {
 	 * This prefix is used to sort the map providers at the end when the map provider is not a map
 	 * profile
 	 */
-	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_"; //$NON-NLS-1$
-
-	private static final String				UTF_8											= "UTF-8";							//$NON-NLS-1$
+	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_";								//$NON-NLS-1$
 
 	private static final int				OSM_BACKGROUND_COLOR							= 0xE8EEF1;
 	private static final int				DEFAULT_ALPHA									= 100;
@@ -103,11 +103,17 @@ public class MapProviderManager {
 	public static final String				MIME_JPG										= "image/jpg";						//$NON-NLS-1$
 	public static final String				MIME_JPEG										= "image/jpeg";					//$NON-NLS-1$
 
-	public static final String				DEFAULT_IMAGE_FORMAT							= MIME_PNG;						//$NON-NLS-1$
+	public static final String				DEFAULT_IMAGE_FORMAT							= MIME_PNG;
 
 	public static final String				FILE_EXTENSION_PNG								= "png";							//$NON-NLS-1$
 	public static final String				FILE_EXTENSION_GIF								= "gif";							//$NON-NLS-1$
 	public static final String				FILE_EXTENSION_JPG								= "jpg";							//$NON-NLS-1$
+
+	/**
+	 * This file name part is attached to saved tile images for profile map providers were only a
+	 * part of the child images are available.
+	 */
+	public static final String				PART_IMAGE_FILE_NAME_SUFFIX						= "-part";							//$NON-NLS-1$
 
 	/*
 	 * map provider file and root tag
@@ -246,7 +252,7 @@ public class MapProviderManager {
 
 	private ArrayList<String>				_errorLog										= new ArrayList<String>();
 
-	private IPreferenceStore				_prefStore										= Activator
+	private static IPreferenceStore			_prefStore										= Activator
 																									.getDefault()
 																									.getPreferenceStore();
 
@@ -255,6 +261,11 @@ public class MapProviderManager {
 
 	private static final DateTimeFormatter	_dtFormatter									= ISODateTimeFormat
 																									.basicDateTimeNoMillis();
+
+	private static boolean					_isDeleteError;
+	private static long						_deleteUIUpdateTime;
+
+	private MapProviderManager() {}
 
 	/**
 	 * Checks if the WMS is initialized, if not it will be done (it is loading the WMS layers). It
@@ -366,6 +377,172 @@ public class MapProviderManager {
 		});
 	}
 
+	/**
+	 * Deletes offline map image files
+	 * 
+	 * @param mp
+	 *            MapProvider
+	 * @param isDeletePartImages
+	 *            When <code>true</code> only the part images are deleted, otherwise all images are
+	 *            deleted.
+	 * @return Returns <code>true</code> when image files are deleted.
+	 */
+	public static boolean deleteOfflineMap(final MP mp, final boolean isDeletePartImages) {
+
+		// reset state that offline images are available
+		mp.resetTileImageAvailability();
+
+		// check base path
+		IPath tileCacheBasePath = getTileCachePath();
+		if (tileCacheBasePath == null) {
+			return false;
+		}
+
+		// check map provider offline folder
+		final String tileOSFolder = mp.getOfflineFolder();
+		if (tileOSFolder == null) {
+			return false;
+		}
+
+		tileCacheBasePath = tileCacheBasePath.addTrailingSeparator();
+
+		boolean isDeleted = false;
+
+		// delete map provider files
+		final File tileCacheDir = tileCacheBasePath.append(tileOSFolder).toFile();
+		if (tileCacheDir.exists()) {
+			deleteOfflineMapFiles(tileCacheDir, isDeletePartImages);
+			isDeleted = true;
+		}
+
+		// delete profile wms files
+		final File wmsPath = tileCacheBasePath.append(MPProfile.WMS_CUSTOM_TILE_PATH).append(tileOSFolder).toFile();
+		if (wmsPath.exists()) {
+			deleteOfflineMapFiles(wmsPath, isDeletePartImages);
+			isDeleted = true;
+		}
+
+		return isDeleted;
+	}
+
+	private static void deleteOfflineMapFiles(final File offlineFolder, final boolean isDeletePartImages) {
+
+		_isDeleteError = false;
+		_deleteUIUpdateTime = System.currentTimeMillis();
+
+		try {
+
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					monitor.beginTask(UI.EMPTY_STRING, IProgressMonitor.UNKNOWN);
+
+					deleteOfflineMapFilesFolder(offlineFolder, isDeletePartImages, monitor);
+				}
+			};
+
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		if (_isDeleteError) {
+			StatusUtil.showStatus(
+					NLS.bind(Messages.MP_Manager_DeleteOfflineImages_CannotDeleteFolder, offlineFolder),
+					new Exception());
+		}
+	}
+
+	/**
+	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+	 * <br>
+	 * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
+	 * delete and returns false. <br>
+	 * <br>
+	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+	 * 
+	 * @param fileFolder
+	 * @param isDeletePartImages
+	 * @param monitor
+	 * @return Returns <code>true</code> if all deletions were successful
+	 */
+	private static void deleteOfflineMapFilesFolder(final File fileFolder,
+													final boolean isDeletePartImages,
+													final IProgressMonitor monitor) {
+
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		boolean doDeleteFileFolder = true;
+
+		if (fileFolder.isDirectory()) {
+
+			// file is a folder
+
+			final String[] allFileFolder = fileFolder.list();
+
+			for (final String fileFolder2 : allFileFolder) {
+				deleteOfflineMapFilesFolder(new File(fileFolder, fileFolder2), isDeletePartImages, monitor);
+			}
+
+			// update monitor every 200ms
+			final long time = System.currentTimeMillis();
+			if (time > _deleteUIUpdateTime + 200) {
+
+				_deleteUIUpdateTime = time;
+
+				monitor.subTask(NLS.bind(isDeletePartImages ? //
+						Messages.MP_Manager_DeletedOfflineImagesParts_MonitorMessage
+						: Messages.MP_Manager_DeletedOfflineImages_MonitorMessage, //
+						fileFolder.toString()));
+			}
+
+			if (isDeletePartImages) {
+				// don't delete folders when only part images are deleted
+				doDeleteFileFolder = false;
+			}
+
+		} else {
+
+			// file is a file
+
+			// check if only part images should be deleted
+			if (isDeletePartImages) {
+				final String fileName = fileFolder.getName();
+				if (fileName.contains(PART_IMAGE_FILE_NAME_SUFFIX) == false) {
+					// this is not a part image -> DON'T delete
+					doDeleteFileFolder = false;
+				}
+			}
+		}
+
+		boolean isFileFolderDeleted = false;
+		if (doDeleteFileFolder) {
+
+			// the folder is now empty so delete it
+			isFileFolderDeleted = fileFolder.delete();
+		}
+
+		/*
+		 * !!! canceled must be checked before isFileFolderDeleted is checked because this returns
+		 * false when the monitor is canceled !!!
+		 */
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		if (doDeleteFileFolder && isFileFolderDeleted == false) {
+			_isDeleteError = true;
+			monitor.setCanceled(true);
+		}
+	}
+
 	private static void fireChangeEvent() {
 
 		final Object[] allListeners = _mapProviderListeners.getListeners();
@@ -473,6 +650,49 @@ public class MapProviderManager {
 			return MAP_PROVIDER_TYPE_WMS;
 		} else if (mapProvider instanceof MPPlugin) {
 			return MAP_PROVIDER_TYPE_PLUGIN;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return Returns file path for the offline maps or <code>null</code> when offline is not used
+	 *         or the path is not valid
+	 */
+	public static IPath getTileCachePath() {
+
+		// get status if the tile is offline cache is activated
+		final boolean useOffLineCache = _prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE);
+
+		if (useOffLineCache == false) {
+			return null;
+		}
+
+		if (useOffLineCache) {
+
+			// check tile cache path
+			String workingDirectory;
+
+			final boolean useDefaultLocation = _prefStore
+					.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION);
+			if (useDefaultLocation) {
+				workingDirectory = Platform.getInstanceLocation().getURL().getPath();
+			} else {
+				workingDirectory = _prefStore.getString(IMappingPreferences.OFFLINE_CACHE_PATH);
+			}
+
+			if (new File(workingDirectory).exists() == false) {
+				StatusUtil.showStatus("Map image offline folder is not available: " + workingDirectory); //$NON-NLS-1$
+				return null;
+			}
+
+			// append a unique path so that deleting tiles is not doing it in the wrong directory
+			final IPath tileCachePath = new Path(workingDirectory).append(TileImageCache.TILE_OFFLINE_CACHE_OS_PATH);
+			if (tileCachePath.toFile().exists() == false) {
+				return null;
+			}
+
+			return tileCachePath;
 		}
 
 		return null;
@@ -615,7 +835,7 @@ public class MapProviderManager {
 
 						if (oldMtLayer.getGeoLayer().getName().equals(mtLayerName)) {
 
-							// update state 
+							// update state
 
 							loadedMtLayer.setIsDisplayedInMap(oldMtLayer.isDisplayedInMap());
 							loadedMtLayer.setPositionIndex(oldMtLayer.getPositionIndex());
@@ -640,7 +860,7 @@ public class MapProviderManager {
 
 							if (offlineLayer.name.equals(mtLayerName)) {
 
-								// update state 
+								// update state
 
 								mtLayer.setIsDisplayedInMap(offlineLayer.isDisplayedInMap);
 								mtLayer.setPositionIndex(offlineLayer.position);
@@ -735,8 +955,6 @@ public class MapProviderManager {
 		}
 	}
 
-	private MapProviderManager() {}
-
 	public void addMapProvider(final MP mp) {
 		_allMapProviders.add(mp);
 		updateMpSorting(mp);
@@ -783,11 +1001,12 @@ public class MapProviderManager {
 				// check factory id
 				if (checkedMapProvider.getId().equalsIgnoreCase(pluginFactoryId)) {
 
-					StatusUtil.showStatus(NLS.bind(Messages.DBG003_Error_InvalidFactoryId, new Object[] {
-							pluginFactoryId,
-							pluginMp.getName(),
-							checkedMapProvider.getName() //
-							}), new Exception());
+					StatusUtil.showStatus(
+							NLS.bind(
+									Messages.DBG003_Error_InvalidFactoryId,
+									new Object[] { pluginFactoryId, pluginMp.getName(), checkedMapProvider.getName() //
+									}),
+							new Exception());
 
 					isValid = false;
 					break;
@@ -800,11 +1019,13 @@ public class MapProviderManager {
 						&& checkedOfflineFolder != null
 						&& checkedOfflineFolder.equalsIgnoreCase(pluginOfflineFolder)) {
 
-					StatusUtil.showStatus(NLS.bind(Messages.DBG004_Error_InvalidOfflineFolder, new Object[] {
-							pluginOfflineFolder,
-							pluginMp.getName(),
-							checkedMapProvider.getName() //
-							}), new Exception());
+					StatusUtil.showStatus(
+							NLS.bind(Messages.DBG004_Error_InvalidOfflineFolder, new Object[] {
+									pluginOfflineFolder,
+									pluginMp.getName(),
+									checkedMapProvider.getName() //
+									}),
+							new Exception());
 
 					isValid = false;
 					break;
@@ -919,7 +1140,7 @@ public class MapProviderManager {
 
 		try {
 
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UTF_8));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
 			final XMLMemento xmlMemento = createXmlRoot(true);
 
@@ -1134,7 +1355,7 @@ public class MapProviderManager {
 				return validMapProviders;
 			}
 
-			reader = new InputStreamReader(new FileInputStream(inputFile), UTF_8);
+			reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
 			final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
 
 			// check if this is an exported map provider
@@ -1546,10 +1767,12 @@ public class MapProviderManager {
 
 					// validate properties
 					if (layerName == null || layerTitle == null || layerIsDisplayed == null) {
-						logError(NLS.bind(Messages.DBG015_Error_Profile_LayerInvalidProperties, new Object[] {
-								mapProviderId,
-								TAG_LAYER,
-								mapProviderId }), new Exception());
+						logError(
+								NLS.bind(Messages.DBG015_Error_Profile_LayerInvalidProperties, new Object[] {
+										mapProviderId,
+										TAG_LAYER,
+										mapProviderId }),
+								new Exception());
 						continue;
 					}
 
@@ -1568,10 +1791,12 @@ public class MapProviderManager {
 						}
 					}
 					if (isLayerValid == false) {
-						logError(NLS.bind(Messages.DBG017_Error_Profile_DuplicateLayer, new Object[] {
-								mapProviderId,
-								layerName,
-								mpId }), new Exception());
+						logError(
+								NLS.bind(Messages.DBG017_Error_Profile_DuplicateLayer, new Object[] {
+										mapProviderId,
+										layerName,
+										mpId }),
+								new Exception());
 						continue;
 					}
 
@@ -1731,8 +1956,9 @@ public class MapProviderManager {
 			System.arraycopy(storedMpIds, 0, newMpIds, 1, storedMpIds.length);
 		}
 
-		_prefStore.setValue(IMappingPreferences.MAP_PROVIDER_SORT_ORDER, StringToArrayConverter
-				.convertArrayToString(newMpIds));
+		_prefStore.setValue(
+				IMappingPreferences.MAP_PROVIDER_SORT_ORDER,
+				StringToArrayConverter.convertArrayToString(newMpIds));
 	}
 
 	/**
@@ -1760,8 +1986,10 @@ public class MapProviderManager {
 			if (mp.equals(importedMP)) {
 
 				// duplicate ID
-				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.Import_Error_Dialog_Title, NLS
-						.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getId()));
+				MessageDialog.openError(
+						Display.getDefault().getActiveShell(),
+						Messages.Import_Error_Dialog_Title,
+						NLS.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getId()));
 
 				return null;
 			}
@@ -1929,7 +2157,7 @@ public class MapProviderManager {
 
 			if (checkedMP == null) {
 
-				// imported wrapper mp do not yet exist and will be created 
+				// imported wrapper mp do not yet exist and will be created
 
 				// a plugin wrapper map provider must exist in the application
 				if (wrappedMP instanceof MPPlugin) {
@@ -1937,9 +2165,9 @@ public class MapProviderManager {
 					MessageDialog.openError(
 							Display.getDefault().getActiveShell(),
 							Messages.Import_Error_Dialog_Title,
-							NLS.bind(Messages.DBG040_Import_Error_PluginMPIsNotAvailable, new Object[] {
-									importedMP.getId(),
-									wrappedMP.getId() }));
+							NLS.bind(
+									Messages.DBG040_Import_Error_PluginMPIsNotAvailable,
+									new Object[] { importedMP.getId(), wrappedMP.getId() }));
 
 					return null;
 				}
@@ -1989,7 +2217,7 @@ public class MapProviderManager {
 			final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 			final File file = stateLocation.append(CUSTOM_MAP_PROVIDER_FILE).toFile();
 
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UTF_8));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
 			final XMLMemento xmlMemento = createXmlRoot(false);
 
@@ -2078,7 +2306,7 @@ public class MapProviderManager {
 
 		} else if (mp instanceof MPPlugin) {
 
-			// plugin mp can be exported in the map profile 
+			// plugin mp can be exported in the map profile
 			tagMapProvider.putString(ATTR_MP_TYPE, MAP_PROVIDER_TYPE_PLUGIN);
 		}
 	}
@@ -2232,7 +2460,7 @@ public class MapProviderManager {
 
 				final Layer layer = mtLayer.getGeoLayer();
 
-				// check if the layer is drawable 
+				// check if the layer is drawable
 				final String layerName = layer.getName();
 				if (layerName != null && layerName.trim().length() > 0) {
 

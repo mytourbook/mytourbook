@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -88,13 +89,15 @@ public class TileImageLoader implements Runnable {
 
 			final boolean useOfflineImage = mp.isUseOfflineImage();
 
-			// load image from offline cache
 			ImageData tileImageData = null;
+			Image tileOfflineImage = null;
+
+			// load image from offline cache
 			if (useOfflineImage) {
-				tileImageData = tileImageCache.getOfflineTileImageData(tile);
+				tileOfflineImage = tileImageCache.getOfflineTileImageData(tile);
 			}
 
-			if (tileImageData == null) {
+			if (tileOfflineImage == null) {
 
 				// offline image is not available
 
@@ -115,8 +118,6 @@ public class TileImageLoader implements Runnable {
 					InputStream inputStream = null;
 
 					try {
-
-//						final ITileLoader tileLoader = mp.getTileLoader();
 
 						if (mp instanceof ITileLoader) {
 
@@ -159,8 +160,8 @@ public class TileImageLoader implements Runnable {
 
 								loadingError = NLS.bind(
 										Messages.DBG052_Loading_Error_FileNotFoundException,
-										tile
-										.getUrl(), e.getMessage());
+										tile.getUrl(),
+										e.getMessage());
 
 								// this is hidden because it can happen very often
 								// StatusUtil.log(loadingError, e);
@@ -170,8 +171,8 @@ public class TileImageLoader implements Runnable {
 
 								loadingError = NLS.bind(
 										Messages.DBG053_Loading_Error_UnknownHostException,
-										tile
-										.getUrl(), e.getMessage());
+										tile.getUrl(),
+										e.getMessage());
 
 								// this is hidden because it can happen very often
 								// StatusUtil.log(loadingError, e);
@@ -205,7 +206,13 @@ public class TileImageLoader implements Runnable {
 
 						try {
 							if (inputStream != null) {
+
+								// the stream can contain an error message from the wms server
+								StatusUtil.showStatus(Util.convertStreamToString(inputStream), e);
+
 								inputStream.close();
+
+								isSaveImage = false;
 							}
 						} catch (final IOException e1) {
 							StatusUtil.log(e.getMessage(), e);
@@ -221,13 +228,14 @@ public class TileImageLoader implements Runnable {
 			 * available
 			 */
 
-			boolean isCreateImage = true;
+			boolean isSetupImage = true;
+			boolean isChildError = false;
 
 			// set tile where the tile image is stored
 			Tile imageTile = tile;
 			String imageTileKey = tile.getTileKey();
 
-			if (tileImageData == null) {
+			if (tileOfflineImage == null && tileImageData == null) {
 
 				// image data is empty, set error
 
@@ -236,7 +244,7 @@ public class TileImageLoader implements Runnable {
 								? Messages.DBG051_Loading_Error_EmptyImageData
 								: loadingError);
 
-				isCreateImage = false;
+				isSetupImage = false;
 			}
 
 			parentTile = tile.getParentTile();
@@ -249,9 +257,18 @@ public class TileImageLoader implements Runnable {
 
 				isNotifyObserver = false;
 
+				if (tileOfflineImage != null) {
+
+					tileImageData = tileOfflineImage.getImageData();
+
+					// when image data is used, the image is not needed any more
+					tileOfflineImage.dispose();
+					tileOfflineImage = null;
+				}
+
 				// save child image
 				if (tileImageData != null && isSaveImage) {
-					tileImageCache.saveOfflineImage(tile, tileImageData);
+					tileImageCache.saveOfflineImage(tile, tileImageData, false);
 				}
 
 				// set image into child
@@ -278,8 +295,9 @@ public class TileImageLoader implements Runnable {
 
 						// parent is final
 						isParentFinal = true;
-						isCreateImage = true;
+						isSetupImage = true;
 						isSaveImage = parentImageStatus.isSaveImage;
+						isChildError = parentImageStatus.isChildError;
 
 					} else {
 
@@ -288,7 +306,7 @@ public class TileImageLoader implements Runnable {
 						 * final
 						 */
 
-						isCreateImage = false;
+						isSetupImage = false;
 					}
 				}
 			}
@@ -296,10 +314,16 @@ public class TileImageLoader implements Runnable {
 			/*
 			 * create tile image
 			 */
-			if (isCreateImage) {
+			if (isSetupImage) {
 
 				// create/save image
-				final Image tileImage = tileImageCache.createImage(tileImageData, imageTile, imageTileKey, isSaveImage);
+				final Image tileImage = tileImageCache.setupImage(
+						tileImageData,
+						tileOfflineImage,
+						imageTile,
+						imageTileKey,
+						isSaveImage,
+						isChildError);
 
 				if (imageTile.setMapImage(tileImage) == false) {
 
@@ -401,9 +425,9 @@ public class TileImageLoader implements Runnable {
 			// it's possible that the waiting queue was reset
 			return;
 		}
- 
+
 		final MP mp = tile.getMP();
- 		final boolean isParentTile = mp instanceof ITileChildrenCreator;
+		final boolean isParentTile = mp instanceof ITileChildrenCreator;
 		{
 			// current tile is in the viewport of the map
 
@@ -424,7 +448,7 @@ public class TileImageLoader implements Runnable {
 
 				} else if (tile.isOfflimeImageAvailable()) {
 
-					// this parent tile has no chilren which needs to be loaded, behave as a normal tile
+					// parent tile has no chilren which needs to be loaded, behave as a normal tile
 
 					getTileImage(tile);
 
@@ -434,6 +458,8 @@ public class TileImageLoader implements Runnable {
 				}
 
 			} else {
+
+				// tile is 'normal' or a children
 
 				getTileImage(tile);
 			}

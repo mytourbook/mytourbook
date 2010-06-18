@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -44,11 +43,9 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -108,7 +105,6 @@ import org.geotools.data.ows.WMSRequest;
 import org.joda.time.DateTime;
 
 import de.byteholder.geoclipse.Activator;
-import de.byteholder.geoclipse.map.TileImageCache;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom;
@@ -174,8 +170,8 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private boolean								_isDisableModifyListener		= false;
 
-	private boolean								_isDeleteError;
-	private long								_deleteUIUpdateTime;
+//	private boolean								_isDeleteError;
+//	private long								_deleteUIUpdateTime;
 
 	/**
 	 * map provider which is currently selected in the list
@@ -438,7 +434,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		 */
 		if (error == null) {
 
-			final IPath tileCacheBasePath = getTileCachePath();
+			final IPath tileCacheBasePath = MapProviderManager.getTileCachePath();
 			if (tileCacheBasePath != null) {
 
 				try {
@@ -1292,54 +1288,54 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 	}
 
-	/**
-	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
-	 * <br>
-	 * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
-	 * delete and returns false. <br>
-	 * <br>
-	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
-	 * 
-	 * @param directory
-	 * @param monitor
-	 * @return Returns <code>true</code> if all deletions were successful
-	 */
-	private void deleteDir(final File directory, final IProgressMonitor monitor) {
-
-		if (monitor.isCanceled()) {
-			return;
-		}
-
-		if (directory.isDirectory()) {
-
-			final String[] children = directory.list();
-
-			for (final String element : children) {
-				deleteDir(new File(directory, element), monitor);
-			}
-
-			// update monitor every 200ms
-			final long time = System.currentTimeMillis();
-			if (time > _deleteUIUpdateTime + 200) {
-				_deleteUIUpdateTime = time;
-				monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, directory.toString()));
-			}
-
-		}
-
-		// The directory is now empty so delete it
-		final boolean isDeleted = directory.delete();
-
-		// canceled must be checked before isDeleted because this returns false when the monitor is canceled
-		if (monitor.isCanceled()) {
-			return;
-		}
-
-		if (isDeleted == false) {
-			_isDeleteError = true;
-			monitor.setCanceled(true);
-		}
-	}
+//	/**
+//	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+//	 * <br>
+//	 * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
+//	 * delete and returns false. <br>
+//	 * <br>
+//	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+//	 *
+//	 * @param file
+//	 * @param monitor
+//	 * @return Returns <code>true</code> if all deletions were successful
+//	 */
+//	private void deleteDir(final File file, final IProgressMonitor monitor) {
+//
+//		if (monitor.isCanceled()) {
+//			return;
+//		}
+//
+//		if (file.isDirectory()) {
+//
+//			final String[] children = file.list();
+//
+//			for (final String element : children) {
+//				deleteDir(new File(file, element), monitor);
+//			}
+//
+//			// update monitor every 200ms
+//			final long time = System.currentTimeMillis();
+//			if (time > _deleteUIUpdateTime + 200) {
+//				_deleteUIUpdateTime = time;
+//				monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
+//			}
+//
+//		}
+//
+//		// The directory is now empty so delete it
+//		final boolean isDeleted = file.delete();
+//
+//		// canceled must be checked before isDeleted because this returns false when the monitor is canceled
+//		if (monitor.isCanceled()) {
+//			return;
+//		}
+//
+//		if (isDeleted == false) {
+//			_isDeleteError = true;
+//			monitor.setCanceled(true);
+//		}
+//	}
 
 	private void deleteFile(final String filePath) {
 
@@ -1364,40 +1360,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 	private void deleteOfflineMapFiles(final MP mp) {
 
-		// reset state that offline images are available
-		mp.resetTileImageAvailability();
-
-		// check base path
-		IPath tileCacheBasePath = getTileCachePath();
-		if (tileCacheBasePath == null) {
-			return;
-		}
-
-		// check map provider offline folder
-		final String tileOSFolder = mp.getOfflineFolder();
-		if (tileOSFolder == null) {
-			return;
-		}
-
-		tileCacheBasePath = tileCacheBasePath.addTrailingSeparator();
-
-		boolean isUpdateUI = false;
-
-		// delete map provider files
-		final File tileCacheDir = tileCacheBasePath.append(tileOSFolder).toFile();
-		if (tileCacheDir.exists()) {
-			isUpdateUI = true;
-			deleteOfflineMapFilesDir(tileCacheDir);
-		}
-
-		// delete profile wms files
-		final File wmsPath = tileCacheBasePath.append(MPProfile.WMS_CUSTOM_TILE_PATH).append(tileOSFolder).toFile();
-		if (wmsPath.exists()) {
-			isUpdateUI = true;
-			deleteOfflineMapFilesDir(wmsPath);
-		}
-
-		if (isUpdateUI) {
+		if (MapProviderManager.deleteOfflineMap(mp, false)) {
 
 			mp.setStateToReloadOfflineCounter();
 
@@ -1408,37 +1371,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 
 			// clear map image cache
 			mp.disposeTileImages();
-		}
-	}
-
-	private void deleteOfflineMapFilesDir(final File tileCacheDir) {
-
-		_isDeleteError = false;
-		_deleteUIUpdateTime = System.currentTimeMillis();
-
-		try {
-
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					monitor.beginTask(UI.EMPTY_STRING, IProgressMonitor.UNKNOWN);
-
-					deleteDir(tileCacheDir, monitor);
-				}
-			};
-
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
-
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		if (_isDeleteError) {
-			StatusUtil.showStatus(NLS.bind(Messages.pref_map_error_deleteTiles_message, tileCacheDir), new Exception());
 		}
 	}
 
@@ -1511,7 +1443,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				&& (_selectedMapProvider.getOfflineFileCounter() > 0)
 				&& isOfflineJobStopped;
 
-		final boolean isOfflinePath = getTileCachePath() != null;
+		final boolean isOfflinePath = MapProviderManager.getTileCachePath() != null;
 
 		final boolean isCustomMapProvider = _selectedMapProvider instanceof MPCustom;
 		final boolean isMapProfile = _selectedMapProvider instanceof MPProfile;
@@ -1704,50 +1636,6 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		table.setSelection(table.getSelectionIndex());
 
 		return new MapProviderNavigator(prevMapProvider, isNextNext == 1);
-	}
-
-	/**
-	 * @return Returns file path for the offline maps or <code>null</code> when offline is not used
-	 *         or the path is not valid
-	 */
-	private IPath getTileCachePath() {
-
-		// get status if the tile is offline cache is activated
-		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
-		final boolean useOffLineCache = prefStore.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE);
-
-		if (useOffLineCache == false) {
-			return null;
-		}
-
-		if (useOffLineCache) {
-
-			// check tile cache path
-			String workingDirectory;
-
-			final boolean useDefaultLocation = prefStore
-					.getBoolean(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION);
-			if (useDefaultLocation) {
-				workingDirectory = Platform.getInstanceLocation().getURL().getPath();
-			} else {
-				workingDirectory = prefStore.getString(IMappingPreferences.OFFLINE_CACHE_PATH);
-			}
-
-			if (new File(workingDirectory).exists() == false) {
-				System.err.println("working directory is not available: " + workingDirectory); //$NON-NLS-1$
-				return null;
-			}
-
-			// append a unique path so that deleting tiles is not doing it in the wrong directory
-			final IPath tileCachePath = new Path(workingDirectory).append(TileImageCache.TILE_OFFLINE_CACHE_OS_PATH);
-			if (tileCachePath.toFile().exists() == false) {
-				return null;
-			}
-
-			return tileCachePath;
-		}
-
-		return null;
 	}
 
 	@Override
@@ -2565,7 +2453,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		}
 
 		// check cache path
-		final IPath tileCacheBasePath = getTileCachePath();
+		final IPath tileCacheBasePath = MapProviderManager.getTileCachePath();
 		if (tileCacheBasePath == null) {
 			return;
 		}

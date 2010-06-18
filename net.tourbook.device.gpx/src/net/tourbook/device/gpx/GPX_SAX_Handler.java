@@ -18,20 +18,23 @@ package net.tourbook.device.gpx;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
@@ -78,9 +81,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final Object				TAG_WPT_TYPE			= "type";											//$NON-NLS-1$
 	////////////////////////
 
-	private static final Calendar			_calendar				= GregorianCalendar.getInstance();
+//	private static final Calendar			_calendar				= GregorianCalendar.getInstance();
 
 	private static final DateTimeFormatter	_dtIsoParser			= ISODateTimeFormat.dateTimeParser();
+	private static final DateTimeFormatter	_dtFormatterShort		= DateTimeFormat.mediumDateTime();
 
 	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat(
@@ -114,22 +118,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isInWptType			= false;
 
 	private final ArrayList<TimeData>		_timeDataList			= new ArrayList<TimeData>();
-	private TimeData						_timeData;
-	private TimeData						_prevTimeData;
+	private TimeData						_timeSlice;
+	private TimeData						_prevTimeSlice;
 
 	private final TourbookDevice			_deviceDataReader;
 	private final String					_importFilePath;
 	private final HashMap<Long, TourData>	_tourDataMap;
-	private int								_lapCounter;
-	private ArrayList<Long>					_lapStart;
+	private int								_trackCounter;
 
 	private final ArrayList<TourWayPoint>	_wptList				= new ArrayList<TourWayPoint>();
 	private TourWayPoint					_wpt;
 
-	private boolean							_isSetLapMarker			= false;
-	private boolean							_isSetLapStartTime		= false;
+	private boolean							_isSetTrackMarker		= false;
 
-	private long							_currentTime;
 	private float							_absoluteDistance;
 
 	private boolean							_isImported;
@@ -206,7 +207,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					_isInEle = false;
 
-					_timeData.absoluteAltitude = getFloatValue(charData);
+					_timeSlice.absoluteAltitude = getFloatValue(charData);
 
 				} else if (name.equals(TAG_TIME)) {
 
@@ -215,18 +216,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					_isInTime = false;
 
 					try {
-						_timeData.absoluteTime = _currentTime = _dtIsoParser.parseDateTime(charData).getMillis();
+						_timeSlice.absoluteTime = _dtIsoParser.parseDateTime(charData).getMillis();
 					} catch (final Exception e0) {
 						try {
-							_timeData.absoluteTime = _currentTime = GPX_TIME_FORMAT.parse(charData).getTime();
+							_timeSlice.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
 						} catch (final ParseException e1) {
 							try {
-								_timeData.absoluteTime = _currentTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
+								_timeSlice.absoluteTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
 							} catch (final ParseException e2) {
 								try {
-									_timeData.absoluteTime = _currentTime = GPX_TIME_FORMAT_RFC822
-											.parse(charData)
-											.getTime();
+									_timeSlice.absoluteTime = GPX_TIME_FORMAT_RFC822.parse(charData).getTime();
 								} catch (final ParseException e3) {
 
 									_isError = true;
@@ -242,21 +241,21 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					// </gpxtpx:cad>
 
 					_isInCadence = false;
-					_timeData.cadence = getIntValue(charData);
+					_timeSlice.cadence = getIntValue(charData);
 
 				} else if (name.equals(TAG_EXT_HR)) {
 
 					// </gpxtpx:hr>
 
 					_isInHr = false;
-					_timeData.pulse = getIntValue(charData);
+					_timeSlice.pulse = getIntValue(charData);
 
 				} else if (name.equals(TAG_EXT_TEMP)) {
 
 					// </gpxtpx:atemp>
 
 					_isInTemp = false;
-					_timeData.temperature = Math.round(getFloatValue(charData));
+					_timeSlice.temperature = Math.round(getFloatValue(charData));
 				}
 
 			} else if (_isInWpt) {
@@ -356,7 +355,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_isInTrk = false;
 
 				if (_deviceDataReader.isMergeTracks == false) {
-					setTourData();
+					finalizeTour();
 				}
 
 			} else if (name.equals(TAG_WPT)) {
@@ -376,155 +375,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				 */
 
 				if (_deviceDataReader.isMergeTracks) {
-					setTourData();
+					finalizeTour();
 				}
 			}
 
 		} catch (final NumberFormatException e) {
-			e.printStackTrace();
+			net.tourbook.util.StatusUtil.showStatus(e);
 		}
 
 	}
 
-	private void finalizeTrackpoint() {
-
-		if (_timeData == null) {
-			return;
-		}
-
-		if (_isSetLapMarker) {
-			_isSetLapMarker = false;
-
-			_timeData.marker = 1;
-			_timeData.markerLabel = Integer.toString(_lapCounter - 1);
-		}
-
-		_timeDataList.add(_timeData);
-
-		if (_isSetLapStartTime) {
-			_isSetLapStartTime = false;
-			_lapStart.add(_currentTime);
-		}
-
-		// calculate distance
-		if (_prevTimeData == null) {
-			// first time data
-			_timeData.absoluteDistance = 0;
-		} else {
-			if (_timeData.absoluteDistance == Float.MIN_VALUE) {
-				_timeData.absoluteDistance = _absoluteDistance += DeviceReaderTools.computeDistance(
-						_prevTimeData.latitude,
-						_prevTimeData.longitude,
-						_timeData.latitude,
-						_timeData.longitude);
-			}
-		}
-
-		// set virtual time if time is not available
-		if (_timeData.absoluteTime == Long.MIN_VALUE) {
-
-			_calendar.set(2000, 0, 1, 0, 0, 0);
-			_timeData.absoluteTime = _calendar.getTimeInMillis();
-		}
-
-		_prevTimeData = _timeData;
-	}
-
-	private void finalizeWayPoint() {
-
-		if (_wpt == null) {
-			return;
-		}
-
-		// lat/lon are required fields
-		if ((_wpt.getLatitude() == Double.MIN_VALUE) || (_wpt.getLongitude() == Double.MIN_VALUE)) {
-			_wpt = null;
-			return;
-		}
-
-		_wptList.add(_wpt);
-
-		_wpt = null;
-	}
-
-	private double getDoubleValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Double.parseDouble(textValue);
-			} else {
-				return Double.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Double.MIN_VALUE;
-		}
-	}
-
-	private float getFloatValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Float.parseFloat(textValue);
-			} else {
-				return Float.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Float.MIN_VALUE;
-		}
-	}
-
-	private int getIntValue(final String textValue) {
-		try {
-			if (textValue != null) {
-				return Integer.parseInt(textValue);
-			} else {
-				return Integer.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Integer.MIN_VALUE;
-		}
-	}
-
-//	private short getShortValue(String textValue) {
-//
-//		try {
-//			if (textValue != null) {
-//				return Short.parseShort(textValue);
-//			} else {
-//				return Short.MIN_VALUE;
-//			}
-//		} catch (NumberFormatException e) {
-//			return Short.MIN_VALUE;
-//		}
-//	}
-
-	private void initNewTrack() {
-		_timeDataList.clear();
-		_absoluteDistance = 0;
-		_prevTimeData = null;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when a tour was imported
-	 */
-	public boolean isImported() {
-
-		if (_isError) {
-			return false;
-		}
-
-		return _isImported;
-	}
-
-	private void setTourData() {
+	private void finalizeTour() {
 
 		if (_timeDataList.size() == 0) {
 			// there is not data
 			return;
 		}
+
+		final TimeData firstTimeData = _timeDataList.get(0);
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
@@ -532,15 +400,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		_calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
+		final DateTime dtTourStart = new DateTime(firstTimeData.absoluteTime);
 
-		tourData.setStartHour((short) _calendar.get(Calendar.HOUR_OF_DAY));
-		tourData.setStartMinute((short) _calendar.get(Calendar.MINUTE));
-		tourData.setStartSecond((short) _calendar.get(Calendar.SECOND));
+		tourData.setStartYear((short) dtTourStart.getYear());
+		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
+		tourData.setStartDay((short) dtTourStart.getDayOfMonth());
 
-		tourData.setStartYear((short) _calendar.get(Calendar.YEAR));
-		tourData.setStartMonth((short) (_calendar.get(Calendar.MONTH) + 1));
-		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
+		tourData.setStartHour((short) dtTourStart.getHourOfDay());
+		tourData.setStartMinute((short) dtTourStart.getMinuteOfHour());
+		tourData.setStartSecond((short) dtTourStart.getSecondOfMinute());
+
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
@@ -553,14 +422,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		tourData.setWayPoints(_wptList);
 
-//		System.out.println();
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//		for (final TourWayPoint wpt : _wptList) {
-//			System.out.println(wpt);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
-//		System.out.println();
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		/*
+		 * adjust default marker which are created in tourData.createTimeSeries()
+		 */
+		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+			tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART);
+
+			// disable time/distance
+			tourMarker.setTime(-1);
+			tourMarker.setDistance(-1);
+		}
 
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -612,6 +484,141 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		}
 
 		_isImported = true;
+	}
+
+	private void finalizeTrackpoint() {
+
+		if (_timeSlice == null) {
+			return;
+		}
+
+		_timeDataList.add(_timeSlice);
+
+		// calculate distance
+		if (_prevTimeSlice == null) {
+			// first time data
+			_timeSlice.absoluteDistance = 0;
+		} else {
+			if (_timeSlice.absoluteDistance == Float.MIN_VALUE) {
+				_timeSlice.absoluteDistance = _absoluteDistance += DeviceReaderTools.computeDistance(
+						_prevTimeSlice.latitude,
+						_prevTimeSlice.longitude,
+						_timeSlice.latitude,
+						_timeSlice.longitude);
+			}
+		}
+
+		final long originalTime = _timeSlice.absoluteTime;
+
+		// set virtual time if time is not available
+		if (_timeSlice.absoluteTime == Long.MIN_VALUE) {
+			_timeSlice.absoluteTime = new DateTime(2000, 1, 1, 0, 0, 0, 0).getMillis();
+		}
+
+		if (_isSetTrackMarker) {
+
+			_isSetTrackMarker = false;
+
+			final String markerLabel = NLS.bind(//
+					Messages.Marker_Label_Track,
+					originalTime == Long.MIN_VALUE //
+							? Integer.toString(_trackCounter)
+							: _dtFormatterShort.print(_timeSlice.absoluteTime));
+
+			_timeSlice.marker = 1;
+			_timeSlice.markerLabel = markerLabel;
+		}
+
+		_prevTimeSlice = _timeSlice;
+	}
+
+	private void finalizeWayPoint() {
+
+		if (_wpt == null) {
+			return;
+		}
+
+		// lat/lon are required fields
+		if ((_wpt.getLatitude() == Double.MIN_VALUE) || (_wpt.getLongitude() == Double.MIN_VALUE)) {
+			_wpt = null;
+			return;
+		}
+
+		_wptList.add(_wpt);
+
+		_wpt = null;
+	}
+
+	private double getDoubleValue(final String textValue) {
+
+		try {
+			if (textValue != null) {
+				return Double.parseDouble(textValue);
+			} else {
+				return Double.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Double.MIN_VALUE;
+		}
+	}
+
+	private float getFloatValue(final String textValue) {
+
+		try {
+			if (textValue != null) {
+				return Float.parseFloat(textValue);
+			} else {
+				return Float.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Float.MIN_VALUE;
+		}
+	}
+
+//	private short getShortValue(String textValue) {
+//
+//		try {
+//			if (textValue != null) {
+//				return Short.parseShort(textValue);
+//			} else {
+//				return Short.MIN_VALUE;
+//			}
+//		} catch (NumberFormatException e) {
+//			return Short.MIN_VALUE;
+//		}
+//	}
+
+	private int getIntValue(final String textValue) {
+		try {
+			if (textValue != null) {
+				return Integer.parseInt(textValue);
+			} else {
+				return Integer.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Integer.MIN_VALUE;
+		}
+	}
+
+	private void initNewTrack() {
+		_timeDataList.clear();
+		_absoluteDistance = 0;
+		_prevTimeSlice = null;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when a tour was imported
+	 */
+	public boolean isImported() {
+
+		if (_isError) {
+			return false;
+		}
+
+		return _isImported;
 	}
 
 	@Override
@@ -702,11 +709,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					_isInTrkPt = true;
 
 					// create new time item
-					_timeData = new TimeData();
+					_timeSlice = new TimeData();
 
 					// get attributes
-					_timeData.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
-					_timeData.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
+					_timeSlice.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
+					_timeSlice.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
 				}
 
 			} else if (_isInWpt) {
@@ -756,7 +763,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				_isInTrk = true;
 
-				if (_deviceDataReader.isMergeTracks == false) {
+				if (_deviceDataReader.isMergeTracks) {
+
+					_trackCounter++;
+
+					_isSetTrackMarker = true;
+
+				} else {
+
 					initNewTrack();
 				}
 

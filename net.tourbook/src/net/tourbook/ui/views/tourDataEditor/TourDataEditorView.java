@@ -626,7 +626,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static class MarkerViewerSorter extends ViewerSorter {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+// time is disabled because it's not always available in gpx files
+			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
 		}
 	}
 
@@ -3339,7 +3341,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final TourMarker marker = (TourMarker) cell.getElement();
 
-				cell.setText(_nf3.format((marker.getDistance()) / (1000 * _unitValueDistance)));
+				final int markerDistance = marker.getDistance();
+				if (markerDistance == -1) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf3.format(markerDistance / (1000 * _unitValueDistance)));
+				}
 
 				if (marker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -5916,10 +5923,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateUITab1Tour() {
 
-		final short tourYear = _tourData.getStartYear();
-		final int tourMonth = _tourData.getStartMonth() - 1;
-		final short tourDay = _tourData.getStartDay();
-
 		/*
 		 * tour/event
 		 */
@@ -5965,7 +5968,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setSelection(temperature);
 
 		// tour date
-		_dtTourDate.setDate(tourYear, tourMonth, tourDay);
+		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
 
 		// start time
 		_dtStartTime.setTime(_tourData.getStartHour(), _tourData.getStartMinute(), _tourData.getStartSecond());

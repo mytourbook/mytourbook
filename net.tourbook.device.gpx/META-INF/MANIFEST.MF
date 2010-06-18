@@ -18,5 +18,7 @@ Export-Package: net.tourbook.device.gpx;
    net.tourbook.importdata,
    org.xml.sax"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.joda.time,
+Import-Package: net.tourbook.chart,
+ net.tourbook.util,
+ org.joda.time,
  org.joda.time.format

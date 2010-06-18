@@ -106,11 +106,16 @@ public class DialogMarker extends TitleAreaDialog {
 	 */
 	private TourMarker				_backupMarker					= new TourMarker();
 
+	private HashSet<TourMarker>		_tourMarkersBackup;
+
 	/**
 	 * initial tour marker
 	 */
 	private TourMarker				_initialTourMarker;
 
+	/*
+	 * UI controls
+	 */
 	private TableViewer				_markerViewer;
 
 	private Text					_txtMarkerName;
@@ -131,11 +136,16 @@ public class DialogMarker extends TitleAreaDialog {
 	private Button					_btnUndo;
 	private Button					_btnReset;
 
+	/*
+	 * none UI
+	 */
 	private NumberFormat			_nf								= NumberFormat.getNumberInstance();
 
-	private HashSet<TourMarker>		_tourMarkersBackup;
-
 	private boolean					_isOkPressed					= false;
+	{
+		_nf.setMinimumFractionDigits(3);
+		_nf.setMaximumFractionDigits(3);
+	}
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -162,9 +172,14 @@ public class DialogMarker extends TitleAreaDialog {
 			switch (cell.getColumnIndex()) {
 
 			case COLUMN_DISTANCE:
-				_nf.setMinimumFractionDigits(3);
-				_nf.setMaximumFractionDigits(3);
-				cell.setText(_nf.format((tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+
+				final int markerDistance = tourMarker.getDistance();
+
+				if (markerDistance == -1) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
+				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -195,7 +210,9 @@ public class DialogMarker extends TitleAreaDialog {
 	private static class MarkerViewerSorter extends ViewerSorter {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+// time is disabled because it's not always available in gpx files
+			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
 		}
 	}
 
@@ -853,7 +870,7 @@ public class DialogMarker extends TitleAreaDialog {
 			return;
 		}
 
-		tourMarker.setLabel(_txtMarkerName.getText().trim());
+		tourMarker.setLabel(_txtMarkerName.getText());
 		tourMarker.setVisualPosition(_cboMarkerPosition.getSelectionIndex());
 
 		tourMarker.setLabelXOffset(_scaleX.getSelection() - OFFSET_0);

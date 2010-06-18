@@ -24,6 +24,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -756,6 +758,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	private DateTime					_dateTimeModified;
+
+	/**
+	 * Tour markers which are sorted by serie index
+	 */
+	@Transient
+	private ArrayList<TourMarker>		_sortedMarkers;
 
 	public TourData() {}
 
@@ -2132,36 +2140,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * Create a device marker at the current position
-	 * 
-	 * @param timeData
-	 * @param timeIndex
-	 * @param timeAbsolute
-	 * @param distanceAbsolute
-	 */
-	private void createMarker(	final TimeData timeData,
-								final int timeIndex,
-								final int timeAbsolute,
-								final int distanceAbsolute) {
-
-		// create a new marker
-		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
-
-		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-		tourMarker.setTime(timeAbsolute + timeData.marker);
-		tourMarker.setDistance(distanceAbsolute);
-		tourMarker.setSerieIndex(timeIndex);
-
-		if (timeData.markerLabel == null) {
-			tourMarker.setLabel(Messages.tour_data_label_device_marker);
-		} else {
-			tourMarker.setLabel(timeData.markerLabel);
-		}
-
-		tourMarkers.add(tourMarker);
-	}
-
 	private void createSRTMDataSerie() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -2398,7 +2376,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		int timeIndex = 0;
 
-		int recordingTime = 0; // time in seconds
+		long recordingTime = 0; // time in seconds relative to the tour start
 
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
@@ -2417,7 +2395,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			int distanceDiff;
 			int altitudeDiff;
 
-			int lastValidTime = 0;
+			long lastValidTime = 0;
 
 			/*
 			 * get first valid altitude
@@ -2499,9 +2477,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					if (absoluteTime == Long.MIN_VALUE) {
 						recordingTime = lastValidTime;
 					} else {
-						recordingTime = (int) ((absoluteTime - firstTime) / 1000);
+						recordingTime = (absoluteTime - firstTime) / 1000;
 					}
-					timeSerie[timeIndex] = lastValidTime = recordingTime;
+					timeSerie[timeIndex] = (int) (lastValidTime = recordingTime);
 
 					/*
 					 * distance
@@ -2599,7 +2577,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				 * marker
 				 */
 				if (isCreateMarker && (timeData.marker != 0)) {
-					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
+					createTourMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
 				// speed
@@ -2626,7 +2604,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			for (final TimeData timeData : timeDataList) {
 
 				final int tdTime = timeData.time;
-				timeSerie[timeIndex] = recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime;
+				timeSerie[timeIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
 
 				if (isDistance) {
 					final int tdDistance = timeData.distance;
@@ -2682,7 +2660,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 
 				if (isCreateMarker && (timeData.marker != 0)) {
-					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
+					createTourMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
 				timeIndex++;
@@ -2690,9 +2668,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		tourDistance = distanceAbsolute;
-		tourRecordingTime = recordingTime;
+		tourRecordingTime = (int) recordingTime;
 
 		cleanupDataSeries();
+		resetSortedMarkers();
 	}
 
 	/**
@@ -2759,6 +2738,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void createTourIdDummy() {
 		tourId = System.nanoTime();
+	}
+
+	/**
+	 * Create a device marker at the current position
+	 * 
+	 * @param timeData
+	 * @param timeIndex
+	 * @param recordingTime
+	 * @param distanceAbsolute
+	 */
+	private void createTourMarker(	final TimeData timeData,
+									final int timeIndex,
+									final long recordingTime,
+									final int distanceAbsolute) {
+
+		// create a new marker
+		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
+
+		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setTime((int) (recordingTime + timeData.marker));
+		tourMarker.setDistance(distanceAbsolute);
+		tourMarker.setSerieIndex(timeIndex);
+
+		if (timeData.markerLabel == null) {
+			tourMarker.setLabel(Messages.tour_data_label_device_marker);
+		} else {
+			tourMarker.setLabel(timeData.markerLabel);
+		}
+
+		tourMarkers.add(tourMarker);
 	}
 
 	/**
@@ -3289,14 +3298,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceWeight;
 	}
 
+	public int getDeviceWheel() {
+		return deviceWheel;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
-
-	public int getDeviceWheel() {
-		return deviceWheel;
-	}
 
 	/**
 	 * @return Returns the distance data serie for the current measurement system, this can be
@@ -3358,6 +3367,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return isDistanceFromSensor == 1;
 	}
 
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
+
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3366,13 +3382,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
-
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
 
 	/**
 	 * @return the maxPulse
@@ -3700,6 +3709,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startSecond;
 	}
 
+	public short getStartYear() {
+		return startYear;
+	}
+
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3710,10 +3723,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
-
-	public short getStartYear() {
-		return startYear;
-	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3828,6 +3837,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
+	}
+
+	public ArrayList<TourMarker> getTourMarkersSorted() {
+
+		if (_sortedMarkers != null) {
+			return _sortedMarkers;
+		}
+
+		// sort markers by serie index
+		_sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+
+		Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
+			public int compare(final TourMarker marker1, final TourMarker marker2) {
+				return marker1.getSerieIndex() - marker2.getSerieIndex();
+			}
+		});
+
+		return _sortedMarkers;
 	}
 
 	/**
@@ -4202,6 +4229,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
+	 * Reset sorted markers that they are resorted.
+	 */
+	private void resetSortedMarkers() {
+
+		if (_sortedMarkers != null) {
+			_sortedMarkers.clear();
+			_sortedMarkers = null;
+		}
+	}
+
+	/**
 	 * @param avgCadence
 	 *            the avgCadence to set
 	 */
@@ -4487,6 +4525,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		this.tourMarkers = tourMarkers;
+
+		resetSortedMarkers();
 	}
 
 	/**
