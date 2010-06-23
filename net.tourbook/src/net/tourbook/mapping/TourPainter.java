@@ -17,6 +17,7 @@ package net.tourbook.mapping;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -653,14 +654,39 @@ public class TourPainter extends MapPainter {
 						continue;
 					}
 
-					// draw tour way points
+					/*
+					 * world positions are cached to optimize performance
+					 */
+					final MP mp = map.getMapProvider();
+					final String projectionId = mp.getProjection().getId();
+					final int mapZoomLevel = map.getZoom();
 
+					HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+							projectionId,
+							mapZoomLevel);
+					if ((allWayPointWorldPixel == null)) {
+
+						allWayPointWorldPixel = initWorldPixelWayPoint(
+								tourData,
+								wayPoints,
+								mp,
+								projectionId,
+								mapZoomLevel);
+					}
+
+					// draw tour way points
 					boolean isTourWayPointInTile = false;
 					boolean isTourWayPointInTile2 = false;
 
 					for (final TourWayPoint tourWayPoint : wayPoints) {
 
-						isTourWayPointInTile2 = drawTourWayPoint(gc, map, tile, tourWayPoint, parts);
+//						if (tourWayPoint.getCreateId() == 70) {
+//							final int a = 0;
+//						}
+
+						final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
+
+						isTourWayPointInTile2 = drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts);
 
 						isTourWayPointInTile = isTourWayPointInTile || isTourWayPointInTile2;
 					}
@@ -756,24 +782,17 @@ public class TourPainter extends MapPainter {
 		 * world positions are cached to optimize performance when multiple tours are selected
 		 */
 		final String projectionId = mp.getProjection().getId();
-		Point tourWorldPixelPosAll[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
+		Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
 
 		if ((tourWorldPixelPosAll == null)) {
 
-			// world pixels are not yet cached, create them now
-
-			tourWorldPixelPosAll = new Point[latitudeSerie.length];
-
-			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
-
-				// convert lat/long into world pixels which depends on the map projection
-
-				tourWorldPixelPosAll[serieIndex] = mp.geoToPixel(//
-						new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
-						mapZoomLevel);
-			}
-
-			tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
+			tourWorldPixelPosAll = initWorldPixelTour(
+					tourData,
+					mp,
+					mapZoomLevel,
+					latitudeSerie,
+					longitudeSerie,
+					projectionId);
 		}
 
 		final Color systemColorBlue = gc.getDevice().getSystemColor(SWT.COLOR_BLUE);
@@ -1132,6 +1151,7 @@ public class TourPainter extends MapPainter {
 										final Map map,
 										final Tile tile,
 										final TourWayPoint twp,
+										final Point twpWorldPixel,
 										final int parts) {
 
 		final MP mp = map.getMapProvider();
@@ -1140,28 +1160,33 @@ public class TourPainter extends MapPainter {
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get world viewport for the current tile
-		final int worldTileX = tile.getX() * tileSize;
-		final int worldTileY = tile.getY() * tileSize;
-
-		// convert lat/long into world pixels
-		final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(twp.getLatitude(), twp.getLongitude()), zoomLevel);
+		final int tileWorldPixelX = tile.getX() * tileSize;
+		final int tilwWorldPixelY = tile.getY() * tileSize;
 
 		// convert world position into device position
-		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+		final int devWayPointX = twpWorldPixel.x - tileWorldPixelX;
+		final int devWayPointY = twpWorldPixel.y - tilwWorldPixelY;
 
-		final boolean isBoundsInTile = isBoundsInTile(_twpImageBounds, devMarkerPosX, devMarkerPosY, tileSize);
+		final boolean isBoundsInTile = isBoundsInTile(_twpImageBounds, devWayPointX, devWayPointY, tileSize);
+
 		if (isBoundsInTile) {
 
-			int devX = devMarkerPosX - _twpImageBounds.width / 2;
-			int devY = devMarkerPosY - _twpImageBounds.height;
+			int devX = devWayPointX - _twpImageBounds.width / 2;
+			int devY = devWayPointY - _twpImageBounds.height;
 
 			devX += devPartOffset;
 			devY += devPartOffset;
 
 			gc.drawImage(_twpImage, devX, devY);
 
-			tile.addTourWayPointBounds(devX, devY, _twpImageBounds.x, _twpImageBounds.y, zoomLevel, parts);
+			tile.addTourWayPointBounds(//
+					twp,
+					devX,
+					devY,
+					_twpImageBounds.width,
+					_twpImageBounds.height,
+					zoomLevel,
+					parts);
 		}
 
 		return isBoundsInTile;
@@ -1253,6 +1278,62 @@ public class TourPainter extends MapPainter {
 	}
 
 	/**
+	 * world pixels are not yet cached, create them now
+	 * 
+	 * @param tourData
+	 * @param mp
+	 * @param mapZoomLevel
+	 * @param latitudeSerie
+	 * @param longitudeSerie
+	 * @param projectionId
+	 * @return
+	 */
+	private Point[] initWorldPixelTour(	final TourData tourData,
+										final MP mp,
+										final int mapZoomLevel,
+										final double[] latitudeSerie,
+										final double[] longitudeSerie,
+										final String projectionId) {
+
+		final Point[] tourWorldPixelPosAll = new Point[latitudeSerie.length];
+
+		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+
+			// convert lat/long into world pixels which depends on the map projection
+
+			tourWorldPixelPosAll[serieIndex] = mp.geoToPixel(//
+					new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
+					mapZoomLevel);
+		}
+
+		tourData.setWorldPixelForTour(tourWorldPixelPosAll, mapZoomLevel, projectionId);
+		return tourWorldPixelPosAll;
+	}
+
+	private HashMap<Integer, Point> initWorldPixelWayPoint(	final TourData tourData,
+															final Set<TourWayPoint> wayPoints,
+															final MP mp,
+															final String projectionId,
+															final int mapZoomLevel) {
+		HashMap<Integer, Point> allWayPointWorldPixel;
+		// world pixels are not yet cached, create them now
+
+		allWayPointWorldPixel = new HashMap<Integer, Point>();
+
+		for (final TourWayPoint twp : wayPoints) {
+
+			// convert lat/long into world pixels which depends on the map projection
+
+			final GeoPosition geoPosition = new GeoPosition(twp.getLatitude(), twp.getLongitude());
+
+			allWayPointWorldPixel.put(twp.hashCode(), mp.geoToPixel(geoPosition, mapZoomLevel));
+		}
+
+		tourData.setWorldPixelForWayPoints(allWayPointWorldPixel, mapZoomLevel, projectionId);
+		return allWayPointWorldPixel;
+	}
+
+	/**
 	 * Checks if an image bounds is within the tile. The image is above the image position and
 	 * one half to the left and right side
 	 * 
@@ -1303,6 +1384,21 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
+		final MP mp = map.getMapProvider();
+		final int mapZoomLevel = map.getZoom();
+		final int tileSize = mp.getTileSize();
+		final String projectionId = mp.getProjection().getId();
+
+		// get viewport for the current tile
+		final int tileWorldPixelLeft = tile.getX() * tileSize;
+		final int tileWorldPixelRight = tileWorldPixelLeft + tileSize;
+
+		final int tileWorldPixelTop = tile.getY() * tileSize;
+		final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
+
+		/*
+		 * check tours
+		 */
 		for (final TourData tourData : tourDataList) {
 
 			// check tour data
@@ -1313,59 +1409,79 @@ public class TourPainter extends MapPainter {
 			// check if position is available
 			final double[] latitudeSerie = tourData.latitudeSerie;
 			final double[] longitudeSerie = tourData.longitudeSerie;
-			if (latitudeSerie == null || longitudeSerie == null) {
-				continue;
-			}
+			if (latitudeSerie != null && longitudeSerie != null) {
 
-			final MP mp = map.getMapProvider();
-			final int mapZoomLevel = map.getZoom();
-			final int tileSize = mp.getTileSize();
-			final String projectionId = mp.getProjection().getId();
+				/*
+				 * world positions are cached to optimize performance when multiple tours are
+				 * selected
+				 */
+				Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+				if ((tourWorldPixelPosAll == null)) {
 
-			// get viewport for the current tile
-			final int tileWorldPixelX = tile.getX() * tileSize;
-			final int tileWorldPixelY = tile.getY() * tileSize;
-			final Rectangle tileViewport = new Rectangle(tileWorldPixelX, tileWorldPixelY, tileSize, tileSize);
+					// world pixels are not yet cached, create them now
 
-			/*
-			 * world positions are cached to optimize performance when multiple tours are selected
-			 */
-			Point tourWorldPixelPosAll[] = tourData.getWorldPosition(projectionId, mapZoomLevel);
-			if ((tourWorldPixelPosAll == null)) {
-
-				// world pixels are not yet cached, create them now
-
-				tourWorldPixelPosAll = new Point[latitudeSerie.length];
+					tourWorldPixelPosAll = initWorldPixelTour(
+							tourData,
+							mp,
+							mapZoomLevel,
+							latitudeSerie,
+							longitudeSerie,
+							projectionId);
+				}
 
 				for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
-					// convert lat/long into world pixels which depends on the map projection
+					final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
 
-					tourWorldPixelPosAll[serieIndex] = mp.geoToPixel(//
-							new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
-							mapZoomLevel);
+					// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+					final int tourWorldPixelX = tourWorldPixel.x;
+					final int tourWorldPixelY = tourWorldPixel.y;
+
+					// check if position is within the tile viewport
+					if ((tourWorldPixelX >= tileWorldPixelLeft)
+							&& (tourWorldPixelY >= tileWorldPixelTop)
+							&& tourWorldPixelX < tileWorldPixelRight
+							&& tourWorldPixelY < tileWorldPixelBottom) {
+
+						// current position is inside the tile
+
+						return true;
+					}
 				}
-
-				tourData.setWorldPosition(projectionId, tourWorldPixelPosAll, mapZoomLevel);
 			}
 
-			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
+			/*
+			 * check way points
+			 */
+			final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
+			if (wayPoints.size() > 0) {
 
-				final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
+				HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+						projectionId,
+						mapZoomLevel);
 
-				// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-				final int x = tourWorldPixel.x;
-				final int y = tourWorldPixel.y;
+				if ((allWayPointWorldPixel == null)) {
+					allWayPointWorldPixel = initWorldPixelWayPoint(tourData, wayPoints, mp, projectionId, mapZoomLevel);
+				}
 
-				// check if position is in the viewport
-				if ((x >= tileViewport.x)
-						&& (y >= tileViewport.y)
-						&& x < (tileViewport.x + tileViewport.width)
-						&& y < (tileViewport.y + tileViewport.height)) {
+				for (final TourWayPoint twp : wayPoints) {
 
-					// current position is inside the tile
+					final Point twpWorldPixel = allWayPointWorldPixel.get(twp.hashCode());
 
-					return true;
+					// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
+					final int twpWorldPixelX = twpWorldPixel.x;
+					final int twpWorldPixelY = twpWorldPixel.y;
+
+					// check if position is within the tile viewport
+					if ((twpWorldPixelX >= tileWorldPixelLeft)
+							&& (twpWorldPixelY >= tileWorldPixelTop)
+							&& twpWorldPixelX < tileWorldPixelRight
+							&& twpWorldPixelY < tileWorldPixelBottom) {
+
+						// current position is inside the tile
+
+						return true;
+					}
 				}
 			}
 		}

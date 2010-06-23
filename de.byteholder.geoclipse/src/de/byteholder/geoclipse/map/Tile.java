@@ -172,7 +172,9 @@ public class Tile extends Observable {
 	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_twpBounds			= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<TourWayPoint>[]		_twp				= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	@SuppressWarnings("unchecked")
+	private ArrayList<Rectangle>[]			_twpSimpleBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 	@SuppressWarnings("unchecked")
 	private ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 
@@ -299,7 +301,8 @@ public class Tile extends Observable {
 		super.addObserver(o);
 	}
 
-	public void addTourWayPointBounds(	final int x,
+	public void addTourWayPointBounds(	final TourWayPoint twp,
+										final int x,
 										final int y,
 										final int width,
 										final int height,
@@ -312,8 +315,10 @@ public class Tile extends Observable {
 
 		final Rectangle twpBounds = new Rectangle(x, y, width, height);
 
+		_twp[zoomLevel].add(twp);
+
 		if (parts == 1) {
-			_twpBounds[zoomLevel].add(twpBounds);
+			_twpSimpleBounds[zoomLevel].add(twpBounds);
 		} else {
 			_twpPartBounds[zoomLevel].add(twpBounds);
 		}
@@ -690,6 +695,23 @@ public class Tile extends Observable {
 	}
 
 	/**
+	 * @param mapZoomLevel
+	 * @param isTourPaintMethodEnhanced
+	 *            When <code>true</code> the overlay image is painted with the enhanced method which
+	 *            is currently 3 x 3 parts.
+	 * @return Returns a list with rectangles for each way point in the tile or <code>null</code>
+	 *         when there are no way points within the tile.
+	 */
+	public ArrayList<Rectangle> getWayPointBounds(final int mapZoomLevel, final boolean isTourPaintMethodEnhanced) {
+
+		if (isTourPaintMethodEnhanced) {
+			return _twpPartBounds[mapZoomLevel];
+		}
+
+		return _twpSimpleBounds[mapZoomLevel];
+	}
+
+	/**
 	 * @return Returns the tile position for the x-axis
 	 */
 	public int getX() {
@@ -740,9 +762,11 @@ public class Tile extends Observable {
 
 				// create bounds for current zoomlevel
 
+				_twp[zoomLevel] = new ArrayList<TourWayPoint>();
+
 				_markerBounds[zoomLevel] = new ArrayList<Rectangle>();
 				_markerPartBounds[zoomLevel] = new ArrayList<Rectangle>();
-				_twpBounds[zoomLevel] = new ArrayList<Rectangle>();
+				_twpSimpleBounds[zoomLevel] = new ArrayList<Rectangle>();
 				_twpPartBounds[zoomLevel] = new ArrayList<Rectangle>();
 			}
 

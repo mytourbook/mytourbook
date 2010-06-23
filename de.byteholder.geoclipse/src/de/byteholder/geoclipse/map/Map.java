@@ -1603,14 +1603,57 @@ public class Map extends Canvas {
 			final int tileX = worldMouseX / _tilePixelSize;
 			final int tileY = worldMouseY / _tilePixelSize;
 
-//			System.out.println(//
-//					("x:" + devMouseX) //
-//							+ (", y:" + devMouseY)
-//							+ (", tileX:" + tileX)
-//							+ (", tileY:" + tileY)
-//					//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			System.out.println(//
+					("x:" + devMouseX) //
+							+ (", y:" + devMouseY)
+							+ (", tileX:" + tileX)
+							+ (", tileY:" + tileY)
+					//
+					);
+
+			// get tile from the map provider, this also starts the loading of the tile image
+			final Tile tile = _mp.getTile(tileX, tileY, _mapZoomLevel);
+
+			final ArrayList<Rectangle> wpBounds = tile.getWayPointBounds(_mapZoomLevel, _isTourPaintMethodEnhanced);
+			if (wpBounds != null) {
+
+				int wpIndex = 0;
+
+				for (final Rectangle wpBound : wpBounds) {
+
+					System.out.println(wpBound);
+					// TODO remove SYSTEM.OUT.PRINTLN
+
+					if (wpBound.contains(worldMouseX, worldMouseY)) {
+
+						System.out.println("is WP");
+						// TODO remove SYSTEM.OUT.PRINTLN
+
+						
+						break;
+					}
+
+					wpIndex++;
+				}
+			}
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 //			for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
 //				for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {

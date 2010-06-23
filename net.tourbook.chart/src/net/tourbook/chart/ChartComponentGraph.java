@@ -2921,11 +2921,11 @@ public class ChartComponentGraph extends Canvas {
 			gc.drawRoundRectangle(labelX, labelY - 4, labelWidth, labelHeight + 3, 4, 4);
 
 			// draw slider label
+			gc.setAlpha(0xff);
 			gc.setForeground(colorTxt);
 			gc.drawText(label.text, labelX + 2, labelY - 5, true);
 
 			// draw a tiny marker on the graph
-			gc.setAlpha(0xff);
 			gc.setBackground(colorLine);
 			gc.fillRectangle(devSliderLinePos - 3, label.yGraph - 2, 7, 3);
 
