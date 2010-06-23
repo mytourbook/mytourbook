@@ -450,6 +450,44 @@ public class UI {
 		return containedTourId;
 	}
 
+//	/**
+//	 * Converts the image into an image with the map transparent background color. Original image
+//	 * will be disposed and the transparent image is returned.
+//	 *
+//	 * @param srcImage
+//	 * @return
+//	 */
+//	public static Image convertIntoTransparentMapImage(final Image srcImage) {
+//
+//		final Rectangle imageBounds = srcImage.getBounds();
+//		final RGB rgbTransparent = Map.getTransparentRGB();
+//
+//		final ImageData transparentImageData = new ImageData(//
+//				imageBounds.width,
+//				imageBounds.height,
+//				24,
+//				new PaletteData(0xff, 0xff00, 0xff0000));
+//
+//		transparentImageData.transparentPixel = transparentImageData.palette.getPixel(rgbTransparent);
+//
+//		final Display display = Display.getCurrent();
+//		final Image transparentImage = new Image(srcImage.getDevice(), transparentImageData);
+//
+//		final Color transparentColor = new Color(display, rgbTransparent);
+//		final GC gc = new GC(transparentImage);
+//		{
+//			gc.setBackground(transparentColor);
+//			gc.fillRectangle(imageBounds);
+//
+//			gc.drawImage(srcImage, 0, 0);
+//		}
+//		gc.dispose();
+//		transparentColor.dispose();
+//		srcImage.dispose();
+//
+//		return transparentImage;
+//	}
+
 	/**
 	 * Disables all controls and their children
 	 */

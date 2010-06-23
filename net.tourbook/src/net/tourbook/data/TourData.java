@@ -4421,7 +4421,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setSpeedSerie(final int[] speedSerie) {
 		this.speedSerie = speedSerie;
-		this.isSpeedSerieFromDevice = true;
+		this.isSpeedSerieFromDevice = speedSerie != null;
 	}
 
 	public void setStartAltitude(final short startAltitude) {

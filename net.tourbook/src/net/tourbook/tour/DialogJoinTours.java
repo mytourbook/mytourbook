@@ -1321,6 +1321,12 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			return false;
 		}
 
+		/*
+		 * TourData.computeComputedValues() creates speed data serie which must be removed that
+		 * cleanupDataSeries() works correctly
+		 */
+		_joinedTourData.setSpeedSerie(null);
+
 		_joinedTourData.cleanupDataSeries();
 
 		_joinedTourData = TourManager.saveModifiedTour(_joinedTourData);

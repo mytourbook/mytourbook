@@ -857,7 +857,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			clearView();
 		}
 
-		if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+		if (tourId > TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 			if (tourData != null) {

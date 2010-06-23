@@ -3877,15 +3877,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_actionModifyColumns.setEnabled(isCellEditorInactive && isTableViewerTab);// && isTourValid);
 
-		_actionSetStartDistanceTo0.setEnabled(isCellEditorInactive
-				&& isNotManualTour
-				&& canEdit
-				&& isDistanceLargerThan0);
-		_actionDeleteDistanceValues.setEnabled(isCellEditorInactive
-				&& isNotManualTour
-				&& canEdit
-				&& isDistanceAvailable);
-		_actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
+		_actionSetStartDistanceTo0.setEnabled(//
+				isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
+
+		_actionDeleteDistanceValues.setEnabled(//
+				isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
+
+		_actionComputeDistanceValues.setEnabled(//
+				isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
 	}
 
 	/**
@@ -4053,6 +4052,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(_actionDeleteTimeSlicesKeepTime);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(_actionSetStartDistanceTo0);
+		menuMgr.add(_actionDeleteDistanceValues);
+		menuMgr.add(_actionComputeDistanceValues);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionSplitTour);
 		menuMgr.add(_actionExtractTour);
 		menuMgr.add(_actionExportTour);
@@ -4089,9 +4093,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(_actionUndoChanges);
-		menuMgr.add(_actionSetStartDistanceTo0);
-		menuMgr.add(_actionDeleteDistanceValues);
-		menuMgr.add(_actionComputeDistanceValues);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionModifyColumns);

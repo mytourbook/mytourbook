@@ -27,18 +27,18 @@ import de.byteholder.geoclipse.map.UI;
  */
 public class ImageDataResources {
 
-	private static final ReentrantLock	TILE_LOCK				= new ReentrantLock();
-	private static final ReentrantLock	NEIGHBOR_LOCK			= new ReentrantLock();
+	private static final ReentrantLock	TILE_LOCK			= new ReentrantLock();
+	private static final ReentrantLock	NEIGHBOR_LOCK		= new ReentrantLock();
 
 	/**
 	 * contains image data which are drawn into this tile
 	 */
-	private ImageData					_tileImageData			= null;
+	private ImageData					_tileImageData		= null;
 
 	/**
 	 * contains image data which are drawn from neighbor tiles
 	 */
-	private ImageData					_neighborImageData		= null;
+	private ImageData					_neighborImageData	= null;
 
 	private final int					_tileSize;
 
@@ -112,7 +112,7 @@ public class ImageDataResources {
 				if (src.transparentPixel != -1) {
 					if (src.transparentPixel == srcPixel) {
 						srcAlpha = 0;
-					}
+				}
 				} else if (src.alpha != -1) {
 					srcAlpha = src.alpha;
 				} else if (src.alphaData != null) {
@@ -262,6 +262,5 @@ public class ImageDataResources {
 	public ImageData getTileImageData() {
 		return _tileImageData;
 	}
-
 
 }

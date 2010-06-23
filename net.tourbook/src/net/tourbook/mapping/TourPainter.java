@@ -490,6 +490,8 @@ public class TourPainter extends MapPainter {
 		_tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
 		_tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
+//		_twpImage = UI.convertIntoTransparentMapImage(//
+//				TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage());
 		_twpImage = TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage();
 		_twpImageBounds = _twpImage.getBounds();
 
@@ -645,7 +647,7 @@ public class TourPainter extends MapPainter {
 
 				if (paintManager.isShowWayPoints) {
 
-					// ckeck if markers are available
+					// ckeck if way points are available
 					final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
 					if (wayPoints.size() == 0) {
 						continue;

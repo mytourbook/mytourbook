@@ -29,6 +29,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -519,11 +520,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			_isSetTrackMarker = false;
 
-			final String markerLabel = NLS.bind(//
-					Messages.Marker_Label_Track,
-					originalTime == Long.MIN_VALUE //
-							? Integer.toString(_trackCounter)
-							: _dtFormatterShort.print(_timeSlice.absoluteTime));
+			final String markerLabel = NLS.bind(Messages.Marker_Label_Track, Integer.toString(_trackCounter) + //
+					(originalTime == Long.MIN_VALUE //
+							? UI.EMPTY_STRING
+							: UI.DASH_WITH_SPACE + _dtFormatterShort.print(_timeSlice.absoluteTime)));
 
 			_timeSlice.marker = 1;
 			_timeSlice.markerLabel = markerLabel;

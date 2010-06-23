@@ -2886,7 +2886,7 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isSliderHovered = _mouseOverXSlider != null && _mouseOverXSlider == slider;
 
 			/*
-			 * when the mouse is over the slider, the slider is drawn in darker color
+			 * when the mouse is over the slider, the slider is painted in a darker color
 			 */
 			// draw slider line
 			if ((_isFocusActive && _selectedXSlider == slider) || isSliderHovered) {

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Alfred Barten
@@ -34,8 +34,8 @@ public class ElevationFile {
 	private FileChannel	fileChannel;
 	private ShortBuffer	shortBuffer;
 
-	private boolean		exists				= false;
-	private boolean		fIsLocalFileError	= false;
+	private boolean		_exists				= false;
+	private boolean		_isLocalFileError	= false;
 
 	public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
 		switch (elevationTyp) {
@@ -68,7 +68,7 @@ public class ElevationFile {
 	}
 
 	public short get(final int index) {
-		if (!exists) {
+		if (!_exists) {
 			return (-32767);
 		}
 		return shortBuffer.get(index);
@@ -84,8 +84,8 @@ public class ElevationFile {
 			e.printStackTrace();
 		}
 
-		exists = false;
-		// dont return exception      
+		_exists = false;
+		// dont return exception
 	}
 
 	private void initETOPO(final String fileName) throws Exception {
@@ -146,7 +146,7 @@ public class ElevationFile {
 
 	private void initSRTM3(final String fileName) throws Exception {
 
-		if (fIsLocalFileError) {
+		if (_isLocalFileError) {
 			return;
 		}
 
@@ -160,7 +160,16 @@ public class ElevationFile {
 				// check if local zip file exists with a size == 0
 				final File localFile = new File(localZipName);
 				if (localFile.exists() && localFile.length() == 0) {
-					fIsLocalFileError = true;
+
+					_isLocalFileError = true;
+
+					/*
+					 * This case occures when an internet connection do not exists. Delete file that
+					 * it is downloaded when an internet connection is available and the application
+					 * is restarted
+					 */
+					localFile.delete();
+
 					throw new Exception("local file is empty"); //$NON-NLS-1$
 				}
 
@@ -192,6 +201,6 @@ public class ElevationFile {
 			throw (e);
 		}
 		System.out.println("open " + fileName); //$NON-NLS-1$
-		exists = true;
+		_exists = true;
 	}
 }

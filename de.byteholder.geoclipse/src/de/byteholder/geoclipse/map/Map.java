@@ -209,11 +209,11 @@ public class Map extends Canvas {
 																									.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
 
 	// [181,208,208] is the color of water in the standard OSM material
-	public final static RGB						OSM_BACKGROUND_RGB							= new RGB(181, 208, 208);
+	public static final RGB						OSM_BACKGROUND_RGB							= new RGB(181, 208, 208);
 
-	private final static RGB					DEFAULT_BACKGROUND_RGB						= new RGB(0x40, 0x40, 0x40);
+	private static final RGB					MAP_DEFAULT_BACKGROUND_RGB					= new RGB(0x40, 0x40, 0x40);
 
-	private static final RGB					_transparentRGB								= new RGB(0xfe, 0xfe, 0xfe);
+	private static final RGB					MAP_TRANSPARENT_RGB							= new RGB(0xfe, 0xfe, 0xfe);
 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
@@ -221,7 +221,7 @@ public class Map extends Canvas {
 	private int									_mapZoomLevel								= 0;
 
 	/**
-	 * Image which contains the map
+	 * This image contains the map which is painted in the map viewport
 	 */
 	private Image								_mapImage;
 
@@ -619,11 +619,10 @@ public class Map extends Canvas {
 		_cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
 		_cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
 
-		_defaultBackgroundColor = new Color(_display, DEFAULT_BACKGROUND_RGB);
+		_transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
+		_defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
 
-		_transparentColor = new Color(_display, _transparentRGB);
-
-		//		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
+//		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
 //		_poiImageBounds = _poiImage.getBounds();
 
 		paintOverlay();
@@ -633,7 +632,7 @@ public class Map extends Canvas {
 	 * @return Returns rgb values for the color which is used as transparent color in the map.
 	 */
 	public static RGB getTransparentRGB() {
-		return _transparentRGB;
+		return MAP_TRANSPARENT_RGB;
 	}
 
 	void actionManageOfflineImages(final Event event) {
@@ -867,10 +866,9 @@ public class Map extends Canvas {
 		}
 
 		// create 9 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize, _transparentRGB);
+		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize, MAP_TRANSPARENT_RGB);
 
 		_image9Parts = new Image(_display, transparentImageData);
-
 		_gc9Parts = new GC(_image9Parts);
 	}
 
@@ -1280,9 +1278,9 @@ public class Map extends Canvas {
 											final int srcYStart,
 											final int tileSize) {
 
-		final int transRed = _transparentRGB.red;
-		final int transGreen = _transparentRGB.green;
-		final int transBlue = _transparentRGB.blue;
+		final int transRed = MAP_TRANSPARENT_RGB.red;
+		final int transGreen = MAP_TRANSPARENT_RGB.green;
+		final int transBlue = MAP_TRANSPARENT_RGB.blue;
 
 		final byte[] srcData = imageData9Parts.data;
 		final int srcBytesPerLine = imageData9Parts.bytesPerLine;
@@ -1812,11 +1810,10 @@ public class Map extends Canvas {
 		try {
 
 			// check or create map image
-			Image image = _mapImage;
+			final Image image = _mapImage;
 			if ((image == null) || image.isDisposed() || (canReuseImage(image, _clientArea) == false)) {
-				image = createImage(_display, image, _clientArea);
+				_mapImage = createImage(_display, image, _clientArea);
 			}
-			_mapImage = image;
 
 			gc = new GC(_mapImage);
 			{
@@ -2435,10 +2432,10 @@ public class Map extends Canvas {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
 
 				// check if the tile is within the map border
-				if (((tileX - xIndex < 0) //
-						|| (tileX + xIndex > maxTiles))
-						|| ((tileY - yIndex < 0) //
-						|| (tileY + yIndex > maxTiles))) {
+				if (((tileX - xIndex < -1) //
+						|| (tileX + xIndex > maxTiles + 1))
+						|| ((tileY - yIndex < -1) //
+						|| (tileY + yIndex > maxTiles + 1))) {
 					continue;
 				}
 
@@ -2590,7 +2587,7 @@ public class Map extends Canvas {
 		boolean isOverlayPainted = false;
 
 		// create 1 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize, _transparentRGB);
+		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize, MAP_TRANSPARENT_RGB);
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);
