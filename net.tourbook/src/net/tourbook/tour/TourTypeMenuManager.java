@@ -18,10 +18,10 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;

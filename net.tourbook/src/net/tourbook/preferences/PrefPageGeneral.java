@@ -22,8 +22,8 @@ import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
 

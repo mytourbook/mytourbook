@@ -19,8 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
-import net.tourbook.plugin.TourbookPlugin;
 
 /**
  * The {@link SQLFilter} provides a where clause and sets the statement parameters for the selected

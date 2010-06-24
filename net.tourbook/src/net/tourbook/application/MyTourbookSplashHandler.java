@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;

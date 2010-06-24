@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
@@ -50,7 +51,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.mapping.SelectionMapPosition;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;

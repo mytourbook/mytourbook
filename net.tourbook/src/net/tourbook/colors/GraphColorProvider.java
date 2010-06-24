@@ -32,9 +32,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.mapping.LegendColor;
 import net.tourbook.mapping.ValueColor;
-import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;

@@ -18,8 +18,8 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 

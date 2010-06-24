@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;

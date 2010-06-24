@@ -43,6 +43,7 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -52,7 +53,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;

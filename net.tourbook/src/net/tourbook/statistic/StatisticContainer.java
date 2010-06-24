@@ -25,9 +25,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;

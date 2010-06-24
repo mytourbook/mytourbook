@@ -16,9 +16,9 @@
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
 import net.tourbook.util.Util;
 

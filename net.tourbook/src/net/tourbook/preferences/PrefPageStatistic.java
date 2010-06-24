@@ -18,7 +18,7 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.util.StringToArrayConverter;

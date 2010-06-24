@@ -16,7 +16,7 @@
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;

@@ -22,7 +22,6 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.tag.TagManager;

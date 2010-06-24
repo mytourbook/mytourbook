@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -31,7 +32,6 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ActionSelectYears;
 import net.tourbook.tour.ITourEventListener;

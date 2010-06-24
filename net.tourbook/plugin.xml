@@ -2,11 +2,13 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-   <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
-   <extension-point id="externalDeviceDataReader" name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
    <extension-point id="exportTour" name="Export Tours" schema="schema/exportTour.exsd"/>
+   <extension-point id="externalDeviceDataReader" name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
+   <extension-point id="mapOverlay" name="MapOverlay" schema="schema/mapOverlay.exsd"/>
    <extension-point id="printTour" name="Print Tours" schema="schema/printTour.exsd"/>
+   <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
+   <extension-point id="tilefactory" name="TileFactory" schema="schema/tilefactory.exsd"/>
 
    <extension
          id="application"
@@ -975,11 +977,6 @@
    </extension>
    
    <extension
-         point="de.byteholder.geoclipse.mapOverlay">
-      <painter class="net.tourbook.mapping.TourPainter"/>
-   </extension>
-   
-   <extension
          point="org.eclipse.ui.handlers">
 
       <handler
@@ -995,8 +992,132 @@
             name="net.tourbook.chart.context.isTourChart">
       </context>
    </extension>
+   
+
+   <extension
+         point="net.tourbook.mapOverlay">
+      <painter class="net.tourbook.mapping.TourPainter"/>
+   </extension>
+
+     <extension
+         point="org.eclipse.ui.preferencePages">
+
+               
+      <page
+            class="net.tourbook.srtm.PrefPageSRTM"
+            id="net.tourbook.ext.srtm.PrefPageSRTM"
+            name="%pref_page_srtm">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.srtm.PrefPageSRTMColors"
+            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
+            name="%pref_page_srtm_colors">
+      </page>
+      
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.tourbook.srtm.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+   <extension
+         point="net.tourbook.tilefactory">
+      <tilefactory
+            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
+            name="SRTM Map Provider"/>
+   </extension>
 
 
+   
+	<extension	point="org.eclipse.ui.preferencePages">
+		 
+		<page
+		      class="de.byteholder.geoclipse.preferences.PrefPageMap"
+		      id="de.byteholder.geoclipse.preferences.map"
+		      name="%pref_page_map">
+		</page>
 
+		<page
+			category="de.byteholder.geoclipse.preferences.map"
+			class="de.byteholder.geoclipse.preferences.PrefPageCache"
+			id="de.byteholder.geoclipse.preferences.PrefPageCache"
+			name="%pref_page_cache">
+		</page>
 
+		<page
+			class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+			id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
+			name="%pref_page_provider">
+		</page>
+
+	</extension>
+
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar id="de.byteholder.geoclipse.toolbar.tileinfo">
+            <control
+                  class="de.byteholder.geoclipse.tileinfo.TileInfoContribution"
+                  id="de.byteholder.geoclipse.tileinfo">
+               <visibleWhen>
+                  <test
+                        forcePluginActivation="true"
+                        property="de.byteholder.geoclipse.tester.someProperty"
+                        value="true">
+                  </test>
+               </visibleWhen>
+            </control>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   
+   
+  	<extension point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+			id="de.byteholder.geoclipse.tester.propertyTester"
+			namespace="de.byteholder.geoclipse.tester"
+			properties="someProperty"
+			type="java.lang.Object"
+			class="de.byteholder.geoclipse.tileinfo.TrimPropertyTester">
+	  	</propertyTester>
+	</extension>
+   
+	<extension point="org.eclipse.ui.actionSets">
+		<actionSet
+			label="Sample Action Set"
+			visible="true"
+			id="de.byteholder.geoclipse.poi.actionSet">
+			
+			<action
+				class="de.byteholder.geoclipse.poi.ShowPoiViewAction"
+				icon="icons/find.png"
+				id="de.byteholder.geoclipse.poi.ShowPlacesViewAction"
+				label="&amp;Places search"
+				menubarPath="window/views"
+				style="push"
+				toolbarPath="views"
+				tooltip="Search for places and show them on the map">
+			</action>
+		</actionSet>
+	</extension>
+	   
+	<extension point="org.eclipse.ui.views">
+		<view
+			allowMultiple="false"
+			category="net.tourbook.category.Tools"
+			class="de.byteholder.geoclipse.poi.PoiView"
+			icon="icons/find.png"
+			id="de.byteholder.geoclipse.poi.poiView"
+			name="Places"/>
+	</extension>
 </plugin>

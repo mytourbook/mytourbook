@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;

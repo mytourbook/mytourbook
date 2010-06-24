@@ -17,7 +17,7 @@ package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.util.Util;
 

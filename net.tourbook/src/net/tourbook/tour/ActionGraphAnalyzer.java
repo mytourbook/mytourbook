@@ -16,8 +16,8 @@
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.TourChartAnalyzerView;
 import net.tourbook.util.Util;
 

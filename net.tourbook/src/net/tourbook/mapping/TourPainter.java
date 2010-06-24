@@ -21,10 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.ui.ColorCacheInt;
@@ -768,9 +768,10 @@ public class TourPainter extends MapPainter {
 		final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
 		// get viewport for the current tile
-		final int worldPixelTileX = tile.getX() * tileSize;
-		final int worldPixelTileY = tile.getY() * tileSize;
-		final Rectangle tileViewport = new Rectangle(worldPixelTileX, worldPixelTileY, tileSize, tileSize);
+		final int tileWorldPixelX = tile.getX() * tileSize;
+		final int tileWorldPixelY = tile.getY() * tileSize;
+		final int tileWidth = tileSize;
+		final int tileHeight = tileSize;
 
 		int devFromWithOffsetX = 0;
 		int devFromWithOffsetY = 0;
@@ -837,9 +838,11 @@ public class TourPainter extends MapPainter {
 			for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
 				final Point tourWorldPixel = tourWorldPixelPosAll[serieIndex];
+				final int tourWorldPixelX = tourWorldPixel.x;
+				final int tourWorldPixelY = tourWorldPixel.y;
 
-				int devX = tourWorldPixel.x - worldPixelTileX;
-				int devY = tourWorldPixel.y - worldPixelTileY;
+				int devX = tourWorldPixelX - tileWorldPixelX;
+				int devY = tourWorldPixelY - tileWorldPixelY;
 
 				if (_prefIsDrawLine) {
 
@@ -863,13 +866,10 @@ public class TourPainter extends MapPainter {
 					// this condition is an inline for:
 					// tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
 
-					final int x = tourWorldPixel.x;
-					final int y = tourWorldPixel.y;
-
-					if ((x >= tileViewport.x)
-							&& (y >= tileViewport.y)
-							&& x < (tileViewport.x + tileViewport.width)
-							&& y < (tileViewport.y + tileViewport.height)) {
+					if ((tourWorldPixelX >= tileWorldPixelX)
+							&& (tourWorldPixelY >= tileWorldPixelY)
+							&& tourWorldPixelX < (tileWorldPixelX + tileWidth)
+							&& tourWorldPixelY < (tileWorldPixelY + tileHeight)) {
 
 						// current position is inside the tile
 
@@ -918,14 +918,11 @@ public class TourPainter extends MapPainter {
 					// draw tour with dots/squares
 
 					// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
-					final int x = tourWorldPixel.x;
-					final int y = tourWorldPixel.y;
-
 					// check if position is in the viewport
-					if ((x >= tileViewport.x)
-							&& (y >= tileViewport.y)
-							&& x < (tileViewport.x + tileViewport.width)
-							&& y < (tileViewport.y + tileViewport.height)) {
+					if ((tourWorldPixelX >= tileWorldPixelX)
+							&& (tourWorldPixelY >= tileWorldPixelY)
+							&& tourWorldPixelX < (tileWorldPixelX + tileWidth)
+							&& tourWorldPixelY < (tileWorldPixelY + tileHeight)) {
 
 						// current position is inside the tile
 
@@ -1179,10 +1176,14 @@ public class TourPainter extends MapPainter {
 
 			gc.drawImage(_twpImage, devX, devY);
 
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			gc.setLineWidth(1);
+			gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
+
 			tile.addTourWayPointBounds(//
 					twp,
-					devX,
-					devY,
+					devX - devPartOffset,
+					devY - devPartOffset,
 					_twpImageBounds.width,
 					_twpImageBounds.height,
 					zoomLevel,
@@ -1315,10 +1316,9 @@ public class TourPainter extends MapPainter {
 															final MP mp,
 															final String projectionId,
 															final int mapZoomLevel) {
-		HashMap<Integer, Point> allWayPointWorldPixel;
 		// world pixels are not yet cached, create them now
 
-		allWayPointWorldPixel = new HashMap<Integer, Point>();
+		final HashMap<Integer, Point> allWayPointWorldPixel = new HashMap<Integer, Point>();
 
 		for (final TourWayPoint twp : wayPoints) {
 
@@ -1330,6 +1330,7 @@ public class TourPainter extends MapPainter {
 		}
 
 		tourData.setWorldPixelForWayPoints(allWayPointWorldPixel, mapZoomLevel, projectionId);
+
 		return allWayPointWorldPixel;
 	}
 
@@ -1363,12 +1364,9 @@ public class TourPainter extends MapPainter {
 		// image position top is in the opposite direction
 		final int devImagePosTop = devImagePosY - imageHeight;
 
-		if ((devImagePosLeft >= 0 && devImagePosLeft <= tileSize)
-				|| (devImagePosRight >= 0 && devImagePosRight <= tileSize)) {
-
-			if (devImagePosY >= 0 && devImagePosY <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize) {
-				return true;
-			}
+		if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0 && devImagePosRight <= tileSize))
+				&& (devImagePosY >= 0 && devImagePosY <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize)) {
+			return true;
 		}
 
 		return false;

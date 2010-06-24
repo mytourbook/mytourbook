@@ -17,7 +17,7 @@ package net.tourbook.ui.tourChart.action;
 
 import java.util.ArrayList;
 
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 

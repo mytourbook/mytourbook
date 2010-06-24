@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;

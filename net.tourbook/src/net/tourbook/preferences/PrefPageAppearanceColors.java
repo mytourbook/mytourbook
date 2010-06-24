@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorItem;
 import net.tourbook.colors.GraphColorProvider;
@@ -30,7 +31,6 @@ import net.tourbook.mapping.LegendColor;
 import net.tourbook.mapping.LegendConfig;
 import net.tourbook.mapping.LegendProvider;
 import net.tourbook.mapping.ValueColor;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TreeColumnLayout;
 

@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -30,7 +31,6 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;

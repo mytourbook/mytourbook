@@ -16,7 +16,7 @@
 package net.tourbook.ui.views.tagging;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 

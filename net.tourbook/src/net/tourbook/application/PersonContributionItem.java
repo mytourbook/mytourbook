@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.UI;

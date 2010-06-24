@@ -30,8 +30,8 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;

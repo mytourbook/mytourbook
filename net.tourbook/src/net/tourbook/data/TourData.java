@@ -56,10 +56,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -702,10 +702,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public double						mapMaxLongitude;
 
 	/**
-	 * caches the world positions for lat/long values for each zoom level
+	 * caches the world positions for the tour lat/long values for each zoom level
 	 */
 	@Transient
-	private final Map<Integer, Point[]>	_worldPosition					= new HashMap<Integer, Point[]>();
+	private final Map<Integer, Point[]>						_tourWorldPosition				= new HashMap<Integer, Point[]>();
+
+	/**
+	 * caches the world positions for the way point lat/long values for each zoom level
+	 */
+	@Transient
+	private final HashMap<Integer, HashMap<Integer, Point>>	_twpWorldPosition				= new HashMap<Integer, HashMap<Integer, Point>>();
 
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -950,7 +956,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * clears the cached world positions, this is necessary when the data serie have been modified
 	 */
 	public void clearWorldPositions() {
-		_worldPosition.clear();
+		_tourWorldPosition.clear();
 	}
 
 	public int compareTo(final Object obj) {
@@ -3982,10 +3988,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * @param zoomLevel
+	 * @param projectionId
 	 * @return Returns the world position for the suplied zoom level and projection id
 	 */
-	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
-		return _worldPosition.get(projectionId.hashCode() + zoomLevel);
+	public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
+		return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
+	}
+
+	/**
+	 * @param zoomLevel
+	 * @param projectionId
+	 * @return Returns the world position for way points
+	 */
+	public HashMap<Integer, Point> getWorldPositionForWayPoints(final String projectionId, final int zoomLevel) {
+		return _twpWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
 
 // not used 5.10.2008
@@ -4632,12 +4648,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Set world positions which are cached
 	 * 
-	 * @param projectionId
 	 * @param worldPositions
 	 * @param zoomLevel
+	 * @param projectionId
 	 */
-	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {
-		_worldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+	public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final String projectionId) {
+		_tourWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+	}
+
+	/**
+	 * Set world positions which are cached
+	 * 
+	 * @param worldPositions
+	 * @param zoomLevel
+	 * @param projectionId
+	 */
+	public void setWorldPixelForWayPoints(	final HashMap<Integer, Point> worldPositions,
+											final int zoomLevel,
+											final String projectionId) {
+		
+		_twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}
 
 	@Override

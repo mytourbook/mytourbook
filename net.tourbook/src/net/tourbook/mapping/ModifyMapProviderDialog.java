@@ -17,7 +17,7 @@ package net.tourbook.mapping;
 
 import java.util.ArrayList;
 
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;
 
@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
@@ -65,7 +64,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 	{
 		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
-		_geoPrefStore = Activator.getDefault().getPreferenceStore();
+		_geoPrefStore = TourbookPlugin.getDefault().getPreferenceStore();
 	}
 
 	public ModifyMapProviderDialog(final Shell parentShell) {

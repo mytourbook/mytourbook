@@ -16,7 +16,7 @@
 package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;

@@ -24,6 +24,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorItem;
 import net.tourbook.colors.GraphColorProvider;
@@ -31,7 +32,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.mapping.ILegendProvider;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TreeColumnLayout;

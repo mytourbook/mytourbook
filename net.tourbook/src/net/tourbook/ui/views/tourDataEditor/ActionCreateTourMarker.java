@@ -17,10 +17,10 @@
 package net.tourbook.ui.views.tourDataEditor;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;

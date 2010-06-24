@@ -17,9 +17,9 @@ package net.tourbook.ui.views;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.statistic.TourbookStatistic;

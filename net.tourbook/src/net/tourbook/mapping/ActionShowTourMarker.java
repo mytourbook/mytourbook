@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 

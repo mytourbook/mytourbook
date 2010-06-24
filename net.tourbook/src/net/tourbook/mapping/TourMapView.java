@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
@@ -27,10 +28,8 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
-import net.tourbook.srtm.Activator;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
@@ -514,8 +513,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				}
 			}
 		};
-		// !!! SRTM pref store !!!
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(_mapPrefChangeListener);
+		_prefStore.addPropertyChangeListener(_mapPrefChangeListener);
 
 		_map.addZoomListener(new IZoomListener() {
 			@Override
@@ -1083,8 +1081,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 		_prefStore.removePropertyChangeListener(_tourbookPrefChangeListener);
-
-		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(_mapPrefChangeListener);
+		_prefStore.removePropertyChangeListener(_mapPrefChangeListener);
 
 		super.dispose();
 	}

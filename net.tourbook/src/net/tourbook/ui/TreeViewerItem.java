@@ -18,8 +18,8 @@ package net.tourbook.ui;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
-import net.tourbook.plugin.TourbookPlugin;
 
 /**
  * Abstract class which contains an item for a tree viewer

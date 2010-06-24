@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
@@ -34,7 +35,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;

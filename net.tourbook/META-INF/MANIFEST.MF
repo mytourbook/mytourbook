@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
 Bundle-Version: 10.3.1.qualifier
-Bundle-Activator: net.tourbook.plugin.TourbookPlugin
+Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
@@ -19,33 +19,36 @@ Require-Bundle: org.eclipse.ui,
  org.apache.derby.core,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
- net.tourbook.srtm,
  net.tourbook.chart,
- net.tourbook.rxtx,
- net.tourbook.util
-Export-Package: net.tourbook,
+ net.tourbook.rxtx
+Export-Package: de.byteholder.geoclipse.map,
+ de.byteholder.geoclipse.map.event,
+ de.byteholder.geoclipse.mapprovider,
+ de.byteholder.geoclipse.tileinfo,
+ net.tourbook,
+ net.tourbook.application,
  net.tourbook.colors,
  net.tourbook.data,
  net.tourbook.database,
  net.tourbook.export,
- net.tourbook.printing,
  net.tourbook.importdata,
  net.tourbook.mapping,
- net.tourbook.plugin,
  net.tourbook.preferences,
+ net.tourbook.printing,
  net.tourbook.statistic,
  net.tourbook.tag,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.action,
  net.tourbook.ui.tourChart
-Import-Package: de.byteholder.geoclipse,
- de.byteholder.geoclipse.map,
- de.byteholder.geoclipse.map.event,
- de.byteholder.geoclipse.mapprovider,
- de.byteholder.geoclipse.preferences,
- de.byteholder.geoclipse.util,
- de.byteholder.gpx,
+Import-Package: com.enterprisedt.net.ftp,
  net.tourbook.export,
- net.tourbook.printing
+ net.tourbook.printing,
+ net.tourbook.util,
+ org.geotools.data.ows,
+ org.geotools.data.wms,
+ org.geotools.data.wms.request,
+ org.geotools.data.wms.response,
+ org.geotools.ows,
+ org.opengis.geometry
 

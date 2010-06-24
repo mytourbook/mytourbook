@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;

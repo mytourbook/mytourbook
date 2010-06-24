@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.colors;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.mapping.LegendColor;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;

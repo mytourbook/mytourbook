@@ -17,9 +17,9 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourBike;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;

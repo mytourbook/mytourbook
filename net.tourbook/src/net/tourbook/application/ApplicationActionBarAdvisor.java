@@ -16,7 +16,6 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.IStatus;

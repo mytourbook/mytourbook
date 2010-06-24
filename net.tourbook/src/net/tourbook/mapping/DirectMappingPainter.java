@@ -17,8 +17,8 @@ package net.tourbook.mapping;
 
 import java.util.List;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;

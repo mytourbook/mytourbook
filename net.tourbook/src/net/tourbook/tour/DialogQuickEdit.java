@@ -21,9 +21,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.IWeather;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;

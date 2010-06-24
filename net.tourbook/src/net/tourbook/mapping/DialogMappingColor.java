@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.colors.ColorDefinition;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.ui.UI;
 

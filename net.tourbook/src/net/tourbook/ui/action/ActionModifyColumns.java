@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.Messages;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;

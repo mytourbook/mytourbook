@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.StringToArrayConverter;
 
@@ -33,7 +33,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
-import de.byteholder.geoclipse.Activator;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
@@ -42,7 +41,7 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator, IMapProviderListener {
 
-	private static IPreferenceStore				_geoPrefStore	= Activator.getDefault().getPreferenceStore();
+	private static IPreferenceStore				_geoPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private final TourMapView					_mapView;
 
@@ -432,7 +431,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 					mapProviders.add(mp);
 					validMpIds.add(mp.getId());
 					break;
-	 			}
+				}
 			}
 		}
 

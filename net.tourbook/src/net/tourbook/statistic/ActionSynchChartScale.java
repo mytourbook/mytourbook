@@ -17,7 +17,7 @@
 package net.tourbook.statistic;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
