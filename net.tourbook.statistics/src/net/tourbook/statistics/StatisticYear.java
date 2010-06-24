@@ -18,6 +18,7 @@ package net.tourbook.statistics;
 
 import java.util.Formatter;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -29,7 +30,6 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;

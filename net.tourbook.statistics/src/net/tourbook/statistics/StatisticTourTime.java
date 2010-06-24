@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -33,7 +34,6 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;

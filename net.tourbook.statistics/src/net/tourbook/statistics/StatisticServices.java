@@ -17,11 +17,11 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 

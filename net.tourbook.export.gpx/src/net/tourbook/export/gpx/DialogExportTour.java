@@ -37,10 +37,10 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.export.ExportTourExtension;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.ImageComboLabel;

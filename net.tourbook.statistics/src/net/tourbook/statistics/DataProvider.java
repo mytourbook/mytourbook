@@ -19,8 +19,8 @@ package net.tourbook.statistics;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 

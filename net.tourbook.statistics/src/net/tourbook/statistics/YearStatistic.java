@@ -18,9 +18,9 @@ package net.tourbook.statistics;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.IYearStatistic;
 import net.tourbook.statistic.TourbookStatistic;
