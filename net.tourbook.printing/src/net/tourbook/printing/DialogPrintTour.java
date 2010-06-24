@@ -27,8 +27,8 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.UI;
@@ -502,6 +502,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 		}
 	}
 
+	private void displayErrorMessage(final Exception exception) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				ErrorDialog.openError(
+						Display.getCurrent().getActiveShell(),
+						Messages.Dialog_Print_Error_Title,
+						Messages.Dialog_Print_Error_Message,
+						new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.Dialog_Print_Error_Title, exception));
+			}
+		});
+	}
+
 	private void doPrint() throws IOException, FOPException, TransformerException {
 
 		// disable button's
@@ -546,7 +558,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			final TourData tourData = _tourDataList.get(0);
 
 			if (_printExtensionPoint instanceof PrintTourPDF) {
-				//System.out.println("tour id:"+tourData.getTourId());	
+				//System.out.println("tour id:"+tourData.getTourId());
 				((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
 			}
 		} else {
@@ -617,18 +629,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private void displayErrorMessage(final Exception exception) {
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				ErrorDialog.openError(
-						Display.getCurrent().getActiveShell(),
-						Messages.Dialog_Print_Error_Title,
-						Messages.Dialog_Print_Error_Message,
-						new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.Dialog_Print_Error_Title, exception));
-			}
-		});
 	}
 
 	private void enableFields() {
