@@ -41,13 +41,14 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.MTRectangle;
+import net.tourbook.ui.TourToolTip;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.TourInfo;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.util.ITourToolTipProvider;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -182,8 +183,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private boolean									_isTour;
 
 	/*
-	 * POI
+	 * toop tips
 	 */
+	private ITourToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
+	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
 	private String									_poiName;
 	private GeoPosition								_poiPosition;
 	private int										_poiZoomLevel;
@@ -214,7 +217,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 * UI controls
 	 */
 	private Map										_map;
-	private TourInfo								_tourInfo;
+
+	private TourToolTip								_tourToolTip;
 
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
@@ -352,7 +356,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		final boolean isVisible = _actionShowTourInfoInMap.isChecked();
 
-		_tourInfo.setVisible(isVisible);
+		if (isVisible) {
+			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+		} else {
+			_tourToolTip.removeToolTipProvider(_tourInfoToolTipProvider);
+		}
+//		_tourInfo.setVisible(isVisible);
 
 		_map.queueMapRedraw();
 	}
@@ -363,7 +372,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowTourMarkerInMap() {
 
-		_paintMgr.isShowTourMarker = _actionShowTourMarker.isChecked();
+		_paintMgr._isShowTourMarker = _actionShowTourMarker.isChecked();
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -371,7 +380,14 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionSetShowWayPointsInMap() {
 
-		_paintMgr.isShowWayPoints = _actionShowWayPoints.isChecked();
+		final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
+		if (isShowWayPoints) {
+			_tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
+		} else {
+			_tourToolTip.removeToolTipProvider(_wayPointToolTipProvider);
+		}
+
+		_paintMgr._isShowWayPoints = isShowWayPoints;
 
 		_map.disposeOverlayImageCache();
 		_map.queueMapRedraw();
@@ -775,7 +791,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_paintMgr.setTourData(new ArrayList<TourData>());
 
-		_tourInfo.setTourData(null);
+//		_tourInfo.setTourData(null);
 
 		showDefaultMap();
 	}
@@ -982,9 +998,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
 		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
 
+		// setup tool tip's
+		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
+
 		// set tour info icon into the left axis
-		_tourInfo = new TourInfo(_map);
-		_map.setToolTip(_tourInfo);
+//		_map.setToolTip(_tourInfo = new TourInfo(_map));
 
 		_map.addControlListener(new ControlAdapter() {
 			@Override
@@ -1523,7 +1541,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void paintAllTours() {
 
 		if (_tourDataList.size() == 0) {
-			_tourInfo.setTourData(null);
+//			_tourInfo.setTourData(null);
 			return;
 		}
 
@@ -1551,7 +1569,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		_paintMgr.setTourData(_tourDataList);
-		_tourInfo.setTourDataList(_tourDataList);
+//		_tourInfo.setTourDataList(_tourDataList);
 
 		final TourData firstTourData = _tourDataList.get(0);
 
@@ -1620,7 +1638,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
 
-		_tourInfo.setTourDataList(_tourDataList);
+//		_tourInfo.setTourDataList(_tourDataList);
 
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
@@ -1698,7 +1716,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_previousTourData = null;
 
 		_paintMgr.setTourData(_tourDataList);
-		_tourInfo.setTourDataList(_tourDataList);
+//		_tourInfo.setTourDataList(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
 
@@ -1759,7 +1777,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					}
 				}
 				_paintMgr.setTourData(_tourDataList);
-				_tourInfo.setTourDataList(_tourDataList);
+//				_tourInfo.setTourDataList(_tourDataList);
 
 				if (_previousOverlayKey != newOverlayKey) {
 
@@ -1861,12 +1879,16 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// checkbox: show tour marker
 		state = settings.get(MEMENTO_SHOW_TOUR_MARKER);
 		_actionShowTourMarker.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_TOUR_MARKER));
-		_paintMgr.isShowTourMarker = _actionShowTourMarker.isChecked();
+		_paintMgr._isShowTourMarker = _actionShowTourMarker.isChecked();
 
 		// checkbox: show way points
 		state = settings.get(MEMENTO_SHOW_WAY_POINTS);
 		_actionShowWayPoints.setChecked(state == null ? true : settings.getBoolean(MEMENTO_SHOW_WAY_POINTS));
-		_paintMgr.isShowWayPoints = _actionShowWayPoints.isChecked();
+		final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
+		_paintMgr._isShowWayPoints = isShowWayPoints;
+		if (isShowWayPoints) {
+			_tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
+		}
 
 		// checkbox: show legend in map
 		_actionShowLegendInMap.setChecked(Util.getStateBoolean(settings, MEMENTO_SHOW_LEGEND_IN_MAP, true));
@@ -1874,7 +1896,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		// checkbox: show tour info in map
 		final boolean isShowTourInfo = Util.getStateBoolean(settings, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
 		_actionShowTourInfoInMap.setChecked(isShowTourInfo);
-		_tourInfo.setVisible(isShowTourInfo);
+		if (isShowTourInfo) {
+			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+		}
+//		_tourInfo.setVisible(isShowTourInfo);
 
 		// checkbox: show scale
 		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);

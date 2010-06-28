@@ -37,8 +37,8 @@ public class PaintManager {
 	private ILegendProvider				_legendProvider;
 
 	private boolean						_isShowStartEndInMap;
-	boolean								isShowTourMarker;
-	boolean								isShowWayPoints;
+	boolean								_isShowTourMarker;
+	boolean								_isShowWayPoints;
 
 	private PaintManager() {}
 

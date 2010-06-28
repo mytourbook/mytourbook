@@ -491,8 +491,6 @@ public class TourPainter extends MapPainter {
 		_tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
 		_tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-//		_twpImage = UI.convertIntoTransparentMapImage(//
-//				TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage());
 		_twpImage = TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage();
 		_twpImageBounds = _twpImage.getBounds();
 
@@ -504,8 +502,6 @@ public class TourPainter extends MapPainter {
 
 		disposeImage(_tourStartMarker);
 		disposeImage(_tourEndMarker);
-
-		disposeImage(_twpImage);
 
 		_isImageAvailable = false;
 	}
@@ -589,7 +585,7 @@ public class TourPainter extends MapPainter {
 			isTourInTile = isTourInTile || isMarkerInTile;
 		}
 
-		if (paintManager.isShowTourMarker || paintManager.isShowWayPoints) {
+		if (paintManager._isShowTourMarker || paintManager._isShowWayPoints) {
 
 			// draw marker above the tour
 
@@ -608,7 +604,7 @@ public class TourPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				if (paintManager.isShowTourMarker) {
+				if (paintManager._isShowTourMarker) {
 
 					// ckeck if markers are available
 					final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
@@ -646,7 +642,7 @@ public class TourPainter extends MapPainter {
 					isTourInTile = isTourInTile || isTourMarkerInTile;
 				}
 
-				if (paintManager.isShowWayPoints) {
+				if (paintManager._isShowWayPoints) {
 
 					// ckeck if way points are available
 					final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
@@ -664,8 +660,8 @@ public class TourPainter extends MapPainter {
 					HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
 							projectionId,
 							mapZoomLevel);
-					if ((allWayPointWorldPixel == null)) {
 
+					if ((allWayPointWorldPixel == null)) {
 						allWayPointWorldPixel = initWorldPixelWayPoint(
 								tourData,
 								wayPoints,
@@ -679,10 +675,6 @@ public class TourPainter extends MapPainter {
 					boolean isTourWayPointInTile2 = false;
 
 					for (final TourWayPoint tourWayPoint : wayPoints) {
-
-//						if (tourWayPoint.getCreateId() == 70) {
-//							final int a = 0;
-//						}
 
 						final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
 
@@ -1176,18 +1168,26 @@ public class TourPainter extends MapPainter {
 
 			gc.drawImage(_twpImage, devX, devY);
 
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			gc.setLineWidth(1);
-			gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
-
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.setLineWidth(1);
+//			gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
+//
 			tile.addTourWayPointBounds(//
 					twp,
-					devX - devPartOffset,
-					devY - devPartOffset,
-					_twpImageBounds.width,
-					_twpImageBounds.height,
+					new Rectangle(
+							devX - devPartOffset,
+							devY - devPartOffset,
+							_twpImageBounds.width,
+							_twpImageBounds.height),
 					zoomLevel,
 					parts);
+
+			/*
+			 * check if the way point paints into a neighbour tile
+			 */
+			if (parts > 1) {
+
+			}
 		}
 
 		return isBoundsInTile;
@@ -1382,6 +1382,10 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
+		if (_isImageAvailable == false) {
+			createImages();
+		}
+
 		final MP mp = map.getMapProvider();
 		final int mapZoomLevel = map.getZoom();
 		final int tileSize = mp.getTileSize();
@@ -1462,6 +1466,11 @@ public class TourPainter extends MapPainter {
 					allWayPointWorldPixel = initWorldPixelWayPoint(tourData, wayPoints, mp, projectionId, mapZoomLevel);
 				}
 
+				// get image size
+				final int imageWidth = _twpImageBounds.width;
+				final int imageWidth2 = imageWidth / 2;
+				final int imageHeight = _twpImageBounds.height;
+
 				for (final TourWayPoint twp : wayPoints) {
 
 					final Point twpWorldPixel = allWayPointWorldPixel.get(twp.hashCode());
@@ -1470,11 +1479,19 @@ public class TourPainter extends MapPainter {
 					final int twpWorldPixelX = twpWorldPixel.x;
 					final int twpWorldPixelY = twpWorldPixel.y;
 
-					// check if position is within the tile viewport
-					if ((twpWorldPixelX >= tileWorldPixelLeft)
-							&& (twpWorldPixelY >= tileWorldPixelTop)
+					final int twpImageWorldPixelX = twpWorldPixelX - imageWidth2;
+
+//					final int diffX = (twpImageWorldPixelX + imageWidth) - tileWorldPixelLeft;
+//					final int diffY = twpWorldPixelY - tileWorldPixelBottom + imageHeight;
+
+//					System.out.println(diffX + "\t" + diffY + "\t" + tile);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					// check if twp image is within the tile viewport
+					if (twpImageWorldPixelX + imageWidth >= tileWorldPixelLeft
 							&& twpWorldPixelX < tileWorldPixelRight
-							&& twpWorldPixelY < tileWorldPixelBottom) {
+							&& twpWorldPixelY >= tileWorldPixelTop
+							&& twpWorldPixelY < tileWorldPixelBottom + imageHeight) {
 
 						// current position is inside the tile
 

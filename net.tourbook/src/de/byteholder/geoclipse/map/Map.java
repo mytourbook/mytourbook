@@ -40,7 +40,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.util.ITourToolTip;
+import net.tourbook.ui.TourToolTip;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -267,12 +267,11 @@ public class Map extends Canvas {
 	private AtomicInteger						_overlayRunnableCounter						= new AtomicInteger();
 
 	private boolean								_isLeftMouseButtonPressed					= false;
-
-	private final Point							_mouseMovePosition							= new Point(
-																									Integer.MIN_VALUE,
-																									Integer.MIN_VALUE);
-	private Point								_mouseDownPosition;
 	private boolean								_isMapPanned;
+
+	private int									_mouseMovePositionX							= Integer.MIN_VALUE;
+	private int									_mouseMovePositionY							= 0;
+	private Point								_mouseDownPosition;
 
 	private Thread								_overlayThread;
 	private long								_nextOverlayRedrawTime;
@@ -356,10 +355,10 @@ public class Map extends Canvas {
 	 * <p>
 	 * <b>!!! x/y values can also be negative when the map is smaller than the viewport !!!</b>
 	 * <p>
-	 * I havn't yet fully understood how it works but I adjusted the map successfully in 10.6 and
+	 * I havn't yet fully understood how it works but I adjusted the map successfully in 10.7 and
 	 * tried to document this behaviour.
 	 */
-	private Rectangle							_worldPixelViewport;
+	private Rectangle							_worldPixelTopLeftViewport;
 
 	/**
 	 * Size in device pixel where the map is displayed
@@ -465,9 +464,14 @@ public class Map extends Canvas {
 
 	private DropTarget							_dropTarget;
 
-	private ITourToolTip						_tourToolTip;
+	private TourToolTip							_tourToolTip;
 
 	private boolean								_isRedrawEnabled							= true;
+
+	private HoveredAreaContext					_hoveredAreaContext;
+
+//	private int									_hoveredTopLeftX;
+//	private int									_hoveredTopLeftY;
 
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
@@ -515,7 +519,7 @@ public class Map extends Canvas {
 
 			if (xDiff != 0 || yDiff != 0) {
 
-				final Rectangle bounds = _worldPixelViewport;
+				final Rectangle bounds = _worldPixelTopLeftViewport;
 
 				final double newCenterX = bounds.x + bounds.width / 2.0 + xDiff;
 				final double newCenterY = bounds.y + bounds.height / 2.0 + yDiff;
@@ -929,7 +933,6 @@ public class Map extends Canvas {
 	}
 
 	public void deleteFailedImageFiles() {
-
 		MapProviderManager.deleteOfflineMap(_mp, true);
 	}
 
@@ -1031,7 +1034,7 @@ public class Map extends Canvas {
 	private void fireMousePosition() {
 
 		// check position, can be initially be null
-		if ((_mouseMovePosition.x == Integer.MIN_VALUE) || (_mp == null)) {
+		if ((_mouseMovePositionX == Integer.MIN_VALUE) || (_mp == null)) {
 			return;
 		}
 
@@ -1040,8 +1043,8 @@ public class Map extends Canvas {
 		 */
 		final Rectangle topLeftViewPort = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 
-		final int worldMouseX = topLeftViewPort.x + _mouseMovePosition.x;
-		final int worldMouseY = topLeftViewPort.y + _mouseMovePosition.y;
+		final int worldMouseX = topLeftViewPort.x + _mouseMovePositionX;
+		final int worldMouseY = topLeftViewPort.y + _mouseMovePositionY;
 
 		final GeoPosition geoPosition = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
 		final MapPositionEvent event = new MapPositionEvent(geoPosition, _mapZoomLevel);
@@ -1155,8 +1158,8 @@ public class Map extends Canvas {
 
 		// get device rectangle for this tile
 		return new Point(//
-				tilePosX * _tilePixelSize - _worldPixelViewport.x,
-				tilePosY * _tilePixelSize - _worldPixelViewport.y);
+				tilePosX * _tilePixelSize - _worldPixelTopLeftViewport.x,
+				tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y);
 	}
 
 //	private Point2D.Double getWorldPixelAdjustedCenter(double newCenterX, double newCenterY) {
@@ -1252,6 +1255,20 @@ public class Map extends Canvas {
 		return _mapZoomLevel;
 	}
 
+	private void hideHoveredArea() {
+
+		// update tool tip because it has it's own mouse move listener for the map
+		_tourToolTip.hideHoveredArea();
+
+		if (_hoveredAreaContext != null) {
+
+			// hide hovered area
+			_hoveredAreaContext = null;
+
+			redraw();
+		}
+	}
+
 	private void initMap() {
 
 		_mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
@@ -1260,7 +1277,7 @@ public class Map extends Canvas {
 		final double tileDefaultCenter = (double) _tilePixelSize / 2;
 
 		_worldPixelMapCenter = new Point2D.Double(tileDefaultCenter, tileDefaultCenter);
-		_worldPixelViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+		_worldPixelTopLeftViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 	}
 
 	/**
@@ -1510,8 +1527,8 @@ public class Map extends Canvas {
 		/*
 		 * set new map center
 		 */
-		final double x = _worldPixelViewport.x + mouseEvent.x;
-		final double y = _worldPixelViewport.y + mouseEvent.y;
+		final double x = _worldPixelTopLeftViewport.x + mouseEvent.x;
+		final double y = _worldPixelTopLeftViewport.y + mouseEvent.y;
 
 		setMapCenterInWorldPixel(new Point2D.Double(x, y));
 
@@ -1521,6 +1538,17 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
+//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
+//
+//		if (_poiTT == null) {
+//			_poiTT = new PoiToolTip(getShell());
+//		}
+//
+//		_poiTT.geoPosition = poiGeoPosition;
+//
+//		return _poiTT;
+//	}
+
 	private void onMouseDown(final MouseEvent e) {
 
 		// check if left mouse button is pressed
@@ -1528,13 +1556,14 @@ public class Map extends Canvas {
 			return;
 		}
 
+		hideHoveredArea();
 //		setPoiVisible(false);
 
 		if (_isSelectOfflineArea) {
 
 			_isOfflineSelectionStarted = true;
 
-			final Rectangle viewPort = _worldPixelViewport;
+			final Rectangle viewPort = _worldPixelTopLeftViewport;
 			final int worldMouseX = viewPort.x + e.x;
 			final int worldMouseY = viewPort.y + e.y;
 
@@ -1555,29 +1584,19 @@ public class Map extends Canvas {
 		}
 	}
 
-//	private PoiToolTip getPoi(final GeoPosition poiGeoPosition) {
-//
-//		if (_poiTT == null) {
-//			_poiTT = new PoiToolTip(getShell());
-//		}
-//
-//		_poiTT.geoPosition = poiGeoPosition;
-//
-//		return _poiTT;
-//	}
-
 	private void onMouseMove(final MouseEvent event) {
 
-		final int devMouseX = event.x;
-		final int devMouseY = event.y;
+		if (_mp == null) {
+			return;
+		}
 
-		_mouseMovePosition.x = devMouseX;
-		_mouseMovePosition.y = devMouseY;
+		_mouseMovePositionX = event.x;
+		_mouseMovePositionY = event.y;
 
 		if (_isSelectOfflineArea) {
 
-			final Rectangle viewPort = _worldPixelViewport;
-			_offlineWorldMouseMove = new Point(viewPort.x + devMouseX, viewPort.y + devMouseY);
+			final Rectangle viewPort = _worldPixelTopLeftViewport;
+			_offlineWorldMouseMove = new Point(viewPort.x + _mouseMovePositionX, viewPort.y + _mouseMovePositionY);
 
 			updateOfflineAreaEndPosition(event);
 
@@ -1593,101 +1612,29 @@ public class Map extends Canvas {
 
 		// #######################################################################
 
-		if (_mp != null) {
+		if (_tourToolTip != null && _tourToolTip.isActive()) {
 
-			final Rectangle worldPixelTopLeftViewPort = _worldPixelViewport;
+			/*
+			 * check if the mouse is within a hovered area
+			 */
+			boolean isContextValid = false;
+			if (_hoveredAreaContext != null) {
 
-			final int worldMouseX = worldPixelTopLeftViewPort.x + _mouseMovePosition.x;
-			final int worldMouseY = worldPixelTopLeftViewPort.y + _mouseMovePosition.y;
+				final int topLeftX = _hoveredAreaContext.hoveredTopLeftX;
+				final int topLeftY = _hoveredAreaContext.hoveredTopLeftY;
 
-			final int tileX = worldMouseX / _tilePixelSize;
-			final int tileY = worldMouseY / _tilePixelSize;
+				if (_mouseMovePositionX >= topLeftX
+						&& _mouseMovePositionX < topLeftX + _hoveredAreaContext.hoveredWidth
+						&& _mouseMovePositionY >= topLeftY
+						&& _mouseMovePositionY < topLeftY + _hoveredAreaContext.hoveredHeight) {
 
-			final int worldTileX = tileX * _tilePixelSize;
-			final int worldTileY = tileY * _tilePixelSize;
-
-//			System.out.println(//
-//					("x:" + devMouseX) //
-//							+ ("\ty:" + devMouseY)
-//							+ ("\ttileX:" + tileX)
-//							+ ("\ttileY:" + tileY)
-//							+ ("\tworldTileX:" + worldTileX)
-//							+ ("\tworldTileY:" + worldTileY)
-//					//
-//					);
-
-			// get tile from the map provider, this also starts the loading of the tile image
-			final Tile tile = _mp.getTile(tileX, tileY, _mapZoomLevel);
-
-			final ArrayList<Rectangle> wpBounds = tile.getWayPointBounds(_mapZoomLevel, _isTourPaintMethodEnhanced);
-			if (wpBounds != null) {
-
-				int wpIndex = 0;
-
-				for (final Rectangle wpBound : wpBounds) {
-
-//					System.out.println(wpBound);
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					final int wpInTileX = wpBound.x;
-					final int wpInTileY = wpBound.y;
-
-					final int mouseInTileX = worldMouseX - (worldTileX + wpInTileX);
-					final int mouseInTileY = worldMouseY - (worldTileY + wpInTileY);
-
-					System.out.println(("x:" + mouseInTileX) + ("\ty:" + mouseInTileY));
-					// TODO remove SYSTEM.OUT.PRINTLN
-
-					if (wpBound.contains(worldMouseX, worldMouseY)) {
-
-						System.out.println("is WP");
-						// TODO remove SYSTEM.OUT.PRINTLN
-
-						break;
-					}
-
-					wpIndex++;
+					isContextValid = true;
 				}
 			}
 
-			System.out.println();
-			System.out.println();
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-//			for (int tilePosX = _tilePosMinX; tilePosX <= _tilePosMaxX; tilePosX++) {
-//				for (int tilePosY = _tilePosMinY; tilePosY <= _tilePosMaxY; tilePosY++) {
-//
-//					// get device rectangle for this tile
-//					final Rectangle devTilePosition = new Rectangle(//
-//							tilePosX * tileSize - _worldViewportX,
-//							tilePosY * tileSize - _worldViewportY,
-//							tileSize,
-//							tileSize);
-//
-//					// check if current tile is within the painting area
-//					if (devTilePosition.intersects(_devVisibleViewport)) {
-//
-//					}
-//				}
-//			}
+			if (isContextValid == false) {
+				updateTourToolTipHoveredArea();
+			}
 		}
 
 //		if (_poiTT != null && (_isPoiPositionInViewport)) {
@@ -1797,21 +1744,30 @@ public class Map extends Canvas {
 			if (_directMapPainter != null) {
 
 				_directMapPainterContext.gc = gc;
-				_directMapPainterContext.viewport = _worldPixelViewport;
+				_directMapPainterContext.viewport = _worldPixelTopLeftViewport;
 
 				_directMapPainter.paint(_directMapPainterContext);
 			}
 
-//				if (_isPoiVisible && _poiTT != null) {
-//					if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
-//						gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
-//					}
+			if (_hoveredAreaContext != null) {
+				final Image hoveredImage = _hoveredAreaContext.hoveredImage;
+				if (hoveredImage != null) {
+					gc.drawImage( //
+							hoveredImage,
+							_hoveredAreaContext.hoveredTopLeftX,
+							_hoveredAreaContext.hoveredTopLeftY);
+				}
+			}
+
+//			if (_isPoiVisible && _poiTT != null) {
+//				if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+//					gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
 //				}
+//			}
 
 			if (_isPaintOfflineArea) {
 				paintOfflineArea(gc);
 			}
-//			}
 		}
 
 //		final double totalTime = (System.nanoTime() - startTime) / 1000000.0;
@@ -1928,8 +1884,8 @@ public class Map extends Canvas {
 				/*
 				 * convert tile world position into device position
 				 */
-				final int devTileX = tilePosX * _tilePixelSize - _worldPixelViewport.x;
-				final int devTileY = tilePosY * _tilePixelSize - _worldPixelViewport.y;
+				final int devTileX = tilePosX * _tilePixelSize - _worldPixelTopLeftViewport.x;
+				final int devTileY = tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y;
 
 				final Rectangle devTileViewport = new Rectangle(devTileX, devTileY, _tilePixelSize, _tilePixelSize);
 
@@ -1966,7 +1922,7 @@ public class Map extends Canvas {
 		final Rectangle imageBounds = legendImage.getBounds();
 
 		// draw legend on bottom left
-		int yPos = _worldPixelViewport.height - 5 - imageBounds.height;
+		int yPos = _worldPixelTopLeftViewport.height - 5 - imageBounds.height;
 		yPos = Math.max(5, yPos);
 
 		final Point legendPosition = new Point(5, yPos);
@@ -1982,7 +1938,7 @@ public class Map extends Canvas {
 	 */
 	private void paintMap30Scale(final GC gc) {
 
-		final int viewPortWidth = _worldPixelViewport.width;
+		final int viewPortWidth = _worldPixelTopLeftViewport.width;
 
 		final int devScaleWidth = viewPortWidth / 3;
 		final float metricWidth = 111.32f / _distanceUnitValue;
@@ -2020,7 +1976,7 @@ public class Map extends Canvas {
 		final int devX1 = viewPortWidth - 5 - devScaleWidth;
 		final int devX2 = devX1 + devScaleWidth;
 
-		int devY = _worldPixelViewport.height - 5 - 3;
+		int devY = _worldPixelTopLeftViewport.height - 5 - 3;
 
 		final int segmentWidth = devScaleWidth / 4;
 
@@ -2353,13 +2309,14 @@ public class Map extends Canvas {
 					// skip tiles from another zoom level
 					if (tile.getZoom() == _mapZoomLevel) {
 
-						// set state that this tile is checked that it contains tours
+						// set state that this tile is checked
 						tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
 						/*
-						 * check if the tour is within the tile
+						 * check if the tour is within the current tile
 						 */
 						boolean isPaintingNeeded = false;
+
 						for (final MapPainter overlayPainter : _overlays) {
 
 							isPaintingNeeded = overlayPainter.isPaintingNeeded(Map.this, tile);
@@ -3545,19 +3502,6 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Gets the current address location of the map
-	 * 
-	 * @param addressLocation
-	 *            the new address location
-	 * @see getAddressLocation()
-	 */
-	public void setAddressLocation(final GeoPosition addressLocation) {
-		_addressLocation = addressLocation;
-		setMapCenterInWorldPixel(_mp.geoToPixel(addressLocation, _mapZoomLevel));
-		queueMapRedraw();
-	}
-
-	/**
 	 * Set map dimming level for the current map factory, this will dimm the map images
 	 * 
 	 * @param mapDimLevel
@@ -3587,6 +3531,17 @@ public class Map extends Canvas {
 		}
 
 		_mapLegend = legend;
+	}
+
+	/**
+	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
+	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
+	 * confuse the user because the map is not displaying the current state.
+	 * 
+	 * @param isLiveView
+	 */
+	public void setLiveView(final boolean isLiveView) {
+		_isLiveView = isLiveView;
 	}
 
 	/*
@@ -3640,17 +3595,6 @@ public class Map extends Canvas {
 //	}
 
 	/**
-	 * When set to <code>false</code>, a loading image is displayed when the tile image is not in
-	 * the cache. When set to <code>true</code> a loading... image is not displayed which can
-	 * confuse the user because the map is not displaying the current state.
-	 * 
-	 * @param isLiveView
-	 */
-	public void setLiveView(final boolean isLiveView) {
-		_isLiveView = isLiveView;
-	}
-
-	/**
 	 * Set the center of the map to a geo position (with lat/long)
 	 * 
 	 * @param geoPosition
@@ -3658,9 +3602,11 @@ public class Map extends Canvas {
 	 */
 	public void setMapCenter(final GeoPosition geoPosition) {
 
+		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
+
 		if (Thread.currentThread() == _displayThread) {
 
-			setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
+			setMapCenterInWorldPixel(newMapCenter);
 
 		} else {
 
@@ -3670,20 +3616,17 @@ public class Map extends Canvas {
 				@Override
 				public void run() {
 					if (!isDisposed()) {
-						setMapCenterInWorldPixel(_mp.geoToPixel(geoPosition, _mapZoomLevel));
+						setMapCenterInWorldPixel(newMapCenter);
 					}
 				}
 			});
 		}
 
 		updateViewPortData();
+		updateTourToolTip();
 
 		queueMapRedraw();
 	}
-
-//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
-//		this._restrictOutsidePanning = restrictOutsidePanning;
-//	}
 
 	/**
 	 * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates. The
@@ -3727,6 +3670,10 @@ public class Map extends Canvas {
 		_mapContextProvider = mapContextProvider;
 	}
 
+//	public void setRestrictOutsidePanning(final boolean restrictOutsidePanning) {
+//		this._restrictOutsidePanning = restrictOutsidePanning;
+//	}
+
 	/**
 	 * Sets the map provider for the map and redraws the map
 	 * 
@@ -3763,6 +3710,29 @@ public class Map extends Canvas {
 		}
 
 		queueMapRedraw();
+	}
+
+	/**
+	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
+	 * position as the previous tile factory
+	 * 
+	 * @param mp
+	 */
+	public synchronized void setMapProviderWithReset(final MP mp) {
+
+		if (_mp != null) {
+			// keep tiles with loading errors that they are not loaded again when the factory has not changed
+			_mp.resetAll(_mp == mp);
+		}
+
+		_mp = mp;
+
+		queueMapRedraw();
+	}
+
+	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
+		_distanceUnitValue = distanceUnitValue;
+		_distanceUnitLabel = distanceUnitLabel;
 	}
 
 //	public void setPoi(final GeoPosition poiPosition, final int zoomLevel, final String poiText) {
@@ -3835,29 +3805,6 @@ public class Map extends Canvas {
 //	}
 
 	/**
-	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
-	 * position as the previous tile factory
-	 * 
-	 * @param mp
-	 */
-	public synchronized void setMapProviderWithReset(final MP mp) {
-
-		if (_mp != null) {
-			// keep tiles with loading errors that they are not loaded again when the factory has not changed
-			_mp.resetAll(_mp == mp);
-		}
-
-		_mp = mp;
-
-		queueMapRedraw();
-	}
-
-	public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
-		_distanceUnitValue = distanceUnitValue;
-		_distanceUnitLabel = distanceUnitLabel;
-	}
-
-	/**
 	 * Set a key to uniquely identify overlays which is used to cache the overlays
 	 * 
 	 * @param key
@@ -3865,13 +3812,6 @@ public class Map extends Canvas {
 	public void setOverlayKey(final String key) {
 		_overlayKey = key;
 	}
-
-//	public void setShowPOI(final boolean isShowPOI) {
-//
-//		_isPoiVisible = isShowPOI;
-//
-//		queueMapRedraw();
-//	}
 
 	/**
 	 * @param isRedrawEnabled
@@ -3903,6 +3843,13 @@ public class Map extends Canvas {
 		queueMapRedraw();
 	}
 
+//	public void setShowPOI(final boolean isShowPOI) {
+//
+//		_isPoiVisible = isShowPOI;
+//
+//		queueMapRedraw();
+//	}
+
 	/**
 	 * Legend will be drawn into the map when the visibility is <code>true</code>
 	 * 
@@ -3921,6 +3868,17 @@ public class Map extends Canvas {
 	 */
 	public void setShowOverlays(final boolean showOverlays) {
 		_isDrawOverlays = showOverlays;
+	}
+
+	public void setShowScale(final boolean isScaleVisible) {
+		_isScaleVisible = isScaleVisible;
+	}
+
+	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+
+		_isTourPaintMethodEnhanced = isEnhanced;
+
+		disposeOverlayImageCache();
 	}
 
 //	private void showPoi(final String poiText) {
@@ -4017,19 +3975,8 @@ public class Map extends Canvas {
 //		setPoiVisible(isVisible);
 //	}
 
-	public void setShowScale(final boolean isScaleVisible) {
-		_isScaleVisible = isScaleVisible;
-	}
-
-	public void setToolTip(final ITourToolTip tourToolTip) {
+	public void setTourToolTip(final TourToolTip tourToolTip) {
 		_tourToolTip = tourToolTip;
-	}
-
-	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
-
-		_isTourPaintMethodEnhanced = isEnhanced;
-
-		disposeOverlayImageCache();
 	}
 
 	/**
@@ -4094,6 +4041,7 @@ public class Map extends Canvas {
 		setMapCenterInWorldPixel(newWorldPixelCenter);
 		updateViewPortData();
 
+		updateTourToolTip();
 //		updatePoiVisibility();
 
 		fireZoomEvent(adjustedZoomLevel);
@@ -4101,14 +4049,186 @@ public class Map extends Canvas {
 
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
-		final int worldMouseX = _worldPixelViewport.x + mouseEvent.x;
-		final int worldMouseY = _worldPixelViewport.y + mouseEvent.y;
+		final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
+		final int worldMouseY = _worldPixelTopLeftViewport.y + mouseEvent.y;
 
 		_offlineDevAreaEnd = new Point(mouseEvent.x, mouseEvent.y);
 		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
 
 		_offlineDevTileEnd = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
 	}
+
+	/**
+	 * Update tour tool tip, this must be done after the view port data are updated
+	 */
+	private void updateTourToolTip() {
+
+		if (_mp != null && _tourToolTip != null && _tourToolTip.isActive()) {
+
+			/*
+			 * redraw must be forced because the hovered area can be the same but can be at a
+			 * different position
+			 */
+			updateTourToolTipHoveredArea();
+
+			_tourToolTip.update();
+		}
+	}
+
+	/**
+	 * Set hovered area context for the current mouse position or <code>null</code> when there a
+	 * tour hovered area (e.g. way point) is not hovered.
+	 * 
+	 * @param isForceRedraw
+	 */
+	private void updateTourToolTipHoveredArea() {
+
+		final HoveredAreaContext oldHoveredContext = _hoveredAreaContext;
+
+		_hoveredAreaContext = _tourToolTip.getHoveredContext(_mouseMovePositionX, _mouseMovePositionY);
+
+		if (_hoveredAreaContext == null) {
+			_hoveredAreaContext = _tourToolTip.getHoveredContext(
+					_mouseMovePositionX,
+					_mouseMovePositionY,
+					_worldPixelTopLeftViewport,
+					_mp,
+					_mapZoomLevel,
+					_tilePixelSize,
+					_isTourPaintMethodEnhanced);
+		}
+
+		if (_hoveredAreaContext != null /* || isForceRedraw */) {
+			redraw();
+		}
+
+		/*
+		 * hide hovered area, this must be done because when a tile do not contain a way point, the
+		 * hovered area can sill be displayed when another position is set with setMapCenter()
+		 */
+		if (oldHoveredContext != null && _hoveredAreaContext == null) {
+
+			// update tool tip because it has it's own mouse move listener for the map
+			_tourToolTip.hideHoveredArea();
+
+			redraw();
+		}
+
+	}
+
+//	/**
+//	 * Set hovered area for the current mouse position or <code>null</code> when there a tour
+//	 * hovered area (e.g. way point) is not hovered.
+//	 *
+//	 * @param isForceRedraw
+//	 */
+//	private void updateTourToolTipHoveredAreaOLD(final boolean isForceRedraw) {
+//
+//		boolean isHovered = false;
+//
+//		final Rectangle worldPixelTopLeftViewPort = _worldPixelTopLeftViewport;
+//
+//		// get mouse world position
+//		final int worldPixelMouseX = worldPixelTopLeftViewPort.x + _mouseMovePositionX;
+//		final int worldPixelMouseY = worldPixelTopLeftViewPort.y + _mouseMovePositionY;
+//
+//		// get tile from mouse position
+//		final int tileX = worldPixelMouseX / _tilePixelSize;
+//		final int tileY = worldPixelMouseY / _tilePixelSize;
+//
+//		final int worldPixelTileX = tileX * _tilePixelSize;
+//		final int worldPixelTileY = tileY * _tilePixelSize;
+//
+//		// get tile from the map provider
+//		final Tile tile = _mp.getTile(tileX, tileY, _mapZoomLevel);
+//
+//		final ArrayList<Rectangle> wayPointBounds = tile.getWayPointBounds(_mapZoomLevel, _isTourPaintMethodEnhanced);
+//		if (wayPointBounds != null) {
+//
+//			// tile contains way points
+//
+//			int wpIndex = 0;
+//
+//			for (final Rectangle wayPointBoundInTile : wayPointBounds) {
+//
+//				final int wpInTileX = wayPointBoundInTile.x;
+//				final int wpInTileY = wayPointBoundInTile.y;
+//
+//				final int worldPixelWayPointX = worldPixelTileX + wpInTileX;
+//				final int worldPixelWayPointY = worldPixelTileY + wpInTileY;
+//
+//				final int mouseInTileX = worldPixelMouseX - worldPixelWayPointX;
+//				final int mouseInTileY = worldPixelMouseY - worldPixelWayPointY;
+//
+//				// check if mouse is within a way point bound (image)
+//				if (mouseInTileX >= 0
+//						&& mouseInTileX <= wayPointBoundInTile.width
+//						&& mouseInTileY >= 0
+//						&& mouseInTileY <= wayPointBoundInTile.height) {
+//
+//					final ArrayList<TourWayPoint> twp = tile.getWayPoints(_mapZoomLevel);
+//					final TourWayPoint hoveredTwp = twp.get(wpIndex);
+//
+//					final int devWayPointX = worldPixelWayPointX - worldPixelTopLeftViewPort.x;
+//					final int devWayPointY = worldPixelWayPointY - worldPixelTopLeftViewPort.y;
+//
+//					_tourToolTip.setHoveredArea(
+//							hoveredTwp,
+//							devWayPointX,
+//							devWayPointY,
+//							wayPointBoundInTile.width,
+//							wayPointBoundInTile.height);
+//
+//					isHovered = true;
+//
+//					if (_hoveredArea != hoveredTwp || isForceRedraw) {
+//
+//						// hovered area has changed
+//
+//						// set hovered area more visible by displaying another image
+//						_hoveredArea = hoveredTwp;
+//						_hoveredTopLeftX = devWayPointX;
+//						_hoveredTopLeftY = devWayPointY;
+//
+//						redraw();
+//					}
+//
+//					break;
+//				}
+//
+//				wpIndex++;
+//			}
+//		}
+//
+//		/*
+//		 * hide hovered area, this must be done because when a tile do not contain a way point, the
+//		 * hovered area can sill be displayed when another position is set with setMapCenter()
+//		 */
+//		if (isHovered == false) {
+//			hideHoveredArea();
+//		}
+//
+////			System.out.println();
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//// TODO remove SYSTEM.OUT.PRINTLN
+//	}
 
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
@@ -4123,12 +4243,12 @@ public class Map extends Canvas {
 			return;
 		}
 
-		_worldPixelViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
+		_worldPixelTopLeftViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
 
 //		System.out.println(_worldPixelMapCenter + "\t" + _worldPixelViewport);
 
-		final int visiblePixelWidth = _worldPixelViewport.width;
-		final int visiblePixelHeight = _worldPixelViewport.height;
+		final int visiblePixelWidth = _worldPixelTopLeftViewport.width;
+		final int visiblePixelHeight = _worldPixelTopLeftViewport.height;
 
 		_devMapViewport = new Rectangle(0, 0, visiblePixelWidth, visiblePixelHeight);
 
@@ -4143,8 +4263,8 @@ public class Map extends Canvas {
 		 * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen
 		 * to the map's origin.
 		 */
-		final int tileOffsetX = (int) Math.floor((double) _worldPixelViewport.x / (double) _tilePixelSize);
-		final int tileOffsetY = (int) Math.floor((double) _worldPixelViewport.y / (double) _tilePixelSize);
+		final int tileOffsetX = (int) Math.floor((double) _worldPixelTopLeftViewport.x / (double) _tilePixelSize);
+		final int tileOffsetY = (int) Math.floor((double) _worldPixelTopLeftViewport.y / (double) _tilePixelSize);
 
 		_tilePosMinX = tileOffsetX;
 		_tilePosMinY = tileOffsetY;

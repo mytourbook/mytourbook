@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.util.ITourToolTip;
 import net.tourbook.util.Util;
 
 import org.eclipse.swt.events.DisposeEvent;
@@ -33,16 +32,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Monitor;
 
-public class TourInfo implements ITourToolTip {
+public class TourInfo_OLD {
 
 	private static final int			HOVER_AREA		= 2;
 
 	/**
 	 * Control for which the tour info is displayed
 	 */
-	protected final Control				_infoControl;
+	private final Control				_infoControl;
 
-	protected final TourInfoToolTip		_tourInfoToolTip;
+	private final TourInfoToolTip		_tourInfoToolTip;
 
 	private final ArrayList<TourData>	_tourDataList	= new ArrayList<TourData>();
 
@@ -54,7 +53,7 @@ public class TourInfo implements ITourToolTip {
 
 	private boolean						_isVisible		= true;
 
-	public class TourInfoToolTip extends TourToolTip {
+	public class TourInfoToolTip extends TourToolTip_OLD {
 
 		public TourInfoToolTip(final Control control) {
 			super(control);
@@ -134,6 +133,9 @@ public class TourInfo implements ITourToolTip {
 
 			final Point location = _infoControl.toDisplay(devX, devY);
 
+			System.out.println(location);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 			return fixupDisplayBounds(tipSize, location);
 		}
 
@@ -149,13 +151,17 @@ public class TourInfo implements ITourToolTip {
 					&& devMouseY >= _devImageY - HOVER_AREA
 					&& devMouseY <= _devImageY + _imageBounds.height + HOVER_AREA) {
 
+				System.out.println(_imageBounds);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 				return _imageBounds;
 			}
 
+			System.out.println();
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 			return null;
 		}
-
-
 
 		@Override
 		protected boolean shouldCreateToolTip(final Event event) {
@@ -169,7 +175,7 @@ public class TourInfo implements ITourToolTip {
 
 	}
 
-	public TourInfo(final Control control) {
+	public TourInfo_OLD(final Control control) {
 
 		_infoControl = control;
 
@@ -191,7 +197,6 @@ public class TourInfo implements ITourToolTip {
 		_tourDataList.clear();
 	}
 
-	@Override
 	public void paint(final GC gc, final Rectangle rectangle) {
 
 		if (_isVisible == false) {
@@ -240,8 +245,4 @@ public class TourInfo implements ITourToolTip {
 		_isVisible = isVisible;
 	}
 
-	@Override
-	public void show(final Point point) {
-
-	}
 }

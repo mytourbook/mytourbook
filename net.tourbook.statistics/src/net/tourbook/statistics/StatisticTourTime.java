@@ -62,7 +62,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private final DateFormat			_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						_chart;
-	private StatisticTourInfo			_tourInfo;
+//	private StatisticTourInfo			_tourInfo;
 
 	private TourTimeData				_tourTimeData;
 
@@ -143,8 +143,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 		// set tour info icon
-		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
-		_chart.setToolTip(_tourInfo);
+//		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
+//		_chart.setToolTip(_tourInfo);
 
 		_chart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, int valueIndex) {
@@ -158,7 +158,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 					}
 
 					_selectedTourId = tourIds[valueIndex];
-					_tourInfo.setTourId(_selectedTourId);
+//					_tourInfo.setTourId(_selectedTourId);
 
 					DataProviderTourTime.getInstance().setSelectedTourId(_selectedTourId);
 					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
@@ -175,7 +175,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				if (tourIds.length > 0) {
 
 					_selectedTourId = tourIds[valueIndex];
-					_tourInfo.setTourId(_selectedTourId);
+//					_tourInfo.setTourId(_selectedTourId);
 
 					DataProviderTourTime.getInstance().setSelectedTourId(_selectedTourId);
 					TourManager.getInstance().openTourInEditor(_selectedTourId);
@@ -197,7 +197,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						if (barChartSelection.serieIndex != -1) {
 
 							_selectedTourId = _tourTimeData.fTourIds[barChartSelection.valueIndex];
-							_tourInfo.setTourId(_selectedTourId);
+//							_tourInfo.setTourId(_selectedTourId);
 
 							TourManager.getInstance().openTourInEditor(_selectedTourId);
 						}
@@ -490,7 +490,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		if (tourIds.length == 0) {
 			_selectedTourId = null;
-			_tourInfo.setTourId(-1);
+//			_tourInfo.setTourId(-1);
 
 			return false;
 		}
@@ -506,7 +506,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				isSelected = true;
 
 				_selectedTourId = tourId;
-				_tourInfo.setTourId(_selectedTourId);
+//				_tourInfo.setTourId(_selectedTourId);
 
 				break;
 			}
@@ -516,7 +516,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			// select first tour
 			selectedTours[0] = true;
 			_selectedTourId = tourIds[0];
-			_tourInfo.setTourId(_selectedTourId);
+//			_tourInfo.setTourId(_selectedTourId);
 		}
 
 		_chart.setSelectedBars(selectedTours);

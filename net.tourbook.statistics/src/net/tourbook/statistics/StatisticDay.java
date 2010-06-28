@@ -86,7 +86,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private boolean						_isSynchScaleEnabled;
 	private ITourEventListener			_tourPropertyListener;
 
-	private StatisticTourInfo			_tourInfo;
+//	private StatisticTourInfo			_tourInfo;
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -192,15 +192,15 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
 		// set tour info icon
-		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
-		_chart.setToolTip(_tourInfo);
+//		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
+//		_chart.setToolTip(_tourInfo);
 
 		_chart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				if (_tourDayData.typeIds.length > 0) {
 
 					_selectedTourId = _tourDayData.tourIds[valueIndex];
-					_tourInfo.setTourId(_selectedTourId);
+//					_tourInfo.setTourId(_selectedTourId);
 
 					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
 				}
@@ -214,7 +214,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
 				_selectedTourId = _tourDayData.tourIds[valueIndex];
-				_tourInfo.setTourId(_selectedTourId);
+//				_tourInfo.setTourId(_selectedTourId);
 
 				TourManager.getInstance().openTourInEditor(_selectedTourId);
 			}
@@ -234,7 +234,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 						if (barChartSelection.serieIndex != -1) {
 
 							_selectedTourId = _tourDayData.tourIds[barChartSelection.valueIndex];
-							_tourInfo.setTourId(_selectedTourId);
+//							_tourInfo.setTourId(_selectedTourId);
 
 							TourManager.getInstance().openTourInEditor(_selectedTourId);
 						}
@@ -644,7 +644,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			if (isTourSelected) {
 				isSelected = true;
 				_selectedTourId = tourId;
-				_tourInfo.setTourId(_selectedTourId);
+//				_tourInfo.setTourId(_selectedTourId);
 			}
 			selectedItems[tourIndex] = isTourSelected;
 		}

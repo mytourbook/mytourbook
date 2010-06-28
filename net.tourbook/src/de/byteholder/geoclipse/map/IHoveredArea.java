@@ -13,30 +13,15 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.util;
+package de.byteholder.geoclipse.map;
 
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Image;
 
-public interface ITourToolTip {
+public interface IHoveredArea {
 
 	/**
-	 * Paints the tool tip icon in the control
-	 * 
-	 * @param gc
-	 * @param rectangle
-	 *            Rectangle where the tool tip can be painted
+	 * @return Returns an image which is displayed when the hovered area is hovered with the mouse.
 	 */
-	public abstract void paint(GC gc, Rectangle rectangle);
-
-	/**
-	 * This method is called when the tool tip control is requesting the tool tip should be
-	 * displayed.
-	 * 
-	 * @param point
-	 *            Position for the mouse pointer
-	 */
-	public abstract void show(Point point);
+	Image getHoveredImage();
 
 }

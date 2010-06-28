@@ -130,7 +130,7 @@ public class TourChart extends Chart {
 
 	private ActionChartOptions				_actionOptions;
 
-	private final TourInfo					_tourInfo;
+	private final TourInfo_OLD					_tourInfo;
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -162,8 +162,8 @@ public class TourChart extends Chart {
 		});
 
 		// set tour info icon into the left axis
-		_tourInfo = new TourInfo(getToolTipControl());
-		setToolTip(_tourInfo);
+		_tourInfo = new TourInfo_OLD(getToolTipControl());
+//		setToolTip(_tourInfo);
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {

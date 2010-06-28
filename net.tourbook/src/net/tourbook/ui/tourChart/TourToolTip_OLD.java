@@ -57,7 +57,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TourToolTip extends ToolTip implements ITourProvider {
+public class TourToolTip_OLD extends ToolTip implements ITourProvider {
 
 	private static final int			SHELL_MARGIN			= 5;
 //	private static final int			MAX_TOOLTIP_WIDTH		= 400;
@@ -153,11 +153,11 @@ public class TourToolTip extends ToolTip implements ITourProvider {
 	private ActionTourToolTipEditTour	_actionEditTour;
 	private ActionTourToolTipEditQuick	_actionEditQuick;
 
-	public TourToolTip(final Control control) {
+	public TourToolTip_OLD(final Control control) {
 		this(control, NO_RECREATE, false);
 	}
 
-	public TourToolTip(final Control control, final int style, final boolean manualActivation) {
+	public TourToolTip_OLD(final Control control, final int style, final boolean manualActivation) {
 		super(control, style, manualActivation);
 	}
 

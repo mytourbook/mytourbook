@@ -17,7 +17,7 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
-import net.tourbook.util.ITourToolTip;
+import net.tourbook.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -56,7 +56,7 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private boolean						_isLeft;
 
-	private ITourToolTip				_chartToolTip;
+	private ITourToolTipProvider		_chartToolTip;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
@@ -316,7 +316,7 @@ public class ChartComponentAxis extends Canvas {
 		onResize();
 	}
 
-	void setToolTip(final ITourToolTip chartToolTip) {
+	void setToolTip(final ITourToolTipProvider chartToolTip) {
 		_chartToolTip = chartToolTip;
 	}
 }

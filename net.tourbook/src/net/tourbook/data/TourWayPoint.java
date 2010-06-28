@@ -22,12 +22,19 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.mapping.Messages;
 import net.tourbook.util.StatusUtil;
+
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
+
+import de.byteholder.geoclipse.map.IHoveredArea;
 import de.byteholder.gpx.GeoPosition;
 
 @Entity
-public class TourWayPoint implements Cloneable, Comparable<Object> {
+public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
 	public static final int	DB_LENGTH_NAME			= 1024;
 	public static final int	DB_LENGTH_DESCRIPTION	= 4096;
@@ -76,6 +83,9 @@ public class TourWayPoint implements Cloneable, Comparable<Object> {
 	 */
 	@Transient
 	private long			_createId				= 0;
+
+	@Transient
+	private static Image	_twpHoveredImage;
 
 	/**
 	 * manually created way points or imported way points create a unique id to identify them, saved
@@ -202,6 +212,24 @@ public class TourWayPoint implements Cloneable, Comparable<Object> {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public Image getHoveredImage() {
+
+		if (_twpHoveredImage != null) {
+			return _twpHoveredImage;
+		}
+
+		final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
+
+		imageRegistry.put(
+				Messages.Image_Map_WayPoint_Hovered,
+				TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint_Hovered));
+
+		_twpHoveredImage = imageRegistry.get(Messages.Image_Map_WayPoint_Hovered);
+
+		return _twpHoveredImage;
 	}
 
 	public double getLatitude() {

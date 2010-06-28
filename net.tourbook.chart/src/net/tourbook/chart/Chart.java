@@ -18,7 +18,7 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.tourbook.util.ITourToolTip;
+import net.tourbook.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -1117,7 +1117,7 @@ public class Chart extends ViewForm {
 		_isFillToolbar = isFillToolbar;
 	}
 
-	public void setToolTip(final ITourToolTip tourToolTip) {
+	public void setToolTip(final ITourToolTipProvider tourToolTip) {
 
 		// set tour info icon into the left axis
 		getToolTipControl().setToolTip(tourToolTip);

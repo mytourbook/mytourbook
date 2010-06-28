@@ -7,9 +7,15 @@ Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: joda-time-1.5.2.jar,
  c3p0-0.9.1.2.jar,
  xpp3_min-1.1.4c.jar,
- xstream-1.3.1.jar
+ xstream-1.3.1.jar,
+ edtftpj.jar
 Bundle-Vendor: MyTourbook
-Export-Package: com.mchange,
+Export-Package: com.enterprisedt,
+ com.enterprisedt.net.ftp,
+ com.enterprisedt.net.ftp.internal,
+ com.enterprisedt.net.ftp.test,
+ com.enterprisedt.util.debug,
+ com.mchange,
  com.mchange.lang,
  com.mchange.util,
  com.mchange.v1,

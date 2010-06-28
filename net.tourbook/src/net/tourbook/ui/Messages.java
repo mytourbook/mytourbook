@@ -218,6 +218,16 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
+	public static String	Tooltip_WayPoint_Label_Category;
+
+	public static String	Tooltip_WayPoint_Label_Comment;
+
+	public static String	Tooltip_WayPoint_Label_Description;
+
+	public static String	Tooltip_WayPoint_Label_Name;
+
+	public static String	Tooltip_WayPoint_Label_Symbol;
+
 	public static String		Tour_Tooltip_Format_Date;
 	public static String		Tour_Tooltip_Format_DateWeekTime;
 	public static String		Tour_Tooltip_Format_Pace;

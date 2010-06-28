@@ -172,6 +172,12 @@ public class Tile extends Observable {
 	@SuppressWarnings("unchecked")
 	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 
+	/**
+	 * Contains the {@link TourWayPoint}'s which are displayed in this tile.
+	 * <p>
+	 * {@link #_twpSimpleBounds} and {@link #_twpPartBounds} contains the rectangles in the same
+	 * sequence as {@link #_twp}.
+	 */
 	@SuppressWarnings("unchecked")
 	private ArrayList<TourWayPoint>[]		_twp				= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
 	@SuppressWarnings("unchecked")
@@ -302,30 +308,49 @@ public class Tile extends Observable {
 		super.addObserver(o);
 	}
 
+	/**
+	 * @param twp
+	 * @param twpBounds
+	 *            Hovered area for the tour way point.
+	 *            <p>
+	 *            <i>x/y</i> is the top left corner within the control, <br>
+	 *            <i>width/height</i> is the dimension for the hovered area which is the size of the
+	 *            painted image
+	 * @param zoomLevel
+	 * @param parts
+	 */
 	public void addTourWayPointBounds(	final TourWayPoint twp,
-										final int x,
-										final int y,
-										final int width,
-										final int height,
+										final Rectangle twpBounds,
 										final int zoomLevel,
 										final int parts) {
+//	public void addTourWayPointBounds(	final TourWayPoint twp,
+//										final int x,
+//										final int y,
+//										final int width,
+//										final int height,
+//										final int zoomLevel,
+//										final int parts) {
+//		final Rectangle twpBounds = new Rectangle(x, y, width, height);
 
 		if (_markerBounds[zoomLevel] == null) {
 			initBounds(zoomLevel);
 		}
 
-		final Rectangle twpBounds = new Rectangle(x, y, width, height);
-
 		final ArrayList<TourWayPoint> twpList = _twp[zoomLevel];
 
 		if (twpList.contains(twp) == false) {
 
-			twpList.add(twp);
+			/*
+			 * The way point is set at the beginning of the list because further way point could
+			 * overpaint the current. So the later painted way point can be not covered by another
+			 * and the tooltips are displayed accordingly.
+			 */
+			twpList.add(0, twp);
 
 			if (parts == 1) {
-				_twpSimpleBounds[zoomLevel].add(twpBounds);
+				_twpSimpleBounds[zoomLevel].add(0, twpBounds);
 			} else {
-				_twpPartBounds[zoomLevel].add(twpBounds);
+				_twpPartBounds[zoomLevel].add(0, twpBounds);
 			}
 		}
 	}
@@ -678,16 +703,16 @@ public class Tile extends Observable {
 		return _timeEndLoading;
 	}
 
-	public long getTimeIsQueued() {
-		return _timeIsQueued;
-	}
-
 //	/**
 //	 * @return Returns <code>true</code> when this tile is a child of another tile
 //	 */
 //	public boolean isChildTile() {
 //		return fParentTile != null;
 //	}
+
+	public long getTimeIsQueued() {
+		return _timeIsQueued;
+	}
 
 	public long getTimeStartLoading() {
 		return _timeStartLoading;
@@ -715,6 +740,10 @@ public class Tile extends Observable {
 		}
 
 		return _twpSimpleBounds[mapZoomLevel];
+	}
+
+	public ArrayList<TourWayPoint> getWayPoints(final int _mapZoomLevel) {
+		return _twp[_mapZoomLevel];
 	}
 
 	/**
