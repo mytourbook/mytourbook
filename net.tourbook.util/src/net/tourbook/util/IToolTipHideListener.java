@@ -13,29 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.util;
 
-import net.tourbook.application.TourbookPlugin;
+import org.eclipse.swt.widgets.Event;
 
-import org.eclipse.jface.action.Action;
+public interface IToolTipHideListener {
 
-public class ActionShowTourInfoInMap extends Action {
-
-	private final TourMapView	_mapView;
-
-	public ActionShowTourInfoInMap(final TourMapView mapView) {
-
-		super(null, AS_CHECK_BOX);
-
-		_mapView = mapView;
-
-		setText(Messages.Map_Action_ShowTourInfoInMap);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.ui.Messages.Image_ToolTip_TourInfo));
-	}
-
-	@Override
-	public void run() {
-		_mapView.actionSetShowTourInfoInMap();
-	}
+	void afterHideToolTip(Event event);
 
 }

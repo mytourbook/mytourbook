@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.TourToolTip;
+import net.tourbook.util.HoveredAreaContext;
 import net.tourbook.util.ITourToolTipProvider;
+import net.tourbook.util.TourToolTip;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -40,13 +41,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
-import de.byteholder.geoclipse.map.HoveredAreaContext;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
 
-//	private TourToolTip		_tourToolTip;
+	private TourToolTip		_tourToolTip;
 
 	private Color			_bgColor;
 	private Color			_fgColor;
@@ -56,6 +56,12 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 	public WayPointToolTipProvider() {
 //		_tourToolTip = tourToolTip;
+	}
+
+	@Override
+	public void afterHideToolTip() {
+
+		_hoveredWayPoint = null;
 	}
 
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
@@ -174,7 +180,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	}
 
 	@Override
-	public HoveredAreaContext getHoveredContext(	final int mousePositionX,
+	public HoveredAreaContext getHoveredContext(final int mousePositionX,
 												final int mousePositionY,
 												final Rectangle worldPixelTopLeftViewPort,
 												final MP mp,
@@ -253,6 +259,11 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	@Override
 	public void paint(final GC gc, final Rectangle rectangle) {
 		// painting is done in the TourPainter
+	}
+
+	@Override
+	public void setTourToolTip(final TourToolTip tourToolTip) {
+		_tourToolTip = tourToolTip;
 	}
 
 	@Override

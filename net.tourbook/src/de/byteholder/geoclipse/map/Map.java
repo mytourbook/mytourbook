@@ -40,8 +40,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.TourToolTip;
+import net.tourbook.ui.IInfoToolTipProvider;
+import net.tourbook.ui.IMapToolTipProvider;
+import net.tourbook.util.HoveredAreaContext;
+import net.tourbook.util.IToolTipHideListener;
+import net.tourbook.util.ITourToolTipProvider;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.TourToolTip;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -76,6 +81,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.TraverseEvent;
@@ -270,7 +276,7 @@ public class Map extends Canvas {
 	private boolean								_isMapPanned;
 
 	private int									_mouseMovePositionX							= Integer.MIN_VALUE;
-	private int									_mouseMovePositionY							= 0;
+	private int									_mouseMovePositionY							= Integer.MIN_VALUE;
 	private Point								_mouseDownPosition;
 
 	private Thread								_overlayThread;
@@ -470,9 +476,6 @@ public class Map extends Canvas {
 
 	private HoveredAreaContext					_hoveredAreaContext;
 
-//	private int									_hoveredTopLeftX;
-//	private int									_hoveredTopLeftY;
-
 	// used to pan using the arrow keys
 	private class KeyMapListener extends KeyAdapter {
 
@@ -573,6 +576,7 @@ public class Map extends Canvas {
 		public void mouseUp(final MouseEvent e) {
 			onMouseUp(e);
 		}
+
 	}
 
 	/**
@@ -728,8 +732,24 @@ public class Map extends Canvas {
 
 		final MouseMapListener mouseListener = new MouseMapListener();
 		addMouseListener(mouseListener);
-		addMouseMoveListener(mouseListener);
 		addListener(SWT.MouseWheel, mouseListener);
+
+		addMouseMoveListener(mouseListener);
+		addMouseTrackListener(new MouseTrackListener() {
+
+			@Override
+			public void mouseEnter(final MouseEvent e) {}
+
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				// set position out of the map that to tool tip is not activated again
+				_mouseMovePositionX = Integer.MIN_VALUE;
+				_mouseMovePositionY = Integer.MIN_VALUE;
+			}
+
+			@Override
+			public void mouseHover(final MouseEvent e) {}
+		});
 
 		addKeyListener(new KeyMapListener());
 
@@ -3976,7 +3996,19 @@ public class Map extends Canvas {
 //	}
 
 	public void setTourToolTip(final TourToolTip tourToolTip) {
+
 		_tourToolTip = tourToolTip;
+
+		tourToolTip.addHideListener(new IToolTipHideListener() {
+			@Override
+			public void afterHideToolTip(final Event event) {
+
+				// hide hovered area
+				_hoveredAreaContext = null;
+
+				redraw();
+			}
+		});
 	}
 
 	/**
@@ -3993,6 +4025,9 @@ public class Map extends Canvas {
 		if (_mp == null) {
 			return;
 		}
+
+//		System.out.println(_mouseMovePositionX);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * check if the requested zoom level is within the bounds of the map provider
@@ -4084,21 +4119,60 @@ public class Map extends Canvas {
 	private void updateTourToolTipHoveredArea() {
 
 		final HoveredAreaContext oldHoveredContext = _hoveredAreaContext;
+		HoveredAreaContext newHoveredContext = null;
 
-		_hoveredAreaContext = _tourToolTip.getHoveredContext(_mouseMovePositionX, _mouseMovePositionY);
+		final ArrayList<ITourToolTipProvider> toolTipProvider = _tourToolTip.getToolTipProvider();
 
-		if (_hoveredAreaContext == null) {
-			_hoveredAreaContext = _tourToolTip.getHoveredContext(
-					_mouseMovePositionX,
-					_mouseMovePositionY,
-					_worldPixelTopLeftViewport,
-					_mp,
-					_mapZoomLevel,
-					_tilePixelSize,
-					_isTourPaintMethodEnhanced);
+		/*
+		 * check tour info tool tip provider as first
+		 */
+		for (final ITourToolTipProvider tttProvider : toolTipProvider) {
+
+			if (tttProvider instanceof IInfoToolTipProvider) {
+
+				final HoveredAreaContext hoveredContext = ((IInfoToolTipProvider) tttProvider).getHoveredContext(
+						_mouseMovePositionX,
+						_mouseMovePositionY);
+
+				if (hoveredContext != null) {
+					newHoveredContext = hoveredContext;
+					break;
+				}
+			}
 		}
 
-		if (_hoveredAreaContext != null /* || isForceRedraw */) {
+		/*
+		 * check map tool tip provider as second
+		 */
+		if (newHoveredContext == null) {
+
+			for (final ITourToolTipProvider tttProvider : toolTipProvider) {
+
+				if (tttProvider instanceof IMapToolTipProvider) {
+
+					final HoveredAreaContext hoveredContext = ((IMapToolTipProvider) tttProvider).getHoveredContext(
+							_mouseMovePositionX,
+							_mouseMovePositionY,
+							_worldPixelTopLeftViewport,
+							_mp,
+							_mapZoomLevel,
+							_tilePixelSize,
+							_isTourPaintMethodEnhanced);
+
+					if (hoveredContext != null) {
+						newHoveredContext = hoveredContext;
+						break;
+					}
+				}
+			}
+		}
+
+		_hoveredAreaContext = newHoveredContext;
+
+		// update tool tip control
+		_tourToolTip.setHoveredContext(_hoveredAreaContext);
+
+		if (_hoveredAreaContext != null) {
 			redraw();
 		}
 
@@ -4116,98 +4190,6 @@ public class Map extends Canvas {
 
 	}
 
-//	/**
-//	 * Set hovered area for the current mouse position or <code>null</code> when there a tour
-//	 * hovered area (e.g. way point) is not hovered.
-//	 *
-//	 * @param isForceRedraw
-//	 */
-//	private void updateTourToolTipHoveredAreaOLD(final boolean isForceRedraw) {
-//
-//		boolean isHovered = false;
-//
-//		final Rectangle worldPixelTopLeftViewPort = _worldPixelTopLeftViewport;
-//
-//		// get mouse world position
-//		final int worldPixelMouseX = worldPixelTopLeftViewPort.x + _mouseMovePositionX;
-//		final int worldPixelMouseY = worldPixelTopLeftViewPort.y + _mouseMovePositionY;
-//
-//		// get tile from mouse position
-//		final int tileX = worldPixelMouseX / _tilePixelSize;
-//		final int tileY = worldPixelMouseY / _tilePixelSize;
-//
-//		final int worldPixelTileX = tileX * _tilePixelSize;
-//		final int worldPixelTileY = tileY * _tilePixelSize;
-//
-//		// get tile from the map provider
-//		final Tile tile = _mp.getTile(tileX, tileY, _mapZoomLevel);
-//
-//		final ArrayList<Rectangle> wayPointBounds = tile.getWayPointBounds(_mapZoomLevel, _isTourPaintMethodEnhanced);
-//		if (wayPointBounds != null) {
-//
-//			// tile contains way points
-//
-//			int wpIndex = 0;
-//
-//			for (final Rectangle wayPointBoundInTile : wayPointBounds) {
-//
-//				final int wpInTileX = wayPointBoundInTile.x;
-//				final int wpInTileY = wayPointBoundInTile.y;
-//
-//				final int worldPixelWayPointX = worldPixelTileX + wpInTileX;
-//				final int worldPixelWayPointY = worldPixelTileY + wpInTileY;
-//
-//				final int mouseInTileX = worldPixelMouseX - worldPixelWayPointX;
-//				final int mouseInTileY = worldPixelMouseY - worldPixelWayPointY;
-//
-//				// check if mouse is within a way point bound (image)
-//				if (mouseInTileX >= 0
-//						&& mouseInTileX <= wayPointBoundInTile.width
-//						&& mouseInTileY >= 0
-//						&& mouseInTileY <= wayPointBoundInTile.height) {
-//
-//					final ArrayList<TourWayPoint> twp = tile.getWayPoints(_mapZoomLevel);
-//					final TourWayPoint hoveredTwp = twp.get(wpIndex);
-//
-//					final int devWayPointX = worldPixelWayPointX - worldPixelTopLeftViewPort.x;
-//					final int devWayPointY = worldPixelWayPointY - worldPixelTopLeftViewPort.y;
-//
-//					_tourToolTip.setHoveredArea(
-//							hoveredTwp,
-//							devWayPointX,
-//							devWayPointY,
-//							wayPointBoundInTile.width,
-//							wayPointBoundInTile.height);
-//
-//					isHovered = true;
-//
-//					if (_hoveredArea != hoveredTwp || isForceRedraw) {
-//
-//						// hovered area has changed
-//
-//						// set hovered area more visible by displaying another image
-//						_hoveredArea = hoveredTwp;
-//						_hoveredTopLeftX = devWayPointX;
-//						_hoveredTopLeftY = devWayPointY;
-//
-//						redraw();
-//					}
-//
-//					break;
-//				}
-//
-//				wpIndex++;
-//			}
-//		}
-//
-//		/*
-//		 * hide hovered area, this must be done because when a tile do not contain a way point, the
-//		 * hovered area can sill be displayed when another position is set with setMapCenter()
-//		 */
-//		if (isHovered == false) {
-//			hideHoveredArea();
-//		}
-//
 ////			System.out.println();
 //// TODO remove SYSTEM.OUT.PRINTLN
 //// TODO remove SYSTEM.OUT.PRINTLN

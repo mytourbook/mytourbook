@@ -25,12 +25,12 @@ import javax.persistence.Transient;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.mapping.Messages;
+import net.tourbook.util.IHoveredArea;
 import net.tourbook.util.StatusUtil;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
-import de.byteholder.geoclipse.map.IHoveredArea;
 import de.byteholder.gpx.GeoPosition;
 
 @Entity

@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.tour;
 
 import java.util.ArrayList;
 
@@ -213,29 +213,29 @@ public class TourInfo_OLD {
 		_tourInfoToolTip.setActionsEnabled(isEnabled);
 	}
 
-	public void setTourData(final TourData tourData) {
-
-		if (tourData == null) {
-			_tourDataList.clear();
-			return;
-		}
-
-		// populate list
-		_tourDataList.clear();
-		_tourDataList.add(tourData);
-
-		_tourInfoToolTip.setTourData(_tourDataList);
-	}
-
-	public void setTourDataList(final ArrayList<TourData> tourDataList) {
-
-		if (tourDataList == null || tourDataList.size() == 0) {
-			_tourDataList.clear();
-			return;
-		}
-
-		_tourInfoToolTip.setTourData(tourDataList);
-	}
+//	public void setTourData(final TourData tourData) {
+//
+//		if (tourData == null) {
+//			_tourDataList.clear();
+//			return;
+//		}
+//
+//		// populate list
+//		_tourDataList.clear();
+//		_tourDataList.add(tourData);
+//
+//		_tourInfoToolTip.setTourData(_tourDataList);
+//	}
+//
+//	public void setTourDataList(final ArrayList<TourData> tourDataList) {
+//
+//		if (tourDataList == null || tourDataList.size() == 0) {
+//			_tourDataList.clear();
+//			return;
+//		}
+//
+//		_tourInfoToolTip.setTourData(tourDataList);
+//	}
 
 	public void setTourId(final long tourId) {
 		_tourInfoToolTip.setTourId(tourId);

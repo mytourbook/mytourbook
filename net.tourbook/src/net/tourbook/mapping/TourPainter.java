@@ -58,8 +58,6 @@ public class TourPainter extends MapPainter {
 	private static final int				MARKER_MARGIN		= 2;
 	private static final int				MARKER_POLE			= 16;
 
-//	private static TourPainter				_instance;
-
 	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
@@ -333,15 +331,6 @@ public class TourPainter extends MapPainter {
 		_colorCache.dispose();
 		textBorderColor.dispose();
 	}
-
-//	public static TourPainter getInstance() {
-//
-//		if (_instance == null) {
-//			_instance = new TourPainter();
-//		}
-//
-//		return _instance;
-//	}
 
 	/**
 	 * @param legendConfig

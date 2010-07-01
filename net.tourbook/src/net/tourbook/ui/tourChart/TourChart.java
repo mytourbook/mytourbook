@@ -37,6 +37,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourInfo_OLD;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
@@ -1434,7 +1435,7 @@ public class TourChart extends Chart {
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-		_tourInfo.setTourData(_tourData);
+//		_tourInfo.setTourData(_tourData);
 	}
 
 	/**

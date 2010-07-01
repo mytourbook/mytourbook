@@ -12,7 +12,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import de.byteholder.geoclipse.map.HoveredAreaContext;
+import net.tourbook.util.HoveredAreaContext;
 
 public interface IInfoToolTipProvider {
 

@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.tour;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
@@ -313,8 +312,8 @@ public class TourToolTip_OLD extends ToolTip implements ITourProvider {
 		/*
 		 * create actions
 		 */
-		_actionEditTour = new ActionTourToolTipEditTour(this);
-		_actionEditQuick = new ActionTourToolTipEditQuick(this);
+//		_actionEditTour = new ActionTourToolTipEditTour(this);
+//		_actionEditQuick = new ActionTourToolTipEditQuick(this);
 
 		/*
 		 * create toolbar

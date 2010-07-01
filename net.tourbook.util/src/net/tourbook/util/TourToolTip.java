@@ -13,12 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.util;
 
 import java.util.ArrayList;
 
-import net.tourbook.util.ITourToolTipProvider;
-
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -28,26 +27,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Monitor;
 
-import de.byteholder.geoclipse.map.HoveredAreaContext;
-import de.byteholder.geoclipse.mapprovider.MP;
-
 public class TourToolTip extends ToolTip {
 
 	public static final int					SHELL_MARGIN			= 5;
 
 	private ArrayList<ITourToolTipProvider>	_tourToolTipProvider	= new ArrayList<ITourToolTipProvider>();
 
-//	private ITourToolTipProvider			_hoveredTTTProvider;
+	private final ListenerList				_hideListeners			= new ListenerList(ListenerList.IDENTITY);
 
 	private Control							_toolTipControl;
 
 	private HoveredAreaContext				_hoveredContext;
-
-//	private Object							_hoveredArea;
-//	private int								_hoveredTopLeftX;
-//	private int								_hoveredTopLeftY;
-//	private int								_hoveredWidth;
-//	private int								_hoveredHeight;
 
 	public TourToolTip(final Control control) {
 
@@ -56,8 +46,39 @@ public class TourToolTip extends ToolTip {
 		_toolTipControl = control;
 	}
 
+	/**
+	 * Add a tool tip hide listener which is called when the tool tip was hidden.
+	 * <p>
+	 * This is helpfull to hide the hovered area when the mouse is not within the tool tip control
+	 * but leaves the tool tip window.
+	 * 
+	 * @param hideListener
+	 */
+	public void addHideListener(final IToolTipHideListener hideListener) {
+		_hideListeners.add(hideListener);
+	}
+
 	public void addToolTipProvider(final ITourToolTipProvider tourToolTipProvider) {
+
 		_tourToolTipProvider.add(tourToolTipProvider);
+
+		// tell the provider the tool tip parent
+		tourToolTipProvider.setTourToolTip(this);
+	}
+
+	@Override
+	protected void afterHideToolTip(final Event event) {
+
+		for (final ITourToolTipProvider tttProvider : _tourToolTipProvider) {
+			tttProvider.afterHideToolTip();
+		}
+
+		final Object[] listeners = _hideListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			((IToolTipHideListener) listeners[i]).afterHideToolTip(event);
+		}
+
+		_hoveredContext = null;
 	}
 
 	@Override
@@ -141,59 +162,6 @@ public class TourToolTip extends ToolTip {
 		return ttTopLeft;
 	}
 
-	public HoveredAreaContext getHoveredContext(final int mouseMovePositionX, final int mouseMovePositionY) {
-
-		for (final ITourToolTipProvider tttProvider : _tourToolTipProvider) {
-
-			if (tttProvider instanceof IInfoToolTipProvider) {
-
-				final IInfoToolTipProvider mapTTProvider = (IInfoToolTipProvider) tttProvider;
-
-				final HoveredAreaContext hoveredContext = mapTTProvider.getHoveredContext(
-						mouseMovePositionX,
-						mouseMovePositionY);
-
-				if (hoveredContext != null) {
-					return _hoveredContext = hoveredContext;
-				}
-			}
-		}
-
-		return _hoveredContext = null;
-	}
-
-	public HoveredAreaContext getHoveredContext(	final int mouseMovePositionX,
-												final int mouseMovePositionY,
-												final Rectangle worldPixelTopLeftViewport,
-												final MP mp,
-												final int mapZoomLevel,
-												final int tilePixelSize,
-												final boolean isTourPaintMethodEnhanced) {
-
-		for (final ITourToolTipProvider tttProvider : _tourToolTipProvider) {
-
-			if (tttProvider instanceof IMapToolTipProvider) {
-
-				final IMapToolTipProvider mapTTProvider = (IMapToolTipProvider) tttProvider;
-
-				final HoveredAreaContext hoveredContext = mapTTProvider.getHoveredContext(
-						mouseMovePositionX,
-						mouseMovePositionY,
-						worldPixelTopLeftViewport,
-						mp,
-						mapZoomLevel,
-						tilePixelSize,
-						isTourPaintMethodEnhanced);
-
-				if (hoveredContext != null) {
-					return _hoveredContext = hoveredContext;
-				}
-			}
-		}
-
-		return _hoveredContext = null;
-	}
-
 	@Override
 	public Point getLocation(final Point tipSize, final Event event) {
 
@@ -212,10 +180,14 @@ public class TourToolTip extends ToolTip {
 	@Override
 	protected Object getToolTipArea(final Event event) {
 
-//		System.out.println("getToolTipArea()\t" + _hoveredArea);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		return _hoveredContext;
+	}
+
+	/**
+	 * @return Returns the tool tip provider which are attached to the tour tool tip.
+	 */
+	public ArrayList<ITourToolTipProvider> getToolTipProvider() {
+		return _tourToolTipProvider;
 	}
 
 	/**
@@ -233,7 +205,7 @@ public class TourToolTip extends ToolTip {
 	}
 
 	/**
-	 * Paints the tool tip icon in the control
+	 * Paints the tool tip icons into the control
 	 * 
 	 * @param gc
 	 * @param clientArea
@@ -245,33 +217,15 @@ public class TourToolTip extends ToolTip {
 		}
 	}
 
-//	public void setHoveredArea(	final Object hoveredArea,
-//								final int devX,
-//								final int devY,
-//								final int width,
-//								final int height) {
-//
-//		_hoveredArea = hoveredArea;
-//		_hoveredTopLeftX = devX;
-//		_hoveredTopLeftY = devY;
-//		_hoveredWidth = width;
-//		_hoveredHeight = height;
-//
-//		/*
-//		 * get tool tip provider which supports the hovered area
-//		 */
-//		for (final ITourToolTipProvider ttProvider : _tourToolTipProvider) {
-//			if (ttProvider.isHoveredAreaSupported(hoveredArea)) {
-//				_hoveredTTTProvider = ttProvider;
-//				return;
-//			}
-//		}
-//
-//		_hoveredTTTProvider = null;
-//	}
-
 	public void removeToolTipProvider(final ITourToolTipProvider tourToolTipProvider) {
+
 		_tourToolTipProvider.remove(tourToolTipProvider);
+
+		tourToolTipProvider.setTourToolTip(null);
+	}
+
+	public void setHoveredContext(final HoveredAreaContext hoveredAreaContext) {
+		_hoveredContext = hoveredAreaContext;
 	}
 
 	/**

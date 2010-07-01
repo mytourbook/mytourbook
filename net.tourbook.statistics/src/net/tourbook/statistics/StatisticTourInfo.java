@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import net.tourbook.mapping.TourInfoToolTipProvider;
+import net.tourbook.tour.TourInfoToolTipProvider;
 
 public class StatisticTourInfo extends TourInfoToolTipProvider {
 

@@ -27,19 +27,16 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
-	public static String	ColumnFactory_altitude_down_computed_label;
-
-	public static String	ColumnFactory_altitude_down_computed_tooltip;
-
+	public static String		ColumnFactory_altitude_down_computed_label;
+	public static String		ColumnFactory_altitude_down_computed_tooltip;
 	public static String		ColumnFactory_altitude_down_h_label;
 	public static String		ColumnFactory_altitude_down_h_tooltip;
 	public static String		ColumnFactory_altitude_down_label;
 	public static String		ColumnFactory_altitude_down_tooltip;
 	public static String		ColumnFactory_altitude_label;
 	public static String		ColumnFactory_altitude_tooltip;
-	public static String	ColumnFactory_altitude_up_computed_label;
-
-	public static String	ColumnFactory_altitude_up_computed_tooltip;
+	public static String		ColumnFactory_altitude_up_computed_label;
+	public static String		ColumnFactory_altitude_up_computed_tooltip;
 
 	public static String		ColumnFactory_altitude_up_h_label;
 	public static String		ColumnFactory_altitude_up_h_tooltip;
@@ -176,9 +173,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
 
-	public static String	ColumnFactory_Id_Label;
+	public static String		ColumnFactory_Id_Label;
 
-	public static String	ColumnFactory_Id_Tooltip;
+	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
@@ -189,9 +186,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Tour_WeekDay_Label;
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
 
-	public static String	ColumnFactory_TourPerson;
+	public static String		ColumnFactory_TourPerson;
 
-	public static String	ColumnFactory_TourPerson_Tooltip;
+	public static String		ColumnFactory_TourPerson_Tooltip;
 	public static String		ColumnFactory_TourWeekYear_Header;
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
@@ -210,6 +207,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Waypoint_Time_Unit;
 
 	public static String		Image_configure_columns;
+	public static String		Image_ToolTip_TourInfo;
+	public static String		Image_ToolTip_TourInfo_Hovered;
 
 	public static String		message_manager_pErrorSummary;
 	public static String		message_manager_pMessageSummary;
@@ -218,62 +217,47 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
-	public static String	Tooltip_WayPoint_Label_Category;
-
-	public static String	Tooltip_WayPoint_Label_Comment;
-
-	public static String	Tooltip_WayPoint_Label_Description;
-
-	public static String	Tooltip_WayPoint_Label_Name;
-
-	public static String	Tooltip_WayPoint_Label_Symbol;
+	public static String		Tooltip_WayPoint_Label_Category;
+	public static String		Tooltip_WayPoint_Label_Comment;
+	public static String		Tooltip_WayPoint_Label_Description;
+	public static String		Tooltip_WayPoint_Label_Name;
+	public static String		Tooltip_WayPoint_Label_Symbol;
 
 	public static String		Tour_Tooltip_Format_Date;
 	public static String		Tour_Tooltip_Format_DateWeekTime;
 	public static String		Tour_Tooltip_Format_Pace;
 	public static String		Tour_Tooltip_Format_WindDirection;
+	public static String		Tour_Tooltip_Format_WindDirectionUnit;
 
-	public static String	Tour_Tooltip_Format_WindDirectionUnit;
-
-	public static String	Tour_Tooltip_Format_WindSpeedUnit;
+	public static String		Tour_Tooltip_Format_WindSpeedUnit;
 	public static String		Tour_Tooltip_Label_AltitudeDown;
 	public static String		Tour_Tooltip_Label_AltitudeUp;
-	public static String	Tour_Tooltip_Label_AvgCadence;
-
+	public static String		Tour_Tooltip_Label_AvgCadence;
 	public static String		Tour_Tooltip_Label_AvgPace;
-
-	public static String	Tour_Tooltip_Label_AvgPulse;
+	public static String		Tour_Tooltip_Label_AvgPulse;
 	public static String		Tour_Tooltip_Label_AvgSpeed;
 	public static String		Tour_Tooltip_Label_BreakTime;
-	public static String	Tour_Tooltip_Label_Calories;
-
+	public static String		Tour_Tooltip_Label_Calories;
 	public static String		Tour_Tooltip_Label_Clouds;
 	public static String		Tour_Tooltip_Label_Date;
-
-	public static String	Tour_Tooltip_Label_DateTimeCreated;
-
-	public static String	Tour_Tooltip_Label_DateTimeModified;
-
-	public static String	Tour_Tooltip_Label_Description;
+	public static String		Tour_Tooltip_Label_DateTimeCreated;
+	public static String		Tour_Tooltip_Label_DateTimeModified;
+	public static String		Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
 	public static String		Tour_Tooltip_Label_Hour;
 	public static String		Tour_Tooltip_Label_MovingTime;
-
-	public static String	Tour_Tooltip_Label_NoTour;
+	public static String		Tour_Tooltip_Label_NoTour;
 	public static String		Tour_Tooltip_Label_RecordingTime;
-
-	public static String	Tour_Tooltip_Label_RestPulse;
+	public static String		Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
 	public static String		Tour_Tooltip_Label_TourType;
 	public static String		Tour_Tooltip_Label_WindDirection;
 	public static String		Tour_Tooltip_Label_WindSpeed;
 
-	public static String	Value_Unit_Cadence;
-
-	public static String	Value_Unit_Calories;
-
-	public static String	Value_Unit_Pulse;
+	public static String		Value_Unit_Cadence;
+	public static String		Value_Unit_Calories;
+	public static String		Value_Unit_Pulse;
 
 	static {
 		// initialize resource bundle

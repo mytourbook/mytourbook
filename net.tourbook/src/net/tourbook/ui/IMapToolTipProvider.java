@@ -12,9 +12,10 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.util.HoveredAreaContext;
+
 import org.eclipse.swt.graphics.Rectangle;
 
-import de.byteholder.geoclipse.map.HoveredAreaContext;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 public interface IMapToolTipProvider {

@@ -42,10 +42,6 @@ public class Messages extends NLS {
 	public static String		Image_Map_WayPoint;
 	public static String		Image_Map_WayPoint_Hovered;
 
-	public static String	Image_ToolTip_TourInfo;
-
-	public static String	Image_ToolTip_TourInfo_Hovered;
-
 	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
 	public static String		image_action_show_tour_in_map_disabled;

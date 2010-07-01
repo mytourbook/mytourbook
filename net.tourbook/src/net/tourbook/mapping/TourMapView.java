@@ -39,9 +39,9 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.MTRectangle;
-import net.tourbook.ui.TourToolTip;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -49,6 +49,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.ITourToolTipProvider;
+import net.tourbook.util.TourToolTip;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -183,10 +184,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private boolean									_isTour;
 
 	/*
-	 * toop tips
+	 * tool tips
 	 */
-	private ITourToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
+	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
 	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
+
 	private String									_poiName;
 	private GeoPosition								_poiPosition;
 	private int										_poiZoomLevel;
@@ -791,7 +793,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		_paintMgr.setTourData(new ArrayList<TourData>());
 
-//		_tourInfo.setTourData(null);
+		_tourInfoToolTipProvider.setTourData(null);
 
 		showDefaultMap();
 	}
@@ -1541,7 +1543,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private void paintAllTours() {
 
 		if (_tourDataList.size() == 0) {
-//			_tourInfo.setTourData(null);
+			_tourInfoToolTipProvider.setTourData(null);
 			return;
 		}
 
@@ -1569,7 +1571,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		_paintMgr.setTourData(_tourDataList);
-//		_tourInfo.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourData(_tourDataList);
 
 		final TourData firstTourData = _tourDataList.get(0);
 
@@ -1638,7 +1640,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
 
-//		_tourInfo.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourData(_tourDataList);
 
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
@@ -1716,7 +1718,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_previousTourData = null;
 
 		_paintMgr.setTourData(_tourDataList);
-//		_tourInfo.setTourDataList(_tourDataList);
+		_tourInfoToolTipProvider.setTourData(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
 
@@ -1777,7 +1779,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					}
 				}
 				_paintMgr.setTourData(_tourDataList);
-//				_tourInfo.setTourDataList(_tourDataList);
+				_tourInfoToolTipProvider.setTourData(_tourDataList);
 
 				if (_previousOverlayKey != newOverlayKey) {
 

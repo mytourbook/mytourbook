@@ -24,6 +24,12 @@ import org.eclipse.swt.widgets.Event;
 public interface ITourToolTipProvider {
 
 	/**
+	 * This method is called after the tool tip is hidden. This method can be used to cleanup
+	 * resources.
+	 */
+	public void afterHideToolTip();
+
+	/**
 	 * * Creates the content area of the the tooltip.
 	 * 
 	 * @param event
@@ -34,16 +40,6 @@ public interface ITourToolTipProvider {
 	 */
 	public Composite createToolTipContentArea(Event event, Composite parent);
 
-//	/**
-//	 * @param hoveredArea
-//	 * @return Returns <code>true</code> when the tour tool tip provider supports the
-//	 *         {@link #hoveredArea}.
-//	 *         <p>
-//	 *         The tour tool tip provider is using the {@link #hoveredArea} to get the content for
-//	 *         the tool tip.
-//	 */
-//	public boolean isHoveredAreaSupported(Object hoveredArea);
-
 	/**
 	 * Paints the tool tip icon in the control
 	 * 
@@ -52,6 +48,15 @@ public interface ITourToolTipProvider {
 	 *            Client area where the tool tip can be painted
 	 */
 	public void paint(GC gc, Rectangle clientArea);
+
+	/**
+	 * Sets the {@link TourToolTip} into the tour tool tip provider. When set to <code>null</code>
+	 * the tool tip provider is detached from the tour tool tip control.
+	 * 
+	 * @param tourToolTip
+	 *            can be <code>null</code>
+	 */
+	public void setTourToolTip(TourToolTip tourToolTip);
 
 	/**
 	 * This method is called when the tool tip control is requesting the tool tip should be

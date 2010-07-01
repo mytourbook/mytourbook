@@ -10,11 +10,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.map;
+package net.tourbook.util;
 
-import net.tourbook.util.ITourToolTipProvider;
 
 import org.eclipse.swt.graphics.Image;
+
 
 /**
  * Contains the context for a hovered area which displays a tool tip when the mouse hoveres the
