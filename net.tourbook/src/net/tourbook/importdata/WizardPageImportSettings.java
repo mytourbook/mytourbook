@@ -305,7 +305,11 @@ public class WizardPageImportSettings extends WizardPage {
 		}
 
 		// save auto save settings
-		settings.put(TEXT_RAW_DATA_PATH, _pathEditor.getStringValue());
+		final String pathValue = _pathEditor.getStringValue();
+		if (pathValue != null) {
+			// this case happened that the path is null, bug in 10.3
+			settings.put(TEXT_RAW_DATA_PATH, pathValue);
+		}
 
 	}
 
