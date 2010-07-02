@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -194,6 +195,19 @@ public class WizardPageImportSettings extends WizardPage {
 				validatePage();
 			}
 		});
+
+		/**
+		 * set pref store because when not set, a NPE can be raised
+		 * 
+		 * <pre>
+		 * 
+		 * Caused by: java.lang.NullPointerException
+		 *         at org.eclipse.jface.preference.StringFieldEditor.getStringValue(StringFieldEditor.java:305)
+		 *         at net.tourbook.importdata.WizardPageImportSettings.persistDialogSettings(WizardPageImportSettings.java:305)
+		 * </pre>
+		 */
+		_pathEditor.setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+		_pathEditor.setPreferenceName("dummy");//$NON-NLS-1$
 	}
 
 	/**
