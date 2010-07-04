@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Monitor;
 
 /**
- * Tour tooltip control which can display registered {@link ITourToolTipProvider}.
+ * Control to display a tour tooltip with the registered {@link ITourToolTipProvider}'s.
  */
 public class TourToolTip extends ToolTip {
 
@@ -59,7 +59,7 @@ public class TourToolTip extends ToolTip {
 	 * Add a tool tip hide listener which is called when the tool tip was hidden.
 	 * <p>
 	 * This is helpfull to hide the hovered area when the mouse is not within the tool tip control
-	 * but leaves the tool tip window.
+	 * but is leaving the tool tip window.
 	 * 
 	 * @param hideListener
 	 */

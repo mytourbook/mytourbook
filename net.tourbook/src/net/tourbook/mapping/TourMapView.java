@@ -1508,11 +1508,40 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 				final TourWayPoint wp = (TourWayPoint) firstElement;
 
-				_poiPosition = wp.getPosition();
-				_poiName = wp.getName();
-				_poiZoomLevel = _map.getZoom();
+				_map.setPOI(_wayPointToolTipProvider, wp);
+				
 
-				_map.setMapCenter(_poiPosition);
+//				System.out.println("\t");
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
+				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}
 

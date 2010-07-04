@@ -12,6 +12,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.util.HoveredAreaContext;
 
 import org.eclipse.swt.graphics.Rectangle;
@@ -28,6 +29,9 @@ public interface IMapToolTipProvider {
 	 * @param mapZoomLevel
 	 * @param tilePixelSize
 	 * @param isTourPaintMethodEnhanced
+	 * @param requestedTourWayPoint
+	 *            Requested tour way point which should be found in the hovered tile or
+	 *            <code>null</code> when a tour way point is not requested.
 	 * @return Returns a hovered area context or <code>null</code> when an area is not hovered.
 	 */
 	HoveredAreaContext getHoveredContext(	int mouseMovePositionX,
@@ -36,6 +40,7 @@ public interface IMapToolTipProvider {
 											MP mp,
 											int mapZoomLevel,
 											int tilePixelSize,
-											boolean isTourPaintMethodEnhanced);
+											boolean isTourPaintMethodEnhanced,
+											TourWayPoint requestedTourWayPoint);
 
 }

@@ -40,6 +40,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.mapping.WayPointToolTipProvider;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.util.HoveredAreaContext;
@@ -3836,6 +3838,66 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
+	public void setPOI(final ITourToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
+
+		// display poi in the center of the map which make it also visible
+		setMapCenter(twp.getPosition());
+
+		if (tourToolTipProvider instanceof WayPointToolTipProvider) {
+
+			final WayPointToolTipProvider wpToolTipProvider = (WayPointToolTipProvider) tourToolTipProvider;
+
+			final HoveredAreaContext hoveredContext = wpToolTipProvider.getHoveredContext(
+					_worldPixelTopLeftViewport.width / 2,
+					_worldPixelTopLeftViewport.height / 2,
+					_worldPixelTopLeftViewport,
+					_mp,
+					_mapZoomLevel,
+					_tilePixelSize,
+					_isTourPaintMethodEnhanced,
+					twp);
+
+			if (hoveredContext == null) {
+				// this case should not happen
+				return;
+			}
+
+			_hoveredAreaContext = hoveredContext;
+
+			// update tool tip control
+			_tourToolTip.setHoveredContext(_hoveredAreaContext);
+
+			_tourToolTip.show(new Point(_hoveredAreaContext.hoveredTopLeftX, _hoveredAreaContext.hoveredTopLeftY));
+
+			redraw();
+		}
+//		System.out.println("\t");
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
+
+	}
+
 	/**
 	 * @param isRedrawEnabled
 	 *            Set <code>true</code> to enable map drawing (which is the default). When
@@ -3853,6 +3915,13 @@ public class Map extends Canvas {
 		}
 	}
 
+//	public void setShowPOI(final boolean isShowPOI) {
+//
+//		_isPoiVisible = isShowPOI;
+//
+//		queueMapRedraw();
+//	}
+
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
 	 * 
@@ -3865,13 +3934,6 @@ public class Map extends Canvas {
 		_isShowTileBorder = isShowTileBorder;
 		queueMapRedraw();
 	}
-
-//	public void setShowPOI(final boolean isShowPOI) {
-//
-//		_isPoiVisible = isShowPOI;
-//
-//		queueMapRedraw();
-//	}
 
 	/**
 	 * Legend will be drawn into the map when the visibility is <code>true</code>
@@ -3895,13 +3957,6 @@ public class Map extends Canvas {
 
 	public void setShowScale(final boolean isScaleVisible) {
 		_isScaleVisible = isScaleVisible;
-	}
-
-	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
-
-		_isTourPaintMethodEnhanced = isEnhanced;
-
-		disposeOverlayImageCache();
 	}
 
 //	private void showPoi(final String poiText) {
@@ -3998,6 +4053,13 @@ public class Map extends Canvas {
 //		setPoiVisible(isVisible);
 //	}
 
+	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+
+		_isTourPaintMethodEnhanced = isEnhanced;
+
+		disposeOverlayImageCache();
+	}
+
 	public void setTourToolTip(final TourToolTip tourToolTip) {
 
 		_tourToolTip = tourToolTip;
@@ -4028,9 +4090,6 @@ public class Map extends Canvas {
 		if (_mp == null) {
 			return;
 		}
-
-//		System.out.println(_mouseMovePositionX);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * check if the requested zoom level is within the bounds of the map provider
@@ -4160,7 +4219,8 @@ public class Map extends Canvas {
 							_mp,
 							_mapZoomLevel,
 							_tilePixelSize,
-							_isTourPaintMethodEnhanced);
+							_isTourPaintMethodEnhanced,
+							null);
 
 					if (hoveredContext != null) {
 						newHoveredContext = hoveredContext;
@@ -4193,28 +4253,6 @@ public class Map extends Canvas {
 
 	}
 
-////			System.out.println();
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//// TODO remove SYSTEM.OUT.PRINTLN
-//	}
-
 	/**
 	 * Sets all viewport data which are necessary to draw the map tiles in
 	 * {@link #paintMap10Tiles(GC)}. Some values are cached to optimize performance.
@@ -4229,8 +4267,6 @@ public class Map extends Canvas {
 		}
 
 		_worldPixelTopLeftViewport = getWorldPixelTopLeftViewport(_worldPixelMapCenter);
-
-//		System.out.println(_worldPixelMapCenter + "\t" + _worldPixelViewport);
 
 		final int visiblePixelWidth = _worldPixelTopLeftViewport.width;
 		final int visiblePixelHeight = _worldPixelTopLeftViewport.height;

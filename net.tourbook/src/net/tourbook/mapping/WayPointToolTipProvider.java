@@ -54,17 +54,11 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 	private TourWayPoint	_hoveredWayPoint;
 
-	public WayPointToolTipProvider() {
-//		_tourToolTip = tourToolTip;
-	}
+	public WayPointToolTipProvider() {}
 
 	@Override
 	public void afterHideToolTip() {
-
 		_hoveredWayPoint = null;
-
-//		System.out.println(System.currentTimeMillis() + " afterHideToolTip()\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
@@ -189,7 +183,8 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 												final MP mp,
 												final int mapZoomLevel,
 												final int tilePixelSize,
-												final boolean isTourPaintMethodEnhanced) {
+												final boolean isTourPaintMethodEnhanced,
+												final TourWayPoint requestedTwp) {
 
 		// get mouse world position
 		final int worldPixelMouseX = worldPixelTopLeftViewPort.x + mousePositionX;
@@ -210,7 +205,8 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 			// tile contains way points
 
-			int wpIndex = 0;
+			final ArrayList<TourWayPoint> allTileTwp = tile.getWayPoints(mapZoomLevel);
+			int wpIndex = -1;
 
 			for (final Rectangle wayPointBoundInTile : wayPointBounds) {
 
@@ -223,14 +219,20 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 				final int mouseInTileX = worldPixelMouseX - worldPixelWayPointX;
 				final int mouseInTileY = worldPixelMouseY - worldPixelWayPointY;
 
+				wpIndex++;
+
 				// check if mouse is within a way point bound (image)
 				if (mouseInTileX >= 0
 						&& mouseInTileX <= wayPointBoundInTile.width
 						&& mouseInTileY >= 0
 						&& mouseInTileY <= wayPointBoundInTile.height) {
 
-					final ArrayList<TourWayPoint> twp = tile.getWayPoints(mapZoomLevel);
-					final TourWayPoint hoveredTwp = twp.get(wpIndex);
+					final TourWayPoint hoveredTwp = allTileTwp.get(wpIndex);
+
+					if (requestedTwp != null && requestedTwp != hoveredTwp) {
+						// this is not the requested way point
+						continue;
+					}
 
 					final int devWayPointX = worldPixelWayPointX - worldPixelTopLeftViewPort.x;
 					final int devWayPointY = worldPixelWayPointY - worldPixelTopLeftViewPort.y;
@@ -245,8 +247,6 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 							wayPointBoundInTile.width,
 							wayPointBoundInTile.height);
 				}
-
-				wpIndex++;
 			}
 		}
 
@@ -273,7 +273,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	@Override
 	public void setTourToolTip(final TourToolTip tourToolTip) {
 
-		// this feature is not yes used in this tool tip provider
+		// this feature is not yet used in this tool tip provider
 
 //		_tourToolTip = tourToolTip;
 	}
