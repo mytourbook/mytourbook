@@ -37,7 +37,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
-import net.tourbook.tour.TourInfo_OLD;
+import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
@@ -51,6 +51,8 @@ import net.tourbook.ui.tourChart.action.ActionXAxisTime;
 import net.tourbook.ui.tourChart.action.TCActionHandler;
 import net.tourbook.ui.tourChart.action.TCActionHandlerManager;
 import net.tourbook.ui.tourChart.action.TCActionProxy;
+import net.tourbook.util.IToolTipHideListener;
+import net.tourbook.util.TourToolTip;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -131,7 +133,8 @@ public class TourChart extends Chart {
 
 	private ActionChartOptions				_actionOptions;
 
-	private final TourInfo_OLD					_tourInfo;
+	private TourToolTip						_tourToolTip;
+	private TourInfoToolTipProvider			_tourInfoToolTipProvider				= new TourInfoToolTipProvider();
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
 
@@ -163,8 +166,19 @@ public class TourChart extends Chart {
 		});
 
 		// set tour info icon into the left axis
-		_tourInfo = new TourInfo_OLD(getToolTipControl());
-//		setToolTip(_tourInfo);
+		_tourToolTip = new TourToolTip(getToolTipControl());
+		_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+
+		_tourToolTip.addHideListener(new IToolTipHideListener() {
+			@Override
+			public void afterHideToolTip(final Event event) {
+
+				// hide hovered image
+				getToolTipControl().afterHideToolTip(event);
+			}
+		});
+
+		setTourToolTipProvider(_tourInfoToolTipProvider);
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -1165,11 +1179,9 @@ public class TourChart extends Chart {
 	 */
 	public void setTourInfoActionsEnabled(final boolean isEnabled) {
 
-		if (_tourInfo == null) {
-			return;
+		if (_tourInfoToolTipProvider != null) {
+			_tourInfoToolTipProvider.setActionsEnabled(isEnabled);
 		}
-
-		_tourInfo.setActionsEnabled(isEnabled);
 	}
 
 	/**
@@ -1435,7 +1447,7 @@ public class TourChart extends Chart {
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-//		_tourInfo.setTourData(_tourData);
+		_tourInfoToolTipProvider.setTourData(_tourData);
 	}
 
 	/**

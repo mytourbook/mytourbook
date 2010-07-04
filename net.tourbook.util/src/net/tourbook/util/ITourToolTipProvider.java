@@ -21,6 +21,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
+/**
+ * Tour tooltip provider which can display tour data in a tooltip.
+ */
 public interface ITourToolTipProvider {
 
 	/**
@@ -48,6 +51,15 @@ public interface ITourToolTipProvider {
 	 *            Client area where the tool tip can be painted
 	 */
 	public void paint(GC gc, Rectangle clientArea);
+
+	/**
+	 * Set location where the mouse is hovering the client area.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return Returns <code>true</code> when the mouse is hovering a hovered location.
+	 */
+	public boolean setHoveredLocation(int x, int y);
 
 	/**
 	 * Sets the {@link TourToolTip} into the tour tool tip provider. When set to <code>null</code>

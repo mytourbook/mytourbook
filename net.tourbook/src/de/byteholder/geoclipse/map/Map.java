@@ -1653,6 +1653,9 @@ public class Map extends Canvas {
 			}
 
 			if (isContextValid == false) {
+				/*
+				 * old hovered context is not valid any more, update the hovered context
+				 */
 				updateTourToolTipHoveredArea();
 			}
 		}
@@ -4102,7 +4105,7 @@ public class Map extends Canvas {
 
 			/*
 			 * redraw must be forced because the hovered area can be the same but can be at a
-			 * different position
+			 * different location
 			 */
 			updateTourToolTipHoveredArea();
 

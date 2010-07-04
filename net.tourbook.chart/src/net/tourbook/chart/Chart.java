@@ -1117,10 +1117,10 @@ public class Chart extends ViewForm {
 		_isFillToolbar = isFillToolbar;
 	}
 
-	public void setToolTip(final ITourToolTipProvider tourToolTip) {
+	public void setTourToolTipProvider(final ITourToolTipProvider tourToolTip) {
 
 		// set tour info icon into the left axis
-		getToolTipControl().setToolTip(tourToolTip);
+		getToolTipControl().setTourToolTipProvider(tourToolTip);
 	}
 
 	/**

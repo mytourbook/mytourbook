@@ -46,7 +46,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 
 public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
 
-	private TourToolTip		_tourToolTip;
+//	private TourToolTip		_tourToolTip;
 
 	private Color			_bgColor;
 	private Color			_fgColor;
@@ -62,6 +62,9 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	public void afterHideToolTip() {
 
 		_hoveredWayPoint = null;
+
+//		System.out.println(System.currentTimeMillis() + " afterHideToolTip()\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
@@ -262,8 +265,17 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	}
 
 	@Override
+	public boolean setHoveredLocation(final int x, final int y) {
+		// this method is not used in this tool tip provider, the method getHoveredContext() is used instead
+		return false;
+	}
+
+	@Override
 	public void setTourToolTip(final TourToolTip tourToolTip) {
-		_tourToolTip = tourToolTip;
+
+		// this feature is not yes used in this tool tip provider
+
+//		_tourToolTip = tourToolTip;
 	}
 
 	@Override

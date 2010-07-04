@@ -99,7 +99,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	private boolean						_hasTags;
 	private boolean						_hasDescription;
 
-	private boolean						_isActionsVisible		= true;
+	private boolean						_isActionsVisible		= false;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
@@ -165,6 +165,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	 */
 	private ActionTourToolTipEditTour	_actionEditTour;
 	private ActionTourToolTipEditQuick	_actionEditQuick;
+
 	/**
 	 * Tour which is displayed in the tool tip
 	 */
@@ -172,16 +173,32 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	private long						_tourId					= -1;
 
+	private HoveredAreaContext			_tourInfoHoveredAreaContext;
+
+	/**
+	 * is <code>true</code> when the mouse is hovering a hovered location
+	 */
+	private boolean						_isHovered				= false;
+
+//	private int							_toolTipHoverCounter	= 0;
+
 	public TourInfoToolTipProvider() {
 
 		createInfoIcon();
+
+		_tourInfoHoveredAreaContext = new HoveredAreaContext(
+				this,
+				this,
+				HOVER_AREA_POSITION,
+				HOVER_AREA_POSITION,
+				_tourInfoImageSize.width,
+				_tourInfoImageSize.height);
 	}
 
 	@Override
 	public void afterHideToolTip() {
 
-//		_tourData = null;
-//		_tourId = -1;
+		_isHovered = false;
 	}
 
 	private void createInfoIcon() {
@@ -218,7 +235,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		Composite container;
 
 		if (_tourId != -1) {
-			// tour id is set
+			// first get data from the tour id when it is set
 			_tourData = TourManager.getInstance().getTourData(_tourId);
 		}
 
@@ -792,14 +809,12 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 				&& devMouseY >= HOVER_AREA_POSITION
 				&& devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height) {
 
-			return new HoveredAreaContext(
-					this,
-					this,
-					HOVER_AREA_POSITION,
-					HOVER_AREA_POSITION,
-					_tourInfoImageSize.width,
-					_tourInfoImageSize.height);
+			_isHovered = true;
+
+			return _tourInfoHoveredAreaContext;
 		}
+
+		_isHovered = false;
 
 		return null;
 	}
@@ -865,15 +880,71 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	@Override
 	public void paint(final GC gc, final Rectangle clientArea) {
+
+		final Image tourInfoImage = _isHovered ? _tourInfoImageHovered : _tourInfoImage;
+
 		// paint static image
-		gc.drawImage(_tourInfoImage, HOVER_AREA_POSITION, HOVER_AREA_POSITION);
+		gc.drawImage(tourInfoImage, HOVER_AREA_POSITION, HOVER_AREA_POSITION);
 	}
 
-	void setActionsEnabled(final boolean isEnabled) {
+	private void resetToolTip() {
+
+		if (_tourToolTip != null) {
+			_tourToolTip.resetToolTip();
+		}
+	}
+
+	/**
+	 * Enable/disable tour edit actions
+	 * 
+	 * @param isEnabled
+	 */
+	public void setActionsEnabled(final boolean isEnabled) {
 		_isActionsVisible = isEnabled;
 	}
 
-	public void setTourData(final ArrayList<TourData> tourDataList) {
+	@Override
+	public boolean setHoveredLocation(final int x, final int y) {
+
+		HoveredAreaContext hoveredContext = null;
+
+		if (_tourToolTip != null) {
+
+			// set hovered context from this tooltip provider into the tooltip control
+
+			hoveredContext = getHoveredContext(x, y);
+
+			_tourToolTip.setHoveredContext(hoveredContext);
+		}
+
+		_isHovered = hoveredContext != null;
+
+		return _isHovered;
+	}
+
+	/**
+	 * Set {@link TourData} for the tooltip provider. When set to <code>null</code> the tour tooltip
+	 * is not displayed.
+	 * 
+	 * @param tourData
+	 */
+	public void setTourData(final TourData tourData) {
+
+		_tourData = tourData;
+
+		// reset id
+		_tourId = -1;
+
+		resetToolTip();
+	}
+
+	/**
+	 * Set {@link TourData} from the first item in the list for the tooltip provider, When set to
+	 * <code>null</code> the tour tooltip is not displayed.
+	 * 
+	 * @param tourData
+	 */
+	public void setTourDataList(final ArrayList<TourData> tourDataList) {
 
 		if (tourDataList == null || tourDataList.size() == 0) {
 			_tourData = null;
@@ -881,36 +952,18 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			_tourData = tourDataList.get(0);
 		}
 
+		// reset id
 		_tourId = -1;
+
+		resetToolTip();
 	}
 
-//	public void setTourData(final TourData tourData) {
-//
-//		if (tourData == null) {
-//			_tourDataList.clear();
-//			return;
-//		}
-//
-//		// populate list
-//		_tourDataList.clear();
-//		_tourDataList.add(tourData);
-//
-//		_tourInfoToolTip.setTourData(_tourDataList);
-//	}
-//
-//	public void setTourDataList(final ArrayList<TourData> tourDataList) {
-//
-//		if (tourDataList == null || tourDataList.size() == 0) {
-//			_tourDataList.clear();
-//			return;
-//		}
-//
-//		_tourInfoToolTip.setTourData(tourDataList);
-//	}
-
 	public void setTourId(final long tourId) {
+
 		_tourId = tourId;
 		_tourData = null;
+
+		resetToolTip();
 	}
 
 	@Override
@@ -920,8 +973,10 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	@Override
 	public void show(final Point point) {
-		// TODO Auto-generated method stub
 
+		if (_tourToolTip != null) {
+			_tourToolTip.show(point);
+		}
 	}
 
 	private void updateUI() {

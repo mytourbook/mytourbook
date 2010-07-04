@@ -186,6 +186,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	/*
 	 * tool tips
 	 */
+	private TourToolTip								_tourToolTip;
 	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
 	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
 
@@ -219,8 +220,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	 * UI controls
 	 */
 	private Map										_map;
-
-	private TourToolTip								_tourToolTip;
 
 	private ActionDimMap							_actionDimMap;
 	private ActionManageMapProviders				_actionManageProvider;
@@ -1002,9 +1001,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 		// setup tool tip's
 		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
-
-		// set tour info icon into the left axis
-//		_map.setToolTip(_tourInfo = new TourInfo(_map));
+		_tourInfoToolTipProvider.setActionsEnabled(true);
 
 		_map.addControlListener(new ControlAdapter() {
 			@Override
@@ -1571,7 +1568,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		_paintMgr.setTourData(_tourDataList);
-		_tourInfoToolTipProvider.setTourData(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		final TourData firstTourData = _tourDataList.get(0);
 
@@ -1640,7 +1637,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
 
-		_tourInfoToolTipProvider.setTourData(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		// set the paint context (slider position) for the direct mapping painter
 		_directMappingPainter.setPaintContext(
@@ -1718,7 +1715,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_previousTourData = null;
 
 		_paintMgr.setTourData(_tourDataList);
-		_tourInfoToolTipProvider.setTourData(_tourDataList);
+		_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 		_directMappingPainter.disablePaintContext();
 
@@ -1779,7 +1776,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 					}
 				}
 				_paintMgr.setTourData(_tourDataList);
-				_tourInfoToolTipProvider.setTourData(_tourDataList);
+				_tourInfoToolTipProvider.setTourDataList(_tourDataList);
 
 				if (_previousOverlayKey != newOverlayKey) {
 
@@ -1901,7 +1898,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		if (isShowTourInfo) {
 			_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
 		}
-//		_tourInfo.setVisible(isShowTourInfo);
 
 		// checkbox: show scale
 		final boolean isScaleVisible = Util.getStateBoolean(settings, MEMENTO_SHOW_SCALE_IN_MAP, true);

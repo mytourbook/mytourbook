@@ -292,6 +292,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
+		_tourChart.setTourInfoActionsEnabled(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvicer(this));
 

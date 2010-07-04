@@ -12,9 +12,7 @@
  *******************************************************************************/
 package net.tourbook.util;
 
-
 import org.eclipse.swt.graphics.Image;
-
 
 /**
  * Contains the context for a hovered area which displays a tool tip when the mouse hoveres the
@@ -55,8 +53,16 @@ public class HoveredAreaContext {
 	 */
 	public int					hoveredHeight;
 
+	/**
+	 * @param tourToolTipProvider
+	 * @param hoveredArea
+	 * @param devTopLeftX
+	 * @param devTopLeftY
+	 * @param devWidth
+	 * @param devHeight
+	 */
 	public HoveredAreaContext(	final ITourToolTipProvider tourToolTipProvider,
-								final IHoveredArea hoveredTwp,
+								final IHoveredArea hoveredArea,
 								final int devTopLeftX,
 								final int devTopLeftY,
 								final int devWidth,
@@ -64,12 +70,25 @@ public class HoveredAreaContext {
 
 		this.tourToolTipProvider = tourToolTipProvider;
 
-		hoveredImage = hoveredTwp.getHoveredImage();
+		hoveredImage = hoveredArea.getHoveredImage();
 
 		hoveredTopLeftX = devTopLeftX;
 		hoveredTopLeftY = devTopLeftY;
 		hoveredWidth = devWidth;
 		hoveredHeight = devHeight;
+	}
+
+	@Override
+	public String toString() {
+		return "HoveredAreaContext [" //
+//				+ ("tourToolTipProvider=" + tourToolTipProvider + ", ")
+//				+ ("hoveredImage=" + hoveredImage + ", ")
+//				+ ("hoveredTopLeftX=" + hoveredTopLeftX + ", ")
+//				+ ("hoveredTopLeftY=" + hoveredTopLeftY + ", ")
+//				+ ("hoveredWidth=" + hoveredWidth + ", ")
+//				+ ("hoveredHeight=" + hoveredHeight)
+				+ "]"
+				+ (" " + this.hashCode());
 	}
 
 }

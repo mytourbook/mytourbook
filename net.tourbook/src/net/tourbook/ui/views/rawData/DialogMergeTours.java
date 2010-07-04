@@ -1336,7 +1336,6 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
-		_tourChart.setTourInfoActionsEnabled(false);
 
 		// set altitude visible
 		_tourChartConfig = new TourChartConfiguration(true);

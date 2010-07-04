@@ -572,7 +572,6 @@ public class DialogMarker extends TitleAreaDialog {
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this));
-		_tourChart.setTourInfoActionsEnabled(false);
 
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {

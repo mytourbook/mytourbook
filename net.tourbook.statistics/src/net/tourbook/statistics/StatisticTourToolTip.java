@@ -15,26 +15,34 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.chart.ChartComponents;
+import net.tourbook.util.TourToolTip;
 
-public class StatisticTourInfo extends TourInfoToolTipProvider {
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 
-//	public StatisticTourInfo(final Control control) {
-//		super(control);
-//	}
-//
-//	@Override
-//	public void show(final Point point) {
-//
-//		/*
-//		 * delay tooltip because first the bar must be selected which selects the tour
-//		 */
-//		_infoControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
-//			public void run() {
-//				_tourInfoToolTip.show(point);
-//			}
-//		});
-//
-//	}
+public class StatisticTourToolTip extends TourToolTip {
+
+	public StatisticTourToolTip(final Control control) {
+		super(control);
+	}
+
+	@Override
+	public void show(final Point point) {
+
+		/*
+		 * delay tooltip because first the bar must be selected which selects the tour
+		 */
+		_toolTipControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
+			public void run() {
+
+				if (_toolTipControl.isDisposed()) {
+					return;
+				}
+
+				StatisticTourToolTip.super.show(point);
+			}
+		});
+	}
 
 }

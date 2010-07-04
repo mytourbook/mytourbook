@@ -42,9 +42,11 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
+import net.tourbook.util.IToolTipHideListener;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -54,15 +56,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
 
-	private static final String			DISTANCE_DATA	= "distance";									//$NON-NLS-1$
-	private static final String			ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
-	private static final String			DURATION_DATA	= "duration";									//$NON-NLS-1$
+	private static final String			DISTANCE_DATA				= "distance";									//$NON-NLS-1$
+	private static final String			ALTITUDE_DATA				= "altitude";									//$NON-NLS-1$
+	private static final String			DURATION_DATA				= "duration";									//$NON-NLS-1$
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
@@ -73,20 +76,21 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private int							_currentMonth;
 	private int							_numberOfYears;
 
-	private final Calendar				_calendar		= GregorianCalendar.getInstance();
-	private final DateFormat			_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final Calendar				_calendar					= GregorianCalendar.getInstance();
+	private final DateFormat			_dateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private IPostSelectionProvider		_postSelectionProvider;
 
 	private Chart						_chart;
-	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	_minMaxKeeper				= new BarChartMinMaxKeeper();
 
 	private TourDayData					_tourDayData;
 
 	private boolean						_isSynchScaleEnabled;
 	private ITourEventListener			_tourPropertyListener;
 
-//	private StatisticTourInfo			_tourInfo;
+	private StatisticTourToolTip		_tourToolTip;
+	private TourInfoToolTipProvider		_tourInfoToolTipProvider	= new TourInfoToolTipProvider();
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -191,16 +195,26 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		_chart.setCanScrollZoomedChart(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
-		// set tour info icon
-//		_tourInfo = new StatisticTourInfo(_chart.getToolTipControl());
-//		_chart.setToolTip(_tourInfo);
+		// set tour info icon into the left axis
+		_tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
+		_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+		_tourToolTip.addHideListener(new IToolTipHideListener() {
+			@Override
+			public void afterHideToolTip(final Event event) {
+				// hide hovered image
+				_chart.getToolTipControl().afterHideToolTip(event);
+			}
+		});
+
+		_chart.setTourToolTipProvider(_tourInfoToolTipProvider);
+		_tourInfoToolTipProvider.setActionsEnabled(true);
 
 		_chart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				if (_tourDayData.typeIds.length > 0) {
 
 					_selectedTourId = _tourDayData.tourIds[valueIndex];
-//					_tourInfo.setTourId(_selectedTourId);
+					_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
 					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
 				}
@@ -214,7 +228,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
 				_selectedTourId = _tourDayData.tourIds[valueIndex];
-//				_tourInfo.setTourId(_selectedTourId);
+				_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
 				TourManager.getInstance().openTourInEditor(_selectedTourId);
 			}
@@ -234,7 +248,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 						if (barChartSelection.serieIndex != -1) {
 
 							_selectedTourId = _tourDayData.tourIds[barChartSelection.valueIndex];
-//							_tourInfo.setTourId(_selectedTourId);
+							_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
 							TourManager.getInstance().openTourInEditor(_selectedTourId);
 						}
@@ -557,8 +571,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		// set grid size
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE), prefStore
-				.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+		_chart.setGridDistance(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);
@@ -644,7 +659,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			if (isTourSelected) {
 				isSelected = true;
 				_selectedTourId = tourId;
-//				_tourInfo.setTourId(_selectedTourId);
+				_tourInfoToolTipProvider.setTourId(_selectedTourId);
 			}
 			selectedItems[tourIndex] = isTourSelected;
 		}

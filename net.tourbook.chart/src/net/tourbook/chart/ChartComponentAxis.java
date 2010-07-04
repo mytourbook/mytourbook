@@ -24,6 +24,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -48,7 +49,7 @@ public class ChartComponentAxis extends Canvas {
 
 	private ArrayList<ChartDrawingData>	_chartDrawingData;
 
-	private boolean						_isAxisDirty;
+	private boolean						_isAxisModified;
 
 	/**
 	 * is set to <code>true</code> when the axis is on the left side, <code>false</code> when on
@@ -56,7 +57,16 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private boolean						_isLeft;
 
-	private ITourToolTipProvider		_chartToolTip;
+	private ITourToolTipProvider		_tourToolTipProvider;
+
+	/**
+	 * <pre>
+	 * -1  not initialized
+	 * 0   not hovered
+	 * 1   hovered
+	 * </pre>
+	 */
+	private int							_hoverState	= -1;
 
 	ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
@@ -89,37 +99,56 @@ public class ChartComponentAxis extends Canvas {
 
 		});
 
+		addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(final MouseEvent e) {
+				checkHoveredArea(e.x, e.y);
+			}
+		});
+
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
 
 				_chart._chartComponents.getChartComponentGraph().onMouseWheel(event);
 
-				if (_chartToolTip != null) {
-					_chartToolTip.show(new Point(event.x, event.y));
+				/*
+				 * display tour tool tip when mouse is hovered over the tour info icon in the
+				 * statistics and the mouse wheel selects another tour
+				 */
+				checkHoveredArea(event.x, event.y);
+
+				if (_tourToolTipProvider != null && _hoverState == 1) {
+					_tourToolTipProvider.show(new Point(event.x, event.y));
 				}
 			}
 		});
-
-//		createContextMenu();
 	}
 
-//	/**
-//	 * create the context menu
-//	 */
-//	private void createContextMenu() {
-//
-//		final MenuManager menuMgr = new MenuManager();
-//
-//		menuMgr.setRemoveAllWhenShown(true);
-//
-//		menuMgr.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(final IMenuManager menuMgr) {
-//				fChart.fillContextMenu(menuMgr);
-//			}
-//		});
-//
-//		setMenu(menuMgr.createContextMenu(this));
-//	}
+	public void afterHideToolTip(final Event event) {
+
+		// force redrawing of the axis and hide the hovered image
+
+		_hoverState = 0;
+
+		_isAxisModified = true;
+		redraw();
+	}
+
+	private void checkHoveredArea(final int x, final int y) {
+
+		if (_tourToolTipProvider != null) {
+
+			final int newHoverState = _tourToolTipProvider.setHoveredLocation(x, y) ? 1 : 0;
+
+			if (_hoverState != newHoverState) {
+				// force redrawing of the axis
+				_isAxisModified = true;
+				redraw();
+			}
+
+			_hoverState = newHoverState;
+		}
+	}
 
 	/**
 	 * draw the chart on the axisImage
@@ -133,8 +162,8 @@ public class ChartComponentAxis extends Canvas {
 		}
 
 		// when the image is the same size as the new we will redraw it only if
-		// it is dirty
-		if (!_isAxisDirty && _axisImage != null) {
+		// it is modified
+		if (!_isAxisModified && _axisImage != null) {
 
 			final Rectangle oldBounds = _axisImage.getBounds();
 
@@ -155,13 +184,13 @@ public class ChartComponentAxis extends Canvas {
 
 		drawYUnits(gc, axisRect);
 
-		if (_chartToolTip != null) {
-			_chartToolTip.paint(gc, axisRect);
+		if (_tourToolTipProvider != null) {
+			_tourToolTipProvider.paint(gc, axisRect);
 		}
 
 		gc.dispose();
 
-		_isAxisDirty = false;
+		_isAxisModified = false;
 	}
 
 	/**
@@ -298,7 +327,7 @@ public class ChartComponentAxis extends Canvas {
 	}
 
 	void onResize() {
-		_isAxisDirty = true;
+		_isAxisModified = true;
 		redraw();
 	}
 
@@ -310,13 +339,14 @@ public class ChartComponentAxis extends Canvas {
 	 *            true if the axis is on the left side
 	 */
 	protected void setDrawingData(final ArrayList<ChartDrawingData> list, final boolean isLeft) {
+
 		_chartDrawingData = list;
 		_isLeft = isLeft;
 
 		onResize();
 	}
 
-	void setToolTip(final ITourToolTipProvider chartToolTip) {
-		_chartToolTip = chartToolTip;
+	void setTourToolTipProvider(final ITourToolTipProvider tourInfoToolTipProvider) {
+		_tourToolTipProvider = tourInfoToolTipProvider;
 	}
 }

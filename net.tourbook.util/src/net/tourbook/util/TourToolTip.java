@@ -27,6 +27,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Monitor;
 
+/**
+ * Tour tooltip control which can display registered {@link ITourToolTipProvider}.
+ */
 public class TourToolTip extends ToolTip {
 
 	public static final int					SHELL_MARGIN			= 5;
@@ -35,9 +38,15 @@ public class TourToolTip extends ToolTip {
 
 	private final ListenerList				_hideListeners			= new ListenerList(ListenerList.IDENTITY);
 
-	private Control							_toolTipControl;
+	protected Control						_toolTipControl;
 
+	/**
+	 * Context for the hovered area. When not <code>null</code>, the tooltip is displayed, otherwise
+	 * it is hidden.
+	 */
 	private HoveredAreaContext				_hoveredContext;
+
+	private boolean							_isResetToolTip			= false;
 
 	public TourToolTip(final Control control) {
 
@@ -78,6 +87,10 @@ public class TourToolTip extends ToolTip {
 			((IToolTipHideListener) listeners[i]).afterHideToolTip(event);
 		}
 
+		/*
+		 * context must be set hidden that a default tool tip is not displayed in the way point tool
+		 * tip provider
+		 */
 		_hoveredContext = null;
 	}
 
@@ -122,7 +135,9 @@ public class TourToolTip extends ToolTip {
 			displayBounds = _toolTipControl.getDisplay().getBounds();
 		}
 
-		final Point bottomRight = new Point(ttTopLeft.x + tipSize.x, ttTopLeft.y + tipSize.y);
+		final Point bottomRight = new Point(//
+				ttTopLeft.x + tipSize.x,
+				ttTopLeft.y + tipSize.y);
 
 //		System.out.println();
 //		System.out.println();
@@ -166,11 +181,14 @@ public class TourToolTip extends ToolTip {
 	public Point getLocation(final Point tipSize, final Event event) {
 
 		if (_hoveredContext == null) {
-			return null;
+			/*
+			 * null cannot be returned because this causes an NPE
+			 */
+			return super.getLocation(tipSize, event);
 		}
 
 		final int devX = _hoveredContext.hoveredTopLeftX - tipSize.x;
-		final int devY = _hoveredContext.hoveredTopLeftY;
+		final int devY = _hoveredContext.hoveredTopLeftY - tipSize.y + _hoveredContext.hoveredHeight;
 
 		final Point toolTipDisplayLocation = _toolTipControl.toDisplay(devX, devY);
 
@@ -179,19 +197,18 @@ public class TourToolTip extends ToolTip {
 
 	@Override
 	protected Object getToolTipArea(final Event event) {
-
 		return _hoveredContext;
 	}
 
 	/**
-	 * @return Returns the tool tip provider which are attached to the tour tool tip.
+	 * @return Returns the tool tip providers which are attached to the tour tool tip.
 	 */
 	public ArrayList<ITourToolTipProvider> getToolTipProvider() {
 		return _tourToolTipProvider;
 	}
 
 	/**
-	 * Hide the hovered area in the tooltip
+	 * Hide the tooltip
 	 */
 	public void hideHoveredArea() {
 		_hoveredContext = null;
@@ -224,8 +241,41 @@ public class TourToolTip extends ToolTip {
 		tourToolTipProvider.setTourToolTip(null);
 	}
 
+	/**
+	 * Force the tooltip to be recreated
+	 */
+	public void resetToolTip() {
+		_isResetToolTip = true;
+	}
+
+	/**
+	 * Set the hovered context which is used to locate and display the tooltip.
+	 * 
+	 * @param hoveredAreaContext
+	 */
 	public void setHoveredContext(final HoveredAreaContext hoveredAreaContext) {
 		_hoveredContext = hoveredAreaContext;
+//
+//		System.out.println(System.currentTimeMillis() + " setHoveredContext()\t" + _hoveredContext);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	/*
+	 * !!! when true is returned, the tool tip is CREATED not only displayed !!!
+	 */
+	@Override
+	protected boolean shouldCreateToolTip(final Event event) {
+
+		if (_isResetToolTip) {
+
+			_isResetToolTip = false;
+
+			final boolean isCreate = _hoveredContext != null;
+
+			return isCreate;
+		}
+
+		return super.shouldCreateToolTip(event);
 	}
 
 	/**

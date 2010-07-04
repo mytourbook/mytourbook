@@ -906,6 +906,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		int joinedCalories = 0;
 		boolean isJoinedDistanceFromSensor = false;
 		short joinedDeviceTimeInterval = -1;
+		String joinedWeatherClouds = UI.EMPTY_STRING;
+		int joinedWeatherWindDir = 0;
+		int joinedWeatherWindSpeed = 0;
+		int joinedRestPulse = 0;
 
 		int relTourTime = 0;
 		long relTourTimeOffset = 0;
@@ -1213,6 +1217,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			if (isFirstTour) {
 				isJoinedDistanceFromSensor = tourTourData.getIsDistanceFromSensor();
 				joinedDeviceTimeInterval = tourTourData.getDeviceTimeInterval();
+
+				joinedWeatherClouds = tourTourData.getWeatherClouds();
+				joinedWeatherWindDir = tourTourData.getWeatherWindDir();
+				joinedWeatherWindSpeed = tourTourData.getWeatherWindSpeed();
+
+				joinedRestPulse = tourTourData.getRestPulse();
+
 			} else {
 				if (isJoinedDistanceFromSensor && tourTourData.getIsDistanceFromSensor()) {
 					// keep TRUE state
@@ -1269,7 +1280,14 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		_joinedTourData.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
 		_joinedTourData.setDeviceTimeInterval(joinedDeviceTimeInterval);
+
 		_joinedTourData.setCalories(joinedCalories);
+		_joinedTourData.setRestPulse(joinedRestPulse);
+
+		_joinedTourData.setWeatherClouds(joinedWeatherClouds);
+		_joinedTourData.setWeatherWindDir(joinedWeatherWindDir);
+		_joinedTourData.setWeatherWindSpeed(joinedWeatherWindSpeed);
+
 
 		_joinedTourData.setTourRecordingTime(joinedRecordingTime);
 		_joinedTourData.setTourDrivingTime(joinedDrivingTime);
