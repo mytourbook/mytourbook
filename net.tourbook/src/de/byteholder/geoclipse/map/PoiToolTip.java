@@ -32,7 +32,6 @@ public class PoiToolTip extends ToolTip {
 	public GeoPosition	geoPosition;
 
 	private Text		_lblPoiText;
-	private String		_poiText;
 
 	public PoiToolTip(final Composite parent) {
 		super(parent);
@@ -57,7 +56,6 @@ public class PoiToolTip extends ToolTip {
 	}
 
 	public void setText(final String poiText) {
-		_poiText = poiText;
 		_lblPoiText.setText(poiText);
 	}
 }

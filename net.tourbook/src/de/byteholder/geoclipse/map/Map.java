@@ -405,21 +405,20 @@ public class Map extends Canvas {
 	private final Color							_transparentColor;
 	private final Color							_defaultBackgroundColor;
 
-//	/*
-//	 * POI image
-//	 */
-//	private boolean										_isPoiVisible;
-//	private boolean										_isPoiPositionInViewport;
-////	private GeoPosition									_poiGeoPosition;
-//	private final Image									_poiImage;
-//	private final Rectangle	_poiImageBounds;
-//	private final Point									_poiImageDevPosition						= new Point(0, 0);
-//
-//	/*
-//	 * POI tooltip
-//	 */
-//	private PoiToolTip									_poiTT;
-//	private final int									_poiTTOffsetY								= 5;
+	/*
+	 * POI image
+	 */
+	private boolean								_isPoiVisible;
+	private boolean								_isPoiPositionInViewport;
+	private final Image							_poiImage;
+	private final Rectangle						_poiImageBounds;
+	private final Point							_poiImageDevPosition						= new Point(0, 0);
+
+	/*
+	 * POI tooltip
+	 */
+	private PoiToolTip							_poiTT;
+	private final int							_poiTTOffsetY								= 5;
 
 	/**
 	 * when <code>true</code> the loading... image is not displayed
@@ -632,8 +631,10 @@ public class Map extends Canvas {
 		_transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
 		_defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
 
-//		_poiImage = Activator.getImageDescriptor(Messages.Image_POI_InMap).createImage();
-//		_poiImageBounds = _poiImage.getBounds();
+		_poiImage = TourbookPlugin
+				.getImageDescriptor(de.byteholder.geoclipse.poi.Messages.Image_POI_InMap)
+				.createImage();
+		_poiImageBounds = _poiImage.getBounds();
 
 		paintOverlay();
 	}
@@ -722,7 +723,7 @@ public class Map extends Canvas {
 		addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(final FocusEvent e) {
-//				updatePoiVisibility();
+				updatePoiVisibility();
 			}
 
 			@Override
@@ -1184,28 +1185,6 @@ public class Map extends Canvas {
 				tilePosY * _tilePixelSize - _worldPixelTopLeftViewport.y);
 	}
 
-//	private Point2D.Double getWorldPixelAdjustedCenter(double newCenterX, double newCenterY) {
-//
-//		if (newCenterX < 0) {
-//			newCenterX = 0;
-//		}
-//		final int maxWidth = _mapTileSize.width * _tilePixelSize;
-//		if (newCenterX > maxWidth) {
-//			newCenterX = maxWidth;
-//		}
-//
-//		if (newCenterY < 0) {
-//			newCenterY = 0;
-//		}
-//
-//		final int maxHeight = _mapTileSize.height * _tilePixelSize;
-//		if (newCenterY > maxHeight) {
-//			newCenterY = maxHeight;
-//		}
-//
-//		return new Point2D.Double(newCenterX, newCenterY);
-//	}
-
 	/**
 	 * @param tileKey
 	 * @return Returns the key to identify overlay images in the image cache
@@ -1225,14 +1204,14 @@ public class Map extends Canvas {
 		return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
 	}
 
-//	/**
-//	 * Indicates if the tile borders should be drawn. Mainly used for debugging.
-//	 *
-//	 * @return the value of this property
-//	 */
-//	public boolean isDrawTileBorders() {
-//		return _isShowTileInfo;
-//	}
+	private PoiToolTip getPoi() {
+
+		if (_poiTT == null) {
+			_poiTT = new PoiToolTip(getShell());
+		}
+
+		return _poiTT;
+	}
 
 	/**
 	 * Returns the bounds of the viewport in pixels. This can be used to transform points into the
@@ -1472,7 +1451,7 @@ public class Map extends Canvas {
 		}
 
 		disposeResource(_mapImage);
-//		disposeResource(_poiImage);
+		disposeResource(_poiImage);
 
 		disposeResource(_image9Parts);
 		disposeResource(_gc9Parts);
@@ -1500,9 +1479,9 @@ public class Map extends Canvas {
 			disposeResource(_mapLegend.getImage());
 		}
 
-//		if (_poiTT != null) {
-//			_poiTT.dispose();
-//		}
+		if (_poiTT != null) {
+			_poiTT.dispose();
+		}
 
 		// stop overlay thread
 		_overlayThread.interrupt();
@@ -1579,7 +1558,7 @@ public class Map extends Canvas {
 		}
 
 		hideHoveredArea();
-//		setPoiVisible(false);
+		setPoiVisible(false);
 
 		if (_isSelectOfflineArea) {
 
@@ -1662,30 +1641,27 @@ public class Map extends Canvas {
 			}
 		}
 
-//		if (_poiTT != null && (_isPoiPositionInViewport)) {
-//
-//			// check if mouse is within the poi image
-//			if (_isPoiVisible
-//					&& (devMouseX > _poiImageDevPosition.x)
-//					&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
-//					&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-//					&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
-//
-//				// display poi
-//				showPoi();
-//
-//			} else {
-//				setPoiVisible(false);
-//			}
-//		}
+		if (_poiTT != null && _isPoiPositionInViewport) {
+
+			// check if mouse is within the poi image
+			if (_isPoiVisible
+					&& (_mouseMovePositionX > _poiImageDevPosition.x)
+					&& (_mouseMovePositionX < _poiImageDevPosition.x + _poiImageBounds.width)
+					&& (_mouseMovePositionY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+					&& (_mouseMovePositionY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+				// display poi
+				showPoi();
+
+			} else {
+				setPoiVisible(false);
+			}
+		}
 
 		fireMousePosition();
 	}
 
 	private void onMouseUp(final MouseEvent event) {
-
-//		final int devMouseX = event.x;
-//		final int devMouseY = event.y;
 
 		if (_isSelectOfflineArea) {
 
@@ -1733,13 +1709,13 @@ public class Map extends Canvas {
 		}
 
 		// show poi info when mouse is within the poi image
-//		if ((devMouseX > _poiImageDevPosition.x)
-//				&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
-//				&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-//				&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
-//
-//			setPoiVisible(true);
-//		}
+		if ((_mouseMovePositionX > _poiImageDevPosition.x)
+				&& (_mouseMovePositionX < _poiImageDevPosition.x + _poiImageBounds.width)
+				&& (_mouseMovePositionY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+				&& (_mouseMovePositionY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+			setPoiVisible(true);
+		}
 
 	}
 
@@ -1784,11 +1760,11 @@ public class Map extends Canvas {
 				}
 			}
 
-//			if (_isPoiVisible && _poiTT != null) {
-//				if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
-//					gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
-//				}
-//			}
+			if (_isPoiVisible && _poiTT != null) {
+				if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+					gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
+				}
+			}
 
 			if (_isPaintOfflineArea) {
 				paintOfflineArea(gc);
@@ -3360,21 +3336,22 @@ public class Map extends Canvas {
 						}
 					}
 
-//					// hide previous tooltip
-//					setPoiVisible(false);
-//
-//					final GeoPosition poiGeoPosition = new GeoPosition(lat, lon);
-//					final String poiText = pageName.replace('_', ' ');
-//
-//					final PoiToolTip poi = getPoi(poiGeoPosition);
-//					poi.setText(poiText);
-//
-//					setZoom(zoom);
-//					setGeoCenterPosition(poiGeoPosition);
-//
-//					_isPoiVisible = true;
-//
-//					firePOIEvent(poiGeoPosition, poiText);
+					// hide previous tooltip
+					setPoiVisible(false);
+
+					final GeoPosition poiGeoPosition = new GeoPosition(lat, lon);
+					final String poiText = pageName.replace('_', ' ');
+
+					final PoiToolTip poi = getPoi();
+					poi.geoPosition = poiGeoPosition;
+					poi.setText(poiText);
+
+					setZoom(zoom);
+					setMapCenter(poiGeoPosition);
+
+					_isPoiVisible = true;
+
+					firePOIEvent(poiGeoPosition, poiText);
 
 					return true;
 				}
@@ -3439,7 +3416,7 @@ public class Map extends Canvas {
 			 * set an additional asynch runnable because it's possible that the synch runnable do
 			 * not draw all tiles
 			 */
-			// TODO check if this is working when disabled
+// TODO check if this is working when disabled
 //			_display.asyncExec(synchImageRunnable);
 
 		} else {
@@ -3760,75 +3737,6 @@ public class Map extends Canvas {
 		_distanceUnitLabel = distanceUnitLabel;
 	}
 
-//	public void setPoi(final GeoPosition poiPosition, final int zoomLevel, final String poiText) {
-//
-//		_isPoiVisible = true;
-//
-//		final PoiToolTip poi = getPoi(poiPosition);
-//		poi.setText(poiText);
-//
-//		setZoom(zoomLevel);
-//
-//		_isPoiPositionInViewport = updatePoiImageDevPosition();
-//
-//		if (_isPoiPositionInViewport == false) {
-//			setGeoCenterPosition(poiPosition);
-//		}
-//
-//		/*
-//		 * when poi is set, it is possible that the mouse is already over the poi -> update tooltip
-//		 */
-//		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
-//		final int devMouseX = devMouse.x;
-//		final int devMouseY = devMouse.y;
-//
-//		// check if mouse is within the poi image
-//		if (_isPoiVisible
-//				&& (devMouseX > _poiImageDevPosition.x)
-//				&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
-//				&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-//				&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
-//
-//			showPoi(poiText);
-//
-//		} else {
-//			setPoiVisible(false);
-//		}
-//
-//		queueMapRedraw();
-//	}
-//
-//	/**
-//	 * Sets the visibility of the poi tooltip. Poi tooltip is visible when the tooltip is available
-//	 * and the poi image is withing the map view port
-//	 *
-//	 * @param isVisible
-//	 *            <code>false</code> will hide the tooltip
-//	 */
-//	private void setPoiVisible(final boolean isVisible) {
-//
-//		if (_poiTT == null) {
-//			return;
-//		}
-//
-//		if (isVisible) {
-//
-//			if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
-//
-//				final Point poiDisplayPosition = toDisplay(_poiImageDevPosition);
-//
-//				_poiTT.show(
-//						poiDisplayPosition.x,
-//						poiDisplayPosition.y,
-//						_poiImageBounds.width,
-//						_poiImageBounds.height,
-//						_poiTTOffsetY);
-//			}
-//		} else {
-//			_poiTT.hide();
-//		}
-//	}
-
 	/**
 	 * Set a key to uniquely identify overlays which is used to cache the overlays
 	 * 
@@ -3836,6 +3744,45 @@ public class Map extends Canvas {
 	 */
 	public void setOverlayKey(final String key) {
 		_overlayKey = key;
+	}
+
+	public void setPoi(final GeoPosition poiGeoPosition, final int zoomLevel, final String poiText) {
+
+		_isPoiVisible = true;
+
+		final PoiToolTip poi = getPoi();
+		poi.geoPosition = poiGeoPosition;
+		poi.setText(poiText);
+
+		setZoom(zoomLevel);
+
+		_isPoiPositionInViewport = updatePoiImageDevPosition();
+
+		if (_isPoiPositionInViewport == false) {
+			setMapCenter(poiGeoPosition);
+		}
+
+		/*
+		 * when poi is set, it is possible that the mouse is already over the poi -> update tooltip
+		 */
+		final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+		final int devMouseX = devMouse.x;
+		final int devMouseY = devMouse.y;
+
+		// check if mouse is within the poi image
+		if (_isPoiVisible
+				&& (devMouseX > _poiImageDevPosition.x)
+				&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
+				&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+				&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+			showPoi();
+
+		} else {
+			setPoiVisible(false);
+		}
+
+		queueMapRedraw();
 	}
 
 	public void setPOI(final ITourToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
@@ -3899,6 +3846,37 @@ public class Map extends Canvas {
 	}
 
 	/**
+	 * Sets the visibility of the poi tooltip. Poi tooltip is visible when the tooltip is available
+	 * and the poi image is withing the map view port
+	 * 
+	 * @param isVisible
+	 *            <code>false</code> will hide the tooltip
+	 */
+	private void setPoiVisible(final boolean isVisible) {
+
+		if (_poiTT == null) {
+			return;
+		}
+
+		if (isVisible) {
+
+			if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+
+				final Point poiDisplayPosition = toDisplay(_poiImageDevPosition);
+
+				_poiTT.show(
+						poiDisplayPosition.x,
+						poiDisplayPosition.y,
+						_poiImageBounds.width,
+						_poiImageBounds.height,
+						_poiTTOffsetY);
+			}
+		} else {
+			_poiTT.hide();
+		}
+	}
+
+	/**
 	 * @param isRedrawEnabled
 	 *            Set <code>true</code> to enable map drawing (which is the default). When
 	 *            <code>false</code>, map drawing is disabled.
@@ -3914,13 +3892,6 @@ public class Map extends Canvas {
 			queueMapRedraw();
 		}
 	}
-
-//	public void setShowPOI(final boolean isShowPOI) {
-//
-//		_isPoiVisible = isShowPOI;
-//
-//		queueMapRedraw();
-//	}
 
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
@@ -3955,103 +3926,16 @@ public class Map extends Canvas {
 		_isDrawOverlays = showOverlays;
 	}
 
+	public void setShowPOI(final boolean isShowPOI) {
+
+		_isPoiVisible = isShowPOI;
+
+		queueMapRedraw();
+	}
+
 	public void setShowScale(final boolean isScaleVisible) {
 		_isScaleVisible = isScaleVisible;
 	}
-
-//	private void showPoi(final String poiText) {
-//
-//		if (_poiTT != null && _poiTT.isVisible()) {
-//			// poi is hidden
-//			return;
-//		}
-//
-//		final PoiToolTip poiTT = getPoi();
-//
-//		final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
-//
-//		poiTT.setText(poiText);
-//		poiTT.show(//
-//				poiDisplayPosition.x,
-//				poiDisplayPosition.y,
-//				_poiImageBounds.width,
-//				_poiImageBounds.height,
-//				_poiTTOffsetY);
-//	}
-
-//	/**
-//	 * @return Returns <code>true</code> when the POI image is visible and the position is set in
-//	 *         {@link #_poiImageDevPosition}
-//	 */
-//	private boolean updatePoiImageDevPosition() {
-//
-//		if (_poiGeoPosition == null) {
-//			return false;
-//		}
-//
-//		// get world position for the poi coordinates
-//		final java.awt.Point worldPoiPos = _MP.geoToPixel(_poiGeoPosition, _mapZoomLevel);
-//
-//		// adjust view port to contain the poi image
-//		final java.awt.Rectangle adjustedViewport = (Rectangle) _worldPixelViewport.clone();
-//		adjustedViewport.x -= _poiImageBounds.width;
-//		adjustedViewport.y -= _poiImageBounds.height;
-//		adjustedViewport.width += _poiImageBounds.width * 2;
-//		adjustedViewport.height += _poiImageBounds.height * 2;
-//
-//		// check if poi is visible
-//		if (adjustedViewport.contains(
-//				worldPoiPos.x - _poiImageBounds.width / 2,
-//				worldPoiPos.y - _poiImageBounds.height,
-//				_poiImageBounds.width,
-//				_poiImageBounds.height)) {
-//
-//			// convert world position into device position
-//			final int devPoiPosX = worldPoiPos.x - _worldPixelViewport.x;
-//			final int devPoiPosY = worldPoiPos.y - _worldPixelViewport.y;
-//
-//			// get poi size
-//			final int poiImageWidth = _poiImageBounds.width;
-//			final int poiImageHeight = _poiImageBounds.height;
-//
-//			_poiImageDevPosition.x = devPoiPosX - (poiImageWidth / 2);
-//			_poiImageDevPosition.y = devPoiPosY - poiImageHeight;
-//
-//			return true;
-//
-//		} else {
-//
-//			return false;
-//		}
-//	}
-//
-//	/**
-//	 * show poi info when mouse is within the poi image
-//	 */
-//	private void updatePoiVisibility() {
-//
-//		boolean isVisible = false;
-//
-//		if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
-//
-//			final Display display = Display.getCurrent();
-//			final Point displayMouse = display.getCursorLocation();
-//			final Point devMouse = this.toControl(displayMouse);
-//
-//			final int devMouseX = devMouse.x;
-//			final int devMouseY = devMouse.y;
-//
-//			if ((devMouseX > _poiImageDevPosition.x)
-//					&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
-//					&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
-//					&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
-//
-//				isVisible = true;
-//			}
-//		}
-//
-//		setPoiVisible(isVisible);
-//	}
 
 	public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
 
@@ -4144,6 +4028,24 @@ public class Map extends Canvas {
 		fireZoomEvent(adjustedZoomLevel);
 	}
 
+	private void showPoi() {
+
+		if (_poiTT != null && _poiTT.isVisible()) {
+			// poi is hidden
+			return;
+		}
+
+		final PoiToolTip poiTT = getPoi();
+		final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
+
+		poiTT.show(//
+				poiDisplayPosition.x,
+				poiDisplayPosition.y,
+				_poiImageBounds.width,
+				_poiImageBounds.height,
+				_poiTTOffsetY);
+	}
+
 	private void updateOfflineAreaEndPosition(final MouseEvent mouseEvent) {
 
 		final int worldMouseX = _worldPixelTopLeftViewport.x + mouseEvent.x;
@@ -4153,6 +4055,86 @@ public class Map extends Canvas {
 		_offlineWorldEnd = new Point(worldMouseX, worldMouseY);
 
 		_offlineDevTileEnd = getOfflineAreaTilePosition(worldMouseX, worldMouseY);
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the POI image is visible and the position is set in
+	 *         {@link #_poiImageDevPosition}
+	 */
+	private boolean updatePoiImageDevPosition() {
+
+		final GeoPosition poiGeoPosition = getPoi().geoPosition;
+		if (poiGeoPosition == null) {
+			return false;
+		}
+
+		// get world position for the poi coordinates
+		final java.awt.Point worldPoiPos = _mp.geoToPixel(poiGeoPosition, _mapZoomLevel);
+
+		// adjust view port to contain the poi image
+		final Rectangle adjustedViewport = new Rectangle(
+				_worldPixelTopLeftViewport.x,
+				_worldPixelTopLeftViewport.y,
+				_worldPixelTopLeftViewport.width,
+				_worldPixelTopLeftViewport.height);
+
+		adjustedViewport.x -= _poiImageBounds.width;
+		adjustedViewport.y -= _poiImageBounds.height;
+		adjustedViewport.width += _poiImageBounds.width * 2;
+		adjustedViewport.height += _poiImageBounds.height * 2;
+
+		// check if poi is visible
+		if (adjustedViewport.intersects(//
+				worldPoiPos.x - _poiImageBounds.width / 2,
+				worldPoiPos.y - _poiImageBounds.height,
+				_poiImageBounds.width,
+				_poiImageBounds.height)) {
+
+			// convert world position into device position
+			final int devPoiPosX = worldPoiPos.x - _worldPixelTopLeftViewport.x;
+			final int devPoiPosY = worldPoiPos.y - _worldPixelTopLeftViewport.y;
+
+			// get poi size
+			final int poiImageWidth = _poiImageBounds.width;
+			final int poiImageHeight = _poiImageBounds.height;
+
+			_poiImageDevPosition.x = devPoiPosX - (poiImageWidth / 2);
+			_poiImageDevPosition.y = devPoiPosY - poiImageHeight;
+
+			return true;
+
+		} else {
+
+			return false;
+		}
+	}
+
+	/**
+	 * show poi info when mouse is within the poi image
+	 */
+	private void updatePoiVisibility() {
+
+		boolean isVisible = false;
+
+		if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+
+			final Display display = Display.getCurrent();
+			final Point displayMouse = display.getCursorLocation();
+			final Point devMouse = this.toControl(displayMouse);
+
+			final int devMouseX = devMouse.x;
+			final int devMouseY = devMouse.y;
+
+			if ((devMouseX > _poiImageDevPosition.x)
+					&& (devMouseX < _poiImageDevPosition.x + _poiImageBounds.width)
+					&& (devMouseY > _poiImageDevPosition.y - _poiTTOffsetY - 5)
+					&& (devMouseY < _poiImageDevPosition.y + _poiImageBounds.height)) {
+
+				isVisible = true;
+			}
+		}
+
+		setPoiVisible(isVisible);
 	}
 
 	/**

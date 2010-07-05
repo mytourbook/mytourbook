@@ -136,15 +136,6 @@ public class Messages extends NLS {
 	public static String		Image_Action_ZoomOutToMinZoom_Disabled;
 	public static String		Image_Action_ZoomShowEntireLayer;
 
-//	public static String		Image_POI_Anchor;
-//	public static String		Image_POI_Car;
-//	public static String		Image_POI_Cart;
-//	public static String		Image_POI_Flag;
-//	public static String		Image_POI_House;
-//	public static String		Image_POI_InMap;
-//	public static String		Image_POI_Soccer;
-//	public static String		Image_POI_Star;
-
 	public static String		Image_ViewIcon_Map;
 	public static String		Image_ViewIcon_Placeholder16;
 
@@ -158,14 +149,10 @@ public class Messages extends NLS {
 	public static String		MP_Error_DialogTitle_Wms;
 	public static String		MP_Error_Title_ErrorInXmlFile;
 
-	public static String	MP_Manager_DeletedOfflineImagesParts_SubTask;
-
-	public static String	MP_Manager_DeletedOfflineImagesParts_TaskName;
-
-	public static String	MP_Manager_DeletedOfflineImagesParts_TaskNameParts;
-
-	public static String	MP_Manager_DeleteOfflineImages_CannotDeleteFolder;
-
+	public static String		MP_Manager_DeletedOfflineImagesParts_SubTask;
+	public static String		MP_Manager_DeletedOfflineImagesParts_TaskName;
+	public static String		MP_Manager_DeletedOfflineImagesParts_TaskNameParts;
+	public static String		MP_Manager_DeleteOfflineImages_CannotDeleteFolder;
 	public static String		MP_Manager_Task_GetWms;
 
 	public static String		DBG001_Error_Wms_LatLonBboxIsNotDefined;

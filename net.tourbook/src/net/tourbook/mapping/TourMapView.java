@@ -290,13 +290,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	void actionPOI() {
 
-//		final boolean isShowPOI = _actionShowPOI.isChecked();
-//
-//		_map.setShowPOI(isShowPOI);
-//
-//		if (isShowPOI) {
-//			_map.setPoi(_poiPosition, _map.getZoom(), _poiName);
-//		}
+		final boolean isShowPOI = _actionShowPOI.isChecked();
+
+		_map.setShowPOI(isShowPOI);
+
+		if (isShowPOI) {
+			_map.setPoi(_poiPosition, _map.getZoom(), _poiName);
+		}
 	}
 
 	void actionReloadFailedMapImages() {
@@ -362,7 +362,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		} else {
 			_tourToolTip.removeToolTipProvider(_tourInfoToolTipProvider);
 		}
-//		_tourInfo.setVisible(isVisible);
 
 		_map.queueMapRedraw();
 	}
@@ -1479,7 +1478,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				_poiZoomLevel = _map.getZoom();
 			}
 
-//			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
+			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
 
 			_actionShowPOI.setChecked(true);
 
@@ -1509,40 +1508,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final TourWayPoint wp = (TourWayPoint) firstElement;
 
 				_map.setPOI(_wayPointToolTipProvider, wp);
-				
-
-//				System.out.println("\t");
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-				// TODO remove SYSTEM.OUT.PRINTLN
-
 			}
 
 			enableActions();
