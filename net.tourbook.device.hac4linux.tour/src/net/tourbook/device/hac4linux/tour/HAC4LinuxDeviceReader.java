@@ -166,7 +166,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 	 * and at it to the TourData object provided.
 	 */
 	private void deviceTotals(final String device, final short modeId, final String line, final TourData tourData){
-		if(device.equals("CM414AM")){
+		if(device.equals("CM414AM")){ //$NON-NLS-1$
 			tourData.setDeviceTimeInterval((short) 20);
 			char bikeNumber = ' ';
 			if( modeId == 46) {
@@ -176,23 +176,23 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 			} else if(modeId == 99) {
 				return;
 			}
-			final String[] fields = line.split("=");
+			final String[] fields = line.split("="); //$NON-NLS-1$
             if(fields.length < 2) {
 				return;
 			}
             final char settingsNumber = fields[0].charAt(fields[0].length()-1);
 			if(bikeNumber == settingsNumber){
 				fields[0] = fields[0].substring(0, fields[0].length()-1 );
-                if(fields[0].equals("Distance")) {
+                if(fields[0].equals("Distance")) { //$NON-NLS-1$
 					tourData.setStartDistance(Integer.parseInt(fields[1]));
 				}
-                if(fields[0].equals("HeightUp")) {
+                if(fields[0].equals("HeightUp")) { //$NON-NLS-1$
 					tourData.setDeviceTotalUp(Integer.parseInt(fields[1]));
 				}
                 //tourData.setDeviceTotalDown(Integer.parseInt(fields[1]));
                 // TODO welches Format?!
                 //if(fields[0].equals("TotalTime")) tourData.setDeviceTravelTime(Long.parseLong(fields[1]));
-                if(fields[0].equals("WheelPerimeter")) {
+                if(fields[0].equals("WheelPerimeter")) { //$NON-NLS-1$
 					tourData.setDeviceWheel(Integer.parseInt(fields[1]));
 				}
 			}
@@ -208,11 +208,11 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		// This is true for the CM414 AltiM but might be different
 		// for other devices
 		if( modeId == 46) {
-			return "Bike2";
+			return "Bike2"; //$NON-NLS-1$
 		} else if(modeId == 64) {
-			return "Bike1";
+			return "Bike1"; //$NON-NLS-1$
 		} else if(modeId == 99) {
-			return "Jogging";
+			return "Jogging"; //$NON-NLS-1$
 		}
 		else {
 			return UI.EMPTY_STRING;
@@ -268,7 +268,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		//!12	95	20	70	0	0.00	30.60	430.00	0.00	25.80	0.00	257.47	00:01:00.00
 
 		final TimeData timeData = new TimeData();
-		final String[] fields = line.split("\t");
+		final String[] fields = line.split("\t"); //$NON-NLS-1$
 		if(fields.length < 13) {
 			return null;
 		}
@@ -344,60 +344,60 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		        int index = -1;
 		        switch(m_section){
 		        	case SECTION_FILE:
-		        		fields = line.split("=");
+		        		fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
-		                if(fields[0].equals("Version"))
+		                if(fields[0].equals("Version")) //$NON-NLS-1$
 						 {
 							continue; // FileVersion "0.1.0"
 						}
 		        		break;
 		        	case SECTION_INFO:
-		                fields = line.split("=");
+		                fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
-		                if(fields[0].equals("Number"))
+		                if(fields[0].equals("Number")) //$NON-NLS-1$
 						 {
 							continue;//
 						}
-		                if(fields[0].equals("Title")) {
+		                if(fields[0].equals("Title")) { //$NON-NLS-1$
 							tourData.setTourTitle(fields[1]);
 						}
-		                if(fields[0].equals("Date")){//"dd.MM.yyyy"
+		                if(fields[0].equals("Date")){//"dd.MM.yyyy" //$NON-NLS-1$
 		                	tourData.setStartYear(Short.parseShort(fields[1].substring(6)));
 		        			tourData.setStartMonth(Short.parseShort(fields[1].substring(3, 5)));
 		        			tourData.setStartDay(Short.parseShort(fields[1].substring(0, 2)));
 		                }
-		                if(fields[0].equals("Time")){//"hh:mm:ss.00"
+		                if(fields[0].equals("Time")){//"hh:mm:ss.00" //$NON-NLS-1$
 		        			tourData.setStartHour(Short.parseShort(fields[1].substring(0, 2)));
 		        			tourData.setStartMinute(Short.parseShort(fields[1].substring(3, 5)));
 		                }
-		                if(fields[0].equals("Mode")) {
+		                if(fields[0].equals("Mode")) { //$NON-NLS-1$
 		                	modeId = Short.parseShort(fields[1]);
 		                	tourData.setDeviceMode(modeId);
 		                	tourData.setDeviceModeName(getDeviceModeName(Integer.parseInt(fields[1])));
 		                }
-		                if(fields[0].equals("TimeDriven")){//"hh:mm:ss.00"
+		                if(fields[0].equals("TimeDriven")){//"hh:mm:ss.00" //$NON-NLS-1$
 		                	int tourDrivingTime = Short.parseShort(fields[1].substring(6, 8));
 		                	tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(3, 5))*60;
 		                	tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(0, 2))*3600;
 		                	tourData.setTourDrivingTime(tourDrivingTime);
 		                }
-		                if(fields[0].equals("RecTime")){//"hh:mm:ss.00"
+		                if(fields[0].equals("RecTime")){//"hh:mm:ss.00" //$NON-NLS-1$
 		                	int tourRecordingTime = Short.parseShort(fields[1].substring(6, 8));
 		                	tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(3, 5))*60;
 		                	tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(0, 2))*3600;
 		                	tourData.setTourRecordingTime(tourRecordingTime);
 		                }
-		                if(fields[0].equals("Distance")) {
+		                if(fields[0].equals("Distance")) { //$NON-NLS-1$
 							tourData.setTourDistance(Integer.parseInt(fields[1]));
 						}
-		                if(fields[0].equals("Start")) {
+		                if(fields[0].equals("Start")) { //$NON-NLS-1$
 							tourData.setTourStartPlace(fields[1]);
 						}
-		                if(fields[0].equals("Finish")) {
+		                if(fields[0].equals("Finish")) { //$NON-NLS-1$
 							tourData.setTourEndPlace(fields[1]);
 						}
 		                break;
@@ -406,7 +406,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		                if(index < 0) {
 							break;
 						}
-		                tourDescription.append(line.substring(index+1)+"\n");
+		                tourDescription.append(line.substring(index+1)+"\n"); //$NON-NLS-1$
 		        		break;
 		        	case SECTION_FRIENDS:
 		        		index = line.indexOf('=');
@@ -414,59 +414,59 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 							break;
 						}
 		                if(friends < 0) {
-							tourDescription.append("\nFriends: \n");
+							tourDescription.append("\nFriends: \n"); //$NON-NLS-1$
 						}
 		                friends++;
-		                tourDescription.append(line.substring(index+1)+"\n");
+		                tourDescription.append(line.substring(index+1)+"\n"); //$NON-NLS-1$
 		        		break;
 		        	case SECTION_PERSON:
-		        		fields = line.split("=");
+		        		fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
-		                if(fields[0].equals("LastName")) {
+		                if(fields[0].equals("LastName")) { //$NON-NLS-1$
 							tourPerson.setLastName(fields[1]);
 						}
-		                if(fields[0].equals("FirstName")) {
+		                if(fields[0].equals("FirstName")) { //$NON-NLS-1$
 							tourPerson.setFirstName(fields[1]);
 						}
-		                if(fields[0].equals("DateOfBirth"))
+		                if(fields[0].equals("DateOfBirth")) //$NON-NLS-1$
 						 {
 							continue; // tourPerson.set (fields[1]);
 						}
-		                if(fields[0].equals("SportsClub"))
+		                if(fields[0].equals("SportsClub")) //$NON-NLS-1$
 						 {
 							continue; // tourPerson.set (fields[1]);
 						}
-		                if(fields[0].equals("Equipment"))
+		                if(fields[0].equals("Equipment")) //$NON-NLS-1$
 						 {
 							continue; // tourPerson.set (fields[1]); //tourData.bike?
 						}
-		                if(fields[0].equals("MaxPulse"))
+		                if(fields[0].equals("MaxPulse")) //$NON-NLS-1$
 						 {
 							continue; // tourPerson.set (fields[1]);
 						}
-		                if(fields[0].equals("RestPulse")) {
+		                if(fields[0].equals("RestPulse")) { //$NON-NLS-1$
 							tourData.setRestPulse(Integer.parseInt(fields[1]));
 						}
-		                if(fields[0].equals("Weight")) {
+		                if(fields[0].equals("Weight")) { //$NON-NLS-1$
 							tourPerson.setWeight( Float.parseFloat(fields[1]));
 						}
 		        		break;
 		        	case SECTION_STATISTICS:
-		        		fields = line.split("=");
+		        		fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
-		                if(fields[0].equals("Rosen")) {
+		                if(fields[0].equals("Rosen")) { //$NON-NLS-1$
 							tourData.setTourAltUp(Integer.parseInt(fields[1]));
 						}
-		                if(fields[0].equals("Fallen")) {
+		                if(fields[0].equals("Fallen")) { //$NON-NLS-1$
 							tourData.setTourAltDown(Integer.parseInt(fields[1]));
 						}
 		                //if(fields[0].equals("Altitude")) //Altitude=147;90;69
-		                if(fields[0].equals("Temperature")){ //Temperature=24;22;20
-		                	final String[] sTemps = fields[1].split(";");
+		                if(fields[0].equals("Temperature")){ //Temperature=24;22;20 //$NON-NLS-1$
+		                	final String[] sTemps = fields[1].split(";"); //$NON-NLS-1$
 		                	if(sTemps.length > 1) {
 								tourData.setAvgTemperature(Integer.parseInt(sTemps[1]));
 							}
@@ -488,29 +488,29 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		                 */
 		        		break;
 		        	case SECTION_SETTINGS:
-		        		fields = line.split("=");
+		        		fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
-		                if(fields[0].equals("DeviceShortName")) {
+		                if(fields[0].equals("DeviceShortName")) { //$NON-NLS-1$
 							tourData.setDeviceName(fields[1]);
 						}
 		                //if(fields[0].equals("DateOfTransfer")) tourData.set //13.04.2007
-		                if(fields[0].equals("DeltaTime")) {
+		                if(fields[0].equals("DeltaTime")) { //$NON-NLS-1$
 							deltaTime = Integer.parseInt(fields[1].substring(6,8));
 						}
 		                //if(fields[0].equals("HomeAltitude")) tourData.set // 71
-		                if(fields[0].equals("HomeAltitude")) {
+		                if(fields[0].equals("HomeAltitude")) { //$NON-NLS-1$
 							lastAlti = Integer.parseInt(fields[1]);
 						}
 		                //if(fields[0].equals("Weight")) tourData.set // already set above
-		                if(fields[0].equals("Distance1") || fields[0].equals("Distance2")
-		                			|| fields[0].equals("HeightUp1")
-		                			|| fields[0].equals("HeightUp2")
-		                			|| fields[0].equals("TotalTime1")
-		                			|| fields[0].equals("TotalTime2")
-		                			|| fields[0].equals("WheelPerimeter1")
-		                			|| fields[0].equals("WheelPerimeter2")){
+		                if(fields[0].equals("Distance1") || fields[0].equals("Distance2") //$NON-NLS-1$ //$NON-NLS-2$
+		                			|| fields[0].equals("HeightUp1") //$NON-NLS-1$
+		                			|| fields[0].equals("HeightUp2") //$NON-NLS-1$
+		                			|| fields[0].equals("TotalTime1") //$NON-NLS-1$
+		                			|| fields[0].equals("TotalTime2") //$NON-NLS-1$
+		                			|| fields[0].equals("WheelPerimeter1") //$NON-NLS-1$
+		                			|| fields[0].equals("WheelPerimeter2")){ //$NON-NLS-1$
 		                	deviceTotals(tourData.getDeviceName(), modeId, line, tourData);
 		                }
 		        		break;
@@ -520,7 +520,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		        	//	StartDelay=0
 		        		break;
 		        	case SECTION_COACH:
-		        		fields = line.split("=");
+		        		fields = line.split("="); //$NON-NLS-1$
 		                if(fields.length < 2) {
 							break;
 						}
@@ -549,7 +549,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		        		// no pulse is recorded.
 		        		// the data written alsways form a sawtooth graph
 		        		// 0-256-0-256....
-		        		if(tourData.getDeviceName().equals("CM414AM") ) {
+		        		if(tourData.getDeviceName().equals("CM414AM") ) { //$NON-NLS-1$
 							timeData.pulse = 0;
 						}
 		        		// The first time slice seems to be set to the total
@@ -568,7 +568,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		        		//!Abzw._Rieseberg	157	00:52:17.64	17:16:17.00
 		        		//!z	370	02:03:10.08	18:27:10.00
 		        		// each line containing a data record starts with !
-		        		fields = line.split("\t");
+		        		fields = line.split("\t"); //$NON-NLS-1$
 		                if(fields.length < 4) {
 							break;
 						}
@@ -612,7 +612,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 				 * disable data series when no data are available
 				 */
 				final TimeData firstTimeData = timeDataList.get(0);
-				if (tourData.getDeviceName().equals("CM414AM")) {
+				if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
 					
 					firstTimeData.pulse = Integer.MIN_VALUE;
 				}
@@ -658,17 +658,17 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 	 * the file currently read.
 	 */
 	private void switchSection(final String line){
-		if(line.equals("[FILE]")){m_section = Section.SECTION_FILE; return;}
-	    if(line.equals("[INFORMATION]")){m_section = Section.SECTION_INFO; return;}
-	    if(line.equals("[NOTES]")){m_section = Section.SECTION_NOTES; return;}
-	    if(line.equals("[FRIENDS]")){m_section = Section.SECTION_FRIENDS; return;}
-	    if(line.equals("[PERSON]")){m_section = Section.SECTION_PERSON; return;}
-	    if(line.equals("[STATISTICS]")){m_section = Section.SECTION_STATISTICS; return;}
-	    if(line.equals("[SETTINGS]")){m_section = Section.SECTION_SETTINGS; return;}
-	    if(line.equals("[POLAR-EXTENSION]")){m_section = Section.SECTION_POLAREXTS; return;}
-	    if(line.equals("[COACH-PARAMETER]")){m_section = Section.SECTION_COACH; return;}
-	    if(line.equals("[TOUR-DATA]")){m_section = Section.SECTION_TOURDATA; return;}
-	    if(line.equals("[MARKING-DATA]")){m_section = Section.SECTION_MARKS; return;}
+		if(line.equals("[FILE]")){m_section = Section.SECTION_FILE; return;} //$NON-NLS-1$
+	    if(line.equals("[INFORMATION]")){m_section = Section.SECTION_INFO; return;} //$NON-NLS-1$
+	    if(line.equals("[NOTES]")){m_section = Section.SECTION_NOTES; return;} //$NON-NLS-1$
+	    if(line.equals("[FRIENDS]")){m_section = Section.SECTION_FRIENDS; return;} //$NON-NLS-1$
+	    if(line.equals("[PERSON]")){m_section = Section.SECTION_PERSON; return;} //$NON-NLS-1$
+	    if(line.equals("[STATISTICS]")){m_section = Section.SECTION_STATISTICS; return;} //$NON-NLS-1$
+	    if(line.equals("[SETTINGS]")){m_section = Section.SECTION_SETTINGS; return;} //$NON-NLS-1$
+	    if(line.equals("[POLAR-EXTENSION]")){m_section = Section.SECTION_POLAREXTS; return;} //$NON-NLS-1$
+	    if(line.equals("[COACH-PARAMETER]")){m_section = Section.SECTION_COACH; return;} //$NON-NLS-1$
+	    if(line.equals("[TOUR-DATA]")){m_section = Section.SECTION_TOURDATA; return;} //$NON-NLS-1$
+	    if(line.equals("[MARKING-DATA]")){m_section = Section.SECTION_MARKS; return;} //$NON-NLS-1$
 
 	    m_section = Section.SECTION_NONE;
 	}

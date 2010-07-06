@@ -592,7 +592,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
 				newTourType,
-				"crId" + newTourType.getCreateId(),
+				"crId" + newTourType.getCreateId(), //$NON-NLS-1$
 				newTourType.getName());
 
 		newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());

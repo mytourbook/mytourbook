@@ -1108,16 +1108,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 	private void enableActions(final boolean isForceTourColor) {
 
+		final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
+
 		_actionShowPOI.setEnabled(_poiPosition != null);
 
 		// update legend action
 		if (_isTour) {
 
-			final boolean isLegendVisible = _actionShowLegendInMap.isChecked();
-
 			_map.setShowLegend(isLegendVisible);
 
-			_actionShowSliderInLegend.setEnabled(isLegendVisible);
 			if (isLegendVisible == false) {
 				_actionShowSliderInLegend.setChecked(false);
 			}
@@ -1140,7 +1139,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		_actionShowWayPoints.setEnabled(_isTour);
 		_actionShowLegendInMap.setEnabled(_isTour);
 		_actionShowSliderInMap.setEnabled(_isTour);
-		_actionShowSliderInLegend.setEnabled(isOneTour);
+		_actionShowSliderInLegend.setEnabled(_isTour && isLegendVisible);
 		_actionShowTourInfoInMap.setEnabled(isOneTour);
 
 		if (_tourDataList.size() == 0) {

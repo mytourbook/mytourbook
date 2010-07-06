@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import org.eclipse.osgi.util.NLS;
@@ -27,15 +26,10 @@ public class Messages extends NLS {
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
 
-	public static String		image_action_change_tile_factory;
-
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
-
-	public static String	Image_Action_ShowSliderInMap;
-
-	public static String	Image_Action_ShowStartEndInMap;
-
+	public static String		Image_Action_ShowSliderInMap;
+	public static String		Image_Action_ShowStartEndInMap;
 	public static String		Image_Action_TourWayPoint;
 	public static String		Image_Action_TourWayPoint_Disabled;
 
@@ -46,6 +40,7 @@ public class Messages extends NLS {
 	public static String		Image_Map_WayPoint;
 	public static String		Image_Map_WayPoint_Hovered;
 
+	public static String		image_action_change_tile_factory;
 	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
 	public static String		image_action_show_tour_in_map_disabled;
@@ -99,25 +94,19 @@ public class Messages extends NLS {
 	public static String		map_action_change_tile_factory_tooltip;
 	public static String		map_action_dim_map;
 	public static String		map_action_dim_map_disabled;
-
 	public static String		map_action_reload_map;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 
 	public static String		Map_Action_ManageMapProviders;
-
 	public static String		Map_Action_POI;
-
 	public static String		Map_Action_POI_Tooltip;
 	public static String		Map_Action_SetDefaultMapProviders;
-
 	public static String		Map_Action_ShowTourInfoInMap;
-
 	public static String		Map_Action_ShowWayPoints;
 	public static String		Map_Action_ToggleMarker;
 
 	public static String		Map_Properties_ShowTileBorder;
-
 	public static String		Map_Properties_ShowTileInfo;
 
 	public static String		map_action_show_legend_in_map;
@@ -148,9 +137,6 @@ public class Messages extends NLS {
 	public static String		map_dlg_dim_warning_toggle_message;
 
 	public static String		map_properties_map_dim_level;
-	public static String		map_properties_show_tile_info;
-	public static String		map_properties_show_tile_info_no;
-	public static String		map_properties_show_tile_info_yes;
 
 	public static String		modify_mapprovider_btn_down;
 	public static String		modify_mapprovider_btn_up;

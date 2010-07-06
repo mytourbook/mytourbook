@@ -139,14 +139,13 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append(partMp);
-			sb.append("\tmissing:");
+			sb.append("\tmissing:");//$NON-NLS-1$
 			sb.append(missingImages);
-			sb.append("\texisting:");
+			sb.append("\texisting:");//$NON-NLS-1$
 			sb.append(existingImages);
 
 			return sb.toString();
 		}
-
 	}
 
 	class PartViewerContentProvicer implements IStructuredContentProvider {
@@ -1052,9 +1051,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
 				final StringBuilder sb = new StringBuilder();
 				sb.append(Integer.toString(tileWaitingQueueSize));
-				sb.append(" - ");
+				sb.append(UI.DASH_WITH_SPACE);
 				sb.append(_nf.format(percent));
-				sb.append("%");
+				sb.append('%');
 
 				_progbarQueue.setSelection((int) progress);
 				_txtQueue.setText(sb.toString());

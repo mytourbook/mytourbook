@@ -80,15 +80,15 @@ public class HoveredAreaContext {
 
 	@Override
 	public String toString() {
-		return "HoveredAreaContext [" //
+		return "HoveredAreaContext [" // //$NON-NLS-1$
 //				+ ("tourToolTipProvider=" + tourToolTipProvider + ", ")
 //				+ ("hoveredImage=" + hoveredImage + ", ")
 //				+ ("hoveredTopLeftX=" + hoveredTopLeftX + ", ")
 //				+ ("hoveredTopLeftY=" + hoveredTopLeftY + ", ")
 //				+ ("hoveredWidth=" + hoveredWidth + ", ")
 //				+ ("hoveredHeight=" + hoveredHeight)
-				+ "]"
-				+ (" " + this.hashCode());
+				+ "]" //$NON-NLS-1$
+				+ (" " + this.hashCode()); //$NON-NLS-1$
 	}
 
 }

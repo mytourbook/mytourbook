@@ -55,54 +55,12 @@ public class Messages extends NLS {
 	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		Dialog_ExtractTour_DlgArea_Message;
-
 	public static String		Dialog_ExtractTour_DlgArea_Title;
-
-	public static String	Dialog_ExtractTour_Label_DeviceName;
-
+	public static String		Dialog_ExtractTour_Label_DeviceName;
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
-	public static String	Dialog_PersonManager_PersonIsNotAvailable_Message;
-
-	public static String	Dialog_PersonManager_PersonIsNotAvailable_Title;
-
-	public static String		Dialog_Print_Chk_TourRangeDisabled;
-	public static String		Dialog_Print_Chk_TourRangeWithDistance;
-	public static String		Dialog_Print_Chk_TourRangeWithoutDistance;
-	public static String		Dialog_Print_Chk_CamouflageSpeedInput_Tooltip;
-	public static String		Dialog_Print_Chk_CamouflageSpeed;
-	public static String		Dialog_Print_Chk_CamouflageSpeed_Tooltip;
-	public static String		Dialog_Print_Chk_PrintMarkers;
-	public static String		Dialog_Print_Chk_PrintMarkers_Tooltip;
-	public static String		Dialog_Print_Chk_PrintNotes;
-	public static String		Dialog_Print_Chk_PrintNotes_Tooltip;
-	public static String		Dialog_Print_Chk_OverwriteFiles;
-	public static String		Dialog_Print_Chk_OverwriteFiles_Tooltip;
-	public static String		Dialog_Print_Btn_Print;
-	public static String		Dialog_Print_Dialog_Message;
-	public static String		Dialog_Print_File_Dialog_Text;
-	public static String		Dialog_Print_Error_CamouflageSpeedIsInvalid;
-	public static String		Dialog_Print_Dialog_Title;
-	public static String		Dialog_Print_Dir_Dialog_Message;
-	public static String		Dialog_Print_Dir_Dialog_Text;
-	public static String		Dialog_Print_Group_PdfFileName;
-	public static String		Dialog_Print_Group_Options;
-	public static String		Dialog_Print_Group_Paper;
-	public static String		Dialog_Print_Label_PrintFilePath;
-	public static String		Dialog_Print_Label_FileName;
-	public static String		Dialog_Print_Label_FilePath;
-	public static String		Dialog_Print_Label_Paper_Size;
-	public static String		Dialog_Print_Label_Paper_Size_A4;
-	public static String		Dialog_Print_Label_Paper_Size_Letter;
-	public static String		Dialog_Print_Label_Paper_Orientation;
-	public static String		Dialog_Print_Label_Paper_Orientation_Portrait;
-	public static String		Dialog_Print_Label_Paper_Orientation_Landscape;
-	public static String		Dialog_Print_Lbl_PdfFilePath;
-	public static String		Dialog_Print_Msg_FileAlreadyExists;
-	public static String		Dialog_Print_Msg_FileNameIsInvalid;
-	public static String		Dialog_Print_Msg_PathIsNotAvailable;
-	public static String		Dialog_Print_Shell_Text;
-	public static String		Dialog_Print_Txt_FilePath_Tooltip;
+	public static String		Dialog_PersonManager_PersonIsNotAvailable_Message;
+	public static String		Dialog_PersonManager_PersonIsNotAvailable_Title;
 
 	public static String		dialog_is_tour_editor_modified_message;
 	public static String		dialog_is_tour_editor_modified_title;
@@ -130,7 +88,6 @@ public class Messages extends NLS {
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;
 	public static String		action_tag_open_tagging_structure;
-	public static String		action_tag_recently_used;
 	public static String		action_tag_remove;
 	public static String		action_tag_remove_all;
 	public static String		action_tag_rename_tag;
@@ -212,9 +169,7 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_set_tour_type;
-
-	public static String	App_Action_SetPerson;
-
+	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
 
 	public static String		App_measurement_imperial;
@@ -297,57 +252,32 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_ComboText_KeepTime;
 	public static String		Dialog_JoinTours_ComboText_MarkerTourTime;
 	public static String		Dialog_JoinTours_ComboText_TourTileCustom;
-
 	public static String		Dialog_JoinTours_ComboText_TourTitleFromTour;
-
 	public static String		Dialog_JoinTours_ComboText_TourTypeCustom;
 	public static String		Dialog_JoinTours_ComboText_TourTypeFromTour;
 	public static String		Dialog_JoinTours_ComboText_TourTypePrevious;
 	public static String		Dialog_JoinTours_DlgArea_Message;
 	public static String		Dialog_JoinTours_DlgArea_Title;
-	public static String		Dialog_JoinTours_Group_JoinedTourTime;
-	public static String		Dialog_JoinTours_Group_TourType;
-	public static String		Dialog_JoinTours_InvalidData_Altitude;
-	public static String		Dialog_JoinTours_InvalidData_Cadence;
 	public static String		Dialog_JoinTours_InvalidData_Distance;
 	public static String		Dialog_JoinTours_InvalidData_DlgMessage;
 	public static String		Dialog_JoinTours_InvalidData_DlgTitle;
 	public static String		Dialog_JoinTours_InvalidData_Latitude;
-	public static String		Dialog_JoinTours_InvalidData_Longitude;
 	public static String		Dialog_JoinTours_InvalidData_Power;
-	public static String		Dialog_JoinTours_InvalidData_Pulse;
 	public static String		Dialog_JoinTours_InvalidData;
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
 	public static String		Dialog_JoinTours_InvalidData_Time;
-	public static String		Dialog_JoinTours_Label_CreateTourMarker;
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
-	public static String		Dialog_JoinTours_Label_Description;
 	public static String		Dialog_JoinTours_Label_DeviceName;
-
 	public static String		Dialog_JoinTours_Label_JoinMethod;
-	public static String		Dialog_JoinTours_Label_OtherFields;
-	public static String		Dialog_JoinTours_Label_OtherFieldsInfo;
-	public static String		Dialog_JoinTours_Label_Title;
-	public static String		Dialog_JoinTours_Label_Title_Tooltip;
 	public static String		Dialog_JoinTours_Label_Tour;
 	public static String		Dialog_JoinTours_Label_TourDate;
-	public static String		Dialog_JoinTours_Label_TourMarker;
 	public static String		Dialog_JoinTours_Label_TourMarkerText;
-
 	public static String		Dialog_JoinTours_Label_TourTime;
 	public static String		Dialog_JoinTours_Label_TourType;
 	public static String		Dialog_JoinTours_Link_TourType;
-	public static String		Dialog_JoinTours_Radio_ConcatenateTime_Tooltip;
-	public static String		Dialog_JoinTours_Radio_KeepTime_Tooltip;
-	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff;
-	public static String		Dialog_JoinTours_Radio_PreserveTourTimeDiff_Tooltip;
-	public static String		Dialog_JoinTours_TourTitle;
-
-	public static String		Dialog_SelectGraphs_Title;
 
 	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
-	public static String		Dialog_SplitTour_ComboText_CustomTime;
 	public static String		Dialog_SplitTour_ComboText_KeepSlices;
 	public static String		Dialog_SplitTour_ComboText_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_RemoveSlices;
@@ -361,12 +291,8 @@ public class Messages extends NLS {
 	public static String		Dialog_SplitTour_DlgArea_Title;
 	public static String		Dialog_SplitTour_Label_DefaultTitle;
 	public static String		Dialog_SplitTour_Label_DeviceName;
-
-	public static String	Dialog_SplitTour_Label_OtherFieldsInfo;
-
-	public static String	Dialog_SplitTour_Label_Person;
-
-	public static String	Dialog_SplitTour_Label_Person_Tooltip;
+	public static String		Dialog_SplitTour_Label_Person;
+	public static String		Dialog_SplitTour_Label_Person_Tooltip;
 	public static String		Dialog_SplitTour_Label_SplitMethod;
 	public static String		Dialog_SplitTour_Label_TourStartDateTime;
 	public static String		Dialog_SplitTour_Label_TourTitle;
@@ -431,7 +357,6 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_time;
 
 	public static String		Image___Empty16;
-
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
 	public static String		Image__chart_analyzer;
@@ -504,8 +429,6 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
-
-	public static String		Image__TourInfo;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -545,7 +468,6 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Data_Action_RemoveTour;
-
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
@@ -610,9 +532,6 @@ public class Messages extends NLS {
 	public static String		Pref_General_CalendarWeek;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
-	public static String		Pref_General_Energy;
-	public static String		Pref_General_Energy_Calorie;
-	public static String		Pref_General_Energy_Joule;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
@@ -661,8 +580,6 @@ public class Messages extends NLS {
 	public static String		Pref_People_Column_height;
 	public static String		Pref_People_Column_last_name;
 	public static String		Pref_People_Column_weight;
-	public static String		Pref_People_Dlg_del_person_message;
-	public static String		Pref_People_Dlg_del_person_title;
 	public static String		Pref_People_Error_first_name_is_required;
 	public static String		Pref_People_Error_invalid_number;
 	public static String		Pref_People_Error_path_is_invalid;
@@ -811,8 +728,6 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
-	public static String		Tour_Database_Dialog_CheckFieldLength_Message;
-	public static String		Tour_Database_Dialog_CheckFieldLength_Title;
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
@@ -855,16 +770,10 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
 
-	public static String		Tour_Person_Dialog_GetSelectedPerson_Message;
-
-	public static String		Tour_Person_Dialog_GetSelectedPerson_Title;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
-
-	public static String		Tour_Waypoint_Column_Comment;
-	public static String		Tour_Waypoint_Column_Time;
 
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;
@@ -1079,8 +988,7 @@ public class Messages extends NLS {
 
 	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String		TourEditor_Action_DeleteDistanceValues;
-
-	public static String	TourEditor_Action_SetStartDistanceTo0;
+	public static String		TourEditor_Action_SetStartDistanceTo0;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;

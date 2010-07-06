@@ -336,19 +336,19 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	public String toString() {
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("wayPointId:");
+		sb.append("wayPointId:"); //$NON-NLS-1$
 		sb.append(wayPointId);
-		sb.append("\tcreateId:");
+		sb.append("\tcreateId:"); //$NON-NLS-1$
 		sb.append(_createId);
-		sb.append("\tname:");
+		sb.append("\tname:"); //$NON-NLS-1$
 		sb.append(name);
-		sb.append("\tlat:");
+		sb.append("\tlat:"); //$NON-NLS-1$
 		sb.append(latitude);
-		sb.append("\tlon:");
+		sb.append("\tlon:"); //$NON-NLS-1$
 		sb.append(longitude);
-		sb.append("\tdesc:");
+		sb.append("\tdesc:"); //$NON-NLS-1$
 		sb.append(description);
-		sb.append("\tcom:");
+		sb.append("\tcom:"); //$NON-NLS-1$
 		sb.append(comment);
 
 		return sb.toString();

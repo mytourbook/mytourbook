@@ -31,7 +31,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DownloadSRTM3 {
 
-	public static final String		URL_SEPARATOR		= "/"; //$NON-NLS-1$
+	public static final String		URL_SEPARATOR		= "/";	//$NON-NLS-1$
 
 	private final static int		DirEurasia			= 0;
 	private final static int		DirNorth_America	= 1;
@@ -40,7 +40,7 @@ public class DownloadSRTM3 {
 	private final static int		DirAustralia		= 4;
 	private final static int		DirIslands			= 5;
 
-	private static String[]			dirs				= { "/SRTM3/Eurasia", // 0 //$NON-NLS-1$
+	private static String[]			_downloadFolder		= { "/SRTM3/Eurasia", // 0 //$NON-NLS-1$
 			"/SRTM3/North_America", //	1 //$NON-NLS-1$
 			"/SRTM3/South_America", //	2 //$NON-NLS-1$
 			"/SRTM3/Africa", //			3 //$NON-NLS-1$
@@ -48,7 +48,7 @@ public class DownloadSRTM3 {
 			"/SRTM3/Islands" //			5 //$NON-NLS-1$
 														};
 
-	private static FTPDownloader	fFtpDownloader		= null;
+	private static FTPDownloader	_ftpDownloader		= null;
 
 	/**
 	 * @param remoteFileName
@@ -66,16 +66,16 @@ public class DownloadSRTM3 {
 
 			// download from FTP server
 
-			if (fFtpDownloader == null) {
-				fFtpDownloader = new FTPDownloader("anonymous", UI.EMPTY_STRING);//$NON-NLS-1$
+			if (_ftpDownloader == null) {
+				_ftpDownloader = new FTPDownloader("anonymous", UI.EMPTY_STRING);//$NON-NLS-1$
 			}
 
 			// set ftp host from url which contains the protocol ftp://
 			String ftpUrl = prefStore.getString(IPreferences.STATE_SRTM3_FTP_URL);
 			ftpUrl = ftpUrl.substring(PrefPageSRTM.PROTOCOL_FTP.length());
-			fFtpDownloader.setHost(ftpUrl);
+			_ftpDownloader.setHost(ftpUrl);
 
-			fFtpDownloader.get(remoteFilePath, remoteFileName, localZipName);
+			_ftpDownloader.get(remoteFilePath, remoteFileName, localZipName);
 
 		} else {
 
@@ -88,7 +88,8 @@ public class DownloadSRTM3 {
 				baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
 			}
 
-			final String url = new StringBuilder().append(baseUrl)
+			final String url = new StringBuilder()
+					.append(baseUrl)
 					.append(remoteFilePath)
 					.append(URL_SEPARATOR)
 					.toString();
@@ -110,68 +111,68 @@ public class DownloadSRTM3 {
 		final GeoLat lat = new GeoLat(latString);
 		final GeoLon lon = new GeoLon(lonString);
 
-		if (lat.greaterThen(new GeoLat("N60:00"))) {
+		if (lat.greaterThen(new GeoLat("N60:00"))) { //$NON-NLS-1$
 			throw (new FileNotFoundException());
 		}
-		if (lat.lessThen(new GeoLat("S56:00"))) {
+		if (lat.lessThen(new GeoLat("S56:00"))) { //$NON-NLS-1$
 			throw (new FileNotFoundException());
 		}
 
 		// order important!
 		// compare map ftp://e0srp01u.ecs.nasa.gov/srtm/version2/Documentation/Continent_def.gif
-		if (isIn(lat, lon, "S56", "S28", "E165", "E179")) {
-			return dirs[DirIslands];
+		if (isIn(lat, lon, "S56", "S28", "E165", "E179")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirIslands];
 		}
-		if (isIn(lat, lon, "S56", "S55", "E158", "E159")) {
-			return dirs[DirIslands];
+		if (isIn(lat, lon, "S56", "S55", "E158", "E159")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirIslands];
 		}
-		if (isIn(lat, lon, "N15", "N30", "W180", "W155")) {
-			return dirs[DirIslands];
+		if (isIn(lat, lon, "N15", "N30", "W180", "W155")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirIslands];
 		}
-		if (isIn(lat, lon, "S44", "S05", "W030", "W006")) {
-			return dirs[DirIslands];
+		if (isIn(lat, lon, "S44", "S05", "W030", "W006")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirIslands];
 		}
-		if (isIn(lat, lon, "S56", "S45", "W039", "E060")) {
-			return dirs[DirIslands];
+		if (isIn(lat, lon, "S56", "S45", "W039", "E060")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirIslands];
 		}
-		if (isIn(lat, lon, "N35", "N39", "W040", "W020")) {
-			return dirs[DirAfrica];
+		if (isIn(lat, lon, "N35", "N39", "W040", "W020")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirAfrica];
 		}
-		if (isIn(lat, lon, "S20", "S20", "E063", "E063")) {
-			return dirs[DirAfrica];
+		if (isIn(lat, lon, "S20", "S20", "E063", "E063")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirAfrica];
 		}
-		if (isIn(lat, lon, "N10", "N10", "W110", "W110")) {
-			return dirs[DirNorth_America];
+		if (isIn(lat, lon, "N10", "N10", "W110", "W110")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirNorth_America];
 		}
-		if (isIn(lat, lon, "S10", "N14", "W180", "W139")) {
-			return dirs[DirEurasia];
+		if (isIn(lat, lon, "S10", "N14", "W180", "W139")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirEurasia];
 		}
-		if (isIn(lat, lon, "S13", "S11", "E096", "E105")) {
-			return dirs[DirEurasia];
+		if (isIn(lat, lon, "S13", "S11", "E096", "E105")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirEurasia];
 		}
-		if (isIn(lat, lon, "S44", "S11", "E112", "E179")) {
-			return dirs[DirAustralia];
+		if (isIn(lat, lon, "S44", "S11", "E112", "E179")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirAustralia];
 		}
-		if (isIn(lat, lon, "S28", "S11", "W180", "W106")) {
-			return dirs[DirAustralia];
+		if (isIn(lat, lon, "S28", "S11", "W180", "W106")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirAustralia];
 		}
-		if (isIn(lat, lon, "S35", "N34", "W030", "E059")) {
-			return dirs[DirAfrica];
+		if (isIn(lat, lon, "S35", "N34", "W030", "E059")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirAfrica];
 		}
-		if (isIn(lat, lon, "N35", "N60", "W011", "E059")) {
-			return dirs[DirEurasia];
+		if (isIn(lat, lon, "N35", "N60", "W011", "E059")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirEurasia];
 		}
-		if (isIn(lat, lon, "S10", "N60", "E060", "E179")) {
-			return dirs[DirEurasia];
+		if (isIn(lat, lon, "S10", "N60", "E060", "E179")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirEurasia];
 		}
-		if (isIn(lat, lon, "N15", "N60", "W180", "W043")) {
-			return dirs[DirNorth_America];
+		if (isIn(lat, lon, "N15", "N60", "W180", "W043")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirNorth_America];
 		}
-		if (isIn(lat, lon, "S56", "N14", "W093", "W033")) {
-			return dirs[DirSouth_America];
+		if (isIn(lat, lon, "S56", "N14", "W093", "W033")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			return _downloadFolder[DirSouth_America];
 		}
 
-		return dirs[DirIslands];
+		return _downloadFolder[DirIslands];
 	}
 
 	private static boolean isIn(final GeoLat lat,
@@ -181,16 +182,16 @@ public class DownloadSRTM3 {
 								final String lonMin,
 								final String lonMax) {
 
-		if (lat.lessThen(new GeoLat(latMin + ":00"))) {
+		if (lat.lessThen(new GeoLat(latMin + ":00"))) { //$NON-NLS-1$
 			return false;
 		}
-		if (lat.greaterThen(new GeoLat(latMax + ":00"))) {
+		if (lat.greaterThen(new GeoLat(latMax + ":00"))) { //$NON-NLS-1$
 			return false;
 		}
-		if (lon.lessThen(new GeoLon(lonMin + ":00"))) {
+		if (lon.lessThen(new GeoLon(lonMin + ":00"))) { //$NON-NLS-1$
 			return false;
 		}
-		if (lon.greaterThen(new GeoLon(lonMax + ":00"))) {
+		if (lon.greaterThen(new GeoLon(lonMax + ":00"))) { //$NON-NLS-1$
 			return false;
 		}
 		return true;

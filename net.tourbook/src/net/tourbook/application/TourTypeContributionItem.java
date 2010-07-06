@@ -77,14 +77,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private static final String								MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";							//$NON-NLS-1$
 
-	private IPreferenceStore								_prefStore					= TourbookPlugin
-																								.getDefault()
+	private IPreferenceStore								_prefStore					= TourbookPlugin.getDefault() //
 																								.getPreferenceStore();
 
-	private final IDialogSettings							_state						= TourbookPlugin
-																								.getDefault()
+	private final IDialogSettings							_state						= TourbookPlugin.getDefault() //
 																								.getDialogSettingsSection(
-																										"TourTypeContributionItem");
+																										"TourTypeContributionItem");	//$NON-NLS-1$
 	private org.eclipse.jface.util.IPropertyChangeListener	_prefChangeListener;
 
 	private TourTypeCombo									_comboTourType;

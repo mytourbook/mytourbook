@@ -58,20 +58,20 @@ public abstract class ToolTip {
 		_shell.addMouseTrackListener(new MouseTrackListener() {
 
 			public void mouseEnter(final MouseEvent e) {
-				System.out.println("mouseEnter()");
+//				System.out.println("mouseEnter()");
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}
 
 			public void mouseExit(final MouseEvent e) {
-				System.out.println("mouseExit");
+//				System.out.println("mouseExit");
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 				_shell.setVisible(false);
 			}
 
 			public void mouseHover(final MouseEvent e) {
-				System.out.println("mouseHover");
+//				System.out.println("mouseHover");
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}

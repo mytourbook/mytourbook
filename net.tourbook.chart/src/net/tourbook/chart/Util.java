@@ -30,7 +30,7 @@ public class Util {
 	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
 
-	private static final String			FORMAT_0F		= "0f";
+	private static final String			FORMAT_0F		= "0f";							//$NON-NLS-1$
 	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
 
 	private final static NumberFormat	_nf				= NumberFormat.getNumberInstance();
@@ -140,7 +140,9 @@ public class Util {
 
 		String format = Messages.Format_number_float;
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? FORMAT_0F : Integer.toString(precision) + 'f';
+		format += (removeDecimalZero && (divValue % 1 == 0)) ? //
+				FORMAT_0F
+				: Integer.toString(precision) + 'f';
 
 		return new Formatter().format(format, divValue).toString();
 	}

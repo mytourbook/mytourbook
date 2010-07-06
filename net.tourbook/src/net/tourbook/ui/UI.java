@@ -1022,8 +1022,8 @@ public class UI {
 	public static void showSQLException(final SQLException e, final String sqlStatement) {
 
 		MessageDialog.openError(Display.getCurrent().getActiveShell(), //
-				"SQL Error",
-				"SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e));
+				"SQL Error", //$NON-NLS-1$
+				"SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e)); //$NON-NLS-1$
 	}
 
 	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {

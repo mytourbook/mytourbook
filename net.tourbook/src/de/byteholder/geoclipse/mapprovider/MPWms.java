@@ -308,7 +308,7 @@ public class MPWms extends MP implements ITileLoader {
 		mapRequest.setBBox(createBBox(tile));
 		mapRequest.setTransparent(_isLoadTransparentImages);
 //		mapRequest.setExceptions(Util.encodeUrl("application/vnd.ogc.se_xml", false));
-		mapRequest.setExceptions("XML");
+		mapRequest.setExceptions("XML"); //$NON-NLS-1$
 
 		// keep url
 		final String finalUrl = mapRequest.getFinalURL().toString();

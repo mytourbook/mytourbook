@@ -165,6 +165,10 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 
 		final Point legendInMapPosition = mapLegend.getLegendPosition();
+		if (legendInMapPosition == null) {
+			return;
+		}
+
 		final int positionX = legendInMapPosition.x;
 		final int positionY = legendInMapPosition.y + legendImageBounds.height - 2;
 

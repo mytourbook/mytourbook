@@ -10,7 +10,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package de.byteholder.geoclipse.preferences;
 
 import org.eclipse.osgi.util.NLS;
@@ -18,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "de.byteholder.geoclipse.preferences.messages";	//$NON-NLS-1$
- 
+
 	public static String		App_Image_Cancel;
 	public static String		App_Image_Cancel_Disabled;
 	public static String		App_Image_RefreshAll;
@@ -28,9 +27,9 @@ public class Messages extends NLS {
 	public static String		App_Image_RefreshSelected;
 	public static String		App_Image_RefreshSelected_Disabled;
 
-	public static String	External_Link_Forum;
+	public static String		External_Link_Forum;
 
-	public static String	External_Link_HomePage;
+	public static String		External_Link_HomePage;
 
 	public static String		External_Link_MapProviders;
 
@@ -64,17 +63,13 @@ public class Messages extends NLS {
 	public static String		Pref_Map_Dialog_Import_Title;
 	public static String		Pref_Map_Dialog_WmsInput_Message;
 	public static String		Pref_Map_Dialog_WmsInput_Title;
-
 	public static String		Pref_Map_Error_Dialog_DragDropError_Message;
 	public static String		Pref_Map_Error_Dialog_DragDropError_Title;
-
 	public static String		Pref_Map_Group_Detail_ModifiedMapProvider;
 	public static String		Pref_Map_Group_Detail_NewMapProvider;
 	public static String		Pref_Map_Group_Detail_SelectedMapProvider;
-
 	public static String		Pref_Map_JobName_DropUrl;
 	public static String		Pref_Map_JobName_ReadMapFactoryOfflineInfo;
-
 	public static String		Pref_Map_Label_AvaiablelMapProvider;
 	public static String		Pref_Map_Label_Description;
 	public static String		Pref_Map_Label_MapProviderDropTarget;
@@ -92,20 +87,14 @@ public class Messages extends NLS {
 	public static String		Pref_Map_Lable_NotAvailable;
 	public static String		Pref_Map_Lable_NotRetrieved;
 	public static String		Pref_Map_Lable_OfflineFolder;
-
 	public static String		Pref_Map_Link_MapProvider;
 	public static String		Pref_Map_Link_MapProvider_Tooltip;
-
-	public static String	Pref_Map_MonitorMessage_DeletedOfflineImages;
-
 	public static String		Pref_Map_ProviderType_Custom;
 	public static String		Pref_Map_ProviderType_MapProfile;
 	public static String		Pref_Map_ProviderType_Plugin;
 	public static String		Pref_Map_ProviderType_Wms;
-
 	public static String		Pref_Map_ValidationError_NameIsRequired;
 	public static String		Pref_Map_ValidationError_OfflineFolderIsUsedInMapProfile;
-
 	public static String		Pref_Map_Viewer_Column_ContentServerTypeCustom;
 	public static String		Pref_Map_Viewer_Column_ContentServerTypeMapProfile;
 	public static String		Pref_Map_Viewer_Column_ContentServerTypePlugin;
@@ -127,7 +116,6 @@ public class Messages extends NLS {
 	public static String		pref_map_dlg_saveModifiedMapProvider_message;
 	public static String		pref_map_dlg_saveModifiedMapProvider_title;
 	public static String		pref_map_dlg_saveOtherMapProvider_message;
-	public static String		pref_map_error_deleteTiles_message;
 	public static String		pref_map_lable_NA;
 	public static String		pref_map_message_loadingWmsCapabilities;
 	public static String		pref_map_show_tile_info;

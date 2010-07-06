@@ -978,11 +978,9 @@ public abstract class MP implements Cloneable, Comparable<Object> {
 
 		if (urlString == null) {
 			final Exception e = new Exception();
-			StatusUtil.log(
-					NLS.bind(
-							Messages.DBG041_Error_InvalidUrlNull,
-							this.getClass().getName() + " - " + tile.getTileKey()),
-					e);
+			StatusUtil.log(NLS.bind(//
+					Messages.DBG041_Error_InvalidUrlNull,
+					this.getClass().getName() + UI.DASH_WITH_SPACE + tile.getTileKey()), e);
 			throw e;
 		}
 
