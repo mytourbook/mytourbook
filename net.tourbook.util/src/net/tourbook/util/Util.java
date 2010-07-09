@@ -458,7 +458,7 @@ public class Util {
 	 * @return Returns a long value from {@link IDialogSettings}. When the key is not found, the
 	 *         default value is returned.
 	 */
-	public static long getStateLong(final IDialogSettings state, final String key, final int defaultValue) {
+	public static long getStateLong(final IDialogSettings state, final String key, final long defaultValue) {
 		try {
 			return state.get(key) == null ? defaultValue : state.getLong(key);
 		} catch (final NumberFormatException e) {

@@ -677,9 +677,9 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
 						.applyTo(_txtDescription);
 
-				if (lineCount > 10) {
+				if (lineCount > 15) {
 					final GridData gd = (GridData) _txtDescription.getLayoutData();
-					gd.heightHint = pc.convertHeightInCharsToPixels(20);
+					gd.heightHint = pc.convertHeightInCharsToPixels(15);
 				}
 
 				_txtDescription.setForeground(_fgColor);

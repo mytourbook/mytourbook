@@ -278,8 +278,9 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Link_TourType;
 
 	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
+
+	public static String	Dialog_SplitTour_Checkbox_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_KeepSlices;
-	public static String		Dialog_SplitTour_ComboText_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_RemoveSlices;
 	public static String		Dialog_SplitTour_ComboText_TourTileCustom;
 	public static String		Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;

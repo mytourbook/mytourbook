@@ -58,7 +58,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -179,6 +178,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private boolean								_canRemoveTimeSlices;
 
 	private DateTime							_extractedTourStartTime;
+
 	/*
 	 * UI controls
 	 */
@@ -251,7 +251,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
 		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+//		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
 	@Override
@@ -275,17 +275,21 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			@Override
 			public void controlResized(final ControlEvent e) {
 
-				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				final Point shellSize = shell.getSize();
-
-				// ensure the shell is not smaller than the default size
-				if (shellSize.x < defaultSize.x || shellSize.y < defaultSize.y) {
-
-					shellSize.x = shellSize.x < defaultSize.x ? defaultSize.x : shellSize.x;
-					shellSize.y = shellSize.y < defaultSize.y ? defaultSize.y : shellSize.y;
-
-					shell.setSize(shellSize);
-				}
+				/*
+				 * this feature causes problems when the dialog message is long -> only one long
+				 * line is the default width
+				 */
+//				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+//				final Point shellSize = shell.getSize();
+//
+//				// ensure the shell is not smaller than the default size
+//				if (shellSize.x < defaultSize.x || shellSize.y < defaultSize.y) {
+//
+//					shellSize.x = shellSize.x < defaultSize.x ? defaultSize.x : shellSize.x;
+//					shellSize.y = shellSize.y < defaultSize.y ? defaultSize.y : shellSize.y;
+//
+//					shell.setSize(shellSize);
+//				}
 			}
 		});
 
@@ -509,7 +513,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		_chkKeepOriginalDateTime = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkKeepOriginalDateTime);
-		_chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_ComboText_KeepTime);
+		_chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_Checkbox_KeepTime);
 		_chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
 
 		//spacer

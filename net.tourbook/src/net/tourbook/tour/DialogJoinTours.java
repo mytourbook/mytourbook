@@ -466,7 +466,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		_chkKeepOriginalDateTime = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkKeepOriginalDateTime);
-		_chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_ComboText_KeepTime);
+		_chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_Checkbox_KeepTime);
 		_chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
 
 		/*
@@ -728,8 +728,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		// keep window size and position
-//		return _state;
-		return null;
+		return _state;
+//		return null;
 	}
 
 	private TourPerson getSelectedPerson() {

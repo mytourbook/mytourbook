@@ -53,8 +53,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourChartAnalyzerView extends ViewPart {
@@ -66,6 +69,7 @@ public class TourChartAnalyzerView extends ViewPart {
 	private static final int			LAYOUT_MEDIUM	= 2;
 	private static final int			LAYOUT_LARGE	= 3;
 
+	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
 
 	private ScrolledComposite			_scrolledContainer;
@@ -94,6 +98,8 @@ public class TourChartAnalyzerView extends ViewPart {
 	 */
 	int									_columnSpacing	= 1;
 
+	private boolean						_isPartVisible	= false;
+
 	public TourChartAnalyzerView() {
 		super();
 	}
@@ -116,9 +122,12 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void addListeners() {
 
+		final IWorkbenchPage page = getSite().getPage();
+
 		_partContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent event) {
+
 				if (_chartDataModel == null) {
 					return;
 				}
@@ -128,44 +137,39 @@ public class TourChartAnalyzerView extends ViewPart {
 		});
 
 		_postSelectionListener = new ISelectionListener() {
-
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+				onSelectionChanged(selection);
+			}
+		};
+		page.addPostSelectionListener(_postSelectionListener);
 
-				if (selection instanceof SelectionChartInfo) {
+		_partListener = new IPartListener2() {
 
-					updateInfo((SelectionChartInfo) selection);
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
-				} else if (selection instanceof SelectionChartXSliderPosition) {
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-					updateInfo(((SelectionChartXSliderPosition) selection));
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
-				} else if (selection instanceof SelectionTourData) {
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-					final TourChart tourChart = ((SelectionTourData) selection).getTourChart();
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartAnalyzerView.this) {
+					_isPartVisible = false;
+				}
+			}
 
-					if (tourChart != null) {
-						updateInfo(tourChart.getChartInfo());
-					}
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-				} else if (selection instanceof SelectionTourChart) {
+			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-					final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
-					if (tourChart != null) {
-						updateInfo(tourChart.getChartInfo());
-					}
-
-				} else if (selection instanceof SelectionActiveEditor) {
-
-					final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-					if (editor instanceof TourEditor) {
-						final TourEditor tourEditor = (TourEditor) editor;
-						updateInfo(tourEditor.getTourChart().getChartInfo());
-					}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartAnalyzerView.this) {
+					_isPartVisible = true;
 				}
 			}
 		};
-
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+		page.addPartListener(_partListener);
 	}
 
 	@Override
@@ -550,7 +554,10 @@ public class TourChartAnalyzerView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
+		final IWorkbenchPage page = getSite().getPage();
+
+		page.removePostSelectionListener(_postSelectionListener);
+		page.removePartListener(_partListener);
 
 		_colorCache.dispose();
 
@@ -572,6 +579,45 @@ public class TourChartAnalyzerView extends ViewPart {
 			return _colorCache.createColor(colorKey, rgb);
 		} else {
 			return color;
+		}
+	}
+
+	private void onSelectionChanged(final ISelection selection) {
+
+		if (_isPartVisible == false) {
+			return;
+		}
+
+		if (selection instanceof SelectionChartInfo) {
+
+			updateInfo((SelectionChartInfo) selection);
+
+		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			updateInfo(((SelectionChartXSliderPosition) selection));
+
+		} else if (selection instanceof SelectionTourData) {
+
+			final TourChart tourChart = ((SelectionTourData) selection).getTourChart();
+
+			if (tourChart != null) {
+				updateInfo(tourChart.getChartInfo());
+			}
+
+		} else if (selection instanceof SelectionTourChart) {
+
+			final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+			if (tourChart != null) {
+				updateInfo(tourChart.getChartInfo());
+			}
+
+		} else if (selection instanceof SelectionActiveEditor) {
+
+			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
+			if (editor instanceof TourEditor) {
+				final TourEditor tourEditor = (TourEditor) editor;
+				updateInfo(tourEditor.getTourChart().getChartInfo());
+			}
 		}
 	}
 
@@ -794,8 +840,11 @@ public class TourChartAnalyzerView extends ViewPart {
 
 					if (graphInfo.avgValue != (int) avgValue) {
 						graphInfo.avgValue = (int) avgValue;
-						graphInfo.lblAvg.setText(Util.formatInteger((int) avgValue, avgDivisor, analyzerInfo
-								.getAvgDecimals(), false)
+						graphInfo.lblAvg.setText(Util.formatInteger(
+								(int) avgValue,
+								avgDivisor,
+								analyzerInfo.getAvgDecimals(),
+								false)
 								+ UI.SPACE);
 						outCounter++;
 					}
