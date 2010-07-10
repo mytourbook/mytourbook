@@ -460,21 +460,14 @@ END OF TERMS AND CONDITIONS
          unpack="false"/>
 
    <plugin
-         id="de.byteholder.geoclipse"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.srtm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.device.hac4linux.tour"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.printing"
          download-size="0"
          install-size="0"
          version="0.0.0"

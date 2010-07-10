@@ -3,12 +3,14 @@ Create Translation Archive
 
 - switch to workspace "ws"
 - set version number in "feature.net.tourbook.app.nl"
-- force version number into the *.nl plugins
+- force feature version number into the *.nl fragments
+- set synch option back to "synch versions on build (recommended)"
 
 
 - switch to workspace "mytourbook-TRUNK.nl-DUMMY-HOST"
 - set version number into the feature "feature.z-Dummy-Host"
-- force version number into dummy host plugins
+- force feature version number into dummy host plugins
+- set synch option back to "synch versions on build (recommended)"
 
 
 - switch to workspace "ws"
@@ -18,10 +20,13 @@ Create Translation Archive
 
 Create Build
 
+- switch to workspace "ws"
 - run script "create-build-files.xml"
+
 - switch to workspace "mytourbook-BUILD-ws"
 - refresh all projects with F5
 - run Project/clean... for all projects
+
 
 Create Update Site
 

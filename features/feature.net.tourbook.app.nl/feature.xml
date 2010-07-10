@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="10.3.1.qualifier"
+      version="10.7.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -299,14 +299,6 @@ END OF TERMS AND CONDITIONS
    </license>
 
    <plugin
-         id="de.byteholder.geoclipse.nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.chart.nl"
          download-size="0"
          install-size="0"
@@ -387,14 +379,6 @@ END OF TERMS AND CONDITIONS
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.srtm.nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.statistics.nl"
          download-size="0"
          install-size="0"
@@ -404,6 +388,14 @@ END OF TERMS AND CONDITIONS
 
    <plugin
          id="net.tourbook.util.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.printing.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"

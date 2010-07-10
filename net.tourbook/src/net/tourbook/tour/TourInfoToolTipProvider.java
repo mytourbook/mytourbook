@@ -197,7 +197,6 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	@Override
 	public void afterHideToolTip() {
-
 		_isHovered = false;
 	}
 
