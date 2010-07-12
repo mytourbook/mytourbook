@@ -313,9 +313,23 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 		return _backgroundColor;
 	}
 
+	/**
+	 * this method is synchronized because when live View is checked in the map profile dialog
+	 * and the brightness is changed, many ConcurrentModificationException occured
+	 * 
+	 * <pre>
+	 * java.util.ConcurrentModificationException
+	 * 	at java.util.AbstractList$Itr.checkForComodification(Unknown Source)
+	 * 	at java.util.AbstractList$Itr.next(Unknown Source)
+	 * 	at de.byteholder.geoclipse.mapprovider.MPProfile.getParentImage(MPProfile.java:334)
+	 * 	at de.byteholder.geoclipse.map.Tile.createParentImage(Tile.java:477)
+	 * 	at de.byteholder.geoclipse.map.TileImageLoader.getTileImage(TileImageLoader.java:275)
+	 * </pre>
+	 */
 	public ParentImageStatus getParentImage(final Tile parentTile) {
 
-		final ArrayList<Tile> tileChildren = parentTile.getChildren();
+		@SuppressWarnings("unchecked")
+		final ArrayList<Tile> tileChildren = (ArrayList<Tile>) parentTile.getChildren().clone();
 		if (tileChildren == null) {
 			return null;
 		}

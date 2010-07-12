@@ -597,82 +597,80 @@ public class TourPainter extends MapPainter {
 
 					// ckeck if markers are available
 					final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
-					if (sortedMarkers.size() == 0) {
-						continue;
-					}
-
-					// draw tour marker
-
-					boolean isTourMarkerInTile = false;
-					boolean isTourMarkerInTile2 = false;
-
-					for (final TourMarker tourMarker : sortedMarkers) {
-
-						if (tourMarker.getLabel().length() == 0) {
-							// skip empty marker
-							continue;
-						}
-
-						final int serieIndex = tourMarker.getSerieIndex();
+					if (sortedMarkers.size() > 0) {
 
 						// draw tour marker
-						isTourMarkerInTile2 = drawTourMarker(
-								gc,
-								map,
-								tile,
-								latitudeSerie[serieIndex],
-								longitudeSerie[serieIndex],
-								tourMarker,
-								parts);
 
-						isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+						boolean isTourMarkerInTile = false;
+						boolean isTourMarkerInTile2 = false;
+
+						for (final TourMarker tourMarker : sortedMarkers) {
+
+							if (tourMarker.getLabel().length() == 0) {
+								// skip empty marker
+								continue;
+							}
+
+							final int serieIndex = tourMarker.getSerieIndex();
+
+							// draw tour marker
+							isTourMarkerInTile2 = drawTourMarker(
+									gc,
+									map,
+									tile,
+									latitudeSerie[serieIndex],
+									longitudeSerie[serieIndex],
+									tourMarker,
+									parts);
+
+							isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+						}
+
+						isTourInTile = isTourInTile || isTourMarkerInTile;
 					}
-
-					isTourInTile = isTourInTile || isTourMarkerInTile;
 				}
 
 				if (paintManager._isShowWayPoints) {
 
 					// ckeck if way points are available
 					final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
-					if (wayPoints.size() == 0) {
-						continue;
-					}
+					if (wayPoints.size() > 0) {
 
-					/*
-					 * world positions are cached to optimize performance
-					 */
-					final MP mp = map.getMapProvider();
-					final String projectionId = mp.getProjection().getId();
-					final int mapZoomLevel = map.getZoom();
+						/*
+						 * world positions are cached to optimize performance
+						 */
+						final MP mp = map.getMapProvider();
+						final String projectionId = mp.getProjection().getId();
+						final int mapZoomLevel = map.getZoom();
 
-					HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
-							projectionId,
-							mapZoomLevel);
-
-					if ((allWayPointWorldPixel == null)) {
-						allWayPointWorldPixel = initWorldPixelWayPoint(
-								tourData,
-								wayPoints,
-								mp,
+						HashMap<Integer, Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
 								projectionId,
 								mapZoomLevel);
+
+						if ((allWayPointWorldPixel == null)) {
+							allWayPointWorldPixel = initWorldPixelWayPoint(
+									tourData,
+									wayPoints,
+									mp,
+									projectionId,
+									mapZoomLevel);
+						}
+
+						// draw tour way points
+						boolean isTourWayPointInTile = false;
+						boolean isTourWayPointInTile2 = false;
+
+						for (final TourWayPoint tourWayPoint : wayPoints) {
+
+							final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
+
+							isTourWayPointInTile2 = drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts);
+
+							isTourWayPointInTile = isTourWayPointInTile || isTourWayPointInTile2;
+						}
+
+						isTourInTile = isTourInTile || isTourWayPointInTile;
 					}
-
-					// draw tour way points
-					boolean isTourWayPointInTile = false;
-					boolean isTourWayPointInTile2 = false;
-
-					for (final TourWayPoint tourWayPoint : wayPoints) {
-
-						final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
-
-						isTourWayPointInTile2 = drawTourWayPoint(gc, map, tile, tourWayPoint, twpWorldPixel, parts);
-
-						isTourWayPointInTile = isTourWayPointInTile || isTourWayPointInTile2;
-					}
-
-					isTourInTile = isTourInTile || isTourWayPointInTile;
 				}
 			}
 		}
@@ -710,16 +708,6 @@ public class TourPainter extends MapPainter {
 
 		final boolean isMarkerInTile = isBoundsInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
 		if (isMarkerInTile) {
-
-//			System.out.println("drawStaticMarker\t"
-//					+ devMarkerPosX
-//					+ "\t"
-//					+ devMarkerPosY
-//					+ "\t"
-//					+ worldPixelMarker
-//					+ "\t"
-//					+ tile);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// get marker size
 			final Rectangle bounds = markerImage.getBounds();
@@ -1469,12 +1457,6 @@ public class TourPainter extends MapPainter {
 					final int twpWorldPixelY = twpWorldPixel.y;
 
 					final int twpImageWorldPixelX = twpWorldPixelX - imageWidth2;
-
-//					final int diffX = (twpImageWorldPixelX + imageWidth) - tileWorldPixelLeft;
-//					final int diffY = twpWorldPixelY - tileWorldPixelBottom + imageHeight;
-
-//					System.out.println(diffX + "\t" + diffY + "\t" + tile);
-//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					// check if twp image is within the tile viewport
 					if (twpImageWorldPixelX + imageWidth >= tileWorldPixelLeft

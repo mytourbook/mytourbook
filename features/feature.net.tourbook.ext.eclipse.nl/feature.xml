@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse.nl"
       label="Eclipse language support"
-      version="3.5.2.qualifier"
+      version="3.6.0.qualifier"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">

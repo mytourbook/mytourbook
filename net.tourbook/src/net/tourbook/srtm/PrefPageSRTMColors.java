@@ -430,7 +430,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			if (createdProfileFile.exists() == false) {
 				MessageDialog.openError(Display.getCurrent().getActiveShell(),//
 						"Default Profile", //$NON-NLS-1$
-						NLS.bind("Profile file {0} could not be created", profileFile.getAbsolutePath())); //$NON-NLS-1$
+						NLS.bind("SRTM color profile file {0} could not be created", profileFile.getAbsolutePath())); //$NON-NLS-1$
 				return;
 			}
 		}
@@ -551,9 +551,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			if (fProfileList.size() == 0) {
 
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), //
-						"Read Profiles", //$NON-NLS-1$
-						"Profiles could not be created, creating default profiles."); //$NON-NLS-1$
+				// !!! this message is confusing the user !!!
+//				MessageDialog.openError(Display.getCurrent().getActiveShell(), //
+//						"Read Profiles", //$NON-NLS-1$
+//						"SRTM color profile is not available, default profile is created."); //$NON-NLS-1$
 
 				// prevent endless loops
 				if (fIsCreateDefault) {

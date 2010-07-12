@@ -1258,6 +1258,10 @@ public class Map extends Canvas {
 
 	private void hideHoveredArea() {
 
+		if (_tourToolTip == null) {
+			return;
+		}
+
 		// update tool tip because it has it's own mouse move listener for the map
 		_tourToolTip.hideHoveredArea();
 
@@ -3818,31 +3822,6 @@ public class Map extends Canvas {
 
 			redraw();
 		}
-//		System.out.println("\t");
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	/**

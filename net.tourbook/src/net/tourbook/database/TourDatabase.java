@@ -85,7 +85,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 11;													// 10.6.0 - 19-05-2010
 
-//	private static final int					TOURBOOK_DB_VERSION							= 11;	// 10.6.0 - 19-05-2010
+//	private static final int					TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
 //	private static final int					TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
 //	private static final int					TOURBOOK_DB_VERSION							= 9;	// 10.3.0
 //	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny

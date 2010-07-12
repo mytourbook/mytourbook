@@ -87,90 +87,91 @@ import org.joda.time.DateTime;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
-	public static final int				DB_LENGTH_TOUR_TITLE			= 255;
-	public static final int				DB_LENGTH_TOUR_DESCRIPTION		= 4096;
-	public static final int				DB_LENGTH_TOUR_DESCRIPTION_V10	= 32000;
-	public static final int				DB_LENGTH_TOUR_START_PLACE		= 255;
-	public static final int				DB_LENGTH_TOUR_END_PLACE		= 255;
-	public static final int				DB_LENGTH_TOUR_IMPORT_FILE_PATH	= 255;
-	public static final int				DB_LENGTH_WEATHER_CLOUDS		= 255;
-	public static final int				DB_LENGTH_DEVICE_TOUR_TYPE		= 2;
-	public static final int				DB_LENGTH_DEVICE_PLUGIN_ID		= 255;
-	public static final int				DB_LENGTH_DEVICE_PLUGIN_NAME	= 255;
-	public static final int				DB_LENGTH_DEVICE_MODE_NAME		= 255;
+	public static final int									DB_LENGTH_TOUR_TITLE			= 255;
+	public static final int									DB_LENGTH_TOUR_DESCRIPTION		= 4096;
+	public static final int									DB_LENGTH_TOUR_DESCRIPTION_V10	= 32000;
+	public static final int									DB_LENGTH_TOUR_START_PLACE		= 255;
+	public static final int									DB_LENGTH_TOUR_END_PLACE		= 255;
+	public static final int									DB_LENGTH_TOUR_IMPORT_FILE_PATH	= 255;
+	public static final int									DB_LENGTH_WEATHER_CLOUDS		= 255;
+	public static final int									DB_LENGTH_DEVICE_TOUR_TYPE		= 2;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_ID		= 255;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_NAME	= 255;
+	public static final int									DB_LENGTH_DEVICE_MODE_NAME		= 255;
 
 	/**
 	 * 
 	 */
-	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+	public static final int									MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 
-	public static final float			MAX_BIKE_SPEED					= 120f;
+	public static final float								MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Device Id for manually created tours
 	 */
-	public static final String			DEVICE_ID_FOR_MANUAL_TOUR		= "manual";								//$NON-NLS-1$
+	public static final String								DEVICE_ID_FOR_MANUAL_TOUR		= "manual";										//$NON-NLS-1$
 
 	/**
 	 * Device id for csv files which behave like manually created tours, marker and timeslices are
 	 * disabled because they are not available, tour duration can be edited<br>
 	 * this is the id of the deviceDataReader
 	 */
-	public static final String			DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
+	public static final String								DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";			//$NON-NLS-1$
 
 	/*
 	 * initialize SRTM
 	 */
 	@SuppressWarnings("unused")
 	@Transient
-	private static final NumberForm		srtmNumberForm					= new NumberForm();
+	private static final NumberForm							srtmNumberForm					= new NumberForm();
 
 	@Transient
-	private static final ElevationSRTM3	elevationSRTM3					= new ElevationSRTM3();
+	private static final ElevationSRTM3						elevationSRTM3					= new ElevationSRTM3();
 
 	@Transient
-	private static IPreferenceStore		_prefStore						= TourbookPlugin
-																				.getDefault()
-																				.getPreferenceStore();
+	private static IPreferenceStore							_prefStore						= TourbookPlugin
+																									.getDefault()
+																									.getPreferenceStore();
 
 	@Transient
-	private final Calendar				_calendar						= GregorianCalendar.getInstance();
+	private final Calendar									_calendar						= GregorianCalendar
+																									.getInstance();
 
 	/**
 	 * entity id which identifies the tour
 	 */
 	@Id
-	private Long						tourId;
+	private Long											tourId;
 
 	/**
 	 * year of tour start
 	 */
-	private short						startYear;
+	private short											startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
-	private short						startMonth;
+	private short											startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
-	private short						startDay;
+	private short											startDay;
 
 	/**
 	 * HH (d) hour of tour
 	 */
-	private short						startHour;
+	private short											startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
-	private short						startMinute;
+	private short											startMinute;
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int							startSecond;																// db-version 7
+	private int												startSecond;																		// db-version 7
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
@@ -178,7 +179,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * week of the tour provided by {@link Calendar#get(int)}
 	 */
 	@SuppressWarnings("unused")
-	private short						startWeek;
+	private short											startWeek;
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
@@ -187,13 +188,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * year for startWeek
 	 */
 	@SuppressWarnings("unused")
-	private short						startWeekYear;
+	private short											startWeekYear;
 
 	/**
 	 * total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
 	 * the field tourDistance
 	 */
-	private int							startDistance;
+	private int												startDistance;
 
 	/**
 	 * ssss distance msw
@@ -201,7 +202,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
 	@SuppressWarnings("unused")
-	private int							distance;
+	private int												distance;
 
 	/**
 	 * A flag indicating that the distance of this series is defined by a distance sensor and not
@@ -209,22 +210,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <br>
 	 * 0 == false, 1 == true
 	 */
-	private short						isDistanceFromSensor			= 0;
+	private short											isDistanceFromSensor			= 0;
 
 	/**
 	 * aaaa (h) initial altitude (m)
 	 */
-	private short						startAltitude;
+	private short											startAltitude;
 
 	/**
 	 * pppp (h) initial pulse (bpm)
 	 */
-	private short						startPulse;
+	private short											startPulse;
 
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short						dpTolerance						= 50;
+	private short											dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -236,167 +237,167 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * "B1" ski-bike
 	 */
 	@Column(length = 2)
-	private String						deviceTourType;
+	private String											deviceTourType;
 
 	/*
 	 * data from the device
 	 */
-	private long						deviceTravelTime;
+	private long											deviceTravelTime;
 
 	@SuppressWarnings("unused")
-	private int							deviceDistance;
+	private int												deviceDistance;
 
-	private int							deviceWheel;
+	private int												deviceWheel;
 
-	private int							deviceWeight;
-
-	@SuppressWarnings("unused")
-	private int							deviceTotalUp;
+	private int												deviceWeight;
 
 	@SuppressWarnings("unused")
-	private int							deviceTotalDown;
+	private int												deviceTotalUp;
+
+	@SuppressWarnings("unused")
+	private int												deviceTotalDown;
 
 	/**
 	 * total distance of the tour in meters (metric system), this value is computed from the
 	 * distance data serie
 	 */
 	@XmlElement
-	private int							tourDistance;
+	private int												tourDistance;
 
 	/**
 	 * total recording time in seconds
 	 */
 	@XmlElement
-	private int							tourRecordingTime;
+	private int												tourRecordingTime;
 
 	/**
 	 * total driving time in seconds
 	 */
 	@XmlElement
-	private int							tourDrivingTime;
+	private int												tourDrivingTime;
 
 	/**
 	 * altitude up (m)
 	 */
 	@XmlElement
-	private int							tourAltUp;
+	private int												tourAltUp;
 
 	/**
 	 * altitude down (m)
 	 */
 	@XmlElement
-	private int							tourAltDown;
+	private int												tourAltDown;
 
 	/**
 	 * plugin id for the device which was used to create this tour
 	 */
-	private String						devicePluginId;
+	private String											devicePluginId;
 
 	/**
 	 * Profile used by the device
 	 */
-	private short						deviceMode;																// db-version 3
+	private short											deviceMode;																		// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short						deviceTimeInterval				= -1;										// db-version 3
+	private short											deviceTimeInterval				= -1;												// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
 	@XmlElement
-	private int							maxAltitude;																// db-version 4
+	private int												maxAltitude;																		// db-version 4
 
 	@XmlElement
-	private int							maxPulse;																	// db-version 4
+	private int												maxPulse;																			// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
 	@XmlElement
-	private float						maxSpeed;																	// db-version 4
+	private float											maxSpeed;																			// db-version 4
 
 	@XmlElement
-	private int							avgPulse;																	// db-version 4
+	private int												avgPulse;																			// db-version 4
 
 	@XmlElement
-	private int							avgCadence;																// db-version 4
-	private int							avgTemperature;															// db-version 4
+	private int												avgCadence;																		// db-version 4
+	private int												avgTemperature;																	// db-version 4
 
-	private int							weatherWindDir;															// db-version 8
-	private int							weatherWindSpd;															// db-version 8
-	private String						weatherClouds;																// db-version 8
+	private int												weatherWindDir;																	// db-version 8
+	private int												weatherWindSpd;																	// db-version 8
+	private String											weatherClouds;																		// db-version 8
 	@XmlElement
-	private int							restPulse;																	// db-version 8
-
-	@XmlElement
-	private String						tourTitle;																	// db-version 4
-	@XmlElement
-	private String						tourDescription;															// db-version 4
+	private int												restPulse;																			// db-version 8
 
 	@XmlElement
-	private String						tourStartPlace;															// db-version 4
+	private String											tourTitle;																			// db-version 4
 	@XmlElement
-	private String						tourEndPlace;																// db-version 4
+	private String											tourDescription;																	// db-version 4
 
 	@XmlElement
-	private Integer						calories;																	// db-version 4
-	private float						bikerWeight;																// db-version 4
+	private String											tourStartPlace;																	// db-version 4
+	@XmlElement
+	private String											tourEndPlace;																		// db-version 4
+
+	@XmlElement
+	private Integer											calories;																			// db-version 4
+	private float											bikerWeight;																		// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String						devicePluginName;															// db-version 4
+	private String											devicePluginName;																	// db-version 4
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String						deviceModeName;															// db-version 4
+	private String											deviceModeName;																	// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String						tourImportFilePath;														// db-version 6
+	private String											tourImportFilePath;																// db-version 6
 
 	/**
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
-	private Long						mergeSourceTourId;															// db-version 7
+	private Long											mergeSourceTourId;																	// db-version 7
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
 	 * the tour into which this tour is merged
 	 */
-	private Long						mergeTargetTourId;															// db-version 7
+	private Long											mergeTargetTourId;																	// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int							mergedTourTimeOffset;														// db-version 7
+	private int												mergedTourTimeOffset;																// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int							mergedAltitudeOffset;														// db-version 7
+	private int												mergedAltitudeOffset;																// db-version 7
 
 	/**
 	 * Date/Time when tour data was created. This value is set to the tour start date before db
 	 * version 11, otherwise the value is set when the tour is saved the first time.
 	 */
-	private long						dateTimeCreated;															// db-version 11
+	private long											dateTimeCreated;																	// db-version 11
 
 	/**
 	 * Date/Time when tour data was modified, default value is 0
 	 */
-	private long						dateTimeModified;															// db-version 11
+	private long											dateTimeModified;																	// db-version 11
 
 	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
-	private SerieData					serieData;
+	private SerieData										serieData;
 
 	/**
 	 * Tour marker
@@ -405,47 +406,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@XmlElementWrapper(name = "TourMarkers")
 	@XmlElement(name = "TourMarker")
-	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
+	private Set<TourMarker>									tourMarkers						= new HashSet<TourMarker>();
 
 	/**
-	 * Way points
+	 * Contains the tour way points
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourWayPoint>		tourWayPoints					= new HashSet<TourWayPoint>();
+	private final Set<TourWayPoint>							tourWayPoints					= new HashSet<TourWayPoint>();
 
 	/**
 	 * Reference tours
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
+	private final Set<TourReference>						tourReferences					= new HashSet<TourReference>();
 
 	/**
 	 * Tags
 	 */
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
-	private Set<TourTag>				tourTags						= new HashSet<TourTag>();
+	private Set<TourTag>									tourTags						= new HashSet<TourTag>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
 	 */
 	@ManyToOne
-	private TourType					tourType;
+	private TourType										tourType;
 
 	/**
 	 * Person which created this tour or <code>null</code> when the tour is not saved in the
 	 * database
 	 */
 	@ManyToOne
-	private TourPerson					tourPerson;
+	private TourPerson										tourPerson;
 
 	/**
 	 * plugin id for the device which was used for this tour Bike used for this tour
 	 */
 	@ManyToOne
-	private TourBike					tourBike;
+	private TourBike										tourBike;
 
 	/*
 	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
@@ -470,236 +471,236 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * {@link #timeSerie} is <code>null</code> for a manually created tour
 	 */
 	@Transient
-	public int[]						timeSerie;
+	public int[]											timeSerie;
 
 	/**
 	 * contains the absolute distance in m (metric system)
 	 */
 	@Transient
-	public int[]						distanceSerie;
+	public int[]											distanceSerie;
 
 	/**
 	 * contains the absolute distance in miles/1000 (imperial system)
 	 */
 	@Transient
-	private int[]						distanceSerieImperial;
+	private int[]											distanceSerieImperial;
 
 	/**
 	 * contains the absolute altitude in m (metric system)
 	 */
 	@Transient
-	public int[]						altitudeSerie;
+	public int[]											altitudeSerie;
 
 	/**
 	 * contains the absolute altitude in feet (imperial system)
 	 */
 	@Transient
-	private int[]						altitudeSerieImperial;
+	private int[]											altitudeSerieImperial;
 
 	/**
 	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
 	 * length()==0 data are invalid
 	 */
 	@Transient
-	private int[]						srtmSerie;
+	private int[]											srtmSerie;
 
 	@Transient
-	private int[]						srtmSerieImperial;
+	private int[]											srtmSerieImperial;
 
 	@Transient
-	public int[]						cadenceSerie;
+	public int[]											cadenceSerie;
 
 	@Transient
-	public int[]						pulseSerie;
+	public int[]											pulseSerie;
 
 	/**
 	 * contains the temperature in the metric measurement system
 	 */
 	@Transient
-	public int[]						temperatureSerie;
+	public int[]											temperatureSerie;
 
 	/**
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private int[]						temperatureSerieImperial;
+	private int[]											temperatureSerieImperial;
 
 	/**
 	 * the metric speed serie is required form computing the power even if the current measurement
 	 * system is imperial
 	 */
 	@Transient
-	private int[]						speedSerie;
+	private int[]											speedSerie;
 
 	@Transient
-	private int[]						speedSerieImperial;
+	private int[]											speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean						isSpeedSerieFromDevice			= false;
+	private boolean											isSpeedSerieFromDevice			= false;
 
 	/**
 	 * pace in min/km
 	 */
 	@Transient
-	private int[]						paceSerieMinute;
+	private int[]											paceSerieMinute;
 
 	/**
 	 * pace in sec/km
 	 */
 	@Transient
-	private int[]						paceSerieSeconds;
+	private int[]											paceSerieSeconds;
 
 	/**
 	 * pace in min/mile
 	 */
 	@Transient
-	private int[]						paceSerieMinuteImperial;
+	private int[]											paceSerieMinuteImperial;
 
 	/**
 	 * pace in sec/mile
 	 */
 	@Transient
-	private int[]						paceSerieSecondsImperial;
+	private int[]											paceSerieSecondsImperial;
 
 	@Transient
-	private int[]						powerSerie;
+	private int[]											powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean						isPowerSerieFromDevice			= false;
+	private boolean											isPowerSerieFromDevice			= false;
 
 	@Transient
-	private int[]						altimeterSerie;
+	private int[]											altimeterSerie;
 
 	@Transient
-	private int[]						altimeterSerieImperial;
+	private int[]											altimeterSerieImperial;
 
 	@Transient
-	public int[]						gradientSerie;
+	public int[]											gradientSerie;
 
 	/*
 	 * computed data series
 	 */
 
 	@Transient
-	public int[]						tourCompareSerie;
+	public int[]											tourCompareSerie;
 
 	/*
 	 * GPS data
 	 */
 	@Transient
-	public double[]						latitudeSerie;
+	public double[]											latitudeSerie;
 
 	@Transient
-	public double[]						longitudeSerie;
+	public double[]											longitudeSerie;
 
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
 	@Transient
-	public Rectangle					gpsBounds;
+	public Rectangle										gpsBounds;
 
 	/**
 	 * Index of the segmented data in the data series
 	 */
 	@Transient
-	public int[]						segmentSerieIndex;
+	public int[]											segmentSerieIndex;
 
 	/**
 	 * oooo (o) DD-record // offset
 	 */
 	@Transient
-	public int							offsetDDRecord;
+	public int												offsetDDRecord;
 
 	/*
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]						segmentSerieTimeTotal;
+	public int[]											segmentSerieTimeTotal;
 	@Transient
-	public int[]						segmentSerieRecordingTime;
+	public int[]											segmentSerieRecordingTime;
 	@Transient
-	public int[]						segmentSerieDrivingTime;
+	public int[]											segmentSerieDrivingTime;
 	@Transient
-	public int[]						segmentSerieBreakTime;
+	public int[]											segmentSerieBreakTime;
 
 	@Transient
-	public int[]						segmentSerieDistanceDiff;
+	public int[]											segmentSerieDistanceDiff;
 	@Transient
-	public int[]						segmentSerieDistanceTotal;
+	public int[]											segmentSerieDistanceTotal;
 
 	@Transient
-	public int[]						segmentSerieAltitudeDiff;
+	public int[]											segmentSerieAltitudeDiff;
 	@Transient
-	public int[]						segmentSerieComputedAltitudeDiff;
+	public int[]											segmentSerieComputedAltitudeDiff;
 
 	@Transient
-	public float[]						segmentSerieAltitudeUpH;
+	public float[]											segmentSerieAltitudeUpH;
 	@Transient
-	public int[]						segmentSerieAltitudeDownH;
+	public int[]											segmentSerieAltitudeDownH;
 
 	@Transient
-	public float[]						segmentSerieSpeed;
+	public float[]											segmentSerieSpeed;
 	@Transient
-	public float[]						segmentSeriePace;
+	public float[]											segmentSeriePace;
 	@Transient
-	public float[]						segmentSeriePaceDiff;
+	public float[]											segmentSeriePaceDiff;
 
 	@Transient
-	public float[]						segmentSeriePower;
+	public float[]											segmentSeriePower;
 	@Transient
-	public float[]						segmentSerieGradient;
+	public float[]											segmentSerieGradient;
 
 	@Transient
-	public float[]						segmentSeriePulse;
+	public float[]											segmentSeriePulse;
 
 	@Transient
-	public float[]						segmentSerieCadence;
+	public float[]											segmentSerieCadence;
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data are not imported they are from the database
 	 */
 	@Transient
-	public String						importRawDataFile;
+	public String											importRawDataFile;
 
 	/**
 	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLatitude		= Double.MIN_VALUE;
+	public double											mapCenterPositionLatitude		= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLongitude		= Double.MIN_VALUE;
+	public double											mapCenterPositionLongitude		= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
 	 */
 	@Transient
-	public int							mapZoomLevel;
+	public int												mapZoomLevel;
 
 	@Transient
-	public double						mapMinLatitude;
+	public double											mapMinLatitude;
 
 	@Transient
-	public double						mapMaxLatitude;
+	public double											mapMaxLatitude;
 
 	@Transient
-	public double						mapMinLongitude;
+	public double											mapMinLongitude;
 
 	@Transient
-	public double						mapMaxLongitude;
+	public double											mapMaxLongitude;
 
 	/**
 	 * caches the world positions for the tour lat/long values for each zoom level
@@ -719,57 +720,57 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * tour cannot be saved again, it must be reloaded from the file system
 	 */
 	@Transient
-	public boolean						isTourDeleted					= false;
+	public boolean											isTourDeleted					= false;
 
 	/**
 	 * 2nd data serie, this is used in the {@link ChartLayer2ndAltiSerie} to display the merged tour
 	 * or the adjusted altitude
 	 */
 	@Transient
-	public int[]						dataSerie2ndAlti;
+	public int[]											dataSerie2ndAlti;
 
 	/**
 	 * altitude difference between this tour and the merge tour with metric measurement
 	 */
 	@Transient
-	public int[]						dataSerieDiffTo2ndAlti;
+	public int[]											dataSerieDiffTo2ndAlti;
 
 	/**
 	 * contains the altitude serie which is adjusted
 	 */
 	@Transient
-	public int[]						dataSerieAdjustedAlti;
+	public int[]											dataSerieAdjustedAlti;
 
 	/**
 	 * contains special data points
 	 */
 	@Transient
-	public SplineData					splineDataPoints;
+	public SplineData										splineDataPoints;
 
 	/**
 	 * Contains a spline data serie
 	 */
 	@Transient
-	public float[]						dataSerieSpline;
+	public float[]											dataSerieSpline;
 
 	/**
 	 * when a tour is not saved, the tour id is not defined, therefore the tour data are provided
 	 * from the import view when tours are merged to display the merge layer
 	 */
 	@Transient
-	private TourData					_mergeSourceTourData;
+	private TourData										_mergeSourceTourData;
 
 	@Transient
-	private DateTime					_dateTimeCreated;
+	private DateTime										_dateTimeCreated;
 
 	@Transient
-	private DateTime					_dateTimeModified;
+	private DateTime										_dateTimeModified;
 
 	/**
 	 * Tour markers which are sorted by serie index
 	 */
 	@Transient
-	private ArrayList<TourMarker>		_sortedMarkers;
+	private ArrayList<TourMarker>							_sortedMarkers;
 
 	public TourData() {}
 
@@ -4594,8 +4595,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// set new way points
 		for (final TourWayPoint tourWayPoint : wptList) {
-			tourWayPoint.setTourData(this);
-			tourWayPoints.add(tourWayPoint);
+
+			/**
+			 * !!!! <br>
+			 * way point must be cloned because the entity could be saved within different tour data
+			 * instances, otherwise hibernate exceptions occure <br>
+			 * !!!!
+			 */
+			final TourWayPoint clonedWP = (TourWayPoint) tourWayPoint.clone();
+
+			clonedWP.setTourData(this);
+			tourWayPoints.add(clonedWP);
 		}
 	}
 
@@ -4666,7 +4676,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public void setWorldPixelForWayPoints(	final HashMap<Integer, Point> worldPositions,
 											final int zoomLevel,
 											final String projectionId) {
-		
+
 		_twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}
 

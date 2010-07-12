@@ -20,12 +20,17 @@ Create Translation Archive
 
 Create Build
 
+
 - switch to workspace "ws"
 - run script "create-build-files.xml"
 
 - switch to workspace "mytourbook-BUILD-ws"
 - refresh all projects with F5
 - run Project/clean... for all projects
+
+- update version number in build.feature.net.tourbook.product
+- set build target correctly
+- run product export wizard in the product file
 
 
 Create Update Site

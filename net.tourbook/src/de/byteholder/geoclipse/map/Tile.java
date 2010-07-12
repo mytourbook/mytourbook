@@ -323,14 +323,6 @@ public class Tile extends Observable {
 										final Rectangle twpBounds,
 										final int zoomLevel,
 										final int parts) {
-//	public void addTourWayPointBounds(	final TourWayPoint twp,
-//										final int x,
-//										final int y,
-//										final int width,
-//										final int height,
-//										final int zoomLevel,
-//										final int parts) {
-//		final Rectangle twpBounds = new Rectangle(x, y, width, height);
 
 		if (_markerBounds[zoomLevel] == null) {
 			initBounds(zoomLevel);
@@ -446,7 +438,7 @@ public class Tile extends Observable {
 		_childTileImageData = childImageData;
 
 		if (_parentTile == null) {
-			StatusUtil.showStatus(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+			StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
 			return null;
 		}
 
@@ -909,10 +901,6 @@ public class Tile extends Observable {
 		}
 
 		_childrenWithErrors.put(childTile.getTileKey(), childTile);
-
-//		System.out.println("setChildLoadingError\t" + childTile.getTileKey());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	/**

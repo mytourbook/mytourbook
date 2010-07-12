@@ -298,6 +298,22 @@ POSSIBILITY OF SUCH DAMAGES.
 END OF TERMS AND CONDITIONS
    </license>
 
+   <requires>
+      <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook.device.cm4xxm"/>
+      <import plugin="net.tourbook.device.crp"/>
+      <import plugin="net.tourbook.device.garmin"/>
+      <import plugin="net.tourbook.device.hac4"/>
+      <import plugin="net.tourbook.device.hac4pro"/>
+      <import plugin="net.tourbook.device.hac5"/>
+      <import plugin="net.tourbook.device.nmea"/>
+      <import plugin="net.tourbook.device.tur"/>
+      <import plugin="net.tourbook"/>
+      <import plugin="net.tourbook.statistics"/>
+      <import plugin="net.tourbook.util"/>
+      <import plugin="net.tourbook.printing"/>
+   </requires>
+
    <plugin
          id="net.tourbook.chart.nl"
          download-size="0"

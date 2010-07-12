@@ -1039,6 +1039,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		createActions();
 		createLegendProviders();
 
+		enableActions();
+
 		addPartListener();
 		addPrefListener();
 		addSelectionListener();
