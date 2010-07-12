@@ -2,7 +2,7 @@
 <feature
       id="feature.z_Dummy_Host"
       label="Z_Dummy_Host"
-      version="10.3.1.qualifier"
+      version="10.7.0.qualifier"
       provider-name="dummy feature">
 
    <description url="http://www.example.com/description">
@@ -88,13 +88,6 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.srtm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.statistics"
          download-size="0"
          install-size="0"
@@ -109,7 +102,7 @@
          unpack="false"/>
 
    <plugin
-         id="de.byteholder.geoclipse"
+         id="net.tourbook.printing"
          download-size="0"
          install-size="0"
          version="0.0.0"
