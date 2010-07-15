@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -125,7 +126,14 @@ public class PrintTourPDF extends PrintTourExtension {
 				 * }
 				 */
 
-				final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
+				StreamSource xmlSource;
+				try {
+					xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+				} catch (UnsupportedEncodingException e) {
+					//if UTF-8 fails, try default encoding
+					xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
+					e.printStackTrace();
+				}
 
 				// setup xsl stylesheet source
 				final FileInputStream xslFileStream = new FileInputStream(_xslFile);
