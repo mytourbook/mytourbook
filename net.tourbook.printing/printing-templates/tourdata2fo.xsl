@@ -25,7 +25,7 @@
 	<xsl:param name="lang.Tour_Print_Tour_Markers" select="''" />
 	<xsl:param name="lang.Tour_Print_No_Markers_Found" select="''" />
 
-	<!-- parameters passed from java code into the TransFormer, usefull for pre-formatting data in java or configuring i18n -->
+	<!-- parameters passed from java code into the TransFormer, useful for pre-formatting data in java or configuring i18n -->
 	<xsl:param name="paperSize" select="''" />
 	<xsl:param name="paperOrientation" select="''" />
 	<xsl:param name="isPrintMarkers" select="''" />
@@ -381,7 +381,7 @@
 						<xsl:when test="count(TourMarker) > 0">
 	
 								<xsl:for-each select="TourMarker">
-			      					<xsl:sort select="@serieIndex"/>		
+			      					<xsl:sort select="distance" data-type="number" order="ascending"/>		
 									<!-- tour marker -->
 									<fo:table-row>
 										<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
