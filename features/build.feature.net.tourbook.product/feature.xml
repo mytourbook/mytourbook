@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.tourbook.product.feature"
-      label="MyTourbook Product Feature"
-      version="10.3.0.qualifier"
+      label="MyTourbook Product Features"
+      version="10.7.0.qualifier"
       provider-name="MyTourbook">
 
    <description>
@@ -303,10 +303,6 @@ END OF TERMS AND CONDITIONS
 
    <includes
          id="org.eclipse.rcp"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.equinox.executable"
          version="0.0.0"/>
 
    <includes
