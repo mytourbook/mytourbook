@@ -1452,6 +1452,11 @@ public class TourPainter extends MapPainter {
 
 					final Point twpWorldPixel = allWayPointWorldPixel.get(twp.hashCode());
 
+					if (twpWorldPixel == null) {
+						// this happened but should not
+						continue;
+					}
+
 					// this is an inline for: tileViewport.contains(tileWorldPos.x, tileWorldPos.y)
 					final int twpWorldPixelX = twpWorldPixel.x;
 					final int twpWorldPixelY = twpWorldPixel.y;

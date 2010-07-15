@@ -4600,6 +4600,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			 * !!!! <br>
 			 * way point must be cloned because the entity could be saved within different tour data
 			 * instances, otherwise hibernate exceptions occure <br>
+			 * this also sets the createId <br>
 			 * !!!!
 			 */
 			final TourWayPoint clonedWP = (TourWayPoint) tourWayPoint.clone();

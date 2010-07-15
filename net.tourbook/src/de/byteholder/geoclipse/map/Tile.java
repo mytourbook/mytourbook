@@ -42,9 +42,9 @@ public class Tile extends Observable {
 
 //	private static final double				MAX_LATITUDE_85_05112877	= 85.05112877;
 
-	private static final String				COLUMN_2			= "  ";										//$NON-NLS-1$
-	private static final String				COLUMN_4			= "    ";										//$NON-NLS-1$
-	private static final String				COLUMN_5			= "     ";										//$NON-NLS-1$
+	private static final String				COLUMN_2			= "  ";								//$NON-NLS-1$
+	private static final String				COLUMN_4			= "    ";								//$NON-NLS-1$
+	private static final String				COLUMN_5			= "     ";								//$NON-NLS-1$
 
 	private OverlayTourState				_overlayTourState	= OverlayTourState.TILE_IS_NOT_CHECKED;
 	private OverlayImageState				_overlayImageState	= OverlayImageState.NOT_SET;
@@ -161,6 +161,7 @@ public class Tile extends Observable {
 	private long							_timeEndLoading;
 
 	private static final ReentrantLock		TILE_LOCK			= new ReentrantLock();
+	private static final int				MAX_BOUNDS			= Map.MAP_MAX_ZOOM_LEVEL + 1;
 
 	/**
 	 * contains children which contains loading errors
@@ -168,9 +169,9 @@ public class Tile extends Observable {
 	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[MAX_BOUNDS];
 
 	/**
 	 * Contains the {@link TourWayPoint}'s which are displayed in this tile.
@@ -179,11 +180,11 @@ public class Tile extends Observable {
 	 * sequence as {@link #_twp}.
 	 */
 	@SuppressWarnings("unchecked")
-	private ArrayList<TourWayPoint>[]		_twp				= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<TourWayPoint>[]		_twp				= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_twpSimpleBounds	= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<Rectangle>[]			_twpSimpleBounds	= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[Map.MAP_MAX_ZOOM_LEVEL + 1];
+	private ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[MAX_BOUNDS];
 
 	/**
 	 * Create a new Tile at the specified tile point and zoom level
@@ -398,6 +399,11 @@ public class Tile extends Observable {
 
 				// draw neighbor first
 				if (neighborImageData != null) {
+
+					// check _overlayImageDataResources again, it could be null at this time
+					if (_overlayImageDataResources == null) {
+						return null;
+					}
 					_overlayImageDataResources.drawImageData(
 							finalImageData,
 							neighborImageData,
@@ -407,8 +413,13 @@ public class Tile extends Observable {
 							tileSize);
 				}
 
-				// draw tile last to overwrite neighbor image data
+				// draw tile last to overwrite neighbor image data,
 				if (tileImageData != null) {
+
+					// check _overlayImageDataResources again, it could be null at this time
+					if (_overlayImageDataResources == null) {
+						return null;
+					}
 					_overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
 				}
 
@@ -871,6 +882,38 @@ public class Tile extends Observable {
 		_overlayContent = 0;
 
 		_overlayImageDataResources = null;
+
+		/*
+		 * reset all bounds for all zoomlevels, this is necessary when a new tour is displayed
+		 */
+		for (int zoomLevel = 0; zoomLevel < MAX_BOUNDS; zoomLevel++) {
+
+			final ArrayList<TourWayPoint> twpBounds = _twp[zoomLevel];
+			if (twpBounds != null) {
+				twpBounds.clear();
+			}
+
+			ArrayList<Rectangle> bounds = _markerBounds[zoomLevel];
+			if (bounds != null) {
+				bounds.clear();
+			}
+
+			bounds = _markerPartBounds[zoomLevel];
+			if (bounds != null) {
+				bounds.clear();
+			}
+
+			bounds = _twpSimpleBounds[zoomLevel];
+			if (bounds != null) {
+				bounds.clear();
+			}
+
+			bounds = _twpPartBounds[zoomLevel];
+			if (bounds != null) {
+				bounds.clear();
+			}
+		}
+
 	}
 
 	/**

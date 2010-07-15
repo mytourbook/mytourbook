@@ -445,6 +445,20 @@ public class UI {
 					break;
 				}
 			}
+
+		} else if (propertyData instanceof TourEvent) {
+
+			final TourEvent tourEvent = (TourEvent) propertyData;
+			final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+
+			if (modifiedTours != null) {
+				for (final TourData tourData : modifiedTours) {
+					if (tourData.getTourId().longValue() == checkedTourId) {
+						containedTourId = checkedTourId;
+						break;
+					}
+				}
+			}
 		}
 
 		return containedTourId;
@@ -1049,6 +1063,13 @@ public class UI {
 		tourTagLabel.pack(true);
 	}
 
+	/**
+	 * Sets the tour type image and text into a {@link CLabel}
+	 * 
+	 * @param tourData
+	 * @param lblTourType
+	 * @param isTextDisplayed
+	 */
 	public static void updateUITourType(final TourData tourData, final CLabel lblTourType, final boolean isTextDisplayed) {
 
 		final TourType tourType = tourData.getTourType();

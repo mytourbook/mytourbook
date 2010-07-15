@@ -211,6 +211,8 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
+	public static String	Tooltip_WayPoint_Label_Altitude;
+
 	public static String		Tooltip_WayPoint_Label_Category;
 	public static String		Tooltip_WayPoint_Label_Comment;
 	public static String		Tooltip_WayPoint_Label_Description;
@@ -232,6 +234,8 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_Clouds;
 	public static String		Tour_Tooltip_Label_DateTimeCreated;
 	public static String		Tour_Tooltip_Label_DateTimeModified;
+	public static String	Tour_Tooltip_Label_DefaultTitle;
+
 	public static String		Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
 	public static String		Tour_Tooltip_Label_Hour;

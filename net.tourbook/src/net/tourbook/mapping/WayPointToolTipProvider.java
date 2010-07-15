@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.Messages;
+import net.tourbook.ui.UI;
 import net.tourbook.util.HoveredAreaContext;
 import net.tourbook.util.ITourToolTipProvider;
 import net.tourbook.util.TourToolTip;
@@ -48,11 +50,17 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 //	private TourToolTip		_tourToolTip;
 
-	private Color			_bgColor;
-	private Color			_fgColor;
-	private Font			_boldFont;
+	private Color				_bgColor;
+	private Color				_fgColor;
+	private Font				_boldFont;
 
-	private TourWayPoint	_hoveredWayPoint;
+	private TourWayPoint		_hoveredWayPoint;
+
+	private final NumberFormat	_nf_1_1	= NumberFormat.getNumberInstance();
+	{
+		_nf_1_1.setMinimumFractionDigits(1);
+		_nf_1_1.setMaximumFractionDigits(1);
+	}
 
 	public WayPointToolTipProvider() {}
 
@@ -120,7 +128,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 					label.setFont(_boldFont);
 				}
 
-				createUIItem(container, _hoveredWayPoint.getComment(), Messages.Tooltip_WayPoint_Label_Comment);
+				createUIItem(container, Messages.Tooltip_WayPoint_Label_Comment, _hoveredWayPoint.getComment());
 
 				/*
 				 * description
@@ -147,19 +155,32 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 					label.setText(description);
 				}
 
-				createUIItem(container, _hoveredWayPoint.getCategory(), Messages.Tooltip_WayPoint_Label_Category);
-				createUIItem(container, _hoveredWayPoint.getSymbol(), Messages.Tooltip_WayPoint_Label_Symbol);
+				createUIItem(container, Messages.Tooltip_WayPoint_Label_Category, _hoveredWayPoint.getCategory());
+				createUIItem(container, Messages.Tooltip_WayPoint_Label_Symbol, _hoveredWayPoint.getSymbol());
+
+				/*
+				 * altitude
+				 */
+				final float wpAltitude = _hoveredWayPoint.getAltitude();
+				if (wpAltitude != Float.MIN_VALUE) {
+
+					final float altitude = wpAltitude / UI.UNIT_VALUE_ALTITUDE;
+
+					createUIItem(container, Messages.Tooltip_WayPoint_Label_Altitude, //
+							_nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
+				}
+
 			}
 		}
 
 		return shellContainer;
 	}
 
-	private void createUIItem(final Composite parent, final String text, final String label) {
+	private void createUIItem(final Composite parent, final String label, final String value) {
 
-		if (text != null) {
+		if (value != null) {
 			createUILabel(parent, label);
-			createUILabel(parent, text);
+			createUILabel(parent, value);
 		}
 	}
 
@@ -261,7 +282,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 
 	@Override
 	public void paint(final GC gc, final Rectangle rectangle) {
-		// painting is done in the TourPainter
+		// painting is done in TourPainter
 	}
 
 	@Override

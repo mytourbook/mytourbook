@@ -1458,7 +1458,7 @@ public class TourDatabase {
 						connection.close();
 
 						// log database path
-//						StatusUtil.handleStatus("Database path: " + _databasePath, Status.INFO); //$NON-NLS-1$
+						System.out.println("Database path: " + _databasePath);
 
 					} catch (final SQLException e1) {
 						UI.showSQLException(e1);

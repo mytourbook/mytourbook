@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.tourbook.rxtx.macosx;singleton:=true
-Bundle-Version: 2.1.8.v20071231-arduino
+Bundle-Version: 2.1.20100715.iharder
 Fragment-Host: net.tourbook.rxtx;bundle-version="2.1.8"
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor

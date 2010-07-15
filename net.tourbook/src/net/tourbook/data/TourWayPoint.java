@@ -93,11 +93,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	 */
 	private static int		_createCounter			= 0;
 
-	public TourWayPoint() {
-
-		// set create id to uniquely identify the way point
-		_createId = ++_createCounter;
-	}
+	public TourWayPoint() {}
 
 	@Override
 	public Object clone() {
@@ -190,6 +186,9 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		return true;
 	}
 
+	/**
+	 * @return Returns altitude in meters or {@link Float#MIN_VALUE} when altitude is not set
+	 */
 	public float getAltitude() {
 		return altitude;
 	}
@@ -329,7 +328,11 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	}
 
 	public void setTourData(final TourData tourData) {
+
 		this.tourData = tourData;
+
+		// set create id to uniquely identify way points which not created from the database
+		_createId = ++_createCounter;
 	}
 
 	@Override

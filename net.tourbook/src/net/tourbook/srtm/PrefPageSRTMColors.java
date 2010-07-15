@@ -312,9 +312,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 					e.printStackTrace();
 				}
 			}
-
-			return file;
 		}
+
+		return file;
 	}
 
 	private static IMemento createXmlProfile(	final XMLMemento xmlMemento,
@@ -417,6 +417,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			final IPath stateRoot = stateLocation.removeLastSegments(1);
 			final IPath oldFilePath = stateRoot.append("net.tourbook.srtm"); //$NON-NLS-1$
+
 			profileFile = oldFilePath.append(PROFILE_FILE_NAME).toFile();
 		}
 
@@ -433,6 +434,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 						NLS.bind("SRTM color profile file {0} could not be created", profileFile.getAbsolutePath())); //$NON-NLS-1$
 				return;
 			}
+
+			profileFile = createdProfileFile;
 		}
 
 		InputStreamReader reader = null;

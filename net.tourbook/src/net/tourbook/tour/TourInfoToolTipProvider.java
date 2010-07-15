@@ -180,6 +180,13 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	 */
 	private boolean						_isHovered				= false;
 
+	/*
+	 * fields which are optionally displayed when they are not null
+	 */
+	private DateTime					_uiDtCreated;
+	private DateTime					_uiDtModified;
+	private String						_uiTourTypeName;
+
 //	private int							_toolTipHoverCounter	= 0;
 
 	public TourInfoToolTipProvider() {
@@ -257,6 +264,15 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 				_hasDescription = tourDescription != null && tourDescription.length() > 0;
 			}
 
+			// date/time created/modified
+			_uiDtCreated = _tourData.getDateTimeCreated();
+			_uiDtModified = _tourData.getDateTimeModified();
+
+			final TourType tourType = _tourData.getTourType();
+			_uiTourTypeName = tourType == null ? //
+					null
+					: TourDatabase.getTourTypeName(tourType.getTypeId());
+
 			container = createUI(parent);
 
 			updateUI();
@@ -300,19 +316,16 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			GridLayoutFactory.fillDefaults() //
 					.numColumns(2)
 					.equalWidth(true)
-					.spacing(20, 5)
+//					.spacing(20, 5)
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
 					.applyTo(_ttContainer);
+//			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
 				createUI10UpperPart(_ttContainer);
 
 				createUI30LeftColumn(_ttContainer);
 				createUI40RightColumn(_ttContainer);
-
-				if (_hasTags || _hasDescription) {
-					createUI50LowerPart(_ttContainer);
-				}
-
+				createUI50LowerPart(_ttContainer);
 				createUI60CreateModifyTime(_ttContainer);
 			}
 		}
@@ -334,12 +347,15 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			/*
 			 * tour type
 			 */
-			_lblTourType = new CLabel(container, SWT.NONE);
-			GridDataFactory.swtDefaults()//
-					.align(SWT.BEGINNING, SWT.BEGINNING)
-					.applyTo(_lblTourType);
-			_lblTourType.setForeground(_fgColor);
-			_lblTourType.setBackground(_bgColor);
+			if (_uiTourTypeName != null) {
+
+				_lblTourType = new CLabel(container, SWT.NONE);
+				GridDataFactory.swtDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_lblTourType);
+				_lblTourType.setForeground(_fgColor);
+				_lblTourType.setBackground(_bgColor);
+			}
 
 			/*
 			 * title
@@ -403,7 +419,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
 		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			/*
 			 * recording time
@@ -502,10 +518,6 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			_secondColumnControls.add(_lblRestPulse);
 
 			createUILabel(container, Messages.Value_Unit_Pulse);
-
-			// ----------------- spacer ----------------
-			label = createUILabel(container, null);
-			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 		}
 	}
 
@@ -620,6 +632,10 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	private void createUI50LowerPart(final Composite parent) {
 
+		if (_hasTags == false && _hasDescription == false) {
+			return;
+		}
+
 		Label label;
 		final PixelConverter pc = new PixelConverter(parent);
 
@@ -689,6 +705,10 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	private void createUI60CreateModifyTime(final Composite parent) {
 
+		if (_uiDtCreated == null && _uiDtModified == null) {
+			return;
+		}
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 		container.setForeground(_fgColor);
@@ -698,42 +718,46 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 				.equalWidth(true)
 				.spacing(20, 5)
 				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			final Composite rightContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(rightContainer);
-			rightContainer.setForeground(_fgColor);
-			rightContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rightContainer);
-			{
-				/*
-				 * date/time modified
-				 */
-				_lblDateTimeModified = createUILabel(rightContainer, Messages.Tour_Tooltip_Label_DateTimeModified);
-
-				_lblDateTimeModifiedValue = createUILabelValue(rightContainer, SWT.LEAD);
-				GridDataFactory.fillDefaults().applyTo(_lblDateTimeModifiedValue);
-			}
-
 			final Composite leftContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(leftContainer);
 			leftContainer.setForeground(_fgColor);
 			leftContainer.setBackground(_bgColor);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(leftContainer);
-			//			leftContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+			{
+				/*
+				 * date/time modified
+				 */
+				_lblDateTimeModified = createUILabel(leftContainer, Messages.Tour_Tooltip_Label_DateTimeModified);
+
+				_lblDateTimeModifiedValue = createUILabelValue(leftContainer, SWT.LEAD);
+				GridDataFactory.fillDefaults().applyTo(_lblDateTimeModifiedValue);
+			}
+
+			final Composite rightContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(rightContainer);
+			rightContainer.setForeground(_fgColor);
+			rightContainer.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rightContainer);
+//			rightContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
 				/*
 				 * date/time created
 				 */
-				_lblDateTimeCreated = createUILabel(leftContainer, Messages.Tour_Tooltip_Label_DateTimeCreated);
+				_lblDateTimeCreated = createUILabel(rightContainer, Messages.Tour_Tooltip_Label_DateTimeCreated);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeCreated);
 
-				_lblDateTimeCreatedValue = createUILabelValue(leftContainer, SWT.TRAIL);
+				_lblDateTimeCreatedValue = createUILabelValue(rightContainer, SWT.TRAIL);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeCreatedValue);
+//
+//				final Label label = new Label(rightContainer, SWT.NONE);
+//				label.setText("test");
 			}
 		}
 	}
@@ -983,20 +1007,17 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		/*
 		 * upper/lower part
 		 */
-		final TourType tourType = _tourData.getTourType();
-		final String tourTypeName = tourType == null ? //
-				UI.EMPTY_STRING
-				: TourDatabase.getTourTypeName(tourType.getTypeId());
+		if (_lblTourType != null) {
+			_lblTourType.setToolTipText(_uiTourTypeName);
+			UI.updateUITourType(_tourData, _lblTourType, false);
+		}
 
 		String tourTitle = _tourData.getTourTitle();
 		if (tourTitle == null || tourTitle.trim().length() == 0) {
-			tourTitle = tourTypeName.length() > 0 ? tourTypeName : UI.EMPTY_STRING;
+			tourTitle = Messages.Tour_Tooltip_Label_DefaultTitle;
 		}
-
 		_lblTitle.setText(tourTitle);
-		_lblTourType.setToolTipText(tourTypeName);
 
-		UI.updateUITourType(_tourData, _lblTourType, false);
 
 		if (_hasTags) {
 			UI.updateUITags(_tourData, _lblTourTags);
@@ -1121,34 +1142,19 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		 */
 
 		// date/time created
-		final DateTime dtCreated = _tourData.getDateTimeCreated();
-		if (dtCreated == null) {
+		if (_uiDtCreated != null) {
 
-			// tour was not yet saved
-
-			_lblDateTimeCreated.setVisible(false);
-			_lblDateTimeCreatedValue.setVisible(false);
-
-		} else {
-
-			_lblDateTimeCreatedValue.setText(dtCreated == null ? //
+			_lblDateTimeCreatedValue.setText(_uiDtCreated == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatter.print(dtCreated.getMillis()));
+					: _dtFormatter.print(_uiDtCreated.getMillis()));
 		}
 
 		// date/time modified
-		final DateTime dtModified = _tourData.getDateTimeModified();
-		if (dtModified == null) {
+		if (_uiDtModified != null) {
 
-			// hide label/value
-			_lblDateTimeModified.setVisible(false);
-			_lblDateTimeModifiedValue.setVisible(false);
-
-		} else {
-
-			_lblDateTimeModifiedValue.setText(dtModified == null ? //
+			_lblDateTimeModifiedValue.setText(_uiDtModified == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatter.print(dtModified.getMillis()));
+					: _dtFormatter.print(_uiDtModified.getMillis()));
 		}
 	}
 

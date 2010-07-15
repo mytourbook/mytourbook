@@ -735,7 +735,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 						resetMap();
 					}
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearView();
 

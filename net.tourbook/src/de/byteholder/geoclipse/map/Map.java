@@ -4134,7 +4134,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Set hovered area context for the current mouse position or <code>null</code> when there a
+	 * Set hovered area context for the current mouse position or <code>null</code> when a
 	 * tour hovered area (e.g. way point) is not hovered.
 	 * 
 	 * @param isForceRedraw

@@ -22,7 +22,7 @@ Create Build
 
 
 - switch to workspace "ws"
-- run script "create-build-files.xml"
+- run script "create-build-files.xml" in plugin net.tourbook and folder ant-build-files
 
 - switch to workspace "mytourbook-BUILD-ws"
 - refresh all projects with F5
@@ -30,6 +30,7 @@ Create Build
 
 - update version number in build.feature.net.tourbook.product
 - set build target correctly
+- delete old exported files when a reexport is done, export will add new files to an existing product archive
 - run product export wizard in the product file
 
 

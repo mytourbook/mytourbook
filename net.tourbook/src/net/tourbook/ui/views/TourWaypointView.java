@@ -31,7 +31,6 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -116,10 +115,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private ITourEventListener		_tourPropertyListener;
 	private IPartListener2			_partListener;
 
-	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
-	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.shortDate();
-	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
-
 	/*
 	 * UI controls
 	 */
@@ -141,6 +136,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private float					_unitValueAltitude;
 
+	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
+	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.shortDate();
+	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
@@ -304,30 +302,24 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 					return;
 				}
 
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
+					// check if a tour must be updated
 
-						// update modified tour
+					final long viewTourId = _tourData.getTourId();
 
-						final long viewTourId = _tourData.getTourId();
+					if (UI.containsTourId(eventData, viewTourId) != null) {
 
-						for (final TourData tourData : modifiedTours) {
-							if (tourData.getTourId() == viewTourId) {
+						// reload tour data
+						_tourData = TourManager.getInstance().getTourData(viewTourId);
 
-								// get modified tour
-								_tourData = tourData;
+						_wpViewer.setInput(new Object[0]);
 
-								_wpViewer.setInput(new Object[0]);
+						// removed old tour data from the selection provider
+						_postSelectionProvider.clearSelection();
 
-								// removed old tour data from the selection provider
-								_postSelectionProvider.clearSelection();
-
-								// nothing more to do, the view contains only one tour
-								return;
-							}
-						}
+					} else {
+						clearView();
 					}
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
@@ -521,9 +513,16 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			public void update(final ViewerCell cell) {
 
 				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				final float altitude = wp.getAltitude() / _unitValueAltitude;
+				final float dbAltitude = wp.getAltitude();
 
-				cell.setText(_nf_1_1.format(altitude));
+				if (dbAltitude == Float.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final float altitude = dbAltitude / _unitValueAltitude;
+
+					cell.setText(_nf_1_1.format(altitude));
+				}
 			}
 		});
 	}
