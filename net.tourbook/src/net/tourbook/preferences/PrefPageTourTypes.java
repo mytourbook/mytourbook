@@ -39,6 +39,8 @@ import net.tourbook.util.TreeColumnLayout;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -75,7 +77,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
+ 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	private static final String[]				SORT_PROPERTY	= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
@@ -221,85 +223,22 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private Composite createUI(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 		label.setText(Messages.Pref_TourTypes_Title);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
-		final GridLayout gl = new GridLayout(2, false);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		container.setLayout(gl);
-		container.setLayoutData(new GridData(SWT.NONE, SWT.FILL, true, true));
-
-		createUITourTypeViewer(container);
-		createUIButtons(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			createUI10TourTypeViewer(container);
+			createUI20Buttons(container);
+		}
 
 		return container;
 	}
 
-	private void createUIButtons(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		container.setLayout(gridLayout);
-
-		// button: add
-		_btnAdd = new Button(container, SWT.NONE);
-		_btnAdd.setText(Messages.Pref_TourTypes_Button_add);
-		setButtonLayoutData(_btnAdd);
-		_btnAdd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onAddTourType();
-				enableButtons();
-			}
-		});
-
-		// button: rename
-		_btnRename = new Button(container, SWT.NONE);
-		_btnRename.setText(Messages.Pref_TourTypes_Button_rename);
-		setButtonLayoutData(_btnRename);
-		_btnRename.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onRenameTourType();
-			}
-		});
-
-		_colorSelector = new ColorSelector(container);
-		_colorSelector.getButton().setLayoutData(new GridData());
-		_colorSelector.setEnabled(false);
-		setButtonLayoutData(_colorSelector.getButton());
-		_colorSelector.addListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeColor(event);
-			}
-		});
-
-// 2009-01-02 disabled because the tour data cache was cleared
-// button: delete
-		_btnDelete = new Button(container, SWT.NONE);
-		_btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
-		final GridData gd = setButtonLayoutData(_btnDelete);
-		gd.verticalIndent = 10;
-		_btnDelete.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onDeleteTourType();
-				enableButtons();
-			}
-		});
-
-		_btnTourTypeImage = new Button(container, SWT.NONE);
-		_btnTourTypeImage.setImage(UI.getInstance().getTourTypeImage(-1));
-
-	}
-
-	private void createUITourTypeViewer(final Composite parent) {
+	private void createUI10TourTypeViewer(final Composite parent) {
 
 		// tree container
 		final Composite treeContainer = new Composite(parent, SWT.NONE);
@@ -410,6 +349,67 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				}
 			}
 		});
+
+	}
+
+	private void createUI20Buttons(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		container.setLayout(gridLayout);
+
+		// button: add
+		_btnAdd = new Button(container, SWT.NONE);
+		_btnAdd.setText(Messages.Pref_TourTypes_Button_add);
+		setButtonLayoutData(_btnAdd);
+		_btnAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onAddTourType();
+				enableButtons();
+			}
+		});
+
+		// button: rename
+		_btnRename = new Button(container, SWT.NONE);
+		_btnRename.setText(Messages.Pref_TourTypes_Button_rename);
+		setButtonLayoutData(_btnRename);
+		_btnRename.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onRenameTourType();
+			}
+		});
+
+		_colorSelector = new ColorSelector(container);
+		_colorSelector.getButton().setLayoutData(new GridData());
+		_colorSelector.setEnabled(false);
+		setButtonLayoutData(_colorSelector.getButton());
+		_colorSelector.addListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				onChangeColor(event);
+			}
+		});
+
+// 2009-01-02 disabled because the tour data cache was cleared
+// button: delete
+		_btnDelete = new Button(container, SWT.NONE);
+		_btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
+		final GridData gd = setButtonLayoutData(_btnDelete);
+		gd.verticalIndent = 10;
+		_btnDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onDeleteTourType();
+				enableButtons();
+			}
+		});
+
+		_btnTourTypeImage = new Button(container, SWT.NONE);
+		_btnTourTypeImage.setImage(UI.getInstance().getTourTypeImage(-1));
 
 	}
 
@@ -747,16 +747,19 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		selectedColorDefinition.setVisibleName(newTourTypeName);
 
 		// update entity in the db
-		final TourType saveTourType = TourDatabase.saveEntity(
+		final TourType savedTourType = TourDatabase.saveEntity(
 				selectedTourType,
 				selectedTourType.getTypeId(),
 				TourType.class);
 
-		if (saveTourType != null) {
+		if (savedTourType != null) {
 
 			// update model
-			selectedColorDefinition.setTourType(saveTourType);
+			selectedColorDefinition.setTourType(savedTourType);
 
+			// replace tour type with new one
+			_tourTypes.remove(selectedTourType);
+			_tourTypes.add(savedTourType);
 			Collections.sort(_tourTypes);
 
 			// update viewer, resort types when necessary
