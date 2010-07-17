@@ -40,6 +40,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.export.ExportTourExtension;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
@@ -181,6 +182,11 @@ public class DialogExportTour extends TitleAreaDialog {
 	private boolean									_isInit;
 
 	private DateTime								_trackStartDateTime;
+
+	/**
+	 * Is <code>true</code> when multiple tours are selected and not merged into 1 file
+	 */
+	private boolean									_isMultipleTourAndMultipleFile;
 
 	public DialogExportTour(final Shell parentShell,
 							final ExportTourExtension exportExtensionPoint,
@@ -413,13 +419,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		return (_tourDataList.size() == 1) && (_tourStartIndex >= 0) && (_tourEndIndex > 0);
 	}
 
-	/**
-	 * @return Returns <code>true</code> when tours can be merged
-	 */
-	private boolean canMergeTours() {
-		return _tourDataList.size() > 1;
-	}
-
 	@Override
 	public boolean close() {
 
@@ -476,8 +475,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 		_isInit = false;
 
-		setFileName();
-		validateFields();
+//		validateFields();
 		enableFields();
 	}
 
@@ -506,13 +504,202 @@ public class DialogExportTour extends TitleAreaDialog {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_inputContainer);
 		GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(_inputContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
-		createUIOption(_inputContainer);
-		createUIDestination(_inputContainer);
-		createUIProgress(parent);
+		{
+			createUI10Option(_inputContainer);
+			createUI20Destination(_inputContainer);
+		}
+		createUI30Progress(parent);
 	}
 
-	private void createUIDestination(final Composite parent) {
+	private void createUI10Option(final Composite parent) {
+
+		// container
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.dialog_export_group_options);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+		{
+			createUI12OptionCamouflageSpeed(group);
+			createUI13OptionExportMarkers(group);
+			createUI14OptionExportNotes(group);
+			createUI15OptionMergeTours(group);
+			createUI16OptionTourPart(group);
+		}
+	}
+
+	private void createUI12OptionCamouflageSpeed(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * checkbox: camouflage speed
+			 */
+			_chkCamouflageSpeed = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkCamouflageSpeed);
+			_chkCamouflageSpeed.setText(Messages.dialog_export_chk_camouflageSpeed);
+			_chkCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeed_tooltip);
+			_chkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					validateFields();
+					enableFields();
+
+					if (_chkCamouflageSpeed.getSelection()) {
+						_txtCamouflageSpeed.setFocus();
+					}
+				}
+			});
+
+			// text: speed
+			_txtCamouflageSpeed = new Text(container, SWT.BORDER | SWT.TRAIL);
+			_txtCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeedInput_tooltip);
+			_txtCamouflageSpeed.addModifyListener(new ModifyListener() {
+				public void modifyText(final ModifyEvent e) {
+					validateFields();
+					enableFields();
+				}
+			});
+			_txtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
+				public void handleEvent(final Event e) {
+					net.tourbook.util.UI.verifyIntegerInput(e, false);
+				}
+			});
+
+			// label: unit
+			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
+			_lblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_lblCoumouflageSpeedUnit);
+		}
+	}
+
+	private void createUI13OptionExportMarkers(final Composite parent) {
+
+		/*
+		 * checkbox: export markers
+		 */
+		_chkExportMarkers = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportMarkers);
+		_chkExportMarkers.setText(Messages.dialog_export_chk_exportMarkers);
+		_chkExportMarkers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
+	}
+
+	private void createUI14OptionExportNotes(final Composite parent) {
+
+		/*
+		 * checkbox: export notes
+		 */
+		_chkExportNotes = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportNotes);
+		_chkExportNotes.setText(Messages.dialog_export_chk_exportNotes);
+		_chkExportNotes.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);
+	}
+
+	private void createUI15OptionMergeTours(final Composite parent) {
+
+		/*
+		 * checkbox: merge all tours
+		 */
+		_chkMergeAllTours = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkMergeAllTours);
+		_chkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
+		_chkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
+		_chkMergeAllTours.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableFields();
+				setFileName();
+			}
+		});
+	}
+
+	private void createUI16OptionTourPart(final Composite parent) {
+
+		/*
+		 * checkbox: tour range
+		 */
+		String tourRangeUI = null;
+
+		if ((_tourDataList.size() == 1) && (_tourStartIndex != -1) && (_tourEndIndex != -1)) {
+
+			final TourData tourData = _tourDataList.get(0);
+			final int[] timeSerie = tourData.timeSerie;
+			if (timeSerie != null) {
+
+				final int[] distanceSerie = tourData.distanceSerie;
+				final boolean isDistance = distanceSerie != null;
+
+				final int startTime = timeSerie[_tourStartIndex];
+				final int endTime = timeSerie[_tourEndIndex];
+
+				final DateTime dtTour = new DateTime(
+						tourData.getStartYear(),
+						tourData.getStartMonth(),
+						tourData.getStartDay(),
+						tourData.getStartHour(),
+						tourData.getStartMinute(),
+						tourData.getStartSecond(),
+						0);
+
+				final String uiStartTime = _timeFormatter.format(dtTour.plusSeconds(startTime).toDate());
+				final String uiEndTime = _timeFormatter.format(dtTour.plusSeconds(endTime).toDate());
+
+				if (isDistance) {
+
+					_numberFormatter.setMinimumFractionDigits(3);
+					_numberFormatter.setMaximumFractionDigits(3);
+
+					tourRangeUI = NLS.bind(
+							Messages.dialog_export_chk_tourRangeWithDistance,
+							new Object[] {
+									uiStartTime,
+									uiEndTime,
+
+									_numberFormatter.format(((float) distanceSerie[_tourStartIndex])
+											/ 1000
+											/ UI.UNIT_VALUE_DISTANCE),
+
+									_numberFormatter.format(((float) distanceSerie[_tourEndIndex])
+											/ 1000
+											/ UI.UNIT_VALUE_DISTANCE),
+
+									UI.UNIT_LABEL_DISTANCE,
+
+									// adjust by 1 to corresponds to the number in the tour editor
+									_tourStartIndex + 1,
+									_tourEndIndex + 1 });
+
+				} else {
+
+					tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithoutDistance, new Object[] {
+							uiStartTime,
+							uiEndTime,
+							_tourStartIndex + 1,
+							_tourEndIndex + 1 });
+				}
+			}
+		}
+
+		_chkExportTourRange = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportTourRange);
+
+		_chkExportTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.dialog_export_chk_tourRangeDisabled);
+
+		_chkExportTourRange.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableFields();
+			}
+		});
+	}
+
+	private void createUI20Destination(final Composite parent) {
 
 		Label label;
 
@@ -606,16 +793,6 @@ public class DialogExportTour extends TitleAreaDialog {
 			// -----------------------------------------------------------------------------
 
 			/*
-			 * checkbox: overwrite files
-			 */
-			_chkOverwriteFiles = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(3, 1).applyTo(_chkOverwriteFiles);
-			_chkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
-			_chkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
-
-			// -----------------------------------------------------------------------------
-
-			/*
 			 * label: file path
 			 */
 			label = new Label(group, SWT.NONE);
@@ -629,200 +806,20 @@ public class DialogExportTour extends TitleAreaDialog {
 			_txtFilePath.setToolTipText(Messages.dialog_export_txt_filePath_tooltip);
 			_txtFilePath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-			// spacer
-//			new Label(group, SWT.NONE);
-		}
+			// -----------------------------------------------------------------------------
 
-	}
-
-	private void createUIOption(final Composite parent) {
-
-		// container
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.dialog_export_group_options);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-		{
-			createUIOptionCamouflageSpeed(group);
-			createUIOptionExportMarkers(group);
-			createUIOptionExportNotes(group);
-			createUIOptionMergeTours(group);
-			createUIOptionTourPart(group);
-		}
-	}
-
-	private void createUIOptionCamouflageSpeed(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
 			/*
-			 * checkbox: camouflage speed
+			 * checkbox: overwrite files
 			 */
-			_chkCamouflageSpeed = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkCamouflageSpeed);
-			_chkCamouflageSpeed.setText(Messages.dialog_export_chk_camouflageSpeed);
-			_chkCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeed_tooltip);
-			_chkCamouflageSpeed.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					validateFields();
-					enableFields();
-
-					if (_chkCamouflageSpeed.getSelection()) {
-						_txtCamouflageSpeed.setFocus();
-					}
-				}
-			});
-
-			// text: speed
-			_txtCamouflageSpeed = new Text(container, SWT.BORDER | SWT.TRAIL);
-			_txtCamouflageSpeed.setToolTipText(Messages.dialog_export_chk_camouflageSpeedInput_tooltip);
-			_txtCamouflageSpeed.addModifyListener(new ModifyListener() {
-				public void modifyText(final ModifyEvent e) {
-					validateFields();
-					enableFields();
-				}
-			});
-			_txtCamouflageSpeed.addListener(SWT.Verify, new Listener() {
-				public void handleEvent(final Event e) {
-					net.tourbook.util.UI.verifyIntegerInput(e, false);
-				}
-			});
-
-			// label: unit
-			_lblCoumouflageSpeedUnit = new Label(container, SWT.NONE);
-			_lblCoumouflageSpeedUnit.setText(UI_AVERAGE_SYMBOL + UI.UNIT_LABEL_SPEED);
-			GridDataFactory
-					.fillDefaults()
-					.grab(true, false)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_lblCoumouflageSpeedUnit);
-		}
-	}
-
-	private void createUIOptionExportMarkers(final Composite parent) {
-
-		/*
-		 * checkbox: export markers
-		 */
-		_chkExportMarkers = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportMarkers);
-		_chkExportMarkers.setText(Messages.dialog_export_chk_exportMarkers);
-		_chkExportMarkers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
-	}
-
-	private void createUIOptionExportNotes(final Composite parent) {
-
-		/*
-		 * checkbox: export notes
-		 */
-		_chkExportNotes = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportNotes);
-		_chkExportNotes.setText(Messages.dialog_export_chk_exportNotes);
-		_chkExportNotes.setToolTipText(Messages.dialog_export_chk_exportNotes_tooltip);
-	}
-
-	private void createUIOptionMergeTours(final Composite parent) {
-
-		/*
-		 * checkbox: merge all tours
-		 */
-		_chkMergeAllTours = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkMergeAllTours);
-		_chkMergeAllTours.setText(Messages.dialog_export_chk_mergeAllTours);
-		_chkMergeAllTours.setToolTipText(Messages.dialog_export_chk_mergeAllTours_tooltip);
-		_chkMergeAllTours.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableFields();
-			}
-		});
-	}
-
-	private void createUIOptionTourPart(final Composite parent) {
-
-		/*
-		 * checkbox: tour range
-		 */
-		String tourRangeUI = null;
-
-		if ((_tourDataList.size() == 1) && (_tourStartIndex != -1) && (_tourEndIndex != -1)) {
-
-			final TourData tourData = _tourDataList.get(0);
-			final int[] timeSerie = tourData.timeSerie;
-			if (timeSerie != null) {
-
-				final int[] distanceSerie = tourData.distanceSerie;
-				final boolean isDistance = distanceSerie != null;
-
-				final int startTime = timeSerie[_tourStartIndex];
-				final int endTime = timeSerie[_tourEndIndex];
-
-				final DateTime dtTour = new DateTime(
-						tourData.getStartYear(),
-						tourData.getStartMonth(),
-						tourData.getStartDay(),
-						tourData.getStartHour(),
-						tourData.getStartMinute(),
-						tourData.getStartSecond(),
-						0);
-
-				final String uiStartTime = _timeFormatter.format(dtTour.plusSeconds(startTime).toDate());
-				final String uiEndTime = _timeFormatter.format(dtTour.plusSeconds(endTime).toDate());
-
-				if (isDistance) {
-
-					_numberFormatter.setMinimumFractionDigits(3);
-					_numberFormatter.setMaximumFractionDigits(3);
-
-					tourRangeUI = NLS.bind(
-							Messages.dialog_export_chk_tourRangeWithDistance,
-							new Object[] {
-									uiStartTime,
-									uiEndTime,
-
-									_numberFormatter.format(((float) distanceSerie[_tourStartIndex])
-											/ 1000
-											/ UI.UNIT_VALUE_DISTANCE),
-
-									_numberFormatter.format(((float) distanceSerie[_tourEndIndex])
-											/ 1000
-											/ UI.UNIT_VALUE_DISTANCE),
-
-									UI.UNIT_LABEL_DISTANCE,
-
-									// adjust by 1 to corresponds to the number in the tour editor
-									_tourStartIndex + 1,
-									_tourEndIndex + 1 });
-
-				} else {
-
-					tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithoutDistance, new Object[] {
-							uiStartTime,
-							uiEndTime,
-							_tourStartIndex + 1,
-							_tourEndIndex + 1 });
-				}
-			}
+			_chkOverwriteFiles = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(3, 1).applyTo(_chkOverwriteFiles);
+			_chkOverwriteFiles.setText(Messages.dialog_export_chk_overwriteFiles);
+			_chkOverwriteFiles.setToolTipText(Messages.dialog_export_chk_overwriteFiles_tooltip);
 		}
 
-		_chkExportTourRange = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkExportTourRange);
-
-		_chkExportTourRange.setText(tourRangeUI != null ? tourRangeUI : Messages.dialog_export_chk_tourRangeDisabled);
-
-		_chkExportTourRange.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableFields();
-			}
-		});
 	}
 
-	private void createUIProgress(final Composite parent) {
+	private void createUI30Progress(final Composite parent) {
 
 		final int selectedTours = _tourDataList.size();
 
@@ -1083,15 +1080,20 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void enableFields() {
 
-		_chkMergeAllTours.setEnabled(canMergeTours());
+		final boolean isMultipleTours = _tourDataList.size() > 1;
+		final boolean isCamouflageTime = _chkCamouflageSpeed.getSelection();
+		final boolean isMergeTour = _chkMergeAllTours.getSelection();
+
+		_chkMergeAllTours.setEnabled(isMultipleTours);
 		// when disabled, uncheck it
 		if (_chkMergeAllTours.isEnabled() == false) {
 			_chkMergeAllTours.setSelection(false);
 		}
+		_isMultipleTourAndMultipleFile = _tourDataList.size() > 1 && _chkMergeAllTours.getSelection() == false;
 
-		_comboFile.setEnabled(true);
+		_comboFile.setEnabled(isMultipleTours == false || isMergeTour);
+		_btnSelectFile.setEnabled(isMultipleTours == false || isMergeTour);
 
-		final boolean isCamouflageTime = _chkCamouflageSpeed.getSelection();
 		_txtCamouflageSpeed.setEnabled(isCamouflageTime);
 		_lblCoumouflageSpeedUnit.setEnabled(isCamouflageTime);
 
@@ -1100,6 +1102,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		if (_chkExportTourRange.isEnabled() == false) {
 			_chkExportTourRange.setSelection(false);
 		}
+
+		setFileName();
 	}
 
 	@Override
@@ -1267,6 +1271,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+		final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
 
 		// check if all dataseries are available
 		if ((timeSerie == null) || (latitudeSerie == null) || (longitudeSerie == null) || (tourMarkers == null)) {
@@ -1285,6 +1290,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			isRange = true;
 		}
 
+		// convert marker into way points
 		for (final TourMarker tourMarker : tourMarkers) {
 
 			final int serieIndex = tourMarker.getSerieIndex();
@@ -1309,6 +1315,35 @@ public class DialogExportTour extends TitleAreaDialog {
 			if (altitudeSerie != null) {
 				wayPoint.setAltitude(altitudeSerie[serieIndex]);
 			}
+		}
+
+		for (final TourWayPoint twp : tourWayPoints) {
+
+			final GarminWaypointBase wayPoint = new GarminWaypointBase();
+			wayPointList.add(wayPoint);
+
+			wayPoint.setLatitude(twp.getLatitude());
+			wayPoint.setLongitude(twp.getLongitude());
+
+			// <name>...<name>
+			wayPoint.setIdentification(twp.getName());
+
+			// <ele>...</ele>
+			if (altitudeSerie != null) {
+				wayPoint.setAltitude(twp.getAltitude());
+			}
+
+// !!! THIS IS NOT WORKING 2010-07-17 !!!
+//			// <desc>...</desc>
+//			final String comment = twp.getComment();
+//			final String description = twp.getComment();
+//			final String descText = description != null ? description : comment;
+//			if (descText != null) {
+//				wayPoint.setComment(descText);
+//			}
+//
+//			// <sym>...</sym>
+//			wayPoint.setSymbolName(twp.getSymbol());
 		}
 	}
 
@@ -1433,7 +1468,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		}
 
 		// merge all tours
-		if (canMergeTours()) {
+		if (_tourDataList.size() > 1) {
 			_state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
 		}
 
@@ -1457,13 +1492,9 @@ public class DialogExportTour extends TitleAreaDialog {
 	}
 
 	/**
-	 * Overwrite filename with the first tour date/time when the tour is not merged
+	 * Set filename with the first tour date/time, when tour is merged "<#default>" is displayed
 	 */
 	private void setFileName() {
-
-		if (_chkMergeAllTours.getSelection() && _chkMergeAllTours.isEnabled()) {
-			return;
-		}
 
 		// search for the first tour
 		TourData minTourData = null;
@@ -1483,7 +1514,13 @@ public class DialogExportTour extends TitleAreaDialog {
 			}
 		}
 
-		if ((_tourDataList.size() == 1) && (_tourStartIndex != -1) && (_tourEndIndex != -1)) {
+		if (_isMultipleTourAndMultipleFile) {
+
+			// use default file name for each exported tour
+
+			_comboFile.setText(Messages.dialog_export_label_DefaultFileName);
+
+		} else if ((_tourDataList.size() == 1) && (_tourStartIndex != -1) && (_tourEndIndex != -1)) {
 
 			// display the start date/time
 
@@ -1496,6 +1533,7 @@ public class DialogExportTour extends TitleAreaDialog {
 					minTourData.getStartSecond(),
 					0);
 
+			// adjust start time
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
@@ -1556,56 +1594,73 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		boolean returnValue = false;
 
-		String fileName = getExportFileName();
+		if (_isMultipleTourAndMultipleFile) {
 
-		// remove extentions
-		final int extPos = fileName.indexOf('.');
-		if (extPos != -1) {
-			fileName = fileName.substring(0, extPos);
-		}
+			// only the path is checked, the file name is created automatically for each exported tour
 
-		// build file path with extension
-		filePath = filePath
-				.addTrailingSeparator()
-				.append(fileName)
-				.addFileExtension(_exportExtensionPoint.getFileExtension());
+			setMessage(_dlgDefaultMessage);
 
-		final File newFile = new File(filePath.toOSString());
+			// build file path with extension
+			filePath = filePath
+					.addTrailingSeparator()
+					.append(Messages.dialog_export_label_DefaultFileName)
+					.addFileExtension(_exportExtensionPoint.getFileExtension());
 
-		if ((fileName.length() == 0) || newFile.isDirectory()) {
-
-			// invalid filename
-
-			setError(Messages.dialog_export_msg_fileNameIsInvalid);
-
-		} else if (newFile.exists()) {
-
-			// file already exists
-
-			setMessage(
-					NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
-					IMessageProvider.WARNING);
 			returnValue = true;
 
 		} else {
 
-			setMessage(_dlgDefaultMessage);
+			String fileName = getExportFileName();
 
-			try {
-				final boolean isFileCreated = newFile.createNewFile();
-
-				// name is correct
-
-				if (isFileCreated) {
-					// delete file because the file is created for checking validity
-					newFile.delete();
-				}
-				returnValue = true;
-
-			} catch (final IOException ioe) {
-				setError(Messages.dialog_export_msg_fileNameIsInvalid);
+			// remove extentions
+			final int extPos = fileName.indexOf('.');
+			if (extPos != -1) {
+				fileName = fileName.substring(0, extPos);
 			}
 
+			// build file path with extension
+			filePath = filePath
+					.addTrailingSeparator()
+					.append(fileName)
+					.addFileExtension(_exportExtensionPoint.getFileExtension());
+
+			final File newFile = new File(filePath.toOSString());
+
+			if ((fileName.length() == 0) || newFile.isDirectory()) {
+
+				// invalid filename
+
+				setError(Messages.dialog_export_msg_fileNameIsInvalid);
+
+			} else if (newFile.exists()) {
+
+				// file already exists
+
+				setMessage(
+						NLS.bind(Messages.dialog_export_msg_fileAlreadyExists, filePath.toOSString()),
+						IMessageProvider.WARNING);
+				returnValue = true;
+
+			} else {
+
+				setMessage(_dlgDefaultMessage);
+
+				try {
+					final boolean isFileCreated = newFile.createNewFile();
+
+					// name is correct
+
+					if (isFileCreated) {
+						// delete file because the file is created for checking validity
+						newFile.delete();
+					}
+					returnValue = true;
+
+				} catch (final IOException ioe) {
+					setError(Messages.dialog_export_msg_fileNameIsInvalid);
+				}
+
+			}
 		}
 
 		_txtFilePath.setText(filePath.toOSString());

@@ -128,31 +128,22 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 					label.setFont(_boldFont);
 				}
 
-				createUIItem(container, Messages.Tooltip_WayPoint_Label_Comment, _hoveredWayPoint.getComment());
-
 				/*
-				 * description
+				 * comment/description
 				 */
 				final String description = _hoveredWayPoint.getDescription();
 				if (description != null) {
+					createUITextarea(container, Messages.Tooltip_WayPoint_Label_Description, description, pc);
+				}
 
-					final int horizontalHint = description.length() > 80
-							? pc.convertWidthInCharsToPixels(80)
-							: SWT.DEFAULT;
+				final String comment = _hoveredWayPoint.getComment();
+				if (comment != null) {
 
-					label = createUILabel(container, Messages.Tooltip_WayPoint_Label_Description);
-					GridDataFactory.fillDefaults()//
-							.align(SWT.FILL, SWT.BEGINNING)
-							.applyTo(label);
+					// ignore comment when it has the same content as the description
 
-					label = new Label(container, SWT.WRAP);
-					GridDataFactory.fillDefaults()//
-							.hint(horizontalHint, SWT.DEFAULT)
-							.applyTo(label);
-
-					label.setForeground(_fgColor);
-					label.setBackground(_bgColor);
-					label.setText(description);
+					if (description == null || (description != null && description.equals(comment) == false)) {
+						createUITextarea(container, Messages.Tooltip_WayPoint_Label_Comment, comment, pc);
+					}
 				}
 
 				createUIItem(container, Messages.Tooltip_WayPoint_Label_Category, _hoveredWayPoint.getCategory());
@@ -195,6 +186,28 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		}
 
 		return label;
+	}
+
+	private void createUITextarea(	final Composite parent,
+									final String labelText,
+									final String areaText,
+									final PixelConverter pc) {
+		Label label;
+		final int horizontalHint = areaText.length() > 80 ? pc.convertWidthInCharsToPixels(80) : SWT.DEFAULT;
+
+		label = createUILabel(parent, labelText);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.BEGINNING)
+				.applyTo(label);
+
+		label = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.hint(horizontalHint, SWT.DEFAULT)
+				.applyTo(label);
+
+		label.setForeground(_fgColor);
+		label.setBackground(_bgColor);
+		label.setText(areaText);
 	}
 
 	@Override

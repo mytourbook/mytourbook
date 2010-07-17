@@ -136,9 +136,10 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private float					_unitValueAltitude;
 
-	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
-	private final DateTimeFormatter	_dtFormatter			= DateTimeFormat.shortDate();
+	private final DateTimeFormatter	_dateFormatter			= DateTimeFormat.shortDate();
 	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
+
+	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
 	{
 		_nf_1_1.setMinimumFractionDigits(1);
 		_nf_1_1.setMaximumFractionDigits(1);
@@ -162,35 +163,36 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				return wp1Time > wp2Time ? 1 : -1;
 			}
 
-			/*
-			 * sort by creation sequence
-			 */
-			final long wp1CreateId = wp1.getCreateId();
-			final long wp2CreateId = wp2.getCreateId();
+			return wp1Time != 0 ? 1 : -1;
 
-			if (wp1CreateId == 0) {
-
-				if (wp2CreateId == 0) {
-
-					// both way points are persisted
-					return wp1.getWayPointId() > wp2.getWayPointId() ? 1 : -1;
-				}
-
-				return 1;
-
-			} else {
-
-				// _createId != 0
-
-				if (wp2CreateId != 0) {
-
-					// both way points are created and not persisted
-					return wp1CreateId > wp2CreateId ? 1 : -1;
-				}
-
-				return -1;
-			}
-
+//			/*
+//			 * sort by creation sequence
+//			 */
+//			final long wp1CreateId = wp1.getCreateId();
+//			final long wp2CreateId = wp2.getCreateId();
+//
+//			if (wp1CreateId == 0) {
+//
+//				if (wp2CreateId == 0) {
+//
+//					// both way points are persisted
+//					return wp1.getWayPointId() > wp2.getWayPointId() ? 1 : -1;
+//				}
+//
+//				return 1;
+//
+//			} else {
+//
+//				// _createId != 0
+//
+//				if (wp2CreateId != 0) {
+//
+//					// both way points are created and not persisted
+//					return wp1CreateId > wp2CreateId ? 1 : -1;
+//				}
+//
+//				return -1;
+//			}
 		}
 	}
 
@@ -575,7 +577,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				final TourWayPoint wp = (TourWayPoint) cell.getElement();
 				final long time = wp.getTime();
 
-				cell.setText(time == 0 ? UI.EMPTY_STRING : _dtFormatter.print(time));
+				cell.setText(time == 0 ? UI.EMPTY_STRING : _dateFormatter.print(time));
 			}
 		});
 	}

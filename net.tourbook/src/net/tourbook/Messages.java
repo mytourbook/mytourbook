@@ -44,6 +44,8 @@ public class Messages extends NLS {
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
+	public static String	dialog_export_label_DefaultFileName;
+
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
