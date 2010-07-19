@@ -56,12 +56,15 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.joda.time.DateTime;
@@ -206,6 +209,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	private Combo								_cboTourMarker;
 
 	private Combo								_cboPerson;
+	protected Point								_shellDefaultSize;
 
 	public DialogJoinTours(final Shell parentShell, final ArrayList<TourData> selectedTours) {
 
@@ -215,6 +219,18 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		Collections.sort(selectedTours);
 
 		_selectedTours = selectedTours;
+
+		// make dialog resizable
+		int shellStyle = getShellStyle();
+		shellStyle = //
+		SWT.NONE //
+				| SWT.TITLE
+				| SWT.CLOSE
+				| SWT.MIN
+//				| SWT.MAX
+				| SWT.RESIZE
+				| SWT.NONE;
+		setShellStyle(shellStyle);
 	}
 
 	@Override
@@ -228,6 +244,32 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
+			}
+		});
+
+		shell.addListener(SWT.Resize, new Listener() {
+			public void handleEvent(final Event event) {
+
+				// allow resizing the width but not the height
+
+				if (_shellDefaultSize == null) {
+					_shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				}
+
+				final Point shellSize = shell.getSize();
+
+				/*
+				 * this is not working, the shell is flickering when the shell size is below min
+				 * size and I found no way to prevent a resize :-(
+				 */
+//				if (shellSize.x < _shellDefaultSize.x) {
+//					event.doit = false;
+//				}
+
+				shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+				shellSize.y = _shellDefaultSize.y;
+
+				shell.setSize(shellSize);
 			}
 		});
 	}

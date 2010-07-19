@@ -1455,7 +1455,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		saveTourIntoDB();
 	}
 
-	void actionSetStartDistanceTo0() {
+	void actionSetStartDistanceTo0000() {
 
 		// it is already checked if a valid data serie is available and first distance is > 0
 

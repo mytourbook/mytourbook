@@ -32,10 +32,10 @@
 
 		<!-- 
 			unzip archive: mt-de.zip 
-		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="de" />
 		</antcall>
+		-->
 
 		<!-- 
 			unzip archive: mt-fr.zip 
@@ -46,10 +46,10 @@
  
 		<!-- 
 			unzip archive: mt-nl.zip 
+		-->
 		<antcall target="unzip-archive-for-one-language">
 			<param name="archive-language" value="nl" />
 		</antcall>
-		-->
  
 		<!-- delete temp dir -->
 		<echo message="delete temp dir: ${path-language-target-temp}" />

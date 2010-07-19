@@ -1007,7 +1007,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		/*
 		 * upper/lower part
 		 */
-		if (_lblTourType != null) {
+		if (_lblTourType != null && _lblTourType.isDisposed() == false) {
 			_lblTourType.setToolTipText(_uiTourTypeName);
 			UI.updateUITourType(_tourData, _lblTourType, false);
 		}

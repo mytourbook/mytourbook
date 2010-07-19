@@ -52,18 +52,19 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.joda.time.DateTime;
@@ -218,6 +219,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	 */
 
 	private TourPerson[]						_people;
+	protected Point								_shellDefaultSize;
 
 	/**
 	 * Split or extract a tour
@@ -251,7 +253,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
 		// make dialog resizable
-//		setShellStyle(getShellStyle() | SWT.RESIZE);
+		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
 	@Override
@@ -270,29 +272,31 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			}
 		});
 
-		shell.addControlListener(new ControlAdapter() {
+		shell.addListener(SWT.Resize, new Listener() {
+			public void handleEvent(final Event event) {
 
-			@Override
-			public void controlResized(final ControlEvent e) {
+				// allow resizing the width but not the height
+
+				if (_shellDefaultSize == null) {
+					_shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				}
+
+				final Point shellSize = shell.getSize();
 
 				/*
-				 * this feature causes problems when the dialog message is long -> only one long
-				 * line is the default width
+				 * this is not working, the shell is flickering when the shell size is below min
+				 * size and I found no way to prevent a resize :-(
 				 */
-//				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-//				final Point shellSize = shell.getSize();
-//
-//				// ensure the shell is not smaller than the default size
-//				if (shellSize.x < defaultSize.x || shellSize.y < defaultSize.y) {
-//
-//					shellSize.x = shellSize.x < defaultSize.x ? defaultSize.x : shellSize.x;
-//					shellSize.y = shellSize.y < defaultSize.y ? defaultSize.y : shellSize.y;
-//
-//					shell.setSize(shellSize);
+//				if (shellSize.x < _shellDefaultSize.x) {
+//					event.doit = false;
 //				}
+
+				shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+				shellSize.y = _shellDefaultSize.y;
+
+				shell.setSize(shellSize);
 			}
 		});
-
 	}
 
 	@Override

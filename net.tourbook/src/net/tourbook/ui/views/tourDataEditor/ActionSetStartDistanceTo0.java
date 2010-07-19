@@ -37,6 +37,6 @@ class ActionSetStartDistanceTo0 extends Action {
 
 	@Override
 	public void run() {
-		_tourDataEditor.actionSetStartDistanceTo0();
+		_tourDataEditor.actionSetStartDistanceTo0000();
 	}
 }

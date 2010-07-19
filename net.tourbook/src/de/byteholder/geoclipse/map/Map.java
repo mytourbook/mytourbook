@@ -425,8 +425,8 @@ public class Map extends Canvas {
 	 */
 	private boolean								_isLiveView;
 
-	private long								_requestedRedrawTime;
-	private long								_drawTime;
+//	private long								_requestedRedrawTime;
+	private long								_lastMapDrawTime;
 
 	/*
 	 * these 4 tile positions correspond to the tiles which are needed to draw the map
@@ -1737,14 +1737,19 @@ public class Map extends Canvas {
 
 //		final long startTime = System.nanoTime();
 //		long imageTime = 0;
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if ((_mapImage != null) && !_mapImage.isDisposed()) {
 
 			final GC gc = event.gc;
 
 //			final long startImage = System.nanoTime();
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			gc.drawImage(_mapImage, 0, 0);
+
 //			imageTime = System.nanoTime() - startImage;
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (_directMapPainter != null) {
 
@@ -1777,8 +1782,13 @@ public class Map extends Canvas {
 
 //		final double totalTime = (System.nanoTime() - startTime) / 1000000.0;
 //		final double imageTimeD = imageTime / 1000000.0;
-//		System.out.println("" + totalTime + "ms\t" + imageTimeD + "ms\t" + imageTimeD / totalTime);
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("" //
+//				+ ("fps: " + (1000 / totalTime)) //
+//				+ ("\ttotal: " + totalTime + "ms")
+//				+ ("\timage: " + imageTimeD + "ms\t")
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 	}
 
@@ -1815,7 +1825,7 @@ public class Map extends Canvas {
 	}
 
 	/**
-	 * Draws the map tiles/legend/scale into the map image which is displayed in the SWT paint
+	 * Draws map tiles/legend/scale into the map image which is displayed in the SWT paint
 	 * event.
 	 */
 	private void paintMap() {
@@ -1825,6 +1835,7 @@ public class Map extends Canvas {
 		}
 
 //		final long start = System.nanoTime();
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Draw the map
 		GC gc = null;
@@ -1866,14 +1877,15 @@ public class Map extends Canvas {
 			}
 		}
 
-		_drawTime = System.currentTimeMillis();
-
-//		System.out.println("paintMap()\t"
+//		System.out.println("paintMap() "
 //				+ ((int) (((System.nanoTime() - start) / 1000000)) + " ms\t")
 //				+ ((int) (1000f / ((System.nanoTime() - start) / 1000000)) + " fps") //
 //		);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		redraw();
+
+		_lastMapDrawTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -3384,18 +3396,17 @@ public class Map extends Canvas {
 			updateViewPortData();
 		}
 
-		_requestedRedrawTime = System.currentTimeMillis();
+		// get time when the redraw of the may is requested
+		final long requestedRedrawTime = System.currentTimeMillis();
 
-		if (_requestedRedrawTime - _drawTime > 200) {
-
-//			System.out.println("queueMapRedraw()-time > 200\t" + (_requestedRedrawTime - _drawTime));
-//			// TODO remove SYSTEM.OUT.PRINTLN
+		if (requestedRedrawTime > _lastMapDrawTime + 40) {
 
 			// update display even when this is not the last created runnable
 
-			final Runnable synchImageRunnable = new Runnable() {
+//			System.out.println("queueMapRedraw()-time > 50\t" + (_requestedRedrawTime - _lastMapDrawTime));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-				final int	__synchRunnableCounter	= redrawCounter;
+			_display.syncExec(new Runnable() {
 
 				@Override
 				public void run() {
@@ -3404,17 +3415,9 @@ public class Map extends Canvas {
 						return;
 					}
 
-					// check if a newer runnable is available
-					if (__synchRunnableCounter != _redrawMapCounter.get()) {
-						// a newer queryRedraw is available
-						return;
-					}
-
 					paintMap();
 				}
-			};
-
-			_display.syncExec(synchImageRunnable);
+			});
 
 			/**
 			 * set an additional asynch runnable because it's possible that the synch runnable do
@@ -3450,7 +3453,7 @@ public class Map extends Canvas {
 		}
 
 		// tell the overlay thread to draw the overlay images
-		_nextOverlayRedrawTime = _requestedRedrawTime;
+		_nextOverlayRedrawTime = requestedRedrawTime;
 	}
 
 	/**
