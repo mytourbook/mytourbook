@@ -3,13 +3,11 @@ package net.tourbook.printing;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Formatter;
 
@@ -25,15 +23,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
-import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
 
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
@@ -49,7 +44,7 @@ public class PrintTourPDF extends PrintTourExtension {
 	private final String			_printOutputPath	= (Platform.getInstanceLocation().getURL().getPath() + "print-output");
 	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
 	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.shortTime();
-	private File					_xslFile;
+	private InputStream				_xslFile;
 
 	private DialogPrintTour			dpt;
 
@@ -59,65 +54,8 @@ public class PrintTourPDF extends PrintTourExtension {
 	public PrintTourPDF() {
 
 		// prepare xsl file for transformation
-
-//		final URL url = Activator.getDefault().getBundle().getEntry(TOURDATA_2_FO_XSL);
-//		PrintTourPDF()	bundleentry://38.fwk20983130/printing-templates/tourdata2fo.xsl
-
-		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
-//		PrintTourPDF()	bundleresource://38.fwk6386542:1/printing-templates/tourdata2fo.xsl
-
-		System.out.println("PrintTourPDF()\turl:\t\t" + url);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		try {
-
-			URL fileUrl = null;
-
-			try {
-
-				/*
-				 * convert bundleentry: into file: protokoll
-				 */
-				fileUrl = FileLocator.resolve(url);
-				System.out.println("PrintTourPDF()\tfileUrl:\t" + fileUrl);
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-				final String encodedUrl = Util.encodeSpace(fileUrl.toString());
-				System.out.println("PrintTourPDF()\tencodedUrl:\t" + encodedUrl);
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-				fileUrl = new URL(encodedUrl);
-
-				/*
-				 * !!! this fails when running on windows and the path contains a space !!!
-				 */
-//				fileUrl = FileLocator.toFileURL(url);
-
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-
-			_xslFile = new File(fileUrl.toURI());
-
-		} catch (final URISyntaxException e2) {
-			StatusUtil.showStatus(e2);
-		}
-
-//		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
-//		PrintTourPDF()	bundleresource://38.fwk6386542:1/printing-templates/tourdata2fo.xsl
-
-//		try {
-//			URL fileUrl = null;
-//			try {
-//				fileUrl = FileLocator.toFileURL(url);
-//			} catch (final IOException e) {
-//				e.printStackTrace();
-//			}
-//			_xslFile = new File(fileUrl.toURI());
-//
-//		} catch (final URISyntaxException e1) {
-//			StatusUtil.showStatus(e1);
-//		}
+		final ClassLoader classLoader = getClass().getClassLoader();
+		_xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);		
 	}
 
 	/**
@@ -209,8 +147,7 @@ public class PrintTourPDF extends PrintTourExtension {
 				}
 
 				// setup xsl stylesheet source
-				final FileInputStream xslFileStream = new FileInputStream(_xslFile);
-				final StreamSource xslSource = new StreamSource(xslFileStream);
+				final StreamSource xslSource = new StreamSource(_xslFile);
 
 				// get transformer
 				final TransformerFactory tfactory = TransformerFactory.newInstance();
