@@ -44,7 +44,6 @@ public class PrintTourPDF extends PrintTourExtension {
 	private final String			_printOutputPath	= (Platform.getInstanceLocation().getURL().getPath() + "print-output");
 	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
 	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.shortTime();
-	private InputStream				_xslFile;
 
 	private DialogPrintTour			dpt;
 
@@ -53,9 +52,6 @@ public class PrintTourPDF extends PrintTourExtension {
 	 */
 	public PrintTourPDF() {
 
-		// prepare xsl file for transformation
-		final ClassLoader classLoader = getClass().getClassLoader();
-		_xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);		
 	}
 
 	/**
@@ -137,6 +133,11 @@ public class PrintTourPDF extends PrintTourExtension {
 				 * }
 				 */
 
+				// prepare xsl file for transformation
+				final ClassLoader classLoader = getClass().getClassLoader();
+				final InputStream xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);		
+
+				
 				StreamSource xmlSource;
 				try {
 					xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes("UTF-8")));
@@ -147,7 +148,7 @@ public class PrintTourPDF extends PrintTourExtension {
 				}
 
 				// setup xsl stylesheet source
-				final StreamSource xslSource = new StreamSource(_xslFile);
+				final StreamSource xslSource = new StreamSource(xslFile);
 
 				// get transformer
 				final TransformerFactory tfactory = TransformerFactory.newInstance();
@@ -167,6 +168,12 @@ public class PrintTourPDF extends PrintTourExtension {
 
 				// launch the pdf file (will only work if the user has a registered pdf viewer installed)
 				Program.launch(printSettings.getCompleteFilePath());
+				
+				try {
+					xslFile.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		} finally {
 			if (pdfContent != null) {
