@@ -57,6 +57,9 @@ public class Util {
 	//static final double HALBACHSE_B = 6356.911946;
 	//static final double ABPLATTUNG_F = 1/297....;
 
+	private static final String	URL_SPACE				= " ";											//$NON-NLS-1$
+	private static final String	URL_SPACE_REPLACEMENT	= "%20";										//$NON-NLS-1$
+
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
 		// accelerate with Ctrl + Shift key
@@ -292,6 +295,10 @@ public class Util {
 		final double s = HALBACHSE_B * A * (sigma - deltaSigma);
 
 		return s * 1000;
+	}
+
+	public static String encodeSpace(final String urlString) {
+		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
 	/*

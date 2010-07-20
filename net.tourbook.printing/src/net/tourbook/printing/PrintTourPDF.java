@@ -25,6 +25,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
@@ -49,25 +51,96 @@ public class PrintTourPDF extends PrintTourExtension {
 	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.shortTime();
 	private File					_xslFile;
 
+	private DialogPrintTour			dpt;
+
 	/**
 	 * plugin extension constructor
 	 */
 	public PrintTourPDF() {
+
 		// prepare xsl file for transformation
+
+//		final URL url = Activator.getDefault().getBundle().getEntry(TOURDATA_2_FO_XSL);
+//		PrintTourPDF()	bundleentry://38.fwk20983130/printing-templates/tourdata2fo.xsl
+
 		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
+//		PrintTourPDF()	bundleresource://38.fwk6386542:1/printing-templates/tourdata2fo.xsl
+
+		System.out.println("PrintTourPDF()\turl:\t\t" + url);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		try {
+
 			URL fileUrl = null;
+
 			try {
-				fileUrl = FileLocator.toFileURL(url);
+
+				/*
+				 * convert bundleentry: into file: protokoll
+				 */
+				fileUrl = FileLocator.resolve(url);
+				System.out.println("PrintTourPDF()\tfileUrl:\t" + fileUrl);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				final String encodedUrl = Util.encodeSpace(fileUrl.toString());
+				System.out.println("PrintTourPDF()\tencodedUrl:\t" + encodedUrl);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				fileUrl = new URL(encodedUrl);
+
+				/*
+				 * !!! this fails when running on windows and the path contains a space !!!
+				 */
+//				fileUrl = FileLocator.toFileURL(url);
+
 			} catch (final IOException e) {
-				e.printStackTrace();
+				StatusUtil.showStatus(e);
 			}
+
 			_xslFile = new File(fileUrl.toURI());
 
-		} catch (final URISyntaxException e1) {
-			e1.printStackTrace();
+		} catch (final URISyntaxException e2) {
+			StatusUtil.showStatus(e2);
 		}
+
+//		final URL url = this.getClass().getResource(TOURDATA_2_FO_XSL);
+//		PrintTourPDF()	bundleresource://38.fwk6386542:1/printing-templates/tourdata2fo.xsl
+
+//		try {
+//			URL fileUrl = null;
+//			try {
+//				fileUrl = FileLocator.toFileURL(url);
+//			} catch (final IOException e) {
+//				e.printStackTrace();
+//			}
+//			_xslFile = new File(fileUrl.toURI());
+//
+//		} catch (final URISyntaxException e1) {
+//			StatusUtil.showStatus(e1);
+//		}
+	}
+
+	/**
+	 * formats tour startDate and startTime according to the preferences
+	 * 
+	 * @param _tourData
+	 * @return
+	 */
+	private String formatStartDate(final TourData _tourData) {
+		final DateTime dtTour = new DateTime(//
+				_tourData.getStartYear(),
+				_tourData.getStartMonth(),
+				_tourData.getStartDay(),
+				_tourData.getStartHour(),
+				_tourData.getStartMinute(),
+				_tourData.getStartSecond(),
+				0);
+
+		return new Formatter().format(
+				Messages.Tour_Tooltip_Format_DateWeekTime,
+				_dateFormatter.print(dtTour.getMillis()),
+				_timeFormatter.print(dtTour.getMillis()),
+				dtTour.getWeekOfWeekyear()).toString();
 	}
 
 	/**
@@ -89,7 +162,7 @@ public class PrintTourPDF extends PrintTourExtension {
 		BufferedOutputStream pdfContent = null;
 		try {
 			// setup pdf outpoutStream
-			File pdfFile = new File(printSettings.getCompleteFilePath());
+			final File pdfFile = new File(printSettings.getCompleteFilePath());
 
 			if (pdfFile.exists()) {
 				if (printSettings.isOverwriteFiles()) {
@@ -129,7 +202,7 @@ public class PrintTourPDF extends PrintTourExtension {
 				StreamSource xmlSource;
 				try {
 					xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-				} catch (UnsupportedEncodingException e) {
+				} catch (final UnsupportedEncodingException e) {
 					//if UTF-8 fails, try default encoding
 					xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
 					e.printStackTrace();
@@ -155,7 +228,7 @@ public class PrintTourPDF extends PrintTourExtension {
 				final Result res = new SAXResult(fop.getDefaultHandler());
 				transformer.transform(xmlSource, res);
 
-				// launch the pdf file (will only work if the user has a registered pdf viewer installed) 
+				// launch the pdf file (will only work if the user has a registered pdf viewer installed)
 				Program.launch(printSettings.getCompleteFilePath());
 			}
 		} finally {
@@ -169,30 +242,19 @@ public class PrintTourPDF extends PrintTourExtension {
 		}
 	}
 
-	private void setTranslationParameters(final Transformer _transformer) {
+	@Override
+	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-		_transformer.setParameter("lang.Tour_Print_Tour", net.tourbook.printing.Messages.Tour_Print_Tour);
-		_transformer.setParameter("lang.Tour_Print_Start", net.tourbook.printing.Messages.Tour_Print_Start);
-		_transformer.setParameter("lang.Tour_Print_Start_Location", net.tourbook.printing.Messages.Tour_Print_Start_Location);
-		_transformer.setParameter("lang.Tour_Print_End_Location", net.tourbook.printing.Messages.Tour_Print_End_Location);
-		_transformer.setParameter("lang.Tour_Print_Time_Distance_Speed", net.tourbook.printing.Messages.Tour_Print_Time_Distance_Speed);
-		_transformer.setParameter("lang.Tour_Print_Tour_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Time);
-		_transformer.setParameter("lang.Tour_Print_Tour_Pausing_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Pausing_Time);
-		_transformer.setParameter("lang.Tour_Print_Tour_Moving_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Moving_Time);
-		_transformer.setParameter("lang.Tour_Print_Distance", net.tourbook.printing.Messages.Tour_Print_Distance);
-		_transformer.setParameter("lang.Tour_Print_Maximum_Speed", net.tourbook.printing.Messages.Tour_Print_Maximum_Speed);
-		_transformer.setParameter("lang.Tour_Print_Personal", net.tourbook.printing.Messages.Tour_Print_Personal);
-		_transformer.setParameter("lang.Tour_Print_Rest_Pulse", net.tourbook.printing.Messages.Tour_Print_Rest_Pulse);
-		_transformer.setParameter("lang.Tour_Print_Maximum_Pulse", net.tourbook.printing.Messages.Tour_Print_Maximum_Pulse);
-		_transformer.setParameter("lang.Tour_Print_Average_Pulse", net.tourbook.printing.Messages.Tour_Print_Average_Pulse);
-		_transformer.setParameter("lang.Tour_Print_Calories", net.tourbook.printing.Messages.Tour_Print_Calories);
-		_transformer.setParameter("lang.Tour_Print_Average_Cadence", net.tourbook.printing.Messages.Tour_Print_Average_Cadence);
-		_transformer.setParameter("lang.Tour_Print_Altitude", net.tourbook.printing.Messages.Tour_Print_Altitude);
-		_transformer.setParameter("lang.Tour_Print_Highest_Altitude", net.tourbook.printing.Messages.Tour_Print_Highest_Altitude);
-		_transformer.setParameter("lang.Tour_Print_Meters_Up", net.tourbook.printing.Messages.Tour_Print_Meters_Up);
-		_transformer.setParameter("lang.Tour_Print_Meters_Down", net.tourbook.printing.Messages.Tour_Print_Meters_Down);
-		_transformer.setParameter("lang.Tour_Print_Tour_Markers", net.tourbook.printing.Messages.Tour_Print_Tour_Markers);
-		_transformer.setParameter("lang.Tour_Print_No_Markers_Found", net.tourbook.printing.Messages.Tour_Print_No_Markers_Found);
+		dpt = new DialogPrintTour(
+				Display.getCurrent().getActiveShell(),
+				this,
+				tourDataList,
+				tourStartIndex,
+				tourEndIndex);
+		dpt.open();
+
+		// hardcoded pdf output path for development
+		// final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
 	}
 
 	/**
@@ -224,43 +286,53 @@ public class PrintTourPDF extends PrintTourExtension {
 		_transformer.setParameter("unitLabelCalories", Messages.Value_Unit_Calories);
 	}
 
-	private DialogPrintTour	dpt;
+	private void setTranslationParameters(final Transformer _transformer) {
 
-	@Override
-	public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
-
-		dpt = new DialogPrintTour(
-				Display.getCurrent().getActiveShell(),
-				this,
-				tourDataList,
-				tourStartIndex,
-				tourEndIndex);
-		dpt.open();
-
-		// hardcoded pdf output path for development
-		// final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
-	}
-
-	/**
-	 * formats tour startDate and startTime according to the preferences
-	 * 
-	 * @param _tourData
-	 * @return
-	 */
-	private String formatStartDate(final TourData _tourData) {
-		final DateTime dtTour = new DateTime(//
-				_tourData.getStartYear(),
-				_tourData.getStartMonth(),
-				_tourData.getStartDay(),
-				_tourData.getStartHour(),
-				_tourData.getStartMinute(),
-				_tourData.getStartSecond(),
-				0);
-
-		return new Formatter().format(
-				Messages.Tour_Tooltip_Format_DateWeekTime,
-				_dateFormatter.print(dtTour.getMillis()),
-				_timeFormatter.print(dtTour.getMillis()),
-				dtTour.getWeekOfWeekyear()).toString();
+		_transformer.setParameter("lang.Tour_Print_Tour", net.tourbook.printing.Messages.Tour_Print_Tour);
+		_transformer.setParameter("lang.Tour_Print_Start", net.tourbook.printing.Messages.Tour_Print_Start);
+		_transformer.setParameter(
+				"lang.Tour_Print_Start_Location",
+				net.tourbook.printing.Messages.Tour_Print_Start_Location);
+		_transformer.setParameter(
+				"lang.Tour_Print_End_Location",
+				net.tourbook.printing.Messages.Tour_Print_End_Location);
+		_transformer.setParameter(
+				"lang.Tour_Print_Time_Distance_Speed",
+				net.tourbook.printing.Messages.Tour_Print_Time_Distance_Speed);
+		_transformer.setParameter("lang.Tour_Print_Tour_Time", net.tourbook.printing.Messages.Tour_Print_Tour_Time);
+		_transformer.setParameter(
+				"lang.Tour_Print_Tour_Pausing_Time",
+				net.tourbook.printing.Messages.Tour_Print_Tour_Pausing_Time);
+		_transformer.setParameter(
+				"lang.Tour_Print_Tour_Moving_Time",
+				net.tourbook.printing.Messages.Tour_Print_Tour_Moving_Time);
+		_transformer.setParameter("lang.Tour_Print_Distance", net.tourbook.printing.Messages.Tour_Print_Distance);
+		_transformer.setParameter(
+				"lang.Tour_Print_Maximum_Speed",
+				net.tourbook.printing.Messages.Tour_Print_Maximum_Speed);
+		_transformer.setParameter("lang.Tour_Print_Personal", net.tourbook.printing.Messages.Tour_Print_Personal);
+		_transformer.setParameter("lang.Tour_Print_Rest_Pulse", net.tourbook.printing.Messages.Tour_Print_Rest_Pulse);
+		_transformer.setParameter(
+				"lang.Tour_Print_Maximum_Pulse",
+				net.tourbook.printing.Messages.Tour_Print_Maximum_Pulse);
+		_transformer.setParameter(
+				"lang.Tour_Print_Average_Pulse",
+				net.tourbook.printing.Messages.Tour_Print_Average_Pulse);
+		_transformer.setParameter("lang.Tour_Print_Calories", net.tourbook.printing.Messages.Tour_Print_Calories);
+		_transformer.setParameter(
+				"lang.Tour_Print_Average_Cadence",
+				net.tourbook.printing.Messages.Tour_Print_Average_Cadence);
+		_transformer.setParameter("lang.Tour_Print_Altitude", net.tourbook.printing.Messages.Tour_Print_Altitude);
+		_transformer.setParameter(
+				"lang.Tour_Print_Highest_Altitude",
+				net.tourbook.printing.Messages.Tour_Print_Highest_Altitude);
+		_transformer.setParameter("lang.Tour_Print_Meters_Up", net.tourbook.printing.Messages.Tour_Print_Meters_Up);
+		_transformer.setParameter("lang.Tour_Print_Meters_Down", net.tourbook.printing.Messages.Tour_Print_Meters_Down);
+		_transformer.setParameter(
+				"lang.Tour_Print_Tour_Markers",
+				net.tourbook.printing.Messages.Tour_Print_Tour_Markers);
+		_transformer.setParameter(
+				"lang.Tour_Print_No_Markers_Found",
+				net.tourbook.printing.Messages.Tour_Print_No_Markers_Found);
 	}
 }
