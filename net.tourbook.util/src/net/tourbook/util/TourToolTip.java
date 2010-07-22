@@ -18,7 +18,6 @@ package net.tourbook.util;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
