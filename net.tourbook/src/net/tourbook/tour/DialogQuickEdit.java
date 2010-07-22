@@ -501,7 +501,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_tk.adapt(_comboWindDirectionText, true, false);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+//					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_comboWindDirectionText);
 			_comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
 			_comboWindDirectionText.setVisibleItemCount(10);
@@ -515,6 +515,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					onSelectWindDirectionText();
 				}
 			});
+			
+			// fill combobox
+			for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
+				_comboWindDirectionText.add(fComboCloudsUIValue);
+			}
 
 			// spacer
 			new Label(container, SWT.NONE);
@@ -559,11 +564,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// label: direction unit = degree
 			_tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
-
-			// fill combobox
-			for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
-				_comboWindDirectionText.add(fComboCloudsUIValue);
-			}
 
 		}
 	}
