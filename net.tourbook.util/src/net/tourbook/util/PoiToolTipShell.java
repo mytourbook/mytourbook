@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class ToolTip {
+public abstract class PoiToolTipShell {
 
 	private final Shell			_shell;
 
@@ -40,7 +40,7 @@ public abstract class ToolTip {
 	 */
 	private static final int	MAX_TOOLTIP_WIDTH	= 500;
 
-	public ToolTip(final Composite parent) {
+	public PoiToolTipShell(final Composite parent) {
 
 		final Display display = parent.getDisplay();
 

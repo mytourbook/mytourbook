@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-import net.tourbook.util.ToolTip;
+import net.tourbook.util.PoiToolTipShell;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.byteholder.gpx.GeoPosition;
-
-public class PoiToolTip extends ToolTip {
+ 
+public class PoiToolTip extends PoiToolTipShell {
 
 	public GeoPosition	geoPosition;
 
