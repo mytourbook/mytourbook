@@ -827,13 +827,16 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	@Override
 	public HoveredAreaContext getHoveredContext(final int devMouseX, final int devMouseY) {
 
-		if (devMouseX >= HOVER_AREA_POSITION
-				&& devMouseX <= HOVER_AREA_POSITION + _tourInfoImageSize.width
-				&& devMouseY >= HOVER_AREA_POSITION
-				&& devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height) {
+		/*
+		 * hovered area which is hit by the mouse is extendet in the width
+		 */
+		if (devMouseX >= 0 //HOVER_AREA_POSITION
+				&& devMouseX <= HOVER_AREA_POSITION + _tourInfoImageSize.width + 5
+				&& devMouseY >= 0 //HOVER_AREA_POSITION
+				&& devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height + 5) {
 
 			_isHovered = true;
-
+ 
 			return _tourInfoHoveredAreaContext;
 		}
 
@@ -1017,7 +1020,6 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			tourTitle = Messages.Tour_Tooltip_Label_DefaultTitle;
 		}
 		_lblTitle.setText(tourTitle);
-
 
 		if (_hasTags) {
 			UI.updateUITags(_tourData, _lblTourTags);
