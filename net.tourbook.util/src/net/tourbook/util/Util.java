@@ -385,24 +385,6 @@ public class Util {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
 	}
 
-//	/**
-//	 * @param combo
-//	 *            combo box, the items in the combo box
-//	 *            must correspond to the items in the states array
-//	 * @param states
-//	 *            array which contains all states
-//	 * @return Returns the state which is selected or null when nothing is selected
-//	 */
-//	public static String getStateFromCombo(final Combo combo, final String[] states) {
-//
-//		final int selectedIndex = combo.getSelectionIndex();
-//		if (selectedIndex == -1 || selectedIndex >= states.length) {
-//			return null;
-//		} else {
-//			return states[selectedIndex];
-//		}
-//	}
-
 	/**
 	 * @param state
 	 * @param key

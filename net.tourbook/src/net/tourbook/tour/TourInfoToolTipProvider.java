@@ -70,7 +70,6 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 	private static final int			SHELL_MARGIN			= 5;
 	private static final int			MAX_DATA_WIDTH			= 300;
-
 	private static final int			HOVER_AREA_POSITION		= 2;
 
 	private TourToolTip					_tourToolTip;
@@ -831,9 +830,9 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		 * hovered area which is hit by the mouse is extendet in the width
 		 */
 		if (devMouseX >= 0 //HOVER_AREA_POSITION
-				&& devMouseX <= HOVER_AREA_POSITION + _tourInfoImageSize.width + 5
+				&& devMouseX <= HOVER_AREA_POSITION + _tourInfoImageSize.width + 2
 				&& devMouseY >= 0 //HOVER_AREA_POSITION
-				&& devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height + 5) {
+				&& devMouseY <= HOVER_AREA_POSITION + _tourInfoImageSize.height + 2) {
 
 			_isHovered = true;
  

@@ -2150,6 +2150,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 		final int graphFillMethod = yData.getGraphFillMethod();
+		final int graphValueOffset2 = _canScrollZoomedChart ? 0 : graphValueOffset;
 
 		final int[][] highValues = yData.getHighValues();
 
@@ -2184,7 +2185,8 @@ public class ChartComponentGraph extends Canvas {
 		// virtual 0 line for the y-axis of the chart in dev units
 		final float devY0 = devYBottom + (scaleY * graphYBottom);
 
-		float devXPrev = xValues[startIndex] * scaleX;
+		final int graphXStart = xValues[startIndex] - graphValueOffset2;
+		float devXPrev = graphXStart * scaleX;
 		int yValuePrev = yValues[startIndex];
 
 		// force the bottom and top value not to drawn over the border
@@ -2211,11 +2213,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
-			int graphX = xValues[xValueIndex];
-
-			if (_canScrollZoomedChart == false) {
-				graphX -= graphValueOffset;
-			}
+			final int graphX = xValues[xValueIndex] - graphValueOffset2;
 
 			final float devX = graphX * scaleX;
 
@@ -2266,7 +2264,7 @@ public class ChartComponentGraph extends Canvas {
 				// move to the first point
 
 				// set the point before devX==0 that the first line is not visible
-				final float devXFirstPoint = devXPrev - 1;
+				final float devXFirstPoint = devXPrev;// - 1;
 
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
@@ -2294,7 +2292,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// optimization: draw only ONE line for the current x-position
-			if (devX != devXPrev) {
+			if ((int) devX != (int) devXPrev) {
 
 				// draw line to the next point
 				path.lineTo(devX, devY0 - (yValue * scaleY));
@@ -2328,7 +2326,7 @@ public class ChartComponentGraph extends Canvas {
 				final float devYAxisLine = graphXAxisLine * scaleY;
 
 				// set the point after the visible area that the last line is not visible
-				final float devXLastPoint = devX + 1;
+				final float devXLastPoint = devX;// + 1;
 
 				path.lineTo(devXLastPoint, devY0 - (yValue * scaleY));
 				path.lineTo(devXLastPoint, devY0 - devYAxisLine);
@@ -2357,10 +2355,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devGraphHeight = drawingData.getDevGraphHeight();
 
-		int graphWidth = xValues[Math.min(xValues.length - 1, endIndex)];
-		if (_canScrollZoomedChart == false) {
-			graphWidth -= graphValueOffset;
-		}
+		final int graphWidth = xValues[Math.min(xValues.length - 1, endIndex)] - graphValueOffset2;
 
 		/*
 		 * force a max width because on linux the fill will not be drawn

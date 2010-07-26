@@ -2547,7 +2547,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_date);
 			_firstColumnControls.add(label);
 
-			_dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+			_dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
 			_tk.adapt(_dtTourDate, true, false);
 			_dtTourDate.addSelectionListener(_dateTimeListener);

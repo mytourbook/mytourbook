@@ -1775,6 +1775,10 @@ public class Map extends Canvas {
 				}
 			}
 
+			if (_tourToolTip != null) {
+				_tourToolTip.paint(gc, _clientArea);
+			}
+
 			if (_isPaintOfflineArea) {
 				paintOfflineArea(gc);
 			}
@@ -1859,9 +1863,9 @@ public class Map extends Canvas {
 					paintMap30Scale(gc);
 				}
 
-				if (_tourToolTip != null) {
-					_tourToolTip.paint(gc, _clientArea);
-				}
+//				if (_tourToolTip != null) {
+//					_tourToolTip.paint(gc, _clientArea);
+//				}
 			}
 
 		} catch (final Exception e) {
