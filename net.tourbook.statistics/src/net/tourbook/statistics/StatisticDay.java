@@ -230,7 +230,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				_selectedTourId = _tourDayData.tourIds[valueIndex];
 				_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-				TourManager.getInstance().openTourInEditor(_selectedTourId);
+				TourManager.getInstance().openTourInEditorArea(_selectedTourId);
 			}
 		});
 
@@ -250,7 +250,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 							_selectedTourId = _tourDayData.tourIds[barChartSelection.valueIndex];
 							_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-							TourManager.getInstance().openTourInEditor(_selectedTourId);
+							TourManager.getInstance().openTourInEditorArea(_selectedTourId);
 						}
 					}
 				}

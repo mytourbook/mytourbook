@@ -76,7 +76,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
-				TourManager.getInstance().openTourInEditor(_tourData.getTourId());
+				TourManager.getInstance().openTourInEditorArea(_tourData.getTourId());
 			}
 		});
 

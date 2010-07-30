@@ -299,7 +299,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
 				if (_tourData.getTourPerson() != null) {
-					TourManager.getInstance().openTourInEditor(_tourData.getTourId());
+					TourManager.getInstance().openTourInEditorArea(_tourData.getTourId());
 				}
 			}
 		});

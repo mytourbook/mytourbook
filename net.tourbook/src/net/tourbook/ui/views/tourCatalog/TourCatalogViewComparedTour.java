@@ -252,7 +252,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
-				TourManager.getInstance().openTourInEditor(_tourData.getTourId());
+				TourManager.getInstance().openTourInEditorArea(_tourData.getTourId());
 			}
 		});
 

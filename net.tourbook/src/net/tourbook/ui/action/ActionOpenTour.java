@@ -43,7 +43,7 @@ public class ActionOpenTour extends Action {
 		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
 		if (selectedTours != null && selectedTours.size() > 0) {
-			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
+			TourManager.getInstance().openTourInEditorArea(selectedTours.get(0).getTourId());
 		}
 	}
 

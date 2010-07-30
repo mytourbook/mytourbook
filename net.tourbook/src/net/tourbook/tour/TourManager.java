@@ -43,6 +43,7 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.IExternalTourEvents;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -506,27 +507,27 @@ public class TourManager {
 	public static TourDataEditorView openTourEditor(final boolean isActive) {
 
 		IViewPart viewPart = null;
-
-		TourDataEditorView tourEditor = null;
+		TourDataEditorView tourDataEditorView = null;
 
 		try {
 
 			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-			final String viewId = TourDataEditorView.ID;
-			viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
+			viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
 			if (viewPart instanceof TourDataEditorView) {
-				tourEditor = (TourDataEditorView) viewPart;
+
+				tourDataEditorView = (TourDataEditorView) viewPart;
 
 				if (isActive) {
 
-					page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+					page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 				} else if (page.isPartVisible(viewPart) == false || isActive) {
 
 					page.bringToTop(viewPart);
 				}
+
 // HINT: this does not restore the part when it's in a fast view
 //
 //			final IWorkbenchPartReference partRef = page.getReference(viewPart);
@@ -537,10 +538,10 @@ public class TourManager {
 			}
 
 		} catch (final PartInitException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 
-		return tourEditor;
+		return tourDataEditorView;
 	}
 
 	/**
@@ -1951,7 +1952,7 @@ public class TourManager {
 	 * 
 	 * @param tourId
 	 */
-	public void openTourInEditor(final Long tourId) {
+	public void openTourInEditorArea(final Long tourId) {
 
 		if (tourId == null) {
 			return;

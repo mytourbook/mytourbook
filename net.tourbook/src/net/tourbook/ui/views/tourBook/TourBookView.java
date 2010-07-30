@@ -502,7 +502,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					// open tour in editor
 
 					final TVITourBookTour tourItem = (TVITourBookTour) selection;
-					TourManager.getInstance().openTourInEditor(tourItem.getTourId());
+					TourManager.getInstance().openTourInEditorArea(tourItem.getTourId());
 
 				} else if (selection != null) {
 

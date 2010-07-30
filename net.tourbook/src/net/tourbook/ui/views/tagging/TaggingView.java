@@ -587,7 +587,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					// open tour in the tour editor
 
-					TourManager.getInstance().openTourInEditor(((TVITagViewTour) selection).getTourId());
+					TourManager.getInstance().openTourInEditorArea(((TVITagViewTour) selection).getTourId());
 
 				} else if (selection != null) {
 

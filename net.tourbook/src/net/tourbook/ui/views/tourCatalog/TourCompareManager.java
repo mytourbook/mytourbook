@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,18 +51,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- * The TourCompareManager manages the comparision between tours
+ * The TourCompareManager manages the comparison between reference and all selected tours
  */
 public class TourCompareManager {
 
-	private static TourCompareManager				fInstance;
+	private static TourCompareManager						_instance;
 
-	private final boolean									isComparing			= false;
+	private TourReference[]									_refTourContext;
+	private TourData[]										_refToursData;
 
-	private TourReference[]							refTourContext;
-	private TourData[]								refToursData;
-
-	private final ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
+	private final ArrayList<TVICompareResultComparedTour>	_comparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
 
 	/**
 	 * internal constructor
@@ -122,10 +120,10 @@ public class TourCompareManager {
 	}
 
 	public static TourCompareManager getInstance() {
-		if (fInstance == null) {
-			fInstance = new TourCompareManager();
+		if (_instance == null) {
+			_instance = new TourCompareManager();
 		}
-		return fInstance;
+		return _instance;
 	}
 
 	/**
@@ -208,6 +206,11 @@ public class TourCompareManager {
 		comparedTourItem.dbSpeed = speed;
 	}
 
+	public void clearCompareResult() {
+
+		_comparedTourItems.clear();
+	}
+
 	/**
 	 * @param refTourIndex
 	 *            index into refTourContext and refToursData
@@ -244,12 +247,12 @@ public class TourCompareManager {
 		/*
 		 * reference tour
 		 */
-		final TourReference refTour = refTourContext[refTourIndex];
+		final TourReference refTour = _refTourContext[refTourIndex];
 		final int refMeasureStartIndex = refTour.getStartValueIndex();
 		final int refMeasureEndIndex = refTour.getEndValueIndex();
 
 		// get the reference tour
-		final TourData refTourData = refToursData[refTourIndex];
+		final TourData refTourData = _refToursData[refTourIndex];
 		if (refTourData == null) {
 			return compareResultItem;
 		}
@@ -381,8 +384,9 @@ public class TourCompareManager {
 		final int compareDistance = compareTourDataDistance[compareEndIndex]
 				- compareTourDataDistance[compareStartIndex];
 		final int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-		final int drivingTime = Math.max(0, recordingTime
-				- compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+		final int drivingTime = Math.max(
+				0,
+				recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
 		compareResultItem.compareDrivingTime = drivingTime;
 		compareResultItem.compareRecordingTime = recordingTime;
@@ -402,8 +406,10 @@ public class TourCompareManager {
 	 */
 	public void compareTours(final TourReference[] refTourContext, final Object[] comparedTours) {
 
-		this.refTourContext = refTourContext;
-		refToursData = new TourData[refTourContext.length];
+		this._refTourContext = refTourContext;
+		_refToursData = new TourData[refTourContext.length];
+
+		final int tours2Compare = comparedTours.length * refTourContext.length;
 
 		final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
 
@@ -412,7 +418,7 @@ public class TourCompareManager {
 										final IProgressMonitor monitor) {
 
 				int tourCounter = 0;
-				fComparedTourItems.clear();
+				_comparedTourItems.clear();
 
 				// get all reference tours
 				getRefToursData();
@@ -457,12 +463,14 @@ public class TourCompareManager {
 								compareResult.refTour = refTourContext[refTourIndex];
 								compareResult.comparedTourData = compareTourData;
 
-								fComparedTourItems.add(compareResult);
+								_comparedTourItems.add(compareResult);
 							}
 
 							// update the message in the progress monitor
-							monitor.subTask(NLS.bind(Messages.tourCatalog_view_compare_job_subtask, Integer
-									.toString(++tourCounter)));
+							monitor.subTask(NLS.bind(//
+									Messages.tourCatalog_view_compare_job_subtask,
+									++tourCounter,
+									tours2Compare));
 
 							monitor.worked(1);
 						}
@@ -473,8 +481,6 @@ public class TourCompareManager {
 
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
-
-				final int tours2Compare = comparedTours.length * refTourContext.length;
 
 				monitor.beginTask(Messages.tourCatalog_view_compare_job_task, tours2Compare);
 
@@ -496,14 +502,14 @@ public class TourCompareManager {
 	 * @return Returns the reference tours which has been compared
 	 */
 	public TourReference[] getComparedReferenceTours() {
-		return refTourContext;
+		return _refTourContext;
 	}
 
 	/**
 	 * @return Returns the compare result with all compared tours
 	 */
 	public TVICompareResultComparedTour[] getComparedTours() {
-		return fComparedTourItems.toArray(new TVICompareResultComparedTour[fComparedTourItems.size()]);
+		return _comparedTourItems.toArray(new TVICompareResultComparedTour[_comparedTourItems.size()]);
 	}
 
 	/**
@@ -513,22 +519,15 @@ public class TourCompareManager {
 	 */
 	private void getRefToursData() {
 
-		for (int tourIndex = 0; tourIndex < refTourContext.length; tourIndex++) {
+		for (int tourIndex = 0; tourIndex < _refTourContext.length; tourIndex++) {
 
-			final TourReference refTour = refTourContext[tourIndex];
+			final TourReference refTour = _refTourContext[tourIndex];
 
-			refTourContext[tourIndex] = refTour;
+			_refTourContext[tourIndex] = refTour;
 
 			// load tour from database
-			refToursData[tourIndex] = refTour.getTourData();
+			_refToursData[tourIndex] = refTour.getTourData();
 		}
-	}
-
-	/**
-	 * @return Returns true when currently tours are compared
-	 */
-	public boolean isComparing() {
-		return isComparing;
 	}
 
 	private void showCompareResults() {

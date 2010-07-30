@@ -15,14 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
+
+	private ITourProvider	_tourProvider;
 
 	public ActionEditTour(final ITourProvider tourProvider) {
 
@@ -32,11 +38,22 @@ public class ActionEditTour extends Action {
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
 
 		setEnabled(false);
+
+		_tourProvider = tourProvider;
 	}
 
 	@Override
 	public void run() {
-		TourManager.openTourEditor(true);
+
+		final TourDataEditorView tourEditorView = TourManager.openTourEditor(true);
+
+		if (tourEditorView != null) {
+
+			final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+			if (selectedTours != null && selectedTours.size() > 0) {
+				tourEditorView.setTourData(selectedTours.get(0));
+			}
+		}
 	}
 
 }

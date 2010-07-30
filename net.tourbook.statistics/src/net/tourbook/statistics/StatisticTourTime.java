@@ -193,7 +193,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 					_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
 					DataProviderTourTime.getInstance().setSelectedTourId(_selectedTourId);
-					TourManager.getInstance().openTourInEditor(_selectedTourId);
+					TourManager.getInstance().openTourInEditorArea(_selectedTourId);
 				}
 			}
 		});
@@ -214,7 +214,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 							_selectedTourId = _tourTimeData.fTourIds[barChartSelection.valueIndex];
 							_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-							TourManager.getInstance().openTourInEditor(_selectedTourId);
+							TourManager.getInstance().openTourInEditorArea(_selectedTourId);
 						}
 					}
 				}

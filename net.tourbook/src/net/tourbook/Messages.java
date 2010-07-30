@@ -44,7 +44,7 @@ public class Messages extends NLS {
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
-	public static String	dialog_export_label_DefaultFileName;
+	public static String		dialog_export_label_DefaultFileName;
 
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
@@ -281,7 +281,7 @@ public class Messages extends NLS {
 
 	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
 
-	public static String	Dialog_SplitTour_Checkbox_KeepTime;
+	public static String		Dialog_SplitTour_Checkbox_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_KeepSlices;
 	public static String		Dialog_SplitTour_ComboText_RemoveSlices;
 	public static String		Dialog_SplitTour_ComboText_TourTileCustom;
@@ -773,7 +773,6 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
 
-
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
@@ -1045,11 +1044,9 @@ public class Messages extends NLS {
 	public static String		Weather_WindSpeed_Bft12;
 	public static String		Weather_WindSpeed_Bft12_Short;
 
-	public static String	Year_Statistic_Combo_LastYears_Tooltip;
-
-	public static String	Year_Statistic_Combo_NumberOfYears_Tooltip;
-
-	public static String	Year_Statistic_Label_NumberOfYears;
+	public static String		Year_Statistic_Combo_LastYears_Tooltip;
+	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;
+	public static String		Year_Statistic_Label_NumberOfYears;
 
 	static {
 		// initialize resource bundle

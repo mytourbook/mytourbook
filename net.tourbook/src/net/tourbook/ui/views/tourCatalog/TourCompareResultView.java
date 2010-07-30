@@ -266,7 +266,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					saveState();
 
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourCompareResultView.this);
+					clearCompareResult();
 				}
 			}
 
@@ -390,6 +390,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			}
 		};
 		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+	}
+
+	private void clearCompareResult() {
+
+		TourCompareManager.getInstance().clearCompareResult();
 	}
 
 	private void createActions() {

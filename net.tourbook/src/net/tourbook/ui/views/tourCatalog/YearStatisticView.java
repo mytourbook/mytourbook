@@ -383,8 +383,12 @@ public class YearStatisticView extends ViewPart {
 
 		final Composite toolbar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbar);
-		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 0, 1).spacing(0, 0).applyTo(toolbar);
-//			toolbar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.extendedMargins(0, 0, 0, 1)
+				.spacing(0, 0)
+				.applyTo(toolbar);
+
 		{
 			/*
 			 * last year
@@ -405,12 +409,17 @@ public class YearStatisticView extends ViewPart {
 			 */
 			// label
 			final Label label = new Label(toolbar, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).indent(10, 0).applyTo(label);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(10, 0)
+					.applyTo(label);
 			label.setText(Messages.Year_Statistic_Label_NumberOfYears);
 
 			// combo
 			_cboNumberOfYears = new Combo(toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().indent(5, 0).applyTo(_cboNumberOfYears);
+			GridDataFactory.fillDefaults()//
+					.indent(2, 0)
+					.applyTo(_cboNumberOfYears);
 			_cboNumberOfYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
 			_cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
 				@Override

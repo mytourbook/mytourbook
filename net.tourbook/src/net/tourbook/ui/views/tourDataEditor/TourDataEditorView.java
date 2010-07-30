@@ -3732,7 +3732,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * tries to get tour data from the last selection or from a tour provider
+	 * try to get tourdata from the last selection or from a tour provider
 	 */
 	private void displaySelectedTour() {
 
@@ -5841,7 +5841,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		Display.getDefault().asyncExec(new Runnable() {
 
-			final int	_runnableCounter	= _uiUpdateCounter;
+			final int	__runnableCounter	= _uiUpdateCounter;
 
 			public void run() {
 
@@ -5850,7 +5850,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 
 				// check if this is the last runnable
-				if (_runnableCounter != _uiUpdateCounter) {
+				if (__runnableCounter != _uiUpdateCounter) {
 					// a new runnable was created
 					return;
 				}
