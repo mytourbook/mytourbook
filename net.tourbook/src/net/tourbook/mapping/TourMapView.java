@@ -105,10 +105,12 @@ import de.byteholder.gpx.PointOfInterest;
  */
 public class TourMapView extends ViewPart implements IMapContextProvider {
 
+
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
+	private static final int						LEGEND_TOP_MARGIN					= 20;
 
 	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	public static final int							LEGEND_UNIT_DISTANCE				= 60;
@@ -133,7 +135,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
 	private static final String						MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";					//$NON-NLS-1$
-
+ 
 	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
 	private static final String						MEMENTO_SELECTED_MAP_PROVIDER_ID	= "selected.map-provider-id";				//$NON-NLS-1$
 
@@ -922,7 +924,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		int legendHeight = DEFAULT_LEGEND_HEIGHT;
 
 		final Rectangle mapBounds = _map.getBounds();
-		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height));
+		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - LEGEND_TOP_MARGIN));
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -1026,10 +1028,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 				final Rectangle mapBounds = _map.getBounds();
 				final Rectangle legendBounds = legendImage.getBounds();
 
-				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT //
-						)
-						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT //
-						) && (legendBounds.height < DEFAULT_LEGEND_HEIGHT))) {
+				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN)
+						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN) //
+						&& (legendBounds.height < DEFAULT_LEGEND_HEIGHT)) //
+				) {
 
 					createLegendImage(_paintMgr.getLegendProvider());
 				}
