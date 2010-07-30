@@ -18,7 +18,7 @@ package net.tourbook.application;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogViewYearStatistic;
+import net.tourbook.ui.views.tourCatalog.YearStatisticView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -50,7 +50,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
 		final IFolderLayout statFolder = layout.createFolder(FOLDER_ID_STAT, IPageLayout.BOTTOM, 0.7f, FOLDER_ID_LIST);
 
-		statFolder.addView(TourCatalogViewYearStatistic.ID);
+		statFolder.addView(YearStatisticView.ID);
 
 		//--------------------------------------------------------------------------------
 

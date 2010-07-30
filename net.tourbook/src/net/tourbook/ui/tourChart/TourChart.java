@@ -1173,7 +1173,7 @@ public class TourChart extends Chart {
 
 	/**
 	 * Enable or disable the edit actions in the tour info tooltip, by default the edit
-	 * actions are enabled.
+	 * actions are disabled.
 	 * 
 	 * @param isEnabled
 	 */

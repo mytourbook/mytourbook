@@ -44,6 +44,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -255,8 +256,9 @@ public class StatisticContainer extends Composite {
 
 	private void createUI() {
 
-		GridLayout gl;
+		final PixelConverter pc = new PixelConverter(this);
 
+		GridLayout gl;
 		gl = new GridLayout(1, false);
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
@@ -268,55 +270,56 @@ public class StatisticContainer extends Composite {
 		 */
 		_statContainer = new Composite(this, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_statContainer);
-		GridLayoutFactory.fillDefaults().numColumns(5).extendedMargins(0, 0, 1, 0).applyTo(_statContainer);
+		GridLayoutFactory.fillDefaults().numColumns(5).extendedMargins(0, 0, 0, 0).applyTo(_statContainer);
+		{
+			// combo: year
+			_cboYear = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).applyTo(_cboYear);
+			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+			_cboYear.setVisibleItemCount(20);
+			_cboYear.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectYear();
+				}
+			});
 
-		// combo: year
-		_cboYear = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_cboYear.setVisibleItemCount(10);
-		_cboYear.setLayoutData(new GridData());
-		_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-		_cboYear.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectYear();
+			// combo: statistics
+			_cboStatistics = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
+			_cboStatistics.setVisibleItemCount(20);
+			_cboStatistics.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectStatistic();
+				}
+			});
+
+			// fill combobox with statistic names
+			for (final TourbookStatistic statistic : getComboStatistics()) {
+				_cboStatistics.add(statistic.fVisibleName);
 			}
-		});
 
-		// combo: statistics
-		_cboStatistics = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_cboStatistics.setVisibleItemCount(20);
-		_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
-		_cboStatistics.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectStatistic();
-			}
-		});
+			/*
+			 * number of years
+			 */
+			final Label label = new Label(_statContainer, SWT.NONE);
+			label.setText(Messages.tour_statistic_label_years);
 
-		// fill combobox with statistic names
-		for (final TourbookStatistic statistic : getComboStatistics()) {
-			_cboStatistics.add(statistic.fVisibleName);
+			// combo: year numbers
+			_cboNumberOfYears = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_cboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+			_cboNumberOfYears.setVisibleItemCount(20);
+			_cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectYear();
+				}
+			});
 		}
 
-		/*
-		 * number of years
-		 */
-		final Label label = new Label(_statContainer, SWT.NONE);
-		label.setText(Messages.tour_statistic_label_years);
-
-		// combo: year numbers
-		_cboNumberOfYears = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_cboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
-		_cboNumberOfYears.setVisibleItemCount(20);
-		_cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectYear();
-			}
-		});
-
 		// fill combobox with number of years
-		for (int years = 1; years < 21; years++) {
+		for (int years = 1; years <= 50; years++) {
 			_cboNumberOfYears.add(Integer.toString(years));
 		}
 
@@ -630,13 +633,14 @@ public class StatisticContainer extends Composite {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " // //$NON-NLS-1$
-				+ "startYear " //$NON-NLS-1$
+		final String sqlString = //
+		//
+		"SELECT" // //$NON-NLS-1$
+				+ " startYear " //$NON-NLS-1$
 
 				+ " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
 
-				+ " WHERE 1=1 " //$NON-NLS-1$
-				+ sqlFilter.getWhereClause()
+				+ " WHERE 1=1 " + sqlFilter.getWhereClause() //$NON-NLS-1$
 
 				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //$NON-NLS-1$
 

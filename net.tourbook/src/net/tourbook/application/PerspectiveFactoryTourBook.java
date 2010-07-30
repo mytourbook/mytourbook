@@ -16,9 +16,9 @@
 package net.tourbook.application;
 
 import net.tourbook.mapping.TourMapView;
+import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourMarkerView;
-import net.tourbook.ui.views.TourStatisticsView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;

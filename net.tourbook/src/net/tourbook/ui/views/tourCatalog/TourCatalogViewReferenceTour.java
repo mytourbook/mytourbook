@@ -72,6 +72,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvicer(this));
+		_tourChart.setTourInfoActionsEnabled(true);
 
 		_tourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {

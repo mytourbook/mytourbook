@@ -15,28 +15,34 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.UI;
+import net.tourbook.chart.ChartComponents;
+import net.tourbook.util.TourToolTip;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 
-public class ActionSynchYearScale extends Action {
+public class YearStatisticTourToolTip extends TourToolTip {
 
-	private final YearStatisticView	_yearStatisticView;
-
-	public ActionSynchYearScale(final YearStatisticView yearStatisticView) {
-
-		super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-		_yearStatisticView = yearStatisticView;
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-		setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
+	public YearStatisticTourToolTip(final Control control) {
+		super(control);
 	}
 
 	@Override
-	public void run() {
-		_yearStatisticView.actionSynchScale(isChecked());
+	public void show(final Point point) {
+
+		/*
+		 * delay tooltip because first the bar must be selected which selects the tour
+		 */
+		_toolTipControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
+			public void run() {
+
+				if (_toolTipControl.isDisposed()) {
+					return;
+				}
+
+				YearStatisticTourToolTip.super.show(point);
+			}
+		});
 	}
+
 }

@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-public class ColumnModifyDialog extends TrayDialog {
+public class DialogModifyColumns extends TrayDialog {
 
 	private ColumnManager				_columnManager;
 	private CheckboxTableViewer			_columnViewer;
@@ -67,7 +67,7 @@ public class ColumnModifyDialog extends TrayDialog {
 	private ArrayList<ColumnDefinition>	_allColumnsInDialog;
 	private ArrayList<ColumnDefinition>	_allDefinedColumns;
 
-	public ColumnModifyDialog(	final Shell parentShell,
+	public DialogModifyColumns(	final Shell parentShell,
 								final ColumnManager columnManager,
 								final ArrayList<ColumnDefinition> dialogColumns,
 								final ArrayList<ColumnDefinition> allDefaultColumns) {

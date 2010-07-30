@@ -260,7 +260,7 @@ public class ChartComponents extends Composite {
 		// enforce minimum chart width
 //		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
 
-		drawingData.setDevGraphWidth(devVirtualGraphWidth);
+		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
 		drawingData.setScaleX((float) (devVirtualGraphWidth - 1) / xMaxValue);
 
 		/*
@@ -514,7 +514,7 @@ public class ChartComponents extends Composite {
 		drawingData.setGraphYBottom(graphMinValue);
 		drawingData.setGraphYTop(graphMaxValue);
 
-		drawingData.setDevGraphHeight(devGraphHeight);
+		drawingData.devGraphHeight = devGraphHeight;
 		drawingData.setDevSliderHeight(_devSliderBarHeight);
 
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
@@ -636,14 +636,14 @@ public class ChartComponents extends Composite {
 			for (int month = 0; month < 12; month++) {
 
 				_calendar.set(year, month, 1);
-				final int firstMonthDay = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
+				final int firstDayInMonth = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
 				String monthLabel = _monthLabels[month];
 				if (useShortUnitLabel) {
 					monthLabel = monthLabel.substring(0, 1);
 				}
 
-				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
+				units.add(new ChartUnit(allDays + firstDayInMonth, monthLabel));
 			}
 
 			allDays += yearDays[yearIndex++];
@@ -925,37 +925,25 @@ public class ChartComponents extends Composite {
 	 * @return Returns the visible chart graph height
 	 */
 	int getDevVisibleChartHeight() {
+
 		if (_visibleGraphRect == null) {
 			return 100;
 		}
+
 		return _visibleGraphRect.height;
 	}
 
 	/**
-	 * @return Returns the visible chart graph width
+	 * @return Returns the visible chart width
 	 */
 	int getDevVisibleChartWidth() {
+
 		if (_visibleGraphRect == null) {
 			return 100;
 		}
+
 		return _visibleGraphRect.width;
 	}
-
-//	void handleLeftRightEvent(final Event event) {
-//
-//		switch (fChartDataModel.getChartType()) {
-//		case ChartDataModel.CHART_TYPE_BAR:
-//			selectBarItem(event);
-//			break;
-//
-//		case ChartDataModel.CHART_TYPE_LINE:
-//			fComponentGraph.moveXSlider(event);
-//			break;
-//
-//		default:
-//			break;
-//		}
-//	}
 
 	/**
 	 * Resize handler for all components, computes the chart when the chart data or the client area

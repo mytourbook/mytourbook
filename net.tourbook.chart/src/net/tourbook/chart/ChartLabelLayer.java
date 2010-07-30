@@ -68,8 +68,8 @@ public class ChartLabelLayer implements IChartLayer {
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devGraphImageOffset = chart.getDevGraphImageXOffset();
-		final int devGraphHeight = drawingData.getDevGraphHeight();
-		final int devGraphWidth = drawingData.getDevGraphWidth();
+		final int devGraphHeight = drawingData.devGraphHeight;
+		final int devGraphWidth = drawingData.devVirtualGraphWidth;
 
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final int[] yValues = drawingData.getYData().getHighValues()[0];

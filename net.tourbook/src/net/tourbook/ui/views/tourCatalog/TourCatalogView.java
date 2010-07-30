@@ -984,7 +984,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			final ISelection selectionInTourChart = getSite()
 					.getWorkbenchWindow()
 					.getSelectionService()
-					.getSelection(TourCatalogViewYearStatistic.ID);
+					.getSelection(YearStatisticView.ID);
 
 			_postSelectionProvider.setSelection(selectionInTourChart);
 

@@ -22,8 +22,8 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
-import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -44,8 +44,6 @@ import org.eclipse.ui.IMemento;
 public class PersonContributionItem extends CustomControlContribution {
 
 	private static final String		ID			= "net.tourbook.clientselector";		//$NON-NLS-1$
-
-	private static final boolean	IS_OSX		= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
 
 	private static TourbookPlugin	_activator	= TourbookPlugin.getDefault();
 
@@ -104,7 +102,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		Composite content;
 
-		if (IS_OSX) {
+		if (UI.IS_OSX) {
 
 			content = createPeopleComboBox(parent);
 

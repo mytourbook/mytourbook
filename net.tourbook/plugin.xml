@@ -224,7 +224,7 @@
 	            name="%view_name_tourCatalog"/>
 	      <view
 	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.TourStatisticsView"
+	            class="net.tourbook.statistic.TourStatisticsView"
 	            icon="icons/statistics.gif"
 	            id="net.tourbook.views.StatisticView"
 	            name="%view_name_Statistics">
@@ -306,7 +306,7 @@
 				name="%view_name_tourCatalog_comparedTour"/>
 			<view
 				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.TourCatalogViewYearStatistic"
+				class="net.tourbook.ui.views.tourCatalog.YearStatisticView"
 				icon="icons/tour-map-statistic.gif"
 				id="net.tourbook.views.tourCatalog.yearStatisticView"
 				name="%view_name_tourCatalog_statistics"/>
@@ -799,7 +799,7 @@
       <command
             id="command.net.tourbook.views.StatisticView"
             name="%view_name_Statistics"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewStatistic"
+            defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
 
       <command

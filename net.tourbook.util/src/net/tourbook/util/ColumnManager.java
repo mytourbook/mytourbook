@@ -47,10 +47,10 @@ public class ColumnManager {
 	/**
 	 * minimum column width, when the column width is 0, there was a bug that this happened
 	 */
-	private static final int			MINIMUM_COLUMN_WIDTH			= 7;
+	private static final int					MINIMUM_COLUMN_WIDTH			= 7;
 
-	private static final String			MEMENTO_COLUMN_SORT_ORDER		= "column_sort_order";					//$NON-NLS-1$
-	private static final String			MEMENTO_COLUMN_WIDTH			= "column_width";						//$NON-NLS-1$
+	private static final String					MEMENTO_COLUMN_SORT_ORDER		= "column_sort_order";					//$NON-NLS-1$
+	private static final String					MEMENTO_COLUMN_WIDTH			= "column_width";						//$NON-NLS-1$
 
 	/**
 	 * column definitions for all columns which are defined for the viewer
@@ -426,7 +426,7 @@ public class ColumnManager {
 	 * Read the order/width for the columns, this is necessary because the user can have rearranged
 	 * the columns and/or resized the columns with the mouse
 	 * 
-	 * @return Returns all columns which are displayed in the {@link ColumnModifyDialog}
+	 * @return Returns all columns which are displayed in the {@link DialogModifyColumns}
 	 */
 	private ArrayList<ColumnDefinition> getDialogColumns() {
 
@@ -508,7 +508,7 @@ public class ColumnManager {
 		_visibleColumnIds = getColumnIdsFromViewer();
 		_columnIdsAndWidth = getColumnIdAndWidthFromViewer();
 
-		(new ColumnModifyDialog(
+		(new DialogModifyColumns(
 				Display.getCurrent().getActiveShell(),
 				this,
 				getDialogColumns(),
@@ -591,7 +591,7 @@ public class ColumnManager {
 
 	/**
 	 * Set the columns in {@link #_visibleColumnDefinitions} to the order of the
-	 * <code>tableItems</code> in the {@link ColumnModifyDialog}
+	 * <code>tableItems</code> in the {@link DialogModifyColumns}
 	 * 
 	 * @param tableItems
 	 */
@@ -712,10 +712,10 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Update the viewer with the columns from the {@link ColumnModifyDialog}
+	 * Update the viewer with the columns from the {@link DialogModifyColumns}
 	 * 
 	 * @param tableItems
-	 *            table item in the {@link ColumnModifyDialog}
+	 *            table item in the {@link DialogModifyColumns}
 	 */
 	void updateColumns(final TableItem[] tableItems) {
 

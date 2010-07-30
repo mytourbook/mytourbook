@@ -1045,6 +1045,12 @@ public class Messages extends NLS {
 	public static String		Weather_WindSpeed_Bft12;
 	public static String		Weather_WindSpeed_Bft12_Short;
 
+	public static String	Year_Statistic_Combo_LastYears_Tooltip;
+
+	public static String	Year_Statistic_Combo_NumberOfYears_Tooltip;
+
+	public static String	Year_Statistic_Label_NumberOfYears;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

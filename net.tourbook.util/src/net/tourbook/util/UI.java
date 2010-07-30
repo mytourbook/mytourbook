@@ -30,20 +30,23 @@ public class UI {
 
 	private static final char[]	INVALID_FILENAME_CHARS	= new char[] { '\\', '/', ':', '*', '?', '"', '<', '>', '|', };
 
-	public static final String	EMPTY_STRING			= "";															//$NON-NLS-1$
-	public static final String	STRING_0				= "0";															//$NON-NLS-1$
+	public static final String	EMPTY_STRING			= "";																		//$NON-NLS-1$
+	public static final String	SPACE					= " ";																		//$NON-NLS-1$
+	public static final String	STRING_0				= "0";																		//$NON-NLS-1$
+
+	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$
 
 	/**
 	 * contains a new line
 	 */
-	public static final String	NEW_LINE				= "\n";														//$NON-NLS-1$
+	public static final String	NEW_LINE				= "\n";																	//$NON-NLS-1$
 
 	/**
 	 * contains 2 new lines
 	 */
-	public static final String	NEW_LINE2				= "\n\n";														//$NON-NLS-1$
+	public static final String	NEW_LINE2				= "\n\n";																	//$NON-NLS-1$
 
-	public static final String	UTF_8					= "UTF-8";														//$NON-NLS-1$
+	public static final String	UTF_8					= "UTF-8";																	//$NON-NLS-1$
 
 	public static void addSashColorHandler(final Sash sash) {
 

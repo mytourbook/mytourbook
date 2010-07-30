@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
-import net.tourbook.ui.views.TourStatisticsView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

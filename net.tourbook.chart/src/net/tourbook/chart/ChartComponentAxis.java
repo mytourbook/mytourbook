@@ -222,7 +222,7 @@ public class ChartComponentAxis extends Canvas {
 			final boolean yAxisDirection = yData.isYAxisDirection();
 
 			final int graphYBottom = drawingData.getGraphYBottom();
-			final int devGraphHeight = drawingData.getDevGraphHeight();
+			final int devGraphHeight = drawingData.devGraphHeight;
 
 			final int devYBottom = drawingData.getDevYBottom();
 			final int devYTop = devYBottom - devGraphHeight;

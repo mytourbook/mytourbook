@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -77,8 +77,12 @@ public class ChartDrawingData {
 	/**
 	 * virtual graph width in dev (pixel) units
 	 */
-	private int						devGraphWidth;
-	private int						devGraphHeight;
+	int								devVirtualGraphWidth;
+
+	/**
+	 * graph height in dev (pixel) units
+	 */
+	public int						devGraphHeight;
 
 	private int						devSliderHeight;
 
@@ -135,16 +139,16 @@ public class ChartDrawingData {
 		return fDevBarRectangleXPos;
 	}
 
-	public int getDevGraphHeight() {
-		return devGraphHeight;
-	}
-
-	/**
-	 * virtual graph width in dev (pixel) units
-	 */
-	public int getDevGraphWidth() {
-		return devGraphWidth;
-	}
+//	public int getDevGraphHeight() {
+//		return devGraphHeight;
+//	}
+//
+//	/**
+//	 * virtual graph width in dev (pixel) units
+//	 */
+//	int getDevGraphWidth() {
+//		return devGraphWidth;
+//	}
 
 	/**
 	 * @return Returns the devMarginTop.
@@ -189,7 +193,7 @@ public class ChartDrawingData {
 	 * @return Returns the y position for the title
 	 */
 	public int getDevYTitle() {
-		return getDevYBottom() - getDevGraphHeight() - getDevSliderBarHeight() - getDevXTitelBarHeight();
+		return getDevYBottom() - devGraphHeight - getDevSliderBarHeight() - getDevXTitelBarHeight();
 	}
 
 	/**
@@ -280,7 +284,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param barFocusRectangles
-	 *        The barFocusRectangles to set.
+	 *            The barFocusRectangles to set.
 	 */
 	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
 		this.barFocusRectangles = barFocusRectangles;
@@ -288,7 +292,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param barPosition
-	 *        The barPosition to set.
+	 *            The barPosition to set.
 	 */
 	public void setBarPosition(final int barPosition) {
 		this.barPosition = barPosition;
@@ -296,7 +300,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param barRectangles
-	 *        The barRectangles to set.
+	 *            The barRectangles to set.
 	 */
 	public void setBarRectangles(final Rectangle[][] barRectList) {
 		this.barRectangles = barRectList;
@@ -304,7 +308,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param barRectangleWidth
-	 *        The barRectangleWidth to set.
+	 *            The barRectangleWidth to set.
 	 */
 	public void setBarRectangleWidth(final int barRectangleWidth) {
 		this.fBarRectangleWidth = barRectangleWidth;
@@ -312,23 +316,23 @@ public class ChartDrawingData {
 
 	/**
 	 * @param barRectanglePos
-	 *        The barRectanglePos to set.
+	 *            The barRectanglePos to set.
 	 */
 	public void setDevBarRectangleXPos(final int barRectanglePos) {
 		fDevBarRectangleXPos = barRectanglePos;
 	}
 
-	public void setDevGraphHeight(final int heightDev) {
-		this.devGraphHeight = heightDev;
-	}
-
-	public void setDevGraphWidth(final int devGraphWidth) {
-		this.devGraphWidth = devGraphWidth;
-	}
+//	public void setDevGraphHeight(final int heightDev) {
+//		this.devGraphHeight = heightDev;
+//	}
+//
+//	public void setDevGraphWidth(final int devGraphWidth) {
+//		this.devGraphWidth = devGraphWidth;
+//	}
 
 	/**
 	 * @param devMarginTop
-	 *        The devMarginTop to set.
+	 *            The devMarginTop to set.
 	 */
 	public void setDevMarginTop(final int devMarginTop) {
 		this.devMarginTop = devMarginTop;
@@ -336,7 +340,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param devMarkerBarHeight
-	 *        The devMarkerBarHeight to set.
+	 *            The devMarkerBarHeight to set.
 	 */
 	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
 		this.devMarkerBarHeight = devMarkerBarHeight;
@@ -344,7 +348,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param devSliderBarHeight
-	 *        The devSliderBarHeight to set.
+	 *            The devSliderBarHeight to set.
 	 */
 	public void setDevSliderBarHeight(final int devSliderBarHeight) {
 		this.devSliderBarHeight = devSliderBarHeight;
@@ -356,7 +360,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param devTitelBarHeight
-	 *        The devTitelBarHeight to set.
+	 *            The devTitelBarHeight to set.
 	 */
 	void setDevXTitelBarHeight(final int devTitelBarHeight) {
 		this.devXTitelBarHeight = devTitelBarHeight;
@@ -368,7 +372,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param devYTop
-	 *        The devYTop to set.
+	 *            The devYTop to set.
 	 */
 	protected void setDevYTop(final int devYTop) {
 		this.devYTop = devYTop;
@@ -380,7 +384,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param graphYTop
-	 *        The graphYTop to set.
+	 *            The graphYTop to set.
 	 */
 	protected void setGraphYTop(final int graphYTop) {
 		this.graphYTop = graphYTop;
@@ -410,7 +414,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param xData
-	 *        The xData to set.
+	 *            The xData to set.
 	 */
 	public void setXData(final ChartDataXSerie xData) {
 		this.xData = xData;
@@ -418,7 +422,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param data2nd
-	 *        The xData2nd to set.
+	 *            The xData2nd to set.
 	 */
 	public void setXData2nd(final ChartDataXSerie data2nd) {
 		xData2nd = data2nd;
@@ -432,7 +436,7 @@ public class ChartDrawingData {
 	 * set the position of the unit text, this can be XUNIT_TEXT_POS_LEFT or XUNIT_TEXT_POS_CENTER
 	 * 
 	 * @param unitTextPos
-	 *        The xUnitTextPos to set.
+	 *            The xUnitTextPos to set.
 	 */
 	public void setXUnitTextPos(final int unitTextPos) {
 		xUnitTextPos = unitTextPos;
@@ -440,7 +444,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param data
-	 *        The yData to set.
+	 *            The yData to set.
 	 */
 	public void setYData(final ChartDataYSerie data) {
 		this.yData = data;
@@ -448,7 +452,7 @@ public class ChartDrawingData {
 
 	/**
 	 * @param sliderHitRect
-	 *        The ySliderHitRect to set.
+	 *            The ySliderHitRect to set.
 	 */
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		ySliderHitRect = sliderHitRect;

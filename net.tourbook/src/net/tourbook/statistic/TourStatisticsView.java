@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.statistic;
 
 import java.util.ArrayList;
 
@@ -21,8 +21,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.StatisticContainer;
-import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;

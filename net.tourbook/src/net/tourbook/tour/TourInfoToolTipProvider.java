@@ -920,7 +920,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	}
 
 	/**
-	 * Enable/disable tour edit actions
+	 * Enable/disable tour edit actions, actions are disabled by default
 	 * 
 	 * @param isEnabled
 	 */
@@ -983,6 +983,11 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		resetToolTip();
 	}
 
+	/**
+	 * Set tour id or <code>-1</code> to disable tooltip
+	 * 
+	 * @param tourId
+	 */
 	public void setTourId(final long tourId) {
 
 		_tourId = tourId;
