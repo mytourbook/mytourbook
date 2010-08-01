@@ -33,13 +33,13 @@
             
          <property
                name="windowImages"
-               value="icons/application/tourbook16.gif,icons/application/tourbook32.gif,icons/application/tourbook48.gif,icons/application/tourbook64.gif,icons/application/tourbook128.gif"/>
+               value="icons/application/tourbook16.png,icons/application/tourbook32.png,icons/application/tourbook48.png,icons/application/tourbook64.png,icons/application/tourbook128.png"/>
          <property
                name="aboutText"
                value="%Product_about"/>
          <property
                name="aboutImage"
-               value="icons/application/tourbook-about-250.gif"/>
+               value="icons/application/tourbook-about.png"/>
          <property
                name="appName"
                value="MyTourbook">
