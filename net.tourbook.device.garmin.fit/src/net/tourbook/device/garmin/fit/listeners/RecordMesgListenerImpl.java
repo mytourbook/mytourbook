@@ -10,65 +10,66 @@ import com.garmin.fit.RecordMesgListener;
 
 public class RecordMesgListenerImpl extends AbstractTimeDataMesgListener implements RecordMesgListener {
 
-    public RecordMesgListenerImpl(ArrayList<TimeData> timeDataList) {
-	super(timeDataList);
-    }
-
-    @Override
-    public void onMesg(RecordMesg mesg) {
-	TimeData timeData = new TimeData();
-
-	DateTime timestamp = mesg.getTimestamp();
-	if (timestamp != null) {
-	    timeData.absoluteTime = timestamp.getTimestamp();
+	public RecordMesgListenerImpl(final ArrayList<TimeData> timeDataList) {
+		super(timeDataList);
 	}
 
-	Integer positionLat = mesg.getPositionLat();
-	if (positionLat != null) {
-	    timeData.latitude = DataConverters.convertSemicirclesToDegrees(positionLat);
-	}
+	@Override
+	public void onMesg(final RecordMesg mesg) {
+		final TimeData timeData = new TimeData();
 
-	Integer positionLong = mesg.getPositionLong();
-	if (positionLong != null) {
-	    timeData.longitude = DataConverters.convertSemicirclesToDegrees(positionLong);
-	}
+		final DateTime timestamp = mesg.getTimestamp();
+		if (timestamp != null) {
+			// convert FIT time to Java time
+			timeData.absoluteTime = timestamp.getTimestamp() * 1000;
+		}
 
-	Float altitude = mesg.getAltitude();
-	if (altitude != null) {
-	    timeData.absoluteAltitude = altitude;
-	}
+		final Integer positionLat = mesg.getPositionLat();
+		if (positionLat != null) {
+			timeData.latitude = DataConverters.convertSemicirclesToDegrees(positionLat);
+		}
 
-	Short heartRate = mesg.getHeartRate();
-	if (heartRate != null) {
-	    timeData.pulse = heartRate;
-	}
+		final Integer positionLong = mesg.getPositionLong();
+		if (positionLong != null) {
+			timeData.longitude = DataConverters.convertSemicirclesToDegrees(positionLong);
+		}
 
-	Short cadence = mesg.getCadence();
-	if (cadence != null) {
-	    timeData.cadence = cadence;
-	}
+		final Float altitude = mesg.getAltitude();
+		if (altitude != null) {
+			timeData.absoluteAltitude = altitude;
+		}
 
-	Float distance = mesg.getDistance();
-	if (distance != null) {
-	    timeData.absoluteDistance = DataConverters.convertDistance(distance);
-	}
+		final Short heartRate = mesg.getHeartRate();
+		if (heartRate != null) {
+			timeData.pulse = heartRate;
+		}
 
-	Float speed = mesg.getSpeed();
-	if (speed != null) {
-	    timeData.speed = DataConverters.convertSpeed(speed);
-	}
+		final Short cadence = mesg.getCadence();
+		if (cadence != null) {
+			timeData.cadence = cadence;
+		}
 
-	Integer power = mesg.getPower();
-	if (power != null) {
-	    timeData.power = power;
-	}
+		final Float distance = mesg.getDistance();
+		if (distance != null) {
+			timeData.absoluteDistance = DataConverters.convertDistance(distance);
+		}
 
-	Byte temperature = mesg.getTemperature();
-	if (temperature != null) {
-	    timeData.temperature = temperature;
-	}
+		final Float speed = mesg.getSpeed();
+		if (speed != null) {
+			timeData.speed = DataConverters.convertSpeed(speed);
+		}
 
-	timeDataList.add(timeData);
-    }
+		final Integer power = mesg.getPower();
+		if (power != null) {
+			timeData.power = power;
+		}
+
+		final Byte temperature = mesg.getTemperature();
+		if (temperature != null) {
+			timeData.temperature = temperature;
+		}
+
+		timeDataList.add(timeData);
+	}
 
 }
