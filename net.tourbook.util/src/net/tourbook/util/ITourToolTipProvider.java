@@ -44,6 +44,11 @@ public interface ITourToolTipProvider {
 	public Composite createToolTipContentArea(Event event, Composite parent);
 
 	/**
+	 * Hides the {@link TourToolTip}
+	 */
+	public void hide();
+
+	/**
 	 * Paints the tool tip icon in the control
 	 * 
 	 * @param gc

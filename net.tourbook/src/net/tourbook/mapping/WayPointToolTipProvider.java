@@ -31,8 +31,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -81,13 +79,6 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-		parent.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 
 		return createUI(parent);
 	}
@@ -289,9 +280,8 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		return null;
 	}
 
-	private void onDispose() {
-
-	}
+	@Override
+	public void hide() {}
 
 	@Override
 	public void paint(final GC gc, final Rectangle rectangle) {
@@ -313,8 +303,6 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	}
 
 	@Override
-	public void show(final Point point) {
-
-	}
+	public void show(final Point point) {}
 
 }

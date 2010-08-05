@@ -180,9 +180,11 @@ public class TourToolTip extends ToolTip {
 	public Point getLocation(final Point tipSize, final Event event) {
 
 		if (_hoveredContext == null) {
-			/*
-			 * null cannot be returned because this causes an NPE
+
+			/**
+			 * !!! null cannot be returned because this causes an NPE !!!
 			 */
+			
 			return super.getLocation(tipSize, event);
 		}
 

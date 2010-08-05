@@ -13,29 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.ui.views;
 
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.util.ITourToolTipProvider;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.graphics.Point;
 
-public class ActionTourToolTipEditTour extends ActionEditTour {
-
-	private final ITourToolTipProvider	_tourInfo;
-
-	public ActionTourToolTipEditTour(	final ITourToolTipProvider _tourInfoToolTipProvider,
-										final ITourProvider _tourProvider) {
-
-		super(_tourProvider);
-
-		_tourInfo = _tourInfoToolTipProvider;
-	}
-
+public abstract class TourInfoToolTipStyledCellLabelProvider extends StyledCellLabelProvider implements
+		IColumnViewerTourIdProvider {
 
 	@Override
-	public void run() {
-
-		_tourInfo.hide();
-
-		super.run();
+	public Point getToolTipShift(final Object object) {
+		return new Point(1, 0);
 	}
+
+	@Override
+	public abstract Long getTourId(final ViewerCell cell);
+
 }

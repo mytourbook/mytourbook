@@ -15,15 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.util.ITourToolTipProvider;
 
 public class ActionTourToolTipEditQuick extends ActionEditQuick {
 
-	private final TourInfoToolTipProvider	_tourInfo;
+	private final ITourToolTipProvider	_tourInfo;
 
-	public ActionTourToolTipEditQuick(final TourInfoToolTipProvider tourInfoToolTipProvider) {
+	public ActionTourToolTipEditQuick(	final ITourToolTipProvider tourInfoToolTipProvider,
+										final ITourProvider tourProvider) {
 
-		super(tourInfoToolTipProvider);
+		super(tourProvider);
 
 		_tourInfo = tourInfoToolTipProvider;
 	}

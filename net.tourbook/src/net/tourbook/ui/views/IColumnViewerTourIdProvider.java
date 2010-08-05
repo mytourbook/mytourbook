@@ -13,29 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.ui.views;
 
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.util.ITourToolTipProvider;
+import org.eclipse.jface.viewers.ViewerCell;
 
-public class ActionTourToolTipEditTour extends ActionEditTour {
+public interface IColumnViewerTourIdProvider {
 
-	private final ITourToolTipProvider	_tourInfo;
+	/**
+	 * @param cell
+	 * @return Returns a tour id which is selected in a {@link ViewerCell} or <code>null</code> when
+	 *         a tour is not available.
+	 */
+	public abstract Long getTourId(final ViewerCell cell);
 
-	public ActionTourToolTipEditTour(	final ITourToolTipProvider _tourInfoToolTipProvider,
-										final ITourProvider _tourProvider) {
-
-		super(_tourProvider);
-
-		_tourInfo = _tourInfoToolTipProvider;
-	}
-
-
-	@Override
-	public void run() {
-
-		_tourInfo.hide();
-
-		super.run();
-	}
 }

@@ -63,6 +63,9 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
@@ -93,7 +96,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -185,7 +187,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionModifyColumns				_actionModifyColumns;
 	private ActionRefreshView				_actionRefreshView;
 
-	private ActionSetPerson			_actionSetOtherPerson;
+	private ActionSetPerson					_actionSetOtherPerson;
 	private ActionJoinTours					_actionJoinTours;
 	private ActionExport					_actionExportTour;
 	private ActionPrint						_actionPrintTour;
@@ -445,6 +447,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
 		createTourViewer(_viewerContainer);
+		new TreeViewerTourInfoToolTip(_tourViewer);
 
 		createActions();
 
@@ -792,7 +795,19 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new StyledCellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+					return ((TVITourBookItem) element).getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -986,14 +1001,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * column: person
 	 */
 	private void defineColumnPerson(final PixelConverter pixelConverter) {
-		
+
 		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					
+
 					final long dbPersonId = ((TVITourBookTour) element).colPersonId;
 
 					cell.setText(PersonManager.getPersonName(dbPersonId));
@@ -1036,7 +1051,19 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+					return ((TVITourBookTour) element).getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
@@ -1054,11 +1081,23 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineColumnTime(final PixelConverter pixelConverter) {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_START_TIME.createColumn(
-				_columnManager,
-				pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_START_TIME //
+				.createColumn(_columnManager, pixelConverter);
+
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+					return ((TVITourBookTour) element).getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
@@ -1236,7 +1275,19 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+					return ((TVITourBookTour) element).getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();

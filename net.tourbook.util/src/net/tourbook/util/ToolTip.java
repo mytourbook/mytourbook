@@ -32,7 +32,8 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * This class gives implementors to provide customized tooltips for any control.
  * <p>
- * <b><i>This class is a copy from the ToolTip in org.eclipse.jface.window</i></b>
+ * <b><i>This class is a copy from the ToolTip in org.eclipse.jface.window</i> </b> <br>
+ * {@link TooltipHideListener} is adjusted
  * 
  * @since 3.3
  */
