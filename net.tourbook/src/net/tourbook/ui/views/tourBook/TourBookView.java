@@ -447,7 +447,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 
 		createTourViewer(_viewerContainer);
-		new TreeViewerTourInfoToolTip(_tourViewer);
 
 		createActions();
 
@@ -471,7 +470,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		reselectTourViewer();
 	}
 
-	private Control createTourViewer(final Composite parent) {
+	private void createTourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
@@ -528,11 +527,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		createContextMenu();
 
-		return tree;
+		// set tour info tooltip provider
+		new TreeViewerTourInfoToolTip(_tourViewer);
 	}
 
 	/**
-	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
+	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
 	 * 
 	 * @param parent
@@ -1417,7 +1417,19 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(_columnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+
+					return ((TVITourBookTour) element).getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();

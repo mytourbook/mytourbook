@@ -65,6 +65,8 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TableViewerTourInfoToolTip;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
@@ -218,6 +220,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
 	private ActionExport					_actionExportTour;
 	private ActionJoinTours					_actionJoinTours;
+
+	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -757,6 +761,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 
 		createContextMenu();
+
+		// set tour info tooltip provider
+		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 	}
 
 	/**
@@ -770,7 +777,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final PixelConverter pc = new PixelConverter(parent);
 
 		defineColumnDatabase(pc);
-		defineColumnTourDate(pc);
+		defineColumnDate(pc);
 		defineColumnTime(pc);
 		defineColumnTourType(pc);
 		defineColumnRecordingTime(pc);
@@ -904,6 +911,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 				// show the database indicator for the person who owns the tour
 				cell.setImage(getDbImage((TourData) cell.getElement()));
+			}
+		});
+	}
+
+	/**
+	 * column: date
+	 */
+	private void defineColumnDate(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+				return ((TourData) cell.getElement()).getTourId();
+			}
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+				cell.setText(_dateFormatter.format(_calendar.getTime()));
+			}
+		});
+
+		// sort column
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
+				_tourViewer.refresh();
 			}
 		});
 	}
@@ -1064,7 +1106,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+				return ((TourData) cell.getElement()).getTourId();
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -1099,7 +1147,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+				return ((TourData) cell.getElement()).getTourId();
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -1135,7 +1189,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+				return ((TourData) cell.getElement()).getTourId();
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourData tourData = (TourData) cell.getElement();
@@ -1146,35 +1206,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);
-				_tourViewer.refresh();
-			}
-		});
-	}
-
-	/**
-	 * column: date
-	 */
-	private void defineColumnTourDate(final PixelConverter pc) {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourData tourData = (TourData) cell.getElement();
-
-				_calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-				cell.setText(_dateFormatter.format(_calendar.getTime()));
-			}
-		});
-
-		// sort column
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
 				_tourViewer.refresh();
 			}
 		});
@@ -1437,6 +1468,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		// hide tour info tooltip, this is displayed when the mouse context menu should be created
+		_tourInfoToolTip.hide();
 
 		if (TourbookPlugin.getActivePerson() != null) {
 			menuMgr.add(_actionSaveTourWithPerson);

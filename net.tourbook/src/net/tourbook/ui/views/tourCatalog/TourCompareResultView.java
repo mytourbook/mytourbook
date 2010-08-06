@@ -49,6 +49,8 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
@@ -556,6 +558,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		createContextMenu();
 
+		// set tour info tooltip provider
+		new TreeViewerTourInfoToolTip(_tourViewer);
+
 		return tree;
 	}
 
@@ -574,11 +579,28 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		colDef.setColumnHeader(Messages.Compare_Result_Column_tour);
 		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
 		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultReferenceTour) {
+
+					return ((TVICompareResultReferenceTour) element).tourId;
+
+				} else if (element instanceof TVICompareResultComparedTour) {
+
+					return ((TVICompareResultComparedTour) element).comparedTourData.getTourId();
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
 
+				final Object element = cell.getElement();
 				if (element instanceof TVICompareResultReferenceTour) {
 
 					final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) element;

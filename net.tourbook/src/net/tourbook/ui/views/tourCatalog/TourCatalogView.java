@@ -52,6 +52,9 @@ import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
@@ -79,7 +82,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -396,7 +398,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
@@ -500,7 +502,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllColumns(parent);
 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -581,20 +583,55 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		});
 
 		createContextMenu();
+
+		// set tour info tooltip provider
+		new TreeViewerTourInfoToolTip(_tourViewer);
 	}
 
-	private void defineViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TreeColumnDefinition colDef;
+		final PixelConverter pc = new PixelConverter(parent);
 
-		/*
-		 * first column: ref tour name/compare tour name /year
-		 */
-		colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, pixelConverter);
+		defineColumn1stColumn(pc);
+		defineColumnTourType(pc);
+		defineColumnTitle(pc);
+		defineColumnTags(pc);
+		defineColumnSpeed(pc);
+
+	}
+
+	/**
+	 * first column: ref tour name/compare tour name /year
+	 */
+	private void defineColumn1stColumn(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new StyledCellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if ((element instanceof TVICatalogRefTourItem)) {
+
+					// ref tour item
+
+					return ((TVICatalogRefTourItem) element).getTourId();
+
+				} else if (element instanceof TVICatalogComparedTour) {
+
+					// compared tour item
+
+					return ((TVICatalogComparedTour) element).getTourId();
+
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -634,56 +671,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: tour type
-		 */
-		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICatalogComparedTour) {
-					cell.setImage(UI.getInstance().getTourTypeImage(((TVICatalogComparedTour) element).tourTypeId));
-				}
-			}
-		});
+	/**
+	 * column: speed
+	 */
+	private void defineColumnSpeed(final PixelConverter pc) {
 
-		/*
-		 * column: title
-		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICatalogComparedTour) {
-					cell.setText(((TVICatalogComparedTour) element).tourTitle);
-				}
-			}
-		});
-
-		/*
-		 * column: tags
-		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICatalogComparedTour) {
-					cell.setText(TourDatabase.getTagNames(((TVICatalogComparedTour) element).tagIds));
-				}
-			}
-		});
-
-		/*
-		 * column: speed
-		 */
-		colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -701,7 +696,84 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		});
+	}
 
+	/**
+	 * column: tags
+	 */
+	private void defineColumnTags(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					return ((TVICatalogComparedTour) element).getTourId();
+				}
+
+				return null;
+			}
+
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setText(TourDatabase.getTagNames(((TVICatalogComparedTour) element).tagIds));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: title
+	 */
+	private void defineColumnTitle(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					return ((TVICatalogComparedTour) element).getTourId();
+				}
+
+				return null;
+			}
+
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setText(((TVICatalogComparedTour) element).tourTitle);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tour type
+	 */
+	private void defineColumnTourType(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setImage(UI.getInstance().getTourTypeImage(((TVICatalogComparedTour) element).tourTypeId));
+				}
+			}
+		});
 	}
 
 	@Override

@@ -136,6 +136,7 @@ public class TourInfoUI {
 
 	private Label						_lblDateTimeCreatedValue;
 	private Label						_lblDateTimeModifiedValue;
+	private Label						_lblDateTimeModified;
 
 	/*
 	 * actions
@@ -159,9 +160,9 @@ public class TourInfoUI {
 	private ITourProvider				_tourProvider;
 
 	public Composite createContentArea(	final Composite parent,
-								final TourData tourData,
-								final ITourToolTipProvider tourInfoToolTipProvider,
-								final ITourProvider tourProvider) {
+										final TourData tourData,
+										final ITourToolTipProvider tourInfoToolTipProvider,
+										final ITourProvider tourProvider) {
 
 		_tourData = tourData;
 		_tourInfoToolTipProvider = tourInfoToolTipProvider;
@@ -193,6 +194,8 @@ public class TourInfoUI {
 		updateUI();
 		enableControls();
 
+//		container.layout(true, true);
+
 		// compute width for all controls and equalize column width for the different sections
 		_ttContainer.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnControls, 5);
@@ -211,6 +214,7 @@ public class TourInfoUI {
 		shellContainer.setForeground(_fgColor);
 		shellContainer.setBackground(_bgColor);
 		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			_ttContainer = new Composite(shellContainer, SWT.NONE);
 			_ttContainer.setForeground(_fgColor);
@@ -218,7 +222,6 @@ public class TourInfoUI {
 			GridLayoutFactory.fillDefaults() //
 					.numColumns(2)
 					.equalWidth(true)
-//					.spacing(20, 5)
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
 					.applyTo(_ttContainer);
 //			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -622,44 +625,41 @@ public class TourInfoUI {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			final Composite leftContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(leftContainer);
-			leftContainer.setForeground(_fgColor);
-			leftContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(leftContainer);
-			{
-				/*
-				 * date/time modified
-				 */
-				createUILabel(leftContainer, Messages.Tour_Tooltip_Label_DateTimeModified);
-
-				_lblDateTimeModifiedValue = createUILabelValue(leftContainer, SWT.LEAD);
-				GridDataFactory.fillDefaults().applyTo(_lblDateTimeModifiedValue);
-			}
-
-			final Composite rightContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(rightContainer);
-			rightContainer.setForeground(_fgColor);
-			rightContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rightContainer);
-//			rightContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+			final Composite containerCreated = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerCreated);
+			containerCreated.setForeground(_fgColor);
+			containerCreated.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerCreated);
 			{
 				/*
 				 * date/time created
 				 */
-				final Label label = createUILabel(rightContainer, Messages.Tour_Tooltip_Label_DateTimeCreated);
+				createUILabel(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
+
+				_lblDateTimeCreatedValue = createUILabelValue(containerCreated, SWT.LEAD);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_lblDateTimeCreatedValue);
+			}
+
+			final Composite containerModified = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerModified);
+			containerModified.setForeground(_fgColor);
+			containerModified.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerModified);
+			{
+				/*
+				 * date/time modified
+				 */
+				_lblDateTimeModified = createUILabel(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.FILL)
-						.applyTo(label);
+						.applyTo(_lblDateTimeModified);
 
-				_lblDateTimeCreatedValue = createUILabelValue(rightContainer, SWT.TRAIL);
+				_lblDateTimeModifiedValue = createUILabelValue(containerModified, SWT.TRAIL);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.END, SWT.FILL)
-						.applyTo(_lblDateTimeCreatedValue);
-//
-//				final Label label = new Label(rightContainer, SWT.NONE);
-//				label.setText("test");
+						.applyTo(_lblDateTimeModifiedValue);
 			}
 		}
 	}

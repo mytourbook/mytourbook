@@ -15,18 +15,18 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TableViewer;
 
-public class TreeViewerTourInfoToolTip extends ColumnViewerTourInfoToolTip {
+public class TableViewerTourInfoToolTip extends ColumnViewerTourInfoToolTip {
 
 	/**
-	 * Tour info tooltip for a tree viewer
+	 * Tour info tooltip for a table viewer
 	 * 
-	 * @param treeViewer
+	 * @param tableViewer
 	 */
-	public TreeViewerTourInfoToolTip(final TreeViewer treeViewer) {
+	public TableViewerTourInfoToolTip(final TableViewer tableViewer) {
 
-		super(treeViewer.getTree(), NO_RECREATE, treeViewer);
+		super(tableViewer.getTable(), NO_RECREATE, tableViewer);
 	}
 
 }

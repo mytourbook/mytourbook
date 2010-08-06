@@ -59,6 +59,9 @@ import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
+import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
@@ -87,7 +90,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -127,7 +129,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private boolean							_isRecTimeFormat_hhmmss;
 	private boolean							_isDriveTimeFormat_hhmmss;
-
 
 	private static final NumberFormat		_nf								= NumberFormat.getNumberInstance();
 
@@ -357,7 +358,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					_tagViewer = (TreeViewer) recreateViewer(_tagViewer);
 
@@ -499,7 +500,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumns(parent);
+		defineAllColumns(parent);
 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -612,6 +613,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		createContextMenu();
 
 		fillToolBar();
+
+		// set tour info tooltip provider
+		new TreeViewerTourInfoToolTip(_tagViewer);
 	}
 
 	/**
@@ -619,18 +623,52 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 * 
 	 * @param parent
 	 */
-	private void defineViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TreeColumnDefinition colDef;
+		final PixelConverter pc = new PixelConverter(parent);
 
-		/*
-		 * tree column: category/tag/year/month/tour
-		 */
-		colDef = TreeColumnFactory.TAG.createColumn(_columnManager, pixelConverter);
+		defineColumn1stColumn(pc);
+		defineColumnTitle(pc);
+		defineColumnTags(pc);
+		defineColumnTimeRecording(pc);
+		defineColumnTimeDriving(pc);
+		defineColumnTimeBreak(pc);
+		defineColumnDistance(pc);
+		defineColumnAltitudeUp(pc);
+		defineColumnAltitudeDown(pc);
+		defineColumnMaxAltitude(pc);
+		defineColumnMaxSpeed(pc);
+		defineColumnMaxPulse(pc);
+		defineColumnAvgSpeed(pc);
+		defineColumnAvgPace(pc);
+		defineColumnAvgPulse(pc);
+		defineColumnAvgCadence(pc);
+		defineColumnAvgTemperature(pc);
+	}
+
+	/**
+	 * tree column: category/tag/year/month/tour
+	 */
+	private void defineColumn1stColumn(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TAG.createColumn(_columnManager, pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new StyledCellLabelProvider() {
+		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final TVITagViewItem viewItem = (TVITagViewItem) element;
+
+				if (viewItem instanceof TVITagViewTour) {
+					return ((TVITagViewTour) viewItem).tourId;
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -677,33 +715,316 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				cell.setStyleRanges(styledString.getStyleRanges());
 			}
 		});
+	}
 
-		/*
-		 * column: title
-		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
+	/**
+	 * column: altitude down (m)
+	 */
+	private void defineColumnAltitudeDown(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
+				if (colAltitudeDown != 0) {
+
+					cell.setText(Long.toString((long) (colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: altitude up (m)
+	 */
+	private void defineColumnAltitudeUp(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
+				if (colAltitudeUp != 0) {
+
+					cell.setText(Long.toString((long) (colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: avg cadence
+	 */
+	private void defineColumnAvgCadence(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
+				if (colAvgCadence != 0) {
+
+					cell.setText(Long.toString(colAvgCadence));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: avg pace min/km - min/mi
+	 */
+	private void defineColumnAvgPace(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+				if (pace == 0.0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg pulse
+	 */
+	private void defineColumnAvgPulse(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
+				if (colAvgPulse != 0) {
+
+					cell.setText(Long.toString(colAvgPulse));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: avg speed km/h - mph
+	 */
+	private void defineColumnAvgSpeed(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
 
-				if (element instanceof TVITagViewTour) {
-					cell.setText(((TVITagViewTour) element).tourTitle);
+				_nf.setMinimumFractionDigits(1);
+				_nf.setMaximumFractionDigits(1);
+
+				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+				if (colAvgSpeed != 0) {
+
+					cell.setText(_nf.format(colAvgSpeed));
 					setCellColor(cell, element);
-				} else {
-					cell.setText(UI.EMPTY_STRING);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: tags
-		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
+	/**
+	 * column: avg temperature
+	 */
+	private void defineColumnAvgTemperature(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				long temperature = ((TVITagViewItem) element).colAvgTemperature;
+				if (temperature != 0) {
+
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+					}
+
+					cell.setText(Long.toString(temperature));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: distance (km/miles)
+	 */
+	private void defineColumnDistance(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colDistance = ((TVITagViewItem) element).colDistance;
+				if (colDistance != 0) {
+
+					// set distance
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					final String distance = _nf.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+
+					cell.setText(distance);
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: max altitude
+	 */
+	private void defineColumnMaxAltitude(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
+				if (colMaxAltitude != 0) {
+
+					cell.setText(Long.toString(colMaxAltitude));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: max pulse
+	 */
+	private void defineColumnMaxPulse(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
+				if (colMaxPulse != 0) {
+
+					cell.setText(Long.toString(colMaxPulse));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: max speed
+	 */
+	private void defineColumnMaxSpeed(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
+				if (colMaxSpeed != 0) {
+
+					_nf.setMinimumFractionDigits(1);
+					_nf.setMaximumFractionDigits(1);
+
+					cell.setText(_nf.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: tags
+	 */
+	private void defineColumnTags(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTour) {
+					return ((TVITagViewTour) element).tourId;
+				}
+
+				return null;
+			}
+
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -718,70 +1039,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: recording time (h)
-		 */
-		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+	/**
+	 * column: paused time (h)
+	 */
+	private void defineColumnTimeBreak(final PixelConverter pc) {
 
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
-
-				if (element instanceof TVITagViewTour) {
-					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: driving time (h)
-		 */
-		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
-
-				if (element instanceof TVITagViewTour) {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: paused time (h)
-		 */
-		colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pixelConverter);
+		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -812,11 +1077,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			}
 		});
+	}
 
-		/*
-		 * column: distance (km/miles)
-		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: driving time (h)
+	 */
+	private void defineColumnTimeDriving(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -826,181 +1094,30 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colDistance = ((TVITagViewItem) element).colDistance;
-				if (colDistance != 0) {
+				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
 
-					// set distance
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					final String distance = _nf.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
-
-					cell.setText(distance);
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: altitude up (m)
-		 */
-		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
-				if (colAltitudeUp != 0) {
-
-					cell.setText(Long.toString((long) (colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: altitude down (m)
-		 */
-		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
-				if (colAltitudeDown != 0) {
-
-					cell.setText(Long.toString((long) (colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: max altitude
-		 */
-		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
-				if (colMaxAltitude != 0) {
-
-					cell.setText(Long.toString(colMaxAltitude));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: max speed
-		 */
-		colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
-				if (colMaxSpeed != 0) {
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: max pulse
-		 */
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
-				if (colMaxPulse != 0) {
-
-					cell.setText(Long.toString(colMaxPulse));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: avg speed km/h - mph
-		 */
-		colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
-
-				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
-				if (colAvgSpeed != 0) {
-
-					cell.setText(_nf.format(colAvgSpeed));
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
-		 * column: avg pace min/km - min/mi
-		 */
-		colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
-
-				if (pace == 0.0) {
-					cell.setText(UI.EMPTY_STRING);
+				if (element instanceof TVITagViewTour) {
+					if (_isDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					}
 				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
+					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: avg pulse
-		 */
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, pixelConverter);
+	/**
+	 * column: recording time (h)
+	 */
+	private void defineColumnTimeRecording(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1010,58 +1127,53 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
-				if (colAvgPulse != 0) {
+				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
 
-					cell.setText(Long.toString(colAvgPulse));
-					setCellColor(cell, element);
-				}
-			}
-		}); /*
-			 * column: avg cadence
-			 */
-		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
+				if (element instanceof TVITagViewTour) {
+					if (_isRecTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
 				}
 
-				final long colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
-				if (colAvgCadence != 0) {
-
-					cell.setText(Long.toString(colAvgCadence));
-					setCellColor(cell, element);
-				}
+				setCellColor(cell, element);
 			}
 		});
+	}
 
-		/*
-		 * column: avg temperature
-		 */
-		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
+	/**
+	 * column: title
+	 */
+	private void defineColumnTitle(final PixelConverter pc) {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTour) {
+					return ((TVITagViewTour) element).tourId;
+				}
+
+				return null;
+			}
 
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
 
-				long temperature = ((TVITagViewItem) element).colAvgTemperature;
-				if (temperature != 0) {
-
-					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-					}
-
-					cell.setText(Long.toString(temperature));
+				if (element instanceof TVITagViewTour) {
+					cell.setText(((TVITagViewTour) element).tourTitle);
 					setCellColor(cell, element);
+				} else {
+					cell.setText(UI.EMPTY_STRING);
 				}
 			}
 		});

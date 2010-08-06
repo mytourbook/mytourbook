@@ -673,10 +673,16 @@
                   style="push"
                   tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
             </command>
-            <separator
-                  name="net.tourbook.separator"
-                  visible="true">
-            </separator>
+            
+         </toolbar>
+      </menuContribution>
+
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            
+         <toolbar
+               id="net.tourbook.toolbars.tourTools">
+            
             <command
                   commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                   icon="icons/tour-segmenter.gif"
