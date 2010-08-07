@@ -15,30 +15,32 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import java.util.Arrays;
+
 import net.tourbook.data.TourType;
 
 public class TourTypeFilterSet {
 
-	private String		fName;
+	private String		_nName;
 
 	/**
 	 * contains the tour types {@link TourType} for this filter
 	 */
-	private Object[]	fTourTypes;
+	private Object[]	_tourTypes;
 
 	public String getName() {
-		return fName;
+		return _nName;
 	}
 
 	/**
 	 * @return Returns an array with {@link TourType} objects
 	 */
 	public Object[] getTourTypes() {
-		return fTourTypes;
+		return _tourTypes;
 	}
 
 	public void setName(final String name) {
-		this.fName = name;
+		this._nName = name;
 	}
 
 	/**
@@ -47,6 +49,11 @@ public class TourTypeFilterSet {
 	 * @param objects
 	 */
 	public void setTourTypes(final Object[] objects) {
-		fTourTypes = objects;
+		_tourTypes = objects;
+	}
+
+	@Override
+	public String toString() {
+		return "TourTypeFilterSet [Name=" + _nName + ", TourTypes=" + Arrays.toString(_tourTypes) + "]";
 	}
 }

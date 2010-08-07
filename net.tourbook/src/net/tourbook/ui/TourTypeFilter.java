@@ -91,6 +91,20 @@ public class TourTypeFilter {
 		_tourTypeSet = filterSet;
 	}
 
+	public String getFilterName() {
+		switch (_filterType) {
+		case FILTER_TYPE_SYSTEM:
+			return _systemFilterName;
+		case FILTER_TYPE_DB:
+			return _tourType.getName();
+		case FILTER_TYPE_TOURTYPE_SET:
+			return _tourTypeSet.getName();
+		default:
+			break;
+		}
+		return "?"; //$NON-NLS-1$
+	}
+
 //	/**
 //	 * @param tourTypeList
 //	 * @return Returns a list with all {@link TourType}'s which this filter contains.<br>
@@ -144,20 +158,6 @@ public class TourTypeFilter {
 //
 //		return null;
 //	}
-
-	public String getFilterName() {
-		switch (_filterType) {
-		case FILTER_TYPE_SYSTEM:
-			return _systemFilterName;
-		case FILTER_TYPE_DB:
-			return _tourType.getName();
-		case FILTER_TYPE_TOURTYPE_SET:
-			return _tourTypeSet.getName();
-		default:
-			break;
-		}
-		return "?"; //$NON-NLS-1$
-	}
 
 	/**
 	 * @return Returns the filter type of this filter which is one of
@@ -282,6 +282,17 @@ public class TourTypeFilter {
 	public boolean showUndefinedTourTypes() {
 		return _filterType == FILTER_TYPE_SYSTEM;
 
+	}
+
+	@Override
+	public String toString() {
+		return "TourTypeFilter ["
+				+ ("filterType=" + _filterType)
+				+ (", tourType=" + _tourType)
+				+ (", tourTypeSet=" + _tourTypeSet)
+				+ (", systemFilterName=" + _systemFilterName)
+				+ (", systemFilterId=" + _systemFilterId)
+				+ "]";
 	}
 
 }

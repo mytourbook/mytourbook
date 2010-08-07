@@ -26,6 +26,8 @@ import org.eclipse.swt.accessibility.AccessibleTextAdapter;
 import org.eclipse.swt.accessibility.AccessibleTextEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
@@ -225,6 +227,19 @@ public class TableCombo extends Composite {
 	    createPopup(-1);
 	    
 	    initAccessible();
+
+	    addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+
+				/*
+				 * paint background because the text control can be smaller than the client area
+				 */
+				GC gc = e.gc;
+				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+				gc.fillRectangle(getClientArea());
+			}
+		});
 	}
 	
 	/**
@@ -1223,10 +1238,17 @@ public class TableCombo extends Composite {
 	    	int imageWidth = selectedImage.computeSize (SWT.DEFAULT, height, changed).x + 2;
 	    	int textWidth = width - imageWidth - arrowSize.x; 
 
-	    	selectedImage.setBounds (0, 0, imageWidth, height);
-		    text.setBounds (imageWidth, 0, textWidth, height);
-		    arrow.setBounds (imageWidth + textWidth, 0, arrowSize.x, arrowSize.y);
-	    }
+			// center text vertically
+			int textYPos = 0;
+			Point textSize = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			if (textSize.y < height) {
+				textYPos = (height - textSize.y) / 2;
+			}
+
+			selectedImage.setBounds(0, 0, imageWidth, height);
+			text.setBounds(imageWidth, textYPos, textWidth, height);
+			arrow.setBounds(imageWidth + textWidth, 0, arrowSize.x, arrowSize.y);
+		}
 	}
 	
 	/**
@@ -1514,8 +1536,7 @@ public class TableCombo extends Composite {
 				refreshText(index);
 				
 				// select the row in the table.
-				table.select (index);
-				table.showSelection ();
+				table.setSelection(index);
 			}
 		}
 	}

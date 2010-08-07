@@ -1,30 +1,25 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -35,7 +30,8 @@ import org.eclipse.swt.widgets.ToolItem;
  * height for a toolbar !!!
  */
 public abstract class CustomControlContribution extends ContributionItem {
-	private Image	image;
+
+//	private Image	image;
 
 	/**
 	 * Creates a control contribution item with the given id.
@@ -78,7 +74,7 @@ public abstract class CustomControlContribution extends ContributionItem {
 
 	@Override
 	public void dispose() {
-		image.dispose();
+//		image.dispose();
 	}
 
 	/**
@@ -115,14 +111,14 @@ public abstract class CustomControlContribution extends ContributionItem {
 		ti.setControl(control);
 		ti.setWidth(computeWidth(control));
 
-		// create dummy item to force the height
-		final int height = control.getSize().y;
-		final ImageData imageData = new ImageData(1, height, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
-		imageData.transparentPixel = 0;
-		image = new Image(Display.getCurrent(), imageData);
-
-		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
-		imageItem.setImage(image);
+//		// create dummy item to force the height
+//		final int height = control.getSize().y;
+//		final ImageData imageData = new ImageData(1, height, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+//		imageData.transparentPixel = 0;
+//		image = new Image(Display.getCurrent(), imageData);
+//
+//		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
+//		imageItem.setImage(image);
 	}
 
 }
