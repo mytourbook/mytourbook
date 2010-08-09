@@ -167,6 +167,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	PREF_PAGE_TAGS								= "net.tourbook.preferences.PrefPageTags";					//$NON-NLS-1$
 	public static final String	PREF_PAGE_TOUR_TYPE							= "net.tourbook.preferences.PrefPageTourTypeDefinition";	//$NON-NLS-1$
+	public static final String	PREF_PAGE_TOUR_TYPE_FILTER					= "net.tourbook.preferences.PrefPageTourTypeFilter";		//$NON-NLS-1$
 
 	/*
 	 * tour data editor

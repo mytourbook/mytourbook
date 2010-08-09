@@ -36,26 +36,32 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.util.UI;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
+import org.eclipse.nebula.widgets.tablecombo.TableCombo;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
@@ -63,7 +69,7 @@ import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class TourTypeContributionItem extends CustomControlContribution {
+public class TourTypeContributionItemOLD extends CustomControlContribution {
 
 	private static final String								ID							= "net.tourbook.tourtypefilter";				//$NON-NLS-1$
 
@@ -93,14 +99,131 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private double											_propertyValue;
 
-	private TourTypeDropDownMenu							_actionTourTypeDropDown;
+	private TableComboViewer								_tourTypeComboViewer;
 
-	public TourTypeContributionItem() {
+	private static class SingleImageItemLabelProvider extends LabelProvider implements ITableLabelProvider {
+
+		public Image getColumnImage(final Object element, final int columnIndex) {
+
+			final TourTypeFilter item = (TourTypeFilter) element;
+
+			if (columnIndex == 0) {
+				return getFilterImage(item);
+			}
+
+			return null;
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
+		public String getColumnText(final Object element, final int columnIndex) {
+
+			final TourTypeFilter item = (TourTypeFilter) element;
+
+			switch (columnIndex) {
+			case 0:
+				return item.getFilterName();
+			}
+
+			return UI.EMPTY_STRING;
+		}
+	}
+
+	public TourTypeContributionItemOLD() {
 		this(ID);
 	}
 
-	protected TourTypeContributionItem(final String id) {
+	protected TourTypeContributionItemOLD(final String id) {
 		super(id);
+	}
+
+	private static Image getFilterImage(final TourTypeFilter filter) {
+
+		final int filterType = filter.getFilterType();
+
+		Image filterImage = null;
+
+		// set filter name/image
+		switch (filterType) {
+		case TourTypeFilter.FILTER_TYPE_DB:
+			final TourType tourType = filter.getTourType();
+			filterImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_SYSTEM:
+			filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+			filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
+			break;
+
+		default:
+			break;
+		}
+
+		return filterImage;
+	}
+
+	/**
+	 * @return Returns a list with all tour type filters
+	 */
+	@SuppressWarnings("unchecked")
+	public static ArrayList<TourTypeFilter> getTourTypeFilters() {
+
+		final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+		final ArrayList<TourType> tourTypesNotDisplayed = (ArrayList<TourType>) tourTypes.clone();
+
+		/*
+		 * check if all system filters are visible
+		 */
+		boolean isSysFilterAll = false;
+		boolean isSysFilterNotDefined = false;
+
+		for (final TourTypeFilter tourTypeFilter : filterList) {
+			if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
+				switch (tourTypeFilter.getSystemFilterId()) {
+				case TourTypeFilter.SYSTEM_FILTER_ID_ALL:
+					isSysFilterAll = true;
+					break;
+				case TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED:
+					isSysFilterNotDefined = true;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		if (isSysFilterAll == false) {
+			filterList.add(new TourTypeFilter(
+					TourTypeFilter.SYSTEM_FILTER_ID_ALL,
+					Messages.App_Tour_type_item_all_types));
+		}
+		if (isSysFilterNotDefined == false) {
+			filterList.add(new TourTypeFilter(
+					TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
+					Messages.App_Tour_type_item_not_defined));
+		}
+
+		/*
+		 * ensure that all available tour types are visible
+		 */
+		for (final TourTypeFilter tourTypeFilter : filterList) {
+			final TourType tourType = tourTypeFilter.getTourType();
+			if (tourType != null) {
+				tourTypesNotDisplayed.remove(tourType);
+			}
+		}
+
+		for (final TourType tourType : tourTypesNotDisplayed) {
+			filterList.add(new TourTypeFilter(tourType));
+		}
+
+		return filterList;
 	}
 
 	private static XMLMemento getXMLMementoRoot() {
@@ -245,66 +368,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	}
 
 	/**
-	 * @return Returns a list with all tour type filters
-	 */
-	@SuppressWarnings("unchecked")
-	public static ArrayList<TourTypeFilter> retrieveTourTypeFilters() {
-
-		final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		final ArrayList<TourType> tourTypesNotDisplayed = (ArrayList<TourType>) tourTypes.clone();
-
-		/*
-		 * check if all system filters are visible
-		 */
-		boolean isSysFilterAll = false;
-		boolean isSysFilterNotDefined = false;
-
-		for (final TourTypeFilter tourTypeFilter : filterList) {
-			if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
-				switch (tourTypeFilter.getSystemFilterId()) {
-				case TourTypeFilter.SYSTEM_FILTER_ID_ALL:
-					isSysFilterAll = true;
-					break;
-				case TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED:
-					isSysFilterNotDefined = true;
-					break;
-				default:
-					break;
-				}
-			}
-		}
-
-		if (isSysFilterAll == false) {
-			filterList.add(new TourTypeFilter(
-					TourTypeFilter.SYSTEM_FILTER_ID_ALL,
-					Messages.App_Tour_type_item_all_types));
-		}
-		if (isSysFilterNotDefined == false) {
-			filterList.add(new TourTypeFilter(
-					TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
-					Messages.App_Tour_type_item_not_defined));
-		}
-
-		/*
-		 * ensure that all available tour types are visible
-		 */
-		for (final TourTypeFilter tourTypeFilter : filterList) {
-			final TourType tourType = tourTypeFilter.getTourType();
-			if (tourType != null) {
-				tourTypesNotDisplayed.remove(tourType);
-			}
-		}
-
-		for (final TourType tourType : tourTypesNotDisplayed) {
-			filterList.add(new TourTypeFilter(tourType));
-		}
-
-		return filterList;
-	}
-
-	/**
 	 * write the filters from the viewer into an xml file
 	 * 
 	 * @param filterViewer
@@ -405,14 +468,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 					// combobox
 					if (_propertyValue != propertyValue) {
 
-						/*
-						 * reselect old tour type filter when it is still available
-						 */
-						final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+						TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-						retrieveTourTypeFilter();
+						fillFilterComboBox();
 
-						reselectTourTypeFilter(activeTourTypeFilter);
+						reselectTourType(activeTourTypeFilter);
 					}
 				}
 			}
@@ -428,77 +488,69 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			return new Label(parent, SWT.NONE);
 		}
 
-		Control returnControl;
-
-		if (UI.IS_OSX) {
-
-			returnControl = createUI(parent);
-
-		} else {
-
-			/*
-			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
-			 * composite removes the pixels
-			 */
-			final Composite container = new Composite(parent, SWT.NONE);
-			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-			{
-				final Control uiControl = createUI(container);
-				uiControl.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
-			}
-
-			returnControl = container;
-		}
-
+		final Composite container = createUI(parent);
 		addPrefListener();
 
-		retrieveTourTypeFilter();
+		fillFilterComboBox();
+
 		reselectLastTourType();
 
-		return returnControl;
+		return container;
 	}
 
-	private Control createUI(final Composite parent) {
+	private Composite createUI(final Composite parent) {
 
-		_actionTourTypeDropDown = new TourTypeDropDownMenu(this);
-		final ActionContributionItem contribItem = new ActionContributionItem(_actionTourTypeDropDown);
+		// create TableCombo
+		_tourTypeComboViewer = new TableComboViewer(parent, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT);
 
+		final TableCombo tableCombo = _tourTypeComboViewer.getTableCombo();
 
-		// enforce that text is displayed not only the icon !!!!
-		contribItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
+//		tableCombo.setLayoutData(new GridData(75, SWT.DEFAULT));
+		tableCombo.setVisibleItemCount(50);
+		tableCombo.setToolTipText(Messages.App_Tour_type_tooltip);
 
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT | SWT.RIGHT);
+		// set the content provider
+		_tourTypeComboViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-//		final ToolItem toolItem = new ToolItem(toolbar, SWT.PUSH);
-//		xxxtoolItem.setText("toolitem");
+		// set the label provider
+		_tourTypeComboViewer.setLabelProvider(new SingleImageItemLabelProvider());
 
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
+		// add listener
+		_tourTypeComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event) {
 
-		tbm.add(contribItem);
+				setActiveTourTypeFilter();
 
-		tbm.update(true);
+				/*
+				 * fire in an asynch that the combo box drop down is hidden and the combo text ist
+				 * displayed
+				 */
+				Display.getCurrent().asyncExec(new Runnable() {
+					public void run() {
 
-		return toolbar;
-	}
-
-	public void onSelectTourTypeFilter(final TourTypeFilter ttFilter) {
-
-		TourbookPlugin.setActiveTourTypeFilter(ttFilter);
-
-		/*
-		 * fire in an asynch that the combo box drop down is hidden and the combo text ist
-		 * displayed
-		 */
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				// fire change event
-				_propertyValue = Math.random();
-				_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
+						// fire change event
+						_propertyValue = Math.random();
+						_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
+					}
+				});
 			}
 		});
 
+		_tourTypeComboViewer.getControl().addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(final DisposeEvent e) {
+				_prefStore.removePropertyChangeListener(_prefChangeListener);
+			}
+		});
+
+		return tableCombo;
+	}
+
+	private void fillFilterComboBox() {
+
+		_tourTypeFilters = getTourTypeFilters();
+
+		_tourTypeComboViewer.setInput(_tourTypeFilters);
 	}
 
 	private void reselectLastTourType() {
@@ -532,37 +584,64 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			}
 		}
 
-		// try to reselect the last tour type filter
-		reselectTourTypeFilter(selectTourTypeFilter);
+		// try to reselect the last person
+		reselectTourType(selectTourTypeFilter);
 	}
 
 	/**
-	 * reselect the tour type in the combo box and set the active tour type in the plugin activator
+	 * reselect the tour type in the combo box and set the active tour type in the plugin
 	 * 
 	 * @param tourTypeFilter
 	 */
-	private void reselectTourTypeFilter(final TourTypeFilter selectTourTypeFilter) {
+	private void reselectTourType(final TourTypeFilter selectTourTypeFilter) {
 
-		TourTypeFilter reselectedTourTypeFilter = _actionTourTypeDropDown.reselectTourTypeFilter(selectTourTypeFilter);
+		final String selectedFilterName = selectTourTypeFilter.getFilterName();
+		TourTypeFilter activeTourTypeFilter = null;
 
-		if (reselectedTourTypeFilter == null) {
-			reselectedTourTypeFilter = _tourTypeFilters.get(0);
+		// find the tour type filter in the combobox
+		for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
+			if (tourTypeFilter.getFilterName().equals(selectedFilterName)) {
+				activeTourTypeFilter = tourTypeFilter;
+				_tourTypeComboViewer.setSelection(new StructuredSelection(activeTourTypeFilter), true);
+				break;
+			}
 		}
 
-		TourbookPlugin.setActiveTourTypeFilter(reselectedTourTypeFilter);
-	}
+		if (activeTourTypeFilter == null) {
+			// filter was not found, set first filter as active filter
+			activeTourTypeFilter = _tourTypeFilters.get(0);
+			_tourTypeComboViewer.setSelection(new StructuredSelection(activeTourTypeFilter), true);
+		}
 
-	private void retrieveTourTypeFilter() {
-
-		_tourTypeFilters = retrieveTourTypeFilters();
-
-		_actionTourTypeDropDown.updateActions(_tourTypeFilters);
+		TourbookPlugin.setActiveTourTypeFilter(activeTourTypeFilter);
 	}
 
 	void saveState(final IMemento memento) {
 
-		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+		TourTypeFilter selectedTourTypeFilter = getSelectedTourTypeFilter();
 
-		_state.put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER, activeTourTypeFilter.getFilterName());
+		_state.put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER, selectedTourTypeFilter.getFilterName());
+	}
+
+	private TourTypeFilter getSelectedTourTypeFilter() {
+
+		StructuredSelection selection = (StructuredSelection) _tourTypeComboViewer.getSelection();
+		TourTypeFilter selectedTourTypeFilter = (TourTypeFilter) selection.getFirstElement();
+
+		return selectedTourTypeFilter;
+	}
+
+	/**
+	 * set the selected tour type
+	 */
+	private void setActiveTourTypeFilter() {
+
+		TourTypeFilter selectedTourTypeFilter = getSelectedTourTypeFilter();
+
+		if (selectedTourTypeFilter == null) {
+			selectedTourTypeFilter = _tourTypeFilters.get(0);
+		}
+
+		TourbookPlugin.setActiveTourTypeFilter(selectedTourTypeFilter);
 	}
 }

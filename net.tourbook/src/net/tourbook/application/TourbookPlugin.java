@@ -62,10 +62,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	/**
 	 * The constructor.
 	 */
-	public TourbookPlugin() {
-//		super();
-//		_instance = this;
-	}
+	public TourbookPlugin() {}
 
 	/**
 	 * @return Returns the active selected person or <code>null</code> when no person is selected
@@ -74,6 +71,9 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return _activePerson;
 	}
 
+	/**
+	 * @return Returns {@link TourTypeFilter} which is currently selected in the UI
+	 */
 	public static TourTypeFilter getActiveTourTypeFilter() {
 		return _activeTourTypeFilter;
 	}

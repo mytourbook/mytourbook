@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+
 /**
  * Contains a filter for tour types
  */
@@ -89,6 +91,34 @@ public class TourTypeFilter {
 	public TourTypeFilter(final TourTypeFilterSet filterSet) {
 		_filterType = FILTER_TYPE_TOURTYPE_SET;
 		_tourTypeSet = filterSet;
+	}
+
+	public static ImageDescriptor getFilterImageDescriptor(final TourTypeFilter filter) {
+
+		final int filterType = filter.getFilterType();
+
+		ImageDescriptor filterImageDescriptor = null;
+
+		// set filter name/image
+		switch (filterType) {
+		case TourTypeFilter.FILTER_TYPE_DB:
+			final TourType tourType = filter.getTourType();
+			filterImageDescriptor = UI.getInstance().getTourTypeImageDescriptor(tourType.getTypeId());
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_SYSTEM:
+			filterImageDescriptor = UI.IMAGE_REGISTRY.getDescriptor(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+			filterImageDescriptor = UI.IMAGE_REGISTRY.getDescriptor(UI.IMAGE_TOUR_TYPE_FILTER);
+			break;
+
+		default:
+			break;
+		}
+
+		return filterImageDescriptor;
 	}
 
 	public String getFilterName() {

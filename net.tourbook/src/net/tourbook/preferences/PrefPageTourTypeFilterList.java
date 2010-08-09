@@ -572,6 +572,8 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		// select next filter item
 		final int nextIndex = Math.min(filterTable.getItemCount() - 1, selectionIndex);
 		_filterViewer.setSelection(new StructuredSelection(_filterViewer.getElementAt(nextIndex)));
+
+		_isModified = true;
 	}
 
 	private void onMoveDown() {
@@ -773,7 +775,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 	private void updateViewers() {
 
-		_filterList = TourTypeContributionItem.getTourTypeFilters();
+		_filterList = TourTypeContributionItem.retrieveTourTypeFilters();
 		_tourTypes = TourDatabase.getAllTourTypes();
 
 		// show contents in the viewers

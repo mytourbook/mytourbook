@@ -18,8 +18,14 @@ package net.tourbook.ui;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -31,7 +37,7 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class CustomControlContribution extends ContributionItem {
 
-//	private Image	image;
+	private Image	_image;
 
 	/**
 	 * Creates a control contribution item with the given id.
@@ -74,7 +80,7 @@ public abstract class CustomControlContribution extends ContributionItem {
 
 	@Override
 	public void dispose() {
-//		image.dispose();
+		_image.dispose();
 	}
 
 	/**
@@ -107,18 +113,24 @@ public abstract class CustomControlContribution extends ContributionItem {
 
 		final Control control = createControl(toolbar);
 
-		final ToolItem ti = new ToolItem(toolbar, SWT.SEPARATOR);
-		ti.setControl(control);
-		ti.setWidth(computeWidth(control));
+		final Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
-//		// create dummy item to force the height
-//		final int height = control.getSize().y;
+		final ToolItem toolItem = new ToolItem(toolbar, SWT.SEPARATOR);
+		toolItem.setControl(control);
+		toolItem.setWidth(size.x);
+
+//		System.out.println("size\t" + size.y);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+//		int height = control.getSize().y;
+
+		final ImageData imageData = new ImageData(1, size.y, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
 //		final ImageData imageData = new ImageData(1, height, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
-//		imageData.transparentPixel = 0;
-//		image = new Image(Display.getCurrent(), imageData);
-//
-//		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
-//		imageItem.setImage(image);
+		imageData.transparentPixel = 0;
+		_image = new Image(Display.getCurrent(), imageData);
+
+		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
+		imageItem.setImage(_image);
 	}
 
 }

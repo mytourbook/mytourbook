@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -36,15 +36,15 @@ import org.eclipse.swt.widgets.Widget;
 
 public class ActionChartOptions extends Action implements IMenuCreator {
 
-	private Menu		fMenu	= null;
+	private Menu		_menu	= null;
 
-	private TourChart	fTourChart;
+	private TourChart	_tourChart;
 
 	public ActionChartOptions(final TourChart tourChart) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
-		fTourChart = tourChart;
+		_tourChart = tourChart;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
@@ -54,30 +54,30 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	private void addItem(final Action action) {
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
 	public Menu getMenu(final Control parent) {
 
-		final Map<String, TCActionProxy> actionProxies = fTourChart.getActionProxies();
+		final Map<String, TCActionProxy> actionProxies = _tourChart.getActionProxies();
 
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_SRTM_DATA).getAction());
-		(new Separator()).fill(fMenu, -1);
+		(new Separator()).fill(_menu, -1);
 
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
 
-		return fMenu;
+		return _menu;
 	}
 
 	public Menu getMenu(final Menu parent) {
@@ -104,7 +104,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 					final Rectangle toolItemBounds = toolItem.getBounds();
 					Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
 					topLeft = toolBar.toDisplay(topLeft);
-					
+
 					menu.setLocation(topLeft.x, topLeft.y);
 					menu.setVisible(true);
 				}

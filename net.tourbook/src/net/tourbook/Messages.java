@@ -70,6 +70,8 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
 
+	public static String	Action_TourType_ModifyTourTypeFilter;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 
