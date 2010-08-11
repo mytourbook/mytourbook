@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourTypeFilterManager;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -254,7 +255,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	public IStatus saveState(final IMemento memento) {
 
 		_personSelector.saveState(memento);
-		_tourTypeSelector.saveState(memento);
+		TourTypeFilterManager.saveState(memento);
 
 		return super.saveState(memento);
 	}

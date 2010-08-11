@@ -42,6 +42,7 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui.action,
  net.tourbook.ui.tourChart
 Import-Package: com.enterprisedt.net.ftp,
+ net.tourbook.application,
  net.tourbook.export,
  net.tourbook.printing,
  net.tourbook.util,

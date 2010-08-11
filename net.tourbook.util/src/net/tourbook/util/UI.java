@@ -22,8 +22,12 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 
 public class UI {
@@ -76,6 +80,26 @@ public class UI {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Opens the menu for a control aligned below the control on the left side
+	 * 
+	 * @param control
+	 *            Controls which menu is opened
+	 */
+	public static void openControlMenu(final Control control) {
+
+		final Rectangle rect = control.getBounds();
+		Point pt = new Point(rect.x, rect.y + rect.height);
+		pt = control.getParent().toDisplay(pt);
+
+		final Menu contextMenu = control.getMenu();
+
+		if (contextMenu != null && contextMenu.isDisposed() == false) {
+			contextMenu.setLocation(pt.x, pt.y);
+			contextMenu.setVisible(true);
+		}
 	}
 
 	public static VerifyListener verifyFilenameInput() {
@@ -165,4 +189,5 @@ public class UI {
 			}
 		};
 	}
+
 }

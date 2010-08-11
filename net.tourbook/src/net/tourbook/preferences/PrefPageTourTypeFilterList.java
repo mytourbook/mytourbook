@@ -18,10 +18,10 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourTypeContributionItem;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 import net.tourbook.ui.UI;
@@ -304,7 +304,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 					}
 
 					public void dragSetData(final DragSourceEvent event) {
-					// data are set in LocalSelectionTransfer
+						// data are set in LocalSelectionTransfer
 					}
 
 					public void dragStart(final DragSourceEvent event) {
@@ -766,7 +766,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 			_isModified = false;
 
-			TourTypeContributionItem.writeXMLFilterFile(_filterViewer);
+			TourTypeFilterManager.writeXMLFilterFile(_filterViewer);
 
 			// fire modify event
 			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
@@ -775,7 +775,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 	private void updateViewers() {
 
-		_filterList = TourTypeContributionItem.retrieveTourTypeFilters();
+		_filterList = TourTypeFilterManager.readTourTypeFilters();
 		_tourTypes = TourDatabase.getAllTourTypes();
 
 		// show contents in the viewers

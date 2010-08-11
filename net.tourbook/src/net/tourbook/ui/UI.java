@@ -58,8 +58,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -67,7 +65,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -824,26 +821,6 @@ public class UI {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Opens the menu for a control aligned below the control on the left side
-	 * 
-	 * @param control
-	 *            Controls which menu is opened
-	 */
-	public static void openControlMenu(final Control control) {
-
-		final Rectangle rect = control.getBounds();
-		Point pt = new Point(rect.x, rect.y + rect.height);
-		pt = control.getParent().toDisplay(pt);
-
-		final Menu contextMenu = control.getMenu();
-
-		if (contextMenu != null && contextMenu.isDisposed() == false) {
-			contextMenu.setLocation(pt.x, pt.y);
-			contextMenu.setVisible(true);
-		}
 	}
 
 	public static void restoreCombo(final Combo combo, final String[] comboItems) {

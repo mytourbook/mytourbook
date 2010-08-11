@@ -224,7 +224,7 @@ public class DialogSplitTourOLD extends TitleAreaDialog {
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					UI.openControlMenu(_linkTourType);
+					net.tourbook.util.UI.openControlMenu(_linkTourType);
 				}
 			});
 

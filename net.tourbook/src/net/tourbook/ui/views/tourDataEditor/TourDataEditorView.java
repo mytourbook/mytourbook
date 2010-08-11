@@ -3029,7 +3029,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_linkTag.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					UI.openControlMenu(_linkTag);
+					net.tourbook.util.UI.openControlMenu(_linkTag);
 				}
 			});
 			_tk.adapt(_linkTag, true, true);
@@ -3051,7 +3051,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					UI.openControlMenu(_linkTourType);
+					net.tourbook.util.UI.openControlMenu(_linkTourType);
 				}
 			});
 			_tk.adapt(_linkTourType, true, true);

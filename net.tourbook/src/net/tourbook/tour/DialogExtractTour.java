@@ -601,7 +601,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					UI.openControlMenu(_linkTourType);
+					net.tourbook.util.UI.openControlMenu(_linkTourType);
 				}
 			});
 
@@ -620,7 +620,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_linkTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_linkTag);
+				net.tourbook.util.UI.openControlMenu(_linkTag);
 			}
 		});
 
