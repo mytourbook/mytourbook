@@ -46,6 +46,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.TableViewer;
@@ -60,6 +61,7 @@ import org.w3c.dom.Element;
 public class TourTypeFilterManager {
 
 	private static final String										TAG_NAME					= "name";									//$NON-NLS-1$
+
 	private static final String										TAG_FILTER_TYPE				= "filterType";							//$NON-NLS-1$
 	private static final String										TAG_SYSTEM_ID				= "systemId";								//$NON-NLS-1$
 	private static final String										TAG_TOUR_TYPE_ID			= "tourTypeId";							//$NON-NLS-1$
@@ -99,26 +101,21 @@ public class TourTypeFilterManager {
 	 */
 	private static ActionTTFilter									_selectedFilterAction;
 
-	static {
-
-		addPrefListener();
-
-		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-				Messages.Action_TourType_ModifyTourTypeFilter,
-				ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
-	}
-
 	private static class ActionTTFilter extends Action {
 
 		private TourTypeFilter	__ttFilter;
+		private ImageDescriptor	__filterImageDescriptor;
 
 		public ActionTTFilter(final TourTypeFilter ttFilter) {
 
-			super(ttFilter.getFilterName(), AS_CHECK_BOX);
+			/*
+			 * push button is used to see the icon in linux, checkbox will hide the image in ubuntu
+			 * 10.4
+			 */
+			super(ttFilter.getFilterName(), AS_PUSH_BUTTON);
 
 			__ttFilter = ttFilter;
-
-			setImageDescriptor(TourTypeFilter.getFilterImageDescriptor(ttFilter));
+			__filterImageDescriptor = TourTypeFilter.getFilterImageDescriptor(ttFilter);
 		}
 
 		@Override
@@ -128,6 +125,15 @@ public class TourTypeFilterManager {
 
 			_tourTypeContributionItem.updateUI(__ttFilter);
 		}
+	}
+
+	static {
+
+		addPrefListener();
+
+		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.Action_TourType_ModifyTourTypeFilter,
+				ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
 	}
 
 	public TourTypeFilterManager() {}
@@ -177,7 +183,13 @@ public class TourTypeFilterManager {
 		for (final ActionTTFilter ttFilterAction : _ttFilterActions) {
 
 			// check filter which is currently selected in the UI
-			ttFilterAction.setChecked(activeTTFilter == ttFilterAction.__ttFilter);
+			final boolean isChecked = activeTTFilter == ttFilterAction.__ttFilter;
+
+			ttFilterAction.setChecked(isChecked);
+			ttFilterAction.setEnabled(isChecked == false);
+
+			ttFilterAction.setText(ttFilterAction.__ttFilter.getFilterName());
+			ttFilterAction.setImageDescriptor(isChecked ? null : ttFilterAction.__filterImageDescriptor);
 
 			menuMgr.add(ttFilterAction);
 		}
@@ -534,6 +546,7 @@ public class TourTypeFilterManager {
 		 * displayed
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// fire change event

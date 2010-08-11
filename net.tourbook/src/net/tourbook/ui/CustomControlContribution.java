@@ -18,9 +18,14 @@ package net.tourbook.ui;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -32,7 +37,7 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class CustomControlContribution extends ContributionItem {
 
-//	private Image	_image;
+	private Image	_image;
 
 	/**
 	 * Creates a control contribution item with the given id.
@@ -75,7 +80,7 @@ public abstract class CustomControlContribution extends ContributionItem {
 
 	@Override
 	public void dispose() {
-//		_image.dispose();
+		_image.dispose();
 	}
 
 	/**
@@ -106,26 +111,85 @@ public abstract class CustomControlContribution extends ContributionItem {
 	@Override
 	public final void fill(final ToolBar toolbar, final int index) {
 
-		final Control control = createControl(toolbar);
+		// toolbar is currently (10.7) two times created
+		if (_image != null) {
+			_image.dispose();
+			_image = null;
+		}
 
-		final Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		final Control control = createControl(toolbar);
+		final Point controlSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
 		final ToolItem toolItem = new ToolItem(toolbar, SWT.SEPARATOR);
 		toolItem.setControl(control);
-		toolItem.setWidth(size.x);
+		toolItem.setWidth(controlSize.x);
 
+//		Point textSize = null;
+//
+//		final GC gc = new GC(toolbar);
+//		{
+//			textSize = gc.textExtent("M");
+//		}
+//		gc.dispose();
+
+//		final ImageData imageData = new ImageData(1, controlSize.y, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+//		final ImageData imageData = new ImageData(1, 1, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+		final ImageData imageData = new ImageData(1, //
+				//
+//				textSize.y + 10,
+				controlSize.y,
+				1,
+				new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+		imageData.transparentPixel = 0;
+		_image = new Image(Display.getCurrent(), imageData);
+
+		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
+		imageItem.setImage(_image);
+	}
+
+//	/**
+//	 * The control item implementation of this <code>IContributionItem</code> method calls the
+//	 * <code>createControl</code> framework method to create a control under the given parent, and
+//	 * then creates a new tool item to hold it. Subclasses must implement <code>createControl</code>
+//	 * rather than overriding this method.
+//	 */
+//	public final void fillOLD(final ToolBar toolbar, final int index) {
+//
+//		final Control control = createControl(toolbar);
+//		final Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+//
+//		ToolItem toolItem = new ToolItem(toolbar, SWT.SEPARATOR);
+//		toolItem.setControl(control);
+//		toolItem.setWidth(size.x);
+//
+//		/*
+//		 * dummy combo to get the height
+//		 */
+//		final Combo combo = new Combo(toolbar, SWT.NONE);
+//		combo.add("dummy");
+//
+//		toolItem = new ToolItem(toolbar, SWT.SEPARATOR);
+//		toolItem.setControl(combo);
+//		toolItem.setWidth(50);
+//
+//		final Point comboSize = combo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+//
+////		System.out.println(size.y + " # " + comboSize.y);
+////// TODO remove SYSTEM.OUT.PRINTLN
+//
 ////		System.out.println("size\t" + size.y);
 ////		// TODO remove SYSTEM.OUT.PRINTLN
 //
 ////		int height = control.getSize().y;
 //
-//		final ImageData imageData = new ImageData(1, size.y, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+////		final ImageData imageData = new ImageData(1, 16, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
+//		final ImageData imageData = new ImageData(1, comboSize.y, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
 ////		final ImageData imageData = new ImageData(1, height, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
 //		imageData.transparentPixel = 0;
 //		_image = new Image(Display.getCurrent(), imageData);
 //
 //		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
 //		imageItem.setImage(_image);
-	}
+//	}
 
 }

@@ -23,11 +23,15 @@ import net.tourbook.util.UI;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -40,6 +44,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private static final String	ID	= "net.tourbook.tourtypefilter";	//$NON-NLS-1$
 
 	private Button				_btnTTFilter;
+
+	private Point				_textSize;
 
 	public TourTypeContributionItem() {
 		this(ID);
@@ -56,6 +62,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			return new Label(parent, SWT.NONE);
 		}
 
+		final GC gc = new GC(parent);
+		{
+			_textSize = gc.textExtent("0123456789");
+		}
+		gc.dispose();
+
 		Control returnControl;
 
 		if (UI.IS_OSX) {
@@ -64,22 +76,28 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		} else {
 
-//			/*
-//			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
-//			 * composite removes the pixels
-//			 */
-//			final Composite container = new Composite(parent, SWT.NONE);
-//			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
+			/*
+			 * on win32/linux a few pixel above and below the combobox are drawn, wrapping it into a
+			 * composite removes the pixels
+			 */
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-//			{
-//				final Control uiControl = createUI(container);
-//				uiControl.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
-//			}
-//
-//			returnControl = container;
+			{
+				final Control uiControl = createUI(container);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(false, true)
+						.hint(_textSize.x, SWT.DEFAULT)
+						.applyTo(uiControl);
+			}
 
-			returnControl = createUI(parent);
+			returnControl = container;
+
+//			returnControl = createUI(parent);
 		}
+
+//		_btnTTFilter.setSize(textSize);
 
 		TourTypeFilterManager.reselectLastTourTypeFilter(this);
 
@@ -88,9 +106,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private Control createUI(final Composite parent) {
 
-		_btnTTFilter = new Button(parent, SWT.FLAT | SWT.LEFT);
-
-		_btnTTFilter.setSize(100, _btnTTFilter.getSize().x);
+		_btnTTFilter = new Button(parent, SWT.PUSH /* | SWT.FLAT */| SWT.LEAD);
 
 		_btnTTFilter.addMouseWheelListener(new MouseWheelListener() {
 			@Override
@@ -112,6 +128,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				// set menu items
@@ -129,10 +146,15 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	public void updateUI(final TourTypeFilter ttFilter) {
 
-		_btnTTFilter.setText(ttFilter.getFilterName());
-		_btnTTFilter.setToolTipText(ttFilter.getFilterName());
+		final String filterName = ttFilter.getFilterName();
+		final String shortFilterName = UI.shortenText(filterName, //
+				_btnTTFilter,
+//				_textSize.x - 16 - 5 - 5,
+				_textSize.x - 16 - 5 - 5,
+				true);
 
+		_btnTTFilter.setText(shortFilterName);
+		_btnTTFilter.setToolTipText(filterName);
 		_btnTTFilter.setImage(TourTypeFilter.getFilterImage(ttFilter));
 	}
-
 }

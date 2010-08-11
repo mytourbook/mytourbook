@@ -61,9 +61,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction					_actionEditActionSets;
 
 	PersonContributionItem						_personSelector;
-	TourTypeContributionItem					_tourTypeSelector;
+	private TourTypeContributionItem			_tourTypeSelector;
 	private MeasurementSystemContributionItem	_measurementSelector;
-
+ 
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
 	}
@@ -169,34 +169,32 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmPeople.add(_personSelector);
 
-		coolBar.add(new ToolBarContributionItem(tbmPeople, "people")); //$NON-NLS-1$
+		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbmPeople, "people");
+		coolBar.add(tbItemPeople);
 
 		// ---------------------------------------------------------
 
 		final IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmTourType.add(_tourTypeSelector);
 
-		coolBar.add(new ToolBarContributionItem(tbmTourType, "tourtype")); //$NON-NLS-1$
+		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbmTourType, "tourtype");
+		coolBar.add(tbItemTourType);
 
 		// ---------------------------------------------------------
 
-		if (TourbookPlugin.getDefault().getPreferenceStore().getBoolean(
-				ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
+		if (TourbookPlugin
+				.getDefault()
+				.getPreferenceStore()
+				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
 
 			final IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 			tbmSystem.add(_measurementSelector);
 
-			coolBar.add(new ToolBarContributionItem(tbmSystem, "measurementSystem")); //$NON-NLS-1$
+			final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
+					tbmSystem,
+					"measurementSystem");
+			coolBar.add(tbItemMeasurement);
 		}
-
-		// ---------------------------------------------------------
-
-//		final IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-//		tbmSave.add(fActionSave);
-//		tbmSave.add(fActionSaveAll);
-//
-//		coolBar.add(new ToolBarContributionItem(tbmSave, "save")); //$NON-NLS-1$
-
 	}
 
 	@Override
