@@ -19,10 +19,12 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.util.UI;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -31,21 +33,40 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
-
+ 
 public class TourTypeContributionItem extends CustomControlContribution {
 
-	private static final String	ID	= "net.tourbook.tourtypefilter";	//$NON-NLS-1$
+	private static final String		ID							= "net.tourbook.tourTypeFilter";		//$NON-NLS-1$
 
-	private Button				_btnTTFilter;
+	public static final String		STATE_IS_SHOW_FILTER_TEXT	= "";									//$NON-NLS-1$
+	public static final String		STATE_TEXT_LENGTH_IN_CHAR	= "";									//$NON-NLS-1$
 
-	private Point				_textSize;
+	private final IDialogSettings	_state						= TourbookPlugin.getDefault() //
+																		.getDialogSettingsSection(ID);
+
+	private ToolItem				_tourTypeDropDown;
+
+	private int						_textWidth;
+
+	private ToolBar					_tourTypeToolBar;
+
+	private boolean					_isUpdating;
+
+	private boolean					_isShowText					= Util.getStateBoolean(
+																		_state,
+																		STATE_IS_SHOW_FILTER_TEXT,
+																		false);
+	private int						_textLengthInChar			= Util.getStateInt(
+																		_state,
+																		STATE_TEXT_LENGTH_IN_CHAR,
+																		15);
 
 	public TourTypeContributionItem() {
 		this(ID);
@@ -64,7 +85,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		final GC gc = new GC(parent);
 		{
-			_textSize = gc.textExtent("0123456789");
+			_textWidth = gc.getFontMetrics().getAverageCharWidth() * _textLengthInChar;
 		}
 		gc.dispose();
 
@@ -85,19 +106,25 @@ public class TourTypeContributionItem extends CustomControlContribution {
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
 				final Control uiControl = createUI(container);
-				GridDataFactory.fillDefaults() //
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(false, true)
-						.hint(_textSize.x, SWT.DEFAULT)
-						.applyTo(uiControl);
+
+				if (_isShowText) {
+					GridDataFactory.fillDefaults() //
+							.align(SWT.FILL, SWT.CENTER)
+							.grab(false, true)
+							.hint(_textWidth + 16 + 10, SWT.DEFAULT)
+							.applyTo(uiControl);
+				} else {
+					GridDataFactory.fillDefaults() //
+							.align(SWT.FILL, SWT.CENTER)
+							.grab(false, true)
+							.applyTo(uiControl);
+				}
 			}
 
 			returnControl = container;
 
 //			returnControl = createUI(parent);
 		}
-
-//		_btnTTFilter.setSize(textSize);
 
 		TourTypeFilterManager.reselectLastTourTypeFilter(this);
 
@@ -106,23 +133,31 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private Control createUI(final Composite parent) {
 
-		_btnTTFilter = new Button(parent, SWT.PUSH /* | SWT.FLAT */| SWT.LEAD);
+		/*
+		 * tour type filter toolbar which contains a drop down tooltitem button
+		 */
+		_tourTypeToolBar = new ToolBar(parent, SWT.FLAT | SWT.RIGHT);
+//		_tourTypeToolBar.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		_btnTTFilter.addMouseWheelListener(new MouseWheelListener() {
+		_tourTypeDropDown = new ToolItem(_tourTypeToolBar, SWT.DROP_DOWN);
+
+		_tourTypeDropDown.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				final ToolBar control = _tourTypeDropDown.getParent();
+				UI.openControlMenu(control);
+			}
+		});
+
+		_tourTypeToolBar.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				TourTypeFilterManager.selectNextFilter(event.count < 0);
 			}
 		});
-		_btnTTFilter.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_btnTTFilter);
-			}
-		});
 
 		/*
-		 * tour type menu
+		 * create tour type context menu
 		 */
 		final MenuManager menuMgr = new MenuManager();
 
@@ -137,24 +172,33 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			}
 		});
 
-		// set menu for the tag item
-		final Menu contextMenu = menuMgr.createContextMenu(_btnTTFilter);
-		_btnTTFilter.setMenu(contextMenu);
+		// set menu for the toolbar, drop down tool item do not contain a control
+		final Menu contextMenu = menuMgr.createContextMenu(_tourTypeToolBar);
+		_tourTypeToolBar.setMenu(contextMenu);
 
-		return _btnTTFilter;
+		return _tourTypeToolBar;
 	}
 
 	public void updateUI(final TourTypeFilter ttFilter) {
 
-		final String filterName = ttFilter.getFilterName();
-		final String shortFilterName = UI.shortenText(filterName, //
-				_btnTTFilter,
-//				_textSize.x - 16 - 5 - 5,
-				_textSize.x - 16 - 5 - 5,
-				true);
+		// prevent endless loops, during testing/debugging the toolbar was disposed
+		if (_isUpdating || _tourTypeToolBar.isDisposed()) {
+			return;
+		}
 
-		_btnTTFilter.setText(shortFilterName);
-		_btnTTFilter.setToolTipText(filterName);
-		_btnTTFilter.setImage(TourTypeFilter.getFilterImage(ttFilter));
+		final String filterName = ttFilter.getFilterName();
+
+		if (_isShowText) {
+
+			final String shortFilterName = UI.shortenText(filterName, //
+					_tourTypeToolBar,
+					_textWidth - 16 - 10,
+					true);
+
+			_tourTypeDropDown.setText(shortFilterName);
+		}
+
+		_tourTypeDropDown.setToolTipText(filterName);
+		_tourTypeDropDown.setImage(TourTypeFilter.getFilterImage(ttFilter));
 	}
 }
