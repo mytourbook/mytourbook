@@ -42,8 +42,11 @@ import net.tourbook.ui.action.ActionOpenPrefDialog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -94,38 +97,16 @@ public class TourTypeFilterManager {
 	private static double											_propertyValue;
 
 	private static ActionOpenPrefDialog								_actionOpenTourTypePrefs;
-	private static TourTypeContributionItem							_tourTypeContributionItem;
 
 	/**
-	 * contains the filter which is currently selected
+	 * contains the action for the filter which is currently selected
 	 */
 	private static ActionTTFilter									_selectedFilterAction;
 
-	private static class ActionTTFilter extends Action {
-
-		private TourTypeFilter	__ttFilter;
-		private ImageDescriptor	__filterImageDescriptor;
-
-		public ActionTTFilter(final TourTypeFilter ttFilter) {
-
-			/*
-			 * push button is used to see the icon in linux, checkbox will hide the image in ubuntu
-			 * 10.4
-			 */
-			super(ttFilter.getFilterName(), AS_PUSH_BUTTON);
-
-			__ttFilter = ttFilter;
-			__filterImageDescriptor = TourTypeFilter.getFilterImageDescriptor(ttFilter);
-		}
-
-		@Override
-		public void run() {
-
-			setActiveTourTypeFilter(__ttFilter);
-
-			_tourTypeContributionItem.updateUI(__ttFilter);
-		}
-	}
+	private static ICoolBarManager									_coolBar;
+	private static IToolBarManager									_tbMgrTourType;
+	private static ToolBarContributionItem							_tbItemTourType;
+	private static TourTypeContributionItem							_tourTypeContribItem;
 
 	static {
 
@@ -136,10 +117,44 @@ public class TourTypeFilterManager {
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
 	}
 
+	private static class ActionTTFilter extends Action {
+
+		private TourTypeFilter	__ttFilter;
+		private ImageDescriptor	__filterImageDescriptor;
+
+		public ActionTTFilter(final TourTypeFilter ttFilter) {
+
+			/*
+			 * push button is used to see the image in a menu item in linux but a checkbox hides the
+			 * image in ubuntu 10.4 therefore the check box is not used an the selected filter is
+			 * marked in another way
+			 */
+			super(ttFilter.getFilterName(), AS_PUSH_BUTTON);
+
+			__ttFilter = ttFilter;
+			__filterImageDescriptor = TourTypeFilter.getFilterImageDescriptor(ttFilter);
+		}
+
+		@Override
+		public void run() {
+
+			_selectedFilterAction = this;
+
+			setActiveTourTypeFilter(__ttFilter);
+
+			_tourTypeContribItem.updateUI(__ttFilter);
+		}
+
+		@Override
+		public String toString() {
+			return __ttFilter.toString();
+		}
+	}
+
 	public TourTypeFilterManager() {}
 
 	/**
-	 * listen for changes in the person list
+	 * listen for changes in the tour type
 	 */
 	private static void addPrefListener() {
 
@@ -188,8 +203,13 @@ public class TourTypeFilterManager {
 			ttFilterAction.setChecked(isChecked);
 			ttFilterAction.setEnabled(isChecked == false);
 
-			ttFilterAction.setText(ttFilterAction.__ttFilter.getFilterName());
+			final String filterName = (isChecked ? "\u25cf   " : "     ") + ttFilterAction.__ttFilter.getFilterName();
+//			final String filterName = (isChecked ? "" : "    ") + ttFilterAction.__ttFilter.getFilterName();
+			ttFilterAction.setText(filterName);
+
+			// disabled filter image is hidden because it look ugly on win32
 			ttFilterAction.setImageDescriptor(isChecked ? null : ttFilterAction.__filterImageDescriptor);
+//			ttFilterAction.setImageDescriptor(ttFilterAction.__filterImageDescriptor);
 
 			menuMgr.add(ttFilterAction);
 		}
@@ -418,9 +438,7 @@ public class TourTypeFilterManager {
 		return filterList;
 	}
 
-	public static void reselectLastTourTypeFilter(final TourTypeContributionItem tourTypeContributionItem) {
-
-		_tourTypeContributionItem = tourTypeContributionItem;
+	public static void restoreTourTypeFilter() {
 
 		final ArrayList<TourTypeFilter> tourTypeFilters = getTourTypeFilters();
 
@@ -468,10 +486,12 @@ public class TourTypeFilterManager {
 	 * @param isNext
 	 *            is <code>true</code> when the next filter should be selected, is
 	 *            <code>false</code> when the previous filter should be selected
+	 * @return Returns <code>true</code> when a new filter is selected
 	 */
-	public static void selectNextFilter(final boolean isNext) {
+	public static boolean selectNextFilter(final boolean isNext) {
 
 		int selectedFilterIndex = 0;
+
 
 		// get filter which is currently selected
 		for (final ActionTTFilter filterAction : _ttFilterActions) {
@@ -494,7 +514,12 @@ public class TourTypeFilterManager {
 			// select previous filter
 
 			selectTourTypeFilter(_tourTypeFilters.get(--selectedFilterIndex));
+
+		} else {
+			return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -530,7 +555,7 @@ public class TourTypeFilterManager {
 
 		final TourTypeFilter selectedFilter = selectedTTFilterAction.__ttFilter;
 
-		_tourTypeContributionItem.updateUI(selectedFilter);
+		_tourTypeContribItem.updateUI(selectedFilter);
 
 		setActiveTourTypeFilter(selectedFilter);
 
@@ -542,8 +567,7 @@ public class TourTypeFilterManager {
 		TourbookPlugin.setActiveTourTypeFilter(ttFilter);
 
 		/*
-		 * fire in an asynch that the combo box drop down is hidden and the combo text ist
-		 * displayed
+		 * fire in an asynch that the combo box drop down is hidden and the combo text ist displayed
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
@@ -554,6 +578,17 @@ public class TourTypeFilterManager {
 				_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
 			}
 		});
+	}
+
+	public static void setToolBarContribItem(	final ICoolBarManager coolBar,
+												final IToolBarManager tbMgrTourType,
+												final ToolBarContributionItem tbItemTourType,
+												final TourTypeContributionItem tourTypeContribItem) {
+
+		_coolBar = coolBar;
+		_tbMgrTourType = tbMgrTourType;
+		_tbItemTourType = tbItemTourType;
+		_tourTypeContribItem = tourTypeContribItem;
 	}
 
 	private static void updateTourTypeFilter() {

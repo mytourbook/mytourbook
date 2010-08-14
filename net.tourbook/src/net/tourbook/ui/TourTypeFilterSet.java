@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *   
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -21,7 +21,7 @@ import net.tourbook.data.TourType;
 
 public class TourTypeFilterSet {
 
-	private String		_nName;
+	private String		_name;
 
 	/**
 	 * contains the tour types {@link TourType} for this filter
@@ -29,7 +29,7 @@ public class TourTypeFilterSet {
 	private Object[]	_tourTypes;
 
 	public String getName() {
-		return _nName;
+		return _name;
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class TourTypeFilterSet {
 	}
 
 	public void setName(final String name) {
-		this._nName = name;
+		_name = name;
 	}
 
 	/**
@@ -54,6 +54,6 @@ public class TourTypeFilterSet {
 
 	@Override
 	public String toString() {
-		return "TourTypeFilterSet [Name=" + _nName + ", TourTypes=" + Arrays.toString(_tourTypes) + "]";
+		return "TourTypeFilterSet [Name=" + _name + ", TourTypes=" + Arrays.toString(_tourTypes) + "]";
 	}
 }

@@ -60,10 +60,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction					_actionCloseAllPerspective;
 	private IWorkbenchAction					_actionEditActionSets;
 
-	PersonContributionItem						_personSelector;
-	private TourTypeContributionItem			_tourTypeSelector;
-	private MeasurementSystemContributionItem	_measurementSelector;
- 
+	PersonContributionItem						_personContribItem;
+	private TourTypeContributionItem			_tourTypeContribItem;
+	private MeasurementSystemContributionItem	_measurementContribItem;
+
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
 	}
@@ -166,35 +166,40 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	@Override
 	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
-		final IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmPeople.add(_personSelector);
+		final IToolBarManager tbMgrPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbMgrPeople.add(_personContribItem);
 
-		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbmPeople, "people");
+		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgrPeople, "people");
 		coolBar.add(tbItemPeople);
 
 		// ---------------------------------------------------------
 
-		final IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmTourType.add(_tourTypeSelector);
+		final IToolBarManager tbMgrTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgrTourType, "tourtype");
 
-		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbmTourType, "tourtype");
 		coolBar.add(tbItemTourType);
+		tbMgrTourType.add(_tourTypeContribItem);
 
 		// ---------------------------------------------------------
 
-		if (TourbookPlugin
+		final boolean isShowMeasurement = TourbookPlugin
 				.getDefault()
 				.getPreferenceStore()
-				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
+				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
 
-			final IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			tbmSystem.add(_measurementSelector);
+		if (isShowMeasurement) {
+
+			final IToolBarManager tbMgrSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			tbMgrSystem.add(_measurementContribItem);
 
 			final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
-					tbmSystem,
+					tbMgrSystem,
 					"measurementSystem");
 			coolBar.add(tbItemMeasurement);
 		}
+
+		// this must be set after the coolbar is created, otherwise it stops populating the coolbar
+		TourTypeFilterManager.setToolBarContribItem(coolBar, tbMgrTourType, tbItemTourType, _tourTypeContribItem);
 	}
 
 	@Override
@@ -215,9 +220,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		_window = window;
 
-		_personSelector = new PersonContributionItem();
-		_tourTypeSelector = new TourTypeContributionItem();
-		_measurementSelector = new MeasurementSystemContributionItem();
+		_personContribItem = new PersonContributionItem();
+		_tourTypeContribItem = new TourTypeContributionItem();
+		_measurementContribItem = new MeasurementSystemContributionItem();
 
 		_actionQuit = ActionFactory.QUIT.create(window);
 		register(_actionQuit);
@@ -252,7 +257,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	@Override
 	public IStatus saveState(final IMemento memento) {
 
-		_personSelector.saveState(memento);
+		_personContribItem.saveState(memento);
 		TourTypeFilterManager.saveState(memento);
 
 		return super.saveState(memento);

@@ -164,60 +164,6 @@ public class TourTypeFilter {
 		return "?"; //$NON-NLS-1$
 	}
 
-//	/**
-//	 * @param tourTypeList
-//	 * @return Returns a list with all {@link TourType}'s which this filter contains.<br>
-//	 *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
-//	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
-//	 */
-//	public ArrayList<TourType> getActiveTourTypes(ArrayList<TourType> tourTypeList) {
-//
-//		ArrayList<TourType> returnList;
-//
-//		switch (fFilterType) {
-//		case FILTER_TYPE_SYSTEM:
-//			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
-//				return tourTypeList;
-//			} else {
-//				// tour type is not defined
-//				return new ArrayList<TourType>();
-//			}
-//
-//		case FILTER_TYPE_DB:
-//
-//			returnList = new ArrayList<TourType>();
-//			returnList.add(fTourType);
-//
-//			return returnList;
-//
-//		case FILTER_TYPE_TOURTYPE_SET:
-//
-//			final Object[] tourTypes = fTourTypeSet.getTourTypes();
-//
-//			if (tourTypes.length == 0) {
-//
-//				return null;
-//
-//			} else {
-//
-//				// select all tours were the tour type is defined in the tour type list
-//
-//				returnList = new ArrayList<TourType>();
-//
-//				for (Object item : tourTypes) {
-//					returnList.add((TourType) item);
-//				}
-//
-//				return returnList;
-//			}
-//
-//		default:
-//			break;
-//		}
-//
-//		return null;
-//	}
-
 	/**
 	 * @return Returns the filter type of this filter which is one of
 	 *         {@link TourTypeFilter#FILTER_TYPE_*}
@@ -346,7 +292,8 @@ public class TourTypeFilter {
 	@Override
 	public String toString() {
 		return "TourTypeFilter ["
-				+ ("filterType=" + _filterType)
+				+ ("name=" + getFilterName())
+				+ (", filterType=" + _filterType)
 				+ (", tourType=" + _tourType)
 				+ (", tourTypeSet=" + _tourTypeSet)
 				+ (", systemFilterName=" + _systemFilterName)

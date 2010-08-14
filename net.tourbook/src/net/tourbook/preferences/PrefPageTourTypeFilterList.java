@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,8 @@ import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -64,7 +66,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -127,93 +128,48 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
-	private void createButtons(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		container.setLayout(gl);
-
-		// button: new
-		_btnNew = new Button(container, SWT.NONE);
-		_btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
-		setButtonLayoutData(_btnNew);
-		_btnNew.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onNewFilterSet();
-			}
-		});
-
-		// button: rename
-		_btnRename = new Button(container, SWT.NONE);
-		_btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
-		setButtonLayoutData(_btnRename);
-		_btnRename.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onRenameFilterSet();
-			}
-		});
-
-		// button: delete
-		_btnRemove = new Button(container, SWT.NONE);
-		_btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
-		setButtonLayoutData(_btnRemove);
-		_btnRemove.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onDeleteFilterSet();
-			}
-		});
-
-		// spacer
-		new Label(container, SWT.NONE);
-
-		// button: up
-		_btnUp = new Button(container, SWT.NONE);
-		_btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
-		setButtonLayoutData(_btnUp);
-		_btnUp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onMoveUp();
-			}
-		});
-
-		// button: down
-		_btnDown = new Button(container, SWT.NONE);
-		_btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
-		setButtonLayoutData(_btnDown);
-		_btnDown.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onMoveDown();
-			}
-		});
-
-	}
-
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		final Composite viewerContainer = createUI(parent);
+		final Composite ui = createUI(parent);
 
 		addPrefListener();
 
 		updateViewers();
 
-		return viewerContainer;
+		return ui;
 	}
 
-	private void createFilterViewer(final Composite parent) {
+	private Composite createUI(final Composite parent) {
+
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Pref_TourTypes_root_title);
+		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			createUI10FilterViewer(container);
+			createUI20TourTypeViewer(container);
+			createUI30Buttons(container);
+		}
+
+		// hint to use drag & drop
+		label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Pref_TourTypes_dnd_hint);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+
+		// spacer
+		new Label(parent, SWT.WRAP);
+
+		return container;
+	}
+
+	private void createUI10FilterViewer(final Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.widthHint = 20;
-		layouter.setLayoutData(gd);
+		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
 
 		final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
 		table.setHeaderVisible(false);
@@ -418,12 +374,10 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				viewerDropAdapter);
 	}
 
-	private void createTourTypeViewer(final Composite parent) {
+	private void createUI20TourTypeViewer(final Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.widthHint = 20;
-		layouter.setLayoutData(gd);
+		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
 
 		final Table table = new Table(
 				layouter,
@@ -489,32 +443,70 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		});
 	}
 
-	private Composite createUI(final Composite parent) {
+	private void createUI30Buttons(final Composite parent) {
 
-		Label label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_root_title);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().margins(0, 0).applyTo(container);
+		{
+			// button: new
+			_btnNew = new Button(container, SWT.NONE);
+			_btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+			setButtonLayoutData(_btnNew);
+			_btnNew.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onNewFilterSet();
+				}
+			});
 
-		// container
-		final Composite viewerContainer = new Composite(parent, SWT.NONE);
-		final GridLayout gl = new GridLayout(3, false);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		viewerContainer.setLayout(gl);
-		viewerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			// button: rename
+			_btnRename = new Button(container, SWT.NONE);
+			_btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+			setButtonLayoutData(_btnRename);
+			_btnRename.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onRenameFilterSet();
+				}
+			});
 
-		createFilterViewer(viewerContainer);
-		createTourTypeViewer(viewerContainer);
-		createButtons(viewerContainer);
+			// button: delete
+			_btnRemove = new Button(container, SWT.NONE);
+			_btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
+			setButtonLayoutData(_btnRemove);
+			_btnRemove.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onDeleteFilterSet();
+				}
+			});
 
-		// hint to use drag & drop
-		label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_dnd_hint);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+			// spacer
+			new Label(container, SWT.NONE);
 
-		// spacer
-		new Label(parent, SWT.WRAP);
-		return viewerContainer;
+			// button: up
+			_btnUp = new Button(container, SWT.NONE);
+			_btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
+			setButtonLayoutData(_btnUp);
+			_btnUp.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onMoveUp();
+				}
+			});
+
+			// button: down
+			_btnDown = new Button(container, SWT.NONE);
+			_btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
+			setButtonLayoutData(_btnDown);
+			_btnDown.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onMoveDown();
+				}
+			});
+		}
 	}
 
 	@Override

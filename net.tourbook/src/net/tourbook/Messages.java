@@ -194,6 +194,8 @@ public class Messages extends NLS {
 	public static String		App_Tour_type_item_not_defined;
 	public static String		App_Tour_type_tooltip;
 
+	public static String	App_TourType_ToolTip;
+
 	public static String		App_Window_Title;
 
 	public static String		Compare_Result_Action_check_selected_tours;

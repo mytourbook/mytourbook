@@ -31,6 +31,7 @@ import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -40,6 +41,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -265,10 +267,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				// open raw data view
 				try {
-					getWindowConfigurer().getWindow().getActivePage().showView(
-							RawDataView.ID,
-							null,
-							IWorkbenchPage.VIEW_ACTIVATE);
+					getWindowConfigurer()
+							.getWindow()
+							.getActivePage()
+							.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 				} catch (final PartInitException e) {
 					e.printStackTrace();
 				}
@@ -277,7 +279,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			conn.close();
 
 			// select person/tour type which was selected in the last session
-			_applicationActionBarAdvisor._personSelector.fireEventNewPersonIsSelected();
+			_applicationActionBarAdvisor._personContribItem.fireEventNewPersonIsSelected();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -286,6 +288,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public void postWindowCreate() {
+
+//		System.out.println("postWindowCreate()\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// show editor area
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
@@ -299,7 +304,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void postWindowOpen() {
 
+//		System.out.println("postWindowOpen()\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		TagManager.restoreState();
+
 		TourTypeMenuManager.restoreState();
 
 		loadPeopleData();
@@ -357,6 +366,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		if (!newTitle.equals(oldTitle)) {
 			configurer.setTitle(newTitle);
 		}
+	}
+
+	@Override
+	public IStatus restoreState(final IMemento memento) {
+		return super.restoreState(memento);
 	}
 
 	/**
