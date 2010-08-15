@@ -256,14 +256,10 @@ public class StatisticContainer extends Composite {
 
 	private void createUI() {
 
-		final PixelConverter pc = new PixelConverter(this);
-
-		GridLayout gl;
-		gl = new GridLayout(1, false);
-		gl.marginWidth = 0;
-		gl.marginHeight = 0;
-		gl.verticalSpacing = 0;
-		setLayout(gl);
+ 		final PixelConverter pc = new PixelConverter(this);
+		final int yearComboWidth = net.tourbook.util.UI.IS_LINUX //
+				? pc.convertWidthInCharsToPixels(12)
+				: pc.convertWidthInCharsToPixels(5);
 
 		/*
 		 * container: statistic combo
@@ -272,16 +268,20 @@ public class StatisticContainer extends Composite {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_statContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(5)
-//				.extendedMargins(0, 0, 0, 0)
 				.spacing(0, 0)
 				.applyTo(_statContainer);
 //		_statContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			// combo: year
+			/*
+			 * combo: year
+			 */
 			_cboYear = new Combo(_statContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).applyTo(_cboYear);
+			GridDataFactory.fillDefaults()//
+// hint is working differently on platforms
+					.hint(yearComboWidth, SWT.DEFAULT)
+					.applyTo(_cboYear);
 			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-			_cboYear.setVisibleItemCount(20);
+			_cboYear.setVisibleItemCount(50);
 			_cboYear.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -319,7 +319,7 @@ public class StatisticContainer extends Composite {
 					.indent(15, 0)
 					.applyTo(_cboStatistics);
 			_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
-			_cboStatistics.setVisibleItemCount(20);
+			_cboStatistics.setVisibleItemCount(50);
 			_cboStatistics.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {

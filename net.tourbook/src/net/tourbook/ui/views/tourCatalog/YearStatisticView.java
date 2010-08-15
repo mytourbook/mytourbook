@@ -95,13 +95,35 @@ public class YearStatisticView extends ViewPart {
 		_nf.setMaximumFractionDigits(1);
 	}
 
-	/**
-	 * contains all {@link TVICatalogComparedTour} tour objects for all years
-	 */
-	private ArrayList<TVICatalogComparedTour>	_allTours;
+	private int[]								_displayedYears;
 
-	private int[]								_allYears;
-	private int									_latestYear					= new DateTime().getYear();
+	private int[]								_numberOfDaysInYear;
+
+	/**
+ 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
+	 */
+	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<TVICatalogComparedTour>();
+
+	/**
+	 * Years which the user can select as start year in the combo box
+	 */
+	private ArrayList<Integer>					_comboYears					= new ArrayList<Integer>();
+
+	/**
+	 * Day of year values for all displayed years<br>
+	 * DOY...Day Of Year
+	 */
+	private ArrayList<Integer>					_DOYValues					= new ArrayList<Integer>();
+
+	/**
+	 * Tour speed for all years
+	 */
+	private ArrayList<Integer>					_tourSpeed					= new ArrayList<Integer>();
+
+	/**
+	 * this is the last year (on the right side) which is displayed in the statistics
+	 */
+	private int									_lastYear					= new DateTime().getYear();
 
 	/**
 	 * year item for the visible statistics
@@ -119,23 +141,6 @@ public class YearStatisticView extends ViewPart {
 
 	private int									_numberOfYears;
 
-	private int[]								_yearDays;
-
-	/**
-	 * Years which the user can select as start year
-	 */
-	private ArrayList<Integer>					_displayedYears				= new ArrayList<Integer>();
-
-	/**
-	 * Day of year values for all years
-	 */
-	private ArrayList<Integer>					_DOYValues;
-
-	/**
-	 * Tour speed for all years
-	 */
-	private ArrayList<Integer>					_tourSpeed;
-
 	private int									_selectedTourIndex;
 
 	/*
@@ -148,6 +153,7 @@ public class YearStatisticView extends ViewPart {
 	private YearStatisticTourToolTip			_tourToolTip;
 	private TourInfoToolTipProvider				_tourInfoToolTipProvider	= new TourInfoToolTipProvider();
 
+	private Composite							_toolbar;
 	private Combo								_cboLastYear;
 	private Combo								_cboNumberOfYears;
 
@@ -165,6 +171,7 @@ public class YearStatisticView extends ViewPart {
 	private void addCompareTourPropertyListener() {
 
 		_compareTourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
@@ -185,24 +192,32 @@ public class YearStatisticView extends ViewPart {
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == YearStatisticView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -211,6 +226,7 @@ public class YearStatisticView extends ViewPart {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -240,6 +256,7 @@ public class YearStatisticView extends ViewPart {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				// prevent to listen to a selection which is originated by this year chart
 				if (selection != _currentSelection) {
@@ -269,17 +286,17 @@ public class YearStatisticView extends ViewPart {
 		final int segmentEnd[] = new int[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
-		final int oldestYear = _latestYear - _numberOfYears + 1;
+		final int firstYear = getFirstYear();
 		int yearDaysSum = 0;
 
 		// create segments for each year
-		for (int yearDayIndex = 0; yearDayIndex < _yearDays.length; yearDayIndex++) {
+		for (int yearDayIndex = 0; yearDayIndex < _numberOfDaysInYear.length; yearDayIndex++) {
 
-			final int yearDays = _yearDays[yearDayIndex];
+			final int yearDays = _numberOfDaysInYear[yearDayIndex];
 
 			segmentStart[yearDayIndex] = yearDaysSum;
 			segmentEnd[yearDayIndex] = yearDaysSum + yearDays - 1;
-			segmentTitle[yearDayIndex] = Integer.toString(oldestYear + yearDayIndex);
+			segmentTitle[yearDayIndex] = Integer.toString(firstYear + yearDayIndex);
 
 			yearDaysSum += yearDays;
 		}
@@ -289,8 +306,8 @@ public class YearStatisticView extends ViewPart {
 		chartSegments.valueEnd = segmentEnd;
 		chartSegments.segmentTitle = segmentTitle;
 
-		chartSegments.years = _allYears;
-		chartSegments.yearDays = _yearDays;
+		chartSegments.years = _displayedYears;
+		chartSegments.yearDays = _numberOfDaysInYear;
 		chartSegments.allValues = yearDaysSum;
 
 		return chartSegments;
@@ -313,7 +330,6 @@ public class YearStatisticView extends ViewPart {
 
 		_pageBook.showPage(_pageNoChart);
 
-		updateUI();
 		restoreState();
 
 		// restore selection
@@ -334,9 +350,9 @@ public class YearStatisticView extends ViewPart {
 		/*
 		 * set calendar day/month/year
 		 */
-		final int oldestYear = _latestYear - _numberOfYears + 1;
+		final int firstYear = getFirstYear();
 		final int tourDOY = _DOYValues.get(valueIndex);
-		final DateTime tourDate = new DateTime(oldestYear, 1, 1, 0, 0, 0, 1).plusDays(tourDOY);
+		final DateTime tourDate = new DateTime(firstYear, 1, 1, 0, 0, 0, 1).plusDays(tourDOY);
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
@@ -380,23 +396,29 @@ public class YearStatisticView extends ViewPart {
 	private void createUI12Toolbar(final Composite parent) {
 
 		final PixelConverter pc = new PixelConverter(parent);
+		final int yearComboWidth = net.tourbook.util.UI.IS_LINUX //
+				? pc.convertWidthInCharsToPixels(12)
+				: pc.convertWidthInCharsToPixels(5);
 
-		final Composite toolbar = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbar);
+		_toolbar = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_toolbar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(3)
 				.extendedMargins(0, 0, 0, 1)
 				.spacing(0, 0)
-				.applyTo(toolbar);
+				.applyTo(_toolbar);
 
 		{
 			/*
-			 * last year
+			 * combo: last year
 			 */
-			// combo
-			_cboLastYear = new Combo(toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).applyTo(_cboLastYear);
+			_cboLastYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+// hint is working differently on platforms
+					.hint(yearComboWidth, SWT.DEFAULT)
+					.applyTo(_cboLastYear);
 			_cboLastYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
+			_cboLastYear.setVisibleItemCount(50);
 			_cboLastYear.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -408,7 +430,7 @@ public class YearStatisticView extends ViewPart {
 			 * number of years
 			 */
 			// label
-			final Label label = new Label(toolbar, SWT.NONE);
+			final Label label = new Label(_toolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(10, 0)
@@ -416,17 +438,23 @@ public class YearStatisticView extends ViewPart {
 			label.setText(Messages.Year_Statistic_Label_NumberOfYears);
 
 			// combo
-			_cboNumberOfYears = new Combo(toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_cboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.indent(2, 0)
 					.applyTo(_cboNumberOfYears);
 			_cboNumberOfYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
+			_cboNumberOfYears.setVisibleItemCount(50);
 			_cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectNumberOfYears(getSelectedYears());
 				}
 			});
+		}
+
+		// fill combo box
+		for (int year = 1; year <= 50; year++) {
+			_cboNumberOfYears.add(Integer.toString(year));
 		}
 	}
 
@@ -438,6 +466,7 @@ public class YearStatisticView extends ViewPart {
 		_yearChart = new Chart(parent, SWT.BORDER);
 
 		_yearChart.addBarSelectionListener(new IBarSelectionListener() {
+			@Override
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
 				if (_allTours.size() == 0) {
@@ -485,6 +514,10 @@ public class YearStatisticView extends ViewPart {
 		super.dispose();
 	}
 
+	private int getFirstYear() {
+		return _lastYear - _numberOfYears + 1;
+	}
+
 	private int getSelectedYears() {
 		return _cboNumberOfYears.getSelectionIndex() + 1;
 	}
@@ -499,7 +532,7 @@ public class YearStatisticView extends ViewPart {
 		int yearDOYs = 0;
 		int yearIndex = 0;
 
-		final int firstYear = _latestYear - _numberOfYears + 1;
+		final int firstYear = getFirstYear();
 
 		for (int currentYear = firstYear; currentYear < selectedYear; currentYear++) {
 
@@ -507,7 +540,7 @@ public class YearStatisticView extends ViewPart {
 				return yearDOYs;
 			}
 
-			yearDOYs += _yearDays[yearIndex];
+			yearDOYs += _numberOfDaysInYear[yearIndex];
 
 			yearIndex++;
 		}
@@ -519,7 +552,7 @@ public class YearStatisticView extends ViewPart {
 	 * get numbers for each year <br>
 	 * <br>
 	 * all years into {@link #fYears} <br>
-	 * number of day's into {@link #_yearDays} <br>
+	 * number of day's into {@link #_numberOfDaysInYear} <br>
 	 * number of week's into {@link #fYearWeeks}
 	 */
 	void initYearNumbers() {
@@ -549,8 +582,8 @@ public class YearStatisticView extends ViewPart {
 
 					_currentRefItem = yearItem.getRefItem();
 
-					// overwrite youngest year
-					_latestYear = yearItem.year;
+					// overwrite last year
+					_lastYear = yearItem.year;
 
 					// update year data
 					setYearData();
@@ -565,13 +598,13 @@ public class YearStatisticView extends ViewPart {
 
 				selectTourInYearChart(compTourId);
 
-			} else if (_allTours != null) {
+			} else {
 
 				// select first tour for the youngest year
 				int yearIndex = 0;
 				for (final TVICatalogComparedTour tourItem : _allTours) {
 
-					if (new DateTime(tourItem.getTourDate()).getYear() == _latestYear) {
+					if (new DateTime(tourItem.getTourDate()).getYear() == _lastYear) {
 						break;
 					}
 					yearIndex++;
@@ -637,8 +670,8 @@ public class YearStatisticView extends ViewPart {
 
 	private void onSelectYear() {
 
-		// overwrite youngest year
-		_latestYear = _displayedYears.get(_cboLastYear.getSelectionIndex());
+		// overwrite last year
+		_lastYear = _comboYears.get(_cboLastYear.getSelectionIndex());
 
 		// update year data
 		setYearData();
@@ -671,7 +704,7 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private void selectTourInYearChart(final long selectedTourId) {
 
-		if (_allTours == null || _allTours.size() == 0) {
+		if (_allTours.size() == 0) {
 			_tourInfoToolTipProvider.setTourId(-1);
 			return;
 		}
@@ -706,10 +739,10 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private void setYearData() {
 
-		_yearDays = new int[_numberOfYears];
-		_allYears = new int[_numberOfYears];
+		_displayedYears = new int[_numberOfYears];
+		_numberOfDaysInYear = new int[_numberOfYears];
 
-		final int firstYear = _latestYear - _numberOfYears + 1;
+		final int firstYear = getFirstYear();
 
 		final DateTime dt = (new DateTime())
 				.withYear(firstYear)
@@ -717,21 +750,13 @@ public class YearStatisticView extends ViewPart {
 				.withDayOfWeek(DateTimeConstants.MONDAY);
 
 		int yearIndex = 0;
-		for (int currentYear = firstYear; currentYear <= _latestYear; currentYear++) {
+		for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
-			_allYears[yearIndex] = currentYear;
-			_yearDays[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
+			_displayedYears[yearIndex] = currentYear;
+			_numberOfDaysInYear[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
+
 			yearIndex++;
 		}
-	}
-
-	private void updateUI() {
-
-		// fill combo box
-		for (int year = 1; year <= 50; year++) {
-			_cboNumberOfYears.add(Integer.toString(year));
-		}
-
 	}
 
 	/**
@@ -750,31 +775,21 @@ public class YearStatisticView extends ViewPart {
 
 		final Object[] yearItems = _currentRefItem.getFetchedChildrenAsArray();
 
-		// get latest year if this is forced
+		// get the last year when it's forced
 		if (isShowLatestYear && yearItems != null && yearItems.length > 0) {
 
 			final Object item = yearItems[yearItems.length - 1];
 
 			if (item instanceof TVICatalogYearItem) {
-				_latestYear = ((TVICatalogYearItem) item).year;
+				_lastYear = ((TVICatalogYearItem) item).year;
 			}
 		}
 
-		if (_allTours != null) {
-			_allTours.clear();
-		}
-		if (_DOYValues != null) {
-			_DOYValues.clear();
-		}
-		if (_tourSpeed != null) {
-			_tourSpeed.clear();
-		}
+		_allTours.clear();
+		_DOYValues.clear();
+		_tourSpeed.clear();
 
-		_DOYValues = new ArrayList<Integer>(); // DOY...Day Of Year
-		_tourSpeed = new ArrayList<Integer>();
-		_allTours = new ArrayList<TVICatalogComparedTour>();
-
-		final int firstYear = _latestYear - _numberOfYears + 1;
+		final int firstYear = getFirstYear();
 
 		// loop: all years
 		for (final Object yearItemObj : yearItems) {
@@ -784,7 +799,7 @@ public class YearStatisticView extends ViewPart {
 
 				// check if the year can be displayed
 				final int yearItemYear = yearItem.year;
-				if (yearItemYear >= firstYear && yearItemYear <= _latestYear) {
+				if (yearItemYear >= firstYear && yearItemYear <= _lastYear) {
 
 					// loop: all tours
 					final Object[] tourItems = yearItem.getFetchedChildrenAsArray();
@@ -870,6 +885,7 @@ public class YearStatisticView extends ViewPart {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			@Override
 			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 				return createToolTipInfo(valueIndex);
 			}
@@ -887,13 +903,13 @@ public class YearStatisticView extends ViewPart {
 		 * update start year combo box
 		 */
 		_cboLastYear.removeAll();
-		_displayedYears.clear();
+		_comboYears.clear();
 
-		for (int year = firstYear; year <= _latestYear + _numberOfYears; year++) {
+		for (int year = firstYear - 1; year <= _lastYear + _numberOfYears; year++) {
 			_cboLastYear.add(Integer.toString(year));
-			_displayedYears.add(year);
+			_comboYears.add(year);
 		}
 
-		_cboLastYear.select(_numberOfYears - 1);
+		_cboLastYear.select(_numberOfYears - 0);
 	}
 }

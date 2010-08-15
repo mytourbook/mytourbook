@@ -48,8 +48,9 @@ public class UI {
 	public static final String	SPACE					= " ";																		//$NON-NLS-1$
 	public static final String	STRING_0				= "0";																		//$NON-NLS-1$
 
-	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$
-
+	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean	IS_LINUX				= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
+ 
 	/**
 	 * contains a new line
 	 */
@@ -157,17 +158,16 @@ public class UI {
 	/**
 	 * copied from {@link Dialog} <br>
 	 * <br>
-	 * Shortens the given text <code>textValue</code> so that its width in
-	 * pixels does not exceed the width of the given control. Overrides
-	 * characters in the center of the original string with an ellipsis ("...")
-	 * if necessary. If a <code>null</code> value is given, <code>null</code> is returned.
+	 * Shortens the given text <code>textValue</code> so that its width in pixels does not exceed
+	 * the width of the given control. Overrides characters in the center of the original string
+	 * with an ellipsis ("...") if necessary. If a <code>null</code> value is given,
+	 * <code>null</code> is returned.
 	 * 
 	 * @param textValue
 	 *            the original string or <code>null</code>
 	 * @param control
 	 *            the control the string will be displayed on
-	 * @return the string to display, or <code>null</code> if null was passed
-	 *         in
+	 * @return the string to display, or <code>null</code> if null was passed in
 	 * @since 3.0
 	 */
 	public static String shortenText(final String textValue, final Control control) {

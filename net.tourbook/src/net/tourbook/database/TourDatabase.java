@@ -1412,26 +1412,28 @@ public class TourDatabase {
 
 				try {
 					_server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-				} catch (final UnknownHostException e2) {
-					e2.printStackTrace();
-				} catch (final Exception e2) {
-					e2.printStackTrace();
+				} catch (final UnknownHostException e) {
+					StatusUtil.log(e);
+				} catch (final Exception e) {
+					StatusUtil.log(e);
 				}
-
+ 
 				try {
 
 					/*
 					 * check if another derby server is already running (this can happen during
 					 * development)
 					 */
+					StatusUtil.log("check if derby server is already running");//$NON-NLS-1$
 					_server.ping();
 
 				} catch (final Exception e) {
 
 					try {
+						StatusUtil.log("starting derby server");//$NON-NLS-1$
 						_server.start(null);
 					} catch (final Exception e2) {
-						e2.printStackTrace();
+						StatusUtil.log(e2);
 					}
 
 					int pingCounter = 0;
@@ -1441,6 +1443,7 @@ public class TourDatabase {
 
 						try {
 							_server.ping();
+							StatusUtil.log("derby server is running");//$NON-NLS-1$
 							break;
 						} catch (final Exception e1) {
 							StatusUtil.log(NLS.bind("Starting derby server: {0}", ++pingCounter), e); //$NON-NLS-1$
