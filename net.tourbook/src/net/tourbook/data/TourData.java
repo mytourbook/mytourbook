@@ -60,6 +60,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
@@ -118,7 +119,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public static final String								DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";			//$NON-NLS-1$
 
-	/*
+	/**
+	 * THIS IS NOT UNUSED !!!<br>
+	 * <br>
 	 * initialize SRTM
 	 */
 	@SuppressWarnings("unused")
@@ -138,10 +141,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 																									.getInstance();
 
 	/**
-	 * entity id which identifies the tour
+	 * Unique entity id which identifies the tour
 	 */
 	@Id
 	private Long											tourId;
+
+	// ############################################# DATE #############################################
 
 	/**
 	 * year of tour start
@@ -190,72 +195,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@SuppressWarnings("unused")
 	private short											startWeekYear;
 
+	// ############################################# TIME #############################################
+
 	/**
-	 * total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
-	 * the field tourDistance
+	 * Total recording time in seconds
+	 */
+	@XmlElement
+	private int												tourRecordingTime;
+
+	/**
+	 * Total driving/moving time in seconds
+	 */
+	@XmlElement
+	private int												tourDrivingTime;
+
+	// ############################################# DISTANCE #############################################
+
+	/**
+	 * Total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
+	 * the field {@link #tourDistance}
 	 */
 	private int												startDistance;
-
-	/**
-	 * ssss distance msw
-	 * <p>
-	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
-	 */
-	@SuppressWarnings("unused")
-	private int												distance;
-
-	/**
-	 * A flag indicating that the distance of this series is defined by a distance sensor and not
-	 * from the GPS device.<br>
-	 * <br>
-	 * 0 == false, 1 == true
-	 */
-	private short											isDistanceFromSensor			= 0;
-
-	/**
-	 * aaaa (h) initial altitude (m)
-	 */
-	private short											startAltitude;
-
-	/**
-	 * pppp (h) initial pulse (bpm)
-	 */
-	private short											startPulse;
-
-	/**
-	 * tolerance for the Douglas Peucker algorithm
-	 */
-	private short											dpTolerance						= 50;
-
-	/**
-	 * tt (h) type of tour <br>
-	 * "2E" bike2 (CM414M) <br>
-	 * "3E" bike1 (CM414M) <br>
-	 * "81" jogging <br>
-	 * "91" ski <br>
-	 * "A1" bike<br>
-	 * "B1" ski-bike
-	 */
-	@Column(length = 2)
-	private String											deviceTourType;
-
-	/*
-	 * data from the device
-	 */
-	private long											deviceTravelTime;
-
-	@SuppressWarnings("unused")
-	private int												deviceDistance;
-
-	private int												deviceWheel;
-
-	private int												deviceWeight;
-
-	@SuppressWarnings("unused")
-	private int												deviceTotalUp;
-
-	@SuppressWarnings("unused")
-	private int												deviceTotalDown;
 
 	/**
 	 * total distance of the tour in meters (metric system), this value is computed from the
@@ -265,16 +225,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												tourDistance;
 
 	/**
-	 * total recording time in seconds
+	 * A flag indicating that the distance of this series is defined by a distance sensor and not
+	 * from the GPS device.<br>
+	 * <br>
+	 * 0 == false, 1 == true
 	 */
-	@XmlElement
-	private int												tourRecordingTime;
+	private short											isDistanceFromSensor			= 0;												// db-version 8
+
+	// ############################################# ALTITUDE #############################################
 
 	/**
-	 * total driving time in seconds
+	 * aaaa (h) initial altitude (m)
 	 */
-	@XmlElement
-	private int												tourDrivingTime;
+	private short											startAltitude;
 
 	/**
 	 * altitude up (m)
@@ -288,21 +251,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	private int												tourAltDown;
 
-	/**
-	 * plugin id for the device which was used to create this tour
-	 */
-	private String											devicePluginId;
+	// ############################################# PULSE/WEIGHT #############################################
 
 	/**
-	 * Profile used by the device
+	 * pppp (h) initial pulse (bpm)
+	 */
+	private short											startPulse;
+
+	@XmlElement
+	private int												restPulse;																			// db-version 8
+
+	@XmlElement
+	private Integer											calories;																			// db-version 4
+
+	private float											bikerWeight;																		// db-version 4
+
+	// ############################################# DEVICE TOUR TYPE #############################################
+
+	/**
+	 * tt (h) type of tour <br>
+	 * "2E" bike2 (CM414M) <br>
+	 * "3E" bike1 (CM414M) <br>
+	 * "81" jogging <br>
+	 * "91" ski <br>
+	 * "A1" bike<br>
+	 * "B1" ski-bike
+	 */
+	@Column(length = 2)
+	private String											deviceTourType;
+
+	/**
+	 * Profile id which is defined by the device
 	 */
 	private short											deviceMode;																		// db-version 3
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
-	 * are unequally
+	 * Visible name for the used profile which is defined in {@link #deviceMode}, e.g. Jogging,
+	 * Running, Bike1, Bike2...
 	 */
-	private short											deviceTimeInterval				= -1;												// db-version 3
+	private String											deviceModeName;																	// db-version 4
+
+	// ############################################# MAX VALUES #############################################
 
 	/**
 	 * maximum altitude in metric system
@@ -319,6 +308,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElement
 	private float											maxSpeed;																			// db-version 4
 
+	// ############################################# AVERAGE VALUES #############################################
+
 	@XmlElement
 	private int												avgPulse;																			// db-version 4
 
@@ -329,36 +320,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												weatherWindDir;																	// db-version 8
 	private int												weatherWindSpd;																	// db-version 8
 	private String											weatherClouds;																		// db-version 8
-	@XmlElement
-	private int												restPulse;																			// db-version 8
+
+	// ############################################# OTHER TOUR DATA #############################################
 
 	@XmlElement
 	private String											tourTitle;																			// db-version 4
+
 	@XmlElement
 	private String											tourDescription;																	// db-version 4
 
 	@XmlElement
 	private String											tourStartPlace;																	// db-version 4
+
 	@XmlElement
 	private String											tourEndPlace;																		// db-version 4
 
-	@XmlElement
-	private Integer											calories;																			// db-version 4
-	private float											bikerWeight;																		// db-version 4
+	/**
+	 * Date/Time when tour data was created. This value is set to the tour start date before db
+	 * version 11, otherwise the value is set when the tour is saved the first time.
+	 */
+	private long											dateTimeCreated;																	// db-version 11
 
 	/**
-	 * visible name for the used plugin to import the data
+	 * Date/Time when tour data was modified, default value is 0
 	 */
-	private String											devicePluginName;																	// db-version 4
-	/**
-	 * visible name for {@link #deviceMode}
-	 */
-	private String											deviceModeName;																	// db-version 4
+	private long											dateTimeModified;																	// db-version 11
 
 	/**
 	 * file path for the imported tour
 	 */
 	private String											tourImportFilePath;																// db-version 6
+
+	/**
+	 * tolerance for the Douglas Peucker algorithm
+	 */
+	private short											dpTolerance						= 50;
+
+	/**
+	 * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
+	 * time slices has variable time duration
+	 */
+	private short											deviceTimeInterval				= -1;												// db-version 3
+
+	// ############################################# MERGED DATA #############################################
 
 	/**
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
@@ -382,22 +386,58 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int												mergedAltitudeOffset;																// db-version 7
 
-	/**
-	 * Date/Time when tour data was created. This value is set to the tour start date before db
-	 * version 11, otherwise the value is set when the tour is saved the first time.
-	 */
-	private long											dateTimeCreated;																	// db-version 11
+	// ############################################# PLUGIN DATA #############################################
 
 	/**
-	 * Date/Time when tour data was modified, default value is 0
+	 * Unique plugin id for the device data reader which created this tour, this id is defined in
+	 * plugin.xml
+	 * <p>
+	 * a better name would be <i>pluginId</i>
 	 */
-	private long											dateTimeModified;																	// db-version 11
+	private String											devicePluginId;
+
+	/**
+	 * Visible name for the used {@link TourbookDevice}, this name is defined in plugin.xml
+	 * <p>
+	 * a better name would be <i>pluginName</i>
+	 */
+	private String											devicePluginName;																	// db-version 4
+
+	// ############################################# UNUSED FIELDS #############################################
+
+	/**
+	 * ssss distance msw
+	 * <p>
+	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
+	 */
+	@SuppressWarnings("unused")
+	private int												distance;
+
+	@SuppressWarnings("unused")
+	private int												deviceDistance;
+
+	@SuppressWarnings("unused")
+	private int												deviceTotalUp;
+
+	@SuppressWarnings("unused")
+	private int												deviceTotalDown;
+
+	@SuppressWarnings("unused")
+	private long											deviceTravelTime;
+
+	@SuppressWarnings("unused")
+	private int												deviceWheel;
+
+	@SuppressWarnings("unused")
+	private int												deviceWeight;
 
 	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
 	private SerieData										serieData;
+
+	// ############################################# ASSOCIATED ENTITIES #############################################
 
 	/**
 	 * Tour marker
@@ -454,15 +494,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
 	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
-	//
-	//
-	/////////////////////////////////////////////////////////////////////
-	/*
-	 * ........................TRANSIENT.DATA............................
-	 */
-	/////////////////////////////////////////////////////////////////////
-	//
-	//
+
+	// ############################################# TRANSIENT DATA #############################################
+
 	/**
 	 * Contains time in seconds relativ to the tour start which is defined in: {@link #startYear},
 	 * {@link #startMonth}, {@link #startDay}, {@link #startHour}, {@link #startMinute} and
@@ -3275,6 +3309,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceModeName;
 	}
 
+	/**
+	 * @return Returns device name which is displayed in the tour editor info tab
+	 */
 	public String getDeviceName() {
 		if ((devicePluginId != null) && devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)) {
 			return Messages.tour_data_label_manually_created_tour;
@@ -3297,17 +3334,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceTourType;
 	}
 
-	public long getDeviceTravelTime() {
-		return deviceTravelTime;
-	}
-
-	public int getDeviceWeight() {
-		return deviceWeight;
-	}
-
-	public int getDeviceWheel() {
-		return deviceWheel;
-	}
+// NOT USED 18.8.2010
+//	public long getDeviceTravelTime() {
+//		return deviceTravelTime;
+//	}
+//
+//	public int getDeviceWeight() {
+//		return deviceWeight;
+//	}
+//
+//	public int getDeviceWheel() {
+//		return deviceWheel;
+//	}
 
 // not used 5.10.2008
 //	public int getDeviceDistance() {
@@ -3566,9 +3604,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			prefTime = currentTime;
 		}
-
-//		System.out.println("joule: " + joule / 1000);
-// TODO remove SYSTEM.OUT.PRINTLN
 
 		return powerSerie;
 	}
@@ -3865,8 +3900,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour
-	 *         is not saved in the database
+	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
+	 *         not saved in the database
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
@@ -4065,8 +4100,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return
-	 *         Returns <code>true</code> when the data in {@link #speedSerie} are from the device
+	 * @return Returns <code>true</code> when the data in {@link #speedSerie} are from the device
 	 *         and not computed. Speed data are normally available from an ergometer and not from a
 	 *         bike computer
 	 */
@@ -4343,15 +4377,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setDeviceTravelTime(final long deviceTravelTime) {
-		this.deviceTravelTime = deviceTravelTime;
+// NOT USED 18.8.2010
+//		this.deviceTravelTime = deviceTravelTime;
 	}
 
 	public void setDeviceWeight(final int deviceWeight) {
-		this.deviceWeight = deviceWeight;
+// NOT USED 18.8.2010
+//		this.deviceWeight = deviceWeight;
 	}
 
 	public void setDeviceWheel(final int deviceWheel) {
-		this.deviceWheel = deviceWheel;
+// NOT USED 18.8.2010
+//		this.deviceWheel = deviceWheel;
 	}
 
 	public void setDpTolerance(final short dpTolerance) {

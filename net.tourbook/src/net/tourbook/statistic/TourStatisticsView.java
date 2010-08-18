@@ -33,16 +33,11 @@ import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -58,7 +53,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private final IDialogSettings	_state		= TourbookPlugin.getDefault().getDialogSettingsSection(
 														"TourStatisticsView");						//$NON-NLS-1$
 
-	private StatisticContainer		_statisticContainer;
+	private StatContainer		_statContainer;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private IPartListener2			_partListener;
@@ -69,25 +64,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private TourPerson				_activePerson;
 	private TourTypeFilter			_activeTourTypeFilter;
 
-	private RGB						_rgbYearFg	= new RGB(255, 255, 255);
-	private RGB						_rgbMonthFg	= new RGB(128, 64, 0);
-	private RGB						_rgbTourFg	= new RGB(0, 0, 128);
-
-	private RGB						_rgbYearBg	= new RGB(111, 130, 197);
-	private RGB						_rgbMonthBg	= new RGB(220, 220, 255);
-	private RGB						_rgbTourBg	= new RGB(240, 240, 255);
-
-	private Color					_colorYearFg;
-	private Color					_colorMonthFg;
-	private Color					_colorTourFg;
-
-	private Color					_colorYearBg;
-	private Color					_colorMonthBg;
-	private Color					_colorTourBg;
-
-	public Font						_fontNormal;
-	public Font						_fontBold;
-
 	private void addPartListener() {
 
 		// set the part listener
@@ -95,7 +71,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
-					_statisticContainer.activateActions(getSite());
+					_statContainer.activateActions(getSite());
 				}
 			}
 
@@ -109,7 +85,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
-					_statisticContainer.deactivateActions(getSite());
+					_statContainer.deactivateActions(getSite());
 				}
 			}
 
@@ -152,7 +128,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
-					_statisticContainer.refreshStatisticProvider();
+					_statContainer.refreshStatisticProvider();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -219,12 +195,10 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		createResources();
-
 		// this view is a selection provider, set it before the statistics container is created
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
-		_statisticContainer = new StatisticContainer(getViewSite(), _postSelectionProvider, parent, SWT.NONE);
+		_statContainer = new StatContainer(parent, getViewSite(), _postSelectionProvider, SWT.NONE);
 
 		addPartListener();
 		addPrefListener();
@@ -234,22 +208,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		_activePerson = TourbookPlugin.getActivePerson();
 		_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-		_statisticContainer.restoreStatistics(_state, _activePerson, _activeTourTypeFilter);
-	}
-
-	private void createResources() {
-
-		final Display display = Display.getCurrent();
-
-		_colorYearFg = new Color(display, _rgbYearFg);
-		_colorYearBg = new Color(display, _rgbYearBg);
-		_colorMonthFg = new Color(display, _rgbMonthFg);
-		_colorMonthBg = new Color(display, _rgbMonthBg);
-		_colorTourFg = new Color(display, _rgbTourFg);
-		_colorTourBg = new Color(display, _rgbTourBg);
-
-		_fontNormal = JFaceResources.getFontRegistry().get(JFaceResources.DIALOG_FONT);
-		_fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+		_statContainer.restoreStatistics(_state, _activePerson, _activeTourTypeFilter);
 	}
 
 	@Override
@@ -261,19 +220,12 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		_colorYearFg.dispose();
-		_colorYearBg.dispose();
-		_colorMonthFg.dispose();
-		_colorMonthBg.dispose();
-		_colorTourFg.dispose();
-		_colorTourBg.dispose();
-
 		super.dispose();
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		final TourbookStatistic selectedStatistic = _statisticContainer.getSelectedStatistic();
+		final TourbookStatistic selectedStatistic = _statContainer.getSelectedStatistic();
 		if (selectedStatistic == null) {
 			return null;
 		}
@@ -294,11 +246,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	}
 
 	private void refreshStatistics() {
-		_statisticContainer.refreshStatistic(_activePerson, _activeTourTypeFilter);
+		_statContainer.refreshStatistic(_activePerson, _activeTourTypeFilter);
 	}
 
 	public void saveState() {
-		_statisticContainer.saveState(_state);
+		_statContainer.saveState(_state);
 	}
 
 	@Override

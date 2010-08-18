@@ -13,31 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.preferences;
 
-package net.tourbook.statistic;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.UI;
+public class PrefPageViews extends PreferencePage implements IWorkbenchPreferencePage {
 
-import org.eclipse.jface.action.Action;
+	public PrefPageViews() {
+		noDefaultAndApplyButton();
+	}
 
-public class ActionSynchChartScale extends Action {
+	public PrefPageViews(final String title) {
+		super(title);
+	}
 
-	private final StatContainer	_statContainer;
-
-	public ActionSynchChartScale(final StatContainer container) {
-
-		super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-		_statContainer = container;
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-		setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
+	public PrefPageViews(final String title, final ImageDescriptor image) {
+		super(title, image);
 	}
 
 	@Override
-	public void run() {
-		_statContainer.actionSynchScale(isChecked());
+	protected Control createContents(final Composite parent) {
+		return null;
 	}
+
+	@Override
+	public void init(final IWorkbench workbench) {
+
+	}
+
 }

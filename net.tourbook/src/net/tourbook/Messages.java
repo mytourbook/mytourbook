@@ -70,7 +70,7 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
 
-	public static String	Action_TourType_ModifyTourTypeFilter;
+	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
@@ -194,7 +194,9 @@ public class Messages extends NLS {
 	public static String		App_Tour_type_item_not_defined;
 	public static String		App_Tour_type_tooltip;
 
-	public static String	App_TourType_ToolTip;
+	public static String		App_TourType_ToolTip;
+
+	public static String		App_TourType_ToolTipTitle;
 
 	public static String		App_Window_Title;
 
@@ -698,6 +700,14 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_dnd_hint;
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
+
+	public static String		PrefPage_ViewTooltip_Group;
+	public static String		PrefPage_ViewTooltip_Label_Day;
+	public static String		PrefPage_ViewTooltip_Label_Info;
+	public static String		PrefPage_ViewTooltip_Label_Tags;
+	public static String		PrefPage_ViewTooltip_Label_Time;
+	public static String		PrefPage_ViewTooltip_Label_Title;
+	public static String		PrefPage_ViewTooltip_Label_WeekDay;
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;

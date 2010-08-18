@@ -24,12 +24,9 @@ import net.tourbook.ui.TourTypeFilterSet;
 import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
-import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -75,12 +72,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private MouseListener			mouseListener;
 	private MouseTrackListener		mouseTrackListener;
 
-	private ICoolBarManager			_coolBarMgr;
-	private IToolBarManager			_tbMgrTourType;
-	private ToolBarContributionItem	_tbItemTourType;
-
 	private boolean					_isUpdating;
-//	private boolean					_isContextMenuVisible;
 
 	private Menu					_contextMenu;
 
@@ -192,7 +184,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		_lblFilterIcon.addMouseListener(mouseListener);
 		_lblFilterIcon.addMouseTrackListener(mouseTrackListener);
-//		_lblFilterIcon.addMouseWheelListener(mouseWheelListener);
 	}
 
 	private void createUI20FilterText(final Composite parent) {
@@ -206,7 +197,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		_lnkFilterText.addMouseListener(mouseListener);
 		_lnkFilterText.addMouseTrackListener(mouseTrackListener);
-//		_lnkFilterText.addMouseWheelListener(mouseWheelListener);
 
 		_lnkFilterText.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -263,18 +253,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		// set context menu and adjust it to the filter icon
 		_contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
 		_lblFilterIcon.setMenu(_contextMenu);
-
-//		_contextMenu.addMenuListener(new MenuListener() {
-//			@Override
-//			public void menuHidden(final MenuEvent e) {
-//				_isContextMenuVisible = true;
-//			}
-//
-//			@Override
-//			public void menuShown(final MenuEvent e) {
-//				_isContextMenuVisible = true;
-//			}
-//		});
 	}
 
 	@Override
@@ -285,15 +263,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		}
 
 		super.dispose();
-	}
-
-	public void setToolBarContribItem(	final ICoolBarManager coolBarMgr,
-										final IToolBarManager tbMgrTourType,
-										final ToolBarContributionItem tbItemTourType) {
-
-		_coolBarMgr = coolBarMgr;
-		_tbMgrTourType = tbMgrTourType;
-		_tbItemTourType = tbItemTourType;
 	}
 
 	public void updateUI(final TourTypeFilter ttFilter) {
@@ -315,8 +284,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			if (ttFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
 
 				final StringBuilder sb = new StringBuilder();
-				sb.append(Messages.App_TourType_ToolTip);
+				sb.append(Messages.App_TourType_ToolTipTitle);
+				sb.append(filterName);
 				sb.append(UI.NEW_LINE2);
+				sb.append(Messages.App_TourType_ToolTip);
+//				sb.append(UI.NEW_LINE);
 
 				final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
 				if (ttSet != null) {
@@ -327,10 +299,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 						if (ttItem instanceof TourType) {
 							final TourType ttFilterFromSet = (TourType) ttItem;
 
-							if (counter++ > 0) {
-								sb.append('\n');
+							if (counter == 0) {
+								sb.append("\t");
+							} else if (counter > 0) {
+								sb.append("\n\t\t\t");
 							}
 							sb.append(ttFilterFromSet.getName());
+
+							counter++;
 						}
 					}
 				}
@@ -343,18 +319,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			_lnkFilterText.setText("<a>" + shortFilterName + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 			_lnkFilterText.setToolTipText(filterTooltip);
 			_lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
-
-			// resize contribution item
-//			final Point defaultSize = _lnkFilterText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-//			System.out.println("size\t" + defaultSize);
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			_tbItemTourType.setCurrentWidth(defaultSize.x);
-//			_tbItemTourType.update(ICoolBarManager.SIZE);
-//
-//			_tbMgrTourType.update(true);
-
-//			_coolBarMgr.update(true);
 		}
 		_isUpdating = false;
 	}

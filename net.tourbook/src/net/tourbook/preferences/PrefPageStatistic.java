@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.statistic.StatisticContainer;
+import net.tourbook.statistic.StatContainer;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.util.StringToArrayConverter;
 
@@ -124,7 +124,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		final Composite uiContainer = createUI(parent);
 
-		_visibleStatistics = StatisticContainer.getStatisticProviders();
+		_visibleStatistics = StatContainer.getStatisticProviders();
 
 		// load viewer
 		_statViewer.setInput(new Object());
@@ -184,7 +184,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 				final TourbookStatistic statistic = (TourbookStatistic) cell.getElement();
 
-				cell.setText(statistic.fVisibleName);
+				cell.setText(statistic.visibleName);
 			}
 		});
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(4, true));
@@ -276,7 +276,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		_isModified = true;
 
-		_visibleStatistics = StatisticContainer.getStatisticExtensionPoints();
+		_visibleStatistics = StatContainer.getStatisticExtensionPoints();
 
 		_statViewer.setInput(new Object());
 
@@ -305,7 +305,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		final String[] statisticIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			statisticIds[itemIndex] = ((TourbookStatistic) items[itemIndex].getData()).fStatisticId;
+			statisticIds[itemIndex] = ((TourbookStatistic) items[itemIndex].getData()).statisticId;
 		}
 
 		// set new value and fire event

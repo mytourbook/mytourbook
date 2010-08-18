@@ -214,4 +214,14 @@ public interface ITourbookPreferences {
 	public static final String	CALENDAR_WEEK_FIRST_DAY_OF_WEEK				= "calendar.week.first-day-of-week";						//$NON-NLS-1$
 	public static final String	CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK		= "calendar.week.minimum-days-in-first-week";				//$NON-NLS-1$
 
+	/*
+	 * view tooltip
+	 */
+	public static final String	VIEW_TOOLTIP_TOURBOOK						= "view.tooltip.tourbook";									//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_DATE					= "view.tooltip.tourbook.date";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TIME					= "view.tooltip.tourbook.time";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_WEEKDAY				= "view.tooltip.tourbook.weekday";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TITLE					= "view.tooltip.tourbook.title";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TAGS					= "view.tooltip.tourbook.tags";							//$NON-NLS-1$
+
 }

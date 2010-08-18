@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistic;
 
@@ -28,13 +28,13 @@ public abstract class TourbookStatistic {
 
 	protected static final String	NEW_LINE	= "\n"; //$NON-NLS-1$
 
-	public String					fStatisticId;
+	public String					statisticId;
 
-	public String					fVisibleName;
+	public String					visibleName;
 
-	private Composite				fContainer;
+	private Composite				_container;
 
-	private boolean					fIsDataDirty;
+	private boolean					_isDataDirty;
 
 	/**
 	 * Activates the actions in the statistic
@@ -78,9 +78,9 @@ public abstract class TourbookStatistic {
 	 * Disposes of the statistic
 	 */
 	public void dispose() {
-		if (fContainer != null && fContainer.isDisposed() == false) {
-			fContainer.dispose();
-			fContainer = null;
+		if (_container != null && _container.isDisposed() == false) {
+			_container.dispose();
+			_container = null;
 		}
 	}
 
@@ -96,18 +96,18 @@ public abstract class TourbookStatistic {
 			return false;
 		}
 		final TourbookStatistic other = (TourbookStatistic) obj;
-		if (fStatisticId == null) {
-			if (other.fStatisticId != null) {
+		if (statisticId == null) {
+			if (other.statisticId != null) {
 				return false;
 			}
-		} else if (!fStatisticId.equals(other.fStatisticId)) {
+		} else if (!statisticId.equals(other.statisticId)) {
 			return false;
 		}
 		return true;
 	}
 
 	public Composite getControl() {
-		return fContainer;
+		return _container;
 	}
 
 	/**
@@ -122,7 +122,7 @@ public abstract class TourbookStatistic {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fStatisticId == null) ? 0 : fStatisticId.hashCode());
+		result = prime * result + ((statisticId == null) ? 0 : statisticId.hashCode());
 		return result;
 	}
 
@@ -131,8 +131,8 @@ public abstract class TourbookStatistic {
 	 *         to <code>false</code>
 	 */
 	protected boolean isDataDirtyWithReset() {
-		final boolean isDataDirty = fIsDataDirty;
-		fIsDataDirty = false;
+		final boolean isDataDirty = _isDataDirty;
+		_isDataDirty = false;
 		return isDataDirty;
 	}
 
@@ -193,7 +193,7 @@ public abstract class TourbookStatistic {
 	}
 
 	public void setContainer(final Composite container) {
-		fContainer = container;
+		_container = container;
 	}
 
 	/**
@@ -201,7 +201,7 @@ public abstract class TourbookStatistic {
 	 * time
 	 */
 	public void setDataDirty() {
-		fIsDataDirty = true;
+		_isDataDirty = true;
 	}
 
 	/**

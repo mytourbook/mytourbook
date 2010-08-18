@@ -158,6 +158,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean							_isRecTimeFormat_hhmmss;
 	private boolean							_isDriveTimeFormat_hhmmss;
 
+	private boolean							_isToolTipInDate;
+	private boolean							_isToolTipInTags;
+	private boolean							_isToolTipInTime;
+	private boolean							_isToolTipInTitle;
+	private boolean							_isToolTipInWeekDay;
+
 	/*
 	 * UI controls
 	 */
@@ -307,6 +313,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					// redraw must be done to see modified tour type image colors
 					_tourViewer.getTree().redraw();
+
+				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK)) {
+
+					updateToolTipState();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -800,6 +810,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInDate == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour)) {
 					return ((TVITourBookItem) element).getTourId();
@@ -1056,6 +1070,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInTags == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour)) {
 					return ((TVITourBookTour) element).getTourId();
@@ -1089,6 +1107,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTime == false) {
+					return null;
+				}
 
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour)) {
@@ -1280,6 +1302,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInTitle == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour)) {
 					return ((TVITourBookTour) element).getTourId();
@@ -1421,9 +1447,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInWeekDay == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour)) {
-
 					return ((TVITourBookTour) element).getTourId();
 				}
 
@@ -2054,6 +2084,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
+
+		updateToolTipState();
 	}
 
 	private void saveState() {
@@ -2093,6 +2125,15 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void setFocus() {
 		_tourViewer.getControl().setFocus();
+	}
+
+	private void updateToolTipState() {
+
+		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE);
+		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME);
+		_isToolTipInWeekDay = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY);
+		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
+		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
 	}
 
 }

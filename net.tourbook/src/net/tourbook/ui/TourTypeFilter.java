@@ -150,6 +150,48 @@ public class TourTypeFilter {
 		return filterImageDescriptor;
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourTypeFilter)) {
+			return false;
+		}
+		final TourTypeFilter other = (TourTypeFilter) obj;
+		if (_filterType != other._filterType) {
+			return false;
+		}
+		if (_systemFilterId != other._systemFilterId) {
+			return false;
+		}
+		if (_systemFilterName == null) {
+			if (other._systemFilterName != null) {
+				return false;
+			}
+		} else if (!_systemFilterName.equals(other._systemFilterName)) {
+			return false;
+		}
+		if (_tourType == null) {
+			if (other._tourType != null) {
+				return false;
+			}
+		} else if (!_tourType.equals(other._tourType)) {
+			return false;
+		}
+		if (_tourTypeSet == null) {
+			if (other._tourTypeSet != null) {
+				return false;
+			}
+		} else if (!_tourTypeSet.equals(other._tourTypeSet)) {
+			return false;
+		}
+		return true;
+	}
+
 	public String getFilterName() {
 		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
@@ -259,6 +301,18 @@ public class TourTypeFilter {
 	 */
 	public TourTypeFilterSet getTourTypeSet() {
 		return _tourTypeSet;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + _filterType;
+		result = prime * result + _systemFilterId;
+		result = prime * result + ((_systemFilterName == null) ? 0 : _systemFilterName.hashCode());
+		result = prime * result + ((_tourType == null) ? 0 : _tourType.hashCode());
+		result = prime * result + ((_tourTypeSet == null) ? 0 : _tourTypeSet.hashCode());
+		return result;
 	}
 
 	public void setName(final String filterName) {

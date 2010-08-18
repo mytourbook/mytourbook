@@ -176,7 +176,7 @@ public class TourTypeFilterManager {
 					if (_propertyValue != propertyValue) {
 
 						/*
-						 * reselect old tour type filter when it is still available
+						 * reselect old tour type filter when it's still available
 						 */
 						final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
@@ -538,7 +538,7 @@ public class TourTypeFilterManager {
 
 		// get requested filter action
 		for (final ActionTTFilter ttFilterAction : _ttFilterActions) {
-			if (ttFilterAction.__ttFilter == requestedTourTypeFilter) {
+			if (ttFilterAction.__ttFilter.equals(requestedTourTypeFilter)) {
 				selectedTTFilterAction = ttFilterAction;
 				break;
 			}

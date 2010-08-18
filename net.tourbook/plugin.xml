@@ -68,6 +68,12 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
+      <initializer
+            class="net.tourbook.srtm.PreferenceInitializer">
+      </initializer>
+      <initializer
+            class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
    
    <extension
@@ -82,98 +88,6 @@
       </splashHandlerProductBinding>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.tourbook.preferences.PrefPageGeneral"
-            id="net.tourbook.preferences.PrefPageGeneralId"
-            name="%preference_page_general">
-      </page>
-      <page
-            class="net.tourbook.preferences.PrefPageDataImport"
-            id="net.tourbook.preferences.PrefPageDataImport"
-            name="%preference_page_data_import">
-      </page>
-      <page
-            class="net.tourbook.preferences.PrefPageComputedValues"
-            id="net.tourbook.preferences.PrefPageComputedValues"
-            name="%preference_page_computedValues">
-      </page>
-      <page
-            class="net.tourbook.preferences.PrefPageBikes"
-            id="net.tourbook.preferences.PrefPageBikes"
-            name="%preference_page_Bikes"/>
-      <page
-            class="net.tourbook.preferences.PrefPagePeople"
-            id="net.tourbook.preferences.PrefPagePeopleId"
-            name="%preference_page_People"/>
-
-      <page
-            class="net.tourbook.preferences.PrefPageStatistic"
-            id="net.tourbook.preferences.prefPageStatistic"
-            name="%preference_page_statistics"/>
-            
-      <page
-            class="net.tourbook.preferences.PrefPageAppearance"
-            id="net.tourbook.preferences.PrefPageAppearance"
-            name="%preference_page_appearance">
-      </page>
-
-      <page
-            category="net.tourbook.preferences.prefPageStatistic"
-            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
-            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
-            name="%preference_page_statistics_tourFrequency"/>
-
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceTourChart"
-            id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%preference_page_Graphs"/>
-            
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
-            id="net.tourbook.preferences.PrefPageTourEditor"
-            name="%preference_page_tourEditor"/>
-
-      <page
-            class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-            id="net.tourbook.preferences.PrefPageTourTypeFilter"
-            name="%preference_page_tour_type_root"/>
-      <page
-            category="net.tourbook.preferences.PrefPageTourTypeFilter"
-            class="net.tourbook.preferences.PrefPageTourTypes"
-            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
-            name="%preference_page_tour_types"/>
-
-      <page
-            class="net.tourbook.preferences.PrefPageTags"
-            id="net.tourbook.preferences.PrefPageTags"
-            name="%preference_page_tags"/>
-      
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceColors"
-            id="net.tourbook.preferences.PrefPageChartColors"
-            name="%preference_page_Chart_Colors">
-      </page>
-      
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceView"
-            id="net.tourbook.preferences.PrefPageViewColors"
-            name="%preference_page_view_colors">
-      </page>
-      
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceMap"
-            id="net.tourbook.preferences.PrefPageMapAppearance"
-            name="%preference_page_map_appearance">
-      </page>
-      
-   </extension>
 
    <extension
          point="org.eclipse.ui.actionSets">
@@ -190,153 +104,41 @@
          </action>
       </actionSet>
    </extension>
-   
    <extension
-         point="org.eclipse.ui.views">
-         
-      <category
-            id="net.tourbook.category.tourList"
-            name="%view_category_tourDirectory"/>
-            
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.rawData.RawDataView"
-	            icon="icons/rawdata.gif"
-	            id="net.tourbook.views.rawData.RawDataView"
-	            name="%view_name_Data_Import"/>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.tourBook.TourBookView"
-	            icon="icons/tour-list.gif"
-	            id="net.tourbook.views.tourListView"
-	            name="%view_name_Book"/>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.tagging.TaggingView"
-	            icon="icons/tour-tag.gif"
-	            id="net.tourbook.views.tagViewID"
-	            name="%view_name_tagView"/>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
-	            icon="icons/tour-map.gif"
-	            id="net.tourbook.views.tourCatalog.TourCatalogView"
-	            name="%view_name_tourCatalog"/>
-	      <view
-	            category="net.tourbook.category.tourList"
-	            class="net.tourbook.statistic.TourStatisticsView"
-	            icon="icons/statistics.gif"
-	            id="net.tourbook.views.StatisticView"
-	            name="%view_name_Statistics">
-	      </view>
-      
-		<category
-			id="net.tourbook.category.tour"
-			name="%view_category_tour"/>
-			
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.tourChart.TourChartView"
-	            icon="icons/tour-chart.gif"
-	            id="net.tourbook.views.TourChartView"
-	            name="%view_name_Chart"/>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
-	            icon="icons/tour-editor.gif"
-	            id="net.tourbook.views.TourDataEditorView"
-	            name="%command_view_tourEditor"/>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.TourMarkerView"
-	            icon="icons/tour-marker.png"
-	            id="net.tourbook.views.TourMarkerView"
-	            name="%view_name_Marker"/>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.mapping.TourMapView"
-	            icon="icons/earth-globe-abstract.png"
-	            id="net.tourbook.mapping.mappingViewID"
-	            name="%view_name_tour_map"/>
-	      <view
-	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.TourWaypointView"
-	            icon="icons/tour-waypoint.png"
-	            id="net.tourbook.views.TourWaypointView"
-	            name="%View_Name_Waypoint"/>
-            
-		<category
-			id="net.tourbook.category.Tools"
-			name="%View_Category_Tools"/>
-			
-			<view
-				category="net.tourbook.category.Tools"
-				class="net.tourbook.ui.views.TourChartAnalyzerView"
-				icon="icons/chart-analyzer.gif"
-				id="net.tourbook.views.TourChartAnalyzer"
-				name="%view_name_Analyzer"/>
-			<view
-				category="net.tourbook.category.Tools"
-				class="net.tourbook.ui.views.TourSegmenterView"
-				icon="icons/tour-segmenter.gif"
-				id="net.tourbook.views.TourSegmenter"
-				name="%view_name_Segmenter"/>
-
-		<category
-			id="net.tourbook.category.compareTours"
-			name="%view_category_compare_tours"/>
-
-			<view
-				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
-				icon="icons/tour-map-compare-result.gif"
-				id="net.tourbook.views.tourCatalog.CompareResultView"
-				name="%view_name_Compare_Result"/>
-			<view
-				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour"
-				icon="icons/tour-map-reftour.png"
-				id="net.tourbook.views.tourCatalog.referenceTourView"
-				name="%view_name_tourCatalog_referenceTour"/>
-			<view
-				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour"
-				icon="icons/tour-map-comparetour.gif"
-				id="net.tourbook.views.tourCatalog.comparedTourView"
-				name="%view_name_tourCatalog_comparedTour"/>
-			<view
-				category="net.tourbook.category.compareTours"
-				class="net.tourbook.ui.views.tourCatalog.YearStatisticView"
-				icon="icons/tour-map-statistic.gif"
-				id="net.tourbook.views.tourCatalog.yearStatisticView"
-				name="%view_name_tourCatalog_statistics"/>
-
-		<category
-			id="net.tourbook.category.system"
-			name="%view_category_system"/>
-
-			<view
-				name="Progress View"
-				id="org.eclipse.ui.views.ProgressView"
-				icon="icons/pview.gif"
-				category="net.tourbook.category.system"
-				class="org.eclipse.ui.ExtensionFactory:progressView"
-			/>
-			<view
-				name="%view_name_ChartProperty"
-				id="net.tourbook.views.TourChartPropertyView"
-				category="net.tourbook.category.system"
-				class="net.tourbook.ui.tourChart.TourChartPropertyView"
-				icon="icons/tourchart-properties.gif"
-			/>
-			<view
-				category="net.tourbook.category.system"
-				class="net.tourbook.mapping.TourMapPropertyView"
-				icon="icons/tour-map-properties.png"
-				id="net.tourbook.mapping.TourMapPropertyView"
-				name="%view_name_map_properties"
-			/>
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="de.byteholder.geoclipse.poi.actionSet"
+            label="Sample Action Set"
+            visible="true">
+         <action
+               class="de.byteholder.geoclipse.poi.ShowPoiViewAction"
+               icon="icons/find.png"
+               id="de.byteholder.geoclipse.poi.ShowPlacesViewAction"
+               label="&amp;Places search"
+               menubarPath="window/views"
+               style="push"
+               toolbarPath="views"
+               tooltip="Search for places and show them on the map">
+         </action>
+      </actionSet>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.tourbook.tour.TourEditor"
+            icon="icons/tour-viewer.png"
+            id="net.tourbook.tour.TourEditor"
+            name="%command_view_tourViewer">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="net.tourbook.tour.TourEditorInputFactory"
+            id="net.tourbook.tour.TourEditorInputFactory">
+      </factory>
+   </extension>
+   
       
    <extension
          point="org.eclipse.ui.perspectives">
@@ -414,23 +216,145 @@
       
       
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.tourbook.preferences.PrefPageGeneral"
+            id="net.tourbook.preferences.PrefPageGeneralId"
+            name="%preference_page_general">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageGeneralId"
+            class="net.tourbook.preferences.PrefPageComputedValues"
+            id="net.tourbook.preferences.PrefPageComputedValues"
+            name="%preference_page_computedValues">
+      </page>
+      <page
+            class="net.tourbook.preferences.PrefPageAppearance"
+            id="net.tourbook.preferences.PrefPageAppearance"
+            name="%preference_page_appearance">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceTourChart"
+            id="net.tourbook.preferences.PrefPageChartGraphs"
+            name="%preference_page_Graphs">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
+            id="net.tourbook.preferences.PrefPageTourEditor"
+            name="%preference_page_tourEditor">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceColors"
+            id="net.tourbook.preferences.PrefPageChartColors"
+            name="%preference_page_Chart_Colors">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceView"
+            id="net.tourbook.preferences.PrefPageViewColors"
+            name="%preference_page_view_colors">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageAppearanceMap"
+            id="net.tourbook.preferences.PrefPageMapAppearance"
+            name="%preference_page_map_appearance">
+      </page>
+      <page
+            class="net.tourbook.preferences.PrefPageDataImport"
+            id="net.tourbook.preferences.PrefPageDataImport"
+            name="%preference_page_data_import">
+      </page>
+      <page
+            class="net.tourbook.preferences.PrefPageBikes"
+            id="net.tourbook.preferences.PrefPageBikes"
+            name="%preference_page_Bikes">
+      </page>
+      <page
+            class="net.tourbook.preferences.PrefPagePeople"
+            id="net.tourbook.preferences.PrefPagePeopleId"
+            name="%preference_page_People">
+      </page>
+      <page
+            class="net.tourbook.srtm.PrefPageSRTM"
+            id="net.tourbook.ext.srtm.PrefPageSRTM"
+            name="%pref_page_srtm">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.srtm.PrefPageSRTMColors"
+            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
+            name="%pref_page_srtm_colors">
+      </page>
+      <page
+            class="de.byteholder.geoclipse.preferences.PrefPageMap"
+            id="de.byteholder.geoclipse.preferences.map"
+            name="%pref_page_map">
+      </page>
+      <page
+            category="de.byteholder.geoclipse.preferences.map"
+            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
+            name="%pref_page_provider">
+      </page>
+      <page
+            category="de.byteholder.geoclipse.preferences.map"
+            class="de.byteholder.geoclipse.preferences.PrefPageCache"
+            id="de.byteholder.geoclipse.preferences.PrefPageCache"
+            name="%pref_page_cache">
+      </page>
+      <page
+            class="net.tourbook.preferences.PrefPageTourTypeFilterList"
+            id="net.tourbook.preferences.PrefPageTourTypeFilter"
+            name="%preference_page_tour_type_root">
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageTourTypeFilter"
+            class="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
+            name="%preference_page_tour_types">
+      </page>
+      
+      
+      <page
+            class="net.tourbook.preferences.PrefPageViews"
+            id="net.tourbook.preferences.PrefPageViews"
+            name="%preference_page_views">
+
+      </page>
+      <page
+            category="net.tourbook.preferences.PrefPageViews"
+            class="net.tourbook.preferences.PrefPageViewTourBook"
+            id="net.tourbook.preferences.PrefPageViewTourBook"
+            name="%Pref_Page_View_Tourbook">
+      </page>
+      
+	      <page
+	            category="net.tourbook.preferences.PrefPageViews"
+	            class="net.tourbook.preferences.PrefPageTags"
+	            id="net.tourbook.preferences.PrefPageTags"
+	            name="%preference_page_tags">
+	      </page>
+
+	      <page
+	            category="net.tourbook.preferences.PrefPageViews"
+	            class="net.tourbook.preferences.PrefPageStatistic"
+	            id="net.tourbook.preferences.prefPageStatistic"
+	            name="%preference_page_statistics">
+	      </page>
+		      <page
+		            category="net.tourbook.preferences.prefPageStatistic"
+		            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
+		            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
+		            name="%preference_page_statistics_tourFrequency">
+		      </page>
+      
+   </extension>
    
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="net.tourbook.tour.TourEditor"
-            icon="icons/tour-viewer.png" 
-            id="net.tourbook.tour.TourEditor"
-            name="%command_view_tourViewer">
-      </editor>
-   </extension>
-   <extension
-         point="org.eclipse.ui.elementFactories">
-      <factory
-            class="net.tourbook.tour.TourEditorInputFactory"
-            id="net.tourbook.tour.TourEditorInputFactory">
-      </factory>
-   </extension>
    
    <extension
          point="org.eclipse.ui.menus">
@@ -737,6 +661,36 @@
          </toolbar>
       </menuContribution>
 
+      
+      <menuContribution
+            locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
+      </menuContribution>
+ 
+      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar id="net.tourbook.mapping.statusline.mapinfo">
+            <control
+                  class="net.tourbook.mapping.MapInfoContribution"
+                  id="net.tourbook.mapping.mapinfo">
+            </control>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar
+               id="de.byteholder.geoclipse.toolbar.tileinfo">
+            <control
+                  class="de.byteholder.geoclipse.tileinfo.TileInfoContribution"
+                  id="de.byteholder.geoclipse.tileinfo">
+               <visibleWhen>
+                  <test
+                        forcePluginActivation="true"
+                        property="de.byteholder.geoclipse.tester.someProperty"
+                        value="true">
+                  </test>
+               </visibleWhen>
+            </control>
+         </toolbar>
+      </menuContribution>
       <menuContribution
             locationURI="toolbar:net.tourbook.views.rawData.RawDataView?after=import">
          <command
@@ -759,21 +713,8 @@
                commandId="net.tourbook.command.device.importFromFile"
                icon="icons/open_folder_add.gif"
                label="%command_device_importFromFile"
-               mnemonic="%command_device_importFromFile_mnemonic"
-         />
-      </menuContribution>
-      
-      <menuContribution
-            locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
-      </menuContribution>
- 
-      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
-         <toolbar id="net.tourbook.mapping.statusline.mapinfo">
-            <control
-                  class="net.tourbook.mapping.MapInfoContribution"
-                  id="net.tourbook.mapping.mapinfo">
-            </control>
-         </toolbar>
+               mnemonic="%command_device_importFromFile_mnemonic">
+         </command>
       </menuContribution>
  
    </extension>
@@ -1005,30 +946,7 @@
       <painter class="net.tourbook.mapping.TourPainter"/>
    </extension>
 
-     <extension
-         point="org.eclipse.ui.preferencePages">
-
-               
-      <page
-            class="net.tourbook.srtm.PrefPageSRTM"
-            id="net.tourbook.ext.srtm.PrefPageSRTM"
-            name="%pref_page_srtm">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.srtm.PrefPageSRTMColors"
-            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
-            name="%pref_page_srtm_colors">
-      </page>
-      
-   </extension>
    
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.tourbook.srtm.PreferenceInitializer">
-      </initializer>
-   </extension>
 
    <extension
          point="net.tourbook.tilefactory">
@@ -1039,55 +957,6 @@
 
 
    
-	<extension	point="org.eclipse.ui.preferencePages">
-		 
-		<page
-		      class="de.byteholder.geoclipse.preferences.PrefPageMap"
-		      id="de.byteholder.geoclipse.preferences.map"
-		      name="%pref_page_map">
-		</page>
-
-		<page
-			category="de.byteholder.geoclipse.preferences.map"
-			class="de.byteholder.geoclipse.preferences.PrefPageCache"
-			id="de.byteholder.geoclipse.preferences.PrefPageCache"
-			name="%pref_page_cache">
-		</page>
-
-		<page
-			class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
-			id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
-			name="%pref_page_provider">
-		</page>
-
-	</extension>
-
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-
-   <extension point="org.eclipse.ui.menus">
-      <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
-         <toolbar id="de.byteholder.geoclipse.toolbar.tileinfo">
-            <control
-                  class="de.byteholder.geoclipse.tileinfo.TileInfoContribution"
-                  id="de.byteholder.geoclipse.tileinfo">
-               <visibleWhen>
-                  <test
-                        forcePluginActivation="true"
-                        property="de.byteholder.geoclipse.tester.someProperty"
-                        value="true">
-                  </test>
-               </visibleWhen>
-            </control>
-         </toolbar>
-      </menuContribution>
-   </extension>
-   
-   
   	<extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
 			id="de.byteholder.geoclipse.tester.propertyTester"
@@ -1097,33 +966,174 @@
 			class="de.byteholder.geoclipse.tileinfo.TrimPropertyTester">
 	  	</propertyTester>
 	</extension>
-   
-	<extension point="org.eclipse.ui.actionSets">
-		<actionSet
-			label="Sample Action Set"
-			visible="true"
-			id="de.byteholder.geoclipse.poi.actionSet">
-			
-			<action
-				class="de.byteholder.geoclipse.poi.ShowPoiViewAction"
-				icon="icons/find.png"
-				id="de.byteholder.geoclipse.poi.ShowPlacesViewAction"
-				label="&amp;Places search"
-				menubarPath="window/views"
-				style="push"
-				toolbarPath="views"
-				tooltip="Search for places and show them on the map">
-			</action>
-		</actionSet>
-	</extension>
+   <extension
+         point="org.eclipse.ui.views">
+
+      <category
+            id="net.tourbook.category.tourList"
+            name="%view_category_tourDirectory">
+      </category>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.rawData.RawDataView"
+	            icon="icons/rawdata.gif"
+	            id="net.tourbook.views.rawData.RawDataView"
+	            name="%view_name_Data_Import">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.tourBook.TourBookView"
+	            icon="icons/tour-list.gif"
+	            id="net.tourbook.views.tourListView"
+	            name="%view_name_Book">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.tagging.TaggingView"
+	            icon="icons/tour-tag.gif"
+	            id="net.tourbook.views.tagViewID"
+	            name="%view_name_tagView">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
+	            icon="icons/tour-map.gif"
+	            id="net.tourbook.views.tourCatalog.TourCatalogView"
+	            name="%view_name_tourCatalog">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tourList"
+	            class="net.tourbook.statistic.TourStatisticsView"
+	            icon="icons/statistics.gif"
+	            id="net.tourbook.views.StatisticView"
+	            name="%view_name_Statistics">
+	      </view>
+
+      <category
+            id="net.tourbook.category.tour"
+            name="%view_category_tour">
+      </category>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.tourChart.TourChartView"
+	            icon="icons/tour-chart.gif"
+	            id="net.tourbook.views.TourChartView"
+	            name="%view_name_Chart">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
+	            icon="icons/tour-editor.gif"
+	            id="net.tourbook.views.TourDataEditorView"
+	            name="%command_view_tourEditor">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.views.TourMarkerView"
+	            icon="icons/tour-marker.png"
+	            id="net.tourbook.views.TourMarkerView"
+	            name="%view_name_Marker">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.mapping.TourMapView"
+	            icon="icons/earth-globe-abstract.png"
+	            id="net.tourbook.mapping.mappingViewID"
+	            name="%view_name_tour_map">
+	      </view>
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.views.TourWaypointView"
+	            icon="icons/tour-waypoint.png"
+	            id="net.tourbook.views.TourWaypointView"
+	            name="%View_Name_Waypoint">
+	      </view>
+
+      <category
+            id="net.tourbook.category.Tools"
+            name="%View_Category_Tools">
+      </category>
+	      <view
+	            category="net.tourbook.category.Tools"
+	            class="net.tourbook.ui.views.TourChartAnalyzerView"
+	            icon="icons/chart-analyzer.gif"
+	            id="net.tourbook.views.TourChartAnalyzer"
+	            name="%view_name_Analyzer">
+	      </view>
+	      <view
+	            category="net.tourbook.category.Tools"
+	            class="net.tourbook.ui.views.TourSegmenterView"
+	            icon="icons/tour-segmenter.gif"
+	            id="net.tourbook.views.TourSegmenter"
+	            name="%view_name_Segmenter">
+	      </view>
+       <view
+             allowMultiple="false"
+             category="net.tourbook.category.Tools"
+             class="de.byteholder.geoclipse.poi.PoiView"
+             icon="icons/find.png"
+             id="de.byteholder.geoclipse.poi.poiView"
+             name="Places">
+       </view>
+
+      <category
+            id="net.tourbook.category.compareTours"
+            name="%view_category_compare_tours">
+      </category>
+	      <view
+	            category="net.tourbook.category.compareTours"
+	            class="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
+	            icon="icons/tour-map-compare-result.gif"
+	            id="net.tourbook.views.tourCatalog.CompareResultView"
+	            name="%view_name_Compare_Result">
+	      </view>
+	      <view
+	            category="net.tourbook.category.compareTours"
+	            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour"
+	            icon="icons/tour-map-reftour.png"
+	            id="net.tourbook.views.tourCatalog.referenceTourView"
+	            name="%view_name_tourCatalog_referenceTour">
+	      </view>
+	      <view
+	            category="net.tourbook.category.compareTours"
+	            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour"
+	            icon="icons/tour-map-comparetour.gif"
+	            id="net.tourbook.views.tourCatalog.comparedTourView"
+	            name="%view_name_tourCatalog_comparedTour">
+	      </view>
+	      <view
+	            category="net.tourbook.category.compareTours"
+	            class="net.tourbook.ui.views.tourCatalog.YearStatisticView"
+	            icon="icons/tour-map-statistic.gif"
+	            id="net.tourbook.views.tourCatalog.yearStatisticView"
+	            name="%view_name_tourCatalog_statistics">
+	      </view>
+
+      <category
+            id="net.tourbook.category.system"
+            name="%view_category_system">
+      </category>
+	      <view
+	            category="net.tourbook.category.system"
+	            class="org.eclipse.ui.ExtensionFactory:progressView"
+	            icon="icons/pview.gif"
+	            id="org.eclipse.ui.views.ProgressView"
+	            name="Progress View">
+	      </view>
+	      <view
+	            category="net.tourbook.category.system"
+	            class="net.tourbook.ui.tourChart.TourChartPropertyView"
+	            icon="icons/tourchart-properties.gif"
+	            id="net.tourbook.views.TourChartPropertyView"
+	            name="%view_name_ChartProperty">
+	      </view>
+	      <view
+	            category="net.tourbook.category.system"
+	            class="net.tourbook.mapping.TourMapPropertyView"
+	            icon="icons/tour-map-properties.png"
+	            id="net.tourbook.mapping.TourMapPropertyView"
+	            name="%view_name_map_properties">
+	      </view>
+   </extension>
 	   
-	<extension point="org.eclipse.ui.views">
-		<view
-			allowMultiple="false"
-			category="net.tourbook.category.Tools"
-			class="de.byteholder.geoclipse.poi.PoiView"
-			icon="icons/find.png"
-			id="de.byteholder.geoclipse.poi.poiView"
-			name="Places"/>
-	</extension>
 </plugin>
