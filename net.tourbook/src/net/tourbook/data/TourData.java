@@ -1020,6 +1020,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void computeAltimeterGradientSerie() {
 
+		// check if needed data are available
+		if (timeSerie == null || timeSerie.length < 2 || distanceSerie == null || altitudeSerie == null) {
+			return;
+		}
+
 		// optimization: don't recreate the data series when they are available
 		if ((altimeterSerie != null) && (altimeterSerieImperial != null) && (gradientSerie != null)) {
 			return;
@@ -1036,10 +1041,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Computes the data serie for altimeters with the internal algorithm for a fix time interval
 	 */
 	private void computeAltimeterGradientSerieWithFixedInterval() {
-
-		if ((distanceSerie == null) || (altitudeSerie == null)) {
-			return;
-		}
 
 		final int serieLength = timeSerie.length;
 
@@ -1138,10 +1139,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private void computeAltimeterGradientSerieWithVariableInterval() {
 
-		if ((distanceSerie == null) || (altitudeSerie == null)) {
-			return;
-		}
-
 		final int[] checkSpeedSerie = getSpeedSerie();
 
 		final int serieLength = timeSerie.length;
@@ -1165,7 +1162,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final boolean checkPosition = (latitudeSerie != null) && (longitudeSerie != null);
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+		for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
 			if (checkSpeedSerie[serieIndex] == 0) {
 				// continue when no speed is available
