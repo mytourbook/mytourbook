@@ -1,22 +1,23 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.data.TourData;
+import net.tourbook.device.garmin.fit.DataConverters;
+import net.tourbook.device.garmin.fit.FitActivityContext;
 
 import com.garmin.fit.FileCreatorMesg;
 import com.garmin.fit.FileCreatorMesgListener;
 
-public class FileCreatorMesgListenerImpl extends AbstractTourDataMesgListener implements FileCreatorMesgListener {
+public class FileCreatorMesgListenerImpl extends AbstractMesgListener implements FileCreatorMesgListener {
 
-    public FileCreatorMesgListenerImpl(TourData tourData) {
-	super(tourData);
-    }
-
-    @Override
-    public void onMesg(FileCreatorMesg mesg) {
-	Integer softwareVersion = mesg.getSoftwareVersion();
-	if (softwareVersion != null) {
-	    // TODO
+	public FileCreatorMesgListenerImpl(FitActivityContext context) {
+		super(context);
 	}
-    }
+
+	@Override
+	public void onMesg(FileCreatorMesg mesg) {
+		Integer softwareVersion = mesg.getSoftwareVersion();
+		if (softwareVersion != null) {
+			context.setSoftwareVersion(DataConverters.convertSoftwareVersion(softwareVersion));
+		}
+	}
 
 }

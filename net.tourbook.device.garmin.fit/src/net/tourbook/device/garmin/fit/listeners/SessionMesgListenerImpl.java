@@ -1,91 +1,95 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import java.util.Calendar;
-
-import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.fit.FitDataReaderException;
+import net.tourbook.device.garmin.fit.FitActivityContext;
+import net.tourbook.device.garmin.fit.FitActivityReaderException;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
 
-public class SessionMesgListenerImpl extends AbstractTourDataMesgListener implements SessionMesgListener {
+public class SessionMesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
 
-    public SessionMesgListenerImpl(TourData tourData) {
-	super(tourData);
-    }
-
-    @Override
-    public void onMesg(SessionMesg mesg) {
-	DateTime startTime = mesg.getStartTime();
-	if (startTime == null) {
-	    throw new FitDataReaderException("Missing session start date");
+	public SessionMesgListenerImpl(FitActivityContext context) {
+		super(context);
 	}
 
-	// TODO: jodatime
-	Calendar calendar = Calendar.getInstance();
+	@Override
+	public void onMesg(SessionMesg mesg) {
+		context.beforeSession();
 
-	calendar.setTime(startTime.getDate());
+		Integer messageIndex = mesg.getMessageIndex();
+		if (messageIndex == null) {
+			throw new FitActivityReaderException("Missing session message index");
+		}
+		context.setSessionIndex(messageIndex.toString());
 
-	tourData.setStartSecond(calendar.get(Calendar.SECOND));
-	tourData.setStartMinute((short) calendar.get(Calendar.MINUTE));
-	tourData.setStartHour((short) calendar.get(Calendar.HOUR_OF_DAY));
-	tourData.setStartDay((short) calendar.get(Calendar.DAY_OF_MONTH));
-	tourData.setStartMonth((short) (calendar.get(Calendar.MONTH) + 1));
-	tourData.setStartYear((short) calendar.get(Calendar.YEAR));
+		DateTime startTime = mesg.getStartTime();
+		if (startTime == null) {
+			throw new FitActivityReaderException("Missing session start date");
+		}
 
-	tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		org.joda.time.DateTime tourDataStartTime = new org.joda.time.DateTime(startTime.getDate());
 
-	Sport sport = mesg.getSport();
-	if (sport != null) {
-	    tourData.setDeviceModeName(sport.name());
+		getTourData().setStartSecond((short) tourDataStartTime.getSecondOfMinute());
+		getTourData().setStartMinute((short) tourDataStartTime.getMinuteOfHour());
+		getTourData().setStartHour((short) tourDataStartTime.getHourOfDay());
+		getTourData().setStartDay((short) tourDataStartTime.getDayOfMonth());
+		getTourData().setStartMonth((short) tourDataStartTime.getMonthOfYear());
+		getTourData().setStartYear((short) tourDataStartTime.getYear());
+
+		getTourData().setWeek(getTourData().getStartYear(), getTourData().getStartMonth(), getTourData().getStartDay());
+
+		Sport sport = mesg.getSport();
+		if (sport != null) {
+			getTourData().setDeviceModeName(sport.name());
+		}
+
+		Short avgHeartRate = mesg.getAvgHeartRate();
+		if (avgHeartRate != null) {
+			getTourData().setAvgPulse(avgHeartRate);
+		}
+
+		Short avgCadence = mesg.getAvgCadence();
+		if (avgCadence != null) {
+			getTourData().setAvgCadence(avgCadence);
+		}
+
+		Float avgSpeed = mesg.getAvgSpeed();
+		if (avgSpeed != null) {
+			// TODO
+		}
+
+		Integer totalCalories = mesg.getTotalCalories();
+		if (totalCalories != null) {
+			getTourData().setCalories(totalCalories);
+		}
+
+		Float totalDistance = mesg.getTotalDistance();
+		if (totalDistance != null) {
+			getTourData().setTourDistance(Math.round(totalDistance));
+		}
+
+		Integer totalAscent = mesg.getTotalAscent();
+		if (totalAscent != null) {
+			getTourData().setTourAltUp(totalAscent);
+		}
+
+		Integer totalDescent = mesg.getTotalDescent();
+		if (totalDescent != null) {
+			getTourData().setTourAltDown(totalDescent);
+		}
+
+		Float totalElapsedTime = mesg.getTotalElapsedTime();
+		if (totalElapsedTime != null) {
+			getTourData().setTourRecordingTime(Math.round(totalElapsedTime));
+		}
+
+		Float totalTimerTime = mesg.getTotalTimerTime();
+		if (totalTimerTime != null) {
+			getTourData().setTourDrivingTime(Math.round(totalTimerTime));
+		}
+
+		context.afterSession();
 	}
-
-	Short avgHeartRate = mesg.getAvgHeartRate();
-	if (avgHeartRate != null) {
-	    tourData.setAvgPulse(avgHeartRate);
-	}
-
-	Short avgCadence = mesg.getAvgCadence();
-	if (avgCadence != null) {
-	    tourData.setAvgCadence(avgCadence);
-	}
-
-	Float avgSpeed = mesg.getAvgSpeed();
-	if (avgSpeed != null) {
-	    // TODO
-	}
-
-	Integer totalCalories = mesg.getTotalCalories();
-	if (totalCalories != null) {
-	    tourData.setCalories(totalCalories);
-	}
-
-	Float totalDistance = mesg.getTotalDistance();
-	if (totalDistance != null) {
-	    tourData.setTourDistance(Math.round(totalDistance));
-	}
-
-	Integer totalAscent = mesg.getTotalAscent();
-	if (totalAscent != null) {
-	    tourData.setTourAltUp(totalAscent);
-	}
-
-	Integer totalDescent = mesg.getTotalDescent();
-	if (totalDescent != null) {
-	    tourData.setTourAltDown(totalDescent);
-	}
-
-	Float totalElapsedTime = mesg.getTotalElapsedTime();
-	if (totalElapsedTime != null) {
-	    tourData.setTourRecordingTime(Math.round(totalElapsedTime));
-	}
-
-	Float totalTimerTime = mesg.getTotalTimerTime();
-	if (totalTimerTime != null) {
-	    tourData.setTourDrivingTime(Math.round(totalTimerTime));
-	}
-
-    }
 }
