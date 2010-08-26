@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -145,6 +145,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 																					.getImageDescriptor(
 																							Messages.Image__tag_root)
 																					.createImage();
+
+	private boolean							_isToolTipInTag;
+	private boolean							_isToolTipInTitle;
+	private boolean							_isToolTipInTags;
 
 	/*
 	 * UI controls
@@ -349,6 +353,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					// update viewer
 
 					_tagViewer.refresh();
+
+				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+					updateToolTipState();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -620,7 +628,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	/**
 	 * Defines all columns for the table viewer in the column manager
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -658,6 +666,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTag == false) {
+					return null;
+				}
 
 				final Object element = cell.getElement();
 				final TVITagViewItem viewItem = (TVITagViewItem) element;
@@ -1017,6 +1029,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInTags == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if (element instanceof TVITagViewTour) {
 					return ((TVITagViewTour) element).tourId;
@@ -1155,6 +1171,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTitle == false) {
+					return null;
+				}
 
 				final Object element = cell.getElement();
 				if (element instanceof TVITagViewTour) {
@@ -1371,6 +1391,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
+	public ColumnManager getColumnManager() {
+		return _columnManager;
+	}
+
 //	@SuppressWarnings("unchecked")
 //	@Override
 //	public Object getAdapter(final Class adapter) {
@@ -1381,10 +1405,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 //
 //		return Platform.getAdapterManager().getAdapter(this, adapter);
 //	}
-
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
@@ -1494,6 +1514,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			_tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
 			_actionSetLayoutHierarchical.setChecked(true);
 		}
+
+		updateToolTipState();
 	}
 
 	private void saveState() {
@@ -1544,6 +1566,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void setViewLayout(final int tagViewStructure) {
 		_tagViewLayout = tagViewStructure;
 		reloadViewer();
+	}
+
+	private void updateToolTipState() {
+
+		_isToolTipInTag = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG);
+		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE);
+		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS);
 	}
 
 	/**

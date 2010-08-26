@@ -25,8 +25,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * Utility class to create status objects.
  * 
- * @private - This class is an internal implementation class and should
- *          not be referenced or subclassed outside of the workbench
+ * @private - This class is an internal implementation class and should not be referenced or
+ *          subclassed outside of the workbench
  */
 public class StatusUtil {
 
@@ -37,7 +37,7 @@ public class StatusUtil {
 		Throwable cause = null;
 		if (exception != null) {
 			if (exception instanceof CoreException) {
-				// Workaround: CoreException contains a cause, but does not actually implement getCause(). 
+				// Workaround: CoreException contains a cause, but does not actually implement getCause().
 				// If we get a CoreException, we need to manually unpack the cause. Otherwise, use
 				// the general-purpose mechanism. Remove this branch if CoreException ever implements
 				// a correct getCause() method.
@@ -76,14 +76,18 @@ public class StatusUtil {
 	 * Utility method for handling status.
 	 */
 	public static void handleStatus(final String message, final int style) {
-		handleStatus(message, null, style);
+		handleStatus(message, null, style, IStatus.ERROR);
 	}
 
 	/**
 	 * Utility method for handling status.
+	 * 
+	 * @param severity
 	 */
-	public static void handleStatus(final String message, final Throwable e, final int style) {
-		StatusManager.getManager().handle(newStatus(Activator.PLUGIN_ID, message, e), style | StatusManager.LOG);
+	public static void handleStatus(final String message, final Throwable e, final int style, final int severity) {
+		StatusManager.getManager().handle(
+				newStatus(Activator.PLUGIN_ID, message, e, severity),
+				style | StatusManager.LOG);
 	}
 
 	/**
@@ -93,7 +97,7 @@ public class StatusUtil {
 	 * @param exception
 	 */
 	public static void log(final String message) {
-		handleStatus(message, null, StatusManager.LOG);
+		handleStatus(message, null, StatusManager.LOG, IStatus.ERROR);
 	}
 
 	/**
@@ -111,8 +115,8 @@ public class StatusUtil {
 			exception = new Exception();
 		}
 
-		handleStatus(message, exception, StatusManager.LOG);
-	} 
+		handleStatus(message, exception, StatusManager.LOG, IStatus.ERROR);
+	}
 
 	/**
 	 * Log into log
@@ -120,7 +124,23 @@ public class StatusUtil {
 	 * @param exception
 	 */
 	public static void log(final Throwable exception) {
-		handleStatus(exception.getMessage(), exception, StatusManager.LOG);
+		handleStatus(exception.getMessage(), exception, StatusManager.LOG, IStatus.ERROR);
+	}
+
+	public static void logInfo(final String message) {
+		handleStatus(message, null, StatusManager.LOG, IStatus.INFO);
+	}
+
+	public static void logInfo(final String message, Exception exception) {
+
+		/*
+		 * create an exception to see in the log the location where the logging occured
+		 */
+		if (exception == null) {
+			exception = new Exception();
+		}
+
+		handleStatus(message, exception, StatusManager.LOG, IStatus.INFO);
 	}
 
 	/**
@@ -140,20 +160,23 @@ public class StatusUtil {
 		return new Status(severity, Activator.PLUGIN_ID, severity, statusMessage, getCause(exception));
 	}
 
-	public static IStatus newStatus(final String pluginId, final String message, final Throwable exception) {
-		return new Status(IStatus.ERROR, pluginId, IStatus.OK, message, getCause(exception));
+	private static IStatus newStatus(	final String pluginId,
+										final String message,
+										final Throwable exception,
+										final int severity) {
+		return new Status(severity, pluginId, IStatus.OK, message, getCause(exception));
 	}
 
 	public static void showStatus(final String message) {
-		handleStatus(message, null, StatusManager.SHOW);
+		handleStatus(message, null, StatusManager.SHOW, IStatus.ERROR);
 	}
 
 	public static void showStatus(final String message, final Throwable exception) {
-		handleStatus(message, exception, StatusManager.SHOW);
+		handleStatus(message, exception, StatusManager.SHOW, IStatus.ERROR);
 	}
 
 	public static void showStatus(final Throwable exception) {
-		handleStatus(exception.getMessage(), exception, StatusManager.SHOW);
+		handleStatus(exception.getMessage(), exception, StatusManager.SHOW, IStatus.ERROR);
 	}
 
 }

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -124,7 +124,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * 
+ *
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer {
 
@@ -174,6 +174,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
 																						DateFormat.SHORT,
 																						Locale.GERMAN);
+
+	private boolean							_isToolTipInDate;
+	private boolean							_isToolTipInTime;
+	private boolean							_isToolTipInTitle;
+	private boolean							_isToolTipInTags;
 
 	/*
 	 * resources
@@ -520,6 +525,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					}
 
 				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
 					_actionSaveTour.resetPeopleList();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
@@ -528,6 +534,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					RawDataManager.getInstance().updateTourDataFromDb(null);
 
 					_tourViewer.refresh();
+
+				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+					updateToolTipState();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -769,7 +779,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -927,6 +937,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInDate == false) {
+					return null;
+				}
+
 				return ((TourData) cell.getElement()).getTourId();
 			}
 
@@ -1110,6 +1125,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTags == false) {
+					return null;
+				}
+
 				return ((TourData) cell.getElement()).getTourId();
 			}
 
@@ -1151,6 +1171,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTime == false) {
+					return null;
+				}
+
 				return ((TourData) cell.getElement()).getTourId();
 			}
 
@@ -1193,6 +1218,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTitle == false) {
+					return null;
+				}
+
 				return ((TourData) cell.getElement()).getTourId();
 			}
 
@@ -1275,7 +1305,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
-	 * 
+	 *
 	 * @param savedTours
 	 *            contains the saved {@link TourData}
 	 */
@@ -1745,7 +1775,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * reimport previous imported tours
-	 * 
+	 *
 	 * @param monitor
 	 * @param importedFiles
 	 */
@@ -1883,6 +1913,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionDisableChecksumValidation.setChecked(_state.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
 		rawDataManager.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
 
+		updateToolTipState();
+
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 				reimportAllImportFiles();
@@ -1989,6 +2021,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			});
 		}
+	}
+
+	private void updateToolTipState() {
+
+		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE);
+		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME);
+		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE);
+		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
 	}
 
 	/**

@@ -701,12 +701,30 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
+	public static String	PrefPage_ViewTooltip_Button_DisableAll;
+
+	public static String	PrefPage_ViewTooltip_Button_EnableAll;
+
 	public static String		PrefPage_ViewTooltip_Group;
+	public static String	PrefPage_ViewTooltip_Label_Date;
+
 	public static String		PrefPage_ViewTooltip_Label_Day;
 	public static String		PrefPage_ViewTooltip_Label_Info;
+
+	public static String	PrefPage_ViewTooltip_Label_RawData;
+
+	public static String	PrefPage_ViewTooltip_Label_ReferenceTour;
+	public static String	PrefPage_ViewTooltip_Label_TagFirstColumn;
+
+	public static String	PrefPage_ViewTooltip_Label_TaggedTour;
+
 	public static String		PrefPage_ViewTooltip_Label_Tags;
 	public static String		PrefPage_ViewTooltip_Label_Time;
 	public static String		PrefPage_ViewTooltip_Label_Title;
+
+	public static String	PrefPage_ViewTooltip_Label_TourBook;
+
+	public static String	PrefPage_ViewTooltip_Label_TourCatalog;
 	public static String		PrefPage_ViewTooltip_Label_WeekDay;
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
@@ -744,6 +762,10 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
+
+	public static String	Tour_Database_CannotConnectToDerbyServer_Message;
+
+	public static String	Tour_Database_CannotConnectToDerbyServer_Title;
 
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;

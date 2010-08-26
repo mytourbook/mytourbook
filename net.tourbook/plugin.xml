@@ -13,24 +13,24 @@
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
-         
+
       <application>
          <run
                class="net.tourbook.application.Application">
          </run>
       </application>
-      
+
    </extension>
-   
-   
+
+
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
-         
+
       <product
             application="net.tourbook.application"
             name="MyTourbook">
-            
+
          <property
                name="windowImages"
                value="icons/application/tourbook16.png,icons/application/tourbook32.png,icons/application/tourbook48.png,icons/application/tourbook64.png,icons/application/tourbook128.png"/>
@@ -61,10 +61,10 @@
                value="plugin_customization.ini">
          </property>
       </product>
-      
+
    </extension>
-   
-   
+
+
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
@@ -75,7 +75,7 @@
             class="de.byteholder.geoclipse.preferences.PreferenceInitializer">
       </initializer>
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.splashHandlers">
       <splashHandler
@@ -87,7 +87,7 @@
             splashId="net.tourbook.splashHandler">
       </splashHandlerProductBinding>
    </extension>
-   
+
 
    <extension
          point="org.eclipse.ui.actionSets">
@@ -138,8 +138,8 @@
             id="net.tourbook.tour.TourEditorInputFactory">
       </factory>
    </extension>
-   
-      
+
+
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -170,10 +170,10 @@
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
-         
+
       <perspectiveExtension
             targetID="*">
-            
+
          <perspectiveShortcut
                id="net.tourbook.perspective.TourBook"/>
          <perspectiveShortcut
@@ -185,14 +185,14 @@
          <perspectiveShortcut
                id="net.tourbook.perspective.CompareTours"/>
       </perspectiveExtension>
-      
+
    <!--
    -->
-      
-      
+
+
       <perspectiveExtension
             targetID="net.tourbook.perspective.TourCatalog">
-            
+
          <viewShortcut
                id="net.tourbook.views.tourCatalog.comparedTourView"/>
          <viewShortcut
@@ -200,11 +200,11 @@
          <viewShortcut
                id="net.tourbook.views.tourCatalog.yearStatisticView"/>
       </perspectiveExtension>
-      
-      
+
+
       <perspectiveExtension
             targetID="net.tourbook.perspective.CompareTours">
-            
+
          <viewShortcut
                id="net.tourbook.views.tourCatalog.CompareResultView"/>
          <viewShortcut
@@ -212,9 +212,9 @@
          <viewShortcut
                id="net.tourbook.views.tourCatalog.comparedTourView"/>
       </perspectiveExtension>
-      
-      
-      
+
+
+
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -318,44 +318,29 @@
             id="net.tourbook.preferences.PrefPageTourTypeDefinition"
             name="%preference_page_tour_types">
       </page>
-      
-      
-      <page
-            class="net.tourbook.preferences.PrefPageViews"
-            id="net.tourbook.preferences.PrefPageViews"
-            name="%preference_page_views">
 
-      </page>
+
       <page
-            category="net.tourbook.preferences.PrefPageViews"
-            class="net.tourbook.preferences.PrefPageViewTourBook"
-            id="net.tourbook.preferences.PrefPageViewTourBook"
-            name="%Pref_Page_View_Tourbook">
+            class="net.tourbook.preferences.PrefPageTags"
+            id="net.tourbook.preferences.PrefPageTags"
+            name="%preference_page_tags">
       </page>
-      
+
+      <page
+            class="net.tourbook.preferences.PrefPageStatistic"
+            id="net.tourbook.preferences.prefPageStatistic"
+            name="%preference_page_statistics">
+      </page>
 	      <page
-	            category="net.tourbook.preferences.PrefPageViews"
-	            class="net.tourbook.preferences.PrefPageTags"
-	            id="net.tourbook.preferences.PrefPageTags"
-	            name="%preference_page_tags">
+	            category="net.tourbook.preferences.prefPageStatistic"
+	            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
+	            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
+	            name="%preference_page_statistics_tourFrequency">
 	      </page>
 
-	      <page
-	            category="net.tourbook.preferences.PrefPageViews"
-	            class="net.tourbook.preferences.PrefPageStatistic"
-	            id="net.tourbook.preferences.prefPageStatistic"
-	            name="%preference_page_statistics">
-	      </page>
-		      <page
-		            category="net.tourbook.preferences.prefPageStatistic"
-		            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
-		            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
-		            name="%preference_page_statistics_tourFrequency">
-		      </page>
-      
    </extension>
-   
-   
+
+
    <extension
          point="org.eclipse.ui.menus">
 
@@ -427,12 +412,12 @@
 
       <menuContribution
             locationURI="menu:views?before=defaultViews">
-            
+
          <separator
             name="net.tourbook.separator.TourDirectories"
             visible="true">
          </separator>
-            
+
          <command
             commandId="command.net.tourbook.views.rawData.RawDataView"
             icon="icons/rawdata.gif"
@@ -459,12 +444,12 @@
             icon="icons/statistics.gif"
             label="%view_name_Statistics"
             mnemonic="%view_name_Statistics_Mnemonic"/>
-            
+
          <separator
             name="net.tourbook.separator.TourProperties"
             visible="true">
          </separator>
-         
+
          <command
                commandId="net.tourbook.command.selectedTour"
                icon="icons/tour-chart.gif"
@@ -486,7 +471,7 @@
                mnemonic="%command_tour_map_name_Mnemonic"
                tooltip="%command_tour_map_name_tooltip">
          </command>
-         
+
          <command
 	           commandId="command.net.tourbook.views.TourMarkerView"
                icon="icons/tour-marker.png"
@@ -498,12 +483,12 @@
                label="%View_Name_Waypoint"
                mnemonic="%View_Name_Waypoint_Mnemonic"/>
 
-         
+
          <separator
                name="net.tourbook.separator.Tools"
                visible="true">
          </separator>
-         
+
          <command
                commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                icon="icons/chart-analyzer.gif"
@@ -521,7 +506,7 @@
                tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
          </command>
       </menuContribution>
-      
+
       <menuContribution
             locationURI="menu:views?after=adminViews">
          <command
@@ -536,7 +521,7 @@
             </parameter>
          </command>
       </menuContribution>
-      
+
       <menuContribution
             locationURI="menu:net.tourbook.menu.main.tools?after=tools">
 
@@ -554,15 +539,15 @@
                label="%command_tourCompare_wizard"
                mnemonic="%command_tourCompare_wizard_mnemonic">
          </command>
-      
+
       </menuContribution>
 
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-            
+
          <toolbar
                id="net.tourbook.toolbars.tourViews">
-            
+
             <command
                   commandId="net.tourbook.command.selectedTour"
                   icon="icons/tour-chart.gif"
@@ -597,16 +582,16 @@
                   style="push"
                   tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
             </command>
-            
+
          </toolbar>
       </menuContribution>
 
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-            
+
          <toolbar
                id="net.tourbook.toolbars.tourTools">
-            
+
             <command
                   commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                   icon="icons/tour-segmenter.gif"
@@ -629,7 +614,7 @@
                   mnemonic="%command_createNewTour_mnemonic"
                   style="push">
             </command>
-         
+
          </toolbar>
       </menuContribution>
 
@@ -647,7 +632,7 @@
             </command>
          </toolbar>
       </menuContribution>
-      
+
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
@@ -661,11 +646,11 @@
          </toolbar>
       </menuContribution>
 
-      
+
       <menuContribution
             locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
       </menuContribution>
- 
+
       <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
          <toolbar id="net.tourbook.mapping.statusline.mapinfo">
             <control
@@ -716,13 +701,13 @@
                mnemonic="%command_device_importFromFile_mnemonic">
          </command>
       </menuContribution>
- 
+
    </extension>
- 
+
    <extension
          point="org.eclipse.ui.commands">
-         
-         
+
+
       <command
             id="command.net.tourbook.views.rawData.RawDataView"
             name="%view_name_Data_Import"
@@ -760,7 +745,7 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
 	  		/>
 
-         
+
       <command
             id="net.tourbook.command.graph.altitude"
             categoryId="net.tourbook.command.category.tourEditor"
@@ -837,7 +822,7 @@
             id="net.tourbook.command.tourChart.canScrollChart"
             name="%command_tourChart_canScrollChart">
       </command>
-      
+
       <command
             defaultHandler="net.tourbook.application.ActionHandlerPreferences"
             id="net.tourbook.command.preferences"
@@ -881,14 +866,14 @@
             name="%command_tourChart_tool_graphAnalyzer"
             defaultHandler="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
             />
-         
+
       <command
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
             name="%command_tourChart_tool_tourSegmenter"
             defaultHandler="net.tourbook.ui.action.ActionHandlerViewTourSegmenter"
             />
-      
-      
+
+
       <command
             id="net.tourbook.command.tourDataEditor"
             name="%command_view_tourEditor"
@@ -920,9 +905,9 @@
             name="%Command_App_OpenForum"
             defaultHandler="net.tourbook.ui.action.ActionHandlerOpenForum"
             />
-      
+
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.handlers">
 
@@ -939,14 +924,14 @@
             name="net.tourbook.chart.context.isTourChart">
       </context>
    </extension>
-   
+
 
    <extension
          point="net.tourbook.mapOverlay">
       <painter class="net.tourbook.mapping.TourPainter"/>
    </extension>
 
-   
+
 
    <extension
          point="net.tourbook.tilefactory">
@@ -956,7 +941,7 @@
    </extension>
 
 
-   
+
   	<extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
 			id="de.byteholder.geoclipse.tester.propertyTester"
@@ -1135,5 +1120,5 @@
 	            name="%view_name_map_properties">
 	      </view>
    </extension>
-	   
+
 </plugin>

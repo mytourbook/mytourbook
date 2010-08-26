@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -144,6 +144,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private boolean						_isToolbarCreated					= false;
 
 	private ColumnManager				_columnManager;
+
+	private boolean						_isToolTipInRefTour;
+	private boolean						_isToolTipInTitle;
+	private boolean						_isToolTipInTags;
 
 	/*
 	 * UI controls
@@ -402,6 +406,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
+				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+					updateToolTipState();
+
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tourbook viewer
@@ -613,6 +621,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInRefTour == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 
 				if ((element instanceof TVICatalogRefTourItem)) {
@@ -710,6 +722,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
+				if (_isToolTipInTags == false) {
+					return null;
+				}
+
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
 					return ((TVICatalogComparedTour) element).getTourId();
@@ -739,6 +755,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			@Override
 			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInTitle == false) {
+					return null;
+				}
 
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
@@ -1019,7 +1039,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Selection changes in the tour map viewer
-	 * 
+	 *
 	 * @param selection
 	 */
 	private void onSelectionChanged(final IStructuredSelection selection) {
@@ -1125,6 +1145,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		// action: link tour with statistics
 		_actionLinkTour.setChecked(_state.getBoolean(MEMENTO_TOUR_CATALOG_LINK_TOUR));
+
+		updateToolTipState();
 	}
 
 	public void saveState() {
@@ -1146,7 +1168,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	/**
 	 * Select the reference tour in the tour viewer
-	 * 
+	 *
 	 * @param refId
 	 */
 	private void selectRefTour(final long refId) {
@@ -1171,6 +1193,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	@Override
 	public void setFocus() {
 //		fTourViewer.getTree().setFocus();
+	}
+
+	private void updateToolTipState() {
+
+		_isToolTipInRefTour = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_REFTOUR);
+		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TITLE);
+		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS);
 	}
 
 	/**

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -217,11 +217,26 @@ public interface ITourbookPreferences {
 	/*
 	 * view tooltip
 	 */
-	public static final String	VIEW_TOOLTIP_TOURBOOK						= "view.tooltip.tourbook";									//$NON-NLS-1$
-	public static final String	VIEW_TOOLTIP_TOURBOOK_DATE					= "view.tooltip.tourbook.date";							//$NON-NLS-1$
-	public static final String	VIEW_TOOLTIP_TOURBOOK_TIME					= "view.tooltip.tourbook.time";							//$NON-NLS-1$
-	public static final String	VIEW_TOOLTIP_TOURBOOK_WEEKDAY				= "view.tooltip.tourbook.weekday";							//$NON-NLS-1$
-	public static final String	VIEW_TOOLTIP_TOURBOOK_TITLE					= "view.tooltip.tourbook.title";							//$NON-NLS-1$
-	public static final String	VIEW_TOOLTIP_TOURBOOK_TAGS					= "view.tooltip.tourbook.tags";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP								= "view.tooltip.";											//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_IS_MODIFIED					= VIEW_TOOLTIP + "isModified";								//$NON-NLS-1$
+
+	public static final String	VIEW_TOOLTIP_TOURBOOK_DATE					= VIEW_TOOLTIP + "tourbook.date";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TIME					= VIEW_TOOLTIP + "tourbook.time";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_WEEKDAY				= VIEW_TOOLTIP + "tourbook.weekday";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TITLE					= VIEW_TOOLTIP + "tourbook.title";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURBOOK_TAGS					= VIEW_TOOLTIP + "tourbook.tags";							//$NON-NLS-1$
+
+	public static final String	VIEW_TOOLTIP_TAGGING_TAG					= VIEW_TOOLTIP + "tagging.tag";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TAGGING_TAGS					= VIEW_TOOLTIP + "tagging.tags";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TAGGING_TITLE					= VIEW_TOOLTIP + "tagging.title";							//$NON-NLS-1$
+
+	public static final String	VIEW_TOOLTIP_TOURCATALOG_REFTOUR			= VIEW_TOOLTIP + "tourcatalog.reftour";					//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURCATALOG_TAGS				= VIEW_TOOLTIP + "tourcatalog.tags";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURCATALOG_TITLE				= VIEW_TOOLTIP + "tourcatalog.title";						//$NON-NLS-1$
+
+	public static final String	VIEW_TOOLTIP_TOURIMPORT_DATE				= VIEW_TOOLTIP + "tourimport.date";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURIMPORT_TIME				= VIEW_TOOLTIP + "tourimport.time";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURIMPORT_TAGS				= VIEW_TOOLTIP + "tourimport.tags";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_TOURIMPORT_TITLE				= VIEW_TOOLTIP + "tourimport.title";						//$NON-NLS-1$
 
 }

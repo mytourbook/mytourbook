@@ -314,7 +314,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					// redraw must be done to see modified tour type image colors
 					_tourViewer.getTree().redraw();
 
-				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK)) {
+				} else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
 
 					updateToolTipState();
 
