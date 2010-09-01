@@ -310,13 +310,6 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.ext.jars.importExport"
-         download-size="0"
-         install-size="0"
-         version="10.7.0.qualifier"
-         unpack="false"/>
-
-   <plugin
          id="de.byteholder.geoclipse.ext.geotools"
          download-size="0"
          install-size="0"
@@ -328,6 +321,13 @@ POSSIBILITY OF SUCH DAMAGES.
          download-size="0"
          install-size="0"
          version="10.7.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.velocity"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

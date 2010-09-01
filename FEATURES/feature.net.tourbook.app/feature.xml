@@ -315,8 +315,8 @@ END OF TERMS AND CONDITIONS
       <import plugin="net.tourbook.rxtx"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
       <import plugin="org.eclipse.jface"/>
-      <import plugin="net.tourbook.ext.jars.importExport"/>
       <import plugin="net.tourbook.ext.jars.printing"/>
+      <import plugin="net.tourbook.ext.velocity"/>
    </requires>
 
    <plugin
@@ -439,13 +439,6 @@ END OF TERMS AND CONDITIONS
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.export.gpx"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.tourbook.util"
          download-size="0"
          install-size="0"
@@ -468,6 +461,13 @@ END OF TERMS AND CONDITIONS
 
    <plugin
          id="net.tourbook.printing"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.export"
          download-size="0"
          install-size="0"
          version="0.0.0"
