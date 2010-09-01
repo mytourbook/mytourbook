@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -59,17 +59,27 @@ public class ActionDeleteTour extends Action {
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
 
+		int selectionSize = selection.size();
+		int tourCounter = 0;
+
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
 
 		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
 		if (monitor != null) {
-			monitor.beginTask(Messages.Tour_Book_Action_delete_selected_tours_task, selection.size());
+			monitor.beginTask(Messages.Tour_Book_Action_DeleteSelectedTours_Monitor, selectionSize);
 		}
 
 		// loop: selected tours
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(
+						Messages.Tour_Book_Action_DeleteSelectedTours_MonitorSubtask,
+						++tourCounter,
+						selectionSize));
+			}
 
 			final Object treeItem = iterator.next();
 			if (treeItem instanceof TVITourBookTour) {
@@ -145,7 +155,8 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// confirm deletion
-		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
 				Messages.Tour_Book_Action_delete_selected_tours_dlg_title,
 				Messages.Tour_Book_Action_delete_selected_tours_dlg_message) == false) {
 			return;
@@ -167,7 +178,8 @@ public class ActionDeleteTour extends Action {
 		 * confirm a second time
 		 */
 		if (selectedTours > 0) {
-			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
 					Messages.Tour_Book_Action_delete_selected_tours_dlg_title_confirm,
 					NLS.bind(Messages.Tour_Book_Action_delete_selected_tours_dlg_message_confirm, selectedTours)) == false) {
 				return;

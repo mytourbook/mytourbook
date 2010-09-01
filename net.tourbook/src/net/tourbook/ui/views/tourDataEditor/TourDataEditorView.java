@@ -1160,50 +1160,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	void actionComputeDistanceValuesFromGeoPosition() {
 
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.TourEditor_Dialog_ComputeDistanceValues_Title,
-				NLS.bind(Messages.TourEditor_Dialog_ComputeDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+		if (TourManager.computeDistanceValuesFromGeoPosition(getSelectedTours()) == false) {
 			return;
-		}
-
-		final double[] latSerie = _tourData.latitudeSerie;
-		final double[] lonSerie = _tourData.longitudeSerie;
-
-		final int[] distanceSerie = new int[latSerie.length];
-		_tourData.distanceSerie = distanceSerie;
-
-		double distance = 0;
-		double latStart = latSerie[0];
-		double lonStart = lonSerie[0];
-
-		// compute distance for every time slice
-		for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
-
-			final double latEnd = latSerie[serieIndex];
-			final double lonEnd = lonSerie[serieIndex];
-
-			/*
-			 * haversine algorithm is much less accurate compared with vincenty
-			 */
-//			final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
-			final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
-
-			distance += distDiff;
-			distanceSerie[serieIndex] = (int) distance;
-
-			latStart = latEnd;
-			lonStart = lonEnd;
-		}
-
-		// set distance in markers
-		final Set<TourMarker> allTourMarker = _tourData.getTourMarkers();
-		if (allTourMarker != null) {
-
-			for (final TourMarker tourMarker : allTourMarker) {
-				final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
-				tourMarker.setDistance(markerDistance);
-			}
 		}
 
 		updateUIAfterDistanceModifications();
@@ -1851,7 +1809,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							if (tourEvent.tourDataEditorSavedTour == _tourData) {
 
 								/*
-								 * nothing to do because the tour is already saved (when it was not
+								 * nothing to do because the tour is already saved (it was not
 								 * modified before) and the UI is already updated
 								 */
 								return;
@@ -6223,6 +6181,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// tour distance
 		final int tourDistance = _tourData.getTourDistance();
+
 		if (tourDistance == 0) {
 			_txtTourDistance.setText(Integer.toString(tourDistance));
 		} else {

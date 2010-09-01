@@ -1,20 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,13 +46,19 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.IExternalTourEvents;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.StringToArrayConverter;
+import net.tourbook.util.Util;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -168,7 +175,7 @@ public class TourManager {
 
 	/**
 	 * Compares two {@link TourData}
-	 * 
+	 *
 	 * @param tourData1
 	 * @param tourData2
 	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
@@ -241,7 +248,7 @@ public class TourManager {
 
 	/**
 	 * create the tour chart configuration by reading the settings from the preferences
-	 * 
+	 *
 	 * @return
 	 */
 	public static TourChartConfiguration createTourChartConfiguration() {
@@ -311,7 +318,7 @@ public class TourManager {
 
 	/**
 	 * Searches all tour providers in the workbench and returns tours which are selected
-	 * 
+	 *
 	 * @return Returns tour id's or <code>null</code> when tours are not found
 	 */
 	public static ArrayList<TourData> getSelectedTours() {
@@ -483,7 +490,7 @@ public class TourManager {
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
 	 * modified. A message dialog informs the user about the modified tour and the requested actions
 	 * cannot be done.
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
 	public static boolean isTourEditorModified() {
@@ -546,7 +553,7 @@ public class TourManager {
 
 	/**
 	 * Remove time slices from {@link TourData}
-	 * 
+	 *
 	 * @param tourData
 	 * @param firstIndex
 	 * @param lastIndex
@@ -727,7 +734,7 @@ public class TourManager {
 	/**
 	 * Removes markers which are deleted and updates marker serie index which are positioned after
 	 * the deleted time slices
-	 * 
+	 *
 	 * @param tourData
 	 * @param firstSerieIndex
 	 * @param lastSerieIndex
@@ -795,7 +802,7 @@ public class TourManager {
 	 * tour is not dirty, if the tour is dirty, saving is not done.
 	 * <p>
 	 * The event {@link TourEventId#TOUR_CHANGED} is fired always.
-	 * 
+	 *
 	 * @param tourData
 	 *            modified tour
 	 * @return Returns the persisted {@link TourData}
@@ -831,7 +838,7 @@ public class TourManager {
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
 	 * fired.
-	 * 
+	 *
 	 * @param modifiedTours
 	 *            modified tours
 	 * @return Returns a list with all persisted {@link TourData}
@@ -846,7 +853,7 @@ public class TourManager {
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done.
-	 * 
+	 *
 	 * @param modifiedTours
 	 *            modified tours
 	 * @param canFireNotification
@@ -856,93 +863,115 @@ public class TourManager {
 	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
 															final boolean canFireNotification) {
 
-		TourData tourDataEditorSavedTour = null;
-		boolean doFireChangeEvent = false;
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+		final TourData[] tourDataEditorSavedTour = { null };
+		final boolean[] doFireChangeEvent = { false };
 
-		for (final TourData tourData : modifiedTours) {
+		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-			boolean doSaveTour = false;
-			TourData savedTour = null;
+				int saveCounter = 0;
+				int tourSize = modifiedTours.size();
 
-			final TourDataEditorView tourDataEditor = getTourDataEditor();
-			if (tourDataEditor != null) {
+				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, tourSize);
 
-				final TourData tourDataInEditor = tourDataEditor.getTourData();
+				for (final TourData tourData : modifiedTours) {
 
-				try {
-					checkTourData(tourData, tourDataInEditor);
-				} catch (final MyTourbookException e) {
-					e.printStackTrace();
-				}
+					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, tourSize));
 
-				if (tourDataInEditor == tourData) {
+					boolean doSaveTour = false;
+					TourData savedTour = null;
 
-					// selected tour is in the tour data editor
+					final TourDataEditorView tourDataEditor = getTourDataEditor();
+					if (tourDataEditor != null) {
 
-					if (tourDataEditor.isDirty()) {
+						final TourData tourDataInEditor = tourDataEditor.getTourData();
 
-						// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
+						try {
+							checkTourData(tourData, tourDataInEditor);
+						} catch (final MyTourbookException e) {
+							e.printStackTrace();
+						}
 
-						savedTour = tourData;
+						if (tourDataInEditor == tourData) {
 
-						/*
-						 * make the tour data editor visible, it could be hidden and confuses the
-						 * user when the changes are not visible
-						 */
-						TourManager.openTourEditor(false);
+							// selected tour is in the tour data editor
 
+							if (tourDataEditor.isDirty()) {
+
+								// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
+
+								savedTour = tourData;
+
+								/*
+								 * make the tour data editor visible, it could be hidden and
+								 * confuses the user when the changes are not visible
+								 */
+								TourManager.openTourEditor(false);
+
+							} else {
+
+								/*
+								 * tour in the editor is not dirty, save tour and update editor ui
+								 */
+
+								savedTour = TourDatabase.saveTour(tourData);
+
+								/*
+								 * set flag for the tour data editor that the tour is saved and the
+								 * ui is updated
+								 */
+								tourDataEditorSavedTour[0] = savedTour;
+							}
+
+							/*
+							 * update UI in the tour data editor with the modified tour data
+							 */
+							tourDataEditor.updateUI(savedTour);
+
+							doFireChangeEvent[0] = true;
+
+						} else {
+
+							// tour is not in the tour editor
+
+							doSaveTour = true;
+						}
 					} else {
 
-						/*
-						 * tour in the editor is not dirty, save tour and update editor ui
-						 */
+						// tour is not in the tour editor
 
-						savedTour = TourDatabase.saveTour(tourData);
-
-						/*
-						 * set flag for the tour data editor that the tour is saved and the ui is
-						 * updated
-						 */
-						tourDataEditorSavedTour = savedTour;
+						doSaveTour = true;
 					}
 
-					/*
-					 * update UI in the tour data editor with the modified tour data
-					 */
-					tourDataEditor.updateUI(savedTour);
+					if (doSaveTour) {
 
-					doFireChangeEvent = true;
+						// save the tour
+						savedTour = TourDatabase.saveTour(tourData);
 
-				} else {
+						doFireChangeEvent[0] = true;
+					}
 
-					// tour is not in the tour editor
+					if (savedTour != null) {
+						savedTours.add(savedTour);
+					}
 
-					doSaveTour = true;
+					monitor.worked(1);
 				}
-			} else {
-
-				// tour is not in the tour editor
-
-				doSaveTour = true;
 			}
+		};
 
-			if (doSaveTour) {
-
-				// save the tour
-				savedTour = TourDatabase.saveTour(tourData);
-
-				doFireChangeEvent = true;
-			}
-
-			if (savedTour != null) {
-				savedTours.add(savedTour);
-			}
+		try {
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+		} catch (final InvocationTargetException e) {
+			StatusUtil.showStatus(e);
+		} catch (final InterruptedException e) {
+			StatusUtil.showStatus(e);
 		}
 
-		if (canFireNotification && doFireChangeEvent) {
+		if (canFireNotification && doFireChangeEvent[0]) {
 			final TourEvent propertyData = new TourEvent(savedTours);
-			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
+			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour[0];
 			fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 		}
 
@@ -951,7 +980,7 @@ public class TourManager {
 
 	/**
 	 * set the graph colors from the pref store
-	 * 
+	 *
 	 * @param prefStore
 	 * @param yData
 	 * @param graphName
@@ -982,7 +1011,7 @@ public class TourManager {
 
 	/**
 	 * update the zoom options in the chart configuration from the pref store
-	 * 
+	 *
 	 * @param chartConfig
 	 * @param prefStore
 	 */
@@ -999,7 +1028,7 @@ public class TourManager {
 
 	/**
 	 * Tour save listeners will be called to save tours before the application is shut down
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addTourSaveListener(final ITourSaveListener listener) {
@@ -1044,7 +1073,7 @@ public class TourManager {
 
 	/**
 	 * Clip values when a minimum distance is fallen short of
-	 * 
+	 *
 	 * @param tourData
 	 */
 	private void computeValueClipping(final TourData tourData) {
@@ -1360,7 +1389,7 @@ public class TourManager {
 
 	/**
 	 * Creates a chart data fDataModel from the tour data
-	 * 
+	 *
 	 * @param tourData
 	 *            data which contains the tour data
 	 * @param tourChartProperty
@@ -1866,7 +1895,7 @@ public class TourManager {
 	/**
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
 	 * creates always a new instance
-	 * 
+	 *
 	 * @param requestedTourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
@@ -1925,7 +1954,7 @@ public class TourManager {
 
 	/**
 	 * Get a tour from the database and keep it in the cache
-	 * 
+	 *
 	 * @param tourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
@@ -1949,7 +1978,7 @@ public class TourManager {
 
 	/**
 	 * Opens the tour for the given tour id
-	 * 
+	 *
 	 * @param tourId
 	 */
 	public void openTourInEditorArea(final Long tourId) {
@@ -1996,7 +2025,7 @@ public class TourManager {
 	 * <p>
 	 * When the tour is requested next time with {@link #getTourData(Long)}, is will be loaded from
 	 * the database.
-	 * 
+	 *
 	 * @param tourId
 	 */
 	public void removeTourFromCache(final Long tourId) {
@@ -2081,7 +2110,7 @@ public class TourManager {
 
 	/**
 	 * Before the application is shut down, the tour save listeners are called to save unsaved data.
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the tours have been saved or false when it was
 	 *         canceled by the user
 	 */
@@ -2112,4 +2141,84 @@ public class TourManager {
 		replaceTourInTourEditor(tourData);
 	}
 
+	/**
+	 * Computes distance values from geo position
+	 *
+	 * @param tourDataList
+	 * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
+	 *         updated but not yet saved.
+	 */
+	public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
+
+		if (tourDataList == null || tourDataList.size() == 0) {
+			return false;
+		}
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.TourEditor_Dialog_ComputeDistanceValues_Title,
+				NLS.bind(Messages.TourEditor_Dialog_ComputeDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+			return false;
+		}
+
+		final boolean[] retValue = { false };
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
+
+				for (TourData tourData : tourDataList) {
+
+					final double[] latSerie = tourData.latitudeSerie;
+					final double[] lonSerie = tourData.longitudeSerie;
+
+					if (latSerie == null) {
+						continue;
+					}
+
+					final int[] distanceSerie = new int[latSerie.length];
+					tourData.distanceSerie = distanceSerie;
+
+					double distance = 0;
+					double latStart = latSerie[0];
+					double lonStart = lonSerie[0];
+
+					// compute distance for every time slice
+					for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+
+						final double latEnd = latSerie[serieIndex];
+						final double lonEnd = lonSerie[serieIndex];
+
+						/*
+						 * vincenty algorithm is much more accurate compared with haversine
+						 */
+//				final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+
+						distance += distDiff;
+						distanceSerie[serieIndex] = (int) distance;
+
+						latStart = latEnd;
+						lonStart = lonEnd;
+					}
+
+					// update tour distance which is displayed in views/tour editor
+					tourData.setTourDistance((int) distance);
+
+					// set distance in markers
+					final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
+					if (allTourMarker != null) {
+
+						for (final TourMarker tourMarker : allTourMarker) {
+							final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+							tourMarker.setDistance(markerDistance);
+						}
+					}
+
+					retValue[0] = true;
+				}
+			}
+		});
+
+		return retValue[0];
+	}
 }

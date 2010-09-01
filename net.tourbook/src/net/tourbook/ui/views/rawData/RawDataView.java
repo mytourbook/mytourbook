@@ -72,6 +72,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -107,7 +108,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -441,26 +441,43 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void actionSaveTour(final TourPerson person) {
 
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
+		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
-				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+		// get selected tours, this must be outside of the runnable !!!
+		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
-				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
+		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int saveCounter = 0;
+				final int selectionSize = selection.size();
+
+				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
 
 				// loop: all selected tours, selected tours can already be saved
 				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
+					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
 
 					final Object selObject = iter.next();
 					if (selObject instanceof TourData) {
 						saveTour((TourData) selObject, person, savedTours, false);
 					}
-				}
 
-				doSaveTourPostActions(savedTours);
+					monitor.worked(1);
+				}
 			}
-		});
+		};
+
+		try {
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+		} catch (final InvocationTargetException e) {
+			StatusUtil.showStatus(e);
+		} catch (final InterruptedException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		doSaveTourPostActions(savedTours);
 	}
 
 	private void addPartListener() {

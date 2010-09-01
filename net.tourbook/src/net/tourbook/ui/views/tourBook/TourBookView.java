@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -53,6 +53,7 @@ import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
@@ -118,85 +119,93 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
+	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
-	private static final String				STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
+	private static final String							STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
+	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
+	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
 
-	private static final String				STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
+	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
-	private final IDialogSettings			_state								= TourbookPlugin.getDefault() //
-																						.getDialogSettingsSection(ID);
+	private final IPreferenceStore						_prefStore							= TourbookPlugin
+																									.getDefault()
+																									//
+																									.getPreferenceStore();
+	private final IDialogSettings						_state								= TourbookPlugin
+																									.getDefault()
+																									//
+																									.getDialogSettingsSection(
+																											ID);
 
-	private ColumnManager					_columnManager;
+	private ColumnManager								_columnManager;
 
-	private PostSelectionProvider			_postSelectionProvider;
-	private ISelectionListener				_postSelectionListener;
-	private IPartListener2					_partListener;
-	private ITourEventListener				_tourPropertyListener;
-	private IPropertyChangeListener			_prefChangeListener;
+	private PostSelectionProvider						_postSelectionProvider;
+	private ISelectionListener							_postSelectionListener;
+	private IPartListener2								_partListener;
+	private ITourEventListener							_tourPropertyListener;
+	private IPropertyChangeListener						_prefChangeListener;
 
-	private TVITourBookRoot					_rootItem;
+	private TVITourBookRoot								_rootItem;
 
-	private NumberFormat					_nf									= NumberFormat.getNumberInstance();
+	private NumberFormat								_nf									= NumberFormat
+																									.getNumberInstance();
 
-	private Calendar						_calendar							= GregorianCalendar.getInstance();
-	private DateFormat						_timeFormatter						= DateFormat
-																						.getTimeInstance(DateFormat.SHORT);
+	private Calendar									_calendar							= GregorianCalendar
+																									.getInstance();
+	private DateFormat									_timeFormatter						= DateFormat
+																									.getTimeInstance(DateFormat.SHORT);
 
-	private static final String[]			_weekDays							= DateFormatSymbols
-																						.getInstance()
-																						.getShortWeekdays();
+	private static final String[]						_weekDays							= DateFormatSymbols
+																									.getInstance()
+																									.getShortWeekdays();
 
-	private int								_selectedYear						= -1;
-	private int								_selectedMonth						= -1;
-	private ArrayList<Long>					_selectedTourIds					= new ArrayList<Long>();
+	private int											_selectedYear						= -1;
+	private int											_selectedMonth						= -1;
+	private ArrayList<Long>								_selectedTourIds					= new ArrayList<Long>();
 
-	private boolean							_isRecTimeFormat_hhmmss;
-	private boolean							_isDriveTimeFormat_hhmmss;
+	private boolean										_isRecTimeFormat_hhmmss;
+	private boolean										_isDriveTimeFormat_hhmmss;
 
-	private boolean							_isToolTipInDate;
-	private boolean							_isToolTipInTags;
-	private boolean							_isToolTipInTime;
-	private boolean							_isToolTipInTitle;
-	private boolean							_isToolTipInWeekDay;
+	private boolean										_isToolTipInDate;
+	private boolean										_isToolTipInTags;
+	private boolean										_isToolTipInTime;
+	private boolean										_isToolTipInTitle;
+	private boolean										_isToolTipInWeekDay;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_viewerContainer;
-	private TreeViewer						_tourViewer;
+	private Composite									_viewerContainer;
+	private TreeViewer									_tourViewer;
 
-	private ActionEditQuick					_actionEditQuick;
+	private ActionEditQuick								_actionEditQuick;
 
-	private ActionCollapseAll				_actionCollapseAll;
-	private ActionCollapseOthers			_actionCollapseOthers;
-	private ActionExpandSelection			_actionExpandSelection;
+	private ActionCollapseAll							_actionCollapseAll;
+	private ActionCollapseOthers						_actionCollapseOthers;
+	private ActionExpandSelection						_actionExpandSelection;
 
-	private ActionDeleteTourMenu			_actionDeleteTour;
-	private ActionEditTour					_actionEditTour;
-	private ActionOpenTour					_actionOpenTour;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
-	private ActionMergeTour					_actionMergeTour;
+	private ActionDeleteTourMenu						_actionDeleteTour;
+	private ActionEditTour								_actionEditTour;
+	private ActionOpenTour								_actionOpenTour;
+	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
+	private ActionMergeTour								_actionMergeTour;
+	private ActionJoinTours								_actionJoinTours;
+	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
 
-	private ActionSetTourTypeMenu			_actionSetTourType;
-	private ActionSetTourTag				_actionAddTag;
-	private ActionSetTourTag				_actionRemoveTag;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionOpenPrefDialog			_actionOpenTagPrefs;
+	private ActionSetTourTypeMenu						_actionSetTourType;
+	private ActionSetTourTag							_actionAddTag;
+	private ActionSetTourTag							_actionRemoveTag;
+	private ActionRemoveAllTags							_actionRemoveAllTags;
+	private ActionOpenPrefDialog						_actionOpenTagPrefs;
 
-	private ActionSelectAllTours			_actionSelectAllTours;
-	private ActionModifyColumns				_actionModifyColumns;
-	private ActionRefreshView				_actionRefreshView;
+	private ActionSelectAllTours						_actionSelectAllTours;
+	private ActionModifyColumns							_actionModifyColumns;
+	private ActionRefreshView							_actionRefreshView;
 
-	private ActionSetPerson					_actionSetOtherPerson;
-	private ActionJoinTours					_actionJoinTours;
-	private ActionExport					_actionExportTour;
-	private ActionPrint						_actionPrintTour;
+	private ActionSetPerson								_actionSetOtherPerson;
+	private ActionExport								_actionExportTour;
+	private ActionPrint									_actionPrintTour;
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -402,6 +411,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionJoinTours = new ActionJoinTours(this);
+		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -544,7 +554,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -1585,6 +1595,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
+		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -1683,6 +1694,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionOpenTour);
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionJoinTours);
+		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);

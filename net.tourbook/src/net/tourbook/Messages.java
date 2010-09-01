@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -72,13 +72,11 @@ public class Messages extends NLS {
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
-	public static String	Adjust_Altitude_CreateDummyAltitudeData_Message;
-
-	public static String	Adjust_Altitude_CreateDummyAltitudeData_Title;
+	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
+	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
-
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
@@ -197,9 +195,7 @@ public class Messages extends NLS {
 	public static String		App_Tour_type_item_all_types;
 	public static String		App_Tour_type_item_not_defined;
 	public static String		App_Tour_type_tooltip;
-
 	public static String		App_TourType_ToolTip;
-
 	public static String		App_TourType_ToolTipTitle;
 
 	public static String		App_Window_Title;
@@ -243,12 +239,11 @@ public class Messages extends NLS {
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
-	public static String	Database_Monitor_CreateDatabase;
+	public static String		Database_Monitor_CreateDatabase;
 
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
-
-	public static String	Database_Monitor_SetupPooledConnection;
+	public static String		Database_Monitor_SetupPooledConnection;
 
 	public static String		DataImport_Error_file_does_not_exist_msg;
 	public static String		DataImport_Error_file_does_not_exist_title;
@@ -294,7 +289,6 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Link_TourType;
 
 	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
-
 	public static String		Dialog_SplitTour_Checkbox_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_KeepSlices;
 	public static String		Dialog_SplitTour_ComboText_RemoveSlices;
@@ -347,7 +341,6 @@ public class Messages extends NLS {
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
-
 	public static String		Format_yyyymmdd_hhmmss;
 
 	public static String		Graph_Label_Altimeter;
@@ -416,7 +409,6 @@ public class Messages extends NLS {
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
-
 	public static String		Image__MyTourbook16;
 	public static String		Image__open_folder_add;
 	public static String		Image__options;
@@ -510,7 +502,6 @@ public class Messages extends NLS {
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
 	public static String		merge_tour_dlg_invalid_tour_title;
-
 	public static String		merge_tour_source_graph_altitude;
 	public static String		merge_tour_source_graph_altitude_tooltip;
 	public static String		merge_tour_source_graph_cadence;
@@ -709,30 +700,21 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	PrefPage_ViewTooltip_Button_DisableAll;
-
-	public static String	PrefPage_ViewTooltip_Button_EnableAll;
-
+	public static String		PrefPage_ViewTooltip_Button_DisableAll;
+	public static String		PrefPage_ViewTooltip_Button_EnableAll;
 	public static String		PrefPage_ViewTooltip_Group;
-	public static String	PrefPage_ViewTooltip_Label_Date;
-
+	public static String		PrefPage_ViewTooltip_Label_Date;
 	public static String		PrefPage_ViewTooltip_Label_Day;
 	public static String		PrefPage_ViewTooltip_Label_Info;
-
-	public static String	PrefPage_ViewTooltip_Label_RawData;
-
-	public static String	PrefPage_ViewTooltip_Label_ReferenceTour;
-	public static String	PrefPage_ViewTooltip_Label_TagFirstColumn;
-
-	public static String	PrefPage_ViewTooltip_Label_TaggedTour;
-
+	public static String		PrefPage_ViewTooltip_Label_RawData;
+	public static String		PrefPage_ViewTooltip_Label_ReferenceTour;
+	public static String		PrefPage_ViewTooltip_Label_TagFirstColumn;
+	public static String		PrefPage_ViewTooltip_Label_TaggedTour;
 	public static String		PrefPage_ViewTooltip_Label_Tags;
 	public static String		PrefPage_ViewTooltip_Label_Time;
 	public static String		PrefPage_ViewTooltip_Label_Title;
-
-	public static String	PrefPage_ViewTooltip_Label_TourBook;
-
-	public static String	PrefPage_ViewTooltip_Label_TourCatalog;
+	public static String		PrefPage_ViewTooltip_Label_TourBook;
+	public static String		PrefPage_ViewTooltip_Label_TourCatalog;
 	public static String		PrefPage_ViewTooltip_Label_WeekDay;
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
@@ -767,18 +749,21 @@ public class Messages extends NLS {
 
 	public static String		Tour_Book_Action_delete_selected_tours_menu;
 	public static String		Tour_Book_Action_delete_selected_tours_task;
+
+	public static String		Tour_Book_Action_DeleteSelectedTours_Monitor;
+	public static String		Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
-	public static String	Tour_Database_CannotConnectToDerbyServer_Message;
+	public static String		Tour_Data_SaveTour_Monitor;
+	public static String		Tour_Data_SaveTour_MonitorSubtask;
 
-	public static String	Tour_Database_CannotConnectToDerbyServer_Title;
-
+	public static String		Tour_Database_CannotConnectToDerbyServer_Message;
+	public static String		Tour_Database_CannotConnectToDerbyServer_Title;
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
-
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
@@ -788,23 +773,16 @@ public class Messages extends NLS {
 	public static String		Tour_Database_UpdateDone;
 	public static String		Tour_Database_UpdateInfo;
 
-	public static String	Tour_Editor_Label_AltitudeDown;
-
-	public static String	Tour_Editor_Label_AltitudeUp;
-
+	public static String		Tour_Editor_Label_AltitudeDown;
+	public static String		Tour_Editor_Label_AltitudeUp;
 	public static String		Tour_Editor_Label_DateTimeCreated;
-
 	public static String		Tour_Editor_Label_DateTimeModified;
-
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor_Yes;
-
-	public static String	Tour_Editor_Label_Hours_Tooltip;
-
-	public static String	Tour_Editor_Label_Minutes_Tooltip;
-
-	public static String	Tour_Editor_Label_Seconds_Tooltip;
+	public static String		Tour_Editor_Label_Hours_Tooltip;
+	public static String		Tour_Editor_Label_Minutes_Tooltip;
+	public static String		Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
