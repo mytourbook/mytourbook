@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -113,10 +113,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private TourData					_tourData;
 	private SplineData					_splineData;
 
+	private boolean						_isCreateDummyAltitude;
 	private int[]						_metricAltitudeSerieBackup;
-	private int[]						_metricAdjustedAltitudeNoneSRTM;
+	private int[]						_metricAdjustedAltitudeWithoutSRTM;
 	private int[]						_srtmValues;
 
+	private int							_oldAdjustmentType			= -1;
 	private ArrayList<AdjustmentType>	_availableAdjustmentTypes	= new ArrayList<AdjustmentType>();
 
 	private int							_pointHitIndex				= -1;
@@ -158,7 +160,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private Combo						_comboAdjustmentType;
 
 	private Button						_btnSRTMRemoveAllPoints;
-	private Button						_btnResetAdjustments;
+//	private Button						_btnResetAdjustments;
 	private Button						_btnResetAltitude;
 	private Button						_btnUpdateAltitude;
 
@@ -186,13 +188,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	public DialogAdjustAltitude(final Shell parentShell, final TourData tourData, final boolean isSaveTour) {
+	public DialogAdjustAltitude(final Shell parentShell,
+								final TourData tourData,
+								final boolean isSaveTour,
+								final boolean isCreateDummyAltitude) {
 
 		super(parentShell);
 
 		_tourData = tourData;
 		_srtmValues = _tourData.getSRTMSerie();
 		_isSaveTour = isSaveTour;
+		_isCreateDummyAltitude = isCreateDummyAltitude;
 
 		// set icon for the window
 		final Image shellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude).createImage();
@@ -224,7 +230,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			// tour is not saved, dialog is canceled, restore original values
 
-			_tourData.altitudeSerie = _metricAltitudeSerieBackup;
+			if (_isCreateDummyAltitude) {
+				_tourData.altitudeSerie = null;
+			} else {
+				_tourData.altitudeSerie = _metricAltitudeSerieBackup;
+			}
+
 			_tourData.clearAltitudeSeries();
 		}
 
@@ -245,7 +256,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_WHOLE_TOUR:
 
 			// adjust evenly
-			computeAltitudeEvenly(metricAltitudeSerie, _metricAdjustedAltitudeNoneSRTM, newAltiStart);
+			computeAltitudeEvenly(metricAltitudeSerie, _metricAdjustedAltitudeWithoutSRTM, newAltiStart);
 			break;
 
 		case ADJUST_TYPE_START_AND_END:
@@ -253,10 +264,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			// adjust start, end and max
 
 			// first adjust end alti to start alti, secondly adjust max
-			computeAltitudeEnd(metricAltitudeSerie, _metricAdjustedAltitudeNoneSRTM, metricAltitudeSerie[0]);
+			computeAltitudeEnd(metricAltitudeSerie, _metricAdjustedAltitudeWithoutSRTM, metricAltitudeSerie[0]);
 			computeAltitudeStartAndMax(
-					_metricAdjustedAltitudeNoneSRTM,
-					_metricAdjustedAltitudeNoneSRTM,
+					_metricAdjustedAltitudeWithoutSRTM,
+					_metricAdjustedAltitudeWithoutSRTM,
 					newAltiStart,
 					newAltiMax);
 
@@ -265,14 +276,18 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_END:
 
 			// adjust end
-			computeAltitudeEnd(metricAltitudeSerie, _metricAdjustedAltitudeNoneSRTM, newAltiEnd);
+			computeAltitudeEnd(metricAltitudeSerie, _metricAdjustedAltitudeWithoutSRTM, newAltiEnd);
 			break;
 
 		case ADJUST_TYPE_MAX_HEIGHT:
 
 			// adjust max
 
-			computeAltitudeStartAndMax(metricAltitudeSerie, _metricAdjustedAltitudeNoneSRTM, newAltiStart, newAltiMax);
+			computeAltitudeStartAndMax(
+					metricAltitudeSerie,
+					_metricAdjustedAltitudeWithoutSRTM,
+					newAltiStart,
+					newAltiMax);
 			break;
 
 		default:
@@ -931,67 +946,75 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void createDataBackup() {
 
+		int[] altitudeSerie;
+
+		if (_isCreateDummyAltitude) {
+			altitudeSerie = new int[_tourData.timeSerie.length];
+			for (int index = 0; index < altitudeSerie.length; index++) {
+				/*
+				 * it's better to set a value instead of having 0, but the value should not be too
+				 * high, I had this idea on 28.08.2010 -> 88
+				 */
+				altitudeSerie[index] = 88;
+			}
+
+			// altitude must be set because it's used
+			_tourData.altitudeSerie = altitudeSerie;
+
+		} else {
+			altitudeSerie = _tourData.altitudeSerie;
+		}
+
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		_metricAltitudeSerieBackup = Util.createDataSerieCopy(_tourData.altitudeSerie);
+		_metricAltitudeSerieBackup = Util.createDataSerieCopy(altitudeSerie);
 	}
 
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
-		final Composite container = (Composite) super.createDialogArea(parent);
+		final Composite dlgArea = (Composite) super.createDialogArea(parent);
 
-		_dlgContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgContainer);
-		GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(_dlgContainer);
-//		fDlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-
-		createUI(_dlgContainer);
+		createUI(dlgArea);
 
 		initializeSplineData();
 		initializeAltitude(_metricAltitudeSerieBackup);
 
-		return container;
+		return dlgArea;
 	}
 
 	private void createUI(final Composite parent) {
 
-		createUIAdjustmentType(parent);
-		createUITourChart(parent);
-
-		/*
-		 * create options for each adjustment type in a pagebook
-		 */
-		_pageBookOptions = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageBookOptions);
-
-		_pageEmpty = new Label(_pageBookOptions, SWT.NONE);
-		_pageOptionSRTM = createUIOptionWithSRTM(_pageBookOptions);
-		_pageOptionSRTMSpline = createUIOptionWithSRTMSpline(_pageBookOptions);
-		_pageOptionNoSRTM = createUIOptionWithoutSRTM(_pageBookOptions);
+		_dlgContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgContainer);
+		GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(_dlgContainer);
+		{
+			createUI10AdjustmentType(_dlgContainer);
+			createUI20TourChart(_dlgContainer);
+			createUI30Options(_dlgContainer);
+		}
 	}
 
-	private void createUIAdjustmentType(final Composite parent) {
+	private void createUI10AdjustmentType(final Composite parent) {
 
-		/*
-		 * combo: adjust type
-		 */
 		final Composite typeContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(typeContainer);
 		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 5, 0).applyTo(typeContainer);
+		{
+			final Label label = new Label(typeContainer, SWT.NONE);
+			label.setText(Messages.adjust_altitude_label_adjustment_type);
 
-		final Label label = new Label(typeContainer, SWT.NONE);
-		label.setText(Messages.adjust_altitude_label_adjustment_type);
-
-		_comboAdjustmentType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_comboAdjustmentType.setVisibleItemCount(20);
-		_comboAdjustmentType.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeAdjustType();
-			}
-		});
+			// combo: adjust type
+			_comboAdjustmentType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboAdjustmentType.setVisibleItemCount(20);
+			_comboAdjustmentType.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangeAdjustType();
+				}
+			});
+		}
 
 		// fill combo
 		for (final AdjustmentType adjustType : ALL_ADJUSTMENT_TYPES) {
@@ -1009,278 +1032,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	private Composite createUIOptionWithoutSRTM(final Composite parent) {
-
-		Label label;
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
-		final Composite startEndContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(startEndContainer);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(startEndContainer);
-		{
-			/*
-			 * field: start altitude
-			 */
-			label = new Label(startEndContainer, SWT.NONE);
-			label.setText(Messages.Dlg_AdjustAltitude_Label_start_altitude);
-			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
-
-			_spinnerNewStartAlti = createAltiField(startEndContainer);
-			_spinnerNewStartAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_START));
-			_spinnerNewStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
-
-			_lblOldStartAlti = new Label(startEndContainer, SWT.NONE);
-			_lblOldStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
-
-			/*
-			 * field: end altitude
-			 */
-			label = new Label(startEndContainer, SWT.NONE);
-			label.setText(Messages.Dlg_AdjustAltitude_Label_end_altitude);
-			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
-
-			_spinnerNewEndAlti = createAltiField(startEndContainer);
-			_spinnerNewEndAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_END));
-			_spinnerNewEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
-
-			_lblOldEndAlti = new Label(startEndContainer, SWT.NONE);
-			_lblOldEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
-		}
-
-		/*
-		 * field: max altitude
-		 */
-		final Composite maxContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.BEGINNING, SWT.FILL)
-				.indent(40, 0)
-				.grab(true, false)
-				.applyTo(maxContainer);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(maxContainer);
-		{
-			label = new Label(maxContainer, SWT.NONE);
-			label.setText(Messages.Dlg_AdjustAltitude_Label_max_altitude);
-			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
-
-			_spinnerNewMaxAlti = createAltiField(maxContainer);
-			_spinnerNewMaxAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_MAX));
-			_spinnerNewMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
-
-			_lblOldMaxAlti = new Label(maxContainer, SWT.NONE);
-			_lblOldMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
-
-			/*
-			 * group: keep start/bottom
-			 */
-			final Group groupKeep = new Group(maxContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().span(3, 1).applyTo(groupKeep);
-			GridLayoutFactory.swtDefaults().applyTo(groupKeep);
-			groupKeep.setText(Messages.Dlg_AdjustAltitude_Group_options);
-			{
-				final SelectionAdapter keepButtonSelectionAdapter = new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onChangeAltitude();
-					}
-				};
-
-				_rdoKeepBottom = new Button(groupKeep, SWT.RADIO);
-				_rdoKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
-				_rdoKeepBottom.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip);
-				_rdoKeepBottom.setLayoutData(new GridData());
-				_rdoKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
-				// fRadioKeepBottom.setSelection(true);
-
-				_rdoKeepStart = new Button(groupKeep, SWT.RADIO);
-				_rdoKeepStart.setText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude);
-				_rdoKeepStart.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip);
-				_rdoKeepStart.setLayoutData(new GridData());
-				_rdoKeepStart.addSelectionListener(keepButtonSelectionAdapter);
-			}
-		}
-
-		/*
-		 * button container
-		 */
-		final Composite buttonContainer = new Composite(container, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(20, 0).applyTo(buttonContainer);
-		GridLayoutFactory.fillDefaults().applyTo(buttonContainer);
-//		buttonContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: reset values
-			 */
-			_btnResetAdjustments = new Button(buttonContainer, SWT.NONE);
-			_btnResetAdjustments.setText(Messages.adjust_altitude_btn_reset_adjustments);
-			_btnResetAdjustments.setToolTipText(Messages.adjust_altitude_btn_reset_adjustments_tooltip);
-			_btnResetAdjustments.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onResetAdjustments();
-				}
-			});
-			setButtonLayoutData(_btnResetAdjustments);
-
-			/*
-			 * button: reset altitude
-			 */
-			_btnResetAltitude = new Button(buttonContainer, SWT.NONE);
-			_btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
-			_btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
-			_btnResetAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onResetAltitude();
-				}
-			});
-			setButtonLayoutData(_btnResetAltitude);
-
-			/*
-			 * button: update altitude
-			 */
-			_btnUpdateAltitude = new Button(buttonContainer, SWT.NONE);
-			_btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
-			_btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-			_btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onUpdateAltitude();
-				}
-			});
-			setButtonLayoutData(_btnUpdateAltitude);
-		}
-
-		return container;
-	}
-
-	private Composite createUIOptionWithSRTM(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			/*
-			 * button: update altitude
-			 */
-			final Button btnUpdateAltitude = new Button(container, SWT.NONE);
-			btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
-			btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-			btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onUpdateAltitudeSRTM();
-				}
-			});
-			setButtonLayoutData(btnUpdateAltitude);
-
-			/*
-			 * button: reset altitude
-			 */
-			final Button btnResetAltitude = new Button(container, SWT.NONE);
-			btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
-			btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
-			btnResetAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onResetAltitudeSRTM();
-				}
-			});
-			setButtonLayoutData(btnResetAltitude);
-		}
-
-		return container;
-	}
-
-	private Composite createUIOptionWithSRTMSpline(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(5).equalWidth(false).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: update altitude
-			 */
-			final Button btnUpdateAltitude = new Button(container, SWT.NONE);
-			btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
-			btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-			btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onUpdateAltitudeSRTMSpline();
-				}
-			});
-			setButtonLayoutData(btnUpdateAltitude);
-
-			/*
-			 * button: reset altitude
-			 */
-			final Button btnResetAltitude = new Button(container, SWT.NONE);
-			btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude_and_points);
-			btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_and_points_tooltip);
-			btnResetAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onResetAltitudeSRTMSpline();
-				}
-			});
-			setButtonLayoutData(btnResetAltitude);
-
-			/*
-			 * button: remove all points
-			 */
-			_btnSRTMRemoveAllPoints = new Button(container, SWT.NONE);
-			_btnSRTMRemoveAllPoints.setText(Messages.adjust_altitude_btn_srtm_remove_all_points);
-			_btnSRTMRemoveAllPoints.setToolTipText(Messages.adjust_altitude_btn_srtm_remove_all_points_tooltip);
-			_btnSRTMRemoveAllPoints.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					initializeSplineData();
-					onChangeAdjustType();
-				}
-			});
-			setButtonLayoutData(_btnSRTMRemoveAllPoints);
-
-			// spacer
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-
-			/*
-			 * container: altitude positions
-			 */
-//			final Composite xyContainer = new Composite(container, SWT.NONE);
-//			GridDataFactory.fillDefaults().applyTo(xyContainer);
-//			GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).applyTo(xyContainer);
-//			xyContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//			{
-//				/*
-//				 * label: altitude
-//				 */
-//				label = new Label(xyContainer, SWT.NONE);
-//				label.setText(Messages.adjust_altitude_lbl_altitude);
-//
-//				/*
-//				 * text: altitude value
-//				 */
-//				fTxtAltitudeValue = new Text(xyContainer, SWT.NONE);
-//				GridDataFactory.fillDefaults().applyTo(fTxtAltitudeValue);
-//
-//				/*
-//				 * label: unit
-//				 */
-//				label = new Label(xyContainer, SWT.NONE);
-//				label.setText(UI.UNIT_LABEL_ALTITUDE);
-//			}
-		}
-
-		return container;
-	}
-
-	private void createUITourChart(final Composite parent) {
+	private void createUI20TourChart(final Composite parent) {
 
 		_tourChart = new TourChart(parent, SWT.BORDER, true);
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(_tourChart);
@@ -1347,6 +1099,260 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		// overwrite x-axis from pref store
 		_tourChartConfig.setIsShowTimeOnXAxis(_prefStore.getString(
 				ITourbookPreferences.ADJUST_ALTITUDE_CHART_X_AXIS_UNIT).equals(TourManager.X_AXIS_TIME));
+	}
+
+	/**
+	 * create options for each adjustment type in a pagebook
+	 */
+	private void createUI30Options(final Composite parent) {
+		_pageBookOptions = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageBookOptions);
+		{
+			_pageEmpty = new Label(_pageBookOptions, SWT.NONE);
+
+			_pageOptionSRTM = createUI40OptionWithSRTM(_pageBookOptions);
+			_pageOptionSRTMSpline = createUI50OptionWithSRTMSpline(_pageBookOptions);
+			_pageOptionNoSRTM = createUI60OptionWithoutSRTM(_pageBookOptions);
+		}
+	}
+
+	private Composite createUI40OptionWithSRTM(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * button: update altitude
+			 */
+			final Button btnUpdateAltitude = new Button(container, SWT.NONE);
+			btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
+			btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
+			btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onUpdateAltitudeSRTM();
+				}
+			});
+			setButtonLayoutData(btnUpdateAltitude);
+
+			/*
+			 * button: reset altitude
+			 */
+			final Button btnResetAltitude = new Button(container, SWT.NONE);
+			btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
+			btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
+			btnResetAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onResetAltitudeSRTM();
+				}
+			});
+			setButtonLayoutData(btnResetAltitude);
+		}
+
+		return container;
+	}
+
+	private Composite createUI50OptionWithSRTMSpline(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(5).equalWidth(false).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * button: update altitude
+			 */
+			final Button btnUpdateAltitude = new Button(container, SWT.NONE);
+			btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
+			btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
+			btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onUpdateAltitudeSRTMSpline();
+				}
+			});
+			setButtonLayoutData(btnUpdateAltitude);
+
+			/*
+			 * button: reset altitude
+			 */
+			final Button btnResetAltitude = new Button(container, SWT.NONE);
+			btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude_and_points);
+			btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_and_points_tooltip);
+			btnResetAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onResetAltitudeSRTMSpline();
+				}
+			});
+			setButtonLayoutData(btnResetAltitude);
+
+			/*
+			 * button: remove all points
+			 */
+			_btnSRTMRemoveAllPoints = new Button(container, SWT.NONE);
+			_btnSRTMRemoveAllPoints.setText(Messages.adjust_altitude_btn_srtm_remove_all_points);
+			_btnSRTMRemoveAllPoints.setToolTipText(Messages.adjust_altitude_btn_srtm_remove_all_points_tooltip);
+			_btnSRTMRemoveAllPoints.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+
+					initializeSplineData();
+					onChangeAdjustType();
+				}
+			});
+			setButtonLayoutData(_btnSRTMRemoveAllPoints);
+
+			// spacer
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+		}
+
+		return container;
+	}
+
+	private Composite createUI60OptionWithoutSRTM(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			createUI61StartEnd(container);
+			createUI62Max(container);
+			createUI63Actions(container);
+		}
+
+		return container;
+	}
+
+	private void createUI61StartEnd(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * field: start altitude
+			 */
+			Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Dlg_AdjustAltitude_Label_start_altitude);
+			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
+
+			_spinnerNewStartAlti = createAltiField(container);
+			_spinnerNewStartAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_START));
+			_spinnerNewStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
+
+			_lblOldStartAlti = new Label(container, SWT.NONE);
+			_lblOldStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
+
+			/*
+			 * field: end altitude
+			 */
+			label = new Label(container, SWT.NONE);
+			label.setText(Messages.Dlg_AdjustAltitude_Label_end_altitude);
+			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
+
+			_spinnerNewEndAlti = createAltiField(container);
+			_spinnerNewEndAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_END));
+			_spinnerNewEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
+
+			_lblOldEndAlti = new Label(container, SWT.NONE);
+			_lblOldEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
+		}
+
+	}
+
+	private void createUI62Max(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.BEGINNING, SWT.FILL)
+				.indent(40, 0)
+				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			/*
+			 * field: max altitude
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Dlg_AdjustAltitude_Label_max_altitude);
+			label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
+
+			_spinnerNewMaxAlti = createAltiField(container);
+			_spinnerNewMaxAlti.setData(WIDGET_DATA_ALTI_ID, new Integer(ALTI_ID_MAX));
+			_spinnerNewMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
+
+			_lblOldMaxAlti = new Label(container, SWT.NONE);
+			_lblOldMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
+
+			/*
+			 * group: keep start/bottom
+			 */
+			final Group groupKeep = new Group(container, SWT.NONE);
+			GridDataFactory.fillDefaults().span(3, 1).applyTo(groupKeep);
+			GridLayoutFactory.swtDefaults().applyTo(groupKeep);
+			groupKeep.setText(Messages.Dlg_AdjustAltitude_Group_options);
+			{
+				final SelectionAdapter keepButtonSelectionAdapter = new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onChangeAltitude();
+					}
+				};
+
+				_rdoKeepBottom = new Button(groupKeep, SWT.RADIO);
+				_rdoKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
+				_rdoKeepBottom.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip);
+				_rdoKeepBottom.setLayoutData(new GridData());
+				_rdoKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
+				// fRadioKeepBottom.setSelection(true);
+
+				_rdoKeepStart = new Button(groupKeep, SWT.RADIO);
+				_rdoKeepStart.setText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude);
+				_rdoKeepStart.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip);
+				_rdoKeepStart.setLayoutData(new GridData());
+				_rdoKeepStart.addSelectionListener(keepButtonSelectionAdapter);
+			}
+		}
+
+	}
+
+	private void createUI63Actions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(20, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * button: reset altitude
+			 */
+			_btnResetAltitude = new Button(container, SWT.NONE);
+			_btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
+			_btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
+			_btnResetAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onResetAltitude();
+				}
+			});
+			setButtonLayoutData(_btnResetAltitude);
+
+			/*
+			 * button: update altitude
+			 */
+			_btnUpdateAltitude = new Button(container, SWT.NONE);
+			_btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
+			_btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
+			_btnUpdateAltitude.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onUpdateAltitude();
+				}
+			});
+			setButtonLayoutData(_btnUpdateAltitude);
+		}
 	}
 
 	private void enableFieldsWithoutSRTM() {
@@ -1454,16 +1460,24 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final int endAlti = metricAltitudeSerie[serieLength - 1];
 		int maxAlti = startAlti;
 
-		// get altitude from original data, calculate max altitude
-		_metricAdjustedAltitudeNoneSRTM = new int[serieLength];
+		/*
+		 * get altitude from original data, calculate max altitude
+		 */
+		_metricAdjustedAltitudeWithoutSRTM = new int[serieLength];
+
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
 			final int altitude = metricAltitudeSerie[serieIndex];
-			_metricAdjustedAltitudeNoneSRTM[serieIndex] = altitude;
+			_metricAdjustedAltitudeWithoutSRTM[serieIndex] = altitude;
+
 			if (altitude > maxAlti) {
 				maxAlti = altitude;
 			}
 		}
 
+		/*
+		 * update UI
+		 */
 		_lblOldStartAlti.setText(Integer.toString((int) (startAlti / UI.UNIT_VALUE_ALTITUDE)));
 		_lblOldEndAlti.setText(Integer.toString((int) (endAlti / UI.UNIT_VALUE_ALTITUDE)));
 		_lblOldMaxAlti.setText(Integer.toString((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE)));
@@ -1567,7 +1581,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_tourData.splineDataPoints = null;
 		_splineData.serieIndex = null;
 
-		switch (getSelectedAdjustmentType().__id) {
+		final int adjustmentType = getSelectedAdjustmentType().__id;
+		switch (adjustmentType) {
 		case ADJUST_TYPE_SRTM:
 
 			_pageBookOptions.showPage(_pageOptionSRTM);
@@ -1591,8 +1606,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_MAX_HEIGHT:
 
 			_pageBookOptions.showPage(_pageOptionNoSRTM);
-//			onChangeAltitude();
-			onResetAdjustments();
+			onResetAltitude();
 
 			break;
 
@@ -1601,7 +1615,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			break;
 		}
 
-		_dlgContainer.layout(true);
+		/*
+		 * layout is a performance hog, optimize it
+		 */
+		if (_oldAdjustmentType != adjustmentType) {
+			_dlgContainer.layout(true);
+		}
+
+		_oldAdjustmentType = adjustmentType;
 
 		updateUI2ndLayer();
 	}
@@ -1706,24 +1727,24 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_pointHitIndex = -1;
 	}
 
-	/**
-	 * set adjustments to the initial values
-	 */
-	private void onResetAdjustments() {
-
-		_altiMaxDiff = 0;
-		_altiStartDiff = 0;
-		_prevAltiStart = 0;
-		_prevAltiMax = 0;
-
-		_metricAdjustedAltitudeNoneSRTM = Util.createDataSerieCopy(_tourData.altitudeSerie);
-		_tourData.clearAltitudeSeries();
-
-		initializeAltitude(_metricAdjustedAltitudeNoneSRTM);
-		onChangeAltitude();
-
-		updateTourChart();
-	}
+//	/**
+//	 * set adjustments to the initial values
+//	 */
+//	private void onResetAdjustments() {
+//
+//		_altiMaxDiff = 0;
+//		_altiStartDiff = 0;
+//		_prevAltiStart = 0;
+//		_prevAltiMax = 0;
+//
+//		_metricAdjustedAltitudeWithoutSRTM = Util.createDataSerieCopy(_tourData.altitudeSerie);
+//		_tourData.clearAltitudeSeries();
+//
+//		initializeAltitude(_metricAdjustedAltitudeWithoutSRTM);
+//		onChangeAltitude();
+//
+//		updateTourChart();
+//	}
 
 	/**
 	 * display altitude with the original altitude data
@@ -1777,7 +1798,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	 */
 	private void onUpdateAltitude() {
 
-		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAdjustedAltitudeNoneSRTM);
+		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAdjustedAltitudeWithoutSRTM);
 		_tourData.clearAltitudeSeries();
 
 		updateTourChart();
@@ -1882,7 +1903,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_START_AND_END:
 		case ADJUST_TYPE_END:
 		case ADJUST_TYPE_MAX_HEIGHT:
-			_tourData.altitudeSerie = _metricAdjustedAltitudeNoneSRTM;
+			_tourData.altitudeSerie = _metricAdjustedAltitudeWithoutSRTM;
 			break;
 
 		default:
@@ -1940,7 +1961,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	 */
 	private void updateUIAltiFields() {
 
-		final int[] metricAltitudeSerie = _metricAdjustedAltitudeNoneSRTM;
+		final int[] metricAltitudeSerie = _metricAdjustedAltitudeWithoutSRTM;
 		final int[] adjustedAltitude = _tourData.dataSerieAdjustedAlti = new int[metricAltitudeSerie.length];
 
 		final int startAlti = metricAltitudeSerie[0];

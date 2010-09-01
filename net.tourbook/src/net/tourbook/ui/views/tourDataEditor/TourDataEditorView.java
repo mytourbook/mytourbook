@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -166,6 +166,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
@@ -202,6 +203,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final IDialogSettings				_viewState						= TourbookPlugin
 																						.getDefault()
 																						.getDialogSettingsSection(ID);
+
 	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
 																						.getDefault()
 																						.getDialogSettingsSection(//
@@ -210,26 +212,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 																						.getDefault()
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
-
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
+
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
+	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
+	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
-
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
 	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
 
 	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";			//$NON-NLS-1$
+
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
-
 	/*
 	 * data series which are displayed in the viewer
 	 */
 	private int[]								_serieTime;
+
 	private int[]								_serieDistance;
 	private int[]								_serieAltitude;
 	private int[]								_serieTemperature;
@@ -241,33 +245,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private int[]								_seriePulse;
 	private double[]							_serieLatitude;
 	private double[]							_serieLongitude;
-
 	// slice viewer
 	private ColumnDefinition					_colDefAltitude;
+
 	private ColumnDefinition					_colDefCadence;
 	private ColumnDefinition					_colDefPulse;
 	private ColumnDefinition					_colDefTemperature;
 	private ColumnDefinition					_colDefSliceMarker;
 	private ColumnDefinition					_colDefLatitude;
 	private ColumnDefinition					_colDefLongitude;
-
 	// marker viewer
 	private ColumnDefinition					_colDefMarker;
 
 	private MessageManager						_messageManager;
 
 	private PostSelectionProvider				_postSelectionProvider;
+
 	private ISelectionListener					_postSelectionListener;
 	private IPartListener2						_partListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 	private ITourSaveListener					_tourSaveListener;
-
 	private final Calendar						_calendar						= GregorianCalendar.getInstance();
 
 	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
 
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
+
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3NoGroup						= NumberFormat.getNumberInstance();
@@ -286,7 +290,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_nf3NoGroup.setMaximumFractionDigits(3);
 		_nf3NoGroup.setGroupingUsed(false);
 	}
-
 	/**
 	 * <code>true</code>: rows can be selected in the viewer<br>
 	 * <code>false</code>: cell can be selected in the viewer
@@ -296,8 +299,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean								_isEditMode;
 
 	private long								_sliceViewerTourId				= -1;
-	private SelectionChartXSliderPosition		_sliceViewerXSliderPosition;
 
+	private SelectionChartXSliderPosition		_sliceViewerXSliderPosition;
 	private boolean								_isTourDirty					= false;
 
 	/**
@@ -307,9 +310,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean								_isSavingInProgress				= false;
 
 	/**
-	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
+	 * when <code>true</code> data are loaded into fields
 	 */
-	private boolean								_isDirtyDisabled				= false;
+	private boolean								_isSetField						= false;
 
 	/**
 	 * contains the tour id from the last selection event
@@ -317,10 +320,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Long								_selectionTourId;
 
 	private KeyAdapter							_keyListener;
+
 	private ModifyListener						_modifyListener;
+	private ModifyListener						_verifyFloatValue;
+	private ModifyListener						_verifyIntValue;
 	private MouseWheelListener					_mouseWheelListener;
 	private SelectionAdapter					_selectionListener;
-	private ModifyListener						_verifyFloatValue;
 	private SelectionAdapter					_tourTimeListener;
 	private SelectionAdapter					_dateTimeListener;
 
@@ -368,9 +373,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private int									_uiRunnableCounter				= 0;
 
 	private int									_uiUpdateTitleCounter			= 0;
+
 	private TourData							_uiRunnableTourData;
 	private boolean								_uiRunnableForceTimeSliceReload;
 	private boolean								_uiRunnableIsDirtyDisabled;
+	private SliceIntegerEditingSupport			_altitudeEditingSupport;
 
 // disabled because tour data get corrupted, the tour date could be from another tour
 //	private int							fUIUpdateCounterTabTour			= -1;
@@ -378,13 +385,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	private int							fUIUpdateCounterTabMarker		= -1;
 //	private int							fUIUpdateCounterTabSlices		= -1;
 
-	private SliceIntegerEditingSupport			_altitudeEditingSupport;
 	private SliceIntegerEditingSupport			_pulseEditingSupport;
 	private SliceIntegerEditingSupport			_temperatureEditingSupport;
 	private SliceIntegerEditingSupport			_cadenceEditingSupport;
 	private SliceDoubleEditingSupport			_latitudeEditingSupport;
 	private SliceDoubleEditingSupport			_longitudeEditingSupport;
-
 	private int									_enableActionCounter			= 0;
 
 	/**
@@ -398,6 +403,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean								_isManualTour;
 
 	private boolean								_isDistManuallyModified;
+	private boolean								_isAltitudeManuallyModified;
+
 	private boolean								_isWindSpeedManuallyModified;
 	private boolean								_isTemperatureManuallyModified;
 
@@ -408,100 +415,106 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private float								_unitValueAltitude;
 	private float								_unitValueTemperature;
 	private int[]								_unitValueWindSpeed;
-
 	private int									_defaultSpinnerWidth;
-
-	/*
-	 * ##################################################
-	 * UI controls
-	 * ##################################################
-	 */
-
-//	private Display									_display;
 
 	// pages
 	private PageBook							_pageBook;
+
+	//
+	// ################################################## UI controls ##################################################
+	//
+
 	private Label								_pageNoTour;
 	private Form								_pageEditorForm;
 
-	// tab folder
 	private CTabFolder							_tabFolder;
 	private CTabItem							_tabTour;
 	private CTabItem							_tabMarker;
 	private CTabItem							_tabSlices;
 	private CTabItem							_tabInfo;
-
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
 	private final ArrayList<Control>			_firstColumnControls			= new ArrayList<Control>();
+
 	private final ArrayList<Control>			_firstColumnContainerControls	= new ArrayList<Control>();
 	private final ArrayList<Control>			_secondColumnControls			= new ArrayList<Control>();
 
 	private TourChart							_tourChart;
 	private TourData							_tourData;
+
+	/*
+	 * UI controls
+	 */
 	private Composite							_tourContainer;
-	private ScrolledComposite					_scrolledTabInfo;
-
+	private ScrolledComposite					_tab1Container;
+	private ScrolledComposite					_tab4Container;
 	private Composite							_infoContainer;
-	private Composite							_markerViewerContainer;
-	private Composite							_sliceContainer;
 
+	private Composite							_markerViewerContainer;
+	private Composite							_tab3Container;
 	private Composite							_sliceViewerContainer;
+
 	private Label								_timeSliceLabel;
 	private TableViewer							_sliceViewer;
-
 	private Object[]							_sliceViewerItems;
+
 	private ColumnManager						_sliceColumnManager;
-
 	private TableViewer							_markerViewer;
-	private ColumnManager						_markerColumnManager;
 
+	private ColumnManager						_markerColumnManager;
 	private FormToolkit							_tk;
 
 	/*
 	 * tab: tour
 	 */
 	private Text								_txtTitle;
+
 	private Text								_txtDescription;
 	private Text								_txtStartLocation;
 	private Text								_txtEndLocation;
-
 	private Spinner								_spinRestPuls;
+
 	private Spinner								_spinTourCalories;
-
 	private Spinner								_spinTemperature;
-	private Label								_lblTemperatureUnit;
 
+	private Label								_lblTemperatureUnit;
 	private Spinner								_spinWindDirectionValue;
+
 	private Spinner								_spinWindSpeedValue;
 	private Combo								_comboWindDirectionText;
 	private Combo								_comboWindSpeedText;
-
 	private CLabel								_lblCloudIcon;
 	private Combo								_comboClouds;
 
 	private Text								_txtTourDistance;
 	private Label								_lblTourDistanceUnit;
-	private Link								_linkTag;
+	private Text								_txtAltitudeUp;
+	private Text								_txtAltitudeDown;
+	private Label								_lblAltitudeUpUnit;
+	private Label								_lblAltitudeDownUnit;
 
+	private Label								_lblSpeedUnit;
+
+	private Link								_linkTag;
 	private Label								_lblTourTags;
+
 	private Link								_linkTourType;
 	private CLabel								_lblTourType;
 
 	private DateTime							_dtTourDate;
 	private DateTime							_dtStartTime;
-	private DateTime							_dtRecordingTime;
-	private DateTime							_dtDrivingTime;
-	private DateTime							_dtPausedTime;
 
-	private Label								_lblSpeedUnit;
+	private TimeDuration						_timeRecording;
+	private TimeDuration						_timePaused;
+	private TimeDuration						_timeDriving;
 
 	/*
 	 * tab: info
 	 */
 	private Text								_txtRefTour;
+
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtDeviceName;
 	private Text								_txtDistanceSensor;
@@ -510,7 +523,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtTourId;
 	private Text								_txtMergeFromTourId;
 	private Text								_txtMergeIntoTourId;
-
 	private Text								_txtDateTimeCreated;
 	private Text								_txtDateTimeModified;
 
@@ -518,6 +530,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * actions
 	 */
 	private ActionSaveTour						_actionSaveTour;
+
 	private ActionCreateTour					_actionCreateTour;
 	private ActionUndoChanges					_actionUndoChanges;
 	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
@@ -534,21 +547,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
 	private ActionSplitTour						_actionSplitTour;
 	private ActionExtractTour					_actionExtractTour;
-
 	private ActionSetTourTag					_actionAddTag;
+
 	private ActionSetTourTag					_actionRemoveTag;
 	private ActionRemoveAllTags					_actionRemoveAllTags;
 	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
-
 	private ActionDeleteTourMarker				_actionDeleteTourMarker;
-	private ActionModifyColumns					_actionModifyColumns;
 
-	/*
-	 * ##################################################
-	 * End of UI controls
-	 * ##################################################
-	 */
+	private ActionModifyColumns					_actionModifyColumns;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -604,6 +611,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 	}
+
+	/*
+	 * ################################################## End of UI controls
+	 * ##################################################
+	 */
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -944,9 +956,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * It took me hours to find this location where the editor is activated/deactivated
-	 * without using TableViewerEditor which is activated in setCellEditingSupport but not
-	 * in the row edit mode.
+	 * It took me hours to find this location where the editor is activated/deactivated without
+	 * using TableViewerEditor which is activated in setCellEditingSupport but not in the row edit
+	 * mode.
 	 */
 	private final class TextCellEditorCustomized extends TextCellEditor {
 
@@ -970,6 +982,174 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_isCellEditorActive = false;
 			enableActionsDelayed();
+		}
+	}
+
+	private class TimeDuration {
+
+		private static final String	timeFormat		= "%5d:%02d:%02d";
+
+		private PageBook			_pageBook;
+		private Composite			_pageReadMode;
+		private Composite			_pageEditMode;
+
+		private Text				_txtTime;
+		private Spinner				_spinHours;
+		private Spinner				_spinMinutes;
+		private Spinner				_spinSeconds;
+
+		private boolean				_isTimeEditMode	= false;
+
+		public TimeDuration(final Composite parent) {
+
+			createUI(parent);
+		}
+
+		private void createUI(final Composite parent) {
+
+			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(4);
+			final int spinnerWidth = _pc.convertWidthInCharsToPixels(3);
+
+			_pageBook = new PageBook(parent, SWT.NONE);
+
+			/*
+			 * page: read mode
+			 */
+
+			_pageReadMode = new Composite(_pageBook, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageReadMode);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_pageReadMode);
+			{
+				_txtTime = _tk.createText(_pageReadMode, UI.EMPTY_STRING, SWT.READ_ONLY);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTime);
+				_txtTime.setEnabled(false);
+
+				_tk.createLabel(_pageReadMode, UI.UNIT_LABEL_TIME, SWT.READ_ONLY);
+			}
+
+			/*
+			 * page: edit mode
+			 */
+
+			_pageEditMode = new Composite(_pageBook, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageEditMode);
+			GridLayoutFactory.fillDefaults().numColumns(3).spacing(0, 0).applyTo(_pageEditMode);
+			{
+				/*
+				 * hour
+				 */
+				_spinHours = new Spinner(_pageEditMode, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(spinnerWidthHour, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinHours);
+				_spinHours.setMinimum(-1);
+				_spinHours.setMaximum(999);
+				_spinHours.setToolTipText(Messages.Tour_Editor_Label_Hours_Tooltip);
+
+				_spinHours.addModifyListener(_modifyListener);
+				_spinHours.addMouseWheelListener(_mouseWheelListener);
+				_spinHours.addSelectionListener(_tourTimeListener);
+				_tk.adapt(_spinHours, true, true);
+
+				/*
+				 * minute
+				 */
+				_spinMinutes = new Spinner(_pageEditMode, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(spinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinMinutes);
+				_spinMinutes.setMinimum(-1);
+				_spinMinutes.setMaximum(60);
+				_spinMinutes.setToolTipText(Messages.Tour_Editor_Label_Minutes_Tooltip);
+
+				_spinMinutes.addModifyListener(_modifyListener);
+				_spinMinutes.addMouseWheelListener(_mouseWheelListener);
+				_spinMinutes.addSelectionListener(_tourTimeListener);
+				_tk.adapt(_spinMinutes, true, true);
+
+				/*
+				 * seconds
+				 */
+				_spinSeconds = new Spinner(_pageEditMode, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(spinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinSeconds);
+				_spinSeconds.setMinimum(-1);
+				_spinSeconds.setMaximum(60);
+				_spinSeconds.setToolTipText(Messages.Tour_Editor_Label_Seconds_Tooltip);
+
+				_spinSeconds.addModifyListener(_modifyListener);
+				_spinSeconds.addMouseWheelListener(_mouseWheelListener);
+				_spinSeconds.addSelectionListener(_tourTimeListener);
+				_tk.adapt(_spinSeconds, true, true);
+			}
+
+			// default is read mode
+			_pageBook.showPage(_pageReadMode);
+		}
+
+		/**
+		 * @return Returns time in seconds
+		 */
+		public int getTime() {
+			return (_spinHours.getSelection() * 3600) //
+					+ (_spinMinutes.getSelection() * 60)
+					+ _spinSeconds.getSelection();
+		}
+
+		public void setEditMode(final boolean isEditMode) {
+
+			// optimize
+			if (_isTimeEditMode == isEditMode) {
+				// nothing changed
+				return;
+			}
+
+			_isTimeEditMode = isEditMode;
+
+			_pageBook.showPage(isEditMode ? _pageEditMode : _pageReadMode);
+
+			// hide drawing artefact, this do not work 100% correct on winXP
+			_tab1Container.setRedraw(false);
+			{
+				_tab1Container.layout(true, true);
+			}
+			_tab1Container.setRedraw(true);
+		}
+
+		public void setTime(final int recordingTime) {
+
+			final int hours = recordingTime / 3600;
+			final int minutes = (recordingTime % 3600) / 60;
+			final int seconds = (recordingTime % 3600) % 60;
+
+			_txtTime.setText(String.format(timeFormat, hours, minutes, seconds));
+
+			final boolean isBackup = _isSetField;
+			_isSetField = true;
+			{
+				_spinHours.setSelection(hours);
+				_spinMinutes.setSelection(minutes);
+				_spinSeconds.setSelection(seconds);
+			}
+			_isSetField = isBackup;
+		}
+
+		public void setTime(final int hours, final int minutes, final int seconds) {
+
+			_txtTime.setText(String.format(timeFormat, hours, minutes, seconds));
+
+			final boolean isBackup = _isSetField;
+			_isSetField = true;
+			{
+				_spinHours.setSelection(hours);
+				_spinMinutes.setSelection(minutes);
+				_spinSeconds.setSelection(seconds);
+			}
+			_isSetField = isBackup;
 		}
 	}
 
@@ -1284,7 +1464,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * delete selected time slices
-	 * 
+	 *
 	 * @param removeTime
 	 */
 	void actionDeleteTimeSlices(final boolean removeTime) {
@@ -1742,7 +1922,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if a marker is within the selected time slices
-	 * 
+	 *
 	 * @param firstSliceIndex
 	 * @param lastSliceIndex
 	 * @return Returns <code>true</code> when the marker can be deleted or there is no marker <br>
@@ -1867,7 +2047,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_modifyListener = new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
 
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 
@@ -1878,17 +2058,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_mouseWheelListener = new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 				setTourDirty();
+
+				updateUITime(event.widget);
 			}
 		};
 
 		_selectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 				setTourDirty();
@@ -1908,7 +2090,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 
@@ -1927,64 +2109,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 
 				setTourDirty();
 
-				/*
-				 * ensure validation for all 3 times
-				 */
-
-				final DateTime dt = (DateTime) event.widget;
-
-				int recTime = (_dtRecordingTime.getHours() * 3600)
-						+ (_dtRecordingTime.getMinutes() * 60)
-						+ _dtRecordingTime.getSeconds();
-
-				int pausedTime = (_dtPausedTime.getHours() * 3600)
-						+ (_dtPausedTime.getMinutes() * 60)
-						+ _dtPausedTime.getSeconds();
-
-				int driveTime = (_dtDrivingTime.getHours() * 3600)
-						+ (_dtDrivingTime.getMinutes() * 60)
-						+ _dtDrivingTime.getSeconds();
-
-				if (dt == _dtRecordingTime) {
-
-					// recording time is modified
-
-					if (pausedTime > recTime) {
-						pausedTime = recTime;
-					}
-
-					driveTime = recTime - pausedTime;
-
-				} else if (dt == _dtPausedTime) {
-
-					// paused time is modified
-
-					if (pausedTime > recTime) {
-						recTime = pausedTime;
-					}
-
-					driveTime = recTime - pausedTime;
-
-				} else if (dt == _dtDrivingTime) {
-
-					// driving time is modified
-
-					if (driveTime > recTime) {
-						recTime = driveTime;
-					}
-
-					pausedTime = recTime - driveTime;
-				}
-
-				_dtRecordingTime.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
-				_dtDrivingTime.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
-				_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+				updateUITime(event.widget);
 			}
 		};
 
@@ -1992,7 +2123,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			public void modifyText(final ModifyEvent event) {
 
-				if (_isDirtyDisabled || _isSavingInProgress) {
+				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
 
@@ -2027,8 +2158,62 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 
 				/*
-				 * set tour dirty must be set after validation because an error can occure which
-				 * enables actions
+				 * tour dirty must be set after validation because an error can occure which enables
+				 * actions
+				 */
+				if (_isTourDirty) {
+					/*
+					 * when an error occured previously and is now solved, the save action must be
+					 * enabled
+					 */
+					enableActions();
+				} else {
+					setTourDirty();
+				}
+			}
+		};
+
+		_verifyIntValue = new ModifyListener() {
+
+			public void modifyText(final ModifyEvent event) {
+
+				if (_isSetField || _isSavingInProgress) {
+					return;
+				}
+
+				final Text widget = (Text) event.widget;
+				final String valueText = widget.getText().trim();
+
+				if (valueText.length() > 0) {
+					try {
+
+						// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+						//
+						// Float.parseFloat() ignores localized strings therefore the databinding converter is used
+						// which provides also a good error message
+						//
+						// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+						StringToNumberConverter.toInteger(true).convert(valueText);
+
+						_messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
+
+					} catch (final IllegalArgumentException e) {
+
+						// wrong characters are entered, display an error message
+
+						_messageManager.addMessage(
+								widget.getData(WIDGET_KEY),
+								e.getLocalizedMessage(),
+								null,
+								IMessageProvider.ERROR,
+								widget);
+					}
+				}
+
+				/*
+				 * tour dirty must be set after validation because an error can occure which enables
+				 * actions
 				 */
 				if (_isTourDirty) {
 					/*
@@ -2124,7 +2309,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * create the views context menu
-	 * 
+	 *
 	 * @param table
 	 */
 	private void createMarkerViewerContextMenu(final Table table) {
@@ -2556,20 +2741,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			createUISeparator(container);
 
 			/*
-			 * start time
-			 */
-			label = _tk.createLabel(container, Messages.tour_editor_label_start_time);
-			_firstColumnControls.add(label);
-
-			_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtStartTime);
-			_tk.adapt(_dtStartTime, true, false);
-			_dtStartTime.addSelectionListener(_dateTimeListener);
-
-			//////////////////////////////////////
-			createUISeparator(container);
-
-			/*
 			 * tour distance
 			 */
 			label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
@@ -2588,6 +2759,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			});
 
 			_lblTourDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
+
+			/*
+			 * altitude up
+			 */
+			label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeUp);
+			_firstColumnControls.add(label);
+
+			_txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+			GridDataFactory.fillDefaults().applyTo(_txtAltitudeUp);
+			_txtAltitudeUp.addModifyListener(_verifyIntValue);
+			_txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
+			_txtAltitudeUp.addKeyListener(new KeyListener() {
+				public void keyPressed(final KeyEvent e) {
+					_isAltitudeManuallyModified = true;
+				}
+
+				public void keyReleased(final KeyEvent e) {}
+			});
+
+			_lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+
+			/*
+			 * altitude down
+			 */
+			label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeDown);
+			_firstColumnControls.add(label);
+
+			_txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+			GridDataFactory.fillDefaults().applyTo(_txtAltitudeDown);
+			_txtAltitudeDown.addModifyListener(_verifyIntValue);
+			_txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
+			_txtAltitudeDown.addKeyListener(new KeyListener() {
+				public void keyPressed(final KeyEvent e) {
+					_isAltitudeManuallyModified = true;
+				}
+
+				public void keyReleased(final KeyEvent e) {}
+			});
+
+			_lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
 		}
 	}
 
@@ -2596,19 +2807,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void createUISection124DateTimeCol2(final Composite section) {
 
+		Label label;
+
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
 			/*
-			 * recording time
+			 * start time
 			 */
-			Label label = _tk.createLabel(container, Messages.tour_editor_label_recording_time);
+			label = _tk.createLabel(container, Messages.tour_editor_label_start_time);
 			_secondColumnControls.add(label);
 
-			_dtRecordingTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-			_dtRecordingTime.addSelectionListener(_tourTimeListener);
-			_tk.adapt(_dtRecordingTime, true, true);
+			_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+//			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).applyTo(_dtStartTime);
+			_tk.adapt(_dtStartTime, true, false);
+			_dtStartTime.addSelectionListener(_dateTimeListener);
+
+			/*
+			 * recording time
+			 */
+			label = _tk.createLabel(container, Messages.tour_editor_label_recording_time);
+			_secondColumnControls.add(label);
+
+			_timeRecording = new TimeDuration(container);
 
 			/*
 			 * paused time
@@ -2616,9 +2838,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_paused_time);
 			_secondColumnControls.add(label);
 
-			_dtPausedTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-			_tk.adapt(_dtPausedTime, true, true);
-			_dtPausedTime.addSelectionListener(_tourTimeListener);
+			_timePaused = new TimeDuration(container);
 
 			/*
 			 * driving time
@@ -2626,9 +2846,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_driving_time);
 			_secondColumnControls.add(label);
 
-			_dtDrivingTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-			_tk.adapt(_dtDrivingTime, true, true);
-			_dtDrivingTime.addSelectionListener(_tourTimeListener);
+			_timeDriving = new TimeDuration(container);
 		}
 	}
 
@@ -2705,7 +2923,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
 			_spinTourCalories.setMinimum(0);
 			_spinTourCalories.setMaximum(1000000);
-//			_spinTourCalories.setToolTipText();
 
 			_spinTourCalories.addModifyListener(_modifyListener);
 			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
@@ -2757,7 +2974,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_spinWindSpeedValue.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -2767,7 +2984,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindSpeedValue.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -2777,7 +2994,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindSpeedValue.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindSpeedValue();
@@ -2802,7 +3019,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindSpeedText();
@@ -2837,7 +3054,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindDirectionText();
@@ -2861,7 +3078,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_spinWindDirectionValue.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -2871,7 +3088,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindDirectionValue.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -2881,7 +3098,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindDirectionValue.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					onSelectWindDirectionValue();
@@ -2933,7 +3150,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				public void modifyText(final ModifyEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -2943,7 +3160,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -2953,7 +3170,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					if (_isDirtyDisabled || _isSavingInProgress) {
+					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
 					_isTemperatureManuallyModified = true;
@@ -3004,12 +3221,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			// force the icon to be displayed to ensure the width is correctly set when the size is computed
-			_isDirtyDisabled = true;
+			_isSetField = true;
 			{
 				_comboClouds.select(0);
 				displayCloudIcon();
 			}
-			_isDirtyDisabled = false;
+			_isSetField = false;
 		}
 	}
 
@@ -3195,49 +3412,51 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Composite createUITab10Tour(final Composite parent) {
 
 		// scrolled container
-		final ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		sc.setExpandVertical(true);
-		sc.setExpandHorizontal(true);
-		sc.addControlListener(new ControlAdapter() {
+		_tab1Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		_tab1Container.setExpandVertical(true);
+		_tab1Container.setExpandHorizontal(true);
+		_tab1Container.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				sc.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				_tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
+		{
+			_tourContainer = new Composite(_tab1Container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(_tourContainer);
+			_tk.adapt(_tourContainer);
+			GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
 
-		_tourContainer = new Composite(sc, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(_tourContainer);
-		_tk.adapt(_tourContainer);
-		GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
+			// set content for scrolled composite
+			_tab1Container.setContent(_tourContainer);
 
-		// set content for scrolled composite
-		sc.setContent(_tourContainer);
+			_tk.setBorderStyle(SWT.BORDER);
+			{
+				createUISection110Title(_tourContainer);
+				createUISectionSeparator(_tourContainer);
 
-		_tk.setBorderStyle(SWT.BORDER);
+				createUISection120DateTime(_tourContainer);
+				createUISectionSeparator(_tourContainer);
 
-		createUISection110Title(_tourContainer);
-		createUISectionSeparator(_tourContainer);
+				createUISection130Personal(_tourContainer);
+				createUISectionSeparator(_tourContainer);
 
-		createUISection120DateTime(_tourContainer);
-		createUISectionSeparator(_tourContainer);
+				createUISection140Weather(_tourContainer);
+				createUISectionSeparator(_tourContainer);
 
-		createUISection130Personal(_tourContainer);
-		createUISectionSeparator(_tourContainer);
-
-		createUISection140Weather(_tourContainer);
-		createUISectionSeparator(_tourContainer);
-
-		createUISection150Characteristics(_tourContainer);
+				createUISection150Characteristics(_tourContainer);
+			}
+		}
 
 		// compute width for all controls and equalize column width for the different sections
-		sc.layout(true, true);
+		_tab1Container.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnControls);
 		UI.setEqualizeColumWidths(_secondColumnControls);
 
-		sc.layout(true, true);
+		_tab1Container.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnContainerControls);
 
-		return sc;
+		return _tab1Container;
 	}
 
 	/**
@@ -3249,12 +3468,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite markerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(markerContainer);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(markerContainer);
+		{
+			_markerViewerContainer = new Composite(markerContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_markerViewerContainer);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_markerViewerContainer);
 
-		_markerViewerContainer = new Composite(markerContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_markerViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_markerViewerContainer);
-
-		createMarkerViewer(_markerViewerContainer);
+			createMarkerViewer(_markerViewerContainer);
+		}
 
 		return markerContainer;
 	}
@@ -3265,23 +3485,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private Control createUITab30Slices(final Composite parent) {
 
-		_sliceContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceContainer);
+		_tab3Container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_tab3Container);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_tab3Container);
+		{
+			_sliceViewerContainer = new Composite(_tab3Container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
 
-		_sliceViewerContainer = new Composite(_sliceContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
+			createSliceViewer(_sliceViewerContainer);
 
-		createSliceViewer(_sliceViewerContainer);
+			_timeSliceLabel = new Label(_tab3Container, SWT.WRAP);
+			_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+			_timeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+			_timeSliceLabel.setVisible(false);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_timeSliceLabel);
+		}
 
-		_timeSliceLabel = new Label(_sliceContainer, SWT.WRAP);
-		_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		_timeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-		_timeSliceLabel.setVisible(false);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_timeSliceLabel);
-
-		return _sliceContainer;
+		return _tab3Container;
 	}
 
 	private Composite createUITab40Info(final Composite parent) {
@@ -3289,27 +3510,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * scrolled container
 		 */
-		_scrolledTabInfo = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		_scrolledTabInfo.setExpandVertical(true);
-		_scrolledTabInfo.setExpandHorizontal(true);
-		_scrolledTabInfo.addControlListener(new ControlAdapter() {
+		_tab4Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		_tab4Container.setExpandVertical(true);
+		_tab4Container.setExpandHorizontal(true);
+		_tab4Container.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
 				onResizeTabInfo();
 			}
 		});
-
-		_infoContainer = new Composite(_scrolledTabInfo, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
-		_tk.adapt(_infoContainer);
-		GridLayoutFactory.swtDefaults().applyTo(_infoContainer);
+		{
+			_infoContainer = new Composite(_tab4Container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
+			_tk.adapt(_infoContainer);
+			GridLayoutFactory.swtDefaults().applyTo(_infoContainer);
+		}
 
 		// set content for scrolled composite
-		_scrolledTabInfo.setContent(_infoContainer);
+		_tab4Container.setContent(_infoContainer);
 
 		createUISection410Info(_infoContainer);
 
-		return _scrolledTabInfo;
+		return _tab4Container;
 	}
 
 	private void defineMarkerViewerColumns(final Composite parent) {
@@ -3927,6 +4149,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void enableControls() {
 
 		final boolean canEdit = _isEditMode && isTourInDb();
+		final boolean isManualAndEdit = _isManualTour && canEdit;
 		final boolean isNotManualTour = _isManualTour == false;
 
 		_txtTitle.setEnabled(canEdit);
@@ -3947,13 +4170,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
 
-		_dtRecordingTime.setEnabled(canEdit && _isManualTour);
-		_dtDrivingTime.setEnabled(canEdit && _isManualTour);
-		_dtPausedTime.setEnabled(canEdit && _isManualTour);
+		_timeRecording.setEditMode(isManualAndEdit);
+		_timePaused.setEditMode(isManualAndEdit);
+		_timeDriving.setEditMode(isManualAndEdit);
 
-		_txtTourDistance.setEnabled(canEdit && _isManualTour);
+		_txtTourDistance.setEnabled(isManualAndEdit);
+		_txtAltitudeUp.setEnabled(isManualAndEdit);
+		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
-		_spinTourCalories.setEnabled(canEdit && _isManualTour);
+		_spinTourCalories.setEnabled(isManualAndEdit);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
@@ -4135,7 +4360,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
-	 * 
+	 *
 	 * @return
 	 */
 	private ISelection fireSliderPosition(final StructuredSelection selection) {
@@ -4299,7 +4524,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Converts a string into a float value
-	 * 
+	 *
 	 * @param valueText
 	 * @return Returns the float value for the parameter valueText, return <code>0</code>
 	 * @throws IllegalArgumentException
@@ -4514,7 +4739,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * check row/cell mode, row mode must be set, it works with the cell mode but can be confusing
 	 * because multiple rows can be selected but they are not visible
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean isRowSelectionMode() {
@@ -4564,7 +4789,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Checks the selection if it contains the current tour, {@link #_selectionTourId} contains the
 	 * tour id which is within the selection
-	 * 
+	 *
 	 * @param selection
 	 * @return Returns <code>true</code> when the current tour is within the selection
 	 */
@@ -4705,7 +4930,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * Checks if tour has no errors
-	 * 
+	 *
 	 * @return Returns <code>true</code> when all data for the tour are valid, <code>false</code>
 	 *         otherwise
 	 */
@@ -4790,8 +5015,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void onResizeTabInfo() {
 
 		// horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
-		int infoContainerWidth = _scrolledTabInfo.getBounds().width;
-		final ScrollBar vertBar = _scrolledTabInfo.getVerticalBar();
+		int infoContainerWidth = _tab4Container.getBounds().width;
+		final ScrollBar vertBar = _tab4Container.getVerticalBar();
 		if (vertBar != null) {
 			// vertical bar is displayed
 			infoContainerWidth -= vertBar.getSize().x;
@@ -4799,7 +5024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final Point minSize = _infoContainer.computeSize(infoContainerWidth, SWT.DEFAULT);
 
-		_scrolledTabInfo.setMinSize(minSize);
+		_tab4Container.setMinSize(minSize);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -5013,12 +5238,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int selectedIndex = _comboWindSpeedText.getSelectionIndex();
 		final int speed = _unitValueWindSpeed[selectedIndex];
 
-		final boolean isBackup = _isDirtyDisabled;
-		_isDirtyDisabled = true;
+		final boolean isBackup = _isSetField;
+		_isSetField = true;
 		{
 			_spinWindSpeedValue.setSelection(speed);
 		}
-		_isDirtyDisabled = isBackup;
+		_isSetField = isBackup;
 	}
 
 	private void onSelectWindSpeedValue() {
@@ -5027,12 +5252,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final int windSpeed = _spinWindSpeedValue.getSelection();
 
-		final boolean isBackup = _isDirtyDisabled;
-		_isDirtyDisabled = true;
+		final boolean isBackup = _isSetField;
+		_isSetField = true;
 		{
 			_comboWindSpeedText.select(getWindSpeedTextIndex(windSpeed));
 		}
-		_isDirtyDisabled = isBackup;
+		_isSetField = isBackup;
 	}
 
 	/*
@@ -5377,7 +5602,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * saves the tour in the {@link TourDataEditorView}
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the tour is saved or <code>false</code> when the tour
 	 *         could not saved because the user canceled saving
 	 */
@@ -5463,7 +5688,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * initialize cell editing
-	 * 
+	 *
 	 * @param viewer
 	 */
 	private void setCellEditSupport(final TableViewer viewer) {
@@ -5511,6 +5736,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_isTourDirty = false;
 
 		_isDistManuallyModified = false;
+		_isAltitudeManuallyModified = false;
 		_isWindSpeedManuallyModified = false;
 		_isTemperatureManuallyModified = false;
 
@@ -5531,7 +5757,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Set {@link TourData} for the editor, when the editor is dirty, nothing is done, the calling
 	 * method must check if the tour editor is dirty
-	 * 
+	 *
 	 * @param tourDataForEditor
 	 */
 	public void setTourData(final TourData tourDataForEditor) {
@@ -5618,8 +5844,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			if (_isWindSpeedManuallyModified) {
 				/*
 				 * update the speed only when it was modified because when the measurement is
-				 * changed when the tour is being modified then the computation of the speed
-				 * value can cause rounding errors
+				 * changed when the tour is being modified then the computation of the speed value
+				 * can cause rounding errors
 				 */
 				_tourData.setWeatherWindSpeed((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
 			}
@@ -5659,15 +5885,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setTourDistance((int) distanceValue);
 			}
 
+			if (_isAltitudeManuallyModified) {
+
+				/*
+				 * update the altitude only when it was modified because when the measurement is
+				 * changed and the tour is modified, the computation of the distance value can cause
+				 * rounding errors
+				 */
+
+				float altitudeUpValue = getFloatValue(_txtAltitudeUp.getText());
+				float altitudeDownValue = getFloatValue(_txtAltitudeDown.getText());
+
+				if (_unitValueAltitude != 1) {
+
+					// none metric measurement systemm
+
+					// ensure float is used
+					float noneMetricValue = altitudeUpValue;
+					altitudeUpValue = Math.round(noneMetricValue * _unitValueAltitude);
+
+					noneMetricValue = altitudeDownValue;
+					altitudeDownValue = Math.round(noneMetricValue * _unitValueAltitude);
+				}
+
+				_tourData.setTourAltUp((int) altitudeUpValue);
+				_tourData.setTourAltDown((int) altitudeDownValue);
+			}
+
 			if (_isManualTour) {
-
-				_tourData.setTourRecordingTime((_dtRecordingTime.getHours() * 3600)
-						+ (_dtRecordingTime.getMinutes() * 60)
-						+ _dtRecordingTime.getSeconds());
-
-				_tourData.setTourDrivingTime((_dtDrivingTime.getHours() * 3600)
-						+ (_dtDrivingTime.getMinutes() * 60)
-						+ _dtDrivingTime.getSeconds());
+				_tourData.setTourRecordingTime(_timeRecording.getTime());
+				_tourData.setTourDrivingTime(_timeDriving.getTime());
 			}
 
 		} catch (final IllegalArgumentException e) {
@@ -5746,13 +5993,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_timeSliceLabel.setVisible(setVisible);
 
-			_sliceContainer.layout(true, true);
+			_tab3Container.layout(true, true);
 		}
 	}
 
 	/**
 	 * Updates the UI from {@link TourData}, dirty flag is not set
-	 * 
+	 *
 	 * @param tourData
 	 */
 	public void updateUI(final TourData tourData) {
@@ -5811,7 +6058,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * updates the fields in the tour data editor and enables actions and controls
-	 * 
+	 *
 	 * @param tourData
 	 * @param forceTimeSliceReload
 	 *            <code>true</code> will reload time slices
@@ -5883,7 +6130,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		_isDirtyDisabled = _uiRunnableIsDirtyDisabled;
+		_isSetField = _uiRunnableIsDirtyDisabled;
 
 		// keep tour data
 		_tourData = _uiRunnableTourData;
@@ -5919,7 +6166,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// show editor page
 		_pageBook.showPage(_pageEditorForm);
 
-		_isDirtyDisabled = false;
+		_isSetField = false;
 	}
 
 	private void updateUITab1Tour() {
@@ -5985,14 +6232,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		}
 
+		// altitude up/down
+		final int altitudeUp = _tourData.getTourAltUp();
+		final int altitudeDown = _tourData.getTourAltDown();
+		_txtAltitudeUp.setText(Integer.toString((int) (altitudeUp / _unitValueAltitude)));
+		_txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
+
 		// tour time's
 		final int recordingTime = _tourData.getTourRecordingTime();
 		final int drivingTime = _tourData.getTourDrivingTime();
 		final int pausedTime = recordingTime - drivingTime;
 
-		_dtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
-		_dtDrivingTime.setTime(drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
-		_dtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+		_timeRecording.setTime(recordingTime);
+		_timeDriving.setTime(drivingTime);
+		_timePaused.setTime(pausedTime);
 
 		// tour type/tags
 		UI.updateUITourType(_tourData, _lblTourType, true);
@@ -6000,6 +6253,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// measurement system
 		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 		_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 		_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
@@ -6141,6 +6396,79 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		onResizeTabInfo();
 	}
 
+	/**
+	 * Validate tour recording/driving/paused time
+	 */
+	private void updateUITime(final Widget widget) {
+
+		/*
+		 * check if a time control is currently used
+		 */
+		if ((widget == _timeRecording._spinHours
+				|| widget == _timeRecording._spinMinutes
+				|| widget == _timeRecording._spinSeconds
+				|| widget == _timeDriving._spinHours
+				|| widget == _timeDriving._spinMinutes
+				|| widget == _timeDriving._spinSeconds
+				|| widget == _timePaused._spinHours
+				|| widget == _timePaused._spinMinutes || widget == _timePaused._spinSeconds) == false) {
+
+			return;
+		}
+
+		int recTime = _timeRecording.getTime();
+		int pausedTime = _timePaused.getTime();
+		int driveTime = _timeDriving.getTime();
+
+		if (recTime < 0) {
+			recTime = -recTime - 1;
+		}
+		if (pausedTime < 0) {
+			pausedTime = 0;
+		}
+
+		if (widget == _timeRecording._spinHours
+				|| widget == _timeRecording._spinMinutes
+				|| widget == _timeRecording._spinSeconds) {
+
+			// recording time is modified
+
+			if (pausedTime > recTime) {
+				pausedTime = recTime;
+			}
+
+			driveTime = recTime - pausedTime;
+
+		} else if (widget == _timePaused._spinHours
+				|| widget == _timePaused._spinMinutes
+				|| widget == _timePaused._spinSeconds) {
+
+			// paused time is modified
+
+			if (pausedTime > recTime) {
+				recTime = pausedTime;
+			}
+
+			driveTime = recTime - pausedTime;
+
+		} else if (widget == _timeDriving._spinHours
+				|| widget == _timeDriving._spinMinutes
+				|| widget == _timeDriving._spinSeconds) {
+
+			// driving time is modified
+
+			if (driveTime > recTime) {
+				recTime = driveTime;
+			}
+
+			pausedTime = recTime - driveTime;
+		}
+
+		_timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
+		_timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
+		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+	}
+
 	private void updateUITitle() {
 
 		updateUITitle(
@@ -6154,7 +6482,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * update title of the view with the modified date/time
-	 * 
+	 *
 	 * @param tourYear
 	 * @param tourMonth
 	 * @param tourDay

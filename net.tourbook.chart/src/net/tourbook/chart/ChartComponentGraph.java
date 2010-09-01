@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Draws the graph and axis into the canvas
- * 
+ *
  * @author Wolfgang Schramm
  */
 public class ChartComponentGraph extends Canvas {
@@ -388,7 +388,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param parent
 	 *            the parent of this control.
 	 * @param style
@@ -829,7 +829,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Computes the value of the x axis according to the slider position
-	 * 
+	 *
 	 * @param slider
 	 * @param devXSliderLinePosition
 	 */
@@ -848,12 +848,12 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final int[] xValues = xValueSerie[0];
-		final int serieLength = xValues.length;
+		final int[] xDataValues = xValueSerie[0];
+		final int serieLength = xDataValues.length;
 		final int maxIndex = Math.max(0, serieLength - 1);
 
 		int valueIndex;
-		int xValue;
+		int xDataValue;
 
 		/*
 		 * disabled because gps data can have non-linear time, 15.01.2008 Wolfgang
@@ -890,31 +890,30 @@ public class ChartComponentGraph extends Canvas {
 			final float positionRatio = (float) devXSliderLinePosition / _devVirtualGraphImageWidth;
 			valueIndex = (int) (positionRatio * serieLength);
 
-			// enforce array bounds
+			// check array bounds
 			valueIndex = Math.min(valueIndex, maxIndex);
 			valueIndex = Math.max(valueIndex, 0);
 
-			// sliderIndex points into the value array for the current slider
-			// position
-			xValue = xValues[valueIndex];
+			// sliderIndex points into the value array for the current slider position
+			xDataValue = xDataValues[valueIndex];
 
 			// compute the value for the slider on the x-axis
 			final int sliderValue = (int) (positionRatio * valueRange);
 
-			if (xValue == sliderValue) {
+			if (xDataValue == sliderValue) {
 
 				// nothing to do
 
-			} else if (sliderValue > xValue) {
+			} else if (sliderValue > xDataValue) {
 
 				/*
 				 * in the value array move towards the end to find the position where the value of
 				 * the slider corresponds with the value in the value array
 				 */
 
-				while (sliderValue > xValue) {
+				while (sliderValue > xDataValue) {
 
-					xValue = xValues[valueIndex++];
+					xDataValue = xDataValues[valueIndex++];
 
 					// check if end of the x-data are reached
 					if (valueIndex == serieLength) {
@@ -922,34 +921,44 @@ public class ChartComponentGraph extends Canvas {
 					}
 				}
 				valueIndex--;
-				xValue = xValues[valueIndex];
+				xDataValue = xDataValues[valueIndex];
 
 			} else {
 
-				// valueX > valueSlider
+				/*
+				 * xDataValue > sliderValue
+				 */
 
-				while (sliderValue < xValue) {
+				while (sliderValue < xDataValue) {
 
 					// check if beginning of the x-data are reached
 					if (valueIndex == 0) {
 						break;
 					}
 
-					xValue = xValues[--valueIndex];
+					xDataValue = xDataValues[--valueIndex];
 				}
+			}
+
+			/*
+			 * This is a bit of a hack because at some positions the value is too small. Solving the
+			 * problem in the algorithm would take more time than using this hack.
+			 */
+			if (xDataValue < sliderValue) {
+				valueIndex++;
 			}
 
 			// enforce maxIndex
 			valueIndex = Math.min(valueIndex, maxIndex);
-			xValue = xValues[valueIndex];
+			xDataValue = xDataValues[valueIndex];
 
-			// xValue = valueIndex * 1000;
-			// valueX = valueSlider * 1000;
-			// xValue = (int) (slider.getPositionRatio() * 1000000000);
+			// !!! debug values !!!
+//			xValue = valueIndex * 1000;
+//			xValue = (int) (slider.getPositionRatio() * 1000000000);
 		}
 
 		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xValue);
+		slider.setValueX(xDataValue);
 	}
 
 	/**
@@ -983,7 +992,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Create a cursor resource from an image file
-	 * 
+	 *
 	 * @param imageName
 	 * @return
 	 */
@@ -1022,7 +1031,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Creates the label(s) and the position for each graph
-	 * 
+	 *
 	 * @param gc
 	 * @param slider
 	 */
@@ -1265,7 +1274,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
 	 * if null is returned, a line graph will be drawn instead
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -1807,7 +1816,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * draw the vertical gridlines
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -2127,7 +2136,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * first we draw the graph into a path, the path is then drawn on the device with a
 	 * transformation
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 * @param startIndex
@@ -2446,7 +2455,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
 	 * if null is returned, a line graph will be drawn instead
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 */
@@ -3041,7 +3050,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Draw the unit label, tick and the vertical grid line for the x axis
-	 * 
+	 *
 	 * @param gc
 	 * @param drawingData
 	 * @param isDrawUnit
@@ -3369,7 +3378,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Fills the surrounding area of an rectangle with background color
-	 * 
+	 *
 	 * @param gc
 	 * @param imageRect
 	 */
@@ -3539,7 +3548,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Returns the size of the graph for the given bounds, the size will be reduced when the
 	 * scrollbars are visible
-	 * 
+	 *
 	 * @param bounds
 	 *            is the size of the receiver where the chart can be drawn
 	 * @return bounds for the chart without scrollbars
@@ -3606,7 +3615,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if mouse has moved over a bar
-	 * 
+	 *
 	 * @param devY
 	 * @param graphX
 	 */
@@ -3712,7 +3721,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Check if the tooltip is too far away from the cursor position
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the cursor is too far away
 	 */
 	private boolean isToolTipWrongPositioned() {
@@ -3747,7 +3756,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if the mouse hit an y-slider and returns the hit slider
-	 * 
+	 *
 	 * @param graphX
 	 * @param devY
 	 * @return
@@ -3849,7 +3858,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move the slider to a new position
-	 * 
+	 *
 	 * @param xSlider
 	 *            Current slider
 	 * @param devSliderLinePos
@@ -3873,7 +3882,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * move the x-slider with the keyboard
-	 * 
+	 *
 	 * @param event
 	 */
 	private void moveXSlider(final Event event) {
@@ -4063,7 +4072,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse down event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseDown(final MouseEvent event) {
@@ -4201,7 +4210,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse exit event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseExit(final MouseEvent event) {
@@ -4233,7 +4242,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse move event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseMove(final MouseEvent event) {
@@ -4444,7 +4453,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse up event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onMouseUp(final MouseEvent event) {
@@ -4609,7 +4618,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Scroll event handler
-	 * 
+	 *
 	 * @param event
 	 */
 	private void onScroll(final SelectionEvent event) {
@@ -4618,7 +4627,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Paint event handler
-	 * 
+	 *
 	 * @param gc
 	 */
 	private void paintChart(final GC gc) {
@@ -4773,7 +4782,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * make the graph dirty and redraw it
-	 * 
+	 *
 	 * @param isGraphDirty
 	 */
 	void redrawBarSelection() {
@@ -5018,7 +5027,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move a zoomed chart that the slider gets visible
-	 * 
+	 *
 	 * @param slider
 	 * @param centerSliderPosition
 	 */
@@ -5162,7 +5171,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the focus to a control depending on the chart type
-	 * 
+	 *
 	 * @return Returns <code>true</code> when the focus was set
 	 */
 	private boolean setFocusToControl() {
@@ -5311,7 +5320,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the scrolling cursor according to the vertical position of the mouse
-	 * 
+	 *
 	 * @param devX
 	 * @param devY
 	 *            vertical coordinat of the mouse in the graph
@@ -5369,7 +5378,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Set value index for a slider and move the slider to this position, slider will be made
 	 * visible
-	 * 
+	 *
 	 * @param slider
 	 * @param valueIndex
 	 * @param centerSliderPosition
@@ -5401,7 +5410,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * makes the slider visible, a slider is only drawn into the chart if a slider was created with
 	 * createSlider
-	 * 
+	 *
 	 * @param isXSliderVisible
 	 */
 	void setXSliderVisible(final boolean isSliderVisible) {
@@ -5471,7 +5480,7 @@ public class ChartComponentGraph extends Canvas {
 	 * set the slider to the 2nd x-data and keep the slider on the same xValue position as before,
 	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the
 	 * painted graph can have a white space on the right side
-	 * 
+	 *
 	 * @param slider
 	 *            the slider which gets changed
 	 */
@@ -6105,7 +6114,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Zooms out of the graph
-	 * 
+	 *
 	 * @param updateChart
 	 */
 	void zoomOutWithMouse(final boolean updateChart) {

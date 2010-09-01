@@ -72,6 +72,10 @@ public class Messages extends NLS {
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
+	public static String	Adjust_Altitude_CreateDummyAltitudeData_Message;
+
+	public static String	Adjust_Altitude_CreateDummyAltitudeData_Title;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 
@@ -239,8 +243,12 @@ public class Messages extends NLS {
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
+	public static String	Database_Monitor_CreateDatabase;
+
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
+
+	public static String	Database_Monitor_SetupPooledConnection;
 
 	public static String		DataImport_Error_file_does_not_exist_msg;
 	public static String		DataImport_Error_file_does_not_exist_title;
@@ -780,6 +788,10 @@ public class Messages extends NLS {
 	public static String		Tour_Database_UpdateDone;
 	public static String		Tour_Database_UpdateInfo;
 
+	public static String	Tour_Editor_Label_AltitudeDown;
+
+	public static String	Tour_Editor_Label_AltitudeUp;
+
 	public static String		Tour_Editor_Label_DateTimeCreated;
 
 	public static String		Tour_Editor_Label_DateTimeModified;
@@ -787,6 +799,12 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor_Yes;
+
+	public static String	Tour_Editor_Label_Hours_Tooltip;
+
+	public static String	Tour_Editor_Label_Minutes_Tooltip;
+
+	public static String	Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;

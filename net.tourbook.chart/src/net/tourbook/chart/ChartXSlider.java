@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Wolfgang Schramm created 11.07.2005
@@ -38,10 +38,7 @@ public class ChartXSlider {
 	public final static int					halfSliderHitLineHeight	= 10;
 	public final static int					sliderHitLineHeight		= 2 * halfSliderHitLineHeight;
 
-	private final Rectangle					hitRectangle			= new Rectangle(0,
-																			0,
-																			sliderHitLineHeight,
-																			0);
+	private final Rectangle					hitRectangle			= new Rectangle(0, 0, sliderHitLineHeight, 0);
 
 	/**
 	 * keep the ratio of sliderpos/clientwidth, this is needed when changing the client width, so we
@@ -110,10 +107,7 @@ public class ChartXSlider {
 	 */
 	Rectangle getHitRectangle() {
 
-		final Rectangle rect = new Rectangle(hitRectangle.x,
-				hitRectangle.y,
-				hitRectangle.width,
-				hitRectangle.height);
+		final Rectangle rect = new Rectangle(hitRectangle.x, hitRectangle.y, hitRectangle.width, hitRectangle.height);
 
 		rect.x -= chartGraph.getDevGraphImageXOffset();
 
@@ -147,7 +141,6 @@ public class ChartXSlider {
 
 	/**
 	 * When the width of the graph changed, the slider bar position must be adjusted
-	 * 
 	 */
 	void handleChartResize(final int devGraphHeight) {
 
@@ -171,9 +164,9 @@ public class ChartXSlider {
 					chartGraph.computeXSliderValue(ChartXSlider.this, devVirtualGraphImageWidth);
 				}
 			});
-			
+
 		} else {
-			
+
 			// reposition the slider line but keep the position ratio
 			final float devSliderPos = devVirtualGraphImageWidth * positionRatio;
 
@@ -182,7 +175,8 @@ public class ChartXSlider {
 	}
 
 	/**
-	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value
+	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
+	 * A Slider move event is fired
 	 * 
 	 * @param newDevVirtualSliderLinePos
 	 */
@@ -196,8 +190,7 @@ public class ChartXSlider {
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
 		if (adjustToImageWidth) {
-			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(0,
-					newDevVirtualSliderLinePos));
+			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(0, newDevVirtualSliderLinePos));
 		}
 
 		// reposition the hit rectangle
@@ -239,7 +232,7 @@ public class ChartXSlider {
 
 	/**
 	 * @param devXClickOffset
-	 *        The devXClickOffset to set.
+	 *            The devXClickOffset to set.
 	 */
 	void setDevXClickOffset(final int devXClickOffset) {
 		this.devXClickOffset = devXClickOffset;

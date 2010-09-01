@@ -1350,7 +1350,7 @@ public class TourDatabase {
 			return false;
 		}
 
-		checkTable();
+		checkTable(null);
 
 		if (checkVersion(null) == false) {
 			return false;
@@ -1397,11 +1397,6 @@ public class TourDatabase {
 							.getTargetException()
 							.getMessage()));
 
-//			Display.getCurrent().asyncExec(new Runnable() {
-//				public void run() {
-//					PlatformUI.getWorkbench().close();
-//				}
-//			});
 			PlatformUI.getWorkbench().close();
 
 			throw e.getTargetException();
@@ -1494,6 +1489,11 @@ public class TourDatabase {
 
 					// make the first connection, this takes longer as the subsequent ones
 					try {
+
+						if (monitor != null) {
+							monitor.subTask(Messages.Database_Monitor_SetupPooledConnection);
+						}
+
 						final Connection connection = getPooledConnection();
 						connection.close();
 
@@ -1512,8 +1512,10 @@ public class TourDatabase {
 
 	/**
 	 * Check if the table in the database exist
+	 * 
+	 * @param monitor
 	 */
-	private void checkTable() {
+	private void checkTable(final IProgressMonitor monitor) {
 
 		if (_isTableChecked) {
 			return;
@@ -1532,8 +1534,13 @@ public class TourDatabase {
 			final ResultSet tables = metaData.getTables(null, null, null, null);
 			while (tables.next()) {
 				if (tables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
+					// table exists
 					return;
 				}
+			}
+
+			if (monitor != null) {
+				monitor.subTask(Messages.Database_Monitor_CreateDatabase);
 			}
 
 			Statement stmt = null;
@@ -2479,7 +2486,8 @@ public class TourDatabase {
 					} catch (final Throwable e) {
 						return;
 					}
-					checkTable();
+
+					checkTable(monitor);
 					checkVersion(monitor);
 
 					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
@@ -2497,7 +2505,7 @@ public class TourDatabase {
 					StatusUtil.showStatus(e);
 					return;
 				}
-				checkTable();
+				checkTable(null);
 				checkVersion(null);
 
 				_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -101,7 +101,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int									DB_LENGTH_DEVICE_MODE_NAME		= 255;
 
 	/**
-	 * 
+	 *
 	 */
 	public static final int									MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 
@@ -2260,7 +2260,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
 		/*
-		 * time serie is always available
+		 * a time serie is always available, except manually created tours
 		 */
 		timeSerie = new int[serieLength];
 
@@ -3927,7 +3927,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return the tourTitle
+	 * @return Returns tour title or an empty string when title is not set
 	 */
 	public String getTourTitle() {
 		return tourTitle == null ? UI.EMPTY_STRING : tourTitle;
@@ -4544,7 +4544,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Set total driving time
+	 * Set total driving/moving time in seconds
 	 * 
 	 * @param tourDrivingTime
 	 */
@@ -4590,6 +4590,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.tourPerson = tourPerson;
 	}
 
+	/**
+	 * Set total recording time in seconds
+	 * 
+	 * @param tourRecordingTime
+	 */
 	public void setTourRecordingTime(final int tourRecordingTime) {
 		this.tourRecordingTime = tourRecordingTime;
 	}
