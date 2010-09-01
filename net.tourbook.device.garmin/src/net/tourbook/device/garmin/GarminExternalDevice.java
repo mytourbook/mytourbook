@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
-import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import net.tourbook.device.DeviceReaderTools;
+import net.tourbook.ext.jars.velocity.VelocityService;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.WizardImportData;
@@ -72,13 +72,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 	public GarminExternalDevice() {
 		buildNewFileNames = false;
-		Properties veloProp = new Properties();
-		try {
-			veloProp.load(this.getClass().getResourceAsStream("/velocity.properties")); //$NON-NLS-1$
-			Velocity.init(veloProp);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		VelocityService.init();
 	}
 
 	@Override
@@ -281,7 +275,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 			/**
 			 * If in the tracks date or altitude values is missing, these are copied from activeLog.
-			 * 
+			 *
 			 * @param monitor
 			 * @param activeLog
 			 * @param tracks
@@ -337,7 +331,7 @@ public class GarminExternalDevice extends ExternalDevice {
 			// ----------------------------------------------------------------------
 			/**
 			 * Adds some important values to the velocity context (e.g. date, ...).
-			 * 
+			 *
 			 * @param context
 			 *            the velocity context holding all the data
 			 * @param productInfo
