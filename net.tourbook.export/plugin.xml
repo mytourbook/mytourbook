@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="net.tourbook.exportTour">
+      <export
+            class="net.tourbook.export.ExportTourGPX"
+            fileextension="gpx"
+            id="net.tourbook.export.gpx"
+            name="GPX">
+      </export>
+      <export
+            class="net.tourbook.export.ExportTourTCX"
+            fileextension="tcx"
+            id="net.tourbook.export.tcx"
+            name="TCX">
+      </export>
+   </extension>
+
+</plugin>

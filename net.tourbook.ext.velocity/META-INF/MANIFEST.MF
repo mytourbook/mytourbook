@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
-Bundle-SymbolicName: net.tourbook.ext.jars.velocity
+Bundle-SymbolicName: net.tourbook.ext.velocity
 Bundle-Version: 10.9.0.qualifier
 Bundle-Activator: net.tourbook.ext.jars.velocity.Activator
 Bundle-Vendor: MyTourbook
