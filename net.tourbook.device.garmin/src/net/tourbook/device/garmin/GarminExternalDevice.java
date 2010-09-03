@@ -37,7 +37,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import net.tourbook.device.DeviceReaderTools;
-import net.tourbook.ext.jars.velocity.VelocityService;
+import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.WizardImportData;

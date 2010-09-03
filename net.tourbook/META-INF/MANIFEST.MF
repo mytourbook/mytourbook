@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 10.7.0.qualifier
+Bundle-Version: 10.9.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -31,7 +31,7 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.colors,
  net.tourbook.data,
  net.tourbook.database,
- net.tourbook.export,
+ net.tourbook.extension.export,
  net.tourbook.importdata,
  net.tourbook.mapping,
  net.tourbook.preferences,
@@ -44,7 +44,7 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui.tourChart
 Import-Package: com.enterprisedt.net.ftp,
  net.tourbook.application,
- net.tourbook.export,
+ net.tourbook.extension.export,
  net.tourbook.printing,
  net.tourbook.util,
  org.geotools.data.ows,

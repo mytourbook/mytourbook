@@ -1,11 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
-Bundle-SymbolicName: net.tourbook.ext.velocity
+Bundle-SymbolicName: net.tourbook.ext.velocity;singleton:=true
 Bundle-Version: 10.9.0.qualifier
-Bundle-Activator: net.tourbook.ext.jars.velocity.Activator
+Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.tourbook.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
@@ -16,7 +18,7 @@ Bundle-ClassPath: .,
  velocity-1.5.jar,
  dinopolis-util-0.5.4mt.jar,
  gpsinput-0.5.4mt.jar
-Export-Package: net.tourbook.ext.jars.velocity,
+Export-Package: net.tourbook.ext.velocity,
  org.apache.velocity,
  org.apache.velocity.anakia,
  org.apache.velocity.app,
@@ -55,4 +57,3 @@ Export-Package: net.tourbook.ext.jars.velocity,
  org.dinopolis.util.resource,
  org.dinopolis.util.servicediscovery,
  org.dinopolis.util.text
-Import-Package: net.tourbook.util

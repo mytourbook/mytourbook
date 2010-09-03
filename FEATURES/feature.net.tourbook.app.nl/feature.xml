@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="10.7.0.qualifier"
+      version="10.9.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -318,7 +318,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.chart.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -326,7 +326,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.cm4xxm.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -334,7 +334,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.crp.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -342,7 +342,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.garmin.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -350,7 +350,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.hac4.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -358,7 +358,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.hac4pro.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -366,7 +366,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.hac5.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -374,7 +374,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.nmea.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -382,7 +382,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.device.tur.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -390,7 +390,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -398,7 +398,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.statistics.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -406,7 +406,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.util.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 
@@ -414,7 +414,7 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook.printing.nl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.9.0.qualifier"
          fragment="true"
          unpack="false"/>
 

@@ -48,7 +48,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.export.ActionExport;
+import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;

@@ -18,7 +18,7 @@ package net.tourbook.export;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
-import net.tourbook.export.ExportTourExtension;
+import net.tourbook.extension.export.ExportTourExtension;
 
 import org.eclipse.swt.widgets.Display;
 
