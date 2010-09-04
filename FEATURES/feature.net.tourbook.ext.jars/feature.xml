@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.jars"
       label="Feature for external jar files"
-      version="10.9.0.qualifier"
+      version="10.9.1.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -306,28 +306,28 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook.ext.jars"
          download-size="0"
          install-size="0"
-         version="10.9.0.qualifier"
+         version="10.9.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.byteholder.geoclipse.ext.geotools"
          download-size="0"
          install-size="0"
-         version="10.9.0.qualifier"
+         version="10.9.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.ext.jars.printing"
          download-size="0"
          install-size="0"
-         version="10.9.0.qualifier"
+         version="10.9.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.ext.velocity"
          download-size="0"
          install-size="0"
-         version="10.9.0.qualifier"
+         version="10.9.1.qualifier"
          unpack="false"/>
 
 </feature>
