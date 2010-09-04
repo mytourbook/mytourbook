@@ -779,24 +779,20 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_DateTimeModified;
 
 	public static String	Tour_Editor_Label_DeviceFirmwareVersion;
-	public static String		Tour_Editor_Label_DistanceSensor_No;
+
+	public static String	Tour_Editor_Label_DeviceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
-	public static String		Tour_Editor_Label_DistanceSensor_Yes;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
 	public static String	Tour_Editor_Label_PowerSensor;
 
-	public static String	Tour_Editor_Label_PowerSensor_No;
-
-	public static String	Tour_Editor_Label_PowerSensor_Yes;
-
 	public static String	Tour_Editor_Label_PulseSensor;
 
-	public static String	Tour_Editor_Label_PulseSensor_No;
-
-	public static String	Tour_Editor_Label_PulseSensor_Yes;
-
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
+	public static String	Tour_Editor_Label_Sensor_No;
+
+	public static String	Tour_Editor_Label_Sensor_Yes;
+
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;

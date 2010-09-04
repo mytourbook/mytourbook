@@ -3325,8 +3325,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _dateTimeModified;
 	}
 
+	public float getDeviceAvgSpeed() {
+		return deviceAvgSpeed;
+	}
+
 	public String getDeviceFirmwareVersion() {
-		return deviceFirmwareVersion;
+		return deviceFirmwareVersion == null ? UI.EMPTY_STRING : deviceFirmwareVersion;
 	}
 
 	public String getDeviceId() {
@@ -3354,14 +3358,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3379,6 +3375,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3440,13 +3444,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3457,11 +3454,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	}
 
 	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
+
+	/**
 	 * @return the maxPulse
 	 */
 	public int getMaxPulse() {
 		return maxPulse;
 	}
+
+//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
 
 	/**
 	 * @return the maxSpeed
@@ -3469,11 +3478,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float getMaxSpeed() {
 		return maxSpeed;
 	}
-
-//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
 
 	public int getMergedAltitudeOffset() {
 		return mergedAltitudeOffset;
@@ -3784,10 +3788,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startSecond;
 	}
 
-	public short getStartYear() {
-		return startYear;
-	}
-
 //	public short getStartWeek() {
 //		return startWeek;
 //	}
@@ -3798,6 +3798,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public short getStartWeekYear() {
 //		return startWeekYear;
 //	}
+
+	public short getStartYear() {
+		return startYear;
+	}
 
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
@@ -3977,10 +3981,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourType;
 	}
 
-	public Set<TourWayPoint> getTourWayPoints() {
-		return tourWayPoints;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -4020,6 +4020,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
 //		}
 //	}
+
+	public Set<TourWayPoint> getTourWayPoints() {
+		return tourWayPoints;
+	}
 
 	public String getWeatherClouds() {
 		return weatherClouds;
@@ -4064,6 +4068,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param zoomLevel
 	 * @param projectionId
@@ -4072,11 +4081,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public HashMap<Integer, Point> getWorldPositionForWayPoints(final String projectionId, final int zoomLevel) {
 		return _twpWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -4393,6 +4397,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setDateTimeModified(final long dateTimeModified) {
 		this.dateTimeModified = dateTimeModified;
+	}
+
+	public void setDeviceAvgSpeed(final float deviceAvgSpeed) {
+		this.deviceAvgSpeed = deviceAvgSpeed;
 	}
 
 	public void setDeviceId(final String deviceId) {
