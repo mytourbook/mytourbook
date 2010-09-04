@@ -1257,7 +1257,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			 * other tour values
 			 */
 			if (isFirstTour) {
-				isJoinedDistanceFromSensor = tourTourData.getIsDistanceFromSensor();
+				isJoinedDistanceFromSensor = tourTourData.isDistanceSensorPresent();
 				joinedDeviceTimeInterval = tourTourData.getDeviceTimeInterval();
 
 				joinedWeatherClouds = tourTourData.getWeatherClouds();
@@ -1267,7 +1267,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				joinedRestPulse = tourTourData.getRestPulse();
 
 			} else {
-				if (isJoinedDistanceFromSensor && tourTourData.getIsDistanceFromSensor()) {
+				if (isJoinedDistanceFromSensor && tourTourData.isDistanceSensorPresent()) {
 					// keep TRUE state
 				} else {
 					isJoinedDistanceFromSensor = false;

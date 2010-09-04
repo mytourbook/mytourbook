@@ -85,15 +85,16 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 11;													// 10.6.0 - 19-05-2010
+	private static final int						TOURBOOK_DB_VERSION							= 12;													// 10.9.1
 
-//	private static final int					TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
-//	private static final int					TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
-//	private static final int					TOURBOOK_DB_VERSION							= 9;	// 10.3.0
-//	private static final int					TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
-//	private static final int					TOURBOOK_DB_VERSION							= 7;	// 9.01
-//	private static final int					TOURBOOK_DB_VERSION							= 6;	// 8.12
-//	private static final int					TOURBOOK_DB_VERSION							= 5;	// 8.11
+//	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
+//	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
+//	private static final int						TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
+//	private static final int						TOURBOOK_DB_VERSION							= 9;	// 10.3.0
+//	private static final int						TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
+//	private static final int						TOURBOOK_DB_VERSION							= 7;	// 9.01
+//	private static final int						TOURBOOK_DB_VERSION							= 6;	// 8.12
+//	private static final int						TOURBOOK_DB_VERSION							= 5;	// 8.11
 
 	private static final String						PERSISTENCE_UNIT_NAME						= "tourdatabase";										//$NON-NLS-1$
 
@@ -119,7 +120,7 @@ public class TourDatabase {
 //
 //  tour category is disabled since version 1.6
 //
-//	public static final String					TABLE_TOUR_CATEGORY							= "TOURCATEGORY";										// "TourCategory";		//$NON-NLS-1$
+//	public static final String						TABLE_TOUR_CATEGORY							= "TOURCATEGORY";										// "TourCategory";		//$NON-NLS-1$
 
 	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
@@ -133,7 +134,7 @@ public class TourDatabase {
 																										+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + TABLE_TOUR_TAG_CATEGORY);				//$NON-NLS-1$
-//	public static final String					JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
+//	public static final String						JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
 //																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
@@ -1910,26 +1911,35 @@ public class TourDatabase {
 				+ "	restPulse        	    INTEGER DEFAULT 0,					\n" //$NON-NLS-1$
 				+ "	isDistanceFromSensor 	SMALLINT DEFAULT 0, 				\n" //$NON-NLS-1$
 				//
-				// version 8 end
+				// version 8 end ----------
 
 				// version 9 start
 				//
 				+ "	startWeekYear			SMALLINT DEFAULT 1977,				\n" //$NON-NLS-1$
 				//
-				// version 9 end
+				// version 9 end ----------
 
 				// version 10 start
 				//
 				// tourWayPoints is mapped in TourData
 				//
-				// version 10 end
+				// version 10 end----------
 
 				// version 11 start
 				//
-				+ "	DateTimeCreated			BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
-				+ "	DateTimeModified		BIGINT DEFAULT 0,					\n" //$NON-NLS-1$
+				+ "	DateTimeCreated				BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	DateTimeModified			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 				//
-				// version 11 end
+				// version 11 end ---------
+
+				// version 12 start
+				//
+				+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+				+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+				+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+				+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
+				//
+				// version 12 end ---------
 
 				+ "	serieData 				BLOB NOT NULL						\n" //$NON-NLS-1$
 				//
@@ -2624,6 +2634,10 @@ public class TourDatabase {
 			isPostUpdate11 = true;
 		}
 
+		if (currentDbVersion == 11) {
+			currentDbVersion = newVersion = updateDbDesign_011_012(conn, monitor);
+		}
+
 		/*
 		 * update version number
 		 */
@@ -3079,7 +3093,7 @@ public class TourDatabase {
 
 	/**
 	 * Set create date/time from the tour date
-	 *
+	 * 
 	 * @param conn
 	 * @param monitor
 	 */
@@ -3154,6 +3168,49 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+	}
+
+	private int updateDbDesign_011_012(final Connection conn, final IProgressMonitor monitor) {
+
+		final int newDbVersion = 12;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		try {
+
+			String sql;
+			final Statement stmt = conn.createStatement();
+			{
+//				+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//				+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+//				+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN IsPulseSensorPresent		INTEGER	DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN IsPowerSensorPresent		INTEGER	DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN DeviceAvgSpeed			FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN DeviceFirmwareVersion		" + varCharNoKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+			}
+			stmt.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) {

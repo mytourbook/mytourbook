@@ -777,11 +777,25 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_AltitudeUp;
 	public static String		Tour_Editor_Label_DateTimeCreated;
 	public static String		Tour_Editor_Label_DateTimeModified;
+
+	public static String	Tour_Editor_Label_DeviceFirmwareVersion;
 	public static String		Tour_Editor_Label_DistanceSensor_No;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor_Yes;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
+	public static String	Tour_Editor_Label_PowerSensor;
+
+	public static String	Tour_Editor_Label_PowerSensor_No;
+
+	public static String	Tour_Editor_Label_PowerSensor_Yes;
+
+	public static String	Tour_Editor_Label_PulseSensor;
+
+	public static String	Tour_Editor_Label_PulseSensor_No;
+
+	public static String	Tour_Editor_Label_PulseSensor_Yes;
+
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 

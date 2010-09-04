@@ -970,7 +970,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				? Messages.Dialog_SplitTour_Label_DeviceName
 				: Messages.Dialog_ExtractTour_Label_DeviceName);
 
-		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.getIsDistanceFromSensor());
+		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.isDistanceSensorPresent());
 		_tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
 
 		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);

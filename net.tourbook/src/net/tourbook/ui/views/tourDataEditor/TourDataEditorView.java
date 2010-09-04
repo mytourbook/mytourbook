@@ -517,7 +517,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtDeviceName;
+	private Text								_txtDeviceFirmwareVersion;
 	private Text								_txtDistanceSensor;
+	private Text								_txtPulseSensor;
+	private Text								_txtPowerSensor;
 	private ImageComboLabel						_txtImportFilePath;
 	private Text								_txtPerson;
 	private Text								_txtTourId;
@@ -987,7 +990,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private class TimeDuration {
 
-		private static final String	timeFormat		= "%5d:%02d:%02d";
+		private static final String	timeFormat		= "%5d:%02d:%02d";	//$NON-NLS-1$
 
 		private PageBook			_pageBook;
 		private Composite			_pageReadMode;
@@ -3292,6 +3295,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
 
 			/*
+			 * device firmware version
+			 */
+			_tk.createLabel(section, Messages.Tour_Editor_Label_DeviceFirmwareVersion);
+
+			_txtDeviceFirmwareVersion = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceFirmwareVersion);
+
+			/*
 			 * distance sensor
 			 */
 			_tk.createLabel(section, Messages.tour_editor_label_DistanceSensor);
@@ -3299,6 +3310,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtDistanceSensor = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
 			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDistanceSensor);
+
+			/*
+			 * pulse sensor
+			 */
+			_tk.createLabel(section, Messages.Tour_Editor_Label_PulseSensor);
+
+			_txtPulseSensor = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtPulseSensor);
+
+			/*
+			 * power sensor
+			 */
+			_tk.createLabel(section, Messages.Tour_Editor_Label_PowerSensor);
+
+			_txtPowerSensor = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtPulseSensor);
 
 			/*
 			 * import file path
@@ -6267,15 +6294,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 		_txtTimeSlicesCount.pack(true);
 
-		// device name
+		// device name/version
 		_txtDeviceName.setText(_tourData.getDeviceName());
 		_txtDeviceName.pack(true);
+		_txtDeviceFirmwareVersion.setText(_tourData.getDeviceFirmwareVersion());
+		_txtDeviceFirmwareVersion.pack(true);
 
 		// distance sensor
-		_txtDistanceSensor.setText(_tourData.getIsDistanceFromSensor()
+		_txtDistanceSensor.setText(_tourData.isDistanceSensorPresent()
 				? Messages.Tour_Editor_Label_DistanceSensor_Yes
 				: Messages.Tour_Editor_Label_DistanceSensor_No);
 		_txtDistanceSensor.pack(true);
+
+		// pulse sensor
+		_txtPulseSensor.setText(_tourData.isPulseSensorPresent()
+				? Messages.Tour_Editor_Label_PulseSensor_Yes
+				: Messages.Tour_Editor_Label_PulseSensor_No);
+		_txtPulseSensor.pack(true);
+
+		// power sensor
+		_txtPowerSensor.setText(_tourData.isPowerSensorPresent()
+				? Messages.Tour_Editor_Label_PowerSensor_Yes
+				: Messages.Tour_Editor_Label_PowerSensor_No);
+		_txtPowerSensor.pack(true);
 
 		// import file path
 		_txtImportFilePath.setText(_tourData.isTourImportFilePathAvailable()
