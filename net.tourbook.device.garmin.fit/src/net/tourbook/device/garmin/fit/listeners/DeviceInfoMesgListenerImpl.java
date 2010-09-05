@@ -18,6 +18,7 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 		if (deviceType != null) {
 			context.setSpeedSensorPresent(hasSpeedSensor(deviceType));
 			context.setHeartRateSensorPresent(hasHeartRateSensor(deviceType));
+			context.setPowerSensorPresent(hasPowerSensor(deviceType));
 		}
 	}
 
@@ -28,4 +29,9 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 	private boolean hasHeartRateSensor(Short deviceType) {
 		return deviceType.equals(DeviceType.HEART_RATE);
 	}
+
+	private boolean hasPowerSensor(Short deviceType) {
+		return deviceType.equals(DeviceType.BIKE_POWER);
+	}
+
 }

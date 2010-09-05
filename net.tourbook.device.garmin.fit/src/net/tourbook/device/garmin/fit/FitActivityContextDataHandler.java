@@ -1,9 +1,11 @@
 package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 /**
  * Defines operation for handling tour data created during activity reading process.
@@ -12,6 +14,6 @@ import net.tourbook.data.TourData;
  */
 interface FitActivityContextDataHandler {
 
-	void handleTour(TourData tourData, ArrayList<TimeData> timeDataList);
+	void handleTour(TourData tourData, ArrayList<TimeData> timeDataList, Set<TourMarker> tourMarkerSet);
 
 }

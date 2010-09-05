@@ -2,9 +2,11 @@ package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -27,6 +29,8 @@ public class FitActivityContext {
 
 	private boolean						heartRateSensorPresent;
 
+	private boolean						powerSensorPresent;
+
 	private String						deviceId;
 
 	private String						manufacturer;
@@ -37,6 +41,12 @@ public class FitActivityContext {
 
 	private String						sessionIndex;
 
+	private int							serieIndex;
+
+	private int							lapDistance;
+
+	private int							lapTime;
+
 	public FitActivityContext(String filename, Map<Long, TourData> tourDataMap) {
 		this.filename = filename;
 		this.tourDataMap = tourDataMap;
@@ -45,11 +55,20 @@ public class FitActivityContext {
 	}
 
 	public void beforeSession() {
+		serieIndex = 0;
 		contextData.initializeTourData();
 	}
 
 	public void afterSession() {
 		contextData.finalizeTourData();
+	}
+
+	public void beforeLap() {
+		contextData.initializeTourMarker();
+	}
+
+	public void afterLap() {
+		contextData.finalizeTourMarker();
 	}
 
 	public void beforeRecord() {
@@ -58,13 +77,14 @@ public class FitActivityContext {
 
 	public void afterRecord() {
 		contextData.finalizeTimeData();
+		serieIndex++;
 	}
 
 	public void processData() {
 		contextData.processData(new FitActivityContextDataHandler() {
 
 			@Override
-			public void handleTour(TourData tourData, ArrayList<TimeData> timeDataList) {
+			public void handleTour(TourData tourData, ArrayList<TimeData> timeDataList, Set<TourMarker> tourMarkerSet) {
 				resetSpeedAtFirstPosition(timeDataList);
 
 				tourData.setTourTitle(getTourTitle());
@@ -86,6 +106,8 @@ public class FitActivityContext {
 					//tourData.computeTourDrivingTime();
 					tourData.computeComputedValues();
 					tourData.computeAltimeterGradientSerie();
+
+					tourData.setTourMarkers(tourMarkerSet);
 
 					tourDataMap.put(tourId, tourData);
 				}
@@ -118,12 +140,8 @@ public class FitActivityContext {
 		return getTourTitle();
 	}
 
-	public TourData getTourData() {
-		return contextData.getCurrentTourData();
-	}
-
-	public TimeData getTimeData() {
-		return contextData.getCurrentTimeData();
+	public FitActivityContextData getContextData() {
+		return contextData;
 	}
 
 	public boolean isSpeedSensorPresent() {
@@ -140,6 +158,14 @@ public class FitActivityContext {
 
 	public void setHeartRateSensorPresent(boolean heartRateSensorPresent) {
 		this.heartRateSensorPresent = heartRateSensorPresent;
+	}
+
+	public boolean isPowerSensorPresent() {
+		return powerSensorPresent;
+	}
+
+	public void setPowerSensorPresent(boolean powerSensorPresent) {
+		this.powerSensorPresent = powerSensorPresent;
 	}
 
 	public String getDeviceId() {
@@ -180,6 +206,26 @@ public class FitActivityContext {
 
 	public void setSessionIndex(String sessionIndex) {
 		this.sessionIndex = sessionIndex;
+	}
+
+	public int getSerieIndex() {
+		return serieIndex;
+	}
+
+	public int getLapDistance() {
+		return lapDistance;
+	}
+
+	public void setLapDistance(int lapDistance) {
+		this.lapDistance = lapDistance;
+	}
+
+	public int getLapTime() {
+		return lapTime;
+	}
+
+	public void setLapTime(int lapTime) {
+		this.lapTime = lapTime;
 	}
 
 	private void resetSpeedAtFirstPosition(ArrayList<TimeData> timeDataList) {

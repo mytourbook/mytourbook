@@ -1,5 +1,6 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitActivityContext;
 import net.tourbook.device.garmin.fit.FitActivityReaderException;
 
@@ -57,7 +58,7 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 
 		Float avgSpeed = mesg.getAvgSpeed();
 		if (avgSpeed != null) {
-			// TODO
+			getTourData().setDeviceAvgSpeed(DataConverters.convertSpeed(avgSpeed));
 		}
 
 		Integer totalCalories = mesg.getTotalCalories();
