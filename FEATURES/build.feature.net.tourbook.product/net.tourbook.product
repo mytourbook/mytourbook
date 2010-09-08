@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="10.7.0.qualifier" useFeatures="true" includeLaunchers="true">
- 
+<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="10.9.2.qualifier" useFeatures="true" includeLaunchers="true">
+
    <aboutInfo>
-      <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
+      <image path="/net.tourbook/icons/application/tourbook-about.png"/>
       <text>
          %Product_about
       </text>
@@ -25,7 +25,7 @@
       <vmArgs>-Xmx512m</vmArgs>
    </launcherArgs>
 
-   <windowImages i16="/net.tourbook/icons/application/tourbook16.gif" i32="/net.tourbook/icons/application/tourbook32.gif" i48="/net.tourbook/icons/application/tourbook48.gif" i64="/net.tourbook/icons/application/tourbook64.gif" i128="/net.tourbook/icons/application/tourbook128.gif"/>
+   <windowImages i16="/net.tourbook/icons/application/tourbook16.png" i32="/net.tourbook/icons/application/tourbook32.png" i48="/net.tourbook/icons/application/tourbook48.png" i64="/net.tourbook/icons/application/tourbook64.png" i128="/net.tourbook/icons/application/tourbook128.png"/>
 
    <splash
       location="net.tourbook"
@@ -46,7 +46,6 @@
             winLargeLow="/net.tourbook/icons/application/tourbook48-8.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -341,7 +340,7 @@ END OF TERMS AND CONDITIONS
    </plugins>
 
    <features>
-      <feature id="net.tourbook.product.feature" version="10.7.0.qualifier"/>
+      <feature id="net.tourbook.product.feature" version="10.9.2.qualifier"/>
    </features>
 
 
