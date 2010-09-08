@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -198,9 +198,9 @@ public class WizardPageImportSettings extends WizardPage {
 
 		/**
 		 * set pref store because when not set, a NPE can be raised
-		 * 
+		 *
 		 * <pre>
-		 * 
+		 *
 		 * Caused by: java.lang.NullPointerException
 		 *         at org.eclipse.jface.preference.StringFieldEditor.getStringValue(StringFieldEditor.java:305)
 		 *         at net.tourbook.importdata.WizardPageImportSettings.persistDialogSettings(WizardPageImportSettings.java:305)
@@ -243,14 +243,24 @@ public class WizardPageImportSettings extends WizardPage {
 		final Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
 		_isPortListAvailable = ports.hasMoreElements();
 
+		System.out.println("Available ports:");
+
 		if (_isPortListAvailable) {
 			// ports are available
 			while (ports.hasMoreElements()) {
+
 				final CommPortIdentifier port = ports.nextElement();
+				final String portName = port.getName();
+
 				if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-					final String portName = port.getName();
+
 					_portList.add(portName);
 					_cboPorts.add(portName);
+
+					System.out.println("\tserial port:\t" + portName);
+
+				} else {
+					System.out.println("\tother port:\t" + portName);
 				}
 			}
 
@@ -259,6 +269,8 @@ public class WizardPageImportSettings extends WizardPage {
 			_cboPorts.add(Messages.Import_Wizard_Control_combo_ports_not_available);
 			_cboPorts.select(0);
 			_cboPorts.setEnabled(false);
+
+			System.out.println("\tserial ports are not available");
 		}
 	}
 

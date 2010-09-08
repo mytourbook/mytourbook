@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
- *  
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.device;
@@ -31,6 +31,7 @@ import java.util.TooManyListenersException;
 
 import net.tourbook.importdata.IDataListener;
 import net.tourbook.importdata.SerialParameters;
+import net.tourbook.ui.UI;
 
 public class PortListener implements SerialPortEventListener {
 
@@ -46,7 +47,7 @@ public class PortListener implements SerialPortEventListener {
 
 	/**
 	 * Class Constructor
-	 * 
+	 *
 	 * @param portParams
 	 * @param dataNotification
 	 */
@@ -64,7 +65,7 @@ public class PortListener implements SerialPortEventListener {
 	 * <code>SerialConnectionException</code>, and returns. Gives a timeout of 5 seconds on the
 	 * portOpen to allow other applications to reliquish the port if have it open and no longer need
 	 * it.
-	 * 
+	 *
 	 * @throws SerialConnectionException
 	 */
 	public void openConnection() throws SerialConnectionException {
@@ -93,6 +94,9 @@ public class PortListener implements SerialPortEventListener {
 		try {
 			fSerialPort = (SerialPort) portId.open("net.tourbook.data.serial", 5000); //$NON-NLS-1$
 		} catch (PortInUseException e) {
+
+			UI.showMessageInfo(Messages.Port_Listener_Error_ntd001, Messages.Port_Listener_Error_ntd002);
+
 			throw new SerialConnectionException(e.getMessage());
 		}
 
@@ -187,8 +191,11 @@ public class PortListener implements SerialPortEventListener {
 		// Set connection parameters, if set fails return parameters object
 		// to original state.
 		try {
-			fSerialPort.setSerialPortParams(fPortParams.getBaudRate(), fPortParams.getDatabits(),
-					fPortParams.getStopbits(), fPortParams.getParity());
+			fSerialPort.setSerialPortParams(
+					fPortParams.getBaudRate(),
+					fPortParams.getDatabits(),
+					fPortParams.getStopbits(),
+					fPortParams.getParity());
 		} catch (UnsupportedCommOperationException e) {
 			fPortParams.setBaudRate(oldBaudRate);
 			fPortParams.setDatabits(oldDatabits);
@@ -239,7 +246,7 @@ public class PortListener implements SerialPortEventListener {
 
 	/**
 	 * send data from the port
-	 * 
+	 *
 	 * @param data
 	 * @return Returns <code>false</code> when an error occured
 	 */

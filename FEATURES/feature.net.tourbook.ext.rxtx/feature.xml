@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.rxtx"
       label="RxTx Feature"
-      version="2.1.8.v20071231-arduino"
+      version="2.2.2.pre2"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -11,7 +11,7 @@
    </description>
 
    <copyright>
-      (c) Copyright Wolfgang Schramm and Contributors 2005, 2009. 
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2009.
 All rights reserved.
    </copyright>
 
@@ -303,18 +303,27 @@ POSSIBILITY OF SUCH DAMAGES.
    </url>
 
    <requires>
-      <import plugin="net.tourbook.rxtx" version="2.1.8" match="greaterOrEqual"/>
+      <import plugin="net.tourbook.rxtx_2.2" version="2.2.2" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="net.tourbook.rxtx"
+         id="net.tourbook.rxtx_2.2"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.linux"
+         id="net.tourbook.rxtx.macosx_2.2"
+         os="macosx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.rxtx.linux32_2.2"
          os="linux"
          arch="x86"
          download-size="0"
@@ -324,7 +333,7 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.linux64"
+         id="net.tourbook.rxtx.linux64_2.2"
          os="linux"
          arch="x86_64"
          download-size="0"
@@ -334,8 +343,9 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.macosx"
-         os="macosx"
+         id="net.tourbook.rxtx.win32_2.2"
+         os="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -343,8 +353,9 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.win32"
+         id="net.tourbook.rxtx.win64_2.2"
          os="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"

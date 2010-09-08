@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: net.tourbook.rxtx.win32_2.2;singleton:=true
+Bundle-Version: 2.2.2.pre2
+Fragment-Host: net.tourbook.rxtx_2.2;bundle-version="2.2.2"
+Bundle-Localization: plugin
+Bundle-Vendor: %Bundle-Vendor
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
