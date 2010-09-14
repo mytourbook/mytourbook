@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="%Feature_Name"
-      version="10.9.2.qualifier"
+      version="10.9.3.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -301,7 +301,7 @@ END OF TERMS AND CONDITIONS
    <url>
       <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
    </url>
-
+ 
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
@@ -312,9 +312,13 @@ END OF TERMS AND CONDITIONS
       <import plugin="org.apache.derby.core"/>
       <import plugin="net.tourbook.ext.jars"/>
       <import plugin="net.tourbook.ext.ejb3"/>
-      <import plugin="net.tourbook.rxtx"/>
+      <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook.rxtx_2.2"/>
+      <import plugin="net.tourbook.util"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
+      <import plugin="net.tourbook"/>
       <import plugin="org.eclipse.jface"/>
+      <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.ext.velocity"/>
       <import plugin="net.tourbook.ext.jars.printing"/>
    </requires>
@@ -323,154 +327,154 @@ END OF TERMS AND CONDITIONS
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.ciclotour.text"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.cm4xxm"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.crp"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.csv.tours"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.daum_ergobike"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.gpx"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4pro"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac5"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.tur"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.statistics"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.nmea"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.util"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin.fit"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4linux.tour"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.printing"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.export"
          download-size="0"
          install-size="0"
-         version="10.9.2.qualifier"
+         version="10.9.3.qualifier"
          unpack="false"/>
 
 </feature>
