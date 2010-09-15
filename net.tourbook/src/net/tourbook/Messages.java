@@ -56,6 +56,11 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String		Dialog_DoubleClickAction_InvalidAction_Message;
+	public static String		Dialog_DoubleClickAction_InvalidAction_Title;
+	public static String		Dialog_DoubleClickAction_NoAction_Message;
+	public static String		Dialog_DoubleClickAction_NoAction_Title;
+
 	public static String		Dialog_ExtractTour_DlgArea_Message;
 	public static String		Dialog_ExtractTour_DlgArea_Title;
 	public static String		Dialog_ExtractTour_Label_DeviceName;
@@ -651,6 +656,8 @@ public class Messages extends NLS {
 	public static String		pref_tourtag_viewer_title;
 
 	public static String		pref_view_layout_display_lines;
+
+	public static String		pref_view_layout_display_lines_Tooltip;
 	public static String		pref_view_layout_group_display_format;
 	public static String		pref_view_layout_label_category;
 	public static String		pref_view_layout_label_color_group;
@@ -699,6 +706,19 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_dnd_hint;
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
+
+	public static String		PrefPage_ViewActions_Group;
+	public static String		PrefPage_ViewActions_Label_DoubleClick;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_EditMarker;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_EditTour;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_None;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_OpenTour;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
+	public static String		PrefPage_ViewActions_Label_DoubleClickWithCtrl;
+	public static String		PrefPage_ViewActions_Label_DoubleClickWithCtrlShift;
+	public static String		PrefPage_ViewActions_Label_DoubleClickWithShift;
+	public static String		PrefPage_ViewActions_Label_Info;
 
 	public static String		PrefPage_ViewTooltip_Button_DisableAll;
 	public static String		PrefPage_ViewTooltip_Button_EnableAll;
@@ -756,6 +776,8 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
+	public static String	Tour_Data_LoadingSRTM_Monitor;
+
 	public static String		Tour_Data_SaveTour_Monitor;
 	public static String		Tour_Data_SaveTour_MonitorSubtask;
 
@@ -777,22 +799,16 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_AltitudeUp;
 	public static String		Tour_Editor_Label_DateTimeCreated;
 	public static String		Tour_Editor_Label_DateTimeModified;
-
-	public static String	Tour_Editor_Label_DeviceFirmwareVersion;
-
-	public static String	Tour_Editor_Label_DeviceSensor_Tooltip;
+	public static String		Tour_Editor_Label_DeviceFirmwareVersion;
+	public static String		Tour_Editor_Label_DeviceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
-	public static String	Tour_Editor_Label_PowerSensor;
-
-	public static String	Tour_Editor_Label_PulseSensor;
-
+	public static String		Tour_Editor_Label_PowerSensor;
+	public static String		Tour_Editor_Label_PulseSensor;
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
-	public static String	Tour_Editor_Label_Sensor_No;
-
-	public static String	Tour_Editor_Label_Sensor_Yes;
-
+	public static String		Tour_Editor_Label_Sensor_No;
+	public static String		Tour_Editor_Label_Sensor_Yes;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;

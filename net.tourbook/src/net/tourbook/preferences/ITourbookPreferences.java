@@ -239,4 +239,9 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_TOOLTIP_TOURIMPORT_TAGS				= VIEW_TOOLTIP + "tourimport.tags";						//$NON-NLS-1$
 	public static final String	VIEW_TOOLTIP_TOURIMPORT_TITLE				= VIEW_TOOLTIP + "tourimport.title";						//$NON-NLS-1$
 
+	/*
+	 * view actions
+	 */
+	public static final String	VIEW_DOUBLE_CLICK_ACTIONS					= "ViewDoubleClickActions";								//$NON-NLS-1$
+
 }

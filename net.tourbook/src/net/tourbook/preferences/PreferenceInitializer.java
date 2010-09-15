@@ -261,5 +261,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE, true);
 		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS, true);
 
+		/*
+		 * view actions
+		 */
+		store.setDefault(
+				ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
+				PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
+
 	}
 }

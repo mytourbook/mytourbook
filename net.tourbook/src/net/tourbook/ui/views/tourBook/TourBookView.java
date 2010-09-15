@@ -44,6 +44,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
@@ -171,6 +172,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
+
+	private TourDoubleClickState						_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
 	 * UI controls
@@ -521,10 +524,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				if (selection instanceof TVITourBookTour) {
 
-					// open tour in editor
-
-					final TVITourBookTour tourItem = (TVITourBookTour) selection;
-					TourManager.getInstance().openTourInEditorArea(tourItem.getTourId());
+					TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
 
 				} else if (selection != null) {
 
@@ -1586,6 +1586,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
 
+		_tourDoubleClickState.canEditTour = isOneTour;
+		_tourDoubleClickState.canOpenTour = isOneTour;
+		_tourDoubleClickState.canQuickEditTour = isOneTour;
+		_tourDoubleClickState.canEditMarker = isOneTour;
+		_tourDoubleClickState.canAdjustAltitude = isOneTour;
+
 		/*
 		 * enable actions
 		 */
@@ -1594,6 +1600,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionEditQuick.setEnabled(isOneTour);
 		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+
 		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
 

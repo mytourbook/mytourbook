@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -44,8 +44,10 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.util.IToolTipHideListener;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -61,7 +63,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
+public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider, ITourProvider {
 
 	private static final String			DISTANCE_DATA				= "distance";									//$NON-NLS-1$
 	private static final String			ALTITUDE_DATA				= "altitude";									//$NON-NLS-1$
@@ -70,7 +72,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
 
-	private long						_selectedTourId;
+	private long						_selectedTourId				= -1;
 
 	private int							_currentYear;
 	private int							_currentMonth;
@@ -230,7 +232,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				_selectedTourId = _tourDayData.tourIds[valueIndex];
 				_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-				TourManager.getInstance().openTourInEditorArea(_selectedTourId);
+				ActionEditQuick.doAction(StatisticDay.this);
 			}
 		});
 
@@ -250,7 +252,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 							_selectedTourId = _tourDayData.tourIds[barChartSelection.valueIndex];
 							_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-							TourManager.getInstance().openTourInEditorArea(_selectedTourId);
+							ActionEditQuick.doAction(StatisticDay.this);
 						}
 					}
 				}
@@ -502,6 +504,20 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	public Long getSelectedTourId() {
 		return _selectedTourId;
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		if (_selectedTourId == -1) {
+			return null;
+		}
+
+		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+
+		selectedTours.add(TourManager.getInstance().getTourData(_selectedTourId));
+
+		return selectedTours;
 	}
 
 	public void prefColorChanged() {

@@ -777,7 +777,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				onOpenTourInEditor();
+
+				final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+
+				if ((firstElement != null) && (firstElement instanceof TourData)) {
+					TourManager.openTourEditor(true);
+				}
 			}
 		});
 
@@ -1703,16 +1708,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public ColumnViewer getViewer() {
 		return _tourViewer;
-	}
-
-	private void onOpenTourInEditor() {
-
-		final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
-
-		if ((firstElement != null) && (firstElement instanceof TourData)) {
-//			TourManager.getInstance().openTourInEditor(((TourData) firstElement).getTourId());
-			TourManager.openTourEditor(true);
-		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

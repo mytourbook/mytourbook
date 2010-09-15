@@ -1,20 +1,20 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.tileinfo;
- 
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -56,21 +56,24 @@ public class TileInfoContribution extends WorkbenchWindowControlContribution {
 	private String				_srtmRemoteName;
 	private long				_srtmReceivedBytes;
 
-	private final Runnable		_updateRunnable	= new Runnable() {
-													public void run() {
+	private final Runnable		_updateRunnable;
+	{
+		_updateRunnable = new Runnable() {
+			public void run() {
 
-														if (_infoWidget == null && _infoWidget.isDisposed()) {
-															return;
-														}
+				if (_infoWidget == null && _infoWidget.isDisposed()) {
+					return;
+				}
 
-														if (_isUpdateUI) {
-															_isUpdateUI = false;
-															updateUIInUIThread();
-														}
+				if (_isUpdateUI) {
+					_isUpdateUI = false;
+					updateUIInUIThread();
+				}
 
-														_display.timerExec(UPDATE_INTERVAL, this);
-													}
-												};
+				_display.timerExec(UPDATE_INTERVAL, this);
+			}
+		};
+	}
 
 	void actionClearStatistics() {
 

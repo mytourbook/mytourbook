@@ -3731,28 +3731,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return Returns SRTM metric data serie or <code>null</code> when SRTM data serie is not
-	 *         available
-	 */
-	public int[] getSRTMSerieMetric() {
-
-		if (latitudeSerie == null) {
-			return null;
-		}
-
-		if (srtmSerie == null) {
-			createSRTMDataSerie();
-		}
-
-		if (srtmSerie.length == 0) {
-			// SRTM data are invalid
-			return null;
-		}
-
-		return srtmSerie;
-	}
-
 	public short getStartAltitude() {
 		return startAltitude;
 	}

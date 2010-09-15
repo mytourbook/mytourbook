@@ -216,54 +216,68 @@
 
 
    </extension>
+
+   <!-- PREF PAGES   -->
+
    <extension
          point="org.eclipse.ui.preferencePages">
+
+
       <page
             class="net.tourbook.preferences.PrefPageGeneral"
             id="net.tourbook.preferences.PrefPageGeneralId"
             name="%preference_page_general">
       </page>
-      <page
-            category="net.tourbook.preferences.PrefPageGeneralId"
-            class="net.tourbook.preferences.PrefPageComputedValues"
-            id="net.tourbook.preferences.PrefPageComputedValues"
-            name="%preference_page_computedValues">
-      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageGeneralId"
+	            class="net.tourbook.preferences.PrefPageComputedValues"
+	            id="net.tourbook.preferences.PrefPageComputedValues"
+	            name="%preference_page_computedValues">
+	      </page>
+
+
       <page
             class="net.tourbook.preferences.PrefPageAppearance"
             id="net.tourbook.preferences.PrefPageAppearance"
             name="%preference_page_appearance">
       </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceTourChart"
-            id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%preference_page_Graphs">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
-            id="net.tourbook.preferences.PrefPageTourEditor"
-            name="%preference_page_tourEditor">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceColors"
-            id="net.tourbook.preferences.PrefPageChartColors"
-            name="%preference_page_Chart_Colors">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceView"
-            id="net.tourbook.preferences.PrefPageViewColors"
-            name="%preference_page_view_colors">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.preferences.PrefPageAppearanceMap"
-            id="net.tourbook.preferences.PrefPageMapAppearance"
-            name="%preference_page_map_appearance">
-      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.preferences.PrefPageAppearanceTourChart"
+	            id="net.tourbook.preferences.PrefPageChartGraphs"
+	            name="%preference_page_Graphs">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
+	            id="net.tourbook.preferences.PrefPageTourEditor"
+	            name="%preference_page_tourEditor">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.preferences.PrefPageAppearanceColors"
+	            id="net.tourbook.preferences.PrefPageChartColors"
+	            name="%preference_page_Chart_Colors">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.preferences.PrefPageAppearanceView"
+	            id="net.tourbook.preferences.PrefPageViewColors"
+	            name="%preference_page_view_colors">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.preferences.PrefPageAppearanceMap"
+	            id="net.tourbook.preferences.PrefPageMapAppearance"
+	            name="%preference_page_map_appearance">
+	      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageAppearance"
+	            class="net.tourbook.srtm.PrefPageSRTMColors"
+	            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
+	            name="%pref_page_srtm_colors">
+	      </page>
+
       <page
             class="net.tourbook.preferences.PrefPageDataImport"
             id="net.tourbook.preferences.PrefPageDataImport"
@@ -284,40 +298,38 @@
             id="net.tourbook.ext.srtm.PrefPageSRTM"
             name="%pref_page_srtm">
       </page>
-      <page
-            category="net.tourbook.preferences.PrefPageAppearance"
-            class="net.tourbook.srtm.PrefPageSRTMColors"
-            id="net.tourbook.ext.srtm.PrefPageSRTMColors"
-            name="%pref_page_srtm_colors">
-      </page>
+
+
       <page
             class="de.byteholder.geoclipse.preferences.PrefPageMap"
             id="de.byteholder.geoclipse.preferences.map"
             name="%pref_page_map">
       </page>
-      <page
-            category="de.byteholder.geoclipse.preferences.map"
-            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
-            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
-            name="%pref_page_provider">
-      </page>
-      <page
-            category="de.byteholder.geoclipse.preferences.map"
-            class="de.byteholder.geoclipse.preferences.PrefPageCache"
-            id="de.byteholder.geoclipse.preferences.PrefPageCache"
-            name="%pref_page_cache">
-      </page>
+	      <page
+	            category="de.byteholder.geoclipse.preferences.map"
+	            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+	            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
+	            name="%pref_page_provider">
+	      </page>
+	      <page
+	            category="de.byteholder.geoclipse.preferences.map"
+	            class="de.byteholder.geoclipse.preferences.PrefPageCache"
+	            id="de.byteholder.geoclipse.preferences.PrefPageCache"
+	            name="%pref_page_cache">
+	      </page>
+
+
       <page
             class="net.tourbook.preferences.PrefPageTourTypeFilterList"
             id="net.tourbook.preferences.PrefPageTourTypeFilter"
             name="%preference_page_tour_type_root">
       </page>
-      <page
-            category="net.tourbook.preferences.PrefPageTourTypeFilter"
-            class="net.tourbook.preferences.PrefPageTourTypes"
-            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
-            name="%preference_page_tour_types">
-      </page>
+	      <page
+	            category="net.tourbook.preferences.PrefPageTourTypeFilter"
+	            class="net.tourbook.preferences.PrefPageTourTypes"
+	            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
+	            name="%preference_page_tour_types">
+	      </page>
 
 
       <page
@@ -325,6 +337,7 @@
             id="net.tourbook.preferences.PrefPageTags"
             name="%preference_page_tags">
       </page>
+
 
       <page
             class="net.tourbook.preferences.PrefPageStatistic"
@@ -337,6 +350,13 @@
 	            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
 	            name="%preference_page_statistics_tourFrequency">
 	      </page>
+
+
+      <page
+            class="net.tourbook.preferences.PrefPageViews"
+            id="net.tourbook.preferences.PrefPageViews"
+            name="%Pref_Page_Views">
+      </page>
 
    </extension>
 

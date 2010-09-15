@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,10 +30,10 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionOpenMarkerDialog extends Action {
 
-	private ITourProvider	fTourProvider;
-	private boolean			fIsSaveTour;
+	private ITourProvider	_tourProvider;
+	private boolean			_isSaveTour;
 
-	private TourMarker		fSelectedTourMarker;
+	private TourMarker		_selectedTourMarker;
 
 	/**
 	 * @param tourProvider
@@ -42,8 +42,8 @@ public class ActionOpenMarkerDialog extends Action {
 	 */
 	public ActionOpenMarkerDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
 
-		fTourProvider = tourProvider;
-		fIsSaveTour = isSaveTour;
+		_tourProvider = tourProvider;
+		_isSaveTour = isSaveTour;
 
 		setText(Messages.app_action_edit_tour_marker);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
@@ -52,10 +52,11 @@ public class ActionOpenMarkerDialog extends Action {
 		setEnabled(false);
 	}
 
-	@Override
-	public void run() {
+	public static void doAction(final ITourProvider tourProvider,
+								final boolean isSaveTour,
+								final TourMarker selectedTourMarker) {
 
-		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
 		// check if one tour is selected
 		if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
@@ -64,14 +65,19 @@ public class ActionOpenMarkerDialog extends Action {
 
 		final TourData tourData = selectedTours.get(0);
 
+		if (tourData.isManualTour()) {
+			// a manually created tour do not have time slices -> no markers
+			return;
+		}
+
 		final DialogMarker markerDialog = new DialogMarker(
 				Display.getCurrent().getActiveShell(),
 				tourData,
-				fSelectedTourMarker);
+				selectedTourMarker);
 
 		if (markerDialog.open() == Window.OK) {
 
-			if (fIsSaveTour) {
+			if (isSaveTour) {
 				TourManager.saveModifiedTours(selectedTours);
 			} else {
 
@@ -89,8 +95,13 @@ public class ActionOpenMarkerDialog extends Action {
 		}
 	}
 
+	@Override
+	public void run() {
+		doAction(_tourProvider, _isSaveTour, _selectedTourMarker);
+	}
+
 	public void setSelectedMarker(final TourMarker tourMarker) {
-		fSelectedTourMarker = tourMarker;
+		_selectedTourMarker = tourMarker;
 	}
 
 }

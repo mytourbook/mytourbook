@@ -17,12 +17,12 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.BooleanFieldEditor2;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -101,7 +101,6 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 			createUI10Colors(parent);
 			createUI20TimeFormat(parent);
 			createUI30ViewTooltip(parent);
-			createUI50Other(parent);
 		}
 	}
 
@@ -140,14 +139,11 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 						ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB,
 						Messages.pref_view_layout_label_sub_sub,
 						containerDefaultView));
-//
-//			GridLayout gl = (GridLayout) containerDefaultView.getLayout();
-//			gl.marginHeight = 5;
-//			gl.marginWidth = 5;
 			}
 
 			final Composite containerSegmenter = new Composite(colorGroup, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(containerSegmenter);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSegmenter);
 			{
 				// color: up
 				addField(new ColorFieldEditor(
@@ -160,43 +156,59 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 						ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
 						Messages.pref_view_layout_label_segmenter_down,
 						containerSegmenter));
+
+				// show lines
+				final BooleanFieldEditor2 editorLines = new BooleanFieldEditor2(
+						ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,
+						Messages.pref_view_layout_display_lines,
+						containerSegmenter);
+				addField(editorLines);
+
+				final GridLayout gl = (GridLayout) containerSegmenter.getLayout();
+				gl.numColumns = 2;
+
+				final Button editorLinesControl = editorLines.getChangeControl(containerSegmenter);
+				GridDataFactory.fillDefaults().span(2, 1).indent(0, 10).applyTo(editorLinesControl);
+				editorLinesControl.setToolTipText(Messages.pref_view_layout_display_lines_Tooltip);
 			}
 		}
 	}
 
 	private void createUI20TimeFormat(final Composite parent) {
+
 		/*
-		 * container: column time format
+		 * group: column time format
 		 */
 		final Group formatGroup = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(formatGroup);
 		formatGroup.setText(Messages.pref_view_layout_group_display_format);
+		{
+			/*
+			 * recording time format: hh:mm
+			 */
+			addField(new RadioGroupFieldEditor(
+					ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
+					Messages.pref_view_layout_label_recording_time_format,
+					2,
+					new String[][] {
+							{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
+							{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
+					formatGroup,
+					false));
 
-		/*
-		 * recording time format: hh:mm
-		 */
-		addField(new RadioGroupFieldEditor(
-				ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
-				Messages.pref_view_layout_label_recording_time_format,
-				2,
-				new String[][] {
-						{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
-						{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
-				formatGroup,
-				false));
-
-		/*
-		 * driving time format: hh:mm
-		 */
-		addField(new RadioGroupFieldEditor(
-				ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
-				Messages.pref_view_layout_label_driving_time_format,
-				2,
-				new String[][] {
-						{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
-						{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
-				formatGroup,
-				false));
+			/*
+			 * driving time format: hh:mm
+			 */
+			addField(new RadioGroupFieldEditor(
+					ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
+					Messages.pref_view_layout_label_driving_time_format,
+					2,
+					new String[][] {
+							{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
+							{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
+					formatGroup,
+					false));
+		}
 
 		// set group margin after the fields are created
 		final GridLayout gl = (GridLayout) formatGroup.getLayout();
@@ -231,7 +243,7 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 				createUI34ToolTipTourCatalog(container);
 			}
 
-			createUI40ToolTipActions(group);
+			createUI39ToolTipActions(group);
 		}
 	}
 
@@ -390,7 +402,7 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 		GridDataFactory.fillDefaults().span(1, 1).applyTo(label);
 	}
 
-	private void createUI40ToolTipActions(final Composite parent) {
+	private void createUI39ToolTipActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -433,21 +445,6 @@ public class PrefPageAppearanceView extends FieldEditorPreferencePage implements
 			});
 			setButtonLayoutData(btnDisableAll);
 		}
-	}
-
-	private void createUI50Other(final Composite parent) {
-
-		/*
-		 * container: other
-		 */
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(container);
-
-		// show lines
-		addField(new BooleanFieldEditor(
-				ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,
-				Messages.pref_view_layout_display_lines,
-				container));
 	}
 
 	private void fireModifyEvent() {

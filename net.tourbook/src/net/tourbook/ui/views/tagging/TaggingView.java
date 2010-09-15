@@ -41,6 +41,7 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -149,6 +150,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private boolean							_isToolTipInTag;
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
+
+	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
 
 	/*
 	 * UI controls
@@ -594,9 +597,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				if (selection instanceof TVITagViewTour) {
 
-					// open tour in the tour editor
-
-					TourManager.getInstance().openTourInEditorArea(((TVITagViewTour) selection).getTourId());
+					TourManager.getInstance().tourDoubleClickAction(TaggingView.this, _tourDoubleClickState);
 
 				} else if (selection != null) {
 
@@ -1248,14 +1249,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isTagSelected = tagItems > 0 && tourItems == 0 && categoryItems == 0 && otherItems == 0;
 		final boolean isCategorySelected = categoryItems > 0 && tourItems == 0 && tagItems == 0 && otherItems == 0;
+		final boolean isOneTour = tourItems == 1;
 
 		final int selectedItems = selection.size();
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
-		_actionEditTour.setEnabled(tourItems == 1);
-		_actionOpenTour.setEnabled(tourItems == 1);
-		_actionEditQuick.setEnabled(tourItems == 1);
+		_tourDoubleClickState.canEditTour = isOneTour;
+		_tourDoubleClickState.canOpenTour = isOneTour;
+		_tourDoubleClickState.canQuickEditTour = isOneTour;
+		_tourDoubleClickState.canEditMarker = isOneTour;
+		_tourDoubleClickState.canAdjustAltitude = isOneTour;
+
+		_actionEditTour.setEnabled(isOneTour);
+		_actionOpenTour.setEnabled(isOneTour);
+		_actionEditQuick.setEnabled(isOneTour);
 
 		// action: set tour type
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1266,7 +1274,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		ArrayList<Long> existingTagIds = null;
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (firstTour != null && tourItems == 1) {
+		if (firstTour != null && isOneTour) {
 
 			// one tour is selected
 

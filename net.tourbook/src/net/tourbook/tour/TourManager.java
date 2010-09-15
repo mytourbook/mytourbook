@@ -37,8 +37,11 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
@@ -224,6 +227,87 @@ public class TourManager {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Computes distance values from geo position
+	 *
+	 * @param tourDataList
+	 * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
+	 *         updated but not yet saved.
+	 */
+	public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
+
+		if (tourDataList == null || tourDataList.size() == 0) {
+			return false;
+		}
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.TourEditor_Dialog_ComputeDistanceValues_Title,
+				NLS.bind(Messages.TourEditor_Dialog_ComputeDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+			return false;
+		}
+
+		final boolean[] retValue = { false };
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
+
+				for (final TourData tourData : tourDataList) {
+
+					final double[] latSerie = tourData.latitudeSerie;
+					final double[] lonSerie = tourData.longitudeSerie;
+
+					if (latSerie == null) {
+						continue;
+					}
+
+					final int[] distanceSerie = new int[latSerie.length];
+					tourData.distanceSerie = distanceSerie;
+
+					double distance = 0;
+					double latStart = latSerie[0];
+					double lonStart = lonSerie[0];
+
+					// compute distance for every time slice
+					for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+
+						final double latEnd = latSerie[serieIndex];
+						final double lonEnd = lonSerie[serieIndex];
+
+						/*
+						 * vincenty algorithm is much more accurate compared with haversine
+						 */
+//				final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+
+						distance += distDiff;
+						distanceSerie[serieIndex] = (int) distance;
+
+						latStart = latEnd;
+						lonStart = lonEnd;
+					}
+
+					// update tour distance which is displayed in views/tour editor
+					tourData.setTourDistance((int) distance);
+
+					// set distance in markers
+					final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
+					if (allTourMarker != null) {
+
+						for (final TourMarker tourMarker : allTourMarker) {
+							final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+							tourMarker.setDistance(markerDistance);
+						}
+					}
+
+					retValue[0] = true;
+				}
+			}
+		});
+
+		return retValue[0];
 	}
 
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
@@ -450,20 +534,6 @@ public class TourManager {
 				+ getTourTimeShort(tourData);
 	}
 
-	/**
-	 * @return returns the detailed title of this tour which contains:<br>
-	 *         date + time + title as it is displayed in the tour chart
-	 */
-	public static String getTourTitleDetailed(final TourData tourData) {
-
-		final String tourTitle = tourData.getTourTitle();
-
-		return getTourDateFull(tourData) //
-				+ UI.DASH_WITH_SPACE
-				+ getTourTimeShort(tourData)
-				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
-	}
-
 //	/**
 //	 * Check if a person is selected in the app toolbar. An error message will be displayed when a
 //	 * person is not selected.
@@ -485,6 +555,20 @@ public class TourManager {
 //
 //		return true;
 //	}
+
+	/**
+	 * @return returns the detailed title of this tour which contains:<br>
+	 *         date + time + title as it is displayed in the tour chart
+	 */
+	public static String getTourTitleDetailed(final TourData tourData) {
+
+		final String tourTitle = tourData.getTourTitle();
+
+		return getTourDateFull(tourData) //
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(tourData)
+				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
+	}
 
 	/**
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
@@ -871,7 +955,7 @@ public class TourManager {
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				int saveCounter = 0;
-				int tourSize = modifiedTours.size();
+				final int tourSize = modifiedTours.size();
 
 				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, tourSize);
 
@@ -1860,15 +1944,6 @@ public class TourManager {
 		}
 	}
 
-	private ChartDataYSerie createChartDataSerie(final int[][] dataSerie, final int chartType) {
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-		} else {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-		}
-	}
-
 //	/**
 //	 * @param tourData
 //	 * @param useNormalizedData
@@ -1887,6 +1962,15 @@ public class TourManager {
 //			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
 //		}
 //	}
+
+	private ChartDataYSerie createChartDataSerie(final int[][] dataSerie, final int chartType) {
+
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+		} else {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+		}
+	}
 
 	public TourChart getActiveTourChart() {
 		return _activeTourChart;
@@ -2130,6 +2214,81 @@ public class TourManager {
 		_activeTourChart = tourChart;
 	}
 
+	/**
+	 * Do custom actions when a tour in a table/tree/chart is double clicked
+	 * 
+	 * @param tourProvider
+	 * @param tourDoubleClickState
+	 */
+	public void tourDoubleClickAction(final ITourProvider tourProvider, final TourDoubleClickState tourDoubleClickState) {
+
+		final String action = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
+
+		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+		final TourData firstTour = selectedTours.get(0);
+
+		String actionInfo = null;
+
+		if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_ADJUST_ALTITUDE)) {
+
+			if (tourDoubleClickState.canAdjustAltitude) {
+				ActionOpenAdjustAltitudeDialog.doAction(tourProvider, false);
+			} else {
+				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude;
+			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_EDIT_MARKER)) {
+
+			if (tourDoubleClickState.canEditMarker) {
+				ActionOpenMarkerDialog.doAction(tourProvider, true, null);
+			} else {
+				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_EditMarker;
+			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_EDIT_TOUR)) {
+
+			if (tourDoubleClickState.canEditTour) {
+				ActionEditTour.doAction(tourProvider);
+			} else {
+				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_EditTour;
+			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_OPEN_TOUR_IN_EDIT_AREA)) {
+
+			if (tourDoubleClickState.canOpenTour && firstTour != null) {
+				TourManager.getInstance().openTourInEditorArea(firstTour.getTourId());
+			} else {
+				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_OpenTour;
+			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_NONE)) {
+
+			// do nothing but show info that this can be customized
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Dialog_DoubleClickAction_NoAction_Title,
+					NLS.bind(Messages.Dialog_DoubleClickAction_NoAction_Message, actionInfo));
+
+		} else {
+
+			// default is quick edit
+
+			if (tourDoubleClickState.canQuickEditTour) {
+				ActionEditQuick.doAction(tourProvider);
+			} else {
+				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
+			}
+		}
+
+		if (actionInfo != null) {
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Dialog_DoubleClickAction_InvalidAction_Title,
+					NLS.bind(Messages.Dialog_DoubleClickAction_InvalidAction_Message, actionInfo));
+		}
+	}
+
 	public void updateTourInCache(final TourData tourData) {
 
 		if (tourData == null) {
@@ -2139,86 +2298,5 @@ public class TourManager {
 		_tourDataCache.put(tourData.getTourId(), tourData);
 
 		replaceTourInTourEditor(tourData);
-	}
-
-	/**
-	 * Computes distance values from geo position
-	 *
-	 * @param tourDataList
-	 * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
-	 *         updated but not yet saved.
-	 */
-	public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
-
-		if (tourDataList == null || tourDataList.size() == 0) {
-			return false;
-		}
-
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.TourEditor_Dialog_ComputeDistanceValues_Title,
-				NLS.bind(Messages.TourEditor_Dialog_ComputeDistanceValues_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
-			return false;
-		}
-
-		final boolean[] retValue = { false };
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			public void run() {
-
-				for (TourData tourData : tourDataList) {
-
-					final double[] latSerie = tourData.latitudeSerie;
-					final double[] lonSerie = tourData.longitudeSerie;
-
-					if (latSerie == null) {
-						continue;
-					}
-
-					final int[] distanceSerie = new int[latSerie.length];
-					tourData.distanceSerie = distanceSerie;
-
-					double distance = 0;
-					double latStart = latSerie[0];
-					double lonStart = lonSerie[0];
-
-					// compute distance for every time slice
-					for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
-
-						final double latEnd = latSerie[serieIndex];
-						final double lonEnd = lonSerie[serieIndex];
-
-						/*
-						 * vincenty algorithm is much more accurate compared with haversine
-						 */
-//				final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
-						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
-
-						distance += distDiff;
-						distanceSerie[serieIndex] = (int) distance;
-
-						latStart = latEnd;
-						lonStart = lonEnd;
-					}
-
-					// update tour distance which is displayed in views/tour editor
-					tourData.setTourDistance((int) distance);
-
-					// set distance in markers
-					final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
-					if (allTourMarker != null) {
-
-						for (final TourMarker tourMarker : allTourMarker) {
-							final int markerDistance = distanceSerie[tourMarker.getSerieIndex()];
-							tourMarker.setDistance(markerDistance);
-						}
-					}
-
-					retValue[0] = true;
-				}
-			}
-		});
-
-		return retValue[0];
 	}
 }

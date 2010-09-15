@@ -33,6 +33,7 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -148,6 +149,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private boolean						_isToolTipInRefTour;
 	private boolean						_isToolTipInTitle;
 	private boolean						_isToolTipInTags;
+
+	private TourDoubleClickState		_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
 	 * UI controls
@@ -578,7 +581,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 
 				if (tourId != -1) {
-					// TourManager.getInstance().openTourInEditor(tourId);
+					TourManager.getInstance().tourDoubleClickAction(TourCatalogView.this, _tourDoubleClickState);
 				} else {
 					// expand/collapse current item
 					if (_tourViewer.getExpandedState(tourItem)) {
@@ -839,10 +842,17 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
 		final boolean isOneRefTour = refItems == 1 && yearItems == 0 && tourItems == 0;
+		final boolean isEditableTour = isOneTour || isOneRefTour;
 
 		final int selectedItems = selection.size();
 		final TreeViewerItem firstElement = (TreeViewerItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+
+		_tourDoubleClickState.canEditTour = isEditableTour;
+		_tourDoubleClickState.canOpenTour = isEditableTour;
+		_tourDoubleClickState.canQuickEditTour = isEditableTour;
+		_tourDoubleClickState.canEditMarker = isEditableTour;
+		_tourDoubleClickState.canAdjustAltitude = isEditableTour;
 
 		_actionRemoveComparedTours.setEnabled(isOneTour);
 
@@ -855,9 +865,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			_actionRemoveComparedTours.setEnabled(false);
 		}
 
-		_actionEditQuick.setEnabled(isOneTour || isOneRefTour);
-		_actionEditTour.setEnabled(isOneTour || isOneRefTour);
-		_actionOpenTour.setEnabled(isOneTour || isOneRefTour);
+		_actionEditQuick.setEnabled(isEditableTour);
+		_actionEditTour.setEnabled(isEditableTour);
+		_actionOpenTour.setEnabled(isEditableTour);
 
 		_actionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
 
