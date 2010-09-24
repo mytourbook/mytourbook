@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -101,6 +101,7 @@ public class TourPainter extends MapPainter {
 
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
@@ -139,7 +140,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * Draw legend colors into the legend bounds
-	 * 
+	 *
 	 * @param gc
 	 * @param legendBounds
 	 * @param isVertical
@@ -535,12 +536,19 @@ public class TourPainter extends MapPainter {
 			if (latitudeSerie == null || longitudeSerie == null) {
 				continue;
 			}
-
+ 
 			setDataSerie(tourData);
 
 			final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
 
 			isTourInTile = isTourInTile || isDrawTourInTile;
+
+			/**
+			 * DEBUG
+			 */
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+//			gc.fillRectangle(1, 1, 3, 3);
+//			isTourInTile = true;
 
 			// status if a marker is drawn
 			boolean isMarkerInTile = false;
@@ -1037,7 +1045,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * create an image for the tour marker
-	 * 
+	 *
 	 * @param device
 	 * @param markerBounds
 	 * @param tourMarker
@@ -1257,7 +1265,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * world pixels are not yet cached, create them now
-	 * 
+	 *
 	 * @param tourData
 	 * @param mp
 	 * @param mapZoomLevel
@@ -1314,7 +1322,7 @@ public class TourPainter extends MapPainter {
 	/**
 	 * Checks if an image bounds is within the tile. The image is above the image position and
 	 * one half to the left and right side
-	 * 
+	 *
 	 * @param imageBounds
 	 *            bounds of the image
 	 * @param devImagePosX
@@ -1482,7 +1490,7 @@ public class TourPainter extends MapPainter {
 
 	/**
 	 * Sets data serie which is painted
-	 * 
+	 *
 	 * @param tourData
 	 */
 	private void setDataSerie(final TourData tourData) {

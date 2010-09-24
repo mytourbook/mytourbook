@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -70,7 +70,7 @@ public class StatContainer extends Composite {
 
 	private static ArrayList<TourbookStatistic>	_statisticExtensionPoints;
 
-	private Calendar							_calendar					= GregorianCalendar.getInstance();
+	private final Calendar							_calendar					= GregorianCalendar.getInstance();
 
 	private int									_selectedYear				= -1;
 
@@ -91,7 +91,7 @@ public class StatContainer extends Composite {
 	private ActionSynchChartScale				_actionSynchChartScale;
 	private boolean								_isSynchScaleEnabled;
 
-	private IPostSelectionProvider				_postSelectionProvider;
+	private final IPostSelectionProvider				_postSelectionProvider;
 
 	/*
 	 * UI controls
@@ -105,7 +105,7 @@ public class StatContainer extends Composite {
 	private ToolBarManager						_tbm;
 	private ToolBar								_toolBar;
 
-	private IViewSite							_viewSite;
+	private final IViewSite							_viewSite;
 
 	StatContainer(	final Composite parent,
 					final IViewSite viewSite,
@@ -123,6 +123,7 @@ public class StatContainer extends Composite {
 		updateUI();
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 
 				// dispose all statistic resources
@@ -137,7 +138,7 @@ public class StatContainer extends Composite {
 
 	/**
 	 * this method is synchronized to conform to FindBugs
-	 * 
+	 *
 	 * @return Returns statistics from the extension registry in the sort order of the registry
 	 */
 	public static synchronized ArrayList<TourbookStatistic> getStatisticExtensionPoints() {
@@ -272,6 +273,10 @@ public class StatContainer extends Composite {
 	private void createUI10Toolbar(final Composite parent) {
 
 		final PixelConverter pc = new PixelConverter(this);
+
+		/**
+		 * OSX works best without HINT
+		 */
 		final int yearComboWidth = net.tourbook.util.UI.IS_LINUX //
 				? pc.convertWidthInCharsToPixels(12)
 				: pc.convertWidthInCharsToPixels(5);
@@ -279,14 +284,14 @@ public class StatContainer extends Composite {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
-		{
+		{ 
 			/*
 			 * combo: year
 			 */
 			_cboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					// hint is working differently on platforms
-					.hint(yearComboWidth, SWT.DEFAULT)
+//					.hint(yearComboWidth, SWT.DEFAULT)
 					.applyTo(_cboYear);
 			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
 			_cboYear.setVisibleItemCount(50);
@@ -520,7 +525,7 @@ public class StatContainer extends Composite {
 
 	/**
 	 * update all statistics which have been created because person or tour type can be changed
-	 * 
+	 *
 	 * @param person
 	 */
 	void refreshStatistic(final TourPerson person, final TourTypeFilter tourTypeFilter) {
@@ -700,7 +705,7 @@ public class StatContainer extends Composite {
 
 	/**
 	 * Restore selected statistic
-	 * 
+	 *
 	 * @param viewState
 	 * @param activeTourTypeFilter
 	 * @param activePerson

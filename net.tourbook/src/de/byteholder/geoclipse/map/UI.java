@@ -30,7 +30,7 @@ public class UI {
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog width.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_WIDTH	= "DIALOG_WIDTH";	//$NON-NLS-1$
@@ -39,7 +39,7 @@ public class UI {
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog height.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
@@ -213,18 +213,19 @@ public class UI {
 
 	/**
 	 * Create a transparent image
-	 * 
+	 *
 	 * @param imageSize
 	 * @param transparentRGB
 	 * @return
 	 */
 	public static ImageData createTransparentImageData(final int imageSize, final RGB transparentRGB) {
-
+ 
 		final ImageData transparentImageData = new ImageData(//
 				imageSize,
 				imageSize,
-				24,
-				new PaletteData(0xff, 0xff00, 0xff0000));
+				32,
+				new PaletteData(0xff0000, 0xff00, 0xff)
+		);
 
 		transparentImageData.transparentPixel = transparentImageData.palette.getPixel(transparentRGB);
 

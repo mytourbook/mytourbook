@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -48,7 +48,7 @@ public class ImageDataResources {
 
 	/**
 	 * this is sysnchonized because multiple threads can call this method
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 * @param srcXStart
@@ -93,16 +93,16 @@ public class ImageDataResources {
 
 			for (int srcX = srcXStart, dstX = 0; srcX < srcMaxX; srcX++, dstX++) {
 
-				final int dataIndex = dstYBytesPerLine + (dstX * 3);
+				final int dataIndex = dstYBytesPerLine + (dstX * 4);
 				final int alphaIndex = dstY * width + dstX;
 
 				// check bounds
 				if (!(0 <= dstX && dstX < dst.width && 0 <= dstY && dstY < dst.height)) {
 					continue;
 				}
-
+ 
 				// get pixel value
-				srcIndex = srcYBytesPerLine + (srcX * 3);
+				srcIndex = srcYBytesPerLine + (srcX * 4);
 				srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
 						+ ((srcData[srcIndex + 1] & 0xFF) << 8)
 						+ (srcData[srcIndex + 2] & 0xFF);
@@ -112,7 +112,7 @@ public class ImageDataResources {
 				if (src.transparentPixel != -1) {
 					if (src.transparentPixel == srcPixel) {
 						srcAlpha = 0;
-				}
+					}
 				} else if (src.alpha != -1) {
 					srcAlpha = src.alpha;
 				} else if (src.alphaData != null) {
@@ -126,7 +126,9 @@ public class ImageDataResources {
 
 				// get rgb values
 				srcRed = srcPixel & srcPalette.redMask;
-				srcRed = (srcPalette.redShift < 0) ? srcRed >>> -srcPalette.redShift : srcRed << srcPalette.redShift;
+				srcRed = (srcPalette.redShift < 0) //
+						? srcRed >>> -srcPalette.redShift
+						: srcRed << srcPalette.redShift;
 
 				srcGreen = srcPixel & srcPalette.greenMask;
 				srcGreen = (srcPalette.greenShift < 0)
@@ -169,6 +171,7 @@ public class ImageDataResources {
 				dstData[dataIndex] = (byte) (dstBlue & 0xff);
 				dstData[dataIndex + 1] = (byte) (dstGreen & 0xff);
 				dstData[dataIndex + 2] = (byte) (dstRed & 0xff);
+				dstData[dataIndex + 3] = (byte) (0x00);
 
 				dstAlphaData[alphaIndex] = (byte) (dstAlpha & 0xff);
 			}
@@ -177,7 +180,7 @@ public class ImageDataResources {
 
 	/**
 	 * Draws image data from src into the neighbor image data
-	 * 
+	 *
 	 * @param src
 	 *            the source image data
 	 * @param srcXStart
@@ -212,7 +215,7 @@ public class ImageDataResources {
 
 	/**
 	 * Draws image data from src into the tile image data
-	 * 
+	 *
 	 * @param src
 	 *            the source image data
 	 * @param srcXStart
@@ -248,8 +251,7 @@ public class ImageDataResources {
 
 	/**
 	 * @return Returns the neighbor image data or <code>null</code> when there is no image data for
-	 *         the
-	 *         neighbor tiles
+	 *         the neighbor tiles
 	 */
 	public ImageData getNeighborImageData() {
 		return _neighborImageData;
