@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,22 +30,21 @@ import de.byteholder.geoclipse.map.Tile;
  */
 final class ProfileTileImage {
 
-	private ImageData	_tileImageData;
+	private final ImageData	_tileImageData;
 
 	ProfileTileImage() {
 		_tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
 	}
-
+  
 	/**
-	 * Draws the given source image data into this composite image at the given
-	 * position.
+	 * Draws the given source image data into this composite image at the given position.
 	 * <p>
 	 * Call this internal framework method to superimpose another image atop this composite image.
 	 * </p>
 	 * <p>
 	 * This method is optimized from 724 ms to 5 ms by removing all image data methods
 	 * </p>
-	 * 
+	 *
 	 * @param src
 	 *            the source image data
 	 * @param srcTile
@@ -483,6 +482,7 @@ final class ProfileTileImage {
 		final int dstWidth = dst.width;
 		final int dstHeight = dst.height;
 		final int dstBytesPerLine = dst.bytesPerLine;
+		final int pixelBytes = dst.depth == 32 ? 4 : 3;
 
 		for (int dstY = 0; dstY < dstHeight; dstY++) {
 
@@ -490,11 +490,15 @@ final class ProfileTileImage {
 
 			for (int dstX = 0; dstX < dstWidth; dstX++) {
 
-				final int dataIndex = dstYBytesPerLine + (dstX * 3);
+				final int dataIndex = dstYBytesPerLine + (dstX * pixelBytes);
 
 				dstData[dataIndex] = blue;
 				dstData[dataIndex + 1] = green;
 				dstData[dataIndex + 2] = red;
+
+				if (pixelBytes == 4) {
+					dstData[dataIndex + 3] = 0x00;
+				}
 			}
 		}
 

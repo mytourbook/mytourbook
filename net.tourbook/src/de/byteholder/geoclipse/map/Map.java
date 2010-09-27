@@ -220,8 +220,14 @@ public class Map extends Canvas {
 
 	private static final RGB					MAP_DEFAULT_BACKGROUND_RGB					= new RGB(0x40, 0x40, 0x40);
 
-	private static final RGB					MAP_TRANSPARENT_RGB							= new RGB(0xfe, 0xfe, 0xfe);
-
+	private static RGB							MAP_TRANSPARENT_RGB;
+	{
+		MAP_TRANSPARENT_RGB = net.tourbook.util.UI.IS_OSX //
+//				? new RGB(0xfe, 0xfe, 0xfe)
+				? new RGB(0xfe, 0x00, 0x00)
+				: new RGB(0xfe, 0xfe, 0xfe);
+	}
+ 
 	/**
 	 * The zoom level. Normally a value between around 0 and 20.
 	 */
@@ -232,9 +238,8 @@ public class Map extends Canvas {
 	 */
 	private Image								_mapImage;
 
-	private Image								_image9Parts;
-
-	private GC									_gc9Parts;
+	private Image								_9PartImage;
+	private GC									_9PartGC;
 
 	/**
 	 * Indicates whether or not to draw the borders between tiles. Defaults to false. not very nice
@@ -808,24 +813,24 @@ public class Map extends Canvas {
 		final int parts = 3;
 		final int partedTileSize = _tilePixelSize * parts;
 
-		if ((_image9Parts != null) && (_image9Parts.isDisposed() == false)) {
-			if (_image9Parts.getBounds().width == partedTileSize) {
+		if ((_9PartImage != null) && (_9PartImage.isDisposed() == false)) {
+			if (_9PartImage.getBounds().width == partedTileSize) {
 				// image is OK
 				return;
 			}
 		}
-		if (_image9Parts != null) {
-			_image9Parts.dispose();
+		if (_9PartImage != null) {
+			_9PartImage.dispose();
 		}
-		if (_gc9Parts != null) {
-			_gc9Parts.dispose();
+		if (_9PartGC != null) {
+			_9PartGC.dispose();
 		}
 
 		// create 9 part image/gc
 		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize, MAP_TRANSPARENT_RGB);
 
-		_image9Parts = new Image(_display, transparentImageData);
-		_gc9Parts = new GC(_image9Parts);
+		_9PartImage = new Image(_display, transparentImageData);
+		_9PartGC = new GC(_9PartImage);
 	}
 
 	@Override
@@ -1234,6 +1239,7 @@ public class Map extends Canvas {
 
 		final byte[] srcData = imageData9Parts.data;
 		final int srcBytesPerLine = imageData9Parts.bytesPerLine;
+		final int pixelBytes = imageData9Parts.depth == 32 ? 4 : 3;
 
 		int srcIndex;
 		int srcRed, srcGreen, srcBlue;
@@ -1245,7 +1251,7 @@ public class Map extends Canvas {
 
 			for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
 
-				srcIndex = srcYBytesPerLine + (srcX * 3);
+				srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
 
 				srcBlue = srcData[srcIndex] & 0xFF;
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
@@ -1264,7 +1270,7 @@ public class Map extends Canvas {
 
 			for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
 
-				srcIndex = srcYBytesPerLine + (srcX * 3);
+				srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
 
 				srcBlue = srcData[srcIndex] & 0xFF;
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
@@ -1278,7 +1284,7 @@ public class Map extends Canvas {
 
 		// check border: left
 		{
-			final int srcX = srcXStart * 3;
+			final int srcX = srcXStart * pixelBytes;
 
 			for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
 
@@ -1296,7 +1302,7 @@ public class Map extends Canvas {
 
 		// check border: right
 		{
-			final int srcX = (srcXStart + tileSize - 1) * 3;
+			final int srcX = (srcXStart + tileSize - 1) * pixelBytes;
 
 			for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
 
@@ -1319,7 +1325,7 @@ public class Map extends Canvas {
 
 			for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
 
-				srcIndex = srcYBytesPerLine + (srcX * 3);
+				srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
 
 				srcBlue = srcData[srcIndex] & 0xFF;
 				srcGreen = srcData[srcIndex + 1] & 0xFF;
@@ -1385,8 +1391,8 @@ public class Map extends Canvas {
 		disposeResource(_mapImage);
 		disposeResource(_poiImage);
 
-		disposeResource(_image9Parts);
-		disposeResource(_gc9Parts);
+		disposeResource(_9PartImage);
+		disposeResource(_9PartGC);
 
 		disposeResource(_cursorDefault);
 		disposeResource(_cursorPan);
@@ -2364,13 +2370,13 @@ public class Map extends Canvas {
 
 		{
 			// clear 9 part image
-			_gc9Parts.setBackground(_transparentColor);
-			_gc9Parts.fillRectangle(_image9Parts.getBounds());
+			_9PartGC.setBackground(_transparentColor);
+			_9PartGC.fillRectangle(_9PartImage.getBounds());
 
 			// paint all overlays for the current tile
 			for (final MapPainter overlay : _overlays) {
 
-				final boolean isPainted = overlay.doPaint(_gc9Parts, Map.this, tile, parts);
+				final boolean isPainted = overlay.doPaint(_9PartGC, Map.this, tile, parts);
 
 				isOverlayPainted = isOverlayPainted || isPainted;
 			}
@@ -2379,7 +2385,7 @@ public class Map extends Canvas {
 
 				tile.setOverlayImageState(OverlayImageState.IMAGE_IS_CREATED);
 
-				final ImageData imageData9Parts = _image9Parts.getImageData();
+				final ImageData imageData9Parts = _9PartImage.getImageData();
 
 				/**
 				 * overlay image is created, split overlay image into 3*3 part images where the
@@ -3083,11 +3089,11 @@ public class Map extends Canvas {
 		final int mapDiffX = movePosition.x - _mouseDownPosition.x;
 		final int mapDiffY = movePosition.y - _mouseDownPosition.y;
 
-		final double worldPixelMapCenterX = _worldPixelMapCenter.getX();
-		final double worldPixelMapCenterY = _worldPixelMapCenter.getY();
+		final double oldCenterX = _worldPixelMapCenter.getX();
+		final double oldCenterY = _worldPixelMapCenter.getY();
 
-		final double newCenterX = worldPixelMapCenterX - mapDiffX;
-		final double newCenterY = worldPixelMapCenterY - mapDiffY;
+		final double newCenterX = oldCenterX - mapDiffX;
+		final double newCenterY = oldCenterY - mapDiffY;
 
 		_mouseDownPosition = movePosition;
 		_isMapPanned = true;

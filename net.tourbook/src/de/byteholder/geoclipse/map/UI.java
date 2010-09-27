@@ -219,13 +219,28 @@ public class UI {
 	 * @return
 	 */
 	public static ImageData createTransparentImageData(final int imageSize, final RGB transparentRGB) {
+
+		ImageData transparentImageData;
+
+		if (net.tourbook.util.UI.IS_OSX) {
+
+			// OSX
+			transparentImageData = new ImageData(//
+					imageSize,
+					imageSize,
+					24,
+					new PaletteData(0xff0000, 0xff00, 0xff));
+//		  palette = new PaletteData(0xFF0000, 0xFF00, 0xFF);
+
+		} else {
  
-		final ImageData transparentImageData = new ImageData(//
-				imageSize,
-				imageSize,
-				32,
-				new PaletteData(0xff0000, 0xff00, 0xff)
-		);
+			// Win & Linux
+			transparentImageData = new ImageData(//
+					imageSize,
+					imageSize,
+					24,
+					new PaletteData(0xff, 0xff00, 0xff0000));
+		}
 
 		transparentImageData.transparentPixel = transparentImageData.palette.getPixel(transparentRGB);
 
@@ -234,16 +249,17 @@ public class UI {
 		return transparentImageData;
 	}
 
-	public static void setBackgroundColor(final RGB bgRGB, final ImageData imageData) {
+	public static void setBackgroundColor(final RGB backgroundRGB, final ImageData imageData) {
 
-		final byte blue = (byte) bgRGB.blue;
-		final byte green = (byte) bgRGB.green;
-		final byte red = (byte) bgRGB.red;
+		final byte blue = (byte) backgroundRGB.blue;
+		final byte green = (byte) backgroundRGB.green;
+		final byte red = (byte) backgroundRGB.red;
 
 		final byte[] dstData = imageData.data;
 		final int dstWidth = imageData.width;
 		final int dstHeight = imageData.height;
 		final int dstBytesPerLine = imageData.bytesPerLine;
+		final int dstPixelBytes = imageData.depth == 32 ? 4 : 3;
 
 		for (int dstY = 0; dstY < dstHeight; dstY++) {
 
@@ -251,11 +267,15 @@ public class UI {
 
 			for (int dstX = 0; dstX < dstWidth; dstX++) {
 
-				final int dataIndex = dstYBytesPerLine + (dstX * 3);
+				final int dataIndex = dstYBytesPerLine + (dstX * dstPixelBytes);
 
 				dstData[dataIndex] = blue;
 				dstData[dataIndex + 1] = green;
 				dstData[dataIndex + 2] = red;
+
+				if (dstPixelBytes == 4) {
+					dstData[dataIndex + 3] = 0x7f;
+				}
 			}
 		}
 	}

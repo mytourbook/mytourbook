@@ -68,6 +68,7 @@ public class ImageDataResources {
 		final PaletteData srcPalette = src.palette;
 		final byte[] srcAlphaData = src.alphaData;
 		final int srcBytesPerLine = src.bytesPerLine;
+		final int srcPixelBytes = src.depth == 32 ? 4 : 3;
 		int srcIndex;
 		int srcPixel = 0;
 
@@ -75,9 +76,10 @@ public class ImageDataResources {
 		final byte[] dstData = dst.data;
 		byte[] dstAlphaData = dst.alphaData;
 		final int dstBytesPerLine = dst.bytesPerLine;
+		final int dstPixelBytes = dst.depth == 32 ? 4 : 3;
 
 		int srcRed, srcGreen, srcBlue;
-
+ 
 		// create alpha data
 		if (dstAlphaData == null) {
 			dst.alphaData = dstAlphaData = new byte[width * height];
@@ -93,16 +95,16 @@ public class ImageDataResources {
 
 			for (int srcX = srcXStart, dstX = 0; srcX < srcMaxX; srcX++, dstX++) {
 
-				final int dataIndex = dstYBytesPerLine + (dstX * 4);
+				final int dstIndex = dstYBytesPerLine + (dstX * dstPixelBytes);
 				final int alphaIndex = dstY * width + dstX;
 
 				// check bounds
 				if (!(0 <= dstX && dstX < dst.width && 0 <= dstY && dstY < dst.height)) {
 					continue;
 				}
- 
+
 				// get pixel value
-				srcIndex = srcYBytesPerLine + (srcX * 4);
+				srcIndex = srcYBytesPerLine + (srcX * srcPixelBytes);
 				srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
 						+ ((srcData[srcIndex + 1] & 0xFF) << 8)
 						+ (srcData[srcIndex + 2] & 0xFF);
@@ -156,9 +158,9 @@ public class ImageDataResources {
 
 					// transparent
 
-					dstRed = dstData[dataIndex + 2] & 0xff;
-					dstGreen = dstData[dataIndex + 1] & 0xff;
-					dstBlue = dstData[dataIndex] & 0xff;
+					dstRed = dstData[dstIndex + 2] & 0xff;
+					dstGreen = dstData[dstIndex + 1] & 0xff;
+					dstBlue = dstData[dstIndex] & 0xff;
 
 					dstRed += (srcRed - dstRed) * srcAlpha / 255;
 					dstGreen += (srcGreen - dstGreen) * srcAlpha / 255;
@@ -168,10 +170,20 @@ public class ImageDataResources {
 					dstAlpha += (srcAlpha - dstAlpha) * srcAlpha / 255;
 				}
 
-				dstData[dataIndex] = (byte) (dstBlue & 0xff);
-				dstData[dataIndex + 1] = (byte) (dstGreen & 0xff);
-				dstData[dataIndex + 2] = (byte) (dstRed & 0xff);
-				dstData[dataIndex + 3] = (byte) (0x00);
+				if (dstPixelBytes == 4) {
+//					dstData[dstIndex + 0] = (byte) (0x00);
+//					dstData[dstIndex + 1] = (byte) (0x00);
+//					dstData[dstIndex + 2] = (byte) (0x00);
+//					dstData[dstIndex + 3] = (byte) (0x00);
+
+					dstData[dstIndex + 0] = (byte) (dstBlue & 0xff);
+					dstData[dstIndex + 1] = (byte) (dstGreen & 0xff);
+					dstData[dstIndex + 2] = (byte) (dstRed & 0xff);
+				} else {
+					dstData[dstIndex] = (byte) (dstBlue & 0xff);
+					dstData[dstIndex + 1] = (byte) (dstGreen & 0xff);
+					dstData[dstIndex + 2] = (byte) (dstRed & 0xff);
+				}
 
 				dstAlphaData[alphaIndex] = (byte) (dstAlpha & 0xff);
 			}

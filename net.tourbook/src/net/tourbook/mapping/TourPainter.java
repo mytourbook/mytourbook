@@ -536,7 +536,7 @@ public class TourPainter extends MapPainter {
 			if (latitudeSerie == null || longitudeSerie == null) {
 				continue;
 			}
- 
+
 			setDataSerie(tourData);
 
 			final boolean isDrawTourInTile = drawTour10InTile(gc, map, tile, tourData, parts);
@@ -546,13 +546,13 @@ public class TourPainter extends MapPainter {
 			/**
 			 * DEBUG
 			 */
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-//			gc.fillRectangle(1, 1, 3, 3);
-//			isTourInTile = true;
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			gc.fillRectangle(1, 1, 5, 50);
+			isTourInTile = true;
 
 			// status if a marker is drawn
 			boolean isMarkerInTile = false;
-
+ 
 			// draw start/end marker
 			if (paintManager.isShowStartEndInMap()) {
 
