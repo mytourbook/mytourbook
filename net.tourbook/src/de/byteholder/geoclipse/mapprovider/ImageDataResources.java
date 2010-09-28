@@ -20,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 
-import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.UI;
 
 /**
@@ -33,7 +32,7 @@ public class ImageDataResources {
 	/**
 	 * contains image data which are drawn into this tile
 	 */
-	private ImageData					_tileImageData		= null;
+	private ImageData	 				_tileImageData		= null;
 
 	/**
 	 * contains image data which are drawn from neighbor tiles
@@ -68,18 +67,21 @@ public class ImageDataResources {
 		final PaletteData srcPalette = src.palette;
 		final byte[] srcAlphaData = src.alphaData;
 		final int srcBytesPerLine = src.bytesPerLine;
-		final int srcPixelBytes = src.depth == 32 ? 4 : 3;
+		final int srcDepth = src.depth;
+		final int srcTransparentPixel = src.transparentPixel;
 		int srcIndex;
 		int srcPixel = 0;
+		int srcRed, srcGreen, srcBlue;
+		final int srcPixelBytes = srcDepth == 32 ? 4 : 3;
 
 		// destination data
 		final byte[] dstData = dst.data;
 		byte[] dstAlphaData = dst.alphaData;
 		final int dstBytesPerLine = dst.bytesPerLine;
 		final int dstPixelBytes = dst.depth == 32 ? 4 : 3;
+		final int dstWidth = dst.width;
+		final int dstHeight = dst.height;
 
-		int srcRed, srcGreen, srcBlue;
- 
 		// create alpha data
 		if (dstAlphaData == null) {
 			dst.alphaData = dstAlphaData = new byte[width * height];
@@ -99,20 +101,31 @@ public class ImageDataResources {
 				final int alphaIndex = dstY * width + dstX;
 
 				// check bounds
-				if (!(0 <= dstX && dstX < dst.width && 0 <= dstY && dstY < dst.height)) {
+				if (dstX >= dstWidth || dstY >= dstHeight) {
 					continue;
 				}
 
 				// get pixel value
 				srcIndex = srcYBytesPerLine + (srcX * srcPixelBytes);
-				srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
-						+ ((srcData[srcIndex + 1] & 0xFF) << 8)
-						+ (srcData[srcIndex + 2] & 0xFF);
+
+				if (srcDepth == 32) {
+					srcPixel = ((srcData[srcIndex] & 0xFF) << 24)
+							+ ((srcData[srcIndex + 1] & 0xFF) << 16)
+							+ ((srcData[srcIndex + 2] & 0xFF) << 8)
+							+ (srcData[srcIndex + 3] & 0xFF);
+				} else if (srcDepth == 24) {
+					srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
+							+ ((srcData[srcIndex + 1] & 0xFF) << 8)
+							+ (srcData[srcIndex + 2] & 0xFF);
+				} else {
+					// this is not supported
+					return;
+				}
 
 				int srcAlpha = 255;
 
-				if (src.transparentPixel != -1) {
-					if (src.transparentPixel == srcPixel) {
+				if (srcTransparentPixel != -1) {
+					if (srcTransparentPixel == srcPixel) {
 						srcAlpha = 0;
 					}
 				} else if (src.alpha != -1) {
@@ -171,16 +184,12 @@ public class ImageDataResources {
 				}
 
 				if (dstPixelBytes == 4) {
-//					dstData[dstIndex + 0] = (byte) (0x00);
-//					dstData[dstIndex + 1] = (byte) (0x00);
-//					dstData[dstIndex + 2] = (byte) (0x00);
-//					dstData[dstIndex + 3] = (byte) (0x00);
-
-					dstData[dstIndex + 0] = (byte) (dstBlue & 0xff);
-					dstData[dstIndex + 1] = (byte) (dstGreen & 0xff);
-					dstData[dstIndex + 2] = (byte) (dstRed & 0xff);
+					dstData[dstIndex + 0] = (byte) (0x00);
+					dstData[dstIndex + 1] = (byte) (dstRed & 0xff);
+					dstData[dstIndex + 2] = (byte) (dstGreen & 0xff);
+					dstData[dstIndex + 3] = (byte) (dstBlue & 0xff);
 				} else {
-					dstData[dstIndex] = (byte) (dstBlue & 0xff);
+					dstData[dstIndex + 0] = (byte) (dstBlue & 0xff);
 					dstData[dstIndex + 1] = (byte) (dstGreen & 0xff);
 					dstData[dstIndex + 2] = (byte) (dstRed & 0xff);
 				}
@@ -213,7 +222,7 @@ public class ImageDataResources {
 
 					// check again
 					if (_neighborImageData == null) {
-						_neighborImageData = UI.createTransparentImageData(_tileSize, Map.getTransparentRGB());
+						_neighborImageData = UI.createTransparentImageData(_tileSize);
 					}
 
 				} finally {
@@ -249,7 +258,7 @@ public class ImageDataResources {
 
 					// check again
 					if (_tileImageData == null) {
-						_tileImageData = UI.createTransparentImageData(_tileSize, Map.getTransparentRGB());
+						_tileImageData = UI.createTransparentImageData(_tileSize);
 					}
 
 				} finally {

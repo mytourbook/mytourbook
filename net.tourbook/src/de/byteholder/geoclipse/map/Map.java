@@ -223,9 +223,12 @@ public class Map extends Canvas {
 	private static RGB							MAP_TRANSPARENT_RGB;
 	{
 		MAP_TRANSPARENT_RGB = net.tourbook.util.UI.IS_OSX //
-//				? new RGB(0xfe, 0xfe, 0xfe)
-				? new RGB(0xfe, 0x00, 0x00)
-				: new RGB(0xfe, 0xfe, 0xfe);
+//				? new RGB(0x7e, 0x7f, 0x80)
+//				? new RGB(0xfe, 0x00, 0x00)
+				? new RGB(0xfe, 0xfe, 0xfe)
+				: new RGB(0xfe, 0xfe, 0xfe)
+//
+		;
 	}
  
 	/**
@@ -827,7 +830,7 @@ public class Map extends Canvas {
 		}
 
 		// create 9 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize, MAP_TRANSPARENT_RGB);
+		final ImageData transparentImageData = UI.createTransparentImageData(partedTileSize);
 
 		_9PartImage = new Image(_display, transparentImageData);
 		_9PartGC = new GC(_9PartImage);
@@ -2342,7 +2345,7 @@ public class Map extends Canvas {
 						if (_isTourPaintMethodEnhanced) {
 							paintOverlay30PaintTile(tile);
 						} else {
-							paintOverlay99PaintTile(tile);
+							paintOverlay40PaintTile(tile);
 						}
 
 					} else {
@@ -2397,7 +2400,7 @@ public class Map extends Canvas {
 					@Override
 					protected IStatus run(final IProgressMonitor monitor) {
 
-						paintOverlay40SplitParts(tile, imageData9Parts);
+						paintOverlay31SplitParts(tile, imageData9Parts);
 
 						queueMapRedraw();
 
@@ -2435,7 +2438,7 @@ public class Map extends Canvas {
 	 * @param tile
 	 * @param imageData9Parts
 	 */
-	private void paintOverlay40SplitParts(final Tile tile, final ImageData imageData9Parts) {
+	private void paintOverlay31SplitParts(final Tile tile, final ImageData imageData9Parts) {
 
 		final TileCache tileCache = MP.getTileCache();
 
@@ -2604,12 +2607,12 @@ public class Map extends Canvas {
 	 *
 	 * @param tile
 	 */
-	private void paintOverlay99PaintTile(final Tile tile) {
+	private void paintOverlay40PaintTile(final Tile tile) {
 
 		boolean isOverlayPainted = false;
 
 		// create 1 part image/gc
-		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize, MAP_TRANSPARENT_RGB);
+		final ImageData transparentImageData = UI.createTransparentImageData(_tilePixelSize);
 
 		final Image overlayImage = new Image(_display, transparentImageData);
 		final GC gc1Part = new GC(overlayImage);

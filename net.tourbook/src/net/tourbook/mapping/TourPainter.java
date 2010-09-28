@@ -132,9 +132,9 @@ public class TourPainter extends MapPainter {
 		super();
 
 		/*
-		 * I've not yet understood to manage this problem because TourPainter() is created from
-		 * an extension point but setting the instance in the constructor is not valid according
-		 * to FindBugs
+		 * I've not yet understood to manage this problem because TourPainter() is created from an
+		 * extension point but setting the instance in the constructor is not valid according to
+		 * FindBugs
 		 */
 	}
 
@@ -151,7 +151,7 @@ public class TourPainter extends MapPainter {
 	 */
 	public static void drawLegendColors(final GC gc,
 										final Rectangle legendBounds,
-										final ILegendProvider legendProvider,
+			 							final ILegendProvider legendProvider,
 										final boolean isVertical) {
 
 		if (legendProvider == null) {
@@ -543,16 +543,25 @@ public class TourPainter extends MapPainter {
 
 			isTourInTile = isTourInTile || isDrawTourInTile;
 
-			/**
-			 * DEBUG
-			 */
-			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-			gc.fillRectangle(1, 1, 5, 50);
-			isTourInTile = true;
+//			/**
+//			 * DEBUG Start
+//			 */
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+//			gc.fillRectangle(0, 0, 2, 50);
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			gc.fillRectangle(2, 0, 2, 50);
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//			gc.fillRectangle(4, 0, 2, 50);
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.fillRectangle(6, 0, 2, 50);
+//			isTourInTile = true;
+//			/**
+//			 * DEBUG End
+//			 */
 
 			// status if a marker is drawn
 			boolean isMarkerInTile = false;
- 
+
 			// draw start/end marker
 			if (paintManager.isShowStartEndInMap()) {
 
@@ -874,8 +883,7 @@ public class TourPainter extends MapPainter {
 
 						/*
 						 * this position is the first which is outside of the tile, draw a line from
-						 * the
-						 * last inside to the first outside position
+						 * the last inside to the first outside position
 						 */
 
 						drawTour20Line(gc, //
@@ -1062,12 +1070,13 @@ public class TourPainter extends MapPainter {
 
 		final int arcSize = 5;
 
-		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
+		final RGB rgbTransparent = Map.getTransparentRGB();
 
-		final ImageData markerImageData = new ImageData(markerImageWidth, markerImageHeight, 24, new PaletteData(
-				0xff,
-				0xff00,
-				0xff0000));
+		final ImageData markerImageData = new ImageData(//
+				markerImageWidth,
+				markerImageHeight,
+				24,
+				new PaletteData(0xff, 0xff00, 0xff0000));
 
 		markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
 
@@ -1320,8 +1329,8 @@ public class TourPainter extends MapPainter {
 	}
 
 	/**
-	 * Checks if an image bounds is within the tile. The image is above the image position and
-	 * one half to the left and right side
+	 * Checks if an image bounds is within the tile. The image is above the image position and one
+	 * half to the left and right side
 	 *
 	 * @param imageBounds
 	 *            bounds of the image

@@ -32,7 +32,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 /**
  * The Tile class represents a particular square image piece of the world bitmap at a particular
  * zoom level.
- * 
+ *
  * @author Joshua Marinacci
  * @author Michael Kanis
  * @author Wolfgang
@@ -52,13 +52,13 @@ public class Tile extends Observable {
 
 	/**
 	 * <pre>
-	 * 
+	 *
 	 * y,x
-	 * 
+	 *
 	 * 0,0		0,1		0,2
 	 * 1,0		1,1		1,2
 	 * 2,0		2,1		2,2
-	 * 
+	 *
 	 * </pre>
 	 */
 
@@ -169,26 +169,26 @@ public class Tile extends Observable {
 	private ConcurrentHashMap<String, Tile>	_childrenWithErrors;
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[MAX_BOUNDS];
+	private final ArrayList<Rectangle>[]			_markerBounds		= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[MAX_BOUNDS];
+	private final ArrayList<Rectangle>[]			_markerPartBounds	= new ArrayList[MAX_BOUNDS];
 
 	/**
 	 * Contains the {@link TourWayPoint}'s which are displayed in this tile.
-	 * <p>
+	 * <p> 
 	 * {@link #_twpSimpleBounds} and {@link #_twpPartBounds} contains the rectangles in the same
 	 * sequence as {@link #_twp}.
 	 */
 	@SuppressWarnings("unchecked")
-	private ArrayList<TourWayPoint>[]		_twp				= new ArrayList[MAX_BOUNDS];
+	private final ArrayList<TourWayPoint>[]		_twp				= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_twpSimpleBounds	= new ArrayList[MAX_BOUNDS];
+	private final ArrayList<Rectangle>[]			_twpSimpleBounds	= new ArrayList[MAX_BOUNDS];
 	@SuppressWarnings("unchecked")
-	private ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[MAX_BOUNDS];
+	private final ArrayList<Rectangle>[]			_twpPartBounds		= new ArrayList[MAX_BOUNDS];
 
 	/**
 	 * Create a new Tile at the specified tile point and zoom level
-	 * 
+	 *
 	 * @param mp
 	 *            map provider which creates the tile image
 	 * @param zoom
@@ -211,7 +211,7 @@ public class Tile extends Observable {
 
 	/**
 	 * create a key for a tile
-	 * 
+	 *
 	 * @param mp
 	 * @param zoom
 	 * @param x
@@ -395,7 +395,7 @@ public class Tile extends Observable {
 				}
 
 				final int tileSize = _mp.getTileSize();
-				final ImageData finalImageData = UI.createTransparentImageData(tileSize, Map.getTransparentRGB());
+				final ImageData finalImageData = UI.createTransparentImageData(tileSize);
 
 				// draw neighbor first
 				if (neighborImageData != null) {
@@ -440,7 +440,7 @@ public class Tile extends Observable {
 	/**
 	 * Set child image data into the parent tile and create the parent image when all child images
 	 * are available
-	 * 
+	 *
 	 * @param childImageData
 	 * @return
 	 */
@@ -504,7 +504,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Creates tile children for all mp wrapper which are displayed in one tile
-	 * 
+	 *
 	 * @return Returns the tile children or <code>null</code> when the tile has no children. A list
 	 *         is returned with children which are not yet available in the tile cache or error
 	 *         cache, children are skipped when they already exist and have loading errord
@@ -553,7 +553,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Check if the new image is valid
-	 * 
+	 *
 	 * @param newImage
 	 * @return Returns a valid image or <code>null</code> when the image is invald
 	 */
@@ -787,7 +787,7 @@ public class Tile extends Observable {
 
 	/**
 	 * creates marker bounds array for the zoom level
-	 * 
+	 *
 	 * @param zoomLevel
 	 */
 	private void initBounds(final int zoomLevel) {
@@ -918,7 +918,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Sets the mercator bounding box for this tile
-	 * 
+	 *
 	 * @param info
 	 * @param projection
 	 */
@@ -948,7 +948,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Set custom data which can be retrieved with {@link #getData()}
-	 * 
+	 *
 	 * @param customData
 	 */
 	public void setData(final Object customData) {
@@ -965,7 +965,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Set loading status
-	 * 
+	 *
 	 * @param loading
 	 */
 	public void setLoading(final boolean loading) {
@@ -974,7 +974,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Set error message when loading of the image failed, an existing tile image will be disposed
-	 * 
+	 *
 	 * @param loadingError
 	 */
 	public void setLoadingError(final String loadingError) {
@@ -1003,7 +1003,7 @@ public class Tile extends Observable {
 
 	/**
 	 * Set the map image for this tile, the image is checked before it is set
-	 * 
+	 *
 	 * @param newImage
 	 * @return <code>true</code> when the image was set, <code>false</code> when the image
 	 *         is invalid
@@ -1026,7 +1026,7 @@ public class Tile extends Observable {
 
 	/**
 	 * sets the path which was used to load the offline image
-	 * 
+	 *
 	 * @param osTilePath
 	 */
 	public void setOfflinePath(final String osTilePath) {

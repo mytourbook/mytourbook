@@ -215,38 +215,52 @@ public class UI {
 	 * Create a transparent image
 	 *
 	 * @param imageSize
-	 * @param transparentRGB
 	 * @return
 	 */
-	public static ImageData createTransparentImageData(final int imageSize, final RGB transparentRGB) {
+	public static ImageData createTransparentImageData(final int imageSize) {
 
 		ImageData transparentImageData;
 
 		if (net.tourbook.util.UI.IS_OSX) {
 
-			// OSX
+			// OSX 
 			transparentImageData = new ImageData(//
 					imageSize,
 					imageSize,
-					24,
-					new PaletteData(0xff0000, 0xff00, 0xff));
-//		  palette = new PaletteData(0xFF0000, 0xFF00, 0xFF);
+					32,
+					getPaletteData());
 
 		} else {
- 
+
 			// Win & Linux
 			transparentImageData = new ImageData(//
 					imageSize,
 					imageSize,
 					24,
-					new PaletteData(0xff, 0xff00, 0xff0000));
+					getPaletteData());
 		}
+
+		final RGB transparentRGB = Map.getTransparentRGB();
 
 		transparentImageData.transparentPixel = transparentImageData.palette.getPixel(transparentRGB);
 
 		setBackgroundColor(transparentRGB, transparentImageData);
 
 		return transparentImageData;
+	}
+
+	public static PaletteData getPaletteData() {
+
+		if (net.tourbook.util.UI.IS_OSX) {
+
+			// OSX
+			return new PaletteData(0xff0000, 0xff00, 0xff);
+
+		} else {
+
+			// Win & Linux
+			return new PaletteData(0xff, 0xff00, 0xff0000);
+		}
 	}
 
 	public static void setBackgroundColor(final RGB backgroundRGB, final ImageData imageData) {
@@ -269,12 +283,15 @@ public class UI {
 
 				final int dataIndex = dstYBytesPerLine + (dstX * dstPixelBytes);
 
-				dstData[dataIndex] = blue;
-				dstData[dataIndex + 1] = green;
-				dstData[dataIndex + 2] = red;
-
 				if (dstPixelBytes == 4) {
-					dstData[dataIndex + 3] = 0x7f;
+					dstData[dataIndex + 0] = (byte) (0x00);
+					dstData[dataIndex + 1] = (byte) (red & 0xff);
+					dstData[dataIndex + 2] = (byte) (green & 0xff);
+					dstData[dataIndex + 3] = (byte) (blue & 0xff);
+				} else {
+					dstData[dataIndex + 0] = (byte) (blue & 0xff);
+					dstData[dataIndex + 1] = (byte) (green & 0xff);
+					dstData[dataIndex + 2] = (byte) (red & 0xff);
 				}
 			}
 		}
