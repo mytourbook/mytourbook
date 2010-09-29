@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target name="Running Platform">
+<target name="3.6.0 Target">
 <locations>
 <location path="L:\e-3.6\target-plugins\eclipse-3.6-delta-pack\eclipse" type="Directory"/>
 <location path="L:\e-3.6\target-plugins\BabelLanguagePack-eclipse_3.6.0\eclipse" type="Directory"/>
