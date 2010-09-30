@@ -74,70 +74,72 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLayer {
 
-	private static final String			WIDGET_DATA_ALTI_ID			= "altiId";										//$NON-NLS-1$
-	private static final String			WIDGET_DATA_METRIC_ALTITUDE	= "metricAltitude";								//$NON-NLS-1$
+	private static final String				WIDGET_DATA_ALTI_ID			= "altiId";						//$NON-NLS-1$
+	private static final String				WIDGET_DATA_METRIC_ALTITUDE	= "metricAltitude";				//$NON-NLS-1$
 
-	private static final int			ALTI_ID_START				= 1;
-	private static final int			ALTI_ID_END					= 2;
-	private static final int			ALTI_ID_MAX					= 3;
+	private static final int				ALTI_ID_START				= 1;
+	private static final int				ALTI_ID_END					= 2;
+	private static final int				ALTI_ID_MAX					= 3;
 
-	private static final int			ADJUST_TYPE_SRTM			= 1010;
-	private static final int			ADJUST_TYPE_SRTM_SPLINE		= 1020;
-	private static final int			ADJUST_TYPE_WHOLE_TOUR		= 1030;
-	private static final int			ADJUST_TYPE_START_AND_END	= 1040;
-	private static final int			ADJUST_TYPE_MAX_HEIGHT		= 1050;
-	private static final int			ADJUST_TYPE_END				= 1060;
+	private static final int				ADJUST_TYPE_SRTM			= 1010;
+	private static final int				ADJUST_TYPE_SRTM_SPLINE		= 1020;
+	private static final int				ADJUST_TYPE_WHOLE_TOUR		= 1030;
+	private static final int				ADJUST_TYPE_START_AND_END	= 1040;
+	private static final int				ADJUST_TYPE_MAX_HEIGHT		= 1050;
+	private static final int				ADJUST_TYPE_END				= 1060;
 
-	private static AdjustmentType[]		ALL_ADJUSTMENT_TYPES		= new AdjustmentType[] {
+	private static AdjustmentType[]			ALL_ADJUSTMENT_TYPES		= new AdjustmentType[] {
 			new AdjustmentType(ADJUST_TYPE_SRTM_SPLINE, Messages.adjust_altitude_type_srtm_spline),
 			new AdjustmentType(ADJUST_TYPE_SRTM, Messages.adjust_altitude_type_srtm),
 			new AdjustmentType(ADJUST_TYPE_START_AND_END, Messages.adjust_altitude_type_start_and_end),
 			new AdjustmentType(ADJUST_TYPE_MAX_HEIGHT, Messages.adjust_altitude_type_adjust_height),
 			new AdjustmentType(ADJUST_TYPE_END, Messages.adjust_altitude_type_adjust_end),
 			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, Messages.adjust_altitude_type_adjust_whole_tour),
-																	//
-																	};
+																		//
+																		};
 
-	private static final String			PREF_ADJUST_TYPE			= "adjust.altitude.adjust_type";					//$NON-NLS-1$
-	private static final String			PREF_KEEP_START				= "adjust.altitude.keep_start";					//$NON-NLS-1$
+	private static final String				PREF_ADJUST_TYPE			= "adjust.altitude.adjust_type";	//$NON-NLS-1$
+	private static final String				PREF_KEEP_START				= "adjust.altitude.keep_start";	//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore			_prefStore					= TourbookPlugin
+																				.getDefault()
+																				.getPreferenceStore();
 
 	/*
 	 * data
 	 */
-	private boolean						_isDisableSliderEvent;
-	private boolean						_isTourSaved				= false;
-	private boolean						_isSaveTour;
+	private boolean							_isDisableSliderEvent;
+	private boolean							_isTourSaved				= false;
+	private final boolean					_isSaveTour;
 
-	private TourData					_tourData;
-	private SplineData					_splineData;
+	private final TourData					_tourData;
+	private SplineData						_splineData;
 
-	private boolean						_isCreateDummyAltitude;
-	private int[]						_metricAltitudeSerieBackup;
-	private int[]						_metricAdjustedAltitudeWithoutSRTM;
-	private int[]						_srtmValues;
+	private final boolean					_isCreateDummyAltitude;
+	private int[]							_metricAltitudeSerieBackup;
+	private int[]							_metricAdjustedAltitudeWithoutSRTM;
+	private final int[]						_srtmValues;
 
-	private int							_oldAdjustmentType			= -1;
-	private ArrayList<AdjustmentType>	_availableAdjustmentTypes	= new ArrayList<AdjustmentType>();
+	private int								_oldAdjustmentType			= -1;
+	private final ArrayList<AdjustmentType>	_availableAdjustmentTypes	= new ArrayList<AdjustmentType>();
+ 
+	private int								_pointHitIndex				= -1;
+	private int								_altiDiff;
+	private int								_sliderXAxisValue;
 
-	private int							_pointHitIndex				= -1;
-	private int							_altiDiff;
-	private int							_sliderXAxisValue;
+	private boolean							_canDeletePoint;
+	private boolean							_isDisableModifyListener;
 
-	private boolean						_canDeletePoint;
-	private boolean						_isDisableModifyListener;
+	private int								_initialAltiStart;
+	private int								_initialAltiMax;
 
-	private int							_initialAltiStart;
-	private int							_initialAltiMax;
+	private int								_altiMaxDiff;
+	private int								_altiStartDiff;
 
-	private int							_altiMaxDiff;
-	private int							_altiStartDiff;
+	private int								_prevAltiMax;
+	private int								_prevAltiStart;
 
-	private int							_prevAltiMax;
-	private int							_prevAltiStart;
-
-	private static final NumberFormat	_nf							= NumberFormat.getNumberInstance();
+	private static final NumberFormat		_nf							= NumberFormat.getNumberInstance();
 	static {
 		_nf.setMinimumFractionDigits(0);
 		_nf.setMaximumFractionDigits(3);
@@ -146,36 +148,36 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	/*
 	 * UI controls
 	 */
-	private TourChart					_tourChart;
-	private TourChartConfiguration		_tourChartConfig;
+	private TourChart						_tourChart;
+	private TourChartConfiguration			_tourChartConfig;
 
-	private Composite					_dlgContainer;
+	private Composite						_dlgContainer;
 
-	private PageBook					_pageBookOptions;
-	private Label						_pageEmpty;
-	private Composite					_pageOptionSRTMSpline;
-	private Composite					_pageOptionNoSRTM;
-	private Composite					_pageOptionSRTM;
+	private PageBook						_pageBookOptions;
+	private Label							_pageEmpty;
+	private Composite						_pageOptionSRTMSpline;
+	private Composite						_pageOptionNoSRTM;
+	private Composite						_pageOptionSRTM;
 
-	private Combo						_comboAdjustmentType;
+	private Combo							_comboAdjustmentType;
 
-	private Button						_btnSRTMRemoveAllPoints;
+	private Button							_btnSRTMRemoveAllPoints;
 //	private Button						_btnResetAdjustments;
-	private Button						_btnResetAltitude;
-	private Button						_btnUpdateAltitude;
+	private Button							_btnResetAltitude;
+	private Button							_btnUpdateAltitude;
 
-	private Spinner						_spinnerNewStartAlti;
-	private Spinner						_spinnerNewMaxAlti;
-	private Spinner						_spinnerNewEndAlti;
+	private Spinner							_spinnerNewStartAlti;
+	private Spinner							_spinnerNewMaxAlti;
+	private Spinner							_spinnerNewEndAlti;
 
-	private Label						_lblOldStartAlti;
-	private Label						_lblOldMaxAlti;
-	private Label						_lblOldEndAlti;
+	private Label							_lblOldStartAlti;
+	private Label							_lblOldMaxAlti;
+	private Label							_lblOldEndAlti;
 
-	private Button						_rdoKeepBottom;
-	private Button						_rdoKeepStart;
+	private Button							_rdoKeepBottom;
+	private Button							_rdoKeepStart;
 
-	private ChartLayer2ndAltiSerie		_chartLayer2ndAltiSerie;
+	private ChartLayer2ndAltiSerie			_chartLayer2ndAltiSerie;
 
 	private static class AdjustmentType {
 
@@ -299,7 +301,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * adjust end altitude
-	 * 
+	 *
 	 * @param altiSrc
 	 * @param tourData
 	 * @param newEndAlti
@@ -323,7 +325,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * adjust every altitude with the same difference
-	 * 
+	 *
 	 * @param altiSrc
 	 * @param altiDest
 	 * @param newStartAlti
@@ -339,7 +341,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Adjust max altitude, keep min value
-	 * 
+	 *
 	 * @param altiSrc
 	 * @param altiDest
 	 * @param maxAltiNew
@@ -721,7 +723,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Compute relative position of the moved point
-	 * 
+	 *
 	 * @param mouseEvent
 	 */
 	private void computePointMoveValues(final ChartMouseEvent mouseEvent) {
@@ -809,6 +811,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateTourChart();
 	}
 
+	@Override
 	public ChartLayer2ndAltiSerie create2ndAltiLayer() {
 
 		final int[] xDataSerie = _tourChartConfig.showTimeOnXAxis ? _tourData.timeSerie : _tourData.getDistanceSerie();
@@ -820,7 +823,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Create altitude spinner field
-	 * 
+	 *
 	 * @param startContainer
 	 * @return Returns the field
 	 */
@@ -835,6 +838,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		spinner.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(final ModifyEvent e) {
 
 				if (_isDisableModifyListener) {
@@ -889,6 +893,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		spinner.addMouseWheelListener(new MouseWheelListener() {
 
+			@Override
 			public void mouseScrolled(final MouseEvent e) {
 
 				if (_isDisableModifyListener) {
@@ -917,8 +922,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		spinner.addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(final FocusEvent e) {}
 
+			@Override
 			public void focusLost(final FocusEvent e) {
 				onChangeAltitude();
 			}
@@ -1043,6 +1050,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_tourChart.setContextProvider(new DialogAdjustAltitudeChartContextProvicer(this), true);
 
 		_tourChart.addDataModelListener(new IDataModelListener() {
+			@Override
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 				// set title
 				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
@@ -1050,6 +1058,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		});
 
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
 
 				if (_isDisableSliderEvent) {
@@ -1062,22 +1071,27 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_tourChart.addMouseListener(new IMouseListener() {
 
+			@Override
 			public void mouseDoubleClick(final ChartMouseEvent event) {}
 
+			@Override
 			public void mouseDown(final ChartMouseEvent event) {
 				onMouseDown(event);
 			}
 
+			@Override
 			public void mouseMove(final ChartMouseEvent event) {
 				onMouseMove(event);
 			}
 
+			@Override
 			public void mouseUp(final ChartMouseEvent event) {
 				onMouseUp(event);
 			}
 		});
 
 		_tourChart.addXAxisSelectionListener(new IXAxisSelectionListener() {
+			@Override
 			public void selectionChanged(final boolean showTimeOnXAxis) {
 				if (getSelectedAdjustmentType().__id == ADJUST_TYPE_SRTM_SPLINE) {
 					computeAltitudeSRTMSpline();
@@ -1449,7 +1463,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * reset altitudes to it's original values
-	 * 
+	 *
 	 * @param metricAltitudeSerie
 	 */
 	private void initializeAltitude(final int[] metricAltitudeSerie) {
@@ -1503,7 +1517,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * create spline values, these are 3 points at start/middle/end
-	 * 
+	 *
 	 * @param altiDiff
 	 * @param sliderDistance
 	 * @return

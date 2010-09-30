@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
 
@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -43,9 +44,9 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
-public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
  
+public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
 	public static final String		MAP_TOUR_SYMBOL_LINE		= "line";											//$NON-NLS-1$
 	public static final String		MAP_TOUR_SYMBOL_DOT			= "dot";											//$NON-NLS-1$
 	public static final String		MAP_TOUR_SYMBOL_SQUARE		= "square";										//$NON-NLS-1$
@@ -133,6 +134,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 					}
 				});
 				_spinnerLineWidth.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeProperty();
@@ -173,6 +175,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 					}
 				});
 				_spinnerBorderWidth.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeProperty();
@@ -228,6 +231,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
@@ -259,7 +263,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 
 		super.performDefaults();
 
-		// display info for the selected paint method 
+		// display info for the selected paint method
 		setUIPaintMethodInfo(_prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
 
 		// this do not work, I have no idea why, but with the apply button it works :-(
@@ -291,8 +295,21 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 
 			if (event.getSource() == _editorTourPaintMethod) {
 
-				// display info for the selected paint method 
-				setUIPaintMethodInfo((String) event.getNewValue());
+				// display info for the selected paint method
+				final String newValue = (String) event.getNewValue();
+				final String oldValue = (String) event.getOldValue();
+
+				if (oldValue.equals(TOUR_PAINT_METHOD_SIMPLE)
+						&& newValue.equals(TOUR_PAINT_METHOD_COMPLEX)
+						&& net.tourbook.util.UI.IS_OSX) {
+
+					MessageDialog.openWarning(
+							getShell(),
+							Messages.Pref_MapLayout_Dialog_OSX_Warning_Title,
+							Messages.Pref_MapLayout_Dialog_OSX_Warning_Message);
+				}
+
+				setUIPaintMethodInfo(newValue);
 			}
 
 			enableControls(_editorTourWithBorder.getBooleanValue());
@@ -306,7 +323,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 		_spinnerLineWidth.setSelection(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH));
 		_spinnerBorderWidth.setSelection(_prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH));
 
-		// display info for the selected paint method 
+		// display info for the selected paint method
 		setUIPaintMethodInfo(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
 
 		enableControls(_prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER));

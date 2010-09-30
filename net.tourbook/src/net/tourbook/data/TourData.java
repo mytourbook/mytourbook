@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+ 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -1025,6 +1026,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_tourWorldPosition.clear();
 	}
 
+	@Override
 	public int compareTo(final Object obj) {
 
 		if (obj instanceof TourData) {
@@ -1340,7 +1342,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes and sets the altitude up/down values into {@link TourData}
-	 * 
+	 *
 	 * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
 	 */
 	public boolean computeAltitudeUpDown() {
@@ -1368,7 +1370,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * compute altitude up/down since version 9.08
-	 * 
+	 *
 	 * @param segmentSerie
 	 *            segments are created for each gradient alternation when segmentSerie is not
 	 *            <code>null</code>
@@ -1841,7 +1843,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the imperial speed data serie and max speed
-	 * 
+	 *
 	 * @return
 	 */
 	private void computeSpeedSerieFromDevice() {
@@ -1871,7 +1873,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the speed data serie with the internal algorithm for a fix time interval
-	 * 
+	 *
 	 * @return
 	 */
 	private void computeSpeedSerieInternalWithFixedInterval() {
@@ -2213,6 +2215,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 
+			@Override
 			public void run() {
 
 				int serieIndex = 0;
@@ -2267,7 +2270,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
 	 * transfered
-	 * 
+	 *
 	 * @param isCreateMarker
 	 *            creates markers when <code>true</code>
 	 */
@@ -2755,7 +2758,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
-	 * 
+	 *
 	 * @param uniqueKey
 	 *            unique key to identify a tour
 	 * @return
@@ -2811,7 +2814,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Create a device marker at the current position
-	 * 
+	 *
 	 * @param timeData
 	 * @param timeIndex
 	 * @param recordingTime
@@ -2841,7 +2844,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Create the tour segment list from the segment index array
-	 * 
+	 *
 	 * @return
 	 */
 	public Object[] createTourSegments() {
@@ -3219,7 +3222,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the time between start index and end index when the speed is <code>0</code>
-	 * 
+	 *
 	 * @param startIndex
 	 * @param endIndex
 	 * @return Returns the break time in seconds
@@ -3253,7 +3256,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
-	 * 
+	 *
 	 * @param distanceValues
 	 * @param indexLeft
 	 * @param indexRight
@@ -3906,6 +3909,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
 
 		Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
+			@Override
 			public int compare(final TourMarker marker1, final TourMarker marker2) {
 				return marker1.getSerieIndex() - marker2.getSerieIndex();
 			}
@@ -4316,6 +4320,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;
+	}
+
+	public boolean replaceAltitudeWithSRTM() {
+		// TODO Auto-generated method stub
+
+		if (getSRTMSerie() == null) {
+			return false;
+		}
+
+		altitudeSerie = Arrays.copyOf(srtmSerie, srtmSerie.length);
+		altitudeSerieImperial = Arrays.copyOf(srtmSerieImperial, srtmSerieImperial.length);
+
+		// adjust computed altitude values
+		computeAltitudeUpDown();
+		computeMaxAltitude();
+
+		return true;
 	}
 
 	/**

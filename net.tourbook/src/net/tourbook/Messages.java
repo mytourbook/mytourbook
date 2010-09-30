@@ -579,6 +579,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
+	public static String	Pref_MapLayout_Dialog_OSX_Warning_Message;
+
+	public static String	Pref_MapLayout_Dialog_OSX_Warning_Title;
+ 
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
 
 	public static String		Pref_MapLayout_Label_TourPaintMethod;
@@ -1048,11 +1052,17 @@ public class Messages extends NLS {
 
 	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String		TourEditor_Action_DeleteDistanceValues;
+	public static String	TourEditor_Action_SetAltitudeValuesFromSRTM;
+
 	public static String		TourEditor_Action_SetStartDistanceTo0;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
+
+	public static String	TourEditor_Dialog_SetAltitudeFromSRTM_Message;
+
+	public static String	TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String		UI_Label_no_chart_is_selected;
 

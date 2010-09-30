@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -58,7 +58,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 																		.getDialogSettingsSection(ID);
 
 	private int						_textWidth;
-	private int						_textLengthInChar			= Util.getStateInt(
+	private final int						_textLengthInChar			= Util.getStateInt(
 																		_state,
 																		STATE_TEXT_LENGTH_IN_CHAR,
 																		18);
@@ -71,7 +71,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private MouseWheelListener		mouseWheelListener;
 	private MouseListener			mouseListener;
 	private MouseTrackListener		mouseTrackListener;
-
+ 
 	private boolean					_isUpdating;
 
 	private Menu					_contextMenu;
@@ -85,17 +85,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 				_contextMenu.setVisible(false);
 				_lnkFilterText.setFocus();
-
-//				if (isNewFilter && _isContextMenuVisible) {
-//
-//					// reopen context menu with newly selected filter
-//					/*
-//					 * 	THIS IS NOT WORKING THE CONTEXT MENU STAYS ALWAYS OPEN
-//					 */
-//					_contextMenu.setVisible(false);
-//					_isContextMenuVisible = false;
-//					UI.openControlMenu(_lblFilterIcon);
-//				}
 			}
 		};
 
@@ -184,6 +173,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		_lblFilterIcon.addMouseListener(mouseListener);
 		_lblFilterIcon.addMouseTrackListener(mouseTrackListener);
+		_lblFilterIcon.addMouseWheelListener(mouseWheelListener);
 	}
 
 	private void createUI20FilterText(final Composite parent) {
@@ -197,6 +187,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		_lnkFilterText.addMouseListener(mouseListener);
 		_lnkFilterText.addMouseTrackListener(mouseTrackListener);
+		_lnkFilterText.addMouseWheelListener(mouseWheelListener);
 
 		_lnkFilterText.addSelectionListener(new SelectionAdapter() {
 			@Override

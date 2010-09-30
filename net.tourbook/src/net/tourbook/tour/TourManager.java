@@ -158,6 +158,7 @@ public class TourManager {
 		final IPreferenceStore prefStore = net.tourbook.util.Activator.getDefault().getPreferenceStore();
 
 		prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (event.getProperty().equals(IExternalTourEvents.CLEAR_TOURDATA_CACHE)) {
@@ -165,6 +166,7 @@ public class TourManager {
 					clearTourDataCache();
 
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 
 							// fire modify event
@@ -175,7 +177,7 @@ public class TourManager {
 			}
 		});
 	}
-
+ 
 	/**
 	 * Compares two {@link TourData}
 	 *
@@ -252,6 +254,7 @@ public class TourManager {
 		final boolean[] retValue = { false };
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				for (final TourData tourData : tourDataList) {
@@ -952,6 +955,7 @@ public class TourManager {
 		final boolean[] doFireChangeEvent = { false };
 
 		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				int saveCounter = 0;
@@ -1060,6 +1064,37 @@ public class TourManager {
 		}
 
 		return savedTours;
+	}
+
+	public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
+
+		if (tourDataList == null || tourDataList.size() == 0) {
+			return false;
+		}
+
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Title,
+				Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Message) == false) {
+			return false;
+		}
+
+		final boolean[] retValue = { false };
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
+			public void run() {
+
+				for (final TourData tourData : tourDataList) {
+
+					final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+
+					retValue[0] = retValue[0] || isReplaced;
+				}
+			}
+		});
+
+		return retValue[0];
 	}
 
 	/**
@@ -1934,16 +1969,6 @@ public class TourManager {
 		return chartDataModel;
 	}
 
-	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-
-		} else {
-			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
-		}
-	}
-
 //	/**
 //	 * @param tourData
 //	 * @param useNormalizedData
@@ -1962,6 +1987,16 @@ public class TourManager {
 //			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
 //		}
 //	}
+
+	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
+
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
+
+		} else {
+			return new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+		}
+	}
 
 	private ChartDataYSerie createChartDataSerie(final int[][] dataSerie, final int chartType) {
 
@@ -2216,7 +2251,7 @@ public class TourManager {
 
 	/**
 	 * Do custom actions when a tour in a table/tree/chart is double clicked
-	 * 
+	 *
 	 * @param tourProvider
 	 * @param tourDoubleClickState
 	 */

@@ -622,16 +622,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (_tourData == null) {
 				return new Object[0];
 			} else {
 				return _tourData.getTourMarkers().toArray();
-			}
+	 		}
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -949,12 +952,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		public SliceViewerContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			return _sliceViewerItems;
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
@@ -1010,8 +1016,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		private void createUI(final Composite parent) {
 
-			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(4);
-			final int spinnerWidth = _pc.convertWidthInCharsToPixels(3);
+			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(net.tourbook.util.UI.IS_OSX ? 8 : 4);
+			final int spinnerWidth = _pc.convertWidthInCharsToPixels(net.tourbook.util.UI.IS_OSX ? 6 : 3);
 
 			_pageBook = new PageBook(parent, SWT.NONE);
 
@@ -1650,14 +1656,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// set the part listener
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 					_postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 
@@ -1666,28 +1675,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 					_isPartVisible = false;
 				}
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 					TourManager.setTourDataEditor(TourDataEditorView.this);
 				}
 			}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 
 					_isPartVisible = true;
 
 					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							updateUIFromModelRunnable();
 						}
@@ -1703,6 +1718,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (_tourData == null) {
@@ -1772,6 +1788,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourDataEditorView.this) {
@@ -1787,6 +1804,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if ((_tourData == null) || (part == TourDataEditorView.this)) {
@@ -1864,6 +1882,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void addTourSaveListener() {
 
 		_tourSaveListener = new ITourSaveListener() {
+			@Override
 			public boolean saveTour() {
 
 				boolean isTourSaved;
@@ -2006,6 +2025,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void createFieldListener() {
 
 		_modifyListener = new ModifyListener() {
+			@Override
 			public void modifyText(final ModifyEvent e) {
 
 				if (_isSetField || _isSavingInProgress) {
@@ -2017,6 +2037,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		};
 
 		_mouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
 				if (_isSetField || _isSavingInProgress) {
@@ -2082,6 +2103,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_verifyFloatValue = new ModifyListener() {
 
+			@Override
 			public void modifyText(final ModifyEvent event) {
 
 				if (_isSetField || _isSavingInProgress) {
@@ -2136,6 +2158,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_verifyIntValue = new ModifyListener() {
 
+			@Override
 			public void modifyText(final ModifyEvent event) {
 
 				if (_isSetField || _isSavingInProgress) {
@@ -2232,12 +2255,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		createMarkerViewerContextMenu(table);
 
 		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onMarkerViewerSelectionChanged();
 			}
 		});
 
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (_isEditMode == false) {
@@ -2278,6 +2303,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillMarkerContextMenu(manager);
 			}
@@ -2302,6 +2328,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				// set menu items
@@ -2323,6 +2350,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				final boolean isTagInTour = _tourData.getTourTags().size() > 0;
@@ -2485,6 +2513,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sliceViewer.setUseHashlookup(true);
 
 		_sliceViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
@@ -2494,6 +2523,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 
 		_sliceViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (_isEditMode == false) {
@@ -2534,6 +2564,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillSliceContextMenu(manager);
 			}
@@ -2712,10 +2743,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtTourDistance.addModifyListener(_verifyFloatValue);
 			_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
 			_txtTourDistance.addKeyListener(new KeyListener() {
+				@Override
 				public void keyPressed(final KeyEvent e) {
 					_isDistManuallyModified = true;
 				}
 
+				@Override
 				public void keyReleased(final KeyEvent e) {}
 			});
 
@@ -2732,10 +2765,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtAltitudeUp.addModifyListener(_verifyIntValue);
 			_txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
 			_txtAltitudeUp.addKeyListener(new KeyListener() {
+				@Override
 				public void keyPressed(final KeyEvent e) {
 					_isAltitudeManuallyModified = true;
 				}
 
+				@Override
 				public void keyReleased(final KeyEvent e) {}
 			});
 
@@ -2752,10 +2787,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_txtAltitudeDown.addModifyListener(_verifyIntValue);
 			_txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
 			_txtAltitudeDown.addKeyListener(new KeyListener() {
+				@Override
 				public void keyPressed(final KeyEvent e) {
 					_isAltitudeManuallyModified = true;
 				}
 
+				@Override
 				public void keyReleased(final KeyEvent e) {}
 			});
 
@@ -2934,6 +2971,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindSpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
 			_spinWindSpeedValue.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isSetField || _isSavingInProgress) {
 						return;
@@ -2953,6 +2991,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 			_spinWindSpeedValue.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isSetField || _isSavingInProgress) {
@@ -3038,6 +3077,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinWindDirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
 			_spinWindDirectionValue.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isSetField || _isSavingInProgress) {
 						return;
@@ -3057,6 +3097,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 			_spinWindDirectionValue.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isSetField || _isSavingInProgress) {
@@ -3110,6 +3151,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.setMaximum(150);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isSetField || _isSavingInProgress) {
 						return;
@@ -3129,6 +3171,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isSetField || _isSavingInProgress) {
@@ -3951,6 +3994,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (_tourData == null) {
 
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					/*
@@ -4035,8 +4079,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * saving is done in the {@link #promptToSaveOnClose()} method
 	 */
+	@Override
 	public void doSave(final IProgressMonitor monitor) {}
 
+	@Override
 	public void doSaveAs() {}
 
 	private void enableActions() {
@@ -4426,6 +4472,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sliderSelection;
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 
 		final CTabItem selectedTab = _tabFolder.getSelection();
@@ -4572,6 +4619,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return newViewerItems;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		if (_tourData == null) {
@@ -4640,6 +4688,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return TourManager.getTourTitle(_tourData);
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 
 		final CTabItem selectedTab = _tabFolder.getSelection();
@@ -4684,6 +4733,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @return Returns <code>true</code> when the data have been modified and not saved, returns
 	 *         <code>false</code> when tour is not modified or {@link TourData} is <code>null</code>
 	 */
+	@Override
 	public boolean isDirty() {
 
 		if (_tourData == null) {
@@ -4752,10 +4802,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return true;
 	}
 
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
+	@Override
 	public boolean isSaveOnCloseNeeded() {
 		return isDirty();
 	}
@@ -5176,6 +5228,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// run asynch because relaodViewer is also running asynch
 				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						selectTimeSlice(_sliceViewerXSliderPosition);
 						_sliceViewer.getTable().setFocus();
@@ -5252,6 +5305,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * shutdown
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
+	@Override
 	public int promptToSaveOnClose() {
 
 		int returnCode;
@@ -5290,6 +5344,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_markerViewer = (TableViewer) recreateViewer(_markerViewer);
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		final ColumnViewer[] newColumnViewer = new ColumnViewer[1];
@@ -5355,6 +5410,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				newColumnViewer[0] = _sliceViewer;
 			}
 
+			@Override
 			public void run() {
 
 				if (columnViewer == _sliceViewer) {
@@ -5396,6 +5452,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * reload the content of the viewer
 	 */
+	@Override
 	public void reloadViewer() {
 
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -5436,6 +5493,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							|| (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
 
 						BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+							@Override
 							public void run() {
 								_sliceViewerItems = getSliceViewerItems();
 								_sliceViewer.setInput(_sliceViewerItems);
@@ -5451,6 +5509,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				table.setRedraw(true);
 			}
 
+			@Override
 			public void run() {
 
 				final CTabItem selectedTab = _tabFolder.getSelection();
@@ -5922,6 +5981,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// sort reference tours by start index
 		Collections.sort(refTourList, new Comparator<TourReference>() {
+			@Override
 			public int compare(final TourReference refTour1, final TourReference refTour2) {
 				return refTour1.getStartValueIndex() - refTour2.getStartValueIndex();
 			}
@@ -6077,6 +6137,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final int	__runnableCounter	= _uiUpdateCounter;
 
+			@Override
 			public void run() {
 
 				/*
@@ -6516,6 +6577,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final int	runnableCounter	= _uiUpdateTitleCounter;
 
+			@Override
 			public void run() {
 
 				if (_pageEditorForm.isDisposed()) {

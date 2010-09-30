@@ -63,6 +63,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -74,7 +75,7 @@ import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
-
+ 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -148,12 +149,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private TVITourBookRoot								_rootItem;
 
-	private NumberFormat								_nf									= NumberFormat
+	private final NumberFormat								_nf									= NumberFormat
 																									.getNumberInstance();
 
-	private Calendar									_calendar							= GregorianCalendar
+	private final Calendar									_calendar							= GregorianCalendar
 																									.getInstance();
-	private DateFormat									_timeFormatter						= DateFormat
+	private final DateFormat									_timeFormatter						= DateFormat
 																									.getTimeInstance(DateFormat.SHORT);
 
 	private static final String[]						_weekDays							= DateFormatSymbols
@@ -162,7 +163,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private int											_selectedYear						= -1;
 	private int											_selectedMonth						= -1;
-	private ArrayList<Long>								_selectedTourIds					= new ArrayList<Long>();
+	private final ArrayList<Long>								_selectedTourIds					= new ArrayList<Long>();
 
 	private boolean										_isRecTimeFormat_hhmmss;
 	private boolean										_isDriveTimeFormat_hhmmss;
@@ -173,7 +174,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
 
-	private TourDoubleClickState						_tourDoubleClickState				= new TourDoubleClickState();
+	private final TourDoubleClickState						_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
 	 * UI controls
@@ -195,6 +196,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionMergeTour								_actionMergeTour;
 	private ActionJoinTours								_actionJoinTours;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
+	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
 
 	private ActionSetTourTypeMenu						_actionSetTourType;
 	private ActionSetTourTag							_actionAddTag;
@@ -212,6 +214,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private static class ItemComparer implements IElementComparer {
 
+		@Override
 		public boolean equals(final Object a, final Object b) {
 
 			if (a == b) {
@@ -242,6 +245,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			return false;
 		}
 
+		@Override
 		public int hashCode(final Object element) {
 			return 0;
 		}
@@ -249,24 +253,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -281,24 +291,32 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBookView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -307,6 +325,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -368,6 +387,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		// this view part is a selection listener
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
@@ -383,6 +403,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void addTourEventListener() {
 
 		_tourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
@@ -415,6 +436,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionJoinTours = new ActionJoinTours(this);
 		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
+		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -448,6 +470,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -511,6 +534,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_tourViewer.setUseHashlookup(true);
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectTreeItem(event);
 			}
@@ -518,6 +542,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
@@ -1603,6 +1628,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
+		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -1702,6 +1728,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionJoinTours);
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+		menuMgr.add(_actionSetAltitudeFromSRTM);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
@@ -1741,6 +1768,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 //		return Platform.getAdapterManager().getAdapter(this, adapter);
 //	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -1772,6 +1800,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -1833,6 +1862,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		if (tourIds.size() > 1) {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				@Override
 				public void run() {
 					getSelectedTourData(selectedTourData, tourIds.keySet());
 				}
@@ -1844,6 +1874,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return selectedTourData;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _tourViewer;
 	}
@@ -1961,6 +1992,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
@@ -1983,6 +2015,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _tourViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 
 		final Tree tree = _tourViewer.getTree();
