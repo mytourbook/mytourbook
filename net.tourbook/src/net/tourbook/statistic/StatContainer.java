@@ -64,13 +64,16 @@ import org.eclipse.ui.part.PageBook;
 
 public class StatContainer extends Composite {
 
+	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean						_isLinux					= net.tourbook.util.UI.IS_LINUX;
+
 	private static final String					MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
 	private static final String					MEMENTO_SELECTED_YEAR		= "statistic.container.selected-year";		//$NON-NLS-1$
 	private static final String					MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
-
+ 
 	private static ArrayList<TourbookStatistic>	_statisticExtensionPoints;
 
-	private final Calendar							_calendar					= GregorianCalendar.getInstance();
+	private final Calendar						_calendar					= GregorianCalendar.getInstance();
 
 	private int									_selectedYear				= -1;
 
@@ -91,7 +94,7 @@ public class StatContainer extends Composite {
 	private ActionSynchChartScale				_actionSynchChartScale;
 	private boolean								_isSynchScaleEnabled;
 
-	private final IPostSelectionProvider				_postSelectionProvider;
+	private final IPostSelectionProvider		_postSelectionProvider;
 
 	/*
 	 * UI controls
@@ -105,7 +108,7 @@ public class StatContainer extends Composite {
 	private ToolBarManager						_tbm;
 	private ToolBar								_toolBar;
 
-	private final IViewSite							_viewSite;
+	private final IViewSite						_viewSite;
 
 	StatContainer(	final Composite parent,
 					final IViewSite viewSite,
@@ -274,24 +277,16 @@ public class StatContainer extends Composite {
 
 		final PixelConverter pc = new PixelConverter(this);
 
-		/**
-		 * OSX works best without HINT
-		 */
-		final int yearComboWidth = net.tourbook.util.UI.IS_LINUX //
-				? pc.convertWidthInCharsToPixels(12)
-				: pc.convertWidthInCharsToPixels(5);
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
-		{ 
+		{
 			/*
 			 * combo: year
 			 */
 			_cboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
-					// hint is working differently on platforms
-//					.hint(yearComboWidth, SWT.DEFAULT)
+					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 					.applyTo(_cboYear);
 			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
 			_cboYear.setVisibleItemCount(50);
@@ -316,6 +311,7 @@ public class StatContainer extends Composite {
 			_cboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.indent(2, 0)
+					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
 					.applyTo(_cboNumberOfYears);
 			_cboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
 			_cboNumberOfYears.setVisibleItemCount(20);

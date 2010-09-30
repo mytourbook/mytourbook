@@ -212,6 +212,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 																						.getDefault()
 																						.getDialogSettingsSection(//
 																								ID + ".marker");			//$NON-NLS-1$
+
+	private final boolean						_isOSX							= net.tourbook.util.UI.IS_OSX;
+
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
@@ -223,7 +226,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
 	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
-
+ 
 	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";			//$NON-NLS-1$
 
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
@@ -335,7 +338,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * this width is used as a hint for the width of the description field, this value also
 	 * influences the width of the columns in this editor
 	 */
-	private final int							_textColumnWidth				= 150;
+	private final int							_hintTextColumnWidth			= _isOSX ? 300 : 150;
+	private int									_hintDefaultSpinnerWidth;
 
 	/**
 	 * is <code>true</code> when {@link #_tourChart} contains reference tours
@@ -415,7 +419,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private float								_unitValueAltitude;
 	private float								_unitValueTemperature;
 	private int[]								_unitValueWindSpeed;
-	private int									_defaultSpinnerWidth;
 
 	// pages
 	private PageBook							_pageBook;
@@ -631,7 +634,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				return new Object[0];
 			} else {
 				return _tourData.getTourMarkers().toArray();
-	 		}
+			}
 		}
 
 		@Override
@@ -1016,8 +1019,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		private void createUI(final Composite parent) {
 
-			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(net.tourbook.util.UI.IS_OSX ? 8 : 4);
-			final int spinnerWidth = _pc.convertWidthInCharsToPixels(net.tourbook.util.UI.IS_OSX ? 6 : 3);
+			final int spinnerWidthHour = _pc.convertWidthInCharsToPixels(_isOSX ? 8 : 4);
+			final int spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 6 : 3);
 
 			_pageBook = new PageBook(parent, SWT.NONE);
 
@@ -2576,7 +2579,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void createUI(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		_defaultSpinnerWidth = pixelConverter.convertWidthInCharsToPixels(5);
+		_hintDefaultSpinnerWidth = pixelConverter.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -2667,7 +2670,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_textColumnWidth, _pc.convertHeightInCharsToPixels(descLines))
+					.hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(descLines))
 					.applyTo(_txtDescription);
 
 			_txtDescription.addModifyListener(_modifyListener);
@@ -2883,7 +2886,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// spinner
 			_spinRestPuls = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinRestPuls);
 			_spinRestPuls.setMinimum(0);
@@ -2963,7 +2966,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// spinner
 			_spinWindSpeedValue = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinWindSpeedValue);
 			_spinWindSpeedValue.setMinimum(0);
@@ -3027,6 +3030,50 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
+			/**
+			 * this is not working correctly, the combo item is modified but an selection change
+			 * event is not fired -> no updates are done :-((
+			 */
+//			_comboWindSpeedText.addMouseWheelListener(new MouseWheelListener() {
+//				@Override
+//				public void mouseScrolled(final MouseEvent event) {
+//
+//					final Combo combo = (Combo) event.widget;
+//					final int itemCount = combo.getItemCount();
+//
+//					if (itemCount == 0) {
+//						return;
+//					}
+//
+//					// items are available
+//
+//					int selectedIndex = combo.getSelectionIndex();
+//
+//					// check if items are selected
+//					if (selectedIndex == -1) {
+//						// select first item
+//						combo.select(0);
+//						return;
+//					}
+//
+//					if (event.count < 0) {
+//
+//						// select next item
+//
+//						if (selectedIndex < itemCount - 1) {
+//							combo.select(++selectedIndex);
+//						}
+//					} else {
+//
+//						// select previous item
+//
+//						if (selectedIndex > 0) {
+//							combo.select(--selectedIndex);
+//						}
+//					}
+//				}
+//			});
+
 			// fill combobox
 			for (final String speedText : IWeather.windSpeedText) {
 				_comboWindSpeedText.add(speedText);
@@ -3046,7 +3093,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.adapt(_comboWindDirectionText, true, false);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_comboWindDirectionText);
 			_comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
 			_comboWindDirectionText.setVisibleItemCount(10);
@@ -3068,7 +3115,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// spinner: wind direction value
 			_spinWindDirectionValue = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinWindDirectionValue);
@@ -3142,7 +3189,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinTemperature);
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
@@ -3260,7 +3307,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					// hint is necessary that the width is not expanded when the text is long
-					.hint(_textColumnWidth, SWT.DEFAULT)
+					.hint(_hintTextColumnWidth, SWT.DEFAULT)
 					.span(3, 1)
 					.applyTo(_lblTourTags);
 

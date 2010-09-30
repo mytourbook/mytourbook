@@ -71,7 +71,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private MouseWheelListener		mouseWheelListener;
 	private MouseListener			mouseListener;
 	private MouseTrackListener		mouseTrackListener;
- 
+
 	private boolean					_isUpdating;
 
 	private Menu					_contextMenu;
@@ -262,7 +262,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		if (_isUpdating) {
 			return;
 		}
-
+ 
 		_isUpdating = true;
 		{
 			final String filterName = ttFilter.getFilterName();
@@ -291,10 +291,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 							final TourType ttFilterFromSet = (TourType) ttItem;
 
 							if (counter == 0) {
-								sb.append("\t");
-							} else if (counter > 0) {
-								sb.append("\n\t\t\t");
+								sb.append("\n");
 							}
+
+							sb.append("\n\t\t\t");
 							sb.append(ttFilterFromSet.getName());
 
 							counter++;

@@ -1,20 +1,20 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
-
+ 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,7 +137,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 * 
+	 *
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -156,7 +156,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
-	 * 
+	 *
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -218,7 +218,7 @@ public class Util {
 	 * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
 	 * <p>
 	 * javascript source location: http://www.movable-type.co.uk/scripts/latlong-vincenty.html
-	 * 
+	 *
 	 * @param {Number} lat1, lon1: first point in decimal degrees
 	 * @param {Number} lat2, lon2: second point in decimal degrees
 	 * @returns (Number} distance in metres between points
@@ -471,7 +471,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 * 
+	 *
 	 * @param cal
 	 * @return
 	 */
@@ -494,7 +494,7 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -525,7 +525,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 * 
+	 *
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -548,7 +548,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array
-	 * 
+	 *
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -583,7 +583,7 @@ public class Util {
 
 	/**
 	 * Open view and activate it
-	 * 
+	 *
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException

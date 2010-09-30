@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -60,12 +60,14 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
+	private final boolean				_isOSX							= net.tourbook.util.UI.IS_OSX;
+
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat		_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private final TourData				_tourData;
-
+ 
 	private final IDialogSettings		_state;
 	private PixelConverter				_pc;
 
@@ -91,7 +93,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private final ArrayList<Control>	_firstColumnContainerControls	= new ArrayList<Control>();
 	private final ArrayList<Control>	_secondColumnControls			= new ArrayList<Control>();
 
-	private int							_defaultSpinnerWidth;
+	private int							_hintDefaultSpinnerWidth;
 
 	private boolean						_isUpdateUI						= false;
 	private boolean						_isTemperatureManuallyModified	= false;
@@ -110,6 +112,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private MouseWheelListener			_mouseWheelListener;
 	{
 		_mouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
 			}
@@ -230,7 +233,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-		_defaultSpinnerWidth = _pc.convertWidthInCharsToPixels(5);
+		_hintDefaultSpinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
@@ -347,7 +350,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// spinner
 			_spinRestPuls = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinRestPuls);
 			_spinRestPuls.setMinimum(0);
@@ -424,7 +427,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// spinner
 			_spinWindSpeedValue = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinWindSpeedValue);
 			_spinWindSpeedValue.setMinimum(0);
@@ -432,6 +435,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindSpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
 			_spinWindSpeedValue.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isUpdateUI) {
 						return;
@@ -449,6 +453,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				}
 			});
 			_spinWindSpeedValue.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isUpdateUI) {
@@ -501,7 +506,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_tk.adapt(_comboWindDirectionText, true, false);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_comboWindDirectionText);
 			_comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
 			_comboWindDirectionText.setVisibleItemCount(10);
@@ -515,7 +520,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					onSelectWindDirectionText();
 				}
 			});
-			
+
 			// fill combobox
 			for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
 				_comboWindDirectionText.add(fComboCloudsUIValue);
@@ -527,7 +532,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// spinner: wind direction value
 			_spinWindDirectionValue = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinWindDirectionValue);
@@ -536,6 +541,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinWindDirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
 			_spinWindDirectionValue.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isUpdateUI) {
 						return;
@@ -553,6 +559,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				}
 			});
 			_spinWindDirectionValue.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isUpdateUI) {
@@ -591,7 +598,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinTemperature);
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
@@ -600,6 +607,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature.setMaximum(150);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isUpdateUI) {
 						return;
@@ -617,6 +625,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				}
 			});
 			_spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					if (_isUpdateUI) {
@@ -830,9 +839,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 		if (_isWindSpeedManuallyModified) {
 			/*
-			 * update the speed only when it was modified because when the measurement is
-			 * changed when the tour is being modified then the computation of the speed
-			 * value can cause rounding errors
+			 * update the speed only when it was modified because when the measurement is changed
+			 * when the tour is being modified then the computation of the speed value can cause
+			 * rounding errors
 			 */
 			_tourData.setWeatherWindSpeed((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
 		}

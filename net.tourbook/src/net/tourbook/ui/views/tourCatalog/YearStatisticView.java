@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -74,12 +74,15 @@ public class YearStatisticView extends ViewPart {
 
 	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
 
+	private final boolean						_isOSX						= net.tourbook.util.UI.IS_OSX;
+	private final boolean						_isLinux					= net.tourbook.util.UI.IS_LINUX;
+
 	static final String							STATE_NUMBER_OF_YEARS		= "numberOfYearsToDisplay";							//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 	private final IDialogSettings				_state						= TourbookPlugin.getDefault() //
-																					.getDialogSettingsSection(
+		 																			.getDialogSettingsSection(
 																							"TourCatalogViewYearStatistic");		//$NON-NLS-1$
 
 	private IPropertyChangeListener				_prefChangeListener;
@@ -100,7 +103,7 @@ public class YearStatisticView extends ViewPart {
 	private int[]								_numberOfDaysInYear;
 
 	/**
- 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
+	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
 	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<TVICatalogComparedTour>();
 
@@ -396,9 +399,6 @@ public class YearStatisticView extends ViewPart {
 	private void createUI12Toolbar(final Composite parent) {
 
 		final PixelConverter pc = new PixelConverter(parent);
-		final int yearComboWidth = net.tourbook.util.UI.IS_LINUX //
-				? pc.convertWidthInCharsToPixels(12)
-				: pc.convertWidthInCharsToPixels(5);
 
 		_toolbar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_toolbar);
@@ -414,8 +414,7 @@ public class YearStatisticView extends ViewPart {
 			 */
 			_cboLastYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
-// hint is working differently on platforms
-					.hint(yearComboWidth, SWT.DEFAULT)
+					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 					.applyTo(_cboLastYear);
 			_cboLastYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
 			_cboLastYear.setVisibleItemCount(50);
@@ -441,6 +440,7 @@ public class YearStatisticView extends ViewPart {
 			_cboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.indent(2, 0)
+					.hint(pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
 					.applyTo(_cboNumberOfYears);
 			_cboNumberOfYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
 			_cboNumberOfYears.setVisibleItemCount(50);
@@ -645,7 +645,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * Update statistic by setting number of years
-	 * 
+	 *
 	 * @param numberOfYears
 	 */
 	private void onSelectNumberOfYears(final int numberOfYears) {
@@ -698,7 +698,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * select the tour in the year map chart
-	 * 
+	 *
 	 * @param selectedTourId
 	 *            tour id which should be selected
 	 */
@@ -761,7 +761,7 @@ public class YearStatisticView extends ViewPart {
 
 	/**
 	 * show statistic for several years
-	 * 
+	 *
 	 * @param isShowLatestYear
 	 *            shows the latest year and the years before
 	 */
