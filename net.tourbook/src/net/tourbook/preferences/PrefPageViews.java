@@ -102,7 +102,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 					_doubleClickActions,
 					group));
 
-			/**
+			/*
 			 * modifier key's do not work correctly in a tree or table
 			 */
 //			/*

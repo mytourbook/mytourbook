@@ -318,7 +318,7 @@ public class TourTypeFilter {
 	public void setName(final String filterName) {
 		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
-			// not supported
+			_systemFilterName = filterName;
 			break;
 
 		case FILTER_TYPE_DB:
@@ -345,14 +345,14 @@ public class TourTypeFilter {
 
 	@Override
 	public String toString() {
-		return "TourTypeFilter ["
-				+ ("name=" + getFilterName())
-				+ (", filterType=" + _filterType)
-				+ (", tourType=" + _tourType)
-				+ (", tourTypeSet=" + _tourTypeSet)
-				+ (", systemFilterName=" + _systemFilterName)
-				+ (", systemFilterId=" + _systemFilterId)
-				+ "]";
+		return "TourTypeFilter [" //$NON-NLS-1$
+				+ ("name=" + getFilterName()) //$NON-NLS-1$
+				+ (", filterType=" + _filterType) //$NON-NLS-1$
+				+ (", tourType=" + _tourType) //$NON-NLS-1$
+				+ (", tourTypeSet=" + _tourTypeSet) //$NON-NLS-1$
+				+ (", systemFilterName=" + _systemFilterName) //$NON-NLS-1$
+				+ (", systemFilterId=" + _systemFilterId) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

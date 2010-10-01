@@ -203,8 +203,17 @@ public class TourTypeFilterManager {
 			ttFilterAction.setChecked(isChecked);
 			ttFilterAction.setEnabled(isChecked == false);
 
-			final String filterName = (isChecked ? "\u25cf   " : "     ") + ttFilterAction.__ttFilter.getFilterName();
+//			final String filterName = (isChecked ? "\u25cf   " : "     ") + ttFilterAction.__ttFilter.getFilterName(); //$NON-NLS-1$ //$NON-NLS-2$
 //			final String filterName = (isChecked ? "" : "    ") + ttFilterAction.__ttFilter.getFilterName();
+
+			String filterName;
+
+			if (isChecked) {
+				filterName = ">>> " + ttFilterAction.__ttFilter.getFilterName() + " <<<";//$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				filterName = ttFilterAction.__ttFilter.getFilterName();
+			}
+
 			ttFilterAction.setText(filterName);
 
 			// disabled filter image is hidden because it look ugly on win32
@@ -273,10 +282,19 @@ public class TourTypeFilterManager {
 			if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
 				switch (tourTypeFilter.getSystemFilterId()) {
 				case TourTypeFilter.SYSTEM_FILTER_ID_ALL:
+
 					isSysFilterAll = true;
+
+					// set correct locale string
+					tourTypeFilter.setName(Messages.App_Tour_type_item_all_types);
 					break;
+
 				case TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED:
+
 					isSysFilterNotDefined = true;
+
+					// set correct locale string
+					tourTypeFilter.setName(Messages.App_Tour_type_item_not_defined);
 					break;
 				default:
 					break;
@@ -491,7 +509,6 @@ public class TourTypeFilterManager {
 	public static boolean selectNextFilter(final boolean isNext) {
 
 		int selectedFilterIndex = 0;
-
 
 		// get filter which is currently selected
 		for (final ActionTTFilter filterAction : _ttFilterActions) {

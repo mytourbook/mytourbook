@@ -39,6 +39,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -177,10 +178,10 @@ public class TourManager {
 			}
 		});
 	}
- 
+
 	/**
 	 * Compares two {@link TourData}
-	 *
+	 * 
 	 * @param tourData1
 	 * @param tourData2
 	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
@@ -233,7 +234,7 @@ public class TourManager {
 
 	/**
 	 * Computes distance values from geo position
-	 *
+	 * 
 	 * @param tourDataList
 	 * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
 	 *         updated but not yet saved.
@@ -335,7 +336,7 @@ public class TourManager {
 
 	/**
 	 * create the tour chart configuration by reading the settings from the preferences
-	 *
+	 * 
 	 * @return
 	 */
 	public static TourChartConfiguration createTourChartConfiguration() {
@@ -405,7 +406,7 @@ public class TourManager {
 
 	/**
 	 * Searches all tour providers in the workbench and returns tours which are selected
-	 *
+	 * 
 	 * @return Returns tour id's or <code>null</code> when tours are not found
 	 */
 	public static ArrayList<TourData> getSelectedTours() {
@@ -577,7 +578,7 @@ public class TourManager {
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
 	 * modified. A message dialog informs the user about the modified tour and the requested actions
 	 * cannot be done.
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
 	public static boolean isTourEditorModified() {
@@ -640,7 +641,7 @@ public class TourManager {
 
 	/**
 	 * Remove time slices from {@link TourData}
-	 *
+	 * 
 	 * @param tourData
 	 * @param firstIndex
 	 * @param lastIndex
@@ -821,7 +822,7 @@ public class TourManager {
 	/**
 	 * Removes markers which are deleted and updates marker serie index which are positioned after
 	 * the deleted time slices
-	 *
+	 * 
 	 * @param tourData
 	 * @param firstSerieIndex
 	 * @param lastSerieIndex
@@ -889,7 +890,7 @@ public class TourManager {
 	 * tour is not dirty, if the tour is dirty, saving is not done.
 	 * <p>
 	 * The event {@link TourEventId#TOUR_CHANGED} is fired always.
-	 *
+	 * 
 	 * @param tourData
 	 *            modified tour
 	 * @return Returns the persisted {@link TourData}
@@ -925,7 +926,7 @@ public class TourManager {
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
 	 * fired.
-	 *
+	 * 
 	 * @param modifiedTours
 	 *            modified tours
 	 * @return Returns a list with all persisted {@link TourData}
@@ -940,7 +941,7 @@ public class TourManager {
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done.
-	 *
+	 * 
 	 * @param modifiedTours
 	 *            modified tours
 	 * @param canFireNotification
@@ -1099,7 +1100,7 @@ public class TourManager {
 
 	/**
 	 * set the graph colors from the pref store
-	 *
+	 * 
 	 * @param prefStore
 	 * @param yData
 	 * @param graphName
@@ -1130,7 +1131,7 @@ public class TourManager {
 
 	/**
 	 * update the zoom options in the chart configuration from the pref store
-	 *
+	 * 
 	 * @param chartConfig
 	 * @param prefStore
 	 */
@@ -1147,7 +1148,7 @@ public class TourManager {
 
 	/**
 	 * Tour save listeners will be called to save tours before the application is shut down
-	 *
+	 * 
 	 * @param listener
 	 */
 	public void addTourSaveListener(final ITourSaveListener listener) {
@@ -1192,7 +1193,7 @@ public class TourManager {
 
 	/**
 	 * Clip values when a minimum distance is fallen short of
-	 *
+	 * 
 	 * @param tourData
 	 */
 	private void computeValueClipping(final TourData tourData) {
@@ -1508,7 +1509,7 @@ public class TourManager {
 
 	/**
 	 * Creates a chart data fDataModel from the tour data
-	 *
+	 * 
 	 * @param tourData
 	 *            data which contains the tour data
 	 * @param tourChartProperty
@@ -2014,7 +2015,7 @@ public class TourManager {
 	/**
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
 	 * creates always a new instance
-	 *
+	 * 
 	 * @param requestedTourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
@@ -2073,7 +2074,7 @@ public class TourManager {
 
 	/**
 	 * Get a tour from the database and keep it in the cache
-	 *
+	 * 
 	 * @param tourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
@@ -2097,7 +2098,7 @@ public class TourManager {
 
 	/**
 	 * Opens the tour for the given tour id
-	 *
+	 * 
 	 * @param tourId
 	 */
 	public void openTourInEditorArea(final Long tourId) {
@@ -2144,7 +2145,7 @@ public class TourManager {
 	 * <p>
 	 * When the tour is requested next time with {@link #getTourData(Long)}, is will be loaded from
 	 * the database.
-	 *
+	 * 
 	 * @param tourId
 	 */
 	public void removeTourFromCache(final Long tourId) {
@@ -2229,7 +2230,7 @@ public class TourManager {
 
 	/**
 	 * Before the application is shut down, the tour save listeners are called to save unsaved data.
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the tours have been saved or false when it was
 	 *         canceled by the user
 	 */
@@ -2251,15 +2252,28 @@ public class TourManager {
 
 	/**
 	 * Do custom actions when a tour in a table/tree/chart is double clicked
-	 *
+	 * 
 	 * @param tourProvider
 	 * @param tourDoubleClickState
 	 */
 	public void tourDoubleClickAction(final ITourProvider tourProvider, final TourDoubleClickState tourDoubleClickState) {
 
-		final String action = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
+		ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+		if (selectedTours.size() == 0) {
 
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+			if (tourProvider instanceof ITourProviderAll) {
+				final ITourProviderAll allTourProvider = (ITourProviderAll) tourProvider;
+				selectedTours = allTourProvider.getAllSelectedTours();
+
+				if (selectedTours.size() == 0) {
+					return;
+				}
+			} else {
+				return;
+			}
+		}
+
+		final String action = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
 		final TourData firstTour = selectedTours.get(0);
 
 		String actionInfo = null;

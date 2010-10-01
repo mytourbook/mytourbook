@@ -51,6 +51,7 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -179,6 +180,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean							_isToolTipInTime;
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
+
+	private TourDoubleClickState			_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
 	 * resources
@@ -782,6 +785,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				if ((firstElement != null) && (firstElement instanceof TourData)) {
 					TourManager.openTourEditor(true);
+					TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
+
 				}
 			}
 		});
@@ -801,7 +806,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequenze defines the
 	 * default columns
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -1327,7 +1332,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
-	 *
+	 * 
 	 * @param savedTours
 	 *            contains the saved {@link TourData}
 	 */
@@ -1377,7 +1382,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		int selectedTours = 0;
 
 		// contains all tours which are selected and not deleted
-		int selectedValidTours = 0;
+		int selectedNotDeleteTours = 0;
 
 		TourData firstSavedTour = null;
 		TourData firstValidTour = null;
@@ -1398,7 +1403,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						// tour is not deleted, deleted tours are ignored
 
 						unsavedTours++;
-						selectedValidTours++;
+						selectedNotDeleteTours++;
 					}
 
 				} else {
@@ -1408,19 +1413,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					}
 
 					savedTours++;
-					selectedValidTours++;
+					selectedNotDeleteTours++;
 				}
 
-				if (selectedValidTours == 1) {
+				if (selectedNotDeleteTours == 1) {
 					firstValidTour = tourData;
 				}
 			}
 		}
 
 		final boolean isTourSelected = savedTours > 0;
-		final boolean isOneSavedAndValidTour = (selectedValidTours == 1) && (savedTours == 1);
+		final boolean isOneSavedAndNotDeleteTour = (selectedNotDeleteTours == 1) && (savedTours == 1);
 
-		final boolean canMergeIntoTour = selectedValidTours == 1;
+		final boolean isOneSelectedNotDeleteTour = selectedNotDeleteTours == 1;
 
 		// action: save tour with person
 		final TourPerson person = TourbookPlugin.getActivePerson();
@@ -1441,7 +1446,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionSaveTour.setEnabled(unsavedTours > 0);
 
 		// action: merge tour ... into ...
-		if (canMergeIntoTour) {
+		if (isOneSelectedNotDeleteTour) {
 
 			final Calendar calendar = GregorianCalendar.getInstance();
 			calendar.set(
@@ -1464,19 +1469,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			// tour cannot be merged, display default text
 			_actionMergeIntoTour.setText(Messages.import_data_action_assignMergedTour_default);
 		}
-		_actionMergeIntoTour.setEnabled(canMergeIntoTour);
+		_actionMergeIntoTour.setEnabled(isOneSelectedNotDeleteTour);
 
-		_actionMergeTour.setEnabled(isOneSavedAndValidTour && (firstSavedTour.getMergeSourceTourId() != null));
+		_actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
 		_actionReimportTour.setEnabled(selectedTours > 0);
 		_actionRemoveTour.setEnabled(selectedTours > 0);
-		_actionExportTour.setEnabled(selectedValidTours > 0);
-		_actionJoinTours.setEnabled(selectedValidTours > 1);
+		_actionExportTour.setEnabled(selectedNotDeleteTours > 0);
+		_actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
 
-		_actionEditTour.setEnabled(isOneSavedAndValidTour);
-		_actionEditQuick.setEnabled(isOneSavedAndValidTour);
-		_actionOpenTour.setEnabled(isOneSavedAndValidTour);
-		_actionOpenMarkerDialog.setEnabled(isOneSavedAndValidTour);
-		_actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndValidTour);
+		_actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
+		_actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
+		_actionOpenTour.setEnabled(isOneSavedAndNotDeleteTour);
+		_actionOpenMarkerDialog.setEnabled(isOneSavedAndNotDeleteTour);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndNotDeleteTour);
+
+		// set double click state
+		_tourDoubleClickState.canEditTour = isOneSavedAndNotDeleteTour;
+		_tourDoubleClickState.canQuickEditTour = isOneSavedAndNotDeleteTour;
+		_tourDoubleClickState.canEditMarker = isOneSavedAndNotDeleteTour;
+		_tourDoubleClickState.canAdjustAltitude = isOneSavedAndNotDeleteTour;
+		_tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && (tourTypes.size() > 0));
@@ -1513,6 +1525,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_actionRemoveTag.setEnabled(isTourSelected);
 			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
+
 
 		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(isTourSelected, existingTags);
@@ -1787,7 +1800,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * reimport previous imported tours
-	 *
+	 * 
 	 * @param monitor
 	 * @param importedFiles
 	 */

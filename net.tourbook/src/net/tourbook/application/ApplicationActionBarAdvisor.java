@@ -169,13 +169,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final IToolBarManager tbMgrPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbMgrPeople.add(_personContribItem);
 
-		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgrPeople, "people");
+		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgrPeople, "people"); //$NON-NLS-1$
 		coolBar.add(tbItemPeople);
 
 		// ---------------------------------------------------------
 
 		final IToolBarManager tbMgrTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgrTourType, "tourtype");
+		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgrTourType, "tourtype"); //$NON-NLS-1$
 
 		coolBar.add(tbItemTourType);
 		tbMgrTourType.add(_tourTypeContribItem);
@@ -194,7 +194,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 			final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
 					tbMgrSystem,
-					"measurementSystem");
+					"measurementSystem"); //$NON-NLS-1$
 			coolBar.add(tbItemMeasurement);
 		}
 

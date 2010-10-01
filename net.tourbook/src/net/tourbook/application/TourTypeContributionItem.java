@@ -58,7 +58,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 																		.getDialogSettingsSection(ID);
 
 	private int						_textWidth;
-	private final int						_textLengthInChar			= Util.getStateInt(
+	private final int				_textLengthInChar			= Util.getStateInt(
 																		_state,
 																		STATE_TEXT_LENGTH_IN_CHAR,
 																		18);
@@ -78,8 +78,18 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	{
 		mouseWheelListener = new MouseWheelListener() {
+
+			private int	__lastEventTime;
+
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
+
+				if (event.time == __lastEventTime) {
+					// prevent doing the same for the same event, this occured when mouse is scrolled -> the event is fired 2x times
+					return;
+				}
+
+				__lastEventTime = event.time;
 
 				TourTypeFilterManager.selectNextFilter(event.count < 0);
 
@@ -262,7 +272,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		if (_isUpdating) {
 			return;
 		}
- 
+
 		_isUpdating = true;
 		{
 			final String filterName = ttFilter.getFilterName();
@@ -291,10 +301,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 							final TourType ttFilterFromSet = (TourType) ttItem;
 
 							if (counter == 0) {
-								sb.append("\n");
+								sb.append("\n"); //$NON-NLS-1$
 							}
 
-							sb.append("\n\t\t\t");
+							sb.append("\n\t\t\t"); //$NON-NLS-1$
 							sb.append(ttFilterFromSet.getName());
 
 							counter++;

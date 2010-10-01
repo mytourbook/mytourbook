@@ -45,7 +45,6 @@ public class Messages extends NLS {
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
 	public static String		dialog_export_label_DefaultFileName;
-
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
@@ -119,8 +118,6 @@ public class Messages extends NLS {
 	public static String		action_tourType_modify_tourTypes;
 
 	public static String		adjust_altitude_action_create_spline_point;
-	public static String		adjust_altitude_btn_reset_adjustments;
-	public static String		adjust_altitude_btn_reset_adjustments_tooltip;
 	public static String		adjust_altitude_btn_reset_altitude;
 	public static String		adjust_altitude_btn_reset_altitude_and_points;
 	public static String		adjust_altitude_btn_reset_altitude_and_points_tooltip;
@@ -134,8 +131,6 @@ public class Messages extends NLS {
 	public static String		adjust_altitude_dlg_dialog_message;
 	public static String		adjust_altitude_dlg_dialog_title;
 	public static String		adjust_altitude_dlg_shell_title;
-	public static String		adjust_altitude_invalid_data_message;
-	public static String		adjust_altitude_invalid_data_title;
 	public static String		adjust_altitude_label_adjustment_type;
 	public static String		adjust_altitude_type_adjust_end;
 	public static String		adjust_altitude_type_adjust_height;
@@ -199,7 +194,6 @@ public class Messages extends NLS {
 
 	public static String		App_Tour_type_item_all_types;
 	public static String		App_Tour_type_item_not_defined;
-	public static String		App_Tour_type_tooltip;
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
@@ -579,12 +573,9 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
-	public static String	Pref_MapLayout_Dialog_OSX_Warning_Message;
-
-	public static String	Pref_MapLayout_Dialog_OSX_Warning_Title;
- 
+	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
+	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
-
 	public static String		Pref_MapLayout_Label_TourPaintMethod;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
@@ -660,7 +651,6 @@ public class Messages extends NLS {
 	public static String		pref_tourtag_viewer_title;
 
 	public static String		pref_view_layout_display_lines;
-
 	public static String		pref_view_layout_display_lines_Tooltip;
 	public static String		pref_view_layout_group_display_format;
 	public static String		pref_view_layout_label_category;
@@ -719,9 +709,6 @@ public class Messages extends NLS {
 	public static String		PrefPage_ViewActions_Label_DoubleClick_None;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_OpenTour;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
-	public static String		PrefPage_ViewActions_Label_DoubleClickWithCtrl;
-	public static String		PrefPage_ViewActions_Label_DoubleClickWithCtrlShift;
-	public static String		PrefPage_ViewActions_Label_DoubleClickWithShift;
 	public static String		PrefPage_ViewActions_Label_Info;
 
 	public static String		PrefPage_ViewTooltip_Button_DisableAll;
@@ -770,17 +757,12 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
-
 	public static String		Tour_Book_Action_delete_selected_tours_menu;
-	public static String		Tour_Book_Action_delete_selected_tours_task;
-
 	public static String		Tour_Book_Action_DeleteSelectedTours_Monitor;
 	public static String		Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
-
-	public static String	Tour_Data_LoadingSRTM_Monitor;
 
 	public static String		Tour_Data_SaveTour_Monitor;
 	public static String		Tour_Data_SaveTour_MonitorSubtask;
@@ -992,7 +974,6 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_action_create_right_marker;
 	public static String		tourCatalog_view_action_delete_tours;
 	public static String		tourCatalog_view_action_link;
-	public static String		tourCatalog_view_action_number_of_years;
 	public static String		tourCatalog_view_action_rename_reference_tour;
 	public static String		tourCatalog_view_action_save_marker;
 	public static String		tourCatalog_view_action_synch_chart_years_tooltip;
@@ -1052,7 +1033,7 @@ public class Messages extends NLS {
 
 	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String		TourEditor_Action_DeleteDistanceValues;
-	public static String	TourEditor_Action_SetAltitudeValuesFromSRTM;
+	public static String		TourEditor_Action_SetAltitudeValuesFromSRTM;
 
 	public static String		TourEditor_Action_SetStartDistanceTo0;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
@@ -1060,9 +1041,9 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
 
-	public static String	TourEditor_Dialog_SetAltitudeFromSRTM_Message;
+	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 
-	public static String	TourEditor_Dialog_SetAltitudeFromSRTM_Title;
+	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String		UI_Label_no_chart_is_selected;
 

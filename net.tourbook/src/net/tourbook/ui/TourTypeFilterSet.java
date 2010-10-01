@@ -88,6 +88,6 @@ public class TourTypeFilterSet {
 
 	@Override
 	public String toString() {
-		return "TourTypeFilterSet [Name=" + _name + ", TourTypes=" + Arrays.toString(_tourTypes) + "]";
+		return "TourTypeFilterSet [Name=" + _name + ", TourTypes=" + Arrays.toString(_tourTypes) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

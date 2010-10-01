@@ -243,7 +243,7 @@ public class WizardPageImportSettings extends WizardPage {
 		final Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
 		_isPortListAvailable = ports.hasMoreElements();
 
-		System.out.println("Available ports:");
+		System.out.println("Available ports:"); //$NON-NLS-1$
 
 		if (_isPortListAvailable) {
 			// ports are available
@@ -257,10 +257,10 @@ public class WizardPageImportSettings extends WizardPage {
 					_portList.add(portName);
 					_cboPorts.add(portName);
 
-					System.out.println("\tserial port:\t" + portName);
+					System.out.println("\tserial port:\t" + portName); //$NON-NLS-1$
 
 				} else {
-					System.out.println("\tother port:\t" + portName);
+					System.out.println("\tother port:\t" + portName); //$NON-NLS-1$
 				}
 			}
 
@@ -270,7 +270,7 @@ public class WizardPageImportSettings extends WizardPage {
 			_cboPorts.select(0);
 			_cboPorts.setEnabled(false);
 
-			System.out.println("\tserial ports are not available");
+			System.out.println("\tserial ports are not available"); //$NON-NLS-1$
 		}
 	}
 
