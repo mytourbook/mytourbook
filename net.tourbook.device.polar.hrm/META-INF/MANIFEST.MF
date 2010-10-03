@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Import Polar .hrm files
+Bundle-SymbolicName: net.tourbook.device.polar.hrm;singleton:=true
+Bundle-Version: 10.9.2.qualifier
+Bundle-Activator: net.tourbook.device.polar.hrm.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook,
+ net.tourbook.device,
+ net.tourbook.chart
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: net.tourbook.util,
+ org.joda.time
