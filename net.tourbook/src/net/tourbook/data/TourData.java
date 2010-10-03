@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
- 
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -215,7 +215,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
-	 * the field {@link #tourDistance}
+	 * in the field {@link #tourDistance}
 	 */
 	private int												startDistance;
 
@@ -230,7 +230,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * A flag indicating that the distance of this series is defined by a distance sensor and not
 	 * from the GPS device.<br>
 	 * <br>
-	 * 0 == false, 1 == true
+	 * 0 == false <i>(default)</i> <br>
+	 * 1 == true
 	 */
 	private short											isDistanceFromSensor				= 0;												// db-version 8
 
@@ -729,9 +730,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public float[]											segmentSerieCadence;
+
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
-	 * data are not imported they are from the database
+	 * data it not imported they are from the database
 	 */
 	@Transient
 	public String											importRawDataFile;
@@ -1342,7 +1344,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes and sets the altitude up/down values into {@link TourData}
-	 *
+	 * 
 	 * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
 	 */
 	public boolean computeAltitudeUpDown() {
@@ -1370,7 +1372,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * compute altitude up/down since version 9.08
-	 *
+	 * 
 	 * @param segmentSerie
 	 *            segments are created for each gradient alternation when segmentSerie is not
 	 *            <code>null</code>
@@ -1843,7 +1845,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the imperial speed data serie and max speed
-	 *
+	 * 
 	 * @return
 	 */
 	private void computeSpeedSerieFromDevice() {
@@ -1873,7 +1875,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the speed data serie with the internal algorithm for a fix time interval
-	 *
+	 * 
 	 * @return
 	 */
 	private void computeSpeedSerieInternalWithFixedInterval() {
@@ -2270,7 +2272,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
 	 * transfered
-	 *
+	 * 
 	 * @param isCreateMarker
 	 *            creates markers when <code>true</code>
 	 */
@@ -2758,7 +2760,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
-	 *
+	 * 
 	 * @param uniqueKey
 	 *            unique key to identify a tour
 	 * @return
@@ -2814,7 +2816,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Create a device marker at the current position
-	 *
+	 * 
 	 * @param timeData
 	 * @param timeIndex
 	 * @param recordingTime
@@ -2844,7 +2846,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Create the tour segment list from the segment index array
-	 *
+	 * 
 	 * @return
 	 */
 	public Object[] createTourSegments() {
@@ -3222,7 +3224,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Computes the time between start index and end index when the speed is <code>0</code>
-	 *
+	 * 
 	 * @param startIndex
 	 * @param endIndex
 	 * @return Returns the break time in seconds
@@ -3256,7 +3258,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
 	 * is defined by <code>sliceMin</code>
-	 *
+	 * 
 	 * @param distanceValues
 	 * @param indexLeft
 	 * @param indexRight
@@ -3344,6 +3346,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return deviceMode;
 	}
 
+	/**
+	 * This info is only displayed in viewer columns
+	 * 
+	 * @return
+	 */
 	public String getDeviceModeName() {
 		return deviceModeName;
 	}
@@ -4116,7 +4123,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * This is the state of the device which is not related to the availability of power data. Power
 	 * data should be available but is not checked.
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the device has a power sensor
 	 */
 	public boolean isPowerSensorPresent() {
@@ -4135,7 +4142,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * This is the state of the device which is not related to the availability of pulse data. Pulse
 	 * data should be available but is not checked.
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the device has a pulse sensor
 	 */
 	public boolean isPulseSensorPresent() {
@@ -4192,7 +4199,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Checks if VARCHAR fields have the correct length
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the data are valid and can be saved
 	 */
 	public boolean isValidForSave() {
@@ -4421,7 +4428,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
 	 * the time slices are not equally
-	 *
+	 * 
 	 * @param deviceTimeInterval
 	 */
 	public void setDeviceTimeInterval(final short deviceTimeInterval) {
@@ -4459,6 +4466,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.dpTolerance = dpTolerance;
 	}
 
+	/**
+	 * Set state if the distance is from a sensor or not, default is <code>false</code>
+	 * 
+	 * @param isFromSensor
+	 */
 	public void setIsDistanceFromSensor(final boolean isFromSensor) {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
 	}
@@ -4485,7 +4497,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Sets the power data serie and set's a flag that the data serie is from a device
-	 *
+	 * 
 	 * @param powerSerie
 	 */
 	public void setPowerSerie(final int[] powerSerie) {
@@ -4534,7 +4546,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Sets the speed data serie and set's a flag that the data serie is from a device
-	 *
+	 * 
 	 * @param speedSerie
 	 */
 	public void setSpeedSerie(final int[] speedSerie) {
@@ -4552,7 +4564,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Set the distance at tour start, this is the distance which the device has accumulated
-	 *
+	 * 
 	 * @param startDistance
 	 */
 	public void setStartDistance(final int startDistance) {
@@ -4612,7 +4624,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Set total driving/moving time in seconds
-	 *
+	 * 
 	 * @param tourDrivingTime
 	 */
 	public void setTourDrivingTime(final int tourDrivingTime) {
@@ -4629,7 +4641,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Sets the file path for the imported file, this is displayed in the {@link TourDataEditorView}
-	 *
+	 * 
 	 * @param tourImportFilePath
 	 */
 	public void setTourImportFilePath(final String tourImportFilePath) {
@@ -4650,7 +4662,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Sets the {@link TourPerson} for the tour or <code>null</code> when the tour is not saved in
 	 * the database
-	 *
+	 * 
 	 * @param tourPerson
 	 */
 	public void setTourPerson(final TourPerson tourPerson) {
@@ -4659,7 +4671,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Set total recording time in seconds
-	 *
+	 * 
 	 * @param tourRecordingTime
 	 */
 	public void setTourRecordingTime(final int tourRecordingTime) {
@@ -4764,7 +4776,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Set world positions which are cached
-	 *
+	 * 
 	 * @param worldPositions
 	 * @param zoomLevel
 	 * @param projectionId
@@ -4775,7 +4787,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Set world positions which are cached
-	 *
+	 * 
 	 * @param worldPositions
 	 * @param zoomLevel
 	 * @param projectionId

@@ -58,9 +58,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	/**
 	 * constructor is used when the plugin is loaded
 	 */
-	public CM4XXMDeviceReader() {
-		canReadFromDevice = true;
-	}
+	public CM4XXMDeviceReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -94,7 +92,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			}
 		}
 
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+		return new Formatter().format(
+				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				cm4xxDeviceData.transferYear,
 				cm4xxDeviceData.transferMonth,
 				cm4xxDeviceData.transferDay).toString();
@@ -142,7 +141,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 
-		return new SerialParameters(portName,
+		return new SerialParameters(
+				portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -164,7 +164,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return CM4XXM_DATA_SIZE;
 	}
 
-	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 

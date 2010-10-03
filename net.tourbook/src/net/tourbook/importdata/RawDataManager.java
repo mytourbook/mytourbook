@@ -37,6 +37,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -230,8 +231,10 @@ public class RawDataManager {
 							monitor.beginTask(Messages.import_data_importTours_task, workedAll);
 
 							final RawDataManager rawDataManager = RawDataManager.getInstance();
-							final ArrayList<String> notImportedFiles = new ArrayList<String>();
+							rawDataManager.setImportId();
 
+							final ArrayList<String> notImportedFiles = new ArrayList<String>();
+							
 							int importCounter = 0;
 
 							final Path filePath = new Path(firstFileName);
@@ -279,9 +282,9 @@ public class RawDataManager {
 					});
 
 		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 	}
 
@@ -364,15 +367,18 @@ public class RawDataManager {
 				boolean isDataImported = false;
 
 				/*
-				 * try to import from all devices which have the same extension
+				 * try to import from all devices which have the defined extension
 				 */
 				for (final TourbookDevice device : deviceList) {
 
-					if (device.fileExtension.equals("*") || device.fileExtension.equalsIgnoreCase(fileExtension)) { //$NON-NLS-1$
+					final String deviceFileExtension = device.fileExtension;
+
+					if (deviceFileExtension.equals("*") || deviceFileExtension.equalsIgnoreCase(fileExtension)) { //$NON-NLS-1$
 
 						// device file extension was found in the filename extension
 
 						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
+
 							isDataImported = true;
 							_isImported = true;
 							break;
@@ -449,135 +455,18 @@ public class RawDataManager {
 			// copy file to destinationPath
 			if (destinationPath != null) {
 
-				String destFileName = new File(sourceFileName).getName();
-				if (buildNewFileName) {
+				final String newFileName = importWithDeviceCopyFile(
+						device,
+						sourceFileName,
+						destinationPath,
+						buildNewFileName,
+						fileCollision);
 
-					destFileName = null;
-
-					try {
-						destFileName = device.buildFileNameFromRawData(sourceFileName);
-					} catch (final Exception e) {
-						e.printStackTrace();
-					} finally {
-
-						if (destFileName == null) {
-
-							MessageDialog
-									.openError(Display.getDefault().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
-											"The filename for the received data" //$NON-NLS-1$
-													+ " could not be created from the file '" //$NON-NLS-1$
-													+ sourceFileName
-													+ "'\n\n" //$NON-NLS-1$
-													+ "The received data will be saved in the temp file '" //$NON-NLS-1$
-													+ new Path(destinationPath).addTrailingSeparator().toString()
-													+ TEMP_IMPORTED_FILE
-													+ "'\n\n" //$NON-NLS-1$
-													+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
-													+ "\n\n" //$NON-NLS-1$
-													+ "When you think the received data are correct, " //$NON-NLS-1$
-													+ "you can send the received data file to the author of MyTourbook to analyze it."); //$NON-NLS-1$
-
-							destFileName = TEMP_IMPORTED_FILE;
-						}
-					}
-				}
-				final File newFile = new File(
-						(new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
-
-				// get source file
-				final File fileIn = new File(sourceFileName);
-
-				// check if file already exist
-				if (newFile.exists()) {
-					// TODO allow user to rename the file
-
-					boolean keepFile = false; // for MessageDialog result
-					if (fileCollision.value == FileCollisionBehavior.ASK) {
-
-						final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-						final MessageDialog messageDialog = new MessageDialog(
-								shell,
-								Messages.Import_Wizard_Message_Title,
-								null,
-								NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
-								MessageDialog.QUESTION,
-								new String[] {
-										IDialogConstants.YES_LABEL,
-										IDialogConstants.YES_TO_ALL_LABEL,
-										IDialogConstants.NO_LABEL,
-										IDialogConstants.NO_TO_ALL_LABEL },
-								0);
-						messageDialog.open();
-						final int returnCode = messageDialog.getReturnCode();
-						switch (returnCode) {
-
-						case 1: // YES_TO_ALL
-							fileCollision.value = FileCollisionBehavior.REPLACE;
-							break;
-
-						case 3: // NO_TO_ALL
-							fileCollision.value = FileCollisionBehavior.KEEP;
-						case 2: // NO
-							keepFile = true;
-							break;
-
-						default:
-							break;
-						}
-					}
-
-					if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
-						_isImportCanceled = true;
-						fileIn.delete();
-						return false;
-					}
-				}
-
-				// copy source file into destination file
-				FileInputStream inReader = null;
-				FileOutputStream outReader = null;
-				try {
-					inReader = new FileInputStream(fileIn);
-					outReader = new FileOutputStream(newFile);
-					int c;
-
-					while ((c = inReader.read()) != -1) {
-						outReader.write(c);
-					}
-
-					inReader.close();
-					outReader.close();
-
-				} catch (final FileNotFoundException e) {
-					e.printStackTrace();
+				if (newFileName == null) {
 					return false;
-				} catch (final IOException e) {
-					e.printStackTrace();
-					return false;
-				} finally {
-					// close the files
-					if (inReader != null) {
-						try {
-							inReader.close();
-						} catch (final IOException e) {
-							e.printStackTrace();
-							return false;
-						}
-					}
-					if (outReader != null) {
-						try {
-							outReader.close();
-						} catch (final IOException e) {
-							e.printStackTrace();
-							return false;
-						}
-					}
 				}
 
-				// delete source file
-				fileIn.delete();
-				sourceFileName = newFile.getAbsolutePath();
-
+				sourceFileName = newFileName;
 			}
 
 			_lastImportedFile = sourceFileName;
@@ -587,6 +476,142 @@ public class RawDataManager {
 
 		return false;
 
+	}
+
+	private String importWithDeviceCopyFile(final TourbookDevice device,
+							final String sourceFileName,
+							final String destinationPath,
+							final boolean buildNewFileName,
+							final FileCollisionBehavior fileCollision) {
+
+		String destFileName = new File(sourceFileName).getName();
+
+		if (buildNewFileName) {
+
+			destFileName = null;
+
+			try {
+				destFileName = device.buildFileNameFromRawData(sourceFileName);
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			} finally {
+
+				if (destFileName == null) {
+
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
+							"The filename for the received data" //$NON-NLS-1$
+									+ " could not be created from the file '" //$NON-NLS-1$
+									+ sourceFileName
+									+ "'\n\n" //$NON-NLS-1$
+									+ "The received data will be saved in the temp file '" //$NON-NLS-1$
+									+ new Path(destinationPath).addTrailingSeparator().toString()
+									+ TEMP_IMPORTED_FILE
+									+ "'\n\n" //$NON-NLS-1$
+									+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
+									+ "\n\n" //$NON-NLS-1$
+									+ "When you think the received data are correct, " //$NON-NLS-1$
+									+ "you can send the received data file to the author of MyTourbook to analyze it."); //$NON-NLS-1$
+
+					destFileName = TEMP_IMPORTED_FILE;
+				}
+			}
+		}
+		final File newFile = new File((new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
+
+		// get source file
+		final File fileIn = new File(sourceFileName);
+
+		// check if file already exist
+		if (newFile.exists()) {
+			// TODO allow user to rename the file
+
+			boolean keepFile = false; // for MessageDialog result
+			if (fileCollision.value == FileCollisionBehavior.ASK) {
+
+				final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				final MessageDialog messageDialog = new MessageDialog(
+						shell,
+						Messages.Import_Wizard_Message_Title,
+						null,
+						NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
+						MessageDialog.QUESTION,
+						new String[] {
+								IDialogConstants.YES_LABEL,
+								IDialogConstants.YES_TO_ALL_LABEL,
+								IDialogConstants.NO_LABEL,
+								IDialogConstants.NO_TO_ALL_LABEL },
+						0);
+				messageDialog.open();
+				final int returnCode = messageDialog.getReturnCode();
+				switch (returnCode) {
+
+				case 1: // YES_TO_ALL
+					fileCollision.value = FileCollisionBehavior.REPLACE;
+					break;
+
+				case 3: // NO_TO_ALL
+					fileCollision.value = FileCollisionBehavior.KEEP;
+				case 2: // NO
+					keepFile = true;
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
+				_isImportCanceled = true;
+				fileIn.delete();
+				return null;
+			}
+		}
+
+		// copy source file into destination file
+		FileInputStream inReader = null;
+		FileOutputStream outReader = null;
+		try {
+			inReader = new FileInputStream(fileIn);
+			outReader = new FileOutputStream(newFile);
+			int c;
+
+			while ((c = inReader.read()) != -1) {
+				outReader.write(c);
+			}
+
+			inReader.close();
+			outReader.close();
+
+		} catch (final FileNotFoundException e) {
+			StatusUtil.log(e);
+			return null;
+		} catch (final IOException e) {
+			StatusUtil.log(e);
+			return null;
+		} finally {
+			// close the files
+			if (inReader != null) {
+				try {
+					inReader.close();
+				} catch (final IOException e) {
+					StatusUtil.log(e);
+					return null;
+				}
+			}
+			if (outReader != null) {
+				try {
+					outReader.close();
+				} catch (final IOException e) {
+					StatusUtil.log(e);
+					return null;
+				}
+			}
+		}
+
+		// delete source file
+		fileIn.delete();
+
+		return newFile.getAbsolutePath();
 	}
 
 	public void removeAllTours() {
@@ -645,6 +670,13 @@ public class RawDataManager {
 		_isImportCanceled = importCanceled;
 	}
 
+	/**
+	 * Sets a unique id into the device data so that each import can be identified.
+	 */
+	public void setImportId() {
+		_deviceData.importId = System.currentTimeMillis();
+	}
+
 	public void setImportYear(final int year) {
 		_importSettingsImportYear = year;
 	}
@@ -676,7 +708,7 @@ public class RawDataManager {
 			return (RawDataView) Util.showView(RawDataView.ID);
 
 		} catch (final WorkbenchException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 		return null;
 	}
@@ -707,9 +739,9 @@ public class RawDataManager {
 							});
 
 				} catch (final InvocationTargetException e) {
-					e.printStackTrace();
+					StatusUtil.log(e);
 				} catch (final InterruptedException e) {
-					e.printStackTrace();
+					StatusUtil.log(e);
 				}
 			} else {
 				updateTourDataFromDbRunnable(monitor);
@@ -755,8 +787,7 @@ public class RawDataManager {
 				if (dbTourData != null) {
 
 					/*
-					 * tour is saved in the database, set rawdata file name to display
-					 * the filepath
+					 * tour is saved in the database, set rawdata file name to display the filepath
 					 */
 					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
@@ -766,8 +797,8 @@ public class RawDataManager {
 					if (_importedTourData.containsKey(dbTourId)) {
 
 						/*
-						 * check if the tour editor contains this tour, this should not
-						 * be necessary, just make sure the correct tour is used !!!
+						 * check if the tour editor contains this tour, this should not be
+						 * necessary, just make sure the correct tour is used !!!
 						 */
 						if (editorTourId == dbTourId) {
 							_importedTourData.put(dbTourId, tourDataEditor.getTourData());
@@ -777,7 +808,7 @@ public class RawDataManager {
 					}
 				}
 			} catch (final Exception e) {
-				e.printStackTrace();
+				StatusUtil.log(e);
 			}
 		}
 

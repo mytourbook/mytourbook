@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import net.tourbook.data.TourData;
+
 public abstract class TourbookDevice implements IRawDataReader {
 
 	/**
@@ -32,38 +34,39 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 */
 	public String	fileExtension;
 
-	/**
-	 * <code>true</code> when this device reader can read from the device, <code>false</code>
-	 * (default) when the device reader can only import from a file
-	 */
-	public boolean	canReadFromDevice						= false;
-
-	/**
-	 * when <code>true</code>, multiple files can be selected in the import, default is
-	 * <code>false</code>
-	 */
-	public boolean	canSelectMultipleFilesInImportDialog	= false;
+// disabled in version 10.10, it seems to be not used anymore
+//	/**
+//	 * <code>true</code> when this device reader can read from the device, <code>false</code>
+//	 * (default) when the device reader can only import from a file
+//	 */
+//	public boolean	canReadFromDevice		= false;
+//
+//	/**
+//	 * when <code>true</code>, multiple files can be selected in the import, default is
+//	 * <code>false</code>
+//	 */
+//	public boolean	canSelectMultipleFilesInImportDialog	= false;
 
 	/**
 	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
-	public int		importYear								= -1;
+	public int		importYear				= -1;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
 	 * created for each track
 	 */
-	public boolean	isMergeTracks							= false;
+	public boolean	isMergeTracks			= false;
 
 	/**
 	 * when <code>true</code> validate the checksum when importing data
 	 */
-	public boolean	isChecksumValidation					= true;
+	public boolean	isChecksumValidation	= true;
 
 	/**
 	 * when <code>true</code> the tour id will be created with the recording time
 	 */
-	public boolean	isCreateTourIdWithTime;
+	public boolean	isCreateTourIdWithRecordingTime;
 
 	public TourbookDevice() {}
 
@@ -86,6 +89,53 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
 	/**
+	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called before
+	 * to create recording time.
+	 * 
+	 * @param tourData
+	 * @param distanceSerie
+	 * @param dummyKey
+	 *            The dummy key is used when distance serie is not available
+	 * @return Returns a unique key for a tour
+	 */
+	public String createUniqueId(final TourData tourData, final int[] distanceSerie, final String dummyKey) {
+
+		String uniqueKey;
+
+		if (isCreateTourIdWithRecordingTime) {
+
+			/*
+			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
+			 * export and import found a wrong tour when exporting was done with camouflage speed ->
+			 * this will result in a NEW tour
+			 */
+			final int tourRecordingTime = tourData.getTourRecordingTime();
+
+			if (distanceSerie == null) {
+				uniqueKey = Integer.toString(tourRecordingTime);
+			} else {
+
+				final long tourDistance = distanceSerie[(distanceSerie.length - 1)];
+
+				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+			}
+
+		} else {
+
+			/*
+			 * original version to create tour id
+			 */
+			if (distanceSerie == null) {
+				uniqueKey = dummyKey;
+			} else {
+				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
+			}
+		}
+
+		return uniqueKey;
+	}
+
+	/**
 	 * @param portName
 	 * @return returns the serial port parameters which are use to receive data from the device or
 	 *         <code>null</code> when data transfer from a device is not supported
@@ -101,7 +151,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public abstract int getStartSequenceSize();
 
 	public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
-		this.isCreateTourIdWithTime = isCreateTourIdWithTime;
+		this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
 	}
 
 	public void setImportYear(final int importYear) {

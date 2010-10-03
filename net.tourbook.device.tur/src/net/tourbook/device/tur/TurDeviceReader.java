@@ -43,15 +43,12 @@ import net.tourbook.ui.UI;
  */
 public class TurDeviceReader extends TourbookDevice {
 
-	private final int	MAX_INT		= 0x10000;
-
+	private final int	MAX_INT	= 0x10000;
 
 	/**
-	 * 
+	 * Plugin constructor
 	 */
-	public TurDeviceReader() {
-		canReadFromDevice = false;
-	}
+	public TurDeviceReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -355,10 +352,10 @@ public class TurDeviceReader extends TourbookDevice {
 
 				// create new markers
 				for (int i = 0; i < markerCount; i++) {
-					
+
 					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 					tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
-					
+
 					String label = TurFileUtil.readText(fileTurData);
 					label = label.substring(0, label.indexOf(';'));
 					final int index = label.indexOf(", Type:"); //$NON-NLS-1$
@@ -369,7 +366,7 @@ public class TurDeviceReader extends TourbookDevice {
 					}
 					tourMarker.setLabel(label);
 					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-					
+
 					final int[] timeSerie = tourData.timeSerie;
 					if (timeSerie != null && timeSerie.length > 0) {
 

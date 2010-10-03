@@ -38,7 +38,7 @@ public class WizardImportData extends Wizard {
 
 	public static final String			SYSPROPERTY_IMPORT_PERSON	= "mytourbook.import.person";	//$NON-NLS-1$
 
-	private WizardPageImportSettings	_importSettings;
+	private WizardPageImportSettings	_wizardPageImportSettings;
 	private final List<File>			_receivedFiles				= new ArrayList<File>();
 
 	/**
@@ -57,21 +57,21 @@ public class WizardImportData extends Wizard {
 	@Override
 	public void addPages() {
 
-		_importSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
-		addPage(_importSettings);
+		_wizardPageImportSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
+		addPage(_wizardPageImportSettings);
 
 	}
 
 	@Override
 	public boolean performFinish() {
 
-		if (_importSettings.validatePage() == false) {
+		if (_wizardPageImportSettings.validatePage() == false) {
 			return false;
 		}
 
 		receiveData();
 
-		_importSettings.persistDialogSettings();
+		_wizardPageImportSettings.persistDialogSettings();
 
 		return true;
 	}
@@ -81,7 +81,7 @@ public class WizardImportData extends Wizard {
 	 */
 	private boolean receiveData() {
 
-		final Combo comboPorts = _importSettings._cboPorts;
+		final Combo comboPorts = _wizardPageImportSettings._cboPorts;
 
 		if (comboPorts.isDisposed()) {
 			return false;
@@ -107,13 +107,14 @@ public class WizardImportData extends Wizard {
 		/*
 		 * set the device which is used to read the data
 		 */
-		_importDevice = _importSettings.getSelectedDevice();
+		_importDevice = _wizardPageImportSettings.getSelectedDevice();
 		if (_importDevice == null) {
 			return false;
 		}
 
 		final RawDataManager rawDataManager = RawDataManager.getInstance();
 		rawDataManager.setImportCanceled(false);
+		rawDataManager.setImportId();
 
 		/*
 		 * receive data from the device
@@ -132,12 +133,13 @@ public class WizardImportData extends Wizard {
 			return true;
 		}
 
-		// import received files
 		final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
+
+		// import received files
 		for (final File inFile : _receivedFiles) {
 			rawDataManager.importRawData(
 					inFile,
-					_importSettings._pathEditor.getStringValue(),
+					_wizardPageImportSettings._pathEditor.getStringValue(),
 					_importDevice.buildNewFileNames,
 					fileCollision);
 		}
@@ -166,7 +168,7 @@ public class WizardImportData extends Wizard {
 						// start downloading
 						final boolean importResult = receiveData();
 
-						_importSettings.persistDialogSettings();
+						_wizardPageImportSettings.persistDialogSettings();
 
 						if (importResult) {
 							getContainer().getShell().close();

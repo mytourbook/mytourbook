@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.csv.tours;
 
@@ -43,9 +43,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class CSVTourDataReader extends TourbookDevice {
 
-	//	
+	//
 	// csv import data samples
-	//	
+	//
 	// Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;
 	// 2008-09-02;08-20;1200;300;8500;zur Arbeit;kein Kommentar, siehe nächste Tour;Rennvelo;Arbeitsfahrt am Abend, new tag
 	// 2008-09-01;14-30;1500;20;6000;auf Fremersberg;;MTB;FB
@@ -57,10 +57,7 @@ public class CSVTourDataReader extends TourbookDevice {
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
 
 	// plugin constructor
-	public CSVTourDataReader() {
-		canReadFromDevice = false;
-		canSelectMultipleFilesInImportDialog = true;
-	}
+	public CSVTourDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -214,14 +211,16 @@ public class CSVTourDataReader extends TourbookDevice {
 
 			final TourType newTourType = new TourType(parsedTourTypeLabel);
 
-			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType, Long
-					.toString(newTourType.getTypeId()), newTourType.getName());
+			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
+					newTourType,
+					Long.toString(newTourType.getTypeId()),
+					newTourType.getName());
 
 			newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
 			newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
 			newTourType.setColorLine(newColorDefinition.getDefaultLineColor());
 
-			// save new entity 
+			// save new entity
 			newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
 			if (newSavedTourType != null) {
 				tourType = newSavedTourType;
@@ -271,20 +270,20 @@ public class CSVTourDataReader extends TourbookDevice {
 
 					tokenizer = new StringTokenizer(tokenLine, CSV_TOKEN_SEPARATOR);
 
-					parseDate(tourData, tokenizer.nextToken());//						1 Date (yyyy-mm-dd); 
-					parseTime(tourData, tokenizer.nextToken());//						2 Time (hh-mm); 
+					parseDate(tourData, tokenizer.nextToken());//						1 Date (yyyy-mm-dd);
+					parseTime(tourData, tokenizer.nextToken());//						2 Time (hh-mm);
 
-					duration = Integer.parseInt(tokenizer.nextToken()); //				3 Duration (sec); 
+					duration = Integer.parseInt(tokenizer.nextToken()); //				3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
 
-					pausedTime = Integer.parseInt(tokenizer.nextToken()); //			4 Paused Time (sec), 
+					pausedTime = Integer.parseInt(tokenizer.nextToken()); //			4 Paused Time (sec),
 					tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
 
-					distance = Integer.parseInt(tokenizer.nextToken());//				5 Distance (m); 
+					distance = Integer.parseInt(tokenizer.nextToken());//				5 Distance (m);
 					tourData.setTourDistance(distance);
 
-					tourData.setTourTitle(tokenizer.nextToken());//						6 Title; 
-					tourData.setTourDescription(tokenizer.nextToken());//				7 Comment; 
+					tourData.setTourTitle(tokenizer.nextToken());//						6 Title;
+					tourData.setTourDescription(tokenizer.nextToken());//				7 Comment;
 
 					isNewTourType |= parseTourType(tourData, tokenizer.nextToken());//	8 Tour Type;
 					isNewTag |= parseTags(tourData, tokenizer.nextToken());//			9 Tags;
@@ -342,9 +341,10 @@ public class CSVTourDataReader extends TourbookDevice {
 					display.syncExec(new Runnable() {
 						public void run() {
 							// fire modify event
-							TourbookPlugin.getDefault().getPreferenceStore().setValue(
-									ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-									Math.random());
+							TourbookPlugin
+									.getDefault()
+									.getPreferenceStore()
+									.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 						}
 					});
 

@@ -54,9 +54,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	private GregorianCalendar	fFileDate;
 
 	// plugin constructor
-	public HAC5DeviceDataReader() {
-		canReadFromDevice = true;
-	}
+	public HAC5DeviceDataReader() {}
 
 	/**
 	 * Adjust the offset for the DD record so it's within the tour data area
@@ -91,7 +89,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		final GregorianCalendar fileDate = new GregorianCalendar();
 		fileDate.setTime(new Date(lastModified));
 
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+		return new Formatter().format(
+				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				(short) fileDate.get(Calendar.YEAR),
 				(short) fileDate.get(Calendar.MONTH) + 1,
 				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
@@ -153,7 +152,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 
-		final SerialParameters hac5PortParameters = new SerialParameters(portName,
+		final SerialParameters hac5PortParameters = new SerialParameters(
+				portName,
 				4800,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -391,8 +391,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						}
 
 						// read data for the current time slice
-						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer,
-								4 + (2 * dataIndex)), timeData);
+						DeviceReaderTools.readTimeSlice(
+								DeviceReaderTools.get2ByteData(recordBuffer, 4 + (2 * dataIndex)),
+								timeData);
 
 						// adjust pulse from relative to absolute
 						timeData.pulse = absolutePulse += timeData.pulse;

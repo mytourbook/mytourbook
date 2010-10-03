@@ -57,9 +57,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	private GregorianCalendar	fFileDate;
 
 	// plugin constructor
-	public HAC4ProDeviceDataReader() {
-		canReadFromDevice = true;
-	}
+	public HAC4ProDeviceDataReader() {}
 
 	/**
 	 * @param timeData
@@ -129,7 +127,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		final GregorianCalendar fileDate = new GregorianCalendar();
 		fileDate.setTime(new Date(lastModified));
 
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+		return new Formatter().format(
+				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				(short) fileDate.get(Calendar.YEAR),
 				(short) fileDate.get(Calendar.MONTH) + 1,
 				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
@@ -228,7 +227,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 
-		return new SerialParameters(portName,
+		return new SerialParameters(
+				portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,

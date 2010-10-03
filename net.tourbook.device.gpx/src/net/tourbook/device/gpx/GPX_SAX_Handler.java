@@ -439,7 +439,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
-		if (_deviceDataReader.isCreateTourIdWithTime) {
+		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
 
 			/*
 			 * 23.3.2009: added recording time to the tour distance for the unique key because tour

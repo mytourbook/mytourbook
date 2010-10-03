@@ -89,7 +89,7 @@ public class TimeData implements Serializable {
 
 	/**
 	 * speed in km/h multiplied by 10, speed is typically provided by an ergo trainer not from a
-	 * bike computer
+	 * bike computer, Polar provides speed but is ignored
 	 */
 	public int					speed				= Integer.MIN_VALUE;
 

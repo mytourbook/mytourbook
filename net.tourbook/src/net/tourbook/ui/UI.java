@@ -147,12 +147,19 @@ public class UI {
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";								//$NON-NLS-1$
 	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";									//$NON-NLS-1$
 
+	/**
+	 * Imperial system for distance
+	 */
 	public static final float								UNIT_MILE						= 1.609344f;
+
+	/**
+	 * Imperial system for height
+	 */
 	public static final float								UNIT_FOOT						= 0.3048f;
 
 	/**
 	 * contains the system of measurement value for distances relative to the metric system, the
-	 * metric systemis <code>1</code>
+	 * metric system is <code>1</code>
 	 */
 	public static float										UNIT_VALUE_DISTANCE				= 1;
 
@@ -292,7 +299,7 @@ public class UI {
 
 	/**
 	 * Change the title for the application
-	 *
+	 * 
 	 * @param newTitle
 	 *            new title for the application or <code>null</code> to set the original title
 	 */
@@ -417,7 +424,7 @@ public class UI {
 
 	/**
 	 * Checks if tour id is contained in the property data
-	 *
+	 * 
 	 * @param propertyData
 	 * @param checkedTourId
 	 * @return Returns the tour id when it is contained in the property data, otherwise it returns
@@ -534,7 +541,7 @@ public class UI {
 
 	/**
 	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -569,7 +576,7 @@ public class UI {
 
 	/**
 	 * force hours to be displayed
-	 *
+	 * 
 	 * @param time
 	 * @return
 	 */
@@ -643,7 +650,7 @@ public class UI {
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -660,7 +667,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterDateShort() {
@@ -717,7 +724,7 @@ public class UI {
 
 	/******************************************************************************
 	 * this method is copied from the following source and was adjusted
-	 *
+	 * 
 	 * <pre>
 	 * Product: Compiere ERP &amp; CRM Smart Business Solution                    *
 	 * Copyright (C) 1999-2006 ComPiere, Inc. All Rights Reserved.                *
@@ -734,7 +741,7 @@ public class UI {
 	 * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
 	 * or via info@compiere.org or http://www.compiere.org/license.html           *
 	 * </pre>
-	 *
+	 * 
 	 * @return date formatter with leading zeros for month and day and 4-digit year
 	 */
 	public static DateFormat getFormatterTimeShort() {
@@ -797,7 +804,7 @@ public class UI {
 
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
-	 *
+	 * 
 	 * @param propertyData
 	 * @param oldTourData
 	 * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
@@ -839,7 +846,7 @@ public class UI {
 
 	/**
 	 * Restore the sash weight from a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param fMemento
 	 * @param weightKey
@@ -874,7 +881,7 @@ public class UI {
 
 	/**
 	 * Store the weights for the sash in a memento
-	 *
+	 * 
 	 * @param sash
 	 * @param memento
 	 * @param weightKey
@@ -890,7 +897,7 @@ public class UI {
 
 	/**
 	 * Set grid layout with no margins for a composite
-	 *
+	 * 
 	 * @param composite
 	 */
 	public static void set0GridLayout(final Composite composite) {
@@ -957,7 +964,7 @@ public class UI {
 
 	/**
 	 * set the tag colors in the JFace color registry from the pref store
-	 *
+	 * 
 	 * @param prefs
 	 */
 	public static void setViewColorsFromPrefStore() {
@@ -990,6 +997,15 @@ public class UI {
 		gd.widthHint = width;
 		control.setLayoutData(gd);
 		return gd;
+	}
+
+	public static void showMessageInfo(final String title, final String message) {
+
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message);
+			}
+		});
 	}
 
 	public static void showSQLException(SQLException e) {
@@ -1042,7 +1058,7 @@ public class UI {
 
 	/**
 	 * Sets the tour type image and text into a {@link CLabel}
-	 *
+	 * 
 	 * @param tourData
 	 * @param lblTourType
 	 * @param isTextDisplayed
@@ -1295,7 +1311,7 @@ public class UI {
 	/**
 	 * The image descriptor is cached because the creation takes system resources and it's called
 	 * very often
-	 *
+	 * 
 	 * @param tourTypeId
 	 *            Tour type id
 	 * @return Returns image descriptor for the tour type id
@@ -1346,7 +1362,7 @@ public class UI {
 
 	/**
 	 * updates an existing tour type image
-	 *
+	 * 
 	 * @param existingImage
 	 */
 	private Image updateTourTypeImage(final Image existingImage, final long typeId, final String keyColorId) {
@@ -1383,14 +1399,5 @@ public class UI {
 		_dirtyImages.remove(keyColorId);
 
 		return existingImage;
-	}
-
-	public static void showMessageInfo(final String title, final String message) {
-
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message);
-			}
-		});
 	}
 }

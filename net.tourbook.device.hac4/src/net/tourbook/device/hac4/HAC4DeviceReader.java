@@ -52,13 +52,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	private static final int	HAC4_DATA_SIZE			= 81930;
 
-
 	/**
 	 * constructor is used when the plugin is loaded
 	 */
-	public HAC4DeviceReader() {
-		canReadFromDevice = true;
-	}
+	public HAC4DeviceReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -93,7 +90,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 			}
 		}
 
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+		return new Formatter().format(
+				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				hac4DeviceData.transferYear,
 				hac4DeviceData.transferMonth,
 				hac4DeviceData.transferDay).toString();
@@ -148,7 +146,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 
-		return new SerialParameters(portName,
+		return new SerialParameters(
+				portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -693,7 +692,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 			if (isChecksumValidation == false && isValid == false) {
 
-				System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
+				System.out
+						.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
 				 * ignore validation

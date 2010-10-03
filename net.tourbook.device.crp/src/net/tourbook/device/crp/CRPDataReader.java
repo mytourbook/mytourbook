@@ -35,10 +35,7 @@ import net.tourbook.ui.UI;
 public class CRPDataReader extends TourbookDevice {
 
 	// plugin constructor
-	public CRPDataReader() {
-		canReadFromDevice = false;
-		canSelectMultipleFilesInImportDialog = true;
-	}
+	public CRPDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -95,7 +92,9 @@ public class CRPDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> tourDataMap) {
 
 		boolean returnValue = false;
 
@@ -128,8 +127,7 @@ public class CRPDataReader extends TourbookDevice {
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
 			@SuppressWarnings("unused")
-			final
-			String fileVersion = tokenLine.nextToken();
+			final String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
 			while ((line = fileReader.readLine()) != null) {
@@ -156,9 +154,8 @@ public class CRPDataReader extends TourbookDevice {
 			// tour start time
 			final String tourStartTime = tokenLine.nextToken();
 			final int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
-			final int tourMin = tourStartTime.length() > 5
-					? Integer.parseInt(tourStartTime.substring(3, 5))
-					: Integer.parseInt(tourStartTime.substring(3));
+			final int tourMin = tourStartTime.length() > 5 ? Integer.parseInt(tourStartTime.substring(3, 5)) : Integer
+					.parseInt(tourStartTime.substring(3));
 
 			// recording time
 			final String tourRecTimeSt = tokenLine.nextToken();

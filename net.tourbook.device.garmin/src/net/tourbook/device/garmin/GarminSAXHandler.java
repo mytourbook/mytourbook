@@ -399,6 +399,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				break;
 			}
 		}
+
 		if (validIndex == 0) {
 
 			// date is not 2007-04-01
@@ -469,7 +470,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
-		if (_deviceDataReader.isCreateTourIdWithTime) {
+		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
 
 			/*
 			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
@@ -499,15 +500,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			}
 		}
 
-		Long tourId;
-
-		/*
-		 * if (fId != null) { try{ tourId = Long.parseLong(fId); } catch (final
-		 * NumberFormatException e) { tourId = tourData.createTourId(uniqueKey); } } else
-		 */
-		{
-			tourId = tourData.createTourId(uniqueKey);
-		}
+		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
 		if (_tourDataMap.containsKey(tourId) == false) {

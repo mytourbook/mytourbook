@@ -313,8 +313,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 		final RawDataManager rawDataMgr = RawDataManager.getInstance();
-		final HashMap<Long, TourData> importedTours = rawDataMgr.getImportedTours();
+		rawDataMgr.setImportId();
 
+		final HashMap<Long, TourData> importedTours = rawDataMgr.getImportedTours();
 		final TourData[] firstTourData = new TourData[1];
 
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
@@ -1526,7 +1527,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
-
 		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(isTourSelected, existingTags);
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
@@ -1816,8 +1816,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 		final RawDataManager rawDataMgr = RawDataManager.getInstance();
-
 		rawDataMgr.getImportedTours().clear();
+		rawDataMgr.setImportId();
+
 		int importedFileCounter = 0;
 
 		// loop: import all files

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.nmea;
 
@@ -53,10 +53,7 @@ public class NmeaDataReader extends TourbookDevice {
 
 	private boolean					fNullCoordinates;
 
-	public NmeaDataReader() {
-		canReadFromDevice = false;
-		canSelectMultipleFilesInImportDialog = true;
-	}
+	public NmeaDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -99,13 +96,13 @@ public class NmeaDataReader extends TourbookDevice {
 		final double latitude = nmea.getLatitude();
 		final double longitude = nmea.getLongitude();
 
-		// ignore 0 coordinates, it's very unlikely that they are valid 
+		// ignore 0 coordinates, it's very unlikely that they are valid
 //	Begin of O. Budischewski, 2008.03.19
 		if (latitude == 0 || longitude == 0) {
 			fNullCoordinates = true;
 			return;
 		}
-//	End	  of O. Budischewski, 2008.03.19		
+//	End	  of O. Budischewski, 2008.03.19
 
 		// create new time item
 		final TimeData timeData = new TimeData();
@@ -156,7 +153,7 @@ public class NmeaDataReader extends TourbookDevice {
 		fPrevTimeData = null;
 		fNullCoordinates = false;
 		fTimeDataList.clear();
-//	End	  of O. Budischewski, 2008.03.19		
+//	End	  of O. Budischewski, 2008.03.19
 
 		// if we are so far, we can assume that the file actually exists,
 		// because the validateRawData call must check for it.
@@ -231,7 +228,7 @@ public class NmeaDataReader extends TourbookDevice {
 			e.printStackTrace();
 		}
 
-//	Begin of O. Budischewski, 2008.03.20		
+//	Begin of O. Budischewski, 2008.03.20
 		if (fNullCoordinates == true) {
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
@@ -242,7 +239,7 @@ public class NmeaDataReader extends TourbookDevice {
 				}
 			});
 		}
-//	End	  of O. Budischewski, 2008.03.20		
+//	End	  of O. Budischewski, 2008.03.20
 
 		return setTourData();
 	}
@@ -320,12 +317,13 @@ public class NmeaDataReader extends TourbookDevice {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				try {
 					reader.close();
 				} catch (final IOException e) {
 					e.printStackTrace();
 				}
+			}
 		}
 
 		return false;
