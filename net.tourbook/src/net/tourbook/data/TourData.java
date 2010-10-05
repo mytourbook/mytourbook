@@ -214,8 +214,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# DISTANCE #############################################
 
 	/**
-	 * Total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
-	 * in the field {@link #tourDistance}
+	 * Total distance of the device at tour start (km) tttt (h). Distance for the tour is stored in
+	 * the field {@link #tourDistance}
 	 */
 	private int												startDistance;
 
@@ -535,7 +535,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * {@link #startMonth}, {@link #startDay}, {@link #startHour}, {@link #startMinute} and
 	 * {@link #startSecond}.
 	 * <p>
-	 * {@link #timeSerie} is <code>null</code> for a manually created tour
+	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
+	 * <b>always</b> set when tour is from a device or imported file.
 	 */
 	@Transient
 	public int[]											timeSerie;
@@ -2271,7 +2272,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
-	 * transfered
+	 * transfered.
+	 * <p>
+	 * The array {@link #timeSerie} is always created even when the time is not available.
 	 * 
 	 * @param isCreateMarker
 	 *            creates markers when <code>true</code>
@@ -2671,7 +2674,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		} else {
 
 			/*
-			 * relativ data are available, these data are from non GPS devices
+			 * relativ data is available, these data are from non GPS devices
 			 */
 
 			// convert data from the tour format into an interger[]
@@ -2818,12 +2821,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Create a device marker at the current position
 	 * 
 	 * @param timeData
-	 * @param timeIndex
+	 * @param serieIndex
 	 * @param recordingTime
 	 * @param distanceAbsolute
 	 */
 	private void createTourMarker(	final TimeData timeData,
-									final int timeIndex,
+									final int serieIndex,
 									final long recordingTime,
 									final int distanceAbsolute) {
 
@@ -2833,7 +2836,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		tourMarker.setTime((int) (recordingTime + timeData.marker));
 		tourMarker.setDistance(distanceAbsolute);
-		tourMarker.setSerieIndex(timeIndex);
+		tourMarker.setSerieIndex(serieIndex);
 
 		if (timeData.markerLabel == null) {
 			tourMarker.setLabel(Messages.tour_data_label_device_marker);
@@ -4563,7 +4566,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Set the distance at tour start, this is the distance which the device has accumulated
+	 * Odometer value, this is the distance which the device is accumulating
 	 * 
 	 * @param startDistance
 	 */

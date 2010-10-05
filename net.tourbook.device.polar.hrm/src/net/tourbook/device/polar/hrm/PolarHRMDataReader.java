@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -42,11 +45,10 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
-	private static final String		HR_DATA_DELIMITER		= "\t";
+	private static final String		DATA_DELIMITER			= "\t";
 	private static final String		SECTION_START_CHARACTER	= "[";
 
 	private static final String		SECTION_PARAMS			= "[Params]";
-
 	private static final String		SECTION_NOTE			= "[Note]";
 	private static final String		SECTION_INT_TIMES		= "[IntTimes]";
 	private static final String		SECTION_INT_NOTES		= "[IntNotes]";
@@ -58,8 +60,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";
 	private static final String		SECTION_TRIP			= "[Trip]";
 	private static final String		SECTION_HR_DATA			= "[HRData]";
-	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
 
+	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
 	private static final String		PARAMS_VERSION			= "Version";										//$NON-NLS-1$
 	private static final String		PARAMS_S_MODE			= "SMode";											//$NON-NLS-1$
 	private static final String		PARAMS_DATE				= "Date";											//$NON-NLS-1$
@@ -87,13 +89,15 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private long					_lastUsedImportId;
 
 	private int						_hrmVersion				= -1;
-	private Params					_params;
+
+	private SectionParams			_sectionParams;
+	private SectionTrip				_sectionTrip;
+	private ArrayList<LapData>		_sectionLapData			= new ArrayList<PolarHRMDataReader.LapData>();
+	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<PolarHRMDataReader.HRDataSlice>();
 
 	private boolean					_isDebug				= true;
 
-	private ArrayList<HRDataSlice>	_HRData					= new ArrayList<PolarHRMDataReader.HRDataSlice>();
-
-	class HRDataSlice {
+	private class HRDataSlice {
 
 		public int	pulse		= Integer.MIN_VALUE;
 		public int	speed		= Integer.MIN_VALUE;
@@ -102,7 +106,29 @@ public class PolarHRMDataReader extends TourbookDevice {
 		public int	power		= Integer.MIN_VALUE;
 	}
 
-	class Params {
+	private class LapData extends HRDataSlice {
+
+		/**
+		 * Relative time of the lap in seconds
+		 */
+		public int	time;
+
+		@Override
+		public String toString() {
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append("IntTimes (LapTimes):\n");
+
+			sb.append("\ttime:\t");
+			sb.append(time);
+			sb.append(UI.NEW_LINE);
+
+			return sb.toString();
+		}
+	}
+
+	private class SectionParams {
 
 		public int		version					= Integer.MIN_VALUE;
 		public int		monitor					= Integer.MIN_VALUE;
@@ -127,9 +153,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		public boolean	isUSUnit				= false;
 		public boolean	isAirPressure			= false;
 
-		/*
-		 * mytourbook specific fields
-		 */
+		// mytourbook specific fields
 		public int		mtInterval;
 
 		@Override
@@ -179,10 +203,6 @@ public class PolarHRMDataReader extends TourbookDevice {
 			sb.append(startSecond);
 			sb.append(UI.NEW_LINE);
 
-//			sb.append("\t:\t");
-//			sb.append();
-//			sb.append(UI.NEW_LINE);
-
 			/*
 			 * SMode
 			 */
@@ -190,41 +210,95 @@ public class PolarHRMDataReader extends TourbookDevice {
 				sb.append("SMode:\n");
 
 				sb.append("\tisSpeed\t\t");
-				sb.append(_params.isSpeed);
+				sb.append(_sectionParams.isSpeed);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisCadence\t");
-				sb.append(_params.isCadence);
+				sb.append(_sectionParams.isCadence);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisAltitude\t");
-				sb.append(_params.isAltitude);
+				sb.append(_sectionParams.isAltitude);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisPower\t\t");
-				sb.append(_params.isPower);
+				sb.append(_sectionParams.isPower);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisPowerLR\t");
-				sb.append(_params.isPowerLeftRightBalance);
+				sb.append(_sectionParams.isPowerLeftRightBalance);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisPowerPed\t");
-				sb.append(_params.isPowerPedallingIndex);
+				sb.append(_sectionParams.isPowerPedallingIndex);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisHRAndCycle\t");
-				sb.append(_params.isHRAndCycling);
+				sb.append(_sectionParams.isHRAndCycling);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisUSUnit\t");
-				sb.append(_params.isUSUnit);
+				sb.append(_sectionParams.isUSUnit);
 				sb.append(UI.NEW_LINE);
 
 				sb.append("\tisAirPressure\t");
-				sb.append(_params.isAirPressure);
+				sb.append(_sectionParams.isAirPressure);
 				sb.append(UI.NEW_LINE);
 			}
+
+			return sb.toString();
+		}
+	}
+
+	public class SectionTrip {
+
+		public int	distance		= Integer.MIN_VALUE;
+		public int	ascent			= Integer.MIN_VALUE;
+		public int	totalTime		= Integer.MIN_VALUE;
+		public int	avgAlititude	= Integer.MIN_VALUE;
+		public int	maxAltitude		= Integer.MIN_VALUE;
+		public int	avgSpeed		= Integer.MIN_VALUE;
+		public int	maxSpeed		= Integer.MIN_VALUE;
+		public int	odometer		= Integer.MIN_VALUE;
+
+		@Override
+		public String toString() {
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append("Trip:\n");
+
+			sb.append("\tdistance:\t");
+			sb.append(distance);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tascent:\t\t");
+			sb.append(ascent);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\ttotalTime:\t");
+			sb.append(totalTime);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tavgAlititude:\t");
+			sb.append(avgAlititude);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tmaxAltitude:\t");
+			sb.append(maxAltitude);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tavgSpeed:\t");
+			sb.append(avgSpeed);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tmaxSpeed:\t");
+			sb.append(maxSpeed);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\todometer:\t");
+			sb.append(odometer);
+			sb.append(UI.NEW_LINE);
 
 			return sb.toString();
 		}
@@ -245,58 +319,13 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private void cleanup() {
 
-		if (_HRData != null) {
-			_HRData.clear();
-		}
-	}
-
-	/**
-	 * Converts {@link HRDataSlice} into {@link TimeData}
-	 * 
-	 * @param dtTourStart
-	 * @return
-	 */
-	private ArrayList<TimeData> createTimeSerie(final DateTime dtTourStart) {
-
-		final boolean isImperial = _params.isUSUnit;
-		final int sliceTimeInterval = _params.interval;
-
-		int relativeTime = 0;
-		float absoluteDistance = 0;
-
-		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
-
-		for (final HRDataSlice hrSlice : _HRData) {
-
-			final TimeData dtSlice = new TimeData();
-
-			dtSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
-
-			if (hrSlice.speed != Integer.MIN_VALUE) {
-
-				final float distanceDiff = ((float) hrSlice.speed) * sliceTimeInterval;
-				absoluteDistance += distanceDiff;
-
-				dtSlice.absoluteDistance = absoluteDistance;
-			}
-
-			/*
-			 * convert speed into distance
-			 */
-			if (hrSlice.altitude != Integer.MIN_VALUE) {
-				dtSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
-			}
-
-			if (hrSlice.cadence != Integer.MIN_VALUE) {
-				dtSlice.cadence = hrSlice.cadence;
-			}
-
-			timeDataList.add(dtSlice);
-
-			relativeTime += sliceTimeInterval;
+		if (_sectionHRData != null) {
+			_sectionHRData.clear();
 		}
 
-		return timeDataList;
+		if (_sectionLapData != null) {
+			_sectionLapData.clear();
+		}
 	}
 
 	public String getDeviceModeName(final int profileId) {
@@ -329,7 +358,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * 
 	 * @param value
 	 */
-	private void parseDate(final String value) {
+	private void parseFieldDate(final String value) {
 
 		final byte[] dataBytes = value.getBytes();
 		final int bytesLength = dataBytes.length;
@@ -338,9 +367,9 @@ public class PolarHRMDataReader extends TourbookDevice {
 			return;
 		}
 
-		_params.startYear = Integer.parseInt(value.substring(0, 4));
-		_params.startMonth = Integer.parseInt(value.substring(4, 6));
-		_params.startDay = Integer.parseInt(value.substring(6, 8));
+		_sectionParams.startYear = Integer.parseInt(value.substring(0, 4));
+		_sectionParams.startMonth = Integer.parseInt(value.substring(4, 6));
+		_sectionParams.startDay = Integer.parseInt(value.substring(6, 8));
 	}
 
 	/**
@@ -376,47 +405,47 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * 
 	 * @param dataType
 	 */
-	private void parseSMode(final String dataType) {
+	private void parseFieldSMode(final String dataType) {
 
-		_params.sMode = dataType;
+		_sectionParams.sMode = dataType;
 
 		final byte[] dataBytes = dataType.getBytes();
 		final int bytesLength = dataBytes.length;
 
 		if (bytesLength > 0) {
-			_params.isSpeed = dataBytes[0] == '1';
+			_sectionParams.isSpeed = dataBytes[0] == '1';
 		}
 
 		if (bytesLength > 1) {
-			_params.isCadence = dataBytes[1] == '1';
+			_sectionParams.isCadence = dataBytes[1] == '1';
 		}
 
 		if (bytesLength > 2) {
-			_params.isAltitude = dataBytes[2] == '1';
+			_sectionParams.isAltitude = dataBytes[2] == '1';
 		}
 
 		if (bytesLength > 3) {
-			_params.isPower = dataBytes[3] == '1';
+			_sectionParams.isPower = dataBytes[3] == '1';
 		}
 
 		if (bytesLength > 4) {
-			_params.isPowerLeftRightBalance = dataBytes[4] == '1';
+			_sectionParams.isPowerLeftRightBalance = dataBytes[4] == '1';
 		}
 
 		if (bytesLength > 5) {
-			_params.isPowerPedallingIndex = dataBytes[5] == '1';
+			_sectionParams.isPowerPedallingIndex = dataBytes[5] == '1';
 		}
 
 		if (bytesLength > 6) {
-			_params.isHRAndCycling = dataBytes[6] == '1';
+			_sectionParams.isHRAndCycling = dataBytes[6] == '1';
 		}
 
 		if (bytesLength > 7) {
-			_params.isUSUnit = dataBytes[7] == '1';
+			_sectionParams.isUSUnit = dataBytes[7] == '1';
 		}
 
 		if (bytesLength > 8) {
-			_params.isAirPressure = dataBytes[8] == '1';
+			_sectionParams.isAirPressure = dataBytes[8] == '1';
 		}
 	}
 
@@ -434,7 +463,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * 
 	 * @param value
 	 */
-	private void parseStartTime(final String value) {
+	private void parseFieldStartTime(final String value) {
 
 		final byte[] dataBytes = value.getBytes();
 		final int bytesLength = dataBytes.length;
@@ -445,25 +474,17 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 		final int offset = dataBytes[1] == ':' ? 0 : 1;
 
-		_params.startHour = offset == 0 //
+		_sectionParams.startHour = offset == 0 //
 				? Integer.parseInt(value.substring(0, 1))
 				: Integer.parseInt(value.substring(0, 2));
 
-		_params.startMinute = Integer.parseInt(value.substring(offset + 2, offset + 4));
-		_params.startSecond = Integer.parseInt(value.substring(offset + 5, offset + 7));
+		_sectionParams.startMinute = Integer.parseInt(value.substring(offset + 2, offset + 4));
+		_sectionParams.startSecond = Integer.parseInt(value.substring(offset + 5, offset + 7));
 	}
 
-	@Override
-	public boolean processDeviceData(	final String importFileName,
-										final DeviceData deviceData,
-										final HashMap<Long, TourData> tourDataMap) {
-
-		_importFilePath = importFileName;
-		_deviceData = deviceData;
-
-		if (_isDebug) {
-			System.out.println(importFileName);
-		}
+	private boolean parseSection(	final String importFileName,
+									final DeviceData deviceData,
+									final HashMap<Long, TourData> tourDataMap) {
 		boolean returnValue = false;
 
 		BufferedReader fileReader = null;
@@ -478,11 +499,15 @@ public class PolarHRMDataReader extends TourbookDevice {
 				boolean isValid = true;
 
 				if (line.startsWith(SECTION_PARAMS)) {
-					isValid = read10Params(fileReader, deviceData);
+					isValid = parseSection10Params(fileReader, deviceData);
 				} else if (line.startsWith(SECTION_NOTE)) {
 					// is not yet supported
 				} else if (line.startsWith(SECTION_INT_TIMES)) {
-					// is not yet supported
+
+					if (_hrmVersion == 106) {
+						isValid = parseSection20LapData106(fileReader);
+					}
+
 				} else if (line.startsWith(SECTION_INT_NOTES)) {
 					// is not yet supported
 				} else if (line.startsWith(SECTION_EXTRA_DATA)) {
@@ -498,11 +523,13 @@ public class PolarHRMDataReader extends TourbookDevice {
 				} else if (line.startsWith(SECTION_SWAP_TIMES)) {
 					// is not yet supported
 				} else if (line.startsWith(SECTION_TRIP)) {
-					// is not yet supported
+
+					isValid = parseSection80Trip(fileReader);
+
 				} else if (line.startsWith(SECTION_HR_DATA)) {
 
 					if (_hrmVersion == 106) {
-						isValid = read90HRData106(fileReader);
+						isValid = parseSection90HRData106(fileReader);
 					}
 				}
 
@@ -535,13 +562,13 @@ public class PolarHRMDataReader extends TourbookDevice {
 				return false;
 			}
 		}
-
 		return returnValue;
 	}
 
-	private boolean read10Params(final BufferedReader fileReader, final DeviceData deviceData) throws IOException {
+	private boolean parseSection10Params(final BufferedReader fileReader, final DeviceData deviceData)
+			throws IOException {
 
-		_params = new Params();
+		_sectionParams = new SectionParams();
 
 		String line;
 
@@ -563,35 +590,35 @@ public class PolarHRMDataReader extends TourbookDevice {
 				if (key.equals(PARAMS_VERSION)) {
 
 					// Version=106
-					_params.version = Integer.parseInt(value);
-					_hrmVersion = _params.version;
+					_sectionParams.version = Integer.parseInt(value);
+					_hrmVersion = _sectionParams.version;
 
 				} else if (key.equals(PARAMS_MONITOR)) {
 
 					// Monitor=22
-					_params.monitor = Integer.parseInt(value);
+					_sectionParams.monitor = Integer.parseInt(value);
 
 				} else if (key.equals(PARAMS_S_MODE)) {
 
 					// SMode=101000100
-					parseSMode(value);
+					parseFieldSMode(value);
 
 				} else if (key.equals(PARAMS_DATE)) {
 
 					// Date=20080227
-					parseDate(value);
+					parseFieldDate(value);
 
 				} else if (key.equals(PARAMS_START_TIME)) {
 
 					// StartTime=15:16:19.0
-					parseStartTime(value);
+					parseFieldStartTime(value);
 
 				} else if (key.equals(PARAMS_LENGTH)) {
 					// Length=01:48:49.7
 				} else if (key.equals(PARAMS_INTERVAL)) {
 
 					// Interval=5
-					_params.interval = Integer.parseInt(value);
+					_sectionParams.interval = Integer.parseInt(value);
 
 				} else if (key.equals(PARAMS_UPPER1)) {
 					// Upper1=0
@@ -618,7 +645,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 				} else if (key.equals(PARAMS_REST_HR)) {
 
 					// RestHR=60
-					_params.restHR = Integer.parseInt(value);
+					_sectionParams.restHR = Integer.parseInt(value);
 
 				} else if (key.equals(PARAMS_START_DELAY)) {
 					// StartDelay=0
@@ -636,7 +663,369 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 
 		if (_isDebug) {
-			System.out.println(_params.toString());
+			System.out.println(_sectionParams.toString());
+		}
+
+		return true;
+	}
+
+	/**
+	 * <pre>
+	 * 
+	 * 8.  Lap Times
+	 * 
+	 * DATA  COMMENTS
+	 * 
+	 * [IntTimes]                  							Lap times
+	 * 
+	 * 00:03:43.7   123     100     150		200     		Row 1
+	 * 32           0		0		0       0  		0		Row 2       Lap time 0
+	 * 0  			0       0  		0       0    			Row 3
+	 * 0 			400     455     21      0  		0		Row 4 #
+	 * 0			0		0		0       0		0		Row 5 #
+	 * 
+	 * 00:04:54.7   159     130     170     200       		Row 1
+	 * 32           0       0  		0       0  		0  		Row 2       Lap time 1
+	 * 0  			0       0  		0       0    			Row 3
+	 * 0  			400     470     21      0  		0  		Row 4 #
+	 * 0  			0       0  		0       0  		0  		Row 5 #
+	 * 
+	 * Field descriptions:
+	 * 
+	 * [IntTimes]   										Lap times
+	 * Time  		HR     	HR      HR      HR          	Row 1
+	 * 						min     avg     max
+	 * 
+	 * Flags        Rec.	Rec.	Speed   Cad		Alt		Row 2
+	 * 				Time	HR
+	 * 
+	 * Extra1       Extra2  Extra3  Asc		Dist            Row 3
+	 * 
+	 * Lap type     Lap		Power   Tempe	Phas	Air		Row 4 #
+	 * 				Dist			rature	eLap	Pr
+	 * 
+	 * StrideAvg   	Autom.	0  		0  		0               Row 5 #
+	 * 				lap
+	 * 
+	 * 
+	 * Row 1
+	 * Time         Lap time in format hh:mm:ss.d
+	 * HR           Momentary heart rate value in bpm
+	 * HR min       Lap’s minimum heart rate value in bpm
+	 * HR avg       Lap’s average heart rate value in bpm
+	 * HR max       Lap’s maximum heart rate value in bpm
+	 * 
+	 * Row 2
+	 * Flags        Misc lap time information in 8 bits, 87654321
+	 * 				bit 8 = Polar Coach lap/interval flag (0 = lap, 1 = interval)
+	 *              bit 7 = Int. time erased (for Conconi test, not included to calculation)
+	 *              bit 6 = Int. type (0 = fixed, 1 = from hrm)
+	 *              bit 5 = Extra data 3 (1 = selected to draw)
+	 *              bit 4 = Extra data 2 (1 = selected to draw)
+	 *              bit 3 = Extra data 1 (1 = selected to draw)
+	 *              bits 1,2 = Recovery (0 = no rec, 1 = Time rec, 2 = HR rec)
+	 * Rec. Time    Recovery time (seconds)
+	 * Rec. HR      Recovery HR (bpm)
+	 * Speed        Momentary speed in Xtrainer units (km/h or mph = X/128)
+	 * Cad          Momentary cadence (rpm)
+	 * Alt          Momentary altitude (HRM version 1.02: 10m / 10ft, version 1.05 1m/1ft)*
+	 * 
+	 * Row 3
+	 * Extra 1 - 3 	Values of extra data series (0 - 3000) (the actual value is multiplied by ten)
+	 * Asc          Lap ascent value from XTr+ 10m / 10ft
+	 * Dist         Lap distance value from XTr+ 0.1km / 0.1ft
+	 * 
+	 * Row 4 #
+	 * Lap type     Lap type identifier, replaces flag 8 (Polar Coach lap/interval flag) value
+	 * 
+	 * 				Type    Description  			Type  		Description
+	 * 
+	 *              0  		normal lap  			8192  		end of exercise
+	 *              1  		interval  				16384       off road
+	 *              2  		start of exercise  		32768       road
+	 *              4  		finishing line  		65536       head wind
+	 *              8  		uphill  				131072      tail wind
+	 *              16  	downhill  				262144      Score / goal
+	 *              32  	service  				524288      penalty
+	 *              64  	stopped  				1048576     city/down
+	 *              128     orienteering marker  	2097152     navigation
+	 *              256     u-turn  				4194304     altitude calibration
+	 *              512     summit / peak  			8388608     crossroads
+	 *              1024    sprint  				16777216	landmark
+	 *              2048    crash
+	 *              4096    timeout
+	 * 
+	 * 
+	 * Lap Dist     Manually given lap distance in meters / yards, units are depending on
+	 * 				US/Euro unit selection
+	 * Power        Momentary power value in Watts
+	 * Temperature	Momentary temperature value in Celcius / Fahrenheit, units are depending
+	 * 				on US/Euro unit selection
+	 * PhaseLap     Internal phase/lap information used for interval calculation
+	 * AirPr        Air pressure value from AXN products
+	 * 
+	 * Row 5 #
+	 * StrideAvg    Stride average in cm (RS800, RS800CX only)
+	 * Autom.lap    Automatic lap used (TRUE/FALSE) (RS and CS products)
+	 * 
+	 * The rest of the new lap time parameters are reserved for future usage.
+	 * Lap times were formerly known as Intermediate times.
+	 * 
+	 * 
+	 * </pre>
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean parseSection20LapData106(final BufferedReader fileReader) throws IOException {
+
+		String line;
+
+		while ((line = fileReader.readLine()) != null) {
+
+			// check if section has ended
+			if (line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+				break;
+			}
+
+			final LapData lapData = new LapData();
+
+			try {
+
+				final StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+				/**
+				 * <pre>
+				 * 
+				 * Row 1
+				 * 
+				 * Time         Lap time in format hh:mm:ss.d
+				 * 								   0123456789
+				 * HR           Momentary heart rate value in bpm
+				 * HR min       Lap’s minimum heart rate value in bpm
+				 * HR avg       Lap’s average heart rate value in bpm
+				 * HR max       Lap’s maximum heart rate value in bpm
+				 * 
+				 * Time Lap time in format hh:mm:ss.d
+				 * 						   0123456789
+				 * </pre>
+				 */
+
+				// time
+				final String token = tokenLine.nextToken();
+				final int timeHour = Integer.parseInt(token.substring(0, 2));
+				final int timeMin = Integer.parseInt(token.substring(3, 5));
+				final int timeSec = Integer.parseInt(token.substring(6, 8));
+				lapData.time = timeHour * 3600 + timeMin * 60 + timeSec;
+
+// not yet used
+//				lapData.hr = Integer.parseInt(tokenLine.nextToken());
+//				lapData.hrMin = Integer.parseInt(tokenLine.nextToken());
+//				lapData.hrAvg = Integer.parseInt(tokenLine.nextToken());
+//				lapData.hrMax = Integer.parseInt(tokenLine.nextToken());
+
+				/**
+				 * <pre>
+				 * 
+				 * Row 2
+				 * 
+				 * Flags        Misc lap time information in 8 bits, 87654321
+				 * 				bit 8 = Polar Coach lap/interval flag (0 = lap, 1 = interval)
+				 *              bit 7 = Int. time erased (for Conconi test, not included to calculation)
+				 *              bit 6 = Int. type (0 = fixed, 1 = from hrm)
+				 *              bit 5 = Extra data 3 (1 = selected to draw)
+				 *              bit 4 = Extra data 2 (1 = selected to draw)
+				 *              bit 3 = Extra data 1 (1 = selected to draw)
+				 *              bits 1,2 = Recovery (0 = no rec, 1 = Time rec, 2 = HR rec)
+				 * Rec. Time    Recovery time (seconds)
+				 * Rec. HR      Recovery HR (bpm)
+				 * Speed        Momentary speed in Xtrainer units (km/h or mph = X/128)
+				 * Cad          Momentary cadence (rpm)
+				 * Alt          Momentary altitude (HRM version 1.02: 10m / 10ft, version 1.05 1m/1ft)*
+				 * 
+				 * 
+				 * </pre>
+				 */
+
+				// next line
+				line = fileReader.readLine();
+				if (line == null || line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+					break;
+				}
+
+				/**
+				 * <pre>
+				 * 
+				 * Row 3
+				 * 
+				 * Extra 1 - 3 	Values of extra data series (0 - 3000) (the actual value is multiplied by ten)
+				 * Asc          Lap ascent value from XTr+ 10m / 10ft
+				 * Dist         Lap distance value from XTr+ 0.1km / 0.1ft
+				 * 
+				 * </pre>
+				 */
+
+				// next line
+				line = fileReader.readLine();
+				if (line == null || line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+					break;
+				}
+
+				/**
+				 * <pre>
+				 * 
+				 * Row 4 #
+				 * 
+				 * Lap type     Lap type identifier, replaces flag 8 (Polar Coach lap/interval flag) value
+				 * 
+				 * 				Type    Description  			Type  		Description
+				 * 
+				 *              0  		normal lap  			8192  		end of exercise
+				 *              1  		interval  				16384       off road
+				 *              2  		start of exercise  		32768       road
+				 *              4  		finishing line  		65536       head wind
+				 *              8  		uphill  				131072      tail wind
+				 *              16  	downhill  				262144      Score / goal
+				 *              32  	service  				524288      penalty
+				 *              64  	stopped  				1048576     city/down
+				 *              128     orienteering marker  	2097152     navigation
+				 *              256     u-turn  				4194304     altitude calibration
+				 *              512     summit / peak  			8388608     crossroads
+				 *              1024    sprint  				16777216	landmark
+				 *              2048    crash
+				 *              4096    timeout
+				 * 
+				 * 
+				 * Lap Dist     Manually given lap distance in meters / yards, units are depending on
+				 * 				US/Euro unit selection
+				 * Power        Momentary power value in Watts
+				 * Temperature	Momentary temperature value in Celcius / Fahrenheit, units are depending
+				 * 				on US/Euro unit selection
+				 * PhaseLap     Internal phase/lap information used for interval calculation
+				 * AirPr        Air pressure value from AXN products
+				 * 
+				 * </pre>
+				 */
+
+				// next line
+				line = fileReader.readLine();
+				if (line == null || line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+					break;
+				}
+
+				/**
+				 * <pre>
+				 * 
+				 * Row 5 #
+				 * 
+				 * StrideAvg    Stride average in cm (RS800, RS800CX only)
+				 * Autom.lap    Automatic lap used (TRUE/FALSE) (RS and CS products)
+				 * 
+				 * </pre>
+				 */
+
+				// next line
+				line = fileReader.readLine();
+				if (line == null || line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+					break;
+				}
+
+				// keep lap data
+				_sectionLapData.add(lapData);
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+				continue;
+			}
+		}
+
+		if (_isDebug) {
+			System.out.println(_sectionLapData.toString());
+		}
+
+		return true;
+	}
+
+	/**
+	 * <pre>
+	 * 
+	 * Cycling parameters are available from XTr+, S710, S710i, S720i, S725, S725X.
+	 * 
+	 * [Trip]  Cycling trip data
+	 * 
+	 * 1:	87 		Distance = 8,7 km / mile
+	 * 2:	1400 	Ascent (hrm 1.02 10m / 10ft, hrm 1.05: 1m / 1ft)
+	 * 3:	92982	Total time in seconds
+	 * 4:	1159 	Average altitude (HRM 1.02 10m / 10ft, HRM 1.05: 1m / 1ft)
+	 * 5:	1304	Maximum altitude (HRM 1.02 10m / 10ft, HRM 1.05: 1m / 1ft)
+	 * 6:	1882	Average speed = 1882 / 128 = 14,7 km/h / mph
+	 * 7:	3396	Maximum speed = 3396 / 128 = 26,5 km/h / mph
+	 * 8:	418		Odometer value at the end of an exercise, 418 = 418 km / mile
+	 * 
+	 * </pre>
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean parseSection80Trip(final BufferedReader fileReader) throws IOException {
+
+		_sectionTrip = new SectionTrip();
+
+		String line;
+		int lineNo = 1;
+		// read section
+		while ((line = fileReader.readLine()) != null) {
+
+			// check if section has ended
+			if (line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+				break;
+			}
+
+			try {
+
+				final int value = Integer.parseInt(line);
+
+				switch (lineNo) {
+				case 1:
+					_sectionTrip.distance = value;
+					break;
+				case 2:
+					_sectionTrip.ascent = value;
+					break;
+				case 3:
+					_sectionTrip.totalTime = value;
+					break;
+				case 4:
+					_sectionTrip.avgAlititude = value;
+					break;
+				case 5:
+					_sectionTrip.maxAltitude = value;
+					break;
+				case 6:
+					_sectionTrip.avgSpeed = value;
+					break;
+				case 7:
+					_sectionTrip.maxSpeed = value;
+					break;
+				case 8:
+					_sectionTrip.odometer = value;
+					break;
+
+				default:
+					break;
+				}
+
+			} catch (final NumberFormatException e) {
+				// just ignore it
+			}
+
+			lineNo++;
+		}
+
+		if (_isDebug) {
+			System.out.println(_sectionTrip.toString());
 		}
 
 		return true;
@@ -699,9 +1088,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean read90HRData106(final BufferedReader fileReader) throws IOException {
+	private boolean parseSection90HRData106(final BufferedReader fileReader) throws IOException {
 
-		// read section
 		String line;
 		while ((line = fileReader.readLine()) != null) {
 
@@ -713,7 +1101,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 			final HRDataSlice hrDataSlice = new HRDataSlice();
 			boolean isSliceAvailable = false;
 
-			final StringTokenizer tokenLine = new StringTokenizer(line, HR_DATA_DELIMITER);
+			final StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
 
 			// loop all tokens in one line
 			while (true) {
@@ -728,22 +1116,22 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 					} else
 
-					if (hrDataSlice.speed == Integer.MIN_VALUE && _params.isSpeed) {
+					if (hrDataSlice.speed == Integer.MIN_VALUE && _sectionParams.isSpeed) {
 						hrDataSlice.speed = tokenValue;
 
 					} else
 
-					if (hrDataSlice.cadence == Integer.MIN_VALUE && _params.isCadence) {
+					if (hrDataSlice.cadence == Integer.MIN_VALUE && _sectionParams.isCadence) {
 						hrDataSlice.cadence = tokenValue;
 
 					} else
 
-					if (hrDataSlice.altitude == Integer.MIN_VALUE && _params.isAltitude) {
+					if (hrDataSlice.altitude == Integer.MIN_VALUE && _sectionParams.isAltitude) {
 						hrDataSlice.altitude = tokenValue;
 
 					} else
 
-					if (hrDataSlice.power == Integer.MIN_VALUE && _params.isPower) {
+					if (hrDataSlice.power == Integer.MIN_VALUE && _sectionParams.isPower) {
 						hrDataSlice.power = tokenValue;
 					}
 
@@ -761,11 +1149,31 @@ public class PolarHRMDataReader extends TourbookDevice {
 			}
 
 			if (isSliceAvailable) {
-				_HRData.add(hrDataSlice);
+				_sectionHRData.add(hrDataSlice);
 			}
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> tourDataMap) {
+
+		_importFilePath = importFileName;
+		_deviceData = deviceData;
+
+		if (_isDebug) {
+			System.out.println(importFileName);
+		}
+
+		/*
+		 * cleanup previous import
+		 */
+		_hrmVersion = -1;
+
+		return parseSection(importFileName, deviceData, tourDataMap);
 	}
 
 	private void setTourData(final HashMap<Long, TourData> tourDataMap) {
@@ -777,12 +1185,12 @@ public class PolarHRMDataReader extends TourbookDevice {
 		 * set tour start date/time
 		 */
 		final DateTime dtTourStart = new DateTime(
-				_params.startYear,
-				_params.startMonth,
-				_params.startDay,
-				_params.startHour,
-				_params.startMinute,
-				_params.startSecond,
+				_sectionParams.startYear,
+				_sectionParams.startMonth,
+				_sectionParams.startDay,
+				_sectionParams.startHour,
+				_sectionParams.startMinute,
+				_sectionParams.startSecond,
 				0);
 
 		tourData.setStartHour((short) dtTourStart.getHourOfDay());
@@ -795,15 +1203,22 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 		tourData.setWeek(dtTourStart);
 
-		tourData.setDeviceTimeInterval((short) _params.mtInterval);
+		tourData.setDeviceTimeInterval((short) _sectionParams.mtInterval);
 
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.createTimeSeries(createTimeSerie(dtTourStart), true);
+		tourData.createTimeSeries(setTourData10CreateTimeSeries(dtTourStart), true);
+
+		setTourData20CreateMarkers(tourData);
 		tourData.computeAltitudeUpDown();
 
 //		tourData.setCalories(_calories);
+		tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 : _sectionParams.restHR);
+
+		if (_sectionTrip != null) {
+			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
+		}
 
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -826,6 +1241,117 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourDataMap.put(tourId, tourData);
 		}
 
+	}
+
+	/**
+	 * Converts {@link HRDataSlice} into {@link TimeData}
+	 * 
+	 * @param dtTourStart
+	 * @return
+	 */
+	private ArrayList<TimeData> setTourData10CreateTimeSeries(final DateTime dtTourStart) {
+
+		final boolean isImperial = _sectionParams.isUSUnit;
+		final int sliceTimeInterval = _sectionParams.interval;
+
+		int relativeTime = 0;
+		float absoluteDistance = 0;
+
+		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+
+		for (final HRDataSlice hrSlice : _sectionHRData) {
+
+			final TimeData dtSlice = new TimeData();
+
+			dtSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
+
+			if (hrSlice.pulse != Integer.MIN_VALUE) {
+				dtSlice.pulse = hrSlice.pulse;
+			}
+
+			if (hrSlice.speed != Integer.MIN_VALUE) {
+
+				// convert speed into distance, speed is computed internally and not saved
+
+				final float speed = (float) hrSlice.speed / 10 * 1000 / 3600;
+
+				final float distanceDiff = speed * sliceTimeInterval;
+
+				absoluteDistance += distanceDiff;
+
+				dtSlice.absoluteDistance = absoluteDistance;
+			}
+
+			if (hrSlice.altitude != Integer.MIN_VALUE) {
+				dtSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
+			}
+
+			if (hrSlice.cadence != Integer.MIN_VALUE) {
+				dtSlice.cadence = hrSlice.cadence;
+			}
+
+			timeDataList.add(dtSlice);
+
+			relativeTime += sliceTimeInterval;
+		}
+
+		return timeDataList;
+	}
+
+	/**
+	 * Create a marker for each lap, the markers are currently numbered 1...n
+	 * 
+	 * @param tourData
+	 */
+	private void setTourData20CreateMarkers(final TourData tourData) {
+
+		if (_sectionLapData.size() == 0) {
+			return;
+		}
+
+		final int[] timeSerie = tourData.timeSerie;
+		if (timeSerie.length == 0) {
+			return;
+		}
+
+		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+		final int[] distanceSerie = tourData.distanceSerie;
+
+		int markerCounter = 1;
+
+		for (final LapData lapData : _sectionLapData) {
+
+			final int lapRelativeTime = lapData.time;
+			int serieIndex = 0;
+
+			// get serie index
+			for (final int relativeTime : timeSerie) {
+				if (relativeTime >= lapRelativeTime) {
+					break;
+				}
+				serieIndex++;
+			}
+
+			// check array bounds
+			if (serieIndex >= timeSerie.length) {
+				serieIndex = timeSerie.length - 1;
+			}
+
+			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+			tourMarker.setLabel(Integer.toString(markerCounter));
+			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+			tourMarker.setSerieIndex(serieIndex);
+			tourMarker.setTime(lapRelativeTime);
+
+			if (distanceSerie != null) {
+				tourMarker.setDistance(distanceSerie[serieIndex]);
+			}
+
+			tourMarkers.add(tourMarker);
+
+			markerCounter++;
+		}
 	}
 
 	private void showError(final String message) {
@@ -852,29 +1378,29 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private boolean validateData() {
 
-		if (_params == null) {
+		if (_sectionParams == null) {
 			return false;
 		}
 
 		// check version
-		if (_params.version != 106) {
+		if (_sectionParams.version != 106) {
 			showError(NLS.bind(Messages.Import_Error_DialogMessage_InvalidVersion, _importFilePath));
 			return false;
 		}
 
 		// check SMode
-		if (_params.sMode == null) {
+		if (_sectionParams.sMode == null) {
 			showError(NLS.bind(Messages.Import_Error_DialogMessage_InvalidField, _importFilePath, PARAMS_S_MODE));
 			return false;
 		}
 
 		// check date/time
-		if (_params.startYear == Integer.MIN_VALUE
-				|| _params.startMonth == Integer.MIN_VALUE
-				|| _params.startDay == Integer.MIN_VALUE
-				|| _params.startHour == Integer.MIN_VALUE
-				|| _params.startMinute == Integer.MIN_VALUE
-				|| _params.startSecond == Integer.MIN_VALUE) {
+		if (_sectionParams.startYear == Integer.MIN_VALUE
+				|| _sectionParams.startMonth == Integer.MIN_VALUE
+				|| _sectionParams.startDay == Integer.MIN_VALUE
+				|| _sectionParams.startHour == Integer.MIN_VALUE
+				|| _sectionParams.startMinute == Integer.MIN_VALUE
+				|| _sectionParams.startSecond == Integer.MIN_VALUE) {
 			showError(NLS.bind(Messages.Import_Error_DialogMessage_InvalidDate, _importFilePath));
 			return false;
 		}
@@ -927,7 +1453,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 */
 	private boolean validateData10Monitor() {
 
-		if (_params.monitor == 33) {
+		if (_sectionParams.monitor == 33) {
 			return true;
 		}
 
@@ -970,7 +1496,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 */
 	private boolean validateData20Interval() {
 
-		final int interval = _params.interval;
+		final int interval = _sectionParams.interval;
 
 		if (interval == 1
 				|| interval == 2
@@ -980,7 +1506,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 				|| interval == 60
 				|| interval == 300) {
 
-			_params.mtInterval = interval;
+			_sectionParams.mtInterval = interval;
 
 			return true;
 		}
