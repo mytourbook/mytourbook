@@ -45,21 +45,21 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
-	private static final String		DATA_DELIMITER			= "\t";
-	private static final String		SECTION_START_CHARACTER	= "[";
+	private static final String		DATA_DELIMITER			= "\t"; //$NON-NLS-1$
+	private static final String		SECTION_START_CHARACTER	= "["; //$NON-NLS-1$
 
-	private static final String		SECTION_PARAMS			= "[Params]";
-	private static final String		SECTION_NOTE			= "[Note]";
-	private static final String		SECTION_INT_TIMES		= "[IntTimes]";
-	private static final String		SECTION_INT_NOTES		= "[IntNotes]";
-	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]";
-	private static final String		SECTION_LAP_NAMES		= "[LapNames]";
-	private static final String		SECTION_SUMMARY_123		= "[Summary-123]";
-	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]";
-	private static final String		SECTION_HR_ZONES		= "[HRZones]";
-	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";
-	private static final String		SECTION_TRIP			= "[Trip]";
-	private static final String		SECTION_HR_DATA			= "[HRData]";
+	private static final String		SECTION_PARAMS			= "[Params]"; //$NON-NLS-1$
+	private static final String		SECTION_NOTE			= "[Note]"; //$NON-NLS-1$
+	private static final String		SECTION_INT_TIMES		= "[IntTimes]"; //$NON-NLS-1$
+	private static final String		SECTION_INT_NOTES		= "[IntNotes]"; //$NON-NLS-1$
+	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]"; //$NON-NLS-1$
+	private static final String		SECTION_LAP_NAMES		= "[LapNames]"; //$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_123		= "[Summary-123]"; //$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]"; //$NON-NLS-1$
+	private static final String		SECTION_HR_ZONES		= "[HRZones]"; //$NON-NLS-1$
+	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]"; //$NON-NLS-1$
+	private static final String		SECTION_TRIP			= "[Trip]"; //$NON-NLS-1$
+	private static final String		SECTION_HR_DATA			= "[HRData]"; //$NON-NLS-1$
 
 	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
 	private static final String		PARAMS_VERSION			= "Version";										//$NON-NLS-1$
@@ -93,17 +93,18 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private SectionParams			_sectionParams;
 	private SectionTrip				_sectionTrip;
 	private ArrayList<LapData>		_sectionLapData			= new ArrayList<PolarHRMDataReader.LapData>();
+	private ArrayList<LapNotes>		_sectionLapNotes		= new ArrayList<PolarHRMDataReader.LapNotes>();
 	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<PolarHRMDataReader.HRDataSlice>();
 
-	private boolean					_isDebug				= true;
+	private boolean					_isDebug				= false;
 
 	private class HRDataSlice {
 
-		public int	pulse		= Integer.MIN_VALUE;
-		public int	speed		= Integer.MIN_VALUE;
-		public int	cadence		= Integer.MIN_VALUE;
-		public int	altitude	= Integer.MIN_VALUE;
-		public int	power		= Integer.MIN_VALUE;
+		private int	pulse		= Integer.MIN_VALUE;
+		private int	speed		= Integer.MIN_VALUE;
+		private int	cadence		= Integer.MIN_VALUE;
+		private int	altitude	= Integer.MIN_VALUE;
+		private int	power		= Integer.MIN_VALUE;
 	}
 
 	private class LapData extends HRDataSlice {
@@ -111,17 +112,41 @@ public class PolarHRMDataReader extends TourbookDevice {
 		/**
 		 * Relative time of the lap in seconds
 		 */
-		public int	time;
+		private int	time;
 
 		@Override
 		public String toString() {
 
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append("IntTimes (LapTimes):\n");
+			sb.append("IntTimes (LapTimes):\n"); //$NON-NLS-1$
 
-			sb.append("\ttime:\t");
+			sb.append("\ttime:\t"); //$NON-NLS-1$
 			sb.append(time);
+			sb.append(UI.NEW_LINE);
+
+			return sb.toString();
+		}
+	}
+
+	private class LapNotes extends LapData {
+
+		private int		lapNo	= Integer.MIN_VALUE;
+		private String	noteText;
+
+		@Override
+		public String toString() {
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append("IntNotes (Lap Notes):\n"); //$NON-NLS-1$
+
+			sb.append("\tlapNo:\t"); //$NON-NLS-1$
+			sb.append(lapNo);
+			sb.append(UI.NEW_LINE);
+
+			sb.append("\tnoteText:\t"); //$NON-NLS-1$
+			sb.append(noteText);
 			sb.append(UI.NEW_LINE);
 
 			return sb.toString();
@@ -130,76 +155,76 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private class SectionParams {
 
-		public int		version					= Integer.MIN_VALUE;
-		public int		monitor					= Integer.MIN_VALUE;
-		public int		interval				= Integer.MIN_VALUE;
-		public int		restHR					= Integer.MIN_VALUE;
+		private int		version					= Integer.MIN_VALUE;
+		private int		monitor					= Integer.MIN_VALUE;
+		private int		interval				= Integer.MIN_VALUE;
+		private int		restHR					= Integer.MIN_VALUE;
 
-		public int		startYear				= Integer.MIN_VALUE;
-		public int		startMonth				= Integer.MIN_VALUE;
-		public int		startDay				= Integer.MIN_VALUE;
-		public int		startHour				= Integer.MIN_VALUE;
-		public int		startMinute				= Integer.MIN_VALUE;
-		public int		startSecond				= Integer.MIN_VALUE;
+		private int		startYear				= Integer.MIN_VALUE;
+		private int		startMonth				= Integer.MIN_VALUE;
+		private int		startDay				= Integer.MIN_VALUE;
+		private int		startHour				= Integer.MIN_VALUE;
+		private int		startMinute				= Integer.MIN_VALUE;
+		private int		startSecond				= Integer.MIN_VALUE;
 
-		public String	sMode;
-		public boolean	isSpeed					= false;
-		public boolean	isCadence				= false;
-		public boolean	isAltitude				= false;
-		public boolean	isPower					= false;
-		public boolean	isPowerLeftRightBalance	= false;
-		public boolean	isPowerPedallingIndex	= false;
-		public boolean	isHRAndCycling			= false;
-		public boolean	isUSUnit				= false;
-		public boolean	isAirPressure			= false;
+		private String	sMode;
+		private boolean	isSpeed					= false;
+		private boolean	isCadence				= false;
+		private boolean	isAltitude				= false;
+		private boolean	isPower					= false;
+		private boolean	isPowerLeftRightBalance	= false;
+		private boolean	isPowerPedallingIndex	= false;
+		private boolean	isHRAndCycling			= false;
+		private boolean	isUSUnit				= false;
+		private boolean	isAirPressure			= false;
 
 		// mytourbook specific fields
-		public int		mtInterval;
+		private int		mtInterval;
 
 		@Override
 		public String toString() {
 
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append("Params:\n");
+			sb.append("Params:\n"); //$NON-NLS-1$
 
-			sb.append("\tversion:\t");
+			sb.append("\tversion:\t"); //$NON-NLS-1$
 			sb.append(version);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tmonitor:\t");
+			sb.append("\tmonitor:\t"); //$NON-NLS-1$
 			sb.append(monitor);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tinterval:\t");
+			sb.append("\tinterval:\t"); //$NON-NLS-1$
 			sb.append(interval);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tRestHR:\t\t");
+			sb.append("\tRestHR:\t\t"); //$NON-NLS-1$
 			sb.append(restHR);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartYear:\t");
+			sb.append("\tStartYear:\t"); //$NON-NLS-1$
 			sb.append(startYear);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartMonth:\t");
+			sb.append("\tStartMonth:\t"); //$NON-NLS-1$
 			sb.append(startMonth);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartDay:\t");
+			sb.append("\tStartDay:\t"); //$NON-NLS-1$
 			sb.append(startDay);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartHour:\t");
+			sb.append("\tStartHour:\t"); //$NON-NLS-1$
 			sb.append(startHour);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartMinute:\t");
+			sb.append("\tStartMinute:\t"); //$NON-NLS-1$
 			sb.append(startMinute);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tStartSecond:\t");
+			sb.append("\tStartSecond:\t"); //$NON-NLS-1$
 			sb.append(startSecond);
 			sb.append(UI.NEW_LINE);
 
@@ -207,41 +232,41 @@ public class PolarHRMDataReader extends TourbookDevice {
 			 * SMode
 			 */
 			{
-				sb.append("SMode:\n");
+				sb.append("SMode:\n"); //$NON-NLS-1$
 
-				sb.append("\tisSpeed\t\t");
+				sb.append("\tisSpeed\t\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isSpeed);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisCadence\t");
+				sb.append("\tisCadence\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isCadence);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisAltitude\t");
+				sb.append("\tisAltitude\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isAltitude);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisPower\t\t");
+				sb.append("\tisPower\t\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isPower);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisPowerLR\t");
+				sb.append("\tisPowerLR\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isPowerLeftRightBalance);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisPowerPed\t");
+				sb.append("\tisPowerPed\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isPowerPedallingIndex);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisHRAndCycle\t");
+				sb.append("\tisHRAndCycle\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isHRAndCycling);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisUSUnit\t");
+				sb.append("\tisUSUnit\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isUSUnit);
 				sb.append(UI.NEW_LINE);
 
-				sb.append("\tisAirPressure\t");
+				sb.append("\tisAirPressure\t"); //$NON-NLS-1$
 				sb.append(_sectionParams.isAirPressure);
 				sb.append(UI.NEW_LINE);
 			}
@@ -252,51 +277,51 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	public class SectionTrip {
 
-		public int	distance		= Integer.MIN_VALUE;
-		public int	ascent			= Integer.MIN_VALUE;
-		public int	totalTime		= Integer.MIN_VALUE;
-		public int	avgAlititude	= Integer.MIN_VALUE;
-		public int	maxAltitude		= Integer.MIN_VALUE;
-		public int	avgSpeed		= Integer.MIN_VALUE;
-		public int	maxSpeed		= Integer.MIN_VALUE;
-		public int	odometer		= Integer.MIN_VALUE;
+		private int	distance		= Integer.MIN_VALUE;
+		private int	ascent			= Integer.MIN_VALUE;
+		private int	totalTime		= Integer.MIN_VALUE;
+		private int	avgAlititude	= Integer.MIN_VALUE;
+		private int	maxAltitude		= Integer.MIN_VALUE;
+		private int	avgSpeed		= Integer.MIN_VALUE;
+		private int	maxSpeed		= Integer.MIN_VALUE;
+		private int	odometer		= Integer.MIN_VALUE;
 
 		@Override
 		public String toString() {
 
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append("Trip:\n");
+			sb.append("Trip:\n"); //$NON-NLS-1$
 
-			sb.append("\tdistance:\t");
+			sb.append("\tdistance:\t"); //$NON-NLS-1$
 			sb.append(distance);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tascent:\t\t");
+			sb.append("\tascent:\t\t"); //$NON-NLS-1$
 			sb.append(ascent);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\ttotalTime:\t");
+			sb.append("\ttotalTime:\t"); //$NON-NLS-1$
 			sb.append(totalTime);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tavgAlititude:\t");
+			sb.append("\tavgAlititude:\t"); //$NON-NLS-1$
 			sb.append(avgAlititude);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tmaxAltitude:\t");
+			sb.append("\tmaxAltitude:\t"); //$NON-NLS-1$
 			sb.append(maxAltitude);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tavgSpeed:\t");
+			sb.append("\tavgSpeed:\t"); //$NON-NLS-1$
 			sb.append(avgSpeed);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\tmaxSpeed:\t");
+			sb.append("\tmaxSpeed:\t"); //$NON-NLS-1$
 			sb.append(maxSpeed);
 			sb.append(UI.NEW_LINE);
 
-			sb.append("\todometer:\t");
+			sb.append("\todometer:\t"); //$NON-NLS-1$
 			sb.append(odometer);
 			sb.append(UI.NEW_LINE);
 
@@ -319,12 +344,18 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private void cleanup() {
 
+		_hrmVersion = -1;
+
 		if (_sectionHRData != null) {
 			_sectionHRData.clear();
 		}
 
 		if (_sectionLapData != null) {
 			_sectionLapData.clear();
+		}
+
+		if (_sectionLapNotes != null) {
+			_sectionLapNotes.clear();
 		}
 	}
 
@@ -499,9 +530,13 @@ public class PolarHRMDataReader extends TourbookDevice {
 				boolean isValid = true;
 
 				if (line.startsWith(SECTION_PARAMS)) {
+
 					isValid = parseSection10Params(fileReader, deviceData);
+
 				} else if (line.startsWith(SECTION_NOTE)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_INT_TIMES)) {
 
 					if (_hrmVersion == 106) {
@@ -509,19 +544,33 @@ public class PolarHRMDataReader extends TourbookDevice {
 					}
 
 				} else if (line.startsWith(SECTION_INT_NOTES)) {
-					// is not yet supported
+
+					isValid = parseSection21LapNotes(fileReader);
+
 				} else if (line.startsWith(SECTION_EXTRA_DATA)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_LAP_NAMES)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_SUMMARY_123)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_SUMMARY_TH)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_HR_ZONES)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_SWAP_TIMES)) {
+
 					// is not yet supported
+
 				} else if (line.startsWith(SECTION_TRIP)) {
 
 					isValid = parseSection80Trip(fileReader);
@@ -950,6 +999,57 @@ public class PolarHRMDataReader extends TourbookDevice {
 	/**
 	 * <pre>
 	 * 
+	 * 9.  Lap Time notes
+	 * 
+	 * [IntNotes]  	Intermediate time note texts
+	 * 
+	 * 3  			Traffic lights  Third intermediate time’s note text.
+	 * 5  			Interval  Fifth intermediate time’s note text.
+	 * </pre>
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean parseSection21LapNotes(final BufferedReader fileReader) throws IOException {
+
+		String line;
+
+		while ((line = fileReader.readLine()) != null) {
+
+			// check if section has ended
+			if (line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
+				break;
+			}
+
+			final LapNotes lapNotes = new LapNotes();
+
+			try {
+
+				final StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+				lapNotes.lapNo = Integer.parseInt(tokenLine.nextToken());
+				lapNotes.noteText = tokenLine.nextToken();
+
+				// keep lap notes
+				_sectionLapNotes.add(lapNotes);
+
+			} catch (final Exception e) {
+				// ignore missing text
+				continue;
+			}
+		}
+
+		if (_isDebug) {
+			System.out.println(_sectionLapNotes.toString());
+		}
+
+		return true;
+	}
+
+	/**
+	 * <pre>
+	 * 
 	 * Cycling parameters are available from XTr+, S710, S710i, S720i, S725, S725X.
 	 * 
 	 * [Trip]  Cycling trip data
@@ -1168,11 +1268,6 @@ public class PolarHRMDataReader extends TourbookDevice {
 			System.out.println(importFileName);
 		}
 
-		/*
-		 * cleanup previous import
-		 */
-		_hrmVersion = -1;
-
 		return parseSection(importFileName, deviceData, tourDataMap);
 	}
 
@@ -1208,11 +1303,6 @@ public class PolarHRMDataReader extends TourbookDevice {
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.createTimeSeries(setTourData10CreateTimeSeries(dtTourStart), true);
-
-		setTourData20CreateMarkers(tourData);
-		tourData.computeAltitudeUpDown();
-
 //		tourData.setCalories(_calories);
 		tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 : _sectionParams.restHR);
 
@@ -1220,11 +1310,16 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
 		}
 
+		tourData.createTimeSeries(setTourData10CreateTimeSeries(dtTourStart), true);
+
+		setTourData20CreateMarkers(tourData);
+		tourData.computeAltitudeUpDown();
+
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 
-		uniqueKey = createUniqueId(tourData, distanceSerie, "63193");
+		uniqueKey = createUniqueId(tourData, distanceSerie, "63193"); //$NON-NLS-1$
 
 		final Long tourId = tourData.createTourId(uniqueKey);
 
@@ -1317,7 +1412,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
 		final int[] distanceSerie = tourData.distanceSerie;
 
-		int markerCounter = 1;
+		int lapCounter = 1;
 
 		for (final LapData lapData : _sectionLapData) {
 
@@ -1337,8 +1432,24 @@ public class PolarHRMDataReader extends TourbookDevice {
 				serieIndex = timeSerie.length - 1;
 			}
 
+			// get marker text from lap notes
+			String markerText = null;
+			for (final LapNotes lapNote : _sectionLapNotes) {
+
+				final String lapText = lapNote.noteText;
+
+				if (lapNote.lapNo == lapCounter && lapText != null && lapText.length() > 0) {
+					markerText = lapText;
+				}
+			}
+
+			if (markerText == null) {
+				// set lap number as label when label is not definded in the polar data
+				markerText = Integer.toString(lapCounter);
+			}
+
 			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-			tourMarker.setLabel(Integer.toString(markerCounter));
+			tourMarker.setLabel(markerText);
 			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			tourMarker.setSerieIndex(serieIndex);
@@ -1350,7 +1461,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 			tourMarkers.add(tourMarker);
 
-			markerCounter++;
+			lapCounter++;
 		}
 	}
 

@@ -104,6 +104,8 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	private Button						_btnUp;
 	private Button						_btnDown;
 
+	private Button						_chkTourTypeContextMenu;
+
 	public PrefPageTourTypeFilterList() {}
 
 	public PrefPageTourTypeFilterList(final String title) {
@@ -133,6 +135,8 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 		final Composite ui = createUI(parent);
 
+		restoreState();
+
 		addPrefListener();
 
 		updateViewers();
@@ -159,6 +163,19 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.Pref_TourTypes_dnd_hint);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+
+		/*
+		 * show tour type context menu on mouse over
+		 */
+		_chkTourTypeContextMenu = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkTourTypeContextMenu);
+		_chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
+		_chkTourTypeContextMenu.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				_isModified = true;
+			}
+		});
 
 		// spacer
 		new Label(parent, SWT.WRAP);
@@ -536,13 +553,13 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	}
 
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(_prefStore);
 	}
 
 	@Override
 	public boolean isValid() {
 
-		saveFilterList();
+		saveState();
 
 		return true;
 	}
@@ -745,14 +762,35 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	}
 
 	@Override
+	protected void performDefaults() {
+
+		_isModified = true;
+
+		_chkTourTypeContextMenu.setSelection(_prefStore
+				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+
+		super.performDefaults();
+
+		// this do not work, I have no idea why, but with the apply button it works :-(
+//		fireModificationEvent();
+	}
+
+	@Override
 	public boolean performOk() {
 
-		saveFilterList();
+		saveState();
 
 		return true;
 	}
 
-	private void saveFilterList() {
+	private void restoreState() {
+
+		_chkTourTypeContextMenu.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU));
+
+	}
+
+	private void saveState() {
 
 		if (_isModified) {
 
@@ -760,8 +798,12 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 			TourTypeFilterManager.writeXMLFilterFile(_filterViewer);
 
+			_prefStore.setValue(
+					ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU,
+					_chkTourTypeContextMenu.getSelection());
+
 			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+			_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 		}
 	}
 

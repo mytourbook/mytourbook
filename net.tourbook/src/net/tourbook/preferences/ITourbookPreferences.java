@@ -181,6 +181,7 @@ public interface ITourbookPreferences {
 	public static final String	APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES		= "appearance.NumberOfRecentTourTypes";					//$NON-NLS-1$
 	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";						//$NON-NLS-1$
 	public static final String	APPEARANCE_SHOW_MEMORY_MONITOR				= "appearance.show-memory-monitor";						//$NON-NLS-1$
+	public static final String	APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU		= "appearance.ShowTourTypeContextMenuOnMouseHovering";		//$NON-NLS-1$
 
 	/*
 	 * merge tour dialog

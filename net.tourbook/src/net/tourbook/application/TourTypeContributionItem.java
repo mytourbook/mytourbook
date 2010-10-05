@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourType;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.TourTypeFilter;
@@ -31,6 +32,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -50,12 +54,14 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourTypeContributionItem extends CustomControlContribution {
 
-	private static final String		ID							= "net.tourbook.tourTypeFilter";		//$NON-NLS-1$
+	private static final String		ID							= "net.tourbook.tourTypeFilter";					//$NON-NLS-1$
 
-	public static final String		STATE_TEXT_LENGTH_IN_CHAR	= "";									//$NON-NLS-1$
+	public static final String		STATE_TEXT_LENGTH_IN_CHAR	= "";												//$NON-NLS-1$
 
 	private final IDialogSettings	_state						= TourbookPlugin.getDefault() //
 																		.getDialogSettingsSection(ID);
+
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private int						_textWidth;
 	private final int				_textLengthInChar			= Util.getStateInt(
@@ -75,6 +81,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private boolean					_isUpdating;
 
 	private Menu					_contextMenu;
+
+	private IPropertyChangeListener	_prefListener;
+
+	private boolean					_isShowTourTypeContextMenu;
 
 	{
 		mouseWheelListener = new MouseWheelListener() {
@@ -116,14 +126,29 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			@Override
 			public void mouseEnter(final MouseEvent e) {
 				if (e.widget instanceof Control) {
+
 					((Control) e.widget).setCursor(_cursorHand);
+
+					if (_isShowTourTypeContextMenu && _contextMenu.isVisible() == false) {
+						UI.openControlMenu(_lblFilterIcon);
+					}
 				}
 			}
 
 			@Override
 			public void mouseExit(final MouseEvent e) {
 				if (e.widget instanceof Control) {
+
 					((Control) e.widget).setCursor(null);
+
+					/*
+					 * this is not working because the menu gets the focus and I didn't find a
+					 * solution to hide the context menu when the mouse is moving outside of the
+					 * context menu, 5.10.2010
+					 */
+//					if (_contextMenu.isVisible()) {
+//						_contextMenu.setVisible(false);
+//					}
 				}
 			}
 
@@ -140,6 +165,26 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		super(id);
 	}
 
+	private void addPrefListener() {
+
+		_prefListener = new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+				if (property.equals(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU)) {
+
+					if (event.getNewValue() instanceof Boolean) {
+						_isShowTourTypeContextMenu = (Boolean) event.getNewValue();
+					}
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefListener);
+	}
+
 	@Override
 	protected Control createControl(final Composite parent) {
 
@@ -152,6 +197,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		_cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 
 		TourTypeFilterManager.restoreTourTypeFilter();
+		addPrefListener();
+		restoreState();
 
 		return ui;
 	}
@@ -263,7 +310,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			_cursorHand.dispose();
 		}
 
+		_prefStore.removePropertyChangeListener(_prefListener);
+
 		super.dispose();
+	}
+
+	private void restoreState() {
+
+		_isShowTourTypeContextMenu = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU);
 	}
 
 	public void updateUI(final TourTypeFilter ttFilter) {

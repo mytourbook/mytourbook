@@ -515,6 +515,8 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 
+	public static String	Pref_Appearance_ShowTourTypeContextMenu;
+
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_unit_high;

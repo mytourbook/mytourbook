@@ -97,7 +97,7 @@ public class UI {
 	}
 
 	/**
-	 * Opens the menu for a control aligned below the control on the left side
+	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 * 
 	 * @param control
 	 *            Controls which menu is opened

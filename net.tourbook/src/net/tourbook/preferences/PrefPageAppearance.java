@@ -59,7 +59,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	 */
 	private Spinner					_spinnerRecentTourTypes;
 	private Spinner					_spinnerRecentTags;
-	private Button					_btnMemMonitor;
+	private Button					_chkMemMonitor;
 
 	public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
@@ -124,9 +124,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			/*
 			 * memory monitor
 			 */
-			_btnMemMonitor = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_btnMemMonitor);
-			_btnMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
+			_chkMemMonitor = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkMemMonitor);
+			_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 		}
 		return container;
 	}
@@ -180,7 +180,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_spinnerRecentTourTypes.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
 
-		_btnMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
+		_chkMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 
 		super.performDefaults();
 
@@ -228,7 +228,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_spinnerRecentTourTypes.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
 
-		_btnMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
+		_chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 	}
 
 	private void saveState() {
@@ -241,6 +241,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES,
 				_spinnerRecentTourTypes.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _btnMemMonitor.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
 	}
 }
