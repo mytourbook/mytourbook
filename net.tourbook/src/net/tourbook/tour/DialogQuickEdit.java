@@ -61,7 +61,8 @@ import org.eclipse.ui.forms.widgets.Section;
 public class DialogQuickEdit extends TitleAreaDialog {
 
 	private final boolean				_isOSX							= net.tourbook.util.UI.IS_OSX;
-
+	private final boolean				_isLinux						= net.tourbook.util.UI.IS_LINUX;				;
+ 
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat		_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -233,7 +234,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;

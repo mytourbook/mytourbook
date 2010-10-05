@@ -214,9 +214,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 																								ID + ".marker");			//$NON-NLS-1$
 
 	private final boolean						_isOSX							= net.tourbook.util.UI.IS_OSX;
+	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;			;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
-
+ 
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
@@ -2579,7 +2580,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void createUI(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = pixelConverter.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
