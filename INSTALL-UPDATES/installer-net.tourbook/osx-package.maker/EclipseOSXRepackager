@@ -1,0 +1,218 @@
+#! /bin/bash
+
+####################################################################################
+#  Utility functions required for parsing user input
+
+function fatal_error() {
+  echo "FATAL ERROR: $1"
+  exit 1
+}
+
+function version() {
+  rev="[[ver]]"
+  if test -z "$1"; then
+    echo "YourSway Eclipse OS X Repackager $rev"
+  else
+    echo -n "$rev"
+  fi
+}
+
+function usage() {
+  version
+  echo "Repackages a standard Eclipse installation as a Mac OS X bundle."
+  echo "Usage:  $(basename $0) [options] path_to_eclipse [destination]"
+  echo "Where:"
+  echo "  path_to_eclipse   path to a directory containing Eclipse.app"
+  echo "                    (or some other .app), plugins, features etc"
+  echo "  destination       target directory; if does not end with .app, "
+  echo "                    bundle name and version are appended automatically"
+  echo "Options:"
+  echo "  -f, --force       force overwriting of the destination folder"
+  echo "  -v, --verbose     show files as they are being copied"
+  echo "  --version         show tool version number"
+  echo "  --explore         explore the passed arguments and dump all computed"
+  echo "                    information (for front-ends' use)"
+  echo "  -h, --help        display this help"
+  exit 0
+}
+
+####################################################################################
+#  Parse options
+
+force_overwrite=0
+explore_mode=0
+verbose=""
+while test "${1:0:1}" = "-"; do
+  case $1 in
+    -f | --force)
+      force_overwrite=1
+      shift;;
+    -v | --verbose)
+      verbose="-v"
+      shift;;
+    --explore)
+      explore_mode=1
+      shift;;
+    -h | --help)
+      usage;;
+    --version)
+      version
+      exit 0;;
+    --pure-version)
+      version pure
+      exit 0;;
+    -*)
+      fatal_error "unknown option: $1";;
+  esac
+done
+
+
+####################################################################################
+#  Parse positional arguments
+
+source_dir="$1"
+target_dir="$2"
+
+test -z "$source_dir" && fatal_error "source directory must be specified (run with --help for usage)"
+test -d "$source_dir" || fatal_error "source directory $source_dir does not exist"
+
+
+####################################################################################
+#  Find Eclipse launcher app
+
+source_app_dir="$source_dir/Eclipse.app"
+if ! test -d "$source_app_dir"; then
+  source_app_name="$(cd $source_dir; ls -1d *.app)"
+  test -z "$source_app_name"  && fatal_error "launcher not found: neither Eclipse.app nor *.app found in $source_dir"
+  source_app_dir="$source_dir/$source_app_name"
+fi
+
+
+####################################################################################
+#  Determine additional locations
+
+source_parent_dir="$(dirname "$source_dir")"
+source_info_plist="$source_app_dir/Contents/Info.plist"
+source_plugins_dir="$source_dir/plugins"
+source_features_dir="$source_dir/features"
+source_configuration_dir="$source_dir/configuration"
+source_p2_dir="$source_dir/p2"
+source_artifacts_xml="$source_dir/artifacts.xml"
+mv_or_cp_r="cp -r"
+mv_or_cp_desc="Copying"
+
+
+####################################################################################
+#  Additional checks
+
+test -d "$source_plugins_dir"        || fatal_error "directory not found: $source_plugins_dir"
+test -d "$source_configuration_dir"  || fatal_error "directory not found: $source_configuration_dir"
+test -f "$source_info_plist"         || fatal_error "expected file to exist: $source_info_plist"
+
+is_p2=false
+test -d "$source_p2_dir" && is_p2=true
+
+####################################################################################
+#  Detemine target bundle name and location (and check if it exists)
+
+bundle_name="$(perl -ne '
+    print $1 and exit if (/<key>CFBundleName<\/key>/ ... /<key>/) && /<string>([^<]+)<\/string>/;
+' "$source_info_plist")"
+
+bundle_version="$(perl -ne '
+    print $1 and exit if (/<key>CFBundleShortVersionString<\/key>/ ... /<key>/) && /<string>([^<]+)<\/string>/;
+' "$source_info_plist")"
+
+target_dir_name="$bundle_name $bundle_version.app"
+
+if test -z "$target_dir"; then
+  target_dir="$source_parent_dir/$target_dir_name"
+elif test "${target_dir:${#target_dir}-4:4}" = ".app"; then
+  target_dir_name="$(basename $target_dir)"
+else
+  target_dir="$target_dir/$target_dir_name"
+fi
+
+
+####################################################################################
+#  Find the launcher
+
+launcher_jar="$(cd $source_plugins_dir; ls -1 org.eclipse.equinox.launcher_*)"
+launcher_fragment_jar="$(cd $source_plugins_dir; ls -1 org.eclipse.equinox.launcher.cocoa.macosx*/eclipse*.so)"
+test -z "$launcher_fragment_jar" &&
+  launcher_fragment_jar="$(cd $source_plugins_dir; ls -1 org.eclipse.equinox.launcher.carbon.macosx_*/eclipse*.so)"
+
+test -z "$launcher_jar"          && fatal_error "cannot find launcher jar (org.eclipse.equinox.launcher_*)"
+test -z "$launcher_fragment_jar" && fatal_error "cannot find launcher fragment jar (org.eclipse.equinox.launcher.carbon.macosx_*)"
+
+
+####################################################################################
+#  Advertise what we'll be doing
+
+target_info_plist="$target_dir/Contents/Info.plist"
+target_java_dir="$target_dir/Contents/Resources/Java"
+
+if test "$explore_mode" -eq 1; then
+  echo "SourceDirectory: $source_dir"
+  echo "BundleName: $bundle_name"
+  echo "BundleVersion: $bundle_version"
+  echo "DestinationDirectory: $target_dir"
+  exit 0
+fi
+
+test -d "$target_dir" -a "$force_overwrite" -eq 0 && fatal_error "directory already exists: '$target_dir' (pass --force to overwrite)"
+
+echo "Source Eclipse installation:  $source_dir"
+echo "Destination Mac OS X bundle:  $target_dir"
+
+####################################################################################
+#  Proceed!
+
+test -d "$target_dir" && (echo "Removing old bundle..."; rm -r "$target_dir")
+
+echo "Copying launcher..."
+mkdir -p "$target_dir/Contents"
+cp -r "$source_app_dir/Contents/MacOS" "$target_dir/Contents/MacOS"
+cp -r "$source_app_dir/Contents/Resources" "$target_dir/Contents/Resources"
+
+perl -pe "
+  if(/<string>-keyring<\/string>/) {
+    print \"<string>-startup</string>\n\";
+    print \"<string>\\\$APP_PACKAGE/Contents/Resources/Java/plugins/$launcher_jar</string>\n\";
+    print \"<string>--launcher.library</string>\n\";
+    print \"<string>\\\$APP_PACKAGE/Contents/Resources/Java/plugins/$launcher_fragment_jar</string>\n\";
+  }
+  if(/<\/array>/) {
+    print \"<key>WorkingDirectory</key>\n\";
+    print \"<string>\\\$APP_PACKAGE/Contents/Resources/Java</string>\n\";
+  }
+" "$source_info_plist" >"$target_info_plist"
+
+# check that Perl script was successful
+grep -q "launcher.library" "$target_info_plist" || fatal_error "internal error (1) when building Info.plist"
+grep -q "WorkingDirectory" "$target_info_plist" || fatal_error "internal error (2) when building Info.plist"
+
+mkdir "$target_java_dir"
+
+echo "$mv_or_cp_desc configuration area..."
+$mv_or_cp_r $verbose "$source_configuration_dir" "$target_java_dir/configuration"
+
+if test -d "$source_p2_dir"; then
+	echo "$mv_or_cp_desc p2 configuration..."
+	$mv_or_cp_r $verbose "$source_p2_dir" "$target_java_dir/p2"
+fi
+
+if test -f "$source_artifacts_xml"; then
+	echo "$mv_or_cp_desc p2 artifacts..."
+	$mv_or_cp_r $verbose "$source_artifacts_xml" "$target_java_dir/artifacts.xml"
+fi
+
+test -d "$source_features_dir" && {
+  echo "$mv_or_cp_desc features..."
+  $mv_or_cp_r $verbose "$source_features_dir" "$target_java_dir/features"
+}
+
+echo "$mv_or_cp_desc plugins..."
+$mv_or_cp_r $verbose "$source_plugins_dir" "$target_java_dir/plugins"
+
+echo "Done."

@@ -1,0 +1,93 @@
+#! /bin/bash
+APP_BUNDLE="$1"; shift
+DLG="$APP_BUNDLE/Contents/Resources/CocoaDialog.app/Contents/MacOS/CocoaDialog"
+WORKER="$APP_BUNDLE/Contents/Resources/EclipseOSXRepackager"
+
+if ! test -z "$TEST_REPACKAGER_UI"; then
+  DLG="/Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog"
+  WORKER="./EclipseOSXRepackager"
+fi
+
+title="Eclipse OS X Repackager [[ver]]"
+
+function display_fatal_error() {
+  "$DLG" msgbox --title "$title" --text "Fatal error" --informative-text "$1" --button1 "Give up and exit"
+  exit 1
+}
+
+# borrowed from http://yost.com/computers/MacStuff/reveal/index.html
+# unix path -> old-style Mac path for AppleScript
+function colonize() {
+  sed 's,.*,"&",
+       s,/,\&,g
+       s,:,/,g
+       s,^"&Volumes&,",
+       s,^"&.*,& of startup disk,' \
+  | sed 's,&,:,g' \
+  | tr -d '\012'
+}
+
+source_dir="$1"
+if test -z "$source_dir"; then
+  source_dir="$("$DLG" fileselect --select‑directories --title "$title" --text "Choose any file inside Eclipse installation to turn into OS X bundle")"
+  test -z "$source_dir" && exit 1
+  if test -f "$source_dir"; then source_dir="$(dirname "$source_dir")"; fi
+fi
+
+info="$("$WORKER" --explore $source_dir)" || display_fatal_error "$info"
+  
+{
+  read bname
+  read bver
+} < <("$WORKER" --explore $source_dir | awk '
+  /^BundleName:/ { bname = $2 }
+  /^BundleVersion:/ { bver = $2 }
+  END {
+    print bname
+    print bver
+  }
+')
+
+source_parent_dir="$(dirname $source_dir)"
+
+{
+  read button
+  read destination_bundle_name
+} < <("$DLG" dropdown --string-output --title "$title" --text "Choose where to save the bundle" --button1 "Start repackaging!" --button2 "Cancel" --items "/Applications/$bname $bver" "/Applications/$bname"  "$source_parent_dir/$bname $bver" "$source_parent_dir/$bname")
+
+test "$button" = "Cancel" && exit 1
+
+destination_bundle="$destination_bundle_name.app"
+
+if test -d "$destination_bundle"; then
+  choice="$("$DLG" msgbox --title "$title" --text "Overwritexx?" --informative-text "Directory $destination_bundle already exists." --button1 "Overwrite" --button2 "Cancel")"
+  test "$choice" -ne 1 && exit 0
+  rm -r "$destination_bundle"
+fi
+
+{
+  line=""
+  activity=""
+  while ! test "$line" == "Done."; do
+    read line
+    test "${line:0:5}" = "FATAL" && display_fatal_error "$line"
+    test "${line:${#line}-3:3}" = "..." && activity="${line:0:${#line}-3}"
+    test "${line:0:1}" = "/" -a ! -z "$activity" && line="$activity: $(basename "$line")"
+    echo "0 $line"
+  done
+} < <("$WORKER" --verbose "$source_dir" "$destination_bundle") > >("$DLG" progressbar --title "$title" --text "Starting..." --indeterminate)
+
+choice="$("$DLG" msgbox --title "$title" --text "Done!" --informative-text "Now you can enjoy $destination_bundle_name." --button1 "Ah, that was amazing")"
+
+case $choice in
+  1)
+    exit 0;;
+  2)
+    itemColonized="$(echo -n "$destination_bundle" | colonize)"
+    osascript -e "
+      tell application \"Finder\"
+        reveal $itemColonized
+        activate
+      end tell
+    ";;
+esac
