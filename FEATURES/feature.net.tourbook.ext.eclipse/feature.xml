@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="feature.net.tourbook.ext.eclipse"
-      label="Additional Eclipse Plugins"
-      version="3.6.0.qualifier">
+      label="Additional Eclipse Plugins for MyTourbook"
+      version="3.6.1.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

@@ -785,9 +785,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
 				if ((firstElement != null) && (firstElement instanceof TourData)) {
-					TourManager.openTourEditor(true);
 					TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
-
 				}
 			}
 		});

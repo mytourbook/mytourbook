@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jars for printing
+Bundle-Name: External jar's for printing
 Bundle-SymbolicName: net.tourbook.ext.jars.printing;singleton:=true
-Bundle-Version: 10.9.1.qualifier
+Bundle-Version: 10.10.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: avalon-framework-4.2.0.jar,

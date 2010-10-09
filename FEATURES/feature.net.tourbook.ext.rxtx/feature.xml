@@ -310,7 +310,7 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook.rxtx_2.2"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          unpack="false"/>
 
    <plugin
@@ -318,7 +318,7 @@ POSSIBILITY OF SUCH DAMAGES.
          os="macosx"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          fragment="true"
          unpack="false"/>
 
@@ -328,7 +328,7 @@ POSSIBILITY OF SUCH DAMAGES.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          fragment="true"
          unpack="false"/>
 
@@ -338,7 +338,7 @@ POSSIBILITY OF SUCH DAMAGES.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          fragment="true"
          unpack="false"/>
 
@@ -348,7 +348,7 @@ POSSIBILITY OF SUCH DAMAGES.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          fragment="true"
          unpack="false"/>
 
@@ -358,7 +358,7 @@ POSSIBILITY OF SUCH DAMAGES.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.2.2.pre2"
          fragment="true"
          unpack="false"/>
 
