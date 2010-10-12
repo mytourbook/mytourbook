@@ -25,14 +25,13 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String	Import_Error_DeviceNameIsUnknown;
 	public static String		Import_Error_DialogMessage_InvalidDate;
 	public static String		Import_Error_DialogMessage_InvalidDevice;
 	public static String		Import_Error_DialogMessage_InvalidField;
 	public static String		Import_Error_DialogMessage_InvalidInterval;
 	public static String		Import_Error_DialogMessage_InvalidVersion;
 	public static String		Import_Error_DialogTitle;
-
-	public static String		Supported_Devices_Polar_CS400;
 
 	public static String		Supported_Intervals_1_Second;
 	public static String		Supported_Intervals_15_Second;

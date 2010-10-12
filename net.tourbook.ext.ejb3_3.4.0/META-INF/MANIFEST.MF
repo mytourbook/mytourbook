@@ -4,7 +4,7 @@ Bundle-Name: Hibernate EJB3
 Bundle-SymbolicName: net.tourbook.ext.ejb3;singleton:=true
 Bundle-Version: 3.4.0
 Eclipse-BuddyPolicy: registered
-Bundle-Vendor: MyTourbook
+Bundle-Vendor: MyTourbook 
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: slf4j-api-1.5.8.jar,

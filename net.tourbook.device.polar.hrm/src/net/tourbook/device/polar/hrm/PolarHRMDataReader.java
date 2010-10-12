@@ -45,23 +45,24 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
-	private static final String		DATA_DELIMITER			= "\t"; //$NON-NLS-1$
-	private static final String		SECTION_START_CHARACTER	= "["; //$NON-NLS-1$
+	private static final String		DATA_DELIMITER			= "\t";											//$NON-NLS-1$
 
-	private static final String		SECTION_PARAMS			= "[Params]"; //$NON-NLS-1$
-	private static final String		SECTION_NOTE			= "[Note]"; //$NON-NLS-1$
-	private static final String		SECTION_INT_TIMES		= "[IntTimes]"; //$NON-NLS-1$
-	private static final String		SECTION_INT_NOTES		= "[IntNotes]"; //$NON-NLS-1$
-	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]"; //$NON-NLS-1$
-	private static final String		SECTION_LAP_NAMES		= "[LapNames]"; //$NON-NLS-1$
-	private static final String		SECTION_SUMMARY_123		= "[Summary-123]"; //$NON-NLS-1$
-	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]"; //$NON-NLS-1$
-	private static final String		SECTION_HR_ZONES		= "[HRZones]"; //$NON-NLS-1$
-	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]"; //$NON-NLS-1$
-	private static final String		SECTION_TRIP			= "[Trip]"; //$NON-NLS-1$
-	private static final String		SECTION_HR_DATA			= "[HRData]"; //$NON-NLS-1$
+	private static final String		SECTION_START_CHARACTER	= "[";												//$NON-NLS-1$
+	private static final String		SECTION_PARAMS			= "[Params]";										//$NON-NLS-1$
 
+	private static final String		SECTION_NOTE			= "[Note]";										//$NON-NLS-1$
+	private static final String		SECTION_INT_TIMES		= "[IntTimes]";									//$NON-NLS-1$
+	private static final String		SECTION_INT_NOTES		= "[IntNotes]";									//$NON-NLS-1$
+	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]";									//$NON-NLS-1$
+	private static final String		SECTION_LAP_NAMES		= "[LapNames]";									//$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_123		= "[Summary-123]";									//$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]";									//$NON-NLS-1$
+	private static final String		SECTION_HR_ZONES		= "[HRZones]";										//$NON-NLS-1$
+	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";									//$NON-NLS-1$
+	private static final String		SECTION_TRIP			= "[Trip]";										//$NON-NLS-1$
+	private static final String		SECTION_HR_DATA			= "[HRData]";										//$NON-NLS-1$
 	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
+
 	private static final String		PARAMS_VERSION			= "Version";										//$NON-NLS-1$
 	private static final String		PARAMS_S_MODE			= "SMode";											//$NON-NLS-1$
 	private static final String		PARAMS_DATE				= "Date";											//$NON-NLS-1$
@@ -83,20 +84,82 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private static final String		PARAMS_START_DELAY		= "StartDelay";									//$NON-NLS-1$
 	private static final String		PARAMS_VO2MAX			= "VO2max";										//$NON-NLS-1$
 	private static final String		PARAMS_WEIGHT			= "Weight";										//$NON-NLS-1$
-
 	private DeviceData				_deviceData;
+
 	private String					_importFilePath;
 	private long					_lastUsedImportId;
-
 	private int						_hrmVersion				= -1;
 
 	private SectionParams			_sectionParams;
+
 	private SectionTrip				_sectionTrip;
 	private ArrayList<LapData>		_sectionLapData			= new ArrayList<PolarHRMDataReader.LapData>();
 	private ArrayList<LapNotes>		_sectionLapNotes		= new ArrayList<PolarHRMDataReader.LapNotes>();
 	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<PolarHRMDataReader.HRDataSlice>();
-
 	private boolean					_isDebug				= false;
+
+	/**
+	 * <pre>
+	 * 
+	 * Heart rate monitor type
+	 * 
+	 *  1 = Polar Sport Tester / Vantage XL
+	 *  2 = Polar Vantage NV (VNV)
+	 *  3 = Polar Accurex Plus
+	 *  4 = Polar XTrainer Plus
+	 *  6 = Polar S520
+	 *  7 = Polar Coach
+	 *  8 = Polar S210
+	 *  9 = Polar S410
+	 * 10 = Polar S510
+	 * 11 = Polar S610 / S610i
+	 * 12 = Polar S710 / S710i / S720i
+	 * 13 = Polar S810 / S810i
+	 * 15 = Polar E600
+	 * 20 = Polar AXN500
+	 * 21 = Polar AXN700
+	 * 22 = Polar S625X / S725X
+	 * 23 = Polar S725
+	 * 33 = Polar CS400
+	 * 34 = Polar CS600X
+	 * 35 = Polar CS600
+	 * 36 = Polar RS400
+	 * 37 = Polar RS800
+	 * 38 = Polar RS800X
+	 * 
+	 * </pre>
+	 */
+	private final PolarDevice[]		_polarDevices;
+
+	{
+		_polarDevices = new PolarDevice[] { //
+		//
+			new PolarDevice(1, "Polar Sport Tester / Vantage XL"), //$NON-NLS-1$
+			new PolarDevice(2, "Polar Vantage NV (VNV)"), //$NON-NLS-1$
+			new PolarDevice(3, "Polar Accurex Plus"), //$NON-NLS-1$
+			new PolarDevice(4, "Polar XTrainer Plus"), //$NON-NLS-1$
+			new PolarDevice(6, "Polar S520"), //$NON-NLS-1$
+			new PolarDevice(7, "Polar Coach"), //$NON-NLS-1$
+			new PolarDevice(8, "Polar S210"), //$NON-NLS-1$
+			new PolarDevice(9, "Polar S410"), //$NON-NLS-1$
+			new PolarDevice(10, "Polar S510"), //$NON-NLS-1$
+			new PolarDevice(11, "Polar S610 / S610i"), //$NON-NLS-1$
+			new PolarDevice(12, "Polar S710 / S710i / S720i"), //$NON-NLS-1$
+			new PolarDevice(13, "Polar S810 / S810i"), //$NON-NLS-1$
+			new PolarDevice(15, "Polar E600"), //$NON-NLS-1$
+			new PolarDevice(20, "Polar AXN500"), //$NON-NLS-1$
+			new PolarDevice(21, "Polar AXN700"), //$NON-NLS-1$
+			new PolarDevice(22, "Polar S625X / S725X"), //$NON-NLS-1$
+			new PolarDevice(23, "Polar S725"), //$NON-NLS-1$
+			new PolarDevice(33, "Polar CS400"), //$NON-NLS-1$
+			new PolarDevice(34, "Polar CS600X"), //$NON-NLS-1$
+			new PolarDevice(35, "Polar CS600"), //$NON-NLS-1$
+			new PolarDevice(36, "Polar RS400"), //$NON-NLS-1$
+			new PolarDevice(37, "Polar RS800"), //$NON-NLS-1$
+			new PolarDevice(38, "Polar RS800X"), //$NON-NLS-1$
+		//
+		};
+	}
 
 	private class HRDataSlice {
 
@@ -153,6 +216,17 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 	}
 
+	private class PolarDevice {
+
+		private int		_deviceNo;
+		private String	_deviceName;
+
+		public PolarDevice(final int deviceNo, final String deviceName) {
+			_deviceNo = deviceNo;
+			_deviceName = deviceName;
+		}
+	}
+
 	private class SectionParams {
 
 		private int		version					= Integer.MIN_VALUE;
@@ -180,6 +254,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 		// mytourbook specific fields
 		private int		mtInterval;
+		private String	monitorName;
 
 		@Override
 		public String toString() {
@@ -361,6 +436,17 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	public String getDeviceModeName(final int profileId) {
 		return null;
+	}
+
+	private String getMonitorName(final int monitor) {
+
+		for (final PolarDevice device : _polarDevices) {
+			if (device._deviceNo == monitor) {
+				return device._deviceName;
+			}
+		}
+
+		return visibleName + UI.SPACE + Messages.Import_Error_DeviceNameIsUnknown;
 	}
 
 	@Override
@@ -645,7 +731,9 @@ public class PolarHRMDataReader extends TourbookDevice {
 				} else if (key.equals(PARAMS_MONITOR)) {
 
 					// Monitor=22
-					_sectionParams.monitor = Integer.parseInt(value);
+					final int monitor = Integer.parseInt(value);
+					_sectionParams.monitor = monitor;
+					_sectionParams.monitorName = getMonitorName(monitor);
 
 				} else if (key.equals(PARAMS_S_MODE)) {
 
@@ -1330,7 +1418,9 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourData.computeComputedValues();
 
 			tourData.setDeviceId(deviceId);
-			tourData.setDeviceName(visibleName);
+			tourData.setDeviceName(_sectionParams.monitorName);
+
+			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
 
 			// add new tour to other tours
 			tourDataMap.put(tourId, tourData);
@@ -1516,9 +1606,10 @@ public class PolarHRMDataReader extends TourbookDevice {
 			return false;
 		}
 
-		if (validateData10Monitor() == false) {
-			return false;
-		}
+// disabled because data version is already checked
+//		if (validateData10Monitor() == false) {
+//			return false;
+//		}
 
 		if (validateData20Interval() == false) {
 			return false;
@@ -1527,59 +1618,59 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return true;
 	}
 
-	/**
-	 * check monitor
-	 * 
-	 * <pre>
-	 * 
-	 * Heart rate monitor type
-	 * 
-	 *  1 = Polar Sport Tester / Vantage XL
-	 *  2 = Polar Vantage NV (VNV)
-	 *  3 = Polar Accurex Plus
-	 *  4 = Polar XTrainer Plus
-	 *  6 = Polar S520
-	 *  7 = Polar Coach
-	 *  8 = Polar S210
-	 *  9 = Polar S410
-	 * 10 = Polar S510
-	 * 11 = Polar S610 / S610i
-	 * 12 = Polar S710 / S710i / S720i
-	 * 13 = Polar S810 / S810i
-	 * 15 = Polar E600
-	 * 20 = Polar AXN500
-	 * 21 = Polar AXN700
-	 * 22 = Polar S625X / S725X
-	 * 23 = Polar S725
-	 * 33 = Polar CS400
-	 * 34 = Polar CS600X
-	 * 35 = Polar CS600
-	 * 36 = Polar RS400
-	 * 37 = Polar RS800
-	 * 38 = Polar RS800X
-	 * 
-	 * </pre>
-	 * 
-	 * @return
-	 */
-	private boolean validateData10Monitor() {
-
-		if (_sectionParams.monitor == 33) {
-			return true;
-		}
-
-		final StringBuilder supportedDevices = new StringBuilder();
-
-		supportedDevices.append(Messages.Supported_Devices_Polar_CS400);
-		supportedDevices.append(UI.NEW_LINE);
-
-		showError(NLS.bind(
-				Messages.Import_Error_DialogMessage_InvalidDevice,
-				_importFilePath,
-				supportedDevices.toString()));
-
-		return false;
-	}
+//	/**
+//	 * check monitor
+//	 *
+//	 * <pre>
+//	 *
+//	 * Heart rate monitor type
+//	 *
+//	 *  1 = Polar Sport Tester / Vantage XL
+//	 *  2 = Polar Vantage NV (VNV)
+//	 *  3 = Polar Accurex Plus
+//	 *  4 = Polar XTrainer Plus
+//	 *  6 = Polar S520
+//	 *  7 = Polar Coach
+//	 *  8 = Polar S210
+//	 *  9 = Polar S410
+//	 * 10 = Polar S510
+//	 * 11 = Polar S610 / S610i
+//	 * 12 = Polar S710 / S710i / S720i
+//	 * 13 = Polar S810 / S810i
+//	 * 15 = Polar E600
+//	 * 20 = Polar AXN500
+//	 * 21 = Polar AXN700
+//	 * 22 = Polar S625X / S725X
+//	 * 23 = Polar S725
+//	 * 33 = Polar CS400
+//	 * 34 = Polar CS600X
+//	 * 35 = Polar CS600
+//	 * 36 = Polar RS400
+//	 * 37 = Polar RS800
+//	 * 38 = Polar RS800X
+//	 *
+//	 * </pre>
+//	 *
+//	 * @return
+//	 */
+//	private boolean validateData10Monitor() {
+//
+//		if (_sectionParams.monitor == 33) {
+//			return true;
+//		}
+//
+//		final StringBuilder supportedDevices = new StringBuilder();
+//
+//		supportedDevices.append(Messages.Supported_Devices_Polar_CS400);
+//		supportedDevices.append(UI.NEW_LINE);
+//
+//		showError(NLS.bind(
+//				Messages.Import_Error_DialogMessage_InvalidDevice,
+//				_importFilePath,
+//				supportedDevices.toString()));
+//
+//		return false;
+//	}
 
 	/**
 	 * check interval
