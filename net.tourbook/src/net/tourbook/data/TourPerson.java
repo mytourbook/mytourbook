@@ -16,6 +16,8 @@
 
 package net.tourbook.data;
 
+import java.sql.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -53,6 +55,8 @@ public class TourPerson {
 
 	private float			height;
 
+	private Date			birthday;
+
 	/**
 	 * Device used by this person, reference to the device plugin
 	 */
@@ -73,6 +77,28 @@ public class TourPerson {
 	 * default constructor used in ejb
 	 */
 	public TourPerson() {}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourPerson)) {
+			return false;
+		}
+		final TourPerson other = (TourPerson) obj;
+		if (personId != other.personId) {
+			return false;
+		}
+		return true;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
 
 	public String getDeviceReaderId() {
 		return deviceReaderId;
@@ -116,6 +142,14 @@ public class TourPerson {
 		return weight;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (personId ^ (personId >>> 32));
+		return result;
+	}
+
 	public boolean persist() {
 
 		boolean isSaved = false;
@@ -153,6 +187,10 @@ public class TourPerson {
 		}
 
 		return isSaved;
+	}
+
+	public void setBirthday(final Date birthday) {
+		this.birthday = birthday;
 	}
 
 	public void setDeviceReaderId(final String deviceId) {

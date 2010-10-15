@@ -85,7 +85,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 12;													// 10.9.1
+	private static final int						TOURBOOK_DB_VERSION							= 13;
+
+//	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.10.next
 
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
 //	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
@@ -1735,7 +1737,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1773,7 +1775,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_COMPARED}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1801,7 +1803,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_DATA}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1961,7 +1963,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_MARKER}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2026,7 +2028,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_PERSON}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2047,6 +2049,13 @@ public class TourDatabase {
 				+ "	height 				FLOAT,									\n" //$NON-NLS-1$ // m
 				+ ("	rawDataPath		" + varCharKomma(TourPerson.DB_LENGTH_RAW_DATA_PATH)) //$NON-NLS-1$
 				+ ("	deviceReaderId	" + varCharKomma(TourPerson.DB_LENGTH_DEVICE_READER_ID)) //$NON-NLS-1$
+
+				// version 13 start
+				//
+				+ "	BirthDay			DATE,									\n" //$NON-NLS-1$
+				//
+				// version 13 end ---------
+
 				+ "	tourBike_bikeId 	BIGINT									\n" //$NON-NLS-1$
 				//
 				+ ")"; //															//$NON-NLS-1$
@@ -2065,7 +2074,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_REFERENCE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2225,7 +2234,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_TAG}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2297,7 +2306,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_TYPE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2339,7 +2348,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_WAYPOINT}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2404,7 +2413,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_DB_VERSION}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2463,7 +2472,7 @@ public class TourDatabase {
 
 	/**
 	 * Creates an entity manager which is used to persist entities
-	 *
+	 * 
 	 * @return
 	 */
 	public EntityManager getEntityManager() {
@@ -2636,6 +2645,10 @@ public class TourDatabase {
 
 		if (currentDbVersion == 11) {
 			currentDbVersion = newVersion = updateDbDesign_011_012(conn, monitor);
+		}
+
+		if (currentDbVersion == 12) {
+			currentDbVersion = newVersion = updateDbDesign_012_013(conn, monitor);
 		}
 
 		/*
@@ -3016,9 +3029,9 @@ public class TourDatabase {
 
 				/**
 				 * resize description column: ref derby docu page 24
-				 *
+				 * 
 				 * <pre>
-				 *
+				 * 
 				 * ALTER TABLE table-Name
 				 * {
 				 *     ADD COLUMN column-definition |
@@ -3028,9 +3041,9 @@ public class TourDatabase {
 				 *   		constraint-name | CHECK constraint-name | CONSTRAINT constraint-name }
 				 *     ALTER [ COLUMN ] column-alteration |
 				 *     LOCKSIZE { ROW | TABLE }
-				 *
+				 * 
 				 *     column-alteration
-				 *
+				 * 
 				 * 		column-Name SET DATA TYPE VARCHAR(integer) |
 				 * 		column-Name SET DATA TYPE VARCHAR FOR BIT DATA(integer) |
 				 * 		column-name SET INCREMENT BY integer-constant |
@@ -3201,6 +3214,38 @@ public class TourDatabase {
 
 				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN DeviceFirmwareVersion		" + varCharNoKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 				exec(stmt, sql);
+			}
+			stmt.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_012_013(final Connection conn, final IProgressMonitor monitor) {
+
+		final int newDbVersion = 13;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		try {
+
+			String sql;
+			final Statement stmt = conn.createStatement();
+			{
+//				+ "	BirthDay			DATE,									\n" //$NON-NLS-1$
+
+				sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN BirthDay		DATE"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
 			}
 			stmt.close();
 
