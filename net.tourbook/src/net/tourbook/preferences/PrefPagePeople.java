@@ -18,7 +18,7 @@ package net.tourbook.preferences;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-
+ 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
@@ -140,6 +140,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 
 				_isPersonModified = true;
+				validatePerson();
 			}
 		};
 		_defaultSelectionListener = new SelectionAdapter() {
@@ -151,6 +152,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 
 				_isPersonModified = true;
+				validatePerson();
 			}
 		};
 	}
@@ -233,7 +235,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// select first person
 		_peopleViewer.getTable().setSelection(0);
 		updateUIPersonDetails();
-		enableActions(true);
+		enableControls(true);
 
 		return container;
 	}
@@ -760,15 +762,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		super.dispose();
 	}
 
-	private void enableActions(final boolean isPersonValid) {
+	private void enableControls(final boolean isPersonValid) {
 
-//		IStructuredSelection selection = (IStructuredSelection) fPeopleViewer.getSelection();
+		final boolean isPersonSelected = _currentPerson != null;
 
-//		boolean isPersonSelected = !selection.isEmpty();
+		_btnAdd.setEnabled(isPersonSelected == false || (isPersonSelected && _isPersonModified == false));
 
-		_btnAdd.setEnabled(_currentPerson == null || (_currentPerson != null && isPersonValid));
+		_btnCancel.setEnabled(_isPersonModified);
+		_btnUpdate.setEnabled(_isPersonModified && isPersonValid);
 
-		// fButtonDelete.setEnabled(isPersonSelected);
+		_peopleViewer.getTable().setEnabled(_isPersonModified == false);
+
 	}
 
 	private void firePersonListModifyEvent() {
@@ -834,9 +838,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	@Override
 	public boolean okToLeave() {
+
 		if (validatePerson() == false) {
 			return false;
 		}
+
 		savePerson();
 		firePersonListModifyEvent();
 
@@ -1060,9 +1066,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_rawDataPathEditor.setEnabled(isEnabled, _containerPersonDetails);
 	}
 
+	/**
+	 * Validates person fields
+	 * 
+	 * @return Returns <code>true</code> when person data are valid, otherwise <code>false</code>
+	 */
 	private boolean validatePerson() {
 
-		boolean isValid = true;
+		boolean isPersonValid = true;
 
 		while (true) {
 
@@ -1072,7 +1083,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			if (_txtFirstName.getText().trim().equals(UI.EMPTY_STRING)) {
 
-				isValid = false;
+				isPersonValid = false;
 				_txtFirstName.setFocus();
 
 				setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
@@ -1081,7 +1092,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			if (!_rawDataPathEditor.getStringValue().trim().equals(UI.EMPTY_STRING) && !_rawDataPathEditor.isValid()) {
 
-				isValid = false;
+				isPersonValid = false;
 				_rawDataPathEditor.setFocus();
 
 				setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
@@ -1090,7 +1101,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			if (isDefaultBirthday()) {
 
-				isValid = false;
+				isPersonValid = false;
 				_dtBirthDay.setFocus();
 
 				setErrorMessage(Messages.Pref_People_Error_Birthday_IsInvalid);
@@ -1098,32 +1109,27 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			}
 
 			if (isFloatValid(_txtHeight.getText()) == false) {//
-				isValid = false;
+				isPersonValid = false;
 				break;
 			}
 
 			if (isFloatValid(_txtWeight.getText()) == false) {//
-				isValid = false;
+				isPersonValid = false;
 				break;
 			}
 
-			isValid = true;
+			isPersonValid = true;
 
 			break;
 		}
 
-		enableActions(isValid);
+		enableControls(isPersonValid);
 
-		if (isValid) {
-			_peopleViewer.getTable().setEnabled(true);
+		if (isPersonValid) {
 			setErrorMessage(null);
-			return true;
-
-		} else {
-
-			_peopleViewer.getTable().setEnabled(false);
-			return false;
 		}
+
+		return isPersonValid;
 	}
 
 }
