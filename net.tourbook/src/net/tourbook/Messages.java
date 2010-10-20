@@ -80,8 +80,6 @@ public class Messages extends NLS {
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 
 	public static String		App_Action_About;
-
-	public static String	App_Action_Cancel;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
@@ -179,8 +177,6 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_SetPerson;
 	public static String		App_Action_SplitTour;
-
-	public static String	App_Action_Update;
 
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -594,15 +590,11 @@ public class Messages extends NLS {
 	public static String		Pref_People_Column_height;
 	public static String		Pref_People_Column_last_name;
 	public static String		Pref_People_Column_weight;
-	public static String	Pref_People_Error_Birthday_IsInvalid;
-
 	public static String		Pref_People_Error_first_name_is_required;
 	public static String		Pref_People_Error_invalid_number;
 	public static String		Pref_People_Error_path_is_invalid;
 	public static String		Pref_People_Group_person;
 	public static String		Pref_People_Label_bike;
-
-	public static String	Pref_People_Label_Birthday;
 	public static String		Pref_People_Label_device;
 	public static String		Pref_People_Label_first_name;
 	public static String		Pref_People_Label_height;

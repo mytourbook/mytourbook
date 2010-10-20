@@ -439,15 +439,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		// update the bike details
 		// updateBikeInfo();
 
-		enableControls();
-
 		return container;
-	}
-
-	private void enableButtons() {
-
-//		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
-//		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
 //	/**
@@ -544,22 +536,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 //		return returnResult;
 //	}
 
-	private void enableControls() {
-
-		/*
-		 * all is disabled because bikes are currently not used
-		 */
-		_btnAdd.setEnabled(false);
-
-		_bikeViewer.getTable().setEnabled(false);
-		_btnAdd.setEnabled(false);
-
-		_txtBikeName.setEnabled(false);
-		_txtWeight.setEnabled(false);
-		_cboBikeType.setEnabled(false);
-		_cboFrontTyre.setEnabled(false);
-		_cboRearTyre.setEnabled(false);
-
+	private void enableButtons() {
+//		final IStructuredSelection selection = (IStructuredSelection) _bikeViewer.getSelection();
+//		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
 	private void fireBikeListModifyEvent() {
