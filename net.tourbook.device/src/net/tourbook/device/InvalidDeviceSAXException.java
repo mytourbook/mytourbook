@@ -24,4 +24,8 @@ public class InvalidDeviceSAXException extends SAXException {
 
 	private static final long	serialVersionUID	= -219904266152289685L;
 
+	public InvalidDeviceSAXException(final String message) {
+		super(message);
+	}
+
 }

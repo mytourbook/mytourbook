@@ -488,6 +488,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		} else {
 			_targetTour.temperatureSerie = _backupTargetTemperatureSerie;
 		}
+		_targetTour.setTemperatureScale(_sourceTour.getTemperatureScale());
 
 		if (_chkMergeCadence.getSelection()) {
 			_targetTour.cadenceSerie = newTargetCadenceSerie;

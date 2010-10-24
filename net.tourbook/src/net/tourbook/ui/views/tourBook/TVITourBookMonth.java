@@ -53,40 +53,41 @@ public class TVITourBookMonth extends TVITourBookItem {
 				//
 				"SELECT " //								//$NON-NLS-1$
 				//
-				+ "startYear," //						1	//$NON-NLS-1$
-				+ "startMonth," //						2	//$NON-NLS-1$
-				+ "startDay," //						3	//$NON-NLS-1$
-				+ "tourDistance," //					4	//$NON-NLS-1$
-				+ "tourRecordingTime," //				5	//$NON-NLS-1$
-				+ "tourDrivingTime," //					6	//$NON-NLS-1$
-				+ "tourAltUp," //						7	//$NON-NLS-1$
-				+ "tourAltDown," //						8	//$NON-NLS-1$
-				+ "startDistance," //					9	//$NON-NLS-1$
-				+ "tourID," //							10	//$NON-NLS-1$
-				+ "tourType_typeId," //					11	//$NON-NLS-1$
-				+ "tourTitle," //						12	//$NON-NLS-1$
-				+ "deviceTimeInterval," //				13	//$NON-NLS-1$
-				+ "maxSpeed," //						14	//$NON-NLS-1$
-				+ "maxAltitude," //						15	//$NON-NLS-1$
-				+ "maxPulse," //						16	//$NON-NLS-1$
-				+ "avgPulse," //						17	//$NON-NLS-1$
-				+ "avgCadence," //						18	//$NON-NLS-1$
-				+ "avgTemperature," //					19	//$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId,"//			20	//$NON-NLS-1$
-				+ "Tmarker.markerId,"//					21	//$NON-NLS-1$
-				+ "startHour," //						22	//$NON-NLS-1$
-				+ "startMinute," //						23	//$NON-NLS-1$
-				+ "startWeek," //						24	//$NON-NLS-1$
-				+ "startWeekYear," //					25	//$NON-NLS-1$
-
-				+ "weatherWindDir," //                  26  //$NON-NLS-1$
-				+ "weatherWindSpd," //                  27  //$NON-NLS-1$
-				+ "weatherClouds," //                   28  //$NON-NLS-1$
-				+ "restPulse," //                    	29  //$NON-NLS-1$
-
-				+ "calories," //						30	//$NON-NLS-1$
-				+ "tourPerson_personId" //				31	//$NON-NLS-1$
-
+				+ "startYear," //									1	//$NON-NLS-1$
+				+ "startMonth," //						            2	//$NON-NLS-1$
+				+ "startDay," //						            3	//$NON-NLS-1$
+				+ "tourDistance," //					            4	//$NON-NLS-1$
+				+ "tourRecordingTime," //				            5	//$NON-NLS-1$
+				+ "tourDrivingTime," //					            6	//$NON-NLS-1$
+				+ "tourAltUp," //						            7	//$NON-NLS-1$
+				+ "tourAltDown," //						            8	//$NON-NLS-1$
+				+ "startDistance," //					            9	//$NON-NLS-1$
+				+ "tourID," //							            10	//$NON-NLS-1$
+				+ "tourType_typeId," //					            11	//$NON-NLS-1$
+				+ "tourTitle," //						            12	//$NON-NLS-1$
+				+ "deviceTimeInterval," //				            13	//$NON-NLS-1$
+				+ "maxSpeed," //						            14	//$NON-NLS-1$
+				+ "maxAltitude," //						            15	//$NON-NLS-1$
+				+ "maxPulse," //						            16	//$NON-NLS-1$
+				+ "avgPulse," //						            17	//$NON-NLS-1$
+				+ "avgCadence," //						            18	//$NON-NLS-1$
+				+ "(DOUBLE(avgTemperature) / temperatureScale)," //	19	//$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId,"//						20	//$NON-NLS-1$
+				+ "Tmarker.markerId,"//					            21	//$NON-NLS-1$
+				+ "startHour," //						            22	//$NON-NLS-1$
+				+ "startMinute," //						            23	//$NON-NLS-1$
+				+ "startWeek," //						            24	//$NON-NLS-1$
+				+ "startWeekYear," //					            25	//$NON-NLS-1$
+				//
+				+ "weatherWindDir," //                              26  //$NON-NLS-1$
+				+ "weatherWindSpd," //                              27  //$NON-NLS-1$
+				+ "weatherClouds," //                               28  //$NON-NLS-1$
+				//
+				+ "restPulse," //                    	            29  //$NON-NLS-1$
+				+ "calories," //						            30	//$NON-NLS-1$
+				//
+				+ "tourPerson_personId" //				            31	//$NON-NLS-1$
+				//
 				+ UI.NEW_LINE
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
@@ -177,7 +178,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 					tourItem.colMaxPulse = result.getLong(16);
 					tourItem.colAvgPulse = result.getLong(17);
 					tourItem.colAvgCadence = result.getLong(18);
-					tourItem.colAvgTemperature = result.getLong(19);
+					tourItem.colAvgTemperature = result.getFloat(19);
 
 					final int dbHour = result.getInt(22);
 					final int dbMinute = result.getInt(23);

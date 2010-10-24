@@ -75,7 +75,7 @@ import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnDefinition;
- 
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -149,12 +149,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private TVITourBookRoot								_rootItem;
 
-	private final NumberFormat								_nf									= NumberFormat
+	private final NumberFormat							_nf1								= NumberFormat
 																									.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
-	private final Calendar									_calendar							= GregorianCalendar
+	private final Calendar								_calendar							= GregorianCalendar
 																									.getInstance();
-	private final DateFormat									_timeFormatter						= DateFormat
+	private final DateFormat							_timeFormatter						= DateFormat
 																									.getTimeInstance(DateFormat.SHORT);
 
 	private static final String[]						_weekDays							= DateFormatSymbols
@@ -163,7 +167,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private int											_selectedYear						= -1;
 	private int											_selectedMonth						= -1;
-	private final ArrayList<Long>								_selectedTourIds					= new ArrayList<Long>();
+	private final ArrayList<Long>						_selectedTourIds					= new ArrayList<Long>();
 
 	private boolean										_isRecTimeFormat_hhmmss;
 	private boolean										_isDriveTimeFormat_hhmmss;
@@ -174,7 +178,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
 
-	private final TourDoubleClickState						_tourDoubleClickState				= new TourDoubleClickState();
+	private final TourDoubleClickState					_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
 	 * UI controls
@@ -579,7 +583,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -768,10 +772,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (speed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(speed));
+					cell.setText(_nf1.format(speed));
 				}
 
 				setCellColor(cell, element);
@@ -787,23 +788,23 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(
 				_columnManager,
 				pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
 
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				long temperature = ((TVITourBookItem) element).colAvgTemperature;
+				float temperature = ((TVITourBookItem) element).colAvgTemperature;
 
 				if (temperature == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
 					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 					}
 
-					cell.setText(Long.toString(temperature));
+					cell.setText(_nf1.format(temperature));
 				}
 
 				setCellColor(cell, element);
@@ -934,10 +935,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-					cell.setText(_nf.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -1034,11 +1032,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbMaxSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -1230,9 +1224,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						/ dbRecordingTime
 						* 100;
 
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
-				cell.setText(_nf.format(relativePausedTime));
+				cell.setText(_nf1.format(relativePausedTime));
 
 				setCellColor(cell, element);
 			}

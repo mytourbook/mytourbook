@@ -59,6 +59,7 @@ public class ActionJoinTours extends Action {
 		boolean isLat = false;
 		boolean isPowerFromDevice = false;
 		boolean isSpeedFromDevice = false;
+		int firstTourTemperatureScale = 1;
 
 		for (final TourData tourData : _tourProvider.getSelectedTours()) {
 
@@ -79,6 +80,7 @@ public class ActionJoinTours extends Action {
 				isLat = isTourLat;
 				isPowerFromDevice = tourData.isPowerSerieFromDevice();
 				isSpeedFromDevice = tourData.isSpeedSerieFromDevice();
+				firstTourTemperatureScale = tourData.getTemperatureScale();
 
 			} else {
 
@@ -115,6 +117,11 @@ public class ActionJoinTours extends Action {
 				// check speed
 				if (isSpeedFromDevice != tourData.isSpeedSerieFromDevice()) {
 					return Messages.Dialog_JoinTours_InvalidData_Speed;
+				}
+
+				// check temperature scale
+				if (firstTourTemperatureScale != tourData.getTemperatureScale()) {
+					return Messages.Dialog_JoinTours_InvalidData_Temperature;
 				}
 			}
 

@@ -27,9 +27,11 @@ import org.joda.time.DateTime;
 public class TVITagViewTour extends TVITagViewItem {
 
 	public static final String	SQL_TOUR_COLUMNS	= UI.EMPTY_STRING //
+															//
 															+ "startYear," //			0 //$NON-NLS-1$
 															+ "startMonth," //			1 //$NON-NLS-1$
 															+ "startDay," //			2 //$NON-NLS-1$
+															//
 															+ "tourTitle," //			3 //$NON-NLS-1$
 															+ "tourType_typeId," //		4 //$NON-NLS-1$
 															+ "deviceTimeInterval," //	5 //$NON-NLS-1$

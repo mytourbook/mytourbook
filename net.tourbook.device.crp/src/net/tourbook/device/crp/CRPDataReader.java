@@ -273,7 +273,10 @@ public class CRPDataReader extends TourbookDevice {
 				altitude = Integer.parseInt(tokenLine.nextToken()); // [m]
 				color = Integer.parseInt(tokenLine.nextToken()); // [0..4]
 				symbol = Integer.parseInt(tokenLine.nextToken()); // [0..42]
-				temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [�C]
+
+				temperature = Math.round(//
+						(Float.parseFloat(tokenLine.nextToken().replace(',', '.')) * TEMPERATURE_SCALE)); // [C]
+
 				trackpointTime = tokenLine.nextToken();
 
 				// get comment for current trackpoint
@@ -368,6 +371,8 @@ public class CRPDataReader extends TourbookDevice {
 				if (sumTemperature == 0) {
 					firstTimeData.temperature = Integer.MIN_VALUE;
 				}
+
+				tourData.setTemperatureScale(TEMPERATURE_SCALE);
 
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);

@@ -1853,6 +1853,7 @@ public class TourManager {
 
 			yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
+			yDataTemperature.setValueDivisor(tourData.getTemperatureScale());
 			yDataTemperature.setShowYSlider(true);
 			yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
@@ -2309,6 +2310,10 @@ public class TourManager {
 			} else {
 				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_OpenTour;
 			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING)) {
+
+			// do nothing and don't show a warning
 
 		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_NONE)) {
 

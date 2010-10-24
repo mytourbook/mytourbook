@@ -50,6 +50,7 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
@@ -217,12 +218,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;			;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
- 
+
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
+
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
+
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
@@ -233,6 +236,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
+
 	/*
 	 * data series which are displayed in the viewer
 	 */
@@ -240,7 +244,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private int[]								_serieDistance;
 	private int[]								_serieAltitude;
-	private int[]								_serieTemperature;
+	private double[]							_serieTemperature;
 	private int[]								_serieCadence;
 	private int[]								_serieGradient;
 	private int[]								_serieSpeed;
@@ -391,10 +395,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	private int							fUIUpdateCounterTabSlices		= -1;
 
 	private SliceIntegerEditingSupport			_pulseEditingSupport;
-	private SliceIntegerEditingSupport			_temperatureEditingSupport;
+	private SliceDouble2EditingSupport			_temperatureEditingSupport;
 	private SliceIntegerEditingSupport			_cadenceEditingSupport;
 	private SliceDoubleEditingSupport			_latitudeEditingSupport;
 	private SliceDoubleEditingSupport			_longitudeEditingSupport;
+
 	private int									_enableActionCounter			= 0;
 
 	/**
@@ -533,6 +538,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtDateTimeCreated;
 	private Text								_txtDateTimeModified;
 
+	//
+	// ################################################## End of UI controls ##################################################
+	//
+
 	/*
 	 * actions
 	 */
@@ -619,11 +628,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	/*
-	 * ################################################## End of UI controls
-	 * ##################################################
-	 */
-
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
 		@Override
@@ -651,6 +655,110 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 // time is disabled because it's not always available in gpx files
 			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+		}
+	}
+
+	private final class SliceDouble2EditingSupport extends EditingSupport {
+
+		private final TextCellEditor	__cellEditor;
+		private double[]				__dataSerie;
+
+		private SliceDouble2EditingSupport(final TextCellEditor cellEditor, final double[] dataSerie) {
+			super(_sliceViewer);
+			__cellEditor = cellEditor;
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected boolean canEdit(final Object element) {
+
+			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(final Object element) {
+			return __cellEditor;
+		}
+
+		@Override
+		protected Object getValue(final Object element) {
+
+			final double metricValue = __dataSerie[((TimeSlice) element).serieIndex];
+			double displayedValue = metricValue;
+
+			/*
+			 * convert current measurement system into metric
+			 */
+			if (__dataSerie == _serieTemperature) {
+
+				if (_unitValueTemperature != 1) {
+
+					// none metric measurement systemm
+
+					displayedValue = metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+				}
+			}
+
+			// remove trailing numbers which should not be displayed
+			final String returnValue = _nf1.format(displayedValue);
+
+			return returnValue;
+		}
+
+		public void setDataSerie(final double[] dataSerie) {
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected void setValue(final Object element, final Object value) {
+
+			if (value instanceof String) {
+
+				try {
+
+					final double enteredValue = Double.parseDouble((String) value);
+					double metricValue = enteredValue;
+
+					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
+
+					if (isTemperatureSerie) {
+
+						if (_unitValueTemperature != 1) {
+
+							// none metric measurement systemm, convert entered value into metric value
+
+							metricValue = ((enteredValue - UI.UNIT_FAHRENHEIT_ADD)) / UI.UNIT_FAHRENHEIT_MULTI;
+						}
+					}
+
+					final int serieIndex = ((TimeSlice) element).serieIndex;
+
+					// check if metric value has changed
+					if (metricValue != __dataSerie[serieIndex]) {
+
+						// value has changed
+
+						// update dataserie
+						__dataSerie[serieIndex] = metricValue;
+
+						if (isTemperatureSerie) {
+							final int temperatureScale = _tourData.getTemperatureScale();
+							final int[] temperatureSerie = _tourData.temperatureSerie;
+
+							temperatureSerie[serieIndex] = (int) (metricValue * temperatureScale);
+						}
+
+						updateUIAfterSliceEdit();
+					}
+
+				} catch (final Exception e) {
+					// ignore invalid characters
+				}
+			}
 		}
 	}
 
@@ -697,8 +805,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				try {
 
 					final double enteredValue = Double.parseDouble((String) value);
-
 					final int serieIndex = ((TimeSlice) element).serieIndex;
+
 					if (enteredValue != __dataSerie[serieIndex]) {
 
 						// value has changed
@@ -766,14 +874,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					displayedValue /= _unitValueAltitude;
 				}
 
-			} else if (__dataSerie == _serieTemperature) {
-
-				if (_unitValueTemperature != 1) {
-
-					// none metric measurement systemm
-
-					displayedValue = (int) (metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-				}
 			}
 
 			return new Integer(displayedValue).toString();
@@ -806,17 +906,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							metricValue = Math.round(noneMetricValue * _unitValueAltitude);
 						}
 
-					} else if (__dataSerie == _serieTemperature) {
-
-						if (_unitValueTemperature != 1) {
-
-							// none metric measurement systemm
-
-							// ensure float is used
-							final float noneMetricValue = enteredValue;
-							metricValue = Math.round(((noneMetricValue - UI.UNIT_FAHRENHEIT_ADD))
-									/ UI.UNIT_FAHRENHEIT_MULTI);
-						}
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
@@ -1211,14 +1300,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
 
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
 
 		// tour id must be created after the tour date/time is set
 		tourData.createTourId();
 
 		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-
-// manual device name is translated in TourData
-//		tourData.setDeviceName(TourData.DEVICE_NAME_FOR_MANUAL_TOUR);
 
 		tourData.setTourPerson(activePerson);
 
@@ -1342,15 +1429,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// temperature
 				if (_serieTemperature != null) {
 
-					final int metricTemperature = _serieTemperature[serieIndex];
+					final double metricTemperature = _serieTemperature[serieIndex];
 
 					if (_unitValueTemperature != 1) {
 						// use imperial system
-						final int imperialTemp = (int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-						sb.append(Integer.toString(imperialTemp));
+						final double imperialTemp = metricTemperature
+								* UI.UNIT_FAHRENHEIT_MULTI
+								+ UI.UNIT_FAHRENHEIT_ADD;
+						sb.append(Double.toString(imperialTemp));
 					} else {
 						// use metric system
-						sb.append(Integer.toString(metricTemperature));
+						sb.append(Double.toString(metricTemperature));
 					}
 				}
 				sb.append(UI.TAB);
@@ -1436,9 +1525,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * delete selected time slices
 	 * 
-	 * @param removeTime
+	 * @param isRemoveTime
 	 */
-	void actionDeleteTimeSlices(final boolean removeTime) {
+	void actionDeleteTimeSlices(final boolean isRemoveTime) {
 
 		// a tour with reference tours is currently not supported
 		if (_isReferenceTourAvailable) {
@@ -1511,9 +1600,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		Arrays.sort(indices);
 		int lastSelectionIndex = indices[0];
 
-		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, removeTime);
+		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime);
 
 		updateMarkerMap();
+		convertTemperatureSerie(_tourData.temperatureSerie);
 
 		getDataSeriesFromTourData();
 
@@ -1893,7 +1983,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				_isSavingInProgress = true;
 				{
-					isTourSaved = saveTourValidation();
+					isTourSaved = saveTourWithValidation();
 				}
 				_isSavingInProgress = false;
 
@@ -1986,6 +2076,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			return dialog.getReturnCode() == Window.OK;
 		}
+	}
+
+	/**
+	 * Convert temperature serie into double
+	 * 
+	 * @param temperatureSerie
+	 */
+	private double[] convertTemperatureSerie(final int[] temperatureSerie) {
+
+		double[] temperatureSerieDouble = null;
+
+		if (temperatureSerie != null) {
+
+			final int temperatureScale = _tourData.getTemperatureScale();
+
+			final int serieLength = temperatureSerie.length;
+			temperatureSerieDouble = new double[serieLength];
+
+			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+				temperatureSerieDouble[serieIndex] = (double) temperatureSerie[serieIndex] / temperatureScale;
+			}
+		}
+		return temperatureSerieDouble;
 	}
 
 	private void createActions() {
@@ -2498,7 +2611,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_altitudeEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieAltitude);
 		_pulseEditingSupport = new SliceIntegerEditingSupport(cellEditor, _seriePulse);
-		_temperatureEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieTemperature);
+		_temperatureEditingSupport = new SliceDouble2EditingSupport(cellEditor, _serieTemperature);
 		_cadenceEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieCadence);
 		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
 		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
@@ -2580,7 +2693,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void createUI(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -3195,8 +3308,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
 			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
-			_spinTemperature.setMinimum(-60);
-			_spinTemperature.setMaximum(150);
+			_spinTemperature.setMinimum(-600);
+			_spinTemperature.setMaximum(1500);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				@Override
@@ -3870,19 +3983,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieTemperature != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int metricTemperature = _serieTemperature[timeSlice.serieIndex];
+					final double metricTemperature = _serieTemperature[timeSlice.serieIndex];
 
 					if (_unitValueTemperature != 1) {
 
 						// use imperial system
 
-						final int imperialTemp = (int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-						cell.setText(Integer.toString(imperialTemp));
+						final double imperialTemp = metricTemperature
+								* UI.UNIT_FAHRENHEIT_MULTI
+								+ UI.UNIT_FAHRENHEIT_ADD;
+
+						cell.setText(_nf1.format(imperialTemp));
 
 					} else {
 
 						// use metric system
-						cell.setText(Integer.toString(metricTemperature));
+						cell.setText(_nf1.format(metricTemperature));
 					}
 
 				} else {
@@ -4418,6 +4534,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData, TourDataEditorView.this);
 	}
 
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
+
 	/**
 	 * fire notification for the reverted tour data
 	 */
@@ -4428,16 +4554,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
-
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
@@ -4540,7 +4656,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_serieDistance = _tourData.distanceSerie;
 		_serieAltitude = _tourData.altitudeSerie;
-		_serieTemperature = _tourData.temperatureSerie;
 
 		_serieCadence = _tourData.cadenceSerie;
 		_seriePulse = _tourData.pulseSerie;
@@ -4552,6 +4667,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieSpeed = _tourData.getSpeedSerie();
 		_seriePace = _tourData.getPaceSerieSeconds();
 		_seriePower = _tourData.getPowerSerie();
+
+		_serieTemperature = convertTemperatureSerie(_tourData.temperatureSerie);
 
 		_altitudeEditingSupport.setDataSerie(_serieAltitude);
 		_temperatureEditingSupport.setDataSerie(_serieTemperature);
@@ -5364,7 +5481,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_isSavingInProgress = true;
 		{
-			if (saveTourValidation()) {
+			if (saveTourWithValidation()) {
 				returnCode = ISaveablePart2.NO;
 			} else {
 				returnCode = ISaveablePart2.CANCEL;
@@ -5700,7 +5817,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @return Returns <code>true</code> when the tour is saved or <code>false</code> when the tour
 	 *         could not saved because the user canceled saving
 	 */
-	private boolean saveTourValidation() {
+	private boolean saveTourWithValidation() {
 
 		if (_tourData == null) {
 			return true;
@@ -6304,12 +6421,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// icon must be displayed after the combobox entry is selected
 		displayCloudIcon();
 
-		// temperature
-		int temperature = _tourData.getAvgTemperature();
+		/*
+		 * avg temperature
+		 */
+		final int temperatureScale = _tourData.getTemperatureScale();
+		int avgTemperature = _tourData.getAvgTemperature();
+
 		if (_unitValueTemperature != 1) {
-			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+			final float imperialTemperature = (float) avgTemperature / temperatureScale;
+			avgTemperature = (int) ((imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
 		}
-		_spinTemperature.setSelection(temperature);
+
+		_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
+		_spinTemperature.setSelection(avgTemperature);
 
 		// tour date
 		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
@@ -6319,14 +6443,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// tour distance
 		final int tourDistance = _tourData.getTourDistance();
-
 		if (tourDistance == 0) {
 			_txtTourDistance.setText(Integer.toString(tourDistance));
 		} else {
 
 			final float distance = ((float) tourDistance) / 1000 / _unitValueDistance;
 			_txtTourDistance.setText(_nf3NoGroup.format(distance));
-
 		}
 
 		// altitude up/down

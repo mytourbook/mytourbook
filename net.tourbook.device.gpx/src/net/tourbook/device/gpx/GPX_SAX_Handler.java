@@ -256,7 +256,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					// </gpxtpx:atemp>
 
 					_isInTemp = false;
-					_timeSlice.temperature = Math.round(getFloatValue(charData));
+					_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
 				}
 
 			} else if (_isInWpt) {
@@ -414,6 +414,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
 
 		tourData.setDeviceTimeInterval((short) -1);
+		tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
 
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);

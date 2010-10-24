@@ -62,13 +62,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private final boolean				_isOSX							= net.tourbook.util.UI.IS_OSX;
 	private final boolean				_isLinux						= net.tourbook.util.UI.IS_LINUX;				;
- 
+
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat		_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private final TourData				_tourData;
- 
+
 	private final IDialogSettings		_state;
 	private PixelConverter				_pc;
 
@@ -234,7 +234,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
@@ -604,8 +604,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
 			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
-			_spinTemperature.setMinimum(-60);
-			_spinTemperature.setMaximum(150);
+			_spinTemperature.setMinimum(-600);
+			_spinTemperature.setMaximum(1500);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				@Override
@@ -902,13 +902,19 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// icon must be displayed after the combobox entry is selected
 			displayCloudIcon();
 
-			// temperature
-			int temperature = _tourData.getAvgTemperature();
-			if (_unitValueTemperature != 1) {
-				temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-			}
-			_spinTemperature.setSelection(temperature);
+			/*
+			 * avg temperature
+			 */
+			final int temperatureScale = _tourData.getTemperatureScale();
+			int avgTemperature = _tourData.getAvgTemperature();
 
+			if (_unitValueTemperature != 1) {
+				final float metricTemperature = (float) avgTemperature / temperatureScale;
+				avgTemperature = (int) ((metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
+			}
+
+			_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
+			_spinTemperature.setSelection(avgTemperature);
 		}
 		_isUpdateUI = false;
 	}

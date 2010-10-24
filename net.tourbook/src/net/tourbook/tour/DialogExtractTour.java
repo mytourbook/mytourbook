@@ -1016,6 +1016,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			_tourDataTarget.timeSerie = extractTimeSerie;
 		}
 
+		_tourDataTarget.setTemperatureScale(_tourDataSource.getTemperatureScale());
+
 		_tourDataTarget.computeAltitudeUpDown();
 		_tourDataTarget.computeTourDrivingTime();
 		_tourDataTarget.computeComputedValues();

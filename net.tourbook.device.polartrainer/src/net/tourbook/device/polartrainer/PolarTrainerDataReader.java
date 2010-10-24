@@ -123,6 +123,7 @@ public class PolarTrainerDataReader extends TourbookDevice {
 			parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
 		} catch (final InvalidDeviceSAXException e) {
+			StatusUtil.log(e);
 			return false;
 		} catch (final Exception e) {
 			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$

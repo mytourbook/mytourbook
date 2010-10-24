@@ -85,8 +85,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 12;													// 10.9.1
+	private static final int						TOURBOOK_DB_VERSION							= 13;													// 10.11
 
+//	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
 //	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
 //	private static final int						TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
@@ -1735,7 +1736,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1773,7 +1774,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_COMPARED}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1801,7 +1802,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_DATA}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -1941,7 +1942,13 @@ public class TourDatabase {
 				//
 				// version 12 end ---------
 
-				+ "	serieData 				BLOB NOT NULL						\n" //$NON-NLS-1$
+				// version 13 start
+				//
+				+ "	TemperatureScale			INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
+				//
+				// version 13 end ---------
+
+				+ "	serieData 					BLOB NOT NULL					\n" //$NON-NLS-1$
 				//
 				+ ")"; //														//$NON-NLS-1$
 
@@ -1961,7 +1968,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_MARKER}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2026,7 +2033,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_PERSON}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2065,7 +2072,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_REFERENCE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2225,7 +2232,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_TAG}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2297,7 +2304,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_TYPE}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2339,7 +2346,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_TOUR_WAYPOINT}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2404,7 +2411,7 @@ public class TourDatabase {
 
 	/**
 	 * create table {@link #TABLE_DB_VERSION}
-	 *
+	 * 
 	 * @param stmt
 	 * @throws SQLException
 	 */
@@ -2463,7 +2470,7 @@ public class TourDatabase {
 
 	/**
 	 * Creates an entity manager which is used to persist entities
-	 *
+	 * 
 	 * @return
 	 */
 	public EntityManager getEntityManager() {
@@ -2573,6 +2580,11 @@ public class TourDatabase {
 			return false;
 		}
 
+		boolean isPostUpdate5 = false;
+		boolean isPostUpdate9 = false;
+		boolean isPostUpdate11 = false;
+		boolean isPostUpdate13 = false;
+
 		int newVersion = currentDbVersion;
 		final int oldVersion = currentDbVersion;
 
@@ -2594,7 +2606,6 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 4;
 		}
 
-		boolean isPostUpdate5 = false;
 		if (currentDbVersion == 4) {
 			updateDbDesign_004_005(conn, monitor);
 			currentDbVersion = newVersion = 5;
@@ -2616,7 +2627,6 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 8;
 		}
 
-		boolean isPostUpdate9 = false;
 		if (currentDbVersion == 8) {
 			updateDbDesign_008_009(conn, monitor);
 			currentDbVersion = newVersion = 9;
@@ -2628,7 +2638,6 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 10;
 		}
 
-		boolean isPostUpdate11 = false;
 		if (currentDbVersion == 10) {
 			currentDbVersion = newVersion = updateDbDesign_010_011(conn, monitor);
 			isPostUpdate11 = true;
@@ -2636,6 +2645,11 @@ public class TourDatabase {
 
 		if (currentDbVersion == 11) {
 			currentDbVersion = newVersion = updateDbDesign_011_012(conn, monitor);
+		}
+
+		if (currentDbVersion == 12) {
+			currentDbVersion = newVersion = updateDbDesign_012_013(conn, monitor);
+			isPostUpdate13 = true;
 		}
 
 		/*
@@ -2656,6 +2670,9 @@ public class TourDatabase {
 		}
 		if (isPostUpdate11) {
 			updateDbDesign_010_011_PostUpdate(conn, monitor);
+		}
+		if (isPostUpdate13) {
+			updateDbDesign_012_013_PostUpdate(conn, monitor);
 		}
 
 		// display info for the successful update
@@ -3016,9 +3033,9 @@ public class TourDatabase {
 
 				/**
 				 * resize description column: ref derby docu page 24
-				 *
+				 * 
 				 * <pre>
-				 *
+				 * 
 				 * ALTER TABLE table-Name
 				 * {
 				 *     ADD COLUMN column-definition |
@@ -3028,9 +3045,9 @@ public class TourDatabase {
 				 *   		constraint-name | CHECK constraint-name | CONSTRAINT constraint-name }
 				 *     ALTER [ COLUMN ] column-alteration |
 				 *     LOCKSIZE { ROW | TABLE }
-				 *
+				 * 
 				 *     column-alteration
-				 *
+				 * 
 				 * 		column-Name SET DATA TYPE VARCHAR(integer) |
 				 * 		column-Name SET DATA TYPE VARCHAR FOR BIT DATA(integer) |
 				 * 		column-name SET INCREMENT BY integer-constant |
@@ -3211,6 +3228,57 @@ public class TourDatabase {
 		logDbUpdateEnd(newDbVersion);
 
 		return newDbVersion;
+	}
+
+	private int updateDbDesign_012_013(final Connection conn, final IProgressMonitor monitor) {
+
+		final int newDbVersion = 13;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		try {
+
+			String sql;
+			final Statement stmt = conn.createStatement();
+			{
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TemperatureScale		INTEGER	DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+			}
+			stmt.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set temperature scale default value
+	 * 
+	 * @param conn
+	 * @param monitor
+	 */
+	private void updateDbDesign_012_013_PostUpdate(final Connection conn, final IProgressMonitor monitor) {
+
+		try {
+
+			final String sql = "UPDATE " + TABLE_TOUR_DATA + " SET TemperatureScale=1"; //$NON-NLS-1$ //$NON-NLS-2$
+
+			System.out.println(sql);
+			System.out.println();
+
+			conn.createStatement().executeUpdate(sql);
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) {

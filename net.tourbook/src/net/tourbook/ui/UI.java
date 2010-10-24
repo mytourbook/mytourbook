@@ -35,6 +35,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.util.PixelConverter;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -1014,8 +1015,7 @@ public class UI {
 
 			final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-			System.out.println(sqlExceptionText);
-			e.printStackTrace();
+			StatusUtil.log(sqlExceptionText);
 
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), //
 					"SQL Error",//$NON-NLS-1$

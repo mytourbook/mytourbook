@@ -42,6 +42,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 	public static final String		VIEW_TIME_LAYOUT_HH_MM_SS						= "hh_mm_ss";					//$NON-NLS-1$
 
 	public static final String		VIEW_DOUBLE_CLICK_ACTION_NONE					= "None";						//$NON-NLS-1$
+	public static final String		VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING		= "NoneNoWarning";				//$NON-NLS-1$
 	public static final String		VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT				= "QuickEdit";					//$NON-NLS-1$
 	public static final String		VIEW_DOUBLE_CLICK_ACTION_EDIT_TOUR				= "EditTour";					//$NON-NLS-1$
 	public static final String		VIEW_DOUBLE_CLICK_ACTION_EDIT_MARKER			= "EditMarker";				//$NON-NLS-1$
@@ -54,7 +55,10 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 			{ Messages.PrefPage_ViewActions_Label_DoubleClick_EditMarker, VIEW_DOUBLE_CLICK_ACTION_EDIT_MARKER },
 			{ Messages.PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude, VIEW_DOUBLE_CLICK_ACTION_ADJUST_ALTITUDE },
 			{ Messages.PrefPage_ViewActions_Label_DoubleClick_OpenTour, VIEW_DOUBLE_CLICK_ACTION_OPEN_TOUR_IN_EDIT_AREA },
-			{ Messages.PrefPage_ViewActions_Label_DoubleClick_None, VIEW_DOUBLE_CLICK_ACTION_NONE }, };
+			{ Messages.PrefPage_ViewActions_Label_DoubleClick_None, VIEW_DOUBLE_CLICK_ACTION_NONE },
+			{ Messages.PrefPage_ViewActions_Label_DoubleClick_NoneNoWarning, VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING },
+																					//
+																					};
 
 	private final IPreferenceStore	_prefStore										= TourbookPlugin
 																							.getDefault()

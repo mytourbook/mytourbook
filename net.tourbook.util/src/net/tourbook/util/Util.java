@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
- 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,14 +42,14 @@ import org.joda.time.DateTime;
 
 public class Util {
 
-	private static final double	EARTH_RADIUS	= 6371;										// km
+	private static final double	EARTH_RADIUS			= 6371;										// km
 
 	// WGS-84 Ellipsoid
-	private static final double	HALBACHSE_A		= 6378.137;
-	private static final double	HALBACHSE_B		= 6356.7523142;
+	private static final double	HALBACHSE_A				= 6378.137;
+	private static final double	HALBACHSE_B				= 6356.7523142;
 
 	// = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
-	private static final double	ABPLATTUNG_F	= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
+	private static final double	ABPLATTUNG_F			= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
 
 	//http://www.kowoma.de/gps/geo/mapdatum/mapdatums.php
 	//EUROPEAN 1950/1979, Western Europe
@@ -85,10 +85,9 @@ public class Util {
 	}
 
 	/**
-	 * To convert the InputStream to String we use the BufferedReader.readLine()
-	 * method. We iterate until the BufferedReader return null which means
-	 * there's no more data to read. Each line will appended to a StringBuilder
-	 * and returned as String.
+	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
+	 * until the BufferedReader return null which means there's no more data to read. Each line will
+	 * appended to a StringBuilder and returned as String.
 	 */
 	public static String convertStreamToString(final InputStream is) throws IOException {
 
@@ -114,8 +113,8 @@ public class Util {
 	/**
 	 * @param sourceString
 	 * @param lookFor
-	 * @return Returns the number of characters which are found in the string or -1 when the
-	 *         string is <code>null</code>
+	 * @return Returns the number of characters which are found in the string or -1 when the string
+	 *         is <code>null</code>
 	 */
 	public static int countCharacter(final String sourceString, final char lookFor) {
 
@@ -137,7 +136,7 @@ public class Util {
 
 	/**
 	 * creates a int array backup
-	 *
+	 * 
 	 * @param original
 	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
 	 */
@@ -156,7 +155,7 @@ public class Util {
 
 	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
-	 *
+	 * 
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -218,7 +217,7 @@ public class Util {
 	 * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
 	 * <p>
 	 * javascript source location: http://www.movable-type.co.uk/scripts/latlong-vincenty.html
-	 *
+	 * 
 	 * @param {Number} lat1, lon1: first point in decimal degrees
 	 * @param {Number} lat2, lon2: second point in decimal degrees
 	 * @returns (Number} distance in metres between points
@@ -299,6 +298,18 @@ public class Util {
 
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
+	}
+
+	public static int getNumberOfDigits(int number) {
+
+		int counter = 0;
+
+		while (number > 0) {
+			counter++;
+			number = number / 10;
+		}
+
+		return counter;
 	}
 
 	/*
@@ -402,8 +413,8 @@ public class Util {
 
 	/**
 	 * @param combo
-	 *            combo box, the items in the combo box
-	 *            must correspond to the items in the states array
+	 *            combo box, the items in the combo box must correspond to the items in the states
+	 *            array
 	 * @param states
 	 *            array which contains all states
 	 * @param defaultState
@@ -471,7 +482,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 *
+	 * 
 	 * @param cal
 	 * @return
 	 */
@@ -494,7 +505,7 @@ public class Util {
 
 	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -525,7 +536,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 *
+	 * 
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -548,7 +559,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -583,7 +594,7 @@ public class Util {
 
 	/**
 	 * Open view and activate it
-	 *
+	 * 
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException

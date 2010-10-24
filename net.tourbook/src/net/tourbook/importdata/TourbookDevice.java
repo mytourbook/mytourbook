@@ -20,19 +20,27 @@ import net.tourbook.data.TourData;
 public abstract class TourbookDevice implements IRawDataReader {
 
 	/**
+	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
+	 * does not make sense for a tour program.
+	 * <p>
+	 * since version 10.11
+	 */
+	public static final int	TEMPERATURE_SCALE		= 10;
+
+	/**
 	 * Unique id for each device reader
 	 */
-	public String	deviceId;
+	public String			deviceId;
 
 	/**
 	 * Visible device name, e.g. HAC4, HAC5
 	 */
-	public String	visibleName;
+	public String			visibleName;
 
 	/**
 	 * File extension used when tour data are imported from a file
 	 */
-	public String	fileExtension;
+	public String			fileExtension;
 
 // disabled in version 10.10, it seems to be not used anymore
 //	/**
@@ -50,23 +58,23 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
-	public int		importYear				= -1;
+	public int				importYear				= -1;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
 	 * created for each track
 	 */
-	public boolean	isMergeTracks			= false;
+	public boolean			isMergeTracks			= false;
 
 	/**
 	 * when <code>true</code> validate the checksum when importing data
 	 */
-	public boolean	isChecksumValidation	= true;
+	public boolean			isChecksumValidation	= true;
 
 	/**
 	 * when <code>true</code> the tour id will be created with the recording time
 	 */
-	public boolean	isCreateTourIdWithRecordingTime;
+	public boolean			isCreateTourIdWithRecordingTime;
 
 	public TourbookDevice() {}
 

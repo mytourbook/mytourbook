@@ -276,6 +276,8 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData;
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
+	public static String	Dialog_JoinTours_InvalidData_Temperature;
+
 	public static String		Dialog_JoinTours_InvalidData_Time;
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
 	public static String		Dialog_JoinTours_Label_DeviceName;
@@ -709,6 +711,8 @@ public class Messages extends NLS {
 	public static String		PrefPage_ViewActions_Label_DoubleClick_EditMarker;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_EditTour;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_None;
+
+	public static String	PrefPage_ViewActions_Label_DoubleClick_NoneNoWarning;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_OpenTour;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
 	public static String		PrefPage_ViewActions_Label_Info;

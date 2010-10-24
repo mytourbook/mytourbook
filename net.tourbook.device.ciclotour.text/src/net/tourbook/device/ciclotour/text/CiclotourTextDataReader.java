@@ -20,8 +20,8 @@ import net.tourbook.util.StatusUtil;
 
 public class CiclotourTextDataReader extends TourbookDevice {
 
-	private static final String	FILE_HEADER_EN	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:";	//$NON-NLS-1$
-	private static final String	FILE_HEADER_DE	= "Zeit:	Strecke:	Höhe:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";	//$NON-NLS-1$
+	private static final String	FILE_HEADER_EN		= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:";	//$NON-NLS-1$
+	private static final String	FILE_HEADER_DE		= "Zeit:	Strecke:	Höhe:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";	//$NON-NLS-1$
 
 	public CiclotourTextDataReader() {}
 
@@ -212,7 +212,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				timeData.altitude = altDelta;
 				timeData.cadence = cadence;
 				timeData.pulse = heartrate;
-				timeData.temperature = Math.round(temperature);
+				timeData.temperature = Math.round(temperature * TEMPERATURE_SCALE);
 				timeData.time = timeDelta;
 				// distance is stored in kilometers, but we need meters.
 				timeData.distance = Math.round(distanceDelta * 1000);
@@ -223,6 +223,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			}
 
+			tourData.setTemperatureScale(TEMPERATURE_SCALE);
 			tourData.setStartDistance(Math.round(distance));
 			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 

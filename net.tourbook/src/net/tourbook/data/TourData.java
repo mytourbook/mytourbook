@@ -346,11 +346,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# OTHER TOUR/DEVICE DATA #############################################
 
-//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
-
 	@XmlElement
 	private String											tourTitle;																				// db-version 4
 
@@ -389,6 +384,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * time slices has variable time duration
 	 */
 	private short											deviceTimeInterval					= -1;												// db-version 3
+
+	/**
+	 * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
+	 * is multiplied by 10, default scaling is <code>1</code>
+	 */
+	private int												temperatureScale					= 1;												// db-version 13
 
 	/**
 	 * Firmware version of the device
@@ -3212,7 +3213,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return the avgTemperature
+	 * @return Returns average temperature multiplied with {@link #temperatureScale}
 	 */
 	public int getAvgTemperature() {
 		return avgTemperature;
@@ -3486,11 +3487,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float getMaxSpeed() {
 		return maxSpeed;
 	}
-
-//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
 
 	public int getMergedAltitudeOffset() {
 		return mergedAltitudeOffset;
@@ -3783,6 +3779,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startYear;
 	}
 
+	public int getTemperatureScale() {
+		return temperatureScale;
+	}
+
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
 	 *         when temperature is not available
@@ -3810,7 +3810,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				temperatureSerieImperial = new int[temperatureSerie.length];
 
 				for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
-					temperatureSerieImperial[valueIndex] = (int) (temperatureSerie[valueIndex] * fahrenheitMulti + fahrenheitAdd);
+
+					final float scaledTemperature = (float) temperatureSerie[valueIndex] / temperatureScale;
+
+					temperatureSerieImperial[valueIndex] = (int) (((scaledTemperature) * fahrenheitMulti + fahrenheitAdd) * temperatureScale);
 				}
 			}
 			serie = temperatureSerieImperial;
@@ -4277,7 +4280,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public boolean replaceAltitudeWithSRTM() {
-		// TODO Auto-generated method stub
 
 		if (getSRTMSerie() == null) {
 			return false;
@@ -4377,8 +4379,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
-	 * the time slices are not equally
+	 * Time difference in seconds between 2 time slices when the interval is constant for the whole
+	 * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
+	 * equally
 	 * 
 	 * @param deviceTimeInterval
 	 */
@@ -4547,6 +4550,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setStartYear(final short startYear) {
 		this.startYear = startYear;
+	}
+
+	public void setTemperatureScale(final int temperatureScale) {
+		this.temperatureScale = temperatureScale;
 	}
 
 	public void setTourAltDown(final int tourAltDown) {

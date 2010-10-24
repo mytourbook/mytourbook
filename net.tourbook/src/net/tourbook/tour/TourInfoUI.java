@@ -861,11 +861,11 @@ public class TourInfoUI {
 				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]).toString());
 
 		// temperature
-		int temperature = _tourData.getAvgTemperature();
+		float temperature = (float) _tourData.getAvgTemperature() / _tourData.getTemperatureScale();
 		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+			temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 		}
-		_lblTemperature.setText(Integer.toString(temperature));
+		_lblTemperature.setText(_nf1.format(temperature));
 
 		// weather clouds
 		final int weatherIndex = _tourData.getWeatherIndex();
