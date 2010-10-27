@@ -91,6 +91,7 @@ public class RawDataManager {
 	private boolean							_importSettingsIsMergeTracks;
 	private boolean							_importSettingsIsChecksumValidation	= true;
 	private boolean							_importSettingsCreateTourIdWithTime	= false;
+	private int								_importPolarHrmGpxTimeDiff			= 0;
 
 	private String							_lastImportedFile;
 
@@ -234,7 +235,7 @@ public class RawDataManager {
 							rawDataManager.setImportId();
 
 							final ArrayList<String> notImportedFiles = new ArrayList<String>();
-							
+
 							int importCounter = 0;
 
 							final Path filePath = new Path(firstFileName);
@@ -301,6 +302,10 @@ public class RawDataManager {
 	 */
 	public HashMap<Long, TourData> getImportedTours() {
 		return _importedTourData;
+	}
+
+	public int getImportPolarHrmGpxTimeDiff() {
+		return _importPolarHrmGpxTimeDiff;
 	}
 
 	/**
@@ -451,6 +456,7 @@ public class RawDataManager {
 
 			device.setMergeTracks(_importSettingsIsMergeTracks);
 			device.setCreateTourIdWithTime(_importSettingsCreateTourIdWithTime);
+			device.setImportPolarHrmGpxTimeDiff(_importPolarHrmGpxTimeDiff);
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
@@ -479,10 +485,10 @@ public class RawDataManager {
 	}
 
 	private String importWithDeviceCopyFile(final TourbookDevice device,
-							final String sourceFileName,
-							final String destinationPath,
-							final boolean buildNewFileName,
-							final FileCollisionBehavior fileCollision) {
+											final String sourceFileName,
+											final String destinationPath,
+											final boolean buildNewFileName,
+											final FileCollisionBehavior fileCollision) {
 
 		String destFileName = new File(sourceFileName).getName();
 
@@ -675,6 +681,10 @@ public class RawDataManager {
 	 */
 	public void setImportId() {
 		_deviceData.importId = System.currentTimeMillis();
+	}
+
+	public void setImportPolarHrmGpxTimeDiff(final int timeDiff) {
+		_importPolarHrmGpxTimeDiff = timeDiff;
 	}
 
 	public void setImportYear(final int year) {

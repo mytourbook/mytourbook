@@ -158,7 +158,7 @@ public class Util {
 		return formatValue(value, unitType, 1, false);
 	}
 
-	public static String formatValue(final int value, final int unitType, final float divisor, final boolean showSeconds) {
+	public static String formatValue(final int value, final int unitType, final float divisor, boolean isShowSeconds) {
 
 		String valueText = EMPTY_STRING;
 
@@ -186,9 +186,23 @@ public class Util {
 			valueText = format_mm_ss(value);
 			break;
 
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
+
+			// seconds are displayed when they are not 0
+
+			final int seconds = (value % 3600) % 60;
+			if (isShowSeconds && seconds == 0) {
+				isShowSeconds = false;
+			}
+
+			// !!! the missing break; is intentional !!!
+
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 
-			if (showSeconds) {
+			if (isShowSeconds) {
+
+				// show seconds only when they are available
+
 				valueText = new Formatter().format(
 						Messages.Format_time_hhmmss,
 						(long) (value / 3600),

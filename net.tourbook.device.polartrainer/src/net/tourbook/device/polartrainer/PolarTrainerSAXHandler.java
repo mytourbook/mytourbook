@@ -377,12 +377,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-
-		uniqueKey = _device.createUniqueId(tourData, distanceSerie, "63193"); //$NON-NLS-1$
-
-		final Long tourId = tourData.createTourId(uniqueKey);
+		final Long tourId = tourData.createTourId(_device.createUniqueId(tourData, "63193"));
 
 		// check if the tour is already imported
 		if (_tourDataMap.containsKey(tourId) == false) {

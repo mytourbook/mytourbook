@@ -21,21 +21,22 @@ import org.eclipse.swt.graphics.RGB;
 
 public abstract class ChartDataSerie {
 
-	public static final int			AXIS_UNIT_NUMBER				= 10;
-	public static final int			AXIS_UNIT_HOUR_MINUTE			= 20;
-	public static final int			AXIS_UNIT_HOUR_MINUTE_24H		= 21;
-	public static final int			AXIS_UNIT_HOUR_MINUTE_SECOND	= 22;
-	public static final int			AXIS_UNIT_MINUTE_SECOND			= 23;
-	public static final int			AXIS_UNIT_MONTH					= 30;
-	public static final int			AXIS_UNIT_DAY					= 40;
-	public static final int			AXIS_UNIT_YEAR					= 50;
+	public static final int			AXIS_UNIT_NUMBER						= 10;
+	public static final int			AXIS_UNIT_HOUR_MINUTE					= 20;
+	public static final int			AXIS_UNIT_HOUR_MINUTE_24H				= 21;
+	public static final int			AXIS_UNIT_HOUR_MINUTE_SECOND			= 22;
+	public static final int			AXIS_UNIT_MINUTE_SECOND					= 23;
+	public static final int			AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND	= 24;
+	public static final int			AXIS_UNIT_MONTH							= 30;
+	public static final int			AXIS_UNIT_DAY							= 40;
+	public static final int			AXIS_UNIT_YEAR							= 50;
 
-	public static final int			X_AXIS_UNIT_WEEK				= 100;
+	public static final int			X_AXIS_UNIT_WEEK						= 100;
 
 	/**
 	 * Default color, when default color is not set
 	 */
-	private static RGB				DEFAULT_DEFAULT_RGB				= new RGB(0xFF, 0xA5, 0xCB);
+	private static RGB				DEFAULT_DEFAULT_RGB						= new RGB(0xFF, 0xA5, 0xCB);
 
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
@@ -48,24 +49,24 @@ public abstract class ChartDataSerie {
 	/**
 	 * divisor for highValues
 	 */
-	private int						_valueDivisor					= 1;
+	private int						_valueDivisor							= 1;
 
 	/**
 	 * unit which is drawn on the x-axis
 	 */
-	private int						_axisUnit						= AXIS_UNIT_NUMBER;
+	private int						_axisUnit								= AXIS_UNIT_NUMBER;
 
 	/**
 	 * Text label for the unit
 	 */
-	private String					_unitLabel						= new String();
+	private String					_unitLabel								= new String();
 
 	/**
 	 * Text label for the chart data, e.g. distance, altitude, speed...
 	 */
-	private String					_label							= new String();
+	private String					_label									= new String();
 
-	private HashMap<String, Object>	_customData						= new HashMap<String, Object>();
+	private HashMap<String, Object>	_customData								= new HashMap<String, Object>();
 
 	/**
 	 * max value which is used to draw the chart
@@ -77,9 +78,9 @@ public abstract class ChartDataSerie {
 	 */
 	protected int					_visibleMinValue;
 
-	private RGB						_rgbBright[]					= new RGB[] { new RGB(255, 0, 0) };
-	private RGB						_rgbDark[]						= new RGB[] { new RGB(0, 0, 255) };
-	private RGB						_rgbLine[]						= new RGB[] { new RGB(0, 255, 0) };
+	private RGB						_rgbBright[]							= new RGB[] { new RGB(255, 0, 0) };
+	private RGB						_rgbDark[]								= new RGB[] { new RGB(0, 0, 255) };
+	private RGB						_rgbLine[]								= new RGB[] { new RGB(0, 255, 0) };
 
 	/**
 	 * minimum value found in the provided values
@@ -96,8 +97,8 @@ public abstract class ChartDataSerie {
 	/**
 	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
 	 */
-	private boolean					_isForceMinValue				= false;
-	private boolean					_isForceMaxValue				= false;
+	private boolean					_isForceMinValue						= false;
+	private boolean					_isForceMaxValue						= false;
 
 	public int getAxisUnit() {
 		return _axisUnit;

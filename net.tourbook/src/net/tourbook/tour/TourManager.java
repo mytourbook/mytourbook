@@ -487,7 +487,7 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the date/time of the tour
+	 * @return Returns date/time of the tour start
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
@@ -1575,7 +1575,7 @@ public class TourManager {
 		xDataTime.setLabel(Messages.tour_editor_label_time);
 		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
-		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
+		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
 		/*
 		 * show the distance on the x-axis when a distance is available, otherwise the time is

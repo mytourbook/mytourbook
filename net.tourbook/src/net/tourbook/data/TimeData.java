@@ -46,7 +46,12 @@ public class TimeData implements Serializable {
 	public long					absoluteTime		= Long.MIN_VALUE;
 
 	/**
-	 * absolute value for temperature
+	 * Contains time in seconds relative to the tour start
+	 */
+	public int					relativeTime;
+
+	/**
+	 * Absolute value for temperature in metric measurement system
 	 */
 	public int					temperature			= Integer.MIN_VALUE;
 

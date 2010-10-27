@@ -837,6 +837,25 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
+
+	public static final TableColumnFactory TOUR_TIME_OF_DAY_HH_MM_SS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(12);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourDayTimeHHMMSS", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Tour_DayTime);
+			colDef.setColumnHeader(Messages.ColumnFactory_Tour_DayTime);
+			colDef.setColumnUnit(Messages.ColumnFactory_tour_time_hhmmss);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Tour_DayTime_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
 	
 	public static final TableColumnFactory TOUR_TITLE = new TableColumnFactory() {
 		

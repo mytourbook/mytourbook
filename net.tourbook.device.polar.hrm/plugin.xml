@@ -3,11 +3,19 @@
 <plugin>
    <extension
          point="net.tourbook.deviceDataReader">
+
       <device
             class="net.tourbook.device.polar.hrm.PolarHRMDataReader"
             fileextension="hrm"
             id="net.tourbook.device.PolarHRMDataReader"
-            name="Polar HRM"/>
+            name="Polar HRM (Heart Rate Monitor)"/>
+
+      <device
+            class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
+            fileextension="pdd"
+            id="net.tourbook.device.PolarPDDDataReader"
+            name="Polar PDD (Polar Diary Data)"/>
+
    </extension>
 
 </plugin>

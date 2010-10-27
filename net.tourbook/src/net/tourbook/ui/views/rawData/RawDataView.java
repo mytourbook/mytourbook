@@ -129,27 +129,29 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer {
 
-	public static final String				ID									= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String				ID										= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	public static final int					COLUMN_DATE							= 0;
-	public static final int					COLUMN_TITLE						= 1;
-	public static final int					COLUMN_DATA_FORMAT					= 2;
-	public static final int					COLUMN_FILE_NAME					= 3;
+	public static final int					COLUMN_DATE								= 0;
+	public static final int					COLUMN_TITLE							= 1;
+	public static final int					COLUMN_DATA_FORMAT						= 2;
+	public static final int					COLUMN_FILE_NAME						= 3;
 
-	private static final String				STATE_IMPORTED_FILENAMES			= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES			= "SelectedTourIndices";					//$NON-NLS-1$
+	private static final String				STATE_IMPORTED_FILENAMES				= "importedFilenames";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDICES				= "SelectedTourIndices";					//$NON-NLS-1$
 
-	private static final String				STATE_IS_MERGE_TRACKS				= "isMergeTracks";							//$NON-NLS-1$
-	private static final String				STATE_IS_CHECKSUM_VALIDATION		= "isChecksumValidation";					//$NON-NLS-1$
-	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME	= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String				STATE_IS_MERGE_TRACKS					= "isMergeTracks";							//$NON-NLS-1$
+	private static final String				STATE_IS_CHECKSUM_VALIDATION			= "isChecksumValidation";					//$NON-NLS-1$
+	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME		= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String				STATE_IMPORT_POLAR_HRM_GPX_TIME_DIFF	= "PolarImportHrmGpxTimeDiff";				//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin
-																						.getDefault()
-																						.getPreferenceStore();
+	private final IPreferenceStore			_prefStore								= TourbookPlugin
+																							.getDefault()
+																							.getPreferenceStore();
 
-	private final IDialogSettings			_state								= TourbookPlugin
-																						.getDefault()
-																						.getDialogSettingsSection(ID);
+	private final IDialogSettings			_state									= TourbookPlugin
+																							.getDefault()
+																							.getDialogSettingsSection(
+																									ID);
 
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -160,28 +162,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 
-	protected boolean						_isPartVisible						= false;
-	protected boolean						_isViewerPersonDataDirty			= false;
+	protected boolean						_isPartVisible							= false;
+	protected boolean						_isViewerPersonDataDirty				= false;
 
 	private ColumnManager					_columnManager;
 
-	private final Calendar					_calendar							= GregorianCalendar.getInstance();
+	private final Calendar					_calendar								= GregorianCalendar.getInstance();
 
-	private final NumberFormat				_nf									= NumberFormat.getNumberInstance();
-	private final DateFormat				_dateFormatter						= DateFormat
-																						.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter						= DateFormat
-																						.getTimeInstance(DateFormat.SHORT);
-	private final DateFormat				_durationFormatter					= DateFormat.getTimeInstance(
-																						DateFormat.SHORT,
-																						Locale.GERMAN);
+	private final NumberFormat				_nf										= NumberFormat.getNumberInstance();
+	private final DateFormat				_dateFormatter							= DateFormat
+																							.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter							= DateFormat
+																							.getTimeInstance(DateFormat.SHORT);
+	private final DateFormat				_durationFormatter						= DateFormat.getTimeInstance(
+																							DateFormat.SHORT,
+																							Locale.GERMAN);
 
 	private boolean							_isToolTipInDate;
 	private boolean							_isToolTipInTime;
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
 
-	private TourDoubleClickState			_tourDoubleClickState				= new TourDoubleClickState();
+	private TourDoubleClickState			_tourDoubleClickState					= new TourDoubleClickState();
 
 	/*
 	 * resources
@@ -211,10 +213,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionMergeIntoMenu				_actionMergeIntoTour;
 	private ActionReimportTour				_actionReimportTour;
 	private ActionRemoveTour				_actionRemoveTour;
-	private ActionAdjustYear				_actionAdjustImportedYear;
-	private ActionMergeGPXTours				_actionMergeGPXTours;
-	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
-	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
 	private ActionSetTourTypeMenu			_actionSetTourType;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
@@ -228,6 +226,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
 	private ActionExport					_actionExportTour;
 	private ActionJoinTours					_actionJoinTours;
+
+	// import actions
+	private ActionAdjustYear				_actionAdjustImportedYear;
+	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
+	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
+	private ActionMergeGPXTours				_actionMergeGPXTours;
+	private ActionImportPolarHrmGpxTimeDiff	_actionImportPolarHrmGpxTimeDiff;
 
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
@@ -683,11 +688,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //		fActionRefreshView = new ActionRefreshView(this);
 
 		// view menu
-		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionMergeGPXTours = new ActionMergeGPXTours(this);
-		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
 		_actionAdjustImportedYear = new ActionAdjustYear(this);
+		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
 		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
+		_actionImportPolarHrmGpxTimeDiff = new ActionImportPolarHrmGpxTimeDiff(this);
+		_actionMergeGPXTours = new ActionMergeGPXTours(this);
+
+		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
 	/**
@@ -1600,6 +1607,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionCreateTourIdWithTime);
 		menuMgr.add(_actionDisableChecksumValidation);
 		menuMgr.add(_actionAdjustImportedYear);
+		menuMgr.add(_actionImportPolarHrmGpxTimeDiff);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionModifyColumns);
@@ -1937,6 +1945,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionDisableChecksumValidation.setChecked(_state.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
 		rawDataManager.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
 
+		/*
+		 * polar hrm gpx time diff
+		 */
+		final int timeDiff = Util.getStateInt(_state, STATE_IMPORT_POLAR_HRM_GPX_TIME_DIFF, 0);
+		_actionImportPolarHrmGpxTimeDiff.setTimeDiff(timeDiff);
+		rawDataManager.setImportPolarHrmGpxTimeDiff(timeDiff);
+
 		updateToolTipState();
 
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -1954,8 +1969,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
+		final RawDataManager rawDataManager = RawDataManager.getInstance();
+
 		// save imported file names
-		final HashSet<String> importedFiles = RawDataManager.getInstance().getImportedFiles();
+		final HashSet<String> importedFiles = rawDataManager.getImportedFiles();
 		_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
 		// keep selected tours
@@ -1964,6 +1981,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_state.put(STATE_IS_MERGE_TRACKS, _actionMergeGPXTours.isChecked());
 		_state.put(STATE_IS_CHECKSUM_VALIDATION, _actionDisableChecksumValidation.isChecked());
 		_state.put(STATE_IS_CREATE_TOUR_ID_WITH_TIME, _actionCreateTourIdWithTime.isChecked());
+		_state.put(STATE_IMPORT_POLAR_HRM_GPX_TIME_DIFF, rawDataManager.getImportPolarHrmGpxTimeDiff());
 
 		_columnManager.saveState(_state);
 	}

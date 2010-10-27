@@ -76,6 +76,12 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 */
 	public boolean			isCreateTourIdWithRecordingTime;
 
+	/**
+	 * Time difference in minutes between .hrm file and gpx file (which contains UTC time) for the
+	 * .pdd Polar files
+	 */
+	public int				importPolarHrmGpxTimeDiff;
+
 	public TourbookDevice() {}
 
 	public TourbookDevice(final String deviceName) {
@@ -97,7 +103,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
 	/**
-	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called before
+	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead,
 	 * to create recording time.
 	 * 
 	 * @param tourData
@@ -106,16 +112,17 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 *            The dummy key is used when distance serie is not available
 	 * @return Returns a unique key for a tour
 	 */
-	public String createUniqueId(final TourData tourData, final int[] distanceSerie, final String dummyKey) {
+	public String createUniqueId(final TourData tourData, final String dummyKey) {
 
 		String uniqueKey;
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		if (isCreateTourIdWithRecordingTime) {
 
 			/*
 			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
 			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this will result in a NEW tour
+			 * this resulted in a NEW tour
 			 */
 			final int tourRecordingTime = tourData.getTourRecordingTime();
 
@@ -131,7 +138,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 		} else {
 
 			/*
-			 * original version to create tour id
+			 * original version to create a tour id
 			 */
 			if (distanceSerie == null) {
 				uniqueKey = dummyKey;
@@ -160,6 +167,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
 		this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
+	}
+
+	public void setImportPolarHrmGpxTimeDiff(final int importPolarHrmGpxTimeDiff) {
+		this.importPolarHrmGpxTimeDiff = importPolarHrmGpxTimeDiff;
 	}
 
 	public void setImportYear(final int importYear) {

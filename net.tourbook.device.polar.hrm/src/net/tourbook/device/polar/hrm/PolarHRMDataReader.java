@@ -49,7 +49,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private static final String		SECTION_START_CHARACTER	= "[";												//$NON-NLS-1$
 	private static final String		SECTION_PARAMS			= "[Params]";										//$NON-NLS-1$
-
+	//
 	private static final String		SECTION_NOTE			= "[Note]";										//$NON-NLS-1$
 	private static final String		SECTION_INT_TIMES		= "[IntTimes]";									//$NON-NLS-1$
 	private static final String		SECTION_INT_NOTES		= "[IntNotes]";									//$NON-NLS-1$
@@ -61,8 +61,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";									//$NON-NLS-1$
 	private static final String		SECTION_TRIP			= "[Trip]";										//$NON-NLS-1$
 	private static final String		SECTION_HR_DATA			= "[HRData]";										//$NON-NLS-1$
+	//
 	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
-
 	private static final String		PARAMS_VERSION			= "Version";										//$NON-NLS-1$
 	private static final String		PARAMS_S_MODE			= "SMode";											//$NON-NLS-1$
 	private static final String		PARAMS_DATE				= "Date";											//$NON-NLS-1$
@@ -84,18 +84,18 @@ public class PolarHRMDataReader extends TourbookDevice {
 	private static final String		PARAMS_START_DELAY		= "StartDelay";									//$NON-NLS-1$
 	private static final String		PARAMS_VO2MAX			= "VO2max";										//$NON-NLS-1$
 	private static final String		PARAMS_WEIGHT			= "Weight";										//$NON-NLS-1$
+	//
 	private DeviceData				_deviceData;
-
 	private String					_importFilePath;
 	private long					_lastUsedImportId;
 	private int						_hrmVersion				= -1;
 
 	private SectionParams			_sectionParams;
-
 	private SectionTrip				_sectionTrip;
 	private ArrayList<LapData>		_sectionLapData			= new ArrayList<PolarHRMDataReader.LapData>();
 	private ArrayList<LapNotes>		_sectionLapNotes		= new ArrayList<PolarHRMDataReader.LapNotes>();
 	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<PolarHRMDataReader.HRDataSlice>();
+	//
 	private boolean					_isDebug				= false;
 
 	/**
@@ -176,6 +176,11 @@ public class PolarHRMDataReader extends TourbookDevice {
 		 * Relative time of the lap in seconds
 		 */
 		private int	time;
+
+		/**
+		 * Temperature in metric or imperial value
+		 */
+		private int	temperature;
 
 		@Override
 		public String toString() {
@@ -930,30 +935,20 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 			try {
 
-				final StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+				StringTokenizer tokenLine = new StringTokenizer(line, DATA_DELIMITER);
 
-				/**
-				 * <pre>
-				 * 
-				 * Row 1
-				 * 
-				 * Time         Lap time in format hh:mm:ss.d
-				 * 								   0123456789
-				 * HR           Momentary heart rate value in bpm
-				 * HR min       Lap’s minimum heart rate value in bpm
-				 * HR avg       Lap’s average heart rate value in bpm
-				 * HR max       Lap’s maximum heart rate value in bpm
-				 * 
-				 * Time Lap time in format hh:mm:ss.d
-				 * 						   0123456789
-				 * </pre>
-				 */
+				// 1: time
+				String token = tokenLine.nextToken();
 
-				// time
-				final String token = tokenLine.nextToken();
+				// 2:
 				final int timeHour = Integer.parseInt(token.substring(0, 2));
+
+				// 3:
 				final int timeMin = Integer.parseInt(token.substring(3, 5));
+
+				// 4:
 				final int timeSec = Integer.parseInt(token.substring(6, 8));
+
 				lapData.time = timeHour * 3600 + timeMin * 60 + timeSec;
 
 // not yet used
@@ -1050,6 +1045,26 @@ public class PolarHRMDataReader extends TourbookDevice {
 				if (line == null || line.length() == 0 || line.startsWith(SECTION_START_CHARACTER)) {
 					break;
 				}
+
+				tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+				// 1: lap type
+				token = tokenLine.nextToken();
+
+				// 2: lap distance
+				token = tokenLine.nextToken();
+
+				// 3: power
+				token = tokenLine.nextToken();
+
+				// 4: temperature
+				lapData.temperature = Integer.parseInt(tokenLine.nextToken());
+
+				// 5: phase/lap
+				token = tokenLine.nextToken();
+
+				// 6: air pressure
+				token = tokenLine.nextToken();
 
 				/**
 				 * <pre>
@@ -1398,18 +1413,16 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
 		}
 
-		tourData.createTimeSeries(setTourData10CreateTimeSeries(dtTourStart), true);
+		final ArrayList<TimeData> timeSeries = setTourData10CreateTimeSeries(dtTourStart);
+		setTourData20SetTemperature(tourData, timeSeries);
 
-		setTourData20CreateMarkers(tourData);
+		tourData.createTimeSeries(timeSeries, true);
+
+		setTourData30CreateMarkers(tourData);
 		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final int[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-
-		uniqueKey = createUniqueId(tourData, distanceSerie, "63193"); //$NON-NLS-1$
-
-		final Long tourId = tourData.createTourId(uniqueKey);
+		final Long tourId = tourData.createTourId(createUniqueId(tourData, "63193")); //$NON-NLS-1$
 
 		// check if the tour is already imported
 		if (tourDataMap.containsKey(tourId) == false) {
@@ -1419,13 +1432,11 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(_sectionParams.monitorName);
-
 			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
 
 			// add new tour to other tours
 			tourDataMap.put(tourId, tourData);
 		}
-
 	}
 
 	/**
@@ -1446,12 +1457,13 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 		for (final HRDataSlice hrSlice : _sectionHRData) {
 
-			final TimeData dtSlice = new TimeData();
+			final TimeData tourSlice = new TimeData();
 
-			dtSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
+			tourSlice.relativeTime = relativeTime;
+			tourSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
 
 			if (hrSlice.pulse != Integer.MIN_VALUE) {
-				dtSlice.pulse = hrSlice.pulse;
+				tourSlice.pulse = hrSlice.pulse;
 			}
 
 			if (hrSlice.speed != Integer.MIN_VALUE) {
@@ -1464,18 +1476,18 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 				absoluteDistance += distanceDiff;
 
-				dtSlice.absoluteDistance = absoluteDistance;
+				tourSlice.absoluteDistance = absoluteDistance;
 			}
 
 			if (hrSlice.altitude != Integer.MIN_VALUE) {
-				dtSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
+				tourSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
 			}
 
 			if (hrSlice.cadence != Integer.MIN_VALUE) {
-				dtSlice.cadence = hrSlice.cadence;
+				tourSlice.cadence = hrSlice.cadence;
 			}
 
-			timeDataList.add(dtSlice);
+			timeDataList.add(tourSlice);
 
 			relativeTime += sliceTimeInterval;
 		}
@@ -1483,12 +1495,52 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return timeDataList;
 	}
 
+	private void setTourData20SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
+
+		if (_sectionLapData.size() == 0) {
+			return;
+		}
+
+		final boolean isImperial = _sectionParams.isUSUnit;
+
+		final TimeData[] timeSlices = timeSeries.toArray(new TimeData[timeSeries.size()]);
+		int serieIndex = 0;
+
+		for (final LapData lapData : _sectionLapData) {
+
+			final int lapRelativeTime = lapData.time;
+
+			for (; serieIndex < timeSlices.length; serieIndex++) {
+
+				final TimeData currentTimeSlice = timeSlices[serieIndex];
+
+				// check if time is within current lap
+				if (currentTimeSlice.relativeTime > lapRelativeTime) {
+					break;
+				}
+
+				int metricTemperature = lapData.temperature;
+
+				if (isImperial) {
+
+					final float metricScaledTemperature = (float) metricTemperature / 10;
+					metricTemperature = (int) ((metricScaledTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * 10);
+				}
+
+				currentTimeSlice.temperature = metricTemperature;
+			}
+		}
+
+		// temperature scale is 10 for the polar data
+		tourData.setTemperatureScale(10);
+	}
+
 	/**
 	 * Create a marker for each lap, the markers are currently numbered 1...n
 	 * 
 	 * @param tourData
 	 */
-	private void setTourData20CreateMarkers(final TourData tourData) {
+	private void setTourData30CreateMarkers(final TourData tourData) {
 
 		if (_sectionLapData.size() == 0) {
 			return;
@@ -1706,7 +1758,10 @@ public class PolarHRMDataReader extends TourbookDevice {
 				|| interval == 15
 				|| interval == 30
 				|| interval == 60
-				|| interval == 300) {
+				|| interval == 300
+//				|| interval == 238
+		//
+		) {
 
 			_sectionParams.mtInterval = interval;
 
@@ -1728,6 +1783,8 @@ public class PolarHRMDataReader extends TourbookDevice {
 		supportedDevices.append(Messages.Supported_Intervals_60_Second);
 		supportedDevices.append(UI.NEW_LINE);
 		supportedDevices.append(Messages.Supported_Intervals_5_Minutes);
+//		supportedDevices.append(UI.NEW_LINE);
+//		supportedDevices.append(Messages.Supported_Intervals_238);
 
 		showError(NLS.bind(
 				Messages.Import_Error_DialogMessage_InvalidInterval,

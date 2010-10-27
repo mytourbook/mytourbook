@@ -280,6 +280,7 @@ public class ChartComponents extends Composite {
 
 		switch (xAxisUnit) {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 			unitValue = Util.roundTimeValue(unitRawValue);
 			break;
@@ -330,7 +331,9 @@ public class ChartComponents extends Composite {
 				final int unitPos = graphValue - unitOffset;
 				int unitLabelValue = unitPos + xStartValue;
 
-				if (xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND && xStartValue > 0) {
+				if ((xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND //
+						|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND)
+						&& xStartValue > 0) {
 
 					/*
 					 * x-axis shows day time, start with 0:00 at midnight
@@ -339,11 +342,9 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				units.add(new ChartUnit(unitPos, //
-						Util.formatValue(unitLabelValue, //
-								xAxisUnit,
-								valueDivisor,
-								false)));
+				final String unitLabel = Util.formatValue(unitLabelValue, xAxisUnit, valueDivisor, true);
+
+				units.add(new ChartUnit(unitPos, unitLabel));
 
 				graphValue += unitValue;
 

@@ -179,6 +179,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_week_header;
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
+	public static String	ColumnFactory_Tour_DayTime;
+
+	public static String	ColumnFactory_Tour_DayTime_Tooltip;
+
 	public static String		ColumnFactory_Tour_WeekDay_Header;
 	public static String		ColumnFactory_Tour_WeekDay_Label;
 	public static String		ColumnFactory_Tour_WeekDay_Tooltip;
@@ -211,8 +215,7 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
-	public static String	Tooltip_WayPoint_Label_Altitude;
-
+	public static String		Tooltip_WayPoint_Label_Altitude;
 	public static String		Tooltip_WayPoint_Label_Category;
 	public static String		Tooltip_WayPoint_Label_Comment;
 	public static String		Tooltip_WayPoint_Label_Description;
@@ -234,8 +237,7 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_Clouds;
 	public static String		Tour_Tooltip_Label_DateTimeCreated;
 	public static String		Tour_Tooltip_Label_DateTimeModified;
-	public static String	Tour_Tooltip_Label_DefaultTitle;
-
+	public static String		Tour_Tooltip_Label_DefaultTitle;
 	public static String		Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
 	public static String		Tour_Tooltip_Label_Hour;

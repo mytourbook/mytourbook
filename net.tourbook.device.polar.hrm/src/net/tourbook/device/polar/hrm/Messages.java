@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String		Supported_Intervals_1_Second;
 	public static String		Supported_Intervals_15_Second;
 	public static String		Supported_Intervals_2_Second;
+	public static String	Supported_Intervals_238;
 	public static String		Supported_Intervals_30_Second;
 	public static String		Supported_Intervals_5_Minutes;
 	public static String		Supported_Intervals_5_Second;
