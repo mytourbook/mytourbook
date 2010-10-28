@@ -59,6 +59,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_GPX					= "gpx";											//$NON-NLS-1$
 
 	private static final String				TAG_TRK					= "trk";											//$NON-NLS-1$
+	private static final String				TAG_TRK_NAME			= "name";											//$NON-NLS-1$
 	private static final String				TAG_TRKPT				= "trkpt";											//$NON-NLS-1$
 
 	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
@@ -95,6 +96,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private int								_gpxVersion				= -1;
 
 	private boolean							_isInTrk				= false;
+	private boolean							_isInTrkName			= false;
 	private boolean							_isInTrkPt				= false;
 
 	private boolean							_isInTime				= false;
@@ -121,6 +123,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private final ArrayList<TimeData>		_timeDataList			= new ArrayList<TimeData>();
 	private TimeData						_timeSlice;
 	private TimeData						_prevTimeSlice;
+	private String							_trkName;
 
 	private final TourbookDevice			_deviceDataReader;
 	private final String					_importFilePath;
@@ -158,7 +161,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-		if (_isInTime //
+		if ( _isInTrkName //
+				|| _isInTime
 				|| _isInEle
 				|| _isInName
 				|| _isInCadence
@@ -198,6 +202,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		try {
 
+			if (_isInTrk) {
+				
 			if (_isInTrkPt) {
 
 				final String charData = _characters.toString();
@@ -259,6 +265,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
 				}
 
+				} else if (name.equals(TAG_TRK_NAME)) {
+	
+					// </name> track name
+	
+					_isInTrkName = false;
+					_trkName = _characters.toString();
+				}
+	
 			} else if (_isInWpt) {
 
 				// in <wpt>
@@ -397,6 +411,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
+
+		tourData.setTourTitle(_trkName);
 
 		/*
 		 * set tour start date/time
@@ -608,6 +624,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		_timeDataList.clear();
 		_absoluteDistance = 0;
 		_prevTimeSlice = null;
+		_trkName = null;
 	}
 
 	/**
@@ -715,6 +732,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					// get attributes
 					_timeSlice.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
 					_timeSlice.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
+
+				} else if (name.equals(TAG_TRK_NAME)) {
+
+					_isInTrkName = true;
+					_characters.delete(0, _characters.length());
+
 				}
 
 			} else if (_isInWpt) {
