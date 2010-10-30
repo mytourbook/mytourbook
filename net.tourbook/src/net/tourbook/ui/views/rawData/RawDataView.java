@@ -129,112 +129,115 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer {
 
-	public static final String				ID										= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String					ID										= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	public static final int					COLUMN_DATE								= 0;
-	public static final int					COLUMN_TITLE							= 1;
-	public static final int					COLUMN_DATA_FORMAT						= 2;
-	public static final int					COLUMN_FILE_NAME						= 3;
+	public static final int						COLUMN_DATE								= 0;
+	public static final int						COLUMN_TITLE							= 1;
+	public static final int						COLUMN_DATA_FORMAT						= 2;
+	public static final int						COLUMN_FILE_NAME						= 3;
 
-	private static final String				STATE_IMPORTED_FILENAMES				= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES				= "SelectedTourIndices";					//$NON-NLS-1$
+	private static final String					STATE_IMPORTED_FILENAMES				= "importedFilenames";						//$NON-NLS-1$
+	private static final String					STATE_SELECTED_TOUR_INDICES				= "SelectedTourIndices";					//$NON-NLS-1$
 
-	private static final String				STATE_IS_MERGE_TRACKS					= "isMergeTracks";							//$NON-NLS-1$
-	private static final String				STATE_IS_CHECKSUM_VALIDATION			= "isChecksumValidation";					//$NON-NLS-1$
-	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME		= "isCreateTourIdWithTime";				//$NON-NLS-1$
-	private static final String				STATE_IMPORT_POLAR_HRM_GPX_TIME_DIFF	= "PolarImportHrmGpxTimeDiff";				//$NON-NLS-1$
+	private static final String					STATE_IS_MERGE_TRACKS					= "isMergeTracks";							//$NON-NLS-1$
+	private static final String					STATE_IS_CHECKSUM_VALIDATION			= "isChecksumValidation";					//$NON-NLS-1$
+	private static final String					STATE_IS_CREATE_TOUR_ID_WITH_TIME		= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String					STATE_IMPORT_POLAR_HRM_GPX_TIME_DIFF	= "PolarImportHrmGpxTimeDiff";				//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore								= TourbookPlugin
-																							.getDefault()
-																							.getPreferenceStore();
+	private final IPreferenceStore				_prefStore								= TourbookPlugin
+																								.getDefault()
+																								.getPreferenceStore();
 
-	private final IDialogSettings			_state									= TourbookPlugin
-																							.getDefault()
-																							.getDialogSettingsSection(
-																									ID);
+	private final IDialogSettings				_state									= TourbookPlugin
+																								.getDefault()
+																								.getDialogSettingsSection(
+																										ID);
 
-	private PostSelectionProvider			_postSelectionProvider;
-	private IPartListener2					_partListener;
-	private ISelectionListener				_postSelectionListener;
-	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
+	private PostSelectionProvider				_postSelectionProvider;
+	private IPartListener2						_partListener;
+	private ISelectionListener					_postSelectionListener;
+	private IPropertyChangeListener				_prefChangeListener;
+	private ITourEventListener					_tourEventListener;
 
-	protected TourPerson					_activePerson;
-	protected TourPerson					_newActivePerson;
+	protected TourPerson						_activePerson;
+	protected TourPerson						_newActivePerson;
 
-	protected boolean						_isPartVisible							= false;
-	protected boolean						_isViewerPersonDataDirty				= false;
+	protected boolean							_isPartVisible							= false;
+	protected boolean							_isViewerPersonDataDirty				= false;
 
-	private ColumnManager					_columnManager;
+	private ColumnManager						_columnManager;
 
-	private final Calendar					_calendar								= GregorianCalendar.getInstance();
+	private final Calendar						_calendar								= GregorianCalendar
+																								.getInstance();
 
-	private final NumberFormat				_nf										= NumberFormat.getNumberInstance();
-	private final DateFormat				_dateFormatter							= DateFormat
-																							.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter							= DateFormat
-																							.getTimeInstance(DateFormat.SHORT);
-	private final DateFormat				_durationFormatter						= DateFormat.getTimeInstance(
-																							DateFormat.SHORT,
-																							Locale.GERMAN);
+	private final NumberFormat					_nf										= NumberFormat
+																								.getNumberInstance();
+	private final DateFormat					_dateFormatter							= DateFormat
+																								.getDateInstance(DateFormat.SHORT);
+	private final DateFormat					_timeFormatter							= DateFormat
+																								.getTimeInstance(DateFormat.SHORT);
+	private final DateFormat					_durationFormatter						= DateFormat.getTimeInstance(
+																								DateFormat.SHORT,
+																								Locale.GERMAN);
 
-	private boolean							_isToolTipInDate;
-	private boolean							_isToolTipInTime;
-	private boolean							_isToolTipInTitle;
-	private boolean							_isToolTipInTags;
+	private boolean								_isToolTipInDate;
+	private boolean								_isToolTipInTime;
+	private boolean								_isToolTipInTitle;
+	private boolean								_isToolTipInTags;
 
-	private TourDoubleClickState			_tourDoubleClickState					= new TourDoubleClickState();
+	private TourDoubleClickState				_tourDoubleClickState					= new TourDoubleClickState();
 
 	/*
 	 * resources
 	 */
-	private ImageDescriptor					_imageDescDatabase;
-	private ImageDescriptor					_imageDescDatabaseOtherPerson;
-	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
-	private ImageDescriptor					_imageDescDatabasePlaceholder;
-	private ImageDescriptor					_imageDescDelete;
+	private ImageDescriptor						_imageDescDatabase;
+	private ImageDescriptor						_imageDescDatabaseOtherPerson;
+	private ImageDescriptor						_imageDescDatabaseAssignMergedTour;
+	private ImageDescriptor						_imageDescDatabasePlaceholder;
+	private ImageDescriptor						_imageDescDelete;
 
-	private Image							_imageDatabase;
-	private Image							_imageDatabaseOtherPerson;
-	private Image							_imageDatabaseAssignMergedTour;
-	private Image							_imageDatabasePlaceholder;
-	private Image							_imageDelete;
+	private Image								_imageDatabase;
+	private Image								_imageDatabaseOtherPerson;
+	private Image								_imageDatabaseAssignMergedTour;
+	private Image								_imageDatabasePlaceholder;
+	private Image								_imageDelete;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_viewerContainer;
-	private TableViewer						_tourViewer;
+	private Composite							_viewerContainer;
+	private TableViewer							_tourViewer;
 
-	private ActionClearView					_actionClearView;
-	private ActionModifyColumns				_actionModifyColumns;
-	private ActionSaveTourInDatabase		_actionSaveTour;
-	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
-	private ActionMergeIntoMenu				_actionMergeIntoTour;
-	private ActionReimportTour				_actionReimportTour;
-	private ActionRemoveTour				_actionRemoveTour;
-	private ActionSetTourTypeMenu			_actionSetTourType;
-	private ActionEditQuick					_actionEditQuick;
-	private ActionEditTour					_actionEditTour;
-	private ActionMergeTour					_actionMergeTour;
-	private ActionSetTourTag				_actionAddTag;
-	private ActionSetTourTag				_actionRemoveTag;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionOpenPrefDialog			_actionOpenTagPrefs;
-	private ActionOpenTour					_actionOpenTour;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
-	private ActionExport					_actionExportTour;
-	private ActionJoinTours					_actionJoinTours;
+	private ActionClearView						_actionClearView;
+	private ActionExport						_actionExportTour;
+	private ActionEditQuick						_actionEditQuick;
+	private ActionEditTour						_actionEditTour;
+	private ActionJoinTours						_actionJoinTours;
+	private ActionMergeIntoMenu					_actionMergeIntoTour;
+	private ActionMergeTour						_actionMergeTour;
+	private ActionModifyColumns					_actionModifyColumns;
+	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+	private ActionOpenTour						_actionOpenTour;
+	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
+	private ActionReimportTour					_actionReimportTour;
+	private ActionReimportTourOnlyTimeSlices	_actionReimportTourTimeSlices;
+	private ActionRemoveAllTags					_actionRemoveAllTags;
+	private ActionRemoveTour					_actionRemoveTour;
+	private ActionSaveTourInDatabase			_actionSaveTour;
+	private ActionSaveTourInDatabase			_actionSaveTourWithPerson;
+	private ActionSetTourTag					_actionAddTag;
+	private ActionSetTourTag					_actionRemoveTag;
+	private ActionSetTourTypeMenu				_actionSetTourType;
 
 	// import actions
-	private ActionAdjustYear				_actionAdjustImportedYear;
-	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
-	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
-	private ActionMergeGPXTours				_actionMergeGPXTours;
-	private ActionImportPolarHrmGpxTimeDiff	_actionImportPolarHrmGpxTimeDiff;
+	private ActionAdjustYear					_actionAdjustImportedYear;
+	private ActionCreateTourIdWithTime			_actionCreateTourIdWithTime;
+	private ActionDisableChecksumValidation		_actionDisableChecksumValidation;
+	private ActionMergeGPXTours					_actionMergeGPXTours;
+	private ActionImportPolarHrmGpxTimeDiff		_actionImportPolarHrmGpxTimeDiff;
 
-	private TableViewerTourInfoToolTip		_tourInfoToolTip;
+	private TableViewerTourInfoToolTip			_tourInfoToolTip;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -292,18 +295,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		mergeIntoTour.setMergeSourceTour(null);
 	}
 
-	void actionReimportTour() {
+	void actionReimportTour(final boolean isImportOnlyTimeSlices) {
 
 		// check if the tour editor contains a modified tour
 		if (TourManager.isTourEditorModified()) {
 			return;
 		}
 
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.import_data_dlg_reimport_title,
-				Messages.Import_Data_Dialog_ConfirmReimport_Message) == false) {
-			return;
+		if (isImportOnlyTimeSlices) {
+
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message) == false) {
+				return;
+			}
+
+		} else {
+
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					Messages.Import_Data_Dialog_ConfirmReimport_Message) == false) {
+				return;
+			}
 		}
 
 		boolean isTourImported = false;
@@ -328,7 +343,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final Object element = iterator.next();
 			if (element instanceof TourData) {
 
-				final TourData tourData = (TourData) element;
+				TourData tourData = (TourData) element;
 
 				// get import file name
 				String importFilePathName = tourData.importRawDataFile;
@@ -350,8 +365,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 
 				// check import file
-				final File file = new File(importFilePathName);
-				if (file.exists() == false) {
+				final File importFile = new File(importFilePathName);
+				if (importFile.exists() == false) {
 					MessageDialog.openInformation(
 							Display.getCurrent().getActiveShell(),
 							Messages.import_data_dlg_reimport_title,
@@ -362,15 +377,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final Long tourId = tourData.getTourId();
 
 				// remove old tour data
-				importedTours.remove(tourId);
+				final TourData oldTourData = importedTours.remove(tourId);
 
-				if (rawDataMgr.importRawData(file, null, false, null)) {
+				if (rawDataMgr.importRawData(importFile, null, false, null)) {
 
 					isTourImported = true;
 
-					// keep first tour
-					if (firstTourData[0] == null) {
-						firstTourData[0] = tourData;
+					if (isImportOnlyTimeSlices) {
+						adjustReimportedTour(importFile, importedTours, oldTourData);
 					}
 
 					final TourPerson tourPerson = tourData.getTourPerson();
@@ -389,10 +403,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 							// replace tour in map
 							importedTours.put(savedTourData.getTourId(), savedTourData);
+
+							tourData = savedTourData;
 						}
 					}
 
+					// keep first tour
+					if (firstTourData[0] == null) {
+						firstTourData[0] = tourData;
+					}
+
 				} else {
+
+					// tour could not be imported
 					notImportedFiles.add(importFilePathName);
 				}
 			}
@@ -655,6 +678,59 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	/**
+	 * Only time slices are reimported.
+	 * 
+	 * @param importFile
+	 * @param importedTours
+	 * @param oldTourData
+	 */
+	private void adjustReimportedTour(	final File importFile,
+										final HashMap<Long, TourData> importedTours,
+										final TourData oldTourData) {
+
+		final long tourId = oldTourData.getTourId();
+
+		final TourData reimportedTour = importedTours.get(tourId);
+
+		/*
+		 * data series must have the same number of time slices, otherwise the markers can be off
+		 * the array bounds, this problem could be solved but takes time to do it.
+		 */
+		if (oldTourData.timeSerie.length != reimportedTour.timeSerie.length) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.import_data_dlg_reimport_title,
+					NLS.bind(
+							Messages.Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message,
+							importFile.toString()));
+
+			// replace tour in map with old tour
+			importedTours.put(oldTourData.getTourId(), oldTourData);
+
+			return;
+		}
+
+		oldTourData.altitudeSerie = reimportedTour.altitudeSerie;
+		oldTourData.cadenceSerie = reimportedTour.cadenceSerie;
+		oldTourData.distanceSerie = reimportedTour.distanceSerie;
+		oldTourData.latitudeSerie = reimportedTour.latitudeSerie;
+		oldTourData.longitudeSerie = reimportedTour.longitudeSerie;
+		oldTourData.pulseSerie = reimportedTour.pulseSerie;
+		oldTourData.temperatureSerie = reimportedTour.temperatureSerie;
+		oldTourData.timeSerie = reimportedTour.timeSerie;
+
+		oldTourData.clearComputedSeries();
+
+		oldTourData.computeAltitudeUpDown();
+		oldTourData.computeTourDrivingTime();
+		oldTourData.computeComputedValues();
+
+		// replace tour in map with imported tour
+		importedTours.put(oldTourData.getTourId(), oldTourData);
+	}
+
 	private void createActions() {
 
 		// context menu
@@ -662,6 +738,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
 		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
 		_actionReimportTour = new ActionReimportTour(this);
+		_actionReimportTourTimeSlices = new ActionReimportTourOnlyTimeSlices(this);
 		_actionRemoveTour = new ActionRemoveTour(this);
 		_actionExportTour = new ActionExport(this);
 		_actionJoinTours = new ActionJoinTours(this);
@@ -685,7 +762,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// view toolbar
 		_actionClearView = new ActionClearView(this);
-//		fActionRefreshView = new ActionRefreshView(this);
 
 		// view menu
 		_actionAdjustImportedYear = new ActionAdjustYear(this);
@@ -1479,6 +1555,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
 		_actionReimportTour.setEnabled(selectedTours > 0);
+		_actionReimportTourTimeSlices.setEnabled(selectedTours > 0);
 		_actionRemoveTour.setEnabled(selectedTours > 0);
 		_actionExportTour.setEnabled(selectedNotDeleteTours > 0);
 		_actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
@@ -1552,6 +1629,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionReimportTour);
+		menuMgr.add(_actionReimportTourTimeSlices);
 		menuMgr.add(_actionRemoveTour);
 
 		menuMgr.add(new Separator());

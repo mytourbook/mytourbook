@@ -135,25 +135,6 @@ public class Util {
 	}
 
 	/**
-	 * creates a int array backup
-	 * 
-	 * @param original
-	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
-	 */
-	public static int[] createDataSerieCopy(final int[] original) {
-
-		int[] backup = null;
-
-		if (original != null) {
-			final int serieLength = original.length;
-			backup = new int[serieLength];
-			System.arraycopy(original, 0, backup, 0, serieLength);
-		}
-
-		return backup;
-	}
-
-	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
 	 * 
 	 * @param yyyymmddhhmmss
@@ -169,6 +150,45 @@ public class Util {
 		final int second = (int) (yyyymmddhhmmss % 100);
 
 		return new DateTime(year, month, day, hour, minute, second, 0);
+	}
+
+	/**
+	 * creates a double array backup
+	 * 
+	 * @param original
+	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
+	 *         is <code>null</code>.
+	 */
+	public static double[] createDoubleCopy(final double[] original) {
+
+		double[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new double[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
+	}
+
+	/**
+	 * creates a int array backup
+	 * 
+	 * @param original
+	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
+	 */
+	public static int[] createIntegerCopy(final int[] original) {
+
+		int[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new int[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
 	}
 
 	public static Resource disposeResource(final Resource resource) {
@@ -300,18 +320,6 @@ public class Util {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
-	public static int getNumberOfDigits(int number) {
-
-		int counter = 0;
-
-		while (number > 0) {
-			counter++;
-			number = number / 10;
-		}
-
-		return counter;
-	}
-
 	/*
 	 * !!! ORIGINAL CODE !!!
 	 */
@@ -369,6 +377,18 @@ public class Util {
 //	  s = s.toFixed(3); // round to 1mm precision
 //	  return s;
 //	}
+
+	public static int getNumberOfDigits(int number) {
+
+		int counter = 0;
+
+		while (number > 0) {
+			counter++;
+			number = number / 10;
+		}
+
+		return counter;
+	}
 
 	public static String getSQLExceptionText(final SQLException e) {
 

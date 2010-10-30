@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,44 +38,44 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 	/**
 	 * contains tour which is displayed in the chart
 	 */
-	private TourData				fTourData;
-	private int[]					fXDataSerie;
-	private TourChartConfiguration	fTourChartConfig;
-	private SplineData				fSplineData;
+	private TourData				_tourData;
+	private int[]					_xDataSerie;
+	private TourChartConfiguration	_tourChartConfig;
+	private SplineData				_splineData;
 
-	private Rectangle[]				fSpPointRects;
+	private Rectangle[]				_spPointRects;
 
-	private int						fGraphXValueOffset;
-	private int						fDevGraphValueXOffset;
-	private int						fDevY0Spline;
-	private float					fScaleX;
-	private float					fScaleY;
+	private int						_graphXValueOffset;
+	private int						_devGraphValueXOffset;
+	private int						_devY0Spline;
+	private float					_scaleX;
+	private float					_scaleY;
 
 	public ChartLayer2ndAltiSerie(	final TourData tourData,
 									final int[] xDataSerie,
 									final TourChartConfiguration tourChartConfig,
 									final SplineData splineData) {
 
-		fTourData = tourData;
-		fTourChartConfig = tourChartConfig;
-		fSplineData = splineData;
+		_tourData = tourData;
+		_tourChartConfig = tourChartConfig;
+		_splineData = splineData;
 
 		// x-data serie contains the time or distance distance data serie
-		fXDataSerie = xDataSerie;
+		_xDataSerie = xDataSerie;
 	}
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
-		final int[] xValues = fXDataSerie;
+		final int[] xValues = _xDataSerie;
 
-		final int[] yValues2ndSerie = fTourData.dataSerie2ndAlti;
-		final int[] yDiffTo2ndSerie = fTourData.dataSerieDiffTo2ndAlti;
-		final int[] yAdjustedSerie = fTourData.dataSerieAdjustedAlti;
+		final int[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
+		final int[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
+		final int[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
 
 		final boolean is2ndYValues = yValues2ndSerie != null;
 		final boolean isDiffValues = yDiffTo2ndSerie != null;
 		final boolean isAdjustedValues = yAdjustedSerie != null;
-		final boolean isPointInGraph = fSplineData != null && fSplineData.serieIndex != null;
+		final boolean isPointInGraph = _splineData != null && _splineData.serieIndex != null;
 
 		if (xValues == null || xValues.length == 0 /*
 													 * || yValues2ndSerie == null ||
@@ -84,12 +84,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			return;
 		}
 
-		fScaleX = drawingData.getScaleX();
-		fScaleY = drawingData.getScaleY();
+		_scaleX = drawingData.getScaleX();
+		_scaleY = drawingData.getScaleY();
 
 		// get the horizontal offset for the graph
-		fDevGraphValueXOffset = chart.getDevGraphImageXOffset();
-		fGraphXValueOffset = (int) (Math.max(0, fDevGraphValueXOffset) / fScaleX);
+		_devGraphValueXOffset = chart.getDevGraphImageXOffset();
+		_graphXValueOffset = (int) (Math.max(0, _devGraphValueXOffset) / _scaleX);
 
 		final Display display = Display.getCurrent();
 
@@ -105,13 +105,13 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final int devYTop = devYBottom - devGraphHeight;
 
 		// write spline into the middle of the chart
-		fDevY0Spline = devYBottom - devGraphHeight / 2;
+		_devY0Spline = devYBottom - devGraphHeight / 2;
 
 		/*
 		 * convert all diff values into positive values
 		 */
 		int diffValues[] = null;
-		float scaleValueDiff = fScaleY;
+		float scaleValueDiff = _scaleY;
 		if (isDiffValues) {
 
 			int valueIndex = 0;
@@ -124,13 +124,13 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			}
 
 			// set value diff scaling
-			if (fTourChartConfig.isRelativeValueDiffScaling) {
-				scaleValueDiff = maxValueDiff == 0 ? fScaleY : (float) devGraphHeight / 2 / maxValueDiff;
+			if (_tourChartConfig.isRelativeValueDiffScaling) {
+				scaleValueDiff = maxValueDiff == 0 ? _scaleY : (float) devGraphHeight / 2 / maxValueDiff;
 			}
 		}
 
 		// position for the x-axis line in the graph
-		final float devY0 = devYBottom + (fScaleY * graphYBottom);
+		final float devY0 = devYBottom + (_scaleY * graphYBottom);
 
 		final int startIndex = 0;
 		final int endIndex = xValues.length;
@@ -139,8 +139,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		final Rectangle graphRect = new Rectangle(0, devYTop, graphClippingWidth, devGraphHeight);
 
 		// get initial dev X
-		int graphXValue = xValues[startIndex] - fGraphXValueOffset;
-		int devPrevXInt = (int) (graphXValue * fScaleX);
+		int graphXValue = xValues[startIndex] - _graphXValueOffset;
+		int devPrevXInt = (int) (graphXValue * _scaleX);
 
 		int graphYValue2nd;
 		if (is2ndYValues) {
@@ -157,8 +157,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 //				return;
 //			}
 
-			graphXValue = xValues[xValueIndex] - fGraphXValueOffset;
-			final float devX = graphXValue * fScaleX;
+			graphXValue = xValues[xValueIndex] - _graphXValueOffset;
+			final float devX = graphXValue * _scaleX;
 			final int devXInt = (int) devX;
 
 			/*
@@ -166,7 +166,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			 */
 			if (isAdjustedValues) {
 
-				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * fScaleY;
+				final float devYAdjustedValue = yAdjustedSerie[xValueIndex] * _scaleY;
 				final float devYAdjusted = devY0 - devYAdjustedValue;
 
 				if (xValueIndex == startIndex) {
@@ -197,7 +197,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 			if (is2ndYValues) {
 
 				graphYValue2nd = yValues2ndSerie[xValueIndex];
-				final float devYValue2nd = graphYValue2nd * fScaleY;
+				final float devYValue2nd = graphYValue2nd * _scaleY;
 
 				final float devY2nd = devY0 - devYValue2nd;
 
@@ -281,24 +281,24 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		 * paint splines
 		 */
 		final Color splineColor = new Color(display, 0x00, 0xb4, 0xff);
-		final float[] ySplineSerie = fTourData.dataSerieSpline;
+		final float[] ySplineSerie = _tourData.dataSerieSpline;
 		if (ySplineSerie != null) {
 
 			gc.setForeground(splineColor);
 
-			int devXPrev = (int) ((xValues[0] - fGraphXValueOffset) * fScaleX);
-			int devYPrev = (int) (ySplineSerie[0] * fScaleY);
+			int devXPrev = (int) ((xValues[0] - _graphXValueOffset) * _scaleX);
+			int devYPrev = (int) (ySplineSerie[0] * _scaleY);
 
 			for (int xIndex = 1; xIndex < xValues.length; xIndex++) {
 
-				final float graphX = xValues[xIndex] - fGraphXValueOffset;
+				final float graphX = xValues[xIndex] - _graphXValueOffset;
 				final float graphY = ySplineSerie[xIndex];
 
-				final int devX = (int) (graphX * fScaleX);
-				final int devY = (int) (graphY * fScaleY);
+				final int devX = (int) (graphX * _scaleX);
+				final int devY = (int) (graphY * _scaleY);
 
 				if (!(devX == devXPrev && devY == devYPrev)) {
-					gc.drawLine(devXPrev, fDevY0Spline - devYPrev, devX, fDevY0Spline - devY);
+					gc.drawLine(devXPrev, _devY0Spline - devYPrev, devX, _devY0Spline - devY);
 				}
 
 				devXPrev = devX;
@@ -317,7 +317,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		/*
 		 * paint spline points
 		 */
-		final SplineData splineData = fTourData.splineDataPoints;
+		final SplineData splineData = _tourData.splineDataPoints;
 		if (splineData != null) {
 
 			final double[] graphXSplineValues = splineData.graphXValues;
@@ -326,7 +326,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
 			final int splinePointLength = graphXSplineValues.length;
 
-			fSpPointRects = new Rectangle[splinePointLength];
+			_spPointRects = new Rectangle[splinePointLength];
 
 			final int pointSize = 10;
 			final int pointSize2 = pointSize / 2;
@@ -343,20 +343,21 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 					continue;
 				}
 
-				final double graphX = graphXSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphX = graphXSplineValues[pointIndex] - _graphXValueOffset;
 				final double graphY = graphYSplineValues[pointIndex];
 
-				final int devPointX = (int) (graphX * fScaleX);
+				final int devPointX = (int) (graphX * _scaleX);
 				final int devPointY = (int) (graphY * scaleValueDiff);
 
 				final int devX = devPointX - pointSize2;
-				final int devY = fDevY0Spline - devPointY - pointSize2;
+				final int devY = _devY0Spline - devPointY - pointSize2;
 
 				gc.fillOval(devX, devY, pointSize, pointSize);
 
 				// keep point position
-				fSpPointRects[pointIndex] = new Rectangle(devPointX - hitSize2,
-						fDevY0Spline - devPointY - hitSize2,
+				_spPointRects[pointIndex] = new Rectangle(
+						devPointX - hitSize2,
+						_devY0Spline - devPointY - hitSize2,
 						hitSize,
 						hitSize);
 			}
@@ -371,20 +372,21 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 					continue;
 				}
 
-				final double graphSpX = graphXSplineValues[pointIndex] - fGraphXValueOffset;
+				final double graphSpX = graphXSplineValues[pointIndex] - _graphXValueOffset;
 				final double graphSpY = graphYSplineValues[pointIndex];
 
-				final int devPointX = (int) (graphSpX * fScaleX);
+				final int devPointX = (int) (graphSpX * _scaleX);
 				final int devPointY = (int) (graphSpY * scaleValueDiff);
 
 				final int devX = devPointX - pointSize2;
-				final int devY = fDevY0Spline - devPointY - pointSize2;
+				final int devY = _devY0Spline - devPointY - pointSize2;
 
 				gc.fillOval(devX, devY, pointSize, pointSize);
 
 				// keep point position
-				fSpPointRects[pointIndex] = new Rectangle(devPointX - hitSize2,
-						fDevY0Spline - devPointY - hitSize2,
+				_spPointRects[pointIndex] = new Rectangle(
+						devPointX - hitSize2,
+						_devY0Spline - devPointY - hitSize2,
 						hitSize,
 						hitSize);
 			}
@@ -396,15 +398,15 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		if (isPointInGraph && isAdjustedValues) {
 
 			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			final int[] graphSerieIndex = fSplineData.serieIndex;
+			final int[] graphSerieIndex = _splineData.serieIndex;
 
 			for (final int serieIndex : graphSerieIndex) {
 
-				final int graphX = xValues[serieIndex] - fGraphXValueOffset;
+				final int graphX = xValues[serieIndex] - _graphXValueOffset;
 				final int graphY = yAdjustedSerie[serieIndex];
 
-				final int devX = (int) (graphX * fScaleX);
-				final int devY = (int) (devY0 - (graphY * fScaleY));
+				final int devX = (int) (graphX * _scaleX);
+				final int devY = (int) (devY0 - (graphY * _scaleY));
 
 				gc.fillOval(devX - 2, devY - 2, 5, 5);
 
@@ -441,16 +443,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		// create drawing data
 		final SplineDrawingData drawingData = new SplineDrawingData();
 
-		drawingData.graphXValueOffset = fGraphXValueOffset;
-		drawingData.devY0Spline = fDevY0Spline;
-		drawingData.scaleX = fScaleX;
-		drawingData.scaleY = fScaleY;
-		drawingData.devGraphValueXOffset = fDevGraphValueXOffset;
+		drawingData.graphXValueOffset = _graphXValueOffset;
+		drawingData.devY0Spline = _devY0Spline;
+		drawingData.scaleX = _scaleX;
+		drawingData.scaleY = _scaleY;
+		drawingData.devGraphValueXOffset = _devGraphValueXOffset;
 
 		return drawingData;
 	}
 
 	public Rectangle[] getPointHitRectangels() {
-		return fSpPointRects;
+		return _spPointRects;
 	}
 }

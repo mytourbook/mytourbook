@@ -30,7 +30,7 @@ public class UI {
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog width.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_WIDTH	= "DIALOG_WIDTH";	//$NON-NLS-1$
@@ -39,7 +39,7 @@ public class UI {
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog height.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
@@ -213,7 +213,7 @@ public class UI {
 
 	/**
 	 * Create a transparent image
-	 *
+	 * 
 	 * @param imageSize
 	 * @return
 	 */
@@ -223,7 +223,7 @@ public class UI {
 
 		if (net.tourbook.util.UI.IS_OSX) {
 
-			// OSX 
+			// OSX
 			transparentImageData = new ImageData(//
 					imageSize,
 					imageSize,

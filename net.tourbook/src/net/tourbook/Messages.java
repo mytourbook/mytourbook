@@ -79,6 +79,10 @@ public class Messages extends NLS {
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 
+	public static String	Adjust_Altitude_Group_GeoPosition;
+
+	public static String	Adjust_Altitude_Type_HorizontalGeoPosition;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
@@ -463,6 +467,8 @@ public class Messages extends NLS {
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_reimport_tour;
+
+	public static String	import_data_action_reimport_tour_OnlyTimeSlices;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
@@ -481,6 +487,10 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
+
+	public static String	Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
+
+	public static String	Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

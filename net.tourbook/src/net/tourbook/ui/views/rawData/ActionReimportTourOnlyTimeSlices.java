@@ -20,22 +20,22 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionReimportTour extends Action {
+public class ActionReimportTourOnlyTimeSlices extends Action {
 
 	private RawDataView	_rawDataView;
 
-	public ActionReimportTour(final RawDataView rawDataView) {
+	public ActionReimportTourOnlyTimeSlices(final RawDataView rawDataView) {
 
 		_rawDataView = rawDataView;
 
-		setText(Messages.import_data_action_reimport_tour);
+		setText(Messages.import_data_action_reimport_tour_OnlyTimeSlices);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__open_folder_add));
 	}
 
 	@Override
 	public void run() {
-		_rawDataView.actionReimportTour(false);
+		_rawDataView.actionReimportTour(true);
 	}
 
 }

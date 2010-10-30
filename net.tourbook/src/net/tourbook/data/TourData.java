@@ -568,7 +568,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
-	 * length()==0 data are invalid
+	 * <code>length()==0</code> data are invalid.
 	 */
 	@Transient
 	private int[]											srtmSerie;
@@ -2265,6 +2265,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					srtmSerie = newSRTMSerie;
 					srtmSerieImperial = newSRTMSerieImperial;
 				} else {
+					// set state that srtm altitude is invalid
 					srtmSerie = new int[0];
 				}
 			}
@@ -2476,29 +2477,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			long lastValidTime = 0;
 
 			/*
-			 * get first valid altitude
+			 * get first valid latitude
 			 */
+			double lastValidLatitude = firstTimeDataItem.latitude;
+			double lastValidLongitude = firstTimeDataItem.longitude;
+
 			// set initial min/max latitude/longitude
-			if ((firstTimeDataItem.latitude == Double.MIN_VALUE) || (firstTimeDataItem.longitude == Double.MIN_VALUE)) {
+			if ((lastValidLatitude == Double.MIN_VALUE) || (lastValidLongitude == Double.MIN_VALUE)) {
 
 				// find first valid latitude/longitude
-				for (final TimeData timeData : timeDataList) {
-					if ((timeData.latitude != Double.MIN_VALUE) && (timeData.longitude != Double.MIN_VALUE)) {
-						mapMinLatitude = timeData.latitude + 90;
-						mapMaxLatitude = timeData.latitude + 90;
-						mapMinLongitude = timeData.longitude + 180;
-						mapMaxLongitude = timeData.longitude + 180;
+				for (final TimeData timeSlice : timeDataList) {
+
+					lastValidLatitude = timeSlice.latitude;
+					lastValidLongitude = timeSlice.longitude;
+
+					if ((lastValidLatitude != Double.MIN_VALUE) && (lastValidLongitude != Double.MIN_VALUE)) {
+						mapMinLatitude = lastValidLatitude + 90;
+						mapMaxLatitude = lastValidLatitude + 90;
+						mapMinLongitude = lastValidLongitude + 180;
+						mapMaxLongitude = lastValidLongitude + 180;
 						break;
 					}
 				}
 			} else {
-				mapMinLatitude = firstTimeDataItem.latitude + 90;
-				mapMaxLatitude = firstTimeDataItem.latitude + 90;
-				mapMinLongitude = firstTimeDataItem.longitude + 180;
-				mapMaxLongitude = firstTimeDataItem.longitude + 180;
+				mapMinLatitude = lastValidLatitude + 90;
+				mapMaxLatitude = lastValidLatitude + 90;
+				mapMinLongitude = lastValidLongitude + 180;
+				mapMaxLongitude = lastValidLongitude + 180;
 			}
-			double lastValidLatitude = mapMinLatitude - 90;
-			double lastValidLongitude = mapMinLongitude - 180;
 
 			// convert data from the tour format into interger[] arrays
 			for (final TimeData timeData : timeDataList) {

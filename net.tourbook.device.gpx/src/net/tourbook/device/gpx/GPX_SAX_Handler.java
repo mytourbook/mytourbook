@@ -161,7 +161,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-		if ( _isInTrkName //
+		if (_isInTrkName //
 				|| _isInTime
 				|| _isInEle
 				|| _isInName
@@ -203,76 +203,76 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		try {
 
 			if (_isInTrk) {
-				
-			if (_isInTrkPt) {
 
-				final String charData = _characters.toString();
+				if (_isInTrkPt) {
 
-				if (name.equals(TAG_ELE)) {
+					final String charData = _characters.toString();
 
-					// </ele>
+					if (name.equals(TAG_ELE)) {
 
-					_isInEle = false;
+						// </ele>
 
-					_timeSlice.absoluteAltitude = getFloatValue(charData);
+						_isInEle = false;
 
-				} else if (name.equals(TAG_TIME)) {
+						_timeSlice.absoluteAltitude = getFloatValue(charData);
 
-					// </time>
+					} else if (name.equals(TAG_TIME)) {
 
-					_isInTime = false;
+						// </time>
 
-					try {
-						_timeSlice.absoluteTime = _dtIsoParser.parseDateTime(charData).getMillis();
-					} catch (final Exception e0) {
+						_isInTime = false;
+
 						try {
-							_timeSlice.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
-						} catch (final ParseException e1) {
+							_timeSlice.absoluteTime = _dtIsoParser.parseDateTime(charData).getMillis();
+						} catch (final Exception e0) {
 							try {
-								_timeSlice.absoluteTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
-							} catch (final ParseException e2) {
+								_timeSlice.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
+							} catch (final ParseException e1) {
 								try {
-									_timeSlice.absoluteTime = GPX_TIME_FORMAT_RFC822.parse(charData).getTime();
-								} catch (final ParseException e3) {
+									_timeSlice.absoluteTime = GPX_TIME_FORMAT_SSSZ.parse(charData).getTime();
+								} catch (final ParseException e2) {
+									try {
+										_timeSlice.absoluteTime = GPX_TIME_FORMAT_RFC822.parse(charData).getTime();
+									} catch (final ParseException e3) {
 
-									_isError = true;
+										_isError = true;
 
-									displayError(e3);
+										displayError(e3);
+									}
 								}
 							}
 						}
+
+					} else if (name.equals(TAG_EXT_CAD)) {
+
+						// </gpxtpx:cad>
+
+						_isInCadence = false;
+						_timeSlice.cadence = getIntValue(charData);
+
+					} else if (name.equals(TAG_EXT_HR)) {
+
+						// </gpxtpx:hr>
+
+						_isInHr = false;
+						_timeSlice.pulse = getIntValue(charData);
+
+					} else if (name.equals(TAG_EXT_TEMP)) {
+
+						// </gpxtpx:atemp>
+
+						_isInTemp = false;
+						_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
 					}
 
-				} else if (name.equals(TAG_EXT_CAD)) {
-
-					// </gpxtpx:cad>
-
-					_isInCadence = false;
-					_timeSlice.cadence = getIntValue(charData);
-
-				} else if (name.equals(TAG_EXT_HR)) {
-
-					// </gpxtpx:hr>
-
-					_isInHr = false;
-					_timeSlice.pulse = getIntValue(charData);
-
-				} else if (name.equals(TAG_EXT_TEMP)) {
-
-					// </gpxtpx:atemp>
-
-					_isInTemp = false;
-					_timeSlice.temperature = Math.round(getFloatValue(charData) * TourbookDevice.TEMPERATURE_SCALE);
-				}
-
 				} else if (name.equals(TAG_TRK_NAME)) {
-	
+
 					// </name> track name
-	
+
 					_isInTrkName = false;
 					_trkName = _characters.toString();
 				}
-	
+
 			} else if (_isInWpt) {
 
 				// in <wpt>
