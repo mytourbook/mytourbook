@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.sporttracks.FitLogDeviceDataReader"
+            fileextension="fitlog"
+            id="net.tourbook.device.SportTracks"
+            name="SportTracks (.fitlog)">
+      </device>
+   </extension>
+
+</plugin>

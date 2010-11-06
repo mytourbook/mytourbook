@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="net.tourbook">
+<schema targetNamespace="net.tourbook" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
          <meta.schema plugin="net.tourbook" id="deviceReader" name="Device Data Reader"/>
@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="device"/>
@@ -78,6 +83,14 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="extensionSortPriority" type="string">
+            <annotation>
+               <documentation>
+                  Enter a number for the priority which is used to sort the fileextensions. The number are sorted ascending, a missing priority puts the fileextention to the end.
+Fileextensions with smaller priority number are imported before fileextension with a higher number.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -117,13 +130,5 @@
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
 </schema>

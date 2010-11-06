@@ -206,12 +206,14 @@ public class UI {
 	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";						//$NON-NLS-1$
 	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";				//$NON-NLS-1$
 
-	public static final String								IMAGE_WEATHER_SUNNY				= "weather-sunny";							//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_CLOUDY			= "weather-cloudy";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_CLOUDS			= "weather-clouds";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_LIGHTNING			= "weather-lightning";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_RAIN				= "weather-rain";							//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_SNOW				= "weather-snow";							//$NON-NLS-1$
+	public static final String								WEATHER_ID_SUNNY				= "weather-sunny";							//$NON-NLS-1$
+	public static final String								WEATHER_ID_CLOUDY				= "weather-cloudy";						//$NON-NLS-1$
+	public static final String								WEATHER_ID_CLOUDS				= "weather-clouds";						//$NON-NLS-1$
+	public static final String								WEATHER_ID_LIGHTNING			= "weather-lightning";						//$NON-NLS-1$
+	public static final String								WEATHER_ID_RAIN					= "weather-rain";							//$NON-NLS-1$
+	public static final String								WEATHER_ID_SNOW					= "weather-snow";							//$NON-NLS-1$
+	public static final String								WEATHER_ID_SEVERE_WEATHER_ALERT				= "weather-severe";						//$NON-NLS-1$
+	public static final String								WEATHER_ID_SHOWERES_SCATTERED	= "weather-showers-scatterd";				//$NON-NLS-1$
 
 	private static final int								TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int								TOUR_TYPE_IMAGE_HEIGHT			= 16;
@@ -263,18 +265,22 @@ public class UI {
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SUNNY, //
+		IMAGE_REGISTRY.put(WEATHER_ID_SUNNY, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDY, //
+		IMAGE_REGISTRY.put(WEATHER_ID_CLOUDY, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDS, //
+		IMAGE_REGISTRY.put(WEATHER_ID_CLOUDS, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_LIGHTNING,//
+		IMAGE_REGISTRY.put(WEATHER_ID_LIGHTNING,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_lightning));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_RAIN,//
+		IMAGE_REGISTRY.put(WEATHER_ID_RAIN,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SNOW,//
+		IMAGE_REGISTRY.put(WEATHER_ID_SNOW,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
+		IMAGE_REGISTRY.put(WEATHER_ID_SHOWERES_SCATTERED,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_ShowersScattered));
+		IMAGE_REGISTRY.put(WEATHER_ID_SEVERE_WEATHER_ALERT,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_Severe));
 
 		/*
 		 * set styler

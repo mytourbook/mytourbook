@@ -39,8 +39,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
+import org.xml.sax.Attributes;
 
 public class Util {
+
+	public static final String	UTF_8					= "UTF-8";										//$NON-NLS-1$
 
 	private static final double	EARTH_RADIUS			= 6371;										// km
 
@@ -198,31 +201,34 @@ public class Util {
 		return null;
 	}
 
-	/**
-	 * Haversine Formula to calculate distance between 2 geo points
-	 * <p>
-	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
-	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
+	/*
+	 * vincenty algorithm is much more accurate compared with haversine
 	 */
-	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
-
-		if (lat1 == lat2 && lon1 == lon2) {
-			return 0;
-		}
-
-		final double dLat = Math.toRadians(lat2 - lat1);
-		final double dLon = Math.toRadians(lon2 - lon1);
-
-		final double a = (Math.sin(dLat / 2))
-				* (Math.sin(dLat / 2))
-				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
-				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
-
-		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
-		final double km = EARTH_RADIUS * c;
-
-		return km * 1000;
-	}
+//	/**
+//	 * Haversine Formula to calculate distance between 2 geo points
+//	 * <p>
+//	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
+//	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
+//	 */
+//	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
+//
+//		if (lat1 == lat2 && lon1 == lon2) {
+//			return 0;
+//		}
+//
+//		final double dLat = Math.toRadians(lat2 - lat1);
+//		final double dLon = Math.toRadians(lon2 - lon1);
+//
+//		final double a = (Math.sin(dLat / 2))
+//				* (Math.sin(dLat / 2))
+//				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
+//				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
+//
+//		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
+//		final double km = EARTH_RADIUS * c;
+//
+//		return km * 1000;
+//	}
 
 	/**
 	 * Calculates geodetic distance between two points specified by latitude/longitude using
@@ -320,6 +326,18 @@ public class Util {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
+	public static int getNumberOfDigits(int number) {
+
+		int counter = 0;
+
+		while (number > 0) {
+			counter++;
+			number = number / 10;
+		}
+
+		return counter;
+	}
+
 	/*
 	 * !!! ORIGINAL CODE !!!
 	 */
@@ -377,18 +395,6 @@ public class Util {
 //	  s = s.toFixed(3); // round to 1mm precision
 //	  return s;
 //	}
-
-	public static int getNumberOfDigits(int number) {
-
-		int counter = 0;
-
-		while (number > 0) {
-			counter++;
-			number = number / 10;
-		}
-
-		return counter;
-	}
 
 	public static String getSQLExceptionText(final SQLException e) {
 
@@ -521,6 +527,90 @@ public class Util {
 		}
 
 		return year;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static double parseDouble(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Double.parseDouble(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Double.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static float parseFloat(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Float.parseFloat(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Float.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static int parseInt(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Integer.parseInt(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static long parseLong(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Long.parseLong(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Long.MIN_VALUE;
 	}
 
 	/**

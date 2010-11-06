@@ -89,18 +89,21 @@ import org.joda.time.DateTime;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
+	public static final int									DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_NAME		= 255;
+	public static final int									DB_LENGTH_DEVICE_MODE_NAME			= 255;
+	public static final int									DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
+
 	public static final int									DB_LENGTH_TOUR_TITLE				= 255;
 	public static final int									DB_LENGTH_TOUR_DESCRIPTION			= 4096;
 	public static final int									DB_LENGTH_TOUR_DESCRIPTION_V10		= 32000;
 	public static final int									DB_LENGTH_TOUR_START_PLACE			= 255;
 	public static final int									DB_LENGTH_TOUR_END_PLACE			= 255;
 	public static final int									DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
+
+	public static final int									DB_LENGTH_WEATHER					= 1000;
 	public static final int									DB_LENGTH_WEATHER_CLOUDS			= 255;
-	public static final int									DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
-	public static final int									DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
-	public static final int									DB_LENGTH_DEVICE_PLUGIN_NAME		= 255;
-	public static final int									DB_LENGTH_DEVICE_MODE_NAME			= 255;
-	public static final int									DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
 
 	/**
 	 *
@@ -341,6 +344,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												weatherWindDir;																		// db-version 8
 	private int												weatherWindSpd;																		// db-version 8
 	private String											weatherClouds;																			// db-version 8
+	private String											weather;																				// db-version 13
 
 	private float											deviceAvgSpeed;																		// db-version 12
 
@@ -3746,6 +3750,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	/**
+	 * @return Returned SRTM values:
+	 *         <p>
+	 *         metric <br>
+	 *         imperial
+	 *         <p>
+	 *         or <code>null</code> when SRTM data serie is not available
+	 */
+	public int[][] getSRTMValues() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (srtmSerie == null) {
+			createSRTMDataSerie();
+		}
+
+		if (srtmSerie.length == 0) {
+			// invalid SRTM values
+			return null;
+		}
+
+		return new int[][] { srtmSerie, srtmSerieImperial };
+	}
+
 	public short getStartAltitude() {
 		return startAltitude;
 	}
@@ -3973,6 +4003,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public Set<TourWayPoint> getTourWayPoints() {
 		return tourWayPoints;
+	}
+
+	/**
+	 * @return Returns weather text or an empty string when weather text is not set.
+	 */
+	public String getWeather() {
+		return weather == null ? UI.EMPTY_STRING : weather;
 	}
 
 	public String getWeatherClouds() {
@@ -4214,6 +4251,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return false;
 		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
 			tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
+		}
+
+		/*
+		 * check: weather
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				weather,
+				DB_LENGTH_WEATHER,
+				Messages.Db_Field_TourData_Weather);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			weather = weather.substring(0, DB_LENGTH_WEATHER);
 		}
 
 		return true;
@@ -4514,6 +4565,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.isSpeedSerieFromDevice = speedSerie != null;
 	}
 
+	public void setSRTMValues(final int[] srtm, final int[] srtmImperial) {
+		srtmSerie = srtm;
+		srtmSerieImperial = srtmImperial;
+	}
+
 	public void setStartAltitude(final short startAltitude) {
 		this.startAltitude = startAltitude;
 	}
@@ -4690,6 +4746,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			clonedWP.setTourData(this);
 			tourWayPoints.add(clonedWP);
 		}
+	}
+
+	public void setWeather(final String weather) {
+		this.weather = weather;
 	}
 
 	public void setWeatherClouds(final String weatherClouds) {

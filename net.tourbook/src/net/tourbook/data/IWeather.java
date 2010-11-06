@@ -101,9 +101,11 @@ public interface IWeather {
 														};
 
 	public static final String		cloudIsNotDefined	= Messages.Weather_Clounds_IsNotDefined;
+
 	/*
-	 * _cloudText and _cloudDbValue must be in synch
+	 * cloudText and cloudDbValue must be in synch
 	 */
+
 	/**
 	 * Text for the weather
 	 */
@@ -112,20 +114,28 @@ public interface IWeather {
 			Messages.Weather_Clounds_Sunny,
 			Messages.Weather_Clounds_Clouny,
 			Messages.Weather_Clounds_Clouds,
-			Messages.Weather_Clounds_Lightning,
+			Messages.Weather_Clounds_ScatteredShowers,
 			Messages.Weather_Clounds_Rain,
-			Messages.Weather_Clounds_Snow				};
+			Messages.Weather_Clounds_Lightning,
+			Messages.Weather_Clounds_Snow,
+			Messages.Weather_Clounds_SevereWeatherAlert
+														//
+														};
 
 	/**
 	 * Icons for the weather
 	 */
 	public static final String[]	cloudIcon			= new String[] {
 			UI.IMAGE_EMPTY_16,
-			UI.IMAGE_WEATHER_SUNNY,
-			UI.IMAGE_WEATHER_CLOUDY,
-			UI.IMAGE_WEATHER_CLOUDS,
-			UI.IMAGE_WEATHER_LIGHTNING,
-			UI.IMAGE_WEATHER_RAIN,
-			UI.IMAGE_WEATHER_SNOW						};
+			UI.WEATHER_ID_SUNNY,
+			UI.WEATHER_ID_CLOUDY,
+			UI.WEATHER_ID_CLOUDS,
+			UI.WEATHER_ID_SHOWERES_SCATTERED,
+			UI.WEATHER_ID_RAIN,
+			UI.WEATHER_ID_LIGHTNING,
+			UI.WEATHER_ID_SNOW,
+			UI.WEATHER_ID_SEVERE_WEATHER_ALERT,
+														//
+														};
 
 }

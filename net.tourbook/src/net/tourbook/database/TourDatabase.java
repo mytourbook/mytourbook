@@ -1945,6 +1945,7 @@ public class TourDatabase {
 				// version 13 start
 				//
 				+ "	TemperatureScale			INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
+				+ " Weather 					" + varCharNoKomma(TourData.DB_LENGTH_WEATHER) //$NON-NLS-1$
 				//
 				// version 13 end ---------
 
@@ -3242,10 +3243,16 @@ public class TourDatabase {
 
 		try {
 
+//			+ "	TemperatureScale			INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
+//			+ " Weather 					" + varCharNoKomma(TourData.DB_LENGTH_WEATHER) //$NON-NLS-1$
+
 			String sql;
 			final Statement stmt = conn.createStatement();
 			{
 				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TemperatureScale		INTEGER	DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN Weather " + varCharNoKomma(TourData.DB_LENGTH_WEATHER); //$NON-NLS-1$ //$NON-NLS-2$
 				exec(stmt, sql);
 			}
 			stmt.close();

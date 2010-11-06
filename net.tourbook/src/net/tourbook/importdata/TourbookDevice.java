@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.util.ArrayList;
+
 import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
@@ -41,6 +43,11 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * File extension used when tour data are imported from a file
 	 */
 	public String			fileExtension;
+
+	/**
+	 * Sort priority (since version 10.11), default will sort devices to the end.
+	 */
+	public int				extensionSortPriority	= Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //	/**
@@ -75,12 +82,6 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * when <code>true</code> the tour id will be created with the recording time
 	 */
 	public boolean			isCreateTourIdWithRecordingTime;
-
-	/**
-	 * Time difference in minutes between .hrm file and gpx file (which contains UTC time) for the
-	 * .pdd Polar files
-	 */
-	public int				importPolarHrmGpxTimeDiff;
 
 	public TourbookDevice() {}
 
@@ -151,6 +152,14 @@ public abstract class TourbookDevice implements IRawDataReader {
 	}
 
 	/**
+	 * @return Returns a list of files which are also imported additonal to the selected imported
+	 *         file or <code>null</code> otherwise.
+	 */
+	public ArrayList<String> getAdditionalImportedFiles() {
+		return null;
+	}
+
+	/**
 	 * @param portName
 	 * @return returns the serial port parameters which are use to receive data from the device or
 	 *         <code>null</code> when data transfer from a device is not supported
@@ -169,10 +178,6 @@ public abstract class TourbookDevice implements IRawDataReader {
 		this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
 	}
 
-	public void setImportPolarHrmGpxTimeDiff(final int importPolarHrmGpxTimeDiff) {
-		this.importPolarHrmGpxTimeDiff = importPolarHrmGpxTimeDiff;
-	}
-
 	public void setImportYear(final int importYear) {
 		this.importYear = importYear;
 	}
@@ -183,6 +188,19 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	public void setMergeTracks(final boolean isMergeTracks) {
 		this.isMergeTracks = isMergeTracks;
+	}
+
+	@Override
+	public String toString() {
+		return "TourbookDevice [deviceId="
+				+ deviceId
+				+ ", visibleName="
+				+ visibleName
+				+ ", fileExtension="
+				+ fileExtension
+				+ ", extensionSortPriority="
+				+ extensionSortPriority
+				+ "]";
 	}
 
 }

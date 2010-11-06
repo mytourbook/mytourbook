@@ -75,6 +75,7 @@ public class TourInfoUI {
 		_nf3.setMaximumFractionDigits(3);
 	}
 
+	private boolean						_hasWeather;
 	private boolean						_hasTags;
 	private boolean						_hasDescription;
 
@@ -93,8 +94,10 @@ public class TourInfoUI {
 	private Composite					_ttContainer;
 	private Label						_lblTitle;
 	private Label						_lblDate;
-	private Label						_lblTourTags;
 	private CLabel						_lblTourType;
+
+	private Text						_txtWeather;
+	private Label						_lblTourTags;
 	private Text						_txtDescription;
 
 	/*
@@ -179,6 +182,7 @@ public class TourInfoUI {
 
 		_hasTags = tourTags != null && tourTags.size() > 0;
 		_hasDescription = tourDescription != null && tourDescription.length() > 0;
+		_hasWeather = _tourData.getWeather().length() > 0;
 
 		// date/time created/modified
 		_uiDtCreated = _tourData.getDateTimeCreated();
@@ -537,7 +541,7 @@ public class TourInfoUI {
 
 	private void createUI50LowerPart(final Composite parent) {
 
-		if (_hasTags == false && _hasDescription == false) {
+		if (_hasTags == false && _hasDescription == false && _hasWeather == false) {
 			return;
 		}
 
@@ -551,20 +555,53 @@ public class TourInfoUI {
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
+			boolean isIndent = false;
+			/*
+			 * weather
+			 */
+			if (_hasWeather) {
+
+				label = createUILabel(container, Messages.Tour_Tooltip_Label_Weather);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.indent(0, 5)
+						.applyTo(label);
+
+				_txtWeather = new Text(container, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.grab(true, false)
+						.indent(0, 5)
+						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
+						.applyTo(_txtWeather);
+
+				_txtWeather.setForeground(_fgColor);
+				_txtWeather.setBackground(_bgColor);
+
+				isIndent = true;
+			}
+
 			/*
 			 * tags
 			 */
 			if (_hasTags) {
 
 				label = createUILabel(container, Messages.Tour_Tooltip_Label_Tags);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+				GridDataFactory
+						.fillDefaults()
+						.indent(0, isIndent ? 5 : 0)
+						.align(SWT.FILL, SWT.BEGINNING)
+						.applyTo(label);
 				_firstColumnControls.add(label);
 
 				_lblTourTags = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
+						.indent(0, isIndent ? 5 : 0)
 						.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
 						.applyTo(_lblTourTags);
+
+				isIndent = true;
 			}
 
 			/*
@@ -793,6 +830,9 @@ public class TourInfoUI {
 		}
 		_lblTitle.setText(tourTitle);
 
+		if (_hasWeather) {
+			_txtWeather.setText(_tourData.getWeather());
+		}
 		if (_hasTags) {
 			UI.updateUITags(_tourData, _lblTourTags);
 		}

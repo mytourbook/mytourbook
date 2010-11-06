@@ -5,17 +5,35 @@
          point="net.tourbook.deviceDataReader">
 
       <device
+            class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
+            extensionSortPriority="1"
+            fileextension="pdd"
+            id="net.tourbook.device.PolarPDDDataReader"
+            name="Polar PDD (Polar Diary Data)"
+            />
+
+      <device
             class="net.tourbook.device.polar.hrm.PolarHRMDataReader"
             fileextension="hrm"
             id="net.tourbook.device.PolarHRMDataReader"
             name="Polar HRM (Heart Rate Monitor)"/>
 
-      <device
-            class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
-            fileextension="pdd"
-            id="net.tourbook.device.PolarPDDDataReader"
-            name="Polar PDD (Polar Diary Data)"/>
-
    </extension>
 
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.polar.hrm.PrefPagePolar"
+            id="net.tourbook.device.polar.hrm.prefPagePolar"
+            name="Polar">
+      </page>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.tourbook.device.polar.hrm.PreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>

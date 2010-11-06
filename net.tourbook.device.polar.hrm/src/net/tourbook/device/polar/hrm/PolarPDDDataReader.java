@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -33,6 +34,7 @@ import net.tourbook.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
 
@@ -41,21 +43,24 @@ import org.joda.time.DateTime;
  */
 public class PolarPDDDataReader extends TourbookDevice {
 
-	private static final String		DATA_DELIMITER			= "\t";			//$NON-NLS-1$
+	private static final String		DATA_DELIMITER				= "\t";										//$NON-NLS-1$
 
-	private static final String		SECTION_DAY_INFO		= "[DayInfo]";
-	private static final String		SECTION_EXERCISE_INFO	= "[ExerciseInfo";
+	private static final String		SECTION_DAY_INFO			= "[DayInfo]";
+	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo";
 	//
+	private final IPreferenceStore	_prefStore					= Activator.getDefault().getPreferenceStore();
+
 	private DeviceData				_deviceData;
 	private String					_importFilePath;
 	private HashMap<Long, TourData>	_tourDataMap;
 	//
-	private boolean					_isDebug				= false;
-	private int						_fileVersionDayInfo		= -1;
+	private boolean					_isDebug					= false;
+	private int						_fileVersionDayInfo			= -1;
 
 	private Exercise				_currentExercise;
 
-//	private int						_fileVersionExeInfo		= -1;
+	private ArrayList<String>		_exerciseFiles				= new ArrayList<String>();
+	private ArrayList<String>		_additionalImportedFiles	= new ArrayList<String>();
 
 	private class Exercise {
 
@@ -63,11 +68,6 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		private String	title;
 		private String	description;
-
-		/**
-		 * Start time in seconds (from midnight 0:00:00) 36000 = 10:00:00
-		 */
-		private int		startTime;
 	}
 
 	// plugin constructor
@@ -90,27 +90,35 @@ public class PolarPDDDataReader extends TourbookDevice {
 			return false;
 		}
 
+		_exerciseFiles.clear();
+
+		final String titleFromTitle = _prefStore.getString(IPreferences.TITLE_DESCRIPTION);
+		final boolean isTitleFromTitle = titleFromTitle
+				.equalsIgnoreCase(IPreferences.TITLE_DESCRIPTION_TITLE_FROM_TITLE) || titleFromTitle.length() == 0;
+
 		final IPath importPath = new Path(_importFilePath).removeLastSegments(1);
 
 		// get .hrm data
-		final TourData hrmTourData = createExercise10ImportSeparatedFile(
-				importPath.append(hrmFileName),
-				new PolarHRMDataReader());
+		final IPath hrmFilePath = importPath.append(hrmFileName);
+		final TourData hrmTourData = createExercise10ImportSeparatedFile(hrmFilePath, new PolarHRMDataReader());
 
 		if (hrmTourData == null) {
 			return false;
 		}
+		_exerciseFiles.add(hrmFilePath.toOSString());
 
 		// get .gpx data
 		if (gpxFileName != null) {
 
-			final TourData gpxTourData = createExercise10ImportSeparatedFile(
-					importPath.append(gpxFileName),
-					new GPXDeviceDataReader());
+			final IPath gpxFilePath = importPath.append(gpxFileName);
+			final TourData gpxTourData = createExercise10ImportSeparatedFile(gpxFilePath, new GPXDeviceDataReader());
 
 			if (gpxTourData != null && gpxTourData.latitudeSerie != null) {
 				createExercise20SyncHrmGpx(hrmTourData, gpxTourData);
+				createExercise22AdjustTimeSlices(hrmTourData, gpxTourData);
 			}
+
+			_exerciseFiles.add(gpxFilePath.toOSString());
 		}
 
 		// overwrite path to pdd file so that a reimport works
@@ -120,13 +128,21 @@ public class PolarPDDDataReader extends TourbookDevice {
 		// set title
 		final String title = _currentExercise.title;
 		if (title != null && title.length() > 0) {
-			hrmTourData.setTourTitle(title);
+			if (isTitleFromTitle) {
+				hrmTourData.setTourTitle(title);
+			} else {
+				hrmTourData.setTourDescription(title);
+			}
 		}
 
 		// set description
 		final String description = _currentExercise.description;
 		if (description != null && description.length() > 0) {
-			hrmTourData.setTourDescription(description);
+			if (isTitleFromTitle) {
+				hrmTourData.setTourDescription(description);
+			} else {
+				hrmTourData.setTourTitle(description);
+			}
 		}
 
 		// after all data are added, the tour id can be created
@@ -137,6 +153,10 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 			// add new tour to other tours
 			_tourDataMap.put(tourId, hrmTourData);
+		}
+
+		if (_exerciseFiles.size() > 0) {
+			_additionalImportedFiles.addAll(_exerciseFiles);
 		}
 
 		return true;
@@ -177,8 +197,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 	}
 
 	/**
-	 * Sets gpx data into hrm data. HRM data are the leading data serie, GPX data is set according
-	 * to the time.
+	 * Sets gpx lat/lon data into hrm tour data. HRM tour data are the leading data serie, GPX data
+	 * is set according to the time.
 	 * 
 	 * @param hrmTourData
 	 * @param gpxTourData
@@ -198,11 +218,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		final int timeDiffHours = (timeDiff / 3600) * 3600;
 
 		// adjust gpx to hrm tour start
-		absoluteGpxTourStart = absoluteGpxTourStart + timeDiffHours + 0;
-//		absoluteGpxTourStart = absoluteGpxTourStart + timeDiff;
-
-//		System.out.println(new Path(_importFilePath).lastSegment() + " " + timeDiff);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		absoluteGpxTourStart = absoluteGpxTourStart + timeDiffHours;
 
 		/*
 		 * define shortcuts for the data series
@@ -276,9 +292,72 @@ public class PolarPDDDataReader extends TourbookDevice {
 				}
 			}
 		}
+	}
 
-//		hrmTourData.latitudeSerie = Arrays.copyOf(gpxTourData.latitudeSerie, hrmSerieLength);
-//		hrmTourData.longitudeSerie = Arrays.copyOf(gpxTourData.longitudeSerie, hrmSerieLength);
+	private void createExercise22AdjustTimeSlices(final TourData hrmTourData, final TourData gpxTourData) {
+
+		int diffGeoSlices = _prefStore.getInt(IPreferences.SLICE_ADJUSTMENT_VALUE);
+
+		// check if time slices needs to be adjusted
+		if (diffGeoSlices == 0) {
+			return;
+		}
+
+		final int[] hrmTimeSerie = hrmTourData.timeSerie;
+		final int hrmSerieLength = hrmTimeSerie.length;
+
+		// adjust slices to bounds
+		if (diffGeoSlices > hrmSerieLength) {
+			diffGeoSlices = hrmSerieLength - 1;
+		} else if (-diffGeoSlices > hrmSerieLength) {
+			diffGeoSlices = -(hrmSerieLength - 1);
+		}
+
+		final double[] hrmLatSerie = hrmTourData.latitudeSerie;
+		final double[] hrmLonSerie = hrmTourData.longitudeSerie;
+
+		final int srcPos = diffGeoSlices >= 0 ? 0 : -diffGeoSlices;
+		final int destPos = diffGeoSlices >= 0 ? diffGeoSlices : 0;
+		final int adjustedLength = hrmSerieLength - (diffGeoSlices < 0 ? -diffGeoSlices : diffGeoSlices);
+
+		System.arraycopy(hrmLatSerie, srcPos, hrmLatSerie, destPos, adjustedLength);
+		System.arraycopy(hrmLonSerie, srcPos, hrmLonSerie, destPos, adjustedLength);
+
+		// fill gaps with starting/ending position
+		if (diffGeoSlices >= 0) {
+
+			final double startLat = hrmLatSerie[0];
+			final double startLon = hrmLonSerie[0];
+
+			for (int serieIndex = 0; serieIndex < diffGeoSlices; serieIndex++) {
+				hrmLatSerie[serieIndex] = startLat;
+				hrmLonSerie[serieIndex] = startLon;
+			}
+
+		} else {
+
+			// diffGeoSlices < 0
+
+			final int lastIndex = hrmSerieLength - 1;
+			final int validEndIndex = lastIndex - (-diffGeoSlices);
+			final double endLat = hrmLatSerie[lastIndex];
+			final double endLon = hrmLonSerie[lastIndex];
+
+			for (int serieIndex = validEndIndex; serieIndex < hrmSerieLength; serieIndex++) {
+				hrmLatSerie[serieIndex] = endLat;
+				hrmLonSerie[serieIndex] = endLon;
+			}
+		}
+	}
+
+	@Override
+	public ArrayList<String> getAdditionalImportedFiles() {
+
+		if (_additionalImportedFiles.size() > 0) {
+			return _additionalImportedFiles;
+		}
+
+		return null;
 	}
 
 	public String getDeviceModeName(final int profileId) {
@@ -552,7 +631,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 			tokenLine.nextToken();
 
 			// column 5
-			_currentExercise.startTime = Integer.parseInt(tokenLine.nextToken());
+//			_currentExercise.startTime = Integer.parseInt(tokenLine.nextToken());
 
 			// skip further number rows
 			if (skipRows(fileReader, numOfNumberRows - numOfNumberRowsAnalyzed) == null) {
@@ -642,11 +721,16 @@ public class PolarPDDDataReader extends TourbookDevice {
 		_deviceData = deviceData;
 		_tourDataMap = tourDataMap;
 
+		_additionalImportedFiles.clear();
+		_exerciseFiles.clear();
+
 		if (_isDebug) {
 			System.out.println(importFilePath);
 		}
 
-		return parseSection();
+		final boolean returnValue = parseSection();
+
+		return returnValue;
 	}
 
 	private String skipRows(final BufferedReader fileReader, final int numberOfRows) throws IOException {

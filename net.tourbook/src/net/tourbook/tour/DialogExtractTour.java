@@ -976,6 +976,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);
 		_tourDataTarget.setTourDistance(extractedDistance);
 
+		_tourDataTarget.setWeather(_tourDataSource.getWeather());
 		_tourDataTarget.setWeatherClouds(_tourDataSource.getWeatherClouds());
 		_tourDataTarget.setWeatherWindDir(_tourDataSource.getWeatherWindDir());
 		_tourDataTarget.setWeatherWindSpeed(_tourDataSource.getWeatherWindSpeed());

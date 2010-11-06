@@ -40,6 +40,7 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -84,6 +85,11 @@ public class RawDataManager {
 	 */
 	private final HashSet<String>			_importedFileNames					= new HashSet<String>();
 
+	/**
+	 * Contains filenames which are not directly imported but is imported from other imported files
+	 */
+	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
+
 	private boolean							_isImported;
 	private boolean							_isImportCanceled;
 
@@ -91,9 +97,11 @@ public class RawDataManager {
 	private boolean							_importSettingsIsMergeTracks;
 	private boolean							_importSettingsIsChecksumValidation	= true;
 	private boolean							_importSettingsCreateTourIdWithTime	= false;
-	private int								_importPolarHrmGpxTimeDiff			= 0;
 
 	private String							_lastImportedFile;
+
+	private List<TourbookDevice>			_devicesBySortPriority;
+	private HashMap<String, TourbookDevice>	_devicesByExtension;
 
 	private RawDataManager() {}
 
@@ -164,18 +172,11 @@ public class RawDataManager {
 	}
 
 	/**
-	 * import tour data from a file
+	 * Import tours from files which are selected in a file selection dialog.
 	 */
 	void actionImportFromFile() {
 
 		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
-
-		// sort device list alphabetically
-		Collections.sort(deviceList, new Comparator<TourbookDevice>() {
-			public int compare(final TourbookDevice o1, final TourbookDevice o2) {
-				return o1.visibleName.compareTo(o2.visibleName);
-			}
-		});
 
 		// create file filter list
 		final int deviceLength = deviceList.size() + 1;
@@ -207,14 +208,64 @@ public class RawDataManager {
 		fileDialog.setFilterPath(lastSelectedPath);
 
 		// open file dialog
-		final String firstFileName = fileDialog.open();
+		final String firstFilePathName = fileDialog.open();
 
 		// check if user canceled the dialog
-		if (firstFileName == null) {
+		if (firstFilePathName == null) {
 			return;
 		}
 
+		final IPath filePath = new Path(firstFilePathName).removeLastSegments(1);
 		final String[] selectedFileNames = fileDialog.getFileNames();
+
+		// keep last selected path
+		final String selectedPath = filePath.makeAbsolute().toString();
+		prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
+
+		// create path for each file
+		final ArrayList<IPath> selectedFilePaths = new ArrayList<IPath>();
+		for (final String fileName : selectedFileNames) {
+
+			// replace filename, keep the directory path
+			final IPath filePathWithName = filePath.append(fileName);
+			final IPath absolutePath = filePathWithName.makeAbsolute();
+			final String filePathName = absolutePath.toString();
+
+			selectedFilePaths.add(new Path(filePathName));
+		}
+
+		// check if devices are loaded
+		if (_devicesByExtension == null) {
+			getDeviceListSortedByPriority();
+		}
+
+		// resort files by extension priority
+		Collections.sort(selectedFilePaths, new Comparator<IPath>() {
+
+			@Override
+			public int compare(final IPath path1, final IPath path2) {
+
+				final String file1Extension = path1.getFileExtension().toLowerCase();
+				final String file2Extension = path2.getFileExtension().toLowerCase();
+
+				if (file1Extension != null
+						&& file1Extension.length() > 0
+						&& file2Extension != null
+						&& file2Extension.length() > 0) {
+
+					final TourbookDevice file1Device = _devicesByExtension.get(file1Extension);
+					final TourbookDevice file2Device = _devicesByExtension.get(file2Extension);
+
+					if (file1Device != null && file2Device != null) {
+						return file1Device.extensionSortPriority - file2Device.extensionSortPriority;
+					}
+				}
+
+				// sort invalid files to the end
+				return Integer.MAX_VALUE;
+			}
+		});
+
 		setImportCanceled(false);
 
 		try {
@@ -227,43 +278,39 @@ public class RawDataManager {
 								InterruptedException {
 
 							int workedDone = 0;
-							final int workedAll = selectedFileNames.length;
+							final int workedAll = selectedFilePaths.size();
 
 							monitor.beginTask(Messages.import_data_importTours_task, workedAll);
 
-							final RawDataManager rawDataManager = RawDataManager.getInstance();
-							rawDataManager.setImportId();
-
-							final ArrayList<String> notImportedFiles = new ArrayList<String>();
+							setImportId();
 
 							int importCounter = 0;
-
-							final Path filePath = new Path(firstFileName);
-
-							// keep last selected path
-							final String selectedPath = filePath.removeLastSegments(1).makeAbsolute().toString();
-							prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
+							final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 							// loop: import all selected files
-							for (String fileName : selectedFileNames) {
-
-								// replace filename, keep the directory path
-								fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
+							for (final IPath filePath : selectedFilePaths) {
 
 								monitor.worked(1);
 								monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
-										new Object[] { workedDone++, workedAll, fileName }));
+										new Object[] { workedDone++, workedAll, filePath }));
 
-								if (rawDataManager.importRawData(new File(fileName), null, false, null)) {
+								final String osFilePath = filePath.toOSString();
+
+								// ignore files which are imported as children from other imported files
+								if (_importedFileNamesChildren.contains(osFilePath)) {
+									continue;
+								}
+
+								if (importRawData(new File(osFilePath), null, false, null)) {
 									importCounter++;
 								} else {
-									notImportedFiles.add(fileName);
+									notImportedFiles.add(osFilePath);
 								}
 							}
 
 							if (importCounter > 0) {
 
-								rawDataManager.updateTourDataFromDb(monitor);
+								updateTourDataFromDb(monitor);
 
 								Display.getDefault().syncExec(new Runnable() {
 									public void run() {
@@ -293,6 +340,38 @@ public class RawDataManager {
 		return _deviceData;
 	}
 
+	private List<TourbookDevice> getDeviceListSortedByPriority() {
+
+		if (_devicesBySortPriority == null) {
+
+			_devicesBySortPriority = new ArrayList<TourbookDevice>(DeviceManager.getDeviceList());
+
+			// sort device list by sorting priority
+			Collections.sort(_devicesBySortPriority, new Comparator<TourbookDevice>() {
+				public int compare(final TourbookDevice o1, final TourbookDevice o2) {
+
+					// 1. sort by prio
+					final int sortByPrio = o1.extensionSortPriority - o2.extensionSortPriority;
+
+					// 2. sort by name
+					if (sortByPrio == 0) {
+						return o1.deviceId.compareTo(o2.deviceId);
+					}
+
+					return sortByPrio;
+				}
+			});
+
+			_devicesByExtension = new HashMap<String, TourbookDevice>();
+
+			for (final TourbookDevice device : _devicesBySortPriority) {
+				_devicesByExtension.put(device.fileExtension.toLowerCase(), device);
+			}
+		}
+
+		return _devicesBySortPriority;
+	}
+
 	public HashSet<String> getImportedFiles() {
 		return _importedFileNames;
 	}
@@ -302,10 +381,6 @@ public class RawDataManager {
 	 */
 	public HashMap<Long, TourData> getImportedTours() {
 		return _importedTourData;
-	}
-
-	public int getImportPolarHrmGpxTimeDiff() {
-		return _importPolarHrmGpxTimeDiff;
 	}
 
 	/**
@@ -362,7 +437,8 @@ public class RawDataManager {
 		}
 		final String fileExtension = filePathName.substring(dotPos + 1);
 
-		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		final List<TourbookDevice> deviceList = getDeviceListSortedByPriority();
+
 		_isImported = false;
 
 		BusyIndicator.showWhile(null, new Runnable() {
@@ -370,6 +446,7 @@ public class RawDataManager {
 			public void run() {
 
 				boolean isDataImported = false;
+				final ArrayList<String> additionalImportedFiles = new ArrayList<String>();
 
 				/*
 				 * try to import from all devices which have the defined extension
@@ -386,6 +463,12 @@ public class RawDataManager {
 
 							isDataImported = true;
 							_isImported = true;
+
+							final ArrayList<String> deviceImportedFiles = device.getAdditionalImportedFiles();
+							if (deviceImportedFiles != null) {
+								additionalImportedFiles.addAll(deviceImportedFiles);
+							}
+
 							break;
 						}
 						if (_isImportCanceled) {
@@ -402,16 +485,31 @@ public class RawDataManager {
 					 */
 					for (final TourbookDevice device : deviceList) {
 						if (importWithDevice(device, filePathName, destinationPath, buildNewFileNames, fileCollision)) {
+
 							isDataImported = true;
 							_isImported = true;
+
+							final ArrayList<String> otherImportedFiles = device.getAdditionalImportedFiles();
+							if (otherImportedFiles != null) {
+								additionalImportedFiles.addAll(otherImportedFiles);
+							}
+
 							break;
 						}
 					}
 				}
 
 				if (isDataImported) {
+
 					_importedFileNames.add(_lastImportedFile);
+
+					if (additionalImportedFiles.size() > 0) {
+						_importedFileNamesChildren.addAll(additionalImportedFiles);
+					}
 				}
+
+				// cleanup
+				additionalImportedFiles.clear();
 			}
 		});
 
@@ -456,7 +554,6 @@ public class RawDataManager {
 
 			device.setMergeTracks(_importSettingsIsMergeTracks);
 			device.setCreateTourIdWithTime(_importSettingsCreateTourIdWithTime);
-			device.setImportPolarHrmGpxTimeDiff(_importPolarHrmGpxTimeDiff);
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
@@ -623,6 +720,7 @@ public class RawDataManager {
 	public void removeAllTours() {
 		_importedTourData.clear();
 		_importedFileNames.clear();
+		_importedFileNamesChildren.clear();
 	}
 
 	public void removeTours(final TourData[] removedTours) {
@@ -681,10 +779,6 @@ public class RawDataManager {
 	 */
 	public void setImportId() {
 		_deviceData.importId = System.currentTimeMillis();
-	}
-
-	public void setImportPolarHrmGpxTimeDiff(final int timeDiff) {
-		_importPolarHrmGpxTimeDiff = timeDiff;
 	}
 
 	public void setImportYear(final int year) {

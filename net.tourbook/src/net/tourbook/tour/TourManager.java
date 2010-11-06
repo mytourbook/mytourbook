@@ -283,7 +283,7 @@ public class TourManager {
 						/*
 						 * vincenty algorithm is much more accurate compared with haversine
 						 */
-//				final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+//						final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
 						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
 						distance += distDiff;

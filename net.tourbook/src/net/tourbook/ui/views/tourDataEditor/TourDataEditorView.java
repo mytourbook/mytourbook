@@ -195,6 +195,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
+	public static final int						DEFAULT_TEXT_INPUT_WIDTH		= 200;
+
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore						= TourbookPlugin
@@ -493,9 +495,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Spinner								_spinTourCalories;
 	private Spinner								_spinTemperature;
 
+	private Text								_txtWeather;
 	private Label								_lblTemperatureUnit;
 	private Spinner								_spinWindDirectionValue;
-
 	private Spinner								_spinWindSpeedValue;
 	private Combo								_comboWindDirectionText;
 	private Combo								_comboWindSpeedText;
@@ -2802,7 +2804,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtStartLocation = _tk.createText(section, UI.EMPTY_STRING);
 			_txtStartLocation.addModifyListener(_modifyListener);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtStartLocation);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.applyTo(_txtStartLocation);
 
 			/*
 			 * end location
@@ -2812,7 +2818,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtEndLocation = _tk.createText(section, UI.EMPTY_STRING);
 			_txtEndLocation.addModifyListener(_modifyListener);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtEndLocation);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.applyTo(_txtEndLocation);
 		}
 	}
 
@@ -3061,8 +3071,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.spacing(20, 5)
 				.applyTo(section);
 		{
+			createUISection141Weather(section);
 			createUISection142Weather(section);
 			createUISection144WeatherCol1(section);
+		}
+	}
+
+	private void createUISection141Weather(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * weather description
+			 */
+			final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Weather);
+			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
+
+			_txtWeather = _tk.createText(container, //
+					UI.EMPTY_STRING,
+					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+			);
+			_txtWeather.addModifyListener(_modifyListener);
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					//
+					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+					//
+					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(2))
+					.applyTo(_txtWeather);
 		}
 	}
 
@@ -6178,6 +6218,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
 			_tourData.setCalories(_spinTourCalories.getSelection());
 
+			_tourData.setWeather(_txtWeather.getText().trim());
 			_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 			if (_isWindSpeedManuallyModified) {
 				/*
@@ -6531,6 +6572,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * wind properties
 		 */
+		_txtWeather.setText(_tourData.getWeather());
+
 		// wind direction
 		final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 		_spinWindDirectionValue.setSelection(weatherWindDirDegree);

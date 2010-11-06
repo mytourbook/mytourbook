@@ -6,7 +6,7 @@
       <device
             class="net.tourbook.device.gpx.GPXDeviceDataReader"
             fileextension="gpx"
-            id="net.tourbook.device.GarminDeviceReader"
+            id="net.tourbook.device.GPXDataReader"
             name="GPX"/>
    </extension>
 

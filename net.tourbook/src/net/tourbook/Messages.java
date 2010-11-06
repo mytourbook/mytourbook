@@ -78,10 +78,10 @@ public class Messages extends NLS {
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
-
-	public static String	Adjust_Altitude_Group_GeoPosition;
-
-	public static String	Adjust_Altitude_Type_HorizontalGeoPosition;
+	public static String		Adjust_Altitude_Group_GeoPosition;
+	public static String		Adjust_Altitude_Label_GeoPosition_SliceDiff;
+	public static String		Adjust_Altitude_Label_GeoPosition_Slices;
+	public static String		Adjust_Altitude_Type_HorizontalGeoPosition;
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
@@ -257,6 +257,8 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_StartPlace;
 	public static String		Db_Field_TourData_Title;
 
+	public static String	Db_Field_TourData_Weather;
+
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
@@ -278,10 +280,10 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_InvalidData_Latitude;
 	public static String		Dialog_JoinTours_InvalidData_Power;
 	public static String		Dialog_JoinTours_InvalidData;
+	public static String		Dialog_JoinTours_InvalidData_InvalidTours;
 	public static String		Dialog_JoinTours_InvalidData_RequiredDataSeries;
 	public static String		Dialog_JoinTours_InvalidData_Speed;
-	public static String	Dialog_JoinTours_InvalidData_Temperature;
-
+	public static String		Dialog_JoinTours_InvalidData_Temperature;
 	public static String		Dialog_JoinTours_InvalidData_Time;
 	public static String		Dialog_JoinTours_Label_DefaultTitle;
 	public static String		Dialog_JoinTours_Label_DeviceName;
@@ -454,6 +456,8 @@ public class Messages extends NLS {
 	public static String		Image__weather_lightning;
 	public static String		Image__weather_rain;
 	public static String		Image__weather_snow;
+	public static String		Image__Weather_Severe;
+	public static String		Image__Weather_ShowersScattered;
 
 	public static String		image__merge_tours;
 
@@ -467,8 +471,7 @@ public class Messages extends NLS {
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_reimport_tour;
-
-	public static String	import_data_action_reimport_tour_OnlyTimeSlices;
+	public static String		import_data_action_reimport_tour_OnlyTimeSlices;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
@@ -483,14 +486,10 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String	Import_Data_Action_AdjustPolarHrmGpxTimeDiff;
-
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
-
-	public static String	Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
-
-	public static String	Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
+	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -528,8 +527,7 @@ public class Messages extends NLS {
 
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
-
-	public static String	Pref_Appearance_ShowTourTypeContextMenu;
+	public static String		Pref_Appearance_ShowTourTypeContextMenu;
 
 	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
@@ -723,8 +721,7 @@ public class Messages extends NLS {
 	public static String		PrefPage_ViewActions_Label_DoubleClick_EditMarker;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_EditTour;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_None;
-
-	public static String	PrefPage_ViewActions_Label_DoubleClick_NoneNoWarning;
+	public static String		PrefPage_ViewActions_Label_DoubleClick_NoneNoWarning;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_OpenTour;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
 	public static String		PrefPage_ViewActions_Label_Info;
@@ -813,6 +810,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_Sensor_No;
 	public static String		Tour_Editor_Label_Sensor_Yes;
+	public static String	Tour_Editor_Label_Weather;
+
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
@@ -1052,15 +1051,14 @@ public class Messages extends NLS {
 	public static String		TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
 	public static String		TourEditor_Action_DeleteDistanceValues;
 	public static String		TourEditor_Action_SetAltitudeValuesFromSRTM;
-
 	public static String		TourEditor_Action_SetStartDistanceTo0;
+
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Message;
 	public static String		TourEditor_Dialog_ComputeDistanceValues_Title;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Message;
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
 
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
-
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String		UI_Label_no_chart_is_selected;
@@ -1072,6 +1070,10 @@ public class Messages extends NLS {
 	public static String		Weather_Clounds_IsNotDefined;
 	public static String		Weather_Clounds_Lightning;
 	public static String		Weather_Clounds_Rain;
+	public static String	Weather_Clounds_ScatteredShowers;
+
+	public static String	Weather_Clounds_SevereWeatherAlert;
+
 	public static String		Weather_Clounds_Snow;
 	public static String		Weather_Clounds_Sunny;
 

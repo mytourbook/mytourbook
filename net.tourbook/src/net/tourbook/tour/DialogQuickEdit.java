@@ -78,6 +78,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private Text						_txtTitle;
 	private Text						_txtDescription;
 
+	private Text						_txtWeather;
 	private Spinner						_spinWindSpeedValue;
 	private Combo						_comboWindSpeedText;
 	private Combo						_comboWindDirectionText;
@@ -404,14 +405,43 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				.spacing(20, 5)
 				.applyTo(section);
 		{
+			createUISection141Weather(section);
 			createUISection142Weather(section);
 			createUISection144WeatherCol1(section);
 		}
 	}
 
-	private void createUISection142Weather(final Composite section) {
+	private void createUISection141Weather(final Composite parent) {
 
-		final Composite container = _tk.createComposite(section);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * weather description
+			 */
+			final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Weather);
+			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
+
+			_txtWeather = _tk.createText(container, //
+					UI.EMPTY_STRING,
+					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+			);
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					//
+					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+					//
+					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(2))
+					.applyTo(_txtWeather);
+		}
+	}
+
+	private void createUISection142Weather(final Composite parent) {
+
+		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
 		{
@@ -579,9 +609,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	/**
 	 * weather: 1. column
 	 */
-	private void createUISection144WeatherCol1(final Composite section) {
+	private void createUISection144WeatherCol1(final Composite parent) {
 
-		final Composite container = _tk.createComposite(section);
+		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
@@ -854,6 +884,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			cloudValue = UI.EMPTY_STRING;
 		}
 		_tourData.setWeatherClouds(cloudValue);
+		_tourData.setWeather(_txtWeather.getText().trim());
 
 		if (_isTemperatureManuallyModified) {
 			int temperature = _spinTemperature.getSelection();
@@ -885,6 +916,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * wind properties
 			 */
+			_txtWeather.setText(_tourData.getWeather());
+
 			// wind direction
 			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 			_spinWindDirectionValue.setSelection(weatherWindDirDegree);

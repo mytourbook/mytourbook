@@ -32,7 +32,15 @@ public class Messages extends NLS {
 	public static String		Import_Error_DialogMessage_InvalidInterval;
 	public static String		Import_Error_DialogMessage_InvalidVersion;
 	public static String		Import_Error_DialogTitle;
+	public static String	PrefPage_Polar_Field_TitleDescription;
+	public static String	PrefPage_Polar_Group_HorizontalAdjustment;
+	public static String	PrefPage_Polar_Group_TitleDescription;
 
+	public static String	PrefPage_Polar_Label_AdjustmentInfo;
+	public static String	PrefPage_Polar_Label_SliceAdjustment;
+	public static String	PrefPage_Polar_Label_Slices;
+	public static String	PrefPage_Polar_Radio_TitleFromDescription;
+	public static String	PrefPage_Polar_Radio_TitleFromTitle;
 	public static String		Supported_Intervals_1_Second;
 	public static String		Supported_Intervals_15_Second;
 	public static String		Supported_Intervals_2_Second;

@@ -439,6 +439,239 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 	}
 
+	private void createTourData(final HashMap<Long, TourData> tourDataMap) {
+
+		// create data object for each tour
+		final TourData tourData = new TourData();
+
+		/*
+		 * set tour start date/time
+		 */
+		final DateTime dtTourStart = new DateTime(
+				_sectionParams.startYear,
+				_sectionParams.startMonth,
+				_sectionParams.startDay,
+				_sectionParams.startHour,
+				_sectionParams.startMinute,
+				_sectionParams.startSecond,
+				0);
+
+		tourData.setStartHour((short) dtTourStart.getHourOfDay());
+		tourData.setStartMinute((short) dtTourStart.getMinuteOfHour());
+		tourData.setStartSecond((short) dtTourStart.getSecondOfMinute());
+
+		tourData.setStartYear((short) dtTourStart.getYear());
+		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
+		tourData.setStartDay((short) dtTourStart.getDayOfMonth());
+
+		tourData.setWeek(dtTourStart);
+
+		tourData.setDeviceTimeInterval((short) _sectionParams.mtInterval);
+
+		tourData.importRawDataFile = _importFilePath;
+		tourData.setTourImportFilePath(_importFilePath);
+
+//		tourData.setCalories(_calories);
+		tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 : _sectionParams.restHR);
+
+		if (_sectionTrip != null) {
+			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
+		}
+
+		final ArrayList<TimeData> timeSeries = createTourData10CreateTimeSeries(dtTourStart);
+		createTourData20SetTemperature(tourData, timeSeries);
+
+		tourData.createTimeSeries(timeSeries, true);
+
+		createTourData30CreateMarkers(tourData);
+		tourData.computeAltitudeUpDown();
+
+		// after all data are added, the tour id can be created
+		final Long tourId = tourData.createTourId(createUniqueId(tourData, "63193")); //$NON-NLS-1$
+
+		// check if the tour is already imported
+		if (tourDataMap.containsKey(tourId) == false) {
+
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
+
+			tourData.setDeviceId(deviceId);
+			tourData.setDeviceName(_sectionParams.monitorName);
+			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
+
+			// add new tour to other tours
+			tourDataMap.put(tourId, tourData);
+		}
+	}
+
+	/**
+	 * Converts {@link HRDataSlice} into {@link TimeData}
+	 * 
+	 * @param dtTourStart
+	 * @return
+	 */
+	private ArrayList<TimeData> createTourData10CreateTimeSeries(final DateTime dtTourStart) {
+
+		final boolean isImperial = _sectionParams.isUSUnit;
+		final int sliceTimeInterval = _sectionParams.interval;
+
+		int relativeTime = 0;
+		float absoluteDistance = 0;
+
+		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+
+		for (final HRDataSlice hrSlice : _sectionHRData) {
+
+			final TimeData tourSlice = new TimeData();
+
+			tourSlice.relativeTime = relativeTime;
+			tourSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
+
+			if (hrSlice.pulse != Integer.MIN_VALUE) {
+				tourSlice.pulse = hrSlice.pulse;
+			}
+
+			if (hrSlice.speed != Integer.MIN_VALUE) {
+
+				// convert speed into distance, speed is computed internally and not saved
+
+				final float speed = (float) hrSlice.speed / 10 * 1000 / 3600;
+
+				final float distanceDiff = speed * sliceTimeInterval;
+
+				absoluteDistance += distanceDiff;
+
+				tourSlice.absoluteDistance = absoluteDistance;
+			}
+
+			if (hrSlice.altitude != Integer.MIN_VALUE) {
+				tourSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
+			}
+
+			if (hrSlice.cadence != Integer.MIN_VALUE) {
+				tourSlice.cadence = hrSlice.cadence;
+			}
+
+			timeDataList.add(tourSlice);
+
+			relativeTime += sliceTimeInterval;
+		}
+
+		return timeDataList;
+	}
+
+	private void createTourData20SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
+
+		if (_sectionLapData.size() == 0) {
+			return;
+		}
+
+		final boolean isImperial = _sectionParams.isUSUnit;
+
+		final TimeData[] timeSlices = timeSeries.toArray(new TimeData[timeSeries.size()]);
+		int serieIndex = 0;
+
+		for (final LapData lapData : _sectionLapData) {
+
+			final int lapRelativeTime = lapData.time;
+
+			for (; serieIndex < timeSlices.length; serieIndex++) {
+
+				final TimeData currentTimeSlice = timeSlices[serieIndex];
+
+				// check if time is within current lap
+				if (currentTimeSlice.relativeTime > lapRelativeTime) {
+					break;
+				}
+
+				int metricTemperature = lapData.temperature;
+
+				if (isImperial) {
+
+					final float metricScaledTemperature = (float) metricTemperature / 10;
+					metricTemperature = (int) ((metricScaledTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * 10);
+				}
+
+				currentTimeSlice.temperature = metricTemperature;
+			}
+		}
+
+		// temperature scale is 10 for the polar data
+		tourData.setTemperatureScale(10);
+	}
+
+	/**
+	 * Create a marker for each lap, the markers are currently numbered 1...n
+	 * 
+	 * @param tourData
+	 */
+	private void createTourData30CreateMarkers(final TourData tourData) {
+
+		if (_sectionLapData.size() == 0) {
+			return;
+		}
+
+		final int[] timeSerie = tourData.timeSerie;
+		if (timeSerie.length == 0) {
+			return;
+		}
+
+		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+		final int[] distanceSerie = tourData.distanceSerie;
+
+		int lapCounter = 1;
+ 
+		for (final LapData lapData : _sectionLapData) {
+
+			final int lapRelativeTime = lapData.time;
+			int serieIndex = 0;
+
+			// get serie index
+			for (final int relativeTime : timeSerie) {
+				if (relativeTime >= lapRelativeTime) {
+					break;
+				}
+				serieIndex++;
+			}
+
+			// check array bounds
+			if (serieIndex >= timeSerie.length) {
+				serieIndex = timeSerie.length - 1;
+			}
+
+			// get marker text from lap notes
+			String markerText = null;
+			for (final LapNotes lapNote : _sectionLapNotes) {
+
+				final String lapText = lapNote.noteText;
+
+				if (lapNote.lapNo == lapCounter && lapText != null && lapText.length() > 0) {
+					markerText = lapText;
+				}
+			}
+
+			if (markerText == null) {
+				// set lap number as label when label is not definded in the polar data
+				markerText = Integer.toString(lapCounter);
+			}
+
+			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+			tourMarker.setLabel(markerText);
+			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+			tourMarker.setSerieIndex(serieIndex);
+			tourMarker.setTime(lapRelativeTime);
+
+			if (distanceSerie != null) {
+				tourMarker.setDistance(distanceSerie[serieIndex]);
+			}
+
+			tourMarkers.add(tourMarker);
+
+			lapCounter++;
+		}
+	}
+
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -682,7 +915,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 				return false;
 			}
 
-			setTourData(tourDataMap);
+			createTourData(tourDataMap);
 
 			returnValue = true;
 
@@ -1372,239 +1605,6 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 
 		return parseSection(importFileName, deviceData, tourDataMap);
-	}
-
-	private void setTourData(final HashMap<Long, TourData> tourDataMap) {
-
-		// create data object for each tour
-		final TourData tourData = new TourData();
-
-		/*
-		 * set tour start date/time
-		 */
-		final DateTime dtTourStart = new DateTime(
-				_sectionParams.startYear,
-				_sectionParams.startMonth,
-				_sectionParams.startDay,
-				_sectionParams.startHour,
-				_sectionParams.startMinute,
-				_sectionParams.startSecond,
-				0);
-
-		tourData.setStartHour((short) dtTourStart.getHourOfDay());
-		tourData.setStartMinute((short) dtTourStart.getMinuteOfHour());
-		tourData.setStartSecond((short) dtTourStart.getSecondOfMinute());
-
-		tourData.setStartYear((short) dtTourStart.getYear());
-		tourData.setStartMonth((short) dtTourStart.getMonthOfYear());
-		tourData.setStartDay((short) dtTourStart.getDayOfMonth());
-
-		tourData.setWeek(dtTourStart);
-
-		tourData.setDeviceTimeInterval((short) _sectionParams.mtInterval);
-
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
-
-//		tourData.setCalories(_calories);
-		tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 : _sectionParams.restHR);
-
-		if (_sectionTrip != null) {
-			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
-		}
-
-		final ArrayList<TimeData> timeSeries = setTourData10CreateTimeSeries(dtTourStart);
-		setTourData20SetTemperature(tourData, timeSeries);
-
-		tourData.createTimeSeries(timeSeries, true);
-
-		setTourData30CreateMarkers(tourData);
-		tourData.computeAltitudeUpDown();
-
-		// after all data are added, the tour id can be created
-		final Long tourId = tourData.createTourId(createUniqueId(tourData, "63193")); //$NON-NLS-1$
-
-		// check if the tour is already imported
-		if (tourDataMap.containsKey(tourId) == false) {
-
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-
-			tourData.setDeviceId(deviceId);
-			tourData.setDeviceName(_sectionParams.monitorName);
-			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
-
-			// add new tour to other tours
-			tourDataMap.put(tourId, tourData);
-		}
-	}
-
-	/**
-	 * Converts {@link HRDataSlice} into {@link TimeData}
-	 * 
-	 * @param dtTourStart
-	 * @return
-	 */
-	private ArrayList<TimeData> setTourData10CreateTimeSeries(final DateTime dtTourStart) {
-
-		final boolean isImperial = _sectionParams.isUSUnit;
-		final int sliceTimeInterval = _sectionParams.interval;
-
-		int relativeTime = 0;
-		float absoluteDistance = 0;
-
-		final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
-
-		for (final HRDataSlice hrSlice : _sectionHRData) {
-
-			final TimeData tourSlice = new TimeData();
-
-			tourSlice.relativeTime = relativeTime;
-			tourSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
-
-			if (hrSlice.pulse != Integer.MIN_VALUE) {
-				tourSlice.pulse = hrSlice.pulse;
-			}
-
-			if (hrSlice.speed != Integer.MIN_VALUE) {
-
-				// convert speed into distance, speed is computed internally and not saved
-
-				final float speed = (float) hrSlice.speed / 10 * 1000 / 3600;
-
-				final float distanceDiff = speed * sliceTimeInterval;
-
-				absoluteDistance += distanceDiff;
-
-				tourSlice.absoluteDistance = absoluteDistance;
-			}
-
-			if (hrSlice.altitude != Integer.MIN_VALUE) {
-				tourSlice.absoluteAltitude = hrSlice.altitude / (isImperial ? UI.UNIT_FOOT : 1);
-			}
-
-			if (hrSlice.cadence != Integer.MIN_VALUE) {
-				tourSlice.cadence = hrSlice.cadence;
-			}
-
-			timeDataList.add(tourSlice);
-
-			relativeTime += sliceTimeInterval;
-		}
-
-		return timeDataList;
-	}
-
-	private void setTourData20SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
-
-		if (_sectionLapData.size() == 0) {
-			return;
-		}
-
-		final boolean isImperial = _sectionParams.isUSUnit;
-
-		final TimeData[] timeSlices = timeSeries.toArray(new TimeData[timeSeries.size()]);
-		int serieIndex = 0;
-
-		for (final LapData lapData : _sectionLapData) {
-
-			final int lapRelativeTime = lapData.time;
-
-			for (; serieIndex < timeSlices.length; serieIndex++) {
-
-				final TimeData currentTimeSlice = timeSlices[serieIndex];
-
-				// check if time is within current lap
-				if (currentTimeSlice.relativeTime > lapRelativeTime) {
-					break;
-				}
-
-				int metricTemperature = lapData.temperature;
-
-				if (isImperial) {
-
-					final float metricScaledTemperature = (float) metricTemperature / 10;
-					metricTemperature = (int) ((metricScaledTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * 10);
-				}
-
-				currentTimeSlice.temperature = metricTemperature;
-			}
-		}
-
-		// temperature scale is 10 for the polar data
-		tourData.setTemperatureScale(10);
-	}
-
-	/**
-	 * Create a marker for each lap, the markers are currently numbered 1...n
-	 * 
-	 * @param tourData
-	 */
-	private void setTourData30CreateMarkers(final TourData tourData) {
-
-		if (_sectionLapData.size() == 0) {
-			return;
-		}
-
-		final int[] timeSerie = tourData.timeSerie;
-		if (timeSerie.length == 0) {
-			return;
-		}
-
-		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-		final int[] distanceSerie = tourData.distanceSerie;
-
-		int lapCounter = 1;
-
-		for (final LapData lapData : _sectionLapData) {
-
-			final int lapRelativeTime = lapData.time;
-			int serieIndex = 0;
-
-			// get serie index
-			for (final int relativeTime : timeSerie) {
-				if (relativeTime >= lapRelativeTime) {
-					break;
-				}
-				serieIndex++;
-			}
-
-			// check array bounds
-			if (serieIndex >= timeSerie.length) {
-				serieIndex = timeSerie.length - 1;
-			}
-
-			// get marker text from lap notes
-			String markerText = null;
-			for (final LapNotes lapNote : _sectionLapNotes) {
-
-				final String lapText = lapNote.noteText;
-
-				if (lapNote.lapNo == lapCounter && lapText != null && lapText.length() > 0) {
-					markerText = lapText;
-				}
-			}
-
-			if (markerText == null) {
-				// set lap number as label when label is not definded in the polar data
-				markerText = Integer.toString(lapCounter);
-			}
-
-			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-			tourMarker.setLabel(markerText);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
-			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setTime(lapRelativeTime);
-
-			if (distanceSerie != null) {
-				tourMarker.setDistance(distanceSerie[serieIndex]);
-			}
-
-			tourMarkers.add(tourMarker);
-
-			lapCounter++;
-		}
 	}
 
 	private void showError(final String message) {
