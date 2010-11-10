@@ -192,15 +192,15 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	@Override
 	public String toString() {
-		return "TourbookDevice [deviceId="
+		return "TourbookDevice [deviceId=" //$NON-NLS-1$
 				+ deviceId
-				+ ", visibleName="
+				+ ", visibleName=" //$NON-NLS-1$
 				+ visibleName
-				+ ", fileExtension="
+				+ ", fileExtension=" //$NON-NLS-1$
 				+ fileExtension
-				+ ", extensionSortPriority="
+				+ ", extensionSortPriority=" //$NON-NLS-1$
 				+ extensionSortPriority
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

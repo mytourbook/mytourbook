@@ -30,6 +30,7 @@ import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -480,7 +481,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			 * original version to create tour id
 			 */
 			if (distanceSerie == null) {
-				uniqueKey = "42984"; //$NON-NLS-1$
+				uniqueKey = Util.UNIQUE_ID_SUFFIX_GPX;
 			} else {
 				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 			}

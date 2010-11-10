@@ -1945,7 +1945,7 @@ public class TourDatabase {
 				// version 13 start
 				//
 				+ "	TemperatureScale			INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
-				+ " Weather 					" + varCharNoKomma(TourData.DB_LENGTH_WEATHER) //$NON-NLS-1$
+				+ " Weather 					" + varCharKomma(TourData.DB_LENGTH_WEATHER) //$NON-NLS-1$
 				//
 				// version 13 end ---------
 

@@ -83,7 +83,7 @@ public class FitActivityReader extends TourbookDevice {
 
 			returnValue = true;
 		} catch (FileNotFoundException e) {
-			StatusUtil.log("Could not read data file '" + fileName + "'", e);
+			StatusUtil.log("Could not read data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}
@@ -100,9 +100,9 @@ public class FitActivityReader extends TourbookDevice {
 			fis = new FileInputStream(fileName);
 			returnValue = Decode.checkIntegrity(fis);
 		} catch (FileNotFoundException e) {
-			StatusUtil.log("Could not read data file '" + fileName + "'", e);
+			StatusUtil.log("Could not read data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (FitRuntimeException e) {
-			StatusUtil.log("Invalid data file '" + fileName + "'", e);
+			StatusUtil.log("Invalid data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}

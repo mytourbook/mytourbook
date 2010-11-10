@@ -176,13 +176,13 @@ public final class FileUtils
 		if (in.read() == 0xef && in.read() == 0xbb && in.read() == 0xbf)
 		{
 			// UTF-8 reader does not consume BOM, so do not reset
-			if (System.getProperty("flex.platform.CLR") != null)
+			if (System.getProperty("flex.platform.CLR") != null) //$NON-NLS-1$
 			{
-				return "UTF8";
+				return "UTF8"; //$NON-NLS-1$
 			}
 			else
 			{
-				return "UTF-8";
+				return "UTF-8"; //$NON-NLS-1$
 			}
 		}
 		else
@@ -199,13 +199,13 @@ public final class FileUtils
                     in.reset();
                 }
 
-				if (System.getProperty("flex.platform.CLR") != null)
+				if (System.getProperty("flex.platform.CLR") != null) //$NON-NLS-1$
 				{
-					return "UTF16";
+					return "UTF16"; //$NON-NLS-1$
 				}
 				else
 				{
-					return "UTF-16";
+					return "UTF-16"; //$NON-NLS-1$
 				}
 	        }
 	        else
@@ -218,7 +218,7 @@ public final class FileUtils
                 }
                 else
                 {
-                    return System.getProperty("file.encoding");
+                    return System.getProperty("file.encoding"); //$NON-NLS-1$
                 }
 	        }
 	    }

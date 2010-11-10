@@ -31,6 +31,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -45,8 +46,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 	private static final String		DATA_DELIMITER				= "\t";										//$NON-NLS-1$
 
-	private static final String		SECTION_DAY_INFO			= "[DayInfo]";
-	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo";
+	private static final String		SECTION_DAY_INFO			= "[DayInfo]"; //$NON-NLS-1$
+	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo"; //$NON-NLS-1$
 	//
 	private final IPreferenceStore	_prefStore					= Activator.getDefault().getPreferenceStore();
 
@@ -146,7 +147,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		}
 
 		// after all data are added, the tour id can be created
-		final Long tourId = hrmTourData.createTourId(createUniqueId(hrmTourData, "76913"));
+		final Long tourId = hrmTourData.createTourId(createUniqueId(hrmTourData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
 
 		// check if the tour is already imported
 		if (_tourDataMap.containsKey(tourId) == false) {
@@ -169,14 +170,14 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		if (importFile.exists() == false) {
 			throw new Exception(NLS.bind(
-					"File {0} is not available but is defined in file {1}",
+					"File {0} is not available but is defined in file {1}", //$NON-NLS-1$
 					importFile.toString(),
 					_importFilePath));
 		}
 
 		if (deviceDataReader.validateRawData(importFilePath.toOSString()) == false) {
 			throw new Exception(NLS.bind(
-					"File {0} in parent file {1} is invalid",
+					"File {0} in parent file {1} is invalid", //$NON-NLS-1$
 					importFile.toString(),
 					_importFilePath));
 		}
@@ -400,7 +401,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 					// check version
 					if (_fileVersionDayInfo != 100) {
 						throw new Exception(NLS.bind(
-								"File {0} has an invalid version in section {1}",
+								"File {0} has an invalid version in section {1}", //$NON-NLS-1$
 								_importFilePath,
 								SECTION_DAY_INFO));
 					}
@@ -414,7 +415,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 					// check version
 					if (_currentExercise.fileVersion != 101) {
 						throw new Exception(NLS.bind(
-								"File {0} has an invalid version in section {1}",
+								"File {0} has an invalid version in section {1}", //$NON-NLS-1$
 								_importFilePath,
 								SECTION_EXERCISE_INFO));
 					}

@@ -3101,7 +3101,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(2))
+					.hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
 					.applyTo(_txtWeather);
 		}
 	}
@@ -4518,8 +4518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtStartLocation.setEnabled(canEdit);
 		_txtEndLocation.setEnabled(canEdit);
 
-		_spinRestPuls.setEnabled(canEdit);
-
+		_txtWeather.setEnabled(canEdit);
 		_spinTemperature.setEnabled(canEdit && (_tourData.temperatureSerie == null));
 		_comboClouds.setEnabled(canEdit);
 		_spinWindDirectionValue.setEnabled(canEdit);
@@ -4529,7 +4528,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
-
 		_timeRecording.setEditMode(isManualAndEdit);
 		_timePaused.setEditMode(isManualAndEdit);
 		_timeDriving.setEditMode(isManualAndEdit);
@@ -4539,6 +4537,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
 		_spinTourCalories.setEnabled(isManualAndEdit);
+		_spinRestPuls.setEnabled(canEdit);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);

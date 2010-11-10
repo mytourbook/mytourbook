@@ -24,19 +24,29 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.util.FileUtils;
 import net.tourbook.util.StatusUtil;
-import net.tourbook.util.Util;
+import net.tourbook.util.UI;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
 public class FitLogDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml";				//$NON-NLS-1$
-	private static final String	XML_FIT_LOG_TAG	= "<FitnessWorkbook ";	//$NON-NLS-1$
+	private static final String				XML_START_ID	= "<?xml";											//$NON-NLS-1$
+	private static final String				XML_FIT_LOG_TAG	= "<FitnessWorkbook ";								//$NON-NLS-1$
+
+	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	// plugin constructor
 	public FitLogDeviceDataReader() {}
@@ -82,9 +92,9 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 			/*
 			 * .fitlog files contain BOM's (Byte Order Mark)
 			 */
-			FileUtils.consumeBOM(inputStream, Util.UTF_8);
+			FileUtils.consumeBOM(inputStream, UI.UTF_8);
 
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, Util.UTF_8));
+			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
 			String line = fileReader.readLine();
 			if (line == null || line.startsWith(XML_START_ID) == false) {
@@ -135,7 +145,30 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
 			return false;
 		} finally {
-//			saxHandler.dispose();
+
+			final Display display = Display.getDefault();
+
+			if (saxHandler.isNewTag()) {
+				display.syncExec(new Runnable() {
+					public void run() {
+						TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
+					}
+				});
+			}
+
+			if (saxHandler.isNewTourType()) {
+
+				TourDatabase.clearTourTypes();
+				TourManager.getInstance().clearTourDataCache();
+
+				display.syncExec(new Runnable() {
+					public void run() {
+						// fire modify event
+						_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+					}
+				});
+
+			}
 		}
 
 		return saxHandler.isImported();

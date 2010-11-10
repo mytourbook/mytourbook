@@ -247,6 +247,8 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;
 	public static String		Tour_Tooltip_Label_Temperature;
+
+	public static String	Tour_Tooltip_Label_TourType;
 	public static String	Tour_Tooltip_Label_Weather;
 
 	public static String		Tour_Tooltip_Label_WindDirection;

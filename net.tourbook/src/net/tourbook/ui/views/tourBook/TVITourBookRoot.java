@@ -25,6 +25,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StatusUtil;
 
 public class TVITourBookRoot extends TVITourBookItem {
 
@@ -58,9 +59,11 @@ public class TVITourBookRoot extends TVITourBookItem {
 		sb.append(" GROUP BY startYear"); //			//$NON-NLS-1$
 		sb.append(" ORDER BY startYear"); //			//$NON-NLS-1$
 
+		Connection conn = null;
+
 		try {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
+			conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			sqlFilter.setParameters(statement, 1);
@@ -86,10 +89,14 @@ public class TVITourBookRoot extends TVITourBookItem {
 				yearItem.addSumColumns(result, 2);
 			}
 
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e, sb.toString());
+		} finally {
+			try {
+				conn.close();
+			} catch (final SQLException e) {
+				StatusUtil.log(e);
+			}
 		}
 	}
 

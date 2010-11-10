@@ -2775,11 +2775,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
-	 * @param uniqueKey
+	 * @param uniqueKeySuffix
 	 *            unique key to identify a tour
 	 * @return
 	 */
-	public Long createTourId(final String uniqueKey) {
+	public Long createTourId(final String uniqueKeySuffix) {
 
 //		final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
@@ -2796,7 +2796,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					//
-					+ uniqueKey;
+					+ uniqueKeySuffix;
 
 			tourId = Long.valueOf(tourIdKey);
 
@@ -2812,7 +2812,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					//
-					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
+					+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
 			tourId = Long.valueOf(tourIdKey);
 		}
@@ -3964,6 +3964,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns total recording time in seconds
+	 */
 	public int getTourRecordingTime() {
 		return tourRecordingTime;
 	}
@@ -4012,6 +4015,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return weather == null ? UI.EMPTY_STRING : weather;
 	}
 
+	/**
+	 * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
+	 *         set.
+	 */
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -4023,12 +4030,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int getWeatherIndex() {
 
 		int weatherCloudsIndex = -1;
-		final String cloudValue = getWeatherClouds();
 
-		if (cloudValue != null) {
-			// we cannot use a binary search as that requires sorting which we cannot...
+		if (weatherClouds != null) {
+			// binary search cannot be done because it requires sorting which we cannot...
 			for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(cloudValue)) {
+				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
 					weatherCloudsIndex = cloudIndex;
 					break;
 				}
@@ -4486,6 +4492,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
 	}
 
+	public void setMaxPulse(final int maxPulse) {
+		this.maxPulse = maxPulse;
+	}
+
 	public void setMergedAltitudeOffset(final int altitudeDiff) {
 		mergedAltitudeOffset = altitudeDiff;
 	}
@@ -4752,6 +4762,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.weather = weather;
 	}
 
+	/**
+	 * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
+	 * when weather id is not defined
+	 * 
+	 * @param weatherClouds
+	 */
 	public void setWeatherClouds(final String weatherClouds) {
 		this.weatherClouds = weatherClouds;
 	}

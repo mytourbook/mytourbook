@@ -569,7 +569,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			 * original version to create tour id
 			 */
 			if (distanceSerie == null) {
-				uniqueKey = "42984"; //$NON-NLS-1$
+				uniqueKey = Util.UNIQUE_ID_SUFFIX_GARMIN_TCX;
 			} else {
 				uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 			}

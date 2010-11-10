@@ -902,6 +902,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		defineColumnAvgPace(pc);
 		defineColumnAltitudeUp(pc);
 		defineColumnAltitudeDown(pc);
+		defineColumnWeatherClouds(pc);
 		defineColumnTitle(pc);
 		defineColumnTags(pc);
 		defineColumnDeviceName(pc);
@@ -1113,7 +1114,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 	}
-
 	/**
 	 * column: driving time
 	 */
@@ -1173,6 +1173,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final Set<TourMarker> tourMarker = tourData.getTourMarkers();
 				final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
+
 				if (tourMarker == null && wayPoints == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -1182,7 +1183,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						size = tourMarker.size();
 					}
 					if (wayPoints != null) {
-						size = wayPoints.size();
+						size += wayPoints.size();
 					}
 					cell.setText(Integer.toString(size));
 				}
@@ -1370,6 +1371,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					 * displayed compared with the tourBookView which displays the correct image
 					 */
 					cell.setImage(tourTypeImage);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: clouds
+	 */
+	private void defineColumnWeatherClouds(final PixelConverter pc) {
+
+		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final String weatherCloudId = ((TourData) cell.getElement()).getWeatherClouds();
+				if (weatherCloudId == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final Image img = UI.IMAGE_REGISTRY.get(weatherCloudId);
+					if (img != null) {
+						cell.setImage(img);
+					} else {
+						cell.setText(weatherCloudId);
+					}
 				}
 			}
 		});

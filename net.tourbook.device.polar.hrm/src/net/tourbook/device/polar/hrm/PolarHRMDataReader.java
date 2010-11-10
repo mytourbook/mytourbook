@@ -34,6 +34,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -487,7 +488,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final Long tourId = tourData.createTourId(createUniqueId(tourData, "63193")); //$NON-NLS-1$
+		final Long tourId = tourData.createTourId(createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM));
 
 		// check if the tour is already imported
 		if (tourDataMap.containsKey(tourId) == false) {

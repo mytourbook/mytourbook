@@ -21,13 +21,13 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 
 		Integer messageIndex = mesg.getMessageIndex();
 		if (messageIndex == null) {
-			throw new FitActivityReaderException("Missing session message index");
+			throw new FitActivityReaderException("Missing session message index"); //$NON-NLS-1$
 		}
 		context.setSessionIndex(messageIndex.toString());
 
 		DateTime startTime = mesg.getStartTime();
 		if (startTime == null) {
-			throw new FitActivityReaderException("Missing session start date");
+			throw new FitActivityReaderException("Missing session start date"); //$NON-NLS-1$
 		}
 
 		org.joda.time.DateTime tourDataStartTime = new org.joda.time.DateTime(startTime.getDate());

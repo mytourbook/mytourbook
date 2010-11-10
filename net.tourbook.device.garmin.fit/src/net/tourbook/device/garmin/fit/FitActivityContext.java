@@ -7,6 +7,7 @@ import java.util.Set;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.util.Util;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -47,16 +48,20 @@ public class FitActivityContext {
 
 	private int							lapTime;
 
-	public FitActivityContext(String filename, Map<Long, TourData> tourDataMap) {
+	public FitActivityContext(final String filename, final Map<Long, TourData> tourDataMap) {
 		this.filename = filename;
 		this.tourDataMap = tourDataMap;
 
 		contextData = new FitActivityContextData();
 	}
 
-	public void beforeSession() {
-		serieIndex = 0;
-		contextData.initializeTourData();
+	public void afterLap() {
+		contextData.finalizeTourMarker();
+	}
+
+	public void afterRecord() {
+		contextData.finalizeTimeData();
+		serieIndex++;
 	}
 
 	public void afterSession() {
@@ -67,24 +72,93 @@ public class FitActivityContext {
 		contextData.initializeTourMarker();
 	}
 
-	public void afterLap() {
-		contextData.finalizeTourMarker();
-	}
-
 	public void beforeRecord() {
 		contextData.initializeTimeData();
 	}
 
-	public void afterRecord() {
-		contextData.finalizeTimeData();
-		serieIndex++;
+	public void beforeSession() {
+		serieIndex = 0;
+		contextData.initializeTourData();
+	}
+
+	public FitActivityContextData getContextData() {
+		return contextData;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public String getDeviceName() {
+		final StringBuilder deviceName = new StringBuilder();
+		if (getManufacturer() != null) {
+			deviceName.append(getManufacturer()).append(" "); //$NON-NLS-1$
+		}
+
+		if (getGarminProduct() != null) {
+			deviceName.append(getGarminProduct()).append(" "); //$NON-NLS-1$
+		}
+
+		if (getSoftwareVersion() != null) {
+			deviceName.append("(").append(getSoftwareVersion()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		return deviceName.toString();
+	}
+
+	public String getGarminProduct() {
+		return garminProduct;
+	}
+
+	public int getLapDistance() {
+		return lapDistance;
+	}
+
+	public int getLapTime() {
+		return lapTime;
+	}
+
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	public int getSerieIndex() {
+		return serieIndex;
+	}
+
+	public String getSessionIndex() {
+		return sessionIndex;
+	}
+
+	public String getSoftwareVersion() {
+		return softwareVersion;
+	}
+
+	public String getTourDescription() {
+		return getTourTitle();
+	}
+
+	public String getTourTitle() {
+		return String.format("%s (%s)", FilenameUtils.getBaseName(filename), getSessionIndex()); //$NON-NLS-1$
+	}
+
+	public boolean isHeartRateSensorPresent() {
+		return heartRateSensorPresent;
+	}
+
+	public boolean isPowerSensorPresent() {
+		return powerSensorPresent;
+	}
+
+	public boolean isSpeedSensorPresent() {
+		return speedSensorPresent;
 	}
 
 	public void processData() {
 		contextData.processData(new FitActivityContextDataHandler() {
 
 			@Override
-			public void handleTour(TourData tourData, ArrayList<TimeData> timeDataList, Set<TourMarker> tourMarkerSet) {
+			public void handleTour(final TourData tourData, final ArrayList<TimeData> timeDataList, final Set<TourMarker> tourMarkerSet) {
 				resetSpeedAtFirstPosition(timeDataList);
 
 				tourData.setTourTitle(getTourTitle());
@@ -99,7 +173,7 @@ public class FitActivityContext {
 
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
-				Long tourId = tourData.createTourId(getDeviceId());
+				final Long tourId = tourData.createTourId(Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
 				if (!tourDataMap.containsKey(tourId)) {
 					tourData.createTimeSeries(timeDataList, false);
 
@@ -115,123 +189,50 @@ public class FitActivityContext {
 		});
 	}
 
-	public String getDeviceName() {
-		StringBuilder deviceName = new StringBuilder();
-		if (getManufacturer() != null) {
-			deviceName.append(getManufacturer()).append(" ");
-		}
-
-		if (getGarminProduct() != null) {
-			deviceName.append(getGarminProduct()).append(" ");
-		}
-
-		if (getSoftwareVersion() != null) {
-			deviceName.append("(").append(getSoftwareVersion()).append(")");
-		}
-
-		return deviceName.toString();
-	}
-
-	public String getTourTitle() {
-		return String.format("%s (%s)", FilenameUtils.getBaseName(filename), getSessionIndex());
-	}
-
-	public String getTourDescription() {
-		return getTourTitle();
-	}
-
-	public FitActivityContextData getContextData() {
-		return contextData;
-	}
-
-	public boolean isSpeedSensorPresent() {
-		return speedSensorPresent;
-	}
-
-	public void setSpeedSensorPresent(boolean speedSensorPresent) {
-		this.speedSensorPresent = speedSensorPresent;
-	}
-
-	public boolean isHeartRateSensorPresent() {
-		return heartRateSensorPresent;
-	}
-
-	public void setHeartRateSensorPresent(boolean heartRateSensorPresent) {
-		this.heartRateSensorPresent = heartRateSensorPresent;
-	}
-
-	public boolean isPowerSensorPresent() {
-		return powerSensorPresent;
-	}
-
-	public void setPowerSensorPresent(boolean powerSensorPresent) {
-		this.powerSensorPresent = powerSensorPresent;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getManufacturer() {
-		return manufacturer;
-	}
-
-	public void setManufacturer(String manufacturer) {
-		this.manufacturer = manufacturer;
-	}
-
-	public String getGarminProduct() {
-		return garminProduct;
-	}
-
-	public void setGarminProduct(String garminProduct) {
-		this.garminProduct = garminProduct;
-	}
-
-	public String getSoftwareVersion() {
-		return softwareVersion;
-	}
-
-	public void setSoftwareVersion(String softwareVersion) {
-		this.softwareVersion = softwareVersion;
-	}
-
-	public String getSessionIndex() {
-		return sessionIndex;
-	}
-
-	public void setSessionIndex(String sessionIndex) {
-		this.sessionIndex = sessionIndex;
-	}
-
-	public int getSerieIndex() {
-		return serieIndex;
-	}
-
-	public int getLapDistance() {
-		return lapDistance;
-	}
-
-	public void setLapDistance(int lapDistance) {
-		this.lapDistance = lapDistance;
-	}
-
-	public int getLapTime() {
-		return lapTime;
-	}
-
-	public void setLapTime(int lapTime) {
-		this.lapTime = lapTime;
-	}
-
-	private void resetSpeedAtFirstPosition(ArrayList<TimeData> timeDataList) {
+	private void resetSpeedAtFirstPosition(final ArrayList<TimeData> timeDataList) {
 		if (!timeDataList.isEmpty()) {
 			timeDataList.get(0).speed = Integer.MIN_VALUE;
 		}
+	}
+
+	public void setDeviceId(final String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public void setGarminProduct(final String garminProduct) {
+		this.garminProduct = garminProduct;
+	}
+
+	public void setHeartRateSensorPresent(final boolean heartRateSensorPresent) {
+		this.heartRateSensorPresent = heartRateSensorPresent;
+	}
+
+	public void setLapDistance(final int lapDistance) {
+		this.lapDistance = lapDistance;
+	}
+
+	public void setLapTime(final int lapTime) {
+		this.lapTime = lapTime;
+	}
+
+	public void setManufacturer(final String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+
+	public void setPowerSensorPresent(final boolean powerSensorPresent) {
+		this.powerSensorPresent = powerSensorPresent;
+	}
+
+	public void setSessionIndex(final String sessionIndex) {
+		this.sessionIndex = sessionIndex;
+	}
+
+	public void setSoftwareVersion(final String softwareVersion) {
+		this.softwareVersion = softwareVersion;
+	}
+
+	public void setSpeedSensorPresent(final boolean speedSensorPresent) {
+		this.speedSensorPresent = speedSensorPresent;
 	}
 
 }

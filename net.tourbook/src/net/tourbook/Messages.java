@@ -79,7 +79,6 @@ public class Messages extends NLS {
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Title;
 	public static String		Adjust_Altitude_Group_GeoPosition;
-	public static String		Adjust_Altitude_Label_GeoPosition_SliceDiff;
 	public static String		Adjust_Altitude_Label_GeoPosition_Slices;
 	public static String		Adjust_Altitude_Type_HorizontalGeoPosition;
 
@@ -256,8 +255,7 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_EndPlace;
 	public static String		Db_Field_TourData_StartPlace;
 	public static String		Db_Field_TourData_Title;
-
-	public static String	Db_Field_TourData_Weather;
+	public static String		Db_Field_TourData_Weather;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
@@ -456,9 +454,9 @@ public class Messages extends NLS {
 	public static String		Image__weather_lightning;
 	public static String		Image__weather_rain;
 	public static String		Image__weather_snow;
-	public static String		Image__Weather_Severe;
-	public static String		Image__Weather_ShowersScattered;
+	public static String		Image__Weather_ScatteredShowers;
 
+	public static String		Image__Weather_Severe;
 	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;
@@ -810,7 +808,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_Sensor_No;
 	public static String		Tour_Editor_Label_Sensor_Yes;
-	public static String	Tour_Editor_Label_Weather;
+	public static String		Tour_Editor_Label_Weather;
 
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
@@ -1070,10 +1068,8 @@ public class Messages extends NLS {
 	public static String		Weather_Clounds_IsNotDefined;
 	public static String		Weather_Clounds_Lightning;
 	public static String		Weather_Clounds_Rain;
-	public static String	Weather_Clounds_ScatteredShowers;
-
-	public static String	Weather_Clounds_SevereWeatherAlert;
-
+	public static String		Weather_Clounds_ScatteredShowers;
+	public static String		Weather_Clounds_SevereWeatherAlert;
 	public static String		Weather_Clounds_Snow;
 	public static String		Weather_Clounds_Sunny;
 

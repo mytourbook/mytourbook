@@ -85,7 +85,7 @@ public class FitActivityContextData {
 
 	public TourData getCurrentTourData() {
 		if (currentContextTourData == null) {
-			throw new IllegalArgumentException("Tour data is not initialized");
+			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
 		}
 
 		return currentContextTourData.data;
@@ -93,7 +93,7 @@ public class FitActivityContextData {
 
 	public TimeData getCurrentTimeData() {
 		if (currentContextTimeData == null) {
-			throw new IllegalArgumentException("Time data is not initialized");
+			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
 		}
 
 		return currentContextTimeData.data;
@@ -102,7 +102,7 @@ public class FitActivityContextData {
 
 	public TourMarker getCurrentTourMarker() {
 		if (currentContextTourMarker == null) {
-			throw new IllegalArgumentException("Tour marker is not initialized");
+			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
 		}
 
 		return currentContextTourMarker.data;

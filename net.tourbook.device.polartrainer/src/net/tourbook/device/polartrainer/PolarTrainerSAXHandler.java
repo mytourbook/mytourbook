@@ -30,6 +30,7 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.Util;
 
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
@@ -62,7 +63,7 @@ import de.byteholder.geoclipse.map.UI;
  */
 public class PolarTrainerSAXHandler extends DefaultHandler {
 
-	private static final String		DEVICE_NAME_POLAR_PERSONALTRAINER	= "Polar Personal Trainer";
+	private static final String		DEVICE_NAME_POLAR_PERSONALTRAINER	= "Polar Personal Trainer"; //$NON-NLS-1$
 
 	/**
 	 * <pre>
@@ -80,20 +81,20 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 	 * 
 	 * value <code>DISTANCE</code> is available but not documented in
 	 */
-	private static final String		SAMPLE_TYPE_ALTITUDE				= "ALTITUDE";
-	private static final String		SAMPLE_TYPE_CADENCE					= "CADENCE";
-	private static final String		SAMPLE_TYPE_DISTANCE				= "DISTANCE";
-	private static final String		SAMPLE_TYPE_HEARTRATE				= "HEARTRATE";
-	private static final String		SAMPLE_TYPE_SPEED					= "SPEED";
-	private static final String		SAMPLE_TYPE_TEMPERATURE				= "TEMPERATURE";
+	private static final String		SAMPLE_TYPE_ALTITUDE				= "ALTITUDE"; //$NON-NLS-1$
+	private static final String		SAMPLE_TYPE_CADENCE					= "CADENCE"; //$NON-NLS-1$
+	private static final String		SAMPLE_TYPE_DISTANCE				= "DISTANCE"; //$NON-NLS-1$
+	private static final String		SAMPLE_TYPE_HEARTRATE				= "HEARTRATE"; //$NON-NLS-1$
+	private static final String		SAMPLE_TYPE_SPEED					= "SPEED"; //$NON-NLS-1$
+	private static final String		SAMPLE_TYPE_TEMPERATURE				= "TEMPERATURE"; //$NON-NLS-1$
 //	private static final String		SAMPLE_TYPE_POWER			= "POWER";
 //	private static final String		SAMPLE_TYPE_POWER_PI		= "POWER_PI";
 //	private static final String		SAMPLE_TYPE_POWER_LRB		= "POWER_LRB";
 //	private static final String		SAMPLE_TYPE_AIR_PRESSURE	= "AIR_PRESSURE";
 //	private static final String		SAMPLE_TYPE_RUN_CADENCE		= "RUN_CADENCE";
 	//
-	private static final String		PATTERN_HHMMSS						= "(\\d{0,2}):*(\\d{0,2}):*(\\d{0,2}).*";
-	private static final String		PATTERN_DATE_TIME					= "(\\d{4})-(\\d{2})-(\\d{2})\\s(\\d{2}):(\\d{2}):(\\d{2})\\.\\d{1}";
+	private static final String		PATTERN_HHMMSS						= "(\\d{0,2}):*(\\d{0,2}):*(\\d{0,2}).*"; //$NON-NLS-1$
+	private static final String		PATTERN_DATE_TIME					= "(\\d{4})-(\\d{2})-(\\d{2})\\s(\\d{2}):(\\d{2}):(\\d{2})\\.\\d{1}"; //$NON-NLS-1$
 	//
 	private static final Pattern	_patternHHMMSS						= Pattern.compile(
 																				PATTERN_HHMMSS,
@@ -108,26 +109,26 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 	private static final String		TAG_ROOT_VERSION					= "version";															//$NON-NLS-1$
 	private static final String		TAG_ROOT_VERSION_1					= "1.0";																//$NON-NLS-1$
 	//
-	private static final String		TAG_EXERCISE						= "exercise";
-	private static final String		TAG_EXERCISE_CREATED				= "created";
-	private static final String		TAG_EXERCISE_TIME					= "time";
+	private static final String		TAG_EXERCISE						= "exercise"; //$NON-NLS-1$
+	private static final String		TAG_EXERCISE_CREATED				= "created"; //$NON-NLS-1$
+	private static final String		TAG_EXERCISE_TIME					= "time"; //$NON-NLS-1$
 	//
-	private static final String		TAG_RESULT							= "result";
-	private static final String		TAG_RESULT_DURATION					= "duration";
-	private static final String		TAG_RESULT_CALORIES					= "calories";
+	private static final String		TAG_RESULT							= "result"; //$NON-NLS-1$
+	private static final String		TAG_RESULT_DURATION					= "duration"; //$NON-NLS-1$
+	private static final String		TAG_RESULT_CALORIES					= "calories"; //$NON-NLS-1$
 	//
-	private static final String		TAG_LAPS							= "laps";
+	private static final String		TAG_LAPS							= "laps"; //$NON-NLS-1$
 	private static final String		TAG_LAP								= "lap";																//$NON-NLS-1$
-	private static final String		TAG_LAP_DURATION					= "duration";
-	private static final String		TAG_LAP_DISTANCE					= "distance";
+	private static final String		TAG_LAP_DURATION					= "duration"; //$NON-NLS-1$
+	private static final String		TAG_LAP_DISTANCE					= "distance"; //$NON-NLS-1$
 	//
 	private static final String		TAG_SAMPLES							= "samples";															//$NON-NLS-1$
-	private static final String		TAG_SAMPLE							= "sample";
-	private static final String		TAG_SAMPLE_TYPE						= "type";
-	private static final String		TAG_SAMPLE_VALUES					= "values";
+	private static final String		TAG_SAMPLE							= "sample"; //$NON-NLS-1$
+	private static final String		TAG_SAMPLE_TYPE						= "type"; //$NON-NLS-1$
+	private static final String		TAG_SAMPLE_VALUES					= "values"; //$NON-NLS-1$
 	//
-	private static final String		TAG_USER_SETTINGS					= "user-settings";
-	private static final String		TAG_USER_SETTINGS_RESTING			= "resting";
+	private static final String		TAG_USER_SETTINGS					= "user-settings"; //$NON-NLS-1$
+	private static final String		TAG_USER_SETTINGS_RESTING			= "resting"; //$NON-NLS-1$
 
 	//
 	private boolean					_isPolarDataValid					= false;
@@ -207,7 +208,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 		@Override
 		public String toString() {
-			return "Lap [duration=" + duration + ", distance=" + distance + "]";
+			return "Lap [duration=" + duration + ", distance=" + distance + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 	}
@@ -306,7 +307,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 				_laps.add(_currentLap);
 
 				if (_isDebug) {
-					System.out.println("\t" + _currentLap);
+					System.out.println("\t" + _currentLap); //$NON-NLS-1$
 				}
 
 			} else if (name.equals(TAG_USER_SETTINGS)) {
@@ -377,7 +378,8 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final Long tourId = tourData.createTourId(_device.createUniqueId(tourData, "63193"));
+		final Long tourId = tourData
+				.createTourId(_device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_TRAINER));
 
 		// check if the tour is already imported
 		if (_tourDataMap.containsKey(tourId) == false) {
@@ -463,7 +465,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 		if (timeInterval == 0) {
 			throw new InvalidDeviceSAXException(NLS.bind(
-					"Tour time interval cannot be determined in: {0}",
+					"Tour time interval cannot be determined in: {0}", //$NON-NLS-1$
 					_importFilePath));
 		}
 
@@ -860,7 +862,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 			final ArrayList<String> floatStrings = new ArrayList<String>();
 
-			final StringTokenizer tokenizer = new StringTokenizer(valueString, ",");
+			final StringTokenizer tokenizer = new StringTokenizer(valueString, UI.KOMMA);
 			while (tokenizer.hasMoreElements()) {
 				floatStrings.add((String) tokenizer.nextElement());
 			}
@@ -1029,7 +1031,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 				}
 			}
 
-			throw new InvalidDeviceSAXException(NLS.bind("Polar xml data are not valid in: {0}", _importFilePath));
+			throw new InvalidDeviceSAXException(NLS.bind("Polar xml data are not valid in: {0}", _importFilePath)); //$NON-NLS-1$
 
 		}
 	}

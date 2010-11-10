@@ -21,9 +21,11 @@ public class UI {
 	public static final String	SPACE			= " ";				//$NON-NLS-1$
 	public static final char	DASH			= '-';
 	public static final String	DASH_WITH_SPACE	= " - ";			//$NON-NLS-1$
+	public static final String	KOMMA			= ",";				//$NON-NLS-1$
 	public static final String	NEW_LINE		= "\n";			//$NON-NLS-1$
 	public static final String	DOTS			= "...";			//$NON-NLS-1$
 	public static final String	MBYTES			= "MByte";			//$NON-NLS-1$
+
 	public static final String	UTF_8			= "UTF-8";			//$NON-NLS-1$
 
 	/**

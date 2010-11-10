@@ -19,15 +19,15 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 	public void onMesg(FileIdMesg mesg) {
 		File type = mesg.getType();
 		if (type != File.ACTIVITY) {
-			throw new FitActivityReaderException("Invalid file type: "
+			throw new FitActivityReaderException("Invalid file type: " //$NON-NLS-1$
 					+ type.name()
-					+ ", expected: "
+					+ ", expected: " //$NON-NLS-1$
 					+ File.ACTIVITY.name());
 		}
 
 		Long serialNumber = mesg.getSerialNumber();
 		if (serialNumber == null) {
-			throw new FitActivityReaderException("File serial number is missing");
+			throw new FitActivityReaderException("File serial number is missing"); //$NON-NLS-1$
 		}
 
 		context.setDeviceId(serialNumber.toString());

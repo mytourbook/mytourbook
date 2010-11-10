@@ -43,16 +43,14 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-	public static final String	UTF_8					= "UTF-8";										//$NON-NLS-1$
-
-	private static final double	EARTH_RADIUS			= 6371;										// km
+//	private static final double	EARTH_RADIUS							= 6371;										// km
 
 	// WGS-84 Ellipsoid
-	private static final double	HALBACHSE_A				= 6378.137;
-	private static final double	HALBACHSE_B				= 6356.7523142;
+	private static final double	HALBACHSE_A								= 6378.137;
+	private static final double	HALBACHSE_B								= 6356.7523142;
 
 	// = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
-	private static final double	ABPLATTUNG_F			= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
+	private static final double	ABPLATTUNG_F							= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
 
 	//http://www.kowoma.de/gps/geo/mapdatum/mapdatums.php
 	//EUROPEAN 1950/1979, Western Europe
@@ -60,8 +58,17 @@ public class Util {
 	//static final double HALBACHSE_B = 6356.911946;
 	//static final double ABPLATTUNG_F = 1/297....;
 
-	private static final String	URL_SPACE				= " ";											//$NON-NLS-1$
-	private static final String	URL_SPACE_REPLACEMENT	= "%20";										//$NON-NLS-1$
+	private static final String	URL_SPACE								= " ";											//$NON-NLS-1$
+	private static final String	URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
+
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168"; //$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -590,6 +597,26 @@ public class Util {
 			// do nothing
 		}
 		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
+	 */
+	public static int parseInt0(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Integer.parseInt(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return 0;
 	}
 
 	/**
