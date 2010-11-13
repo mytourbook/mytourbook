@@ -53,6 +53,14 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	private static final String	TOUR_CSV_ID			= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 
+	/**
+	 * This header is a modified header for {@link #TOUR_CSV_ID} with a semikolon instead of a komma
+	 * after
+	 * <p>
+	 * <i>Paused Time (sec);</i>
+	 */
+	private static final String	TOUR_CSV_ID_2		= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
+
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
 
@@ -85,6 +93,15 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	public int getTransferDataSize() {
 		return -1;
+	}
+
+	private boolean isFileValid(final String fileHeader) {
+
+		if (fileHeader.startsWith(TOUR_CSV_ID) || fileHeader.startsWith(TOUR_CSV_ID_2) == false) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void parseDate(final TourData tourData, final String nextToken) {
@@ -250,7 +267,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
 			// check file header
 			final String fileHeader = fileReader.readLine();
-			if (fileHeader.startsWith(TOUR_CSV_ID) == false) {
+			if (isFileValid(fileHeader) == false) {
 				return false;
 			}
 
@@ -371,11 +388,7 @@ public class CSVTourDataReader extends TourbookDevice {
 			fileReader = new BufferedReader(new FileReader(fileName));
 
 			final String fileHeader = fileReader.readLine();
-			if (fileHeader == null) {
-				return false;
-			}
-
-			if (fileHeader.startsWith(TOUR_CSV_ID) == false) {
+			if (fileHeader == null || isFileValid(fileHeader) == false) {
 				return false;
 			}
 
