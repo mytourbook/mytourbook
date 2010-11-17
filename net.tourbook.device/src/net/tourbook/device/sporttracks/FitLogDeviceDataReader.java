@@ -92,7 +92,11 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 			/*
 			 * .fitlog files contain BOM's (Byte Order Mark)
 			 */
-			FileUtils.consumeBOM(inputStream, UI.UTF_8);
+			try {
+				FileUtils.consumeBOM(inputStream, UI.UTF_8);
+			} catch (final IOException e) {
+				// just ignore it
+			}
 
 			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 

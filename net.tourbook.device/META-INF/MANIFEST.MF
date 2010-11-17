@@ -2,12 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader
 Bundle-SymbolicName: net.tourbook.device;singleton:=true
-Bundle-Version: 10.10.0.qualifier
+Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.device.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui;bundle-version="3.6.1",
+ org.eclipse.ui,
  net.tourbook,
- org.eclipse.jface,
  net.tourbook.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device

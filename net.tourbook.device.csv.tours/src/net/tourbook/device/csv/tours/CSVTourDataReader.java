@@ -97,7 +97,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	private boolean isFileValid(final String fileHeader) {
 
-		if (fileHeader.startsWith(TOUR_CSV_ID) || fileHeader.startsWith(TOUR_CSV_ID_2) == false) {
+		if (fileHeader.startsWith(TOUR_CSV_ID) || fileHeader.startsWith(TOUR_CSV_ID_2)) {
 			return true;
 		}
 
@@ -242,7 +242,6 @@ public class CSVTourDataReader extends TourbookDevice {
 			if (newSavedTourType != null) {
 				tourType = newSavedTourType;
 			}
-
 		}
 
 		tourData.setTourType(tourType);
@@ -271,7 +270,7 @@ public class CSVTourDataReader extends TourbookDevice {
 				return false;
 			}
 
-			StringTokenizer tokenizer;
+//			StringTokenizer tokenizer;
 			String tokenLine;
 
 			// read all tours, each line is one tour
@@ -285,25 +284,29 @@ public class CSVTourDataReader extends TourbookDevice {
 
 				try {
 
-					tokenizer = new StringTokenizer(tokenLine, CSV_TOKEN_SEPARATOR);
+					/*
+					 * The split method is used because the Tokenizer ignores empty tokens !!!
+					 */
 
-					parseDate(tourData, tokenizer.nextToken());//						1 Date (yyyy-mm-dd);
-					parseTime(tourData, tokenizer.nextToken());//						2 Time (hh-mm);
+					final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR);
 
-					duration = Integer.parseInt(tokenizer.nextToken()); //				3 Duration (sec);
+					parseDate(tourData, allToken[0]);//							1 Date (yyyy-mm-dd);
+					parseTime(tourData, allToken[1]);//							2 Time (hh-mm);
+
+					duration = Integer.parseInt(allToken[2]); //				3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
 
-					pausedTime = Integer.parseInt(tokenizer.nextToken()); //			4 Paused Time (sec),
+					pausedTime = Integer.parseInt(allToken[3]); //				4 Paused Time (sec),
 					tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
 
-					distance = Integer.parseInt(tokenizer.nextToken());//				5 Distance (m);
+					distance = Integer.parseInt(allToken[4]);//					5 Distance (m);
 					tourData.setTourDistance(distance);
 
-					tourData.setTourTitle(tokenizer.nextToken());//						6 Title;
-					tourData.setTourDescription(tokenizer.nextToken());//				7 Comment;
+					tourData.setTourTitle(allToken[5]);//						6 Title;
+					tourData.setTourDescription(allToken[6]);//					7 Comment;
 
-					isNewTourType |= parseTourType(tourData, tokenizer.nextToken());//	8 Tour Type;
-					isNewTag |= parseTags(tourData, tokenizer.nextToken());//			9 Tags;
+					isNewTourType |= parseTourType(tourData, allToken[7]);//	8 Tour Type;
+					isNewTag |= parseTags(tourData, allToken[8]);//				9 Tags;
 
 				} catch (final NoSuchElementException e) {
 					// not all tokens are defined

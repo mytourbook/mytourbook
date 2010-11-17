@@ -6,10 +6,10 @@
 		copy all project files from "mytourbook-TRUNK" into the build folder "mytourbook-BUILD-temp"
 	-->
 
-	<property name="path-mt-trunk" value="../../mytourbook-TRUNK" />
-	<property name="path-mt-trunk.nl" value="../../mytourbook-TRUNK.nl" />
+	<property name="path-mt-trunk" value="../../mytourbook" />
+	<property name="path-mt-trunk.nl" value="../../mytourbook/LANGUAGE-FRAGMENTS" />
 
-	<property name="path-mt-build" value="../../mytourbook-BUILD-autocreated" />
+	<property name="path-mt-build" value="../../../mytourbook-BUILD-autocreated" />
 
 	<property name="path-build-core" value="${path-mt-build}/core" />
 	<property name="path-build-translation" value="${path-mt-build}/translation" />
@@ -62,7 +62,12 @@
 
 				<include name="net.tourbook*/**/*" />
 				<include name="de.byteholder*/**/*" />
-				<include name="feature*/**/*" />
+				<include name="org.apache.derby*/**" />
+				
+				<!--
+				<include name="FEATURES/**" />
+				<include name="INSTALL-UPDATES/**" />
+				-->
 
 				<exclude name="**/plugin_*.properties" />
 				<exclude name="**/feature_*.properties" />

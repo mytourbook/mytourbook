@@ -255,6 +255,8 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_EndPlace;
 	public static String		Db_Field_TourData_StartPlace;
 	public static String		Db_Field_TourData_Title;
+
+	public static String	Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;

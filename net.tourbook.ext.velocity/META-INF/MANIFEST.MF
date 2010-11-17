@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
 Bundle-SymbolicName: net.tourbook.ext.velocity;singleton:=true
-Bundle-Version: 10.10.0.qualifier
+Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,

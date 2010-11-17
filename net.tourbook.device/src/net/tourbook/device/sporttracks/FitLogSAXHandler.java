@@ -46,30 +46,29 @@ import org.xml.sax.helpers.DefaultHandler;
 public class FitLogSAXHandler extends DefaultHandler {
 
 	private static final String						TAG_ACTIVITY				= "Activity";							//$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_CADENCE		= "Cadence"; //$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_CADENCE		= "Cadence";							//$NON-NLS-1$
 	private static final String						TAG_ACTIVITY_CALORIES		= "Calories";							//$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_CATEGORY		= "Category"; //$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_DURATION		= "Duration"; //$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_DISTANCE		= "Distance"; //$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_ELEVATION		= "Elevation"; //$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_EQUIPMENT_ITEM	= "EquipmentItem"; //$NON-NLS-1$
-	private static final String						TAG_ACTIVITY_HEART_RATE		= "HeartRate"; //$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_CATEGORY		= "Category";							//$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_DURATION		= "Duration";							//$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_DISTANCE		= "Distance";							//$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_ELEVATION		= "Elevation";							//$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_EQUIPMENT_ITEM	= "EquipmentItem";						//$NON-NLS-1$
+	private static final String						TAG_ACTIVITY_HEART_RATE		= "HeartRate";							//$NON-NLS-1$
 	private static final String						TAG_ACTIVITY_LOCATION		= "Location";							//$NON-NLS-1$
 	private static final String						TAG_ACTIVITY_NAME			= "Name";								//$NON-NLS-1$
 	private static final String						TAG_ACTIVITY_NOTES			= "Notes";								//$NON-NLS-1$
 	private static final String						TAG_ACTIVITY_WEATHER		= "Weather";							//$NON-NLS-1$
 
-	private static final String						ATTRIB_NAME					= "Name"; //$NON-NLS-1$
+	private static final String						ATTRIB_NAME					= "Name";								//$NON-NLS-1$
 	private static final String						ATTRIB_START_TIME			= "StartTime";							//$NON-NLS-1$
-	private static final String						ATTRIB_TOTAL_SECONDS		= "TotalSeconds"; //$NON-NLS-1$
-	private static final String						ATTRIB_TOTAL_METERS			= "TotalMeters"; //$NON-NLS-1$
+	private static final String						ATTRIB_TOTAL_SECONDS		= "TotalSeconds";						//$NON-NLS-1$
+	private static final String						ATTRIB_TOTAL_METERS			= "TotalMeters";						//$NON-NLS-1$
 	private static final String						ATTRIB_TOTAL_CAL			= "TotalCal";							//$NON-NLS-1$
-	private static final String						ATTRIB_ASCEND_METERS		= "AscendMeters"; //$NON-NLS-1$
-	private static final String						ATTRIB_DESCEND_METERS		= "DescendMeters"; //$NON-NLS-1$
-	private static final String						ATTRIB_AVERAGE_BPM			= "AverageBPM"; //$NON-NLS-1$
-	private static final String						ATTRIB_MAXIMUM_BPM			= "MaximumBPM"; //$NON-NLS-1$
-	private static final String						ATTRIB_AVERAGE_RPM			= "AverageRPM"; //$NON-NLS-1$
-//	private static final String						ATTRIB_MAXIMUM_RPM			= "MaximumRPM";
+	private static final String						ATTRIB_ASCEND_METERS		= "AscendMeters";						//$NON-NLS-1$
+	private static final String						ATTRIB_DESCEND_METERS		= "DescendMeters";						//$NON-NLS-1$
+	private static final String						ATTRIB_AVERAGE_BPM			= "AverageBPM";						//$NON-NLS-1$
+	private static final String						ATTRIB_MAXIMUM_BPM			= "MaximumBPM";						//$NON-NLS-1$
+	private static final String						ATTRIB_AVERAGE_RPM			= "AverageRPM";						//$NON-NLS-1$
 	private static final String						ATTRIB_WEATHER_TEMP			= "Temp";								//$NON-NLS-1$
 	private static final String						ATTRIB_WEATHER_CONDITIONS	= "Conditions";						//$NON-NLS-1$
 	//
@@ -140,10 +139,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 		private ArrayList<Lap>		laps				= new ArrayList<Lap>();
 		private ArrayList<String>	equipmentName		= new ArrayList<String>();
 
-		private DateTime			tourDateTime;
-		private long				tourStartTime		= Long.MIN_VALUE;
-		private DateTime			trackTourDateTime;
-		private long				trackTourStartTime	= Long.MIN_VALUE;
+		private DateTime			tourStartTime;
+		private long				tourStartTimeMills	= Long.MIN_VALUE;
+//		private DateTime			trackTourDateTime;
+//		private long				trackTourStartTime	= Long.MIN_VALUE;
 
 		private String				location;
 		private String				name;
@@ -231,29 +230,29 @@ public class FitLogSAXHandler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		DateTime tourDateTime = _currentActivity.trackTourDateTime;
-		final long trackStartTime = _currentActivity.trackTourStartTime;
-		if (trackStartTime != Long.MIN_VALUE && trackStartTime < 0) {
+//		DateTime tourDateTime = _currentActivity.trackTourDateTime;
+//		final long trackStartTime = _currentActivity.trackTourStartTime;
+//		if (trackStartTime != Long.MIN_VALUE && trackStartTime < 0) {
+//
+//			// this case occured, e.g. year was 0002
+//			tourDateTime = _currentActivity.tourStartTime;
+//
+//		} else if (tourDateTime == null) {
+//
+//			// this case can occure when a tour do not have a track
+//			tourDateTime = _currentActivity.tourStartTime;
+//		}
+		final DateTime tourStartTime = _currentActivity.tourStartTime;
 
-			// this case occured, e.g. year was 0002
-			tourDateTime = _currentActivity.tourDateTime;
+		tourData.setStartHour((short) tourStartTime.getHourOfDay());
+		tourData.setStartMinute((short) tourStartTime.getMinuteOfHour());
+		tourData.setStartSecond((short) tourStartTime.getSecondOfMinute());
 
-		} else if (tourDateTime == null) {
+		tourData.setStartYear((short) tourStartTime.getYear());
+		tourData.setStartMonth((short) tourStartTime.getMonthOfYear());
+		tourData.setStartDay((short) tourStartTime.getDayOfMonth());
 
-			// this case can occure when a tour do not have a track
-			tourDateTime = _currentActivity.tourDateTime;
-		}
-		final DateTime tourStart = tourDateTime;
-
-		tourData.setStartHour((short) tourStart.getHourOfDay());
-		tourData.setStartMinute((short) tourStart.getMinuteOfHour());
-		tourData.setStartSecond((short) tourStart.getSecondOfMinute());
-
-		tourData.setStartYear((short) tourStart.getYear());
-		tourData.setStartMonth((short) tourStart.getMonthOfYear());
-		tourData.setStartDay((short) tourStart.getDayOfMonth());
-
-		tourData.setWeek(tourStart);
+		tourData.setWeek(tourStartTime);
 
 		tourData.setTourTitle(_currentActivity.name);
 		tourData.setTourDescription(_currentActivity.notes);
@@ -387,7 +386,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 		tourData.setTourType(tourType);
 
-		_isNewTourType = newSavedTourType != null;
+		_isNewTourType |= newSavedTourType != null;
 	}
 
 	private void finalizeTour20SetTags(final TourData tourData) {
@@ -458,7 +457,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 			tourData.setTourTags(tourTags);
 		}
 
-		_isNewTag = isNewTag;
+		_isNewTag |= isNewTag;
 	}
 
 	private void finalizeTour30CreateMarkers(final TourData tourData) {
@@ -479,14 +478,14 @@ public class FitLogSAXHandler extends DefaultHandler {
 		/*
 		 * tour and track can have different start times
 		 */
-		final long tourStartTime = _currentActivity.tourStartTime;
-		final long tour2sliceTimeDiff = _currentActivity.trackTourStartTime - tourStartTime;
+		final long tourStartTime = _currentActivity.tourStartTimeMills;
+//		final long tour2sliceTimeDiff = _currentActivity.trackTourStartTime - tourStartTime;
 
 		int lapCounter = 1;
 
 		for (final Lap lap : _laps) {
 
-			final long startTimeDiff = lap.lapStartTime - tourStartTime - tour2sliceTimeDiff;
+			final long startTimeDiff = lap.lapStartTime - tourStartTime;// - tour2sliceTimeDiff;
 			long lapRelativeTime = startTimeDiff / 1000;
 			int serieIndex = 0;
 
@@ -535,10 +534,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 		_prevLongitude = Double.MIN_VALUE;
 
 		final String startTime = attributes.getValue(ATTRIB_START_TIME);
-
 		if (startTime != null) {
-			_currentActivity.tourDateTime = _dtParser.parseDateTime(startTime);
-			_currentActivity.tourStartTime = _currentActivity.tourDateTime.getMillis();
+			final DateTime tourDateTime = _dtParser.parseDateTime(startTime);
+			_currentActivity.tourStartTime = tourDateTime;
+			_currentActivity.tourStartTimeMills = tourDateTime.getMillis();
 		}
 	}
 
@@ -685,31 +684,30 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private void parseTrack(final Attributes attributes) {
-
-		final String startTime = attributes.getValue(ATTRIB_START_TIME);
-
-		if (startTime != null) {
-			_currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
-			_currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
-		}
-	}
+//	private void parseTrack(final Attributes attributes) {
+//
+//		final String startTime = attributes.getValue(ATTRIB_START_TIME);
+//
+//		if (startTime != null) {
+//			_currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
+//			_currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
+//		}
+//	}
 
 	private void parseTrackPoints(final String name, final Attributes attributes) throws InvalidDeviceSAXException {
 
 		if (name.equals(TAG_TRACK_PT)) {
 
-			if (_currentActivity.tourStartTime == Long.MIN_VALUE
-					|| _currentActivity.trackTourStartTime == Long.MIN_VALUE) {
+			if (_currentActivity.tourStartTimeMills == Long.MIN_VALUE) {
 				throw new InvalidDeviceSAXException(NLS.bind(Messages.FitLog_Error_InvalidStartTime, _importFilePath));
 			}
 
 			final TimeData timeSlice = new TimeData();
 
 			// relative time in seconds
-			final long longValue = Util.parseLong(attributes, ATTRIB_PT_TM);
-			if (longValue != Long.MIN_VALUE) {
-				timeSlice.absoluteTime = _currentActivity.trackTourStartTime + (longValue * 1000);
+			final long tmValue = Util.parseLong(attributes, ATTRIB_PT_TM);
+			if (tmValue != Long.MIN_VALUE) {
+				timeSlice.absoluteTime = _currentActivity.tourStartTimeMills + (tmValue * 1000);
 			}
 
 			final double tpDistance = Util.parseDouble(attributes, ATTRIB_PT_DIST);
@@ -764,7 +762,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 			_isInTrack = true;
 
-			parseTrack(attributes);
+//			parseTrack(attributes);
 
 		} else if (name.equals(TAG_LAPS)) {
 

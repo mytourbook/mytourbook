@@ -99,11 +99,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private static AdjustmentType[]			ALL_ADJUSTMENT_TYPES				= new AdjustmentType[] {
 			new AdjustmentType(ADJUST_TYPE_SRTM_SPLINE, Messages.adjust_altitude_type_srtm_spline),
 			new AdjustmentType(ADJUST_TYPE_SRTM, Messages.adjust_altitude_type_srtm),
-			new AdjustmentType(ADJUST_TYPE_HORIZONTAL_GEO_POSITION, Messages.Adjust_Altitude_Type_HorizontalGeoPosition),
 			new AdjustmentType(ADJUST_TYPE_START_AND_END, Messages.adjust_altitude_type_start_and_end),
 			new AdjustmentType(ADJUST_TYPE_MAX_HEIGHT, Messages.adjust_altitude_type_adjust_height),
 			new AdjustmentType(ADJUST_TYPE_END, Messages.adjust_altitude_type_adjust_end),
 			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, Messages.adjust_altitude_type_adjust_whole_tour),
+			new AdjustmentType(ADJUST_TYPE_HORIZONTAL_GEO_POSITION, Messages.Adjust_Altitude_Type_HorizontalGeoPosition),
 																				//
 																				};
 

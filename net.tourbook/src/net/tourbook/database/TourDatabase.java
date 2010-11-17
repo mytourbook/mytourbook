@@ -803,25 +803,44 @@ public class TourDatabase {
 	 * @param field
 	 * @param maxLength
 	 * @param uiFieldName
+	 * @param isForceTruncation
 	 * @return Returns {@link FIELD_VALIDATION} status
 	 */
-	public static FIELD_VALIDATION isFieldValidForSave(final String field, final int maxLength, final String uiFieldName) {
+	public static FIELD_VALIDATION isFieldValidForSave(	final String field,
+														final int maxLength,
+														final String uiFieldName,
+														final boolean isForceTruncation) {
+
+		final FIELD_VALIDATION[] returnValue = { FIELD_VALIDATION.IS_VALID };
 
 		if (field != null && field.length() > maxLength) {
 
-			if (MessageDialog.openConfirm(
-					Display.getDefault().getActiveShell(),
-					Messages.Tour_Database_Dialog_ValidateFields_Title,
-					NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message, //
-							new Object[] { uiFieldName, field.length(), maxLength }))) {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
 
-				return FIELD_VALIDATION.TRUNCATE;
-			} else {
-				return FIELD_VALIDATION.IS_INVALID;
-			}
+					if (isForceTruncation) {
+						returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+						StatusUtil.log(new Exception(NLS.bind(
+								"Field \"{0}\" with content \"{1}\" is truncated to {2} characters.",//$NON-NLS-1$
+								new Object[] { uiFieldName, field, maxLength })));
+						return;
+					}
+
+					if (MessageDialog.openConfirm(
+							Display.getDefault().getActiveShell(),
+							Messages.Tour_Database_Dialog_ValidateFields_Title,
+							NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message, //
+									new Object[] { uiFieldName, field.length(), maxLength }))) {
+
+						returnValue[0] = FIELD_VALIDATION.TRUNCATE;
+					} else {
+						returnValue[0] = FIELD_VALIDATION.IS_INVALID;
+					}
+				}
+			});
 		}
 
-		return FIELD_VALIDATION.IS_VALID;
+		return returnValue[0];
 	}
 
 	/**
@@ -1125,6 +1144,13 @@ public class TourDatabase {
 		 */
 		if (tourData.getTourPerson() == null) {
 			StatusUtil.log("Cannot save a tour without a person: " + tourData); //$NON-NLS-1$
+			return null;
+		}
+
+		/*
+		 * check size of the fields
+		 */
+		if (tourData.isValidForSave() == false) {
 			return null;
 		}
 
