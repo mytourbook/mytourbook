@@ -543,7 +543,7 @@ public class TourInfoUI {
 
 	private void createUI50LowerPart(final Composite parent) {
 
-		if (_hasTags == false && _hasDescription == false && _hasWeather == false) {
+		if (_hasTags == false && _hasDescription == false && _hasWeather == false && _hasTourType == false) {
 			return;
 		}
 
@@ -563,10 +563,7 @@ public class TourInfoUI {
 			if (_hasTourType) {
 
 				label = createUILabel(container, Messages.Tour_Tooltip_Label_TourType);
-				GridDataFactory
-						.fillDefaults()
-						.align(SWT.FILL, SWT.BEGINNING)
-						.applyTo(label);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 				_firstColumnControls.add(label);
 
 				_lblTourTypeText = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
@@ -582,10 +579,7 @@ public class TourInfoUI {
 			if (_hasTags) {
 
 				label = createUILabel(container, Messages.Tour_Tooltip_Label_Tags);
-				GridDataFactory
-						.fillDefaults()
-						.align(SWT.FILL, SWT.BEGINNING)
-						.applyTo(label);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 				_firstColumnControls.add(label);
 
 				_lblTourTags = createUILabelValue(container, SWT.LEAD | SWT.WRAP);

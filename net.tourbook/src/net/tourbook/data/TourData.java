@@ -4209,7 +4209,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
 				tourTitle,
 				DB_LENGTH_TOUR_TITLE,
-				Messages.Db_Field_TourData_Title);
+				Messages.Db_Field_TourData_Title,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4223,7 +4224,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourDescription,
 				DB_LENGTH_TOUR_DESCRIPTION_V10,
-				Messages.Db_Field_TourData_Description);
+				Messages.Db_Field_TourData_Description,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4237,7 +4239,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourStartPlace,
 				DB_LENGTH_TOUR_START_PLACE,
-				Messages.Db_Field_TourData_StartPlace);
+				Messages.Db_Field_TourData_StartPlace,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4251,7 +4254,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourEndPlace,
 				DB_LENGTH_TOUR_END_PLACE,
-				Messages.Db_Field_TourData_EndPlace);
+				Messages.Db_Field_TourData_EndPlace,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4260,12 +4264,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		/*
+		 * check: tour import file path
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourImportFilePath,
+				DB_LENGTH_TOUR_IMPORT_FILE_PATH,
+				Messages.Db_Field_TourData_TourImportFilePath,
+				true);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourImportFilePath = tourImportFilePath.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_PATH);
+		}
+
+		/*
 		 * check: weather
 		 */
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				weather,
 				DB_LENGTH_WEATHER,
-				Messages.Db_Field_TourData_Weather);
+				Messages.Db_Field_TourData_Weather,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
