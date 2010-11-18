@@ -87,6 +87,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
@@ -424,6 +425,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean								_isWindSpeedManuallyModified;
 	private boolean								_isTemperatureManuallyModified;
+
+	private boolean								_isSetDigits					= false;
 
 	/*
 	 * measurement unit values
@@ -3369,6 +3372,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
+
+					if (_isSetDigits) {
+						_isSetDigits = false;
+						return;
+					}
+
 					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
@@ -5290,8 +5299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			try {
 				TourManager.checkTourData(selectedTourData, _tourData);
 			} catch (final MyTourbookException e) {
-				System.out.println("Selection:" + selection);//$NON-NLS-1$
-				e.printStackTrace();
+				StatusUtil.log("Selection:" + selection,e);//$NON-NLS-1$
 			}
 		}
 
@@ -6601,6 +6609,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			avgTemperature = (int) ((imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
 		}
 
+		/*
+		 * on Linux .setDigit() fires an asynch selection event that the flag _isSetField is not
+		 * recognized
+		 */
+		_isSetDigits = true;
 		_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
 		_spinTemperature.setSelection(avgTemperature);
 
