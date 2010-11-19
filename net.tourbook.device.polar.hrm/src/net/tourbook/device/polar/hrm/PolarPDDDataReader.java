@@ -17,9 +17,12 @@ package net.tourbook.device.polar.hrm;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -31,6 +34,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StatusUtil;
+import net.tourbook.util.UI;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.runtime.IPath;
@@ -387,9 +391,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		try {
 
-			String line;
-			fileReader = new BufferedReader(new FileReader(_importFilePath));
+			// fileReader = new BufferedReader(new FileReader(_importFilePath));
 
+			// the default charset has not handled correctly the german umlaute in uppercase on Linux/OSX
+			fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(_importFilePath), UI.ISO_8859_1));
+
+			String line;
 			while ((line = fileReader.readLine()) != null) {
 
 				boolean isValid = true;
@@ -455,7 +462,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 * [DayInfo]
 	 * 100         1           4           6            1       512		// row 0
 	 * 20011116    1           65         20         7500     25200		// row 1
-	 * ...         														// row 2 … n
+	 * ...         														// row 2 ï¿½ n
 	 * Day note text                									// text row
 	 * </pre>
 	 * 
@@ -532,12 +539,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 * 
 	 * [ExerciseInfo1]
 	 * 101       1           12         6           12         512          // row 0
-	 * ...                        											// row 1 … n
+	 * ...                        											// row 1 ï¿½ n
 	 * exercise name              											// text row 0
 	 * exercise note text                    								// text row 1
 	 * attached hrm file (if in same folder, no folder info with file name) // text row 2
 	 * reserved text                 										// text row 3
-	 * …                       												// text row 4 … n
+	 * ï¿½                       												// text row 4 ï¿½ n
 	 * </pre>
 	 * 
 	 * @param fileReader
@@ -606,8 +613,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 			 * 3:	Not edited manually  	0
 			 * 4:	- Reserved -  			0
 			 * 5:	Start time  			36000   	Seconds (from midnight 0:00:00) 36000 = 10:00:00
-			 * 6:	Total time  			2700        Seconds 2700 = 0:45:00, 0 – 99 h 59 min, for one
-			 * 											phase 10 s – 99 min 59 s
+			 * 6:	Total time  			2700        Seconds 2700 = 0:45:00, 0 ï¿½ 99 h 59 min, for one
+			 * 											phase 10 s ï¿½ 99 min 59 s
 			 * </pre>
 			 */
 
