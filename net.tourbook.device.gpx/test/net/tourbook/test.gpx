@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="manually edited"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1"
+	xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+	xsi:schemaLocation="http://www.topografix.com/GPX/1/1
+http://www.topografix.com/GPX/1/1/gpx.xsd
+http://www.garmin.com/xmlschemas/GpxExtensions/v3
+http://www.garmin.com/xmlschemas/GpxExtensions/v3/GpxExtensionsv3.xsd
+http://www.garmin.com/xmlschemas/TrackPointExtension/v1
+http://www.garmin.com/xmlschemas/TrackPointExtension/v1/TrackPointExtensionv1.xsd">
+	<wpt lat="47.5674099" lon="9.47741068">
+		<ele>394.0</ele>
+		<time>2010-10-10T10:30:00Z</time>
+		<name>waypoint1</name>
+		<cmt>waypoint1</cmt>
+		<desc>waypoint1</desc>
+	</wpt>
+	<!-- manual waypoint like exported from MagicMaps Tour Explorer -->
+	<wpt lat="47.5673538" lon="9.49069975">
+		<ele>0</ele>
+		<!-- error when importing in MyTourbook:
+		<time></time>
+		-->
+		<name>waypoint2</name>
+		<cmt>waypoint2</cmt>
+	</wpt>
+	<trk>
+		<name>track1</name>
+		<trkseg>
+			<trkpt lat="47.567517620" lon="9.450832423">
+				<ele>395.0</ele>
+				<time>2010-10-10T10:00:00Z</time>
+				<extensions>
+					<gpxtpx:TrackPointExtension>
+						<gpxtpx:atemp>20.0</gpxtpx:atemp>
+						<gpxtpx:hr>110</gpxtpx:hr>
+						<gpxtpx:cad>40</gpxtpx:cad>
+					</gpxtpx:TrackPointExtension>
+				</extensions>
+			</trkpt>
+			<trkpt lat="47.585505568" lon="9.450987056">
+				<ele>394.0</ele>
+				<time>2010-10-10T10:10:00Z</time>
+				<extensions>
+					<gpxtpx:TrackPointExtension>
+						<gpxtpx:atemp>21.0</gpxtpx:atemp>
+						<gpxtpx:hr>120</gpxtpx:hr>
+						<gpxtpx:cad>50</gpxtpx:cad>
+					</gpxtpx:TrackPointExtension>
+				</extensions>
+			</trkpt>
+			<trkpt lat="47.585397817" lon="9.477574415">
+				<ele>393.0</ele>
+				<time>2010-10-10T10:20:00Z</time>
+				<extensions>
+					<gpxtpx:TrackPointExtension>
+						<gpxtpx:atemp>22.0</gpxtpx:atemp>
+						<gpxtpx:hr>130</gpxtpx:hr>
+						<gpxtpx:cad>60</gpxtpx:cad>
+					</gpxtpx:TrackPointExtension>
+				</extensions>
+			</trkpt>
+			<trkpt lat="47.567409937" lon="9.477410677">
+				<ele>394.0</ele>
+				<time>2010-10-10T10:30:00Z</time>
+				<extensions>
+					<gpxtpx:TrackPointExtension>
+						<gpxtpx:atemp>21.0</gpxtpx:atemp>
+						<gpxtpx:hr>120</gpxtpx:hr>
+						<gpxtpx:cad>50</gpxtpx:cad>
+					</gpxtpx:TrackPointExtension>
+				</extensions>
+			</trkpt>
+		</trkseg>
+	</trk>
+	<!-- manual track like exported from MagicMaps Tour Explorer -->
+	<trk>
+		<name>track2</name>
+		<trkseg>
+			<trkpt lat="47.567353785" lon="9.490699746">
+				<ele>390.5</ele>
+			</trkpt>
+			<trkpt lat="47.585341631" lon="9.490868035">
+				<ele>400.0</ele>
+			</trkpt>
+			<trkpt lat="47.585224637" lon="9.517455151">
+				<ele>410.5</ele>
+			</trkpt>
+		</trkseg>
+	</trk>
+</gpx>

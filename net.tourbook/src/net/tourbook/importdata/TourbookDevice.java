@@ -15,24 +15,39 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.util.ArrayList;
+
 import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
 	/**
+	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
+	 * does not make sense for a tour program.
+	 * <p>
+	 * since version 10.11
+	 */
+	public static final int	TEMPERATURE_SCALE		= 10;
+
+	/**
 	 * Unique id for each device reader
 	 */
-	public String	deviceId;
+	public String			deviceId;
 
 	/**
 	 * Visible device name, e.g. HAC4, HAC5
 	 */
-	public String	visibleName;
+	public String			visibleName;
 
 	/**
 	 * File extension used when tour data are imported from a file
 	 */
-	public String	fileExtension;
+	public String			fileExtension;
+
+	/**
+	 * Sort priority (since version 10.11), default will sort devices to the end.
+	 */
+	public int				extensionSortPriority	= Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //	/**
@@ -50,23 +65,23 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
-	public int		importYear				= -1;
+	public int				importYear				= -1;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
 	 * created for each track
 	 */
-	public boolean	isMergeTracks			= false;
+	public boolean			isMergeTracks			= false;
 
 	/**
 	 * when <code>true</code> validate the checksum when importing data
 	 */
-	public boolean	isChecksumValidation	= true;
+	public boolean			isChecksumValidation	= true;
 
 	/**
 	 * when <code>true</code> the tour id will be created with the recording time
 	 */
-	public boolean	isCreateTourIdWithRecordingTime;
+	public boolean			isCreateTourIdWithRecordingTime;
 
 	public TourbookDevice() {}
 
@@ -89,7 +104,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
 	/**
-	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called before
+	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead,
 	 * to create recording time.
 	 * 
 	 * @param tourData
@@ -98,16 +113,17 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 *            The dummy key is used when distance serie is not available
 	 * @return Returns a unique key for a tour
 	 */
-	public String createUniqueId(final TourData tourData, final int[] distanceSerie, final String dummyKey) {
+	public String createUniqueId(final TourData tourData, final String dummyKey) {
 
 		String uniqueKey;
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 
 		if (isCreateTourIdWithRecordingTime) {
 
 			/*
 			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
 			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this will result in a NEW tour
+			 * this resulted in a NEW tour
 			 */
 			final int tourRecordingTime = tourData.getTourRecordingTime();
 
@@ -123,7 +139,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 		} else {
 
 			/*
-			 * original version to create tour id
+			 * original version to create a tour id
 			 */
 			if (distanceSerie == null) {
 				uniqueKey = dummyKey;
@@ -133,6 +149,14 @@ public abstract class TourbookDevice implements IRawDataReader {
 		}
 
 		return uniqueKey;
+	}
+
+	/**
+	 * @return Returns a list of files which are also imported additonal to the selected imported
+	 *         file or <code>null</code> otherwise.
+	 */
+	public ArrayList<String> getAdditionalImportedFiles() {
+		return null;
 	}
 
 	/**
@@ -164,6 +188,19 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	public void setMergeTracks(final boolean isMergeTracks) {
 		this.isMergeTracks = isMergeTracks;
+	}
+
+	@Override
+	public String toString() {
+		return "TourbookDevice [deviceId=" //$NON-NLS-1$
+				+ deviceId
+				+ ", visibleName=" //$NON-NLS-1$
+				+ visibleName
+				+ ", fileExtension=" //$NON-NLS-1$
+				+ fileExtension
+				+ ", extensionSortPriority=" //$NON-NLS-1$
+				+ extensionSortPriority
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

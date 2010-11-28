@@ -53,7 +53,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL;
+			final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL;
 
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeComputedDiffSegment", SWT.TRAIL); //$NON-NLS-1$
 			
@@ -72,7 +72,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
-			String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_VERTICAL;
+			final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_VERTICAL;
 
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDiffSegBorder", SWT.TRAIL); //$NON-NLS-1$
 			
@@ -307,6 +307,22 @@ public abstract class TableColumnFactory {
 			colDef.setColumnUnit(Messages.ColumnFactory_calories);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_calories_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory CLOUDS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "weatherClouds", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_clouds_label);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_clouds_tooltip);
+
+			colDef.setDefaultColumnWidth(18);
 			
 			return colDef;
 		};
@@ -834,6 +850,25 @@ public abstract class TableColumnFactory {
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
+			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory TOUR_TIME_OF_DAY_HH_MM_SS = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(12);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourDayTimeHHMMSS", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_Tour_DayTime);
+			colDef.setColumnHeader(Messages.ColumnFactory_Tour_DayTime);
+			colDef.setColumnUnit(Messages.ColumnFactory_tour_time_hhmmss);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_Tour_DayTime_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
 			return colDef;
 		};
 	};

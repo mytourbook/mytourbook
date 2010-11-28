@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -35,6 +36,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.util.PixelConverter;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -205,13 +207,6 @@ public class UI {
 	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";						//$NON-NLS-1$
 	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";				//$NON-NLS-1$
 
-	public static final String								IMAGE_WEATHER_SUNNY				= "weather-sunny";							//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_CLOUDY			= "weather-cloudy";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_CLOUDS			= "weather-clouds";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_LIGHTNING			= "weather-lightning";						//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_RAIN				= "weather-rain";							//$NON-NLS-1$
-	public static final String								IMAGE_WEATHER_SNOW				= "weather-snow";							//$NON-NLS-1$
-
 	private static final int								TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int								TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
@@ -262,18 +257,22 @@ public class UI {
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SUNNY, //
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_sunny));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDY, //
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_cloudy));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_CLOUDS, //
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_clouds));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_LIGHTNING,//
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_lightning));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_RAIN,//
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_rain));
-		IMAGE_REGISTRY.put(IMAGE_WEATHER_SNOW,//
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,//
 				TourbookPlugin.getImageDescriptor(Messages.Image__weather_snow));
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
+		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__Weather_Severe));
 
 		/*
 		 * set styler
@@ -1014,8 +1013,7 @@ public class UI {
 
 			final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-			System.out.println(sqlExceptionText);
-			e.printStackTrace();
+			StatusUtil.log(sqlExceptionText);
 
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), //
 					"SQL Error",//$NON-NLS-1$
@@ -1024,13 +1022,19 @@ public class UI {
 			e = e.getNextException();
 		}
 
+		StatusUtil.log(e);
 	}
 
 	public static void showSQLException(final SQLException e, final String sqlStatement) {
 
+		final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$
+
 		MessageDialog.openError(Display.getCurrent().getActiveShell(), //
 				"SQL Error", //$NON-NLS-1$
-				"SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e)); //$NON-NLS-1$
+				message);
+
+		StatusUtil.log(message);
+		StatusUtil.log(e);
 	}
 
 	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {

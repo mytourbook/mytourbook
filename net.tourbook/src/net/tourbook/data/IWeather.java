@@ -5,7 +5,16 @@ import net.tourbook.ui.UI;
 
 public interface IWeather {
 
-	public static final String[]	windDirectionText	= new String[] {
+	public static final String		WEATHER_ID_CLEAR				= "weather-sunny";							//$NON-NLS-1$
+	public static final String		WEATHER_ID_PART_CLOUDS				= "weather-cloudy";						//$NON-NLS-1$
+	public static final String		WEATHER_ID_OVERCAST				= "weather-clouds";						//$NON-NLS-1$
+	public static final String		WEATHER_ID_LIGHTNING			= "weather-lightning";						//$NON-NLS-1$
+	public static final String		WEATHER_ID_RAIN					= "weather-rain";							//$NON-NLS-1$
+	public static final String		WEATHER_ID_SNOW					= "weather-snow";							//$NON-NLS-1$
+	public static final String		WEATHER_ID_SEVERE_WEATHER_ALERT	= "weather-severe";						//$NON-NLS-1$
+	public static final String		WEATHER_ID_SCATTERED_SHOWERS	= "weather-showers-scatterd";				//$NON-NLS-1$
+
+	public static final String[]	windDirectionText				= new String[] {
 			Messages.Weather_WindDirection_N,
 			Messages.Weather_WindDirection_NE,
 			Messages.Weather_WindDirection_E,
@@ -13,7 +22,7 @@ public interface IWeather {
 			Messages.Weather_WindDirection_S,
 			Messages.Weather_WindDirection_SW,
 			Messages.Weather_WindDirection_W,
-			Messages.Weather_WindDirection_NW			};
+			Messages.Weather_WindDirection_NW						};
 
 	/**
 	 * <pre>
@@ -37,7 +46,7 @@ public interface IWeather {
 	 * 
 	 * </pre>
 	 */
-	public static final String[]	windSpeedText		= new String[] {
+	public static final String[]	windSpeedText					= new String[] {
 			Messages.Weather_WindSpeed_Bft00,
 			Messages.Weather_WindSpeed_Bft01,
 			Messages.Weather_WindSpeed_Bft02,
@@ -50,9 +59,9 @@ public interface IWeather {
 			Messages.Weather_WindSpeed_Bft09,
 			Messages.Weather_WindSpeed_Bft10,
 			Messages.Weather_WindSpeed_Bft11,
-			Messages.Weather_WindSpeed_Bft12			};
+			Messages.Weather_WindSpeed_Bft12						};
 
-	public static final String[]	windSpeedTextShort	= new String[] {
+	public static final String[]	windSpeedTextShort				= new String[] {
 			Messages.Weather_WindSpeed_Bft00_Short,
 			Messages.Weather_WindSpeed_Bft01_Short,
 			Messages.Weather_WindSpeed_Bft02_Short,
@@ -65,12 +74,12 @@ public interface IWeather {
 			Messages.Weather_WindSpeed_Bft09_Short,
 			Messages.Weather_WindSpeed_Bft10_Short,
 			Messages.Weather_WindSpeed_Bft11_Short,
-			Messages.Weather_WindSpeed_Bft12_Short		};
+			Messages.Weather_WindSpeed_Bft12_Short					};
 
 	/**
 	 * Wind speed in km/h
 	 */
-	public static final int[]		windSpeedKmh		= new int[] { 0, // 0 bft
+	public static final int[]		windSpeedKmh					= new int[] { 0, // 0 bft
 			5, //	1 bft
 			11, //	2
 			19, //	3
@@ -83,9 +92,9 @@ public interface IWeather {
 			102, // 10
 			117, // 11
 			118, // 12
-														};
+																	};
 
-	public static final int[]		windSpeedMph		= new int[] { 0, // 0 bft
+	public static final int[]		windSpeedMph					= new int[] { 0, // 0 bft
 			3, //  1 bft
 			7, //  2
 			12, // 3
@@ -98,34 +107,43 @@ public interface IWeather {
 			63, // 10
 			72, // 11
 			73, // 12
-														};
+																	};
 
-	public static final String		cloudIsNotDefined	= Messages.Weather_Clounds_IsNotDefined;
+	public static final String		cloudIsNotDefined				= Messages.Weather_Clounds_IsNotDefined;
+
 	/*
-	 * _cloudText and _cloudDbValue must be in synch
+	 * cloudText and cloudDbValue must be in synch
 	 */
+
 	/**
 	 * Text for the weather
 	 */
-	public static final String[]	cloudText			= new String[] {
+	public static final String[]	cloudText						= new String[] {
 			cloudIsNotDefined,
 			Messages.Weather_Clounds_Sunny,
 			Messages.Weather_Clounds_Clouny,
 			Messages.Weather_Clounds_Clouds,
-			Messages.Weather_Clounds_Lightning,
+			Messages.Weather_Clounds_ScatteredShowers,
 			Messages.Weather_Clounds_Rain,
-			Messages.Weather_Clounds_Snow				};
+			Messages.Weather_Clounds_Lightning,
+			Messages.Weather_Clounds_Snow,
+			Messages.Weather_Clounds_SevereWeatherAlert
+																	//
+																	};
 
 	/**
 	 * Icons for the weather
 	 */
-	public static final String[]	cloudIcon			= new String[] {
+	public static final String[]	cloudIcon						= new String[] {
 			UI.IMAGE_EMPTY_16,
-			UI.IMAGE_WEATHER_SUNNY,
-			UI.IMAGE_WEATHER_CLOUDY,
-			UI.IMAGE_WEATHER_CLOUDS,
-			UI.IMAGE_WEATHER_LIGHTNING,
-			UI.IMAGE_WEATHER_RAIN,
-			UI.IMAGE_WEATHER_SNOW						};
-
+			WEATHER_ID_CLEAR,
+			WEATHER_ID_PART_CLOUDS,
+			WEATHER_ID_OVERCAST,
+			WEATHER_ID_SCATTERED_SHOWERS,
+			WEATHER_ID_RAIN,
+			WEATHER_ID_LIGHTNING,
+			WEATHER_ID_SNOW,
+			WEATHER_ID_SEVERE_WEATHER_ALERT,
+																	//
+																	};
 }

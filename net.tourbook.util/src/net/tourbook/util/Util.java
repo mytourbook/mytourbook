@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.util;
- 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,17 +39,18 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
+import org.xml.sax.Attributes;
 
 public class Util {
 
-	private static final double	EARTH_RADIUS	= 6371;										// km
+//	private static final double	EARTH_RADIUS							= 6371;										// km
 
 	// WGS-84 Ellipsoid
-	private static final double	HALBACHSE_A		= 6378.137;
-	private static final double	HALBACHSE_B		= 6356.7523142;
+	private static final double	HALBACHSE_A								= 6378.137;
+	private static final double	HALBACHSE_B								= 6356.7523142;
 
 	// = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
-	private static final double	ABPLATTUNG_F	= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
+	private static final double	ABPLATTUNG_F							= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
 
 	//http://www.kowoma.de/gps/geo/mapdatum/mapdatums.php
 	//EUROPEAN 1950/1979, Western Europe
@@ -57,8 +58,17 @@ public class Util {
 	//static final double HALBACHSE_B = 6356.911946;
 	//static final double ABPLATTUNG_F = 1/297....;
 
-	private static final String	URL_SPACE				= " ";											//$NON-NLS-1$
-	private static final String	URL_SPACE_REPLACEMENT	= "%20";										//$NON-NLS-1$
+	private static final String	URL_SPACE								= " ";											//$NON-NLS-1$
+	private static final String	URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
+
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457"; //$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168"; //$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -85,10 +95,9 @@ public class Util {
 	}
 
 	/**
-	 * To convert the InputStream to String we use the BufferedReader.readLine()
-	 * method. We iterate until the BufferedReader return null which means
-	 * there's no more data to read. Each line will appended to a StringBuilder
-	 * and returned as String.
+	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
+	 * until the BufferedReader return null which means there's no more data to read. Each line will
+	 * appended to a StringBuilder and returned as String.
 	 */
 	public static String convertStreamToString(final InputStream is) throws IOException {
 
@@ -114,8 +123,8 @@ public class Util {
 	/**
 	 * @param sourceString
 	 * @param lookFor
-	 * @return Returns the number of characters which are found in the string or -1 when the
-	 *         string is <code>null</code>
+	 * @return Returns the number of characters which are found in the string or -1 when the string
+	 *         is <code>null</code>
 	 */
 	public static int countCharacter(final String sourceString, final char lookFor) {
 
@@ -136,27 +145,8 @@ public class Util {
 	}
 
 	/**
-	 * creates a int array backup
-	 *
-	 * @param original
-	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
-	 */
-	public static int[] createDataSerieCopy(final int[] original) {
-
-		int[] backup = null;
-
-		if (original != null) {
-			final int serieLength = original.length;
-			backup = new int[serieLength];
-			System.arraycopy(original, 0, backup, 0, serieLength);
-		}
-
-		return backup;
-	}
-
-	/**
 	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
-	 *
+	 * 
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
@@ -172,6 +162,45 @@ public class Util {
 		return new DateTime(year, month, day, hour, minute, second, 0);
 	}
 
+	/**
+	 * creates a double array backup
+	 * 
+	 * @param original
+	 * @return Returns a copy of a <code>double[]</code> or <code>null</code> when the original data
+	 *         is <code>null</code>.
+	 */
+	public static double[] createDoubleCopy(final double[] original) {
+
+		double[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new double[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
+	}
+
+	/**
+	 * creates a int array backup
+	 * 
+	 * @param original
+	 * @return the backup array or <code>null</code> when the original data is <code>null</code>
+	 */
+	public static int[] createIntegerCopy(final int[] original) {
+
+		int[] backup = null;
+
+		if (original != null) {
+			final int serieLength = original.length;
+			backup = new int[serieLength];
+			System.arraycopy(original, 0, backup, 0, serieLength);
+		}
+
+		return backup;
+	}
+
 	public static Resource disposeResource(final Resource resource) {
 		if (resource != null && !resource.isDisposed()) {
 			resource.dispose();
@@ -179,31 +208,34 @@ public class Util {
 		return null;
 	}
 
-	/**
-	 * Haversine Formula to calculate distance between 2 geo points
-	 * <p>
-	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
-	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
+	/*
+	 * vincenty algorithm is much more accurate compared with haversine
 	 */
-	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
-
-		if (lat1 == lat2 && lon1 == lon2) {
-			return 0;
-		}
-
-		final double dLat = Math.toRadians(lat2 - lat1);
-		final double dLon = Math.toRadians(lon2 - lon1);
-
-		final double a = (Math.sin(dLat / 2))
-				* (Math.sin(dLat / 2))
-				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
-				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
-
-		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
-		final double km = EARTH_RADIUS * c;
-
-		return km * 1000;
-	}
+//	/**
+//	 * Haversine Formula to calculate distance between 2 geo points
+//	 * <p>
+//	 * <a href="http://en.wikipedia.org/wiki/Haversine_formula"
+//	 * >http://en.wikipedia.org/wiki/Haversine_formula</a>
+//	 */
+//	public static double distanceHaversine(final double lat1, final double lon1, final double lat2, final double lon2) {
+//
+//		if (lat1 == lat2 && lon1 == lon2) {
+//			return 0;
+//		}
+//
+//		final double dLat = Math.toRadians(lat2 - lat1);
+//		final double dLon = Math.toRadians(lon2 - lon1);
+//
+//		final double a = (Math.sin(dLat / 2))
+//				* (Math.sin(dLat / 2))
+//				+ (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)))
+//				* (Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon / 2)));
+//
+//		final double c = 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
+//		final double km = EARTH_RADIUS * c;
+//
+//		return km * 1000;
+//	}
 
 	/**
 	 * Calculates geodetic distance between two points specified by latitude/longitude using
@@ -218,7 +250,7 @@ public class Util {
 	 * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
 	 * <p>
 	 * javascript source location: http://www.movable-type.co.uk/scripts/latlong-vincenty.html
-	 *
+	 * 
 	 * @param {Number} lat1, lon1: first point in decimal degrees
 	 * @param {Number} lat2, lon2: second point in decimal degrees
 	 * @returns (Number} distance in metres between points
@@ -299,6 +331,18 @@ public class Util {
 
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
+	}
+
+	public static int getNumberOfDigits(int number) {
+
+		int counter = 0;
+
+		while (number > 0) {
+			counter++;
+			number = number / 10;
+		}
+
+		return counter;
 	}
 
 	/*
@@ -402,8 +446,8 @@ public class Util {
 
 	/**
 	 * @param combo
-	 *            combo box, the items in the combo box
-	 *            must correspond to the items in the states array
+	 *            combo box, the items in the combo box must correspond to the items in the states
+	 *            array
 	 * @param states
 	 *            array which contains all states
 	 * @param defaultState
@@ -471,7 +515,7 @@ public class Util {
 
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
-	 *
+	 * 
 	 * @param cal
 	 * @return
 	 */
@@ -493,8 +537,112 @@ public class Util {
 	}
 
 	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns double value or {@link Double#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static double parseDouble(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Double.parseDouble(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Double.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns float value or {@link Float#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static float parseFloat(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Float.parseFloat(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Float.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static int parseInt(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Integer.parseInt(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns integer value or 0 when attribute is not available or cannot be parsed.
+	 */
+	public static int parseInt0(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Integer.parseInt(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return 0;
+	}
+
+	/**
+	 * Parses SAX attribute
+	 * 
+	 * @param attributes
+	 * @param attributeName
+	 * @return Returns long value or {@link Long#MIN_VALUE} when attribute is not available or
+	 *         cannot be parsed.
+	 */
+	public static long parseLong(final Attributes attributes, final String attributeName) {
+
+		try {
+			final String valueString = attributes.getValue(attributeName);
+			if (valueString != null) {
+				return Long.parseLong(valueString);
+			}
+		} catch (final NumberFormatException e) {
+			// do nothing
+		}
+		return Long.MIN_VALUE;
+	}
+
+	/**
 	 * Selects an item in the combo box which is retrieved from a state.
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param comboStates
@@ -525,7 +673,7 @@ public class Util {
 	/**
 	 * Selects a text item in the combo box. When text item is not available, the first item is
 	 * selected
-	 *
+	 * 
 	 * @param combo
 	 * @param comboItems
 	 * @param selectedItem
@@ -548,7 +696,7 @@ public class Util {
 
 	/**
 	 * Set the state for an integer array
-	 *
+	 * 
 	 * @param state
 	 * @param stateKey
 	 * @param intValues
@@ -583,7 +731,7 @@ public class Util {
 
 	/**
 	 * Open view and activate it
-	 *
+	 * 
 	 * @param viewId
 	 * @return
 	 * @throws PartInitException

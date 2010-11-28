@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device;
 
@@ -99,6 +99,32 @@ public class DeviceReaderTools {
 		return rslt;
 	}
 
+	/**
+	 * @return Return the distance in meters between two positions
+	 */
+	public static double computeDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
+
+		double a, c;
+
+		// convert the degree values to radians before calculation
+		latitude1 = latitude1 * DEGRAD;
+		longitude1 = longitude1 * DEGRAD;
+		latitude2 = latitude2 * DEGRAD;
+		longitude2 = longitude2 * DEGRAD;
+
+		final double dlon = longitude2 - longitude1;
+		final double dlat = latitude2 - latitude1;
+
+		a = Math.pow(Math.sin(dlat / 2), 2)
+				+ Math.cos(latitude1)
+				* Math.cos(latitude2)
+				* Math.pow(Math.sin(dlon / 2), 2);
+
+		c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+		return (EARTH_RADIUS * c) * 1000;
+	}
+
 	public static int convert1ByteBCD(final byte[] buffer, final int offset) {
 
 		final byte bufferByte = buffer[offset];
@@ -181,32 +207,6 @@ public class DeviceReaderTools {
 
 		// distance (6 bits)
 		timeData.distance = (short) (data & 0x003F) * 10;
-	}
-
-	/**
-	 * @return Return the distance in meters between two positions
-	 */
-	public static double computeDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
-
-		double a, c;
-
-		// convert the degree values to radians before calculation
-		latitude1 = latitude1 * DEGRAD;
-		longitude1 = longitude1 * DEGRAD;
-		latitude2 = latitude2 * DEGRAD;
-		longitude2 = longitude2 * DEGRAD;
-
-		final double dlon = longitude2 - longitude1;
-		final double dlat = latitude2 - latitude1;
-
-		a = Math.pow(Math.sin(dlat / 2), 2)
-				+ Math.cos(latitude1)
-				* Math.cos(latitude2)
-				* Math.pow(Math.sin(dlon / 2), 2);
-
-		c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-		return (EARTH_RADIUS * c) * 1000;
 	}
 
 }

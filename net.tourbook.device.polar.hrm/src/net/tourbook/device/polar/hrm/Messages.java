@@ -18,6 +18,7 @@ package net.tourbook.device.polar.hrm;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
+
 	private static final String	BUNDLE_NAME	= "net.tourbook.device.polar.hrm.messages"; //$NON-NLS-1$
 
 	static {
@@ -25,13 +26,21 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	public static String	Import_Error_DeviceNameIsUnknown;
+	public static String		Import_Error_DeviceNameIsUnknown;
 	public static String		Import_Error_DialogMessage_InvalidDate;
-	public static String		Import_Error_DialogMessage_InvalidDevice;
 	public static String		Import_Error_DialogMessage_InvalidField;
 	public static String		Import_Error_DialogMessage_InvalidInterval;
 	public static String		Import_Error_DialogMessage_InvalidVersion;
 	public static String		Import_Error_DialogTitle;
+
+	public static String		PrefPage_Polar_Field_TitleDescription;
+	public static String		PrefPage_Polar_Group_HorizontalAdjustment;
+	public static String		PrefPage_Polar_Group_TitleDescription;
+	public static String		PrefPage_Polar_Label_AdjustmentInfo;
+	public static String		PrefPage_Polar_Label_SliceAdjustment;
+	public static String		PrefPage_Polar_Label_Slices;
+	public static String		PrefPage_Polar_Radio_TitleFromDescription;
+	public static String		PrefPage_Polar_Radio_TitleFromTitle;
 
 	public static String		Supported_Intervals_1_Second;
 	public static String		Supported_Intervals_15_Second;

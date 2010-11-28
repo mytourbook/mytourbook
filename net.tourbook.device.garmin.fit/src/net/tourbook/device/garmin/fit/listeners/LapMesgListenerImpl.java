@@ -20,7 +20,7 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		Integer messageIndex = mesg.getMessageIndex();
 		if (messageIndex == null) {
-			throw new FitActivityReaderException("Lap message index is missing");
+			throw new FitActivityReaderException("Lap message index is missing"); //$NON-NLS-1$
 		}
 		getTourMarker().setLabel(messageIndex.toString());
 		getTourMarker().setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);

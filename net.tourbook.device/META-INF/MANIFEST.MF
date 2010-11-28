@@ -1,14 +1,18 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader
-Bundle-SymbolicName: net.tourbook.device
-Bundle-Version: 10.10.0.qualifier
+Bundle-SymbolicName: net.tourbook.device;singleton:=true
+Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.device.Activator
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
  net.tourbook,
- org.eclipse.jface,
  net.tourbook.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: net.tourbook.chart,
+ net.tourbook.util,
+ org.joda.time,
+ org.joda.time.format

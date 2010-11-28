@@ -16,6 +16,8 @@
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -35,15 +37,23 @@ public class DeviceManager {
 	private static List<ExternalDevice>	_externalDeviceList;
 
 	/**
-	 * read devices from the extension registry
+	 * Read devices from the extension registry
 	 * 
-	 * @return
+	 * @return Returns a list with devices sorted by name
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<TourbookDevice> getDeviceList() {
 
 		if (_deviceList == null) {
 			_deviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+
+			// sort device list alphabetically
+			Collections.sort(_deviceList, new Comparator<TourbookDevice>() {
+				public int compare(final TourbookDevice o1, final TourbookDevice o2) {
+					return o1.visibleName.compareTo(o2.visibleName);
+				}
+			});
+
 		}
 		return _deviceList;
 	}
@@ -80,7 +90,9 @@ public class DeviceManager {
 
 						Object object;
 						try {
+
 							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+
 							if (object instanceof TourbookDevice) {
 
 								final TourbookDevice device = (TourbookDevice) object;
@@ -89,8 +101,20 @@ public class DeviceManager {
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 								device.fileExtension = configElement.getAttribute("fileextension"); //$NON-NLS-1$
 
+								final String extensionSortPriority = configElement
+										.getAttribute("extensionSortPriority"); //$NON-NLS-1$
+
+								if (extensionSortPriority != null) {
+									try {
+										device.extensionSortPriority = Integer.parseInt(extensionSortPriority);
+									} catch (final Exception e) {
+										// do nothing
+									}
+								}
+
 								deviceList.add(device);
 							}
+
 							if (object instanceof ExternalDevice) {
 
 								final ExternalDevice device = (ExternalDevice) object;
@@ -100,6 +124,7 @@ public class DeviceManager {
 
 								deviceList.add(device);
 							}
+
 						} catch (final CoreException e) {
 							e.printStackTrace();
 						}

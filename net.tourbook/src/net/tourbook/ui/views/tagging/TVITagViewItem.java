@@ -34,14 +34,18 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 														+ "SUM(tourDrivingTime)," //	2	//$NON-NLS-1$
 														+ "SUM(tourAltUp)," //			3	//$NON-NLS-1$
 														+ "SUM(tourAltDown)," //		4	//$NON-NLS-1$
+														//
 														+ "MAX(maxPulse)," //			5	//$NON-NLS-1$
 														+ "MAX(maxAltitude)," //		6	//$NON-NLS-1$
 														+ "MAX(maxSpeed)," //			7	//$NON-NLS-1$
+														//
 														+ "AVG(avgPulse)," //			8	//$NON-NLS-1$
 														+ "AVG(avgCadence)," //			9	//$NON-NLS-1$
-														+ "AVG(avgTemperature)," //		10	//$NON-NLS-1$
-
-														+ "SUM(1)";		//				11	//$NON-NLS-1$
+														+ "AVG(DOUBLE(avgTemperature) / TemperatureScale)," //		10	//$NON-NLS-1$
+														//
+														// tour counter
+														+ "SUM(1)" //					11	//$NON-NLS-1$
+												;
 
 	static final String	SQL_SUM_COLUMNS_TOUR	= UI.EMPTY_STRING //
 														+ "tourDistance," // 			0	//$NON-NLS-1$
@@ -49,12 +53,15 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 														+ "tourDrivingTime," //			2	//$NON-NLS-1$
 														+ "tourAltUp," //				3	//$NON-NLS-1$
 														+ "tourAltDown," //				4	//$NON-NLS-1$
+														//
 														+ "maxPulse," //				5	//$NON-NLS-1$
 														+ "maxAltitude," //				6	//$NON-NLS-1$
 														+ "maxSpeed," //				7	//$NON-NLS-1$
+														//
 														+ "avgPulse," //				8	//$NON-NLS-1$
 														+ "avgCadence," //				9	//$NON-NLS-1$
-														+ "avgTemperature"; //			10	//$NON-NLS-1$
+														+ "(DOUBLE(AvgTemperature) / TemperatureScale)" //			10	//$NON-NLS-1$
+												;
 
 	/**
 	 * content which is displayed in the tree column
@@ -79,9 +86,11 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 	long				colAvgPulse;
 	long				colAvgCadence;
-	long				colAvgTemperature;
+	float				colAvgTemperature;
 
-	long				colItemCounter;
+	long				colTourCounter;
+
+	int					temperatureDigits;
 
 	/**
 	 * Read sum totals from the database for the tagItem
@@ -121,7 +130,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 			conn.close();
 
-			if (tagItem.colItemCounter == 0) {
+			if (tagItem.colTourCounter == 0) {
 
 				/*
 				 * to hide the '+' for an item which has no children, an empty list of children will
@@ -152,20 +161,19 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 		colAvgPulse = result.getLong(startIndex + 8);
 		colAvgCadence = result.getLong(startIndex + 9);
-		colAvgTemperature = result.getLong(startIndex + 10);
+		colAvgTemperature = result.getFloat(startIndex + 10);
 
 		// prevent divide by 0
 		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)
 		colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
 		colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000f / colDistance;
-
 	}
 
 	public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
 		readDefaultColumnData(result, startIndex);
 
-		colItemCounter = result.getLong(startIndex + 11);
+		colTourCounter = result.getLong(startIndex + 11);
 	}
 
 }

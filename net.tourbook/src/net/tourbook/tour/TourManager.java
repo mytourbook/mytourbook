@@ -283,7 +283,7 @@ public class TourManager {
 						/*
 						 * vincenty algorithm is much more accurate compared with haversine
 						 */
-//				final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+//						final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
 						final double distDiff = Util.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
 						distance += distDiff;
@@ -487,7 +487,7 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the date/time of the tour
+	 * @return Returns date/time of the tour start
 	 */
 	public static DateTime getTourDateTime(final TourData tourData) {
 
@@ -955,107 +955,47 @@ public class TourManager {
 		final TourData[] tourDataEditorSavedTour = { null };
 		final boolean[] doFireChangeEvent = { false };
 
-		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-			@Override
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		if (modifiedTours.size() == 1) {
 
-				int saveCounter = 0;
-				final int tourSize = modifiedTours.size();
+			// no progress when only 1 tour is saved
 
-				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, tourSize);
+			saveModifiedToursOneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0));
 
-				for (final TourData tourData : modifiedTours) {
+		} else {
 
-					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, tourSize));
+			try {
 
-					boolean doSaveTour = false;
-					TourData savedTour = null;
+				final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+					@Override
+					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+							InterruptedException {
 
-					final TourDataEditorView tourDataEditor = getTourDataEditor();
-					if (tourDataEditor != null) {
+						int saveCounter = 0;
+						final int tourSize = modifiedTours.size();
 
-						final TourData tourDataInEditor = tourDataEditor.getTourData();
+						monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, tourSize);
 
-						try {
-							checkTourData(tourData, tourDataInEditor);
-						} catch (final MyTourbookException e) {
-							e.printStackTrace();
+						for (final TourData tourData : modifiedTours) {
+
+							monitor.subTask(NLS.bind(
+									Messages.Tour_Data_SaveTour_MonitorSubtask,
+									++saveCounter,
+									tourSize));
+
+							saveModifiedToursOneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
+
+							monitor.worked(1);
 						}
-
-						if (tourDataInEditor == tourData) {
-
-							// selected tour is in the tour data editor
-
-							if (tourDataEditor.isDirty()) {
-
-								// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
-
-								savedTour = tourData;
-
-								/*
-								 * make the tour data editor visible, it could be hidden and
-								 * confuses the user when the changes are not visible
-								 */
-								TourManager.openTourEditor(false);
-
-							} else {
-
-								/*
-								 * tour in the editor is not dirty, save tour and update editor ui
-								 */
-
-								savedTour = TourDatabase.saveTour(tourData);
-
-								/*
-								 * set flag for the tour data editor that the tour is saved and the
-								 * ui is updated
-								 */
-								tourDataEditorSavedTour[0] = savedTour;
-							}
-
-							/*
-							 * update UI in the tour data editor with the modified tour data
-							 */
-							tourDataEditor.updateUI(savedTour);
-
-							doFireChangeEvent[0] = true;
-
-						} else {
-
-							// tour is not in the tour editor
-
-							doSaveTour = true;
-						}
-					} else {
-
-						// tour is not in the tour editor
-
-						doSaveTour = true;
 					}
+				};
 
-					if (doSaveTour) {
+				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
 
-						// save the tour
-						savedTour = TourDatabase.saveTour(tourData);
-
-						doFireChangeEvent[0] = true;
-					}
-
-					if (savedTour != null) {
-						savedTours.add(savedTour);
-					}
-
-					monitor.worked(1);
-				}
+			} catch (final InvocationTargetException e) {
+				StatusUtil.showStatus(e);
+			} catch (final InterruptedException e) {
+				StatusUtil.showStatus(e);
 			}
-		};
-
-		try {
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
-		} catch (final InvocationTargetException e) {
-			StatusUtil.showStatus(e);
-		} catch (final InterruptedException e) {
-			StatusUtil.showStatus(e);
 		}
 
 		if (canFireNotification && doFireChangeEvent[0]) {
@@ -1065,6 +1005,88 @@ public class TourManager {
 		}
 
 		return savedTours;
+	}
+
+	private static void saveModifiedToursOneTour(	final ArrayList<TourData> savedTours,
+													final TourData[] tourDataEditorSavedTour,
+													final boolean[] doFireChangeEvent,
+													final TourData tourData) {
+		boolean doSaveTour = false;
+		TourData savedTour = null;
+
+		final TourDataEditorView tourDataEditor = getTourDataEditor();
+		if (tourDataEditor != null) {
+
+			final TourData tourDataInEditor = tourDataEditor.getTourData();
+
+			try {
+				checkTourData(tourData, tourDataInEditor);
+			} catch (final MyTourbookException e) {
+				e.printStackTrace();
+			}
+
+			if (tourDataInEditor == tourData) {
+
+				// selected tour is in the tour data editor
+
+				if (tourDataEditor.isDirty()) {
+
+					// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
+
+					savedTour = tourData;
+
+					/*
+					 * make the tour data editor visible, it could be hidden and confuses the user
+					 * when the changes are not visible
+					 */
+					TourManager.openTourEditor(false);
+
+				} else {
+
+					/*
+					 * tour in the editor is not dirty, save tour and update editor ui
+					 */
+
+					savedTour = TourDatabase.saveTour(tourData);
+
+					/*
+					 * set flag for the tour data editor that the tour is saved and the ui is
+					 * updated
+					 */
+					tourDataEditorSavedTour[0] = savedTour;
+				}
+
+				/*
+				 * update UI in the tour data editor with the modified tour data
+				 */
+				tourDataEditor.updateUI(savedTour);
+
+				doFireChangeEvent[0] = true;
+
+			} else {
+
+				// tour is not in the tour editor
+
+				doSaveTour = true;
+			}
+		} else {
+
+			// tour is not in the tour editor
+
+			doSaveTour = true;
+		}
+
+		if (doSaveTour) {
+
+			// save the tour
+			savedTour = TourDatabase.saveTour(tourData);
+
+			doFireChangeEvent[0] = true;
+		}
+
+		if (savedTour != null) {
+			savedTours.add(savedTour);
+		}
 	}
 
 	public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
@@ -1575,7 +1597,7 @@ public class TourManager {
 		xDataTime.setLabel(Messages.tour_editor_label_time);
 		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
-		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
+		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
 		/*
 		 * show the distance on the x-axis when a distance is available, otherwise the time is
@@ -1853,6 +1875,7 @@ public class TourManager {
 
 			yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
+			yDataTemperature.setValueDivisor(tourData.getTemperatureScale());
 			yDataTemperature.setShowYSlider(true);
 			yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
@@ -2309,6 +2332,10 @@ public class TourManager {
 			} else {
 				actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_OpenTour;
 			}
+
+		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING)) {
+
+			// do nothing and don't show a warning
 
 		} else if (action.equals(PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_NONE)) {
 

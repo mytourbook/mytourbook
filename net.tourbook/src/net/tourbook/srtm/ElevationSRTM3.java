@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Alfred Barten
@@ -35,8 +35,8 @@ public final class ElevationSRTM3 extends ElevationBase {
 
 		private SRTM3ElevationFile(final GeoLat lat, final GeoLon lon) {
 
-			System.out.println(lat + " - " + lon); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(lat + " - " + lon); //$NON-NLS-1$
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			final String srtm3DataPath = getElevationDataPath("srtm3"); //$NON-NLS-1$
 			final String srtm3Suffix = ".hgt"; //$NON-NLS-1$
@@ -113,7 +113,7 @@ public final class ElevationSRTM3 extends ElevationBase {
 			}
 		}
 //		public int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
-//			
+//
 //			if (lat.isSouth()) {
 //				if (lon.isEast()) {
 //					return 1201
@@ -152,6 +152,11 @@ public final class ElevationSRTM3 extends ElevationBase {
 //		}
 	}
 
+	public ElevationSRTM3() {
+		gridLat.setDegreesMinutesSecondsDirection(0, 0, 3, 'N');
+		gridLon.setDegreesMinutesSecondsDirection(0, 0, 3, 'E');
+	}
+
 	/**
 	 * Clears the file cache by closing and removing all evaluation files
 	 */
@@ -165,22 +170,21 @@ public final class ElevationSRTM3 extends ElevationBase {
 		fileMap.clear();
 	}
 
-	public ElevationSRTM3() {
-		gridLat.setDegreesMinutesSecondsDirection(0, 0, 3, 'N');
-		gridLon.setDegreesMinutesSecondsDirection(0, 0, 3, 'E');
-	}
-
 	@Override
 	public short getElevation(final GeoLat lat, final GeoLon lon) {
 
-		if (lat.tertias != 0)
+		if (lat.tertias != 0) {
 			return getElevationGrid(lat, lon);
-		if (lon.tertias != 0)
+		}
+		if (lon.tertias != 0) {
 			return getElevationGrid(lat, lon);
-		if (lat.seconds % 3 != 0)
+		}
+		if (lat.seconds % 3 != 0) {
 			return getElevationGrid(lat, lon);
-		if (lon.seconds % 3 != 0)
+		}
+		if (lon.seconds % 3 != 0) {
 			return getElevationGrid(lat, lon);
+		}
 
 		int i = lon.degrees;
 		if (lon.direction == GeoLon.DIRECTION_WEST) {

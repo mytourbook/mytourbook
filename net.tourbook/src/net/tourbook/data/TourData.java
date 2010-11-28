@@ -89,18 +89,21 @@ import org.joda.time.DateTime;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourData implements Comparable<Object>, IXmlSerializable {
 
+	public static final int									DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
+	public static final int									DB_LENGTH_DEVICE_PLUGIN_NAME		= 255;
+	public static final int									DB_LENGTH_DEVICE_MODE_NAME			= 255;
+	public static final int									DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
+
 	public static final int									DB_LENGTH_TOUR_TITLE				= 255;
 	public static final int									DB_LENGTH_TOUR_DESCRIPTION			= 4096;
 	public static final int									DB_LENGTH_TOUR_DESCRIPTION_V10		= 32000;
 	public static final int									DB_LENGTH_TOUR_START_PLACE			= 255;
 	public static final int									DB_LENGTH_TOUR_END_PLACE			= 255;
 	public static final int									DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
+
+	public static final int									DB_LENGTH_WEATHER					= 1000;
 	public static final int									DB_LENGTH_WEATHER_CLOUDS			= 255;
-	public static final int									DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
-	public static final int									DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
-	public static final int									DB_LENGTH_DEVICE_PLUGIN_NAME		= 255;
-	public static final int									DB_LENGTH_DEVICE_MODE_NAME			= 255;
-	public static final int									DB_LENGTH_DEVICE_FIRMWARE_VERSION	= 255;
 
 	/**
 	 *
@@ -341,15 +344,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int												weatherWindDir;																		// db-version 8
 	private int												weatherWindSpd;																		// db-version 8
 	private String											weatherClouds;																			// db-version 8
+	private String											weather;																				// db-version 13
 
 	private float											deviceAvgSpeed;																		// db-version 12
 
 	// ############################################# OTHER TOUR/DEVICE DATA #############################################
-
-//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
 
 	@XmlElement
 	private String											tourTitle;																				// db-version 4
@@ -389,6 +388,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * time slices has variable time duration
 	 */
 	private short											deviceTimeInterval					= -1;												// db-version 3
+
+	/**
+	 * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
+	 * is multiplied by 10, default scaling is <code>1</code>
+	 */
+	private int												temperatureScale					= 1;												// db-version 13
 
 	/**
 	 * Firmware version of the device
@@ -567,7 +572,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	/**
 	 * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
-	 * length()==0 data are invalid
+	 * <code>length()==0</code> data are invalid.
 	 */
 	@Transient
 	private int[]											srtmSerie;
@@ -2264,6 +2269,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					srtmSerie = newSRTMSerie;
 					srtmSerieImperial = newSRTMSerieImperial;
 				} else {
+					// set state that srtm altitude is invalid
 					srtmSerie = new int[0];
 				}
 			}
@@ -2475,29 +2481,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			long lastValidTime = 0;
 
 			/*
-			 * get first valid altitude
+			 * get first valid latitude
 			 */
+			double lastValidLatitude = firstTimeDataItem.latitude;
+			double lastValidLongitude = firstTimeDataItem.longitude;
+
 			// set initial min/max latitude/longitude
-			if ((firstTimeDataItem.latitude == Double.MIN_VALUE) || (firstTimeDataItem.longitude == Double.MIN_VALUE)) {
+			if ((lastValidLatitude == Double.MIN_VALUE) || (lastValidLongitude == Double.MIN_VALUE)) {
 
 				// find first valid latitude/longitude
-				for (final TimeData timeData : timeDataList) {
-					if ((timeData.latitude != Double.MIN_VALUE) && (timeData.longitude != Double.MIN_VALUE)) {
-						mapMinLatitude = timeData.latitude + 90;
-						mapMaxLatitude = timeData.latitude + 90;
-						mapMinLongitude = timeData.longitude + 180;
-						mapMaxLongitude = timeData.longitude + 180;
+				for (final TimeData timeSlice : timeDataList) {
+
+					lastValidLatitude = timeSlice.latitude;
+					lastValidLongitude = timeSlice.longitude;
+
+					if ((lastValidLatitude != Double.MIN_VALUE) && (lastValidLongitude != Double.MIN_VALUE)) {
+						mapMinLatitude = lastValidLatitude + 90;
+						mapMaxLatitude = lastValidLatitude + 90;
+						mapMinLongitude = lastValidLongitude + 180;
+						mapMaxLongitude = lastValidLongitude + 180;
 						break;
 					}
 				}
 			} else {
-				mapMinLatitude = firstTimeDataItem.latitude + 90;
-				mapMaxLatitude = firstTimeDataItem.latitude + 90;
-				mapMinLongitude = firstTimeDataItem.longitude + 180;
-				mapMaxLongitude = firstTimeDataItem.longitude + 180;
+				mapMinLatitude = lastValidLatitude + 90;
+				mapMaxLatitude = lastValidLatitude + 90;
+				mapMinLongitude = lastValidLongitude + 180;
+				mapMaxLongitude = lastValidLongitude + 180;
 			}
-			double lastValidLatitude = mapMinLatitude - 90;
-			double lastValidLongitude = mapMinLongitude - 180;
 
 			// convert data from the tour format into interger[] arrays
 			for (final TimeData timeData : timeDataList) {
@@ -2764,11 +2775,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
-	 * @param uniqueKey
+	 * @param uniqueKeySuffix
 	 *            unique key to identify a tour
 	 * @return
 	 */
-	public Long createTourId(final String uniqueKey) {
+	public Long createTourId(final String uniqueKeySuffix) {
 
 //		final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
@@ -2785,7 +2796,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					//
-					+ uniqueKey;
+					+ uniqueKeySuffix;
 
 			tourId = Long.valueOf(tourIdKey);
 
@@ -2801,7 +2812,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					//
-					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
+					+ uniqueKeySuffix.substring(0, Math.min(5, uniqueKeySuffix.length()));
 
 			tourId = Long.valueOf(tourIdKey);
 		}
@@ -3212,7 +3223,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return the avgTemperature
+	 * @return Returns average temperature multiplied with {@link #temperatureScale}
 	 */
 	public int getAvgTemperature() {
 		return avgTemperature;
@@ -3487,11 +3498,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return maxSpeed;
 	}
 
-//	+ "	IsPulseSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	IsPowerSensorPresent		INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
-//	+ "	DeviceAvgSpeed				FLOAT DEFAULT 0,				\n" //$NON-NLS-1$
-//	+ ("	DeviceFirmwareVersion	" + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
-
 	public int getMergedAltitudeOffset() {
 		return mergedAltitudeOffset;
 	}
@@ -3744,6 +3750,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	/**
+	 * @return Returned SRTM values:
+	 *         <p>
+	 *         metric <br>
+	 *         imperial
+	 *         <p>
+	 *         or <code>null</code> when SRTM data serie is not available
+	 */
+	public int[][] getSRTMValues() {
+
+		if (latitudeSerie == null) {
+			return null;
+		}
+
+		if (srtmSerie == null) {
+			createSRTMDataSerie();
+		}
+
+		if (srtmSerie.length == 0) {
+			// invalid SRTM values
+			return null;
+		}
+
+		return new int[][] { srtmSerie, srtmSerieImperial };
+	}
+
 	public short getStartAltitude() {
 		return startAltitude;
 	}
@@ -3783,6 +3815,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startYear;
 	}
 
+	public int getTemperatureScale() {
+		return temperatureScale;
+	}
+
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
 	 *         when temperature is not available
@@ -3810,7 +3846,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				temperatureSerieImperial = new int[temperatureSerie.length];
 
 				for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
-					temperatureSerieImperial[valueIndex] = (int) (temperatureSerie[valueIndex] * fahrenheitMulti + fahrenheitAdd);
+
+					final float scaledTemperature = (float) temperatureSerie[valueIndex] / temperatureScale;
+
+					temperatureSerieImperial[valueIndex] = (int) (((scaledTemperature) * fahrenheitMulti + fahrenheitAdd) * temperatureScale);
 				}
 			}
 			serie = temperatureSerieImperial;
@@ -3925,6 +3964,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourPerson;
 	}
 
+	/**
+	 * @return Returns total recording time in seconds
+	 */
 	public int getTourRecordingTime() {
 		return tourRecordingTime;
 	}
@@ -3966,6 +4008,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return tourWayPoints;
 	}
 
+	/**
+	 * @return Returns weather text or an empty string when weather text is not set.
+	 */
+	public String getWeather() {
+		return weather == null ? UI.EMPTY_STRING : weather;
+	}
+
+	/**
+	 * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
+	 *         set.
+	 */
 	public String getWeatherClouds() {
 		return weatherClouds;
 	}
@@ -3977,12 +4030,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int getWeatherIndex() {
 
 		int weatherCloudsIndex = -1;
-		final String cloudValue = getWeatherClouds();
 
-		if (cloudValue != null) {
-			// we cannot use a binary search as that requires sorting which we cannot...
+		if (weatherClouds != null) {
+			// binary search cannot be done because it requires sorting which we cannot...
 			for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(cloudValue)) {
+				if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
 					weatherCloudsIndex = cloudIndex;
 					break;
 				}
@@ -4157,7 +4209,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
 				tourTitle,
 				DB_LENGTH_TOUR_TITLE,
-				Messages.Db_Field_TourData_Title);
+				Messages.Db_Field_TourData_Title,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4171,7 +4224,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourDescription,
 				DB_LENGTH_TOUR_DESCRIPTION_V10,
-				Messages.Db_Field_TourData_Description);
+				Messages.Db_Field_TourData_Description,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4185,7 +4239,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourStartPlace,
 				DB_LENGTH_TOUR_START_PLACE,
-				Messages.Db_Field_TourData_StartPlace);
+				Messages.Db_Field_TourData_StartPlace,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -4199,12 +4254,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				tourEndPlace,
 				DB_LENGTH_TOUR_END_PLACE,
-				Messages.Db_Field_TourData_EndPlace);
+				Messages.Db_Field_TourData_EndPlace,
+				false);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
 		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
 			tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
+		}
+
+		/*
+		 * check: tour import file path
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourImportFilePath,
+				DB_LENGTH_TOUR_IMPORT_FILE_PATH,
+				Messages.Db_Field_TourData_TourImportFilePath,
+				true);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourImportFilePath = tourImportFilePath.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_PATH);
+		}
+
+		/*
+		 * check: weather
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				weather,
+				DB_LENGTH_WEATHER,
+				Messages.Db_Field_TourData_Weather,
+				false);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			weather = weather.substring(0, DB_LENGTH_WEATHER);
 		}
 
 		return true;
@@ -4277,7 +4363,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public boolean replaceAltitudeWithSRTM() {
-		// TODO Auto-generated method stub
 
 		if (getSRTMSerie() == null) {
 			return false;
@@ -4377,8 +4462,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * Time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
-	 * the time slices are not equally
+	 * Time difference in seconds between 2 time slices when the interval is constant for the whole
+	 * tour or <code>-1</code> for GPS devices or ergometer when the time slice duration are not
+	 * equally
 	 * 
 	 * @param deviceTimeInterval
 	 */
@@ -4424,6 +4510,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setIsDistanceFromSensor(final boolean isFromSensor) {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setMaxPulse(final int maxPulse) {
+		this.maxPulse = maxPulse;
 	}
 
 	public void setMergedAltitudeOffset(final int altitudeDiff) {
@@ -4505,6 +4595,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.isSpeedSerieFromDevice = speedSerie != null;
 	}
 
+	public void setSRTMValues(final int[] srtm, final int[] srtmImperial) {
+		srtmSerie = srtm;
+		srtmSerieImperial = srtmImperial;
+	}
+
 	public void setStartAltitude(final short startAltitude) {
 		this.startAltitude = startAltitude;
 	}
@@ -4547,6 +4642,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setStartYear(final short startYear) {
 		this.startYear = startYear;
+	}
+
+	public void setTemperatureScale(final int temperatureScale) {
+		this.temperatureScale = temperatureScale;
 	}
 
 	public void setTourAltDown(final int tourAltDown) {
@@ -4679,6 +4778,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
+	public void setWeather(final String weather) {
+		this.weather = weather;
+	}
+
+	/**
+	 * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
+	 * when weather id is not defined
+	 * 
+	 * @param weatherClouds
+	 */
 	public void setWeatherClouds(final String weatherClouds) {
 		this.weatherClouds = weatherClouds;
 	}

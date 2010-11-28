@@ -62,13 +62,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private final boolean				_isOSX							= net.tourbook.util.UI.IS_OSX;
 	private final boolean				_isLinux						= net.tourbook.util.UI.IS_LINUX;				;
- 
+
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat		_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private final TourData				_tourData;
- 
+
 	private final IDialogSettings		_state;
 	private PixelConverter				_pc;
 
@@ -78,6 +78,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private Text						_txtTitle;
 	private Text						_txtDescription;
 
+	private Text						_txtWeather;
 	private Spinner						_spinWindSpeedValue;
 	private Combo						_comboWindSpeedText;
 	private Combo						_comboWindDirectionText;
@@ -234,7 +235,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
 		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
@@ -311,7 +312,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
 					//
-					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(descLines))
+					.hint(_pc.convertWidthInCharsToPixels(40), _pc.convertHeightInCharsToPixels(descLines))
 					.applyTo(_txtDescription);
 		}
 	}
@@ -404,14 +405,43 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				.spacing(20, 5)
 				.applyTo(section);
 		{
+			createUISection141Weather(section);
 			createUISection142Weather(section);
 			createUISection144WeatherCol1(section);
 		}
 	}
 
-	private void createUISection142Weather(final Composite section) {
+	private void createUISection141Weather(final Composite parent) {
 
-		final Composite container = _tk.createComposite(section);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * weather description
+			 */
+			final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Weather);
+			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
+
+			_txtWeather = _tk.createText(container, //
+					UI.EMPTY_STRING,
+					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+			);
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					//
+					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+					//
+					.hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(2))
+					.applyTo(_txtWeather);
+		}
+	}
+
+	private void createUISection142Weather(final Composite parent) {
+
+		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
 		{
@@ -579,9 +609,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	/**
 	 * weather: 1. column
 	 */
-	private void createUISection144WeatherCol1(final Composite section) {
+	private void createUISection144WeatherCol1(final Composite parent) {
 
-		final Composite container = _tk.createComposite(section);
+		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
@@ -604,8 +634,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
 			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
-			_spinTemperature.setMinimum(-60);
-			_spinTemperature.setMaximum(150);
+			_spinTemperature.setMinimum(-600);
+			_spinTemperature.setMaximum(1500);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				@Override
@@ -854,6 +884,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			cloudValue = UI.EMPTY_STRING;
 		}
 		_tourData.setWeatherClouds(cloudValue);
+		_tourData.setWeather(_txtWeather.getText().trim());
 
 		if (_isTemperatureManuallyModified) {
 			int temperature = _spinTemperature.getSelection();
@@ -885,6 +916,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * wind properties
 			 */
+			_txtWeather.setText(_tourData.getWeather());
+
 			// wind direction
 			final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 			_spinWindDirectionValue.setSelection(weatherWindDirDegree);
@@ -902,13 +935,19 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// icon must be displayed after the combobox entry is selected
 			displayCloudIcon();
 
-			// temperature
-			int temperature = _tourData.getAvgTemperature();
-			if (_unitValueTemperature != 1) {
-				temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-			}
-			_spinTemperature.setSelection(temperature);
+			/*
+			 * avg temperature
+			 */
+			final int temperatureScale = _tourData.getTemperatureScale();
+			int avgTemperature = _tourData.getAvgTemperature();
 
+			if (_unitValueTemperature != 1) {
+				final float metricTemperature = (float) avgTemperature / temperatureScale;
+				avgTemperature = (int) ((metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
+			}
+
+			_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
+			_spinTemperature.setSelection(avgTemperature);
 		}
 		_isUpdateUI = false;
 	}

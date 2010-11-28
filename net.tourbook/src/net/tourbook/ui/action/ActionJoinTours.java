@@ -28,7 +28,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class ActionJoinTours extends Action {
 
@@ -59,6 +58,7 @@ public class ActionJoinTours extends Action {
 		boolean isLat = false;
 		boolean isPowerFromDevice = false;
 		boolean isSpeedFromDevice = false;
+		int firstTourTemperatureScale = 1;
 
 		for (final TourData tourData : _tourProvider.getSelectedTours()) {
 
@@ -79,6 +79,7 @@ public class ActionJoinTours extends Action {
 				isLat = isTourLat;
 				isPowerFromDevice = tourData.isPowerSerieFromDevice();
 				isSpeedFromDevice = tourData.isSpeedSerieFromDevice();
+				firstTourTemperatureScale = tourData.getTemperatureScale();
 
 			} else {
 
@@ -116,6 +117,11 @@ public class ActionJoinTours extends Action {
 				if (isSpeedFromDevice != tourData.isSpeedSerieFromDevice()) {
 					return Messages.Dialog_JoinTours_InvalidData_Speed;
 				}
+
+				// check temperature scale
+				if (firstTourTemperatureScale != tourData.getTemperatureScale()) {
+					return Messages.Dialog_JoinTours_InvalidData_Temperature;
+				}
 			}
 
 			if (isTime == false && isDistance == false && isLat == false) {
@@ -137,6 +143,9 @@ public class ActionJoinTours extends Action {
 		// get selected tour, make sure at least two tours are selected
 		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 		if (selectedTours == null || selectedTours.size() < 2) {
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(), //
+					Messages.Dialog_JoinTours_InvalidData_DlgTitle,
+					Messages.Dialog_JoinTours_InvalidData_InvalidTours);
 			return;
 		}
 
@@ -148,14 +157,16 @@ public class ActionJoinTours extends Action {
 		// check tour data
 		final String checkMessage = checkTourData();
 
-		final Shell activeShell = Display.getCurrent().getActiveShell();
-
 		if (checkMessage != null) {
-			MessageDialog.openInformation(activeShell, //
-					Messages.Dialog_JoinTours_InvalidData_DlgTitle,
-					NLS.bind(Messages.Dialog_JoinTours_InvalidData_DlgMessage, checkMessage));
+			showMessage(checkMessage);
 		} else {
-			new DialogJoinTours(activeShell, selectedTours).open();
+			new DialogJoinTours(Display.getCurrent().getActiveShell(), selectedTours).open();
 		}
+	}
+
+	private void showMessage(final String checkedMessage) {
+		MessageDialog.openInformation(Display.getCurrent().getActiveShell(), //
+				Messages.Dialog_JoinTours_InvalidData_DlgTitle,
+				NLS.bind(Messages.Dialog_JoinTours_InvalidData_DlgMessage, checkedMessage));
 	}
 }

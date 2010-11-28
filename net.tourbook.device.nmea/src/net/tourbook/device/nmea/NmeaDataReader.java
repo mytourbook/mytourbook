@@ -30,6 +30,7 @@ import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -278,7 +279,7 @@ public class NmeaDataReader extends TourbookDevice {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 		if (distanceSerie == null) {
-			uniqueKey = "32481"; //$NON-NLS-1$
+			uniqueKey = Util.UNIQUE_ID_SUFFIX_NMEA;
 		} else {
 			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 		}

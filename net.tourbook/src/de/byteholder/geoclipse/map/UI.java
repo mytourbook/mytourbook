@@ -21,16 +21,18 @@ public class UI {
 	public static final String	SPACE			= " ";				//$NON-NLS-1$
 	public static final char	DASH			= '-';
 	public static final String	DASH_WITH_SPACE	= " - ";			//$NON-NLS-1$
+	public static final String	KOMMA			= ",";				//$NON-NLS-1$
 	public static final String	NEW_LINE		= "\n";			//$NON-NLS-1$
 	public static final String	DOTS			= "...";			//$NON-NLS-1$
 	public static final String	MBYTES			= "MByte";			//$NON-NLS-1$
+
 	public static final String	UTF_8			= "UTF-8";			//$NON-NLS-1$
 
 	/**
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog width.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_WIDTH	= "DIALOG_WIDTH";	//$NON-NLS-1$
@@ -39,7 +41,7 @@ public class UI {
 	 * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
 	 * <br>
 	 * The dialog settings key name for stored dialog height.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String	DIALOG_HEIGHT	= "DIALOG_HEIGHT";	//$NON-NLS-1$
@@ -213,7 +215,7 @@ public class UI {
 
 	/**
 	 * Create a transparent image
-	 *
+	 * 
 	 * @param imageSize
 	 * @return
 	 */
@@ -223,7 +225,7 @@ public class UI {
 
 		if (net.tourbook.util.UI.IS_OSX) {
 
-			// OSX 
+			// OSX
 			transparentImageData = new ImageData(//
 					imageSize,
 					imageSize,

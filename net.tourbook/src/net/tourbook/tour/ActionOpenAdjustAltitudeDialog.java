@@ -68,6 +68,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 		boolean isCreateDummyAltitude = false;
 		final int[] altitudeSerie = tourData.altitudeSerie;
 
+		// check if altitude values are available
 		if (altitudeSerie == null || altitudeSerie.length == 0) {
 			if (MessageDialog.openQuestion(
 					Display.getCurrent().getActiveShell(),
@@ -81,7 +82,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 
 		/*
 		 * don't save when the tour is opened in the editor, just update the tour, saving must be
-		 * done in the editor ALWAYS
+		 * done ALWAYS in the editor
 		 */
 		boolean isSave = true;
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();

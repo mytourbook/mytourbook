@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,7 @@ import net.tourbook.ui.tourChart.IXAxisSelectionListener;
 import net.tourbook.ui.tourChart.SplineDrawingData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
+import net.tourbook.util.PixelConverter;
 import net.tourbook.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -54,7 +55,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -62,10 +62,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -74,56 +78,64 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLayer {
 
-	private static final String				WIDGET_DATA_ALTI_ID			= "altiId";						//$NON-NLS-1$
-	private static final String				WIDGET_DATA_METRIC_ALTITUDE	= "metricAltitude";				//$NON-NLS-1$
+	// 40 is the largest size that the mouse wheel can adjust the scale by 1 (windows)
+	public static final int					MAX_ADJUST_GEO_POS_SLICES			= 40;
 
-	private static final int				ALTI_ID_START				= 1;
-	private static final int				ALTI_ID_END					= 2;
-	private static final int				ALTI_ID_MAX					= 3;
+	private static final String				WIDGET_DATA_ALTI_ID					= "altiId";								//$NON-NLS-1$
+	private static final String				WIDGET_DATA_METRIC_ALTITUDE			= "metricAltitude";						//$NON-NLS-1$
 
-	private static final int				ADJUST_TYPE_SRTM			= 1010;
-	private static final int				ADJUST_TYPE_SRTM_SPLINE		= 1020;
-	private static final int				ADJUST_TYPE_WHOLE_TOUR		= 1030;
-	private static final int				ADJUST_TYPE_START_AND_END	= 1040;
-	private static final int				ADJUST_TYPE_MAX_HEIGHT		= 1050;
-	private static final int				ADJUST_TYPE_END				= 1060;
+	private static final int				ALTI_ID_START						= 1;
+	private static final int				ALTI_ID_END							= 2;
+	private static final int				ALTI_ID_MAX							= 3;
 
-	private static AdjustmentType[]			ALL_ADJUSTMENT_TYPES		= new AdjustmentType[] {
+	private static final int				ADJUST_TYPE_SRTM					= 1010;
+	private static final int				ADJUST_TYPE_SRTM_SPLINE				= 1020;
+	private static final int				ADJUST_TYPE_WHOLE_TOUR				= 1030;
+	private static final int				ADJUST_TYPE_START_AND_END			= 1040;
+	private static final int				ADJUST_TYPE_MAX_HEIGHT				= 1050;
+	private static final int				ADJUST_TYPE_END						= 1060;
+	private static final int				ADJUST_TYPE_HORIZONTAL_GEO_POSITION	= 1100;
+
+	private static AdjustmentType[]			ALL_ADJUSTMENT_TYPES				= new AdjustmentType[] {
 			new AdjustmentType(ADJUST_TYPE_SRTM_SPLINE, Messages.adjust_altitude_type_srtm_spline),
 			new AdjustmentType(ADJUST_TYPE_SRTM, Messages.adjust_altitude_type_srtm),
 			new AdjustmentType(ADJUST_TYPE_START_AND_END, Messages.adjust_altitude_type_start_and_end),
 			new AdjustmentType(ADJUST_TYPE_MAX_HEIGHT, Messages.adjust_altitude_type_adjust_height),
 			new AdjustmentType(ADJUST_TYPE_END, Messages.adjust_altitude_type_adjust_end),
 			new AdjustmentType(ADJUST_TYPE_WHOLE_TOUR, Messages.adjust_altitude_type_adjust_whole_tour),
-																		//
-																		};
+			new AdjustmentType(ADJUST_TYPE_HORIZONTAL_GEO_POSITION, Messages.Adjust_Altitude_Type_HorizontalGeoPosition),
+																				//
+																				};
 
-	private static final String				PREF_ADJUST_TYPE			= "adjust.altitude.adjust_type";	//$NON-NLS-1$
-	private static final String				PREF_KEEP_START				= "adjust.altitude.keep_start";	//$NON-NLS-1$
+	private static final String				PREF_ADJUST_TYPE					= "adjust.altitude.adjust_type";			//$NON-NLS-1$
+	private static final String				PREF_KEEP_START						= "adjust.altitude.keep_start";			//$NON-NLS-1$
+	private static final String				PREF_SCALE_GEO_POSITION				= "Dialog_AdjustAltitude_GeoPositionScale"; //$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore					= TourbookPlugin
-																				.getDefault()
-																				.getPreferenceStore();
+	private final IPreferenceStore			_prefStore							= TourbookPlugin
+																						.getDefault()
+																						.getPreferenceStore();
 
 	/*
 	 * data
 	 */
 	private boolean							_isDisableSliderEvent;
-	private boolean							_isTourSaved				= false;
+	private boolean							_isTourSaved						= false;
 	private final boolean					_isSaveTour;
+	private final boolean					_isCreateDummyAltitude;
 
 	private final TourData					_tourData;
 	private SplineData						_splineData;
 
-	private final boolean					_isCreateDummyAltitude;
-	private int[]							_metricAltitudeSerieBackup;
-	private int[]							_metricAdjustedAltitudeWithoutSRTM;
-	private final int[]						_srtmValues;
+	private int[]							_backupMetricAltitudeSerie;
+	private int[]							_backupSrtmSerie;
+	private int[]							_backupSrtmSerieImperial;
 
-	private int								_oldAdjustmentType			= -1;
-	private final ArrayList<AdjustmentType>	_availableAdjustmentTypes	= new ArrayList<AdjustmentType>();
- 
-	private int								_pointHitIndex				= -1;
+	private int[]							_metricAdjustedAltitudeWithoutSRTM;
+
+	private int								_oldAdjustmentType					= -1;
+	private final ArrayList<AdjustmentType>	_availableAdjustmentTypes			= new ArrayList<AdjustmentType>();
+
+	private int								_pointHitIndex						= -1;
 	private int								_altiDiff;
 	private int								_sliderXAxisValue;
 
@@ -139,7 +151,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private int								_prevAltiMax;
 	private int								_prevAltiStart;
 
-	private static final NumberFormat		_nf							= NumberFormat.getNumberInstance();
+	private static final NumberFormat		_nf									= NumberFormat.getNumberInstance();
+
 	static {
 		_nf.setMinimumFractionDigits(0);
 		_nf.setMaximumFractionDigits(3);
@@ -158,11 +171,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	private Composite						_pageOptionSRTMSpline;
 	private Composite						_pageOptionNoSRTM;
 	private Composite						_pageOptionSRTM;
+	private Composite						_pageOptionGeoPosition;
 
 	private Combo							_comboAdjustmentType;
 
 	private Button							_btnSRTMRemoveAllPoints;
-//	private Button						_btnResetAdjustments;
 	private Button							_btnResetAltitude;
 	private Button							_btnUpdateAltitude;
 
@@ -176,6 +189,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private Button							_rdoKeepBottom;
 	private Button							_rdoKeepStart;
+
+	private Label							_lblSliceValue;
+	private Scale							_scaleSlicePos;
 
 	private ChartLayer2ndAltiSerie			_chartLayer2ndAltiSerie;
 
@@ -198,13 +214,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		super(parentShell);
 
 		_tourData = tourData;
-		_srtmValues = _tourData.getSRTMSerie();
 		_isSaveTour = isSaveTour;
 		_isCreateDummyAltitude = isCreateDummyAltitude;
 
 		// set icon for the window
-		final Image shellImage = TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude).createImage();
-		setDefaultImage(shellImage);
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude).createImage());
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -213,13 +227,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	void actionCreateSplinePoint(final int mouseDownDevPositionX, final int mouseDownDevPositionY) {
 
 		if (computeNewPoint(mouseDownDevPositionX, mouseDownDevPositionY, 1)) {
-			onChangeAdjustType();
+			onSelectAdjustmentType();
 		}
 	}
 
 	void actionCreateSplinePoint3(final int mouseDownDevPositionX, final int mouseDownDevPositionY) {
 		if (computeNewPoint(mouseDownDevPositionX, mouseDownDevPositionY, 3)) {
-			onChangeAdjustType();
+			onSelectAdjustmentType();
 		}
 	}
 
@@ -235,10 +249,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			if (_isCreateDummyAltitude) {
 				_tourData.altitudeSerie = null;
 			} else {
-				_tourData.altitudeSerie = _metricAltitudeSerieBackup;
+				_tourData.altitudeSerie = _backupMetricAltitudeSerie;
 			}
-
 			_tourData.clearAltitudeSeries();
+
+			_tourData.setSRTMValues(_backupSrtmSerie, _backupSrtmSerieImperial);
 		}
 
 		return super.close();
@@ -301,7 +316,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * adjust end altitude
-	 *
+	 * 
 	 * @param altiSrc
 	 * @param tourData
 	 * @param newEndAlti
@@ -325,7 +340,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * adjust every altitude with the same difference
-	 *
+	 * 
 	 * @param altiSrc
 	 * @param altiDest
 	 * @param newStartAlti
@@ -341,7 +356,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Adjust max altitude, keep min value
-	 *
+	 * 
 	 * @param altiSrc
 	 * @param altiDest
 	 * @param maxAltiNew
@@ -388,7 +403,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		// get altitude diff serie
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			final int srtmAltitude = _srtmValues[serieIndex];
+			final int srtmAltitude = _backupSrtmSerie[serieIndex];
 
 			diffTo2ndAlti[serieIndex] = 0;
 			adjustedAltiSerie[serieIndex] = srtmAltitude;
@@ -413,7 +428,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		final int[] yDataSerie = _tourData.getAltitudeSerie();
 
 		_sliderXAxisValue = xDataSerie[sliderIndex];
-		_altiDiff = _srtmValues[0] - yDataSerie[0];
+		_altiDiff = _backupSrtmSerie[0] - yDataSerie[0];
 
 		// ensure that a point can be moved with the mouse
 		_altiDiff = _altiDiff == 0 ? 1 : _altiDiff;
@@ -426,7 +441,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final int yValue = yDataSerie[serieIndex];
-			final int srtmValue = _srtmValues[serieIndex];
+			final int srtmValue = _backupSrtmSerie[serieIndex];
 
 			if (serieIndex <= sliderIndex && sliderIndex != 0) {
 
@@ -723,7 +738,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Compute relative position of the moved point
-	 *
+	 * 
 	 * @param mouseEvent
 	 */
 	private void computePointMoveValues(final ChartMouseEvent mouseEvent) {
@@ -823,7 +838,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * Create altitude spinner field
-	 *
+	 * 
 	 * @param startContainer
 	 * @return Returns the field
 	 */
@@ -956,7 +971,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		int[] altitudeSerie;
 
 		if (_isCreateDummyAltitude) {
+
 			altitudeSerie = new int[_tourData.timeSerie.length];
+
 			for (int index = 0; index < altitudeSerie.length; index++) {
 				/*
 				 * it's better to set a value instead of having 0, but the value should not be too
@@ -975,7 +992,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		_metricAltitudeSerieBackup = Util.createDataSerieCopy(altitudeSerie);
+		_backupMetricAltitudeSerie = Util.createIntegerCopy(altitudeSerie);
+
+		final int[][] srtmValues = _tourData.getSRTMValues();
+		if (srtmValues != null) {
+			_backupSrtmSerie = srtmValues[0];
+			_backupSrtmSerieImperial = srtmValues[1];
+		}
 	}
 
 	@Override
@@ -986,7 +1009,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		createUI(dlgArea);
 
 		initializeSplineData();
-		initializeAltitude(_metricAltitudeSerieBackup);
+		initializeAltitude(_backupMetricAltitudeSerie);
 
 		return dlgArea;
 	}
@@ -1018,7 +1041,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			_comboAdjustmentType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangeAdjustType();
+					onSelectAdjustmentType();
 				}
 			});
 		}
@@ -1026,8 +1049,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		// fill combo
 		for (final AdjustmentType adjustType : ALL_ADJUSTMENT_TYPES) {
 
-			if (_srtmValues == null
-					&& (adjustType.__id == ADJUST_TYPE_SRTM_SPLINE || adjustType.__id == ADJUST_TYPE_SRTM)) {
+			if (_backupSrtmSerie == null && (//
+					adjustType.__id == ADJUST_TYPE_SRTM_SPLINE //
+							|| adjustType.__id == ADJUST_TYPE_SRTM //
+					|| adjustType.__id == ADJUST_TYPE_HORIZONTAL_GEO_POSITION
+					//
+					)) {
 
 				// skip types which require srtm data
 				continue;
@@ -1065,7 +1092,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 					return;
 				}
 
-				onChangeAdjustType();
+				onSelectAdjustmentType();
 			}
 		});
 
@@ -1127,6 +1154,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			_pageOptionSRTM = createUI40OptionWithSRTM(_pageBookOptions);
 			_pageOptionSRTMSpline = createUI50OptionWithSRTMSpline(_pageBookOptions);
 			_pageOptionNoSRTM = createUI60OptionWithoutSRTM(_pageBookOptions);
+			_pageOptionGeoPosition = createUI70OptionGeoPosition(_pageBookOptions);
 		}
 	}
 
@@ -1213,7 +1241,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				public void widgetSelected(final SelectionEvent e) {
 
 					initializeSplineData();
-					onChangeAdjustType();
+					onSelectAdjustmentType();
 				}
 			});
 			setButtonLayoutData(_btnSRTMRemoveAllPoints);
@@ -1369,6 +1397,57 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
+	private Composite createUI70OptionGeoPosition(final PageBook parent) {
+
+		final PixelConverter pc = new PixelConverter(parent);
+		final int valueWidth = pc.convertWidthInCharsToPixels(4);
+		Label label;
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		group.setText(Messages.Adjust_Altitude_Group_GeoPosition);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		{
+			/*
+			 * label: adjusted slices
+			 */
+			label = new Label(group, SWT.NONE);
+			label.setText(Messages.Adjust_Altitude_Label_GeoPosition_Slices);
+
+			/*
+			 * label: slice value
+			 */
+			_lblSliceValue = new Label(group, SWT.TRAIL);
+			GridDataFactory
+					.fillDefaults()
+					.align(SWT.END, SWT.CENTER)
+					.hint(valueWidth, SWT.DEFAULT)
+					.applyTo(_lblSliceValue);
+
+			/*
+			 * scale: slice position
+			 */
+			_scaleSlicePos = new Scale(group, SWT.HORIZONTAL);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleSlicePos);
+			_scaleSlicePos.setMinimum(0);
+			_scaleSlicePos.setMaximum(MAX_ADJUST_GEO_POS_SLICES * 2);
+			_scaleSlicePos.setPageIncrement(5);
+			_scaleSlicePos.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectSlicePosition();
+				}
+			});
+			_scaleSlicePos.addListener(SWT.MouseDoubleClick, new Listener() {
+				public void handleEvent(final Event event) {
+					onDoubleClickGeoPos(event.widget);
+				}
+			});
+		}
+
+		return group;
+	}
+
 	private void enableFieldsWithoutSRTM() {
 
 		// set adjustment type and enable the field(s) which can be modified
@@ -1463,7 +1542,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * reset altitudes to it's original values
-	 *
+	 * 
 	 * @param metricAltitudeSerie
 	 */
 	private void initializeAltitude(final int[] metricAltitudeSerie) {
@@ -1517,7 +1596,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	/**
 	 * create spline values, these are 3 points at start/middle/end
-	 *
+	 * 
 	 * @param altiDiff
 	 * @param sliderDistance
 	 * @return
@@ -1583,64 +1662,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		super.okPressed();
 	}
 
-	private void onChangeAdjustType() {
-
-		// hide all 2nd data series
-		_tourData.dataSerieAdjustedAlti = null;
-		_tourData.dataSerieDiffTo2ndAlti = null;
-		_tourData.dataSerie2ndAlti = null;
-		_tourData.dataSerieSpline = null;
-
-		// hide splines
-		_tourData.splineDataPoints = null;
-		_splineData.serieIndex = null;
-
-		final int adjustmentType = getSelectedAdjustmentType().__id;
-		switch (adjustmentType) {
-		case ADJUST_TYPE_SRTM:
-
-			_pageBookOptions.showPage(_pageOptionSRTM);
-			computeAltitudeSRTM();
-
-			break;
-
-		case ADJUST_TYPE_SRTM_SPLINE:
-
-			// display splines
-			_tourData.splineDataPoints = _splineData;
-
-			_pageBookOptions.showPage(_pageOptionSRTMSpline);
-			computeAltitudeSRTMSpline();
-
-			break;
-
-		case ADJUST_TYPE_WHOLE_TOUR:
-		case ADJUST_TYPE_START_AND_END:
-		case ADJUST_TYPE_END:
-		case ADJUST_TYPE_MAX_HEIGHT:
-
-			_pageBookOptions.showPage(_pageOptionNoSRTM);
-			onResetAltitude();
-
-			break;
-
-		default:
-			_pageBookOptions.showPage(_pageEmpty);
-			break;
-		}
-
-		/*
-		 * layout is a performance hog, optimize it
-		 */
-		if (_oldAdjustmentType != adjustmentType) {
-			_dlgContainer.layout(true);
-		}
-
-		_oldAdjustmentType = adjustmentType;
-
-		updateUI2ndLayer();
-	}
-
 	private void onChangeAltitude() {
 
 		// calcuate new altitude values
@@ -1652,6 +1673,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateUIAltiFields();
 
 		updateUI2ndLayer();
+	}
+
+	private void onDoubleClickGeoPos(final Widget widget) {
+
+		final Scale scale = (Scale) widget;
+		final int max = scale.getMaximum();
+
+		scale.setSelection(max / 2);
+
+		onSelectSlicePosition();
 	}
 
 	private void onMouseDown(final ChartMouseEvent mouseEvent) {
@@ -1703,7 +1734,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 			computePointMoveValues(mouseEvent);
 
-			onChangeAdjustType();
+			onSelectAdjustmentType();
 
 			mouseEvent.isWorked = true;
 
@@ -1734,11 +1765,30 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			computeDeletedPoint();
 
 			// redraw layer to update the hit rectangles
-			onChangeAdjustType();
+			onSelectAdjustmentType();
 		}
 
 		mouseEvent.isWorked = true;
 		_pointHitIndex = -1;
+	}
+
+	/**
+	 * display altitude with the original altitude data
+	 */
+	private void onResetAltitude() {
+
+		_altiMaxDiff = 0;
+		_altiStartDiff = 0;
+		_prevAltiStart = 0;
+		_prevAltiMax = 0;
+
+		_tourData.altitudeSerie = Util.createIntegerCopy(_backupMetricAltitudeSerie);
+		_tourData.clearAltitudeSeries();
+
+		initializeAltitude(_backupMetricAltitudeSerie);
+		onChangeAltitude();
+
+		updateTourChart();
 	}
 
 //	/**
@@ -1760,28 +1810,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //		updateTourChart();
 //	}
 
-	/**
-	 * display altitude with the original altitude data
-	 */
-	private void onResetAltitude() {
-
-		_altiMaxDiff = 0;
-		_altiStartDiff = 0;
-		_prevAltiStart = 0;
-		_prevAltiMax = 0;
-
-		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAltitudeSerieBackup);
-		_tourData.clearAltitudeSeries();
-
-		initializeAltitude(_metricAltitudeSerieBackup);
-		onChangeAltitude();
-
-		updateTourChart();
-	}
-
 	private void onResetAltitudeSRTM() {
 
-		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAltitudeSerieBackup);
+		_tourData.altitudeSerie = Util.createIntegerCopy(_backupMetricAltitudeSerie);
 		_tourData.clearAltitudeSeries();
 
 		computeAltitudeSRTM();
@@ -1791,7 +1822,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void onResetAltitudeSRTMSpline() {
 
-		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAltitudeSerieBackup);
+		_tourData.altitudeSerie = Util.createIntegerCopy(_backupMetricAltitudeSerie);
 		_tourData.clearAltitudeSeries();
 
 		/*
@@ -1807,12 +1838,132 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		updateTourChart();
 	}
 
+	private void onSelectAdjustmentType() {
+
+		// hide all 2nd data series
+		_tourData.dataSerieAdjustedAlti = null;
+		_tourData.dataSerieDiffTo2ndAlti = null;
+		_tourData.dataSerie2ndAlti = null;
+		_tourData.dataSerieSpline = null;
+		_tourData.setSRTMValues(_backupSrtmSerie, _backupSrtmSerieImperial);
+
+		// hide splines
+		_tourData.splineDataPoints = null;
+		_splineData.serieIndex = null;
+
+		final int adjustmentType = getSelectedAdjustmentType().__id;
+		switch (adjustmentType) {
+		case ADJUST_TYPE_SRTM:
+
+			_pageBookOptions.showPage(_pageOptionSRTM);
+
+			computeAltitudeSRTM();
+
+			break;
+
+		case ADJUST_TYPE_HORIZONTAL_GEO_POSITION:
+
+			_pageBookOptions.showPage(_pageOptionGeoPosition);
+
+			onSelectSlicePosition();
+
+			break;
+
+		case ADJUST_TYPE_SRTM_SPLINE:
+
+			_pageBookOptions.showPage(_pageOptionSRTMSpline);
+
+			// display splines
+			_tourData.splineDataPoints = _splineData;
+			computeAltitudeSRTMSpline();
+
+			break;
+
+		case ADJUST_TYPE_WHOLE_TOUR:
+		case ADJUST_TYPE_START_AND_END:
+		case ADJUST_TYPE_END:
+		case ADJUST_TYPE_MAX_HEIGHT:
+
+			_pageBookOptions.showPage(_pageOptionNoSRTM);
+			onResetAltitude();
+
+			break;
+
+		default:
+			_pageBookOptions.showPage(_pageEmpty);
+			break;
+		}
+
+		/*
+		 * layout is a performance hog, optimize it
+		 */
+		if (_oldAdjustmentType != adjustmentType) {
+			_dlgContainer.layout(true);
+		}
+
+		_oldAdjustmentType = adjustmentType;
+
+		updateUI2ndLayer();
+	}
+
+	private void onSelectSlicePosition() {
+
+		int diffGeoSlices = _scaleSlicePos.getSelection() - MAX_ADJUST_GEO_POS_SLICES;
+		final int serieLength = _tourData.timeSerie.length;
+
+		// adjust slices to bounds
+		if (diffGeoSlices > serieLength) {
+			diffGeoSlices = serieLength - 1;
+		} else if (-diffGeoSlices > serieLength) {
+			diffGeoSlices = -(serieLength - 1);
+		}
+
+		/*
+		 * adjust srtm data
+		 */
+		final int[] adjustedSRTM = new int[serieLength];
+		final int[] adjustedSRTMImperial = new int[serieLength];
+
+		final int srcPos = diffGeoSlices >= 0 ? 0 : -diffGeoSlices;
+		final int destPos = diffGeoSlices >= 0 ? diffGeoSlices : 0;
+		final int adjustedLength = serieLength - (diffGeoSlices < 0 ? -diffGeoSlices : diffGeoSlices);
+
+		System.arraycopy(_backupSrtmSerie, srcPos, adjustedSRTM, destPos, adjustedLength);
+		System.arraycopy(_backupSrtmSerieImperial, srcPos, adjustedSRTMImperial, destPos, adjustedLength);
+
+		_tourData.setSRTMValues(adjustedSRTM, adjustedSRTMImperial);
+
+		final int[] metricAltiSerie = _tourData.altitudeSerie;
+		final int[] diffTo2ndAlti = _tourData.dataSerieDiffTo2ndAlti = new int[serieLength];
+
+		// get altitude diff serie
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			final int srtmAltitude = adjustedSRTM[serieIndex];
+
+			// ignore diffs which are outside of the adjusted srtm
+			if ((diffGeoSlices >= 0 && serieIndex >= diffGeoSlices)
+					|| (diffGeoSlices < 0 && serieIndex < (serieLength - (-diffGeoSlices)))) {
+
+				final int sliceDiff = metricAltiSerie[serieIndex] - srtmAltitude;
+				diffTo2ndAlti[serieIndex] = sliceDiff;
+			}
+		}
+
+		updateUIGeoPos();
+		updateTourChart();
+
+		// this is not working, srtm data must be adjusted !!!
+		// update only the second layer, this is much faster
+//		_tourChart.update2ndAltiLayer(this, true);
+	}
+
 	/**
 	 * display altitude with the adjusted altitude data
 	 */
 	private void onUpdateAltitude() {
 
-		_tourData.altitudeSerie = Util.createDataSerieCopy(_metricAdjustedAltitudeWithoutSRTM);
+		_tourData.altitudeSerie = Util.createIntegerCopy(_metricAdjustedAltitudeWithoutSRTM);
 		_tourData.clearAltitudeSeries();
 
 		updateTourChart();
@@ -1820,28 +1971,17 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void onUpdateAltitudeSRTM() {
 
-		final int[] dataSerieAdjustedAlti = _tourData.dataSerieAdjustedAlti;
-		final int[] newAltitudeSerie = new int[dataSerieAdjustedAlti.length];
-		for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
-			newAltitudeSerie[serieIndex] = (int) (dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE);
-		}
-		_tourData.altitudeSerie = newAltitudeSerie;
+		saveTour10AdjustSRTM();
 		_tourData.clearAltitudeSeries();
 
 		computeAltitudeSRTM();
 
 		updateTourChart();
-
 	}
 
 	private void onUpdateAltitudeSRTMSpline() {
 
-		final int[] dataSerieAdjustedAlti = _tourData.dataSerieAdjustedAlti;
-		final int[] newAltitudeSerie = new int[dataSerieAdjustedAlti.length];
-		for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
-			newAltitudeSerie[serieIndex] = (int) (dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE);
-		}
-		_tourData.altitudeSerie = newAltitudeSerie;
+		saveTour10AdjustSRTM();
 		_tourData.clearAltitudeSeries();
 
 		/*
@@ -1882,6 +2022,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_rdoKeepStart.setSelection(isKeepStart);
 		_rdoKeepBottom.setSelection(!isKeepStart);
 
+		/*
+		 * scale: geo position
+		 */
+		int scaleGeoPos;
+		if (_prefStore.contains(PREF_SCALE_GEO_POSITION)) {
+			scaleGeoPos = _prefStore.getInt(PREF_SCALE_GEO_POSITION);
+		} else {
+			scaleGeoPos = MAX_ADJUST_GEO_POS_SLICES;
+		}
+		_scaleSlicePos.setSelection(scaleGeoPos);
 	}
 
 	private void saveState() {
@@ -1894,8 +2044,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		_prefStore.setValue(PREF_KEEP_START, _rdoKeepStart.getSelection());
 
+		_prefStore.setValue(PREF_SCALE_GEO_POSITION, _scaleSlicePos.getSelection());
 	}
 
+	/**
+	 * Tour is saved in the database when the dialog is closed, this method prepares the data.
+	 */
 	private void saveTour() {
 
 		_isTourSaved = true;
@@ -1903,14 +2057,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		switch (getSelectedAdjustmentType().__id) {
 		case ADJUST_TYPE_SRTM:
 		case ADJUST_TYPE_SRTM_SPLINE:
+			saveTour10AdjustSRTM();
+			break;
 
-			final int[] dataSerieAdjustedAlti = _tourData.dataSerieAdjustedAlti;
-			final int[] altitudeSerie = new int[dataSerieAdjustedAlti.length];
-
-			for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
-				altitudeSerie[serieIndex] = (int) (dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE);
-			}
-			_tourData.altitudeSerie = altitudeSerie;
+		case ADJUST_TYPE_HORIZONTAL_GEO_POSITION:
+			saveTour20AdjustGeoSlicePosition();
 			break;
 
 		case ADJUST_TYPE_WHOLE_TOUR:
@@ -1929,6 +2080,68 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		// adjust altitude up/down values
 		_tourData.computeAltitudeUpDown();
+	}
+
+	private void saveTour10AdjustSRTM() {
+
+		final int[] dataSerieAdjustedAlti = _tourData.dataSerieAdjustedAlti;
+		final int[] newAltitudeSerie = _tourData.altitudeSerie = new int[dataSerieAdjustedAlti.length];
+
+		for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
+			newAltitudeSerie[serieIndex] = (int) (dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE);
+		}
+	}
+
+	private void saveTour20AdjustGeoSlicePosition() {
+
+		int diffGeoSlices = _scaleSlicePos.getSelection() - MAX_ADJUST_GEO_POS_SLICES;
+		final int serieLength = _tourData.timeSerie.length;
+
+		// adjust slices to bounds
+		if (diffGeoSlices > serieLength) {
+			diffGeoSlices = serieLength - 1;
+		} else if (-diffGeoSlices > serieLength) {
+			diffGeoSlices = -(serieLength - 1);
+		}
+
+		final double[] oldLatSerie = _tourData.latitudeSerie;
+		final double[] oldLonSerie = _tourData.longitudeSerie;
+
+		final double[] newLatSerie = _tourData.latitudeSerie = new double[serieLength];
+		final double[] newLonSerie = _tourData.longitudeSerie = new double[serieLength];
+
+		final int srcPos = diffGeoSlices >= 0 ? 0 : -diffGeoSlices;
+		final int destPos = diffGeoSlices >= 0 ? diffGeoSlices : 0;
+		final int adjustedLength = serieLength - (diffGeoSlices < 0 ? -diffGeoSlices : diffGeoSlices);
+
+		System.arraycopy(oldLatSerie, srcPos, newLatSerie, destPos, adjustedLength);
+		System.arraycopy(oldLonSerie, srcPos, newLonSerie, destPos, adjustedLength);
+
+		// fill gaps with starting/ending position
+		if (diffGeoSlices >= 0) {
+
+			final double startLat = oldLatSerie[0];
+			final double startLon = oldLonSerie[0];
+
+			for (int serieIndex = 0; serieIndex < diffGeoSlices; serieIndex++) {
+				newLatSerie[serieIndex] = startLat;
+				newLonSerie[serieIndex] = startLon;
+			}
+
+		} else {
+
+			// diffGeoSlices < 0
+
+			final int lastIndex = serieLength - 1;
+			final int validEndIndex = lastIndex - (-diffGeoSlices);
+			final double endLat = oldLatSerie[lastIndex];
+			final double endLon = oldLonSerie[lastIndex];
+
+			for (int serieIndex = validEndIndex; serieIndex < serieLength; serieIndex++) {
+				newLatSerie[serieIndex] = endLat;
+				newLonSerie[serieIndex] = endLon;
+			}
+		}
 	}
 
 	private CubicSpline updateSplineData() {
@@ -2017,6 +2230,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		_isDisableModifyListener = false;
 
 		getButton(IDialogConstants.OK_ID).setEnabled(true);
+	}
+
+	private void updateUIGeoPos() {
+
+		final int geoPosSlices = _scaleSlicePos.getSelection() - MAX_ADJUST_GEO_POS_SLICES;
+
+		_lblSliceValue.setText(Integer.toString(geoPosSlices));
 	}
 
 }

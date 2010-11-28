@@ -330,8 +330,8 @@ public class MapProviderManager {
 					StatusUtil.showStatus(e.getMessage(), e);
 
 					/*
-					 * disable this wms map provider, it is possible that
-					 * the server is currently not available
+					 * disable this wms map provider, it is possible that the server is currently
+					 * not available
 					 */
 					for (final MP mapProvider : _allMapProviders) {
 
@@ -505,10 +505,16 @@ public class MapProviderManager {
 
 				_deleteUIUpdateTime = time;
 
+				final String fileFolderName = fileFolder.toString();
+				final int endIndex = fileFolderName.length();
+				int beginIndex = endIndex - 100;
+				beginIndex = beginIndex < 0 ? 0 : beginIndex;
+
 				monitor.subTask(NLS.bind(Messages.MP_Manager_DeletedOfflineImagesParts_SubTask, //
-						new Object[] { _deleteUICheckedFiles, _deleteUIDeletedFiles
-//						, fileFolder.toString()
-						}));
+						new Object[] {
+								_deleteUICheckedFiles,
+								_deleteUIDeletedFiles,
+								fileFolderName.substring(beginIndex, endIndex) }));
 			}
 
 			if (isDeletePartImages) {
@@ -1331,11 +1337,10 @@ public class MapProviderManager {
 
 	/**
 	 * @param importFilePath
-	 * @return Returns the imported map provider or <code>null</code> when an import
-	 *         error occured<br>
+	 * @return Returns the imported map provider or <code>null</code> when an import error occured<br>
 	 * <br>
-	 *         Multiple map providers are returned when a map profile contains map providers
-	 *         which do not yet exists
+	 *         Multiple map providers are returned when a map profile contains map providers which
+	 *         do not yet exists
 	 */
 	public ArrayList<MP> importMapProvider(final String importFilePath) {
 

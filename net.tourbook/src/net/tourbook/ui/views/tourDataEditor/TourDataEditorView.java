@@ -50,6 +50,7 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
@@ -86,6 +87,7 @@ import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.StatusUtil;
 import net.tourbook.util.Util;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
@@ -194,6 +196,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
+	public static final int						DEFAULT_TEXT_INPUT_WIDTH		= 200;
+
 	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore						= TourbookPlugin
@@ -217,12 +221,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;			;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
- 
+
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
+
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
+
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
@@ -233,6 +239,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
+
+	/**
+	 * Tour start daytime in seconds
+	 */
+	private int									_tourStartDayTime;
+
 	/*
 	 * data series which are displayed in the viewer
 	 */
@@ -240,7 +252,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private int[]								_serieDistance;
 	private int[]								_serieAltitude;
-	private int[]								_serieTemperature;
+	private double[]							_serieTemperature;
 	private int[]								_serieCadence;
 	private int[]								_serieGradient;
 	private int[]								_serieSpeed;
@@ -391,10 +403,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	private int							fUIUpdateCounterTabSlices		= -1;
 
 	private SliceIntegerEditingSupport			_pulseEditingSupport;
-	private SliceIntegerEditingSupport			_temperatureEditingSupport;
+	private SliceDouble2EditingSupport			_temperatureEditingSupport;
 	private SliceIntegerEditingSupport			_cadenceEditingSupport;
 	private SliceDoubleEditingSupport			_latitudeEditingSupport;
 	private SliceDoubleEditingSupport			_longitudeEditingSupport;
+
 	private int									_enableActionCounter			= 0;
 
 	/**
@@ -412,6 +425,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean								_isWindSpeedManuallyModified;
 	private boolean								_isTemperatureManuallyModified;
+
+	private boolean								_isSetDigits					= false;
 
 	/*
 	 * measurement unit values
@@ -483,9 +498,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Spinner								_spinTourCalories;
 	private Spinner								_spinTemperature;
 
+	private Text								_txtWeather;
 	private Label								_lblTemperatureUnit;
 	private Spinner								_spinWindDirectionValue;
-
 	private Spinner								_spinWindSpeedValue;
 	private Combo								_comboWindDirectionText;
 	private Combo								_comboWindSpeedText;
@@ -532,6 +547,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtMergeIntoTourId;
 	private Text								_txtDateTimeCreated;
 	private Text								_txtDateTimeModified;
+
+	//
+	// ################################################## End of UI controls ##################################################
+	//
 
 	/*
 	 * actions
@@ -619,11 +638,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	/*
-	 * ################################################## End of UI controls
-	 * ##################################################
-	 */
-
 	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
 		@Override
@@ -651,6 +665,110 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 // time is disabled because it's not always available in gpx files
 			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+		}
+	}
+
+	private final class SliceDouble2EditingSupport extends EditingSupport {
+
+		private final TextCellEditor	__cellEditor;
+		private double[]				__dataSerie;
+
+		private SliceDouble2EditingSupport(final TextCellEditor cellEditor, final double[] dataSerie) {
+			super(_sliceViewer);
+			__cellEditor = cellEditor;
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected boolean canEdit(final Object element) {
+
+			if ((__dataSerie == null) || (isTourInDb() == false) || (_isEditMode == false)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(final Object element) {
+			return __cellEditor;
+		}
+
+		@Override
+		protected Object getValue(final Object element) {
+
+			final double metricValue = __dataSerie[((TimeSlice) element).serieIndex];
+			double displayedValue = metricValue;
+
+			/*
+			 * convert current measurement system into metric
+			 */
+			if (__dataSerie == _serieTemperature) {
+
+				if (_unitValueTemperature != 1) {
+
+					// none metric measurement systemm
+
+					displayedValue = metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+				}
+			}
+
+			// remove trailing numbers which should not be displayed
+			final String returnValue = _nf1.format(displayedValue);
+
+			return returnValue;
+		}
+
+		public void setDataSerie(final double[] dataSerie) {
+			__dataSerie = dataSerie;
+		}
+
+		@Override
+		protected void setValue(final Object element, final Object value) {
+
+			if (value instanceof String) {
+
+				try {
+
+					final double enteredValue = Double.parseDouble((String) value);
+					double metricValue = enteredValue;
+
+					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
+
+					if (isTemperatureSerie) {
+
+						if (_unitValueTemperature != 1) {
+
+							// none metric measurement systemm, convert entered value into metric value
+
+							metricValue = ((enteredValue - UI.UNIT_FAHRENHEIT_ADD)) / UI.UNIT_FAHRENHEIT_MULTI;
+						}
+					}
+
+					final int serieIndex = ((TimeSlice) element).serieIndex;
+
+					// check if metric value has changed
+					if (metricValue != __dataSerie[serieIndex]) {
+
+						// value has changed
+
+						// update dataserie
+						__dataSerie[serieIndex] = metricValue;
+
+						if (isTemperatureSerie) {
+							final int temperatureScale = _tourData.getTemperatureScale();
+							final int[] temperatureSerie = _tourData.temperatureSerie;
+
+							temperatureSerie[serieIndex] = (int) (metricValue * temperatureScale);
+						}
+
+						updateUIAfterSliceEdit();
+					}
+
+				} catch (final Exception e) {
+					// ignore invalid characters
+				}
+			}
 		}
 	}
 
@@ -697,8 +815,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				try {
 
 					final double enteredValue = Double.parseDouble((String) value);
-
 					final int serieIndex = ((TimeSlice) element).serieIndex;
+
 					if (enteredValue != __dataSerie[serieIndex]) {
 
 						// value has changed
@@ -766,14 +884,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					displayedValue /= _unitValueAltitude;
 				}
 
-			} else if (__dataSerie == _serieTemperature) {
-
-				if (_unitValueTemperature != 1) {
-
-					// none metric measurement systemm
-
-					displayedValue = (int) (metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-				}
 			}
 
 			return new Integer(displayedValue).toString();
@@ -806,17 +916,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							metricValue = Math.round(noneMetricValue * _unitValueAltitude);
 						}
 
-					} else if (__dataSerie == _serieTemperature) {
-
-						if (_unitValueTemperature != 1) {
-
-							// none metric measurement systemm
-
-							// ensure float is used
-							final float noneMetricValue = enteredValue;
-							metricValue = Math.round(((noneMetricValue - UI.UNIT_FAHRENHEIT_ADD))
-									/ UI.UNIT_FAHRENHEIT_MULTI);
-						}
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
@@ -1211,14 +1310,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.setStartDay((short) _calendar.get(Calendar.DAY_OF_MONTH));
 
 		tourData.setWeek(tourData.getStartYear(), tourData.getStartMonth(), tourData.getStartDay());
+		tourData.setTemperatureScale(TourbookDevice.TEMPERATURE_SCALE);
 
 		// tour id must be created after the tour date/time is set
 		tourData.createTourId();
 
 		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-
-// manual device name is translated in TourData
-//		tourData.setDeviceName(TourData.DEVICE_NAME_FOR_MANUAL_TOUR);
 
 		tourData.setTourPerson(activePerson);
 
@@ -1342,15 +1439,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// temperature
 				if (_serieTemperature != null) {
 
-					final int metricTemperature = _serieTemperature[serieIndex];
+					final double metricTemperature = _serieTemperature[serieIndex];
 
 					if (_unitValueTemperature != 1) {
 						// use imperial system
-						final int imperialTemp = (int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-						sb.append(Integer.toString(imperialTemp));
+						final double imperialTemp = metricTemperature
+								* UI.UNIT_FAHRENHEIT_MULTI
+								+ UI.UNIT_FAHRENHEIT_ADD;
+						sb.append(Double.toString(imperialTemp));
 					} else {
 						// use metric system
-						sb.append(Integer.toString(metricTemperature));
+						sb.append(Double.toString(metricTemperature));
 					}
 				}
 				sb.append(UI.TAB);
@@ -1436,9 +1535,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * delete selected time slices
 	 * 
-	 * @param removeTime
+	 * @param isRemoveTime
 	 */
-	void actionDeleteTimeSlices(final boolean removeTime) {
+	void actionDeleteTimeSlices(final boolean isRemoveTime) {
 
 		// a tour with reference tours is currently not supported
 		if (_isReferenceTourAvailable) {
@@ -1511,9 +1610,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		Arrays.sort(indices);
 		int lastSelectionIndex = indices[0];
 
-		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, removeTime);
+		TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime);
 
 		updateMarkerMap();
+		convertTemperatureSerie(_tourData.temperatureSerie);
 
 		getDataSeriesFromTourData();
 
@@ -1893,7 +1993,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				_isSavingInProgress = true;
 				{
-					isTourSaved = saveTourValidation();
+					isTourSaved = saveTourWithValidation();
 				}
 				_isSavingInProgress = false;
 
@@ -1986,6 +2086,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			return dialog.getReturnCode() == Window.OK;
 		}
+	}
+
+	/**
+	 * Convert temperature serie into double
+	 * 
+	 * @param temperatureSerie
+	 */
+	private double[] convertTemperatureSerie(final int[] temperatureSerie) {
+
+		double[] temperatureSerieDouble = null;
+
+		if (temperatureSerie != null) {
+
+			final int temperatureScale = _tourData.getTemperatureScale();
+
+			final int serieLength = temperatureSerie.length;
+			temperatureSerieDouble = new double[serieLength];
+
+			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+				temperatureSerieDouble[serieIndex] = (double) temperatureSerie[serieIndex] / temperatureScale;
+			}
+		}
+		return temperatureSerieDouble;
 	}
 
 	private void createActions() {
@@ -2498,7 +2621,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_altitudeEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieAltitude);
 		_pulseEditingSupport = new SliceIntegerEditingSupport(cellEditor, _seriePulse);
-		_temperatureEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieTemperature);
+		_temperatureEditingSupport = new SliceDouble2EditingSupport(cellEditor, _serieTemperature);
 		_cadenceEditingSupport = new SliceIntegerEditingSupport(cellEditor, _serieCadence);
 		_latitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLatitude);
 		_longitudeEditingSupport = new SliceDoubleEditingSupport(cellEditor, _serieLongitude);
@@ -2580,7 +2703,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void createUI(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : pixelConverter.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -2684,7 +2807,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtStartLocation = _tk.createText(section, UI.EMPTY_STRING);
 			_txtStartLocation.addModifyListener(_modifyListener);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtStartLocation);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.applyTo(_txtStartLocation);
 
 			/*
 			 * end location
@@ -2694,7 +2821,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtEndLocation = _tk.createText(section, UI.EMPTY_STRING);
 			_txtEndLocation.addModifyListener(_modifyListener);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtEndLocation);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
+					.applyTo(_txtEndLocation);
 		}
 	}
 
@@ -2943,8 +3074,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.spacing(20, 5)
 				.applyTo(section);
 		{
+			createUISection141Weather(section);
 			createUISection142Weather(section);
 			createUISection144WeatherCol1(section);
+		}
+	}
+
+	private void createUISection141Weather(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * weather description
+			 */
+			final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Weather);
+			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+			_firstColumnControls.add(label);
+
+			_txtWeather = _tk.createText(container, //
+					UI.EMPTY_STRING,
+					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+			);
+			_txtWeather.addModifyListener(_modifyListener);
+
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					//
+					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+					//
+					.hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
+					.applyTo(_txtWeather);
 		}
 	}
 
@@ -3195,8 +3356,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
 			// the min/max temperature has a large range because fahrenheit has bigger values than celcius
-			_spinTemperature.setMinimum(-60);
-			_spinTemperature.setMaximum(150);
+			_spinTemperature.setMinimum(-600);
+			_spinTemperature.setMaximum(1500);
 
 			_spinTemperature.addModifyListener(new ModifyListener() {
 				@Override
@@ -3211,6 +3372,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTemperature.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
+
+					if (_isSetDigits) {
+						_isSetDigits = false;
+						return;
+					}
+
 					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
@@ -3671,14 +3838,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineSliceViewerColumns(final Composite parent) {
 
-		final PixelConverter pixelConverter = new PixelConverter(parent);
+		final PixelConverter pc = new PixelConverter(parent);
 
-		ColumnDefinition colDef;
+		defineSliceViewerColumns_1_First(pc);
+		defineSliceViewerColumns_Sequence(pc);
+		defineSliceViewerColumns_TimeInHHMMSSRelative(pc);
+		defineSliceViewerColumns_TimeOfDay(pc);
+		defineSliceViewerColumns_TimeInSeconds(pc);
+		defineSliceViewerColumns_Distance(pc);
+		defineSliceViewerColumns_Altitude(pc);
+		defineSliceViewerColumns_Gradient(pc);
+		defineSliceViewerColumns_Pulse(pc);
+		defineSliceViewerColumns_Marker(pc);
+		defineSliceViewerColumns_Temperature(pc);
+		defineSliceViewerColumns_Cadence(pc);
+		defineSliceViewerColumns_Speed(pc);
+		defineSliceViewerColumns_Pace(pc);
+		defineSliceViewerColumns_Power(pc);
+		defineSliceViewerColumns_Latitude(pc);
+		defineSliceViewerColumns_Longitude(pc);
+	}
 
-		/*
-		 * 1. column will be hidden because the alignment for the first column is always to the left
-		 */
-		colDef = TableColumnFactory.FIRST_COLUMN.createColumn(_sliceColumnManager, pixelConverter);
+	/**
+	 * 1. column will be hidden because the alignment for the first column is always to the left
+	 */
+	private void defineSliceViewerColumns_1_First(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.FIRST_COLUMN.createColumn(
+				_sliceColumnManager,
+				pixelConverter);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsColumnMoveable(false);
@@ -3687,11 +3876,251 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void update(final ViewerCell cell) {}
 		});
+	}
 
-		/*
-		 * column: #
-		 */
-		colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, pixelConverter);
+	/**
+	 * column: altitude
+	 */
+	private void defineSliceViewerColumns_Altitude(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+
+		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieAltitude != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Integer.toString((int) (_serieAltitude[timeSlice.serieIndex] / _unitValueAltitude)));
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: cadence
+	 */
+	private void defineSliceViewerColumns_Cadence(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+
+		_colDefCadence = colDef = TableColumnFactory.CADENCE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieCadence != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Integer.toString(_serieCadence[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: distance
+	 */
+	private void defineSliceViewerColumns_Distance(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieDistance != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+
+					final float distance = ((float) _serieDistance[serieIndex]) / 1000 / _unitValueDistance;
+
+					cell.setText(_nf3.format(distance));
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: gradient
+	 */
+	private void defineSliceViewerColumns_Gradient(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieGradient != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+
+					cell.setText(_nf1.format((float) _serieGradient[timeSlice.serieIndex] / 10));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: latitude
+	 */
+	private void defineSliceViewerColumns_Latitude(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+
+		_colDefLatitude = colDef = TableColumnFactory.LATITUDE.createColumn(_sliceColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieLatitude != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Double.toString(_serieLatitude[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: longitude
+	 */
+	private void defineSliceViewerColumns_Longitude(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieLongitude != null) {
+
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Double.toString(_serieLongitude[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: marker
+	 */
+	private void defineSliceViewerColumns_Marker(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+		_colDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+
+				final TourMarker tourMarker = _markerMap.get(timeSlice.serieIndex);
+				if (tourMarker != null) {
+					cell.setText(tourMarker.getLabel());
+
+					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: pace
+	 */
+	private void defineSliceViewerColumns_Pace(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_seriePace == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final long pace = _seriePace[timeSlice.serieIndex];
+
+					cell.setText(UI.format_mm_ss(pace));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: power
+	 */
+	private void defineSliceViewerColumns_Power(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_seriePower != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Integer.toString(_seriePower[timeSlice.serieIndex]));
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: pulse
+	 */
+	private void defineSliceViewerColumns_Pulse(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, pixelConverter);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_seriePulse != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Integer.toString(_seriePulse[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: #
+	 */
+	private void defineSliceViewerColumns_Sequence(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, pixelConverter);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsColumnMoveable(false);
@@ -3723,194 +4152,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: time hh:mm:ss
-		 */
-		colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				if (_serieTime != null) {
-					cell.setText(UI.format_hh_mm_ss(_serieTime[serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
+	/**
+	 * column: speed
+	 */
+	private void defineSliceViewerColumns_Speed(final PixelConverter pixelConverter) {
 
-		/*
-		 * column: time in seconds
-		 */
-		colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+		final ColumnDefinition colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, pixelConverter);
 
-				if (_serieTime != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
-					cell.setText(Integer.toString(_serieTime[serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: distance
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieDistance != null) {
-
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
-
-					final float distance = ((float) _serieDistance[serieIndex]) / 1000 / _unitValueDistance;
-
-					cell.setText(_nf3.format(distance));
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: altitude
-		 */
-		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_serieAltitude != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) (_serieAltitude[timeSlice.serieIndex] / _unitValueAltitude)));
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: gradient
-		 */
-		colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_serieGradient != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-
-					cell.setText(_nf1.format((float) _serieGradient[timeSlice.serieIndex] / 10));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: pulse
-		 */
-		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_seriePulse != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_seriePulse[timeSlice.serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: marker
-		 */
-		_colDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-
-				final TourMarker tourMarker = _markerMap.get(timeSlice.serieIndex);
-				if (tourMarker != null) {
-					cell.setText(tourMarker.getLabel());
-
-					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-					}
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: temperature
-		 */
-		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_serieTemperature != null) {
-
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int metricTemperature = _serieTemperature[timeSlice.serieIndex];
-
-					if (_unitValueTemperature != 1) {
-
-						// use imperial system
-
-						final int imperialTemp = (int) (metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-						cell.setText(Integer.toString(imperialTemp));
-
-					} else {
-
-						// use metric system
-						cell.setText(Integer.toString(metricTemperature));
-					}
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: cadence
-		 */
-		_colDefCadence = colDef = TableColumnFactory.CADENCE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_serieCadence != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_serieCadence[timeSlice.serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: speed
-		 */
-		colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -3926,74 +4176,112 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: pace
-		 */
-		colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, pixelConverter);
+	/**
+	 * column: temperature
+	 */
+	private void defineSliceViewerColumns_Temperature(final PixelConverter pixelConverter) {
+
+		ColumnDefinition colDef;
+		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, pixelConverter);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (_seriePace == null) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final long pace = _seriePace[timeSlice.serieIndex];
+				if (_serieTemperature != null) {
 
-					cell.setText(UI.format_mm_ss(pace));
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final double metricTemperature = _serieTemperature[timeSlice.serieIndex];
+
+					if (_unitValueTemperature != 1) {
+
+						// use imperial system
+
+						final double imperialTemp = metricTemperature
+								* UI.UNIT_FAHRENHEIT_MULTI
+								+ UI.UNIT_FAHRENHEIT_ADD;
+
+						cell.setText(_nf1.format(imperialTemp));
+
+					} else {
+
+						// use metric system
+						cell.setText(_nf1.format(metricTemperature));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: power
-		 */
-		colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_seriePower != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString(_seriePower[timeSlice.serieIndex]));
+	/**
+	 * column: time hh:mm:ss relative to tour start
+	 */
+	private void defineSliceViewerColumns_TimeInHHMMSSRelative(final PixelConverter pixelConverter) {
 
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(
+				_sliceColumnManager,
+				pixelConverter);
 
-		/*
-		 * column: longitude
-		 */
-		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, pixelConverter);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (_serieLongitude != null) {
-
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Double.toString(_serieLongitude[timeSlice.serieIndex]));
+				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+				if (_serieTime != null) {
+					cell.setText(UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
 			}
 		});
+	}
 
-		/*
-		 * column: latitude
-		 */
-		_colDefLatitude = colDef = TableColumnFactory.LATITUDE.createColumn(_sliceColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
+	/**
+	 * column: time in seconds
+	 */
+	private void defineSliceViewerColumns_TimeInSeconds(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, pixelConverter);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (_serieLatitude != null) {
 
+				if (_serieTime != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Double.toString(_serieLatitude[timeSlice.serieIndex]));
+					final int serieIndex = timeSlice.serieIndex;
+					cell.setText(Integer.toString(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time of day in hh:mm:ss
+	 */
+	private void defineSliceViewerColumns_TimeOfDay(final PixelConverter pixelConverter) {
+
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
+				_sliceColumnManager,
+				pixelConverter);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+					cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
 				}
 			}
 		});
@@ -4239,8 +4527,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtStartLocation.setEnabled(canEdit);
 		_txtEndLocation.setEnabled(canEdit);
 
-		_spinRestPuls.setEnabled(canEdit);
-
+		_txtWeather.setEnabled(canEdit);
 		_spinTemperature.setEnabled(canEdit && (_tourData.temperatureSerie == null));
 		_comboClouds.setEnabled(canEdit);
 		_spinWindDirectionValue.setEnabled(canEdit);
@@ -4250,7 +4537,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
-
 		_timeRecording.setEditMode(isManualAndEdit);
 		_timePaused.setEditMode(isManualAndEdit);
 		_timeDriving.setEditMode(isManualAndEdit);
@@ -4260,6 +4546,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
 		_spinTourCalories.setEnabled(isManualAndEdit);
+		_spinRestPuls.setEnabled(canEdit);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
@@ -4418,6 +4705,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData, TourDataEditorView.this);
 	}
 
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
+
 	/**
 	 * fire notification for the reverted tour data
 	 */
@@ -4428,16 +4725,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
-
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
@@ -4540,7 +4827,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_serieDistance = _tourData.distanceSerie;
 		_serieAltitude = _tourData.altitudeSerie;
-		_serieTemperature = _tourData.temperatureSerie;
 
 		_serieCadence = _tourData.cadenceSerie;
 		_seriePulse = _tourData.pulseSerie;
@@ -4553,12 +4839,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_seriePace = _tourData.getPaceSerieSeconds();
 		_seriePower = _tourData.getPowerSerie();
 
+		_serieTemperature = convertTemperatureSerie(_tourData.temperatureSerie);
+
 		_altitudeEditingSupport.setDataSerie(_serieAltitude);
 		_temperatureEditingSupport.setDataSerie(_serieTemperature);
 		_pulseEditingSupport.setDataSerie(_seriePulse);
 		_cadenceEditingSupport.setDataSerie(_serieCadence);
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
+
+		_tourStartDayTime = (_tourData.getStartHour() * 3600)
+				+ (_tourData.getStartMinute() * 60)
+				+ _tourData.getStartSecond();
 
 		if (_isManualTour == false) {
 
@@ -5007,8 +5299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			try {
 				TourManager.checkTourData(selectedTourData, _tourData);
 			} catch (final MyTourbookException e) {
-				System.out.println("Selection:" + selection);//$NON-NLS-1$
-				e.printStackTrace();
+				StatusUtil.log("Selection:" + selection,e);//$NON-NLS-1$
 			}
 		}
 
@@ -5364,7 +5655,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_isSavingInProgress = true;
 		{
-			if (saveTourValidation()) {
+			if (saveTourWithValidation()) {
 				returnCode = ISaveablePart2.NO;
 			} else {
 				returnCode = ISaveablePart2.CANCEL;
@@ -5700,7 +5991,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @return Returns <code>true</code> when the tour is saved or <code>false</code> when the tour
 	 *         could not saved because the user canceled saving
 	 */
-	private boolean saveTourValidation() {
+	private boolean saveTourWithValidation() {
 
 		if (_tourData == null) {
 			return true;
@@ -5934,6 +6225,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
 			_tourData.setCalories(_spinTourCalories.getSelection());
 
+			_tourData.setWeather(_txtWeather.getText().trim());
 			_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 			if (_isWindSpeedManuallyModified) {
 				/*
@@ -6287,6 +6579,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * wind properties
 		 */
+		_txtWeather.setText(_tourData.getWeather());
+
 		// wind direction
 		final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 		_spinWindDirectionValue.setSelection(weatherWindDirDegree);
@@ -6304,12 +6598,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// icon must be displayed after the combobox entry is selected
 		displayCloudIcon();
 
-		// temperature
-		int temperature = _tourData.getAvgTemperature();
+		/*
+		 * avg temperature
+		 */
+		final int temperatureScale = _tourData.getTemperatureScale();
+		int avgTemperature = _tourData.getAvgTemperature();
+
 		if (_unitValueTemperature != 1) {
-			temperature = (int) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+			final float imperialTemperature = (float) avgTemperature / temperatureScale;
+			avgTemperature = (int) ((imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD) * temperatureScale);
 		}
-		_spinTemperature.setSelection(temperature);
+
+		/*
+		 * on Linux .setDigit() fires an asynch selection event that the flag _isSetField is not
+		 * recognized
+		 */
+		_isSetDigits = true;
+		_spinTemperature.setDigits(Util.getNumberOfDigits(temperatureScale) - 1);
+		_spinTemperature.setSelection(avgTemperature);
 
 		// tour date
 		_dtTourDate.setDate(_tourData.getStartYear(), _tourData.getStartMonth() - 1, _tourData.getStartDay());
@@ -6319,14 +6625,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// tour distance
 		final int tourDistance = _tourData.getTourDistance();
-
 		if (tourDistance == 0) {
 			_txtTourDistance.setText(Integer.toString(tourDistance));
 		} else {
 
 			final float distance = ((float) tourDistance) / 1000 / _unitValueDistance;
 			_txtTourDistance.setText(_nf3NoGroup.format(distance));
-
 		}
 
 		// altitude up/down

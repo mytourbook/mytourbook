@@ -37,6 +37,11 @@ public class UI {
 
 	private static final char[]	INVALID_FILENAME_CHARS	= new char[] { '\\', '/', ':', '*', '?', '"', '<', '>', '|', };
 
+	public static final String	EMPTY_STRING			= "";																		//$NON-NLS-1$
+	public static final String	SPACE					= " ";																		//$NON-NLS-1$
+	public static final String	DOT						= ".";																		//$NON-NLS-1$
+	public static final String	STRING_0				= "0";																		//$NON-NLS-1$
+
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
 	 * 
@@ -44,13 +49,9 @@ public class UI {
 	 */
 	public static final String	ELLIPSIS				= "...";																	//$NON-NLS-1$
 
-	public static final String	EMPTY_STRING			= "";																		//$NON-NLS-1$
-	public static final String	SPACE					= " ";																		//$NON-NLS-1$
-	public static final String	STRING_0				= "0";																		//$NON-NLS-1$
-
 	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean	IS_LINUX				= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
- 
+
 	/**
 	 * contains a new line
 	 */
@@ -62,6 +63,7 @@ public class UI {
 	public static final String	NEW_LINE2				= "\n\n";																	//$NON-NLS-1$
 
 	public static final String	UTF_8					= "UTF-8";																	//$NON-NLS-1$
+	public static final String	ISO_8859_1				= "ISO-8859-1";															//$NON-NLS-1$
 
 	public static void addSashColorHandler(final Sash sash) {
 

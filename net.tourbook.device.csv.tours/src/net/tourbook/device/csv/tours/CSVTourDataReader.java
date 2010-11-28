@@ -53,6 +53,14 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	private static final String	TOUR_CSV_ID			= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 
+	/**
+	 * This header is a modified header for {@link #TOUR_CSV_ID} with a semikolon instead of a komma
+	 * after
+	 * <p>
+	 * <i>Paused Time (sec);</i>
+	 */
+	private static final String	TOUR_CSV_ID_2		= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
+
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
 
@@ -85,6 +93,15 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	public int getTransferDataSize() {
 		return -1;
+	}
+
+	private boolean isFileValid(final String fileHeader) {
+
+		if (fileHeader.startsWith(TOUR_CSV_ID) || fileHeader.startsWith(TOUR_CSV_ID_2)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void parseDate(final TourData tourData, final String nextToken) {
@@ -225,7 +242,6 @@ public class CSVTourDataReader extends TourbookDevice {
 			if (newSavedTourType != null) {
 				tourType = newSavedTourType;
 			}
-
 		}
 
 		tourData.setTourType(tourType);
@@ -250,11 +266,11 @@ public class CSVTourDataReader extends TourbookDevice {
 
 			// check file header
 			final String fileHeader = fileReader.readLine();
-			if (fileHeader.startsWith(TOUR_CSV_ID) == false) {
+			if (isFileValid(fileHeader) == false) {
 				return false;
 			}
 
-			StringTokenizer tokenizer;
+//			StringTokenizer tokenizer;
 			String tokenLine;
 
 			// read all tours, each line is one tour
@@ -268,25 +284,29 @@ public class CSVTourDataReader extends TourbookDevice {
 
 				try {
 
-					tokenizer = new StringTokenizer(tokenLine, CSV_TOKEN_SEPARATOR);
+					/*
+					 * The split method is used because the Tokenizer ignores empty tokens !!!
+					 */
 
-					parseDate(tourData, tokenizer.nextToken());//						1 Date (yyyy-mm-dd);
-					parseTime(tourData, tokenizer.nextToken());//						2 Time (hh-mm);
+					final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR);
 
-					duration = Integer.parseInt(tokenizer.nextToken()); //				3 Duration (sec);
+					parseDate(tourData, allToken[0]);//							1 Date (yyyy-mm-dd);
+					parseTime(tourData, allToken[1]);//							2 Time (hh-mm);
+
+					duration = Integer.parseInt(allToken[2]); //				3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
 
-					pausedTime = Integer.parseInt(tokenizer.nextToken()); //			4 Paused Time (sec),
+					pausedTime = Integer.parseInt(allToken[3]); //				4 Paused Time (sec),
 					tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
 
-					distance = Integer.parseInt(tokenizer.nextToken());//				5 Distance (m);
+					distance = Integer.parseInt(allToken[4]);//					5 Distance (m);
 					tourData.setTourDistance(distance);
 
-					tourData.setTourTitle(tokenizer.nextToken());//						6 Title;
-					tourData.setTourDescription(tokenizer.nextToken());//				7 Comment;
+					tourData.setTourTitle(allToken[5]);//						6 Title;
+					tourData.setTourDescription(allToken[6]);//					7 Comment;
 
-					isNewTourType |= parseTourType(tourData, tokenizer.nextToken());//	8 Tour Type;
-					isNewTag |= parseTags(tourData, tokenizer.nextToken());//			9 Tags;
+					isNewTourType |= parseTourType(tourData, allToken[7]);//	8 Tour Type;
+					isNewTag |= parseTags(tourData, allToken[8]);//				9 Tags;
 
 				} catch (final NoSuchElementException e) {
 					// not all tokens are defined
@@ -371,11 +391,7 @@ public class CSVTourDataReader extends TourbookDevice {
 			fileReader = new BufferedReader(new FileReader(fileName));
 
 			final String fileHeader = fileReader.readLine();
-			if (fileHeader == null) {
-				return false;
-			}
-
-			if (fileHeader.startsWith(TOUR_CSV_ID) == false) {
+			if (fileHeader == null || isFileValid(fileHeader) == false) {
 				return false;
 			}
 

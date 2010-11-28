@@ -101,7 +101,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final DateFormat			_timeFormatter				= DateFormat.getTimeInstance(DateFormat.MEDIUM);
 	private static final NumberFormat		_numberFormatter			= NumberFormat.getNumberInstance();
 
-	private static final String				PDF_FILE_EXTENSION			= "pdf";
+	private static final String				PDF_FILE_EXTENSION			= "pdf"; //$NON-NLS-1$
 
 	private static String					_dlgDefaultMessage;
 

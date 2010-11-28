@@ -18,6 +18,7 @@
             type="serial">
       </device>
    </extension>
+   
    <extension
          point="org.eclipse.ui.preferencePages">
       <page

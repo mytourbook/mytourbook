@@ -131,7 +131,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private boolean							_isRecTimeFormat_hhmmss;
 	private boolean							_isDriveTimeFormat_hhmmss;
 
-	private static final NumberFormat		_nf								= NumberFormat.getNumberInstance();
+	private boolean							_isToolTipInTag;
+	private boolean							_isToolTipInTitle;
+	private boolean							_isToolTipInTags;
+
+	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
+
+	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	/*
 	 * resources
@@ -146,13 +156,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 																					.getImageDescriptor(
 																							Messages.Image__tag_root)
 																					.createImage();
-
-	private boolean							_isToolTipInTag;
-	private boolean							_isToolTipInTitle;
-	private boolean							_isToolTipInTags;
-
-	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
-
 	/*
 	 * UI controls
 	 */
@@ -629,7 +632,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	/**
 	 * Defines all columns for the table viewer in the column manager
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void defineAllColumns(final Composite parent) {
@@ -701,7 +704,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					final TVITagViewTag tagItem = (TVITagViewTag) viewItem;
 
 					styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
-					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+					styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 					cell.setImage(tagItem.isRoot ? _imgTagRoot : _imgTag);
 
 				} else if (viewItem instanceof TVITagViewTagCategory) {
@@ -712,7 +715,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				} else if (viewItem instanceof TVITagViewYear || viewItem instanceof TVITagViewMonth) {
 
 					styledString.append(viewItem.treeColumn);
-					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+					styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
 					if (viewItem instanceof TVITagViewMonth) {
 						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
@@ -866,13 +869,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final Object element = cell.getElement();
 
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
-
 				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 				if (colAvgSpeed != 0) {
 
-					cell.setText(_nf.format(colAvgSpeed));
+					cell.setText(_nf1.format(colAvgSpeed));
 					setCellColor(cell, element);
 				}
 			}
@@ -895,14 +895,15 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				long temperature = ((TVITagViewItem) element).colAvgTemperature;
+				final TVITagViewItem tviTagViewItem = (TVITagViewItem) element;
+				float temperature = tviTagViewItem.colAvgTemperature;
 				if (temperature != 0) {
 
 					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
 					}
 
-					cell.setText(Long.toString(temperature));
+					cell.setText(_nf1.format(temperature));
 					setCellColor(cell, element);
 				}
 			}
@@ -927,11 +928,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final long colDistance = ((TVITagViewItem) element).colDistance;
 				if (colDistance != 0) {
 
-					// set distance
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					final String distance = _nf.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+					final String distance = _nf1.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
 
 					cell.setText(distance);
 					setCellColor(cell, element);
@@ -1008,10 +1005,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
 				if (colMaxSpeed != 0) {
 
-					_nf.setMinimumFractionDigits(1);
-					_nf.setMaximumFractionDigits(1);
-
-					cell.setText(_nf.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -1086,9 +1080,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						/ dbRecordingTime
 						* 100;
 
-				_nf.setMinimumFractionDigits(1);
-				_nf.setMaximumFractionDigits(1);
-				cell.setText(_nf.format(relativePausedTime));
+				cell.setText(_nf1.format(relativePausedTime));
 
 				setCellColor(cell, element);
 

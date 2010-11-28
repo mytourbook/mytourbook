@@ -34,7 +34,7 @@ public class DeviceData {
 	public short	transferDay		= 1;
 
 	/**
-	 * 
+	 * Contains a unique id so that each import can be identified.
 	 */
 	public long		importId;
 

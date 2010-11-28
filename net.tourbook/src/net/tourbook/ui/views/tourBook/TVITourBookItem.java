@@ -36,14 +36,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 													+ "SUM(TOURALTUP)," //			4	//$NON-NLS-1$
 													+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
 													+ "SUM(1)," //					6	//$NON-NLS-1$
+													//
 													+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
 													+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
 													+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
 													+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
 													+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
+													//
 													+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
 													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-													+ "AVG(AVGTEMPERATURE)," //		14	//$NON-NLS-1$
+													+ "AVG(DOUBLE(AvgTemperature) / TemperatureScale)," //		14	//$NON-NLS-1$
 
 													+ "AVG(WEATHERWINDDIR)," //		15	//$NON-NLS-1$
 													+ "AVG(WEATHERWINDSPD)," //		16	//$NON-NLS-1$
@@ -64,7 +66,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	int						tourDay;
 
 	long					colTourDate;
-//	DateTime				colTourDate;
 	String					colTourTitle;
 	long					colPersonId;										// tourPerson_personId
 
@@ -87,7 +88,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	float					colAvgPace;
 	long					colAvgPulse;
 	long					colAvgCadence;
-	long					colAvgTemperature;
+	float					colAvgTemperature;
 
 	int						colWindSpd;
 	int						colWindDir;
@@ -128,7 +129,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 		colAvgPulse = result.getLong(startIndex + 11);
 		colAvgCadence = result.getLong(startIndex + 12);
-		colAvgTemperature = result.getLong(startIndex + 13);
+		colAvgTemperature = result.getFloat(startIndex + 13);
 
 		colWindDir = result.getInt(startIndex + 14);
 		colWindSpd = result.getInt(startIndex + 15);

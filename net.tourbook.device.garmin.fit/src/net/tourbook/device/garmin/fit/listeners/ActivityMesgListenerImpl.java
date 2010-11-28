@@ -16,9 +16,9 @@ public class ActivityMesgListenerImpl extends AbstractMesgListener implements Ac
 	public void onMesg(ActivityMesg mesg) {
 		Integer numSessions = mesg.getNumSessions();
 		if (numSessions == null || numSessions < 1) {
-			throw new FitActivityReaderException("Invalid number of sessions: "
+			throw new FitActivityReaderException("Invalid number of sessions: " //$NON-NLS-1$
 					+ numSessions
-					+ ", expected at least one session.");
+					+ ", expected at least one session."); //$NON-NLS-1$
 		}
 	}
 

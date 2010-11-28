@@ -2,13 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import .GPX files
 Bundle-SymbolicName: net.tourbook.device.gpx;singleton:=true
-Bundle-Version: 10.10.0.qualifier
+Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.device.gpx.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
  net.tourbook.device,
- net.tourbook.rxtx_2.2
+ net.tourbook.rxtx_2.2,
+ org.junit;resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Export-Package: net.tourbook.device.gpx;
