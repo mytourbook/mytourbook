@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -50,8 +49,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 	private static final String		DATA_DELIMITER				= "\t";										//$NON-NLS-1$
 
-	private static final String		SECTION_DAY_INFO			= "[DayInfo]"; //$NON-NLS-1$
-	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo"; //$NON-NLS-1$
+	private static final String		SECTION_DAY_INFO			= "[DayInfo]";									//$NON-NLS-1$
+	private static final String		SECTION_EXERCISE_INFO		= "[ExerciseInfo";								//$NON-NLS-1$
 	//
 	private final IPreferenceStore	_prefStore					= Activator.getDefault().getPreferenceStore();
 
@@ -73,6 +72,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		private String	title;
 		private String	description;
+
+		private int		calories;
 	}
 
 	// plugin constructor
@@ -126,7 +127,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 			_exerciseFiles.add(gpxFilePath.toOSString());
 		}
 
-		// overwrite path to pdd file so that a reimport works
+		// overwrite path and set it to pdd file so that a reimport works
 		hrmTourData.importRawDataFile = _importFilePath;
 		hrmTourData.setTourImportFilePath(_importFilePath);
 
@@ -149,6 +150,9 @@ public class PolarPDDDataReader extends TourbookDevice {
 				hrmTourData.setTourTitle(description);
 			}
 		}
+
+		// set other fields
+		hrmTourData.setCalories(_currentExercise.calories);
 
 		// after all data are added, the tour id can be created
 		final Long tourId = hrmTourData.createTourId(createUniqueId(hrmTourData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
@@ -173,15 +177,13 @@ public class PolarPDDDataReader extends TourbookDevice {
 		final File importFile = importFilePath.toFile();
 
 		if (importFile.exists() == false) {
-			throw new Exception(NLS.bind(
-					"File {0} is not available but is defined in file {1}", //$NON-NLS-1$
+			throw new Exception(NLS.bind("File {0} is not available but is defined in file {1}", //$NON-NLS-1$
 					importFile.toString(),
 					_importFilePath));
 		}
 
 		if (deviceDataReader.validateRawData(importFilePath.toOSString()) == false) {
-			throw new Exception(NLS.bind(
-					"File {0} in parent file {1} is invalid", //$NON-NLS-1$
+			throw new Exception(NLS.bind("File {0} in parent file {1} is invalid", //$NON-NLS-1$
 					importFile.toString(),
 					_importFilePath));
 		}
@@ -407,8 +409,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 					// check version
 					if (_fileVersionDayInfo != 100) {
-						throw new Exception(NLS.bind(
-								"File {0} has an invalid version in section {1}", //$NON-NLS-1$
+						throw new Exception(NLS.bind("File {0} has an invalid version in section {1}", //$NON-NLS-1$
 								_importFilePath,
 								SECTION_DAY_INFO));
 					}
@@ -421,8 +422,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 					// check version
 					if (_currentExercise.fileVersion != 101) {
-						throw new Exception(NLS.bind(
-								"File {0} has an invalid version in section {1}", //$NON-NLS-1$
+						throw new Exception(NLS.bind("File {0} has an invalid version in section {1}", //$NON-NLS-1$
 								_importFilePath,
 								SECTION_EXERCISE_INFO));
 					}
@@ -462,7 +462,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 * [DayInfo]
 	 * 100         1           4           6            1       512		// row 0
 	 * 20011116    1           65         20         7500     25200		// row 1
-	 * ...         														// row 2 � n
+	 * ...         														// row 2 ... n
 	 * Day note text                									// text row
 	 * </pre>
 	 * 
@@ -539,12 +539,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 * 
 	 * [ExerciseInfo1]
 	 * 101       1           12         6           12         512          // row 0
-	 * ...                        											// row 1 � n
+	 * ...                        											// row 1...n
 	 * exercise name              											// text row 0
 	 * exercise note text                    								// text row 1
 	 * attached hrm file (if in same folder, no folder info with file name) // text row 2
 	 * reserved text                 										// text row 3
-	 * �                       												// text row 4 � n
+	 * ...                       											// text row 4...n
 	 * </pre>
 	 * 
 	 * @param fileReader
@@ -604,7 +604,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 			/**
 			 * <pre>
 			 * 
-			 * Row 1
+			 * Number Row 1
 			 * 
 			 * Data  						Example    	Format
 			 * 
@@ -613,8 +613,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 			 * 3:	Not edited manually  	0
 			 * 4:	- Reserved -  			0
 			 * 5:	Start time  			36000   	Seconds (from midnight 0:00:00) 36000 = 10:00:00
-			 * 6:	Total time  			2700        Seconds 2700 = 0:45:00, 0 � 99 h 59 min, for one
-			 * 											phase 10 s � 99 min 59 s
+			 * 6:	Total time  			2700        Seconds 2700 = 0:45:00, 0 ... 99 h 59 min, for one
+			 * 											phase 10 s ... 99 min 59 s
 			 * </pre>
 			 */
 
@@ -641,7 +641,52 @@ public class PolarPDDDataReader extends TourbookDevice {
 			// column 5
 //			_currentExercise.startTime = Integer.parseInt(tokenLine.nextToken());
 
-			// skip further number rows
+			/**
+			 * <pre>
+			 * 
+			 * Number Row 2
+			 * 
+			 * Data							Example		Format
+			 * 
+			 * 1:	Sport					3			Personal Sport ID
+			 * 2:	Distance OLD  			150         km * 10 NOT IN USE AFTER PPP version 3.02.008
+			 * 3:	Feeling  				0 ... 5		0 = :-)	5 = :-(
+			 * 4:	Recovery  				0 ... 4  	0 = Fully Recovered ... 4 = Exhausted
+			 * 5:	- Reserved -  			0
+			 * 6:	Energy consumption  	376
+			 * 
+			 * </pre>
+			 */
+
+			line = fileReader.readLine();
+			if (line == null) {
+				return false;
+			}
+			numOfNumberRowsAnalyzed++;
+
+			tokenLine = new StringTokenizer(line, DATA_DELIMITER);
+
+			// column 1
+			tokenLine.nextToken();
+
+			// column 2
+			tokenLine.nextToken();
+
+			// column 3
+			tokenLine.nextToken();
+
+			// column 4
+			tokenLine.nextToken();
+
+			// column 5
+			tokenLine.nextToken();
+
+			// column 6
+			_currentExercise.calories = Integer.parseInt(tokenLine.nextToken());
+
+			/**
+			 * skip further number rows
+			 */
 			if (skipRows(fileReader, numOfNumberRows - numOfNumberRowsAnalyzed) == null) {
 				return false;
 			}

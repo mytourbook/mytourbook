@@ -23,20 +23,29 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 import net.tourbook.util.StatusUtil;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This device reader is importing data from Polar Personaltrainer files.
  */
 public class PolarTrainerDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml";					//$NON-NLS-1$
-	private static final String	XML_POLAR_TAG	= "<<polar-exercise-data";	//$NON-NLS-1$
+	private static final String				XML_START_ID	= "<?xml";											//$NON-NLS-1$
+	private static final String				XML_POLAR_TAG	= "<<polar-exercise-data";							//$NON-NLS-1$
+
+	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	// plugin constructor
 	public PolarTrainerDataReader() {}
@@ -129,7 +138,21 @@ public class PolarTrainerDataReader extends TourbookDevice {
 			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
 			return false;
 		} finally {
+
 			saxHandler.dispose();
+
+			if (saxHandler.isNewTourType()) {
+
+				TourDatabase.clearTourTypes();
+				TourManager.getInstance().clearTourDataCache();
+
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						// fire modify event
+						_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+					}
+				});
+			}
 		}
 
 		return saxHandler.isImported();

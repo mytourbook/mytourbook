@@ -2337,7 +2337,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 						// set altitude to the first available altitude value
 
-						final int firstAltitudeValue = (int) timeData.absoluteAltitude;
+						final int firstAltitudeValue = (int) (timeData.absoluteAltitude + 0.5);
 
 						for (int valueIndex = 0; valueIndex < firstAltitudeIndex; valueIndex++) {
 							altitudeSerie[valueIndex] = firstAltitudeValue;
@@ -2515,7 +2515,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				if ((altitudeStartIndex == -1) && isAltitude) {
 					altitudeStartIndex = timeIndex;
-					altitudeAbsolute = (int) timeData.absoluteAltitude;
+					altitudeAbsolute = (int) (timeData.absoluteAltitude + 0.5);
 				}
 
 				final long absoluteTime = timeData.absoluteTime;

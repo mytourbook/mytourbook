@@ -46,6 +46,8 @@ import org.joda.time.DateTime;
  */
 public class PolarHRMDataReader extends TourbookDevice {
 
+	private static final int	SPEED_SCALING	= 10;
+
 	private static final String		DATA_DELIMITER			= "\t";											//$NON-NLS-1$
 
 	private static final String		SECTION_START_CHARACTER	= "[";												//$NON-NLS-1$
@@ -536,7 +538,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 				// convert speed into distance, speed is computed internally and not saved
 
-				final float speed = (float) hrSlice.speed / 10 * 1000 / 3600;
+				final float speed = (float) hrSlice.speed / SPEED_SCALING * 1000 / 3600;
 
 				final float distanceDiff = speed * sliceTimeInterval;
 
