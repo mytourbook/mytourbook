@@ -36,6 +36,9 @@ import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.util.StatusUtil;
+
+import org.eclipse.osgi.util.NLS;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
 
@@ -220,6 +223,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			int offsetDDRecord = adjustDDRecordOffset(offsetNextFreeTour);
 
 			final int initialOffsetDDRecord = offsetDDRecord;
+			int checkedOffset1 = Integer.MAX_VALUE;
+			int checkedOffset2 = Integer.MAX_VALUE;
 
 			// loop: all tours in the file
 			while (true) {
@@ -479,6 +484,24 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				if (offsetDDRecord == initialOffsetDDRecord) {
 					returnValue = true;
 					break;
+				}
+
+				/*
+				 * prevent endless loops by checking if the loop is run twice
+				 */
+				if (checkedOffset1 > offsetDDRecord) {
+					// first loop has not yet ended
+					checkedOffset1 = offsetDDRecord;
+				} else {
+					if (checkedOffset2 > offsetDDRecord) {
+						// second loop has not yet ended
+						checkedOffset2 = offsetDDRecord;
+					} else {
+						StatusUtil
+								.showStatus(new Exception(NLS.bind(Messages.Import_Error_EndlessLoop, importFileName)));
+						returnValue = true;
+						break;
+					}
 				}
 
 				offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
