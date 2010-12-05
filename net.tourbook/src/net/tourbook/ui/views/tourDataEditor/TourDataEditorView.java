@@ -4521,6 +4521,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final boolean isManualAndEdit = _isManualTour && canEdit;
 		final boolean isNotManualTour = _isManualTour == false;
 
+		final int[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
+		final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
+
 		_txtTitle.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
 
@@ -4541,7 +4544,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setEditMode(isManualAndEdit);
 		_timeDriving.setEditMode(isManualAndEdit);
 
-		_txtTourDistance.setEnabled(isManualAndEdit);
+		_txtTourDistance.setEnabled(canEdit && isDistanceSerie == false);
 		_txtAltitudeUp.setEnabled(isManualAndEdit);
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
@@ -4854,6 +4857,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (_isManualTour == false) {
 
+			// tour is imported
+
 			if ((_serieTime == null) || (_serieTime.length == 0)) {
 				_tourData.setTourRecordingTime(0);
 			} else {
@@ -4862,8 +4867,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.computeTourDrivingTime();
 
 			if ((_serieDistance == null) || (_serieDistance.length == 0)) {
-				_tourData.setTourDistance(0);
+				// disabled because distance can be edited when distance serie is not available
+				// _tourData.setTourDistance(0);
 			} else {
+				// have no idea why tour distance is set because it should be already set during the tour import
 				_tourData.setTourDistance(_serieDistance[_serieDistance.length - 1]);
 			}
 
@@ -5299,7 +5306,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			try {
 				TourManager.checkTourData(selectedTourData, _tourData);
 			} catch (final MyTourbookException e) {
-				StatusUtil.log("Selection:" + selection,e);//$NON-NLS-1$
+				StatusUtil.log("Selection:" + selection, e);//$NON-NLS-1$
 			}
 		}
 
