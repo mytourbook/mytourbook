@@ -53,6 +53,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefHistory;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
@@ -488,11 +489,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * tab: tour
 	 */
-	private Text								_txtTitle;
+	private Combo								_txtTitle;
 
 	private Text								_txtDescription;
-	private Text								_txtStartLocation;
-	private Text								_txtEndLocation;
+	private Combo								_txtStartLocation;
+	private Combo								_txtEndLocation;
 	private Spinner								_spinRestPuls;
 
 	private Spinner								_spinTourCalories;
@@ -2763,11 +2764,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			 */
 			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
-
-			_txtTitle = _tk.createText(section, UI.EMPTY_STRING);
+			// combo: tour title with history
+			_txtTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_txtTitle.setText(UI.EMPTY_STRING);
+			
+			_tk.adapt(_txtTitle, true, false);
+		
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_txtTitle);
+	
+			// fill combobox
+			String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
+			_txtTitle.setItems(strings);
+			
 			_txtTitle.addKeyListener(_keyListener);
 			_txtTitle.addModifyListener(_modifyListener);
 
@@ -2804,14 +2814,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			 */
 			label = _tk.createLabel(section, Messages.tour_editor_label_start_location);
 			_firstColumnControls.add(label);
-
-			_txtStartLocation = _tk.createText(section, UI.EMPTY_STRING);
-			_txtStartLocation.addModifyListener(_modifyListener);
+			
+			
+			_txtStartLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_txtStartLocation.setText(UI.EMPTY_STRING);
+			
+			_tk.adapt(_txtStartLocation, true, false);
+		
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
 					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
 					.applyTo(_txtStartLocation);
+
+			// fill combobox
+			strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY);
+			_txtStartLocation.setItems(strings);
+			
+			_txtStartLocation.addModifyListener(_modifyListener);
+
 
 			/*
 			 * end location
@@ -2819,13 +2840,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(section, Messages.tour_editor_label_end_location);
 			_firstColumnControls.add(label);
 
-			_txtEndLocation = _tk.createText(section, UI.EMPTY_STRING);
-			_txtEndLocation.addModifyListener(_modifyListener);
+			_txtEndLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_txtEndLocation.setText(UI.EMPTY_STRING);
+
+			_tk.adapt(_txtEndLocation, true, false);
+
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
 					.hint(DEFAULT_TEXT_INPUT_WIDTH, SWT.DEFAULT)
 					.applyTo(_txtEndLocation);
+
+			// fill combobox
+			strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY);
+			_txtEndLocation.setItems(strings);
+
+			_txtEndLocation.addModifyListener(_modifyListener);
+
 		}
 	}
 
@@ -5981,6 +6012,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_tourData = TourDatabase.saveTour(_tourData);
 		updateMarkerMap();
+		
+		
+		//STFU:
+		//save tour titles history:
+		saveComboHistory();
+
+		
+		
 
 		setTourClean();
 
@@ -6215,7 +6254,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_markerMap.put(tourMarker.getSerieIndex(), tourMarker);
 		}
 	}
-
+	
+	
+	private void saveComboHistory(){
+		
+		String text = _txtTitle.getText();
+		
+		boolean ret;
+		
+		//STFU: TODO Only save history if modified!
+		ret = PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, text);	
+		if (ret){
+			_txtTitle.clearSelection();
+			_txtTitle.setItems(PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY));
+			_txtTitle.update();
+		}
+		text = _txtStartLocation.getText();
+		ret = PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY, text);
+		if (ret){
+			_txtStartLocation.clearSelection();
+			_txtStartLocation.setItems(PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY));
+			_txtStartLocation.update();
+		}
+		text = _txtEndLocation.getText();
+		ret = PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY, text);
+		if (ret){
+			_txtEndLocation.clearSelection();
+			_txtEndLocation.setItems(PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY));
+			_txtEndLocation.update();
+		}
+	}
+	
 	/**
 	 * update {@link TourData} from the UI fields
 	 */

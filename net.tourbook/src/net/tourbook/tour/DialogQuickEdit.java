@@ -36,6 +36,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
@@ -274,6 +275,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private void createUISection110Title(final Composite parent) {
 
+		//ComboViewer label;
 		Label label;
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_tour, true);
@@ -282,6 +284,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * title
 			 */
+			
+			//STFU: Start here
+			//TODO: SFU this is the dialog
+			System.out.println("Create Label: " +Messages.tour_editor_label_tour_title);
+		
 			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
 
