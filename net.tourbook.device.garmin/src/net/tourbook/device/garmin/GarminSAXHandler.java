@@ -455,8 +455,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				_isInCreator = false;
 
-				_tourNotes = _characters.toString();
-
 			} else if (name.equals(TAG_LAP)) {
 
 				_isInLap = false;
