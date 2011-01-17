@@ -78,7 +78,7 @@ public class PrefHistory {
 	}
 
 	/**
-	 * This method stores strings separated by ';' to the plugin preference store. Empty string will
+	 * This method stores strings separated by '\r' to the plugin preference store. Empty string will
 	 * be filters and leading and trailing whitespace omitted. They strings can be restored with the
 	 * method getHistory.
 	 * 
@@ -97,7 +97,7 @@ public class PrefHistory {
 		for (String element : list) {
 			if (!element.trim().isEmpty()) {
 				if (entries != 0)
-					buffer.append(";"); //$NON-NLS-1$
+					buffer.append('\r'); //$NON-NLS-1$
 				buffer.append(element);
 				entries++;
 			}
@@ -125,11 +125,11 @@ public class PrefHistory {
 			return new String[] {}; //$NON-NLS-1$
 		}
 
-		return string.split(";"); //$NON-NLS-1$
+		return string.split("\r"); //$NON-NLS-1$
 	}
 
 	/**
-	 * Helper method for saveHistory, creates one String ';' separated to store prefernces
+	 * Helper method for saveHistory, creates one String '\r' separated to store prefernces
 	 * 
 	 * @see saveHistory
 	 * @author Stefan F.
@@ -141,7 +141,7 @@ public class PrefHistory {
 		StringBuilder buffer = new StringBuilder();
 		for (String element : list) {
 			buffer.append(element);
-			buffer.append(";"); //$NON-NLS-1$
+			buffer.append("\r"); //$NON-NLS-1$
 		}
 		/* remove last ';' */
 		if (buffer.length() > 0)

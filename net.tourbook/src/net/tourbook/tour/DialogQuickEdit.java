@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefHistory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.Util;
@@ -36,7 +37,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
@@ -76,7 +76,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private FormToolkit					_tk;
 	private Form						_formContainer;
 
-	private Text						_txtTitle;
+	private Combo						_comboTitle;
 	private Text						_txtDescription;
 
 	private Text						_txtWeather;
@@ -90,7 +90,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
-	 * the maximum width and set the first column within the differenct section to the same width
+	 * the maximum width and set the first column within the different section to the same width
 	 */
 	private final ArrayList<Control>	_firstColumnControls			= new ArrayList<Control>();
 	private final ArrayList<Control>	_firstColumnContainerControls	= new ArrayList<Control>();
@@ -99,6 +99,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private int							_hintDefaultSpinnerWidth;
 
 	private boolean						_isUpdateUI						= false;
+	private boolean						_isTitleModified;
 	private boolean						_isTemperatureManuallyModified	= false;
 	private boolean						_isWindSpeedManuallyModified	= false;
 	private int[]						_unitValueWindSpeed;
@@ -285,17 +286,29 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			 * title
 			 */
 			
-			//STFU: Start here
-			//TODO: SFU this is the dialog
-			System.out.println("Create Label: " +Messages.tour_editor_label_tour_title);
-		
 			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
-
-			_txtTitle = _tk.createText(section, UI.EMPTY_STRING);
+			
+			// combo: tour title with history
+			_comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_comboTitle.setText(UI.EMPTY_STRING);
+			
+			_tk.adapt(_comboTitle, true, false);
+		
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.applyTo(_txtTitle);
+					.applyTo(_comboTitle);
+	
+			// fill combobox
+			String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
+			_comboTitle.setItems(strings);
+			
+			_comboTitle.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(final ModifyEvent e) {
+					_isTitleModified = true;
+				}
+			});
 
 			/*
 			 * description
@@ -790,6 +803,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// data are not valid to be saved which is done in the action which opened this dialog
 			return;
 		}
+		if (_isTitleModified)
+			PrefHistory.saveHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, _comboTitle.getText());
 
 		super.okPressed();
 	}
@@ -868,7 +883,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	 */
 	private void updateModelFromUI() {
 
-		_tourData.setTourTitle(_txtTitle.getText().trim());
+		_tourData.setTourTitle(_comboTitle.getText().trim());
 		_tourData.setTourDescription(_txtDescription.getText().trim());
 
 		_tourData.setRestPulse(_spinRestPuls.getSelection());
@@ -911,7 +926,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			 * tour/event
 			 */
 			// set field content
-			_txtTitle.setText(_tourData.getTourTitle());
+			_comboTitle.setText(_tourData.getTourTitle());
 			_txtDescription.setText(_tourData.getTourDescription());
 
 			/*
