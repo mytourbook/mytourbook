@@ -256,7 +256,7 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_StartPlace;
 	public static String		Db_Field_TourData_Title;
 
-	public static String	Db_Field_TourData_TourImportFilePath;
+	public static String		Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
@@ -392,6 +392,8 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
+
+	public static String		Image__Graph_All;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -779,6 +781,10 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
+	public static String		Tour_Chart_DeflactionPoint;
+
+	public static String		Tour_Chart_InvalidData;
+
 	public static String		Tour_Data_SaveTour_Monitor;
 	public static String		Tour_Data_SaveTour_MonitorSubtask;
 
@@ -1035,6 +1041,11 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_compared_tours_title;
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
+
+	public static String		TourChart_Action_ChartType_ConconiPower;
+	public static String		TourChart_Action_ChartType_Title;
+	public static String		TourChart_Action_ChartType_TourChart;
+	public static String		TourChart_Action_ChartType_TourChart_Tooltip;
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;

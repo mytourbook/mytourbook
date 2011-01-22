@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,10 +20,15 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartComponentAxis;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
@@ -36,6 +41,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
@@ -44,19 +50,34 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.util.IToolTipHideListener;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.TourToolTip;
+import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -73,26 +94,64 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements ITourChartViewer {
 
-	public static final String		ID			= "net.tourbook.views.TourChartView";				//$NON-NLS-1$
+	public static final String			ID								= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final String			STATE_SELECTED_TOUR_CHART_TYPE	= "STATE_SELECTED_TOUR_CHART_TYPE";	//$NON-NLS-1$
 
-	private TourChartConfiguration	_tourChartConfig;
-	private TourData				_tourData;
+	private final IPreferenceStore		_prefStore						= TourbookPlugin.getDefault() //
+																				.getPreferenceStore();
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private final IDialogSettings		_state							= TourbookPlugin.getDefault().//
+																				getDialogSettingsSection(ID);
+
+	private TourData					_tourData;
+	private TourChartConfiguration		_tourChartConfig;
+
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
+
+	private ActionTourChartTitle		_actionTourChartTitle;
+	private ActionTourChartDefault		_actionTourChartDefault;
+	private ActionTourChartConconiPower	_actionTourChartConconiPower;
+
+	private TourChartType				_requestedTourChartType			= TourChartType.TOUR_CHART;
+	private TourChartType				_displayedTourChartType;
+	private IToolBarManager				_tbmTourChartView;
+
+	private IContributionItem[]			_tourChartContribItems;
+	private IContributionItem[]			_conconiTestContribItems;
+
+	private TourInfoToolTipProvider		_conconiTourInfoToolTipProvider;
+	private ChartDataYSerie				_yDataPulse;
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Label					_pageNoChart;
+	private PageBook					_pageBook;
+	private Label						_pageNoChart;
+	private TourChart					_pageTourChart;
+	private Composite					_pageConconiTest;
 
-	private TourChart				_tourChart;
+	private Chart						_chartConconiTest;
+	private Scale						_scaleDeflection;
+	private Label						_lblDeflactionPulse;
+
+	private ChartLayerConconiTest		_conconiLayer;
+
+	/**
+	 * Tour chart type is selected
+	 * 
+	 * @param tourChartType
+	 */
+	void actionTourChartType(final TourChartType tourChartType) {
+
+		_requestedTourChartType = tourChartType;
+
+		updateChart10(_tourData);
+	}
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -103,7 +162,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-//					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartView.this);
+					saveState();
 				}
 			}
 
@@ -136,13 +195,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 					_tourChartConfig = TourManager.createTourChartConfiguration();
 
-					if (_tourChart != null) {
-						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+					if (_pageTourChart != null) {
+						_pageTourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-					_tourChart.setMouseMode(event.getNewValue());
+					if (_pageTourChart != null) {
+						_pageTourChart.setMouseMode(event.getNewValue());
+					}
 				}
 			}
 		};
@@ -180,11 +241,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					_tourChart.updateSegmentLayer((Boolean) eventData);
+					if (_pageTourChart != null) {
+						_pageTourChart.updateSegmentLayer((Boolean) eventData);
+					}
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					_tourChart.updateTourChart(true, true);
+					if (_pageTourChart != null) {
+						_pageTourChart.updateTourChart(true, true);
+					}
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
@@ -215,7 +280,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 							if (tourData.getTourId() == chartTourId) {
 
-								updateChart(tourData);
+								updateChart10(tourData);
 
 								// removed old tour data from the selection provider
 								_postSelectionProvider.clearSelection();
@@ -243,7 +308,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					if (UI.containsTourId(eventData, tourId) != null) {
 
 						// reload tour data and update chart
-						updateChart(TourManager.getInstance().getTourData(tourId));
+						updateChart10(TourManager.getInstance().getTourData(tourId));
 					}
 				}
 			}
@@ -255,7 +320,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void clearView() {
 
 		_tourData = null;
-		_tourChart.updateChart(null, false);
+
+		if (_pageTourChart != null) {
+			_pageTourChart.updateChart(null, false);
+		}
 
 		_pageBook.showPage(_pageNoChart);
 
@@ -263,9 +331,86 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_postSelectionProvider.clearSelection();
 	}
 
+	private void createActions() {
+
+		/*
+		 * create actions
+		 */
+		_actionTourChartTitle = new ActionTourChartTitle();
+		_actionTourChartDefault = new ActionTourChartDefault(this);
+		_actionTourChartConconiPower = new ActionTourChartConconiPower(this);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		menuMgr.add(_actionTourChartTitle);
+		menuMgr.add(_actionTourChartDefault);
+		menuMgr.add(_actionTourChartConconiPower);
+	}
+
+	private ChartDataModel createChartDataModelConconiTest() {
+
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_XY_SCATTER);
+
+		final int[] powerSerie = _tourData.getPowerSerie();
+		final int[] pulseSerie = _tourData.pulseSerie;
+
+		/*
+		 * check if required value series are available
+		 */
+		if (powerSerie == null || powerSerie.length == 0 || pulseSerie == null || pulseSerie.length == 0) {
+
+			chartDataModel.setErrorMessage(NLS.bind(
+					Messages.Tour_Chart_InvalidData,
+					TourManager.getTourTitle(_tourData)));
+
+			return chartDataModel;
+		}
+
+		/*
+		 * power
+		 */
+		final ChartDataXSerie xDataPower = new ChartDataXSerie(powerSerie);
+		xDataPower.setLabel(Messages.Graph_Label_Power);
+		xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
+		xDataPower.setDefaultRGB(new RGB(0, 0, 0));
+
+		/*
+		 * heartbeat
+		 */
+		_yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerie);
+		_yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
+		_yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
+		_yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+		TourManager.setGraphColor(_prefStore, _yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+
+		/*
+		 * adjust min/max values
+		 */
+		xDataPower.setVisibleMinValue(0, true);
+		xDataPower.setVisibleMaxValue(xDataPower.getVisibleMaxValue() + 20, true);
+		_yDataPulse.setVisibleMinValue(_yDataPulse.getVisibleMinValue() - 10, true);
+		_yDataPulse.setVisibleMaxValue(_yDataPulse.getVisibleMaxValue() + 10, true);
+
+		// setup chart data model
+		chartDataModel.setXData(xDataPower);
+		chartDataModel.addYData(_yDataPulse);
+		chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
+
+		setConconiLayer(_yDataPulse);
+		getPossibleDeflectionValues(powerSerie);
+
+		return chartDataModel;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_tbmTourChartView = getViewSite().getActionBars().getToolBarManager();
+
+		createActions();
 		createUI(parent);
 
 		addSelectionListener();
@@ -273,11 +418,17 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		addTourEventListener();
 		addPartListener();
 
+		enableActions();
+
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
+		restoreState();
+
+		// show tour chart from selection service
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
+		// check if tour chart is displayed
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
@@ -290,14 +441,19 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
-		_tourChart.setShowZoomActions(true);
-		_tourChart.setShowSlider(true);
-		_tourChart.setTourInfoActionsEnabled(true);
-		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		_tourChart.setContextProvider(new TourChartContextProvicer(this));
+		// charts are created lazily
+	}
 
-		_tourChart.addDoubleClickListener(new Listener() {
+	private void createUI10TourChart() {
+
+		_pageTourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_pageTourChart.setShowZoomActions(true);
+		_pageTourChart.setShowSlider(true);
+		_pageTourChart.setTourInfoActionsEnabled(true);
+		_pageTourChart.setContextProvider(new TourChartContextProvicer(this));
+		_pageTourChart.setToolBarManager(_tbmTourChartView, true);
+
+		_pageTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
 				if (_tourData.getTourPerson() != null) {
 					ActionEditQuick.doAction(TourChartView.this);
@@ -305,21 +461,105 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 		});
 
-		_tourChartConfig = TourManager.createTourChartConfiguration();
-
 		// set chart title
-		_tourChart.addDataModelListener(new IDataModelListener() {
+		_pageTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
 				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
 		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
-		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+		_pageTourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
+
+		_tourChartConfig = TourManager.createTourChartConfiguration();
+	}
+
+	private void createUI20ConconiTest() {
+
+		_pageConconiTest = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageConconiTest);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageConconiTest);
+		{
+			createUI21ConconiChart(_pageConconiTest);
+			createUI22DeflactionPoint(_pageConconiTest);
+		}
+	}
+
+	/**
+	 * chart: conconi test
+	 */
+	private void createUI21ConconiChart(final Composite parent) {
+
+		_chartConconiTest = new Chart(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartConconiTest);
+
+		// fill toolbar
+		_tbmTourChartView.add(_actionTourChartDefault);
+		_chartConconiTest.setToolBarManager(_tbmTourChartView, false);
+		_tbmTourChartView.update(true);
+
+		/*
+		 * set tour info icon into the left axis
+		 */
+		final ChartComponentAxis toolTipControl = _chartConconiTest.getToolTipControl();
+		_conconiTourInfoToolTipProvider = new TourInfoToolTipProvider();
+		final TourToolTip _tourToolTip = new TourToolTip(toolTipControl);
+
+		_tourToolTip.addToolTipProvider(_conconiTourInfoToolTipProvider);
+		_tourToolTip.addHideListener(new IToolTipHideListener() {
+			@Override
+			public void afterHideToolTip(final Event event) {
+
+				// hide hovered image
+				toolTipControl.afterHideToolTip(event);
+			}
+		});
+
+		_chartConconiTest.setTourToolTipProvider(_conconiTourInfoToolTipProvider);
+
+		_conconiLayer = new ChartLayerConconiTest();
+	}
+
+	private void createUI22DeflactionPoint(final Composite parent) {
+
+		final PixelConverter pc = new PixelConverter(parent);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().extendedMargins(5, 5, 0, 5).numColumns(4).applyTo(container);
+		{
+			// label: deflaction point
+			Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Tour_Chart_DeflactionPoint);
+
+			// scale: deflection point
+			_scaleDeflection = new Scale(container, SWT.HORIZONTAL);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleDeflection);
+			_scaleDeflection.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectDeflection();
+				}
+			});
+
+			// label: heartbeat
+			_lblDeflactionPulse = new Label(container, SWT.TRAIL);
+//			_lblDeflactionPulse.setText(Messages.Tour_Segmenter_Label_default_tolerance);
+			GridDataFactory
+					.fillDefaults()
+					.align(SWT.FILL, SWT.CENTER)
+					.hint(pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+					.applyTo(_lblDeflactionPulse);
+
+			// label: heartbeat
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			label.setText(Messages.Graph_Label_Heartbeat_unit);
+		}
 	}
 
 	@Override
@@ -335,19 +575,74 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		super.dispose();
 	}
 
+	private void enableActions() {
+
+		final boolean isTour = _tourData != null;
+		final boolean isTourChart = _displayedTourChartType == TourChartType.TOUR_CHART;
+		final boolean isConconiTest = _displayedTourChartType == TourChartType.CONCONI_TEST_POWER;
+
+		// disable title
+		_actionTourChartTitle.setEnabled(false);
+
+		_actionTourChartDefault.setEnabled(isTour && isTourChart == false);
+		_actionTourChartConconiPower.setEnabled(isTour && isConconiTest == false);
+
+		// check selected chart type
+		_actionTourChartDefault.setChecked(isTourChart);
+		_actionTourChartConconiPower.setChecked(isConconiTest);
+	}
+
 	/**
 	 * fire slider move event when the chart is drawn the first time or when the focus gets the
 	 * chart, this will move the sliders in the map to the correct position
 	 */
 	private void fireSliderPosition() {
+
+		if (_pageTourChart == null) {
+			return;
+		}
+
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 				TourManager.fireEvent(
 						TourEventId.SLIDER_POSITION_CHANGED,
-						_tourChart.getChartInfo(),
+						_pageTourChart.getChartInfo(),
 						TourChartView.this);
 			}
 		});
+	}
+
+	/**
+	 * Count number of deflection values
+	 * 
+	 * @param xValues
+	 */
+	private void getPossibleDeflectionValues(final int[] xValues) {
+
+		int xCounter = 0;
+
+		if (xValues != null) {
+
+			// find number of different x-values
+			int currentXValue = xValues[0];
+
+			for (final int xValue : xValues) {
+
+				if (xValue != currentXValue) {
+
+					// next x value is displayed, keep last max y
+
+					xCounter++;
+
+					currentXValue = xValue;
+				}
+			}
+
+			// get last value
+			xCounter++;
+		}
+
+		_scaleDeflection.setMaximum(xCounter);
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
@@ -363,7 +658,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	}
 
 	public TourChart getTourChart() {
-		return _tourChart;
+		return _pageTourChart;
+	}
+
+	private void onSelectDeflection() {
+
+		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _scaleDeflection.getSelection());
+
+		_lblDeflactionPulse.setText(Integer.toString(_scaleDeflection.getSelection()));
+
+		_chartConconiTest.updateCustomLayers();
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -378,7 +682,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					return;
 				}
 
-				updateChart(selectionTourData);
+				updateChart10(selectionTourData);
 			}
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -408,46 +712,53 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					if (tourData != null) {
 
 						if (_tourData == null || _tourData.equals(tourData) == false) {
-							updateChart(tourData);
+							updateChart10(tourData);
 						}
 
-						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+						if (_pageTourChart != null) {
 
-						// set slider position
-						_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
-								_tourChart,
-								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex));
+							// set slider position
+
+							final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+							_pageTourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+									_pageTourChart,
+									chartInfo.leftSliderValuesIndex,
+									chartInfo.rightSliderValuesIndex));
+						}
 					}
 				}
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
-			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
+			if (_pageTourChart != null) {
 
-			final Chart chart = xSliderPosition.getChart();
-			if (chart != null && chart != _tourChart) {
+				final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
-				// it's not the same chart, check if it's the same tour
+				final Chart chart = xSliderPosition.getChart();
+				if (chart != null && chart != _pageTourChart) {
 
-				final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
+					// it's not the same chart, check if it's the same tour
 
-					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData != null) {
+					final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					if (tourId instanceof Long) {
 
-						if (_tourData.equals(tourData)) {
+						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+						if (tourData != null) {
 
-							// it's the same tour, overwrite chart
+							if (_tourData.equals(tourData)) {
 
-							xSliderPosition.setChart(_tourChart);
+								// it's the same tour, overwrite chart
+
+								xSliderPosition.setChart(_pageTourChart);
+							}
 						}
 					}
 				}
-			}
 
-			_tourChart.setXSliderPosition(xSliderPosition);
+				_pageTourChart.setXSliderPosition(xSliderPosition);
+			}
 
 		} else if (selection instanceof StructuredSelection) {
 
@@ -461,7 +772,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
-				updateChart(tourData);
+				updateChart10(tourData);
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
@@ -488,7 +799,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					return;
 				}
 
-				updateChart(editorTourData);
+				updateChart10(editorTourData);
 			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
@@ -497,17 +808,109 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
+	private void restoreState() {
+
+		/*
+		 * restore enum tour chart type
+		 */
+		final String stateChartTypeName = Util.getStateString(
+				_state,
+				STATE_SELECTED_TOUR_CHART_TYPE,
+				TourChartType.TOUR_CHART.name());
+
+		// set default
+		TourChartType chartType = TourChartType.TOUR_CHART;
+
+		try {
+			chartType = TourChartType.valueOf(stateChartTypeName);
+		} catch (final Exception e) {
+			// use default
+		}
+
+		_requestedTourChartType = chartType;
+	}
+
+	private void saveState() {
+
+		// check if UI is disposed
+		if (_pageBook.isDisposed()) {
+			return;
+		}
+
+		_state.put(STATE_SELECTED_TOUR_CHART_TYPE, _displayedTourChartType.name());
+	}
+
+	private void setConconiLayer(final ChartDataYSerie yData) {
+
+		/*
+		 * set regression line layer
+		 */
+		final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<IChartLayer>();
+		chartCustomLayers.add(_conconiLayer);
+
+		yData.setCustomLayers(chartCustomLayers);
+		yData.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _scaleDeflection.getSelection());
+	}
+
 	@Override
 	public void setFocus() {
 
-		_tourChart.setFocus();
+		if (_pageTourChart != null) {
+
+			_pageTourChart.setFocus();
+
+			/*
+			 * fire tour selection
+			 */
+			_postSelectionProvider.setSelection(new SelectionTourData(_pageTourChart, _tourData));
+
+			fireSliderPosition();
+
+		} else if (_pageConconiTest != null) {
+			_chartConconiTest.setFocus();
+		}
+	}
+
+	/**
+	 * set toolbar items
+	 */
+	private void setToolbar() {
+
+		final IContributionItem[] tbmItems = _tbmTourChartView.getItems();
+
+		if (_displayedTourChartType != null) {
+
+			// backup toolbar items for the displayed tour chart
+
+			if (_displayedTourChartType == TourChartType.TOUR_CHART) {
+				_tourChartContribItems = tbmItems;
+			} else if (_displayedTourChartType == TourChartType.CONCONI_TEST_POWER) {
+				_conconiTestContribItems = tbmItems;
+			}
+		}
+
+		_displayedTourChartType = _requestedTourChartType;
+		_requestedTourChartType = null;
+
+		_tbmTourChartView.removeAll();
 
 		/*
-		 * fire tour selection
+		 * fill toolbar when contribution actions are available
 		 */
-		_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
+		if (_displayedTourChartType == TourChartType.TOUR_CHART && _tourChartContribItems != null) {
 
-		fireSliderPosition();
+			for (final IContributionItem item : _tourChartContribItems) {
+				_tbmTourChartView.add(item);
+			}
+
+		} else if (_displayedTourChartType == TourChartType.CONCONI_TEST_POWER && _conconiTestContribItems != null) {
+
+			for (final IContributionItem item : _conconiTestContribItems) {
+				_tbmTourChartView.add(item);
+			}
+		}
+
+		_tbmTourChartView.update(true);
 	}
 
 	private void showTourFromTourProvider() {
@@ -532,42 +935,25 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 				if (selectedTours != null && selectedTours.size() > 0) {
-					updateChart(selectedTours.get(0));
+					updateChart10(selectedTours.get(0));
 				}
 			}
 		});
 	}
 
-	private void updateChart() {
-
-		if (_tourData == null) {
-			// nothing to do
-			return;
-		}
-
-		TourManager.getInstance().setActiveTourChart(_tourChart);
-
-		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
-
-		_pageBook.showPage(_tourChart);
-
-		// set application window title
-		setTitleToolTip(TourManager.getTourDateShort(_tourData));
-	}
-
 	private void updateChart(final long tourId) {
 
+		// check if tour is already displayed
 		if (_tourData != null && _tourData.getTourId() == tourId) {
-			// optimize
 			return;
 		}
 
-		updateChart(TourManager.getInstance().getTourData(tourId));
+		updateChart10(TourManager.getInstance().getTourData(tourId));
 
 		fireSliderPosition();
 	}
 
-	private void updateChart(final TourData tourData) {
+	private void updateChart10(final TourData tourData) {
 
 		if (tourData == null) {
 			// nothing to do
@@ -576,7 +962,62 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		_tourData = tourData;
 
-		updateChart();
+		updateChart20();
+
+		// set application window title
+		setTitleToolTip(TourManager.getTourDateShort(_tourData));
+	}
+
+	private void updateChart20() {
+
+		if (_requestedTourChartType != null) {
+			// a new tour chart type is selected
+			setToolbar();
+		}
+
+		if (_displayedTourChartType == TourChartType.TOUR_CHART) {
+
+			/*
+			 * default tour chart
+			 */
+
+			if (_pageTourChart == null) {
+				createUI10TourChart();
+			}
+
+			TourManager.getInstance().setActiveTourChart(_pageTourChart);
+
+			_pageTourChart.updateTourChart(_tourData, _tourChartConfig, false);
+
+			_pageBook.showPage(_pageTourChart);
+
+		} else if (_displayedTourChartType == TourChartType.CONCONI_TEST_POWER) {
+
+			/*
+			 * conconi test
+			 */
+			if (_pageConconiTest == null) {
+				createUI20ConconiTest();
+			}
+
+			TourManager.getInstance().setActiveTourChart(null);
+
+			final ChartDataModel conconiChartDataModel = createChartDataModelConconiTest();
+
+			_conconiTourInfoToolTipProvider.setTourData(_tourData);
+
+			_chartConconiTest.updateChart(conconiChartDataModel, true, true);
+
+			_pageBook.showPage(_pageConconiTest);
+
+		} else {
+
+			TourManager.getInstance().setActiveTourChart(null);
+
+			_pageBook.showPage(_pageNoChart);
+		}
+
+		enableActions();
 	}
 
 }

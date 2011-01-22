@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,6 +91,7 @@ public class TourManager {
 
 	public static final String					CUSTOM_DATA_SEGMENT_VALUES	= "segmentValues";							//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_ANALYZER_INFO	= "analyzerInfo";							//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_CONCONI_TEST	= "CUSTOM_DATA_CONCONI_TEST";				//$NON-NLS-1$
 
 	public static final String					X_AXIS_TIME					= "time";									//$NON-NLS-1$
 	public static final String					X_AXIS_DISTANCE				= "distance";								//$NON-NLS-1$
@@ -343,8 +344,10 @@ public class TourManager {
 
 		final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 
-		// convert the graph ids from the preferences into visible graphs in
-		// the chart panel configuration
+		/*
+		 * convert graph ids from the preferences into visible graphs in the chart panel
+		 * configuration
+		 */
 		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(_prefStore
 				.getString(ITourbookPreferences.GRAPH_VISIBLE));
 		for (final String prefGraphId : prefGraphIds) {
@@ -1133,18 +1136,21 @@ public class TourManager {
 
 		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
-		final RGB lineColor = PreferenceConverter.getColor(prefStore, //
+		final RGB lineColor = PreferenceConverter.getColor(//
+				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
 		yData.setDefaultRGB(lineColor);
 
 		yData.setRgbLine(new RGB[] { lineColor });
 
-		yData.setRgbDark(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColorProvider.PREF_COLOR_DARK) });
+		yData.setRgbDark(new RGB[] { PreferenceConverter.getColor(//
+				prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_DARK) });
 
-		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColorProvider.PREF_COLOR_BRIGHT) });
+		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(//
+				prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT) });
 	}
 
 	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
@@ -1237,21 +1243,19 @@ public class TourManager {
 			return;
 		}
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
 		int clippingTime;
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING)) {
+		if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING)) {
 			// use custom clipping
-			clippingTime = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE);
+			clippingTime = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE);
 		} else {
 			// use internal clipping, value was evaluated with experiments
 			clippingTime = 15;
 		}
 
 		int paceClipping;
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING)) {
+		if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING)) {
 			// use custom clipping
-			paceClipping = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE);
+			paceClipping = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE);
 		} else {
 			// use internal clipping, value was evaluated with experiments
 			paceClipping = 15;
@@ -1554,7 +1558,7 @@ public class TourManager {
 														final TourChartConfiguration chartConfig,
 														final boolean hasPropertyChanged) {
 
-		// check if the callbacks are created
+		// check if avg callbacks are created
 		if (_computeSpeedAvg == null) {
 			createAvgCallbacks();
 		}
@@ -1564,8 +1568,6 @@ public class TourManager {
 		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 			return chartDataModel;
 		}
-
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		if (hasPropertyChanged) {
 			tourData.clearComputedSeries();
@@ -1646,7 +1648,7 @@ public class TourManager {
 			chartDataModel.addXyData(xDataTime);
 		}
 
-		final int chartType = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+		final int chartType = _prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 
 		/*
 		 * altitude
@@ -1687,7 +1689,7 @@ public class TourManager {
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
-			setGraphColor(prefStore, yDataAltitude, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+			setGraphColor(_prefStore, yDataAltitude, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 			adjustMinMax(yDataAltitude);
 			chartDataModel.addXyData(yDataAltitude);
 		}
@@ -1709,7 +1711,7 @@ public class TourManager {
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
-			setGraphColor(prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
 		}
 
@@ -1731,7 +1733,7 @@ public class TourManager {
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 2));
 
-			setGraphColor(prefStore, yDataSpeed, GraphColorProvider.PREF_GRAPH_SPEED);
+			setGraphColor(_prefStore, yDataSpeed, GraphColorProvider.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
 		}
 
@@ -1754,16 +1756,16 @@ public class TourManager {
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, false, _computePaceAvg, 1));
 
-			setGraphColor(prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
+			setGraphColor(_prefStore, yDataPace, GraphColorProvider.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
 
 			// adjust pace min/max values when it's defined in the pref store
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
 
-				yDataPace.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60, true);
+				yDataPace.setVisibleMinValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60, true);
 
 				// set max value after min value
-				yDataPace.setVisibleMaxValue(prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60, true);
+				yDataPace.setVisibleMaxValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60, true);
 			}
 		}
 
@@ -1784,7 +1786,7 @@ public class TourManager {
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, false, _computePowerAvg, 0));
 
-			setGraphColor(prefStore, yDataPower, GraphColorProvider.PREF_GRAPH_POWER);
+			setGraphColor(_prefStore, yDataPower, GraphColorProvider.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
 		}
 
@@ -1805,13 +1807,13 @@ public class TourManager {
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, _computeAltimeterAvg));
 
-			setGraphColor(prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
+			setGraphColor(_prefStore, yDataAltimeter, GraphColorProvider.PREF_GRAPH_ALTIMETER);
 			chartDataModel.addXyData(yDataAltimeter);
 
 			// adjust min altitude when it's defined in the pref store
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED)) {
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED)) {
 				yDataAltimeter.setVisibleMinValue(
-						prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
+						_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
 						true);
 			}
 		}
@@ -1834,12 +1836,12 @@ public class TourManager {
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeGradientAvg, 1));
 
-			setGraphColor(prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
+			setGraphColor(_prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
 			// adjust min value when defined in the pref store
-			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
-				yDataGradient.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
+				yDataGradient.setVisibleMinValue(_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
 						* GRADIENT_DIVISOR, true);
 			}
 		}
@@ -1860,7 +1862,7 @@ public class TourManager {
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
-			setGraphColor(prefStore, yDataCadence, GraphColorProvider.PREF_GRAPH_CADENCE);
+			setGraphColor(_prefStore, yDataCadence, GraphColorProvider.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
 		}
 
@@ -1881,7 +1883,7 @@ public class TourManager {
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
 
-			setGraphColor(prefStore, yDataTemperature, GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+			setGraphColor(_prefStore, yDataTemperature, GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
 			adjustMinMax(yDataTemperature);
 			chartDataModel.addXyData(yDataTemperature);
 		}
@@ -1901,7 +1903,7 @@ public class TourManager {
 			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
 
-			setGraphColor(prefStore, yDataTourCompare, GraphColorProvider.PREF_GRAPH_TOUR_COMPARE);
+			setGraphColor(_prefStore, yDataTourCompare, GraphColorProvider.PREF_GRAPH_TOUR_COMPARE);
 			chartDataModel.addXyData(yDataTourCompare);
 		}
 
@@ -1992,25 +1994,6 @@ public class TourManager {
 
 		return chartDataModel;
 	}
-
-//	/**
-//	 * @param tourData
-//	 * @param useNormalizedData
-//	 */
-//	// public void createTour(final TourData tourData) {
-//	//
-//	// openTourEditor(createTourEditorInput(tourData));
-//	// }
-//	/**
-//	 * @param tourData
-//	 */
-//	public void createTour(TourData tourData) {
-//
-//		if (tourData.getTourPerson() != null) {
-//			// load tour from database
-//			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
-//		}
-//	}
 
 	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
 

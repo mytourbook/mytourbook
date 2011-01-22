@@ -434,12 +434,14 @@ public class Chart extends ViewForm {
 				_chartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
 			}
 
-			menuMgr.add(new Separator());
-			menuMgr.add(actionMouseMode);
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
-			menuMgr.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			if (_isShowZoomActions) {
+				menuMgr.add(new Separator());
+				menuMgr.add(actionMouseMode);
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
+				menuMgr.add(_chartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			}
 		}
 
 		if (_chartContextProvider != null && showOnlySliderContext == false && _isFirstContextMenu == false) {
@@ -1200,11 +1202,20 @@ public class Chart extends ViewForm {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
+			String errorMessage = chartDataModel.getErrorMessage();
+			if (errorMessage == null) {
+				errorMessage = Messages.Error_Message_001_Default;
+			}
+			_chartComponents.setErrorMessage(errorMessage);
+
 			_chartDataModel = emptyModel;
 			_chartComponents.setModel(emptyModel, false);
 
 			return;
 		}
+
+		// reset error
+		_chartComponents.setErrorMessage(null);
 
 		_chartDataModel = chartDataModel;
 
@@ -1227,7 +1238,10 @@ public class Chart extends ViewForm {
 		_actionHandlerManager.updateActionHandlers(this);
 	}
 
-	public void updateChartLayers() {
+	/**
+	 * Updates only chart layers not the chart itself
+	 */
+	public void updateCustomLayers() {
 		_chartComponents.updateChartLayers();
 	}
 

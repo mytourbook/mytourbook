@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Wolfgang Schramm
@@ -55,12 +55,12 @@ public class TourChartConfiguration {
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
 	 * in which the graphs will be displayed
 	 */
-	private ArrayList<Integer>		visibleGraphSequence	= new ArrayList<Integer>();
+	private ArrayList<Integer>		_visibleGraphSequence	= new ArrayList<Integer>();
 
 	/**
 	 * contains the min/max keeper or <code>null</code> when min/max is not kept
 	 */
-	private ChartYDataMinMaxKeeper	fMinMaxKeeper;
+	private ChartYDataMinMaxKeeper	_minMaxKeeper;
 
 	/**
 	 * when <code>true</code> the sliders are moved when the chart is zoomed
@@ -104,7 +104,7 @@ public class TourChartConfiguration {
 	}
 
 	public void addVisibleGraph(final int visibleGraph) {
-		visibleGraphSequence.add(visibleGraph);
+		_visibleGraphSequence.add(visibleGraph);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class TourChartConfiguration {
 	 *         min/max keeper is not set
 	 */
 	ChartYDataMinMaxKeeper getMinMaxKeeper() {
-		return fMinMaxKeeper;
+		return _minMaxKeeper;
 	}
 
 	/**
@@ -120,16 +120,16 @@ public class TourChartConfiguration {
 	 *         in which the graphs are displayed
 	 */
 	public ArrayList<Integer> getVisibleGraphs() {
-		return visibleGraphSequence;
+		return _visibleGraphSequence;
 	}
 
 	public void removeVisibleGraph(final int selectedGraphId) {
 
 		int graphIndex = 0;
 
-		for (final Integer graphId : visibleGraphSequence) {
+		for (final Integer graphId : _visibleGraphSequence) {
 			if (graphId == selectedGraphId) {
-				visibleGraphSequence.remove(graphIndex);
+				_visibleGraphSequence.remove(graphIndex);
 				break;
 			}
 			graphIndex++;
@@ -150,9 +150,9 @@ public class TourChartConfiguration {
 	 */
 	public void setMinMaxKeeper(final boolean keepMinMaxValues) {
 		if (keepMinMaxValues) {
-			fMinMaxKeeper = new ChartYDataMinMaxKeeper();
+			_minMaxKeeper = new ChartYDataMinMaxKeeper();
 		} else {
-			fMinMaxKeeper = null;
+			_minMaxKeeper = null;
 		}
 	}
 
