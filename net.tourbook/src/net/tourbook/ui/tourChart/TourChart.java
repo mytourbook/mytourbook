@@ -105,6 +105,8 @@ public class TourChart extends Chart {
 	private TourChartConfiguration			_tourChartConfig;
 	private Map<String, TCActionProxy>		_actionProxies;
 
+	private TourChartType					_tourChartType							= TourChartType.CONCONI_TEST_POWER;
+
 	private final boolean					_isShowActions;
 
 	private final TCActionHandlerManager	_tcActionHandlerManager					= TCActionHandlerManager
@@ -1171,9 +1173,16 @@ public class TourChart extends Chart {
 		enableZoomOptions();
 	}
 
+	void setTourChartType(final TourChartType tourChartType) {
+
+		_tourChartType = tourChartType;
+
+		updateTourChart(true);
+	}
+
 	/**
-	 * Enable or disable the edit actions in the tour info tooltip, by default the edit
-	 * actions are disabled.
+	 * Enable or disable the edit actions in the tour info tooltip, by default the edit actions are
+	 * disabled.
 	 * 
 	 * @param isEnabled
 	 */
@@ -1399,16 +1408,18 @@ public class TourChart extends Chart {
 			}
 		}
 
-		// set current tour data and chart config
+		// set current tour data and chart config to new values
 		_tourData = newTourData;
 		_tourChartConfig = newChartConfig;
 
+		_tourChartConfig.tourChartType = _tourChartType;
+
 		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
-				newTourData,
-				newChartConfig,
+				_tourData,
+				_tourChartConfig,
 				isPropertyChanged);
 
-		// set the model BEFORE the actions are created/enabled/checked
+		// set the model BEFORE actions are created/enabled/checked
 		setDataModel(newChartDataModel);
 
 		if (_isShowActions) {
@@ -1418,7 +1429,7 @@ public class TourChart extends Chart {
 		}
 
 		// restore min/max values from the chart config
-		final ChartYDataMinMaxKeeper newMinMaxKeeper = newChartConfig.getMinMaxKeeper();
+		final ChartYDataMinMaxKeeper newMinMaxKeeper = _tourChartConfig.getMinMaxKeeper();
 		final boolean isMinMaxKeeper = (newMinMaxKeeper != null) && keepMinMaxValues;
 		if (isMinMaxKeeper) {
 			newMinMaxKeeper.setMinMaxValues(newChartDataModel);

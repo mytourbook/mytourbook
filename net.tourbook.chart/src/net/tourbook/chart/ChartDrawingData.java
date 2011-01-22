@@ -28,51 +28,51 @@ public class ChartDrawingData {
 	public static final int			BAR_POS_LEFT			= 0;
 	public static final int			BAR_POS_CENTER			= 1;
 
-	private ChartDataXSerie			xData;
-	private ChartDataXSerie			xData2nd;
-	private ChartDataYSerie			yData;
+	private ChartDataXSerie			_xData;
+	private ChartDataXSerie			_xData2nd;
+	private ChartDataYSerie			_yData;
 
-	private Rectangle[]				ySliderHitRect;
+	private Rectangle[]				_ySliderHitRect;
 
-	private String					fXTitle;
+	private String					_xTitle;
 
 	/**
 	 * management for the bar graph
 	 */
-	private Rectangle[][]			barRectangles;
-	private Rectangle[][]			barFocusRectangles;
+	private Rectangle[][]			_barRectangles;
+	private Rectangle[][]			_barFocusRectangles;
 
-	private int						fBarRectangleWidth;
-	private int						fDevBarRectangleXPos;
+	private int						_barRectangleWidth;
+	private int						_devBarRectangleXPos;
 
 	/**
 	 * Contains all unit labels and their positions for the x axis
 	 */
-	private ArrayList<ChartUnit>	xUnits					= new ArrayList<ChartUnit>();
-	private int						xUnitTextPos			= XUNIT_TEXT_POS_LEFT;
+	private ArrayList<ChartUnit>	_xUnits					= new ArrayList<ChartUnit>();
+	private int						_xUnitTextPos			= XUNIT_TEXT_POS_LEFT;
 
 	/**
 	 * List with all unit labels and positions for the y axis
 	 */
-	private ArrayList<ChartUnit>	yUnits					= new ArrayList<ChartUnit>();
+	private ArrayList<ChartUnit>	_yUnits					= new ArrayList<ChartUnit>();
 
 	// scaling from graph value to device value
-	private float					scaleX;
-	private float					scaleY;
+	private float					_scaleX;
+	private float					_scaleY;
 
 	/**
 	 * scaling the the x unit
 	 */
-	private float					scaleUnitX				= Float.MIN_VALUE;
+	private float					_scaleUnitX				= Float.MIN_VALUE;
 
-	private int						devMarginTop;
-	private int						devXTitelBarHeight;
-	private int						devMarkerBarHeight;
-	private int						devSliderBarHeight;
+	private int						_devMarginTop;
+	private int						_devXTitelBarHeight;
+	private int						_devMarkerBarHeight;
+	private int						_devSliderBarHeight;
 
 	// graph position
-	private int						devYTop;
-	private int						devYBottom;
+	private int						_devYTop;
+	private int						_devYBottom;
 
 	/**
 	 * virtual graph width in dev (pixel) units
@@ -84,59 +84,59 @@ public class ChartDrawingData {
 	 */
 	public int						devGraphHeight;
 
-	private int						devSliderHeight;
+	private int						_devSliderHeight;
 
 	/**
 	 * graph value for the bottom of the graph
 	 */
-	private int						graphYBottom;
-	private int						graphYTop;
+	private int						_graphYBottom;
+	private int						_graphYTop;
 
-	private int						barPosition				= BAR_POS_LEFT;
+	private int						_barPosition			= BAR_POS_LEFT;
 
-	private int						fChartType;
+	private int						_chartType;
 
 	public ChartDrawingData(final int chartType) {
-		fChartType = chartType;
+		_chartType = chartType;
 	}
 
 	/**
 	 * @return Returns the barFocusRectangles.
 	 */
 	public Rectangle[][] getBarFocusRectangles() {
-		return barFocusRectangles;
+		return _barFocusRectangles;
 	}
 
 	/**
 	 * @return Returns the barPosition, this can be set to BAR_POS_LEFT, BAR_POS_CENTER
 	 */
 	public int getBarPosition() {
-		return barPosition;
+		return _barPosition;
 	}
 
 	/**
 	 * @return Returns the barRectangles.
 	 */
 	public Rectangle[][] getBarRectangles() {
-		return barRectangles;
+		return _barRectangles;
 	}
 
 	/**
 	 * @return Returns the barRectangleWidth.
 	 */
 	public int getBarRectangleWidth() {
-		return fBarRectangleWidth;
+		return _barRectangleWidth;
 	}
 
 	public int getChartType() {
-		return fChartType;
+		return _chartType;
 	}
 
 	/**
 	 * @return Returns the barRectanglePos.
 	 */
 	public int getDevBarRectangleXPos() {
-		return fDevBarRectangleXPos;
+		return _devBarRectangleXPos;
 	}
 
 //	public int getDevGraphHeight() {
@@ -154,39 +154,39 @@ public class ChartDrawingData {
 	 * @return Returns the devMarginTop.
 	 */
 	public int getDevMarginTop() {
-		return devMarginTop;
+		return _devMarginTop;
 	}
 
 	/**
 	 * @return Returns the devMarkerBarHeight.
 	 */
 	public int getDevMarkerBarHeight() {
-		return devMarkerBarHeight;
+		return _devMarkerBarHeight;
 	}
 
 	/**
 	 * @return Returns the devSliderBarHeight.
 	 */
 	public int getDevSliderBarHeight() {
-		return devSliderBarHeight;
+		return _devSliderBarHeight;
 	}
 
 	public int getDevSliderHeight() {
-		return devSliderHeight;
+		return _devSliderHeight;
 	}
 
 	/**
 	 * @return Returns the devTitelBarHeight.
 	 */
 	public int getDevXTitelBarHeight() {
-		return devXTitelBarHeight;
+		return _devXTitelBarHeight;
 	}
 
 	/**
 	 * @return Returns the bottom of the chart in dev units
 	 */
 	public int getDevYBottom() {
-		return devYBottom;
+		return _devYBottom;
 	}
 
 	/**
@@ -200,86 +200,86 @@ public class ChartDrawingData {
 	 * @return Returns the top of the chart in dev units
 	 */
 	public int getDevYTop() {
-		return devYTop;
+		return _devYTop;
 	}
 
 	/**
 	 * @return Returns the bottom of the chart in graph units
 	 */
 	public int getGraphYBottom() {
-		return graphYBottom;
+		return _graphYBottom;
 	}
 
 	/**
 	 * @return Returns the top of the chart in graph units
 	 */
 	public int getGraphYTop() {
-		return graphYTop;
+		return _graphYTop;
 	}
 
 	public float getScaleUnitX() {
-		return scaleUnitX;
+		return _scaleUnitX;
 	}
 
 	public float getScaleX() {
-		return scaleX;
+		return _scaleX;
 	}
 
 	public float getScaleY() {
-		return scaleY;
+		return _scaleY;
 	}
 
 	/**
 	 * @return Returns the xData.
 	 */
 	public ChartDataXSerie getXData() {
-		return xData;
+		return _xData;
 	}
 
 	/**
 	 * @return Returns the xData2nd.
 	 */
 	public ChartDataXSerie getXData2nd() {
-		return xData2nd;
+		return _xData2nd;
 	}
 
 	public String getXTitle() {
-		return fXTitle;
+		return _xTitle;
 	}
 
 	/**
 	 * @return Returns the units for the x-axis.
 	 */
 	public ArrayList<ChartUnit> getXUnits() {
-		return xUnits;
+		return _xUnits;
 	}
 
 	/**
 	 * @return Returns the xUnitTextPos.
 	 */
 	public int getXUnitTextPos() {
-		return xUnitTextPos;
+		return _xUnitTextPos;
 	}
 
 	/**
 	 * @return Returns the ChartDataXSerie for the y-axis
 	 */
 	public ChartDataYSerie getYData() {
-		return yData;
+		return _yData;
 	}
 
 	/**
 	 * @return Returns the ySliderHitRect.
 	 */
 	public Rectangle[] getYSliderHitRect() {
-		return ySliderHitRect;
+		return _ySliderHitRect;
 	}
 
 	/**
 	 * @return Returns the yUnits.
 	 */
 	public ArrayList<ChartUnit> getYUnits() {
-		return yUnits;
+		return _yUnits;
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class ChartDrawingData {
 	 *            The barFocusRectangles to set.
 	 */
 	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
-		this.barFocusRectangles = barFocusRectangles;
+		this._barFocusRectangles = barFocusRectangles;
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class ChartDrawingData {
 	 *            The barPosition to set.
 	 */
 	public void setBarPosition(final int barPosition) {
-		this.barPosition = barPosition;
+		this._barPosition = barPosition;
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class ChartDrawingData {
 	 *            The barRectangles to set.
 	 */
 	public void setBarRectangles(final Rectangle[][] barRectList) {
-		this.barRectangles = barRectList;
+		this._barRectangles = barRectList;
 	}
 
 	/**
@@ -311,7 +311,7 @@ public class ChartDrawingData {
 	 *            The barRectangleWidth to set.
 	 */
 	public void setBarRectangleWidth(final int barRectangleWidth) {
-		this.fBarRectangleWidth = barRectangleWidth;
+		this._barRectangleWidth = barRectangleWidth;
 	}
 
 	/**
@@ -319,7 +319,7 @@ public class ChartDrawingData {
 	 *            The barRectanglePos to set.
 	 */
 	public void setDevBarRectangleXPos(final int barRectanglePos) {
-		fDevBarRectangleXPos = barRectanglePos;
+		_devBarRectangleXPos = barRectanglePos;
 	}
 
 //	public void setDevGraphHeight(final int heightDev) {
@@ -335,7 +335,7 @@ public class ChartDrawingData {
 	 *            The devMarginTop to set.
 	 */
 	public void setDevMarginTop(final int devMarginTop) {
-		this.devMarginTop = devMarginTop;
+		this._devMarginTop = devMarginTop;
 	}
 
 	/**
@@ -343,7 +343,7 @@ public class ChartDrawingData {
 	 *            The devMarkerBarHeight to set.
 	 */
 	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
-		this.devMarkerBarHeight = devMarkerBarHeight;
+		this._devMarkerBarHeight = devMarkerBarHeight;
 	}
 
 	/**
@@ -351,11 +351,11 @@ public class ChartDrawingData {
 	 *            The devSliderBarHeight to set.
 	 */
 	public void setDevSliderBarHeight(final int devSliderBarHeight) {
-		this.devSliderBarHeight = devSliderBarHeight;
+		this._devSliderBarHeight = devSliderBarHeight;
 	}
 
 	public void setDevSliderHeight(final int devSliderHeight) {
-		this.devSliderHeight = devSliderHeight;
+		this._devSliderHeight = devSliderHeight;
 	}
 
 	/**
@@ -363,11 +363,11 @@ public class ChartDrawingData {
 	 *            The devTitelBarHeight to set.
 	 */
 	void setDevXTitelBarHeight(final int devTitelBarHeight) {
-		this.devXTitelBarHeight = devTitelBarHeight;
+		this._devXTitelBarHeight = devTitelBarHeight;
 	}
 
 	public void setDevYBottom(final int devY) {
-		this.devYBottom = devY;
+		this._devYBottom = devY;
 	}
 
 	/**
@@ -375,11 +375,11 @@ public class ChartDrawingData {
 	 *            The devYTop to set.
 	 */
 	protected void setDevYTop(final int devYTop) {
-		this.devYTop = devYTop;
+		this._devYTop = devYTop;
 	}
 
 	public void setGraphYBottom(final int yGraphMin) {
-		this.graphYBottom = yGraphMin;
+		this._graphYBottom = yGraphMin;
 	}
 
 	/**
@@ -387,7 +387,7 @@ public class ChartDrawingData {
 	 *            The graphYTop to set.
 	 */
 	protected void setGraphYTop(final int graphYTop) {
-		this.graphYTop = graphYTop;
+		this._graphYTop = graphYTop;
 	}
 
 	/**
@@ -396,7 +396,7 @@ public class ChartDrawingData {
 	 * @param scaleXUnit
 	 */
 	public void setScaleUnitX(final float scaleXUnit) {
-		this.scaleUnitX = scaleXUnit;
+		this._scaleUnitX = scaleXUnit;
 	}
 
 	/**
@@ -405,11 +405,11 @@ public class ChartDrawingData {
 	 * @param scaleX
 	 */
 	public void setScaleX(final float scaleX) {
-		this.scaleX = scaleX;
+		this._scaleX = scaleX;
 	}
 
 	public void setScaleY(final float scaleY) {
-		this.scaleY = scaleY;
+		this._scaleY = scaleY;
 	}
 
 	/**
@@ -417,7 +417,7 @@ public class ChartDrawingData {
 	 *            The xData to set.
 	 */
 	public void setXData(final ChartDataXSerie xData) {
-		this.xData = xData;
+		this._xData = xData;
 	}
 
 	/**
@@ -425,11 +425,11 @@ public class ChartDrawingData {
 	 *            The xData2nd to set.
 	 */
 	public void setXData2nd(final ChartDataXSerie data2nd) {
-		xData2nd = data2nd;
+		_xData2nd = data2nd;
 	}
 
 	public void setXTitle(final String title) {
-		fXTitle = title;
+		_xTitle = title;
 	}
 
 	/**
@@ -439,7 +439,7 @@ public class ChartDrawingData {
 	 *            The xUnitTextPos to set.
 	 */
 	public void setXUnitTextPos(final int unitTextPos) {
-		xUnitTextPos = unitTextPos;
+		_xUnitTextPos = unitTextPos;
 	}
 
 	/**
@@ -447,7 +447,7 @@ public class ChartDrawingData {
 	 *            The yData to set.
 	 */
 	public void setYData(final ChartDataYSerie data) {
-		this.yData = data;
+		this._yData = data;
 	}
 
 	/**
@@ -455,6 +455,6 @@ public class ChartDrawingData {
 	 *            The ySliderHitRect to set.
 	 */
 	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
-		ySliderHitRect = sliderHitRect;
+		_ySliderHitRect = sliderHitRect;
 	}
 }

@@ -1052,8 +1052,8 @@ public class ChartComponents extends Composite {
 		_chartDataModel = chartModel;
 
 		/*
-		 * when the data model is changed update the visible y-values to use the full visible area
-		 * for drawing the chart
+		 * when data model has changed, update the visible y-values to use the full visible area for
+		 * drawing the chart
 		 */
 		if (_chartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR && isShowAllData) {
 			_componentGraph.updateYDataMinMaxValues();

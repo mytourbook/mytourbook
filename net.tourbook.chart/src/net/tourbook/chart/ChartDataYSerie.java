@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -46,41 +46,41 @@ public class ChartDataYSerie extends ChartDataSerie {
 	/**
 	 * Slider label format: n.1
 	 */
-	public static final int			SLIDER_LABEL_FORMAT_DEFAULT	= 0;							//$NON-NLS-1$
+	public static final int			SLIDER_LABEL_FORMAT_DEFAULT	= 0;
 	/**
 	 * Slider label format: mm:ss
 	 */
-	public static final int			SLIDER_LABEL_FORMAT_MM_SS	= 1;							//$NON-NLS-1$
+	public static final int			SLIDER_LABEL_FORMAT_MM_SS	= 1;
 
-	private int						fSliderLabelFormat			= SLIDER_LABEL_FORMAT_DEFAULT;
-	private int						fChartLayout				= BAR_LAYOUT_SINGLE_SERIE;
-	private String					fYTitle;
+	private int						_sliderLabelFormat			= SLIDER_LABEL_FORMAT_DEFAULT;
+	private int						_chartLayout				= BAR_LAYOUT_SINGLE_SERIE;
+	private String					_yTitle;
 
 	/**
 	 * contains the color index for each value
 	 */
-	private int[][]					fColorIndex;
+	private int[][]					_colorIndex;
 
-	private int						graphFillMethod				= FILL_METHOD_NOFILL;
+	private int						_graphFillMethod			= FILL_METHOD_NOFILL;
 
-	private boolean					showYSlider					= false;
+	private boolean					_showYSlider				= false;
 
 	/**
 	 * <p>
 	 * true: the direction is from bottom to top by increasing number <br>
 	 * false: the direction is from top to bottom by increasing number
 	 */
-	private boolean					yAxisDirection				= true;
+	private boolean					_yAxisDirection				= true;
 
 	/**
 	 * Contains a list with all layers which are drawn on top of the graph
 	 */
-	private ArrayList<IChartLayer>	fCustomLayers				= new ArrayList<IChartLayer>();
+	private ArrayList<IChartLayer>	_customLayers				= new ArrayList<IChartLayer>();
 
-	private ChartYSlider			ySliderTop;
+	private ChartYSlider			_ySliderTop;
 
-	private ChartYSlider			ySliderBottom;
-	private final int				fChartType;
+	private ChartYSlider			_ySliderBottom;
+	private final int				_chartType;
 
 	/**
 	 * 2nd y-data serie is currently used to display the slider label and the pace y-units
@@ -92,81 +92,62 @@ public class ChartDataYSerie extends ChartDataSerie {
 							final int[][] lowValueSeries,
 							final int[][] highValueSeries) {
 
-		fChartType = chartType;
-		fChartLayout = chartLayout;
+		_chartType = chartType;
+		_chartLayout = chartLayout;
 
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
 	public ChartDataYSerie(final int chartType, final int[] valueSerie) {
-		fChartType = chartType;
+		_chartType = chartType;
 		setMinMaxValues(new int[][] { valueSerie });
 	}
 
 	public ChartDataYSerie(final int chartType, final int[] lowValueSerie, final int[] highValueSerie) {
-		fChartType = chartType;
+		_chartType = chartType;
 		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
 
 	public ChartDataYSerie(final int chartType, final int[][] valueSeries) {
-		fChartType = chartType;
+		_chartType = chartType;
 		setMinMaxValues(valueSeries);
 	}
 
 	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
-		fChartType = chartType;
+		_chartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
-
-//	public ChartDataYSerie(int chartType, int[][] valueSerie) {
-//		fChartType = chartType;
-//		setMinMaxValues(valueSerie);
-//	}
 
 	/**
 	 * @return Returns the chartLayout.
 	 */
 	protected int getChartLayout() {
-		return fChartLayout;
+		return _chartLayout;
 	}
 
-//	int getAdjustedMaxValue() {
-//		// return yAxisDirection
-//		// ? fSavedMaxValue + (fSavedMaxValue / 10)
-//		// : (fSavedMaxValue + (fSavedMaxValue / 100));
-//		return fOriginalMaxValue;
-//	}
-
-//	int getAdjustedMinValue() {
-//		// return yAxisDirection
-//		// ? fSavedMinValue - (fSavedMinValue / 10)
-//		// : (fSavedMinValue - (fSavedMinValue / 100));
-//		return fOriginalMinValue;
-//	}
-
 	public int getChartType() {
-		return fChartType;
+		return _chartType;
 	}
 
 	/**
 	 * @return Returns the valueColors.
 	 */
 	public int[][] getColorsIndex() {
-		if (fColorIndex == null || fColorIndex.length == 0 || fColorIndex[0] == null || fColorIndex[0].length == 0) {
+		if (_colorIndex == null || _colorIndex.length == 0 || _colorIndex[0] == null || _colorIndex[0].length == 0) {
 			setAllValueColors(0);
 		}
-		return fColorIndex;
+		return _colorIndex;
 	}
 
 	public ArrayList<IChartLayer> getCustomLayers() {
-		return fCustomLayers;
+		return _customLayers;
 	}
 
 	/**
 	 * @return returns true if the graph is filled
 	 */
 	public int getGraphFillMethod() {
-		return graphFillMethod;
+		return _graphFillMethod;
 	}
 
 	/**
@@ -174,43 +155,39 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 *         {@link #SLIDER_LABEL_FORMAT_DEFAULT}<br> {@link #SLIDER_LABEL_FORMAT_MM_SS}
 	 */
 	public int getSliderLabelFormat() {
-		return fSliderLabelFormat;
+		return _sliderLabelFormat;
 	}
 
 	public String getXTitle() {
 		return null;
 	}
 
-//	public int[] getYData2ndSerie() {
-//		return fYData2ndSerie;
-//	}
-
 	/**
 	 * @return Returns the ySliderBottom.
 	 */
 	public ChartYSlider getYSliderBottom() {
-		return ySliderBottom;
+		return _ySliderBottom;
 	}
 
 	/**
 	 * @return Returns the ySliderTop.
 	 */
 	public ChartYSlider getYSliderTop() {
-		return ySliderTop;
+		return _ySliderTop;
 	}
 
 	/**
 	 * @return Returns the title.
 	 */
 	public String getYTitle() {
-		return fYTitle;
+		return _yTitle;
 	}
 
 	/**
 	 * @return Returns the showYSlider.
 	 */
 	public boolean isShowYSlider() {
-		return showYSlider;
+		return _showYSlider;
 	}
 
 	/**
@@ -219,7 +196,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * false: the direction is from top to bottom by increasing number
 	 */
 	public boolean isYAxisDirection() {
-		return yAxisDirection;
+		return _yAxisDirection;
 	}
 
 	/**
@@ -233,10 +210,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 			return;
 		}
 
-		fColorIndex = new int[1][_highValues[0].length];
+		_colorIndex = new int[1][_highValues[0].length];
 
-		for (int colorIndex = 0; colorIndex < fColorIndex[0].length; colorIndex++) {
-			fColorIndex[0][colorIndex] = colorIndexValue;
+		for (int colorIndex = 0; colorIndex < _colorIndex[0].length; colorIndex++) {
+			_colorIndex[0][colorIndex] = colorIndexValue;
 		}
 	}
 
@@ -245,15 +222,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 *            set's the color index for each value
 	 */
 	public void setColorIndex(final int[] colorIndex) {
-		fColorIndex = new int[][] { colorIndex };
+		_colorIndex = new int[][] { colorIndex };
 	}
 
 	public void setColorIndex(final int[][] colorIndex) {
-		fColorIndex = colorIndex;
+		_colorIndex = colorIndex;
 	}
 
 	public void setCustomLayers(final ArrayList<IChartLayer> customLayers) {
-		fCustomLayers = customLayers;
+		_customLayers = customLayers;
 	}
 
 	/**
@@ -261,7 +238,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 *            when set to <tt>true</tt> graph is filled, default is <tt>false</tt>
 	 */
 	public void setGraphFillMethod(final int fillMethod) {
-		graphFillMethod = fillMethod;
+		_graphFillMethod = fillMethod;
 	}
 
 	@Override
@@ -279,14 +256,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 			// set initial min/max value
 			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
 
-			if (fChartType == ChartDataModel.CHART_TYPE_LINE || //
-					fChartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
+			if (_chartType == ChartDataModel.CHART_TYPE_LINE || //
+					_chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
 
 				super.setMinMaxValues(valueSeries);
 
-			} else if (fChartType == ChartDataModel.CHART_TYPE_BAR) {
+			} else if (_chartType == ChartDataModel.CHART_TYPE_BAR) {
 
-				switch (fChartLayout) {
+				switch (_chartLayout) {
 				case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
 				case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
@@ -351,15 +328,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_lowValues = lowValues;
 			_highValues = highValues;
-			fColorIndex = new int[_highValues.length][_highValues[0].length];
+			_colorIndex = new int[_highValues.length][_highValues[0].length];
 
 			// set initial min/max value
 			_visibleMinValue = lowValues[0][0];
 			_visibleMaxValue = highValues[0][0];
 
-			if (fChartType == ChartDataModel.CHART_TYPE_LINE
-					|| (fChartType == ChartDataModel.CHART_TYPE_BAR && fChartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
-					|| (fChartType == ChartDataModel.CHART_TYPE_BAR && fChartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
+			if (_chartType == ChartDataModel.CHART_TYPE_LINE
+					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
+					|| (_chartType == ChartDataModel.CHART_TYPE_BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
 
 				// get the min/max values for all data
 				for (final int[] valueSerie : highValues) {
@@ -374,8 +351,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 					}
 				}
 
-			} else if (fChartType == ChartDataModel.CHART_TYPE_BAR
-					&& fChartLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
+			} else if (_chartType == ChartDataModel.CHART_TYPE_BAR
+					&& _chartLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
 
 				/*
 				 * calculate the max value
@@ -417,17 +394,17 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setShowYSlider(final boolean showYSlider) {
 
-		this.showYSlider = showYSlider;
+		this._showYSlider = showYSlider;
 
-		ySliderTop = new ChartYSlider(this);
-		ySliderBottom = new ChartYSlider(this);
+		_ySliderTop = new ChartYSlider(this);
+		_ySliderBottom = new ChartYSlider(this);
 	}
 
 	/**
 	 * @param sliderLabelFormat
 	 */
 	public void setSliderLabelFormat(final int sliderLabelFormat) {
-		fSliderLabelFormat = sliderLabelFormat;
+		_sliderLabelFormat = sliderLabelFormat;
 	}
 
 	/**
@@ -439,19 +416,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * @param axisDirection
 	 */
 	public void setYAxisDirection(final boolean axisDirection) {
-		yAxisDirection = axisDirection;
+		_yAxisDirection = axisDirection;
 	}
-
-//	public void setYData2ndSerie(final int[] yData2ndSerie) {
-//		fYData2ndSerie = yData2ndSerie;
-//	}
 
 	/**
 	 * @param title
 	 *            set the title for the y-axis
 	 */
 	public void setYTitle(final String title) {
-		fYTitle = title;
+		_yTitle = title;
 	}
 
 	@Override
