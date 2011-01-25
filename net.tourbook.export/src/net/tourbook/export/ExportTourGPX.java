@@ -15,17 +15,10 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
-
-import net.tourbook.data.TourData;
-import net.tourbook.extension.export.ExportTourExtension;
-
-import org.eclipse.swt.widgets.Display;
-
 /**
  * Export tours in the GPX data format
  */
-public class ExportTourGPX extends ExportTourExtension {
+public class ExportTourGPX extends AbstractExportTourFormat {
 
 	/**
 	 * plugin extension constructor
@@ -33,18 +26,7 @@ public class ExportTourGPX extends ExportTourExtension {
 	public ExportTourGPX() {}
 
 	@Override
-	public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
-
-		DialogExportTour dialogExportTour = new DialogExportTour(
-				Display.getCurrent().getActiveShell(),
-				this,
-				tourDataList,
-				tourStartIndex,
-				tourEndIndex,
-				"/format-templates/gpx-1.0.vm" //$NON-NLS-1$
-		);
-
-		dialogExportTour.open();
+	public String getFormatTemplate() {
+		return "/format-templates/gpx-1.0.vm"; //$NON-NLS-1$
 	}
-
 }

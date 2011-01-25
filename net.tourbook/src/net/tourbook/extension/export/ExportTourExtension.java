@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.extension.export;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 
@@ -35,6 +37,20 @@ public abstract class ExportTourExtension {
 	 * @param tourEndIndex
 	 */
 	public abstract void exportTours(ArrayList<TourData> tourDataList, int tourStartIndex, int tourEndIndex);
+
+	/**
+	 * Exports the tour in the {@link TourData} list without user interaction (does not open the
+	 * export dialog).
+	 * 
+	 * @param tourDataList
+	 *            one or more tours to be exported
+	 * @param targetDir
+	 *            directory to which the exported files will be written
+	 * @return list of the complete path of each exported file
+	 * @throws IOException
+	 *             when writing the export file went wrong
+	 */
+	public abstract List<String> exportTourHeadless(List<TourData> tourDataList, String targetDir) throws IOException;
 
 	public String getExportId() {
 		return _exportId;
