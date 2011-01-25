@@ -45,6 +45,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
+import net.tourbook.ui.tourChart.TourChartType;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.IExternalTourEvents;
@@ -1563,7 +1564,11 @@ public class TourManager {
 			createAvgCallbacks();
 		}
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+		final boolean isDefault = chartConfig.tourChartType == TourChartType.DEFAULT;
+
+		final ChartDataModel chartDataModel = new ChartDataModel(isDefault
+				? ChartDataModel.CHART_TYPE_LINE
+				: ChartDataModel.CHART_TYPE_XY_SCATTER);
 
 		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 			return chartDataModel;
@@ -1577,6 +1582,65 @@ public class TourManager {
 		tourData.computeAltimeterGradientSerie();
 
 		computeValueClipping(tourData);
+
+		if (isDefault) {
+			createChartDataModelInternalDefault(tourData, chartConfig, chartDataModel);
+		} else {
+			createChartDataModelInternalConconiTest(tourData, chartConfig, chartDataModel);
+		}
+
+		return chartDataModel;
+	}
+
+	private void createChartDataModelInternalConconiTest(	final TourData tourData,
+															final TourChartConfiguration chartConfig,
+															final ChartDataModel chartDataModel) {
+
+		/*
+		 * power
+		 */
+		final int[] powerSerie = tourData.getPowerSerie();
+		ChartDataXSerie xDataPower = null;
+		if (powerSerie != null) {
+
+			xDataPower = new ChartDataXSerie(powerSerie);
+			xDataPower.setLabel(Messages.Graph_Label_Power);
+			xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
+			xDataPower.setDefaultRGB(new RGB(0, 0, 0));
+
+			chartDataModel.setXData(xDataPower);
+//			chartDataModel.addXyData(xDataPower);
+		}
+
+		/*
+		 * heartbeat
+		 */
+		ChartDataYSerie yDataPulse = null;
+
+		final int[] pulseSerie = tourData.pulseSerie;
+		if (pulseSerie != null) {
+
+			yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerie);
+
+			yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
+			yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
+			yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			yDataPulse.setShowYSlider(true);
+			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
+			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+
+			setGraphColor(_prefStore, yDataPulse, GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+
+			chartDataModel.addYData(yDataPulse);
+//			chartDataModel.addXyData(yDataPulse);
+		}
+
+		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
+	}
+
+	private void createChartDataModelInternalDefault(	final TourData tourData,
+														final TourChartConfiguration chartConfig,
+														final ChartDataModel chartDataModel) {
 
 		/*
 		 * distance
@@ -1991,8 +2055,6 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
-
-		return chartDataModel;
 	}
 
 	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {

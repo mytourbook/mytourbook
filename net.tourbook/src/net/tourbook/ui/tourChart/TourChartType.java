@@ -17,7 +17,7 @@ package net.tourbook.ui.tourChart;
 
 public enum TourChartType {
 
-	TOUR_CHART,
+	DEFAULT,
 
 	// conconi test by power
 	CONCONI_TEST_POWER,
