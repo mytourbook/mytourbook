@@ -134,7 +134,7 @@ public class ActionExport extends Action implements IMenuCreator {
 	/**
 	 * read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
 	 */
-	private ArrayList<ExportTourExtension> getExtensionPoints() {
+	public ArrayList<ExportTourExtension> getExtensionPoints() {
 
 		if (_exportExtensionPoints != null) {
 			return _exportExtensionPoints;

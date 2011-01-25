@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -1241,6 +1242,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		}
 
 		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
+	}
+
+	/**
+	 * Returns the tours which are displayed in the map
+	 *
+	 * @return the tours which are displayed in the map
+	 */
+	public List<TourData> getTourDataList() {
+		return _tourDataList;
 	}
 
 	/**

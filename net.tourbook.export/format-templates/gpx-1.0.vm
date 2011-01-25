@@ -56,7 +56,9 @@
 #foreach( $track in $tracks )
 #set($close_segment = false)
   <trk>
+#if($track.getIdentification().length() > 0)
     <name>$!track.Identification</name>
+#end
 #if($point.getComment().length() > 0)
     <desc>![CDATA[$!point.Comment]]</desc>
 #end

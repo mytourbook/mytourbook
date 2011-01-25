@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: OpenLayers Export
+Bundle-SymbolicName: net.tourbook.export.openlayers;singleton:=true
+Bundle-Version: 10.11.0.qualifier
+Bundle-Activator: net.tourbook.export.openlayers.Activator
+Bundle-Vendor: MyTourbook
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.tourbook,
+ net.tourbook.util,
+ net.tourbook.export,
+ net.tourbook.ext.velocity
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

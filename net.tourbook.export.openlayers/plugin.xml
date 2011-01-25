@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension point="org.eclipse.ui.viewActions">
+		<viewContribution
+			id="net.tourbook.export.openlayers.viewContribution" 
+			targetID="net.tourbook.mapping.mappingViewID">
+			<action id="net.tourbook.export.openlayers.ActionOpenWebMapBrowser"
+				label="OpenLayers" 
+				icon="icons/open_web_map_browser.png" 
+				tooltip="Open in browser"
+				toolbarPath="mapSelection"
+				class="net.tourbook.export.openlayers.ActionOpenWebMapBrowser">
+			</action>
+		</viewContribution>
+	</extension>
+   <extension
+         point="net.tourbook.exportTour">
+      <export
+            class="net.tourbook.export.ExportTourHTML"
+            fileextension="html"
+            id="net.tourbook.export.html"
+            name="HTML">
+      </export>
+   </extension>
+
+</plugin>
