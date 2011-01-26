@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.Arrays;
 
 import net.tourbook.chart.Chart;
@@ -37,10 +35,16 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
-		// get the chart data
-		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
+
+		ConconiData conconiData;
+		final Object customData = yData.getCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST);
+		if (customData instanceof ConconiData) {
+			conconiData = (ConconiData) customData;
+		} else {
+			return;
+		}
 
 		// get the chart values
 		final float scaleX = drawingData.getScaleX();
@@ -48,60 +52,19 @@ public class ChartLayerConconiTest implements IChartLayer {
 		final int graphYBottom = drawingData.getGraphYBottom();
 
 		// get the horizontal offset for the graph
+		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
 		final int graphValueOffset = (int) (Math.max(0, devGraphImageXOffset) / scaleX);
 
 		// get the top/bottom of the graph
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.devGraphHeight;
 
-		final int xValues[] = xData.getHighValues()[0];
-		final int yHighValues[] = yData.getHighValues()[0];
-
-		final TDoubleArrayList maxXValueList = new TDoubleArrayList();
-		final TDoubleArrayList maxYValuesList = new TDoubleArrayList();
-		int lastMaxY = Integer.MIN_VALUE;
-		int currentXValue = xValues[0];
-
-		// loop: all values in the current serie
-		for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
-
-			// check array bounds
-			if (valueIndex >= yHighValues.length) {
-				break;
-			}
-
-			final int xValue = xValues[valueIndex];
-			final int yValue = yHighValues[valueIndex];
-
-			if (xValue == currentXValue) {
-
-				// get maximum y value for the same x value
-
-				if (yValue > lastMaxY) {
-					lastMaxY = yValue;
-				}
-
-			} else {
-
-				// next x value is displayed, keep last max y
-
-				maxXValueList.add(currentXValue);
-				maxYValuesList.add(lastMaxY);
-
-				currentXValue = xValue;
-				lastMaxY = yValue;
-			}
-		}
-
-		// get last value
-		maxXValueList.add(currentXValue);
-		maxYValuesList.add(lastMaxY);
-
 		/*
 		 * draw regression lines
 		 */
-		final double[] maxXValues = maxXValueList.toArray();
-		final double[] maxYValues = maxYValuesList.toArray();
+		final double[] maxXValues = conconiData.maxXValues.toArray();
+		final double[] maxYValues = conconiData.maxYValues.toArray();
+		final int deflexionIndex = conconiData.selectedDefletion;
 
 		// check that at least 2  values are available
 		if (maxXValues.length < 2) {
@@ -110,24 +73,24 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 		final int lastIndex = maxXValues.length - 1;
 
-		int deflexionIndex = (int) (lastIndex * 0.7);
+//		int deflexionIndexAdjusted = deflexionIndex == 0 ? 1 : deflexionIndex;
+		int deflexionIndexAdjusted = deflexionIndex + 1;
 
-		final Object deflectionPoint = yData.getCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST);
-		if (deflectionPoint instanceof Integer) {
-			deflexionIndex = (Integer) deflectionPoint;
-		}
-
-		int deflexionIndexAdjusted = deflexionIndex == 0 ? 1 : deflexionIndex;
-
-		double[] linRegXValues = Arrays.copyOfRange(maxXValues, 0, deflexionIndexAdjusted);
-		double[] linRegYValues = Arrays.copyOfRange(maxYValues, 0, deflexionIndexAdjusted);
+		final Display display = Display.getCurrent();
+		final Color color1 = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+		final Color color2 = display.getSystemColor(SWT.COLOR_BLUE);
 
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setLineWidth(5);
+		gc.setLineWidth(3);
 		gc.setAntialias(SWT.ON);
-		gc.setAlpha(0x80);
+		gc.setAlpha(0xa0);
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
+		/*
+		 * draw left regression line
+		 */
+		double[] linRegXValues = Arrays.copyOfRange(maxXValues, 0, deflexionIndexAdjusted);
+		double[] linRegYValues = Arrays.copyOfRange(maxYValues, 0, deflexionIndexAdjusted);
 		draw10LineLinearRegression(
 				gc,
 				scaleX,
@@ -138,7 +101,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 				linRegXValues,
 				linRegYValues,
 				xData,
-				Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+				color2);
 
 		draw20Point(
 				gc,
@@ -149,8 +112,11 @@ public class ChartLayerConconiTest implements IChartLayer {
 				graphYBottom,
 				graphValueOffset,
 				devYBottom,
-				Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+				color2);
 
+		/*
+		 * draw right regression line
+		 */
 		deflexionIndexAdjusted = deflexionIndex >= lastIndex ? lastIndex : deflexionIndex;
 
 		linRegXValues = Arrays.copyOfRange(maxXValues, deflexionIndexAdjusted, lastIndex + 1);
@@ -166,7 +132,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 				linRegXValues,
 				linRegYValues,
 				xData,
-				Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+				color1);
 
 		draw20Point(
 				gc,
@@ -177,9 +143,9 @@ public class ChartLayerConconiTest implements IChartLayer {
 				graphYBottom,
 				graphValueOffset,
 				devYBottom,
-				Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+				color1);
 
-		draw20Point(
+		draw30DeflectionPoint(
 				gc,
 				linRegXValues[0],
 				linRegYValues[0],
@@ -188,17 +154,8 @@ public class ChartLayerConconiTest implements IChartLayer {
 				graphYBottom,
 				graphValueOffset,
 				devYBottom,
-				Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		draw30HalfPoint(
-				gc,
-				linRegXValues[0],
-				linRegYValues[0],
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
-				Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+				color1,
+				color2);
 
 		// reset clipping/antialias
 		gc.setClipping((Rectangle) null);
@@ -224,8 +181,8 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 		final LinearRegression linReg = new LinearRegression(maxXValues, maxYValues);
 
-		final double graphXStart = 0;
-		final double graphXEnd = xData.getVisibleMaxValue();
+		final double graphXStart = maxXValues[0];
+		final double graphXEnd = maxXValues[maxXValues.length - 1];
 
 		final double graphYStart = linReg.calculateY(graphXStart);
 		final double graphYEnd = linReg.calculateY(graphXEnd);
@@ -250,33 +207,41 @@ public class ChartLayerConconiTest implements IChartLayer {
 								final int devYBottom,
 								final Color color) {
 
-		final int ovalSize = 15;
-		final int ovalSize2 = ovalSize / 2;
+		final int size = 9;
+		final int size2 = size / 2;
 
 		final int devX = (int) ((graphX - graphValueOffset) * scaleX);
 		final int devY = devYBottom - ((int) ((graphY - graphYBottom) * scaleY));
 
 		gc.setBackground(color);
-		gc.fillOval(devX - ovalSize2, devY - ovalSize2, ovalSize, ovalSize);
+		gc.fillOval(devX - size2, devY - size2, size, size);
+//		gc.fillRectangle(devX - size2, devY - size2, size, size);
 	}
 
-	private void draw30HalfPoint(	final GC gc,
-									final double graphX,
-									final double graphY,
-									final float scaleX,
-									final float scaleY,
-									final int graphYBottom,
-									final int graphValueOffset,
-									final int devYBottom,
-									final Color color) {
+	private void draw30DeflectionPoint(	final GC gc,
+										final double graphX,
+										final double graphY,
+										final float scaleX,
+										final float scaleY,
+										final int graphYBottom,
+										final int graphValueOffset,
+										final int devYBottom,
+										final Color color1,
+										final Color color2) {
 
-		final int ovalSize = 15;
-		final int ovalSize2 = ovalSize / 2;
+		final int size = 9;
+		final int size2 = size / 2;
 
 		final int devX = (int) ((graphX - graphValueOffset) * scaleX);
 		final int devY = devYBottom - ((int) ((graphY - graphYBottom) * scaleY));
 
-		gc.setBackground(color);
-		gc.fillArc(devX - ovalSize2, devY - ovalSize2, ovalSize, ovalSize, -90, 180);
+		gc.setBackground(color2);
+//		gc.fillRectangle(devX - size2, devY - size2, size2, size);
+		gc.fillArc(devX - size2, devY - size2, size, size, 90, 180);
+
+		gc.setBackground(color1);
+//		gc.fillRectangle(devX, devY - size2, size2, size);
+		gc.fillArc(devX - size2, devY - size2, size, size, -90, 180);
 	}
+
 }

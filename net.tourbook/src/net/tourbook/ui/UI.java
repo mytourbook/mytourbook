@@ -141,6 +141,8 @@ public class UI {
 	private static final String								UNIT_ALTIMETER_FT_H				= "ft/h";									//$NON-NLS-1$
 	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
 
+	public static final String								UNIT_LABEL_POWER				= "Watt";									//$NON-NLS-1$
+
 	public static final String								SYMBOL_AVERAGE					= "\u00d8";								//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00d8 ";								//$NON-NLS-1$
 	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";								//$NON-NLS-1$

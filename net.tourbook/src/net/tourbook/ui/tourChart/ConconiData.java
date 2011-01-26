@@ -15,25 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.Messages;
-import net.tourbook.ui.UI;
+import gnu.trove.list.array.TDoubleArrayList;
 
-import org.eclipse.jface.action.Action;
+class ConconiData {
 
-public class ActionTourChartConconiPower extends Action {
+	TDoubleArrayList	maxXValues;
+	TDoubleArrayList	maxYValues;
 
-	private TourChartView	_tourChartView;
-
-	public ActionTourChartConconiPower(final TourChartView tourChartView) {
-
-		super(UI.SPACE4 + Messages.TourChart_Action_ChartType_ConconiPower, AS_RADIO_BUTTON);
-
-		_tourChartView = tourChartView;
-	}
-
-	@Override
-	public void run() {
-		_tourChartView.actionTourChartType(TourChartType.CONCONI_TEST_POWER);
-	}
-
+	int					selectedDefletion;
 }

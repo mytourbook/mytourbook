@@ -884,6 +884,13 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * Do a resize for all chart components which creates new drawing data
+	 */
+	public void resizeChart() {
+		_chartComponents.onResize();
+	}
+
+	/**
 	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
 	 * 
 	 * @param backgroundColor
@@ -920,6 +927,16 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 *
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	/**
 	 * Set the enable state for a command and update the UI
 	 */
@@ -931,16 +948,6 @@ public class Chart extends ViewForm {
 			_actionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
 		}
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		_chartContextProvider = chartContextProvider;
@@ -997,6 +1004,10 @@ public class Chart extends ViewForm {
 		_chartComponents.onResize();
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
 	 * this is the default
@@ -1012,10 +1023,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setDefaultCursor();
 
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	public void setMouseMode(final Object newMouseMode) {
 

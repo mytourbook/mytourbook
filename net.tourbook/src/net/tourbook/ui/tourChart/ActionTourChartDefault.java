@@ -29,15 +29,25 @@ public class ActionTourChartDefault extends Action {
 
 		super(UI.SPACE4 + Messages.TourChart_Action_ChartType_TourChart, AS_RADIO_BUTTON);
 
-		setToolTipText(Messages.TourChart_Action_ChartType_TourChart_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_All));
-
 		_tourChartView = tourChartView;
 	}
 
 	@Override
 	public void run() {
 		_tourChartView.actionTourChartType(TourChartType.TOUR_CHART);
+	}
+
+	/**
+	 * Hide image when disabled
+	 * 
+	 * @param isEnabled
+	 */
+	public void setEnabledEx(final boolean isEnabled) {
+
+		setEnabled(isEnabled);
+
+		// disabled image looks very ugly -> hide it
+		setImageDescriptor(isEnabled ? TourbookPlugin.getImageDescriptor(Messages.Image__Graph_All) : null);
 	}
 
 }

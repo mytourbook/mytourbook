@@ -193,6 +193,8 @@ public class Messages extends NLS {
 
 	public static String		App_Label_ISO8601;
 
+	public static String	App_Label_NA;
+
 	public static String		App_Title;
 
 	public static String		App_Tour_type_item_all_types;

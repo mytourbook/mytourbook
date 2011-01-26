@@ -16,24 +16,25 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
-import net.tourbook.ui.UI;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionTourChartConconiPower extends Action {
+public class ActionTourChartDefaultToolbar extends Action {
 
 	private TourChartView	_tourChartView;
 
-	public ActionTourChartConconiPower(final TourChartView tourChartView) {
+	public ActionTourChartDefaultToolbar(final TourChartView tourChartView) {
 
-		super(UI.SPACE4 + Messages.TourChart_Action_ChartType_ConconiPower, AS_RADIO_BUTTON);
+		setToolTipText(Messages.TourChart_Action_ChartType_TourChart_Tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_All));
 
 		_tourChartView = tourChartView;
 	}
 
 	@Override
 	public void run() {
-		_tourChartView.actionTourChartType(TourChartType.CONCONI_TEST_POWER);
+		_tourChartView.actionTourChartType(TourChartType.TOUR_CHART);
 	}
 
 }
