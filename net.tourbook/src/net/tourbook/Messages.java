@@ -1036,6 +1036,12 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
 
+	public static String	TourChart_Action_ChartTypeConconiPower;
+
+	public static String	TourChart_Action_ChartTypeDefault;
+
+	public static String	TourChart_Action_ChartTypeTitle;
+
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;

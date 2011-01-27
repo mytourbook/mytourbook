@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Draws the graph and axis into the canvas
- *
+ * 
  * @author Wolfgang Schramm
  */
 public class ChartComponentGraph extends Canvas {
@@ -388,7 +388,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param parent
 	 *            the parent of this control.
 	 * @param style
@@ -829,7 +829,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Computes the value of the x axis according to the slider position
-	 *
+	 * 
 	 * @param slider
 	 * @param devXSliderLinePosition
 	 */
@@ -992,7 +992,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Create a cursor resource from an image file
-	 *
+	 * 
 	 * @param imageName
 	 * @return
 	 */
@@ -1031,7 +1031,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Creates the label(s) and the position for each graph
-	 *
+	 * 
 	 * @param gc
 	 * @param slider
 	 */
@@ -1272,413 +1272,15 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
-	 * if null is returned, a line graph will be drawn instead
-	 *
-	 * @param gc
-	 * @param drawingData
-	 */
-	private void drawBarGraph(final GC gc, final ChartDrawingData drawingData) {
-
-		// get the chart data
-		final ChartDataXSerie xData = drawingData.getXData();
-		final ChartDataYSerie yData = drawingData.getYData();
-		final int[][] colorsIndex = yData.getColorsIndex();
-
-		gc.setLineStyle(SWT.LINE_SOLID);
-
-		// get the colors
-		final RGB[] rgbLine = yData.getRgbLine();
-		final RGB[] rgbDark = yData.getRgbDark();
-		final RGB[] rgbBright = yData.getRgbBright();
-
-		// get the chart values
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
-		final int graphYBottom = drawingData.getGraphYBottom();
-		final boolean axisDirection = yData.isYAxisDirection();
-
-		// get the horizontal offset for the graph
-		int graphValueOffset;
-		if (_chartComponents._synchConfigSrc == null) {
-			// a synch marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
-		} else {
-			// adjust the start position to the synch marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
-		}
-
-		// get the top/bottom of the graph
-		final int devYBottom = drawingData.getDevYBottom();
-		final int devYTop = devYBottom - drawingData.devGraphHeight;
-
-		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
-
-		final int xValues[] = xData.getHighValues()[0];
-		final int yHighSeries[][] = yData.getHighValues();
-		final int yLowSeries[][] = yData.getLowValues();
-
-		final int serieLength = yHighSeries.length;
-		final int valueLength = xValues.length;
-
-		// keep the bar rectangles
-		final Rectangle[][] barRecangles = new Rectangle[serieLength][valueLength];
-		final Rectangle[][] barFocusRecangles = new Rectangle[serieLength][valueLength];
-		drawingData.setBarRectangles(barRecangles);
-		drawingData.setBarFocusRectangles(barFocusRecangles);
-
-		// keep the height for stacked bar charts
-		final int devHeightSummary[] = new int[valueLength];
-
-		final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
-		final int devBarWidth = Math.max(1, devBarWidthOriginal);
-
-		final int serieLayout = yData.getChartLayout();
-		final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
-
-		// loop: all data series
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			final int yHighValues[] = yHighSeries[serieIndex];
-			int yLowValues[] = null;
-			if (yLowSeries != null) {
-				yLowValues = yLowSeries[serieIndex];
-			}
-
-			int devBarXPos = devBarRectangleStartXPos;
-			int devBarWidthPositioned = devBarWidth;
-
-			// reposition the rectangle when the bars are beside each other
-			if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-				devBarXPos += serieIndex * devBarWidth;
-				devBarWidthPositioned = devBarWidth - 1;
-			}
-
-			// loop: all values in the current serie
-			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
-
-				// get the x position
-				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
-
-//				final int devBarWidthSelected = devBarWidth;
-//				final int devBarWidth2 = devBarWidthSelected / 2;
-//
-//				int devXPosSelected = devXPos;
-//
-//				// center the bar
-//				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
-//					devXPosSelected -= devBarWidth2;
-//				}
-
-				int valueYLow;
-				if (yLowValues == null) {
-					valueYLow = yData.getVisibleMinValue();
-				} else {
-					// check array bounds
-					if (valueIndex >= yLowValues.length) {
-						break;
-					}
-					valueYLow = yLowValues[valueIndex];
-				}
-
-				// check array bounds
-				if (valueIndex >= yHighValues.length) {
-					break;
-				}
-				final int valueYHigh = yHighValues[valueIndex];
-
-				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
-				if (barHeight == 0) {
-					continue;
-				}
-
-				final int devBarHeight = (int) (barHeight * scaleY);
-
-				// get the old y position for stacked bars
-				int devYPreviousHeight = 0;
-				if (serieLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
-					devYPreviousHeight = devHeightSummary[valueIndex];
-				}
-
-				// get the y position
-				int devYPos;
-				if (axisDirection) {
-					devYPos = devYBottom - ((int) ((valueYHigh - graphYBottom) * scaleY) + devYPreviousHeight);
-				} else {
-					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY) + devYPreviousHeight);
-				}
-
-				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidthPositioned, devBarHeight);
-
-				final int colorIndex = colorsIndex[serieIndex][valueIndex];
-				final RGB rgbBrightDef = rgbBright[colorIndex];
-				final RGB rgbDarkDef = rgbDark[colorIndex];
-				final RGB rgbLineDef = rgbLine[colorIndex];
-
-				final Color colorBright = getColor(rgbBrightDef);
-				final Color colorDark = getColor(rgbDarkDef);
-				final Color colorLine = getColor(rgbLineDef);
-
-				gc.setBackground(colorDark);
-
-				/*
-				 * draw bar
-				 */
-				if (devBarWidthOriginal > 0) {
-
-					gc.setForeground(colorBright);
-					gc.fillGradientRectangle(barShape.x, barShape.y, barShape.width, barShape.height, false);
-
-					gc.setForeground(colorLine);
-					gc.drawRectangle(barShape);
-
-				} else {
-
-					gc.setForeground(colorLine);
-					gc.drawLine(barShape.x, barShape.y, barShape.x, (barShape.y + barShape.height));
-				}
-
-				barRecangles[serieIndex][valueIndex] = barShape;
-				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
-						devXPos - 2,
-						(devYPos - 2),
-						devBarWidthPositioned + 4,
-						(devBarHeight + 7));
-
-				// keep the height for the bar
-				devHeightSummary[valueIndex] += devBarHeight;
-			}
-		}
-
-		// reset clipping
-		gc.setClipping((Rectangle) null);
-	}
-
-	private void drawBarSelection(final GC gc, final ChartDrawingData drawingData) {
-
-		// check if multiple bars are selected
-		boolean drawSelection = false;
-		int selectedIndex = 0;
-		if (_selectedBarItems != null) {
-			int selectionIndex = 0;
-			for (final boolean isBarSelected : _selectedBarItems) {
-				if (isBarSelected) {
-					if (drawSelection == false) {
-						drawSelection = true;
-						selectedIndex = selectionIndex;
-					} else {
-						drawSelection = false;
-						return;
-					}
-				}
-				selectionIndex++;
-			}
-		}
-
-		if (drawSelection == false) {
-			return;
-		}
-
-		/*
-		 * a bar is selected
-		 */
-
-		// get the chart data
-		final ChartDataYSerie yData = drawingData.getYData();
-		final int[][] colorsIndex = yData.getColorsIndex();
-
-		// get the colors
-		final RGB[] rgbLine = yData.getRgbLine();
-		final RGB[] rgbDark = yData.getRgbDark();
-		final RGB[] rgbBright = yData.getRgbBright();
-
-		final int devYBottom = drawingData.getDevYBottom();
-		final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
-
-		if (barRectangeleSeries == null) {
-			return;
-		}
-
-		final int markerWidth = BAR_MARKER_WIDTH;
-		final int barThickness = 1;
-		final int markerWidth2 = markerWidth / 2;
-
-		gc.setLineStyle(SWT.LINE_SOLID);
-
-		// loop: all data series
-		for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
-
-			// get selected rectangle
-			final Rectangle[] barRectangles = barRectangeleSeries[serieIndex];
-			if (barRectangles == null || selectedIndex >= barRectangles.length) {
-				continue;
-			}
-
-			final Rectangle barRectangle = barRectangles[selectedIndex];
-			if (barRectangle == null) {
-				continue;
-			}
-
-			/*
-			 * current bar is selected, draw the selected bar
-			 */
-
-			final Rectangle barShapeSelected = new Rectangle(
-					(barRectangle.x - markerWidth2),
-					(barRectangle.y - markerWidth2),
-					(barRectangle.width + markerWidth),
-					(barRectangle.height + markerWidth));
-
-			final Rectangle barBarSelected = new Rectangle(
-					barRectangle.x - 1,
-					barRectangle.y - barThickness,
-					barRectangle.width + barThickness,
-					barRectangle.height + 2 * barThickness);
-
-			final int colorIndex = colorsIndex[serieIndex][selectedIndex];
-			final RGB rgbBrightDef = rgbBright[colorIndex];
-			final RGB rgbDarkDef = rgbDark[colorIndex];
-			final RGB rgbLineDef = rgbLine[colorIndex];
-
-			final Color colorBrightSelected = getColor(rgbBrightDef);
-			final Color colorDarkSelected = getColor(rgbDarkDef);
-			final Color colorLineSelected = getColor(rgbLineDef);
-
-			// do't write into the x-axis units which also contains the
-			// selection marker
-			if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
-				barShapeSelected.height = devYBottom - barShapeSelected.y;
-			}
-
-			// draw the selection darker when the focus is set
-			if (_isFocusActive) {
-//				gc.setAlpha(0xb0);
-				gc.setAlpha(0xf0);
-			} else {
-//				gc.setAlpha(0x70);
-				gc.setAlpha(0xa0);
-			}
-
-			// fill bar background
-			gc.setForeground(colorDarkSelected);
-			gc.setBackground(colorBrightSelected);
-
-			gc.fillGradientRectangle(
-					barShapeSelected.x + 1,
-					barShapeSelected.y + 1,
-					barShapeSelected.width - 1,
-					barShapeSelected.height - 1,
-					true);
-
-			// draw bar border
-			gc.setForeground(colorLineSelected);
-			gc.drawRoundRectangle(
-					barShapeSelected.x,
-					barShapeSelected.y,
-					barShapeSelected.width,
-					barShapeSelected.height,
-					4,
-					4);
-
-			// draw bar thicker
-			gc.setBackground(colorDarkSelected);
-			gc
-					.fillRoundRectangle(
-							barBarSelected.x,
-							barBarSelected.y,
-							barBarSelected.width,
-							barBarSelected.height,
-							2,
-							2);
-
-			/*
-			 * draw a marker below the x-axis to make the selection more visible
-			 */
-			if (_isFocusActive) {
-
-				final int devMarkerXPos = barRectangle.x + (barRectangle.width / 2) - markerWidth2;
-
-				final int[] marker = new int[] {
-						devMarkerXPos,
-						devYBottom + 1 + markerWidth2,
-						devMarkerXPos + markerWidth2,
-						devYBottom + 1,
-						devMarkerXPos + markerWidth - 0,
-						devYBottom + 1 + markerWidth2 };
-
-				// draw background
-				gc.setBackground(colorDarkSelected);
-				gc.fillPolygon(marker);
-
-				// draw border
-				gc.setForeground(colorLineSelected);
-				gc.drawPolygon(marker);
-
-				gc.setAlpha(0xff);
-			}
-		}
-	}
-
-	private void drawCustomLayerImage() {
-
-		// the layer above image is the same size as the graph image
-		final Rectangle graphRect = _graphImage.getBounds();
-
-		// ensure correct image size
-		if (graphRect.width <= 0 || graphRect.height <= 0) {
-			return;
-		}
-
-		/*
-		 * when the existing image is the same size as the new image, we will redraw it only if it's
-		 * set to dirty
-		 */
-		if (_isCustomLayerDirty == false && _cumstomLayerImage != null) {
-
-			final Rectangle oldBounds = _cumstomLayerImage.getBounds();
-
-			if (oldBounds.width == graphRect.width && oldBounds.height == graphRect.height) {
-				return;
-			}
-		}
-
-		if (Util.canReuseImage(_cumstomLayerImage, graphRect) == false) {
-			_cumstomLayerImage = Util.createImage(getDisplay(), _cumstomLayerImage, graphRect);
-		}
-
-		final GC gc = new GC(_cumstomLayerImage);
-
-		gc.fillRectangle(graphRect);
-
-		/*
-		 * copy the image with the graphs into the custom layer image, the custom layers are drawn
-		 * on top of the graphs
-		 */
-//		if (fIsGraphDirty == false) {
-		gc.drawImage(_graphImage, 0, 0);
-//		}
-
-		for (final ChartDrawingData drawingData : _drawingData) {
-			for (final IChartLayer layer : drawingData.getYData().getCustomLayers()) {
-				layer.draw(gc, drawingData, _chart);
-			}
-		}
-
-		gc.dispose();
-
-		_isCustomLayerDirty = false;
-	}
-
-	/**
 	 * draws the graph into the graph image
 	 */
-	private void drawGraphImage() {
+	private void draw010GraphImage() {
 
 		_drawCounter[0]++;
 
 		final Runnable imageThread = new Runnable() {
 
-			final int	fRunnableDrawCounter	= _drawCounter[0];
+			final int	__runnableDrawCounter	= _drawCounter[0];
 
 			public void run() {
 
@@ -1687,7 +1289,7 @@ public class ChartComponentGraph extends Canvas {
 				/*
 				 * create the chart image only when a new onPaint event has not occured
 				 */
-				if (fRunnableDrawCounter != _drawCounter[0]) {
+				if (__runnableDrawCounter != _drawCounter[0]) {
 					// a new onPaint event occured
 					return;
 				}
@@ -1755,33 +1357,37 @@ public class ChartComponentGraph extends Canvas {
 				for (final ChartDrawingData drawingData : _drawingData) {
 
 					if (graphIndex == 0) {
-						drawXTitle(gc, drawingData);
+						draw030XTitle(gc, drawingData);
 					}
 
-					drawSegments(gc, drawingData);
+					draw020Segments(gc, drawingData);
 
 					if (graphIndex == _drawingData.size() - 1) {
 						// draw the unit label and unit tick for the last graph
-						drawXUnitsAndGrid(gc, drawingData, true, true);
+						draw032XUnitsAndGrid(gc, drawingData, true, true);
 					} else {
-						drawXUnitsAndGrid(gc, drawingData, false, true);
+						draw032XUnitsAndGrid(gc, drawingData, false, true);
 					}
 
-					drawHorizontalGridlines(gc, drawingData);
+					draw040HorizontalGridlines(gc, drawingData);
 
 					// draw units and grid on the x and y axis
 					switch (drawingData.getChartType()) {
 					case ChartDataModel.CHART_TYPE_LINE:
-						drawLineGraph(gc, drawingData);
-						drawRangeMarker(gc, drawingData);
+						draw120LineGraph(gc, drawingData);
+						draw122RangeMarker(gc, drawingData);
 						break;
 
 					case ChartDataModel.CHART_TYPE_BAR:
-						drawBarGraph(gc, drawingData);
+						draw130BarGraph(gc, drawingData);
 						break;
 
 					case ChartDataModel.CHART_TYPE_LINE_WITH_BARS:
-						drawLineWithBarGraph(gc, drawingData);
+						draw140LineWithBarGraph(gc, drawingData);
+						break;
+
+					case ChartDataModel.CHART_TYPE_XY_SCATTER:
+						draw150XYScatter(gc, drawingData);
 						break;
 
 					default:
@@ -1814,13 +1420,369 @@ public class ChartComponentGraph extends Canvas {
 		getDisplay().asyncExec(imageThread);
 	}
 
+	private void draw020Segments(final GC gc, final ChartDrawingData drawingData) {
+
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+
+		if (chartSegments == null) {
+			return;
+		}
+
+		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = drawingData.getDevYTop();
+		final float scaleX = drawingData.getScaleX();
+
+		final int[] startValues = chartSegments.valueStart;
+		final int[] endValues = chartSegments.valueEnd;
+
+		if (startValues == null || endValues == null) {
+			return;
+		}
+
+		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
+
+		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
+
+			if (segmentIndex % 2 == 1) {
+
+				// draw segment background color
+
+				final int startValue = startValues[segmentIndex];
+				final int endValue = endValues[segmentIndex];
+
+				final int devValueStart = (int) (scaleX * startValue) - _devGraphImageXOffset;
+
+				// adjust endValue to fill the last part of the segment
+				final int devValueEnd = (int) (scaleX * (endValue + 1)) - _devGraphImageXOffset;
+
+				gc.setBackground(alternateColor);
+				gc.fillRectangle(devValueStart, //
+						devYTop,
+						devValueEnd - devValueStart,
+						devYBottom - devYTop);
+			}
+		}
+
+		alternateColor.dispose();
+	}
+
+	private void draw030XTitle(final GC gc, final ChartDrawingData drawingData) {
+
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final int devYTitle = drawingData.getDevMarginTop();
+
+		final int devGraphWidth = _canScrollZoomedChart ? //
+				drawingData.devVirtualGraphWidth
+				: _chartComponents.getDevVisibleChartWidth();
+
+		if (chartSegments == null) {
+
+			/*
+			 * draw default title, center within the chart
+			 */
+
+			final String title = drawingData.getXTitle();
+
+			if (title == null || title.length() == 0) {
+				return;
+			}
+
+			gc.drawText(title, //
+					(devGraphWidth / 2) - (gc.textExtent(title).x / 2),
+					(devYTitle),
+					true);
+
+		} else {
+
+			/*
+			 * draw title for each segment
+			 */
+
+			final float scaleX = drawingData.getScaleX();
+
+			final int[] valueStart = chartSegments.valueStart;
+			final int[] valueEnd = chartSegments.valueEnd;
+			final String[] segmentTitles = chartSegments.segmentTitle;
+
+			if (valueStart != null && valueEnd != null && segmentTitles != null) {
+
+				int devXChartTitleEnd = -1;
+
+				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
+
+					// draw the title in the center of the segment
+					final String segmentTitle = segmentTitles[segmentIndex];
+					if (segmentTitle != null) {
+
+						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex]) - _devGraphImageXOffset;
+						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1))
+								- _devGraphImageXOffset;
+
+						final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
+						final int devXSegmentCenter = devXSegmentEnd - (devXSegmentLength / 2);
+						final int devXTitleCenter = gc.textExtent(segmentTitle).x / 2;
+
+						final int devX = devXSegmentCenter - devXTitleCenter;
+
+						if (devX <= devXChartTitleEnd) {
+							// skip title when it overlaps the previous title
+							continue;
+						}
+
+						gc.drawText(segmentTitle, devX, devYTitle, false);
+
+						devXChartTitleEnd = devXSegmentCenter + devXTitleCenter + 3;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Draw the unit label, tick and the vertical grid line for the x axis
+	 * 
+	 * @param gc
+	 * @param drawingData
+	 * @param isDrawUnit
+	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
+	 *            unit grid line
+	 * @param isDraw0Unit
+	 *            <code>true</code> indicate to draw the unit at the 0 position
+	 */
+	private void draw032XUnitsAndGrid(	final GC gc,
+										final ChartDrawingData drawingData,
+										final boolean isDrawUnit,
+										final boolean isDraw0Unit) {
+
+		final Display display = getDisplay();
+
+		final ArrayList<ChartUnit> units = drawingData.getXUnits();
+
+		final int devYBottom = drawingData.getDevYBottom();
+		final int unitPos = drawingData.getXUnitTextPos();
+		float scaleX = drawingData.getScaleX();
+
+		// check if the x-units has a special scaling
+		final float scaleUnitX = drawingData.getScaleUnitX();
+		if (scaleUnitX != Float.MIN_VALUE) {
+			scaleX = scaleUnitX;
+		}
+
+		// compute the distance between two units
+		final float devUnitWidth = units.size() > 1 ? //
+				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
+				: 0;
+
+		float devXOffset = 0;
+		int unitCounterInvisibleLeft = 0;
+		int unitCounterInvisibleRight = 0;
+		int unitCounter = 0;
+		boolean isUnitVisibilityChecked = false;
+
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+		final boolean isLineChart = _chartComponents.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR;
+
+		/*
+		 * check if units are outside of the visible chart
+		 */
+		if (isLineChart && _canScrollZoomedChart == false && _devGraphImageXOffset > 0) {
+
+			// calculate the unit offset
+			unitCounterInvisibleLeft = (int) (_devGraphImageXOffset / devUnitWidth);
+			unitCounterInvisibleRight = (int) ((_devGraphImageXOffset + devVisibleChartWidth) / devUnitWidth);
+
+			devXOffset -= _devGraphImageXOffset % devUnitWidth;
+
+			isUnitVisibilityChecked = true;
+		}
+
+		boolean isUnitLabelPrinted = false;
+		int devXLastUnitRightPos = 0;
+		int devXFirstUnitRightPos = 0;
+		int devXChartUnitEnd = -1;
+
+		final String unitLabel = drawingData.getXData().getUnitLabel();
+		final int unitLabelExtendX = gc.textExtent(unitLabel).x;
+
+		for (final ChartUnit unit : units) {
+
+			if (isUnitVisibilityChecked) {
+
+				/*
+				 * skip units which are outside of the chart and not displayed
+				 */
+				if (unitCounter < unitCounterInvisibleLeft) {
+
+					devXOffset -= devUnitWidth;
+
+					unitCounter++;
+
+					continue;
+				}
+
+				if (unitCounter > unitCounterInvisibleRight) {
+					break;
+				}
+			}
+
+			// dev x-position for the unit tick
+			final int devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
+
+			/*
+			 * the first unit is not painted because it would clip at the left border of the chart
+			 * canvas
+			 */
+			if ((unitCounter == 0 && isDraw0Unit) || unitCounter > 0) {
+
+				if (isDrawUnit) {
+
+					gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+
+					/*
+					 * draw unit tick
+					 */
+					if (unitCounter > 0) {
+						gc.setLineStyle(SWT.LINE_SOLID);
+						gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
+					}
+
+					/*
+					 * draw unit value
+					 */
+					final int unitValueExtendX = gc.textExtent(unit.valueLabel).x;
+					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
+
+						// draw the unit value BETWEEN two units
+
+						final int devXUnitCenter = Math.max(0, (((int) devUnitWidth - unitValueExtendX) / 2));
+						final int devX = devXUnitTick + devXUnitCenter;
+
+						if (devX <= devXChartUnitEnd) {
+
+							/**
+							 * !!! skipping is not implemented correctly because it's a bigger task
+							 * to implement it !!!
+							 */
+
+							// skip unit when it overlaps the previous unit
+
+							continue;
+						}
+
+						gc.drawText(unit.valueLabel, devX, devYBottom + 7, true);
+
+						devXChartUnitEnd = devX + unitValueExtendX + 0;
+
+					} else {
+
+						// draw the unit value in the MIDDLE of the unit tick
+
+						/*
+						 * when the chart is zoomed and not scrolled, prevent to clip the text at
+						 * the left border
+						 */
+						final int unitValueExtend2 = unitValueExtendX / 2;
+						if (unitCounter == 0 || devXUnitTick >= 0) {
+
+							if (unitCounter == 0) {
+
+								/*
+								 * this is the first unit, do not center it otherwise it would be
+								 * clipped on the left border
+								 */
+
+								if (devXUnitTick == 0) {
+
+									gc.drawText(unit.valueLabel, devXUnitTick, devYBottom + 7, true);
+
+									// draw unit label (km, mi, h)
+									if (isUnitLabelPrinted == false) {
+										isUnitLabelPrinted = true;
+										gc.drawText(unitLabel,//
+												devXUnitTick + unitValueExtendX + 2,
+												devYBottom + 7,
+												true);
+									}
+
+									devXFirstUnitRightPos = devXUnitTick + unitValueExtendX + 2 + unitLabelExtendX + 2;
+								}
+
+							} else {
+
+								// center the unit text
+
+								int devXUnitValue = devXUnitTick - unitValueExtend2;
+								if (devXUnitValue >= 0) {
+
+									if ((devXUnitTick + unitValueExtend2) > devVisibleChartWidth) {
+
+										/*
+										 * unit value would be clipped at the chart border, move it
+										 * to the left to make it fully visible
+										 */
+
+										devXUnitValue = devVisibleChartWidth - unitValueExtendX;
+
+										// check if the unit value is overlapping the previous unit value
+										if (devXUnitValue <= devXLastUnitRightPos + -1) {
+											break;
+										}
+									}
+
+									// check if the unit value will overlap the first unit value
+									if (devXUnitValue <= devXFirstUnitRightPos) {
+										continue;
+									}
+
+									gc.drawText(unit.valueLabel, devXUnitValue, devYBottom + 7, true);
+
+//									gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//									gc.fillRectangle(devXUnitValue, devYBottom + 7, unitValueExtendX, 10);
+
+									// draw unit label (km, mi, h) for the first unit
+									if (isUnitLabelPrinted == false) {
+
+										isUnitLabelPrinted = true;
+
+										gc.drawText(unitLabel,//
+												devXUnitTick + unitValueExtend2 + 2,
+												devYBottom + 7,
+												true);
+
+										devXFirstUnitRightPos = devXUnitTick
+												+ unitValueExtendX
+												+ 2
+												+ unitLabelExtendX
+												+ 2;
+									}
+
+									devXLastUnitRightPos = devXUnitValue + unitValueExtendX;
+								}
+							}
+						}
+					}
+				}
+
+				// draw the vertical gridline
+				if (unitCounter > 0) {
+
+					gc.setForeground(_gridColor);
+					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom - drawingData.devGraphHeight);
+				}
+			}
+
+			unitCounter++;
+		}
+	}
+
 	/**
 	 * draw the vertical gridlines
-	 *
+	 * 
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void drawHorizontalGridlines(final GC gc, final ChartDrawingData drawingData) {
+	private void draw040HorizontalGridlines(final GC gc, final ChartDrawingData drawingData) {
 
 		final Display display = getDisplay();
 
@@ -1868,190 +1830,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawHoveredBar(final GC gc) {
-
-		// check if hovered bar is disabled
-		if (_hoveredBarSerieIndex == -1) {
-			return;
-		}
-
-		// draw only bar chars
-		if (_chart.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR) {
-			return;
-		}
-
-		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setAlpha(0xd0);
-
-		// loop: all graphs
-		for (final ChartDrawingData drawingData : _drawingData) {
-
-			// get the chart data
-			final ChartDataYSerie yData = drawingData.getYData();
-			final int serieLayout = yData.getChartLayout();
-			final int[][] colorsIndex = yData.getColorsIndex();
-
-			// get the colors
-			final RGB[] rgbLine = yData.getRgbLine();
-			final RGB[] rgbDark = yData.getRgbDark();
-			final RGB[] rgbBright = yData.getRgbBright();
-
-			final int devYBottom = drawingData.getDevYBottom();
-			final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
-
-			final int markerWidth = BAR_MARKER_WIDTH;
-			final int markerWidth2 = markerWidth / 2;
-
-			// loop: all data series
-			for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
-
-				// get hovered rectangle
-				final Rectangle hoveredRectangle = barRectangeleSeries[serieIndex][_hoveredBarValueIndex];
-
-				if (hoveredRectangle == null) {
-					continue;
-				}
-
-				if (serieIndex != _hoveredBarSerieIndex) {
-					continue;
-				}
-
-				final int colorIndex = colorsIndex[serieIndex][_hoveredBarValueIndex];
-				final RGB rgbBrightDef = rgbBright[colorIndex];
-				final RGB rgbDarkDef = rgbDark[colorIndex];
-				final RGB rgbLineDef = rgbLine[colorIndex];
-
-				final Color colorBright = getColor(rgbBrightDef);
-				final Color colorDark = getColor(rgbDarkDef);
-				final Color colorLine = getColor(rgbLineDef);
-
-				if (serieLayout != ChartDataYSerie.BAR_LAYOUT_STACKED) {
-
-				}
-
-				final Rectangle hoveredBarShape = new Rectangle(
-						(hoveredRectangle.x - markerWidth2),
-						(hoveredRectangle.y - markerWidth2),
-						(hoveredRectangle.width + markerWidth),
-						(hoveredRectangle.height + markerWidth));
-
-				// do't write into the x-axis units which also contains the
-				// selection marker
-				if (hoveredBarShape.y + hoveredBarShape.height > devYBottom) {
-					hoveredBarShape.height = devYBottom - hoveredBarShape.y;
-				}
-
-				// fill bar background
-				gc.setForeground(colorDark);
-				gc.setBackground(colorBright);
-
-				gc.fillGradientRectangle(
-						hoveredBarShape.x + 1,
-						hoveredBarShape.y + 1,
-						hoveredBarShape.width - 1,
-						hoveredBarShape.height - 1,
-						true);
-
-				// draw bar border
-				gc.setForeground(colorLine);
-				gc.drawRoundRectangle(
-						hoveredBarShape.x,
-						hoveredBarShape.y,
-						hoveredBarShape.width,
-						hoveredBarShape.height,
-						4,
-						4);
-			}
-		}
-
-		gc.setAlpha(0xff);
-	}
-
-	/**
-	 * draws the layer image which contains the custom layer image
-	 */
-	private void drawLayerImage() {
-
-		if (_cumstomLayerImage == null) {
-			return;
-		}
-
-		// the slider image is the same size as the graph image
-		final Rectangle graphRect = _cumstomLayerImage.getBounds();
-
-		/*
-		 * check if the layer image needs to be redrawn
-		 */
-		if (_isLayerImageDirty == false
-				&& _isSliderDirty == false
-				&& _isSelectionDirty == false
-				&& _isHoveredBarDirty == false
-				&& _layerImage != null) {
-
-			final Rectangle oldBounds = _layerImage.getBounds();
-			if (oldBounds.width == graphRect.width && oldBounds.height == graphRect.height) {
-				return;
-			}
-		}
-
-		// ensure correct image size
-		if (graphRect.width <= 0 || graphRect.height <= 0) {
-			return;
-		}
-
-		if (Util.canReuseImage(_layerImage, graphRect) == false) {
-			_layerImage = Util.createImage(getDisplay(), _layerImage, graphRect);
-		}
-
-		if (_layerImage.isDisposed()) {
-			return;
-		}
-
-		final GC gc = new GC(_layerImage);
-
-		// copy the graph image into the slider image, the slider will be drawn
-		// on top of the graph
-		gc.fillRectangle(graphRect);
-//		if (fIsGraphDirty == false) {
-		gc.drawImage(_cumstomLayerImage, 0, 0);
-//		}
-
-		/*
-		 * draw x/y-sliders
-		 */
-		if (_isXSliderVisible) {
-			createXSliderLabel(gc, _xSliderOnTop);
-			createXSliderLabel(gc, _xSliderOnBottom);
-			updateXSliderYPosition();
-
-			drawXSlider(gc, _xSliderOnBottom);
-			drawXSlider(gc, _xSliderOnTop);
-
-		}
-		if (_isYSliderVisible) {
-			drawYSliders(gc);
-		}
-		_isSliderDirty = false;
-
-		if (_isXMarkerMoved) {
-			drawXMarker(gc);
-		}
-
-		if (_isSelectionVisible) {
-			drawSelection(gc);
-		}
-
-		if (_isHoveredBarDirty) {
-			drawHoveredBar(gc);
-			_isHoveredBarDirty = false;
-		}
-
-		gc.dispose();
-
-		_isLayerImageDirty = false;
-	}
-
-	private void drawLineGraph(final GC gc, final ChartDrawingData drawingData) {
+	private void draw120LineGraph(final GC gc, final ChartDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -2077,7 +1856,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// synch marker is not displayed
 
-			drawLineGraphSegment(
+			draw121LineGraphSegment(
 					gc,
 					drawingData,
 					0,
@@ -2096,7 +1875,7 @@ public class ChartComponentGraph extends Canvas {
 			final int noneMarkerAlpha = 0x60;
 
 			// draw the x-marker
-			drawLineGraphSegment(
+			draw121LineGraphSegment(
 					gc,
 					drawingData,
 					xData.getSynchMarkerStartIndex(),
@@ -2108,7 +1887,7 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment before the marker
-			drawLineGraphSegment(
+			draw121LineGraphSegment(
 					gc,
 					drawingData,
 					0,
@@ -2120,7 +1899,7 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment after the marker
-			drawLineGraphSegment(
+			draw121LineGraphSegment(
 					gc,
 					drawingData,
 					xData.getSynchMarkerEndIndex() - 0,
@@ -2136,7 +1915,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * first we draw the graph into a path, the path is then drawn on the device with a
 	 * transformation
-	 *
+	 * 
 	 * @param gc
 	 * @param drawingData
 	 * @param startIndex
@@ -2146,15 +1925,15 @@ public class ChartComponentGraph extends Canvas {
 	 * @param rgbBg2
 	 * @param graphValueOffset
 	 */
-	private void drawLineGraphSegment(	final GC gc,
-										final ChartDrawingData drawingData,
-										final int startIndex,
-										final int endIndex,
-										final RGB rgbFg,
-										final RGB rgbBg1,
-										final RGB rgbBg2,
-										final int alphaValue,
-										final int graphValueOffset) {
+	private void draw121LineGraphSegment(	final GC gc,
+											final ChartDrawingData drawingData,
+											final int startIndex,
+											final int endIndex,
+											final RGB rgbFg,
+											final RGB rgbBg1,
+											final RGB rgbBg2,
+											final int alphaValue,
+											final int graphValueOffset) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -2452,14 +2231,246 @@ public class ChartComponentGraph extends Canvas {
 		gc.setAlpha(0xFF);
 	}
 
+	private void draw122RangeMarker(final GC gc, final ChartDrawingData drawingData) {
+
+//		final RGB colorRangeMarker = new RGB(0, 200, 200);
+
+		final ChartDataXSerie xData = drawingData.getXData();
+		final ChartDataYSerie yData = drawingData.getYData();
+
+		final int[] startIndex = xData.getRangeMarkerStartIndex();
+		final int[] endIndex = xData.getRangeMarkerEndIndex();
+
+		if (startIndex == null) {
+			return;
+		}
+
+		final float scaleX = drawingData.getScaleX();
+
+		final RGB rgbFg = yData.getRgbLine()[0];
+		final RGB rgbBg1 = yData.getRgbDark()[0];
+		final RGB rgbBg2 = yData.getRgbBright()[0];
+
+		// get the horizontal offset for the graph
+		int graphValueOffset;
+		if (_chartComponents._synchConfigSrc == null) {
+			// a zoom marker is not set, draw it normally
+			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+		} else {
+			// adjust the start position to the zoom marker position
+			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+		}
+
+		int runningIndex = 0;
+		for (final int markerStartIndex : startIndex) {
+
+			// draw range marker
+			draw121LineGraphSegment(gc, //
+					drawingData,
+					markerStartIndex,
+					endIndex[runningIndex] + 1,
+					rgbFg,
+					rgbBg1,
+					rgbBg2,
+					0x40,
+					graphValueOffset);
+
+			runningIndex++;
+		}
+
+	}
+
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
 	 * if null is returned, a line graph will be drawn instead
-	 *
+	 * 
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void drawLineWithBarGraph(final GC gc, final ChartDrawingData drawingData) {
+	private void draw130BarGraph(final GC gc, final ChartDrawingData drawingData) {
+
+		// get the chart data
+		final ChartDataXSerie xData = drawingData.getXData();
+		final ChartDataYSerie yData = drawingData.getYData();
+		final int[][] colorsIndex = yData.getColorsIndex();
+
+		gc.setLineStyle(SWT.LINE_SOLID);
+
+		// get the colors
+		final RGB[] rgbLine = yData.getRgbLine();
+		final RGB[] rgbDark = yData.getRgbDark();
+		final RGB[] rgbBright = yData.getRgbBright();
+
+		// get the chart values
+		final float scaleX = drawingData.getScaleX();
+		final float scaleY = drawingData.getScaleY();
+		final int graphYBottom = drawingData.getGraphYBottom();
+		final boolean axisDirection = yData.isYAxisDirection();
+
+		// get the horizontal offset for the graph
+		int graphValueOffset;
+		if (_chartComponents._synchConfigSrc == null) {
+			// a synch marker is not set, draw it normally
+			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
+		} else {
+			// adjust the start position to the synch marker position
+			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
+		}
+
+		// get the top/bottom of the graph
+		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = devYBottom - drawingData.devGraphHeight;
+
+		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
+
+		final int xValues[] = xData.getHighValues()[0];
+		final int yHighSeries[][] = yData.getHighValues();
+		final int yLowSeries[][] = yData.getLowValues();
+
+		final int serieLength = yHighSeries.length;
+		final int valueLength = xValues.length;
+
+		// keep the bar rectangles
+		final Rectangle[][] barRecangles = new Rectangle[serieLength][valueLength];
+		final Rectangle[][] barFocusRecangles = new Rectangle[serieLength][valueLength];
+		drawingData.setBarRectangles(barRecangles);
+		drawingData.setBarFocusRectangles(barFocusRecangles);
+
+		// keep the height for stacked bar charts
+		final int devHeightSummary[] = new int[valueLength];
+
+		final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
+		final int devBarWidth = Math.max(1, devBarWidthOriginal);
+
+		final int serieLayout = yData.getChartLayout();
+		final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
+
+		// loop: all data series
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			final int yHighValues[] = yHighSeries[serieIndex];
+			int yLowValues[] = null;
+			if (yLowSeries != null) {
+				yLowValues = yLowSeries[serieIndex];
+			}
+
+			int devBarXPos = devBarRectangleStartXPos;
+			int devBarWidthPositioned = devBarWidth;
+
+			// reposition the rectangle when the bars are beside each other
+			if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
+				devBarXPos += serieIndex * devBarWidth;
+				devBarWidthPositioned = devBarWidth - 1;
+			}
+
+			// loop: all values in the current serie
+			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+				// get the x position
+				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
+
+//				final int devBarWidthSelected = devBarWidth;
+//				final int devBarWidth2 = devBarWidthSelected / 2;
+//
+//				int devXPosSelected = devXPos;
+//
+//				// center the bar
+//				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
+//					devXPosSelected -= devBarWidth2;
+//				}
+
+				int valueYLow;
+				if (yLowValues == null) {
+					valueYLow = yData.getVisibleMinValue();
+				} else {
+					// check array bounds
+					if (valueIndex >= yLowValues.length) {
+						break;
+					}
+					valueYLow = yLowValues[valueIndex];
+				}
+
+				// check array bounds
+				if (valueIndex >= yHighValues.length) {
+					break;
+				}
+				final int valueYHigh = yHighValues[valueIndex];
+
+				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
+				if (barHeight == 0) {
+					continue;
+				}
+
+				final int devBarHeight = (int) (barHeight * scaleY);
+
+				// get the old y position for stacked bars
+				int devYPreviousHeight = 0;
+				if (serieLayout == ChartDataYSerie.BAR_LAYOUT_STACKED) {
+					devYPreviousHeight = devHeightSummary[valueIndex];
+				}
+
+				// get the y position
+				int devYPos;
+				if (axisDirection) {
+					devYPos = devYBottom - ((int) ((valueYHigh - graphYBottom) * scaleY) + devYPreviousHeight);
+				} else {
+					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY) + devYPreviousHeight);
+				}
+
+				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidthPositioned, devBarHeight);
+
+				final int colorIndex = colorsIndex[serieIndex][valueIndex];
+				final RGB rgbBrightDef = rgbBright[colorIndex];
+				final RGB rgbDarkDef = rgbDark[colorIndex];
+				final RGB rgbLineDef = rgbLine[colorIndex];
+
+				final Color colorBright = getColor(rgbBrightDef);
+				final Color colorDark = getColor(rgbDarkDef);
+				final Color colorLine = getColor(rgbLineDef);
+
+				gc.setBackground(colorDark);
+
+				/*
+				 * draw bar
+				 */
+				if (devBarWidthOriginal > 0) {
+
+					gc.setForeground(colorBright);
+					gc.fillGradientRectangle(barShape.x, barShape.y, barShape.width, barShape.height, false);
+
+					gc.setForeground(colorLine);
+					gc.drawRectangle(barShape);
+
+				} else {
+
+					gc.setForeground(colorLine);
+					gc.drawLine(barShape.x, barShape.y, barShape.x, (barShape.y + barShape.height));
+				}
+
+				barRecangles[serieIndex][valueIndex] = barShape;
+				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
+						devXPos - 2,
+						(devYPos - 2),
+						devBarWidthPositioned + 4,
+						(devBarHeight + 7));
+
+				// keep the height for the bar
+				devHeightSummary[valueIndex] += devBarHeight;
+			}
+		}
+
+		// reset clipping
+		gc.setClipping((Rectangle) null);
+	}
+
+	/**
+	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
+	 * if null is returned, a line graph will be drawn instead
+	 * 
+	 * @param gc
+	 * @param drawingData
+	 */
+	private void draw140LineWithBarGraph(final GC gc, final ChartDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -2595,125 +2606,437 @@ public class ChartComponentGraph extends Canvas {
 		gc.setClipping((Rectangle) null);
 	}
 
-	private void drawRangeMarker(final GC gc, final ChartDrawingData drawingData) {
+	/**
+	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
+	 * if null is returned, a line graph will be drawn instead
+	 * 
+	 * @param gc
+	 * @param drawingData
+	 */
+	private void draw150XYScatter(final GC gc, final ChartDrawingData drawingData) {
 
-//		final RGB colorRangeMarker = new RGB(0, 200, 200);
-
+		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
+		final int[][] colorsIndex = yData.getColorsIndex();
 
-		final int[] startIndex = xData.getRangeMarkerStartIndex();
-		final int[] endIndex = xData.getRangeMarkerEndIndex();
+		// get the colors
+		final RGB[] rgbLine = yData.getRgbLine();
 
-		if (startIndex == null) {
-			return;
-		}
-
+		// get the chart values
 		final float scaleX = drawingData.getScaleX();
-
-		final RGB rgbFg = yData.getRgbLine()[0];
-		final RGB rgbBg1 = yData.getRgbDark()[0];
-		final RGB rgbBg2 = yData.getRgbBright()[0];
+		final float scaleY = drawingData.getScaleY();
+		final int graphYBottom = drawingData.getGraphYBottom();
 
 		// get the horizontal offset for the graph
-		int graphValueOffset;
-		if (_chartComponents._synchConfigSrc == null) {
-			// a zoom marker is not set, draw it normally
-			graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
-		} else {
-			// adjust the start position to the zoom marker position
-			graphValueOffset = (int) (_devGraphImageXOffset / scaleX);
-		}
+		final int graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
 
-		int runningIndex = 0;
-		for (final int markerStartIndex : startIndex) {
-
-			// draw range marker
-			drawLineGraphSegment(gc, //
-					drawingData,
-					markerStartIndex,
-					endIndex[runningIndex] + 1,
-					rgbFg,
-					rgbBg1,
-					rgbBg2,
-					0x40,
-					graphValueOffset);
-
-			runningIndex++;
-		}
-
-	}
-
-	private void drawSegments(final GC gc, final ChartDrawingData drawingData) {
-
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-
-		if (chartSegments == null) {
-			return;
-		}
-
+		// get the top/bottom of the graph
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devYTop = drawingData.getDevYTop();
-		final float scaleX = drawingData.getScaleX();
+		final int devYTop = devYBottom - drawingData.devGraphHeight;
 
-		final int[] startValues = chartSegments.valueStart;
-		final int[] endValues = chartSegments.valueEnd;
+		final int xValues[] = xData.getHighValues()[0];
+		final int yHighSeries[][] = yData.getHighValues();
 
-		if (startValues == null || endValues == null) {
+		final int serieLength = yHighSeries.length;
+		final int valueLength = xValues.length;
+
+		final ArrayList<Integer> maxXValueList = new ArrayList<Integer>();
+		final ArrayList<Integer> maxYValuesList = new ArrayList<Integer>();
+		int lastMaxY = Integer.MIN_VALUE;
+		int currentXValue = xValues[0];
+
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
+
+		// loop: all data series
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			final int yHighValues[] = yHighSeries[serieIndex];
+
+			// loop: all values in the current serie
+			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+				// check array bounds
+				if (valueIndex >= yHighValues.length) {
+					break;
+				}
+
+				final int xValue = xValues[valueIndex];
+				final int yValue = yHighValues[valueIndex];
+
+				// get the x/y position
+				final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
+				final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
+
+				final int colorIndex = colorsIndex[serieIndex][valueIndex];
+				final RGB rgbLineDef = rgbLine[colorIndex];
+				final Color colorLine = getColor(rgbLineDef);
+
+				// draw shape
+				gc.setBackground(colorLine);
+				gc.fillRectangle(devXPos - 1, devYPos, 3, 3);
+
+				// get max y value for the same x value
+				if (xValue == currentXValue) {
+
+					if (yValue > lastMaxY) {
+						lastMaxY = yValue;
+					}
+
+				} else {
+
+					// next x value is displayed, keep last max y
+
+					maxXValueList.add(currentXValue);
+					maxYValuesList.add(lastMaxY);
+
+					currentXValue = xValue;
+					lastMaxY = yValue;
+				}
+			}
+
+		}
+
+		// get last max y
+		maxXValueList.add(currentXValue);
+		maxYValuesList.add(lastMaxY);
+
+		/*
+		 * draw line between the max values
+		 */
+		final Integer[] maxXValues = maxXValueList.toArray(new Integer[maxXValueList.size()]);
+		final Integer[] maxYValues = maxYValuesList.toArray(new Integer[maxYValuesList.size()]);
+		int devXPosLast = 0;
+		int devYPosLast = 0;
+
+		gc.setAntialias(SWT.ON);
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+		for (int valueIndex = 0; valueIndex < maxXValues.length; valueIndex++) {
+
+			final int xValue = maxXValues[valueIndex];
+			final int yValue = maxYValues[valueIndex];
+
+			if (valueIndex == 0) {
+
+				devXPosLast = (int) ((xValue - graphValueOffset) * scaleX);
+				devYPosLast = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
+
+				continue;
+			}
+
+			final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
+			final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
+
+			gc.drawLine(devXPosLast, devYPosLast, devXPos, devYPos);
+
+			devXPosLast = devXPos;
+			devYPosLast = devYPos;
+		}
+
+		// reset clipping
+		gc.setClipping((Rectangle) null);
+		gc.setAntialias(SWT.OFF);
+	}
+
+	/**
+	 * draws the layer image which contains the custom layer image
+	 */
+	private void draw400LayerImage() {
+
+		if (_cumstomLayerImage == null) {
 			return;
 		}
 
-		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
+		// the slider image is the same size as the graph image
+		final Rectangle graphRect = _cumstomLayerImage.getBounds();
 
-		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
+		/*
+		 * check if the layer image needs to be redrawn
+		 */
+		if (_isLayerImageDirty == false
+				&& _isSliderDirty == false
+				&& _isSelectionDirty == false
+				&& _isHoveredBarDirty == false
+				&& _layerImage != null) {
 
-			if (segmentIndex % 2 == 1) {
-
-				// draw segment background color
-
-				final int startValue = startValues[segmentIndex];
-				final int endValue = endValues[segmentIndex];
-
-				final int devValueStart = (int) (scaleX * startValue) - _devGraphImageXOffset;
-
-				// adjust endValue to fill the last part of the segment
-				final int devValueEnd = (int) (scaleX * (endValue + 1)) - _devGraphImageXOffset;
-
-				gc.setBackground(alternateColor);
-				gc.fillRectangle(devValueStart, //
-						devYTop,
-						devValueEnd - devValueStart,
-						devYBottom - devYTop);
+			final Rectangle oldBounds = _layerImage.getBounds();
+			if (oldBounds.width == graphRect.width && oldBounds.height == graphRect.height) {
+				return;
 			}
 		}
 
-		alternateColor.dispose();
+		// ensure correct image size
+		if (graphRect.width <= 0 || graphRect.height <= 0) {
+			return;
+		}
+
+		if (Util.canReuseImage(_layerImage, graphRect) == false) {
+			_layerImage = Util.createImage(getDisplay(), _layerImage, graphRect);
+		}
+
+		if (_layerImage.isDisposed()) {
+			return;
+		}
+
+		final GC gc = new GC(_layerImage);
+
+		// copy the graph image into the slider image, the slider will be drawn
+		// on top of the graph
+		gc.fillRectangle(graphRect);
+//		if (fIsGraphDirty == false) {
+		gc.drawImage(_cumstomLayerImage, 0, 0);
+//		}
+
+		/*
+		 * draw x/y-sliders
+		 */
+		if (_isXSliderVisible) {
+			createXSliderLabel(gc, _xSliderOnTop);
+			createXSliderLabel(gc, _xSliderOnBottom);
+			updateXSliderYPosition();
+
+			draw410XSlider(gc, _xSliderOnBottom);
+			draw410XSlider(gc, _xSliderOnTop);
+
+		}
+		if (_isYSliderVisible) {
+			draw420YSliders(gc);
+		}
+		_isSliderDirty = false;
+
+		if (_isXMarkerMoved) {
+			draw430XMarker(gc);
+		}
+
+		if (_isSelectionVisible) {
+			draw440Selection(gc);
+		}
+
+		if (_isHoveredBarDirty) {
+			draw450HoveredBar(gc);
+			_isHoveredBarDirty = false;
+		}
+
+		gc.dispose();
+
+		_isLayerImageDirty = false;
 	}
 
-	private void drawSelection(final GC gc) {
+	/**
+	 * @param gc
+	 * @param slider
+	 */
+	private void draw410XSlider(final GC gc, final ChartXSlider slider) {
 
-		_isSelectionDirty = false;
+		final Display display = getDisplay();
 
-		final int chartType = _chart.getChartDataModel().getChartType();
+		final int devSliderLinePos = slider.getDevVirtualSliderLinePos() - getDevGraphImageXOffset();
 
-		// loop: all graphs
+		final int grayColorIndex = 60;
+		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+
+		int labelIndex = 0;
+
+		final ArrayList<ChartXSliderLabel> labelList = slider.getLabelList();
+
+		// draw slider for each graph
 		for (final ChartDrawingData drawingData : _drawingData) {
-			switch (chartType) {
-			case ChartDataModel.CHART_TYPE_LINE:
-				// drawLineSelection(gc, drawingData);
-				break;
 
-			case ChartDataModel.CHART_TYPE_BAR:
-				drawBarSelection(gc, drawingData);
-				break;
+			final ChartDataYSerie yData = drawingData.getYData();
+			final ChartXSliderLabel label = labelList.get(labelIndex);
 
-			default:
-				break;
+			final Color colorLine = new Color(display, yData.getRgbLine()[0]);
+			final Color colorBright = new Color(display, yData.getRgbBright()[0]);
+			final Color colorDark = new Color(display, yData.getRgbDark()[0]);
+
+			final int labelHeight = label.height;
+			final int labelWidth = label.width;
+			final int labelX = label.x;
+			final int labelY = label.y;
+
+			final int devYBottom = drawingData.getDevYBottom();
+			final boolean isSliderHovered = _mouseOverXSlider != null && _mouseOverXSlider == slider;
+
+			/*
+			 * when the mouse is over the slider, the slider is painted in a darker color
+			 */
+			// draw slider line
+			if ((_isFocusActive && _selectedXSlider == slider) || isSliderHovered) {
+				gc.setAlpha(0xd0);
+			} else {
+				gc.setAlpha(0x60);
 			}
+			gc.setForeground(colorLine);
+			gc.setLineStyle(SWT.LINE_DOT);
+			gc.drawLine(devSliderLinePos, labelY + labelHeight, devSliderLinePos, devYBottom);
+
+			/*
+			 * left and right slider have different label backgrounds
+			 */
+//			if (slider == getLeftSlider()) {
+//				// left slider
+			gc.setBackground(colorDark);
+			gc.setForeground(colorBright);
+//			} else {
+//				// right slider
+//				gc.setBackground(colorBright);
+//				gc.setForeground(colorDark);
+//			}
+
+			// draw label background
+//			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
+//			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
+
+			// draw label border
+			gc.setForeground(colorLine);
+			gc.setLineStyle(SWT.LINE_SOLID);
+			gc.drawRoundRectangle(labelX, labelY - 4, labelWidth, labelHeight + 3, 4, 4);
+
+			// draw slider label
+			gc.setAlpha(0xff);
+			gc.setForeground(colorTxt);
+			gc.drawText(label.text, labelX + 2, labelY - 5, true);
+
+			// draw a tiny marker on the graph
+			gc.setBackground(colorLine);
+			gc.fillRectangle(devSliderLinePos - 3, label.yGraph - 2, 7, 3);
+
+			/*
+			 * draw a marker below the x-axis to make the selection more visible
+			 */
+			if (_isFocusActive && slider == _selectedXSlider) {
+
+				final int markerWidth = BAR_MARKER_WIDTH;
+				final int markerWidth2 = markerWidth / 2;
+
+				final int devMarkerXPos = devSliderLinePos - markerWidth2;
+
+				final int[] marker = new int[] {
+						devMarkerXPos,
+						devYBottom + 1 + markerWidth2,
+						devMarkerXPos + markerWidth2,
+						devYBottom + 1,
+						devMarkerXPos + markerWidth,
+						devYBottom + 1 + markerWidth2 };
+
+				gc.setAlpha(0xc0);
+				gc.setLineStyle(SWT.LINE_SOLID);
+
+				// draw background
+				gc.setBackground(colorDark);
+				gc.fillPolygon(marker);
+
+				// draw border
+				gc.setForeground(colorLine);
+				gc.drawPolygon(marker);
+
+				gc.setAlpha(0xff);
+			}
+
+			colorLine.dispose();
+			colorBright.dispose();
+			colorDark.dispose();
+
+			labelIndex++;
 		}
+
+		colorTxt.dispose();
 	}
 
-	private void drawXMarker(final GC gc) {
+	/**
+	 * @param gc
+	 * @param slider
+	 */
+	private void draw420YSliders(final GC gc) {
+
+		final Display display = getDisplay();
+
+		final int grayColorIndex = 60;
+		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+
+		for (final ChartYSlider ySlider : _ySliders) {
+
+			if (_hitYSlider == ySlider) {
+
+				final ChartDataYSerie yData = ySlider.getYData();
+
+				final Color colorLine = new Color(display, yData.getRgbLine()[0]);
+				final Color colorBright = new Color(display, yData.getRgbBright()[0]);
+				final Color colorDark = new Color(display, yData.getRgbDark()[0]);
+
+				final ChartDrawingData drawingData = ySlider.getDrawingData();
+				final int devYBottom = drawingData.getDevYBottom();
+				final int devYTop = devYBottom - drawingData.devGraphHeight;
+
+				final int devYSliderLine = ySlider.getDevYSliderLine();
+
+				// set the label and line NOT outside of the chart
+				int devYLabelPos = devYSliderLine;
+
+				if (devYSliderLine > devYBottom) {
+					devYLabelPos = devYBottom;
+				} else if (devYSliderLine < devYTop) {
+					devYLabelPos = devYTop;
+				}
+
+				// ySlider is the slider which was hit by the mouse, draw the
+				// slider label
+
+				final StringBuilder labelText = new StringBuilder();
+
+				final int devYValue = (int) ((devYBottom - devYSliderLine) / drawingData.getScaleY())
+						+ drawingData.getGraphYBottom();
+
+				// create the slider text
+				labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
+				labelText.append(' ');
+				labelText.append(yData.getUnitLabel());
+				labelText.append("  "); //$NON-NLS-1$
+				final String label = labelText.toString();
+
+				final Point labelExtend = gc.stringExtent(label);
+
+				final int labelHeight = labelExtend.y - 2;
+				final int labelWidth = labelExtend.x + 0;
+				final int labelX = _ySliderGraphX - labelWidth - 5;
+				final int labelY = devYLabelPos - labelHeight;
+
+				// draw label background
+				gc.setForeground(colorBright);
+				gc.setBackground(colorDark);
+				gc.setAlpha(0xb0);
+				gc.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
+
+				// draw label border
+				gc.setAlpha(0xa0);
+				gc.setForeground(colorLine);
+				gc.drawRectangle(labelX, labelY, labelWidth, labelHeight);
+				gc.setAlpha(0xff);
+
+				// draw label text
+				gc.setForeground(colorTxt);
+				gc.drawText(label, labelX + 2, labelY - 2, true);
+
+				// draw slider line
+				final Rectangle hitRect = ySlider.getHitRectangle();
+				gc.setForeground(colorLine);
+				gc.setLineStyle(SWT.LINE_DOT);
+				gc.drawLine(0, devYLabelPos, hitRect.width, devYLabelPos);
+
+				// gc.setLineStyle(SWT.LINE_SOLID);
+
+				colorLine.dispose();
+				colorBright.dispose();
+				colorDark.dispose();
+			}
+		}
+
+		colorTxt.dispose();
+	}
+
+	private void draw430XMarker(final GC gc) {
 
 		final Display display = getDisplay();
 		final Color colorXMarker = new Color(display, 255, 153, 0);
@@ -2854,531 +3177,346 @@ public class ChartComponentGraph extends Canvas {
 		colorXMarker.dispose();
 	}
 
-	/**
-	 * @param gc
-	 * @param slider
-	 */
-	private void drawXSlider(final GC gc, final ChartXSlider slider) {
+	private void draw440Selection(final GC gc) {
 
-		final Display display = getDisplay();
+		_isSelectionDirty = false;
 
-		final int devSliderLinePos = slider.getDevVirtualSliderLinePos() - getDevGraphImageXOffset();
+		final int chartType = _chart.getChartDataModel().getChartType();
 
-		final int grayColorIndex = 60;
-		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
-
-		int labelIndex = 0;
-
-		final ArrayList<ChartXSliderLabel> labelList = slider.getLabelList();
-
-		// draw slider for each graph
+		// loop: all graphs
 		for (final ChartDrawingData drawingData : _drawingData) {
+			switch (chartType) {
+			case ChartDataModel.CHART_TYPE_LINE:
+				// drawLineSelection(gc, drawingData);
+				break;
 
-			final ChartDataYSerie yData = drawingData.getYData();
-			final ChartXSliderLabel label = labelList.get(labelIndex);
+			case ChartDataModel.CHART_TYPE_BAR:
+				draw442BarSelection(gc, drawingData);
+				break;
 
-			final Color colorLine = new Color(display, yData.getRgbLine()[0]);
-			final Color colorBright = new Color(display, yData.getRgbBright()[0]);
-			final Color colorDark = new Color(display, yData.getRgbDark()[0]);
-
-			final int labelHeight = label.height;
-			final int labelWidth = label.width;
-			final int labelX = label.x;
-			final int labelY = label.y;
-
-			final int devYBottom = drawingData.getDevYBottom();
-			final boolean isSliderHovered = _mouseOverXSlider != null && _mouseOverXSlider == slider;
-
-			/*
-			 * when the mouse is over the slider, the slider is painted in a darker color
-			 */
-			// draw slider line
-			if ((_isFocusActive && _selectedXSlider == slider) || isSliderHovered) {
-				gc.setAlpha(0xd0);
-			} else {
-				gc.setAlpha(0x60);
+			default:
+				break;
 			}
-			gc.setForeground(colorLine);
-			gc.setLineStyle(SWT.LINE_DOT);
-			gc.drawLine(devSliderLinePos, labelY + labelHeight, devSliderLinePos, devYBottom);
+		}
+	}
+
+	private void draw442BarSelection(final GC gc, final ChartDrawingData drawingData) {
+
+		// check if multiple bars are selected
+		boolean drawSelection = false;
+		int selectedIndex = 0;
+		if (_selectedBarItems != null) {
+			int selectionIndex = 0;
+			for (final boolean isBarSelected : _selectedBarItems) {
+				if (isBarSelected) {
+					if (drawSelection == false) {
+						drawSelection = true;
+						selectedIndex = selectionIndex;
+					} else {
+						drawSelection = false;
+						return;
+					}
+				}
+				selectionIndex++;
+			}
+		}
+
+		if (drawSelection == false) {
+			return;
+		}
+
+		/*
+		 * a bar is selected
+		 */
+
+		// get the chart data
+		final ChartDataYSerie yData = drawingData.getYData();
+		final int[][] colorsIndex = yData.getColorsIndex();
+
+		// get the colors
+		final RGB[] rgbLine = yData.getRgbLine();
+		final RGB[] rgbDark = yData.getRgbDark();
+		final RGB[] rgbBright = yData.getRgbBright();
+
+		final int devYBottom = drawingData.getDevYBottom();
+		final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
+
+		if (barRectangeleSeries == null) {
+			return;
+		}
+
+		final int markerWidth = BAR_MARKER_WIDTH;
+		final int barThickness = 1;
+		final int markerWidth2 = markerWidth / 2;
+
+		gc.setLineStyle(SWT.LINE_SOLID);
+
+		// loop: all data series
+		for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
+
+			// get selected rectangle
+			final Rectangle[] barRectangles = barRectangeleSeries[serieIndex];
+			if (barRectangles == null || selectedIndex >= barRectangles.length) {
+				continue;
+			}
+
+			final Rectangle barRectangle = barRectangles[selectedIndex];
+			if (barRectangle == null) {
+				continue;
+			}
 
 			/*
-			 * left and right slider have different label backgrounds
+			 * current bar is selected, draw the selected bar
 			 */
-//			if (slider == getLeftSlider()) {
-//				// left slider
-			gc.setBackground(colorDark);
-			gc.setForeground(colorBright);
-//			} else {
-//				// right slider
-//				gc.setBackground(colorBright);
-//				gc.setForeground(colorDark);
-//			}
 
-			// draw label background
-//			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
-//			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
+			final Rectangle barShapeSelected = new Rectangle(
+					(barRectangle.x - markerWidth2),
+					(barRectangle.y - markerWidth2),
+					(barRectangle.width + markerWidth),
+					(barRectangle.height + markerWidth));
 
-			// draw label border
-			gc.setForeground(colorLine);
-			gc.setLineStyle(SWT.LINE_SOLID);
-			gc.drawRoundRectangle(labelX, labelY - 4, labelWidth, labelHeight + 3, 4, 4);
+			final Rectangle barBarSelected = new Rectangle(
+					barRectangle.x - 1,
+					barRectangle.y - barThickness,
+					barRectangle.width + barThickness,
+					barRectangle.height + 2 * barThickness);
 
-			// draw slider label
-			gc.setAlpha(0xff);
-			gc.setForeground(colorTxt);
-			gc.drawText(label.text, labelX + 2, labelY - 5, true);
+			final int colorIndex = colorsIndex[serieIndex][selectedIndex];
+			final RGB rgbBrightDef = rgbBright[colorIndex];
+			final RGB rgbDarkDef = rgbDark[colorIndex];
+			final RGB rgbLineDef = rgbLine[colorIndex];
 
-			// draw a tiny marker on the graph
-			gc.setBackground(colorLine);
-			gc.fillRectangle(devSliderLinePos - 3, label.yGraph - 2, 7, 3);
+			final Color colorBrightSelected = getColor(rgbBrightDef);
+			final Color colorDarkSelected = getColor(rgbDarkDef);
+			final Color colorLineSelected = getColor(rgbLineDef);
+
+			// do't write into the x-axis units which also contains the
+			// selection marker
+			if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
+				barShapeSelected.height = devYBottom - barShapeSelected.y;
+			}
+
+			// draw the selection darker when the focus is set
+			if (_isFocusActive) {
+//				gc.setAlpha(0xb0);
+				gc.setAlpha(0xf0);
+			} else {
+//				gc.setAlpha(0x70);
+				gc.setAlpha(0xa0);
+			}
+
+			// fill bar background
+			gc.setForeground(colorDarkSelected);
+			gc.setBackground(colorBrightSelected);
+
+			gc.fillGradientRectangle(
+					barShapeSelected.x + 1,
+					barShapeSelected.y + 1,
+					barShapeSelected.width - 1,
+					barShapeSelected.height - 1,
+					true);
+
+			// draw bar border
+			gc.setForeground(colorLineSelected);
+			gc.drawRoundRectangle(
+					barShapeSelected.x,
+					barShapeSelected.y,
+					barShapeSelected.width,
+					barShapeSelected.height,
+					4,
+					4);
+
+			// draw bar thicker
+			gc.setBackground(colorDarkSelected);
+			gc
+					.fillRoundRectangle(
+							barBarSelected.x,
+							barBarSelected.y,
+							barBarSelected.width,
+							barBarSelected.height,
+							2,
+							2);
 
 			/*
 			 * draw a marker below the x-axis to make the selection more visible
 			 */
-			if (_isFocusActive && slider == _selectedXSlider) {
+			if (_isFocusActive) {
 
-				final int markerWidth = BAR_MARKER_WIDTH;
-				final int markerWidth2 = markerWidth / 2;
-
-				final int devMarkerXPos = devSliderLinePos - markerWidth2;
+				final int devMarkerXPos = barRectangle.x + (barRectangle.width / 2) - markerWidth2;
 
 				final int[] marker = new int[] {
 						devMarkerXPos,
 						devYBottom + 1 + markerWidth2,
 						devMarkerXPos + markerWidth2,
 						devYBottom + 1,
-						devMarkerXPos + markerWidth,
+						devMarkerXPos + markerWidth - 0,
 						devYBottom + 1 + markerWidth2 };
 
-				gc.setAlpha(0xc0);
-				gc.setLineStyle(SWT.LINE_SOLID);
-
 				// draw background
-				gc.setBackground(colorDark);
+				gc.setBackground(colorDarkSelected);
 				gc.fillPolygon(marker);
 
 				// draw border
-				gc.setForeground(colorLine);
+				gc.setForeground(colorLineSelected);
 				gc.drawPolygon(marker);
 
 				gc.setAlpha(0xff);
 			}
-
-			colorLine.dispose();
-			colorBright.dispose();
-			colorDark.dispose();
-
-			labelIndex++;
 		}
-
-		colorTxt.dispose();
 	}
 
-	private void drawXTitle(final GC gc, final ChartDrawingData drawingData) {
+	private void draw450HoveredBar(final GC gc) {
 
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
-		final int devYTitle = drawingData.getDevMarginTop();
-
-		final int devGraphWidth = _canScrollZoomedChart ? //
-				drawingData.devVirtualGraphWidth
-				: _chartComponents.getDevVisibleChartWidth();
-
-		if (chartSegments == null) {
-
-			/*
-			 * draw default title, center within the chart
-			 */
-
-			final String title = drawingData.getXTitle();
-
-			if (title == null || title.length() == 0) {
-				return;
-			}
-
-			gc.drawText(title, //
-					(devGraphWidth / 2) - (gc.textExtent(title).x / 2),
-					(devYTitle),
-					true);
-
-		} else {
-
-			/*
-			 * draw title for each segment
-			 */
-
-			final float scaleX = drawingData.getScaleX();
-
-			final int[] valueStart = chartSegments.valueStart;
-			final int[] valueEnd = chartSegments.valueEnd;
-			final String[] segmentTitles = chartSegments.segmentTitle;
-
-			if (valueStart != null && valueEnd != null && segmentTitles != null) {
-
-				int devXChartTitleEnd = -1;
-
-				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
-
-					// draw the title in the center of the segment
-					final String segmentTitle = segmentTitles[segmentIndex];
-					if (segmentTitle != null) {
-
-						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex]) - _devGraphImageXOffset;
-						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1))
-								- _devGraphImageXOffset;
-
-						final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
-						final int devXSegmentCenter = devXSegmentEnd - (devXSegmentLength / 2);
-						final int devXTitleCenter = gc.textExtent(segmentTitle).x / 2;
-
-						final int devX = devXSegmentCenter - devXTitleCenter;
-
-						if (devX <= devXChartTitleEnd) {
-							// skip title when it overlaps the previous title
-							continue;
-						}
-
-						gc.drawText(segmentTitle, devX, devYTitle, false);
-
-						devXChartTitleEnd = devXSegmentCenter + devXTitleCenter + 3;
-					}
-				}
-			}
+		// check if hovered bar is disabled
+		if (_hoveredBarSerieIndex == -1) {
+			return;
 		}
 
-	}
-
-	/**
-	 * Draw the unit label, tick and the vertical grid line for the x axis
-	 *
-	 * @param gc
-	 * @param drawingData
-	 * @param isDrawUnit
-	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
-	 *            unit grid line
-	 * @param isDraw0Unit
-	 *            <code>true</code> indicate to draw the unit at the 0 position
-	 */
-	private void drawXUnitsAndGrid(	final GC gc,
-									final ChartDrawingData drawingData,
-									final boolean isDrawUnit,
-									final boolean isDraw0Unit) {
-
-		final Display display = getDisplay();
-
-		final ArrayList<ChartUnit> units = drawingData.getXUnits();
-
-		final int devYBottom = drawingData.getDevYBottom();
-		final int unitPos = drawingData.getXUnitTextPos();
-		float scaleX = drawingData.getScaleX();
-
-		// check if the x-units has a special scaling
-		final float scaleUnitX = drawingData.getScaleUnitX();
-		if (scaleUnitX != Float.MIN_VALUE) {
-			scaleX = scaleUnitX;
+		// draw only bar chars
+		if (_chart.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR) {
+			return;
 		}
 
-		// compute the distance between two units
-		final float devUnitWidth = units.size() > 1 ? //
-				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
-				: 0;
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setAlpha(0xd0);
 
-		float devXOffset = 0;
-		int unitCounterInvisibleLeft = 0;
-		int unitCounterInvisibleRight = 0;
-		int unitCounter = 0;
-		boolean isUnitVisibilityChecked = false;
+		// loop: all graphs
+		for (final ChartDrawingData drawingData : _drawingData) {
 
-		final int devVisibleChartWidth = getDevVisibleChartWidth();
-		final boolean isLineChart = _chartComponents.getChartDataModel().getChartType() != ChartDataModel.CHART_TYPE_BAR;
+			// get the chart data
+			final ChartDataYSerie yData = drawingData.getYData();
+			final int serieLayout = yData.getChartLayout();
+			final int[][] colorsIndex = yData.getColorsIndex();
 
-		/*
-		 * check if units are outside of the visible chart
-		 */
-		if (isLineChart && _canScrollZoomedChart == false && _devGraphImageXOffset > 0) {
+			// get the colors
+			final RGB[] rgbLine = yData.getRgbLine();
+			final RGB[] rgbDark = yData.getRgbDark();
+			final RGB[] rgbBright = yData.getRgbBright();
 
-			// calculate the unit offset
-			unitCounterInvisibleLeft = (int) (_devGraphImageXOffset / devUnitWidth);
-			unitCounterInvisibleRight = (int) ((_devGraphImageXOffset + devVisibleChartWidth) / devUnitWidth);
+			final int devYBottom = drawingData.getDevYBottom();
+			final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
-			devXOffset -= _devGraphImageXOffset % devUnitWidth;
+			final int markerWidth = BAR_MARKER_WIDTH;
+			final int markerWidth2 = markerWidth / 2;
 
-			isUnitVisibilityChecked = true;
-		}
+			// loop: all data series
+			for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
 
-		boolean isUnitLabelPrinted = false;
-		int devXLastUnitRightPos = 0;
-		int devXFirstUnitRightPos = 0;
-		int devXChartUnitEnd = -1;
+				// get hovered rectangle
+				final Rectangle hoveredRectangle = barRectangeleSeries[serieIndex][_hoveredBarValueIndex];
 
-		final String unitLabel = drawingData.getXData().getUnitLabel();
-		final int unitLabelExtendX = gc.textExtent(unitLabel).x;
-
-		for (final ChartUnit unit : units) {
-
-			if (isUnitVisibilityChecked) {
-
-				/*
-				 * skip units which are outside of the chart and not displayed
-				 */
-				if (unitCounter < unitCounterInvisibleLeft) {
-
-					devXOffset -= devUnitWidth;
-
-					unitCounter++;
-
+				if (hoveredRectangle == null) {
 					continue;
 				}
 
-				if (unitCounter > unitCounterInvisibleRight) {
-					break;
+				if (serieIndex != _hoveredBarSerieIndex) {
+					continue;
 				}
+
+				final int colorIndex = colorsIndex[serieIndex][_hoveredBarValueIndex];
+				final RGB rgbBrightDef = rgbBright[colorIndex];
+				final RGB rgbDarkDef = rgbDark[colorIndex];
+				final RGB rgbLineDef = rgbLine[colorIndex];
+
+				final Color colorBright = getColor(rgbBrightDef);
+				final Color colorDark = getColor(rgbDarkDef);
+				final Color colorLine = getColor(rgbLineDef);
+
+				if (serieLayout != ChartDataYSerie.BAR_LAYOUT_STACKED) {
+
+				}
+
+				final Rectangle hoveredBarShape = new Rectangle(
+						(hoveredRectangle.x - markerWidth2),
+						(hoveredRectangle.y - markerWidth2),
+						(hoveredRectangle.width + markerWidth),
+						(hoveredRectangle.height + markerWidth));
+
+				// do't write into the x-axis units which also contains the
+				// selection marker
+				if (hoveredBarShape.y + hoveredBarShape.height > devYBottom) {
+					hoveredBarShape.height = devYBottom - hoveredBarShape.y;
+				}
+
+				// fill bar background
+				gc.setForeground(colorDark);
+				gc.setBackground(colorBright);
+
+				gc.fillGradientRectangle(
+						hoveredBarShape.x + 1,
+						hoveredBarShape.y + 1,
+						hoveredBarShape.width - 1,
+						hoveredBarShape.height - 1,
+						true);
+
+				// draw bar border
+				gc.setForeground(colorLine);
+				gc.drawRoundRectangle(
+						hoveredBarShape.x,
+						hoveredBarShape.y,
+						hoveredBarShape.width,
+						hoveredBarShape.height,
+						4,
+						4);
 			}
-
-			// dev x-position for the unit tick
-			final int devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
-
-			/*
-			 * the first unit is not painted because it would clip at the left border of the chart
-			 * canvas
-			 */
-			if ((unitCounter == 0 && isDraw0Unit) || unitCounter > 0) {
-
-				if (isDrawUnit) {
-
-					gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-
-					/*
-					 * draw unit tick
-					 */
-					if (unitCounter > 0) {
-						gc.setLineStyle(SWT.LINE_SOLID);
-						gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
-					}
-
-					/*
-					 * draw unit value
-					 */
-					final int unitValueExtendX = gc.textExtent(unit.valueLabel).x;
-					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
-
-						// draw the unit value BETWEEN two units
-
-						final int devXUnitCenter = Math.max(0, (((int) devUnitWidth - unitValueExtendX) / 2));
-						final int devX = devXUnitTick + devXUnitCenter;
-
-						if (devX <= devXChartUnitEnd) {
-
-							/**
-							 * !!! skipping is not implemented correctly because it's a bigger task
-							 * to implement it !!!
-							 */
-
-							// skip unit when it overlaps the previous unit
-
-							continue;
-						}
-
-						gc.drawText(unit.valueLabel, devX, devYBottom + 7, true);
-
-						devXChartUnitEnd = devX + unitValueExtendX + 0;
-
-					} else {
-
-						// draw the unit value in the MIDDLE of the unit tick
-
-						/*
-						 * when the chart is zoomed and not scrolled, prevent to clip the text at
-						 * the left border
-						 */
-						final int unitValueExtend2 = unitValueExtendX / 2;
-						if (unitCounter == 0 || devXUnitTick >= 0) {
-
-							if (unitCounter == 0) {
-
-								/*
-								 * this is the first unit, do not center it otherwise it would be
-								 * clipped on the left border
-								 */
-
-								if (devXUnitTick == 0) {
-
-									gc.drawText(unit.valueLabel, devXUnitTick, devYBottom + 7, true);
-
-									// draw unit label (km, mi, h)
-									if (isUnitLabelPrinted == false) {
-										isUnitLabelPrinted = true;
-										gc.drawText(unitLabel,//
-												devXUnitTick + unitValueExtendX + 2,
-												devYBottom + 7,
-												true);
-									}
-
-									devXFirstUnitRightPos = devXUnitTick + unitValueExtendX + 2 + unitLabelExtendX + 2;
-								}
-
-							} else {
-
-								// center the unit text
-
-								int devXUnitValue = devXUnitTick - unitValueExtend2;
-								if (devXUnitValue >= 0) {
-
-									if ((devXUnitTick + unitValueExtend2) > devVisibleChartWidth) {
-
-										/*
-										 * unit value would be clipped at the chart border, move it
-										 * to the left to make it fully visible
-										 */
-
-										devXUnitValue = devVisibleChartWidth - unitValueExtendX;
-
-										// check if the unit value is overlapping the previous unit value
-										if (devXUnitValue <= devXLastUnitRightPos + -1) {
-											break;
-										}
-									}
-
-									// check if the unit value will overlap the first unit value
-									if (devXUnitValue <= devXFirstUnitRightPos) {
-										continue;
-									}
-
-									gc.drawText(unit.valueLabel, devXUnitValue, devYBottom + 7, true);
-
-//									gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//									gc.fillRectangle(devXUnitValue, devYBottom + 7, unitValueExtendX, 10);
-
-									// draw unit label (km, mi, h) for the first unit
-									if (isUnitLabelPrinted == false) {
-
-										isUnitLabelPrinted = true;
-
-										gc.drawText(unitLabel,//
-												devXUnitTick + unitValueExtend2 + 2,
-												devYBottom + 7,
-												true);
-
-										devXFirstUnitRightPos = devXUnitTick
-												+ unitValueExtendX
-												+ 2
-												+ unitLabelExtendX
-												+ 2;
-									}
-
-									devXLastUnitRightPos = devXUnitValue + unitValueExtendX;
-								}
-							}
-						}
-					}
-				}
-
-				// draw the vertical gridline
-				if (unitCounter > 0) {
-
-					gc.setForeground(_gridColor);
-					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom - drawingData.devGraphHeight);
-				}
-			}
-
-			unitCounter++;
 		}
+
+		gc.setAlpha(0xff);
 	}
 
-	/**
-	 * @param gc
-	 * @param slider
-	 */
-	private void drawYSliders(final GC gc) {
+	private void draw500CustomLayerImage() {
 
-		final Display display = getDisplay();
+		// the layer above image is the same size as the graph image
+		final Rectangle graphRect = _graphImage.getBounds();
 
-		final int grayColorIndex = 60;
-		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+		// ensure correct image size
+		if (graphRect.width <= 0 || graphRect.height <= 0) {
+			return;
+		}
 
-		for (final ChartYSlider ySlider : _ySliders) {
+		/*
+		 * when the existing image is the same size as the new image, we will redraw it only if it's
+		 * set to dirty
+		 */
+		if (_isCustomLayerDirty == false && _cumstomLayerImage != null) {
 
-			if (_hitYSlider == ySlider) {
+			final Rectangle oldBounds = _cumstomLayerImage.getBounds();
 
-				final ChartDataYSerie yData = ySlider.getYData();
-
-				final Color colorLine = new Color(display, yData.getRgbLine()[0]);
-				final Color colorBright = new Color(display, yData.getRgbBright()[0]);
-				final Color colorDark = new Color(display, yData.getRgbDark()[0]);
-
-				final ChartDrawingData drawingData = ySlider.getDrawingData();
-				final int devYBottom = drawingData.getDevYBottom();
-				final int devYTop = devYBottom - drawingData.devGraphHeight;
-
-				final int devYSliderLine = ySlider.getDevYSliderLine();
-
-				// set the label and line NOT outside of the chart
-				int devYLabelPos = devYSliderLine;
-
-				if (devYSliderLine > devYBottom) {
-					devYLabelPos = devYBottom;
-				} else if (devYSliderLine < devYTop) {
-					devYLabelPos = devYTop;
-				}
-
-				// ySlider is the slider which was hit by the mouse, draw the
-				// slider label
-
-				final StringBuilder labelText = new StringBuilder();
-
-				final int devYValue = (int) ((devYBottom - devYSliderLine) / drawingData.getScaleY())
-						+ drawingData.getGraphYBottom();
-
-				// create the slider text
-				labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
-				labelText.append(' ');
-				labelText.append(yData.getUnitLabel());
-				labelText.append("  "); //$NON-NLS-1$
-				final String label = labelText.toString();
-
-				final Point labelExtend = gc.stringExtent(label);
-
-				final int labelHeight = labelExtend.y - 2;
-				final int labelWidth = labelExtend.x + 0;
-				final int labelX = _ySliderGraphX - labelWidth - 5;
-				final int labelY = devYLabelPos - labelHeight;
-
-				// draw label background
-				gc.setForeground(colorBright);
-				gc.setBackground(colorDark);
-				gc.setAlpha(0xb0);
-				gc.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
-
-				// draw label border
-				gc.setAlpha(0xa0);
-				gc.setForeground(colorLine);
-				gc.drawRectangle(labelX, labelY, labelWidth, labelHeight);
-				gc.setAlpha(0xff);
-
-				// draw label text
-				gc.setForeground(colorTxt);
-				gc.drawText(label, labelX + 2, labelY - 2, true);
-
-				// draw slider line
-				final Rectangle hitRect = ySlider.getHitRectangle();
-				gc.setForeground(colorLine);
-				gc.setLineStyle(SWT.LINE_DOT);
-				gc.drawLine(0, devYLabelPos, hitRect.width, devYLabelPos);
-
-				// gc.setLineStyle(SWT.LINE_SOLID);
-
-				colorLine.dispose();
-				colorBright.dispose();
-				colorDark.dispose();
+			if (oldBounds.width == graphRect.width && oldBounds.height == graphRect.height) {
+				return;
 			}
 		}
 
-		colorTxt.dispose();
+		if (Util.canReuseImage(_cumstomLayerImage, graphRect) == false) {
+			_cumstomLayerImage = Util.createImage(getDisplay(), _cumstomLayerImage, graphRect);
+		}
+
+		final GC gc = new GC(_cumstomLayerImage);
+
+		gc.fillRectangle(graphRect);
+
+		/*
+		 * copy the image with the graphs into the custom layer image, the custom layers are drawn
+		 * on top of the graphs
+		 */
+//		if (fIsGraphDirty == false) {
+		gc.drawImage(_graphImage, 0, 0);
+//		}
+
+		for (final ChartDrawingData drawingData : _drawingData) {
+			for (final IChartLayer layer : drawingData.getYData().getCustomLayers()) {
+				layer.draw(gc, drawingData, _chart);
+			}
+		}
+
+		gc.dispose();
+
+		_isCustomLayerDirty = false;
 	}
 
 	/**
 	 * Fills the surrounding area of an rectangle with background color
-	 *
+	 * 
 	 * @param gc
 	 * @param imageRect
 	 */
@@ -3548,7 +3686,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Returns the size of the graph for the given bounds, the size will be reduced when the
 	 * scrollbars are visible
-	 *
+	 * 
 	 * @param bounds
 	 *            is the size of the receiver where the chart can be drawn
 	 * @return bounds for the chart without scrollbars
@@ -3615,7 +3753,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if mouse has moved over a bar
-	 *
+	 * 
 	 * @param devY
 	 * @param graphX
 	 */
@@ -3721,7 +3859,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Check if the tooltip is too far away from the cursor position
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the cursor is too far away
 	 */
 	private boolean isToolTipWrongPositioned() {
@@ -3756,7 +3894,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * check if the mouse hit an y-slider and returns the hit slider
-	 *
+	 * 
 	 * @param graphX
 	 * @param devY
 	 * @return
@@ -3858,7 +3996,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move the slider to a new position
-	 *
+	 * 
 	 * @param xSlider
 	 *            Current slider
 	 * @param devSliderLinePos
@@ -3882,7 +4020,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * move the x-slider with the keyboard
-	 *
+	 * 
 	 * @param event
 	 */
 	private void moveXSlider(final Event event) {
@@ -4072,7 +4210,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse down event handler
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onMouseDown(final MouseEvent event) {
@@ -4210,7 +4348,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse exit event handler
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onMouseExit(final MouseEvent event) {
@@ -4242,7 +4380,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse move event handler
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onMouseMove(final MouseEvent event) {
@@ -4453,7 +4591,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Mouse up event handler
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onMouseUp(final MouseEvent event) {
@@ -4618,7 +4756,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Scroll event handler
-	 *
+	 * 
 	 * @param event
 	 */
 	private void onScroll(final SelectionEvent event) {
@@ -4627,7 +4765,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Paint event handler
-	 *
+	 * 
 	 * @param gc
 	 */
 	private void paintChart(final GC gc) {
@@ -4645,7 +4783,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isGraphDirty) {
 
-			drawGraphImage();
+			draw010GraphImage();
 
 			if (_isPaintDraggedImage) {
 
@@ -4702,7 +4840,7 @@ public class ChartComponentGraph extends Canvas {
 		// calculate the scrollbars before the sliders are created
 		updateHorizontalBar();
 
-		drawCustomLayerImage();
+		draw500CustomLayerImage();
 
 		paintChartImage(gc);
 	}
@@ -4715,7 +4853,7 @@ public class ChartComponentGraph extends Canvas {
 				|| _isSelectionVisible;
 
 		if (isLayerImageVisible) {
-			drawLayerImage();
+			draw400LayerImage();
 		}
 
 		final Rectangle graphRect = _graphImage.getBounds();
@@ -4782,7 +4920,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * make the graph dirty and redraw it
-	 *
+	 * 
 	 * @param isGraphDirty
 	 */
 	void redrawBarSelection() {
@@ -5027,7 +5165,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Move a zoomed chart that the slider gets visible
-	 *
+	 * 
 	 * @param slider
 	 * @param centerSliderPosition
 	 */
@@ -5171,7 +5309,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the focus to a control depending on the chart type
-	 *
+	 * 
 	 * @return Returns <code>true</code> when the focus was set
 	 */
 	private boolean setFocusToControl() {
@@ -5320,7 +5458,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Set the scrolling cursor according to the vertical position of the mouse
-	 *
+	 * 
 	 * @param devX
 	 * @param devY
 	 *            vertical coordinat of the mouse in the graph
@@ -5378,7 +5516,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Set value index for a slider and move the slider to this position, slider will be made
 	 * visible
-	 *
+	 * 
 	 * @param slider
 	 * @param valueIndex
 	 * @param centerSliderPosition
@@ -5410,7 +5548,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * makes the slider visible, a slider is only drawn into the chart if a slider was created with
 	 * createSlider
-	 *
+	 * 
 	 * @param isXSliderVisible
 	 */
 	void setXSliderVisible(final boolean isSliderVisible) {
@@ -5480,7 +5618,7 @@ public class ChartComponentGraph extends Canvas {
 	 * set the slider to the 2nd x-data and keep the slider on the same xValue position as before,
 	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the
 	 * painted graph can have a white space on the right side
-	 *
+	 * 
 	 * @param slider
 	 *            the slider which gets changed
 	 */
@@ -6114,7 +6252,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * Zooms out of the graph
-	 *
+	 * 
 	 * @param updateChart
 	 */
 	void zoomOutWithMouse(final boolean updateChart) {

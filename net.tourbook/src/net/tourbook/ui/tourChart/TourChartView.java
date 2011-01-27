@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -57,6 +58,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -73,26 +75,42 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements ITourChartViewer {
 
-	public static final String		ID			= "net.tourbook.views.TourChartView";				//$NON-NLS-1$
+	public static final String			ID								= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private TourChartConfiguration	_tourChartConfig;
-	private TourData				_tourData;
+	private final IPreferenceStore		_prefStore						= TourbookPlugin.getDefault() //
+																				.getPreferenceStore();
 
-	private PostSelectionProvider	_postSelectionProvider;
-	private ISelectionListener		_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+	private TourChartConfiguration		_tourChartConfig;
+	private TourData					_tourData;
+
+	private PostSelectionProvider		_postSelectionProvider;
+	private ISelectionListener			_postSelectionListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
+
+	private ActionTourChartTitle		_actionTourChartTitle;
+	private ActionTourChartDefault		_actionTourChartDefault;
+	private ActionTourChartConconiPower	_actionTourChartConconiPower;
+
 
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Label					_pageNoChart;
+	private PageBook					_pageBook;
+	private Label						_pageNoChart;
 
-	private TourChart				_tourChart;
+	private TourChart					_tourChart;
+
+	/**
+	 * Tour chart type is selected
+	 * 
+	 * @param tourChartType
+	 */
+	void actionTourChartType(final TourChartType tourChartType) {
+		_tourChart.setTourChartType(tourChartType);
+	}
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -263,9 +281,29 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_postSelectionProvider.clearSelection();
 	}
 
+	private void createActions() {
+
+		/*
+		 * create actions
+		 */
+		_actionTourChartTitle = new ActionTourChartTitle();
+		_actionTourChartDefault = new ActionTourChartDefault(this);
+		_actionTourChartConconiPower = new ActionTourChartConconiPower(this);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		menuMgr.add(_actionTourChartTitle);
+		menuMgr.add(_actionTourChartDefault);
+		menuMgr.add(_actionTourChartConconiPower);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		createActions();
 		createUI(parent);
 
 		addSelectionListener();
@@ -273,17 +311,23 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		addTourEventListener();
 		addPartListener();
 
+		enableActions();
+
 		// set this view part as selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
 
+		// show tour chart from selection service
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
+		// check if tour chart is displayed
 		if (_tourData == null) {
 			showTourFromTourProvider();
 		}
 	}
 
 	private void createUI(final Composite parent) {
+
+		final IActionBars actionBars = getViewSite().getActionBars();
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
@@ -294,7 +338,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setTourInfoActionsEnabled(true);
-		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		_tourChart.setToolBarManager(actionBars.getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvicer(this));
 
 		_tourChart.addDoubleClickListener(new Listener() {
@@ -333,6 +377,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void enableActions() {
+
+		// disable title
+		_actionTourChartTitle.setEnabled(false);
+
+		// default tour chart type is the default
+		_actionTourChartDefault.setChecked(true);
+		_actionTourChartConconiPower.setChecked(false);
 	}
 
 	/**
