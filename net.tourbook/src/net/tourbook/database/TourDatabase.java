@@ -85,8 +85,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 13;													// 10.11
+	private static final int						TOURBOOK_DB_VERSION							= 14;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.??
 //	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
 //	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
 //	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
@@ -1150,7 +1151,7 @@ public class TourDatabase {
 		}
 
 		/*
-		 * check size of the fields
+		 * check size of varcar fields
 		 */
 		if (tourData.isValidForSave() == false) {
 			return null;
@@ -1977,6 +1978,12 @@ public class TourDatabase {
 				//
 				// version 13 end ---------
 
+				// version 14 start
+				//
+				+ "	ConconiDeflection			INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+				//
+				// version 14 end ---------
+
 				+ "	serieData 					BLOB NOT NULL					\n" //$NON-NLS-1$
 				//
 				+ ")"; //														//$NON-NLS-1$
@@ -2683,6 +2690,10 @@ public class TourDatabase {
 				isPostUpdate13 = true;
 			}
 
+			if (currentDbVersion == 13) {
+				currentDbVersion = newVersion = updateDbDesign_013_014(conn, monitor);
+			}
+
 			/*
 			 * update version number
 			 */
@@ -2706,7 +2717,7 @@ public class TourDatabase {
 				updateDbDesign_012_013_PostUpdate(conn, monitor);
 			}
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			UI.showSQLException(e);
 			_isSQLUpdateError = true;
 			return false;
@@ -3246,6 +3257,31 @@ public class TourDatabase {
 		System.out.println();
 
 		conn.createStatement().executeUpdate(sql);
+	}
+
+	private int updateDbDesign_013_014(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 14;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+//		+ "	ConconiDeflection			INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
+
+		String sql;
+		final Statement stmt = conn.createStatement();
+		{
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN ConconiDeflection			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+			exec(stmt, sql);
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {

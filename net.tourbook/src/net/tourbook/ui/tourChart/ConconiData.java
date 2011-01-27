@@ -22,5 +22,5 @@ class ConconiData {
 	TDoubleArrayList	maxXValues;
 	TDoubleArrayList	maxYValues;
 
-	int					selectedDefletion;
+	int					selectedDeflection;
 }

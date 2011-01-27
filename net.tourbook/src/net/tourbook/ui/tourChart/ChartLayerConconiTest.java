@@ -64,7 +64,7 @@ public class ChartLayerConconiTest implements IChartLayer {
 		 */
 		final double[] maxXValues = conconiData.maxXValues.toArray();
 		final double[] maxYValues = conconiData.maxYValues.toArray();
-		final int deflexionIndex = conconiData.selectedDefletion;
+		final int deflexionIndex = conconiData.selectedDeflection;
 
 		// check that at least 2  values are available
 		if (maxXValues.length < 2) {

@@ -441,6 +441,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											devicePluginName;																		// db-version 4
 
+	// ############################################# CONCONI TEST #############################################
+
+	/**
+	 * Deflection point in the conconi test, this value is the index for the data serie on the
+	 * x-axis
+	 */
+	private int												ConconiDeflection;
+
 	// ############################################# UNUSED FIELDS #############################################
 
 	/**
@@ -3314,6 +3322,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return calories;
 	}
 
+	public int getConconiDeflection() {
+		return ConconiDeflection;
+	}
+
 	/**
 	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
 	 *         date/time is not available
@@ -3382,14 +3394,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3407,6 +3411,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3468,13 +3480,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3483,6 +3488,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
 
 	/**
 	 * @return the maxPulse
@@ -4427,6 +4439,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setCalories(final int calories) {
 		this.calories = calories;
+	}
+
+	public void setConconiDeflection(final int conconiDeflection) {
+		ConconiDeflection = conconiDeflection;
 	}
 
 	public void setDateTimeCreated(final long dateTimeCreated) {

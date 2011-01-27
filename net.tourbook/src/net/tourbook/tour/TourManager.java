@@ -187,7 +187,7 @@ public class TourManager {
 	 * @param tourData2
 	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
 	 * @throws MyTourbookException
-	 *             throws this exception when {@link TourData} are corrupted
+	 *             throws an exception when {@link TourData} are corrupted
 	 */
 	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
 
@@ -1025,6 +1025,7 @@ public class TourManager {
 			try {
 				checkTourData(tourData, tourDataInEditor);
 			} catch (final MyTourbookException e) {
+				// error is already displayed, just log it
 				e.printStackTrace();
 			}
 
@@ -1995,7 +1996,6 @@ public class TourManager {
 		return chartDataModel;
 	}
 
-
 	private ChartDataYSerie createChartDataSerie(final int[] dataSerie, final int chartType) {
 
 		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
@@ -2166,8 +2166,8 @@ public class TourManager {
 	}
 
 	/**
-	 * Check tour in tour editor, when the tour is modified and it contains a wrong tourData
-	 * instance, show an error, otherwise replace (silently) the tour data in the editor
+	 * Check tour in tour editor. When tour is modified and it contains a wrong tourData instance,
+	 * show an error, otherwise replace (silently) the tour data in the editor
 	 */
 	private void replaceTourInTourEditor(final TourData tourDataForEditor) {
 

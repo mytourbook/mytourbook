@@ -33,6 +33,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
@@ -133,6 +134,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private ChartDataYSerie					_yDataPulse;
 	private ConconiData						_conconiData;
 
+	private boolean							_isTourDirty					= false;
+	private boolean							_isDirtyDisabled				= true;
+	private int								_savedDpTolerance;
+	private int								_dpTolerance;
+
 	/*
 	 * UI controls
 	 */
@@ -169,6 +175,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
+					saveTour();
 					saveState();
 				}
 			}
@@ -474,7 +481,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		final ConconiData conconiData = new ConconiData();
 		conconiData.maxXValues = maxXValues;
 		conconiData.maxYValues = maxYValues;
-		conconiData.selectedDefletion = _scaleDeflection.getSelection();
+		conconiData.selectedDeflection = _scaleDeflection.getSelection();
 
 		return conconiData;
 	}
@@ -615,6 +622,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectDeflection();
+					setTourDirty();
 				}
 			});
 
@@ -729,13 +737,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void onSelectDeflection() {
 
 		// update conconi data
-		_conconiData.selectedDefletion = _scaleDeflection.getSelection();
+		_conconiData.selectedDeflection = _scaleDeflection.getSelection();
 		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _conconiData);
 
 		updateUI20Conconi();
+
+		// update tolerance into the tour data
+		_tourData.setConconiDeflection(_scaleDeflection.getSelection());
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
+
+
 
 		if (selection instanceof SelectionTourData) {
 
@@ -747,6 +760,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 					return;
 				}
 
+				savePreviousTour(selectionTourData);
+
 				updateChart10(selectionTourData);
 			}
 
@@ -755,7 +770,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 			if (tourIds != null && tourIds.size() > 0) {
-				updateChart(tourIds.get(0));
+
+				final Long tourId = tourIds.get(0);
+
+				savePreviousTour(tourId);
+				updateChart(tourId);
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -895,6 +914,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_requestedTourChartType = chartType;
 	}
 
+	private void savePreviousTour(final long tourId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void savePreviousTour(final TourData newTourData) {
+		
+		savedTour = TourDatabase.saveTour(tourData);
+	}
+
 	private void saveState() {
 
 		// check if UI is disposed
@@ -966,6 +995,20 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		_tbmTourChartView.update(true);
 	}
 
+	/**
+	 * when dp tolerance was changed set the tour dirty
+	 */
+	private void setTourDirty() {
+
+		if (_isDirtyDisabled) {
+			return;
+		}
+
+		if (_tourData != null && _savedDpTolerance != _tourData.getConconiDeflection()) {
+			_isTourDirty = true;
+		}
+	}
+
 	private void showTourFromTourProvider() {
 
 		_pageBook.showPage(_pageNoChart);
@@ -1013,9 +1056,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			return;
 		}
 
-		_tourData = tourData;
+		_isDirtyDisabled = true;
+		{
 
-		updateChart20();
+			_tourData = tourData;
+
+			updateChart20();
+
+			// keep original dp tolerance
+			_savedDpTolerance = _dpTolerance = _tourData.getDpTolerance();
+
+		}
+		_isDirtyDisabled = false;
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
@@ -1084,11 +1136,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		enableActions();
 	}
 
-	private void updateUI10Conconi(final int xCounter) {
+	private void updateUI10Conconi(final int maxDeflection) {
 
-		_scaleDeflection.setMaximum(xCounter > 0 ? xCounter - 1 : 0);
+		/*
+		 * update deflection scale
+		 */
+		_scaleDeflection.setMaximum(maxDeflection > 0 ? maxDeflection - 1 : 0);
 
-		final int pageIncrement = xCounter < 20 ? 1 : xCounter < 100 ? 5 : xCounter < 1000 ? 50 : 100;
+		// ensure that too much scale ticks are displayed
+		final int pageIncrement = maxDeflection < 20 ? 1 : maxDeflection < 100 ? 5 : maxDeflection < 1000 ? 50 : 100;
 
 		_scaleDeflection.setPageIncrement(pageIncrement);
 	}
