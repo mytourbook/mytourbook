@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      Coverage report file schema for NL cataglogue generator.
+      Copyright 2008 IBM. All rights reserved.
+    </xs:documentation>
+  </xs:annotation>
+  
+  <!--
+    coverage is the root element of a coverage report
+      timestamp:  is the time at which the report was generated in the format
+                  YY-MM-DDThh:mm:ss
+
+      archive is the eclipse archive used to generate the translation catalogue
+        location: the path to the archive
+      translations is the translations used to generate the translations catalogue
+        location: the path to the translations
+      output is the output produced by the generator
+        location: the path to the generated output
+      locales is an enumeration of the locales processed during generation
+      plugins is an enumeration of the plug-ins processed during generation
+  -->
+  <xs:element name="coverage">
+    <xs:complexType>
+      <xs:all>
+        <xs:element type="location" name="archive" />
+        <xs:element type="location" name="translations" />
+        <xs:element type="location" name="output" />
+        <xs:element name="locales" type="locales" />
+        <xs:element name="plugins" type="plugins" />
+      </xs:all>
+      <xs:attribute name="timestamp" type="xs:dateTime" />
+    </xs:complexType>
+  </xs:element>
+  
+  <!--
+    locale is an element specifying a single locale
+      name: the name of a locale (eg. 'en', 'zh_TW', etc.)
+  -->
+  <xs:complexType name="locales">
+    <xs:sequence>
+      <xs:element name="locale" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- an enumeration of one or more plug-ins --> 
+  <xs:complexType name="plugins">
+    <xs:sequence>
+      <xs:element name="plugin" type="plugin" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!--
+    a plug-in in the eclipse archive
+      name: the name of the plug-in (eg. org.eclipse.core)
+      version: the version of the plug-in (eg. 1.5.0)
+      
+      resource is a resource in the plug-in
+        location: the path to the resource from the root of the plug-in
+        excluded: whether this resource was excluded from the generation
+
+        locale the translation coverage in the context of this resource
+          name: name of the locale (eg. en, zh_TW, etc.)
+          coverage: percentage coverage of translations for this resource (eg. 75)
+   -->
+  <xs:complexType name="plugin">
+    <xs:sequence>
+      <xs:element name="resource" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="locale" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="coverage" type="xs:integer" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="location" type="path" />
+          <xs:attribute name="excluded" type="boolean" default="false" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="version" type="version" />
+  </xs:complexType>
+
+  <xs:complexType name="location">
+    <xs:attribute type="path" name="location" />
+  </xs:complexType>
+
+  <xs:complexType name="filter">
+    <xs:attribute type="xs:string" name="file" />
+  </xs:complexType>
+
+  <!-- A boolean: either 'true' or 'false' -->
+  <xs:simpleType name="boolean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+    A path: a number of path elements delimited by '/'. 
+            '\' is not allowed in a path.
+  -->
+  <xs:simpleType name="path">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^/\\]*(/[^/\\]{1,})*" />
+    </xs:restriction>
+  </xs:simpleType>
+    
+  <!-- A version designation: a ',' delimited three tuple of digits. -->
+  <xs:simpleType name="version">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{1,}\.\d{1,}\.\d{1,}" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

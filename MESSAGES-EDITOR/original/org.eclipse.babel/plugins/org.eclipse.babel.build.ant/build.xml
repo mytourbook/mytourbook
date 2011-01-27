@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BuildAnt" default="dist">
+    <description>description</description>
+	
+	<property name="dir.src" value="src" />
+	<property name="dir.build" value="build" />
+	<property name="dir.dist" value="dist" />
+	<property name="dir.lib" value="lib" />
+	<property name="dir.junit" value="junit" />
+	<property name="dir.core" value="../org.eclipse.babel.build" />
+	<property name="dir.doc" value="doc" />
+	
+	<path id="lib.classpath">
+		<fileset dir="${dir.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="core.classpath">
+		<fileset dir="${dir.core}/dist">
+			<include name="*.jar" />		
+		</fileset>
+	</path>
+	
+	<target name="deps">
+		<subant buildpath="${dir.core}/build.xml" target="dist" />
+	</target>
+	
+	<target name="prepare">
+		<mkdir dir="${dir.build}" />
+		<mkdir dir="${dir.dist}" />
+		<mkdir dir="${dir.junit}" />
+	</target>
+	
+	<target name="clean" description="Delete generated files">
+		<delete dir="${dir.build}" />
+		<delete dir="${dir.dist}" />
+		<delete dir="${dir.junit}" />
+		<delete file="cobertura.ser" />
+	</target>
+	
+	<target name="compile" depends="deps,prepare" description="Compile project files">
+		<javac destdir="${dir.build}" debug="true" source="1.5" target="1.5">
+			<src path="${dir.src}" />
+			<classpath refid="lib.classpath" />
+			<classpath refid="core.classpath" />
+		</javac>
+	</target>
+	
+	<target name="deps-jar" depends="compile">
+		<jar jarfile="${dir.dist}/azure-ant-deps.jar" basedir="${dir.build}">
+			<fileset dir="${dir.core}/build" includes="**/*" />
+		</jar>
+	</target>
+	
+	<target name="dist" depends="compile,deps-jar" description="Package project files for distribution">
+		<jar jarfile="${dir.dist}/build-ant.jar" basedir="${dir.build}" />
+	</target>
+	
+	<target name="junit">
+		<junit printsummary="on" fork="true" haltonfailure="false" failureproperty="tests.failed" showoutput="true">
+			<classpath refid="lib.classpath" />
+			<classpath refid="core.classpath" />
+			<formatter type="xml" usefile="true" />
+			<batchtest fork="yes" todir="${dir.junit}">
+			    <fileset dir="${dir.src}">
+			      <include name="**/*Test*.java"/>
+			    </fileset>
+	 	 	</batchtest>
+		</junit>
+		<fail if="tests.failed" />
+	</target>
+	
+	<target name="javadoc" description="Generates javadoc for the project">
+		<javadoc sourcepath="${dir.src}" 
+			packagenames="org.eclipse.babel.build.ant" 
+			destdir="${dir.doc}/javadoc"
+			access="public"
+			classpathref="lib.classpath"
+			excludepackagenames="org.eclipse.babel.build.ant.test.*"
+		>
+			<classpath refid="core.classpath"/>
+		</javadoc>
+	</target>
+</project>

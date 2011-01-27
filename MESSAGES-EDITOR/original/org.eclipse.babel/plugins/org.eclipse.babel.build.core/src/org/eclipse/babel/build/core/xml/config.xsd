@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+     Configuration file schema for NL catalogue generator.
+     Copyright 2008 IBM. All rights reserved.
+    </xs:documentation>
+  </xs:annotation>
+  
+  <!--
+    config is the root element of a configuration file.
+      mode: either 'production' or 'testing'
+      compatibilityRange: range of plug-in versions that generated fragments are
+        compatible with.
+      includePseudoTranslation: whether or not the generated fragments should 
+        contain pseudo translation of messages.
+
+      archive is the eclipse archive used to generate the translation catalogue
+        location: the path to the archive
+      translations is the translations used to generate the translations catalogue
+        location: the path to the translations
+      workspace is where the generator stores the output produced
+        location: the path to the generated output
+      timestamp 
+        value: is the timestamp to use in generated artifacts, YY-MM-DDThh:mm:ss
+        format: the format the timestamp should take in generated artifacts
+
+      report values associated with the report
+        location: location at which the report should be saved
+        
+        include a resource that should be included in the report
+          file: pattern to specify resources by filename
+        exclude a resource that should be excluded from the report
+          file: pattern to specify resources by filename
+  -->
+
+  <xs:element name="config">
+    <xs:complexType>
+      <xs:all>
+        <xs:element type="location" name="archive" />
+        <xs:element type="location" name="translations" />
+        <xs:element maxOccurs="1" name="timestamp" minOccurs="0">
+          <xs:complexType>
+            <xs:attribute type="dateTime" default="now" name="value" />
+            <xs:attribute type="xs:string" default="%y-%M-%d" name="format" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element type="location" name="workspace" />
+        <xs:element maxOccurs="1" name="report" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice maxOccurs="unbounded" minOccurs="0">
+                <xs:element type="filter" name="include" />
+                <xs:element type="filter" name="exclude" />
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute type="path" name="location" />
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute type="xs:string" name="compatibilityRange" />
+      <xs:attribute type="mode" default="production" name="mode" />
+      <xs:attribute type="boolean" default="false" name="includePseudoTranslation" />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- A date and time specifier, allows the special value 'now' -->
+  <xs:simpleType name="dateTime">
+    <xs:union memberTypes="xs:dateTime now" />
+  </xs:simpleType>
+
+  <xs:simpleType name="now">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="now" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="location">
+    <xs:attribute type="path" name="location" />
+  </xs:complexType>
+
+  <xs:complexType name="filter">
+    <xs:attribute type="xs:string" name="file" />
+  </xs:complexType>
+
+  <!-- A boolean, either 'true' or 'false' -->
+  <xs:simpleType name="boolean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+    A path: a number of path elements delimited by '/'. 
+            '\' is not allowed in a path.
+  -->
+  <xs:simpleType name="path">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^/\\]*(/[^/\\]{1,})*" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- A mode, either 'testing' or 'production' -->
+  <xs:simpleType name="mode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="testing" />
+      <xs:enumeration value="production" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

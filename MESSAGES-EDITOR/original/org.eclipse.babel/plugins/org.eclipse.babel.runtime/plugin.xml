@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+	<extension point="org.eclipse.ui.startup">
+		<startup class="org.eclipse.babel.runtime.StartupClass"/>
+	</extension>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            name="%command.localize.name"
+            description="%command.localize.description"
+            categoryId="org.eclipse.ui.category.views"
+	        defaultHandler="org.eclipse.babel.runtime.handlers.LocalizeHandler"
+            id="org.eclipse.babel.runtime.localizeAction" />
+         
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.babel.runtime.localizeAction"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M3+L"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?after=additions">
+            <command
+                  commandId="org.eclipse.babel.runtime.localizeAction">
+            </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="org.eclipse.babel.runtime.menuContribution1">
+         <menu
+               label="label">
+            <command
+                  commandId="org.eclipse.babel.runtime.command1"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+
+   </extension>
+</plugin>
