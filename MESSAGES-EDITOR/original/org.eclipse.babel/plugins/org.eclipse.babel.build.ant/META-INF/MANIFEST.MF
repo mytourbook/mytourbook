@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Babel Ant Plug-in
+Bundle-SymbolicName: org.eclipse.babel.build.ant
+Bundle-Version: 1.0.0
+Bundle-Vendor: Eclipse.org
+Require-Bundle: org.junit,
+ org.apache.ant,
+ org.eclipse.babel.build.core

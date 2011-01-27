@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.babel_update.site_feature_1.0.1.v20090725-1023.jar" id="org.eclipse.babel_update.site_feature" version="1.0.1.v20090725-1023">
+      <category name="Babel Resource Editor"/>
+   </feature>
+   <category-def name="Babel Resource Editor" label="Babel Resource Editor">
+      <description>
+         Custom version of the Babel Resource Editor
+      </description>
+   </category-def>
+</site>
