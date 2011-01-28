@@ -193,7 +193,7 @@ public class Messages extends NLS {
 
 	public static String		App_Label_ISO8601;
 
-	public static String	App_Label_NA;
+	public static String		App_Label_NA;
 
 	public static String		App_Title;
 
@@ -394,8 +394,6 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
-
-	public static String		Image__Graph_All;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;

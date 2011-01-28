@@ -13,27 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.ui.views;
 
-import net.tourbook.Messages;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ConconiChartView;
+import net.tourbook.util.Util;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public class ActionTourChartConconiPower extends Action {
+public class ActionHandlerOpenViewConconiChart extends AbstractHandler {
 
-	private TourChartView	_tourChartView;
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-	public ActionTourChartConconiPower(final TourChartView tourChartView) {
+		Util.showView(ConconiChartView.ID);
 
-		super(UI.SPACE4 + Messages.TourChart_Action_ChartType_ConconiPower, AS_RADIO_BUTTON);
-
-		_tourChartView = tourChartView;
-	}
-
-	@Override
-	public void run() {
-		_tourChartView.actionTourChartType(TourChartType.CONCONI_TEST_POWER);
+		return null;
 	}
 
 }
