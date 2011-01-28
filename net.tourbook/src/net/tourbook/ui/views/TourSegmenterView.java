@@ -35,7 +35,6 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -1948,27 +1947,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				TourData nextTourData = null;
 				TourChart nextTourChart = null;
 
-				if (selection instanceof SelectionActiveEditor) {
-
-					final IEditorPart editorPart = ((SelectionActiveEditor) selection).getEditor();
-
-					if (editorPart instanceof TourEditor) {
-
-						final TourEditor tourEditor = (TourEditor) editorPart;
-
-						// check if editor changed
-						if (_tourChart != null && _tourChart == tourEditor.getTourChart()) {
-							return;
-						}
-
-						nextTourChart = tourEditor.getTourChart();
-						nextTourData = nextTourChart.getTourData();
-
-					} else {
-						return;
-					}
-
-				} else if (selection instanceof SelectionTourData) {
+				if (selection instanceof SelectionTourData) {
 
 					final SelectionTourData selectionTourData = (SelectionTourData) selection;
 
