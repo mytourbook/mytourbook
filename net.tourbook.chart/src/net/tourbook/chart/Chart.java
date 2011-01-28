@@ -50,9 +50,6 @@ public class Chart extends ViewForm {
 
 	static final String					COMMAND_ID_MOUSE_MODE				= "net.tourbook.chart.command.mouseMode";			//$NON-NLS-1$
 
-//	static final String					COMMAND_ID_PART_NEXT				= "net.tourbook.chart.command.partNext";			//$NON-NLS-1$
-//	static final String					COMMAND_ID_PART_PREVIOUS			= "net.tourbook.chart.command.partPrevious";		//$NON-NLS-1$
-
 	private static final String			COMMAND_ID_MOVE_LEFT_SLIDER_HERE	= "net.tourbook.chart.command.moveLeftSliderHere";	//$NON-NLS-1$
 	private static final String			COMMAND_ID_MOVE_RIGHT_SLIDER_HERE	= "net.tourbook.chart.command.moveRightSliderHere"; //$NON-NLS-1$
 	private static final String			COMMAND_ID_MOVE_SLIDERS_TO_BORDER	= "net.tourbook.chart.command.moveSlidersToBorder"; //$NON-NLS-1$
@@ -104,18 +101,16 @@ public class Chart extends ViewForm {
 	 * is outsite of the chart
 	 */
 	boolean								_useInternalActionBar				= true;
-
 	boolean								_useActionHandlers					= false;
 
-	private int							_barSelectionSerieIndex;
-
-	private int							_barSelectionValueIndex;
 	private final ActionHandlerManager	_actionHandlerManager				= ActionHandlerManager.getInstance();
-
 	HashMap<String, ActionProxy>		_chartActionProxies;
 	private boolean						_isFillToolbar						= true;
-
 	private boolean						_isToolbarCreated;
+
+	private int							_barSelectionSerieIndex;
+	private int							_barSelectionValueIndex;
+
 	int									_synchMode;
 
 	/**
@@ -223,7 +218,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Creates the action proxys for all chart actions
+	 * Creates action proxys for all chart actions
 	 */
 	private void createChartActionProxies() {
 
@@ -371,10 +366,14 @@ public class Chart extends ViewForm {
 		// fit to graph is always enabled because the y-slider can change the chart
 		_chartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
+		_chartActionProxies.get(COMMAND_ID_MOUSE_MODE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).setEnabled(true);
+		_chartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).setEnabled(true);
+
 		if (_useActionHandlers) {
 			_actionHandlerManager.updateUIState();
 		}
-
 	}
 
 	void fillContextMenu(	final IMenuManager menuMgr,
@@ -1209,14 +1208,26 @@ public class Chart extends ViewForm {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
-			String errorMessage = chartDataModel.getErrorMessage();
-			if (errorMessage == null) {
-				errorMessage = Messages.Error_Message_001_Default;
+			if (chartDataModel != null) {
+				String errorMessage = chartDataModel.getErrorMessage();
+				if (errorMessage == null) {
+					errorMessage = Messages.Error_Message_001_Default;
+				}
+				_chartComponents.setErrorMessage(errorMessage);
 			}
-			_chartComponents.setErrorMessage(errorMessage);
 
 			_chartDataModel = emptyModel;
 			_chartComponents.setModel(emptyModel, false);
+
+			if (_chartActionProxies != null) {
+
+				// disable all actions
+
+				for (final ActionProxy actionProxy : _chartActionProxies.values()) {
+					actionProxy.setEnabled(false);
+				}
+				_actionHandlerManager.updateUIState();
+			}
 
 			return;
 		}
@@ -1228,6 +1239,7 @@ public class Chart extends ViewForm {
 
 		createActions();
 		_chartComponents.setModel(chartDataModel, isShowAllData);
+		enableActions();
 
 		// reset last selected x-data
 		if (isResetSelection) {

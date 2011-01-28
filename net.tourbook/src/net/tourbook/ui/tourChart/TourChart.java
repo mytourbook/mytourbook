@@ -1171,7 +1171,6 @@ public class TourChart extends Chart {
 		enableZoomOptions();
 	}
 
-
 	/**
 	 * Enable or disable the edit actions in the tour info tooltip, by default the edit actions are
 	 * disabled.
@@ -1284,6 +1283,18 @@ public class TourChart extends Chart {
 		if (chartDataModel == null) {
 			_tourData = null;
 			_tourChartConfig = null;
+
+			if (_actionProxies != null) {
+
+				for (final TCActionProxy actionProxy : _actionProxies.values()) {
+					actionProxy.setEnabled(false);
+				}
+
+				// update UI state for the action handlers
+				if (useActionHandlers()) {
+					_tcActionHandlerManager.updateUIState();
+				}
+			}
 		}
 	}
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
@@ -26,33 +26,33 @@ public class TCActionProxy {
 	/**
 	 * action for this command, when <code>null</code> an action handler is used
 	 */
-	private Action	fAction;
+	private Action	_action;
 
-	private String	fCommandId;
+	private String	_commandId;
 
-	private boolean	fIsEnabled	= true;
-	private boolean	fIsChecked;
+	private boolean	_isEnabled	= true;
+	private boolean	_isChecked;
 
 	public TCActionProxy(final String commandId, final Action action) {
 
-		fCommandId = commandId;
-		fAction = action;
+		_commandId = commandId;
+		_action = action;
 	}
 
 	public Action getAction() {
-		return fAction;
+		return _action;
 	}
 
 	public String getCommandId() {
-		return fCommandId;
+		return _commandId;
 	}
 
 	public boolean isChecked() {
-		return fIsChecked;
+		return _isChecked;
 	}
 
 	public boolean isEnabled() {
-		return fIsEnabled;
+		return _isEnabled;
 	}
 
 	/**
@@ -63,14 +63,14 @@ public class TCActionProxy {
 	 */
 	public void setChecked(final boolean isChecked) {
 
-		// keep check state for this action 
-		fIsChecked = isChecked;
+		// keep check state for this action
+		_isChecked = isChecked;
 
-		if (fAction != null) {
-			fAction.setChecked(isChecked);
+		if (_action != null) {
+			_action.setChecked(isChecked);
 		}
 
-		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(fCommandId);
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(_commandId);
 
 		if (actionHandler != null) {
 			actionHandler.setChecked(isChecked);
@@ -86,14 +86,14 @@ public class TCActionProxy {
 	 */
 	public void setEnabled(final boolean isEnabled) {
 
-		// keep enabled state for this action 
-		fIsEnabled = isEnabled;
+		// keep enabled state for this action
+		_isEnabled = isEnabled;
 
-		if (fAction != null) {
-			fAction.setEnabled(isEnabled);
+		if (_action != null) {
+			_action.setEnabled(isEnabled);
 		}
 
-		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(fCommandId);
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(_commandId);
 
 		if (actionHandler != null) {
 			actionHandler.setEnabled(isEnabled);
