@@ -20,7 +20,7 @@
             class="net.tourbook.export.ExportTourHTML"
             fileextension="html"
             id="net.tourbook.export.html"
-            name="HTML">
+            name="HTML OpenLayers">
       </export>
    </extension>
 

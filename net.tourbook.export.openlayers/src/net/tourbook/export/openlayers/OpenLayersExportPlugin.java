@@ -1,10 +1,21 @@
 package net.tourbook.export.openlayers;
 
+import static org.eclipse.ui.browser.IWorkbenchBrowserSupport.AS_VIEW;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import net.tourbook.data.TourData;
 import net.tourbook.export.ExportTourHTML;
@@ -14,12 +25,15 @@ import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.mapping.TourMapView;
 import net.tourbook.util.StatusUtil;
 import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.util.Util;
 
 /**
  * The main class of the OpenLayers export plugin. Offers an action which opens an external browser
  * to show the current map position and displayed tours with OpenLayers on Google or Bing Maps, ...
  */
 public class OpenLayersExportPlugin {
+
+	private static final String	OPENLAYERS_BROWSER_ID	= "net.tourbook.export.openlayers"; //$NON-NLS-1$
 
 	private final TourMapView	_tourMapView;
 
@@ -83,18 +97,16 @@ public class OpenLayersExportPlugin {
 
 	private void browse(String tmpDir, String htmlName) {
 
-		final StringBuilder url = new StringBuilder();
-		try {
-			final URI uri = new File(tmpDir, htmlName).toURI();
+		URI uri = new File(tmpDir, htmlName).toURI();
 
-			if (Desktop.isDesktopSupported()) {
-				Desktop.getDesktop().browse(uri);
-			} else {
-				StatusUtil.log("Desktop not supported"); //$NON-NLS-1$
+		final Util.IBrowserGetter browserGetter = new Util.IBrowserGetter() {
+			@Override
+			public IWebBrowser getBrowser(IWorkbenchBrowserSupport support) throws PartInitException {
+
+				return support.createBrowser(AS_VIEW, OPENLAYERS_BROWSER_ID, "Browser Maps", null);
 			}
-		} catch (final IOException e) {
-			StatusUtil.log("Error opening URL " + url, e); //$NON-NLS-1$
-		}
+		};
+		Util.openLink(browserGetter, uri.toString());
 	}
 
 	public String getFileExtension() {

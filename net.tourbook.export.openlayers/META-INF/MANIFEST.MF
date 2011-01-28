@@ -6,10 +6,11 @@ Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.export.openlayers.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.browser,
  org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.util,
  net.tourbook.export,
- net.tourbook.ext.velocity
+ net.tourbook.ext.velocity;bundle-version="10.11.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

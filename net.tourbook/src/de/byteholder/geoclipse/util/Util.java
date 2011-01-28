@@ -16,10 +16,22 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 public class Util {
 
-	private static final String	URL_SPACE				= " ";		//$NON-NLS-1$
-	private static final String	URL_SPACE_REPLACEMENT	= "%20";	//$NON-NLS-1$
+	public interface IBrowserGetter {
+		public IWebBrowser getBrowser(IWorkbenchBrowserSupport support) throws PartInitException;
+	}
 
+	public static final IBrowserGetter	EXTERNAL_BROWSER		= new IBrowserGetter() {
+																	@Override
+																	public IWebBrowser getBrowser(IWorkbenchBrowserSupport support)
+																			throws PartInitException {
+																		return support.getExternalBrowser();
+																	}
+																};
 
+	public static final IBrowserGetter	DEFAULT_BROWSER			= EXTERNAL_BROWSER;
+
+	private static final String			URL_SPACE				= " ";														//$NON-NLS-1$
+	private static final String			URL_SPACE_REPLACEMENT	= "%20";													//$NON-NLS-1$
 
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
@@ -69,6 +81,18 @@ public class Util {
 	 * Open a link
 	 */
 	public static void openLink(final Shell shell, String href) {
+		openLink(DEFAULT_BROWSER, href);
+	}
+
+	/**
+	 * Open a link with the provided browser
+	 * 
+	 * @param href
+	 *            the link
+	 * @param browserGetter
+	 *            allows the caller to implement the kind, style and behavior of the browser to use
+	 */
+	public static void openLink(final IBrowserGetter browserGetter, String href) {
 		
 		// format the href for an html file (file:///<filename.html>
 		// required for Mac only.
@@ -84,7 +108,7 @@ public class Util {
 		
 		try {
 
-			final IWebBrowser browser = support.getExternalBrowser();
+			final IWebBrowser browser = browserGetter.getBrowser(support);
 			browser.openURL(new URL(urlEncodeForSpaces(href.toCharArray())));
 
 		} catch (final MalformedURLException e) {
