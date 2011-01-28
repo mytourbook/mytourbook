@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.ui;
 
@@ -34,18 +34,18 @@ public class ViewerDetailForm {
 
 	private static final int	MINIMUM_WIDTH	= 100;
 
-	private Composite			fParent;
+	private Composite			_parent;
 
-	private Control				fMaximizedControl;
+	private Control				_maximizedControl;
 
-	private Control				fViewer;
-	private Control				fSash;
-	private Control				fDetail;
+	private Control				_viewer;
+	private Control				_sash;
+	private Control				_detail;
 
-	private Integer				fViewerWidth;
-	private FormData			fSashLayoutData;
+	private Integer				_viewerWidth;
+	private FormData			_sashLayoutData;
 
-	private boolean				isInitialResize;
+	private boolean				_isInitialResize;
 
 	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash, final Control detail) {
 		this(parent, viewer, sash, detail, 50);
@@ -57,10 +57,10 @@ public class ViewerDetailForm {
 							final Control detail,
 							final int leftWidth) {
 
-		fParent = parent;
-		fViewer = viewer;
-		fDetail = detail;
-		fSash = sash;
+		_parent = parent;
+		_viewer = viewer;
+		_detail = detail;
+		_sash = sash;
 
 		parent.setLayout(new FormLayout());
 
@@ -74,11 +74,11 @@ public class ViewerDetailForm {
 		viewerLayoutData.bottom = bottomAttachment;
 		viewer.setLayoutData(viewerLayoutData);
 
-		fSashLayoutData = new FormData();
-		fSashLayoutData.left = new FormAttachment(leftWidth, 0);
-		fSashLayoutData.top = topAttachment;
-		fSashLayoutData.bottom = bottomAttachment;
-		sash.setLayoutData(fSashLayoutData);
+		_sashLayoutData = new FormData();
+		_sashLayoutData.left = new FormAttachment(leftWidth, 0);
+		_sashLayoutData.top = topAttachment;
+		_sashLayoutData.bottom = bottomAttachment;
+		sash.setLayoutData(_sashLayoutData);
 
 		final FormData detailLayoutData = new FormData();
 		detailLayoutData.left = new FormAttachment(sash, 0);
@@ -111,73 +111,73 @@ public class ViewerDetailForm {
 				final int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
 
 				if (sashWidth != sashRect.x) {
-					fSashLayoutData.left = new FormAttachment(0, sashWidth);
+					_sashLayoutData.left = new FormAttachment(0, sashWidth);
 					parent.layout();
 				}
 
-				fViewerWidth = sashWidth;
+				_viewerWidth = sashWidth;
 			}
 		});
 	}
 
 	private void onResize() {
 
-		if (isInitialResize == false) {
+		if (_isInitialResize == false) {
 
 			/*
 			 * set the initial width for the viewer sash, this is a bit of hacking but it works
 			 */
 
 			// execute only the first time
-			isInitialResize = true;
+			_isInitialResize = true;
 
-			Integer viewerWidth = fViewerWidth;
+			Integer viewerWidth = _viewerWidth;
 
 			if (viewerWidth == null) {
-				fViewerWidth = viewerWidth = fViewer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+				_viewerWidth = viewerWidth = _viewer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 			}
 
-			fSashLayoutData.left = new FormAttachment(0, viewerWidth);
+			_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 
-			fParent.layout();
+			_parent.layout();
 
 		} else {
 
-			if (fMaximizedControl != null) {
+			if (_maximizedControl != null) {
 
-				if (fMaximizedControl == fViewer) {
+				if (_maximizedControl == _viewer) {
 
-					fSashLayoutData.left = new FormAttachment(100, 0);
-					fParent.layout();
+					_sashLayoutData.left = new FormAttachment(100, 0);
+					_parent.layout();
 
-				} else if (fMaximizedControl == fDetail) {
-					fSashLayoutData.left = new FormAttachment(0, -fSash.getSize().x);
-					fParent.layout();
+				} else if (_maximizedControl == _detail) {
+					_sashLayoutData.left = new FormAttachment(0, -_sash.getSize().x);
+					_parent.layout();
 				}
 
 			} else {
 
-				if (fViewerWidth == null) {
-					fSashLayoutData.left = new FormAttachment(50, 0);
+				if (_viewerWidth == null) {
+					_sashLayoutData.left = new FormAttachment(50, 0);
 				} else {
 
-					final Rectangle parentRect = fParent.getClientArea();
+					final Rectangle parentRect = _parent.getClientArea();
 
 					// set the minimum width
 
 					int viewerWidth = 0;
 
-					if (fViewerWidth + MINIMUM_WIDTH >= parentRect.width) {
+					if (_viewerWidth + MINIMUM_WIDTH >= parentRect.width) {
 
 						viewerWidth = Math.max(parentRect.width - MINIMUM_WIDTH, 50);
 
 					} else {
-						viewerWidth = fViewerWidth;
+						viewerWidth = _viewerWidth;
 					}
 
-					fSashLayoutData.left = new FormAttachment(0, viewerWidth);
+					_sashLayoutData.left = new FormAttachment(0, viewerWidth);
 				}
-				fParent.layout();
+				_parent.layout();
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public class ViewerDetailForm {
 	 * @param control
 	 */
 	public void setMaximizedControl(final Control control) {
-		fMaximizedControl = control;
+		_maximizedControl = control;
 		onResize();
 	}
 
@@ -196,7 +196,7 @@ public class ViewerDetailForm {
 	 * @param viewerWidth
 	 */
 	public void setViewerWidth(final Integer viewerWidth) {
-		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
+		_viewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
 		onResize();
 	}
 }

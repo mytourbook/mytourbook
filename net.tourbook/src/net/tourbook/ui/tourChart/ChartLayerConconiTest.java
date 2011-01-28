@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart;
 import java.util.Arrays;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
@@ -35,7 +34,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
-		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 
 		ConconiData conconiData;
@@ -73,7 +71,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 		final int lastIndex = maxXValues.length - 1;
 
-//		int deflexionIndexAdjusted = deflexionIndex == 0 ? 1 : deflexionIndex;
 		int deflexionIndexAdjusted = deflexionIndex + 1;
 
 		final Display display = Display.getCurrent();
@@ -100,7 +97,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 				devYBottom,
 				linRegXValues,
 				linRegYValues,
-				xData,
 				color2);
 
 		draw20Point(
@@ -131,7 +127,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 				devYBottom,
 				linRegXValues,
 				linRegYValues,
-				xData,
 				color1);
 
 		draw20Point(
@@ -172,7 +167,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 											final int devYBottom,
 											final double[] maxXValues,
 											final double[] maxYValues,
-											final ChartDataXSerie xData,
 											final Color color) {
 
 		if (maxXValues.length < 2) {

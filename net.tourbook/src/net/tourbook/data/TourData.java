@@ -1042,6 +1042,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_tourWorldPosition.clear();
 	}
 
+	/*
+	 * Set default sort method (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(final Object obj) {
 
@@ -3891,6 +3895,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public TourBike getTourBike() {
 		return tourBike;
+	}
+
+	/**
+	 * @return
+	 * @return Returns date/time for the tour start
+	 */
+	public DateTime getStartDateTime() {
+		return new DateTime(startYear, startMonth, startDay, startHour, startMinute, startSecond, 0);
 	}
 
 	/**

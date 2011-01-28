@@ -2020,6 +2020,25 @@ public class TourManager {
 	}
 
 	/**
+	 * @param tourIds
+	 * @return Returns a list with {@link TourData} for all tour ids. <code>Null</code> is returned
+	 *         when {@link TourData} are not available.
+	 */
+	public ArrayList<TourData> getTourData(final ArrayList<Long> tourIds) {
+
+		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+
+		for (final Long tourId : tourIds) {
+			final TourData tourData = getTourData(tourId);
+			if (tourData != null) {
+				tourDataList.add(tourData);
+			}
+		}
+
+		return tourDataList.size() == 0 ? null : tourDataList;
+	}
+
+	/**
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
 	 * creates always a new instance
 	 * 

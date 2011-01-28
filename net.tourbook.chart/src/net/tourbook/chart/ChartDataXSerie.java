@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 /**
@@ -28,69 +28,73 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private int				startValue				= 0;
+	private int				_startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
 	 * disables the synch marker
 	 */
-	private int				fSynchMarkerStartIndex	= -1;
+	private int				_synchMarkerStartIndex	= -1;
 
 	/**
 	 * index in the x-data at which the graph is stoped to painted in the marker color
 	 */
-	private int				fSynchMarkerEndIndex	= -1;
+	private int				_synchMarkerEndIndex	= -1;
 
 	/**
 	 * Range marker shows an area with a different color in the graph
 	 */
-	private int[]			fRangeMarkerStartIndex;
-	private int[]			fRangeMarkerEndIndex;
+	private int[]			_rangeMarkerStartIndex;
+	private int[]			_rangeMarkerEndIndex;
 
 	/**
 	 * Segment contains information to show statistics for several years
 	 */
-	private ChartSegments	fChartSegments;
+	private ChartSegments	_chartSegments;
 
 	public ChartDataXSerie(final int values[]) {
 		setMinMaxValues(new int[][] { values });
 	}
 
+	public ChartDataXSerie(final int values[][]) {
+		setMinMaxValues(values);
+	}
+
 	public ChartSegments getChartSegments() {
-		return fChartSegments;
+		return _chartSegments;
 	}
 
 	public int[] getRangeMarkerEndIndex() {
-		return fRangeMarkerEndIndex;
+		return _rangeMarkerEndIndex;
 	}
 
 	public int[] getRangeMarkerStartIndex() {
-		return fRangeMarkerStartIndex;
+		return _rangeMarkerStartIndex;
 	}
 
 	/**
 	 * @return Returns the startValue.
 	 */
 	public int getStartValue() {
-		return startValue;
+		return _startValue;
 	}
 
 	/**
 	 * @return Returns the xMarkerEndIndex.
 	 */
 	public int getSynchMarkerEndIndex() {
-		return fSynchMarkerEndIndex;
+		return _synchMarkerEndIndex;
 	}
 
 	/**
 	 * @return Returns the xMarkerStartIndex or <code>-1</code> when the x-marker is not displayed
 	 */
 	public int getSynchMarkerStartIndex() {
-		return fSynchMarkerStartIndex;
+		return _synchMarkerStartIndex;
 	}
 
 	public void setChartSegments(final ChartSegments chartSegments) {
-		fChartSegments = chartSegments;
+		_chartSegments = chartSegments;
 	}
 
 	@Override
@@ -103,8 +107,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param rangeMarkerEndIndex
 	 */
 	public void setRangeMarkers(final int[] rangeMarkerStartIndex, final int[] rangeMarkerEndIndex) {
-		fRangeMarkerStartIndex = rangeMarkerStartIndex;
-		fRangeMarkerEndIndex = rangeMarkerEndIndex;
+		_rangeMarkerStartIndex = rangeMarkerStartIndex;
+		_rangeMarkerEndIndex = rangeMarkerEndIndex;
 	}
 
 	/**
@@ -112,7 +116,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 *            The startValue to set.
 	 */
 	public void setStartValue(final int startValue) {
-		this.startValue = startValue;
+		this._startValue = startValue;
 	}
 
 	/**
@@ -123,8 +127,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param endIndex
 	 */
 	public void setSynchMarkerValueIndex(final int startIndex, final int endIndex) {
-		fSynchMarkerStartIndex = startIndex;
-		fSynchMarkerEndIndex = endIndex;
+		_synchMarkerStartIndex = startIndex;
+		_synchMarkerEndIndex = endIndex;
 	}
 
 	@Override

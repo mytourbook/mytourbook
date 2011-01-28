@@ -235,6 +235,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private TableViewerTourInfoToolTip			_tourInfoToolTip;
 
+	private PixelConverter						_pc;
+
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
 		public TourDataContentProvider() {}
@@ -592,7 +594,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineAllColumns(_viewerContainer);
+					defineAllColumns();
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
@@ -768,38 +770,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Menu menu = menuMgr.createContextMenu(_tourViewer.getControl());
-		_tourViewer.getControl().setMenu(menu);
-
-		getSite().registerContextMenu(menuMgr, _tourViewer);
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createResources();
+		_pc = new PixelConverter(parent);
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns(parent);
+		defineAllColumns();
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createTourViewer(_viewerContainer);
+		createUI(parent);
 
 		createActions();
 		fillToolbar();
@@ -838,10 +819,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	}
 
+	private void createUI(final Composite parent) {
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TourViewer(_viewerContainer);
+			createUI20ContextMenu();
+
+			// set tour info tooltip provider
+			_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
+		}
+	}
+
 	/**
 	 * @param parent
 	 */
-	private void createTourViewer(final Composite parent) {
+	private void createUI10TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -873,11 +867,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				fireSelectedTour();
 			}
 		});
+	}
 
-		createContextMenu();
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
 
-		// set tour info tooltip provider
-		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Menu menu = menuMgr.createContextMenu(_tourViewer.getControl());
+		_tourViewer.getControl().setMenu(menu);
+
+		getSite().registerContextMenu(menuMgr, _tourViewer);
 	}
 
 	/**
@@ -886,41 +894,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * 
 	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void defineAllColumns() {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
-		defineColumnDatabase(pc);
-		defineColumnDate(pc);
-		defineColumnTime(pc);
-		defineColumnTourType(pc);
-		defineColumnRecordingTime(pc);
-		defineColumnDrivingTime(pc);
-		defineColumnCalories(pc);
-		defineColumnDistance(pc);
-		defineColumnAvgSpeed(pc);
-		defineColumnAvgPace(pc);
-		defineColumnAltitudeUp(pc);
-		defineColumnAltitudeDown(pc);
-		defineColumnWeatherClouds(pc);
-		defineColumnTitle(pc);
-		defineColumnTags(pc);
-		defineColumnDeviceName(pc);
-		defineColumnDeviceProfile(pc);
-		defineColumnMarker(pc);
-		defineColumnTimeInterval(pc);
-		defineColumnImportFileName(pc);
-		defineColumnImportFilePath(pc);
+		defineColumnDatabase();
+		defineColumnDate();
+		defineColumnTime();
+		defineColumnTourType();
+		defineColumnRecordingTime();
+		defineColumnDrivingTime();
+		defineColumnCalories();
+		defineColumnDistance();
+		defineColumnAvgSpeed();
+		defineColumnAvgPace();
+		defineColumnAltitudeUp();
+		defineColumnAltitudeDown();
+		defineColumnWeatherClouds();
+		defineColumnTitle();
+		defineColumnTags();
+		defineColumnDeviceName();
+		defineColumnDeviceProfile();
+		defineColumnMarker();
+		defineColumnTimeInterval();
+		defineColumnImportFileName();
+		defineColumnImportFilePath();
 	}
 
 	/**
 	 * column: altitude down
 	 */
-	private void defineColumnAltitudeDown(final PixelConverter pc) {
+	private void defineColumnAltitudeDown() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
-				pc);
+				_pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -935,11 +942,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: altitude up
 	 */
-	private void defineColumnAltitudeUp(final PixelConverter pc) {
+	private void defineColumnAltitudeUp() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
-				pc);
+				_pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -955,9 +963,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: average pace
 	 */
-	private void defineColumnAvgPace(final PixelConverter pc) {
+	private void defineColumnAvgPace() {
 
-		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -979,9 +988,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: avg speed
 	 */
-	private void defineColumnAvgSpeed(final PixelConverter pc) {
+	private void defineColumnAvgSpeed() {
 
-		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1001,9 +1011,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: calories (cal)
 	 */
-	private void defineColumnCalories(final PixelConverter pc) {
+	private void defineColumnCalories() {
 
-		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1016,9 +1027,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: database indicator
 	 */
-	private void defineColumnDatabase(final PixelConverter pc) {
+	private void defineColumnDatabase() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1033,9 +1045,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: date
 	 */
-	private void defineColumnDate(final PixelConverter pc) {
+	private void defineColumnDate() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -1073,9 +1086,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device name
 	 */
-	private void defineColumnDeviceName(final PixelConverter pc) {
+	private void defineColumnDeviceName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
+
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -1088,17 +1102,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device profile
 	 */
-	private void defineColumnDeviceProfile(final PixelConverter pc) {
+	private void defineColumnDeviceProfile() {
 
-		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, pc);
+		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumnDistance(final PixelConverter pc) {
+	private void defineColumnDistance() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1114,12 +1129,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 	}
+
 	/**
 	 * column: driving time
 	 */
-	private void defineColumnDrivingTime(final PixelConverter pc) {
+	private void defineColumnDrivingTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1139,9 +1156,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file name
 	 */
-	private void defineColumnImportFileName(final PixelConverter pc) {
+	private void defineColumnImportFileName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
+
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -1154,16 +1172,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file path
 	 */
-	private void defineColumnImportFilePath(final PixelConverter pc) {
-		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, pc);
+	private void defineColumnImportFilePath() {
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: markers
 	 */
-	private void defineColumnMarker(final PixelConverter pixelConverter) {
+	private void defineColumnMarker() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1194,9 +1213,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: recording time
 	 */
-	private void defineColumnRecordingTime(final PixelConverter pc) {
+	private void defineColumnRecordingTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1222,9 +1242,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tags
 	 */
-	private void defineColumnTags(final PixelConverter pc) {
+	private void defineColumnTags() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1267,9 +1288,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time
 	 */
-	private void defineColumnTime(final PixelConverter pc) {
+	private void defineColumnTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -1307,17 +1329,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time interval
 	 */
-	private void defineColumnTimeInterval(final PixelConverter pc) {
+	private void defineColumnTimeInterval() {
 
-		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pc);
+		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: tour title
 	 */
-	private void defineColumnTitle(final PixelConverter pc) {
+	private void defineColumnTitle() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1349,9 +1372,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tour type
 	 */
-	private void defineColumnTourType(final PixelConverter pc) {
+	private void defineColumnTourType() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1379,9 +1403,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: clouds
 	 */
-	private void defineColumnWeatherClouds(final PixelConverter pc) {
+	private void defineColumnWeatherClouds() {
 
-		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1859,7 +1884,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_viewerContainer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createTourViewer(_viewerContainer);
+			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			// update the viewer

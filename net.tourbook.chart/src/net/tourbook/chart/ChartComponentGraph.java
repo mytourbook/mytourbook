@@ -2779,15 +2779,15 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void draw230XYScatter(final GC gc, final ChartDrawingData drawingData) {
 
-		// get the chart data
+		// get chart data
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
-		final int[][] colorsIndex = yData.getColorsIndex();
 
-		// get the colors
+		// get colors
+		final int[][] colorsIndex = yData.getColorsIndex();
 		final RGB[] rgbLine = yData.getRgbLine();
 
-		// get the chart values
+		// get chart values
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
@@ -2799,34 +2799,46 @@ public class ChartComponentGraph extends Canvas {
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.devGraphHeight;
 
-		final int xValues[] = xData.getHighValues()[0];
-		final int yHighValues[] = yData.getHighValues()[0];
-
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
-		// loop: all values in the current serie
-		for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
+		final int[][] xSeries = xData.getHighValues();
+		final int[][] ySeries = yData.getHighValues();
 
-			// check array bounds
-			if (valueIndex >= yHighValues.length) {
-				break;
+		for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
+
+			int prevColorIndex = -1;
+			final int xValues[] = xSeries[serieIndex];
+			final int yHighValues[] = ySeries[serieIndex];
+
+			// loop: all values in the current serie
+			for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
+
+				// check array bounds
+				if (valueIndex >= yHighValues.length) {
+					break;
+				}
+
+				final int xValue = xValues[valueIndex];
+				final int yValue = yHighValues[valueIndex];
+
+				// get the x/y position
+				final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
+				final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
+
+				// set color when a new color is used
+				final int colorIndex = colorsIndex[0][valueIndex];
+				if (colorIndex != prevColorIndex) {
+					prevColorIndex = colorIndex;
+					final RGB rgbLineDef = rgbLine[colorIndex];
+					final Color colorLine = getColor(rgbLineDef);
+
+					gc.setBackground(colorLine);
+				}
+
+				// draw shape
+				gc.fillRectangle(devXPos - 1, devYPos, 3, 3);
 			}
-
-			final int xValue = xValues[valueIndex];
-			final int yValue = yHighValues[valueIndex];
-
-			// get the x/y position
-			final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
-			final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
-
-			final int colorIndex = colorsIndex[0][valueIndex];
-			final RGB rgbLineDef = rgbLine[colorIndex];
-			final Color colorLine = getColor(rgbLineDef);
-
-			// draw shape
-			gc.setBackground(colorLine);
-			gc.fillRectangle(devXPos - 1, devYPos, 3, 3);
 		}
 
 		// reset clipping/antialias
@@ -3674,7 +3686,6 @@ public class ChartComponentGraph extends Canvas {
 //		final String colorKey = rgb.toString();
 
 		final String colorKey = Integer.toString(rgb.hashCode());
-
 		final Color color = _colorCache.get(colorKey);
 
 		if (color == null) {
