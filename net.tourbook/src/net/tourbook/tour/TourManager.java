@@ -1137,21 +1137,23 @@ public class TourManager {
 
 		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
-		final RGB lineColor = PreferenceConverter.getColor(//
+		final RGB prefLineColor = PreferenceConverter.getColor(//
 				prefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
-		yData.setDefaultRGB(lineColor);
-
-		yData.setRgbLine(new RGB[] { lineColor });
-
-		yData.setRgbDark(new RGB[] { PreferenceConverter.getColor(//
+		final RGB prefDarkColor = PreferenceConverter.getColor(//
 				prefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_DARK) });
+				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
 
-		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(//
+		final RGB prefBrightColor = PreferenceConverter.getColor(//
 				prefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT) });
+				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
+
+		yData.setDefaultRGB(prefLineColor);
+
+		yData.setRgbLine(new RGB[] { prefLineColor });
+		yData.setRgbDark(new RGB[] { prefDarkColor });
+		yData.setRgbBright(new RGB[] { prefBrightColor });
 	}
 
 	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {

@@ -2782,15 +2782,12 @@ public class ChartComponentGraph extends Canvas {
 		// get chart data
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
-
-		// get colors
-		final int[][] colorsIndex = yData.getColorsIndex();
-		final RGB[] rgbLine = yData.getRgbLine();
-
-		// get chart values
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
+
+		// get colors
+		final RGB[] rgbLine = yData.getRgbLine();
 
 		// get the horizontal offset for the graph
 		final int graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
@@ -2807,9 +2804,10 @@ public class ChartComponentGraph extends Canvas {
 
 		for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
 
-			int prevColorIndex = -1;
 			final int xValues[] = xSeries[serieIndex];
 			final int yHighValues[] = ySeries[serieIndex];
+
+			gc.setBackground(getColor(rgbLine[serieIndex]));
 
 			// loop: all values in the current serie
 			for (int valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
@@ -2825,16 +2823,6 @@ public class ChartComponentGraph extends Canvas {
 				// get the x/y position
 				final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
 				final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
-
-				// set color when a new color is used
-				final int colorIndex = colorsIndex[0][valueIndex];
-				if (colorIndex != prevColorIndex) {
-					prevColorIndex = colorIndex;
-					final RGB rgbLineDef = rgbLine[colorIndex];
-					final Color colorLine = getColor(rgbLineDef);
-
-					gc.setBackground(colorLine);
-				}
 
 				// draw shape
 				gc.fillRectangle(devXPos - 1, devYPos, 3, 3);

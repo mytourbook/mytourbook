@@ -849,6 +849,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private DateTime										_dateTimeModified;
 
 	/**
+	 * Tour start time
+	 */
+	@Transient
+	private DateTime										_dateTimeStart;
+
+	/**
 	 * Tour markers which are sorted by serie index
 	 */
 	@Transient
@@ -3796,6 +3802,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return startAltitude;
 	}
 
+	/**
+	 * @return Returns date/time for the tour start
+	 */
+	public DateTime getStartDateTime() {
+
+		if (_dateTimeStart == null) {
+			_dateTimeStart = new DateTime(startYear, startMonth, startDay, startHour, startMinute, startSecond, 0);
+		}
+
+		return _dateTimeStart;
+	}
+
 	public short getStartDay() {
 		return startDay;
 	}
@@ -3895,14 +3913,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public TourBike getTourBike() {
 		return tourBike;
-	}
-
-	/**
-	 * @return
-	 * @return Returns date/time for the tour start
-	 */
-	public DateTime getStartDateTime() {
-		return new DateTime(startYear, startMonth, startDay, startHour, startMinute, startSecond, 0);
 	}
 
 	/**
@@ -4633,6 +4643,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartDay(final short startDay) {
+		_dateTimeStart = null;
 		this.startDay = startDay;
 	}
 
@@ -4646,10 +4657,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartHour(final short startHour) {
+		_dateTimeStart = null;
 		this.startHour = startHour;
 	}
 
 	public void setStartMinute(final short startMinute) {
+		_dateTimeStart = null;
 		this.startMinute = startMinute;
 	}
 
@@ -4657,6 +4670,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Sets the month for the tour start in the range 1...12
 	 */
 	public void setStartMonth(final short startMonth) {
+		_dateTimeStart = null;
 		this.startMonth = startMonth;
 	}
 
@@ -4665,10 +4679,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartSecond(final int startSecond) {
+		_dateTimeStart = null;
 		this.startSecond = startSecond;
 	}
 
 	public void setStartYear(final short startYear) {
+		_dateTimeStart = null;
 		this.startYear = startYear;
 	}
 

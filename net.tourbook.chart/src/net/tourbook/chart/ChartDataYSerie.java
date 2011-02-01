@@ -212,8 +212,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 		_colorIndex = new int[1][_highValues[0].length];
 
-		for (int colorIndex = 0; colorIndex < _colorIndex[0].length; colorIndex++) {
-			_colorIndex[0][colorIndex] = colorIndexValue;
+		final int[] colorIndex0 = _colorIndex[0];
+
+		for (int colorIndex = 0; colorIndex < colorIndex0.length; colorIndex++) {
+			colorIndex0[colorIndex] = colorIndexValue;
 		}
 	}
 

@@ -825,10 +825,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
 			createUI10TourViewer(_viewerContainer);
-			createUI20ContextMenu();
-
-			// set tour info tooltip provider
-			_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 		}
 	}
 
@@ -867,6 +863,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				fireSelectedTour();
 			}
 		});
+
+		// set tour info tooltip provider
+		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
+
+		createUI20ContextMenu();
 	}
 
 	/**
