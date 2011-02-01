@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
@@ -696,10 +697,11 @@ public class ConconiChartView extends ViewPart {
 		 * tour combo box
 		 */
 		_comboTours.removeAll();
-
-		for (final TourData tourData : _tourDataList) {
-			final DateTime dt = tourData.getStartDateTime();
-
+		
+		
+		for (TourData tourData : _tourDataList) {
+			DateTime dt = tourData.getStartDateTime();
+			
 		}
 	}
 
