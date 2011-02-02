@@ -221,13 +221,14 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
-	public static String	Conconi_Chart_DeflactionPoint;
+	public static String	Conconi_Chart_Chk_LogScaling;
 
-	public static String	Conconi_Chart_InvalidData;
+	public static String	Conconi_Chart_Chk_LogScaling_Tooltip;
 
-	public static String	Conconi_Chart_Label_Tour;
-
-	public static String	Conconi_Chart_Label_Tour_Tooltip;
+	public static String		Conconi_Chart_DeflactionPoint;
+	public static String		Conconi_Chart_InvalidData;
+	public static String		Conconi_Chart_Label_Tour;
+	public static String		Conconi_Chart_Label_Tour_Tooltip;
 
 	public static String		compute_tourValueElevation_button_computeValues;
 	public static String		compute_tourValueElevation_button_computeValues_tooltip;
@@ -1078,7 +1079,7 @@ public class Messages extends NLS {
 
 	public static String		UI_Label_no_chart_is_selected;
 
-	public static String	UI_Label_TourIsNotSelected;
+	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;
 

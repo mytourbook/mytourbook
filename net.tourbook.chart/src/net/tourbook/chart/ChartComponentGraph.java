@@ -1726,9 +1726,13 @@ public class ChartComponentGraph extends Canvas {
 
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
+		final ChartDataXSerie xData = drawingData.getXData();
 		final int devYBottom = drawingData.getDevYBottom();
 		final int unitPos = drawingData.getXUnitTextPos();
 		float scaleX = drawingData.getScaleX();
+		final double logScaling1 = xData.getLogScaling1();
+		final double logScaling2 = xData.getLogScaling2();
+		final boolean isPowScaling = logScaling1 != 1.0;
 
 		// check if the x-units has a special scaling
 		final float scaleUnitX = drawingData.getScaleUnitX();
@@ -1736,7 +1740,7 @@ public class ChartComponentGraph extends Canvas {
 			scaleX = scaleUnitX;
 		}
 
-		// compute the distance between two units
+		// compute distance between two units
 		final float devUnitWidth = units.size() > 1 ? //
 				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
 				: 0;
@@ -1794,7 +1798,18 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// dev x-position for the unit tick
-			final int devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
+			int devXUnitTick;
+			if (isPowScaling) {
+
+				double scaledUnitValue = unit.value * scaleX;
+//				scaledUnitValue = Math.pow(scaledUnitValue, powScaling);
+				scaledUnitValue = ((Math.pow(scaledUnitValue, logScaling1)) / logScaling2);
+
+				// scale with devXOffset
+				devXUnitTick = (int) (scaledUnitValue);
+			} else {
+				devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
+			}
 
 			/*
 			 * the first unit is not painted because it would clip at the left border of the chart
@@ -2773,6 +2788,9 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
 	 * if null is returned, a line graph will be drawn instead
+	 * <p>
+	 * <b> Zooming the chart is not yet supported for this charttype because logarithmic scaling is
+	 * very complex for a zoomed chart </b>
 	 * 
 	 * @param gc
 	 * @param drawingData
@@ -2786,21 +2804,25 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
 
+		final double logScaling1 = xData.getLogScaling1();
+		final double logScaling2 = xData.getLogScaling2();
+		final boolean isLogScaling = logScaling1 != 1.0;
+
 		// get colors
 		final RGB[] rgbLine = yData.getRgbLine();
-
-		// get the horizontal offset for the graph
-		final int graphValueOffset = (int) (Math.max(0, _devGraphImageXOffset) / scaleX);
 
 		// get the top/bottom of the graph
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.devGraphHeight;
 
+//		gc.setAntialias(SWT.ON);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
 		final int[][] xSeries = xData.getHighValues();
 		final int[][] ySeries = yData.getHighValues();
+		final int size = 6;
+		final int size2 = size / 2;
 
 		for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
 
@@ -2820,17 +2842,30 @@ public class ChartComponentGraph extends Canvas {
 				final int xValue = xValues[valueIndex];
 				final int yValue = yHighValues[valueIndex];
 
-				// get the x/y position
-				final int devXPos = (int) ((xValue - graphValueOffset) * scaleX);
-				final int devYPos = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
+				// get the x/y positions
+				int devX;
+				if (isLogScaling) {
+
+					final double devXScaled = (xValue * scaleX);
+
+					devX = (int) ((Math.pow(devXScaled, logScaling1)) / logScaling2);
+//					devX = (int) ((Math.pow(devXScaled, logScaling1)) / drawingData.devVirtualGraphWidth);
+
+				} else {
+					devX = (int) (xValue * scaleX);
+				}
+
+				final int devY = devYBottom - ((int) ((yValue - graphYBottom) * scaleY));
 
 				// draw shape
-				gc.fillRectangle(devXPos - 1, devYPos, 3, 3);
+//				gc.fillRectangle(devXPos - size2, devYPos - size2, size, size);
+				gc.fillOval(devX - size2, devY - size2, size, size);
 			}
 		}
 
 		// reset clipping/antialias
 		gc.setClipping((Rectangle) null);
+		gc.setAntialias(SWT.OFF);
 	}
 
 	/**

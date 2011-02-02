@@ -1220,8 +1220,9 @@ public class TourDatabase {
 				persistedEntity = em.find(TourData.class, tourData.getTourId());
 
 			} catch (final Exception e) {
-				e.printStackTrace();
+				StatusUtil.log(e);
 			}
+
 			em.close();
 
 			TourManager.getInstance().updateTourInCache(persistedEntity);

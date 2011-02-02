@@ -215,6 +215,11 @@ public abstract class ChartDataSerie {
 		_customData.put(key, value);
 	}
 
+	/**
+	 * This value is also used to draw the axis text for the data serie
+	 * 
+	 * @param color
+	 */
 	public void setDefaultRGB(final RGB color) {
 		_defaultRGB = color;
 	}

@@ -733,18 +733,6 @@ public class Chart extends ViewForm {
 		return getChartComponents().getAxisLeft();
 	}
 
-	/**
-	 * returns the value index for the x-sliders
-	 */
-	public SelectionChartXSliderPosition getXSliderPosition() {
-
-		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
-
-		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
-				.getRightSlider()
-				.getValuesIndex());
-	}
-
 //	boolean isMouseDownExternalPost(final int devXMouse, final int devYMouse, final int devXGraph) {
 //
 //		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPost);
@@ -757,6 +745,18 @@ public class Chart extends ViewForm {
 //
 //		return event.isWorked;
 //	}
+
+	/**
+	 * returns the value index for the x-sliders
+	 */
+	public SelectionChartXSliderPosition getXSliderPosition() {
+
+		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
+
+		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
+				.getRightSlider()
+				.getValuesIndex());
+	}
 
 	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse, final int devXGraph) {
 
@@ -917,15 +917,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
 	}
 
-	/**
-	 * set the option to scroll/not scroll the zoomed chart
-	 * 
-	 * @param canScrollabelZoomedGraph
-	 */
-	public void setCanScrollZoomedChart(final boolean canScrollabelZoomedGraph) {
-		_chartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
-	}
-
 //	/**
 //	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
 //	 * when the workbench action should be used.
@@ -935,6 +926,15 @@ public class Chart extends ViewForm {
 //	public void setUseInternalActionBar(boolean useInternalActionBar) {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
+
+	/**
+	 * set the option to scroll/not scroll the zoomed chart
+	 * 
+	 * @param canScrollabelZoomedGraph
+	 */
+	public void setCanScrollZoomedChart(final boolean canScrollabelZoomedGraph) {
+		_chartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
+	}
 
 	/**
 	 * Set the enable state for a command and update the UI
@@ -995,6 +995,10 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
 
 		_gridVerticalDistance = verticalGrid;
@@ -1002,10 +1006,6 @@ public class Chart extends ViewForm {
 
 		_chartComponents.onResize();
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,

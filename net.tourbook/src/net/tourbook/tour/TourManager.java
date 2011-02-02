@@ -585,11 +585,17 @@ public class TourManager {
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
 	public static boolean isTourEditorModified() {
+		return isTourEditorModified(true);
+	}
+
+	public static boolean isTourEditorModified(final boolean isOpenEditor) {
 
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty()) {
 
-			openTourEditor(true);
+			if (isOpenEditor) {
+				openTourEditor(true);
+			}
 
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),

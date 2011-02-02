@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.Arrays;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.IChartLayer;
@@ -32,6 +33,16 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerConconiTest implements IChartLayer {
 
+	private float	_scaleX;
+	private float	_scaleY;
+	private int		_graphValueOffset;
+	private int		_devYBottom;
+	private int		_graphYBottom;
+
+	private double	_logScaling1;
+	private double	_logScaling2;
+	private boolean	_isLogScaling;
+
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -45,17 +56,22 @@ public class ChartLayerConconiTest implements IChartLayer {
 		}
 
 		// get the chart values
-		final float scaleX = drawingData.getScaleX();
-		final float scaleY = drawingData.getScaleY();
-		final int graphYBottom = drawingData.getGraphYBottom();
+		final ChartDataXSerie xData = drawingData.getXData();
+		_scaleX = drawingData.getScaleX();
+		_scaleY = drawingData.getScaleY();
+
+		_logScaling1 = xData.getLogScaling1();
+		_logScaling2 = xData.getLogScaling2();
+		_isLogScaling = _logScaling1 != 1.0;
 
 		// get the horizontal offset for the graph
 		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
-		final int graphValueOffset = (int) (Math.max(0, devGraphImageXOffset) / scaleX);
+		_graphValueOffset = (int) (Math.max(0, devGraphImageXOffset) / _scaleX);
 
 		// get the top/bottom of the graph
-		final int devYBottom = drawingData.getDevYBottom();
-		final int devYTop = devYBottom - drawingData.devGraphHeight;
+		_devYBottom = drawingData.getDevYBottom();
+		final int devYTop = _devYBottom - drawingData.devGraphHeight;
+		_graphYBottom = drawingData.getGraphYBottom();
 
 		/*
 		 * draw regression lines
@@ -80,34 +96,21 @@ public class ChartLayerConconiTest implements IChartLayer {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(3);
 		gc.setAntialias(SWT.ON);
-		gc.setAlpha(0xa0);
-		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
+		gc.setClipping(0, devYTop, gc.getClipping().width, _devYBottom - devYTop);
 
 		/*
 		 * draw left regression line
 		 */
 		double[] linRegXValues = Arrays.copyOfRange(maxXValues, 0, deflexionIndexAdjusted);
 		double[] linRegYValues = Arrays.copyOfRange(maxYValues, 0, deflexionIndexAdjusted);
-		draw10LineLinearRegression(
-				gc,
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
+
+		draw10LineLinearRegression(gc, //
 				linRegXValues,
 				linRegYValues,
 				color2);
-
-		draw20Point(
-				gc,
+		draw20Point(gc, //
 				linRegXValues[0],
 				linRegYValues[0],
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
 				color2);
 
 		/*
@@ -118,37 +121,17 @@ public class ChartLayerConconiTest implements IChartLayer {
 		linRegXValues = Arrays.copyOfRange(maxXValues, deflexionIndexAdjusted, lastIndex + 1);
 		linRegYValues = Arrays.copyOfRange(maxYValues, deflexionIndexAdjusted, lastIndex + 1);
 
-		draw10LineLinearRegression(
-				gc,
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
+		draw10LineLinearRegression(gc, //
 				linRegXValues,
 				linRegYValues,
 				color1);
-
-		draw20Point(
-				gc,
+		draw20Point(gc, //
 				linRegXValues[linRegXValues.length - 1],
 				linRegYValues[linRegXValues.length - 1],
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
 				color1);
-
-		draw30DeflectionPoint(
-				gc,
+		draw30DeflectionPoint(gc, //
 				linRegXValues[0],
 				linRegYValues[0],
-				scaleX,
-				scaleY,
-				graphYBottom,
-				graphValueOffset,
-				devYBottom,
 				color1,
 				color2);
 
@@ -160,11 +143,6 @@ public class ChartLayerConconiTest implements IChartLayer {
 	}
 
 	private void draw10LineLinearRegression(final GC gc,
-											final float scaleX,
-											final float scaleY,
-											final int graphYBottom,
-											final int graphValueOffset,
-											final int devYBottom,
 											final double[] maxXValues,
 											final double[] maxYValues,
 											final Color color) {
@@ -175,37 +153,53 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 		final LinearRegression linReg = new LinearRegression(maxXValues, maxYValues);
 
-		final double graphXStart = maxXValues[0];
-		final double graphXEnd = maxXValues[maxXValues.length - 1];
+		final int extendedGraph = 0;
+
+		final double graphXStart = maxXValues[0] - extendedGraph;
+		final double graphXEnd = maxXValues[maxXValues.length - 1] + extendedGraph;
 
 		final double graphYStart = linReg.calculateY(graphXStart);
 		final double graphYEnd = linReg.calculateY(graphXEnd);
 
-		final int devXStart = (int) ((graphXStart - graphValueOffset) * scaleX);
-		final int devYStart = devYBottom - ((int) ((graphYStart - graphYBottom) * scaleY));
+		final double devXStartDbl = (graphXStart - _graphValueOffset) * _scaleX;
+		final double devXEndDbl = (graphXEnd - _graphValueOffset) * _scaleX;
 
-		final int devXEnd = (int) ((graphXEnd - graphValueOffset) * scaleX);
-		final int devYEnd = devYBottom - ((int) ((graphYEnd - graphYBottom) * scaleY));
+		int devXStart;
+		int devXEnd;
+		if (_isLogScaling) {
+			devXStart = (int) ((Math.pow(devXStartDbl, _logScaling1)) / _logScaling2);
+			devXEnd = (int) ((Math.pow(devXEndDbl, _logScaling1)) / _logScaling2);
+		} else {
+			devXStart = (int) devXStartDbl;
+			devXEnd = (int) devXEndDbl;
+		}
+
+		final int devYStart = _devYBottom - ((int) ((graphYStart - _graphYBottom) * _scaleY));
+		final int devYEnd = _devYBottom - ((int) ((graphYEnd - _graphYBottom) * _scaleY));
+
+		gc.setAlpha(0xb0);
 
 		gc.setForeground(color);
 		gc.drawLine(devXStart, devYStart, devXEnd, devYEnd);
 	}
 
-	private void draw20Point(	final GC gc,
-								final double graphX,
-								final double graphY,
-								final float scaleX,
-								final float scaleY,
-								final int graphYBottom,
-								final int graphValueOffset,
-								final int devYBottom,
-								final Color color) {
+	private void draw20Point(final GC gc, final double graphX, final double graphY, final Color color) {
 
-		final int size = 9;
+		final int size = 20;//9;
 		final int size2 = size / 2;
 
-		final int devX = (int) ((graphX - graphValueOffset) * scaleX);
-		final int devY = devYBottom - ((int) ((graphY - graphYBottom) * scaleY));
+		// get the x/y positions
+		final double devXDbl = (graphX - _graphValueOffset) * _scaleX;
+		int devX;
+		if (_isLogScaling) {
+			devX = (int) ((Math.pow(devXDbl, _logScaling1)) / _logScaling2);
+		} else {
+			devX = (int) devXDbl;
+		}
+
+		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
+
+		gc.setAlpha(0x60);
 
 		gc.setBackground(color);
 		gc.fillOval(devX - size2, devY - size2, size, size);
@@ -215,19 +209,22 @@ public class ChartLayerConconiTest implements IChartLayer {
 	private void draw30DeflectionPoint(	final GC gc,
 										final double graphX,
 										final double graphY,
-										final float scaleX,
-										final float scaleY,
-										final int graphYBottom,
-										final int graphValueOffset,
-										final int devYBottom,
 										final Color color1,
 										final Color color2) {
 
-		final int size = 9;
+		final int size = 20;//9;
 		final int size2 = size / 2;
 
-		final int devX = (int) ((graphX - graphValueOffset) * scaleX);
-		final int devY = devYBottom - ((int) ((graphY - graphYBottom) * scaleY));
+		final double devXDbl = (graphX - _graphValueOffset) * _scaleX;
+		int devX;
+		if (_isLogScaling) {
+			devX = (int) ((Math.pow(devXDbl, _logScaling1)) / _logScaling2);
+		} else {
+			devX = (int) devXDbl;
+		}
+		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
+
+		gc.setAlpha(0x60);
 
 		gc.setBackground(color2);
 //		gc.fillRectangle(devX - size2, devY - size2, size2, size);

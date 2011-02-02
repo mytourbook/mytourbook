@@ -16,6 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -60,36 +62,38 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 /**
  * Show selected tours in a conconi test chart
  */
 public class ConconiChartView extends ViewPart {
 
-	public static final String		ID									= "net.tourbook.views.ConconiChartView";	//$NON-NLS-1$
+	public static final String		ID							= "net.tourbook.views.ConconiChartView";	//$NON-NLS-1$
 
-	private static final String		STATE_CONCONIT_TOURS_VIEWER_WIDTH	= "STATE_CONCONIT_TOURS_VIEWER_WIDTH";		//$NON-NLS-1$
+	private static final String		STATE_CONCONI_LOG_SCALING	= "STATE_CONCONI_LOG_SCALING";				//$NON-NLS-1$
 
-	private static final RGB		DEFAULT_RGB							= new RGB(0xd0, 0xd0, 0xd0);
+	private static final RGB		DEFAULT_RGB					= new RGB(0xd0, 0xd0, 0xd0);
 
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getDefault() //
-																				.getPreferenceStore();
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault() //
+																		.getPreferenceStore();
 
-	private final IDialogSettings	_state								= TourbookPlugin.getDefault().//
-																				getDialogSettingsSection(ID);
-
-	private final DateTimeFormatter	_tourDTFormatter					= DateTimeFormat.shortDateTime();
+	private final IDialogSettings	_state						= TourbookPlugin.getDefault().//
+																		getDialogSettingsSection(ID);
 
 	private ISelectionListener		_postSelectionListener;
 	private IPartListener2			_partListener;
 	private ITourEventListener		_tourEventListener;
 
 	private ChartDataYSerie			_yDataPulse;
-	private ConconiData				_conconiData;
+	private ConconiData				_selectedTourConconiData;
+
+	private boolean					_isSelectionDisabled		= true;
+	private boolean					_isSaving;
+
+	private TourData				_selectedTour;
+
+	private int						_originalTourDeflection		= -1;
+	private int						_modifiedTourDeflection		= -1;
 
 	private PixelConverter			_pc;
 
@@ -101,9 +105,6 @@ public class ConconiChartView extends ViewPart {
 
 	private Composite				_pageConconiTest;
 
-	private Composite				_containerConconiTours;
-	private ViewerDetailForm		_detailFormConconi;
-
 	private ArrayList<TourData>		_conconiTours;
 
 	private Chart					_chartConconiTest;
@@ -111,10 +112,9 @@ public class ConconiChartView extends ViewPart {
 
 	private Combo					_comboTours;
 	private Scale					_scaleDeflection;
+	private Button					_chkLogScaling;
 	private Label					_lblDeflactionPulse;
 	private Label					_lblDeflactionPower;
-
-	private boolean					_isSelectionDisabled				= true;
 
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
@@ -125,7 +125,7 @@ public class ConconiChartView extends ViewPart {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == ConconiChartView.this) {
-//					saveTour();
+					saveTour();
 					saveState();
 				}
 			}
@@ -164,6 +164,7 @@ public class ConconiChartView extends ViewPart {
 	private void clearView() {
 
 		_conconiTours = null;
+		_selectedTour = null;
 
 		if (_chartConconiTest != null) {
 			_chartConconiTest.updateChart(null, false);
@@ -222,7 +223,21 @@ public class ConconiChartView extends ViewPart {
 			markedTour = validTourList.get(0);
 		}
 
+		_selectedTour = markedTour;
+
 		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + GraphColorProvider.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
+
+		final RGB rgbPrefLine = PreferenceConverter.getColor(//
+				_prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
+
+		final RGB rgbPrefDark = PreferenceConverter.getColor(//
+				_prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
+
+		final RGB rgbPrefBright = PreferenceConverter.getColor(//
+				_prefStore,
+				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
 		final int[][] powerSerie = new int[validDataLength][];
 		final int[][] pulseSerie = new int[validDataLength][];
@@ -234,7 +249,8 @@ public class ConconiChartView extends ViewPart {
 		int markedIndex = 0;
 
 		/*
-		 * create data series which contain valid data
+		 * create data series which contain valid data, reduce data that the highes value for an x
+		 * value is displayed
 		 */
 		for (int tourIndex = 0; tourIndex < validDataLength; tourIndex++) {
 
@@ -249,30 +265,61 @@ public class ConconiChartView extends ViewPart {
 					&& tourPulseSerie != null
 					&& tourPulseSerie.length != 0) {
 
-				powerSerie[tourIndex] = tourPowerSerie;
-				pulseSerie[tourIndex] = tourPulseSerie;
+				final TIntArrayList maxXValues = new TIntArrayList();
+				final TIntArrayList maxYValues = new TIntArrayList();
 
-				// set color, marked tour is displayed with pulse color
+				int lastMaxY = Integer.MIN_VALUE;
+				int currentXValue = tourPowerSerie[0];
+
+				// loop: all values in the current serie
+				for (int valueIndex = 0; valueIndex < tourPowerSerie.length; valueIndex++) {
+
+					// check array bounds
+					if (valueIndex >= tourPulseSerie.length) {
+						break;
+					}
+
+					final int xValue = tourPowerSerie[valueIndex];
+					final int yValue = tourPulseSerie[valueIndex];
+
+					if (xValue == currentXValue) {
+
+						// get maximum y value for the same x value
+
+						if (yValue > lastMaxY) {
+							lastMaxY = yValue;
+						}
+
+					} else {
+
+						// next x value is displayed, keep last max y
+
+						maxXValues.add(currentXValue);
+						maxYValues.add(lastMaxY);
+
+						currentXValue = xValue;
+						lastMaxY = yValue;
+					}
+				}
+
+				// get last value
+				maxXValues.add(currentXValue);
+				maxYValues.add(lastMaxY);
+
+				powerSerie[tourIndex] = maxXValues.toArray();
+				pulseSerie[tourIndex] = maxYValues.toArray();
+
+				/*
+				 * marked tour is displayed with pulse color
+				 */
 				if (tourData.equals(markedTour)) {
 
 					// get index of marked tour
 					markedIndex = tourIndex;
 
-					final RGB prefLineColor = PreferenceConverter.getColor(//
-							_prefStore,
-							prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
-
-					final RGB prefDarkColor = PreferenceConverter.getColor(//
-							_prefStore,
-							prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
-
-					final RGB prefBrightColor = PreferenceConverter.getColor(//
-							_prefStore,
-							prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
-
-					rgbLine[tourIndex] = prefLineColor;
-					rgbDark[tourIndex] = prefDarkColor;
-					rgbBright[tourIndex] = prefBrightColor;
+					rgbLine[tourIndex] = rgbPrefLine;
+					rgbDark[tourIndex] = rgbPrefDark;
+					rgbBright[tourIndex] = rgbPrefBright;
 
 				} else {
 
@@ -312,12 +359,18 @@ public class ConconiChartView extends ViewPart {
 		xDataPower.setLabel(Messages.Graph_Label_Power);
 		xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
 
+		if (_chkLogScaling.getSelection()) {
+//			xDataPower.setLogScaling(2.0, 450.0);
+			xDataPower.setLogScaling(2.0, 300.0);
+		}
+
 		/*
 		 * pulse
 		 */
 		_yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_XY_SCATTER, pulseSerie);
 		_yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 		_yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
+		_yDataPulse.setDefaultRGB(rgbPrefLine);
 		_yDataPulse.setRgbLine(rgbLine);
 		_yDataPulse.setRgbDark(rgbDark);
 		_yDataPulse.setRgbBright(rgbBright);
@@ -332,7 +385,8 @@ public class ConconiChartView extends ViewPart {
 		chartDataModel.setXData(xDataPower);
 		chartDataModel.addYData(_yDataPulse);
 
-		_conconiData = createConconiData(powerSerie[lastTourIndex], pulseSerie[lastTourIndex]);
+		// create conconi data for the selected tour
+		_selectedTourConconiData = createConconiData(powerSerie[lastTourIndex], pulseSerie[lastTourIndex]);
 
 		/*
 		 * updata layer for regression lines
@@ -341,7 +395,7 @@ public class ConconiChartView extends ViewPart {
 		chartCustomLayers.add(_conconiLayer);
 
 		_yDataPulse.setCustomLayers(chartCustomLayers);
-		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _conconiData);
+		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _selectedTourConconiData);
 
 		return chartDataModel;
 	}
@@ -397,7 +451,6 @@ public class ConconiChartView extends ViewPart {
 		final ConconiData conconiData = new ConconiData();
 		conconiData.maxXValues = maxXValues;
 		conconiData.maxYValues = maxYValues;
-		conconiData.selectedDeflection = _scaleDeflection.getSelection();
 
 		return conconiData;
 	}
@@ -406,6 +459,7 @@ public class ConconiChartView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+		restoreState();
 
 		addSelectionListener();
 		addPartListener();
@@ -435,29 +489,20 @@ public class ConconiChartView extends ViewPart {
 
 		_pageConconiTest = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageConconiTest);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageConconiTest);
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_pageConconiTest);
+//		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI20ConconiChart(_pageConconiTest);
-			createUI30PanelOptions(_pageConconiTest);
+			createUI30Options(_pageConconiTest);
+			createUI40ConconiChart(_pageConconiTest);
 		}
 	}
 
-	/**
-	 * chart: conconi test
-	 */
-	private void createUI20ConconiChart(final Composite parent) {
-
-		_chartConconiTest = new Chart(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartConconiTest);
-
-		_conconiLayer = new ChartLayerConconiTest();
-	}
-
-	private void createUI30PanelOptions(final Composite parent) {
+	private void createUI30Options(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(5, 5, 0, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).extendedMargins(5, 5, 5, 0).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * label: tour
@@ -466,17 +511,7 @@ public class ConconiChartView extends ViewPart {
 			label.setText(Messages.Conconi_Chart_Label_Tour);
 			label.setToolTipText(Messages.Conconi_Chart_Label_Tour_Tooltip);
 
-			/*
-			 * combo: tour date/time
-			 */
-			_comboTours = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTours.setVisibleItemCount(20);
-			_comboTours.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectTour();
-				}
-			});
+			createUI32Options(container);
 
 			/*
 			 * label: deflaction point
@@ -487,6 +522,7 @@ public class ConconiChartView extends ViewPart {
 			final Composite deflContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(deflContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(deflContainer);
+//			deflContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
 				/*
 				 * scale: deflection point
@@ -501,18 +537,62 @@ public class ConconiChartView extends ViewPart {
 					}
 				});
 
-				createUI32DeflPointValues(deflContainer);
+				createUI34DeflPointValues(deflContainer);
 			}
 		}
 	}
 
-	private void createUI32DeflPointValues(final Composite parent) {
+	private void createUI32Options(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * combo: tour date/time
+			 */
+			_comboTours = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+			GridDataFactory
+					.fillDefaults()
+					.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+					.grab(true, false)
+					.applyTo(_comboTours);
+			_comboTours.setVisibleItemCount(20);
+			_comboTours.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectTour();
+				}
+			});
+
+			/*
+			 * checkbox: log scaling
+			 */
+			_chkLogScaling = new Button(container, SWT.CHECK);
+			GridDataFactory//
+					.fillDefaults()
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(5, 1)
+					.applyTo(_chkLogScaling);
+			_chkLogScaling.setText(Messages.Conconi_Chart_Chk_LogScaling);
+			_chkLogScaling.setToolTipText(Messages.Conconi_Chart_Chk_LogScaling_Tooltip);
+			_chkLogScaling.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					updateChart30NewTour(_selectedTour);
+				}
+			});
+		}
+	}
+
+	private void createUI34DeflPointValues(final Composite parent) {
 
 		Label label;
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(false, false).align(SWT.FILL, SWT.CENTER).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
 			// label: heartbeat value
 			_lblDeflactionPulse = new Label(container, SWT.TRAIL);
@@ -542,6 +622,17 @@ public class ConconiChartView extends ViewPart {
 		}
 	}
 
+	/**
+	 * chart: conconi test
+	 */
+	private void createUI40ConconiChart(final Composite parent) {
+
+		_chartConconiTest = new Chart(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartConconiTest);
+
+		_conconiLayer = new ChartLayerConconiTest();
+	}
+
 	@Override
 	public void dispose() {
 
@@ -555,8 +646,11 @@ public class ConconiChartView extends ViewPart {
 	private void onSelectDeflection() {
 
 		// update conconi data
-		_conconiData.selectedDeflection = _scaleDeflection.getSelection();
-		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _conconiData);
+		final int newDeflection = _scaleDeflection.getSelection();
+		_selectedTourConconiData.selectedDeflection = newDeflection;
+		_yDataPulse.setCustomData(TourManager.CUSTOM_DATA_CONCONI_TEST, _selectedTourConconiData);
+
+		_modifiedTourDeflection = newDeflection;
 
 		updateUI20ConconiValues();
 
@@ -565,6 +659,10 @@ public class ConconiChartView extends ViewPart {
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
+
+		if (_isSaving) {
+			return;
+		}
 
 		if (_pageBook != null && _pageBook.isDisposed()) {
 			return;
@@ -615,17 +713,13 @@ public class ConconiChartView extends ViewPart {
 			selectedIndex = 0;
 		}
 
-		updateChart24(_conconiTours.get(selectedIndex));
+		updateChart30NewTour(_conconiTours.get(selectedIndex));
 	}
 
-	private void restoreStateConconiUI() {
+	private void restoreState() {
 
-		// restore width for the marker list when the width is available
-		try {
-			_detailFormConconi.setViewerWidth(_state.getInt(STATE_CONCONIT_TOURS_VIEWER_WIDTH));
-		} catch (final NumberFormatException e) {
-			// ignore
-		}
+		_chkLogScaling.setSelection(_state.getBoolean(STATE_CONCONI_LOG_SCALING));
+
 	}
 
 	private void saveState() {
@@ -635,13 +729,39 @@ public class ConconiChartView extends ViewPart {
 			return;
 		}
 
-		if (_containerConconiTours != null) {
+		_state.put(STATE_CONCONI_LOG_SCALING, _chkLogScaling.getSelection());
+	}
 
-			final int viewerWidth = _containerConconiTours.getSize().x;
-			if (viewerWidth > 0) {
-				_state.put(STATE_CONCONIT_TOURS_VIEWER_WIDTH, viewerWidth);
+	private void saveTour() {
+
+		if (_originalTourDeflection == _modifiedTourDeflection) {
+			return;
+		}
+
+		_selectedTour.setConconiDeflection(_modifiedTourDeflection);
+
+		TourData savedTour;
+		_isSaving = true;
+		{
+			savedTour = TourManager.saveModifiedTour(_selectedTour);
+		}
+		_isSaving = false;
+
+		if (savedTour != null) {
+
+			_selectedTour = savedTour;
+
+			// replace tour with saved tour
+			final TourData[] conconiTours = _conconiTours.toArray(new TourData[_conconiTours.size()]);
+			for (int tourIndex = 0; tourIndex < conconiTours.length; tourIndex++) {
+				if (conconiTours[tourIndex].equals(savedTour)) {
+					_conconiTours.set(tourIndex, savedTour);
+					break;
+				}
 			}
 		}
+
+		_originalTourDeflection = _modifiedTourDeflection = -1;
 	}
 
 	@Override
@@ -706,7 +826,11 @@ public class ConconiChartView extends ViewPart {
 
 	private void updateChart22(final ArrayList<TourData> tourDataList) {
 
-		if (tourDataList == null || tourDataList.size() == 0) {
+		/*
+		 * tour editor is not opened because it can cause a recursive attempt to active a part in
+		 * the middle of activating a part
+		 */
+		if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
 			// nothing to do
 			clearView();
 			return;
@@ -718,7 +842,7 @@ public class ConconiChartView extends ViewPart {
 		_conconiTours = tourDataList;
 
 		updateUI10SetupConconi();
-		updateChart24(null);
+		updateChart30NewTour(null);
 
 		_pageBook.showPage(_pageConconiTest);
 
@@ -729,7 +853,9 @@ public class ConconiChartView extends ViewPart {
 	 * @param markedTour
 	 *            contains a tour which is marked in the conconi chart
 	 */
-	private void updateChart24(final TourData markedTour) {
+	private void updateChart30NewTour(final TourData markedTour) {
+
+		saveTour();
 
 		final ChartDataModel conconiChartDataModel = createChartDataModelConconiTest(_conconiTours, markedTour);
 
@@ -755,34 +881,53 @@ public class ConconiChartView extends ViewPart {
 			_comboTours.removeAll();
 
 			for (final TourData tourData : _conconiTours) {
-				_comboTours.add(_tourDTFormatter.print(tourData.getStartDateTime()));
+				_comboTours.add(TourManager.getTourTitleDetailed(tourData));
 			}
 
 			_comboTours.select(0);
+			_comboTours.setEnabled(_conconiTours.size() > 1);
 		}
 		_isSelectionDisabled = false;
 	}
 
 	private void updateUI12SetupNewTour() {
 
-		/*
-		 * update deflection scale
-		 */
-		final int maxDeflection = _conconiData.maxXValues.size();
-		_scaleDeflection.setMaximum(maxDeflection > 0 ? maxDeflection - 1 : 0);
+		// update deflection scale
+		final int maxDeflection = _selectedTourConconiData.maxXValues.size();
+		final int lastXIndex = maxDeflection - 1;
+		_scaleDeflection.setMaximum(maxDeflection > 0 ? lastXIndex : 0);
 
 		// ensure that too much scale ticks are displayed
 		final int pageIncrement = maxDeflection < 20 ? 1 : maxDeflection < 100 ? 5 : maxDeflection < 1000 ? 50 : 100;
 
 		_scaleDeflection.setPageIncrement(pageIncrement);
+
+		int tourDeflection = _selectedTour.getConconiDeflection();
+
+		// ensure deflection is within x-values
+		if (tourDeflection > lastXIndex) {
+			tourDeflection = lastXIndex;
+		}
+		if (tourDeflection < 0) {
+			tourDeflection = 0;
+		}
+
+		_originalTourDeflection = _modifiedTourDeflection = tourDeflection;
+
+		// update conconi data
+		_selectedTourConconiData.selectedDeflection = tourDeflection;
+
+		// update UI
+		_scaleDeflection.setSelection(tourDeflection);
+
 	}
 
 	private void updateUI20ConconiValues() {
 
 		// deflation values
 		final int scaleIndex = _scaleDeflection.getSelection();
-		final int pulseValue = (int) _conconiData.maxYValues.get(scaleIndex);
-		final int powerValue = (int) _conconiData.maxXValues.get(scaleIndex);
+		final int pulseValue = (int) _selectedTourConconiData.maxYValues.get(scaleIndex);
+		final int powerValue = (int) _selectedTourConconiData.maxXValues.get(scaleIndex);
 
 		_lblDeflactionPulse.setText(Integer.toString(pulseValue));
 		_lblDeflactionPower.setText(Integer.toString(powerValue));

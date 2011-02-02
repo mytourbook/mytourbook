@@ -447,7 +447,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Deflection point in the conconi test, this value is the index for the data serie on the
 	 * x-axis
 	 */
-	private int												ConconiDeflection;
+	private int												conconiDeflection;
 
 	// ############################################# UNUSED FIELDS #############################################
 
@@ -3333,7 +3333,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public int getConconiDeflection() {
-		return ConconiDeflection;
+		return conconiDeflection;
 	}
 
 	/**
@@ -4464,7 +4464,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setConconiDeflection(final int conconiDeflection) {
-		ConconiDeflection = conconiDeflection;
+		this.conconiDeflection = conconiDeflection;
 	}
 
 	public void setDateTimeCreated(final long dateTimeCreated) {
