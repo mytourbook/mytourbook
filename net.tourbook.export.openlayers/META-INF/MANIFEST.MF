@@ -5,6 +5,7 @@ Bundle-SymbolicName: net.tourbook.export.openlayers;singleton:=true
 Bundle-Version: 10.11.0.qualifier
 Bundle-Activator: net.tourbook.export.openlayers.Activator
 Bundle-Vendor: MyTourbook
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.browser,
  org.eclipse.core.runtime,

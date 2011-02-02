@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.export.ExportUtil;
+import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.ui.UI;
 
 import org.apache.velocity.VelocityContext;
@@ -35,6 +36,9 @@ public class ExportOpenLayers {
 
 	public ExportOpenLayers(final String fileExtension) {
 		this._fileExtension = fileExtension;
+		
+		// initialize velocity
+		VelocityService.init();
 	}
 
 	/**

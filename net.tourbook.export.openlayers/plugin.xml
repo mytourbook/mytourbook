@@ -3,13 +3,13 @@
 <plugin>
 	<extension point="org.eclipse.ui.viewActions">
 		<viewContribution
-			id="net.tourbook.export.openlayers.viewContribution" 
+			id="net.tourbook.export.openlayers.viewContribution"
 			targetID="net.tourbook.mapping.mappingViewID">
 			<action id="net.tourbook.export.openlayers.ActionOpenWebMapBrowser"
-				label="OpenLayers" 
-				icon="icons/open_web_map_browser.png" 
-				tooltip="Open in browser"
-				toolbarPath="mapSelection"
+				label="%map_action_open_browser_map" 
+				icon="icons/internal_browser.gif" 
+				tooltip="%map_action_open_browser_map_tooltip"
+				toolbarPath="mapSelectionAdditions"
 				class="net.tourbook.export.openlayers.ActionOpenWebMapBrowser">
 			</action>
 		</viewContribution>

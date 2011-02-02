@@ -144,7 +144,8 @@
                // OSM Lonvias Wanderwege Layer (http://osm.lonvia.de/world_hiking.html)
                var lwander = new OpenLayers.Layer.OSM("Lonvia's Hiking Paths", 
                   "http://osm.lonvia.de/hiking/${z}/${x}/${y}.png",
-                  { type: 'png', displayOutsideMaxExtent: true, 
+                  { attribution: "Hiking Paths by <a href='http://osm.lonvia.de/world_hiking.html'>Lonvia's Hiking Map</a>",
+                  	type: 'png', displayOutsideMaxExtent: true, 
                     isBaseLayer: false, visibility: false, numZoomLevels: 17, transparent: true } 
                );
                map.addLayer(lwander);

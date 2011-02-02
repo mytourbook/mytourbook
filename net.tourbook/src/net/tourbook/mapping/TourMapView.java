@@ -53,6 +53,7 @@ import net.tourbook.util.ITourToolTipProvider;
 import net.tourbook.util.TourToolTip;
 import net.tourbook.util.Util;
 
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -108,6 +109,9 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
+
+	/** View Toolbar group marker for plug-ins to contribute additional actions */
+	public static final String						GROUP_MAP_SELECTION_ADDITIONS		= "mapSelectionAdditions"; //$NON-NLS-1$
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
@@ -886,6 +890,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 		viewTbm.add(new Separator());
 
 		viewTbm.add(_actionSelectMapProvider);
+		viewTbm.add(new GroupMarker(GROUP_MAP_SELECTION_ADDITIONS));
 		viewTbm.add(new Separator());
 
 		viewTbm.add(_actionZoomCentered);

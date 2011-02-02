@@ -2,28 +2,22 @@ package net.tourbook.export.openlayers;
 
 import static org.eclipse.ui.browser.IWorkbenchBrowserSupport.AS_VIEW;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
-
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import net.tourbook.data.TourData;
 import net.tourbook.export.ExportTourHTML;
 import net.tourbook.export.OpenLayersExportUtil;
-import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.mapping.TourMapView;
 import net.tourbook.util.StatusUtil;
+
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.util.Util;
 
@@ -42,9 +36,6 @@ public class OpenLayersExportPlugin {
 	public OpenLayersExportPlugin(final TourMapView tourMapView) {
 		this._tourMapView = tourMapView;
 		this._fileExtension = ExportTourHTML.GPX_EXTENSION;
-
-		// initialize velocity
-		VelocityService.init();
 	}
 
 	public void actionOpenWebMapBrowser() {
@@ -103,7 +94,9 @@ public class OpenLayersExportPlugin {
 			@Override
 			public IWebBrowser getBrowser(IWorkbenchBrowserSupport support) throws PartInitException {
 
-				return support.createBrowser(AS_VIEW, OPENLAYERS_BROWSER_ID, "Browser Maps", null);
+				// eclipse bug: name is ignored with AS_VIEW (view title is always 'Internal Web Browser') 
+				// fixed in 3.7, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=322000
+				return support.createBrowser(AS_VIEW, OPENLAYERS_BROWSER_ID, Messages.view_name_browser_map, null);
 			}
 		};
 		Util.openLink(browserGetter, uri.toString());

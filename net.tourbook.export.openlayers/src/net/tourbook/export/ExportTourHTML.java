@@ -90,7 +90,7 @@ public class ExportTourHTML extends ExportTourExtension {
 					final String tourFileName = new File(completeFilePath).getName();
 					final int index = tourFileName.lastIndexOf('.');
 					final String nameOnly =	index > 0 ? tourFileName.substring(0, index) : tourFileName;
-					htmlName = nameOnly + '.' + HTML_EXTENSION; //$NON-NLS-1$
+					htmlName = nameOnly + '.' + HTML_EXTENSION;
 	
 					exportOpenLayers.doExportHTML(tourFileName, path, htmlName);
 				}
@@ -107,6 +107,6 @@ public class ExportTourHTML extends ExportTourExtension {
 	@Override
 	public List<String> exportTourHeadless(List<TourData> tourDataList, String completeFilePath) throws IOException {
 
-		throw new RuntimeException("not implemented");
+		throw new RuntimeException("not implemented"); //$NON-NLS-1$
 	}
 }
