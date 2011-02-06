@@ -419,11 +419,6 @@ public class ConconiChartView extends ViewPart {
 			final int xValue = xValues[valueIndex];
 			final int yValue = yValues[valueIndex];
 
-			// ignore 0 values
-//			if (xValue == 0) {
-//				continue;
-//			}
-
 			if (xValue == currentXValue) {
 
 				// get maximum y value for the same x value
