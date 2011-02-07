@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,7 +77,7 @@ public class ChartDrawingData {
 	/**
 	 * virtual graph width in dev (pixel) units
 	 */
-	int								devVirtualGraphWidth;
+	public int						devVirtualGraphWidth;
 
 	/**
 	 * graph height in dev (pixel) units
@@ -98,8 +98,6 @@ public class ChartDrawingData {
 
 	private String					_errorMessage;
 
-	
-	
 	public ChartDrawingData(final int chartType) {
 		_chartType = chartType;
 	}
@@ -387,7 +385,7 @@ public class ChartDrawingData {
 	}
 
 	public void setErrorMessage(final String errorMessage) {
-		_errorMessage=errorMessage;
+		_errorMessage = errorMessage;
 	}
 
 	public void setGraphYBottom(final int yGraphMin) {

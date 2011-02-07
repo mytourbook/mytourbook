@@ -1730,9 +1730,12 @@ public class ChartComponentGraph extends Canvas {
 		final int devYBottom = drawingData.getDevYBottom();
 		final int unitPos = drawingData.getXUnitTextPos();
 		float scaleX = drawingData.getScaleX();
-		final double logScaling1 = xData.getLogScaling1();
-		final double logScaling2 = xData.getLogScaling2();
-		final boolean isPowScaling = logScaling1 != 1.0;
+
+		final double devGraphWidth = drawingData.devVirtualGraphWidth;
+		final double scalingFactor = xData.getScalingFactor();
+		final double scalingMaxValue = xData.getScalingMaxValue();
+		final boolean isExtendedScaling = scalingFactor != 1.0;
+		final double extScaleX = ((devGraphWidth - 1) / Math.pow(scalingMaxValue, scalingFactor));
 
 		// check if the x-units has a special scaling
 		final float scaleUnitX = drawingData.getScaleUnitX();
@@ -1799,11 +1802,11 @@ public class ChartComponentGraph extends Canvas {
 
 			// dev x-position for the unit tick
 			int devXUnitTick;
-			if (isPowScaling) {
+			if (isExtendedScaling) {
 
-				double scaledUnitValue = unit.value * scaleX;
-//				scaledUnitValue = Math.pow(scaledUnitValue, powScaling);
-				scaledUnitValue = ((Math.pow(scaledUnitValue, logScaling1)) / logScaling2);
+//				double scaledUnitValue = unit.value * scaleX;
+//				scaledUnitValue = ((Math.pow(scaledUnitValue, scalingFactor)) / scalingMaxValue);
+				final double scaledUnitValue = ((Math.pow(unit.value, scalingFactor)) * extScaleX);
 
 				// scale with devXOffset
 				devXUnitTick = (int) (scaledUnitValue);
@@ -2803,10 +2806,12 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
+		final double devGraphWidth = drawingData.devVirtualGraphWidth;
 
-		final double logScaling1 = xData.getLogScaling1();
-		final double logScaling2 = xData.getLogScaling2();
-		final boolean isLogScaling = logScaling1 != 1.0;
+		final double scalingFactor = xData.getScalingFactor();
+		final double scalingMaxValue = xData.getScalingMaxValue();
+		final boolean isExtendedScaling = scalingFactor != 1.0;
+		final double scaleXExtended = ((devGraphWidth - 1) / Math.pow(scalingMaxValue, scalingFactor));
 
 		// get colors
 		final RGB[] rgbLine = yData.getRgbLine();
@@ -2844,13 +2849,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// get the x/y positions
 				int devX;
-				if (isLogScaling) {
-
-					final double devXScaled = (xValue * scaleX);
-
-					devX = (int) ((Math.pow(devXScaled, logScaling1)) / logScaling2);
-//					devX = (int) ((Math.pow(devXScaled, logScaling1)) / drawingData.devVirtualGraphWidth);
-
+				if (isExtendedScaling) {
+					devX = (int) ((Math.pow(xValue, scalingFactor)) * scaleXExtended);
 				} else {
 					devX = (int) (xValue * scaleX);
 				}

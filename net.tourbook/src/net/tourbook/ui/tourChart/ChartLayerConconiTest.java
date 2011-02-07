@@ -35,13 +35,12 @@ public class ChartLayerConconiTest implements IChartLayer {
 
 	private float	_scaleX;
 	private float	_scaleY;
-	private int		_graphValueOffset;
 	private int		_devYBottom;
 	private int		_graphYBottom;
 
-	private double	_logScaling1;
-	private double	_logScaling2;
-	private boolean	_isLogScaling;
+	private double	_scalingFactor;
+	private double	_scaleXextended;
+	private boolean	_isExtendedScaling;
 
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
@@ -60,18 +59,16 @@ public class ChartLayerConconiTest implements IChartLayer {
 		_scaleX = drawingData.getScaleX();
 		_scaleY = drawingData.getScaleY();
 
-		_logScaling1 = xData.getLogScaling1();
-		_logScaling2 = xData.getLogScaling2();
-		_isLogScaling = _logScaling1 != 1.0;
-
-		// get the horizontal offset for the graph
-		final int devGraphImageXOffset = chart.getDevGraphImageXOffset();
-		_graphValueOffset = (int) (Math.max(0, devGraphImageXOffset) / _scaleX);
+		final double devGraphWidth = drawingData.devVirtualGraphWidth;
+		final double scalingMaxValue = xData.getScalingMaxValue();
+		_scalingFactor = xData.getScalingFactor();
+		_isExtendedScaling = _scalingFactor != 1.0;
+		_scaleXextended = ((devGraphWidth - 1) / Math.pow(scalingMaxValue, _scalingFactor));
 
 		// get the top/bottom of the graph
 		_devYBottom = drawingData.getDevYBottom();
-		final int devYTop = _devYBottom - drawingData.devGraphHeight;
 		_graphYBottom = drawingData.getGraphYBottom();
+		final int devYTop = _devYBottom - drawingData.devGraphHeight;
 
 		/*
 		 * draw regression lines
@@ -161,17 +158,14 @@ public class ChartLayerConconiTest implements IChartLayer {
 		final double graphYStart = linReg.calculateY(graphXStart);
 		final double graphYEnd = linReg.calculateY(graphXEnd);
 
-		final double devXStartDbl = (graphXStart - _graphValueOffset) * _scaleX;
-		final double devXEndDbl = (graphXEnd - _graphValueOffset) * _scaleX;
-
 		int devXStart;
 		int devXEnd;
-		if (_isLogScaling) {
-			devXStart = (int) ((Math.pow(devXStartDbl, _logScaling1)) / _logScaling2);
-			devXEnd = (int) ((Math.pow(devXEndDbl, _logScaling1)) / _logScaling2);
+		if (_isExtendedScaling) {
+			devXStart = (int) ((Math.pow(graphXStart, _scalingFactor)) * _scaleXextended);
+			devXEnd = (int) ((Math.pow(graphXEnd, _scalingFactor)) * _scaleXextended);
 		} else {
-			devXStart = (int) devXStartDbl;
-			devXEnd = (int) devXEndDbl;
+			devXStart = (int) (graphXStart * _scaleX);
+			devXEnd = (int) (graphXEnd * _scaleX);
 		}
 
 		final int devYStart = _devYBottom - ((int) ((graphYStart - _graphYBottom) * _scaleY));
@@ -188,13 +182,11 @@ public class ChartLayerConconiTest implements IChartLayer {
 		final int size = 20;//9;
 		final int size2 = size / 2;
 
-		// get the x/y positions
-		final double devXDbl = (graphX - _graphValueOffset) * _scaleX;
 		int devX;
-		if (_isLogScaling) {
-			devX = (int) ((Math.pow(devXDbl, _logScaling1)) / _logScaling2);
+		if (_isExtendedScaling) {
+			devX = (int) ((Math.pow(graphX, _scalingFactor)) * _scaleXextended);
 		} else {
-			devX = (int) devXDbl;
+			devX = (int) (graphX * _scaleX);
 		}
 
 		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
@@ -215,12 +207,11 @@ public class ChartLayerConconiTest implements IChartLayer {
 		final int size = 20;//9;
 		final int size2 = size / 2;
 
-		final double devXDbl = (graphX - _graphValueOffset) * _scaleX;
 		int devX;
-		if (_isLogScaling) {
-			devX = (int) ((Math.pow(devXDbl, _logScaling1)) / _logScaling2);
+		if (_isExtendedScaling) {
+			devX = (int) ((Math.pow(graphX, _scalingFactor)) * _scaleXextended);
 		} else {
-			devX = (int) devXDbl;
+			devX = (int) (graphX * _scaleX);
 		}
 		final int devY = _devYBottom - ((int) ((graphY - _graphYBottom) * _scaleY));
 

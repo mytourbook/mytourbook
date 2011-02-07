@@ -227,6 +227,8 @@ public class Messages extends NLS {
 
 	public static String		Conconi_Chart_DeflactionPoint;
 	public static String		Conconi_Chart_InvalidData;
+	public static String	Conconi_Chart_Label_ScalingFactor;
+
 	public static String		Conconi_Chart_Label_Tour;
 	public static String		Conconi_Chart_Label_Tour_Tooltip;
 

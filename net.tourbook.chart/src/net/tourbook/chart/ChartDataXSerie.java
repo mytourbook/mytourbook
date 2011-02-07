@@ -56,8 +56,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * Scaling for the x-axis which is computed with {@link Math#pow(double, double)} when this
 	 * value is <code>!= 1</code>
 	 */
-	private double			_logScaling1			= 1;
-	private double			_logScaling2			= 1;
+	private double			_scalingFactor			= 1;
+	private double			_scalingMaxValue		= 1;
 
 	public ChartDataXSerie(final int values[]) {
 		setMinMaxValues(new int[][] { values });
@@ -75,12 +75,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @return Returns scaling for the x-axis which is computed with Math.pow(double, double). This
 	 *         scaling is disabled when <code>1</code> is returned.
 	 */
-	public double getLogScaling1() {
-		return _logScaling1;
-	}
-
-	public double getLogScaling2() {
-		return _logScaling2;
+	public double getScalingFactor() {
+		return _scalingFactor;
 	}
 
 	public int[] getRangeMarkerEndIndex() {
@@ -89,6 +85,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public int[] getRangeMarkerStartIndex() {
 		return _rangeMarkerStartIndex;
+	}
+
+	public double getScalingMaxValue() {
+		return _scalingMaxValue;
 	}
 
 	/**
@@ -116,11 +116,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 		_chartSegments = chartSegments;
 	}
 
-	public void setLogScaling(final double logScaling1, final double logScaling2) {
-		_logScaling1 = logScaling1;
-		_logScaling2 = logScaling2;
-	}
-
 	@Override
 	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
 
@@ -133,6 +128,11 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setRangeMarkers(final int[] rangeMarkerStartIndex, final int[] rangeMarkerEndIndex) {
 		_rangeMarkerStartIndex = rangeMarkerStartIndex;
 		_rangeMarkerEndIndex = rangeMarkerEndIndex;
+	}
+
+	public void setScalingFactors(final double scalingFactor, final double scalingMaxValue) {
+		_scalingFactor = scalingFactor;
+		_scalingMaxValue = scalingMaxValue;
 	}
 
 	/**
