@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,7 +58,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private ArrayList<TourData>	_selectedTours;
 
-	public class ActionTagCategory extends Action implements IMenuCreator {
+	private class ActionTagCategory extends Action implements IMenuCreator {
 
 		private Menu					_categoryMenu;
 		private final TourTagCategory	_tagCategory;
@@ -115,18 +115,18 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private class ActionTourTag extends Action {
 
-		private final TourTag	fTourTag;
+		private final TourTag	_tourTag;
 
 		public ActionTourTag(final TourTag tourTag) {
 
 			super(tourTag.getTagName(), AS_CHECK_BOX);
 
-			fTourTag = tourTag;
+			_tourTag = tourTag;
 		}
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(fTourTag, _tourProvider, _isAddMode, _isSaveTour);
+			TagManager.setTagIntoTour(_tourTag, _tourProvider, _isAddMode, _isSaveTour);
 		}
 
 	}
@@ -230,7 +230,19 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	}
 
 	public Menu getMenu(final Control parent) {
-		return null;
+
+		dispose();
+		_menu = new Menu(parent);
+
+		// Add listener to repopulate the menu each time
+		_menu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(final MenuEvent e) {
+				onFillMenu((Menu) e.widget);
+			}
+		});
+
+		return _menu;
 	}
 
 	public Menu getMenu(final Menu parent) {
@@ -242,53 +254,60 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		_menu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuShown(final MenuEvent e) {
-
-				final Menu menu = (Menu) e.widget;
-
-				// dispose old items
-				final MenuItem[] items = menu.getItems();
-				for (final MenuItem item : items) {
-					item.dispose();
-				}
-
-				// check if a tour is selected
-				_selectedTours = _tourProvider.getSelectedTours();
-				if (_selectedTours == null || _selectedTours.size() == 0) {
-					// a tour is not selected
-					return;
-				}
-
-				// get all tags for all tours
-				_selectedTags = new HashSet<TourTag>();
-				for (final TourData tourData : _selectedTours) {
-					final Set<TourTag> tags = tourData.getTourTags();
-					if (tags != null) {
-						_selectedTags.addAll(tags);
-					}
-				}
-
-				if (_isAddMode) {
-
-					// add tags, create actions for the root tags
-
-					final TagCollection rootTagCollection = TourDatabase.getRootTags();
-
-					createCategoryActions(rootTagCollection, _menu);
-					createTagActions(rootTagCollection, _menu);
-
-				} else {
-
-					// remove tags, create actions for all tags of all selected tours
-
-					final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(_selectedTags);
-					Collections.sort(sortedTags);
-
-					createTagActions(new TagCollection(sortedTags), _menu);
-				}
+				onFillMenu((Menu) e.widget);
 			}
 		});
 
 		return _menu;
+	}
+
+	/**
+	 * Fill the context menu and check/disable tags for the selected tours
+	 * 
+	 * @param menu
+	 */
+	private void onFillMenu(final Menu menu) {
+
+		// dispose old items
+		final MenuItem[] items = menu.getItems();
+		for (final MenuItem item : items) {
+			item.dispose();
+		}
+
+		// check if a tour is selected
+		_selectedTours = _tourProvider.getSelectedTours();
+		if (_selectedTours == null || _selectedTours.size() == 0) {
+			// a tour is not selected
+			return;
+		}
+
+		// get all tags for all tours
+		_selectedTags = new HashSet<TourTag>();
+		for (final TourData tourData : _selectedTours) {
+			final Set<TourTag> tags = tourData.getTourTags();
+			if (tags != null) {
+				_selectedTags.addAll(tags);
+			}
+		}
+
+		if (_isAddMode) {
+
+			// add tags, create actions for the root tags
+
+			final TagCollection rootTagCollection = TourDatabase.getRootTags();
+
+			createCategoryActions(rootTagCollection, _menu);
+			createTagActions(rootTagCollection, _menu);
+
+		} else {
+
+			// remove tags, create actions for all tags of all selected tours
+
+			final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(_selectedTags);
+			Collections.sort(sortedTags);
+
+			createTagActions(new TagCollection(sortedTags), _menu);
+		}
 	}
 
 	@Override
