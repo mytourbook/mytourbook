@@ -32,6 +32,7 @@ import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionRemoveTourTag;
 import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
@@ -184,7 +185,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionSetLayoutFlat				_actionSetLayoutFlat;
 	private ActionRefreshView				_actionRefreshView;
 	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionSetTourTag				_actionRemoveTag;
+	private ActionRemoveTourTag				_actionRemoveTag;
 	private ActionRenameTag					_actionRenameTag;
 	private ActionMenuSetAllTagStructures	_actionSetAllTagStructures;
 	private ActionMenuSetTagStructure		_actionSetTagStructure;
@@ -468,7 +469,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
 		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
+		_actionRemoveTag = new ActionRemoveTourTag(this, true);
 		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		_actionRefreshView = new ActionRefreshView(this);

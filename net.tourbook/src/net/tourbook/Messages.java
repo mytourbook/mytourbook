@@ -74,6 +74,13 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_title;
 
+	public static String		Action_Tag_Add_AutoOpen;
+	public static String		Action_Tag_Add_AutoOpen_ModifiedTags;
+	public static String		Action_Tag_Add_AutoOpen_Title;
+	public static String		Action_Tag_Add_RecentTags;
+	public static String		Action_Tag_AutoOpenCancel;
+	public static String		Action_Tag_AutoOpenOK;
+	public static String		Action_Tag_Remove_AutoOpen;
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -221,14 +228,11 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 
-	public static String	Conconi_Chart_Chk_LogScaling;
-
-	public static String	Conconi_Chart_Chk_LogScaling_Tooltip;
-
+	public static String		Conconi_Chart_Chk_LogScaling;
+	public static String		Conconi_Chart_Chk_LogScaling_Tooltip;
 	public static String		Conconi_Chart_DeflactionPoint;
 	public static String		Conconi_Chart_InvalidData;
-	public static String	Conconi_Chart_Label_ScalingFactor;
-
+	public static String		Conconi_Chart_Label_ScalingFactor;
 	public static String		Conconi_Chart_Label_Tour;
 	public static String		Conconi_Chart_Label_Tour_Tooltip;
 
@@ -387,6 +391,8 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_time;
 
 	public static String		Image___Empty16;
+	public static String		Image__App_Cancel;
+	public static String		Image__App_OK;
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
 	public static String		Image__chart_analyzer;
@@ -538,6 +544,9 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
+	public static String		Pref_Appearance_Check_AutoOpenTagging;
+	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
+	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;
@@ -705,6 +714,8 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_h;
 	public static String		Pref_Statistic_Label_interval;
 	public static String		Pref_Statistic_Label_separator;
+
+	public static String		Pref_TourTag_Link_AppearanceOptions;
 
 	public static String		Pref_TourTypeFilter_button_new;
 	public static String		Pref_TourTypeFilter_button_remove;
@@ -1080,7 +1091,6 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String		UI_Label_no_chart_is_selected;
-
 	public static String		UI_Label_TourIsNotSelected;
 
 	public static String		ui_tour_not_defined;

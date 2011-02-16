@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,8 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
+	public static final String		ID			= "net.tourbook.preferences.PrefPageAppearance";	//$NON-NLS-1$
+
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isModified	= false;
@@ -61,6 +63,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	private Spinner					_spinnerRecentTags;
 	private Button					_chkMemMonitor;
 
+	private Button					_chkAutoOpenTagging;
+	private Spinner					_spinnerAutoOpenDelay;
+	private Label					_lblAutoTagDelay;
+	private Label					_lblAutoOpenMS;
+
 	public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
 	}
@@ -73,6 +80,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		final Composite container = createUI(parent);
 
 		restoreState();
+		enableControls();
 
 		return container;
 	}
@@ -90,6 +98,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			 */
 			label = new Label(container, NONE);
 			label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
+			label.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
 
 			// spinner
 			_spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
@@ -108,6 +117,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			 */
 			label = new Label(container, NONE);
 			label.setText(Messages.pref_appearance_number_of_recent_tags);
+			label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
 
 			// spinner
 			_spinnerRecentTags = new Spinner(container, SWT.BORDER);
@@ -121,14 +131,66 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			_spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
 			_spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
 
+			createUI20TaggingAutoOpen(container);
+
 			/*
 			 * memory monitor
 			 */
 			_chkMemMonitor = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkMemMonitor);
+			GridDataFactory.fillDefaults().span(2, 1).indent(0, 10).applyTo(_chkMemMonitor);
 			_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 		}
 		return container;
+	}
+
+	private void createUI20TaggingAutoOpen(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 2).applyTo(container);
+		{
+			/*
+			 * autoopen tagging
+			 */
+			_chkAutoOpenTagging = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
+			_chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
+			_chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
+			_chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
+
+			final Composite autoTagContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).applyTo(autoTagContainer);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
+			{
+				// label: delay
+				_lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
+				_lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
+
+				// spinner
+				_spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinnerAutoOpenDelay);
+				_spinnerAutoOpenDelay.setMinimum(0);
+				_spinnerAutoOpenDelay.setMaximum(3000);
+				_spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionAdapter);
+				_spinnerAutoOpenDelay.addMouseWheelListener(_defaultMouseWheelListener);
+
+				// label: ms
+				_lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
+				_lblAutoOpenMS.setText(UI.UNIT_LABEL_MS);
+			}
+		}
+	}
+
+	private void enableControls() {
+
+		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
+
+		_lblAutoOpenMS.setEnabled(isTagAutoOpen);
+		_lblAutoTagDelay.setEnabled(isTagAutoOpen);
+		_spinnerAutoOpenDelay.setEnabled(isTagAutoOpen);
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -143,6 +205,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeProperty();
+				enableControls();
 			}
 		};
 
@@ -180,12 +243,19 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_spinnerRecentTourTypes.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
 
+		_chkAutoOpenTagging.setSelection(_prefStore
+				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+		_spinnerAutoOpenDelay.setSelection(_prefStore
+				.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+
 		_chkMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 
 		super.performDefaults();
 
 		// this do not work, I have no idea why, but with the apply button it works :-(
 //		fireModificationEvent();
+
+		enableControls();
 	}
 
 	@Override
@@ -228,6 +298,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_spinnerRecentTourTypes.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
 
+		_chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+		_spinnerAutoOpenDelay.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+
 		_chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
 	}
 
@@ -240,6 +313,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_prefStore.setValue(
 				ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES,
 				_spinnerRecentTourTypes.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, _chkAutoOpenTagging.getSelection());
+		_prefStore.setValue(
+				ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,
+				_spinnerAutoOpenDelay.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
 	}

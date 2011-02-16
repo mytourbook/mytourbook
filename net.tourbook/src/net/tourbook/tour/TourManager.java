@@ -1033,6 +1033,7 @@ public class TourManager {
 			} catch (final MyTourbookException e) {
 				// error is already displayed, just log it
 				e.printStackTrace();
+				return;
 			}
 
 			if (tourDataInEditor == tourData) {

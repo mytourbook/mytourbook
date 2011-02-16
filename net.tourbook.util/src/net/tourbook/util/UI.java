@@ -49,8 +49,9 @@ public class UI {
 	 */
 	public static final String	ELLIPSIS				= "...";																	//$NON-NLS-1$
 
-	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean	IS_LINUX				= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
+	public static final boolean	IS_OSX					= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean	IS_WIN					= "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * contains a new line

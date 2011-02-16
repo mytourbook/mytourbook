@@ -22,17 +22,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.util.ActionAdvancedMenu;
+import net.tourbook.util.IActionAdvancedMenu;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
@@ -42,39 +48,114 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Add or removes a tag from the selected tours
  */
-public class ActionSetTourTag extends Action implements IMenuCreator {
+public class ActionSetTourTag extends Action implements IMenuCreator, IActionAdvancedMenu {
 
-	private Menu				_menu;
+	private static final String		SPACE_PRE_TAG	= "   ";						//$NON-NLS-1$
 
-	private final ITourProvider	_tourProvider;
+	private Menu					_menu;
 
-	private final boolean		_isAddMode;
-	private final boolean		_isSaveTour;
+	private final ITourProvider		_tourProvider;
+
+	private final boolean			_isAddMode;
+	private final boolean			_isSaveTour;
 
 	/**
 	 * contains the tags for all selected tours in the viewer
 	 */
-	private Set<TourTag>		_selectedTags;
+	private Set<TourTag>			_selectedTourTags;
+	private ArrayList<TourData>		_selectedTours;
 
-	private ArrayList<TourData>	_selectedTours;
+	private HashMap<Long, TourTag>	_modifiedTags	= new HashMap<Long, TourTag>();
+
+	private ActionAdvancedMenu		_advancedMenuProvider;
+
+	private ActionOpenPrefDialog	_actionOpenTagPrefs;
+	private Action					_actionAddTagTitle;
+	private Action					_actionRecentTags;
+
+	private final class ActionCancel extends Action {
+
+		private ActionCancel() {
+
+			super(Messages.Action_Tag_AutoOpenCancel);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Cancel));
+		}
+
+		@Override
+		public void run() {
+			resetData();
+		}
+	}
+
+	public class ActionModifiedTag extends Action {
+
+		private final TourTag	__tourTag;
+
+		public ActionModifiedTag(final TourTag tourTag) {
+
+			super(SPACE_PRE_TAG + tourTag.getTagName(), AS_CHECK_BOX);
+
+			__tourTag = tourTag;
+
+			// this tag is always checked, unchecking it will also remove it
+			setChecked(true);
+		}
+
+		@Override
+		public void run() {
+
+			// uncheck/remove this tag
+			_modifiedTags.remove(__tourTag.getTagId());
+
+			// reopen action menu
+			_advancedMenuProvider.openActionMenu();
+		}
+	}
+
+	private class ActionModifiedTags extends Action {
+
+		public ActionModifiedTags() {
+
+			super(Messages.Action_Tag_Add_AutoOpen_ModifiedTags);
+
+			// this action is only for info
+			setEnabled(false);
+		}
+	}
+
+	private final class ActionOK extends Action {
+
+		private ActionOK() {
+
+			super(Messages.Action_Tag_AutoOpenOK);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_OK));
+		}
+
+		@Override
+		public void run() {
+			saveTags();
+		}
+	}
 
 	private class ActionTagCategory extends Action implements IMenuCreator {
 
-		private Menu					_categoryMenu;
-		private final TourTagCategory	_tagCategory;
+		private Menu					__categoryMenu;
+		private final TourTagCategory	__tagCategory;
 
 		public ActionTagCategory(final TourTagCategory tagCategory) {
 
 			super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
 			setMenuCreator(this);
 
-			_tagCategory = tagCategory;
+			__tagCategory = tagCategory;
 		}
 
 		public void dispose() {
-			if (_categoryMenu != null) {
-				_categoryMenu.dispose();
-				_categoryMenu = null;
+			if (__categoryMenu != null) {
+				__categoryMenu.dispose();
+				__categoryMenu = null;
 			}
 		}
 
@@ -85,10 +166,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		public Menu getMenu(final Menu parent) {
 
 			dispose();
-			_categoryMenu = new Menu(parent);
+			__categoryMenu = new Menu(parent);
 
 			// Add listener to repopulate the menu each time
-			_categoryMenu.addMenuListener(new MenuAdapter() {
+			__categoryMenu.addMenuListener(new MenuAdapter() {
 				@Override
 				public void menuShown(final MenuEvent e) {
 
@@ -100,35 +181,44 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 						item.dispose();
 					}
 
-					final TagCollection tagCollection = TourDatabase.getTagEntries(_tagCategory.getCategoryId());
+					final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
 
 					// add actions
-					createCategoryActions(tagCollection, _categoryMenu);
-					createTagActions(tagCollection, _categoryMenu);
+					createCategoryActions(tagCollection, __categoryMenu);
+					createTagActions(tagCollection, __categoryMenu);
 				}
 			});
 
-			return _categoryMenu;
+			return __categoryMenu;
 		}
-
 	}
 
 	private class ActionTourTag extends Action {
 
-		private final TourTag	_tourTag;
+		private final TourTag	__tourTag;
 
 		public ActionTourTag(final TourTag tourTag) {
 
 			super(tourTag.getTagName(), AS_CHECK_BOX);
 
-			_tourTag = tourTag;
+			__tourTag = tourTag;
 		}
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(_tourTag, _tourProvider, _isAddMode, _isSaveTour);
-		}
 
+			if (_advancedMenuProvider == null) {
+
+				// add tag
+				_modifiedTags.put(__tourTag.getTagId(), __tourTag);
+
+				saveTags();
+
+			} else {
+
+				setTourTag(isChecked(), __tourTag);
+			}
+		}
 	}
 
 	/**
@@ -159,6 +249,40 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		setMenuCreator(this);
 	}
 
+	/**
+	 * This constructor creates a push button action without a drop down menu
+	 * 
+	 * @param tourProvider
+	 * @param isAddMode
+	 * @param isSaveTour
+	 * @param isAutoOpen
+	 *            This parameter is ignored but it indicates that the menu auto open behaviour is
+	 *            used.
+	 */
+	public ActionSetTourTag(final ITourProvider tourProvider,
+							final boolean isAddMode,
+							final boolean isSaveTour,
+							final boolean isAutoOpen) {
+
+		super(UI.IS_NOT_INITIALIZED, AS_PUSH_BUTTON);
+
+		setText(Messages.Action_Tag_Add_AutoOpen);
+
+		_tourProvider = tourProvider;
+		_isAddMode = isAddMode;
+		_isSaveTour = isSaveTour;
+
+		_actionAddTagTitle = new Action(Messages.Action_Tag_Add_AutoOpen_Title) {};
+		_actionAddTagTitle.setEnabled(false);
+
+		_actionRecentTags = new Action(Messages.Action_Tag_Add_RecentTags) {};
+		_actionRecentTags.setEnabled(false);
+
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+				Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
+	}
+
 	private void addActionToMenu(final Menu menu, final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
@@ -175,21 +299,26 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private void createTagActions(final TagCollection tagCollection, final Menu menu) {
 
-		final ArrayList<TourTag> tourTags = tagCollection.tourTags;
-		if (tourTags == null) {
+		final ArrayList<TourTag> allTourTags = tagCollection.tourTags;
+		if (allTourTags == null) {
 			return;
 		}
 
 		// add tag items
-		for (final TourTag menuTourTag : tourTags) {
+		for (final TourTag menuTourTag : allTourTags) {
 
 			// check the tag when it's set in the tour
 			final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
 
+			final boolean isModifiedTags = _modifiedTags.size() > 0;
+			final boolean isSelectedTags = _selectedTourTags != null;
+
 			boolean isTagChecked = false;
 			final boolean isOneTour = _selectedTours != null && _selectedTours.size() == 1;
-			if (_selectedTags != null && //
-					(isOneTour || _isAddMode == false)) {
+			final boolean isRemoveMode = _isAddMode == false;
+			boolean isModifiedTag = false;
+
+			if (isSelectedTags && (isOneTour || isRemoveMode)) {
 
 				/*
 				 * only when one tour is selected check the tag otherwise it's confusing, a
@@ -198,23 +327,41 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				final long tagId = menuTourTag.getTagId();
 
-				for (final TourTag checkTourTag : _selectedTags) {
-					if (checkTourTag.getTagId() == tagId) {
-						isTagChecked = true;
-						break;
+				if (isSelectedTags) {
+
+					for (final TourTag _selectedTourTag : _selectedTourTags) {
+						if (_selectedTourTag.getTagId() == tagId) {
+							isTagChecked = true;
+							break;
+						}
 					}
 				}
+
 			}
+
+			if (isModifiedTags) {
+
+				if (isTagChecked == false && _modifiedTags.containsValue(menuTourTag)) {
+					isTagChecked = true;
+					isModifiedTag = true;
+				}
+
+			}
+
 			actionTourTag.setChecked(isTagChecked);
 
 			// disable tags which are not tagged
-			if (isOneTour) {
+			if (isModifiedTag) {
+
+				// modified tags are always enabled
+
+			} else if (isOneTour) {
 				if (_isAddMode) {
 					actionTourTag.setEnabled(!isTagChecked);
 				} else {
 					actionTourTag.setEnabled(isTagChecked);
 				}
-			} else if (_isAddMode == false) {
+			} else if (isRemoveMode) {
 				actionTourTag.setEnabled(isTagChecked);
 			}
 
@@ -229,44 +376,12 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		}
 	}
 
-	public Menu getMenu(final Control parent) {
-
-		dispose();
-		_menu = new Menu(parent);
-
-		// Add listener to repopulate the menu each time
-		_menu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuShown(final MenuEvent e) {
-				onFillMenu((Menu) e.widget);
-			}
-		});
-
-		return _menu;
-	}
-
-	public Menu getMenu(final Menu parent) {
-
-		dispose();
-		_menu = new Menu(parent);
-
-		// Add listener to repopulate the menu each time
-		_menu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuShown(final MenuEvent e) {
-				onFillMenu((Menu) e.widget);
-			}
-		});
-
-		return _menu;
-	}
-
 	/**
 	 * Fill the context menu and check/disable tags for the selected tours
 	 * 
 	 * @param menu
 	 */
-	private void onFillMenu(final Menu menu) {
+	private void fillMenu(final Menu menu) {
 
 		// dispose old items
 		final MenuItem[] items = menu.getItems();
@@ -282,11 +397,11 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		}
 
 		// get all tags for all tours
-		_selectedTags = new HashSet<TourTag>();
+		_selectedTourTags = new HashSet<TourTag>();
 		for (final TourData tourData : _selectedTours) {
 			final Set<TourTag> tags = tourData.getTourTags();
 			if (tags != null) {
-				_selectedTags.addAll(tags);
+				_selectedTourTags.addAll(tags);
 			}
 		}
 
@@ -294,29 +409,166 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 			// add tags, create actions for the root tags
 
+			final boolean isTagAvailable = TourDatabase.getAllTourTags().size() > 0;
 			final TagCollection rootTagCollection = TourDatabase.getRootTags();
 
-			createCategoryActions(rootTagCollection, _menu);
-			createTagActions(rootTagCollection, _menu);
+			if (_advancedMenuProvider == null) {
+
+				createCategoryActions(rootTagCollection, menu);
+				createTagActions(rootTagCollection, menu);
+
+			} else {
+
+				/*
+				 * this action is managed by the advanced menu provider
+				 */
+
+				// create title menu items
+
+				addActionToMenu(menu, _actionAddTagTitle);
+
+				(new Separator()).fill(menu, -1);
+				{
+					createCategoryActions(rootTagCollection, menu);
+					createTagActions(rootTagCollection, menu);
+				}
+
+				if (isTagAvailable) {
+
+					(new Separator()).fill(menu, -1);
+					{
+						addActionToMenu(menu, _actionRecentTags);
+						TagManager.fillMenuRecentTags(menu, this, true, true);
+					}
+				}
+
+				final boolean isModifiedTags = _modifiedTags.size() > 0;
+
+				if (isModifiedTags) {
+
+					(new Separator()).fill(menu, -1);
+					{
+						addActionToMenu(menu, new ActionModifiedTags());
+
+						// create actions
+						final ArrayList<TourTag> modifiedTags = new ArrayList<TourTag>(_modifiedTags.values());
+						Collections.sort(modifiedTags);
+
+						for (final TourTag tourTag : modifiedTags) {
+							addActionToMenu(menu, new ActionModifiedTag(tourTag));
+						}
+					}
+				}
+
+				(new Separator()).fill(menu, -1);
+				{
+
+					if (isModifiedTags) {
+						addActionToMenu(menu, new ActionOK());
+					}
+
+					addActionToMenu(menu, new ActionCancel());
+					addActionToMenu(menu, _actionOpenTagPrefs);
+				}
+			}
 
 		} else {
 
 			// remove tags, create actions for all tags of all selected tours
 
-			final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(_selectedTags);
+			final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(_selectedTourTags);
 			Collections.sort(sortedTags);
 
-			createTagActions(new TagCollection(sortedTags), _menu);
+			createTagActions(new TagCollection(sortedTags), menu);
 		}
+	}
+
+	public Menu getMenu(final Control parent) {
+
+		dispose();
+
+		_menu = new Menu(parent);
+
+		// Add listener to repopulate the menu each time
+		_menu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(final MenuEvent e) {
+				fillMenu((Menu) e.widget);
+			}
+		});
+
+		return _menu;
+	}
+
+	public Menu getMenu(final Menu parent) {
+
+		dispose();
+		_modifiedTags.clear();
+
+		_menu = new Menu(parent);
+
+		// Add listener to repopulate the menu each time
+		_menu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(final MenuEvent e) {
+				fillMenu((Menu) e.widget);
+			}
+		});
+
+		return _menu;
+	}
+
+	@Override
+	public void resetData() {
+		_modifiedTags.clear();
+	}
+
+	@Override
+	public void run() {
+		_advancedMenuProvider.openActionMenu();
+	}
+
+	private void saveTags() {
+
+		if (_modifiedTags.size() > 0) {
+			TagManager.setTagIntoTour(_modifiedTags, _tourProvider, _isAddMode, _isSaveTour);
+		}
+	}
+
+	@Override
+	public void setAdvancedMenuProvider(final ActionAdvancedMenu advancedMenuProvider) {
+		_advancedMenuProvider = advancedMenuProvider;
 	}
 
 	@Override
 	public void setEnabled(final boolean enabled) {
 
-		// ensure tags are available
-		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+		if (_advancedMenuProvider == null) {
 
-		super.setEnabled(enabled && allTags.size() > 0);
+			// ensure tags are available
+			final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+
+			super.setEnabled(enabled && allTags.size() > 0);
+
+		} else {
+
+			super.setEnabled(enabled);
+		}
+	}
+
+	void setTourTag(final boolean isChecked, final TourTag tourTag) {
+
+		// update tags
+		if (isChecked) {
+			// add tag
+			_modifiedTags.put(tourTag.getTagId(), tourTag);
+		} else {
+			// remove tag
+			_modifiedTags.remove(tourTag.getTagId());
+		}
+
+		// reopen action menu
+		_advancedMenuProvider.openActionMenu();
 	}
 
 }

@@ -142,6 +142,7 @@ public class UI {
 	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";								//$NON-NLS-1$
 
 	public static final String								UNIT_LABEL_POWER				= "Watt";									//$NON-NLS-1$
+	public static final String								UNIT_LABEL_MS					= "ms";									//$NON-NLS-1$
 
 	public static final String								SYMBOL_AVERAGE					= "\u00d8";								//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00d8 ";								//$NON-NLS-1$
@@ -1059,7 +1060,7 @@ public class UI {
 			tourTagLabel.setToolTipText(tagLabels);
 		}
 
-		tourTagLabel.pack(true);
+//		tourTagLabel.pack(true);
 	}
 
 	/**
