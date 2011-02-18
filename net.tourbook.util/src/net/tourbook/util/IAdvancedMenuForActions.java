@@ -15,23 +15,23 @@
  *******************************************************************************/
 package net.tourbook.util;
 
-public interface IActionAdvancedMenu {
+public interface IAdvancedMenuForActions {
+
+	/**
+	 * Method is called when the advance menu is displayed
+	 */
+	void onShowMenu();
 
 	/**
 	 * Resets data which are keept when the advanced menu is open
 	 */
 	void resetData();
 
-//	/**
-//	 * Save data which are keept when the advanced menu is open
-//	 */
-//	void saveData();
-
 	/**
 	 * Set the advanced menu into an action
 	 * 
 	 * @param actionAdvancedMenu
 	 */
-	void setAdvancedMenuProvider(ActionAdvancedMenu actionAdvancedMenu);
+	void setAdvancedMenuProvider(AdvancedMenuForActions actionAdvancedMenu);
 
 }

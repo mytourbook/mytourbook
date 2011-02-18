@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TreeViewerItem;
@@ -594,7 +594,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// remove old tags from cached tours
 			TourDatabase.clearTourTags();
 
-			TagManager.updateTagNames();
+			TagMenuManager.updateRecentTagNames();
 
 			TourManager.getInstance().clearTourDataCache();
 

@@ -25,9 +25,6 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -43,12 +40,10 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionRemoveTourTag extends Action implements IMenuCreator {
 
+	private TagMenuManager		_tagMenuMgr;
 	private Menu				_menu;
 
-	private final ITourProvider	_tourProvider;
 	private ArrayList<TourData>	_selectedTours;
-
-	private final boolean		_isSaveTour;
 
 	/**
 	 * contains the tags for all selected tours in the viewer
@@ -68,26 +63,16 @@ public class ActionRemoveTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(_tourTag, _tourProvider, false, _isSaveTour);
+			_tagMenuMgr.saveTourTags(_tourTag, false);
 		}
-
 	}
 
-	/**
-	 * @param tourProvider
-	 * @param isSaveTour
-	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
-	 *            from the tour provider is only updated
-	 */
-	public ActionRemoveTourTag(final ITourProvider tourProvider, final boolean isSaveTour) {
+	public ActionRemoveTourTag(final TagMenuManager tagMenuManager) {
 
-		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
+		super(Messages.action_tag_remove, AS_DROP_DOWN_MENU);
 
-		_tourProvider = tourProvider;
-		_isSaveTour = isSaveTour;
+		_tagMenuMgr = tagMenuManager;
 
-		setText(Messages.action_tag_remove);
 		setMenuCreator(this);
 	}
 
@@ -127,6 +112,8 @@ public class ActionRemoveTourTag extends Action implements IMenuCreator {
 						break;
 					}
 				}
+			} else {
+				isTagChecked = true;
 			}
 
 			actionTourTag.setChecked(isTagChecked);
@@ -189,7 +176,7 @@ public class ActionRemoveTourTag extends Action implements IMenuCreator {
 		}
 
 		// check if a tour is selected
-		_selectedTours = _tourProvider.getSelectedTours();
+		_selectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
 		if (_selectedTours == null || _selectedTours.size() == 0) {
 			// a tour is not selected
 			return;

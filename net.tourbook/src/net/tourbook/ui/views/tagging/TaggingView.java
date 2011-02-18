@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,10 +31,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceView;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionRemoveTourTag;
 import net.tourbook.tag.ActionRenameTag;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
@@ -57,7 +54,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -174,24 +170,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private IPropertyChangeListener			_prefChangeListener;
 	private IPartListener2					_partListener;
 
-	private ActionSetTourTag				_actionAddTag;
 	private ActionCollapseAll				_actionCollapseAll;
 	private ActionCollapseOthers			_actionCollapseOthers;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
 	private ActionExpandSelection			_actionExpandSelection;
-	private ActionOpenPrefDialog			_actionOpenTagPrefs;
 	private ActionSetLayoutHierarchical		_actionSetLayoutHierarchical;
 	private ActionSetLayoutFlat				_actionSetLayoutFlat;
 	private ActionRefreshView				_actionRefreshView;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionRemoveTourTag				_actionRemoveTag;
 	private ActionRenameTag					_actionRenameTag;
 	private ActionMenuSetAllTagStructures	_actionSetAllTagStructures;
 	private ActionMenuSetTagStructure		_actionSetTagStructure;
 	private ActionSetTourTypeMenu			_actionSetTourType;
 	private ActionOpenTour					_actionOpenTour;
 	private ActionModifyColumns				_actionModifyColumns;
+
+//	private ActionAddTourTag				_actionAddTag;
+//	private ActionRemoveTourTag				_actionRemoveTag;
+//	private ActionRemoveAllTags				_actionRemoveAllTags;
+//	private ActionOpenPrefDialog			_actionOpenTagPrefs;
 
 	/**
 	 * comparatore is sorting the tree items
@@ -468,9 +465,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionRemoveTourTag(this, true);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//		_actionAddTag = new ActionAddTourTag(this, true);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//
+//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+//				Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionRefreshView = new ActionRefreshView(this);
 		_actionSetTagStructure = new ActionMenuSetTagStructure(this);
@@ -480,10 +481,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_actionExpandSelection = new ActionExpandSelection(this);
 		_actionCollapseAll = new ActionCollapseAll(this);
 		_actionCollapseOthers = new ActionCollapseOthers(this);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionSetLayoutFlat = new ActionSetLayoutFlat(this);
 		_actionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
@@ -1263,7 +1260,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// action: add tag
-		_actionAddTag.setEnabled(isTourSelected);
+//		_actionAddTag.setEnabled(isTourSelected);
 
 		ArrayList<Long> existingTagIds = null;
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -1274,23 +1271,23 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			existingTagIds = firstTour.tagIds;
 			existingTourTypeId = firstTour.tourTypeId;
 
-			if (existingTagIds != null && existingTagIds.size() > 0) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
+//			if (existingTagIds != null && existingTagIds.size() > 0) {
+//
+//				// at least one tag is within the tour
+//
+//				_actionRemoveAllTags.setEnabled(true);
+//				_actionRemoveTag.setEnabled(true);
+//			} else {
+//				// tags are not available
+//				_actionRemoveAllTags.setEnabled(false);
+//				_actionRemoveTag.setEnabled(false);
+//			}
 		} else {
 
 			// multiple tours are selected
 
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
+//			_actionRemoveTag.setEnabled(isTourSelected);
+//			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
 		// enable rename action
@@ -1347,15 +1344,15 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+//		// tour tag actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionAddTag);
+//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+//		menuMgr.add(_actionRemoveTag);
+//		menuMgr.add(_actionRemoveAllTags);
+//		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions();
 	}

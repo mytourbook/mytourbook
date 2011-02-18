@@ -86,6 +86,7 @@ public class UI {
 	public static final String								SPACE2							= "  ";									//$NON-NLS-1$
 	public static final String								SPACE4							= "    ";									//$NON-NLS-1$
 	public static final String								COLON_SPACE						= ": ";									//$NON-NLS-1$
+	public static final String								COMMA_SPACE						= ", ";									//$NON-NLS-1$
 	public static final String								UNDERSCORE						= "_";										//$NON-NLS-1$
 	public static final String								DASH							= "-";										//$NON-NLS-1$
 	public static final String								DASH_WITH_SPACE					= " - ";									//$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -38,7 +35,6 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
@@ -64,10 +60,11 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 	private ActionExport					_actionExportTour;
 
 	private ActionSetTourTypeMenu			_actionSetTourType;
-	private ActionSetTourTag				_actionAddTag;
-	private ActionSetTourTag				_actionRemoveTag;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-	private ActionOpenPrefDialog			_actionOpenTagPrefDialog;
+
+//	private ActionAddTourTag				_actionAddTag;
+//	private ActionRemoveTourTag				_actionRemoveTag;
+//	private ActionRemoveAllTags				_actionRemoveAllTags;
+//	private ActionOpenPrefDialog			_actionOpenTagPrefDialog;
 
 	private ChartXSlider					_leftSlider;
 	private ChartXSlider					_rightSlider;
@@ -112,12 +109,12 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		_actionOpenAdjustAltitudeDialog.setEnabled(true);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-		_actionOpenTagPrefDialog = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+//		_actionAddTag = new ActionAddTourTag(this, true);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//		_actionOpenTagPrefDialog = new ActionOpenPrefDialog(
+//				Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -154,18 +151,18 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
 		if (isTourSaved) {
-			TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+			TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 		}
 
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		if (isTourSaved) {
-			TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		}
-		menuMgr.add(_actionOpenTagPrefDialog);
+//		// tour tag actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionAddTag);
+//		menuMgr.add(_actionRemoveTag);
+//		menuMgr.add(_actionRemoveAllTags);
+//		if (isTourSaved) {
+//			TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+//		}
+//		menuMgr.add(_actionOpenTagPrefDialog);
 
 		// set slider position in export action
 		_actionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
@@ -181,9 +178,9 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		_actionExportTour.setEnabled(true);
 
 		_actionSetTourType.setEnabled(isTourSaved);
-		_actionAddTag.setEnabled(isTourSaved);
-		_actionRemoveTag.setEnabled(isTourSaved);
-		_actionRemoveAllTags.setEnabled(isTourSaved && isTagAvailable);
+//		_actionAddTag.setEnabled(isTourSaved);
+//		_actionRemoveTag.setEnabled(isTourSaved);
+//		_actionRemoveAllTags.setEnabled(isTourSaved && isTagAvailable);
 
 		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(isTourSaved, allExistingTags);
