@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,8 +41,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -63,7 +61,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
@@ -213,18 +210,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionMergeIntoMenu					_actionMergeIntoTour;
 	private ActionMergeTour						_actionMergeTour;
 	private ActionModifyColumns					_actionModifyColumns;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenTour						_actionOpenTour;
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
 	private ActionReimportTour					_actionReimportTour;
 	private ActionReimportTourOnlyTimeSlices	_actionReimportTourTimeSlices;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
 	private ActionRemoveTour					_actionRemoveTour;
 	private ActionSaveTourInDatabase			_actionSaveTour;
 	private ActionSaveTourInDatabase			_actionSaveTourWithPerson;
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
+
+//	private ActionAddTourTag					_actionAddTag;
+//	private ActionRemoveAllTags					_actionRemoveAllTags;
+//	private ActionRemoveTourTag					_actionRemoveTag;
+//	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+
 	private ActionSetTourTypeMenu				_actionSetTourType;
 
 	// import actions
@@ -750,13 +749,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+//		_actionAddTag = new ActionAddTourTag(this, true);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//
+//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+//				Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		// view toolbar
 		_actionClearView = new ActionClearView(this);
@@ -1625,7 +1624,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && (tourTypes.size() > 0));
 
-		_actionAddTag.setEnabled(isTourSelected);
+//		_actionAddTag.setEnabled(isTourSelected);
 
 		Set<TourTag> existingTags = null;
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -1639,23 +1638,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			existingTags = firstSavedTour.getTourTags();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 
-			if ((existingTags != null) && (existingTags.size() > 0)) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
+//			if ((existingTags != null) && (existingTags.size() > 0)) {
+//
+//				// at least one tag is within the tour
+//
+//				_actionRemoveAllTags.setEnabled(true);
+//				_actionRemoveTag.setEnabled(true);
+//			} else {
+//				// tags are not available
+//				_actionRemoveAllTags.setEnabled(false);
+//				_actionRemoveTag.setEnabled(false);
+//			}
 		} else {
 
 			// multiple tours are selected
 
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
+//			_actionRemoveTag.setEnabled(isTourSelected);
+//			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
 		// enable/disable actions for tags/tour types
@@ -1692,15 +1691,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+//		// tour tag actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionAddTag);
+//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+//		menuMgr.add(_actionRemoveTag);
+//		menuMgr.add(_actionRemoveAllTags);
+//		menuMgr.add(_actionOpenTagPrefs);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

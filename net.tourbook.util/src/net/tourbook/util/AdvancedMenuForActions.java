@@ -32,22 +32,19 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TypedListener;
 
 /**
- * A subsequent menu will be automatically opened with a delay, when a menu item is hovered which is
- * done with the Arm listener.
+ * Opens a submenu automatically with a delay, when a menu item is hovered. This is done with the
+ * Arm listener.
  */
-public class ActionAdvancedMenu {
-
-//	private int							DELAY_OPEN_AUTO_MENU	= 200;
+public class AdvancedMenuForActions {
 
 	private final ContextArmListener	_contextArmListener	= new ContextArmListener();
 
-	private long						_armActionItemTime;							//		= -1;
-	private long						_armOtherItemTime;								//		= -1;
+	private long						_armActionItemTime;
+	private long						_armOtherItemTime;
 
-	private Menu						_actionContextMenu;
 	private ActionContributionItem		_actionContributionItem;
 
-	private Control						_menuParent;
+	private Control						_menuParentControl;
 	private Point						_contextMenuPosition;
 
 	private boolean						_isActionMenuOpen	= false;
@@ -68,14 +65,14 @@ public class ActionAdvancedMenu {
 	/**
 	 * @param actionContributionItem
 	 */
-	public ActionAdvancedMenu(final ActionContributionItem actionContributionItem) {
+	public AdvancedMenuForActions(final ActionContributionItem actionContributionItem) {
 
 		_actionContributionItem = actionContributionItem;
 
 		final IAction action = actionContributionItem.getAction();
 
-		if (action instanceof IActionAdvancedMenu) {
-			((IActionAdvancedMenu) action).setAdvancedMenuProvider(this);
+		if (action instanceof IAdvancedMenuForActions) {
+			((IAdvancedMenuForActions) action).setAdvancedMenuProvider(this);
 		}
 	}
 
@@ -137,8 +134,10 @@ public class ActionAdvancedMenu {
 		}
 
 		// hide menu which contains the add tag action
-		if (_actionContextMenu != null && _actionContextMenu.isDisposed() == false) {
-			_actionContextMenu.setVisible(false);
+
+		final Menu actionContextMenu = _menuParentControl.getMenu();
+		if (actionContextMenu != null && actionContextMenu.isDisposed() == false) {
+			actionContextMenu.setVisible(false);
 		}
 
 		// run async because the hide menu action is also doing cleanup in async mode
@@ -150,12 +149,22 @@ public class ActionAdvancedMenu {
 	}
 
 	/**
-	 * This is called when the context menu is displayed. An arm listener is added to each menu item
-	 * in the context menu.
+	 * This is called when the parent menu is displayed. An arm listener is added to each menu item
+	 * in the parent menu.
 	 * 
 	 * @param menuEvent
+	 * @param menuParentControl
+	 * @param isAutoOpen
+	 * @param autoOpenDelay
 	 */
-	public void onContextMenuShow(final MenuEvent menuEvent) {
+	public void onShowParentMenu(	final MenuEvent menuEvent,
+									final Control menuParentControl,
+									final boolean isAutoOpen,
+									final int autoOpenDelay) {
+
+		_menuParentControl = menuParentControl;
+		_isAutoOpen = isAutoOpen;
+		_autoOpenDelay = autoOpenDelay;
 
 		final Menu menu = (Menu) menuEvent.widget;
 
@@ -187,14 +196,14 @@ public class ActionAdvancedMenu {
 
 		// reset data from previous menu
 		final IAction action = _actionContributionItem.getAction();
-		if (action instanceof IActionAdvancedMenu) {
-			((IActionAdvancedMenu) action).resetData();
+		if (action instanceof IAdvancedMenuForActions) {
+			((IAdvancedMenuForActions) action).resetData();
 		}
 	}
 
 	/**
 	 * Opens the menu which is created by the action and is associated with this
-	 * {@link ActionAdvancedMenu}
+	 * {@link AdvancedMenuForActions}
 	 */
 	public void openActionMenu() {
 
@@ -207,7 +216,7 @@ public class ActionAdvancedMenu {
 
 			// create menu
 
-			final Menu actionMenu = ((IMenuCreator) action).getMenu(_menuParent);
+			final Menu actionMenu = ((IMenuCreator) action).getMenu(_menuParentControl);
 			if (actionMenu != null && actionMenu.isDisposed() == false) {
 
 				actionMenu.addMenuListener(new MenuListener() {
@@ -229,14 +238,4 @@ public class ActionAdvancedMenu {
 		}
 	}
 
-	public void setActionContextMenu(final Control control, final Menu contextMenu) {
-		_menuParent = control;
-		_actionContextMenu = contextMenu;
-	}
-
-	public void setAutoOpen(final boolean isAutoOpen, final int autoOpenDelay) {
-
-		_isAutoOpen = isAutoOpen;
-		_autoOpenDelay = autoOpenDelay;
-	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
@@ -46,7 +44,6 @@ import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -147,14 +144,16 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionUncheckTours					_actionUncheckTours;
 	private ActionModifyColumns					_actionModifyColumns;
 	private ActionCollapseAll					_actionCollapseAll;
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+
 	private ActionEditQuick						_actionEditQuick;
 	private ActionEditTour						_actionEditTour;
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionOpenTour						_actionOpenTour;
+
+//	private ActionAddTourTag					_actionAddTag;
+//	private ActionRemoveTourTag					_actionRemoveTag;
+//	private ActionRemoveAllTags					_actionRemoveAllTags;
+//	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -408,13 +407,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_actionUncheckTours = new ActionUncheckTours(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+//		_actionAddTag = new ActionAddTourTag(this, true);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//
+//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+//				Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionEditTour = new ActionEditTour(this);
@@ -947,7 +947,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		/*
 		 * tags: add/remove/remove all
 		 */
-		_actionAddTag.setEnabled(isTourSelected);
+//		_actionAddTag.setEnabled(isTourSelected);
 
 		Set<TourTag> allExistingTags = null;
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -961,23 +961,23 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			final TourType tourType = firstTourItem.comparedTourData.getTourType();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 
-			if (allExistingTags != null && allExistingTags.size() > 0) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
+//			if (allExistingTags != null && allExistingTags.size() > 0) {
+//
+//				// at least one tag is within the tour
+//
+//				_actionRemoveAllTags.setEnabled(true);
+//				_actionRemoveTag.setEnabled(true);
+//			} else {
+//				// tags are not available
+//				_actionRemoveAllTags.setEnabled(false);
+//				_actionRemoveTag.setEnabled(false);
+//			}
 		} else {
 
 			// multiple tours are selected
 
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
+//			_actionRemoveTag.setEnabled(isTourSelected);
+//			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
 		// enable/disable actions for tags/tour types
@@ -1000,15 +1000,15 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+//		// tour tag actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionAddTag);
+//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+//		menuMgr.add(_actionRemoveTag);
+//		menuMgr.add(_actionRemoveAllTags);
+//		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions();
 	}

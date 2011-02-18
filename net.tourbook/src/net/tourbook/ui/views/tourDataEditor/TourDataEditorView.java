@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -46,6 +45,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourReference;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
@@ -54,9 +54,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionRemoveTourTag;
-import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -83,7 +81,6 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.util.ActionAdvancedMenu;
 import net.tourbook.util.ColumnDefinition;
 import net.tourbook.util.ColumnManager;
 import net.tourbook.util.ITourViewer;
@@ -97,7 +94,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -589,15 +585,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionSplitTour						_actionSplitTour;
 	private ActionExtractTour					_actionExtractTour;
 
-	private ActionContributionItem				_actionAddTagAutoOpen;
-	private ActionAdvancedMenu					_advMenuAddTag;
-	private ActionRemoveTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 	private ActionDeleteTourMarker				_actionDeleteTourMarker;
 
 	private ActionModifyColumns					_actionModifyColumns;
+	private TagMenuManager						_tagMenuMgr;
 
 	private Section								_sectionTitle;
 	private Section								_sectionDateTime;
@@ -1896,12 +1888,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						updateUIFromModel(_tourData, false, true);
 					}
 
-				} else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
-						|| property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
-
-					_advMenuAddTag.setAutoOpen(
-							_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
-							_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+//				} else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
+//						|| property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
+//
+//					_advMenuAddTag.setAutoOpen(
+//							_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
+//							_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
 				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
@@ -2165,21 +2157,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSplitTour = new ActionSplitTour(this);
 		_actionExtractTour = new ActionExtractTour(this);
 
-		_actionRemoveTag = new ActionRemoveTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
-
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
 		_actionModifyColumns = new ActionModifyColumns(this);
-	}
 
-	private void createActionsBeforeUI() {
-
-		_actionAddTagAutoOpen = new ActionContributionItem(new ActionSetTourTag(this, true, false, true));
-		_actionAddTagAutoOpen.setId(ICommandIds.ACTION_ADD_TAG);
-		_advMenuAddTag = new ActionAdvancedMenu(_actionAddTagAutoOpen);
+		_tagMenuMgr = new TagMenuManager(this, false);
 	}
 
 	private void createFieldListener() {
@@ -2513,17 +2497,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				final boolean isTagInTour = _tourData.getTourTags().size() > 0;
+				final Set<TourTag> tourTags = _tourData.getTourTags();
+				final boolean isTagInTour = tourTags.size() > 0;
 
-				// enable actions
-				((ActionSetTourTag) _actionAddTagAutoOpen.getAction()).setEnabled(true);
-				_actionRemoveTag.setEnabled(isTagInTour);
-				_actionRemoveAllTags.setEnabled(isTagInTour);
-
-				// set menu items
-				menuMgr.add(_actionAddTagAutoOpen);
-				menuMgr.add(_actionRemoveTag);
-				menuMgr.add(_actionRemoveAllTags);
+				_tagMenuMgr.fillTagMenu(menuMgr);
+				_tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
 			}
 		});
 
@@ -2532,20 +2510,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
 		tagContextMenu.addMenuListener(new MenuAdapter() {
 			@Override
-			public void menuShown(final MenuEvent e) {
-				_advMenuAddTag.onContextMenuShow(e);
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowTagMenu(menuEvent, _linkTag);
 			}
 		});
-
-		_advMenuAddTag.setActionContextMenu(_linkTag, tagContextMenu);
 
 		_linkTag.setMenu(tagContextMenu);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
-
-//		_display = parent.getDisplay();
 
 		updateInternalUnitValues();
 
@@ -2560,19 +2534,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// must be set before the UI is created
 		createFieldListener();
-		createActionsBeforeUI();
 
 		createUI(parent);
 		createMenus();
+		createActions();
+
+		fillToolbar();
 
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
 		addTourSaveListener();
-
-		createActions();
-		fillToolbar();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -5958,9 +5931,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				Messages.TourEditor_Action_SetStartDistanceTo0,
 				UI.UNIT_LABEL_DISTANCE));
 
-		_advMenuAddTag.setAutoOpen(
-				_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
-				_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+//		_advMenuAddTag.setAutoOpen(
+//				_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
+//				_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
 		// expand/collapse sections
 		_sectionCharacteristics.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_CHARACTERISTICS, true));

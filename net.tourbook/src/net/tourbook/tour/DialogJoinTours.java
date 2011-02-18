@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,6 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
@@ -158,10 +155,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 																								.shortDateTime();
 	private final DateTimeFormatter				_dtFormatterFull						= DateTimeFormat.fullDateTime();
 
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+//	private ActionAddTourTag					_actionAddTag;
+//	private ActionRemoveTourTag					_actionRemoveTag;
+//	private ActionRemoveAllTags					_actionRemoveAllTags;
+//	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
 	private TourData							_joinedTourData;
@@ -285,13 +282,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 	private void createActions() {
 
-		_actionAddTag = new ActionSetTourTag(this, true, false);
-		_actionRemoveTag = new ActionSetTourTag(this, false, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+//		_actionAddTag = new ActionAddTourTag(this, false);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, false);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
+//
+//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+//				Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
@@ -338,20 +335,20 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
 				final boolean isTagInTour = joinedTourTags != null && joinedTourTags.size() > 0;
 
-				// enable actions
-				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
-				_actionRemoveTag.setEnabled(isTagInTour);
-				_actionRemoveAllTags.setEnabled(isTagInTour);
-
-				// set menu items
-				menuMgr.add(_actionAddTag);
-				menuMgr.add(_actionRemoveTag);
-				menuMgr.add(_actionRemoveAllTags);
-
-				TagManager.fillMenuRecentTags(menuMgr, DialogJoinTours.this, true, false);
-
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTagPrefs);
+//				// enable actions
+//				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
+//				_actionRemoveTag.setEnabled(isTagInTour);
+//				_actionRemoveAllTags.setEnabled(isTagInTour);
+//
+//				// set menu items
+//				menuMgr.add(_actionAddTag);
+//				menuMgr.add(_actionRemoveTag);
+//				menuMgr.add(_actionRemoveAllTags);
+//
+//				TagManager.fillMenuRecentTags(menuMgr, DialogJoinTours.this, true, false);
+//
+//				menuMgr.add(new Separator());
+//				menuMgr.add(_actionOpenTagPrefs);
 			}
 		});
 

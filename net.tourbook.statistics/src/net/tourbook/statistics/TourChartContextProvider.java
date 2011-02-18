@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,16 +28,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 
@@ -57,12 +53,11 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionOpenTour		_actionOpenTour;
 
 	private final ActionSetTourTypeMenu	_actionSetTourType;
-	private final ActionSetTourTag		_actionAddTag;
-	private final ActionSetTourTag		_actionRemoveTag;
 
-	private final ActionRemoveAllTags	_actionRemoveAllTags;
-	private final ActionOpenPrefDialog	_actionOpenTagPrefs;
-
+//	private final ActionAddTourTag		_actionAddTag;
+//	private final ActionRemoveTourTag	_actionRemoveTag;
+//	private final ActionRemoveAllTags	_actionRemoveAllTags;
+//	private final ActionOpenPrefDialog	_actionOpenTagPrefs;
 
 	public TourChartContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
@@ -74,13 +69,13 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		_actionOpenTour = new ActionOpenTour(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				net.tourbook.Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+//		_actionAddTag = new ActionAddTourTag(this, true);
+//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
+//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
+//
+//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
+//				net.tourbook.Messages.action_tag_open_tagging_structure,
+//				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	private void enableActions(final boolean isTourHovered) {
@@ -109,9 +104,9 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		_actionOpenTour.setEnabled(isTourHovered);
 
 		_actionSetTourType.setEnabled(isTourHovered && TourDatabase.getAllTourTypes().size() > 0);
-		_actionAddTag.setEnabled(isTourHovered);
-		_actionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
-		_actionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
+//		_actionAddTag.setEnabled(isTourHovered);
+//		_actionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
+//		_actionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
 
 		// enable/disable actions for tags/tour types
 		TagManager.enableRecentTagActions(isTourHovered, allExistingTags);
@@ -129,15 +124,15 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		// tour type action
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+//		// tour tag actions
+//		menuMgr.add(new Separator());
+//		menuMgr.add(_actionAddTag);
+//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
+//		menuMgr.add(_actionRemoveTag);
+//		menuMgr.add(_actionRemoveAllTags);
+//		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions(hoveredBarSerieIndex != -1);
 	}
