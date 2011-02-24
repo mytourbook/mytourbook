@@ -522,7 +522,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 
 		_tagMenuMgr.setIsAdvanceMenu();
 
-		TagMenuManager.enableRecentTagActions(_modifiedTags.keySet());
+		TagMenuManager.enableRecentTagActions(true, _modifiedTags.keySet());
 	}
 
 	@Override
@@ -627,7 +627,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 
 	@Override
 	public String toString() {
-		return "ActionAddTourTag [getText()=" + getText() + ", hashCode()=" + hashCode() + "]";
+		return "ActionAddTourTag [getText()=" + getText() + ", hashCode()=" + hashCode() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

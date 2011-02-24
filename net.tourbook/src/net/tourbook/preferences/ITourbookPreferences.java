@@ -184,6 +184,7 @@ public interface ITourbookPreferences {
 	public static final String	APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU		= "appearance.ShowTourTypeContextMenuOnMouseHovering";		//$NON-NLS-1$
 
 	public static final String	APPEARANCE_IS_TAGGING_AUTO_OPEN				= "Appearance.IsAutoOpenTagging";							//$NON-NLS-1$
+	public static final String	APPEARANCE_IS_TAGGING_ANIMATION		= "Appearance.IsTaggingAnimation";							//$NON-NLS-1$
 	public static final String	APPEARANCE_TAGGING_AUTO_OPEN_DELAY			= "Appearance.AutoOpenTaggingDelay";						//$NON-NLS-1$
 
 	/*

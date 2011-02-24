@@ -545,6 +545,8 @@ public class Messages extends NLS {
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
+
+	public static String	Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;

@@ -176,7 +176,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
+
 	private final TourDoubleClickState					_tourDoubleClickState				= new TourDoubleClickState();
+	private TagMenuManager								_tagMenuMgr;
 
 	/*
 	 * UI controls
@@ -210,7 +212,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ActionExport								_actionExportTour;
 	private ActionPrint									_actionPrintTour;
-	private TagMenuManager								_tagMenuMgr;
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -556,8 +557,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void createUI20ContextMenu() {
 
-		final Control controlMenuParent = _tourViewer.getControl();
-
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -567,8 +566,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 
+		final Control controlMenuParent = _tourViewer.getControl();
 		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
 		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
 			@Override
 			public void menuShown(final MenuEvent menuEvent) {
 				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
@@ -1637,38 +1642,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		final boolean isAddTagEnabled = isTourSelected;
-		final boolean isRemoveTagEnabled;
-
-		// remove tags
-		ArrayList<Long> existingTagIds = null;
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (isOneTour) {
-
-			// one tour is selected
-
-			existingTagIds = firstTour.getTagIds();
-			existingTourTypeId = firstTour.getTourTypeId();
-
-			if (existingTagIds != null && existingTagIds.size() > 0) {
-
-				// at least one tag is within the tour
-
-				isRemoveTagEnabled = true;
-
-			} else {
-
-				// tags are not available
-
-				isRemoveTagEnabled = false;
-			}
-		} else {
-
-			// multiple tours are selected
-
-			isRemoveTagEnabled = isTourSelected;
-		}
-
 		_actionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
 
 		_actionExpandSelection.setEnabled(firstElement == null ? false : //
@@ -1677,9 +1650,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
-		// enable/disable actions for tags/tour types
-		_tagMenuMgr.enableTagActions(isAddTagEnabled, isRemoveTagEnabled, existingTagIds);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
+
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
+				? firstTour.getTourTypeId()
+				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
 	private void fillActionBars() {
@@ -1716,12 +1691,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 
+		_tagMenuMgr.fillTagMenu(menuMgr);
+
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
 		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
-
-		_tagMenuMgr.fillTagMenu(menuMgr);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionCollapseOthers);

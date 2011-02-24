@@ -31,6 +31,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -53,6 +55,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -987,7 +990,21 @@ public class ChartComponentGraph extends Canvas {
 			}
 		});
 
-		setMenu(menuMgr.createContextMenu(this));
+		final Menu contextMenu = menuMgr.createContextMenu(this);
+
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_chart.onHideContextMenu(e, ChartComponentGraph.this);
+			}
+
+			@Override
+			public void menuShown(final MenuEvent e) {
+				_chart.onShowContextMenu(e, ChartComponentGraph.this);
+			}
+		});
+
+		setMenu(contextMenu);
 	}
 
 	/**
@@ -3644,7 +3661,10 @@ public class ChartComponentGraph extends Canvas {
 
 	private void draw999ErrorMessage(final GC gc) {
 
-		gc.drawText(_chartComponents.errorMessage, 0, 10);
+		final String errorMessage = _chartComponents.errorMessage;
+		if (errorMessage != null) {
+			gc.drawText(errorMessage, 0, 10);
+		}
 	}
 
 	/**

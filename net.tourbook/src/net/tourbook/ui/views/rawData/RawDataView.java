@@ -41,7 +41,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -106,11 +106,14 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -179,6 +182,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean								_isToolTipInTitle;
 	private boolean								_isToolTipInTags;
 
+	private TagMenuManager						_tagMenuMgr;
 	private TourDoubleClickState				_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
@@ -218,12 +222,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionRemoveTour					_actionRemoveTour;
 	private ActionSaveTourInDatabase			_actionSaveTour;
 	private ActionSaveTourInDatabase			_actionSaveTourWithPerson;
-
-//	private ActionAddTourTag					_actionAddTag;
-//	private ActionRemoveAllTags					_actionRemoveAllTags;
-//	private ActionRemoveTourTag					_actionRemoveTag;
-//	private ActionOpenPrefDialog				_actionOpenTagPrefs;
-
 	private ActionSetTourTypeMenu				_actionSetTourType;
 
 	// import actions
@@ -749,13 +747,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 
-//		_actionAddTag = new ActionAddTourTag(this, true);
-//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
-//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-//
-//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-//				Messages.action_tag_open_tagging_structure,
-//				ITourbookPreferences.PREF_PAGE_TAGS);
+		_tagMenuMgr = new TagMenuManager(this, true);
 
 		// view toolbar
 		_actionClearView = new ActionClearView(this);
@@ -874,6 +866,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void createUI20ContextMenu() {
 
+		final Control controlMenuParent = _tourViewer.getControl();
+
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -882,8 +876,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		final Menu menu = menuMgr.createContextMenu(_tourViewer.getControl());
-		_tourViewer.getControl().setMenu(menu);
+		final Menu menu = menuMgr.createContextMenu(controlMenuParent);
+		controlMenuParent.setMenu(menu);
+
+		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+			}
+		});
+
+		// add the context menu to the table viewer
+		controlMenuParent.setMenu(contextMenu);
 
 		getSite().registerContextMenu(menuMgr, _tourViewer);
 	}
@@ -1552,7 +1562,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		}
 
-		final boolean isTourSelected = savedTours > 0;
+		final boolean isSavedTourSelected = savedTours > 0;
 		final boolean isOneSavedAndNotDeleteTour = (selectedNotDeleteTours == 1) && (savedTours == 1);
 
 		final boolean isOneSelectedNotDeleteTour = selectedNotDeleteTours == 1;
@@ -1622,44 +1632,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		_actionSetTourType.setEnabled(isTourSelected && (tourTypes.size() > 0));
+		_actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
 
 //		_actionAddTag.setEnabled(isTourSelected);
 
-		Set<TourTag> existingTags = null;
+		final ArrayList<Long> existingTagIds = new ArrayList<Long>();
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		boolean isOneTour;
 
 		if ((firstSavedTour != null) && (savedTours == 1)) {
 
 			// one tour is selected
 
-			final TourType tourType = firstSavedTour.getTourType();
+			isOneTour = true;
 
-			existingTags = firstSavedTour.getTourTags();
+			final TourType tourType = firstSavedTour.getTourType();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 
-//			if ((existingTags != null) && (existingTags.size() > 0)) {
-//
-//				// at least one tag is within the tour
-//
-//				_actionRemoveAllTags.setEnabled(true);
-//				_actionRemoveTag.setEnabled(true);
-//			} else {
-//				// tags are not available
-//				_actionRemoveAllTags.setEnabled(false);
-//				_actionRemoveTag.setEnabled(false);
-//			}
+			final Set<TourTag> existingTags = firstSavedTour.getTourTags();
+			if ((existingTags != null) && (existingTags.size() > 0)) {
+
+				// tour contains at least one tag
+				for (final TourTag tourTag : existingTags) {
+					existingTagIds.add(tourTag.getTagId());
+				}
+			}
 		} else {
 
 			// multiple tours are selected
 
-//			_actionRemoveTag.setEnabled(isTourSelected);
-//			_actionRemoveAllTags.setEnabled(isTourSelected);
+			isOneTour = false;
 		}
 
 		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected, existingTags);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+		_tagMenuMgr.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
+		TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1693,13 +1700,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionSetTourType);
 		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-//		// tour tag actions
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionAddTag);
-//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-//		menuMgr.add(_actionRemoveTag);
-//		menuMgr.add(_actionRemoveAllTags);
-//		menuMgr.add(_actionOpenTagPrefs);
+		// tour tag actions
+		_tagMenuMgr.fillTagMenu(menuMgr);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

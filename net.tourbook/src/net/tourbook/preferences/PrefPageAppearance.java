@@ -67,6 +67,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	private Spinner					_spinnerAutoOpenDelay;
 	private Label					_lblAutoTagDelay;
 	private Label					_lblAutoOpenMS;
+	private Button					_chkTaggingAnimation;
 
 	public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
@@ -180,6 +181,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				// label: ms
 				_lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
 				_lblAutoOpenMS.setText(UI.UNIT_LABEL_MS);
+
+				// check: show animation
+				_chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
+				_chkTaggingAnimation.setText(Messages.Pref_Appearance_Check_TaggingAnimation);
+				_chkTaggingAnimation.addSelectionListener(_defaultSelectionAdapter);
 			}
 		}
 	}
@@ -191,6 +198,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		_lblAutoOpenMS.setEnabled(isTagAutoOpen);
 		_lblAutoTagDelay.setEnabled(isTagAutoOpen);
 		_spinnerAutoOpenDelay.setEnabled(isTagAutoOpen);
+		_chkTaggingAnimation.setEnabled(isTagAutoOpen);
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -198,6 +206,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	}
 
 	private void initUITools(final Composite parent) {
+
 		_pc = new PixelConverter(parent);
 		_defaultSpinnerWidth = _pc.convertWidthInCharsToPixels(5);
 
@@ -245,6 +254,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 		_chkAutoOpenTagging.setSelection(_prefStore
 				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+		_chkTaggingAnimation.setSelection(_prefStore
+				.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
 		_spinnerAutoOpenDelay.setSelection(_prefStore
 				.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
@@ -299,6 +310,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES));
 
 		_chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+		_chkTaggingAnimation.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
 		_spinnerAutoOpenDelay.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
 		_chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
@@ -315,6 +327,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				_spinnerRecentTourTypes.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, _chkAutoOpenTagging.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, _chkTaggingAnimation.getSelection());
 		_prefStore.setValue(
 				ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,
 				_spinnerAutoOpenDelay.getSelection());

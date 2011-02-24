@@ -28,7 +28,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
@@ -39,6 +38,8 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * provides the fill menu methods for the chart context menu
@@ -109,7 +110,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 //		_actionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
 
 		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourHovered, allExistingTags);
+//		TagManager.enableRecentTagActions(isTourHovered, allExistingTags);
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourHovered, existingTourTypeId);
 	}
 
@@ -173,6 +174,18 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		}
 
 		return null;
+	}
+
+	@Override
+	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public boolean showOnlySliderContextMenu() {

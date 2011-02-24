@@ -30,10 +30,12 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
@@ -855,6 +857,20 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart);
 	}
 
+	void onHideContextMenu(final MenuEvent e, final Control menuParentControl) {
+		
+		if (_chartContextProvider != null) {
+			_chartContextProvider.onHideContextMenu(e, menuParentControl);
+		}
+	}
+
+	void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+
+		if (_chartContextProvider != null) {
+			_chartContextProvider.onShowContextMenu(menuEvent, menuParentControl);
+		}
+	}
+
 	/**
 	 * make the graph dirty and redraw it
 	 */
@@ -899,6 +915,16 @@ public class Chart extends ViewForm {
 		this._backgroundColor = backgroundColor;
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 *
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	/**
 	 * Set the option to move the sliders to the border when the chart is zoomed
 	 * 
@@ -916,16 +942,6 @@ public class Chart extends ViewForm {
 	public void setCanAutoZoomToSlider(final boolean canZoomToSliderOnMouseUp) {
 		_chartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 *
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	/**
 	 * set the option to scroll/not scroll the zoomed chart
@@ -977,6 +993,10 @@ public class Chart extends ViewForm {
 		this._isDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	@Override
 	public boolean setFocus() {
 
@@ -994,10 +1014,6 @@ public class Chart extends ViewForm {
 	public void setGraphAlpha(final int alphaValue) {
 		_chartComponents.getChartComponentGraph()._graphAlpha = alphaValue;
 	}
-
-//	public void setShowPartNavigation(final boolean showPartNavigation) {
-//		fShowPartNavigation = showPartNavigation;
-//	}
 
 	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
 
@@ -1211,6 +1227,10 @@ public class Chart extends ViewForm {
 			if (chartDataModel != null) {
 				String errorMessage = chartDataModel.getErrorMessage();
 				if (errorMessage == null) {
+					/*
+					 * error message is disabled because it confuses the user because it is
+					 * displayed when a graph is not displayed but another graph could be selected
+					 */
 					errorMessage = Messages.Error_Message_001_Default;
 				}
 				_chartComponents.setErrorMessage(errorMessage);

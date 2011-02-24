@@ -39,8 +39,15 @@ public class AdvancedMenuForActions {
 
 	private final ContextArmListener	_contextArmListener	= new ContextArmListener();
 
-	private long						_armActionItemTime;
-	private long						_armOtherItemTime;
+	/**
+	 * Contains time when the action menu item is hovered
+	 */
+	private long						_armItemTimeAction;
+
+	/**
+	 * Contains time when other menu items are hovered
+	 */
+	private long						_armItemTimeOther;
 
 	private ActionContributionItem		_actionContributionItem;
 
@@ -48,11 +55,18 @@ public class AdvancedMenuForActions {
 	private Point						_advMenuPosition;
 
 	private boolean						_isAdvMenuOpen		= false;
-
 	private boolean						_isAutoOpen			= false;
-	private int							_autoOpenDelay		= 500;
+	private boolean						_isAnimationEnabled	= false;
+	private boolean						_isAnimating;
 
-	private int							_armOpenCounter;
+	private int							_autoOpenDelay		= 500;
+	private final int					_animationDelay		= 50;						//180;					// this is the same time as in BusyIndicator
+	private int							_consumedAnimationTime;
+
+	private Display						_display;
+	private Runnable					_animationRunnable;
+	private MenuItem					_armMenuItem;
+	private String						_armActionText;
 
 	private class ContextArmListener implements ArmListener {
 
@@ -71,8 +85,62 @@ public class AdvancedMenuForActions {
 
 		final IAction action = actionContributionItem.getAction();
 		if (action instanceof IAdvancedMenuForActions) {
-
 			((IAdvancedMenuForActions) action).setAdvancedMenuProvider(this);
+		}
+
+		_display = Display.getCurrent();
+		_animationRunnable = new Runnable() {
+			public void run() {
+				onAnimation20Run(this);
+			}
+		};
+
+	}
+
+	private synchronized void onAnimation10Start() {
+
+		if (_isAnimating) {
+			return;
+		}
+
+		_isAnimating = true;
+
+		_consumedAnimationTime = 0;
+
+		_display.asyncExec(_animationRunnable);
+	}
+
+	private void onAnimation20Run(final Runnable runnable) {
+
+		if (_armMenuItem == null) {
+			return;
+		}
+		_consumedAnimationTime += _animationDelay;
+
+		if (_consumedAnimationTime >= _autoOpenDelay) {
+
+			_isAnimating = false;
+
+			onArmEventOpenMenu();
+
+		} else {
+
+			if (_isAnimationEnabled) {
+
+				int animationTime = _consumedAnimationTime;
+				int counter = 0;
+
+				final StringBuilder sb = new StringBuilder();
+				while (animationTime > 0) {
+					sb.append("»");
+					animationTime -= _animationDelay;
+					counter++;
+				}
+
+				_armMenuItem.setText(_armActionText + UI.SPACE + sb.toString());
+			}
+
+			_display.timerExec(_animationDelay, runnable);
 		}
 	}
 
@@ -80,61 +148,53 @@ public class AdvancedMenuForActions {
 
 		final MenuItem menuItem = (MenuItem) event.widget;
 
-		if (menuItem.isEnabled() == false || _isAutoOpen == false) {
-			_armOtherItemTime = event.time & 0xFFFFFFFFL;
-			return;
-		}
+		if (_isAutoOpen && menuItem.isEnabled()) {
 
-		final Object itemData = menuItem.getData();
-		if (itemData instanceof ActionContributionItem) {
+			final Object itemData = menuItem.getData();
+			if (itemData instanceof ActionContributionItem) {
 
-			final String itemId = ((ActionContributionItem) itemData).getId();
-			final String actionId = _actionContributionItem.getId();
+				final String itemId = ((ActionContributionItem) itemData).getId();
+				final String actionId = _actionContributionItem.getId();
 
-			if (itemId != null && itemId.equals(actionId)) {
+				if (itemId != null && itemId.equals(actionId)) {
 
-				/*
-				 * the item is hovered which is associated with the action for the advanced menu
-				 */
+					/*
+					 * the item is hovered which is associated with the action for the advanced menu
+					 */
 
-				_armActionItemTime = event.time & 0xFFFFFFFFL;
+					_armItemTimeAction = event.time & 0xFFFFFFFFL;
 
-				Display.getCurrent().timerExec(_autoOpenDelay, new Runnable() {
+					_armMenuItem = menuItem;
+					_armActionText = _actionContributionItem.getAction().getText();
 
-					private int	__armOpenCounter	= ++_armOpenCounter;
+					onAnimation10Start();
 
-					public void run() {
-
-						if (_armOpenCounter > __armOpenCounter) {
-							// another open is executed
-							return;
-						}
-
-						onArmEventRunnable();
-					}
-				});
-
-				return;
+					return;
+				}
 			}
 		}
 
-		_armOtherItemTime = event.time & 0xFFFFFFFFL;
+		restoreMenuItemText();
+
+		_armMenuItem = null;
+		_isAnimating = false;
+
+		_armItemTimeOther = event.time & 0xFFFFFFFFL;
 	}
 
-	private void onArmEventRunnable() {
+	private void onArmEventOpenMenu() {
 
+		// check if menu is already open
 		if (_isAdvMenuOpen) {
-			// action menu is already open
 			return;
 		}
 
 		// check if a hide event has occured
-		if (_armOtherItemTime >= _armActionItemTime) {
+		if (_armItemTimeOther >= _armItemTimeAction) {
 			return;
 		}
 
-		// hide menu which contains the add tag action
-
+		// hide parent menu
 		final Menu parentMenu = _menuParentControl.getMenu();
 		if (parentMenu != null && parentMenu.isDisposed() == false) {
 			parentMenu.setVisible(false);
@@ -146,6 +206,10 @@ public class AdvancedMenuForActions {
 				openAdvancedMenu();
 			}
 		});
+	}
+
+	public void onHideParentMenu() {
+		restoreMenuItemText();
 	}
 
 	/**
@@ -161,11 +225,13 @@ public class AdvancedMenuForActions {
 	public void onShowParentMenu(	final MenuEvent menuEvent,
 									final Control menuParentControl,
 									final boolean isAutoOpen,
+									final boolean isAnimationEnabled,
 									final int autoOpenDelay,
 									final Point menuPosition) {
 
 		_menuParentControl = menuParentControl;
 		_isAutoOpen = isAutoOpen;
+		_isAnimationEnabled = isAnimationEnabled;
 		_autoOpenDelay = autoOpenDelay;
 		_advMenuPosition = menuPosition;
 
@@ -192,6 +258,14 @@ public class AdvancedMenuForActions {
 			if (isArmAvailable == false) {
 				menuItem.addArmListener(_contextArmListener);
 			}
+
+			/*
+			 * it happened that the text of the menu item was not reset when the menu was opened
+			 * with a mouse click and not automatically
+			 */
+			if (_armMenuItem != null && _armMenuItem == menuItem) {
+				_armMenuItem.setText(_armActionText);
+			}
 		}
 
 		// reset data from previous menu
@@ -202,7 +276,7 @@ public class AdvancedMenuForActions {
 	}
 
 	/**
-	 * Opens the menu which is associated with this {@link AdvancedMenuForActions}
+	 * Open menu which is associated with this {@link AdvancedMenuForActions}
 	 */
 	public void openAdvancedMenu() {
 
@@ -229,6 +303,7 @@ public class AdvancedMenuForActions {
 					public void menuShown(final MenuEvent e) {
 
 						_isAdvMenuOpen = true;
+						_isAnimating = false;
 
 						final IAction action = _actionContributionItem.getAction();
 						if (action instanceof IAdvancedMenuForActions) {
@@ -240,6 +315,13 @@ public class AdvancedMenuForActions {
 				actionMenu.setLocation(_advMenuPosition.x, _advMenuPosition.y);
 				actionMenu.setVisible(true);
 			}
+		}
+	}
+
+	private void restoreMenuItemText() {
+
+		if (_armMenuItem != null) {
+			_armMenuItem.setText(_armActionText);
 		}
 	}
 

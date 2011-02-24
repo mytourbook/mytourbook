@@ -26,7 +26,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -37,6 +36,8 @@ import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * Chart context provider for the tour viewer (which is currently the TourEditor)
@@ -129,7 +130,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionEditTour.setEnabled(isDataAvailable);
 
 		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isDataAvailable, allExistingTags);
+//		TagManager.enableRecentTagActions(isDataAvailable, allExistingTags);
 		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
 	}
 
@@ -211,6 +212,18 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		tourList.add(_tourEditor.getTourData());
 
 		return tourList;
+	}
+
+	@Override
+	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public boolean showOnlySliderContextMenu() {

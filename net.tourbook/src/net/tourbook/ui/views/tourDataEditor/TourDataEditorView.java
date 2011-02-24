@@ -2511,6 +2511,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
 		tagContextMenu.addMenuListener(new MenuAdapter() {
 			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
 			public void menuShown(final MenuEvent menuEvent) {
 
 				final Rectangle rect = _linkTag.getBounds();
@@ -5513,7 +5518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							MESSAGE_KEY_ANOTHER_SELECTION,
 							NLS.bind(Messages.tour_editor_message_show_another_tour, getTourTitle()),
 							null,
-							IMessageProvider.WARNING);
+							IMessageProvider.ERROR);
 
 					_isInfoInTitle = true;
 				}
