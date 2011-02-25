@@ -132,7 +132,7 @@ public class AdvancedMenuForActions {
 
 				final StringBuilder sb = new StringBuilder();
 				while (animationTime > 0) {
-					sb.append("»");
+					sb.append(Messages.Advanced_Menu_AnimationSymbol);
 					animationTime -= _animationDelay;
 					counter++;
 				}

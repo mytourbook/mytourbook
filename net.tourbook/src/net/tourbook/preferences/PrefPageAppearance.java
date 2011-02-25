@@ -166,6 +166,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				// label: delay
 				_lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
 				_lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
+				_lblAutoTagDelay.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
 
 				// spinner
 				_spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);

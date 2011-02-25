@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -38,6 +39,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Chart context provider for the tour viewer (which is currently the TourEditor)
@@ -57,11 +59,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionCreateMarker				_actionCreateMarkerRight;
 
 	private ActionSetTourTypeMenu			_actionSetTourType;
-
-//	private ActionAddTourTag				_actionAddTag;
-//	private ActionRemoveTourTag				_actionRemoveTag;
-//	private ActionRemoveAllTags				_actionRemoveAllTags;
-//	private ActionOpenPrefDialog			_actionOpenTagPrefs;
+	private TagMenuManager					_tagMenuMgr;
 
 	private ChartXSlider					_leftSlider;
 	private ChartXSlider					_rightSlider;
@@ -102,12 +100,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
-//		_actionAddTag = new ActionAddTourTag(this, true);
-//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
-//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-//				Messages.action_tag_open_tagging_structure,
-//				ITourbookPreferences.PREF_PAGE_TAGS);
+		_tagMenuMgr = new TagMenuManager(this, true);
 	}
 
 	/**
@@ -117,8 +110,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		final TourData tourData = _tourEditor.getTourData();
 		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
-
-		final Set<TourTag> allExistingTags = isDataAvailable ? tourData.getTourTags() : null;
+		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
 
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		if (tourData != null) {
@@ -129,8 +121,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionQuickEdit.setEnabled(isDataAvailable);
 		_actionEditTour.setEnabled(isDataAvailable);
 
-		// enable/disable actions for tags/tour types
-//		TagManager.enableRecentTagActions(isDataAvailable, allExistingTags);
+		_tagMenuMgr.enableTagActions(//
+				isDataAvailable,
+				isDataAvailable && tourTags.size() > 0,
+				tourTags);
+
 		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
 	}
 
@@ -148,18 +143,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionAdjustAltitude);
 
+		// tour tag actions
+		_tagMenuMgr.fillTagMenu(menuMgr);
+
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
 		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
-
-//		// tour tag actions
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionAddTag);
-//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-//		menuMgr.add(_actionRemoveTag);
-//		menuMgr.add(_actionRemoveAllTags);
-//		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions();
 	}
@@ -191,7 +181,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 			_actionCreateRefTour.setEnabled(canCreateRefTours);
 
 		}
-
 	}
 
 	public Chart getChart() {
@@ -216,14 +205,16 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 	@Override
 	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
-		
+		_tagMenuMgr.onHideMenu();
 	}
 
 	@Override
 	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
 
+		_tagMenuMgr.onShowMenu(//
+				menuEvent,
+				menuParentControl,
+				Display.getCurrent().getCursorLocation());
 	}
 
 	public boolean showOnlySliderContextMenu() {

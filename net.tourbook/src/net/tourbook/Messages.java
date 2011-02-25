@@ -199,7 +199,6 @@ public class Messages extends NLS {
 	public static String		App_Dlg_first_startup_title;
 
 	public static String		App_Label_ISO8601;
-
 	public static String		App_Label_NA;
 
 	public static String		App_Title;
@@ -272,7 +271,6 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_EndPlace;
 	public static String		Db_Field_TourData_StartPlace;
 	public static String		Db_Field_TourData_Title;
-
 	public static String		Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
 
@@ -476,8 +474,8 @@ public class Messages extends NLS {
 	public static String		Image__weather_rain;
 	public static String		Image__weather_snow;
 	public static String		Image__Weather_ScatteredShowers;
-
 	public static String		Image__Weather_Severe;
+
 	public static String		image__merge_tours;
 
 	public static String		import_data_action_adjust_imported_year;
@@ -545,8 +543,7 @@ public class Messages extends NLS {
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
 	public static String		Pref_Appearance_Check_AutoOpenTagging;
-
-	public static String	Pref_Appearance_Check_TaggingAnimation;
+	public static String		Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;

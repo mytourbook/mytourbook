@@ -19,25 +19,18 @@
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 
@@ -53,13 +46,6 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionEditTour		_actionEditTour;
 	private final ActionOpenTour		_actionOpenTour;
 
-	private final ActionSetTourTypeMenu	_actionSetTourType;
-
-//	private final ActionAddTourTag		_actionAddTag;
-//	private final ActionRemoveTourTag	_actionRemoveTag;
-//	private final ActionRemoveAllTags	_actionRemoveAllTags;
-//	private final ActionOpenPrefDialog	_actionOpenTagPrefs;
-
 	public TourChartContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
 		_chart = chart;
@@ -68,50 +54,13 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionEditTour = new ActionEditTour(this);
 		_actionOpenTour = new ActionOpenTour(this);
-
-		_actionSetTourType = new ActionSetTourTypeMenu(this);
-//		_actionAddTag = new ActionAddTourTag(this, true);
-//		_actionRemoveTag = new ActionRemoveTourTag(this, true);
-//		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-//
-//		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-//				net.tourbook.Messages.action_tag_open_tagging_structure,
-//				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	private void enableActions(final boolean isTourHovered) {
 
-		boolean isTagAvailable = false;
-		Set<TourTag> allExistingTags = null;
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-		final Long selectedTourId = _barSelectionProvider.getSelectedTourId();
-		if (selectedTourId != null) {
-
-			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
-
-			if (tourData != null) {
-
-				allExistingTags = tourData.getTourTags();
-				isTagAvailable = allExistingTags.size() > 0;
-
-				final TourType tourType = tourData.getTourType();
-				existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-			}
-		}
-
 		_actionEditQuick.setEnabled(isTourHovered);
 		_actionEditTour.setEnabled(isTourHovered);
 		_actionOpenTour.setEnabled(isTourHovered);
-
-		_actionSetTourType.setEnabled(isTourHovered && TourDatabase.getAllTourTypes().size() > 0);
-//		_actionAddTag.setEnabled(isTourHovered);
-//		_actionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
-//		_actionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
-
-		// enable/disable actions for tags/tour types
-//		TagManager.enableRecentTagActions(isTourHovered, allExistingTags);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourHovered, existingTourTypeId);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -121,19 +70,6 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		menuMgr.add(_actionEditQuick);
 		menuMgr.add(_actionEditTour);
 		menuMgr.add(_actionOpenTour);
-
-		// tour type action
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
-
-//		// tour tag actions
-//		menuMgr.add(new Separator());
-//		menuMgr.add(_actionAddTag);
-//		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-//		menuMgr.add(_actionRemoveTag);
-//		menuMgr.add(_actionRemoveAllTags);
-//		menuMgr.add(_actionOpenTagPrefs);
 
 		enableActions(hoveredBarSerieIndex != -1);
 	}
@@ -177,16 +113,10 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	}
 
 	@Override
-	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {}
 
 	@Override
-	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {}
 
 	public boolean showOnlySliderContextMenu() {
 		return false;
