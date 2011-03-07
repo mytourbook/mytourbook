@@ -674,7 +674,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * Only time slices are reimported.
+	 * Only time slices will be reimported.
 	 * 
 	 * @param importFile
 	 * @param importedTours
@@ -684,9 +684,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 										final HashMap<Long, TourData> importedTours,
 										final TourData oldTourData) {
 
-		final long tourId = oldTourData.getTourId();
-
-		final TourData reimportedTour = importedTours.get(tourId);
+		final long oldTourId = oldTourData.getTourId();
+		final TourData reimportedTour = importedTours.get(oldTourId);
 
 		/*
 		 * data series must have the same number of time slices, otherwise the markers can be off
@@ -715,6 +714,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		oldTourData.pulseSerie = reimportedTour.pulseSerie;
 		oldTourData.temperatureSerie = reimportedTour.temperatureSerie;
 		oldTourData.timeSerie = reimportedTour.timeSerie;
+
+		oldTourData.setCalories(reimportedTour.getCalories());
 
 		oldTourData.clearComputedSeries();
 

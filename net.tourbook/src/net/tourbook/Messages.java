@@ -546,6 +546,8 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Check_TaggingAnimation;
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
+
+	public static String	Pref_Appearance_Label_NoOSXSupport;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
 	public static String		Pref_Appearance_ShowTourTypeContextMenu;

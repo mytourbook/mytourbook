@@ -276,6 +276,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 	}
 
 	private void createDefaultAction(final TagMenuManager tagMenuMgr) {
+
 		_tagMenuMgr = tagMenuMgr;
 
 		_actionAddTagTitle = new Action(Messages.Action_Tag_Add_AutoOpen_Title) {};

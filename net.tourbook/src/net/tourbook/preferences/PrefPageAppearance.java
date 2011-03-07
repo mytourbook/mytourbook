@@ -44,6 +44,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 	public static final String		ID			= "net.tourbook.preferences.PrefPageAppearance";	//$NON-NLS-1$
 
+	private final boolean			_isOSX		= net.tourbook.util.UI.IS_OSX;
+	private final boolean			_isLinux	= net.tourbook.util.UI.IS_LINUX;
+
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private boolean					_isModified	= false;
@@ -51,7 +54,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	/*
 	 * UI tools
 	 */
-	private int						_defaultSpinnerWidth;
+	private int						_hintDefaultSpinnerWidth;
 	private PixelConverter			_pc;
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
@@ -104,7 +107,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			// spinner
 			_spinnerRecentTourTypes = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinnerRecentTourTypes);
 			_spinnerRecentTourTypes.setToolTipText(Messages.Pref_Appearance_NumberOfRecent_TourTypes_Tooltip);
@@ -123,7 +126,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			// spinner
 			_spinnerRecentTags = new Spinner(container, SWT.BORDER);
 			GridDataFactory.fillDefaults()//
-					.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinnerRecentTags);
 			_spinnerRecentTags.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
@@ -163,6 +166,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).applyTo(autoTagContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
 			{
+				if (_isOSX) {
+					// label: no OSX support
+					final Label label = new Label(autoTagContainer, SWT.WRAP);
+					GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+					label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
+				}
+
 				// label: delay
 				_lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
 				_lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
@@ -171,7 +181,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 				// spinner
 				_spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.hint(_defaultSpinnerWidth, SWT.DEFAULT)
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_spinnerAutoOpenDelay);
 				_spinnerAutoOpenDelay.setMinimum(0);
@@ -194,7 +204,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 	private void enableControls() {
 
-		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
+		final boolean isTagAutoOpen = _isOSX ? false : _chkAutoOpenTagging.getSelection();
 
 		_lblAutoOpenMS.setEnabled(isTagAutoOpen);
 		_lblAutoTagDelay.setEnabled(isTagAutoOpen);
@@ -209,7 +219,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	private void initUITools(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-		_defaultSpinnerWidth = _pc.convertWidthInCharsToPixels(5);
+		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
 		_defaultSelectionAdapter = new SelectionAdapter() {
 			@Override
