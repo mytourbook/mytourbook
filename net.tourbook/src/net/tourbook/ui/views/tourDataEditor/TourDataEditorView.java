@@ -56,9 +56,6 @@ import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefHistory;
 import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -439,7 +436,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean								_isTitleModified;
 	private boolean								_isStartLocationModified;
 	private boolean								_isEndLocationModified;
-	
+
 	private boolean								_isDistManuallyModified;
 	private boolean								_isAltitudeManuallyModified;
 
@@ -2790,19 +2787,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
 			// combo: tour title with history
-			_comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_comboTitle = new Combo(container, SWT.BORDER | SWT.FLAT);
 			_comboTitle.setText(UI.EMPTY_STRING);
-			
+
 			_tk.adapt(_comboTitle, true, false);
-		
+
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_comboTitle);
-	
+
 			// fill combobox
 			String[] strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY);
 			_comboTitle.setItems(strings);
-			
+
 			_comboTitle.addKeyListener(_keyListener);
 			_comboTitle.addModifyListener(new ModifyListener() {
 				@Override
@@ -2849,13 +2846,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			 */
 			label = _tk.createLabel(container, Messages.tour_editor_label_start_location);
 			_firstColumnControls.add(label);
-			
-			_txtStartLocation = _tk.createText(container, UI.EMPTY_STRING);
-			_comboStartLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
+
+			_comboStartLocation = new Combo(container, SWT.BORDER | SWT.FLAT);
 			_comboStartLocation.setText(UI.EMPTY_STRING);
-			
+
 			_tk.adapt(_comboStartLocation, true, false);
-		
+
 			GridDataFactory
 					.fillDefaults()
 					.grab(true, false)
@@ -2865,7 +2861,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			// fill combobox
 			strings = PrefHistory.getHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY);
 			_comboStartLocation.setItems(strings);
-			
+
 			_comboStartLocation.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(final ModifyEvent e) {
@@ -2877,15 +2873,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			});
 
-
 			/*
 			 * end location
 			 */
 			label = _tk.createLabel(container, Messages.tour_editor_label_end_location);
 			_firstColumnControls.add(label);
 
-			_comboEndLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
-			_txtEndLocation = _tk.createText(container, UI.EMPTY_STRING);
+			_comboEndLocation = new Combo(container, SWT.BORDER | SWT.FLAT);
 			_comboEndLocation.setText(UI.EMPTY_STRING);
 
 			_tk.adapt(_comboEndLocation, true, false);
@@ -3545,27 +3539,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			/*
-			 * tour type
-			 */
-			_linkTourType = new Link(container, SWT.NONE);
-			_linkTourType.setText(Messages.tour_editor_label_tour_type);
-			_linkTourType.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.util.UI.openControlMenu(_linkTourType);
-				}
-			});
-			_tk.adapt(_linkTourType, true, true);
-			_firstColumnControls.add(_linkTourType);
-
-			_lblTourType = new CLabel(container, SWT.NONE);
-			GridDataFactory.swtDefaults()//
-					.grab(true, false)
-					.span(3, 1)
-					.applyTo(_lblTourType);
-//			_lblTourType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-			/*
 			 * tags
 			 */
 			_linkTag = new Link(container, SWT.NONE);
@@ -3594,6 +3567,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					.applyTo(_lblTourTags);
 //			_lblTourTags.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
+			/*
+			 * tour type
+			 */
+			_linkTourType = new Link(container, SWT.NONE);
+			_linkTourType.setText(Messages.tour_editor_label_tour_type);
+			_linkTourType.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					net.tourbook.util.UI.openControlMenu(_linkTourType);
+				}
+			});
+			_tk.adapt(_linkTourType, true, true);
+			_firstColumnControls.add(_linkTourType);
+
+			_lblTourType = new CLabel(container, SWT.NONE);
+			GridDataFactory.swtDefaults()//
+					.grab(true, false)
+					.span(3, 1)
+					.applyTo(_lblTourType);
+//			_lblTourType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		}
 	}
 
@@ -6014,6 +6007,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sectionWeather.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_WEATHER, true));
 	}
 
+	/**
+	 * saves combo history
+	 */
+	private void saveComboHistory(final String prefName, final Combo widget) {
+
+		final String text = widget.getText();
+
+		boolean ret;
+
+		ret = PrefHistory.saveHistory(prefName, text);
+		if (ret) {
+			widget.clearSelection();
+			widget.setItems(PrefHistory.getHistory(prefName));
+			widget.update();
+		}
+	}
+
 	private void saveState() {
 
 		// selected tab
@@ -6095,7 +6105,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean saveTourIntoDB() {
 
 		_isSavingInProgress = true;
-	
+
 		updateModelFromUI();
 
 		_tourData.computeAltitudeUpDown();
@@ -6109,24 +6119,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_isTourDirty = false;
 
 		_tourData = TourDatabase.saveTour(_tourData);
-		
+
 		updateMarkerMap();
-		
+
 		// save combo history
 
-		if (_isTitleModified){
+		if (_isTitleModified) {
 			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_TITLE_HISTORY, _comboTitle);
 			_isTitleModified = false;
 		}
-		if (_isStartLocationModified){
+		if (_isStartLocationModified) {
 			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_START_LOCATION_HISTORY, _comboStartLocation);
 			_isStartLocationModified = false;
 		}
-		if (_isEndLocationModified){
+		if (_isEndLocationModified) {
 			saveComboHistory(ITourbookPreferences.TOUR_EDITOR_END_LOCATION_HISTORY, _comboEndLocation);
 			_isEndLocationModified = false;
 		}
-				
+
 		setTourClean();
 
 		// notify all views which display the tour type
@@ -6360,24 +6370,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_markerMap.put(tourMarker.getSerieIndex(), tourMarker);
 		}
 	}
-	
-	/**
-	 * saves combo history
-	 */
-	private void saveComboHistory(String prefName, Combo widget) {
 
-		String text = widget.getText();
-
-		boolean ret;
-
-		ret = PrefHistory.saveHistory(prefName, text);
-		if (ret) {
-			widget.clearSelection();
-			widget.setItems(PrefHistory.getHistory(prefName));
-			widget.update();
-		}
-	}
-		
 	/**
 	 * update {@link TourData} from the UI fields
 	 */
