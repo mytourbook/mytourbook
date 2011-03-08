@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -153,6 +153,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 2).applyTo(container);
 		{
+			if (_isOSX) {
+				// label: OSX is not supported
+				final Label label = new Label(container, SWT.WRAP);
+				GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+				label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
+			}
+
 			/*
 			 * autoopen tagging
 			 */
@@ -166,12 +173,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 			GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).applyTo(autoTagContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(autoTagContainer);
 			{
-				if (_isOSX) {
-					// label: no OSX support
-					final Label label = new Label(autoTagContainer, SWT.WRAP);
-					GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
-					label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
-				}
 
 				// label: delay
 				_lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
@@ -204,14 +205,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 	private void enableControls() {
 
-		final boolean isTagAutoOpen = _isOSX ? false : _chkAutoOpenTagging.getSelection();
+		final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
+		final boolean isEnabled = _isOSX == false;
 
-		_lblAutoOpenMS.setEnabled(isTagAutoOpen);
-		_lblAutoTagDelay.setEnabled(isTagAutoOpen);
-		_spinnerAutoOpenDelay.setEnabled(isTagAutoOpen);
-		_chkTaggingAnimation.setEnabled(isTagAutoOpen);
+		_chkAutoOpenTagging.setEnabled(isEnabled);
+		_lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);
+		_lblAutoTagDelay.setEnabled(isEnabled && isTagAutoOpen);
+		_spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
+		_chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
@@ -230,6 +234,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		};
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
@@ -302,6 +307,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 					Messages.pref_appearance_showMemoryMonitor_message)) {
 
 				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						PlatformUI.getWorkbench().restart();
 					}
