@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,9 +41,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -63,7 +61,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
@@ -109,11 +106,14 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -182,6 +182,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean								_isToolTipInTitle;
 	private boolean								_isToolTipInTags;
 
+	private TagMenuManager						_tagMenuMgr;
 	private TourDoubleClickState				_tourDoubleClickState				= new TourDoubleClickState();
 
 	/*
@@ -213,18 +214,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionMergeIntoMenu					_actionMergeIntoTour;
 	private ActionMergeTour						_actionMergeTour;
 	private ActionModifyColumns					_actionModifyColumns;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenTour						_actionOpenTour;
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
 	private ActionReimportTour					_actionReimportTour;
 	private ActionReimportTourOnlyTimeSlices	_actionReimportTourTimeSlices;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
 	private ActionRemoveTour					_actionRemoveTour;
 	private ActionSaveTourInDatabase			_actionSaveTour;
 	private ActionSaveTourInDatabase			_actionSaveTourWithPerson;
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
 	private ActionSetTourTypeMenu				_actionSetTourType;
 
 	// import actions
@@ -234,6 +231,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionMergeGPXTours					_actionMergeGPXTours;
 
 	private TableViewerTourInfoToolTip			_tourInfoToolTip;
+
+	private PixelConverter						_pc;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -592,7 +591,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineAllColumns(_viewerContainer);
+					defineAllColumns();
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
@@ -675,7 +674,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * Only time slices are reimported.
+	 * Only time slices will be reimported.
 	 * 
 	 * @param importFile
 	 * @param importedTours
@@ -685,9 +684,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 										final HashMap<Long, TourData> importedTours,
 										final TourData oldTourData) {
 
-		final long tourId = oldTourData.getTourId();
-
-		final TourData reimportedTour = importedTours.get(tourId);
+		final long oldTourId = oldTourData.getTourId();
+		final TourData reimportedTour = importedTours.get(oldTourId);
 
 		/*
 		 * data series must have the same number of time slices, otherwise the markers can be off
@@ -716,6 +714,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		oldTourData.pulseSerie = reimportedTour.pulseSerie;
 		oldTourData.temperatureSerie = reimportedTour.temperatureSerie;
 		oldTourData.timeSerie = reimportedTour.timeSerie;
+
+		oldTourData.setCalories(reimportedTour.getCalories());
 
 		oldTourData.clearComputedSeries();
 
@@ -748,13 +748,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
-
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+		_tagMenuMgr = new TagMenuManager(this, true);
 
 		// view toolbar
 		_actionClearView = new ActionClearView(this);
@@ -768,38 +762,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Menu menu = menuMgr.createContextMenu(_tourViewer.getControl());
-		_tourViewer.getControl().setMenu(menu);
-
-		getSite().registerContextMenu(menuMgr, _tourViewer);
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createResources();
+		_pc = new PixelConverter(parent);
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns(parent);
+		defineAllColumns();
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-
-		createTourViewer(_viewerContainer);
+		createUI(parent);
 
 		createActions();
 		fillToolbar();
@@ -838,10 +811,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	}
 
+	private void createUI(final Composite parent) {
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI10TourViewer(_viewerContainer);
+		}
+	}
+
 	/**
 	 * @param parent
 	 */
-	private void createTourViewer(final Composite parent) {
+	private void createUI10TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -874,10 +856,47 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		createContextMenu();
-
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
+
+		createUI20ContextMenu();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI20ContextMenu() {
+
+		final Control controlMenuParent = _tourViewer.getControl();
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Menu menu = menuMgr.createContextMenu(controlMenuParent);
+		controlMenuParent.setMenu(menu);
+
+		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
+			}
+		});
+
+		// add the context menu to the table viewer
+		controlMenuParent.setMenu(contextMenu);
+
+		getSite().registerContextMenu(menuMgr, _tourViewer);
 	}
 
 	/**
@@ -886,41 +905,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * 
 	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void defineAllColumns() {
 
-		final PixelConverter pc = new PixelConverter(parent);
-
-		defineColumnDatabase(pc);
-		defineColumnDate(pc);
-		defineColumnTime(pc);
-		defineColumnTourType(pc);
-		defineColumnRecordingTime(pc);
-		defineColumnDrivingTime(pc);
-		defineColumnCalories(pc);
-		defineColumnDistance(pc);
-		defineColumnAvgSpeed(pc);
-		defineColumnAvgPace(pc);
-		defineColumnAltitudeUp(pc);
-		defineColumnAltitudeDown(pc);
-		defineColumnWeatherClouds(pc);
-		defineColumnTitle(pc);
-		defineColumnTags(pc);
-		defineColumnDeviceName(pc);
-		defineColumnDeviceProfile(pc);
-		defineColumnMarker(pc);
-		defineColumnTimeInterval(pc);
-		defineColumnImportFileName(pc);
-		defineColumnImportFilePath(pc);
+		defineColumnDatabase();
+		defineColumnDate();
+		defineColumnTime();
+		defineColumnTourType();
+		defineColumnRecordingTime();
+		defineColumnDrivingTime();
+		defineColumnCalories();
+		defineColumnDistance();
+		defineColumnAvgSpeed();
+		defineColumnAvgPace();
+		defineColumnAltitudeUp();
+		defineColumnAltitudeDown();
+		defineColumnWeatherClouds();
+		defineColumnTitle();
+		defineColumnTags();
+		defineColumnDeviceName();
+		defineColumnDeviceProfile();
+		defineColumnMarker();
+		defineColumnTimeInterval();
+		defineColumnImportFileName();
+		defineColumnImportFilePath();
 	}
 
 	/**
 	 * column: altitude down
 	 */
-	private void defineColumnAltitudeDown(final PixelConverter pc) {
+	private void defineColumnAltitudeDown() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
-				pc);
+				_pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -935,11 +953,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: altitude up
 	 */
-	private void defineColumnAltitudeUp(final PixelConverter pc) {
+	private void defineColumnAltitudeUp() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
-				pc);
+				_pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -955,9 +974,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: average pace
 	 */
-	private void defineColumnAvgPace(final PixelConverter pc) {
+	private void defineColumnAvgPace() {
 
-		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -979,9 +999,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: avg speed
 	 */
-	private void defineColumnAvgSpeed(final PixelConverter pc) {
+	private void defineColumnAvgSpeed() {
 
-		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1001,9 +1022,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: calories (cal)
 	 */
-	private void defineColumnCalories(final PixelConverter pc) {
+	private void defineColumnCalories() {
 
-		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1016,9 +1038,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: database indicator
 	 */
-	private void defineColumnDatabase(final PixelConverter pc) {
+	private void defineColumnDatabase() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1033,9 +1056,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: date
 	 */
-	private void defineColumnDate(final PixelConverter pc) {
+	private void defineColumnDate() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -1073,9 +1097,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device name
 	 */
-	private void defineColumnDeviceName(final PixelConverter pc) {
+	private void defineColumnDeviceName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
+
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -1088,17 +1113,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device profile
 	 */
-	private void defineColumnDeviceProfile(final PixelConverter pc) {
+	private void defineColumnDeviceProfile() {
 
-		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, pc);
+		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumnDistance(final PixelConverter pc) {
+	private void defineColumnDistance() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1114,12 +1140,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 	}
+
 	/**
 	 * column: driving time
 	 */
-	private void defineColumnDrivingTime(final PixelConverter pc) {
+	private void defineColumnDrivingTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1139,9 +1167,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file name
 	 */
-	private void defineColumnImportFileName(final PixelConverter pc) {
+	private void defineColumnImportFileName() {
 
-		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
+
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -1154,16 +1183,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file path
 	 */
-	private void defineColumnImportFilePath(final PixelConverter pc) {
-		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, pc);
+	private void defineColumnImportFilePath() {
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: markers
 	 */
-	private void defineColumnMarker(final PixelConverter pixelConverter) {
+	private void defineColumnMarker() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, pixelConverter);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1194,9 +1224,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: recording time
 	 */
-	private void defineColumnRecordingTime(final PixelConverter pc) {
+	private void defineColumnRecordingTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1222,9 +1253,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tags
 	 */
-	private void defineColumnTags(final PixelConverter pc) {
+	private void defineColumnTags() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1267,9 +1299,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time
 	 */
-	private void defineColumnTime(final PixelConverter pc) {
+	private void defineColumnTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -1307,17 +1340,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time interval
 	 */
-	private void defineColumnTimeInterval(final PixelConverter pc) {
+	private void defineColumnTimeInterval() {
 
-		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, pc);
+		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: tour title
 	 */
-	private void defineColumnTitle(final PixelConverter pc) {
+	private void defineColumnTitle() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1349,9 +1383,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tour type
 	 */
-	private void defineColumnTourType(final PixelConverter pc) {
+	private void defineColumnTourType() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1379,9 +1414,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: clouds
 	 */
-	private void defineColumnWeatherClouds(final PixelConverter pc) {
+	private void defineColumnWeatherClouds() {
 
-		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, pc);
+		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1527,7 +1563,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		}
 
-		final boolean isTourSelected = savedTours > 0;
+		final boolean isSavedTourSelected = savedTours > 0;
 		final boolean isOneSavedAndNotDeleteTour = (selectedNotDeleteTours == 1) && (savedTours == 1);
 
 		final boolean isOneSelectedNotDeleteTour = selectedNotDeleteTours == 1;
@@ -1597,44 +1633,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		_actionSetTourType.setEnabled(isTourSelected && (tourTypes.size() > 0));
+		_actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
 
-		_actionAddTag.setEnabled(isTourSelected);
+//		_actionAddTag.setEnabled(isTourSelected);
 
-		Set<TourTag> existingTags = null;
+		final ArrayList<Long> existingTagIds = new ArrayList<Long>();
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		boolean isOneTour;
 
 		if ((firstSavedTour != null) && (savedTours == 1)) {
 
 			// one tour is selected
 
-			final TourType tourType = firstSavedTour.getTourType();
+			isOneTour = true;
 
-			existingTags = firstSavedTour.getTourTags();
+			final TourType tourType = firstSavedTour.getTourType();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 
+			final Set<TourTag> existingTags = firstSavedTour.getTourTags();
 			if ((existingTags != null) && (existingTags.size() > 0)) {
 
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
+				// tour contains at least one tag
+				for (final TourTag tourTag : existingTags) {
+					existingTagIds.add(tourTag.getTagId());
+				}
 			}
 		} else {
 
 			// multiple tours are selected
 
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
+			isOneTour = false;
 		}
 
 		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected, existingTags);
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+		_tagMenuMgr.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
+		TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1666,15 +1699,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
 		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+		_tagMenuMgr.fillTagMenu(menuMgr);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -1859,7 +1887,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_viewerContainer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createTourViewer(_viewerContainer);
+			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			// update the viewer

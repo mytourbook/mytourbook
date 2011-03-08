@@ -45,6 +45,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourReference;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
@@ -54,6 +55,7 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.mapping.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefHistory;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
@@ -148,6 +150,8 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -156,6 +160,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -165,6 +170,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -178,6 +184,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -219,7 +227,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 																								ID + ".marker");			//$NON-NLS-1$
 
 	private final boolean						_isOSX							= net.tourbook.util.UI.IS_OSX;
-	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;			;
+	private final boolean						_isLinux						= net.tourbook.util.UI.IS_LINUX;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
 
@@ -240,6 +248,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
+
+	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";			//$NON-NLS-1$
+	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";				//$NON-NLS-1$
+	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";					//$NON-NLS-1$
+	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";				//$NON-NLS-1$
+	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";					//$NON-NLS-1$
+	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";					//$NON-NLS-1$
 
 	/**
 	 * Tour start daytime in seconds
@@ -578,15 +593,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
 	private ActionSplitTour						_actionSplitTour;
 	private ActionExtractTour					_actionExtractTour;
-	private ActionSetTourTag					_actionAddTag;
 
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 	private ActionDeleteTourMarker				_actionDeleteTourMarker;
 
 	private ActionModifyColumns					_actionModifyColumns;
+	private TagMenuManager						_tagMenuMgr;
+
+	private Section								_sectionTitle;
+	private Section								_sectionDateTime;
+	private Section								_sectionPersonal;
+	private Section								_sectionWeather;
+	private Section								_sectionCharacteristics;
+	private Section								_sectionInfo;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -2140,18 +2159,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSplitTour = new ActionSplitTour(this);
 		_actionExtractTour = new ActionExtractTour(this);
 
-		_actionAddTag = new ActionSetTourTag(this, true, false);
-		_actionRemoveTag = new ActionSetTourTag(this, false, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this, false);
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
-
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
 		_actionModifyColumns = new ActionModifyColumns(this);
+
+		_tagMenuMgr = new TagMenuManager(this, false);
 	}
 
 	private void createFieldListener() {
@@ -2485,33 +2499,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				final boolean isTagInTour = _tourData.getTourTags().size() > 0;
+				final Set<TourTag> tourTags = _tourData.getTourTags();
+				final boolean isTagInTour = tourTags.size() > 0;
 
-				// enable actions
-				_actionAddTag.setEnabled(true); // 			// !!! action enablement is overwritten
-				_actionRemoveTag.setEnabled(isTagInTour);
-				_actionRemoveAllTags.setEnabled(isTagInTour);
-
-				// set menu items
-				menuMgr.add(_actionAddTag);
-				menuMgr.add(_actionRemoveTag);
-				menuMgr.add(_actionRemoveAllTags);
-
-				TagManager.fillMenuRecentTags(menuMgr, TourDataEditorView.this, true, false);
-
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTagPrefs);
+				_tagMenuMgr.fillTagMenu(menuMgr);
+				_tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
 			}
 		});
 
 		// set menu for the tag item
-		_linkTag.setMenu(menuMgr.createContextMenu(_linkTag));
+
+		final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
+		tagContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+
+				final Rectangle rect = _linkTag.getBounds();
+				Point pt = new Point(rect.x, rect.y + rect.height);
+				pt = _linkTag.getParent().toDisplay(pt);
+
+				_tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt);
+			}
+		});
+
+		_linkTag.setMenu(tagContextMenu);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
-
-//		_display = parent.getDisplay();
 
 		updateInternalUnitValues();
 
@@ -2529,15 +2549,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		createUI(parent);
 		createMenus();
+		createActions();
+
+		fillToolbar();
 
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
 		addTourEventListener();
 		addTourSaveListener();
-
-		createActions();
-		fillToolbar();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
@@ -2549,18 +2569,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		displaySelectedTour();
 	}
 
-	private Composite createSection(final Composite parent,
+	private Section createSection(	final Composite parent,
 									final FormToolkit tk,
 									final String title,
-									final boolean isGrabVertical) {
+									final boolean isGrabVertical,
+									final boolean isExpandable) {
 
-		final Section section = tk.createSection(parent,//
-				//Section.TWISTIE |
-//				Section.SHORT_TITLE_BAR
-				Section.TITLE_BAR
-		// | Section.DESCRIPTION
-		// | Section.EXPANDED
-				);
+		final int style = isExpandable ? //
+				Section.TWISTIE //
+						| Section.TITLE_BAR
+				: Section.TITLE_BAR;
+
+		final Section section = tk.createSection(parent, style);
 
 		section.setText(title);
 		GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
@@ -2568,14 +2588,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final Composite sectionContainer = tk.createComposite(section);
 		section.setClient(sectionContainer);
 
-//		section.addExpansionListener(new ExpansionAdapter() {
-//			@Override
-//			public void expansionStateChanged(final ExpansionEvent e) {
-//				form.reflow(false);
-//			}
-//		});
+		section.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(final ExpansionEvent e) {
+				onExpandSection();
+			}
+		});
 
-		return sectionContainer;
+		return section;
 	}
 
 	/**
@@ -2760,13 +2780,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		Label label;
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_tour, true);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+		_sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour, true, true);
+		final Composite container = (Composite) _sectionTitle.getClient();
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
 			/*
 			 * title
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
+			label = _tk.createLabel(container, Messages.tour_editor_label_tour_title);
 			_firstColumnControls.add(label);
 			// combo: tour title with history
 			_comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
@@ -2797,11 +2818,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * description
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_description);
+			label = _tk.createLabel(container, Messages.tour_editor_label_description);
 			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 			_firstColumnControls.add(label);
 
-			_txtDescription = _tk.createText(section, UI.EMPTY_STRING, SWT.BORDER //
+			_txtDescription = _tk.createText(container, UI.EMPTY_STRING, SWT.BORDER //
 					| SWT.WRAP
 					| SWT.V_SCROLL
 					| SWT.H_SCROLL//
@@ -2812,6 +2833,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
 			descLines = descLines == 0 ? 5 : descLines;
 
+			// description will grab all vertical space in the tour tab
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					//
@@ -2825,10 +2847,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * start location
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_start_location);
+			label = _tk.createLabel(container, Messages.tour_editor_label_start_location);
 			_firstColumnControls.add(label);
 			
-			
+			_txtStartLocation = _tk.createText(container, UI.EMPTY_STRING);
 			_comboStartLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
 			_comboStartLocation.setText(UI.EMPTY_STRING);
 			
@@ -2859,10 +2881,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * end location
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_end_location);
+			label = _tk.createLabel(container, Messages.tour_editor_label_end_location);
 			_firstColumnControls.add(label);
 
 			_comboEndLocation = new Combo(section, SWT.BORDER | SWT.FLAT);
+			_txtEndLocation = _tk.createText(container, UI.EMPTY_STRING);
 			_comboEndLocation.setText(UI.EMPTY_STRING);
 
 			_tk.adapt(_comboEndLocation, true, false);
@@ -2893,15 +2916,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection120DateTime(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_date_time, false);
+		_sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time, false, true);
+		final Composite container = (Composite) _sectionDateTime.getClient();
 		GridLayoutFactory.fillDefaults()//
 //				.equalWidth(true)
 				.numColumns(2)
 				.spacing(20, 5)
-				.applyTo(section);
+				.applyTo(container);
 		{
-			createUISection122DateTimeCol1(section);
-			createUISection124DateTimeCol2(section);
+			createUISection122DateTimeCol1(container);
+			createUISection124DateTimeCol2(container);
 		}
 	}
 
@@ -3047,14 +3071,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection130Personal(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_personal, false);
+		_sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal, false, true);
+		final Composite container = (Composite) _sectionPersonal.getClient();
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
-				.applyTo(section);
+				.applyTo(container);
 		{
-			createUISection132PersonalCol1(section);
-			createUISection134PersonalCol2(section);
+			createUISection132PersonalCol1(container);
+			createUISection134PersonalCol2(container);
 		}
 	}
 
@@ -3130,15 +3155,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection140Weather(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_weather, false);
+		_sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
+		final Composite container = (Composite) _sectionWeather.getClient();
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
-				.applyTo(section);
+				.applyTo(container);
 		{
-			createUISection141Weather(section);
-			createUISection142Weather(section);
-			createUISection144WeatherCol1(section);
+			createUISection141Weather(container);
+			createUISection142Weather(container);
+			createUISection144WeatherCol1(container);
 		}
 	}
 
@@ -3513,38 +3539,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void createUISection150Characteristics(final Composite parent) {
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(section);
+		_sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
+		final Composite container = (Composite) _sectionCharacteristics.getClient();
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			/*
-			 * tags
-			 */
-			_linkTag = new Link(section, SWT.NONE);
-			_linkTag.setText(Messages.tour_editor_label_tour_tag);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_linkTag);
-			_linkTag.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.util.UI.openControlMenu(_linkTag);
-				}
-			});
-			_tk.adapt(_linkTag, true, true);
-			_firstColumnControls.add(_linkTag);
-
-			_lblTourTags = _tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					// hint is necessary that the width is not expanded when the text is long
-					.hint(_hintTextColumnWidth, SWT.DEFAULT)
-					.span(3, 1)
-					.applyTo(_lblTourTags);
-
 			/*
 			 * tour type
 			 */
-			_linkTourType = new Link(section, SWT.NONE);
+			_linkTourType = new Link(container, SWT.NONE);
 			_linkTourType.setText(Messages.tour_editor_label_tour_type);
 			_linkTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -3555,11 +3558,42 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.adapt(_linkTourType, true, true);
 			_firstColumnControls.add(_linkTourType);
 
-			_lblTourType = new CLabel(section, SWT.NONE);
+			_lblTourType = new CLabel(container, SWT.NONE);
 			GridDataFactory.swtDefaults()//
 					.grab(true, false)
 					.span(3, 1)
 					.applyTo(_lblTourType);
+//			_lblTourType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+			/*
+			 * tags
+			 */
+			_linkTag = new Link(container, SWT.NONE);
+			_linkTag.setText(Messages.tour_editor_label_tour_tag);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_linkTag);
+			_linkTag.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					net.tourbook.util.UI.openControlMenu(_linkTag);
+				}
+			});
+			_tk.adapt(_linkTag, true, true);
+			_firstColumnControls.add(_linkTag);
+//			_linkTag.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+			_lblTourTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					/*
+					 * hint is necessary that the width is not expanded when the text is long
+					 */
+					.hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
+					.span(3, 1)
+					.applyTo(_lblTourTags);
+//			_lblTourTags.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
 		}
 	}
 
@@ -3571,90 +3605,91 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
 
-		final Composite section = createSection(parent, _tk, Messages.tour_editor_section_info, false);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
+		_sectionInfo = createSection(parent, _tk, Messages.tour_editor_section_info, false, false);
+		final Composite container = (Composite) _sectionInfo.getClient();
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
 			/*
 			 * date/time created
 			 */
-			label = _tk.createLabel(section, Messages.Tour_Editor_Label_DateTimeCreated);
+			label = _tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeCreated);
 
-			_txtDateTimeCreated = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtDateTimeCreated = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeCreated);
 
 			/*
 			 * date/time modified
 			 */
-			label = _tk.createLabel(section, Messages.Tour_Editor_Label_DateTimeModified);
+			label = _tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeModified);
 
-			_txtDateTimeModified = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtDateTimeModified = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeModified);
 
 			/*
 			 * reference tours
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_ref_tour);
+			label = _tk.createLabel(container, Messages.tour_editor_label_ref_tour);
 			GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
-			_txtRefTour = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
+			_txtRefTour = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
 
 			/*
 			 * number of time slices
 			 */
-			_tk.createLabel(section, Messages.tour_editor_label_datapoints);
+			_tk.createLabel(container, Messages.tour_editor_label_datapoints);
 
-			_txtTimeSlicesCount = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtTimeSlicesCount = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
 
 			/*
 			 * device name
 			 */
-			_tk.createLabel(section, Messages.tour_editor_label_device_name);
+			_tk.createLabel(container, Messages.tour_editor_label_device_name);
 
-			_txtDeviceName = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtDeviceName = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
 
 			/*
 			 * device firmware version
 			 */
-			_tk.createLabel(section, Messages.Tour_Editor_Label_DeviceFirmwareVersion);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_DeviceFirmwareVersion);
 
-			_txtDeviceFirmwareVersion = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtDeviceFirmwareVersion = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceFirmwareVersion);
 
 			/*
 			 * distance sensor
 			 */
-			_tk.createLabel(section, Messages.tour_editor_label_DistanceSensor);
+			_tk.createLabel(container, Messages.tour_editor_label_DistanceSensor);
 
-			_lblDistanceSensor = _tk.createLabel(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_lblDistanceSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			_lblDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblDistanceSensor);
 
 			/*
 			 * pulse sensor
 			 */
-			_tk.createLabel(section, Messages.Tour_Editor_Label_PulseSensor);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_PulseSensor);
 
-			_lblPulseSensor = _tk.createLabel(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_lblPulseSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			_lblPulseSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblPulseSensor);
 
 			/*
 			 * power sensor
 			 */
-			_tk.createLabel(section, Messages.Tour_Editor_Label_PowerSensor);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_PowerSensor);
 
-			_lblPowerSensor = _tk.createLabel(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_lblPowerSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			_lblPowerSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblPulseSensor);
 
 			/*
 			 * import file path
 			 */
-			_tk.createLabel(section, Messages.tour_editor_label_import_file_path);
+			_tk.createLabel(container, Messages.tour_editor_label_import_file_path);
 
-			_txtImportFilePath = new ImageComboLabel(section, SWT.NONE);
+			_txtImportFilePath = new ImageComboLabel(container, SWT.NONE);
 			_tk.adapt(_txtImportFilePath);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
@@ -3668,36 +3703,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * person
 			 */
-			_tk.createLabel(section, Messages.tour_editor_label_person);
+			_tk.createLabel(container, Messages.tour_editor_label_person);
 
-			_txtPerson = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtPerson = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
 
 			/*
 			 * tour id
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_tour_id);
+			label = _tk.createLabel(container, Messages.tour_editor_label_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
 
-			_txtTourId = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
 
 			/*
 			 * merged from tour id
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_merge_from_tour_id);
+			label = _tk.createLabel(container, Messages.tour_editor_label_merge_from_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
 
-			_txtMergeFromTourId = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtMergeFromTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
 
 			/*
 			 * merged into tour id
 			 */
-			label = _tk.createLabel(section, Messages.tour_editor_label_merge_into_tour_id);
+			label = _tk.createLabel(container, Messages.tour_editor_label_merge_into_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
 
-			_txtMergeIntoTourId = _tk.createText(section, UI.EMPTY_STRING, SWT.READ_ONLY);
+			_txtMergeIntoTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
 		}
 
@@ -3725,7 +3760,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tab1Container.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				_tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				onResizeTab1();
 			}
 		});
 		{
@@ -3733,6 +3768,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().applyTo(_tourContainer);
 			_tk.adapt(_tourContainer);
 			GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
+//			_tourContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
 
 			// set content for scrolled composite
 			_tab1Container.setContent(_tourContainer);
@@ -5420,6 +5456,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	private void onExpandSection() {
+
+		onResizeTab1();
+
+//				form.reflow(false);
+	}
+
 	/**
 	 * fires a slider position for the marker viewer and select the corresponding time slice
 	 */
@@ -5457,6 +5500,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		enableActions();
 
 		fireModifyNotification();
+	}
+
+	private void onResizeTab1() {
+		_tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	private void onResizeTabInfo() {
@@ -5530,7 +5577,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							MESSAGE_KEY_ANOTHER_SELECTION,
 							NLS.bind(Messages.tour_editor_message_show_another_tour, getTourTitle()),
 							null,
-							IMessageProvider.WARNING);
+							IMessageProvider.ERROR);
 
 					_isInfoInTitle = true;
 				}
@@ -5953,6 +6000,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSetStartDistanceTo0.setText(NLS.bind(
 				Messages.TourEditor_Action_SetStartDistanceTo0,
 				UI.UNIT_LABEL_DISTANCE));
+
+//		_advMenuAddTag.setAutoOpen(
+//				_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
+//				_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+
+		// expand/collapse sections
+		_sectionCharacteristics.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_CHARACTERISTICS, true));
+		_sectionDateTime.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_DATE_TIME, true));
+		_sectionInfo.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_INFO, true));
+		_sectionPersonal.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_PERSONAL, true));
+		_sectionTitle.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_TITLE, true));
+		_sectionWeather.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_WEATHER, true));
 	}
 
 	private void saveState() {
@@ -5967,6 +6026,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// viewer state
 		_sliceColumnManager.saveState(_viewStateSlice);
 		_markerColumnManager.saveState(_viewStateMarker);
+
+		// editor state
+		_viewState.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
+		_viewState.put(STATE_SECTION_DATE_TIME, _sectionDateTime.isExpanded());
+		_viewState.put(STATE_SECTION_INFO, _sectionInfo.isExpanded());
+		_viewState.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
+		_viewState.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
+		_viewState.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
 	}
 
 	/**

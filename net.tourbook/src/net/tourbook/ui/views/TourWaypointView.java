@@ -25,19 +25,16 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -81,7 +78,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -814,25 +810,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if ((tourIds != null) && (tourIds.size() > 0)) {
 				tourId = tourIds.get(0);
-			}
-
-		} else if (selection instanceof SelectionActiveEditor) {
-
-			// check tour editor
-			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-
-			TourEditor tourEditor;
-			if (editor instanceof TourEditor) {
-
-				tourEditor = (TourEditor) editor;
-
-				// update viewer when tour data have change
-				final TourChart tourChart = tourEditor.getTourChart();
-				final TourData tourData = tourChart.getTourData();
-				if (tourData != _tourData) {
-					_tourData = tourData;
-					tourId = _tourData.getTourId();
-				}
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {

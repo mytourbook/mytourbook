@@ -69,7 +69,7 @@ public class ChartComponents extends Composite {
 
 	static final int					SLIDER_BAR_HEIGHT			= 10;
 	static final int					MARKER_BAR_HEIGHT			= 50;
-	static final int					TITLE_BAR_HEIGHT			= 15;
+	static final int					TITLE_BAR_HEIGHT			= 18;								//15;
 	static final int					MARGIN_TOP_WITH_TITLE		= 5;
 	static final int					MARGIN_TOP_WITHOUT_TITLE	= 10;
 
@@ -159,6 +159,11 @@ public class ChartComponents extends Composite {
 	private final int[]					_lastKeyDownCounter			= new int[1];
 
 	private final Calendar				_calendar					= GregorianCalendar.getInstance();
+
+	/**
+	 * this error message is displayed instead of the chart when it's not <code>null</code>
+	 */
+	String								errorMessage;
 
 	/**
 	 * Create and layout the components of the chart
@@ -571,6 +576,7 @@ public class ChartComponents extends Composite {
 
 			// set chart title
 			if (graphIndex == 1) {
+
 				drawingData.setXTitle(_chartDataModel.getTitle());
 
 				// set the chart title height and margin
@@ -602,6 +608,15 @@ public class ChartComponents extends Composite {
 
 			graphIndex++;
 		}
+
+//		if (chartDrawingData.isEmpty()) {
+//
+//			final ChartDrawingData drawingData = new ChartDrawingData(ChartDataModel.CHART_TYPE_ERROR_MESSAGE);
+//
+//			drawingData.setErrorMessage(_chartDataModel.getErrorMessage());
+//
+//			chartDrawingData.add(drawingData);
+//		}
 
 		return chartDrawingData;
 	}
@@ -991,6 +1006,7 @@ public class ChartComponents extends Composite {
 	void selectBarItem(final Event event) {
 
 		_keyDownCounter[0]++;
+
 		final int[] selectedIndex = new int[] { Chart.NO_BAR_SELECTION };
 
 		switch (event.keyCode) {
@@ -1034,6 +1050,10 @@ public class ChartComponents extends Composite {
 		}
 	}
 
+	void setErrorMessage(final String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
 	/**
 	 * @param isMarkerVisible
 	 */
@@ -1052,10 +1072,13 @@ public class ChartComponents extends Composite {
 		_chartDataModel = chartModel;
 
 		/*
-		 * when the data model is changed update the visible y-values to use the full visible area
-		 * for drawing the chart
+		 * when data model has changed, update the visible y-values to use the full visible area for
+		 * drawing the chart
 		 */
-		if (_chartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR && isShowAllData) {
+		final int chartType = _chartDataModel.getChartType();
+		if ((chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS)
+				&& isShowAllData) {
+
 			_componentGraph.updateYDataMinMaxValues();
 		}
 
@@ -1282,11 +1305,11 @@ public class ChartComponents extends Composite {
 
 		final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
 
-		int iGraph = 0;
+		int graphIndex = 0;
 
-		// loop all graphs
+		// set custom layers in the drawing data
 		for (final ChartDataYSerie yData : yDataList) {
-			_chartDrawingData.get(iGraph++).getYData().setCustomLayers(yData.getCustomLayers());
+			_chartDrawingData.get(graphIndex++).getYData().setCustomLayers(yData.getCustomLayers());
 		}
 
 		_componentGraph.updateChartLayers();

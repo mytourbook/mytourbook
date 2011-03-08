@@ -118,6 +118,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private int								_dataVersion				= -1;
 
 	private int								_lapCounter;
+	private int								_trackPointCounter;
 
 	private boolean							_isSetLapMarker				= false;
 	private boolean							_isSetLapStartTime			= false;
@@ -126,7 +127,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private long							_currentTime;
 	private String							_activitySport				= null;
-	private int								_calories;
+	private int								_tourCalories;
+	private int								_lapCalories;
 	private boolean							_isDistanceFromSensor		= false;
 	private StringBuilder					_characters					= new StringBuilder();
 
@@ -387,10 +389,11 @@ public class GarminSAXHandler extends DefaultHandler {
 			prevInvalidTime = currentInvalidTime;
 		}
 
-		StatusUtil.showStatus(NLS.bind(//
-				Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
-				_importFilePath,
-				new DateTime(_dtList.get(0).absoluteTime).toString()));
+		StatusUtil.log(//
+				NLS.bind(//
+						Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
+						_importFilePath,
+						new DateTime(_dtList.get(0).absoluteTime).toString()));
 	}
 
 	@Override
@@ -432,8 +435,11 @@ public class GarminSAXHandler extends DefaultHandler {
 		try {
 
 			if (_isInTrackpoint) {
+
 				getData_TrackPoint20End(name);
+
 			} else if (_isInCreator) {
+
 				getData_Creator20End(name);
 			}
 
@@ -459,14 +465,24 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				_isInLap = false;
 
+				if (_trackPointCounter > 0) {
+					/*
+					 * summarize calories when at least one trackpoint is available. This will fix a
+					 * bug because an invalid tcx file can contain old laps with calories but
+					 * without trackpoints
+					 */
+					_tourCalories += _lapCalories;
+				}
+
 			} else if (name.equals(TAG_CALORIES)) {
 
 				_isInCalories = false;
 
 				try {
-					/* every lab has a calorie value */
-					_calories += Integer.parseInt(_characters.toString());
+					/* every lap has a calorie value */
+					_lapCalories += Integer.parseInt(_characters.toString());
 					_characters.delete(0, _characters.length());
+
 				} catch (final NumberFormatException e) {}
 
 			} else if (name.equals(TAG_ACTIVITY)) {
@@ -537,7 +553,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		tourData.setDeviceModeName(_activitySport);
 
-		tourData.setCalories(_calories);
+		tourData.setCalories(_tourCalories);
 
 		// after all data are added, the tour id can be created
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -621,6 +637,10 @@ public class GarminSAXHandler extends DefaultHandler {
 			}
 
 			_dtList.add(_timeData);
+
+			_timeData = null;
+
+			_trackPointCounter++;
 		}
 
 		if (_isSetLapStartTime) {
@@ -839,6 +859,20 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
+	private void initializeNewLap() {
+
+		_isInLap = true;
+
+		_lapCounter++;
+		_lapCalories = 0;
+		_trackPointCounter = 0;
+
+		if (_lapCounter > 1) {
+			_isSetLapMarker = true;
+		}
+		_isSetLapStartTime = true;
+	}
+
 	private void initializeNewTour() {
 
 		_lapCounter = 0;
@@ -895,7 +929,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
 
-		//System.out.print("<" + name + ">");
+//		System.out.print("<" + name + ">\n");
 
 		if (_dataVersion > 0) {
 
@@ -919,14 +953,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					} else if (name.equals(TAG_LAP)) {
 
-						_isInLap = true;
-
-						_lapCounter++;
-
-						if (_lapCounter > 1) {
-							_isSetLapMarker = true;
-						}
-						_isSetLapStartTime = true;
+						initializeNewLap();
 					}
 
 				} else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
@@ -960,21 +987,16 @@ public class GarminSAXHandler extends DefaultHandler {
 
 							// create new time item
 							_timeData = new TimeData();
+
 						} else if (name.equals(TAG_CALORIES)) {
+
 							_isInCalories = true;
 							_characters.delete(0, _characters.length());
 						}
 
 					} else if (name.equals(TAG_LAP)) {
 
-						_isInLap = true;
-
-						_lapCounter++;
-
-						if (_lapCounter > 1) {
-							_isSetLapMarker = true;
-						}
-						_isSetLapStartTime = true;
+						initializeNewLap();
 					}
 
 				} else if (_isInCourse) {

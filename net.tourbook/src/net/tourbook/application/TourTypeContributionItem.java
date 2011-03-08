@@ -38,6 +38,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -45,8 +47,11 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
@@ -78,13 +83,19 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private MouseListener			mouseListener;
 	private MouseTrackListener		mouseTrackListener;
 
-	private boolean					_isUpdating;
+	private boolean					_isUIUpdating;
 
 	private Menu					_contextMenu;
 
 	private IPropertyChangeListener	_prefListener;
 
+	private boolean					_isContextOpening			= false;
 	private boolean					_isShowTourTypeContextMenu;
+
+	private Composite				_filterContainer;
+
+	private long					_lastOpenTime;
+	private long					_lastHideTime;
 
 	{
 		mouseWheelListener = new MouseWheelListener() {
@@ -115,7 +126,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			@Override
 			public void mouseDown(final MouseEvent e) {
 				_lnkFilterText.setFocus();
-				UI.openControlMenu(_lblFilterIcon);
+				openContextMenu();
 			}
 
 			@Override
@@ -127,11 +138,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			public void mouseEnter(final MouseEvent e) {
 				if (e.widget instanceof Control) {
 
-					((Control) e.widget).setCursor(_cursorHand);
+					final Control control = (Control) e.widget;
+					control.setCursor(_cursorHand);
 
-					if (_isShowTourTypeContextMenu && _contextMenu.isVisible() == false) {
-						UI.openControlMenu(_lblFilterIcon);
-					}
+					openContextMenuOpen(control, e);
 				}
 			}
 
@@ -139,13 +149,16 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			public void mouseExit(final MouseEvent e) {
 				if (e.widget instanceof Control) {
 
-					((Control) e.widget).setCursor(null);
+					final Control control = (Control) e.widget;
+					control.setCursor(null);
 
-					/*
-					 * this is not working because the menu gets the focus and I didn't find a
-					 * solution to hide the context menu when the mouse is moving outside of the
-					 * context menu, 5.10.2010
-					 */
+					openContextMenuHide(control, e);
+
+//					/*
+//					 * this is not working because the menu gets the focus and I didn't find a
+//					 * solution to hide the context menu when the mouse is moving outside of the
+//					 * context menu, 5.10.2010
+//					 */
 //					if (_contextMenu.isVisible()) {
 //						_contextMenu.setVisible(false);
 //					}
@@ -208,19 +221,20 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		final PixelConverter pc = new PixelConverter(parent);
 		_textWidth = pc.convertWidthInCharsToPixels(_textLengthInChar);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		container.addMouseListener(mouseListener);
-		container.addMouseTrackListener(mouseTrackListener);
-		container.addMouseWheelListener(mouseWheelListener);
-		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		_filterContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_filterContainer);
+		_filterContainer.addMouseListener(mouseListener);
+		_filterContainer.addMouseTrackListener(mouseTrackListener);
+		_filterContainer.addMouseWheelListener(mouseWheelListener);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(_filterContainer);
+//		_filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI10FilterIcon(container);
-			createUI20FilterText(container);
+			createUI10FilterIcon(_filterContainer);
+			createUI20FilterText(_filterContainer);
+			createUI30ContextMenu();
 		}
 
-		return container;
+		return _filterContainer;
 	}
 
 	private void createUI10FilterIcon(final Composite parent) {
@@ -249,7 +263,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		_lnkFilterText.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_lblFilterIcon);
+				openContextMenu();
 			}
 		});
 
@@ -272,7 +286,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				 */
 				case SWT.CR:
 				case ' ':
-					UI.openControlMenu(_lblFilterIcon);
+					openContextMenu();
 					break;
 
 				default:
@@ -283,10 +297,13 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			@Override
 			public void keyReleased(final KeyEvent e) {}
 		});
+	}
 
-		/*
-		 * create tour type filter context menu
-		 */
+	/**
+	 * create tour type filter context menu
+	 */
+	private void createUI30ContextMenu() {
+
 		final MenuManager menuMgr = new MenuManager();
 
 		menuMgr.setRemoveAllWhenShown(true);
@@ -300,6 +317,22 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		// set context menu and adjust it to the filter icon
 		_contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
+
+		_contextMenu.addMenuListener(new MenuListener() {
+
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				int a = 0;
+				a++;
+			}
+
+			@Override
+			public void menuShown(final MenuEvent e) {
+				int a = 0;
+				a++;
+			}
+		});
+
 		_lblFilterIcon.setMenu(_contextMenu);
 	}
 
@@ -315,6 +348,66 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		super.dispose();
 	}
 
+	private void openContextMenu() {
+
+		if (_contextMenu.isVisible() || _isContextOpening) {
+			return;
+		}
+
+		_isContextOpening = true;
+
+		final Rectangle rect = _lblFilterIcon.getBounds();
+		Point pt = new Point(rect.x, rect.y + rect.height);
+		pt = _lblFilterIcon.getParent().toDisplay(pt);
+
+		_contextMenu.setLocation(pt.x, pt.y);
+		_contextMenu.setVisible(true);
+
+//		/**
+//		 * Eventloop MUST be run otherwise the first click in the menu is not executed because of
+//		 * the delayed execution
+//		 */
+//		final Display display = _contextMenu.getDisplay();
+//
+//		while (!_contextMenu.isDisposed() && _contextMenu.isVisible()) {
+//			if (!display.readAndDispatch()) {
+//				display.sleep();
+//			}
+//		}
+
+		_isContextOpening = false;
+	}
+
+	private void openContextMenuHide(final Control control, final MouseEvent mouseEvent) {
+		_lastHideTime = mouseEvent.time & 0xFFFFFFFFL;
+	}
+
+	private void openContextMenuOpen(final Control control, final MouseEvent mouseEvent) {
+
+		if (_isShowTourTypeContextMenu == false || _contextMenu.isVisible() || _isContextOpening) {
+			// nothing to do
+			return;
+		}
+
+		_lastOpenTime = mouseEvent.time & 0xFFFFFFFFL;
+
+		/*
+		 * delay opening that the context is not opened when the tour type label is only hovered and
+		 * something else is selected
+		 */
+		Display.getDefault().timerExec(500, new Runnable() {
+			public void run() {
+
+				// check if a hide event has occured
+				if (_lastHideTime > _lastOpenTime) {
+					return;
+				}
+
+				openContextMenu();
+			}
+		});
+	}
+
 	private void restoreState() {
 
 		_isShowTourTypeContextMenu = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU);
@@ -323,11 +416,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	public void updateUI(final TourTypeFilter ttFilter) {
 
 		// prevent endless loops
-		if (_isUpdating) {
+		if (_isUIUpdating) {
 			return;
 		}
 
-		_isUpdating = true;
+		_isUIUpdating = true;
 		{
 			final String filterName = ttFilter.getFilterName();
 			final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _textWidth, true);
@@ -375,6 +468,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			_lnkFilterText.setToolTipText(filterTooltip);
 			_lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
 		}
-		_isUpdating = false;
+		_isUIUpdating = false;
 	}
 }

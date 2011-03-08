@@ -29,10 +29,8 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
@@ -52,7 +50,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -609,14 +606,6 @@ public class TourChartAnalyzerView extends ViewPart {
 			final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
 			if (tourChart != null) {
 				updateInfo(tourChart.getChartInfo());
-			}
-
-		} else if (selection instanceof SelectionActiveEditor) {
-
-			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-			if (editor instanceof TourEditor) {
-				final TourEditor tourEditor = (TourEditor) editor;
-				updateInfo(tourEditor.getTourChart().getChartInfo());
 			}
 		}
 	}

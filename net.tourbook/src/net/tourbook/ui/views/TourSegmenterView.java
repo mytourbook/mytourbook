@@ -35,7 +35,6 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -1940,6 +1939,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 
+				// check if view is disposed
 				if (_pageBook.isDisposed() || _isClearView) {
 					return;
 				}
@@ -1947,27 +1947,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				TourData nextTourData = null;
 				TourChart nextTourChart = null;
 
-				if (selection instanceof SelectionActiveEditor) {
-
-					final IEditorPart editorPart = ((SelectionActiveEditor) selection).getEditor();
-
-					if (editorPart instanceof TourEditor) {
-
-						final TourEditor tourEditor = (TourEditor) editorPart;
-
-						// check if editor changed
-						if (_tourChart != null && _tourChart == tourEditor.getTourChart()) {
-							return;
-						}
-
-						nextTourChart = tourEditor.getTourChart();
-						nextTourData = nextTourChart.getTourData();
-
-					} else {
-						return;
-					}
-
-				} else if (selection instanceof SelectionTourData) {
+				if (selection instanceof SelectionTourData) {
 
 					final SelectionTourData selectionTourData = (SelectionTourData) selection;
 
@@ -2228,25 +2208,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		_isDirtyDisabled = true;
-		_tourData = tourData;
+		{
+			_tourData = tourData;
 
-		_pageBook.showPage(_pageSegmenter);
+			_pageBook.showPage(_pageSegmenter);
 
-		// update tour title
-		_lblTitle.setText(TourManager.getTourTitleDetailed(_tourData));
+			// update tour title
+			_lblTitle.setText(TourManager.getTourTitleDetailed(_tourData));
 
-		// keep original dp tolerance
-		_savedDpTolerance = _dpTolerance = _tourData.getDpTolerance();
+			// keep original dp tolerance
+			_savedDpTolerance = _dpTolerance = _tourData.getDpTolerance();
 
-		// update segmenter values, the factor is defined by experimentals
-		final float factor = 1 / 2.05f;
-		final double tolerance = Math.pow(_dpTolerance * 50, factor);
+			// update segmenter values, the factor is defined by experimentals
+			final float factor = 1 / 2.05f;
+			final double tolerance = Math.pow(_dpTolerance * 50, factor);
 
-		_scaleTolerance.setSelection((int) tolerance);
-		_lblToleranceValue.setText(Integer.toString(_tourData.getDpTolerance()));
+			_scaleTolerance.setSelection((int) tolerance);
+			_lblToleranceValue.setText(Integer.toString(_tourData.getDpTolerance()));
 
-		_btnSaveTour.setEnabled(_tourData.getTourPerson() != null);
-
+			_btnSaveTour.setEnabled(_tourData.getTourPerson() != null);
+		}
 		_isDirtyDisabled = false;
 
 		updateUISegmenterSelector();

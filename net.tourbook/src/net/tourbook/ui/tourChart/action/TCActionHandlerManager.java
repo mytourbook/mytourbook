@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
@@ -43,25 +43,25 @@ import org.eclipse.ui.services.IServiceLocator;
  */
 public class TCActionHandlerManager {
 
-	private static TCActionHandlerManager		fInstance;
+	private static TCActionHandlerManager		_instance;
 
-	private ICommandService						fCommandService;
-	private IHandlerService						fHandlerService;
+	private ICommandService						_commandService;
+	private IHandlerService						_handlerService;
 
 	/**
 	 * map for all action handlers
 	 */
-	private HashMap<String, TCActionHandler>	fActionHandlers;
+	private HashMap<String, TCActionHandler>	_actionHandlers;
+
+	private TCActionHandlerManager() {}
 
 	public static TCActionHandlerManager getInstance() {
 
-		if (fInstance == null) {
-			fInstance = new TCActionHandlerManager();
+		if (_instance == null) {
+			_instance = new TCActionHandlerManager();
 		}
-		return fInstance;
+		return _instance;
 	}
-
-	private TCActionHandlerManager() {}
 
 	/**
 	 * Create all action handlers used by the tour chart
@@ -69,38 +69,39 @@ public class TCActionHandlerManager {
 	public void createActionHandlers() {
 
 		// check if the handlers are created
-		if (fActionHandlers != null) {
+		if (_actionHandlers != null) {
 			return;
 		}
 
 		final IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
-		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
+		_commandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
+		_handlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
 //		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
 
-		fActionHandlers = new HashMap<String, TCActionHandler>();
+		_actionHandlers = new HashMap<String, TCActionHandler>();
 
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TOUR_COMPARE, new ActionHandlerGraphTourCompare());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_TOUR_COMPARE, new ActionHandlerGraphTourCompare());
 
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PACE, new ActionHandlerGraphPace());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_POWER, new ActionHandlerGraphPower());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE, new ActionHandlerGraphTemperature());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_CADENCE, new ActionHandlerGraphCadence());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_PACE, new ActionHandlerGraphPace());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_POWER, new ActionHandlerGraphPower());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE, new ActionHandlerGraphTemperature());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_CADENCE, new ActionHandlerGraphCadence());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
+		_actionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
 
-		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
-		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
+		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
+		_actionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
 
-		fActionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
-		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
-		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_SRTM_DATA, new ActionHandlerShowSRTMData());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,
+		_actionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
+		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
+		_actionHandlers.put(TourChart.COMMAND_ID_SHOW_SRTM_DATA, new ActionHandlerShowSRTMData());
+		_actionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
+		_actionHandlers.put(
+				TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,
 				new ActionHandlerCanMoveSlidersWhenZoomed());
 
 		setupHandlers();
@@ -115,11 +116,11 @@ public class TCActionHandlerManager {
 	 */
 	public TCActionHandler getActionHandler(final String commandId) {
 
-		if (fActionHandlers == null) {
+		if (_actionHandlers == null) {
 			return null;
 		}
 
-		return fActionHandlers.get(commandId);
+		return _actionHandlers.get(commandId);
 	}
 
 	/**
@@ -162,9 +163,10 @@ public class TCActionHandlerManager {
 		};
 
 		// activate the handler for all tour chart actions
-		for (final TCActionHandler actionHandler : fActionHandlers.values()) {
+		for (final TCActionHandler actionHandler : _actionHandlers.values()) {
 
-			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
+			final IHandlerActivation handlerActivation = _handlerService.activateHandler(
+					actionHandler.getCommandId(),
 					actionHandler,
 					partIdExpression);
 
@@ -182,7 +184,7 @@ public class TCActionHandlerManager {
 
 		for (final TCActionProxy actionProxy : tourChart.getActionProxies().values()) {
 
-			final TCActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
+			final TCActionHandler actionHandler = _actionHandlers.get(actionProxy.getCommandId());
 
 			if (actionHandler != null) {
 				actionHandler.setTourChart(tourChart);
@@ -198,8 +200,8 @@ public class TCActionHandlerManager {
 	 * Update the UI check state for one command
 	 */
 	public void updateUICheckState(final String commandId) {
-		if (fCommandService != null) {
-			fCommandService.refreshElements(commandId, null);
+		if (_commandService != null) {
+			_commandService.refreshElements(commandId, null);
 		}
 	}
 
@@ -208,9 +210,9 @@ public class TCActionHandlerManager {
 	 */
 	public void updateUIState() {
 
-		for (final TCActionHandler actionHandler : fActionHandlers.values()) {
+		for (final TCActionHandler actionHandler : _actionHandlers.values()) {
 			actionHandler.fireHandlerChanged();
-			fCommandService.refreshElements(actionHandler.getCommandId(), null);
+			_commandService.refreshElements(actionHandler.getCommandId(), null);
 		}
 	}
 

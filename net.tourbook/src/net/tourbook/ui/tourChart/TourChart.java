@@ -1172,8 +1172,8 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Enable or disable the edit actions in the tour info tooltip, by default the edit
-	 * actions are disabled.
+	 * Enable or disable the edit actions in the tour info tooltip, by default the edit actions are
+	 * disabled.
 	 * 
 	 * @param isEnabled
 	 */
@@ -1272,7 +1272,7 @@ public class TourChart extends Chart {
 		create2ndAltiLayer();
 
 		setCustomGraphData();
-		updateChartLayers();
+		updateCustomLayers();
 	}
 
 	@Override
@@ -1283,6 +1283,18 @@ public class TourChart extends Chart {
 		if (chartDataModel == null) {
 			_tourData = null;
 			_tourChartConfig = null;
+
+			if (_actionProxies != null) {
+
+				for (final TCActionProxy actionProxy : _actionProxies.values()) {
+					actionProxy.setEnabled(false);
+				}
+
+				// update UI state for the action handlers
+				if (useActionHandlers()) {
+					_tcActionHandlerManager.updateUIState();
+				}
+			}
 		}
 	}
 
@@ -1300,7 +1312,7 @@ public class TourChart extends Chart {
 		}
 
 		setCustomGraphData();
-		updateChartLayers();
+		updateCustomLayers();
 	}
 
 	/**
@@ -1323,7 +1335,7 @@ public class TourChart extends Chart {
 		}
 
 		setCustomGraphData();
-		updateChartLayers();
+		updateCustomLayers();
 
 		/*
 		 * the chart needs to be redrawn because the alpha for filling the chart was modified
@@ -1399,16 +1411,16 @@ public class TourChart extends Chart {
 			}
 		}
 
-		// set current tour data and chart config
+		// set current tour data and chart config to new values
 		_tourData = newTourData;
 		_tourChartConfig = newChartConfig;
 
 		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
-				newTourData,
-				newChartConfig,
+				_tourData,
+				_tourChartConfig,
 				isPropertyChanged);
 
-		// set the model BEFORE the actions are created/enabled/checked
+		// set the model BEFORE actions are created/enabled/checked
 		setDataModel(newChartDataModel);
 
 		if (_isShowActions) {
@@ -1418,7 +1430,7 @@ public class TourChart extends Chart {
 		}
 
 		// restore min/max values from the chart config
-		final ChartYDataMinMaxKeeper newMinMaxKeeper = newChartConfig.getMinMaxKeeper();
+		final ChartYDataMinMaxKeeper newMinMaxKeeper = _tourChartConfig.getMinMaxKeeper();
 		final boolean isMinMaxKeeper = (newMinMaxKeeper != null) && keepMinMaxValues;
 		if (isMinMaxKeeper) {
 			newMinMaxKeeper.setMinMaxValues(newChartDataModel);

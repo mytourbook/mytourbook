@@ -441,6 +441,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private String											devicePluginName;																		// db-version 4
 
+	// ############################################# CONCONI TEST #############################################
+
+	/**
+	 * Deflection point in the conconi test, this value is the index for the data serie on the
+	 * x-axis
+	 */
+	private int												conconiDeflection;
+
 	// ############################################# UNUSED FIELDS #############################################
 
 	/**
@@ -841,6 +849,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private DateTime										_dateTimeModified;
 
 	/**
+	 * Tour start time
+	 */
+	@Transient
+	private DateTime										_dateTimeStart;
+
+	/**
 	 * Tour markers which are sorted by serie index
 	 */
 	@Transient
@@ -1034,6 +1048,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		_tourWorldPosition.clear();
 	}
 
+	/*
+	 * Set default sort method (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(final Object obj) {
 
@@ -3314,6 +3332,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return calories;
 	}
 
+	public int getConconiDeflection() {
+		return conconiDeflection;
+	}
+
 	/**
 	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
 	 *         date/time is not available
@@ -3382,14 +3404,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
-
 // NOT USED 18.8.2010
 //	public long getDeviceTravelTime() {
 //		return deviceTravelTime;
@@ -3407,6 +3421,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceDistance() {
 //		return deviceDistance;
 //	}
+
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3468,13 +3490,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return gradientSerie;
 	}
 
-	/**
-	 * @return the maxAltitude
-	 */
-	public int getMaxAltitude() {
-		return maxAltitude;
-	}
-
 // not used 5.10.2008
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -3483,6 +3498,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
 
 	/**
 	 * @return the maxPulse
@@ -3778,6 +3800,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public short getStartAltitude() {
 		return startAltitude;
+	}
+
+	/**
+	 * @return Returns date/time for the tour start
+	 */
+	public DateTime getStartDateTime() {
+
+		if (_dateTimeStart == null) {
+			_dateTimeStart = new DateTime(startYear, startMonth, startDay, startHour, startMinute, startSecond, 0);
+		}
+
+		return _dateTimeStart;
 	}
 
 	public short getStartDay() {
@@ -4429,6 +4463,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.calories = calories;
 	}
 
+	public void setConconiDeflection(final int conconiDeflection) {
+		this.conconiDeflection = conconiDeflection;
+	}
+
 	public void setDateTimeCreated(final long dateTimeCreated) {
 		this.dateTimeCreated = dateTimeCreated;
 	}
@@ -4605,6 +4643,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartDay(final short startDay) {
+		_dateTimeStart = null;
 		this.startDay = startDay;
 	}
 
@@ -4618,10 +4657,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartHour(final short startHour) {
+		_dateTimeStart = null;
 		this.startHour = startHour;
 	}
 
 	public void setStartMinute(final short startMinute) {
+		_dateTimeStart = null;
 		this.startMinute = startMinute;
 	}
 
@@ -4629,6 +4670,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Sets the month for the tour start in the range 1...12
 	 */
 	public void setStartMonth(final short startMonth) {
+		_dateTimeStart = null;
 		this.startMonth = startMonth;
 	}
 
@@ -4637,10 +4679,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public void setStartSecond(final int startSecond) {
+		_dateTimeStart = null;
 		this.startSecond = startSecond;
 	}
 
 	public void setStartYear(final short startYear) {
+		_dateTimeStart = null;
 		this.startYear = startYear;
 	}
 

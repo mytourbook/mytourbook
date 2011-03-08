@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Localize Plug-in
+Bundle-SymbolicName: org.eclipse.babel.runtime; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.babel.runtime.Activator
+Bundle-Localization: plugin
+Bundle-Vendor: Nigel Westbury
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.search,
+ org.eclipse.ui.forms
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.babel.runtime.external
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -32,18 +32,15 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.MTRectangle;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -77,7 +74,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -1328,8 +1324,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 
 			if (selection instanceof SelectionTourData
 					|| selection instanceof SelectionTourId
-					|| selection instanceof SelectionTourIds
-					|| selection instanceof SelectionActiveEditor) {
+					|| selection instanceof SelectionTourIds) {
 
 				// keep only selected tours
 				_selectionWhenHidden = selection;
@@ -1367,27 +1362,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider {
 			paintTours(tourIds);
 
 			enableActions(true);
-
-		} else if (selection instanceof SelectionActiveEditor) {
-
-			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-			if (editor instanceof TourEditor) {
-
-				final TourEditor fTourEditor = (TourEditor) editor;
-				final TourChart fTourChart = fTourEditor.getTourChart();
-				final TourData tourData = fTourChart.getTourData();
-
-				paintOneTour(tourData, false, true);
-
-				final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
-				paintTourSliders(
-						tourData,
-						chartInfo.leftSliderValuesIndex,
-						chartInfo.rightSliderValuesIndex,
-						chartInfo.selectedSliderValuesIndex);
-
-				enableActions();
-			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,9 +30,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -46,7 +44,6 @@ import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -90,6 +87,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -126,6 +125,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private final NumberFormat					_nf					= NumberFormat.getNumberInstance();
 
 	private ColumnManager						_columnManager;
+	private TagMenuManager						_tagMenuMgr;
 
 	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
 
@@ -147,10 +147,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionUncheckTours					_actionUncheckTours;
 	private ActionModifyColumns					_actionModifyColumns;
 	private ActionCollapseAll					_actionCollapseAll;
-	private ActionSetTourTag					_actionAddTag;
-	private ActionSetTourTag					_actionRemoveTag;
-	private ActionRemoveAllTags					_actionRemoveAllTags;
-	private ActionOpenPrefDialog				_actionOpenTagPrefs;
+
 	private ActionEditQuick						_actionEditQuick;
 	private ActionEditTour						_actionEditTour;
 	private ActionSetTourTypeMenu				_actionSetTourType;
@@ -408,13 +405,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_actionUncheckTours = new ActionUncheckTours(this);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionAddTag = new ActionSetTourTag(this, true);
-		_actionRemoveTag = new ActionSetTourTag(this, false);
-		_actionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+		_tagMenuMgr = new TagMenuManager(this, true);
 
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionEditTour = new ActionEditTour(this);
@@ -432,15 +424,28 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
-				TourCompareResultView.this.fillContextMenu(manager);
+				fillContextMenu(manager);
+			}
+		});
+
+		final Control controlMenuParent = _tourViewer.getControl();
+		final Menu contextMenu = menuMgr.createContextMenu(controlMenuParent);
+		contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, controlMenuParent, Display.getCurrent().getCursorLocation());
 			}
 		});
 
 		// add the context menu to the table viewer
-		final Control tourViewer = _tourViewer.getControl();
-		final Menu menu = menuMgr.createContextMenu(tourViewer);
-		tourViewer.setMenu(menu);
+		controlMenuParent.setMenu(contextMenu);
 	}
 
 	@Override
@@ -944,11 +949,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		/*
-		 * tags: add/remove/remove all
-		 */
-		_actionAddTag.setEnabled(isTourSelected);
-
+		// tags: add/remove/remove all
 		Set<TourTag> allExistingTags = null;
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
@@ -960,28 +961,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			final TourType tourType = firstTourItem.comparedTourData.getTourType();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-
-			if (allExistingTags != null && allExistingTags.size() > 0) {
-
-				// at least one tag is within the tour
-
-				_actionRemoveAllTags.setEnabled(true);
-				_actionRemoveTag.setEnabled(true);
-			} else {
-				// tags are not available
-				_actionRemoveAllTags.setEnabled(false);
-				_actionRemoveTag.setEnabled(false);
-			}
-		} else {
-
-			// multiple tours are selected
-
-			_actionRemoveTag.setEnabled(isTourSelected);
-			_actionRemoveAllTags.setEnabled(isTourSelected);
 		}
+		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, allExistingTags);
 
-		// enable/disable actions for tags/tour types
-		TagManager.enableRecentTagActions(isTourSelected, allExistingTags);
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
 	}
 
@@ -997,18 +979,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		menuMgr.add(_actionEditTour);
 		menuMgr.add(_actionOpenTour);
 
+		// tour tag actions
+		_tagMenuMgr.fillTagMenu(menuMgr);
+
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuRecentTourTypes(menuMgr, this, true);
-
-		// tour tag actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionAddTag);
-		TagManager.fillMenuRecentTags(menuMgr, this, true, true);
-		menuMgr.add(_actionRemoveTag);
-		menuMgr.add(_actionRemoveAllTags);
-		menuMgr.add(_actionOpenTagPrefs);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
 		enableActions();
 	}
