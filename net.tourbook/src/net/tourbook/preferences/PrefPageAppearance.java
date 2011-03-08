@@ -154,7 +154,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 2).applyTo(container);
 		{
 			if (_isOSX) {
-				// label: OSX is not supported
+				// label: OSX is not supported, feature is not working
 				final Label label = new Label(container, SWT.WRAP);
 				GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 				label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
